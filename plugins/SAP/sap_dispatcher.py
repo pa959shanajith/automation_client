@@ -21,6 +21,7 @@ import radio_checkbox_keywords_sap
 import saputil_operations
 import sap_table_keywords
 import sap_shell_keywords
+import sap_shell_tree_keywords
 #-------------------------------------------------------------
 import sap_constants
 import constants
@@ -38,6 +39,7 @@ class SAPDispatcher:
     saputil_keywords_obj = saputil_operations.SapUtilKeywords()
     table_keywords_obj = sap_table_keywords.Table_keywords()
     shell_keywords_obj = sap_shell_keywords.Shell_Keywords()
+    shell_tree_keywords_obj = sap_shell_tree_keywords.Shell_Tree_Keywords()
     sap_dict = {
             #------------------------------------------------------launch keywords
             'launchapplication' : launch_keywords_obj.launch_application,
@@ -136,15 +138,15 @@ class SAPDispatcher:
             'scrolltorownumber' : shell_keywords_obj.scrollToRowNumber,
             'getcellcolor' : shell_keywords_obj.getCellColor,
             #------------------------------------------------------treekeywords
-            'selecttreeelement' : shell_keywords_obj.selectTreeElement,
-            'gettreenodetext' : shell_keywords_obj.getTreeNodeText,
-            'gettreenodecount' : shell_keywords_obj.getTreeNodeCount,
-            'singleselectparentofselected' : shell_keywords_obj.singleSelectParentOfSelected,
-            'collapsetree' : shell_keywords_obj.collapseTree,
-            'getcolvaluecorrtoselectednode' : shell_keywords_obj.getColValueCorrToSelectedNode,
-            'selecttreenode' : shell_keywords_obj.selectTreeNode,
-            'getnodenamebyindex' : shell_keywords_obj.getNodeNameByIndex,
-            'verifytreepath' : shell_keywords_obj.verifyTreePath
+            'selecttreeelement' : shell_tree_keywords_obj.selectTreeElement,
+            'gettreenodetext' : shell_tree_keywords_obj.getTreeNodeText,
+            'gettreenodecount' : shell_tree_keywords_obj.getTreeNodeCount,
+            'singleselectparentofselected' : shell_tree_keywords_obj.singleSelectParentOfSelected,
+            'collapsetree' : shell_tree_keywords_obj.collapseTree,
+            'getcolvaluecorrtoselectednode' : shell_tree_keywords_obj.getColValueCorrToSelectedNode,
+            'selecttreenode' : shell_tree_keywords_obj.selectTreeNode,
+            'getnodenamebyindex' : shell_tree_keywords_obj.getNodeNameByIndex,
+            'verifytreepath' : shell_tree_keywords_obj.verifyTreePath
             }
 
     def __init__(self):
