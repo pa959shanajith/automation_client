@@ -14,7 +14,7 @@ if SYSTEM_OS != 'Darwin':
 from generic_constants import *
 from constants import *
 import logger
-
+import re
 import time
 from constants import *
 import logging
@@ -97,7 +97,7 @@ class SendFunctionKeys:
         return status,methodoutput,output_res,err_msg
 
     def execute_key(self,key,count):
-        for x in range(len([count])):
+        for x in range(count):
             robot=Robot()
             log.debug('press and release the key', key)
             robot.press_and_release(key)
@@ -133,16 +133,21 @@ class SendFunctionKeys:
 
     def get_args(self,args):
         value=1
-        if len(args)>0 :
+        print ("legnth {}".format(len(args)))
+        if len(args)>1 :
             var=args[0]
-            if var is not None or var != '':
-                import re
-                if (var.startswith('|') and var.endswith('|')) or (var.startswith('{') and var.endswith('}')):
+            if args[0] is not None or args[0] != '':
+                if (args[0].startswith('|') and args[0].endswith('|')) or (args[0].startswith('{') and args[0].endswith('}')):
                     value= 'type'
-                elif re.match(('^\d+$'),var):
-                    value=int(var)
+                elif args[-1]!='':
+                    if (re.match(('^\d+$'),args[-1]))!=False:
+                        value=int(args[-1])
+        elif len(args)==1:
+            if (args[0].startswith('|') and args[0].endswith('|')) or (args[0].startswith('{') and args[0].endswith('}')):
+                    value= 'type'
+            else:
+                value=value
         return value
-
 
 
 
