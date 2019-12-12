@@ -84,7 +84,10 @@ class Scrape:
                         custname = elem.__getattr__("Name") + "_tab"
                         tag = type
                     elif ( type == "GuiShell" ):
-                        if (elem.SubType == 'Tree'):
+                        Subtype = None
+                        try : Subtype = elem.SubType
+                        except : log.debug('Shell does not have a subtype')
+                        if ( Subtype and Subtype == 'Tree'):
                             custname = elem.__getattr__("Name") + "_tree"
                             tag = "tree"
                         else:
@@ -235,7 +238,10 @@ class Scrape:
                                 custname = elem.__getattr__("Name") + "_tab"
                                 tag = type
                             elif ( type == "GuiShell" ):
-                                if (elem.SubType == 'Tree'):
+                                Subtype = None
+                                try : Subtype = elem.SubType
+                                except : log.debug('Shell does not have a subtype')
+                                if ( Subtype and Subtype == 'Tree'):
                                     custname = elem.__getattr__("Name") + "_tree"
                                     tag = "tree"
                                 else:
