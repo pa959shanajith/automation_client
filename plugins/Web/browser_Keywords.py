@@ -400,6 +400,21 @@ class BrowserKeywords():
             err_msg=self.__web_driver_exception(e)
         return status,result,output,err_msg
 
+    def navigate_back(self, webelement, url, *args):
+        """performs a back operation"""
+        global local_bk
+        status=webconstants.TEST_RESULT_FAIL
+        result=webconstants.TEST_RESULT_FALSE
+        output=OUTPUT_CONSTANT
+        err_msg=None
+        try:
+            local_bk.driver_obj.execute_script("window.history.go(-1)")
+            status=webconstants.TEST_RESULT_PASS
+            result=webconstants.TEST_RESULT_TRUE
+        except Exception as e:
+            err_msg=self.__web_driver_exception(e)
+        return status,result,output,err_msg
+
     def getPageTitle(self,*args):
         global local_bk
         status=webconstants.TEST_RESULT_FAIL

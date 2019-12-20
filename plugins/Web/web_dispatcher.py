@@ -168,7 +168,9 @@ class Dispatcher:
             'verifytextexists':local_Wd.statict_text_object.verify_text_exists,
             'verifypagetitle':local_Wd.browser_object.verify_page_title,
             'clearcache':local_Wd.browser_object.clear_cache,
-            'navigatewithauthenticate':local_Wd.browser_object.navigate_with_authenticate
+            'navigatewithauthenticate':local_Wd.browser_object.navigate_with_authenticate,
+            'navigateback':local_Wd.browser_object.navigate_back
+
         }
         self.exception_flag=''
         self.action=None
