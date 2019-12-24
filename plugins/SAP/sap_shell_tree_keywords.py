@@ -442,10 +442,15 @@ class Shell_Tree_Keywords():
                             if ( check ):
                                 elem.SelectItem(node, item_id)
                                 if ( isDoubleClick ):
-                                    if elem.GetItemType(node, item_id) == 5:
+                                    elem.DoubleClickItem(node, item_id)
+                                else:
+                                    if elem.GetItemType(node, item_id) == 3: #checkbox type
+                                        elem.ChangeCheckbox(node, item_id, True)
+                                    elif elem.GetItemType(node, item_id) == 4: #button type
+                                        elem.PressButton(node, item_id)
+                                    elif elem.GetItemType(node, item_id) == 5: #link type
                                         elem.clickLink(node, item_id)
-                                    else:
-                                        elem.DoubleClickItem(node, item_id)
+
                             else:
                                 err_msg = 'Invalid item'
                                 log.debug( err_msg )
