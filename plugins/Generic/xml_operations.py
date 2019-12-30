@@ -53,7 +53,7 @@ class XMLOperations():
                 
         except Exception as e:
             log.debug(e)
-            return None
+            return input_string
         return input_string
 
     def build_dict(self,json_obj):
