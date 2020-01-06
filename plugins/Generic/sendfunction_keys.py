@@ -133,9 +133,9 @@ class SendFunctionKeys:
 
     def get_args(self,args):
         value=1
-        print ("legnth {}".format(len(args)))
+        #print ("legnth {}".format(len(args)))
         if len(args)>1 :
-            var=args[0]
+            #var=args[0]
             if args[0] is not None or args[0] != '':
                 if (args[0].startswith('|') and args[0].endswith('|')) or (args[0].startswith('{') and args[0].endswith('}')):
                     value= 'type'
