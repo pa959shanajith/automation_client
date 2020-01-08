@@ -1062,7 +1062,7 @@ class Singleton_DriverUtil():
         elif(browser_num == '6'):
             try:
                 driver = webdriver.Safari()
-                driver.set_window_size(1024, 768)
+                driver.maximize_window()
                 drivermap.append(driver)
 
                 logger.print_on_console('Safari browser started')

@@ -143,15 +143,12 @@ class FileOperations:
             inputpath=inputpath.strip()
             info_msg=generic_constants.INPUT_IS+inputpath
             log.info(info_msg)
-##            logger.print_on_console(info_msg)
             if inputpath!= None and inputpath!='':
                 if file_name!= None and file_name!='':
-##                    logger.print_on_console(' and File name is:'+file_name)
                     log.info(' and File name is:'+file_name)
-                    inputpath=inputpath+'\\'+file_name
+                    inputpath=inputpath+os.sep+file_name
                 if os.path.isfile(inputpath):
                     log.debug(generic_constants.FILE_EXISTS)
-##                    logger.print_on_console(generic_constants.FILE_EXISTS)
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
                 else:

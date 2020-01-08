@@ -9,6 +9,7 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 import logger
+import os
 from utils_web import Utils
 from utilweb_operations import UtilWebKeywords
 from button_link_keyword import ButtonLinkKeyword
@@ -381,7 +382,7 @@ class ElementKeywords:
         try:
             filepath = inputs[0]
             filename = inputs[1]
-            inputfile = filepath + '\\' + filename
+            inputfile = filepath + os.sep + filename
             if webelement is not None:
                 local_eo.log.info('Recieved web element from the web dispatcher')
                 local_eo.log.debug(webelement)

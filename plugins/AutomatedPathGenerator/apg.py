@@ -32,7 +32,7 @@ class AutomatedPathGenerator:
 
     '''function to open zip file'''
     def open_zip(self, zip_file, java_version):
-        fstart = zip_file.rfind("/")
+        fstart = zip_file.rfind(os.sep)
         fend = zip_file.rfind(".")
         fname = zip_file[fstart:fend]
         try:

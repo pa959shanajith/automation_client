@@ -493,8 +493,33 @@ class UtilWebKeywords:
                         webelement = cellChild
                         break
             if webelement is not None:
-                location=webelement.location
-                if SYSTEM_OS != 'Darwin':
+                if SYSTEM_OS == 'Darwin':
+                    obj = Utils()
+                    if isinstance(browser_Keywords.driver_obj, webdriver.Firefox):
+                        javascript = "return window.mozInnerScreenY"
+                        value = browser_Keywords.driver_obj.execute_script(javascript)
+                        logger.print_on_console(value)
+                        offset = int(value)
+                        location = webelement.location
+                        obj.mouse_move(int(location.get('x') + 18), int(location.get('y') + offset + 18))
+                        log.debug('hover performed')
+                        status = TEST_RESULT_PASS
+                        methodoutput = TEST_RESULT_TRUE
+                    elif isinstance(browser_Keywords.driver_obj, webdriver.Safari):
+                        location = obj.get_element_location(webelement)
+                        obj.mouse_move(int(location.get('x') + 9), int(location.get('y') + 70))
+                    else:
+                        location = obj.get_element_location(webelement)
+                        obj.enumwindows()
+                        obj.mouse_move(int(location.get('x')) + 9, int(location.get('y') + 150))
+                        ##clickinfo = browser_Keywords.driver_obj.execute_script(webconstants.CLICK_JAVASCRIPT,webelement)
+                        # hover = webdriver.ActionChains(browser_Keywords.driver_obj).move_to_element(webelement)
+                        # hover.perform()
+                        log.info('Hover operation performed')
+                        status = TEST_RESULT_PASS
+                        methodoutput = TEST_RESULT_TRUE
+                else:
+                    location=webelement.location
                     if isinstance(browser_Keywords.local_bk.driver_obj,webdriver.Firefox):
                         javascript = "return window.mozInnerScreenY"
                         value=browser_Keywords.local_bk.driver_obj.execute_script(javascript)
@@ -513,19 +538,8 @@ class UtilWebKeywords:
                         robot=pyrobot.Robot()
                         obj.mouse_move(int(location.get('x'))+9,int(location.get('y')+rect[1]+6))
                         local_uo.log.debug('hover performed')
-                if SYSTEM_OS == 'Darwin':
-                    try:
-                        ##clickinfo = browser_Keywords.local_bk.driver_obj.execute_script(webconstants.CLICK_JAVASCRIPT,webelement)
-                        hover = webdriver.ActionChains(browser_Keywords.local_bk.driver_obj).move_to_element(webelement)
-                        hover.perform()
-                        local_uo.log.info('Hover operation performed')
-                        status = TEST_RESULT_PASS
-                        methodoutput = TEST_RESULT_TRUE
-                    except Exception as e:
-                        local_uo.log.error(e)
-                        logger.print_on_console("Cannot perform mouseHover operation.")
-                status=TEST_RESULT_PASS
-                methodoutput=TEST_RESULT_TRUE
+                        status=TEST_RESULT_PASS
+                        methodoutput=TEST_RESULT_TRUE
         except Exception as e:
             local_uo.log.error(e)
             err_msg=self.__web_driver_exception(e)
