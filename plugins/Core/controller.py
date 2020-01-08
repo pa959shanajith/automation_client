@@ -350,7 +350,7 @@ class Controller():
                         logger.print_on_console('Step Execution start time is : '+start_time_string)
                         log.info('Step Execution start time is : '+start_time_string)
                         index,result = self.keywordinvocation(index,inpval,self.reporting_obj,*args)
-                        if tsp.name=='verifyValues' or tsp.name.lower()=='verifytextiris':
+                        if tsp.name.lower()=='verifytextiris':
                             #testcase_details_orig=tsp.testcase_details
                             testcase_details=tsp.testcase_details
                             if testcase_details=='':
@@ -491,7 +491,8 @@ class Controller():
                 if self.core_utilsobject.getdatasize(display_keyword_response[1],'mb') < 10:
                     from bs4 import BeautifulSoup
                     if 'soap:Envelope' in display_keyword_response[1]:
-                        root = BeautifulSoup(display_keyword_response[1][2:-1], "xml").prettify()
+                        #root = BeautifulSoup(display_keyword_response[1][2:-1], "xml").prettify()
+                        root = BeautifulSoup(display_keyword_response[1], "xml").prettify()
                         respBody = root.replace("\n",' ')
                         logger.print_on_console('Response Body: \n',respBody,'\n')
                     else:
@@ -535,12 +536,11 @@ class Controller():
                         elif result:
                             logger.print_on_console('Result obtained is: ',result[1])
                     else:
-                        logger.print_on_console('Result obtained is ',",".join([str(display_keyword_response[local_cont.i])
+                        if (tsp.apptype.lower()!='desktop') : logger.print_on_console('Result obtained is ',",".join([str(display_keyword_response[local_cont.i])
                         if not isinstance(display_keyword_response[local_cont.i],str) else display_keyword_response[local_cont.i] for local_cont.i in range(len(display_keyword_response))]))
             else:
                 logger.print_on_console('Result obtained exceeds max. Limit, please use writeToFile keyword.')
-        log.info('Result obtained is: ')
-        log.info(display_keyword_response)
+        log.info('Result obtained is: '+str(display_keyword_response))
         if tsp.apptype.lower()=='desktop' or tsp.apptype.lower()=='sap' or tsp.apptype.lower()=='desktopjava' or (tsp.cord!='' and tsp.cord!=None):
             if result[2]!='9cc33d6fe25973868b30f4439f09901a' and tsp.name.lower()!='verifytextiris':
                 logger.print_on_console('Result obtained is: ',result[2])

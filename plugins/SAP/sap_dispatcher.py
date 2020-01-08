@@ -21,6 +21,7 @@ import radio_checkbox_keywords_sap
 import saputil_operations
 import sap_table_keywords
 import sap_shell_keywords
+import sap_shell_tree_keywords
 #-------------------------------------------------------------
 import sap_constants
 import constants
@@ -38,6 +39,7 @@ class SAPDispatcher:
     saputil_keywords_obj = saputil_operations.SapUtilKeywords()
     table_keywords_obj = sap_table_keywords.Table_keywords()
     shell_keywords_obj = sap_shell_keywords.Shell_Keywords()
+    shell_tree_keywords_obj = sap_shell_tree_keywords.Shell_Tree_Keywords()
     sap_dict = {
             #------------------------------------------------------launch keywords
             'launchapplication' : launch_keywords_obj.launch_application,
@@ -46,8 +48,10 @@ class SAPDispatcher:
             'starttransaction' : launch_keywords_obj.startTransaction,
             'serverconnect' : launch_keywords_obj.serverConnect,
             'getpopuptext' : launch_keywords_obj.getPopUpText,
-            'geterrormessage' : launch_keywords_obj.getErrorMessage,
+            'getstatusbarmessage' : launch_keywords_obj.getStatusBarMessage,
             'toolbaraction' : launch_keywords_obj.toolbar_actions,
+            'selectmenu': launch_keywords_obj.selectMenu,
+            'doubleclickstatusbar': launch_keywords_obj.doubleClickStatusBar,
             #------------------------------------------------------textbox keywords
             'settext' : editable_text_obj.setText,
             'setsecuretext' : editable_text_obj.setSecureText,
@@ -134,15 +138,15 @@ class SAPDispatcher:
             'scrolltorownumber' : shell_keywords_obj.scrollToRowNumber,
             'getcellcolor' : shell_keywords_obj.getCellColor,
             #------------------------------------------------------treekeywords
-            'selecttreeelement' : shell_keywords_obj.selectTreeElement,
-            'gettreenodetext' : shell_keywords_obj.getTreeNodeText,
-            'gettreenodecount' : shell_keywords_obj.getTreeNodeCount,
-            'singleselectparentofselected' : shell_keywords_obj.singleSelectParentOfSelected,
-            'collapsetree' : shell_keywords_obj.collapseTree,
-            'getcolvaluecorrtoselectednode' : shell_keywords_obj.getColValueCorrToSelectedNode,
-            'selecttreenode' : shell_keywords_obj.selectTreeNode,
-            'getnodenamebyindex' : shell_keywords_obj.getNodeNameByIndex,
-            'verifytreepath' : shell_keywords_obj.verifyTreePath
+            'selecttreeelement' : shell_tree_keywords_obj.selectTreeElement,
+            'gettreenodetext' : shell_tree_keywords_obj.getTreeNodeText,
+            'gettreenodecount' : shell_tree_keywords_obj.getTreeNodeCount,
+            'singleselectparentofselected' : shell_tree_keywords_obj.singleSelectParentOfSelected,
+            'collapsetree' : shell_tree_keywords_obj.collapseTree,
+            'getcolvaluecorrtoselectednode' : shell_tree_keywords_obj.getColValueCorrToSelectedNode,
+            'selecttreenode' : shell_tree_keywords_obj.selectTreeNode,
+            'getnodenamebyindex' : shell_tree_keywords_obj.getNodeNameByIndex,
+            'verifytreepath' : shell_tree_keywords_obj.verifyTreePath
             }
 
     def __init__(self):
@@ -204,6 +208,8 @@ class SAPDispatcher:
                 import iris_operations
                 iris_object = iris_operations.IRISKeywords()
                 self.sap_dict['clickiris'] = iris_object.clickiris
+                self.sap_dict['doubleclickiris'] = iris_object.doubleclickiris
+                self.sap_dict['rightclickiris'] = iris_object.rightclickiris
                 self.sap_dict['settextiris'] = iris_object.settextiris
                 self.sap_dict['gettextiris'] = iris_object.gettextiris
                 self.sap_dict['getrowcountiris'] = iris_object.getrowcountiris
@@ -214,7 +220,7 @@ class SAPDispatcher:
 
             keyword = keyword.lower()
             if ( keyword in list(self.sap_dict.keys()) ):
-                if ( keyword == 'serverconnect' or keyword == 'launchapplication' or keyword == 'starttransaction' or keyword == 'toolbaraction' ):
+                if ( keyword == 'serverconnect' or keyword == 'launchapplication' or keyword == 'starttransaction' or keyword == 'toolbaraction' or keyword == 'selectmenu'):
                     result= self.sap_dict[keyword](input, output)
                 else:
                     if ( teststepproperty.cord != None and teststepproperty.cord != '' ):

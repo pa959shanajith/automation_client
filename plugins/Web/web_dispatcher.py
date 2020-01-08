@@ -168,7 +168,9 @@ class Dispatcher:
             'verifytextexists':local_Wd.statict_text_object.verify_text_exists,
             'verifypagetitle':local_Wd.browser_object.verify_page_title,
             'clearcache':local_Wd.browser_object.clear_cache,
-            'navigatewithauthenticate':local_Wd.browser_object.navigate_with_authenticate
+            'navigatewithauthenticate':local_Wd.browser_object.navigate_with_authenticate,
+            'navigateback':local_Wd.browser_object.navigate_back
+
         }
         self.exception_flag=''
         self.action=None
@@ -215,7 +217,7 @@ class Dispatcher:
 
                     }
         custom_dict_element={'element':['getobjectcount','getobject','clickelement','doubleclick','rightclick','getelementtext','verifyelementtext','drag', 'drop','gettooltiptext','verifytooltiptext','verifyexists', 'verifydoesnotexists', 'verifyhidden','verifyvisible', 'switchtotab','switchtowindow','setfocus','sendfunctionkeys',
-                                        'tab','waitforelementvisible','mousehover','savefile','press','verifyenabled','verifydisabled','verifyreadonly','getattributevalue','verifyattribute']}
+                                        'tab','waitforelementvisible','mousehover','savefile','press','verifyenabled','verifydisabled','verifyreadonly','getattributevalue','verifyattribute','getrowcount','getcolumncount','getcellvalue','verifycellvalue','getcelltooltip','verifycelltooltip','cellclick','getrownumbytext','getcolnumbytext','getinnertable','selectbyabsolutevalue']}
 
         result=[TEST_RESULT_FAIL,TEST_RESULT_FALSE,OUTPUT_CONSTANT,err_msg]
 
@@ -223,6 +225,8 @@ class Dispatcher:
             import iris_operations
             iris_object = iris_operations.IRISKeywords()
             self.web_dict['clickiris'] = iris_object.clickiris
+            self.web_dict['doubleclickiris'] = iris_object.doubleclickiris
+            self.web_dict['rightclickiris'] = iris_object.rightclickiris
             self.web_dict['settextiris'] = iris_object.settextiris
             self.web_dict['gettextiris'] = iris_object.gettextiris
             self.web_dict['getrowcountiris'] = iris_object.getrowcountiris
@@ -655,7 +659,7 @@ class Dispatcher:
                 err_msg=WEB_ELEMENT_NOT_FOUND
                 logger.print_on_console(err_msg)
                 local_Wd.log.error(err_msg)
-                configvalues = readconfig.configvalues
+        configvalues = readconfig.configvalues
         if((webElement==None or webElement== '') and configvalues['extn_enabled'].lower() == 'yes' and self.action=='debug' and isinstance(driver, webdriver.Chrome)):
             try:
                 flag=True
@@ -663,7 +667,7 @@ class Dispatcher:
                 import pause_display_operation
                 from itertools import combinations
                 o = pause_display_operation.PauseAndDisplay()
-                inputs={'stepnum':stepnum,'custname':custname} 
+                inputs={'stepnum':stepnum,'custname':custname}
                 o.debug_object(inputs,self.wxObject,self.thread,driver)
                 attributes=driver.execute_script("return JSON.parse(window.localStorage.attributes)")
                 new_ele_type=driver.execute_script("return window.localStorage.element").lower()

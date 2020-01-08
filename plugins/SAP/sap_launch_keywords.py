@@ -75,8 +75,7 @@ class Launch_Keywords():
             logger.print_on_console( sap_constants.NO_INSTANCE_OPEN_ERROR )
         return ses, wnd
 
-    def getErrorMessage(self, *args):
-        #time.sleep(2)
+    def getStatusBarMessage(self, *args):
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
         err_msg = None
@@ -88,20 +87,54 @@ class Launch_Keywords():
                 sbarId = wndId + '/sbar'
                 sbar = ses.FindById(sbarId)
                 value = sbar.FindByName("pane[0]", "GuiStatusPane").text
-                if value == '' or value == None:
-                    err_msg = "Empty text in error message"
-                status = sap_constants.TEST_RESULT_PASS
-                result = sap_constants.TEST_RESULT_TRUE
+                if ( value == '' or value == None ):
+                    err_msg = "No message displayed in status bar"
+                else:
+                    msgdict = {'S':'Success','W':'Warning','E':'Error','A':'Abort','I':'Information'}#msgdict is a dictionary containing sbar message types, map appropriate value to given key
+                    if ( str(sbar.MessageType) in msgdict ):
+                        value = msgdict[str(sbar.MessageType)] +' : '+ value
+                    else:
+                        log.info( 'Unable to map message type' )
+                    status = sap_constants.TEST_RESULT_PASS
+                    result = sap_constants.TEST_RESULT_TRUE
             else:
                 err_msg = sap_constants.SESSION_AND_WINDOW_ERROR
             #-----------------------------------logging
             if ( err_msg ):
                 log.info( err_msg )
-                log.print_on_console ( err_msg )
+                logger.print_on_console( err_msg )
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
             log.error( err_msg )
-            logger.print_on_console( "Error occured in getErrorMessage" )
+            logger.print_on_console( "Error occured in getStatusBarMessage" )
+        return status, result, value, err_msg
+
+    def doubleClickStatusBar(self, *args):
+        status = sap_constants.TEST_RESULT_FAIL
+        result = sap_constants.TEST_RESULT_FALSE
+        err_msg = None
+        value = OUTPUT_CONSTANT
+        try:
+            ses, wnd = self.getSessWindow()
+            if ( ses and wnd ):
+                wndId =  wnd.__getattr__('id')
+                sbarId = wndId + '/sbar'
+                if ( ses.FindById(sbarId).FindByName("pane[0]", "GuiStatusPane").text != '' or None ):
+                    ses.FindById(sbarId).DoubleClick()
+                    status = sap_constants.TEST_RESULT_PASS
+                    result = sap_constants.TEST_RESULT_TRUE
+                else:
+                    err_msg = "No message, unable to perform DoubleClick on status bar"
+            else:
+                err_msg = sap_constants.SESSION_AND_WINDOW_ERROR
+            #-----------------------------------logging
+            if ( err_msg ):
+                log.info( err_msg )
+                logger.print_on_console ( err_msg )
+        except Exception as e:
+            err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
+            log.error( err_msg )
+            logger.print_on_console( "Error occured in doubleClickStatusBar" )
         return status, result, value, err_msg
 
     def startTransaction(self, input_val, *args):
@@ -121,7 +154,7 @@ class Launch_Keywords():
             #-----------------------------------logging
             if ( err_msg ):
                 log.info( err_msg )
-                log.print_on_console ( err_msg )
+                logger.print_on_console ( err_msg )
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
             log.error( err_msg )
@@ -178,11 +211,64 @@ class Launch_Keywords():
             #-----------------------------------logging
             if ( err_msg ):
                 log.info( err_msg)
-                log.print_on_console ( err_msg )
+                logger.print_on_console ( err_msg )
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
             log.error( err_msg )
             logger.print_on_console( "Error occured in ToolbarActions" )
+        return status,result,value,err_msg
+
+    def selectMenu(self, input_val, *args):
+        status = sap_constants.TEST_RESULT_FAIL
+        result = sap_constants.TEST_RESULT_FALSE
+        err_msg = None
+        value = OUTPUT_CONSTANT
+        flag=False
+        try:
+            ses, wnd = self.getSessWindow()
+            if ( ses and wnd ):
+                wndId =  wnd.__getattr__('id')
+                mbar_action = wndId +'/mbar'
+                mbar = ses.FindById(mbar_action) #get the window id from getSessWindow and append /mbar
+                global index,flag1,flag2
+                index = 0
+                flag1 = flag2 =  False
+                def menuSelector(fobj):
+                    global index,flag1,flag2
+                    try:
+                        for i in list(fobj.Children):
+                            if( i.Name != input_val[index] ):
+                                flag1 = False
+                            elif( i.Name == input_val[index] ):
+                                log.debug("Selecting menu item : ",i.Name)
+                                i.Select()
+                                flag1 = True
+                                index = index + 1
+                                if ( index < len(input_val) ):
+                                    menuSelector(i)
+                                else:
+                                    flag2 = True
+                                    break
+                            if( flag2 ):
+                                break
+                    except Exception as e:
+                        err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
+                menuSelector(mbar)
+                if ( flag1 == True and flag2 == True ):
+                    status = sap_constants.TEST_RESULT_PASS
+                    result = sap_constants.TEST_RESULT_TRUE
+                elif( flag1 != False ):
+                    err_msg = "Unable to find the menu item"
+            else:
+                err_msg = sap_constants.SESSION_AND_WINDOW_ERROR
+            #-----------------------------------logging
+            if ( err_msg ):
+                log.info( err_msg)
+                logger.print_on_console ( err_msg )
+        except Exception as e:
+            err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
+            log.error( err_msg )
+            logger.print_on_console( "Error occured in SelectMenu" )
         return status,result,value,err_msg
 
     def launch_application(self, input_val, *args):

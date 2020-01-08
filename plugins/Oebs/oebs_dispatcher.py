@@ -197,6 +197,8 @@ class OebsDispatcher:
                 import iris_operations
                 iris_object = iris_operations.IRISKeywords()
                 dict['clickiris'] = iris_object.clickiris
+                dict['doubleclickiris'] = iris_object.doubleclickiris
+                dict['rightclickiris'] = iris_object.rightclickiris
                 dict['settextiris'] = iris_object.settextiris
                 dict['gettextiris'] = iris_object.gettextiris
                 dict['getrowcountiris'] = iris_object.getrowcountiris
@@ -204,7 +206,7 @@ class OebsDispatcher:
                 dict['getcellvalueiris'] = iris_object.getcellvalueiris
                 dict['verifyexistsiris'] = iris_object.verifyexistsiris
                 dict['verifytextiris'] = iris_object.verifytextiris
-                
+
             keyword=keyword.lower()
             if keyword in list(dict.keys()):
                 if(tsp.cord != '' and tsp.cord != None):

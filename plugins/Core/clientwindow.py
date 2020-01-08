@@ -1543,6 +1543,7 @@ class Config_window(wx.Frame):
             "Disp_var":[(225,158),(140, 28),(360,158), (85,-1)],
             "S_cert":[(12,188),(85, 28),(100,188),(310,-1),(415,188),(30, -1)],
             "C_Timeout" :[(12,218),(120, 28),(130,218), (80,-1)],
+            "Delay_Stringinput":[(225,218),(140, 28),(360,218), (85,-1)],
             "Ignore_cert":[(12,248)],
             "IE_arch":[(150,248)],
             "Dis_s_cert":[(290,248)],
@@ -1659,6 +1660,14 @@ class Config_window(wx.Frame):
             self.delay.SetValue(isConfigJson['delay'])
         else:
             self.delay.SetValue("0.3")
+
+        #Delay input box kept for provide the delay in typestring.
+        self.Delay_input=wx.StaticText(self.panel, label="Delay for StringInput", pos=config_fields["Delay_Stringinput"][0],size=config_fields["Delay_Stringinput"][1], style=0, name="")
+        self.Delay_input=wx.TextCtrl(self.panel, pos=config_fields["Delay_Stringinput"][2], size=config_fields["Delay_Stringinput"][3])
+        if isConfigJson!=False:
+            self.Delay_input.SetValue(isConfigJson['delay_stringinput'])
+        else:
+            self.Delay_input.SetValue("0.005")
 
         self.stepExecWait=wx.StaticText(self.panel, label="Step Execution Wait", pos=config_fields["Step_exec"][0],size=config_fields["Step_exec"][1], style=0, name="")
         self.step_exe_wait=wx.TextCtrl(self.panel, pos=config_fields["Step_exec"][2], size=config_fields["Step_exec"][3])
@@ -1843,6 +1852,7 @@ class Config_window(wx.Frame):
         conn_timeout = self.conn_timeout.GetValue()
         extn_enabled = self.rbox13.GetStringSelection()
         update_check = self.rbox14.GetStringSelection()
+        delay_string_in = self.Delay_input.GetValue()
         #----------------creating data dictionary
         data['server_ip'] = server_add.strip()
         data['server_port'] = server_port.strip()
@@ -1870,6 +1880,7 @@ class Config_window(wx.Frame):
         data['connection_timeout']= conn_timeout.strip()
         data['extn_enabled']= extn_enabled.strip()
         data['update_check']= update_check.strip()
+        data['delay_stringinput']=delay_string_in.strip()
         config_data=data
         if data['server_ip']!='' and data['server_port']!='' and data['server_cert']!='' and data['chrome_path']!='' and data['queryTimeOut']!='' and data['logFile_Path']!='' and data['delay']!='' and data['timeOut']!='' and data['stepExecutionWait']!='' and data['displayVariableTimeOut']!='' and data['firefox_path']!='' and  data['connection_timeout']>='':
             #---------------------------------------resetting the static texts
