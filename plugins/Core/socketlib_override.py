@@ -13,15 +13,31 @@
 import json
 import time
 import logging
-import socketIO_client
+#from io import StringIO
 from uuid import uuid4 as uuid
+from threading import Timer
+import socketIO_client
 from socketIO_client.exceptions import *
 from socketIO_client.transports import *
 
 CHUNK_MAX_LIMIT = 15*1024*1024 # 15 MB
-CHUNK_SIZE = 10*1024*1024 # 10 MB
+CHUNK_SIZE = 15*1024*1024 # 10 MB
+PACKET_TIMEOUT = 10 # Seconds
+VERIFY_HOSTNAME = False
+PAGINATE_INDEX = "p@gIn8"
+pckts = {}
 
 __all__ = ['SocketIO','BaseNamespace']
+
+
+##import requests
+##def http_adapter_init_poolmanager(self, connections, maxsize, block=requests.adapters.DEFAULT_POOLBLOCK, **pool_kwargs):
+##    self._pool_connections = connections
+##    self._pool_maxsize = maxsize
+##    self._pool_block = block
+##    self.poolmanager = requests.adapters.PoolManager(num_pools=connections, maxsize=maxsize,
+##        block=block, strict=True, assert_hostname=VERIFY_HOSTNAME, **pool_kwargs)
+##requests.adapters.HTTPAdapter.init_poolmanager = http_adapter_init_poolmanager
 
 """ Override SocketIO library's _warn method used for logging.
     This is needed because this library doesn't gives anything to stdout or stderr
@@ -139,7 +155,7 @@ def socketIO_WS_init(self, http_session, is_secure, url, engineIO_session=None):
             kw['http_proxy_auth'] = (
                 proxy_url_pack.username, proxy_url_pack.password)
     if http_session.verify:
-        kw['sslopt'] = {'cert_reqs': ssl.CERT_REQUIRED, 'ca_certs': http_session.verify, 'check_hostname': False}  ## New Change
+        kw['sslopt'] = {'cert_reqs': ssl.CERT_REQUIRED, 'ca_certs': http_session.verify, 'check_hostname': VERIFY_HOSTNAME}  ## New Change
         if http_session.cert:  # Specify certificate path on disk
             if isinstance(http_session.cert, six.string_types):
                 kw['ca_certs'] = http_session.cert
@@ -151,6 +167,25 @@ def socketIO_WS_init(self, http_session, is_secure, url, engineIO_session=None):
         self._connection = create_connection(ws_url, **kw)
     except Exception as e:
         raise ConnectionError(e)
+
+""" Override SocketIO library's transports.get_response method used for processing
+    XHR-polling response. This is needed because this library doesn't handle NGINX 504 Error.
+"""
+def socketIO_get_response(request, *args, **kw):
+    try:
+        response = request(*args, stream=True, **kw)
+    except requests.exceptions.Timeout as e:
+        raise TimeoutError(e)
+    except requests.exceptions.ConnectionError as e:
+        raise ConnectionError(e)
+    except requests.exceptions.SSLError as e:
+        raise ConnectionError('could not negotiate SSL (%s)' % e)
+    status_code = response.status_code
+    if 200 != status_code:
+        if status_code == 504 and "Nineteen68 Error" in response.text: raise ValueError("Nineteen68 Server Unavailable")
+        raise ConnectionError('unexpected status code (%s %s)' % (
+            status_code, response.text))
+    return response
 
 """ Override SocketIO library's wait method used for creating a blocking connection.
     This is needed because this library doesn't handle empty packages.
@@ -188,61 +223,96 @@ def socketIO_wait(self, seconds=None, **kw):
     #self._transport.set_timeout()
 
 """ Add a ACK_EVENT listener in SocketIO library's socketIO_client.BaseNamespace class
-    This is needed to free up memory consumed by stored packet.
+    This is needed to free up memory consumed by stored packet, send next packet in queue.
 """
 def socketIO_on_data_ack(self, pack_id, *args):
-    self._io.emitting = False
-    if (pack_id in self._io.evdata): del self._io.evdata[pack_id]
+    if (self._io.activeTimer != None and self._io.activeTimer.isAlive()):
+        self._io.activeTimer.cancel()
+    idx = pack_id.split('_')
+    idx = idx[1] if len(idx) == 2 else ""
+    print("Ack'd "+str(pack_id))
+    if idx == "eof": return None # EOF ACK packets always emit one more ACK. So ignore current one
+    if len(args) > 0 and args[0] == "paginate_fail":
+        pckt = pckts[pack_id.split('_')[0]][PAGINATE_INDEX]  ####### get someid
+        self._io.send_pckt(pckt[0], *pckt[1], **pckt[2])
+    else:
+        # delete packets from $db
+        if pack_id in pckts: del pckts[pack_id]
+        if len(pckts) > 0:
+            pckt = pckts[list(pckts.keys())[0]]  ####### get someid
+            if type(pckt) == dict:
+                try:
+                    if idx == "": idx = PAGINATE_INDEX
+                    elif idx == PAGINATE_INDEX: idx = 1
+                    else: idx = int(idx) + 1
+                    if (idx + 1) == len(pckt): idx = "eof"
+                    pckt = pckt[str(idx)]  ####### get someid
+                except:
+                    print(list(pckts.keys()))
+                    print(list(pckt.keys()))
+                    print(pack_id, idx)
+            self._io.send_pckt(pckt[0], *pckt[1], **pckt[2])
 
-
-""" Add a NACK_EVENT listener in SocketIO library's socketIO_client.BaseNamespace class
-    This is needed to resend lost chunks of stored packet.
-"""
-def socketIO_on_data_nack(self, pack_id, indexes, *args):
-    packet = self._io.evdata[pack_id]
-    ev = packet['e']
-    kw = packet['kw']
-    if indexes == "all": indexes = range(1,packet['b']+1)
-    for i in indexes:
-        self._io.emit(ev, packet['d'][i], enable_loop=False,**kw)
-    return self._io.emit(ev, pack_id+";eof", enable_loop=False, **kw)
+def socketIO_save_pckt(self, pack_id, event, *fargs, **fkw):
+    fargs = (pack_id,) + fargs
+    idx = pack_id.split('_')
+    pack_id = idx[0]
+    if len(idx) == 2:
+        if pack_id not in pckts: pckts[pack_id] = {idx[1]: [event, fargs, fkw]}
+        else: pckts[pack_id][idx[1]] = [event, fargs, fkw]
+    else: pckts[pack_id] = [event, fargs, fkw]
+    if len(pckts) == 1:
+        pckt = pckts[list(pckts.keys())[0]]
+        if type(pckt) != dict or (type(pckt) == dict and len(pckt.keys()) == 1):
+            self.send_pckt(event, *fargs, **fkw)
 
 """ Override SocketIO library's emit method used for sending data.
-    This is needed because this library doesn't support packet size largen than 100 MB
+    This is needed because this library doesn't support packet size larger than 100 MB
 """
 def socketIO_emit(self, event, *args, **kw):
-    enable_loop = kw.pop('enable_loop', True)
-    while self.emitting and enable_loop:
-        time.sleep(1)
-    if len(args) == 0 or (len(args) > 0 and type(args[0]) == bool): return self._emit(event, *args, **kw)
-    payload = args[0]
-    stringify = False
-    if type(payload) in [dict, list, tuple]:
-        stringify = True
-        payload = json.dumps(payload)
-    size = len(payload)
-    # Increasing 45 bytes (36 bytes for uuid, 2 bytes for separator, 7 bytes for index)
-    if not (size > CHUNK_MAX_LIMIT+45): return self._emit(event, *args, **kw)
-    else:
-        self.emitting = True
-        pack_id = str(uuid())
-        data = []
-        blocks = int(size/CHUNK_SIZE) + 1
-        data.append(';'.join([pack_id,"p@gIn8",str(size),str(blocks),str(stringify)]))
-        for i in range(blocks):
-            data.append(pack_id+';'+str(i+1)+';'+payload[CHUNK_SIZE*i : CHUNK_SIZE*(i+1)])
-        del payload
-        self.evdata[pack_id] = {'e': event, 'b': blocks, 'd': data, 'kw': kw}
-        return self._emit(event, data[0], **kw)
+    self.pckt_id += 1
+    if len(args) == 0 or (len(args) > 0 and type(args[0]) == bool):
+        self.save_pckt(str(self.pckt_id), event, *args, **kw)
+    else: # Check for pagination
+        payload = args[0]
+        stringify = False
+        if type(payload) in [dict, list, tuple]:
+            stringify = True
+            payload = json.dumps(payload)
+        size = len(payload)
+        # Increasing 45 bytes in check limit (36 bytes for uuid, 2 bytes for separator, 7 bytes for index)
+        if not (size > CHUNK_MAX_LIMIT+45): self.save_pckt(str(self.pckt_id), event, *args, **kw)
+        else: # Pagination begins
+            sub_pack_id = str(uuid())
+            blocks = int(size/CHUNK_SIZE) + 1
+            pckt = (';'.join([sub_pack_id,str(size),str(blocks),str(stringify)]))
+            self.save_pckt(str(self.pckt_id)+"_"+PAGINATE_INDEX, event, pckt, **kw)
+            for i in range(blocks):
+                pckt = (sub_pack_id+';'+payload[CHUNK_SIZE*i : CHUNK_SIZE*(i+1)])
+                self.save_pckt(str(self.pckt_id)+'_'+str(i+1), event, pckt, **kw)
+            self.save_pckt(str(self.pckt_id)+"_eof", event, sub_pack_id, **kw)
+            del payload
+
+def socketIO_send_pckt(self, event, *args, **kw):
+    print("Sending "+str(args[0]))
+    try:
+        self._emit(event, *args, **kw)
+    except:
+        pass
+    args = (event,) + args
+    self.activeTimer = Timer(PACKET_TIMEOUT, self.send_pckt, args, kw)
+    self.activeTimer.start()
 
 
 socketIO_client.parsers._read_packet_length = socketIO_read_packet_length
 socketIO_client.parsers._read_packet_text = socketIO_read_packet_text
+socketIO_client.transports.get_response = socketIO_get_response
 socketIO_client.XHR_PollingTransport.close = socketIO_XHR_close
 socketIO_client.WebsocketTransport.__init__ = socketIO_WS_init
 socketIO_client.WebsocketTransport.close = socketIO_WS_close
 socketIO_client.BaseNamespace.on_data_ack = socketIO_on_data_ack
-socketIO_client.BaseNamespace.on_data_nack = socketIO_on_data_nack
+socketIO_client.SocketIO.save_pckt = socketIO_save_pckt
+socketIO_client.SocketIO.send_pckt = socketIO_send_pckt
 socketIO_client.SocketIO._emit = socketIO_client.SocketIO.emit
 socketIO_client.SocketIO.emit = socketIO_emit
 socketIO_client.SocketIO._warn = socketIO_warn
@@ -250,8 +320,8 @@ socketIO_client.SocketIO._close = socketIO_close
 socketIO_client.SocketIO._transport = socketIO_transport
 socketIO_client.SocketIO.waiting_for_close = socketIO_waiting_for_close
 socketIO_client.SocketIO.wait = socketIO_wait
-socketIO_client.SocketIO.evdata = {}
-socketIO_client.SocketIO.emitting = False
+socketIO_client.SocketIO.activeTimer = None
+socketIO_client.SocketIO.pckt_id = 0
 
 SocketIO = socketIO_client.SocketIO
 BaseNamespace = socketIO_client.BaseNamespace
