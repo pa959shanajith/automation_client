@@ -11,13 +11,14 @@ import os
 import time
 import controller
 import readconfig
+from constants import *
 if SYSTEM_OS != 'Darwin':
     import screeninfo
     from pywinauto.findwindows import find_window
     from pywinauto.win32functions import SetForegroundWindow
 else:
     from AppKit import NSScreen
-from constants import *
+
 drawing1 = False
 constant_image = False
 ix,iy = -1,-1

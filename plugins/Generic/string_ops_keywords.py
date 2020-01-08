@@ -16,11 +16,10 @@ import core_utils
 from constants import SYSTEM_OS
 import subprocess
 from unidecode import unidecode
+from constants import *
 if SYSTEM_OS == "Windows":
     import win32clipboard
-
 import logging
-from constants import *
 log = logging.getLogger('string_ops_keywords.py')
 
 class StringOperation:
