@@ -350,7 +350,7 @@ class Controller():
                         logger.print_on_console('Step Execution start time is : '+start_time_string)
                         log.info('Step Execution start time is : '+start_time_string)
                         index,result = self.keywordinvocation(index,inpval,self.reporting_obj,*args)
-                        if tsp.name=='verifyValues' or tsp.name.lower()=='verifytextiris':
+                        if tsp.name.lower()=='verifytextiris':
                             #testcase_details_orig=tsp.testcase_details
                             testcase_details=tsp.testcase_details
                             if testcase_details=='':
