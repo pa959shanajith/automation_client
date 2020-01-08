@@ -6,6 +6,7 @@
     "delay": "0.3",
     "disable_server_cert": "No",
     "displayVariableTimeOut": "1",
+    "delay_stringinput": "1",
     "enableSecurityCheck": "No",
     "exception_flag": "false",
     "extn_enabled": "No",

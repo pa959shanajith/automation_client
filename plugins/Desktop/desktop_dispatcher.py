@@ -97,6 +97,11 @@ class DesktopDispatcher:
         'selectmultiplevaluesbytext' : dropdown_keywords_obj.selectMultpleValuesByText,
         'selectradiobutton' : radio_checkbox_keywords_obj.select_radiobutton,
         'selectcheckbox' : radio_checkbox_keywords_obj.select_checkbox,
+
+        #author : priyanka.r
+        #added mapping of 'getAllValues' to dropdown list object
+        'getallvalues':dropdown_keywords_obj.getAllValues,
+
         'unselectcheckbox' : radio_checkbox_keywords_obj.unselect_checkbox,
         'getstatus' : radio_checkbox_keywords_obj.get_status,
         'selecttabbyindex' : tab_control_keywords_obj.selectTabByIndex,
@@ -157,7 +162,10 @@ class DesktopDispatcher:
         "verifyelementtext" : ['radiobutton', 'checkbox', 'input', 'button', 'select'],
         "verifyexists" : ['radiobutton', 'checkbox', 'input', 'button', 'select'],
         "mousehover" : ['radiobutton', 'checkbox', 'input', 'button'],
-        "verifyallvalues" : ['select']
+        "verifyallvalues" : ['select'],
+        "getallvalues" : ['select','list'],
+        "selecttreenode" : ['tree'],
+        "getnodenamebyindex" : ['tree']
     }
 
     get_ele_type = {
@@ -166,6 +174,8 @@ class DesktopDispatcher:
         'dropdown' : 'select',
         'textbox' : 'input',
         'button' : 'button',
+        'list' : 'list',
+        'tree' : 'tree'
     }
 
 
@@ -203,6 +213,8 @@ class DesktopDispatcher:
             import iris_operations
             iris_object = iris_operations.IRISKeywords()
             self.desktop_dict['clickiris'] = iris_object.clickiris
+            self.desktop_dict['doubleclickiris'] = iris_object.doubleclickiris
+            self.desktop_dict['rightclickiris'] = iris_object.rightclickiris
             self.desktop_dict['settextiris'] = iris_object.settextiris
             self.desktop_dict['gettextiris'] = iris_object.gettextiris
             self.desktop_dict['getrowcountiris'] = iris_object.getrowcountiris

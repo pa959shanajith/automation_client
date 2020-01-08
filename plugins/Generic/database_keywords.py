@@ -134,10 +134,11 @@ class DatabaseOperation():
             err_msg = 'Database Login failed'
             logger.print_on_console(err_msg)
         finally:
-##            cursor.close()
+            ##            cursor.close()
             if cnxn!=None:
                 cnxn.close()
         return status,result,details,err_msg
+
 
     def fetchData(self,input_val,*args):
         value = None
@@ -495,11 +496,17 @@ class DatabaseOperation():
         param : database type, IP, port number , database name, username , password , query
         return : connection object
         """
-        dbNumber = {4:'{SQL Server}',5:'{Microdsoft ODBC for Oracle}',2:'{IBM DB2 ODBC DRIVER}'}
+        dbNumber = {4:'{SQL Server}',5:'{Microdsoft ODBC for Oracle}'}#,2:'{IBM DB2 ODBC DRIVER}'}
         err_msg=None
         try:
             dbtype= int(dbtype)
-            self.cnxn = pyodbc.connect('driver=%s;SERVER=%s;PORT=%s;DATABASE=%s;UID=%s;PWD=%s' % ( dbNumber[dbtype], ip, port, dbName, userName ,password ) )
+            if dbtype != 2:
+                self.cnxn = pyodbc.connect('driver=%s;SERVER=%s;PORT=%s;DATABASE=%s;UID=%s;PWD=%s' % ( dbNumber[dbtype], ip, port, dbName, userName ,password ) )
+            else:
+                import ibm_db
+                cnxn = ibm_db.connect('database=%s;hostname=%s;port=%s;protocol=TCPIP;uid=%s;pwd=%s'%(dbName,ip,port,userName,password), '', '')
+                import ibm_db_dbi
+                self.cnxn = ibm_db_dbi.Connection(cnxn)
             return self.cnxn
         except Exception as e:
             log.error(e)

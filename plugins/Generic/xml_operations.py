@@ -10,17 +10,51 @@
 #-------------------------------------------------------------------------------
 
 import xml.etree.ElementTree as ET
+from xml.etree import ElementTree
 import ast
 import logger
 from generic_constants import *
 import core_utils
-
+import os
 import json
 import logging
 from constants import *
 from lxml import etree
+import xmltodict
 log = logging.getLogger('xml_operations.py')
 class XMLOperations():
+
+    def check_xml_json_file(self,input_string):
+        #checking for xml file.
+        try:
+            if os.path.exists(input_string):
+            
+                filename,file_ext = os.path.splitext(input_string)
+                
+                if file_ext.find('.xml')!=-1:
+                    tree = ET.parse(input_string)
+                    input_string = ElementTree.tostring(tree.getroot()).decode('utf8')
+                    log.info("Result : XML file to string")
+                elif file_ext.find('.json')!=-1:
+                    with open(input_string) as file_open:
+                        input_string=json.dumps((json.load(file_open)))
+                    log.info("Result : JSON file to string")
+                else:
+                    log.debug("Please Pass the XML/JSON file with proper extension")
+                    logger.print_on_console("Please Pass the XML/JSON file with proper extension")
+                    
+            elif isinstance(input_string,str):
+                
+                log.info("Passed input is a string")
+                logger.print_on_console("Passed input is a string")
+            else:
+                log.debug("Unable to find the specified path")
+                logger.print_on_console("Unable to find the specified path")
+                
+        except Exception as e:
+            log.debug(e)
+            return input_string
+        return input_string
 
     def build_dict(self,json_obj):
      keys={}
@@ -39,6 +73,9 @@ class XMLOperations():
                 keys.update(val)
          else:
             keys[key]=value
+            
+            
+      print ("Keys {}".format(keys))
       return keys
 
 
@@ -58,15 +95,18 @@ class XMLOperations():
         exception_json=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
-
+            
+            input_string=self.check_xml_json_file(input_string)
             encoded_inp_string=input_string
             json_obj=None
             if isinstance(input_string,str):
                 encoded_inp_string=input_string.encode('utf-8')
             try:
                 json_obj=json.loads(encoded_inp_string)
+                print ("Checking the JSON : {}".format(json_obj))
                 if len(args)>0:
                     block_number=args[0]
+                    print ("BLOCK NUMBER : {}".format(type(block_number)))
             except Exception as e:
                try:
                     json_obj=ast.literal_eval(encoded_inp_string)
@@ -78,6 +118,7 @@ class XMLOperations():
             if json_obj != None:
                 #json logic
                 json_obj_dict=self.build_dict(json_obj)
+                print(input_tag)
                 block = input_tag.split('.')
                 number = block_number.split(',')
                 log.info('Json Input:',json_obj_dict)
@@ -188,6 +229,7 @@ class XMLOperations():
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
 ##            root = ET.fromstring(str(input_string))
+            input_string=self.check_xml_json_file(input_string)
             if isinstance(input_string,str):
                 root = ET.fromstring(input_string.encode('utf-8'))
             else:
@@ -288,9 +330,11 @@ class XMLOperations():
         err_msg=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
+            input_string=self.check_xml_json_file(input_string)
             encoded_inp_string=input_string
             json_obj=None
             if isinstance(input_string,str):
+                #encoded_inp_string=json.dumps(xmltodict.parse(input_string.encode('utf-8')))
                 encoded_inp_string=input_string.encode('utf-8')
             try:
                 json_obj=json.loads(encoded_inp_string)
@@ -362,10 +406,10 @@ class XMLOperations():
                     log.info('Block number: ',block_number)
                     block = blocks[block_number-1].getchildren()
                     log.info('Iterating child in the block')
-                    for child in block:
-                        log.info('Child text :',child.text)
+                    for child in block:   
                         if '}' in child.tag:
                             if child.text != None:
+                                log.info('Child text :',child.text)
                                 blockvalue.append(  '<' + child.tag.split('}')[1]  + '>' + child.text +  '</' + child.tag.split('}')[1]  + '>')
                             else:
                                 blockvalue.append(  '<' + child.tag.split('}')[1]  + '/>')
@@ -476,6 +520,9 @@ class JSONOperations():
         err_msg=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
+        
+            xml_class=XMLOperations()
+            input_string=xml_class.check_xml_json_file(input_string)
             encoded_inp_string=input_string
             if isinstance(input_string,str):
                 encoded_inp_string=input_string.encode('utf-8')
