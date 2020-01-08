@@ -16,11 +16,10 @@ import core_utils
 from constants import SYSTEM_OS
 import subprocess
 from unidecode import unidecode
+from constants import *
 if SYSTEM_OS == "Windows":
     import win32clipboard
-
 import logging
-from constants import *
 log = logging.getLogger('string_ops_keywords.py')
 
 class StringOperation:
@@ -556,7 +555,7 @@ class StringOperation:
                 status=generic_constants.TEST_RESULT_PASS
             elif SYSTEM_OS == "Darwin":
                 p = subprocess.Popen(['pbcopy'], stdin=subprocess.PIPE)
-                p.stdin.write(data)
+                p.stdin.write(input_val)
                 p.stdin.close()
                 retcode = p.wait()
                 if str(retcode)=="0":

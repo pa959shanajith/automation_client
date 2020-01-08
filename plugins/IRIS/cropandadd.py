@@ -7,16 +7,22 @@ import PIL.ImageGrab
 import numpy as np
 import cv2
 import screeninfo
-drawing1 = False
-constant_image = False
-ix,iy = -1,-1
-log = logging.getLogger('cropandadd.py')
-from pywinauto.findwindows import find_window
-from pywinauto.win32functions import SetForegroundWindow
 import os
 import time
 import controller
 import readconfig
+from constants import *
+if SYSTEM_OS != 'Darwin':
+    import screeninfo
+    from pywinauto.findwindows import find_window
+    from pywinauto.win32functions import SetForegroundWindow
+else:
+    from AppKit import NSScreen
+
+drawing1 = False
+constant_image = False
+ix,iy = -1,-1
+log = logging.getLogger('cropandadd.py')
 
 class Cropandadd():
     def startcropandadd(self,wx_window):
@@ -27,6 +33,11 @@ class Cropandadd():
             im = PIL.ImageGrab.grab()
             im.save('test.png')
             image_orig = cv2.imread("test.png")
+            if SYSTEM_OS != 'Darwin':
+                screen = screeninfo.get_monitors()[0]
+            else:
+                width = int(NSScreen.mainScreen().frame().size.width)
+                height = int(NSScreen.mainScreen().frame().size.height)
             screen = screeninfo.get_monitors()[0]
             overlay = image_orig.copy()
             output = image_orig.copy()
@@ -84,14 +95,18 @@ class Cropandadd():
 
             cv2.namedWindow('image',cv2.WND_PROP_FULLSCREEN)
             cv2.setMouseCallback('image',draw_rect)
-            cv2.moveWindow('image', screen.x - 1, screen.y - 1)
+            if SYSTEM_OS != 'Darwin':
+                cv2.moveWindow('image', screen.x - 1, screen.y - 1)
+            else:
+                cv2.moveWindow('image', width-1,height-1)
             cv2.setWindowProperty('image', cv2.WND_PROP_FULLSCREEN,cv2.WINDOW_FULLSCREEN)
             flag = False
             while(1):
                 cv2.imshow('image',self.RGB_img)
                 if(not flag):
                     flag = True
-                    SetForegroundWindow(find_window(title='image'))
+                    if SYSTEM_OS != 'Darwin':
+                        SetForegroundWindow(find_window(title='image'))
                 k = cv2.waitKey(1) & 0xFF
                 if(controller.terminate_flag):
                     self.stopflag = True

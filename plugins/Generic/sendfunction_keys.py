@@ -8,23 +8,19 @@
 # Copyright:   (c) sushma.p 2016
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
-from constants import SYSTEM_OS
-if SYSTEM_OS != 'Darwin':
-    from pyrobot import Robot
 from generic_constants import *
 from constants import *
 import logger
+if SYSTEM_OS != 'Darwin':
+    from pyrobot import Robot
+import pyautogui
+import subprocess
 import re
 import time
 from constants import *
 import logging
 import readconfig
 configvalues = readconfig.readConfig().readJson()
-#print (configvalues)
-delay_stringinput = float(configvalues['delay_stringinput'])
-
-configvalues = readconfig.readConfig().readJson()
-#print (configvalues)
 delay_stringinput = float(configvalues['delay_stringinput'])
 log = logging.getLogger('sendfunction_keys.py')
 class SendFunctionKeys:
@@ -40,29 +36,43 @@ class SendFunctionKeys:
         try:
             import browser_Keywords
             import selenium
-            import win32gui,win32api,win32process
-            pids = browser_Keywords.local_bk.pid_set
-            if(len(pids)>0):
-                pid = pids[-1]
-                toplist, winlist = [], []
-                def enum_cb(hwnd, results):
-                    winlist.append((hwnd, win32gui.GetWindowText(hwnd)))
-                win32gui.EnumWindows(enum_cb, toplist)
-                app = [(hwnd, title) for hwnd, title in winlist if ((("Chrome" in title) or ("Firefox" in title) or ("Explorer" in title)) and (win32process.GetWindowThreadProcessId(hwnd)[1] == pid))]
-                if(len(app)==1):
-                    app = app[0]
-                    handle = app[0]
-                    foreThread = win32process.GetWindowThreadProcessId(win32gui.GetForegroundWindow())
-                    appThread = win32api.GetCurrentThreadId()
-                    if( foreThread != appThread ):
-                        win32process.AttachThreadInput(foreThread[0], appThread, True)
-                        win32gui.BringWindowToTop(handle)
-                        win32gui.ShowWindow(handle,5)
-                        win32process.AttachThreadInput(foreThread[0], appThread, False)
-                    else:
-                        win32gui.BringWindowToTop(handle)
-                        win32gui.ShowWindow(handle,5)
-                time.sleep(1)
+            if SYSTEM_OS == "Darwin":
+                try:
+                    pids = browser_Keywords.pid_set
+                    if (len(pids) > 0):
+                        pid = pids.pop()
+                        apple_script = """osascript<<EOF
+                        tell application "System Events"
+                        set frontmost of every process whose unix id is """+pid+""" to true
+                        end tell
+                        EOF"""
+                        subprocess.Popen(apple_script, shell=True)
+                except Exception as e:
+                    log.error("Failed to bring window to foreground")
+            else:
+                import win32gui,win32api,win32process
+                pids = browser_Keywords.local_bk.pid_set
+                if(len(pids)>0):
+                    pid = pids[-1]
+                    toplist, winlist = [], []
+                    def enum_cb(hwnd, results):
+                        winlist.append((hwnd, win32gui.GetWindowText(hwnd)))
+                    win32gui.EnumWindows(enum_cb, toplist)
+                    app = [(hwnd, title) for hwnd, title in winlist if ((("Chrome" in title) or ("Firefox" in title) or ("Explorer" in title)) and (win32process.GetWindowThreadProcessId(hwnd)[1] == pid))]
+                    if(len(app)==1):
+                        app = app[0]
+                        handle = app[0]
+                        foreThread = win32process.GetWindowThreadProcessId(win32gui.GetForegroundWindow())
+                        appThread = win32api.GetCurrentThreadId()
+                        if( foreThread != appThread ):
+                            win32process.AttachThreadInput(foreThread[0], appThread, True)
+                            win32gui.BringWindowToTop(handle)
+                            win32gui.ShowWindow(handle,5)
+                            win32process.AttachThreadInput(foreThread[0], appThread, False)
+                        else:
+                            win32gui.BringWindowToTop(handle)
+                            win32gui.ShowWindow(handle,5)
+                    time.sleep(1)
         except Exception as e:
             log.error("Web plugin not loaded")
         try:
@@ -86,7 +96,6 @@ class SendFunctionKeys:
                 methodoutput=TEST_RESULT_TRUE
             else:
                 log.debug('Invalid input')
-##                logger.print_on_console('Invalid input')
                 err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
 
         except Exception as e:
@@ -97,10 +106,14 @@ class SendFunctionKeys:
         return status,methodoutput,output_res,err_msg
 
     def execute_key(self,key,count):
-        for x in range(count):
-            robot=Robot()
-            log.debug('press and release the key', key)
-            robot.press_and_release(key)
+        log.debug('press and release the key', key)
+        if SYSTEM_OS == "Darwin":
+            for x in range(count):
+                pyautogui.press(key)
+        else:
+            for x in range(count):
+                robot=Robot()
+                robot.press_and_release(key)
 
     def press_multiple_keys(self,keys_list,count):
         for x in range(count):
@@ -109,33 +122,37 @@ class SendFunctionKeys:
             for key in keys_list:
                 self.release_key(key)
 
-
-
-    def type(self,input,delay_stringinput=0.005):
+    def type(self,input):
         try:
-            robot=Robot()
-            robot.type_string(str(input),delay_stringinput)
+            if SYSTEM_OS == "Darwin":
+                pyautogui.typewrite(str(input))
+            else:
+                robot=Robot()
+                robot.type_string(str(input),1)
         except Exception as e:
             log.error(e)
             logger.print_on_console(e)
             err_msg=INPUT_ERROR
 
-
     def press_key(self,key):
-        robot=Robot()
-        log.debug('press  the key', key)
-        robot.key_press(key)
+        log.debug('pressing  the key', key)
+        if SYSTEM_OS == "Darwin":
+            pyautogui.keyDown(key)
+        else:
+            robot=Robot()
+            robot.key_press(key)
 
     def release_key(self,key):
-        robot=Robot()
         log.debug('releasing  the key', key)
-        robot.key_release(key)
-
+        if SYSTEM_OS == "Darwin":
+            pyautogui.keyUp(key)
+        else:
+            robot=Robot()
+            robot.key_release(key)
+        
     def get_args(self,args):
         value=1
-        #print ("legnth {}".format(len(args)))
         if len(args)>1 :
-            #var=args[0]
             if args[0] is not None or args[0] != '':
                 if (args[0].startswith('|') and args[0].endswith('|')) or (args[0].startswith('{') and args[0].endswith('}')):
                     value= 'type'
@@ -148,6 +165,3 @@ class SendFunctionKeys:
             else:
                 value=value
         return value
-
-
-

@@ -12,12 +12,13 @@ log = logging.getLogger('iris_operations.py')
 import os
 from pytesseract import pytesseract
 import base64,json
-from pyrobot import Robot
 import imutils
 import sys,math
 from uuid import uuid4
 import codecs
-import pythoncom
+if SYSTEM_OS != 'Darwin':
+    from pyrobot import Robot
+    import pythoncom
 vertical = []
 horizontal = []
 verifyexists = []
@@ -328,7 +329,7 @@ class IRISKeywords():
             else:
                 res = gotoobject(element)
             if(len(res)>0):
-                pythoncom.CoInitialize()
+                if SYSTEM_OS != 'Darwin': pythoncom.CoInitialize()
                 log.info('Performing clickiris')
                 pyautogui.click()
                 log.info('clickiris performed')
@@ -361,7 +362,7 @@ class IRISKeywords():
                 height = res[3] - res[1]
                 pyautogui.moveTo(res[0]+ int(width/2),res[1] + int(height/2))
             else:
-                pythoncom.CoInitialize()
+                if SYSTEM_OS != 'Darwin': pythoncom.CoInitialize()
                 log.info('Performing doubleClick')
                 res = gotoobject(element)
                 log.info('doubleClick performed')
@@ -398,7 +399,7 @@ class IRISKeywords():
             else:
                 res = gotoobject(element)
             if(len(res)>0):
-                pythoncom.CoInitialize()
+                if SYSTEM_OS != 'Darwin': pythoncom.CoInitialize()
                 log.info('Performing rightClick')
                 pyautogui.rightClick()
                 log.info('rightClick performed')
@@ -433,14 +434,22 @@ class IRISKeywords():
             else:
                 res = gotoobject(element)
             if(len(res)>0):
-                pythoncom.CoInitialize()
-                pyautogui.click()
-                robot = Robot()
-                robot.ctrl_press('a')
-                time.sleep(1)
-                robot.key_press('backspace')
-                time.sleep(1)
-                robot.type_string(args[0][0], delay=0.2)
+                if SYSTEM_OS != 'Darwin':
+                    pythoncom.CoInitialize()
+                    pyautogui.click()
+                    robot = Robot()
+                    robot.ctrl_press('a')
+                    time.sleep(1)
+                    robot.key_press('backspace')
+                    time.sleep(1)
+                    robot.type_string(args[0][0], delay=0.2)
+                else:
+                    pyautogui.click()
+                    pyautogui.hotkey('ctrl','a')
+                    time.sleep(1)
+                    pyautogui.press('backspace')
+                    time.sleep(1)
+                    pyautogui.typewrite(args[0][0]) ## Pending
                 status= TEST_RESULT_PASS
                 result = TEST_RESULT_TRUE
             else:
@@ -458,8 +467,12 @@ class IRISKeywords():
         value = OUTPUT_CONSTANT
         try:
             if(TESSERACT_PATH_EXISTS):
-                pytesseract.tesseract_cmd = TESSERACT_PATH + '/tesseract'
-                os.environ["TESSDATA_PREFIX"] = TESSERACT_PATH + '/tessdata'
+                if SYSTEM_OS != 'Darwin':
+                    pytesseract.tesseract_cmd = TESSERACT_PATH + '/tesseract'
+                    os.environ["TESSDATA_PREFIX"] = TESSERACT_PATH + '/tessdata'
+                else:
+                    pytesseract.tesseract_cmd = TESSERACT_PATH + '/bin/tesseract'
+                    os.environ["TESSDATA_PREFIX"] = TESSERACT_PATH + '/share/tessdata'
                 img = None
                 if(len(args) == 3 and args[2]!='' and len(verifyexists)>0):
                     elem_coordinates = element['coordinates']
@@ -476,13 +489,14 @@ class IRISKeywords():
                 image = cv2.imread("cropped.png")
                 text = ''
                 if(len(args[0])==1 and args[0][0].lower().strip() == 'select'):
-                    robot = Robot()
-                    height = int(element['coordinates'][3]) - int(element['coordinates'][1])
-                    pyautogui.moveTo(int(element['coordinates'][2]),int(element['coordinates'][3])-int(height/2))
-                    pyautogui.dragTo(int(element['coordinates'][0]),int(element['coordinates'][1])+int(height/2),button='left')
-                    robot.ctrl_press('c')
-                    time.sleep(1)
-                    text = robot.get_clipboard_data()
+                    if SYSTEM_OS != 'Darwin':
+                        robot = Robot()
+                        height = int(element['coordinates'][3]) - int(element['coordinates'][1])
+                        pyautogui.moveTo(int(element['coordinates'][2]),int(element['coordinates'][3])-int(height/2))
+                        pyautogui.dragTo(int(element['coordinates'][0]),int(element['coordinates'][1])+int(height/2),button='left')
+                        robot.ctrl_press('c')
+                        time.sleep(1)
+                        text = robot.get_clipboard_data()
                 elif(len(args[0])==1 and args[0][0].lower().strip() == 'date'):
                     img = Image.open('cropped.png')
                     imgr = img.resize((img.size[0] * 10, img.size[1] * 10), Image.ANTIALIAS)

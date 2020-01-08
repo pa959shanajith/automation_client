@@ -33,6 +33,9 @@ import platform
 import win32com.client
 if SYSTEM_OS == "Windows":
     import win32api
+if SYSTEM_OS == 'Darwin':
+    import pandas
+    from pandas import ExcelWriter
 
 class ExcelFile:
 
@@ -633,21 +636,31 @@ class ExcelXLS:
         log.debug('Deleting a row of .xls file')
         excel_file=None
         try:
-            excelobj= object_creator()
-            excel=excelobj.excel_object()
-            excel.DisplayAlerts = False
-            excel_file = excel.Workbooks.Open(excel_path)
-
-            if not(excel_file.ReadOnly):
-                sheet = excel.Sheets(sheetname)
-                last_row=sheet.UsedRange.Rows.Count
-                if row<=last_row:
-                    sheet.Rows(row).Delete()
+            if SYSTEM_OS == 'Darwin':
+                writer = ExcelWriter(excel_path)
+                excel_data = pandas.read_excel(excel_path)
+                if row<=len(excel_data.index):
+                    excel_data = excel_data.drop(excel_data.index[[row - 1]])
+                    excel_data.to_excel(writer, sheetname, index=False)
                     status=True
                 else:
                     err_msg=ERROR_CODE_DICT["ERR_ROW_DOESN'T_EXIST"]
+                writer.save()
             else:
-                err_msg='Excel is Read only'
+                excelobj= object_creator()
+                excel=excelobj.excel_object()
+                excel.DisplayAlerts = False
+                excel_file = excel.Workbooks.Open(excel_path)
+                if not(excel_file.ReadOnly):
+                    sheet = excel.Sheets(sheetname)
+                    last_row=sheet.UsedRange.Rows.Count
+                    if row<=last_row:
+                        sheet.Rows(row).Delete()
+                        status=True
+                    else:
+                        err_msg=ERROR_CODE_DICT["ERR_ROW_DOESN'T_EXIST"]
+                else:
+                    err_msg='Excel is Read only'
         except Exception as e:
             err_msg='Error occured in deleting row of excel file'
             log.error(e)
