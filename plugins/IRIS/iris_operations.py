@@ -17,6 +17,7 @@ import imutils
 import sys,math
 from uuid import uuid4
 import codecs
+import pythoncom
 vertical = []
 horizontal = []
 verifyexists = []
@@ -306,6 +307,7 @@ def get_byte_mirror(element_cord):
 
 class IRISKeywords():
     def clickiris(self,element,*args):
+        log.info('Inside clickiris and No. of arguments passed are : '+str(len(args)))
         status = TEST_RESULT_FAIL
         result = TEST_RESULT_FALSE
         err_msg=None
@@ -326,7 +328,10 @@ class IRISKeywords():
             else:
                 res = gotoobject(element)
             if(len(res)>0):
+                pythoncom.CoInitialize()
+                log.info('Performing clickiris')
                 pyautogui.click()
+                log.info('clickiris performed')
                 status= TEST_RESULT_PASS
                 result = TEST_RESULT_TRUE
             else:
@@ -336,7 +341,43 @@ class IRISKeywords():
             logger.print_on_console("Error occurred in clickiris")
         return status,result,value,err_msg
 
-    def settextiris(self,element,*args):
+    def doubleclickiris(self,element,*args):
+        log.info('Inside doubleclickiris and No. of arguments passed are : '+str(len(args)))
+        status = TEST_RESULT_FAIL
+        result = TEST_RESULT_FALSE
+        err_msg=None
+        value = OUTPUT_CONSTANT
+        try:
+            img = None
+            if(len(args) == 3 and args[2]!='' and len(verifyexists)>0):
+                elem_coordinates = element['coordinates']
+                const_coordintes = args[2]['coordinates']
+                elements = [(const_coordintes[0],const_coordintes[1]),
+                        (const_coordintes[2],const_coordintes[3]),
+                        (elem_coordinates[0], elem_coordinates[1]),
+                        (elem_coordinates[2], elem_coordinates[3])]
+                img,res = find_relative_image(elements, verifyexists)
+                width = res[2] - res[0]
+                height = res[3] - res[1]
+                pyautogui.moveTo(res[0]+ int(width/2),res[1] + int(height/2))
+            else:
+                pythoncom.CoInitialize()
+                log.info('Performing doubleClick')
+                res = gotoobject(element)
+                log.info('doubleClick performed')
+            if(len(res)>0):
+                pyautogui.doubleClick()
+                status= TEST_RESULT_PASS
+                result = TEST_RESULT_TRUE
+            else:
+                logger.print_on_console("Object not found")
+        except Exception as e:
+            log.error("Error occurred in doubleclickiris, Err_Msg :",e)
+            logger.print_on_console("Error occurred in doubleclickiris")
+        return status,result,value,err_msg
+
+    def rightclickiris(self,element,*args):
+        log.info('Inside rightclickiris and No. of arguments passed are : '+str(len(args)))
         status = TEST_RESULT_FAIL
         result = TEST_RESULT_FALSE
         err_msg=None
@@ -357,6 +398,42 @@ class IRISKeywords():
             else:
                 res = gotoobject(element)
             if(len(res)>0):
+                pythoncom.CoInitialize()
+                log.info('Performing rightClick')
+                pyautogui.rightClick()
+                log.info('rightClick performed')
+                status= TEST_RESULT_PASS
+                result = TEST_RESULT_TRUE
+            else:
+                logger.print_on_console("Object not found")
+        except Exception as e:
+            log.error("Error occurred in rightclickiris, Err_Msg :",e)
+            logger.print_on_console("Error occurred in rightclickiris")
+        return status,result,value,err_msg
+
+    def settextiris(self,element,*args):
+        log.info('Inside settextiris and No. of arguments passed are : '+str(len(args)))
+        status = TEST_RESULT_FAIL
+        result = TEST_RESULT_FALSE
+        err_msg=None
+        value = OUTPUT_CONSTANT
+        try:
+            img = None
+            if(len(args) == 3 and args[2]!='' and len(verifyexists)>0):
+                elem_coordinates = element['coordinates']
+                const_coordintes = args[2]['coordinates']
+                elements = [(const_coordintes[0],const_coordintes[1]),
+                        (const_coordintes[2],const_coordintes[3]),
+                        (elem_coordinates[0], elem_coordinates[1]),
+                        (elem_coordinates[2], elem_coordinates[3])]
+                img,res = find_relative_image(elements, verifyexists)
+                width = res[2] - res[0]
+                height = res[3] - res[1]
+                pyautogui.moveTo(res[0]+ int(width/2),res[1] + int(height/2))
+            else:
+                res = gotoobject(element)
+            if(len(res)>0):
+                pythoncom.CoInitialize()
                 pyautogui.click()
                 robot = Robot()
                 robot.ctrl_press('a')
@@ -374,6 +451,7 @@ class IRISKeywords():
         return status,result,value,err_msg
 
     def gettextiris(self,element,*args):
+        log.info('Inside gettextiris and No. of arguments passed are : '+str(len(args)))
         status = TEST_RESULT_FAIL
         result = TEST_RESULT_FALSE
         err_msg=None
@@ -457,6 +535,7 @@ class IRISKeywords():
         return status,result,value,err_msg
 
     def getrowcountiris(self,element,*args):
+        log.info('Inside getrowcountiris and No. of arguments passed are : '+str(len(args)))
         global horizontal,vertical
         status = TEST_RESULT_FAIL
         result = TEST_RESULT_FALSE
@@ -499,6 +578,7 @@ class IRISKeywords():
         return status,result,value,err_msg
 
     def getcolcountiris(self,element,*args):
+        log.info('Inside getcolcountiris and No. of arguments passed are : '+str(len(args)))
         global horizontal,vertical
         status = TEST_RESULT_FAIL
         result = TEST_RESULT_FALSE
@@ -541,6 +621,7 @@ class IRISKeywords():
         return status,result,value,err_msg
 
     def getcellvalueiris(self,element,*args):
+        log.info('Inside getcellvalueiris and No. of arguments passed are : '+str(len(args)))
         global horizontal,vertical
         status = TEST_RESULT_FAIL
         result = TEST_RESULT_FALSE
@@ -581,6 +662,7 @@ class IRISKeywords():
         return status,result,value,err_msg
 
     def verifyexistsiris(self,element,*args):
+        log.info('Inside verifyexistsiris and No. of arguments passed are : '+str(len(args)))
         status = TEST_RESULT_FAIL
         result = TEST_RESULT_FALSE
         err_msg=None
@@ -613,6 +695,7 @@ class IRISKeywords():
         return status,result,value,err_msg
 
     def verifytextiris(self,element,*args):
+        log.info('Inside verifytextiris and No. of arguments passed are : '+str(len(args)))
         status = TEST_RESULT_FAIL
         result = TEST_RESULT_FALSE
         err_msg=None

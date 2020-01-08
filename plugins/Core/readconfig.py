@@ -29,7 +29,7 @@ class readConfig():
         "queryTimeOut":"", "timeOut":"", "stepExecutionWait":"", "displayVariableTimeOut":"",
         "retrieveURL":"", "delay":"", "ignoreVisibilityCheck":"", "exception_flag":"",
         "server_cert":"", "enableSecurityCheck":"","browser_check":"","disable_server_cert":"","highlight_check":"","firefox_path":"",
-        "prediction_for_iris_objects":"","hide_soft_key":"","connection_timeout":"","extn_enabled":"","update_check":""}
+        "prediction_for_iris_objects":"","hide_soft_key":"","connection_timeout":"","extn_enabled":"","update_check":"","delay_stringinput":""}
         if os.path.isfile(self.config_path)==True:
             try:
                 conf = open(self.config_path, 'r')
@@ -61,6 +61,7 @@ class readConfig():
                 configvalues['connection_timeout'] = params['connection_timeout']
                 configvalues['extn_enabled'] = params['extn_enabled']
                 configvalues['update_check'] = params['update_check']
+                configvalues['delay_stringinput']=params['delay_stringinput']
             except Exception as e:
                 configvalues['errorflag']=e
         else:

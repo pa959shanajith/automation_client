@@ -14,13 +14,18 @@ if SYSTEM_OS != 'Darwin':
 from generic_constants import *
 from constants import *
 import logger
-
+import re
 import time
 from constants import *
-
 import logging
+import readconfig
+configvalues = readconfig.readConfig().readJson()
+#print (configvalues)
+delay_stringinput = float(configvalues['delay_stringinput'])
 
-
+configvalues = readconfig.readConfig().readJson()
+#print (configvalues)
+delay_stringinput = float(configvalues['delay_stringinput'])
 log = logging.getLogger('sendfunction_keys.py')
 class SendFunctionKeys:
 
@@ -67,7 +72,7 @@ class SendFunctionKeys:
                 count=self.get_args(args)
                 if count == 'type':
                     log.debug('sending the keys in input')
-                    self.type(input)
+                    self.type(input,delay_stringinput)
                 else:
                     if '+' in input:
                         keys_list=input.split('+')
@@ -106,10 +111,10 @@ class SendFunctionKeys:
 
 
 
-    def type(self,input):
+    def type(self,input,delay_stringinput=0.005):
         try:
             robot=Robot()
-            robot.type_string(str(input),1)
+            robot.type_string(str(input),delay_stringinput)
         except Exception as e:
             log.error(e)
             logger.print_on_console(e)
@@ -128,16 +133,21 @@ class SendFunctionKeys:
 
     def get_args(self,args):
         value=1
-        if len(args)>0 :
-            var=args[0]
-            if var is not None or var != '':
-                import re
-                if (var.startswith('|') and var.endswith('|')) or (var.startswith('{') and var.endswith('}')):
+        #print ("legnth {}".format(len(args)))
+        if len(args)>1 :
+            #var=args[0]
+            if args[0] is not None or args[0] != '':
+                if (args[0].startswith('|') and args[0].endswith('|')) or (args[0].startswith('{') and args[0].endswith('}')):
                     value= 'type'
-                elif re.match(('^\d+$'),var):
-                    value=int(var)
+                elif args[-1]!='':
+                    if (re.match(('^\d+$'),args[-1]))!=False:
+                        value=int(args[-1])
+        elif len(args)==1:
+            if (args[0].startswith('|') and args[0].endswith('|')) or (args[0].startswith('{') and args[0].endswith('}')):
+                    value= 'type'
+            else:
+                value=value
         return value
-
 
 
 
