@@ -559,7 +559,7 @@ class Controller():
             self.dynamic_var_handler_obj.store_dynamic_value(output[1],result[1],tsp.name)
 
     def keywordinvocation(self,index,inpval,*args):
-        gglobal socket_object,iris_constant_step,status_per
+        global socket_object,iris_constant_step,status_per
         configvalues = self.configvalues
         try:
             import time
