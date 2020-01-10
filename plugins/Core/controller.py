@@ -38,7 +38,9 @@ pause_flag=False
 iris_flag = False
 iris_constant_step = -1
 socket_object = None
+count = 0
 log = logging.getLogger("controller.py")
+status_per = {TEST_RESULT_PASS:0,TEST_RESULT_FAIL:0,TERMINATE:0,"total":0}
 
 
 class Controller():
@@ -557,7 +559,7 @@ class Controller():
             self.dynamic_var_handler_obj.store_dynamic_value(output[1],result[1],tsp.name)
 
     def keywordinvocation(self,index,inpval,*args):
-        global socket_object,iris_constant_step
+        gglobal socket_object,iris_constant_step,status_per
         configvalues = self.configvalues
         try:
             import time
@@ -707,6 +709,8 @@ class Controller():
                 index=result
                 self.status=result
             #Fixing issue #382
+            status_per[self.keyword_status]+=1
+            status_per["total"]+=1
             logger.print_on_console(keyword+' executed and the status is '+self.keyword_status+'\n')
             log.info(keyword+' executed and the status is '+self.keyword_status+'\n')
             #Checking for stop keyword
@@ -717,7 +721,8 @@ class Controller():
         else:
             return index,TERMINATE
 
-    def executor(self,tsplist,action,last_tc_num,debugfrom_step,mythread):
+    def executor(self,tsplist,action,last_tc_num,debugfrom_step,mythread,json_data,index):
+        global status_per
         i=0
         status=True
         self.scenario_start_time=datetime.now()
@@ -739,6 +744,8 @@ class Controller():
                     if i== TERMINATE:
                         #Changing the overallstatus of the report_obj to Terminate - (Sushma)
                         self.reporting_obj.overallstatus=TERMINATE
+                        status_per[TERMINATE]+=1
+                        status_per["total"]+=1
                         logger.print_on_console('Terminating the execution')
                         status=i
                         break
@@ -769,8 +776,13 @@ class Controller():
         if terminate_flag:
             #Indication of user_termination to report_obj to add a proper description in report - (Sushma)
             self.reporting_obj.user_termination=True
-        self.reporting_obj.build_overallstatus(self.scenario_start_time,self.scenario_end_time,self.scenario_ellapsed_time)
+            status_per[TERMINATE]+=1
+            status_per["total"]+=1
+        status_per["s_index"]=index[0]
+        status_per["index"]=index[1]
+        self.reporting_obj.build_overallstatus(self.scenario_start_time,self.scenario_end_time,self.scenario_ellapsed_time,json_data,status_per)
         logger.print_on_console('Step Elapsed time is : ',str(self.scenario_ellapsed_time))
+        status_per = {TEST_RESULT_PASS:0,TEST_RESULT_FAIL:0,TERMINATE:0,"total":0}
         return status
 
     def invokegenerickeyword(self,teststepproperty,dispatcher_obj,inputval):
@@ -847,7 +859,7 @@ class Controller():
         if flag:
             if runfrom_step > 0 and runfrom_step <= tsplist[len(tsplist)-1].stepnum:
                 self.conthread=mythread
-                status = self.executor(tsplist,DEBUG,last_tc_num,runfrom_step,mythread)
+                status = self.executor(tsplist,DEBUG,last_tc_num,runfrom_step,mythread,json_data,[0,0])
             else:
                 logger.print_on_console( 'Invalid step number!! Please provide run from step number from 1 to ',tsplist[len(tsplist)-1].stepnum,'\n')
                 log.info('Invalid step number!! Please provide run from step number')
@@ -864,7 +876,7 @@ class Controller():
         return status
 
     def invoke_execution(self,mythread,json_data,socketIO,wxObject,configvalues,qc_soc):
-        global terminate_flag
+        global terminate_flag,count
         qc_url=''
         qc_password=''
         qc_username=''
@@ -970,7 +982,7 @@ class Controller():
                                     con.action=EXECUTE
                                     con.conthread=mythread
                                     con.tsp_list=tsplist
-                                    status = con.executor(tsplist,EXECUTE,last_tc_num,1,con.conthread)
+                                    status = con.executor(tsplist,EXECUTE,last_tc_num,1,con.conthread,json_data,[j-1,i])
                                     print('=======================================================================================================')
                                     logger.print_on_console( '***Scenario' ,str(i + 1) ,' execution completed***')
                                     print('=======================================================================================================')
@@ -979,7 +991,8 @@ class Controller():
                                 logger.print_on_console( '***Saving report of Scenario' ,str(i  + 1 ),'***')
                                 log.info( '***Saving report of Scenario' +str(i  + 1 )+'***')
                                 os.chdir(self.cur_dir)
-                                filename='Scenario'+str(i  + 1)+'.json'
+                                filename='Scenario'+str(count  + 1)+'.json'
+                                count+=1
                                 #check if user has manually terminated during execution, then check if the teststep data and overallstatus is [] if so poputale default values in teststep data and overallstatus
                                 if terminate_flag ==True and execute_flag==True:
                                     if con.reporting_obj.report_json['rows']==[] and con.reporting_obj.report_json['overallstatus']==[]:
@@ -1027,7 +1040,7 @@ class Controller():
 
                                 #Check is made to fix issue #401
                                 if len(report_json)>0:
-                                    overall_status=report_json[0]['overallstatus']
+                                    overall_status=report_json[0]['overAllStatus']
                                     if(condition_check_value==1):
                                         if(overall_status==TEST_RESULT_PASS):
                                             continue
@@ -1038,7 +1051,8 @@ class Controller():
                                 logger.print_on_console( '***Saving report of Scenario' ,str(i  + 1 ),'***')
                                 log.info( '***Saving report of Scenario' +str(i  + 1 )+'***')
                                 os.chdir(self.cur_dir)
-                                filename='Scenario'+str(i  + 1)+'.json'
+                                filename='Scenario'+str(count  + 1)+'.json'
+                                count+=1
                                 con.reporting_obj.save_report_json_conditioncheck_testcase_empty(filename,info_msg)
                                 socketIO.emit('result_executeTestSuite',self.getreport_data_conditioncheck_testcase_empty(suite_id,scenario_id,con,execution_id))
                                 obj.clearList(con)
@@ -1047,7 +1061,8 @@ class Controller():
                             logger.print_on_console( '***Saving report of Scenario' ,str(i  + 1 ),'***')
                             log.info( '***Saving report of Scenario' +str(i  + 1 )+'***')
                             os.chdir(self.cur_dir)
-                            filename='Scenario'+str(i  + 1)+'.json'
+                            filename='Scenario'+str(count  + 1)+'.json'
+                            count+=1
                             con.reporting_obj.save_report_json_conditioncheck(filename)
                             socketIO.emit('result_executeTestSuite',self.getreport_data_conditioncheck(suite_id,scenario_id,con,execution_id))
                             obj.clearList(con)
