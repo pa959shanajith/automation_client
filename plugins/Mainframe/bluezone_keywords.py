@@ -964,6 +964,9 @@ def check_n_init(emulator_type):
     if soc_api is None:
         try:
             soc_api = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            #add the time sleep due to some connectivity issue in one of the ODC:
+            #[ERROR: WINERROR10061]
+            time.sleep(5)
             soc_api.connect(("localhost",10001))
             data = dataTransmitter("test", emulator_type)
             if data["stat"] != 0:
