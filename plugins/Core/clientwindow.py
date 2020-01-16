@@ -285,7 +285,9 @@ class MainNamespace(BaseNamespace):
                         browsername = '3'
                     elif str(task) == 'OPEN BROWSER FX':
                         browsername = '2'
-                wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
+
+                if not bool(wxObject.scrapewindow):
+                    wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
         except Exception as e:
             err_msg='Error while Scraping Web application'
             log.error(err_msg)
@@ -1449,7 +1451,7 @@ class ClientWindow(wx.Frame):
             log.error(e,exc_info=True)
 
     def verifyMACAddress(self):
-        flag = False
+        flag = True
         core_utils_obj = core_utils.CoreUtils()
         system_mac = core_utils_obj.getMacAddress()
         mac_verification_key = "".join(['N','1','i','1','N','2','e','3','T','5','e','8','E','1','3','n','2','1','S','i','X','t','Y','3','4','e','I','g','H','t','5','5'])
@@ -1491,6 +1493,8 @@ class ClientWindow(wx.Frame):
             logger.print_on_console(msg)
             log.error(msg)
         else: self.EnableAll()
+        irisFlag = True
+        controller.iris_flag = True
         return flag
 
     def DisableAll(self):
@@ -2543,3 +2547,4 @@ def check_update(flag):
             logger.print_on_console( UPDATE_MSG )
             log.info( UPDATE_MSG )
     return False,l_ver
+
