@@ -104,7 +104,7 @@ class MainframeKeywords:
                     elif self.emulator_type == MAINFRAME_BLUEZONE:
                         result,output,err_msg =  self.bluezone_object.launch_mainframe(self.emulator_path, self.emulator_type)
                         if output == "x86":
-                            subprocess.Popen(mainframe_api, cwd = os.path.dirname(mainframe_api))
+                            #subprocess.Popen(mainframe_api, cwd = os.path.dirname(mainframe_api))
                             self.bluezone_object = BluezoneAPIKeywords()
                             result,output,err_msg =  self.bluezone_object.launch_mainframe(self.emulator_path, self.emulator_type)
                             if result == False:

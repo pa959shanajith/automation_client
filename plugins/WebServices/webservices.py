@@ -420,7 +420,31 @@ class WSkeywords:
                     err_msg=ws_constants.METHOD_INVALID_INPUT
                     log.error(err_msg)
                     logger.print_on_console(ws_constants.METHOD_INVALID_INPUT)
+            elif "x-www-form-urlencoded" in self.content_type.lower():
+                if not (self.baseEndPointURL is '' and self.baseReqBody is '' and self.baseReqHeader is ''):
+                    if (not(self.client_cert_path == '' or self.client_cert_path == None)):
+                        #if client certificates exists
+                        response = self.client_Authentication()
+                    elif(not(self.auth_uname == '' or self.auth_uname == None)
+                            and not (self.auth_pass == '' or self.auth_pass == None)):
+                        #if only basic authentication required
+                        response = self.basic_Authentication()
+                    elif(not(self.server_cert_path == '' or self.server_cert_path == None)):
+                        #if only server certificate
+                        response = self.server_Verification()
+                    else:
+                        response = requests.post(self.baseEndPointURL,data=self.baseReqBody,headers=self.baseReqHeader)
 
+                    if response != None and response != False:
+                        self.clearCertFiles()
+                        status,methodoutput,output=self.__saveResults(response)
+                    else:
+                        err_msg=ws_constants.METHOD_INVALID_INPUT
+                        log.error(err_msg)
+                else:
+                    err_msg=ws_constants.METHOD_INVALID_INPUT
+                    log.error(err_msg)
+                    logger.print_on_console(ws_constants.METHOD_INVALID_INPUT)
             else:
                 err_msg=ws_constants.METHOD_INVALID_INPUT
                 log.error(err_msg)

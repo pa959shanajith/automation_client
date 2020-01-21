@@ -119,7 +119,7 @@ class Reporting:
         return description
 
 
-    def build_overallstatus(self,start_time,end_time,ellapsed_time):
+    def build_overallstatus(self,start_time,end_time,ellapsed_time,json_data,i):
         """
         def : build_overallstatus
         purpose : builds the overallstatus field of report_json
@@ -136,8 +136,17 @@ class Reporting:
         obj[END_TIME]=self.end_time
         obj[BROWSER_VERSION]=self.browser_version
         obj[START_TIME]=self.start_time
-        obj[OVERALLSTATUS]=self.overallstatus
+        obj[OVERALLSTATUSREPORT]=self.overallstatus
         obj[BROWSER_TYPE]=self.browser_type
+        if ("suitedetails" in json_data):
+            obj[RELEASE_NAME]=json_data["suitedetails"][i["s_index"]]['releaseid']
+            obj[DOMAIN_NAME]=json_data["suitedetails"][i["s_index"]]['domainname']
+            obj[PROJECT_NAME]=json_data["suitedetails"][i["s_index"]]['projectname']
+            obj[SCENARIO_NAME]=json_data["suitedetails"][i["s_index"]]['scenarioNames'][i["index"]]
+            obj[CYCLE_NAME]=json_data["suitedetails"][i["s_index"]]['cyclename']
+            obj["pass"]=str(round(i["Pass"]/i['total']*100,2))
+            obj["fail"]=str(round(i["Fail"]/i['total']*100,2))
+            obj["terminate"]=str(round(i["Terminate"]/i['total']*100,2))
         self.overallstatus_array.append(obj)
 
     def build_overallstatus_conditionCheck(self):

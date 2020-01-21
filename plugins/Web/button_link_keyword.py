@@ -28,6 +28,7 @@ class ButtonLinkKeyword():
     def __init__(self):
         local_blk.log = logging.getLogger('button_link_keyword.py')
         local_blk.text_javascript = """function stext_content(f) {     var sfirstText = '';     var stextdisplay = '';     for (var z = 0; z < f.childNodes.length; z++) {         var scurNode = f.childNodes[z];         swhitespace = /^\s*$/;         if (scurNode.nodeName === '#text' && !(swhitespace.test(scurNode.nodeValue))) {             sfirstText = scurNode.nodeValue;             stextdisplay = stextdisplay + sfirstText;         }     }     return (stextdisplay); }; return stext_content(arguments[0])"""
+        self.copy_text=None
 
     def click(self,webelement,*args):
         local_blk.log.debug('Got the driver object from browser keyword class')
@@ -498,7 +499,8 @@ class ButtonLinkKeyword():
             robot.key_release(Keys.n)
             robot.key_release(Keys.alt)
             robot.sleep(0.5)
-            robot.paste()
+            robot.type_string(str(self.copy_text),0.005)
+            #robot.paste()
             robot.sleep(0.5)
             robot.key_press(Keys.enter)
             robot.sleep(0.5)
@@ -518,6 +520,7 @@ class ButtonLinkKeyword():
             robot = Robot()
             local_blk.log.debug('Copying input file path to the clipboard')
             robot.add_to_clipboard(inputfile.encode(encoding='utf8'))
+            self.copy_text=robot.get_clipboard_data().decode('utf8')
             local_blk.log.debug(' input file path Copied to  clipboard')
             status = True
         except Exception as e:
@@ -538,7 +541,8 @@ class ButtonLinkKeyword():
                 status = True
             else:
                 local_blk.log.debug('Going to perform click operation')
-                webelement.click()
+                #webelement.click()
+                self.click(webelement)
                 local_blk.log.info('Click operation performed using selenium click')
                 status = True
         except Exception as e:

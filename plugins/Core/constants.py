@@ -293,6 +293,8 @@ ROWS='rows'
 
 OVERALLSTATUS='overallstatus'
 
+OVERALLSTATUSREPORT='overAllStatus'
+
 ID='id'
 
 PARENT_ID='parentId'
@@ -328,6 +330,16 @@ BROWSER_TYPE='browserType'
 START_TIME='StartTime'
 
 TIME_FORMAT='%Y-%m-%d %H:%M:%S'
+
+CYCLE_NAME='cycleName'
+
+PROJECT_NAME='projectName'
+
+DOMAIN_NAME='domainName'
+
+SCENARIO_NAME='scenarioName'
+
+RELEASE_NAME='releaseName'
 
 #Logger constants
 
