@@ -40,7 +40,7 @@ iris_constant_step = -1
 socket_object = None
 count = 0
 log = logging.getLogger("controller.py")
-status_per = {TEST_RESULT_PASS:0,TEST_RESULT_FAIL:0,TERMINATE:0,"total":0}
+status_percentage = {TEST_RESULT_PASS:0,TEST_RESULT_FAIL:0,TERMINATE:0,"total":0}
 
 
 class Controller():
@@ -559,7 +559,7 @@ class Controller():
             self.dynamic_var_handler_obj.store_dynamic_value(output[1],result[1],tsp.name)
 
     def keywordinvocation(self,index,inpval,*args):
-        global socket_object,iris_constant_step,status_per
+        global socket_object,iris_constant_step,status_percentage
         configvalues = self.configvalues
         try:
             import time
@@ -709,8 +709,8 @@ class Controller():
                 index=result
                 self.status=result
             #Fixing issue #382
-            status_per[self.keyword_status]+=1
-            status_per["total"]+=1
+            status_percentage[self.keyword_status]+=1
+            status_percentage["total"]+=1
             logger.print_on_console(keyword+' executed and the status is '+self.keyword_status+'\n')
             log.info(keyword+' executed and the status is '+self.keyword_status+'\n')
             #Checking for stop keyword
@@ -722,7 +722,7 @@ class Controller():
             return index,TERMINATE
 
     def executor(self,tsplist,action,last_tc_num,debugfrom_step,mythread,json_data,index):
-        global status_per
+        global status_percentage
         i=0
         status=True
         self.scenario_start_time=datetime.now()
@@ -744,8 +744,8 @@ class Controller():
                     if i== TERMINATE:
                         #Changing the overallstatus of the report_obj to Terminate - (Sushma)
                         self.reporting_obj.overallstatus=TERMINATE
-                        status_per[TERMINATE]+=1
-                        status_per["total"]+=1
+                        status_percentage[TERMINATE]+=1
+                        status_percentage["total"]+=1
                         logger.print_on_console('Terminating the execution')
                         status=i
                         break
@@ -776,13 +776,13 @@ class Controller():
         if terminate_flag:
             #Indication of user_termination to report_obj to add a proper description in report - (Sushma)
             self.reporting_obj.user_termination=True
-            status_per[TERMINATE]+=1
-            status_per["total"]+=1
-        status_per["s_index"]=index[0]
-        status_per["index"]=index[1]
-        self.reporting_obj.build_overallstatus(self.scenario_start_time,self.scenario_end_time,self.scenario_ellapsed_time,json_data,status_per)
+            status_percentage[TERMINATE]+=1
+            status_percentage["total"]+=1
+        status_percentage["s_index"]=index[0]
+        status_percentage["index"]=index[1]
+        self.reporting_obj.build_overallstatus(self.scenario_start_time,self.scenario_end_time,self.scenario_ellapsed_time,json_data,status_percentage)
         logger.print_on_console('Step Elapsed time is : ',str(self.scenario_ellapsed_time))
-        status_per = {TEST_RESULT_PASS:0,TEST_RESULT_FAIL:0,TERMINATE:0,"total":0}
+        status_percentage = {TEST_RESULT_PASS:0,TEST_RESULT_FAIL:0,TERMINATE:0,"total":0}
         return status
 
     def invokegenerickeyword(self,teststepproperty,dispatcher_obj,inputval):
