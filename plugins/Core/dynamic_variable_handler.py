@@ -169,7 +169,7 @@ class DynamicVariables:
                 if type(eval(inputvar))==list:
                     return status,nested_variable
             except Exception as e:
-                log.error(e)
+                pass
             pattern = '\\[(.*?)\\]'
             regularexp = re.compile(pattern)
             nested_variable = regularexp.findall(inputvar)
