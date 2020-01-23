@@ -90,7 +90,7 @@ class BrowserKeywords():
                     #stale logic
                     try:
                         import win32com.client
-                        my_processes = ['chromedriver.exe','IEDriverServer.exe','IEDriverServer64.exe','CobraWinLDTP.exe','phantomjs.exe']
+                        my_processes = ['MicrosoftWebDriver.exe','chromedriver.exe','IEDriverServer.exe','IEDriverServer64.exe','CobraWinLDTP.exe','phantomjs.exe']
                         wmi=win32com.client.GetObject('winmgmts:')
                         for p in wmi.InstancesOf('win32_process'):
                             if p.Name in my_processes:
@@ -138,6 +138,14 @@ class BrowserKeywords():
                         p = psutil.Process(local_bk.driver_obj.iedriver.process.pid)
                         pidie = p.children()[0]
                         pid = pidie.pid
+                        local_bk.pid_set.append(pid)
+                    elif(self.browser_num == '7'):
+                        if enableSecurityFlag:
+                            local_bk.driver_obj = obj.set_security_zones(
+                                self.browser_num, local_bk.driver_obj)
+                        p = psutil.Process(local_bk.driver_obj.edge_service.process.pid)
+                        pidedge = p.children()[0]
+                        pid = pidedge.pid
                         local_bk.pid_set.append(pid)
                     hwndg = utilobject.bring_Window_Front(pid)
                 self.update_pid_set(enableSecurityFlag)
@@ -759,6 +767,14 @@ class BrowserKeywords():
                 pidie = p.children()[0]
                 pid = pidie.pid
                 local_bk.pid_set.append(pid)
+            elif(self.browser_num == '7'):
+                if enableSecurityFlag:
+                    local_bk.driver_obj = obj.set_security_zones(
+                        self.browser_num, local_bk.driver_obj)
+                p = psutil.Process(local_bk.driver_obj.edge_service.process.pid)
+                pidedge = p.children()[0]
+                pid = pidedge.pid
+                local_bk.pid_set.append(pid)
             hwndg = utilobject.bring_Window_Front(pid)
 
     def switch_to_window(self,webelement,input,*args):
@@ -945,6 +961,19 @@ class Singleton_DriverUtil():
                         except Exception as e:
                             d = 'stale'
                             break
+        elif browserType == '7':
+            if len(drivermap) > 0:
+                for i in drivermap:
+                    if isinstance(i,webdriver.Edge ):
+                        try:
+                            if len (i.window_handles) == 0:
+                                d = 'stale'
+                                break
+                            else:
+                                d = i
+                        except Exception as e:
+                            d = 'stale'
+                            break
 
                                    ##        drivermap.reverse()
         return d
@@ -1083,6 +1112,28 @@ class Singleton_DriverUtil():
                 logger.print_on_console('Safari browser started')
                 local_bk.log.info('Safari browser started')
 
+            except Exception as e:
+                logger.print_on_console("Requested browser is not available")
+                local_bk.log.info('Requested browser is not available')
+
+        elif(browser_num == '7'):
+            try:
+                caps = webdriver.DesiredCapabilities.EDGE.copy()
+                caps['INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS'] = True
+                caps['ignoreProtectedModeSettings'] = True
+                caps['IE_ENSURE_CLEAN_SESSION'] = True
+                caps['ignoreZoomSetting'] = True
+                caps['NATIVE_EVENTS'] = True
+                bit_64 = configvalues['bit_64']
+                if ((str(bit_64).lower()) == 'no'):
+                    edgepath = webconstants.EDGE_DRIVER_PATH
+                else:
+                    edgepath = webconstants.EDGE_DRIVER_PATH
+                driver = webdriver.Edge(capabilities=caps,executable_path=edgepath)
+                drivermap.append(driver)
+                driver.maximize_window()
+                logger.print_on_console('edge browser started')
+                local_bk.log.info('edge browser started')
             except Exception as e:
                 logger.print_on_console("Requested browser is not available")
                 local_bk.log.info('Requested browser is not available')

@@ -105,7 +105,8 @@ class BrowserOperations():
             '1':webdriver.Chrome,
             '2':webdriver.Firefox,
             '3':webdriver.Ie,
-            '6':webdriver.Safari
+            '6':webdriver.Safari,
+            '7':webdriver.Edge
         }
         if len(browser_Keywords.drivermap) > 0:
             for i in browser_Keywords.drivermap:

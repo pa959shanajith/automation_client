@@ -177,6 +177,8 @@ class Clickandadd():
                 scrapedin = 'IE'
             elif browserops.browser == 1:
                 scrapedin = 'CH'
+            elif browserops.browser == 7:
+                scrapedin = 'EDGE'
             data['scrapetype'] = 'cna'
             data['scrapedin'] = scrapedin
             #XPath encryption logic implemented
