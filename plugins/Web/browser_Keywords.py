@@ -1119,11 +1119,6 @@ class Singleton_DriverUtil():
         elif(browser_num == '7'):
             try:
                 caps = webdriver.DesiredCapabilities.EDGE.copy()
-                caps['INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS'] = True
-                caps['ignoreProtectedModeSettings'] = True
-                caps['IE_ENSURE_CLEAN_SESSION'] = True
-                caps['ignoreZoomSetting'] = True
-                caps['NATIVE_EVENTS'] = True
                 bit_64 = configvalues['bit_64']
                 if ((str(bit_64).lower()) == 'no'):
                     edgepath = webconstants.EDGE_DRIVER_PATH

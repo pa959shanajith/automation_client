@@ -2500,10 +2500,6 @@ def check_browser():
             p = subprocess.Popen('MicrosoftWebDriver.exe --version', stdout=subprocess.PIPE, bufsize=1,cwd=DRIVERS_PATH,shell=True) 
             a = p.stdout.readline()
             a = a.decode('utf-8')[28:40]
-            #caps = DesiredCapabilities.EDGE
-            #choptions2 = webdriver.ChromeOptions()
-            #choptions2.add_argument('--headless')
-            #driver = webdriver.Edge(capabilities=caps,executable_path=EDGE_DRIVER_PATH)
             driver = webdriver.Edge(executable_path=EDGE_DRIVER_PATH)
             browser_ver = driver.capabilities['browserVersion']
             browser_ver1 = browser_ver.encode('utf-8')

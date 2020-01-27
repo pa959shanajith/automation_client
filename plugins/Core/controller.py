@@ -1208,11 +1208,11 @@ def kill_process():
     else:
         try:
             import win32com.client
-            my_processes = ['MicrosoftWebDriver.exe','chromedriver.exe','IEDriverServer.exe','IEDriverServer64.exe','CobraWinLDTP.exe','phantomjs.exe','geckodriver.exe']
-            wmi=win32com.client.GetObject('winmgmts:')
+            my_processes = ['MicrosoftWebDriver.exe','MicrosoftEdge.exe','chromedriver.exe','IEDriverServer.exe','IEDriverServer64.exe','CobraWinLDTP.exe','phantomjs.exe','geckodriver.exe']
+            wmi=win32com.client.GetObject('winmgmts:') 
             for p in wmi.InstancesOf('win32_process'):
                 if p.Name in my_processes:
-                    os.system("TASKKILL /F /IM " + p.Name )
+                    os.system("TASKKILL /F /T /IM " + p.Name )
         except Exception as e:
             log.error(e)
 
