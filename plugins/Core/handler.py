@@ -122,6 +122,7 @@ class Handler():
         local_handler.tspIndex2 = -1
         local_handler.tspIndex = -1
         local_handler.tspList = []
+        local_handler.awsKeywords = {}
 
     def parse_json(self,test_data,data_param_path=None):
         """
@@ -164,7 +165,12 @@ class Handler():
                         continue
                 except Exception as e:
                     local_handler.log.error(e)
-
+                
+                if('apptype' in json_data and json_data['apptype']=="Mobility"):
+                    local_handler.awsKeywords[json_data["testcasename"]]=set()
+                    for i in range(0,len(testcase)):
+                        if(testcase[i]["keywordVal"] in constants.AWSKEYWORDS):
+                            local_handler.awsKeywords[json_data["testcasename"]].add(testcase[i]["keywordVal"])
                 #passing test case value to ftfy module to handle special charcter
 ##                if(type(testcase) == 'unicode'):
 ##                    temp_testcase = ftfy.fix_text(testcase)

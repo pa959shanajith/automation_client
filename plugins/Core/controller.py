@@ -865,6 +865,12 @@ class Controller():
                 log.info('Invalid step number!! Please provide run from step number')
         else:
             logger.print_on_console('Invalid script')
+        if (handler.local_handler.awsKeywords):
+            testcases=[]
+            for x in range(0,len(json_data)-1):
+                testcases.append(json_data[x]["testcasename"])
+            logger.print_on_console("Following Testcases "+", ".join(testcases)+" are not AWS Compatible because of the following keywords")
+            logger.print_on_console(", ".join(handler.local_handler.awsKeywords[json_data[0]["testcasename"]]))
         print('=======================================================================================================')
         log.info('***DEBUG COMPLETED***')
         logger.print_on_console('***DEBUG COMPLETED***')
@@ -906,6 +912,7 @@ class Controller():
             print('=======================================================================================================')
             log.info('***SUITE '+str( j) +' EXECUTION STARTED***')
             logger.print_on_console('***SUITE ', str(j) ,' EXECUTION STARTED***')
+            logger.print_on_console('***SUITE ', json_data['suitedetails'][j-1]["testsuitename"] ,' EXECUTION STARTED***')
             log.info('-----------------------------------------------')
             print('=======================================================================================================')
             do_not_execute = False
@@ -933,6 +940,7 @@ class Controller():
                             if not(terminate_flag):
                                 print('=======================================================================================================')
                                 logger.print_on_console( '***Scenario ' ,str(i+1) ,' execution started***')
+                                logger.print_on_console( '***Scenario ' ,json_data['suitedetails'][j-1]["scenarioNames"][i] ,' execution started***')
                                 print('=======================================================================================================')
                                 log.info('***Scenario '  + str(i+1)+ ' execution started***')
                             if(len(scenario)==3 and len(scenario['qcdetails'])==7):
