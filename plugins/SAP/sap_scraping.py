@@ -55,48 +55,7 @@ class Scrape:
                     i = i + 1
                 else:
                     path = wnd_title + elem.__getattr__("Id")[25:]
-                    type = elem.__getattr__("Type")
-                    if ( type == "GuiButton" ):
-                        custname = elem.__getattr__("Name") + "_btn"
-                        tag = "button"
-                    elif ( type == "GuiTextField" or type == "GuiCTextField" or type == "GuiPasswordField" ):
-                        custname = elem.__getattr__("Name") + "_txtbox"
-                        tag = "input"
-                    elif ( type == "GuiComboBox" or type == "GuiBox" ):
-                        custname = elem.__getattr__("Name") + "_select"
-                        tag = "select"
-                    elif ( type == "GuiLabel" ):
-                        custname = elem.__getattr__("Name") + "_lbl"
-                        tag = type
-                    elif ( type == "GuiRadioButton" ):
-                        custname = elem.__getattr__("Name") + "_radiobtn"
-                        tag = "radiobutton"
-                    elif ( type == "GuiCheckBox" ):
-                        custname = elem.__getattr__("Name") + "_chkbox"
-                        tag = "checkbox"
-                    elif ( type == "GuiTableControl" ):
-                        custname = elem.__getattr__("Name") + "_tbl"
-                        tag = "table"
-                    elif ( type == "GuiScrollContainer" ):
-                        custname = elem.__getattr__("Name") + "_scroll"
-                        tag = type
-                    elif ( type == "GuiTab" ):
-                        custname = elem.__getattr__("Name") + "_tab"
-                        tag = type
-                    elif ( type == "GuiShell" ):
-                        Subtype = None
-                        try : Subtype = elem.SubType
-                        except : log.debug('Shell does not have a subtype')
-                        if ( Subtype and Subtype == 'Tree'):
-                            custname = elem.__getattr__("Name") + "_tree"
-                            tag = "tree"
-                        else:
-                            custname = elem.__getattr__("Name") + "_shl"
-                            tag = "shell"
-                    else:
-                        custname = elem.__getattr__("Name") + "_elmnt"
-                        tag = type
-
+                    custname, tag = self.get_ele_custname_tag(elem)
                     """ Python dictionary to store the properties associated with the objects."""
                     dict = {
                         'xpath': path,
@@ -104,8 +63,6 @@ class Scrape:
                         'text': elem.__getattr__("Text"),
                         'tag': tag,
                         'custname': custname,
-                        #'screenleft': elem.__getattr__("ScreenLeft"),
-                        #'screentop': elem.__getattr__("ScreenTop"),
                         'left': elem.__getattr__("ScreenLeft"),
                         'top': elem.__getattr__("ScreenTop"),
                         'height': elem.__getattr__("Height"),
@@ -185,6 +142,13 @@ class Scrape:
     #     return window_to_scrape
 
     def clickandadd(self, operation):
+        """
+        name: clickandadd
+        purpose : To recursively obtain all the elements/objects in the window and filter out the ones clicked by the user
+        parameters: window to be scrapped
+        returns: scraped elements
+        """
+        scrape_obj = Scrape()
         if ( operation == 'STARTCLICKANDADD' ):
             global view
             view = []
@@ -209,55 +173,13 @@ class Scrape:
                             custname = None
                             wnd_title = ses.FindById(self.window_id).Text
                             path = wnd_title + elem.__getattr__("Id")[25:]
-                            type = elem.__getattr__("Type")
-                            if ( type == "GuiButton" ):
-                                custname = elem.__getattr__("Name") + "_btn"
-                                tag = "button"
-                            elif ( type == "GuiTextField" or type == "GuiCTextField" or type == "GuiPasswordField" ) :
-                                custname = elem.__getattr__("Name") + "_txtbox"
-                                tag = "input"
-                            elif ( type == "GuiComboBox" ):
-                                custname = elem.__getattr__("Name") + "_select"
-                                tag = "select"
-                            elif ( type == "GuiLabel" ):
-                                custname = elem.__getattr__("Name") + "_lbl"
-                                tag = type
-                            elif ( type == "GuiRadioButton" ):
-                                custname = elem.__getattr__("Name") + "_radiobtn"
-                                tag = "radiobutton"
-                            elif ( type == "GuiCheckBox" ):
-                                custname = elem.__getattr__("Name") + "_chkbox"
-                                tag = "checkbox"
-                            elif ( type == "GuiTableControl" ):
-                                custname = elem.__getattr__("Name") + "_tbl"
-                                tag = "table"
-                            elif ( type == "GuiScrollContainer" ):
-                                custname = elem.__getattr__("Name") + "_scroll"
-                                tag = type
-                            elif ( type == "GuiTab" ):
-                                custname = elem.__getattr__("Name") + "_tab"
-                                tag = type
-                            elif ( type == "GuiShell" ):
-                                Subtype = None
-                                try : Subtype = elem.SubType
-                                except : log.debug('Shell does not have a subtype')
-                                if ( Subtype and Subtype == 'Tree'):
-                                    custname = elem.__getattr__("Name") + "_tree"
-                                    tag = "tree"
-                                else:
-                                    custname = elem.__getattr__("Name") + "_shl"
-                                    tag = "shell"
-                            else:
-                                custname = elem.__getattr__("Name") + "_elmnt"
-                                tag = type
+                            custname, tag = scrape_obj.get_ele_custname_tag(elem)
                             dict = {
                                     'xpath': path,
                                     'id': elem.__getattr__("Id"),
                                     'text': elem.__getattr__("Text"),
                                     'tag': tag,
                                     'custname': custname,
-                                    #'screenleft': elem.__getattr__("ScreenLeft"),
-                                    #'screentop': elem.__getattr__("ScreenTop"),
                                     'left': elem.__getattr__("ScreenLeft"),
                                     'top': elem.__getattr__("ScreenTop"),
                                     'height': elem.__getattr__("Height"),
@@ -436,3 +358,74 @@ class Scrape:
                 log.error( 'Error occured : ' + str(e) )
                 logger.print_on_console( 'Error occured in Stop click and add' )
                 pass
+
+    def get_ele_custname_tag(self,elem):
+        """
+            name: get_ele_custname_tag
+            purpose: Method retreves only the custname and tag of the input element
+            parameters: <element> object
+            returns: tag, custname
+        """
+        custname=tag=None
+        type = elem.__getattr__("Type")
+        if ( type == "GuiButton" ):
+            custname = elem.__getattr__("Name") + "_btn"
+            tag = "button"
+        elif ( type == "GuiTextField" or type == "GuiCTextField" or type == "GuiPasswordField" ):
+            custname = elem.__getattr__("Name") + "_txtbox"
+            tag = "input"
+        elif ( type == "GuiComboBox" or type == "GuiBox" ):
+            custname = elem.__getattr__("Name") + "_select"
+            tag = "select"
+        elif ( type == "GuiLabel" ):
+            custname = elem.__getattr__("Name") + "_lbl"
+            tag = type
+        elif ( type == "GuiRadioButton" ):
+            custname = elem.__getattr__("Name") + "_radiobtn"
+            tag = "radiobutton"
+        elif ( type == "GuiCheckBox" ):
+            custname = elem.__getattr__("Name") + "_chkbox"
+            tag = "checkbox"
+        elif ( type == "GuiTableControl" ):
+            custname = elem.__getattr__("Name") + "_tbl"
+            tag = "table"
+        elif ( type == "GuiScrollContainer" ):
+            custname = elem.__getattr__("Name") + "_scroll"
+            tag = type
+        elif ( type == "GuiTab" ):
+            custname = elem.__getattr__("Name") + "_tab"
+            tag = type
+        elif ( type == "GuiSimpleContainer" ):
+            custname = elem.__getattr__("Name") + "_scontainer"
+            tag = type
+        elif ( type == "GuiShell" ):
+            """Shell has subtypes, filtering via 'custname' and 'tag' type accordingly"""
+            Subtype = None
+            try : Subtype = elem.SubType
+            except : log.debug('Shell does not have a subtype')
+            if ( Subtype and Subtype == 'Tree'):
+                custname = elem.__getattr__("Name") + "_tree"
+                tag = "tree"
+            elif ( Subtype and Subtype == 'GridView'):
+                custname = elem.__getattr__("Name") + "_gridview"
+                tag = "gridview"
+            elif ( Subtype and Subtype == 'Calendar'):
+                custname = elem.__getattr__("Name") + "_calendar"
+                tag = "calendar"
+            else:
+                """
+                These elements are of type shell and all have Subtypes
+                Tag for these elements will remain shell, these objects will have default shell keywords
+                Incase of a CR remove the element from here and assign a tag name to it
+                """
+                if ( Subtype and Subtype == 'HTMLViewer') : custname = elem.__getattr__("Name") + "_html_viewer"
+                elif ( Subtype and Subtype == 'Picture') : custname = elem.__getattr__("Name") + "_picture"
+                elif ( Subtype and Subtype == 'TextEdit') : custname = elem.__getattr__("Name") + "_textedit"
+                elif ( Subtype and Subtype == 'OfficeIntegration') : custname = elem.__getattr__("Name") + "_ointegration"
+                elif ( Subtype and Subtype == 'Toolbar') : custname = elem.__getattr__("Name") + "_toolbar"
+                else : custname = elem.__getattr__("Name") + "_shl"
+                tag = "shell"
+        else:
+            custname = elem.__getattr__("Name") + "_elmnt"
+            tag = type
+        return custname,tag

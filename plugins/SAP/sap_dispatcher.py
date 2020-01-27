@@ -22,6 +22,7 @@ import saputil_operations
 import sap_table_keywords
 import sap_shell_keywords
 import sap_shell_tree_keywords
+import sap_shell_calendar_keywords
 #-------------------------------------------------------------
 import sap_constants
 import constants
@@ -40,6 +41,7 @@ class SAPDispatcher:
     table_keywords_obj = sap_table_keywords.Table_keywords()
     shell_keywords_obj = sap_shell_keywords.Shell_Keywords()
     shell_tree_keywords_obj = sap_shell_tree_keywords.Shell_Tree_Keywords()
+    shell_calendar_keywords_obj = sap_shell_calendar_keywords.Shell_Calendar_Keywords()
     sap_dict = {
             #------------------------------------------------------launch keywords
             'launchapplication' : launch_keywords_obj.launch_application,
@@ -121,7 +123,8 @@ class SAPDispatcher:
             'selectrow' : table_keywords_obj.selectRow,
             'unselectrow' : table_keywords_obj.unselectRow,
             'setcelltext' : table_keywords_obj.setCellText,
-            #-----------------------------------------------------shell keywords
+            #Shell keywords
+            #-----------------------------------------------------gridviewkeywords
             'getcountofrows' : shell_keywords_obj.get_rowCount,
             'getcountofcolumns' : shell_keywords_obj.get_colCount,
             'selectrows' : shell_keywords_obj.selectRows,
@@ -146,7 +149,12 @@ class SAPDispatcher:
             'getcolvaluecorrtoselectednode' : shell_tree_keywords_obj.getColValueCorrToSelectedNode,
             'selecttreenode' : shell_tree_keywords_obj.selectTreeNode,
             'getnodenamebyindex' : shell_tree_keywords_obj.getNodeNameByIndex,
-            'verifytreepath' : shell_tree_keywords_obj.verifyTreePath
+            'verifytreepath' : shell_tree_keywords_obj.verifyTreePath,
+            #------------------------------------------------------callenderkeywords
+            'selectdate' : shell_calendar_keywords_obj.select_date,
+            'selectrange':shell_calendar_keywords_obj.select_range,
+            'selectmonth':shell_calendar_keywords_obj.select_month,
+            'selectweek':shell_calendar_keywords_obj.select_week
             }
 
     def __init__(self):

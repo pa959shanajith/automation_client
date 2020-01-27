@@ -251,67 +251,88 @@ class Shell_Keywords():
             id, ses = self.uk.getSapElement(sap_id)
             if ( id and ses ):
                 elem = ses.FindById(id)
-                try:
-                    rowcount = elem.rowCount
-                    ele_type = "GuiGridControl"
-                except Exception as e:
-                    ele_type = "GuiToolbarControl"
-                if ( elem.type == 'GuiShell' ):
-                    if ( ele_type == "GuiGridControl" ):
-                        try:
-                            #-------------------------------store the tooltips of the grid buttons
-                            lim = elem.ToolbarButtonCount
-                            for x in range (0,lim):
-                                 a = elem.GetToolbarButtonTooltip(x)
-                                 if ( str(input_val[0]).strip().lower() == str(a).strip().lower() ):
-                                    elmID = elem.GetToolbarButtonId(x)
-                                    if ( (elem.GetToolbarButtonType(x) == "Menu" or "ButtonAndMenu") and len(input_val) > 1 ):
-                                        menuItem = str(input_val[1]).strip()
-                                        elem.PressToolbarContextButton(elmID)
-                                        elem.SelectContextMenuItemByText(menuItem)
-                                    else:
-                                        elem.PressToolbarButton(elmID)
-                                    status = sap_constants.TEST_RESULT_PASS
-                                    result = sap_constants.TEST_RESULT_TRUE
-                                    break
-                            #-------------------------------store the tooltips of the grid buttons
-                        except Exception as e:
-                            logger.print_on_console('Unable to press button / button does not exist')
-                            err_msg = sap_constants.ERROR_MSG
-                    elif ( ele_type == "GuiToolbarControl" ):
-                        count = elem.ButtonCount
-                        btn_id = None
-                        for i in range(0,count):
-                            if ( elem.GetButtonTooltip(i).lower() == str(input_val[0]).strip().lower() ):
-                                btn_id = elem.GetButtonId(i)
-                                btn_type = elem.GetButtonType(i)
+                if ( elem.type == 'GuiShell' and elem.SubType == 'GridView' ):# check for shell gridview
+                    try:
+                        #-------------------------------store the tooltips of the grid buttons
+                        lim = elem.ToolbarButtonCount
+                        for x in range (0,lim):
+                             a = elem.GetToolbarButtonTooltip(x)
+                             if ( str(input_val[0]).strip().lower() == str(a).strip().lower() ):
+                                elmID = elem.GetToolbarButtonId(x)
+                                if ( (elem.GetToolbarButtonType(x) == "Menu" or "ButtonAndMenu") and len(input_val) > 1 ):
+                                    menuItem = str(input_val[1]).strip()
+                                    elem.PressToolbarContextButton(elmID)
+                                    elem.SelectContextMenuItemByText(menuItem)
+                                else:
+                                    elem.PressToolbarButton(elmID)
+                                status = sap_constants.TEST_RESULT_PASS
+                                result = sap_constants.TEST_RESULT_TRUE
                                 break
-                        if ( btn_id ):
-                            if ( btn_type == "Button" or (btn_type == "ButtonAndMenu" and len(input_val) == 1) ):
-                                if ( len(input_val) > 1 ):
-                                    log.info('Extra input not required')
-                                    logger.print_on_console('Extra input not required')
-                                elem.pressButton(btn_id)
+                        #-------------------------------store the tooltips of the grid buttons
+                    except Exception as e:
+                        logger.print_on_console('Unable to press button / button does not exist')
+                        err_msg = sap_constants.ERROR_MSG
+                elif ( elem.type == 'GuiShell' and elem.SubType == 'Toolbar' ): # check for shell Toolbar
+                    count = elem.ButtonCount
+                    btn_id = None
+                    btn_type = None
+                    #---------------------------info for buttons
+                    info_list=[]
+                    for i in range(0,count):
+                        info_list.append(elem.GetButtonTooltip(i).lower().strip())
+                    log.info("Toolbar(shell) Buttons avaliable are : "+str(info_list))
+                    del info_list
+                    #---------------------------info for buttons
+                    for i in range(0,count):
+                        if ( elem.GetButtonTooltip(i).lower().strip() == str(input_val[0]).strip().lower() ):
+                            btn_id = elem.GetButtonId(i)
+                            btn_type = elem.GetButtonType(i)
+                            break
+                    if ( btn_id ):
+                        if ( btn_type == "Button" or (btn_type == "ButtonAndMenu" and len(input_val) == 1) ):
+                            if ( len(input_val) > 1 ):
+                                log.info('Extra input not required')
+                                logger.print_on_console('Extra input not required')
+                            elem.pressButton(btn_id)
+                            status = sap_constants.TEST_RESULT_PASS
+                            result = sap_constants.TEST_RESULT_TRUE
+                        else:
+                            if ( len(input_val) >= 2 ):
+                                elem.PressContextButton(btn_id)
+##                                self.menuItem_list=input_val[1:]
+##                                self.count = 0
+##                                def recq_call(elem, menuItem):
+##                                    print('1', elem, menuItem)
+##                                    try:
+##                                        print(elem.CurrentContextMenu())
+##                                    except:
+##                                        pass
+##                                    temp_elem = elem.SelectContextMenuItemByText(menuItem)
+##                                    self.count = self.count + 1
+##                                    print(count)
+##                                    print(len(self.menuItem_list))
+##                                    if count == len(self.menuItem_list):
+##                                        return
+##                                    else:
+##                                        recq_call(temp_elem,self.menuItem_list[self.count])
+##                                recq_call(elem,self.menuItem_list[self.count])
+                                menuItem = str(input_val[1]).strip()
+##                                elem.PressContextButton(btn_id)
+                                elem.SelectContextMenuItemByText(menuItem)
                                 status = sap_constants.TEST_RESULT_PASS
                                 result = sap_constants.TEST_RESULT_TRUE
                             else:
-                                if ( len(input_val) == 2 ):
-                                    menuItem = str(input_val[1]).strip()
-                                    elem.PressContextButton(btn_id)
-                                    elem.SelectContextMenuItemByText(menuItem)
-                                    status = sap_constants.TEST_RESULT_PASS
-                                    result = sap_constants.TEST_RESULT_TRUE
-                                else:
-                                    err_msg = sap_constants.INVALID_INPUT
-                        else:
-                            err_msg = 'Unable to press button / button does not exist'
+                                err_msg = sap_constants.INVALID_INPUT
                     else:
-                        err_msg = 'Unsupported element type'
+                        err_msg = 'Unable to press button / button does not exist'
                 else:
                     err_msg = 'Element is not a shell object'
             else:
                 err_msg = sap_constants.ELELMENT_NOT_FOUND
-
+            #----------------------------------logging
+            if ( err_msg ):
+                log.info( err_msg )
+                logger.print_on_console( err_msg )
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
             log.error( err_msg )
