@@ -56,7 +56,7 @@ class DatabaseOperation():
         except Exception as e:
             log.error(e)
             logger.print_on_console(e)
-            err_msg = str(e)
+            err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
         finally:
             cursor.close()
             cnxn.close()
@@ -165,7 +165,7 @@ class DatabaseOperation():
                 log.info(value)
             except Exception as e:
                 log.error(e)
-                err_msg = str(e)
+                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                 logger.print_on_console(err_msg)
             finally:
                 cursor.close()
@@ -308,7 +308,7 @@ class DatabaseOperation():
                 logger.print_on_console(generic_constants.FILE_NOT_EXISTS)
         except Exception as e:
             log.error(e)
-            err_msg = str(e)
+            err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
             logger.print_on_console(err_msg)
         finally:
             os.remove(file_path)
@@ -382,7 +382,7 @@ class DatabaseOperation():
                         except Exception as e:
                             log.error(e)
                             logger.print_on_console(e)
-                            err_msg = e
+                            err_msg = str(e) #Changed on 23/1/2020
                     if(inp_sheet is None or inp_sheet == ''):
                         inp_sheet = generic_constants.DATABASE_SHEET
                         log.debug('Input Sheet is :')
@@ -419,7 +419,7 @@ class DatabaseOperation():
                         k+=1
                     work_book.save(fields)
                 except Exception as e:
-                    err_msg = e
+                    err_msg = str(e) #Changed on 23/1/2020
                     logger.print_on_console(e)
                 status=generic_constants.TEST_RESULT_PASS
                 result=generic_constants.TEST_RESULT_TRUE
@@ -457,8 +457,8 @@ class DatabaseOperation():
 ##            else:
 ##                logger.print_on_console(generic_constants.FILE_NOT_EXISTS)
         except Exception as e:
-            log.error(e)
-            err_msg = str(e)
+            log.error(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+            err_msg = str(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
             logger.print_on_console(err_msg)
         finally:
             cursor.close()
@@ -510,7 +510,9 @@ class DatabaseOperation():
             return self.cnxn
         except Exception as e:
             log.error(e)
-            err_msg = e.msg
+            err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+        if err_msg!=None:
+            logger.print_on_console(err_msg)    
         return err_msg
 
 
