@@ -153,12 +153,12 @@ class Shell_Calendar_Keywords():
         elif ( horizontal_movement > 0 ):
             elem.FocusDate
             for i in range(0,horizontal_movement):
-                win32api.keybd_event(0x25, 0,0,0)#right_arrow
+                win32api.keybd_event(VK_CODE['left_arrow'], 0,0,0)#left_arrow
                 time.sleep(0.20)
         elif ( horizontal_movement < 0 ):
             elem.FocusDate
             for i in range(0,abs(horizontal_movement)):
-                win32api.keybd_event(0x27, 0,0,0)#right_arrow
+                win32api.keybd_event(VK_CODE['right_arrow'], 0,0,0)#right_arrow
                 time.sleep(0.20)
         #if focusdate is lesser or greater that date to focus
         fdate = elem.FocusDate
@@ -173,7 +173,7 @@ class Shell_Calendar_Keywords():
                     status_flag = True
                     breakloop_flag = False
                 else:
-                    win32api.keybd_event(0x26, 0,0,0)#up_arrow
+                    win32api.keybd_event(VK_CODE['up_arrow'], 0,0,0)#up_arrow
                     time.sleep(0.20)
         elif( vertical_movement < 0 ):
             breakloop_flag = True
@@ -182,7 +182,7 @@ class Shell_Calendar_Keywords():
                     status_flag = True
                     breakloop_flag = False
                 else:
-                    win32api.keybd_event(0x28, 0,0,0)#down_arrow
+                    win32api.keybd_event(VK_CODE['down_arrow'], 0,0,0)#down_arrow
                     time.sleep(0.20)
         return status_flag
 
@@ -340,14 +340,12 @@ class Shell_Calendar_Keywords():
                         try:
                             status_flag = self.navigate_to(elem,input_val[0])
                             if( status_flag and elem.FocusDate == str(input_val[0]) ):
-                                win32api.keybd_event(0x0D, 0,0,0)#enter
+                                win32api.keybd_event(VK_CODE['enter'], 0,0,0)#enter
                                 status = sap_constants.TEST_RESULT_PASS
                                 result = sap_constants.TEST_RESULT_TRUE
                             elif(status_flag and elem.FocusDate != str(input_val[0]) ):
                                 err_msg = 'Unable to focus the input date'
                         except Exception as e:
-                            import traceback
-                            traceback.print_exc()
                             log.info('WARNING: Following issue found in SelectMonth ',e)
                     else : err_msg = 'Element is not a shell-calender object'
                 else : err_msg = sap_constants.ELELMENT_NOT_FOUND

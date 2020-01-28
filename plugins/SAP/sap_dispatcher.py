@@ -21,6 +21,7 @@ import radio_checkbox_keywords_sap
 import saputil_operations
 import sap_table_keywords
 import sap_shell_keywords
+import sap_shell_gridview_toolbar_keywords
 import sap_shell_tree_keywords
 import sap_shell_calendar_keywords
 #-------------------------------------------------------------
@@ -40,6 +41,7 @@ class SAPDispatcher:
     saputil_keywords_obj = saputil_operations.SapUtilKeywords()
     table_keywords_obj = sap_table_keywords.Table_keywords()
     shell_keywords_obj = sap_shell_keywords.Shell_Keywords()
+    shell_gridview_toolbar_keywords_obj = sap_shell_gridview_toolbar_keywords.Shell_GridView_Toolbar_Keywords()
     shell_tree_keywords_obj = sap_shell_tree_keywords.Shell_Tree_Keywords()
     shell_calendar_keywords_obj = sap_shell_calendar_keywords.Shell_Calendar_Keywords()
     sap_dict = {
@@ -122,6 +124,8 @@ class SAPDispatcher:
             'getcellstatus' : table_keywords_obj.getStatus,
             'selectrow' : table_keywords_obj.selectRow,
             'unselectrow' : table_keywords_obj.unselectRow,
+            'selectcolumn' : table_keywords_obj.selectColumn,
+            'unselectColumn' : table_keywords_obj.unselectColumn,
             'setcelltext' : table_keywords_obj.setCellText,
             #Shell keywords
             #-----------------------------------------------------gridviewkeywords

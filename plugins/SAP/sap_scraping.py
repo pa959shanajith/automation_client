@@ -412,17 +412,17 @@ class Scrape:
             elif ( Subtype and Subtype == 'Calendar'):
                 custname = elem.__getattr__("Name") + "_calendar"
                 tag = "calendar"
+            elif ( Subtype and Subtype == 'Toolbar'):
+                custname = elem.__getattr__("Name") + "_toolbar"
+                tag = "toolbar"
+
             else:
                 """
                 These elements are of type shell and all have Subtypes
                 Tag for these elements will remain shell, these objects will have default shell keywords
                 Incase of a CR remove the element from here and assign a tag name to it
                 """
-                if ( Subtype and Subtype == 'HTMLViewer') : custname = elem.__getattr__("Name") + "_html_viewer"
-                elif ( Subtype and Subtype == 'Picture') : custname = elem.__getattr__("Name") + "_picture"
-                elif ( Subtype and Subtype == 'TextEdit') : custname = elem.__getattr__("Name") + "_textedit"
-                elif ( Subtype and Subtype == 'OfficeIntegration') : custname = elem.__getattr__("Name") + "_ointegration"
-                elif ( Subtype and Subtype == 'Toolbar') : custname = elem.__getattr__("Name") + "_toolbar"
+                if ( Subtype ) : custname = elem.__getattr__("Name") + '_' + str(Subtype).lower()
                 else : custname = elem.__getattr__("Name") + "_shl"
                 tag = "shell"
         else:
