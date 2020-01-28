@@ -22,7 +22,7 @@ class StepDescription:
         def getcurrentdate():
             return 'Get current date of the system and save the date '+ "'" + str(output)+ "'" + ' in '+ "'"+ tsp.outputval+ "'"
         def getcurrentdateandtime():
-            return 'Get current date and time of the system and save the date and time '+"'"+ inputval[0] +"' and '"+ inputval[1] + "'"+ ' in '+"'"+ tsp.outputval+"'"
+            return 'Get current date time of the system and save the date time '+"'"+ inputval[0] +"' and '"+ inputval[1] + "'"+ ' in '+"'"+ tsp.outputval+"'"
         def getcurrentday():
             return 'Get current day of the system and save the day '+ "'" + str(output)+ "'" + ' in '+ "'"+ tsp.outputval+ "'"
         def getcurrentdaydateandtime():
@@ -51,7 +51,7 @@ class StepDescription:
         def renamefile():
             return "rename filename '"+ inputval[1] +"' to '"+ inputval[2]+"' in the path '"+ inputval[0]+"'"
         def savefile():
-            return "Save File: '"+ inputval[1] +"'and stored in: '"+ inputval[0]+"'"
+            return "File saved: '"+ inputval[1] +"'and stored in: '"+ inputval[0]+"'"
         def executefile():
             return "Perform execution of the file'"+ input+"'"
         def verifycontent():
@@ -61,7 +61,7 @@ class StepDescription:
         def comparefiles():
             return "Compare the contents of file '"+ inputval[0] + "' and '"+ inputval[1]+"'"
         def executescript():
-            return "Perform execution of the file '"+ input+"'"
+            return "Perform execution of the script '"+ input+"'"
         def writetofile():
             return "Write '"+ inputval[1] + "' to file  '" + inputval[0] + "'"
         def verifyfileimages():
@@ -107,9 +107,9 @@ class StepDescription:
         def verifyfolderexists():
             return "Verify '"+ inputval[1] + "' folder exists in the path: '" + inputval[0]+"'"
         def deletefolder():
-            return "delete: '" + inputval[1] + "' folder from the path: '" + inputval[0]+"'"
+            return "Delete: '" + inputval[1] + "' folder from the path: '" + inputval[0]+"'"
         def renamefolder():
-            return "rename folder '" + str(inputval[1]) +"' to '"+ str(inputval[2])+ "' in the path '"+ inputval[0]+"'"
+            return "Rename folder '" + str(inputval[1]) +"' to '"+ str(inputval[2])+ "' in the path '"+ inputval[0]+"'"
 
         #Math opeartions
         def add():
@@ -135,11 +135,11 @@ class StepDescription:
         def split():
             return 'Split the string ' +"'"+ str(inputval[0])+"'"+' with split character '+"'"+str(inputval[1])+"'"+' and save the value: '+"'"+ output+"'"+' in '+"'"+tsp.outputval+"'"
         def right():
-            return "Perform String operation right on string '"+ input+ "' with index '"+ inputval[1]+ "' and save the value '" + output + "' in '"+ tsp.outputval + "'"
+            return "Perform String operation RIGHT on string '"+ input+ "' with index '"+ inputval[1]+ "' and save the value '" + output + "' in '"+ tsp.outputval + "'"
         def left():
-            return "Perform String operation Left on string '"+ input+ "' with index '"+ inputval[1]+ "' and save the value '" + output + "' in '"+ tsp.outputval + "'"
+            return "Perform String operation LEFT on string '"+ input+ "' with index '"+ inputval[1]+ "' and save the value '" + output + "' in '"+ tsp.outputval + "'"
         def mid():
-            return "Perform String operation Mid on string '" + input+ "' and save the value '" + output + "' in '"+ tsp.outputval + "'"
+            return "Perform String operation MID on string '" + input+ "' and save the value '" + output + "' in '"+ tsp.outputval + "'"
         def concatenate():
             return "Concatenate string '"+ input + "' and save the value '" + output + "' in '"+ tsp.outputval + "'"
         def find():
@@ -147,9 +147,9 @@ class StepDescription:
         def replace():
             return "In string '"+ inputval[0] + "' replace '"+ inputval[1] + "' with '"+ inputval[2]+ "' and save the updated input string '" + output+ "' in '" + tsp.outputval + "'"
         def getstringlength():
-            return "Get the length of the string '" + input+ "' and save the value '" + output + "' in '"+ tsp.outputval + "'"
+            return "Get the length of the string '" + input+ "' and save the length '" + output + "' in '"+ tsp.outputval + "'"
         def getsubstring():
-            return "Get Substring of the string '"+ inputval[0]+ "' with index/range '"+ inputval[1]+ "'  and save the value '" + output+ "' in variable '"+ tsp.outputval + "'"
+            return "Get Substring of the string '"+ inputval[0]+ "' with index/range '"+ inputval[1]+ "'  and save the Substring '" + output+ "' in '"+ tsp.outputval + "'"
         def stringgeneration():
             if input.find("num") != -1:
                 return "Generate a number having a length '"+ input + "'."
@@ -158,13 +158,13 @@ class StepDescription:
 
         #Clipboard keywords
         def savetoclipboard():
-            return "Save the value '"+input +"' to ClipBoard and store the output '"+ output+ "' in variable '"+ tsp.outputval + "'."
+            return "Save the value '"+input +"' to ClipBoard and store the output '"+ output+ "' in '"+ tsp.outputval + "'."
         def getfromclipboard():
-            return "Get data from ClipBoard and save the value '"+ output+ "' in variable '"+ tsp.outputval + "'."
+            return "Get data from ClipBoard and save the value '"+ output+ "' in '"+ tsp.outputval + "'."
 
         #delay keywords
         def wait():
-            return "Wait for '" +input+"'  Second(s)"
+            return "Wait for '" +input+"'  second(s)"
         def pause():
             return 'Pause the application until the user interrupts'
 
@@ -184,7 +184,7 @@ class StepDescription:
         def copyvalue():
             return "Copy value to variable '"+str(inputval[0])+ "' from variable '"+str(inputval[1])+ "'"
         def getcontent():
-            return "Get content from the pdf '" +input+ "' and save it in '"+ tsp.outputval + "'"
+           return "Get content from the file '" +input+ "' and save it in '"+ tsp.outputval + "'"
         def getindexcount():
             if '@' in output:
                 row,col=output.split('@')
@@ -198,7 +198,7 @@ class StepDescription:
         def modifyvalue():
             return "Modify variable '"+ str(inputval[0]) + "' value to '"+str(inputval[1])+ "'"
         def mousepress():
-            return 'Mouse Pressed'
+            return 'Mouse left button pressed'
         def replacecontent():
             return "Replace '"+str(inputval[0]) + "' in the '"+ str(inputval[1])+"' with the '"+str(inputval[2])+"'"
         def sendfunctionkeys():
@@ -247,7 +247,7 @@ class StepDescription:
         def getrowcount():
             return 'Get row count of the '+"'"+tsp.custname+"'"+' and save the count '+"'"+output+"'"+' in '+"'"+tsp.outputval+"'"
         def readcell():
-            return 'Read the content from the cell '+"'"+ input+"'"+' and save the value '+"'"+output+"'"+' in variable '+"'"+tsp.outputval+"'"
+            return 'Read the content from the cell '+"'"+ input+"'"+' and save the value '+"'"+output+"'"+' in '+"'"+tsp.outputval+"'"
         def setexcelpath():
             return 'Sets the excel file path: '+"'"+ input+"'"+' internally for the excel operations'
         def writetocell():
@@ -302,11 +302,11 @@ class StepDescription:
         def waitforelementvisible():
             return 'Wait until the element'  + "'" + tsp.custname + "'"+  'is visible'
         def verifyhidden():
-            return 'Verify' + tsp.custname +  'is hidden'
+            return 'Verify' + tsp.custname +  'is Hidden'
         def verifydisabled():
-            return 'Verify' + "'" + tsp.custname + "'" +  'is disabled'
+            return 'Verify' + "'" + tsp.custname + "'" +  'is Disabled'
         def verifyenabled():
-            return 'Verify' + "'" + tsp.custname + "'" +  'is enabled'
+            return 'Verify' + "'" + tsp.custname + "'" +  'is Enabled'
         def verifyvisible():
             return 'Verify' + "'" + tsp.custname + "'" +  'is visible'
         def verifyreadonly():
@@ -320,7 +320,7 @@ class StepDescription:
         def verifydoesnotexists():
             return 'Verify ' + "'" + tsp.custname + "'" + ' does not exists'
         def rightclick():
-            return 'Perform right click on element' + "'" + tsp.custname + "'"
+            return 'Perform right click on ' + "'" + tsp.custname + "'"
         def drag():
             return 'Perform drag on element' + "'" + tsp.custname + "'"
         def drop():
@@ -338,15 +338,15 @@ class StepDescription:
         def cleartext():
             return 'Clear text from the ' + "'" + tsp.custname + "'"
         def click():
-            return 'Click on the ' + "'" + tsp.custname + "'"
+            return 'Click on ' + "'" + tsp.custname + "'"
         def doubleclick():
-            return 'DoubleClick on the ' + "'" + tsp.custname + "'"
+            return 'Double Click on ' + "'" + tsp.custname + "'"
         def verifybuttonname():
             return 'Verify ' +"'"+ input +"'"+  'is the name of ' + "'" + tsp.custname + "'"
         def getbuttonname():
-            return 'Get the name of the ' + "'" + tsp.custname + "'" + 'and save the +output+ in ' + tsp.outputval
+            return 'Get the name of the ' + "'" + tsp.custname + "'" + 'and save the '+output+'' in ' + tsp.outputval
         def getlinktext():
-            return 'Get Text From ' + "'" + tsp.custname + "'" + ' and save the text \'' + output + '\' in ' + tsp.outputval
+            return 'Get text From ' + "'" + tsp.custname + "'" + ' and save the text \'' + output + '\' in ' + tsp.outputval
         def verifylinktext():
             return 'Verify text ' + "'"+input +"'"+ ' is the name of the ' + "'" + tsp.custname + "'"
         def selectradiobutton():
@@ -372,7 +372,7 @@ class StepDescription:
         def verifyselectedvalues():
             return 'Verify values ' +"'"+ input + "'"+' are selected in the ' + "'" + tsp.custname + "'"
         def getselected():
-            return 'Get Selected value of '+  "'" + tsp.custname + "'" + ' and save value \'' + output + '\' in '+ tsp.outputval
+            return 'Get Selected value of '+  "'" + tsp.custname + "'" + ' and save the value \'' + output + '\' in '+ tsp.outputval
         def verifyvaluesexists():
             return 'Verify values ' +"'"+ input +"'"+ ' exists in the '+  "'" + tsp.custname + "'"
         def getvaluebyindex():
@@ -399,11 +399,11 @@ class StepDescription:
             return 'Verify cell value ' + f_input[2] + ' is present in the ' + "'" + tsp.custname + '['+f_input[0] +']['+ f_input[1] + "]'" +  '  table'
         def cellclick():
             f_input = input.split(',')
-            return 'Click ' + "'" + tsp.custname + '['+f_input[0] +']['+ f_input[1] + "]'"
+            return 'Click on ' + "'" + tsp.custname + '['+f_input[0] +']['+ f_input[1] + "]'"
         def clickelement():
-            return 'Click ' + "'" + tsp.custname + "'"
+            return 'Click on ' + "'" + tsp.custname + "'"
         def getelementtext():
-            return'Get the text of the element ' + "'" + tsp.custname + "'" + ' and save the value  \'' + output + '\' in ' + tsp.outputval
+            return'Get the text of the element ' + "'" + tsp.custname + "'" + ' and save the text  \'' + output + '\' in ' + tsp.outputval
         def verifyelementtext():
             return 'Verify ' +"'"+ input +"'"+ ' is the the text of the ' + "'" + tsp.custname + "'"
         def sendfunctionkeys():
@@ -427,11 +427,11 @@ class StepDescription:
         def settextiris():
             return ' Enter text '+"'"+ input+"'"+ ' in ' + "'" + tsp.custname + "'"+ '.'
         def gettextiris():
-            return ' Get Text From '+ "'" +tsp.custname + "'" + ' and save the text '+"'"+ output + "'"+' in ' +"'"+ tsp.outputval+"'"+ '.'
+            return ' Get text From '+ "'" +tsp.custname + "'" + ' and save the text '+"'"+ output + "'"+' in ' +"'"+ tsp.outputval+"'"+ '.'
         def getrowcountiris():
             return ' Get row count of '+ "'" + tsp.custname + "'"+ ' and save the count '+"'"+output+"'"+ ' in '+"'"+ tsp.outputval+"'"+ '.'
         def getcolcountiris():
-            return ' Get column Count of ' + "'" + tsp.custname + "'" + ' and save the count ' + "'"+output+"'" + ' in '+"'"+ tsp.outputval+"'"+'.'
+            return ' Get column count of ' + "'" + tsp.custname + "'" + ' and save the count ' + "'"+output+"'" + ' in '+"'"+ tsp.outputval+"'"+'.'
         def getcellvalueiris():
             inp = input.split(',')
             return 'Get cell value of ' + "'" + tsp.custname +'['+inp[0]+']['+inp[1]+']'+"'" + ' in the table and save the value ' +"'"+output +"'"+ ' in '+"'"+tsp.outputval+"'"
@@ -462,7 +462,7 @@ class StepDescription:
         def launchapplication():
             return ' The application present in the path ' + "'" + inputval[0] + "'" + ' is launched' + '.'
         def getpagetitle():
-            return ' The page title is '+ "'" + output + "'" + ' and  is saved  in the variable ' + "'" + tsp.outputval + "'" + '.'
+            return ' The page title is '+ "'" + output + "'" + ' and is saved  in the variable ' + "'" + tsp.outputval + "'" + '.'
         def closeapplication():
             return ' The application is closed' + '.'
         def geterrormessage():
@@ -479,7 +479,7 @@ class StepDescription:
 
         #Textbox keywords
         def gettext():
-            return ' Get Text From '+ "'" +tsp.custname + "'" + ' and save the text '+"'"+ output + "'"+' in ' +"'"+ tsp.outputval+"'"+ '.'
+            return ' Get text From '+ "'" +tsp.custname + "'" + ' and save the text '+"'"+ output + "'"+' in ' +"'"+ tsp.outputval+"'"+ '.'
         def setsecuretext():
             return ' Enter secure text ' +"'"+inputval[0]+"'"+ ' in the  ' + "'" + tsp.custname + "'"+ '.'
         def cleartext():
@@ -503,7 +503,7 @@ class StepDescription:
 
         #Dropdown keywords
         def getselected():
-            return ' Get Selected value of '+ "'" + tsp.custname + "'"+ ' and save value ' +"'"+ output +"'"+ ' in '+"'"+ tsp.outputval+"'"+ '.'
+            return ' Get Selected value of '+ "'" + tsp.custname + "'"+ ' and save the value ' +"'"+ output +"'"+ ' in '+"'"+ tsp.outputval+"'"+ '.'
         ##        def GetValueByIndex():
         ##            return 'Get value with index ' + input + ' in the '+ "'" + tsp.custname + "'" + ' and save the value ' + output + ' in '+ tsp.outputval+'.'
         def verifyvaluesexists():
@@ -524,7 +524,7 @@ class StepDescription:
         ##        def ClickElement():
         ##            return 'Click on ' +"'" + tsp.custname + "'"+'.'
         def getelementtext():
-            return ' Get the text of the element '+ "'" + tsp.custname + "'"+ ' and save the value  '+"'"+output +"'"+ ' in '+"'"+ tsp.outputval+"'"+'.'
+            return ' Get the text of the element '+ "'" + tsp.custname + "'"+ ' and save the text  '+"'"+output +"'"+ ' in '+"'"+ tsp.outputval+"'"+'.'
         def verifyelementtext():
             return ' Verify '+ "'" + input + "'"+ ' is the text of '+"'" + tsp.custname + "'"+'.'
         def verifyiconname():
@@ -550,7 +550,7 @@ class StepDescription:
         def getrownumbytext():
             return ' Get row number of ' + "'" + tsp.custname + "'" + ' by text '+"'" +input +"'" +' and save the row number ' + "'"+ output +"'" + ' in '+ tsp.outputval+"'"+'.'
         def getcellvalue():
-            return ' Get cell value of  '+ "'" + tsp.custname + "'" +' in row number ' + "'" + input[0] + "'" +' and column number '+"'"+input[1] +"'"+'in the table and save the value '+"'"+ output +"'"+ " in " +"'"+ tsp.outputval +"'"+'.'
+            return ' Get cell value of '+ "'" + tsp.custname + "'" +' in row number ' + "'" + input[0] + "'" +' and column number '+"'"+input[1] +"'"+'in the table and save the value '+"'"+ output +"'"+ " in " +"'"+ tsp.outputval +"'"+'.'
         def verifycellvalue():
             return ' Verify cell value of element in row number ' +"'"+ input[0] +"'"+' and column number '+"'"+input[1] +"'"+' against the input value '+"'"+input[2]+"'"+' present in ' +"'" + tsp.custname + "'"+'.'
         def verifytextexists():
@@ -582,9 +582,9 @@ class StepDescription:
 
         #SAP gerenal keywords
         def click():
-            return ' Click on the '+ "'" +tsp.custname+ "'" +'.'
+            return ' Click on '+ "'" +tsp.custname+ "'" +'.'
         def doubleclick():
-            return ' Double click on the '+ "'" +tsp.custname+ "'" +'.'
+            return ' Double click on '+ "'" +tsp.custname+ "'" +'.'
         def mousehover():
             return ' Move mouse pointer to ' + "'" + tsp.custname + "'"+'.'
         def gettooltiptext():
@@ -596,9 +596,9 @@ class StepDescription:
 
         #Saputil keywords
         def verifyenabled():
-            return ' Verify '+ "'" + tsp.custname + "'" + ' is enabled '+'.'
+            return ' Verify '+ "'" + tsp.custname + "'" + ' is Enabled '+'.'
         def verifydisabled():
-            return ' Verify '+ "'" + tsp.custname + "'" + ' is disabled '+'.'
+            return ' Verify '+ "'" + tsp.custname + "'" + ' is Disabled '+'.'
         def verifyexists():
             return ' Verify '+ "'" + tsp.custname + "'" + '  exists '+'.'
 
@@ -674,7 +674,7 @@ class StepDescription:
         def settextiris():
             return ' Enter text '+"'"+ input+"'"+ ' in ' + "'" + tsp.custname + "'"+ '.'
         def gettextiris():
-            return ' Get Text From '+ "'" +tsp.custname + "'" + ' and save the text '+"'"+ output + "'"+' in ' +"'"+ tsp.outputval+"'"+ '.'
+            return ' Get text From '+ "'" +tsp.custname + "'" + ' and save the text '+"'"+ output + "'"+' in ' +"'"+ tsp.outputval+"'"+ '.'
         def getrowcountiris():
             return ' Get row count of '+ "'" + tsp.custname + "'"+ ' and save the count '+"'"+output+"'"+ ' in '+"'"+ tsp.outputval+"'"+ '.'
         def getcolcountiris():
@@ -786,15 +786,15 @@ class StepDescription:
         def getattachmentstatus():
             return ' Attachment is '+"'"+output+"'"+' in the mail '+"'"+tsp.outputval+"'."
         def getbody():
-            return ' Fetch the '+"'"+'Body'+"'"+' from the mail '+"'"+inputval[0]+"'"+' and save the value in variable '+"'"+tsp.outputval+"'."
+            return ' Fetch the '+"'"+'Body'+"'"+' from the mail '+"'"+inputval[0]+"'"+' and save the value in '+"'"+tsp.outputval+"'."
         def getemail():
             return ' Fetch the email  which is having '+"'"+'From'+"'"+' as '+"'"+listInput[0]+"'"+', '+"'"+' To '+"'" +' as '+"'"+listInput[1]+"'"+' and '+"'"+'Subject'+"'"+ ' as '+"'"+listInput[2]+"' and save the email in the variable "+"'"+tsp.outputval+"'."
         def getfrommailid():
-            return ' Fetch the '+"'"+'From Mail ID'+"'"+' from the mail '+"'"+inputval[0]+"'"+'  and save the value '+"'"+output+"'"+' in variable '+"'"+tsp.outputval+"'."
+            return ' Fetch the '+"'"+'From Mail ID'+"'"+' from the mail '+"'"+inputval[0]+"'"+'  and save the value '+"'"+output+"'"+' in '+"'"+tsp.outputval+"'."
         def getsubject():
-            return ' Fetch the '+"'"+'Subject'+"'"+' from the mail '+"'"+inputval[0]+"'"+' and save the value '+"'"+output+"'"+' in variable '+"'"+tsp.outputval+"'."
+            return ' Fetch the '+"'"+'Subject'+"'"+' from the mail '+"'"+inputval[0]+"'"+' and save the value '+"'"+output+"'"+' in '+"'"+tsp.outputval+"'."
         def gettomailid():
-            return ' Fetch the '+"'"+'To Mail ID'+"'"+' from the mail '+"'"+inputval[0]+"'"+' and save the value '+"'"+output+"'"+' in variable '+"'"+tsp.outputval+"'."
+            return ' Fetch the '+"'"+'To Mail ID'+"'"+' from the mail '+"'"+inputval[0]+"'"+' and save the value '+"'"+output+"'"+' in '+"'"+tsp.outputval+"'."
         def switchtofolder():
             return ' Switched to folder '+"'"+input+"'."
         def verifyemail():
@@ -804,37 +804,37 @@ class StepDescription:
                 input = ", ".join(listInput)
             else:
                 input =str(inputval[0])
-            return ' Set '+"'"+'To Mail ID'+"'"+' as '+"'"+input+"'"+' for the email and save the value in variable '+"'"+tsp.outputval+"'."
+            return ' Set '+"'"+'To Mail ID'+"'"+' as '+"'"+input+"'"+' for the email and save the value in '+"'"+tsp.outputval+"'."
         def setcc():
             if len(listInput)>0:
                 input = ", ".join(listInput)
             else:
                 input =str(inputval[0])
-            return ' Set '+"'"+'CC'+"'"+' as '+"'"+input+"'"+' for the email and save the value in variable '+"'"+tsp.outputval+"'."
+            return ' Set '+"'"+'CC'+"'"+' as '+"'"+input+"'"+' for the email and save the value in '+"'"+tsp.outputval+"'."
         def setbcc():
             if len(listInput)>0:
                 input = ", ".join(listInput)
             else:
                 input =str(inputval[0])
-            return ' Set '+"'"+'BCC'+"'"+' as '+"'"+input+"'"+' for the email and save the value in variable '+"'"+tsp.outputval+"'."
+            return ' Set '+"'"+'BCC'+"'"+' as '+"'"+input+"'"+' for the email and save the value in '+"'"+tsp.outputval+"'."
         def setsubject():
-            return ' Set '+"'"+'Subject'+"'"+' as '+"'"+input+"'"+' for the email and save the value in variable '+"'"+tsp.outputval+"'."
+            return ' Set '+"'"+'Subject'+"'"+' as '+"'"+input+"'"+' for the email and save the value in '+"'"+tsp.outputval+"'."
         def setbody():
-            return ' Set '+"'"+'Body'+"'"+' as '+"'"+input+"'"+' for the email and save the value in variable '+"'"+tsp.outputval+"'."
+            return ' Set '+"'"+'Body'+"'"+' as '+"'"+input+"'"+' for the email and save the value in '+"'"+tsp.outputval+"'."
         def setattachments():
             if len(listInput)>0:
                 input = ", ".join(listInput)
             else:
                 input =str(inputval[0])
-            return ' Set attachment/attachments from the path '+"'"+input+"'"+' for the email and save the value in variable '+"'"+tsp.outputval+"'."
+            return ' Set attachment/attachments from the path '+"'"+input+"'"+' for the email and save the value in '+"'"+tsp.outputval+"'."
         def sendemail():
-            return ' Send the email and save the value in variable '+"'"+tsp.outputval+"'."
+            return ' Send the email and save the value in '+"'"+tsp.outputval+"'."
 
         #TextBox keywords( 5 keywords)
         def cleartext():
             return ' Clear text from the '+ "'" + tsp.custname + "'"+ '.'
         def gettext():
-            return ' Get Text From '+ "'" +tsp.custname + "'" + ' and save the text '+"'"+ output + "'"+' in ' +"'"+tsp.outputval+"'."
+            return ' Get text From '+ "'" +tsp.custname + "'" + ' and save the text '+"'"+ output + "'"+' in ' +"'"+tsp.outputval+"'."
         def settext():
             return ' Enter text '+"'"+ input+"'"+ ' in the  ' + "'" + tsp.custname + "'"+ '.'
         def verifytext():
@@ -860,15 +860,15 @@ class StepDescription:
 
         #Button Keywords(7 keywords)
         def click():
-            return ' Click on the ' +"'" + tsp.custname + "'."
+            return ' Click on ' +"'" + tsp.custname + "'."
         def doubleclick():
-            return ' Double click on the '+"'"+tsp.custname + "'."
+            return ' Double click on '+"'"+tsp.custname + "'."
         def verifybuttonname():
-            return ' Verify button name '+"'"+tsp.custname + "'" +' and save the value ' +"'"+output+"'"+' in '+"'" + tsp.outputval+ "'."
+            return ' Verify button name of '+"'"+tsp.custname + "'" +' and save the value ' +"'"+output+"'"+' in '+"'" + tsp.outputval+ "'."
         def getbuttonname():
-            return ' Get button name '+"'"+tsp.custname + "'" +' and save the value ' +"'"+output+"'"+' in '+"'" + tsp.outputval+ "'."
+            return ' Get button name of '+"'"+tsp.custname + "'" +' and save the value ' +"'"+output+"'"+' in '+"'" + tsp.outputval+ "'."
         def rightclick():
-            return ' Right click on the '+"'" + tsp.custname + "'."
+            return ' Right click on '+"'" + tsp.custname + "'."
         #link Keywords(2 keywords but not in use)
         def getlinktext():
             return ' Get the value present in ' + "'" + tsp.custname + "'" +' and save the value '+"'"+ output+"'"+' in '+ tsp.outputval+"."
@@ -879,11 +879,11 @@ class StepDescription:
         def setfocus():
             return ' Set focus on '+"'"+tsp.custname+"'."
         def verifydisabled():
-            return ' Verify if '+"'"+tsp.custname+"'."+' is disabled.'
+            return ' Verify if '+"'"+tsp.custname+"'."+' is Disabled.'
         def verifyenabled():
-            return ' Verify if '+"'"+tsp.custname+"'."+' is enabled.'
+            return ' Verify if '+"'"+tsp.custname+"'."+' is Enabled.'
         def verifyhidden():
-            return ' Verify if '+"'"+tsp.custname+"'."+' is hidden.'
+            return ' Verify if '+"'"+tsp.custname+"'."+' is Hidden.'
         def verifyvisible():
             return ' Verify if '+"'"+tsp.custname+"'."+' is visible.'
         def verifyreadonly():
@@ -908,7 +908,7 @@ class StepDescription:
         def settextiris():
             return ' Enter text '+"'"+ input+"'"+ ' in ' + "'" + tsp.custname + "'"+ '.'
         def gettextiris():
-            return ' Get Text From '+ "'" +tsp.custname + "'" + ' and save the text '+"'"+ output + "'"+' in ' +"'"+ tsp.outputval+"'"+ '.'
+            return ' Get text From '+ "'" +tsp.custname + "'" + ' and save the text '+"'"+ output + "'"+' in ' +"'"+ tsp.outputval+"'"+ '.'
         def getrowcountiris():
             return ' Get row count of '+ "'" + tsp.custname + "'"+ ' and save the count '+"'"+output+"'"+ ' in '+"'"+ tsp.outputval+"'"+ '.'
         def getcolcountiris():
@@ -937,19 +937,19 @@ class StepDescription:
         def closeapplication():
             return 'The application is closed.'
         def swipeup():
-            return 'Performed swipe up operation.'
+            return 'Performed Swipe Up operation.'
         def verifydoesnotexists():
             return ' Verify '+ "'" + tsp.custname + "'" + '  does not exists'
         def swipedown():
-            return 'Performed swipe down operation'
+            return 'Performed Swipe Down operation'
         def swipeleft():
-            return 'Performed swipe left operation'
+            return 'Performed Swipe Left operation'
         def hidesoftkeyboard():
             return 'Performed HideSoftKeyBoard operation'
         def backpress():
             return 'Performed Back Press operation'
         def swiperight():
-            return 'Performed swipe right operation'
+            return 'Performed Swipe Right operation'
         def toggleon():
             return 'Performed toggle on operation on  ' + "'" + tsp.custname + "'"
         def toggleoff():
@@ -963,13 +963,13 @@ class StepDescription:
         def longpresselement():
             return 'Long Press ' + "'" + tsp.custname + "'"
         def getelementtext():
-            return'Get the text of the element ' + "'" + tsp.custname + "'" + ' and save the value  ' +"'"+ output+"'"+' in ' +"'"+output_list+"'."
+            return'Get the text of the element ' + "'" + tsp.custname + "'" + ' and save the text  ' +"'"+ output+"'"+' in ' +"'"+output_list+"'."
         def verifyelementtext():
             return 'Verify ' + input + ' is the the text of the ' + "'" + tsp.custname + "'"
         def waitforelementexists():
-            return 'Wait until the element'  + "'" + tsp.custname + "'"+  'is exists'
+            return 'Wait until the element'  + "'" + tsp.custname + "'"+  ' exists'
         def verifyenabled():
-            return ' Verify '+ "'" + tsp.custname + "'" + ' is enabled '
+            return ' Verify '+ "'" + tsp.custname + "'" + ' is Enabled '
         def setdate():
             return 'Set date '+ inputval[0]+ ' in the  ' + "'" + tsp.custname + "'"+ '.'
         def setnumber():
@@ -981,11 +981,11 @@ class StepDescription:
         def settime():
             return 'Enter time '+ inputval[0]+ ' in the  ' + "'" + tsp.custname + "'"+ '.'
         def verifyelementenabled():
-            return ' Verify '+ "'" + tsp.custname + "'" + ' is enabled '
+            return ' Verify '+ "'" + tsp.custname + "'" + ' is Enabled '
         def verifyelementdisabled():
             return ' Verify '+ "'" + tsp.custname + "'" + ' is Disabled '
         def verifydisabled():
-            return 'Verify '+ "'" + tsp.custname + "'" + ' is disabled '
+            return 'Verify '+ "'" + tsp.custname + "'" + ' is Disabled '
         def verifyexists():
             return ' Verify '+ "'" + tsp.custname + "'" + '  exists '
         def verifyelementexists():
@@ -1016,7 +1016,7 @@ class StepDescription:
         def sendvalue():
             return ' Enter value ' +"'"+input+"'"+' in the '+ "'" + tsp.custname + "'"
         def gettext():
-            return 'Get Text From '+ "'" +tsp.custname + "'" + ' and save the text '+"'"+output+"'"+' in '+"'"+output_list+"'."
+            return 'Get text from '+ "'" +tsp.custname + "'" + ' and save the text '+"'"+output+"'"+' in '+"'"+output_list+"'."
         def setsecuretext():
              return 'Enter secure text '+"'"+inputval[0]+"'"+' in the '+"'"+tsp.custname+"'."
         def cleartext():
@@ -1047,7 +1047,6 @@ class StepDescription:
             return 'Select value by text '+"'"+input+"'"+' of the '+ 'type '+ "'" + tsp.custname + "'" +' with the element '+"'"+input+"'"+' present in the table cell '+"'" + tsp.custname + "'"+'-['+ input + ']['+ input +']'
         def getmultiplevaluesbyindexes():
             return 'Get values with indexes ' +"'"+input+"'"+' in the '+ "'" + tsp.custname + "'"+ ' and save the value ' +"'"+output+"'"+' in '+"'"+tsp.outputval+"'."
-
         def getallvalues():
             return 'Get all the values present in the '+"'"+tsp.custname+"' and save the values '"+ output +"'"+' in ' + "'" + tsp.outputval +"'."
         def verifyallvalues():
@@ -1064,7 +1063,7 @@ class StepDescription:
         def getviewbyindex():
             return 'Get View with index ' +"'"+input +"'"+' in the '+ "'" + tsp.custname + "'" + ' and save the value ' +"'"+output +"'"+' in '+"'"+ output_list+"'."
         def getselectedviews():
-            return 'Get Selected value of '+ "'" + tsp.custname + "'"+ ' and save value ' +"'"+output +"'"+' in '+"'"+output_list+"'."
+            return 'Get Selected value of '+ "'" + tsp.custname + "'"+ ' and save the value ' +"'"+output +"'"+' in '+"'"+output_list+"'."
         def verifyselectedviews():
             return 'Verify value ' +"'"+input+"'"+' are selected in the '+ "'" + tsp.custname + "'"+'.'
         def selectviewbytext():
@@ -1092,16 +1091,16 @@ class StepDescription:
 
         # dropdown keywords
         def getrowcount():
-            return 'Get the count of cells in the table ' + "'" + tsp.custname + "'" + ' and save the count ' +"'"+output+"'"+' in ' +"'"+output_list+"'"
+            return 'Get the row count ' + "'" + tsp.custname + "'" + ' and save the count ' +"'"+output+"'"+' in ' +"'"+output_list+"'"
 
         def verifyrowcount():
             return 'Verify ' +"'"+input+"'"+' is the list count of the ' +"'" + tsp.custname + "'"
 
         def cellclick():
-            return 'Click on the cell number ' +"'"+input+"'"+' in the table ' +"'" + tsp.custname + "'"
+            return 'Click on ' +"'"+input+"'"+' in the table ' +"'" + tsp.custname + "'"
 
         def getcellvalue():
-            return "Get data from the cell number '" +input+ "' in the table '" + tsp.custname + "'" +' and save the value '+"'"+ output +"'"+' in '+"'"+output_list+"'"
+            return "Get cell value of '" +input+ "' in the table '" + tsp.custname + "'" +' and save the value '+"'"+ output +"'"+' in '+"'"+output_list+"'"
 
         def verifycellvalue():
             return "Verify data from the cell number '" + input+ "' in the table '" + tsp.custname + "'"
@@ -1188,7 +1187,7 @@ class StepDescription:
 
         #dropdown keywords
         def getselected():
-            return 'Get Selected value of '+ "'" + tsp.custname + "'"+ ' and save value ' +"'"+output +"'"+' in '+"'"+tsp.outputval+"'"
+            return 'Get Selected value of '+ "'" + tsp.custname + "'"+ ' and save the value ' +"'"+output +"'"+' in '+"'"+tsp.outputval+"'"
         def selectmultiplevaluesbytext():
             return 'Select values ' +"'"+ input +"'"+ ' in the '+ "'" + tsp.custname + "'"
         def deselectall():
@@ -1205,7 +1204,7 @@ class StepDescription:
         def getmultiplevaluesbyindexes():
             return 'Get values with indexes ' +"'"+ input +"'"+ ' in the '+ "'" + tsp.custname + "'"+ ' and save the value ' + output + ' in  '+ tsp.outputval
         def verifyselectedvalue():
-            return 'Verify value ' +"'"+ input +"'"+ ' are selected in the '+ "'" + tsp.custname + "'"
+            return 'Verify value ' +"'"+ input +"'"+ ' is selected in the '+ "'" + tsp.custname + "'"
         def verifyselectedvalues():
             return 'Verify values ' +"'"+ input +"'"+ ' are selected in the '+ "'" + tsp.custname + "'"
         def getallvalues():
@@ -1247,16 +1246,16 @@ class StepDescription:
         def closebrowser():
             return 'Close the browser '
         def navigatetourl():
-            return 'Open url ' +"'"+ input+"'"+ ' in the browser'
+            return 'Navigate to url ' +"'"+ input+"'"+ ' in the browser'
         def navigateforward():
             return 'Navigate forward in the browser'
         def navigatewithauthenticate():
             vals = str(input).split(',')
-            return ' Open url ' +"'"+vals[0]+"'"+' with authentication of '+"'"+vals[1]+"' in the browser."
+            return ' Navigate to url ' +"'"+vals[0]+"'"+' with authentication of '+"'"+vals[1]+"' in the browser."
         def navigateback():
             return 'Navigate back in the browser'
         def verifytextexists():
-            return 'Verify ' +"'"+ input + "'"+' exist and Number of occurance of the text ' +"'"+ input + "'"+' is '+"'"+output+"'"+' time(s).'
+            return 'Verify ' +"'"+ input + "'"+' exist in the browser and number of occurance of the text ' +"'"+ input + "'"+' is '+"'"+output+"'"+' time(s).'
         def getcurrenturl():
             return 'Get current url of the web page and save the URL '+"'"+output+"'"+' in '+"'"+tsp.outputval+"'"
         def verifycurrenturl():
@@ -1283,7 +1282,7 @@ class StepDescription:
         def verifytooltiptext():
             return 'Verify ' +"'"+ input +"'"+ ' is the tooltip of  '+ "'" + tsp.custname + "'"
         def clickelement():
-            return ' Click '+ "'" + tsp.custname + "'"
+            return ' Click on '+ "'" + tsp.custname + "'"
         def mouseclick():
             if len(inputval)>0:
                 return ' Mouse Click on  '+ "'" + tsp.custname +'['+inputval[0]+']['+inputval[1]+']'+"'"
@@ -1294,16 +1293,16 @@ class StepDescription:
         def verifyelementexists():
             return ' Verify '+ "'" + tsp.custname + "'" + ' exists '
         def getelementtext():
-            return 'Get the text of the element '+ "'" + tsp.custname + "'"+ ' and save the value  '+"'"+ output +"'"+ ' in '+"'"+tsp.outputval+"'"
+            return 'Get the text of the element '+ "'" + tsp.custname + "'"+ ' and save the text  '+"'"+ output +"'"+ ' in '+"'"+tsp.outputval+"'"
         def verifydoesnotexists():
             return ' Verify '+ "'" + tsp.custname + "'" + '  does not exists '
         def tab():
             return 'Perform tab on '+ "'" + tsp.custname + "'"
 
         def rightclick():
-            return 'Perform right click on element '+ "'" + tsp.custname + "'"
+            return 'Perform right click on '+ "'" + tsp.custname + "'"
         def doubleclick():
-            return 'Double click on the '+ "'" + tsp.custname + "'"
+            return 'Double click on '+ "'" + tsp.custname + "'"
         def waitforelementvisible():
             return 'Wait until the element '+ "'" + tsp.custname + "'" +'is visible'
         def dropfile():
@@ -1311,15 +1310,15 @@ class StepDescription:
 
         #Button link keywords
         def click():
-            return ' Click on the '+ "'" + tsp.custname + "'"
+            return ' Click on '+ "'" + tsp.custname + "'"
         def cellclick():
-            return 'Click ' + "'" + tsp.custname + "'"
+            return 'Click on ' + "'" + tsp.custname + "'"
         def verifybuttonname():
             return 'Verify text ' +"'"+ input +"'"+ ' is the name of the '+ "'" + tsp.custname + "'"
         def uploadfile():
             return ' Upload the file  present in the path ' +"'" + input + "'" +'.'
         def getlinktext():
-            return ' Get Text From '+ "'" + tsp.custname + "'" + ' and save the text '+"'"+output+"'"+' in ' +"'"+tsp.outputval+"'"
+            return ' Get text From '+ "'" + tsp.custname + "'" + ' and save the text '+"'"+output+"'"+' in ' +"'"+tsp.outputval+"'"
         def getbuttonname():
             return ' Get ButtonName From '+ "'" + tsp.custname + "'" + ' and save the text '+"'"+output+"'"+' in ' +"'"+tsp.outputval+"'"
         def verifylinktext():
@@ -1329,9 +1328,9 @@ class StepDescription:
         def verifyreadonly():
             return 'Verify '+ "'" + tsp.custname + "'" + ' is read-only'
         def verifyenabled():
-            return ' Verify '+ "'" + tsp.custname + "'" + ' is enabled '
+            return ' Verify '+ "'" + tsp.custname + "'" + ' is Enabled '
         def verifydisabled():
-            return 'Verify '+ "'" + tsp.custname + "'" + ' is disabled '
+            return 'Verify '+ "'" + tsp.custname + "'" + ' is Disabled '
         def verifyexists():
             return ' Verify '+ "'" + tsp.custname + "'" + '  exists '
         def verifyhidden():
@@ -1361,7 +1360,7 @@ class StepDescription:
         def verifycelltooltip():
             return 'Verify cell tooltip value '+"'"+input+"'"+' is present in the '+ "'"+ tsp.custname +'['+inputval[0]+']['+inputval[1]+']'+ "' table."
         def cellclick():
-            return 'Click ' + "'" + tsp.custname + "'"
+            return 'Click on ' + "'" + tsp.custname + "'"
         def getrowcount():
             return 'Get row count of the ' + "'" + tsp.custname + "'" + ' and save the count ' +"'"+output+"'"+' in '+"'"+tsp.outputval+"'"
         def getcolumncount():
@@ -1385,7 +1384,7 @@ class StepDescription:
         def settextiris():
             return ' Enter text '+"'"+ input+"'"+ ' in ' + "'" + tsp.custname + "'"+ '.'
         def gettextiris():
-            return ' Get Text From '+ "'" +tsp.custname + "'" + ' and save the text '+"'"+ output + "'"+' in ' +"'"+ tsp.outputval+"'"+ '.'
+            return ' Get text From '+ "'" +tsp.custname + "'" + ' and save the text '+"'"+ output + "'"+' in ' +"'"+ tsp.outputval+"'"+ '.'
         def getrowcountiris():
             return ' Get row count of '+ "'" + tsp.custname + "'"+ ' and save the count '+"'"+output+"'"+ ' in '+"'"+ tsp.outputval+"'"+ '.'
         def getcolcountiris():
@@ -1528,7 +1527,7 @@ class StepDescription:
 
         def getosinfo():
             machine_name = get_machine_name(input)
-            return "Get Os Information from '"+machine_name+"' and save the info '"+output+"' in '"+tsp.outputval+"'"
+            return "Get OS Information from '"+machine_name+"' and save the info '"+output+"' in '"+tsp.outputval+"'"
             pass
 
         def getallprocess():
