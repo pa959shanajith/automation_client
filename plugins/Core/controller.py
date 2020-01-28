@@ -222,6 +222,13 @@ class Controller():
             log.error(e)
 
 
+    def __load_aws(self):
+        try:
+            core_utils.get_all_the_imports('AWS')
+        except Exception as e:
+            logger.print_on_console('Error loading AWS plugin')
+            log.error(e)
+
     def dangling_status(self,index):
         step=handler.local_handler.tspList[index]
         return step.executed
@@ -881,7 +888,7 @@ class Controller():
         obj.clear_dyn_variables()
         return status
 
-    def invoke_execution(self,mythread,json_data,socketIO,wxObject,configvalues,qc_soc):
+    def invoke_execution(self,mythread,json_data,socketIO,wxObject,configvalues,qc_soc,aws_mode):
         global terminate_flag,count
         qc_url=''
         qc_password=''
@@ -900,6 +907,15 @@ class Controller():
         log.info( 'No  of Suites : '+str(len(suiteId_list)))
         logger.print_on_console('No  of Suites : ',str(len(suiteId_list)))
         j=1
+        tc_obj=None
+        aws_obj=None
+        if aws_mode:
+            self.__load_aws()
+            from testcase_compile import TestcaseCompile
+            from aws_operations import AWS_Operations
+            cur_date=str(datetime.now()).replace(' ','_').replace('.','_').replace(':','_')
+            tc_obj=TestcaseCompile(cur_date)
+            aws_obj=AWS_Operations(cur_date)
         #Iterate through the suites-list
         for suite,suite_id,suite_id_data in zip(suite_details,suiteId_list,suite_data):
             #EXECUTION GOES HERE
@@ -978,11 +994,21 @@ class Controller():
                                     tsplist = handler.local_handler.tspList
                                     if len(tsplist)==0:
                                         continue
-                                    for k in range(len(tsplist)):
-                                        if tsplist[k].name.lower() == 'openbrowser':
-                                            if tsplist[k].apptype.lower()=='web':
-                                                if not (IGNORE_THIS_STEP in tsplist[k].inputval[0].split(';')):
-                                                        tsplist[k].inputval = [browser]
+                                    if not(aws_mode):
+                                        for k in range(len(tsplist)):
+                                            if tsplist[k].name.lower() == 'openbrowser':
+                                                if tsplist[k].apptype.lower()=='web':
+                                                    if not (IGNORE_THIS_STEP in tsplist[k].inputval[0].split(';')):
+                                                            tsplist[k].inputval = [browser]
+                            if aws_mode:
+                                compile_status=tc_obj.compile_tc(tsplist,i+1)
+                                print('=======================================================================================================')
+                                logger.print_on_console( '***Scenario' ,str(i + 1) ,' Compiled for AWS Execution***')
+                                print('=======================================================================================================')
+                                log.info('=======================================================================================================')
+                                log.info( '***Scenario' ,str(i + 1) ,' Compiled for AWS Execution***')
+                                log.info('=======================================================================================================')
+                                execute_flag=False
                             if flag and execute_flag :
                                 #check for temrinate flag before execution
                                 tsplist = obj.read_step()
@@ -994,6 +1020,9 @@ class Controller():
                                     print('=======================================================================================================')
                                     logger.print_on_console( '***Scenario' ,str(i + 1) ,' execution completed***')
                                     print('=======================================================================================================')
+                                    log.info('=======================================================================================================')
+                                    log.info( '***Scenario' ,str(i + 1) ,' execution completed***')
+                                    log.info('=======================================================================================================')
                             if execute_flag:
                                 #Saving the report for the scenario
                                 logger.print_on_console( '***Saving report of Scenario' ,str(i  + 1 ),'***')
@@ -1077,6 +1106,8 @@ class Controller():
                             i+=1
                             #logic for condition check
                             report_json=con.reporting_obj.report_json[OVERALLSTATUS]
+            if aws_mode:
+                execution_status=aws_obj.run_aws_android_tests()
             log.info('---------------------------------------------------------------------')
             print('=======================================================================================================')
             log.info('***SUITE '+ str(j) +' EXECUTION COMPLETED***')
@@ -1127,12 +1158,14 @@ class Controller():
             local_cont.web_dispatcher_obj.action=action
         self.debug_choice=wxObject.choice
         if action==EXECUTE:
+            if len(args)>0:
+                aws_mode=args[0]
             self.execution_mode = json_data['exec_mode'].lower()
             kill_process()
             if self.execution_mode == SERIAL:
-                status=self.invoke_execution(mythread,json_data,socketIO,wxObject,self.configvalues,qc_soc)
+                status=self.invoke_execution(mythread,json_data,socketIO,wxObject,self.configvalues,qc_soc,aws_mode)
             elif self.execution_mode == PARALLEL:
-                status = self.invoke_parralel_exe(mythread,json_data,socketIO,wxObject,self.configvalues,qc_soc)
+                status = self.invoke_parralel_exe(mythread,json_data,socketIO,wxObject,self.configvalues,qc_soc,aws_mode)
         elif action==DEBUG:
             self.debug_mode=debug_mode
             self.wx_object=wxObject

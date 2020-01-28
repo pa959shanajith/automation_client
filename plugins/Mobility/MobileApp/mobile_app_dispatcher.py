@@ -442,18 +442,19 @@ class MobileDispatcher:
         mobileElement = None
         global ELEMENT_FOUND
         xpath = None
+        id = None
         if objectname.strip() != '':
             if SYSTEM_OS=='Darwin':
                 objectname = objectname.replace("/AppiumAUT[1]/", "/")
                 print(objectname)
-            identifiers = objectname.split(';')
-            id = identifiers[0]
-            xpath = identifiers[1]
-            log.debug('Identifiers are ')
-            log.debug(identifiers)
+            else:
+                identifiers = objectname.split(';')
+                id = identifiers[0]
+                xpath = identifiers[1]
+                log.debug('Identifiers are ')
+                log.debug(identifiers)
             try:
                 log.debug('trying to find mobileElement by xpath')
-                import platform
                 if SYSTEM_OS=='Darwin':
                     mobileElement = driver.find_element_by_xpath(objectname)
                 else:

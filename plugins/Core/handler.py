@@ -462,9 +462,8 @@ class Handler():
             step=testcase[x]
 
             keyword=step['keywordVal']
-            outputval=step['outputVal'].strip()
-            outputArray=outputval.split(';')
-            if not (len(outputArray)>=1 and not(outputval.endswith('##;')) and outputval.split(';') and '##' in outputArray[len(outputArray)-1] ):
+            outputArray=step['outputVal'].strip().split(';')
+            if not (len(outputArray)>=1 and  '##' == outputArray[-1] ):
                 logger.print_on_console('keyword: '+keyword)
                 local_handler.log.info('keyword: '+keyword)
                 local_handler.log.debug(str(x)+'keyword: '+keyword)
