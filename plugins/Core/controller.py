@@ -924,19 +924,22 @@ class Controller():
             if terminate_flag:
                 status=TERMINATE
 ##                break
+            suite_name=json_data['suitedetails'][j-1]["testsuitename"]
             log.info('---------------------------------------------------------------------')
             print('=======================================================================================================')
-            log.info('***SUITE '+str( j) +' EXECUTION STARTED***')
-            logger.print_on_console('***SUITE ', str(j) ,' EXECUTION STARTED***')
-            logger.print_on_console('***SUITE ', json_data['suitedetails'][j-1]["testsuitename"] ,' EXECUTION STARTED***')
+            log.info('***SUITE '+str( j) +': '+suite_name+' EXECUTION STARTED***')
+            logger.print_on_console('***SUITE '+str( j) +': '+suite_name+' EXECUTION STARTED***')
             log.info('-----------------------------------------------')
             print('=======================================================================================================')
             do_not_execute = False
             #Check for the disabled scenario
             if not (do_not_execute) :
-                i=0
+                if aws_mode:
+                    pytest_files=[]
                  #Logic to Execute each suite for each of the browser
                 for browser in browser_type[suite_id]:
+                    i=0
+                    
                     #Logic to iterate through each scenario in the suite
                     for scenario,scenario_id,condition_check_value,dataparam_path_value in zip(suite_id_data,scenarioIds[suite_id],condition_check[suite_id],dataparam_path[suite_id]):
                         execute_flag=True
@@ -953,12 +956,12 @@ class Controller():
                         #condition check for scenario execution and reporting for condition check
                         if not(condition_check_flag):
                              #check for temrinate flag before printing loggers
+                            scenario_name=json_data['suitedetails'][j-1]["scenarioNames"][i]
                             if not(terminate_flag):
                                 print('=======================================================================================================')
-                                logger.print_on_console( '***Scenario ' ,str(i+1) ,' execution started***')
-                                logger.print_on_console( '***Scenario ' ,json_data['suitedetails'][j-1]["scenarioNames"][i] ,' execution started***')
+                                logger.print_on_console( '***Scenario '+str(i+1)+ ': '+scenario_name+' execution started***')
                                 print('=======================================================================================================')
-                                log.info('***Scenario '  + str(i+1)+ ' execution started***')
+                                log.info('***Scenario '  + str(i+1)+ ': '+scenario_name+ ' execution started***')
                             if(len(scenario)==3 and len(scenario['qcdetails'])==7):
                                 qc_details_creds=scenario['qccredentials']
                                 qc_username=qc_details_creds['qcusername']
@@ -1001,12 +1004,15 @@ class Controller():
                                                     if not (IGNORE_THIS_STEP in tsplist[k].inputval[0].split(';')):
                                                             tsplist[k].inputval = [browser]
                             if aws_mode:
-                                compile_status=tc_obj.compile_tc(tsplist,i+1)
+                                compile_status,pytest_file=tc_obj.compile_tc(tsplist,i+1,scenario_name)
+                                pytest_files.append(pytest_file)
+                                i+=1
+                                msg='***Scenario'+str(i + 1)+': '+scenario_name+' Compiled for AWS Execution***'
                                 print('=======================================================================================================')
-                                logger.print_on_console( '***Scenario' ,str(i + 1) ,' Compiled for AWS Execution***')
+                                logger.print_on_console(msg)
                                 print('=======================================================================================================')
                                 log.info('=======================================================================================================')
-                                log.info( '***Scenario' ,str(i + 1) ,' Compiled for AWS Execution***')
+                                log.info(msg)
                                 log.info('=======================================================================================================')
                                 execute_flag=False
                             if flag and execute_flag :
@@ -1107,6 +1113,7 @@ class Controller():
                             #logic for condition check
                             report_json=con.reporting_obj.report_json[OVERALLSTATUS]
             if aws_mode:
+                tc_obj.make_zip(pytest_files)
                 execution_status=aws_obj.run_aws_android_tests()
             log.info('---------------------------------------------------------------------')
             print('=======================================================================================================')

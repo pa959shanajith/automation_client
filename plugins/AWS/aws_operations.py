@@ -10,9 +10,6 @@
 #-------------------------------------------------------------------------------
 
 import os
-#imp note credentials and config should be of type file not text files or any ext otherwise it will throw error
-# os.environ["AWS_SHARED_CREDENTIALS_FILE"]="D:\AWS\config\credentials"
-# os.environ["AWS_CONFIG_FILE"]='D:\AWS\config\config'
 import requests
 import boto3
 import time
@@ -26,8 +23,8 @@ log = logging.getLogger('aws_operations.py')
 RUN_TIMEOUT_SECONDS = 60 * 10
 WEB_URL_TEMPLATE = 'https://us-west-2.console.aws.amazon.com/devicefarm/home#/projects/%s/runs/%s'
 
-AWS_Path=os.environ['NINETEEN68_HOME']+os.sep+'Nineteen68'+os.sep+'plugins'+os.sep+'AWS'
-AWS_assets=os.environ['NINETEEN68_HOME']+os.sep+'Nineteen68'+os.sep+'plugins'+os.sep+'AWS'+os.sep+'AWS_assets'
+AWS_Path=os.environ['NINETEEN68_HOME']+os.sep+'plugins'+os.sep+'AWS'
+AWS_assets=os.environ['NINETEEN68_HOME']+os.sep+'plugins'+os.sep+'AWS'+os.sep+'AWS_assets'
 AWS_config_path=AWS_assets+os.sep+'AWS_config.json'
 AWS_cred_path=AWS_assets+os.sep+'config'
 AWS_output_path=AWS_assets+os.sep+'output'
@@ -62,8 +59,9 @@ class AWS_Operations:
             self.app_name=params['appname']
             self.package_name=params['packagename']
             self.file_path=params['filepath']
-            self.test_spec=params['testspec']
-            self.test_spec_path=AWS_assets+os.sep+params['testspec']
+            self.android_test_spec=params['android_testspec']
+            self.ios_test_spec=params['ios_testspec']
+            # self.test_spec_path=AWS_assets+os.sep+params['testspec']
 
 
         except Exception as e:
@@ -260,10 +258,11 @@ class AWS_Operations:
 
         #get test spec name
         if self.apk_path[-3:] == 'ipa':
-            spec_arn=self.get_app_arn(project_arn,'APPIUM_PYTHON_TEST_SPEC','Default TestSpec for iOS Appium 1.9.1 Python (Support for iOS 12)')
+            # spec_arn=self.get_app_arn(project_arn,'APPIUM_PYTHON_TEST_SPEC','Default TestSpec for iOS Appium 1.9.1 Python (Support for iOS 12)')
+            spec_arn=self.get_app_arn(project_arn,'APPIUM_PYTHON_TEST_SPEC',self.ios_test_spec,AWS_assets+os.sep+self.ios_test_spec)
         else:
-            spec_arn=self.get_app_arn(project_arn,'APPIUM_PYTHON_TEST_SPEC','Default TestSpec for Android Appium Python')
-        # spec_arn=self.get_app_arn(project_arn,'APPIUM_PYTHON_TEST_SPEC',self.test_spec,self.test_spec_path)
+            # spec_arn=self.get_app_arn(project_arn,'APPIUM_PYTHON_TEST_SPEC','Default TestSpec for Android Appium Python')
+            spec_arn=self.get_app_arn(project_arn,'APPIUM_PYTHON_TEST_SPEC',self.android_test_spec,AWS_assets+os.sep+self.android_test_spec)
         log.debug ('spec_arn',spec_arn)
         info_msg="All details fetched to Schedule Run"
         log.info(info_msg)
@@ -281,6 +280,8 @@ class AWS_Operations:
         artifcats=self.dc.list_artifacts(arn=test_run_arn,type=download_type)['artifacts']
         logger.print_on_console('Outputs are stored here '+output_dir)
         log.info('Outputs are stored here '+output_dir)
+        if not os.path.exists(output_dir):
+            os.mkdir(output_dir)
         for a in artifcats:
             msg='Downloading ',a['type'],a['name']
             if a['type'] in ['CUSTOMER_ARTIFACT','VIDEO','TESTSPEC_OUTPUT']:

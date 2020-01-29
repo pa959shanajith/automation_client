@@ -56,7 +56,6 @@ class MobileOpeartions():
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
-        text=input_val[0]
         try:
             if element is not None:
                 visibility=element.is_displayed()
@@ -69,8 +68,8 @@ class MobileOpeartions():
                         if len(element.text)>0:
                             log.info('clearing  the existing text')
                             element.clear()
-                        if SYSTEM_OS != 'Darwin': element.set_text(text)
-                        else: element.set_value(text)
+                        if SYSTEM_OS != 'Darwin': element.set_text(input_val)
+                        else: element.set_value(input_val)
                         time.sleep(2)
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE

@@ -792,12 +792,13 @@ class TestThread(threading.Thread):
     """Test Worker Thread Class."""
 
     #----------------------------------------------------------------------
-    def __init__(self,wxObject,action,json_data,debug_mode):
+    def __init__(self,wxObject,action,json_data,debug_mode,aws_mode):
         """Init Worker Thread Class."""
         super(TestThread, self).__init__()
         self.wxObject = wxObject
          #flag to pause thread
         self.paused = False
+        self.aws_mode=aws_mode
         # Explicitly using Lock over RLock since the use of self.paused
         # break reentrancy anyway, and I believe using Lock could allow
         # one thread to pause the worker, while another resumes; haven't

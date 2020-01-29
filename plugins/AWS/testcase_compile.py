@@ -58,12 +58,13 @@ class TestcaseCompile():
 
 
 
-    def compile_tc(self,tspList,counter):
+    def compile_tc(self,tspList,scenario_counter,scenario_name):
         compile_status=True
         # cur_date=str(datetime.now()).replace(' ','_').replace('.','_').replace(':','_')
         launch_status=False
-
-        filename='test_scenario'+str(counter)+'_'+self.cur_date
+        log.info("Compiling Scenario "+str(scenario_counter)+':'+scenario_name)
+        logger.print_on_console("Compiling Scenario "+str(scenario_counter)+':'+scenario_name)
+        filename='test_scenario'+str(scenario_counter)+'_'+scenario_name+'_'+self.cur_date
         pytest_file=filename+'.py'
         f=open(pytest_file,"w")
         code="""import pytest
@@ -88,7 +89,7 @@ def test_scenario():
 \tmob_obj.start_server()"""
         f.write(code)
         launch_status=False
-        counter=1
+        # counter=1
         for t in tspList:
 
             inputs=t.inputval[0].split(';')
@@ -113,11 +114,11 @@ def test_scenario():
                 f.write("\n\ttime.sleep(2)")
                 f.write("\n\tmob_ele=mob_obj.getMobileElement"+"('"+t.objectname+"')")
                 f.write("\n\t"+"result=mob_obj."+self.mobile_keywords_dict[t.name.lower()]+"(mob_ele,*"+str(inputs)+")")
-                if counter==1:
-                    f.write("\n\tif result[0]==TEST_RESULT_FAIL:")
-                    f.write('\n\t\tmob_obj.driver.press_keycode(4)')
-                    f.write('\n\t\tmob_obj.driver.swipe(1,1,2,2, 3000)')
-                    counter+=1
+                # if counter==1:
+                #     f.write("\n\tif result[0]==TEST_RESULT_FAIL:")
+                #     f.write('\n\t\tmob_obj.driver.press_keycode(4)')
+                #     f.write('\n\t\tmob_obj.driver.swipe(1,1,2,2, 3000)')
+                #     counter+=1
             elif t.name.lower() in self.spinner_keywords_dict:
                 f.write("\n\ttime.sleep(2)")
                 f.write("\n\tmob_ele=mob_obj.getMobileElement"+"('"+t.objectname+"')")
@@ -134,25 +135,27 @@ def test_scenario():
 
 
         f.close()
-        if launch_status:
-            self.make_zip(pytest_file)
+        dest_folder=AWS_assets+os.sep+bundle_name+os.sep+'tests'+os.sep+pytest_file
+        shutil.move(pytest_file, dest_folder)
+        # if launch_status:
+        #     self.make_zip(pytest_file)
 
+        log.info("Completed Compiling Scenario "+str(scenario_counter)+':'+scenario_name)
+        logger.print_on_console("Completed Compiling Scenario "+str(scenario_counter)+':'+scenario_name)
+        return compile_status,pytest_file
 
-        return compile_status
-
-    def make_zip(self,pytest_file):
+    def make_zip(self,pytest_files):
         """
-        Purpose : Place the pytest_file into the test_bundle folder and converts it
-                  into .zip file
-        pytest_file : Name of the pytest file generated from Nineteen68 which is to be
+        Purpose : Converting test_bundle folder  into .zip file
+        pytest_files : List of all the pytest file generated from Nineteen68 which is to be
                       sent to AWS
 
         By-default : Test_Bundle is the folder in which required tests and python wheel
                      dependencies are already present
 
         """
-        dest_folder=AWS_assets+os.sep+bundle_name+os.sep+'tests'+os.sep+pytest_file
-        shutil.move(pytest_file, dest_folder)
+        # dest_folder=AWS_assets+os.sep+bundle_name+os.sep+'tests'+os.sep+pytest_file
+        # shutil.move(pytest_file, dest_folder)
         filelist=os.listdir(AWS_Path)
         for f in filelist:
             if f not in ['testcase_compile.py','aws_operations.py','AWS_assets','__pycache__']:
@@ -168,7 +171,7 @@ def test_scenario():
             for filename in files:
                 # join the two strings in order to form the full filepath.
                 filepath = os.path.join(root, filename)
-                if (filename.startswith('test_scenario') and filename != pytest_file) or ((filename.endswith('.zip') and filename != test_bundle)):
+                if (filename.startswith('test_scenario') and filename not in pytest_files) or ((filename.endswith('.zip') and filename != test_bundle)):
                     os.remove(filepath)
                     continue
                 if test_bundle not in filename:
