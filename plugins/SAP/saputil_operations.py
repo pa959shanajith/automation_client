@@ -14,6 +14,7 @@ from constants import *
 from sap_scraping import Scrape
 import logger
 import logging
+import sap_highlight
 log = logging.getLogger('saputil_operations.py')
 class SapUtilKeywords:
 
@@ -111,8 +112,14 @@ class SapUtilKeywords:
         try:
             id, ses = self.getSapElement(sap_id)
             if ( id and ses ):
-                status = sap_constants.TEST_RESULT_PASS
-                result = sap_constants.TEST_RESULT_TRUE
+                highligh_obj = sap_highlight.highLight()
+                elem = ses.FindById(id)
+                if ( elem ):
+                    highligh_obj.draw_outline(elem,'yellow')
+                    status = sap_constants.TEST_RESULT_PASS
+                    result = sap_constants.TEST_RESULT_TRUE
+                else:
+                    err_msg = sap_constants.ELELMENT_NOT_FOUND + ", Unable to highlight"
             else:
                 err_msg = sap_constants.ELELMENT_NOT_FOUND
             if ( err_msg ):

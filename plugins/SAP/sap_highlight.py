@@ -145,7 +145,7 @@ class highLight():
         * **rect** the coordinates of the rectangle to draw (defaults to
           the rectangle of the control)
         """
-        colours = {"green": 0x00ff00,"blue": 0xff0000,"red": 0x0000ff}
+        colours = {"green": 0x00ff00,"blue": 0xff0000,"red": 0x0000ff,'yellow':0x00aaff}
 
         # if it's a known colour
         if colour in colours : colour = colours[colour]
