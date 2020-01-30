@@ -1597,6 +1597,7 @@ class Config_window(wx.Frame):
             "High_ch":[(260,378)],
             "Save":[(135,458),(100, 28)],
             "C_Timeout" :[(12,218),(120, 28),(180,218), (80,-1)],
+            "Delay_Stringinput":[(225,218),(140, 28),(360,218), (85,-1)],
             "Iris_prediction":[(12,398)],
             "hide_soft_key":[(180,398)],
             "extn_enabled":[(370,428)],
