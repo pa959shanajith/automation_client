@@ -11,18 +11,87 @@
 
 import win32gui
 import win32process
-import win32con
 import win32api
 import time
 import sap_launch_keywords
 import logger
 import logging
 import sap_constants
+
+import ctypes
+from ctypes import c_uint, c_long
+from ctypes import \
+   c_uint, c_long, c_ulong
+
 log = logging.getLogger('sap_highlight.py')
 
-class highLight():
+class Structure(ctypes.Structure):
 
+        """Override the Structure class from ctypes to add printing and comparison"""
+
+        #----------------------------------------------------------------
+        def __str__(self):
+            """Print out the fields of the ctypes Structure
+
+            fields in exceptList will not be printed"""
+            lines = []
+            for f in self._fields_:
+                name = f[0]
+                lines.append("%20s\t%s"% (name, getattr(self, name)))
+
+            return "\n".join(lines)
+
+        #----------------------------------------------------------------
+        def __eq__(self, other_struct):
+            """Return True if the two structures have the same coordinates"""
+            if isinstance(other_struct, ctypes.Structure):
+                try:
+                    # pretend they are two structures - check that they both
+                    # have the same value for all fields
+                    are_equal = True
+                    for field in self._fields_:
+                        name = field[0]
+                        if getattr(self, name) != getattr(other_struct, name):
+                            are_equal = False
+                            break
+
+                    return are_equal
+
+                except AttributeError:
+                    return False
+
+            if isinstance(other_struct, (list, tuple)):
+                # Now try to see if we have been passed in a list or tuple
+                try:
+                    are_equal = True
+                    for i, field in enumerate(self._fields_):
+                        name = field[0]
+                        if getattr(self, name) != other_struct[i]:
+                            are_equal = False
+                            break
+                    return are_equal
+
+                except Exception:
+                    return False
+
+            return False
+
+class LOGBRUSH(Structure):
+    _fields_ = [
+        # C:/PROGRA~1/MIAF9D~1/VC98/Include/wingdi.h 1025
+        ('lbStyle', c_uint),
+        ('lbColor', c_ulong),
+        ('lbHatch', c_long),
+    ]
+
+class highLight():
     def highlight_element(self, elem):
+        """
+        imput : element id
+        output : highlights the element
+        Working : 1. Brings the window to foreground
+                  2. draws an outline around the element to be highlighted
+        """
         try:
             launch = sap_launch_keywords.Launch_Keywords()
             ses, window = launch.getSessWindow()
@@ -34,10 +103,6 @@ class highLight():
                 elemId = window.Id
                 screen_name = elem
             elem_to_highlight = ses.FindById(elemId)
-            top_left_x = elem_to_highlight.ScreenLeft
-            top_left_y = elem_to_highlight.ScreenTop
-            bottom_right_x = elem_to_highlight.ScreenLeft + elem_to_highlight.Width
-            bottom_right_y = elem_to_highlight.ScreenTop + elem_to_highlight.Height
             toplist, winlist = [], []
             def enum_cb(hwnd, results):
                 winlist.append((hwnd, win32gui.GetWindowText(hwnd)))
@@ -57,23 +122,70 @@ class highLight():
                     win32gui.BringWindowToTop(hwnd)
                     win32gui.ShowWindow(hwnd,3)
                 time.sleep(1)
-                if ( (len(ses.Children) > 1) or (bottom_right_y+60 <= window.Height) or ('sbar' in str(elemId)) ):
-                    rgn1=win32gui.CreateRectRgnIndirect((top_left_x,top_left_y,bottom_right_x,bottom_right_y))
-                    rgn2=win32gui.CreateRectRgnIndirect((top_left_x+4,top_left_y+4,bottom_right_x-4,bottom_right_y-4))
-                    hdc=win32gui.CreateDC("DISPLAY", None, None)
-                    brush=win32gui.GetSysColorBrush(13)
-                    win32gui.CombineRgn(rgn1,rgn1,rgn2,3)
-                    win32gui.FillRgn(hdc,rgn1,brush)
-                    win32gui.SystemParametersInfo(win32con.SPI_SETFOREGROUNDLOCKTIMEOUT,5,win32con.SPIF_SENDWININICHANGE or win32con.SPIF_UPDATEINIFILE)
-                    win32gui.DeleteObject(rgn1)
-                    win32gui.DeleteObject(rgn2)
-                    win32gui.DeleteDC(hdc)
+                if (elem_to_highlight): self.draw_outline(elem_to_highlight)
                 else:
                     log.error( sap_constants.ELELMENT_NOT_FOUND_HIGHLIGHT )
                     logger.print_on_console( sap_constants.ELELMENT_NOT_FOUND_HIGHLIGHT )
-            except:
+            except Exception as e:
+                print('some error',e)
                 pass
         except Exception as e:
             log.error(e)
             log.error( sap_constants.ERROR_HIGHLIGHT )
             logger.print_on_console( sap_constants.ERROR_HIGHLIGHT )
+
+    def draw_outline(self, elem, colour='green', thickness = 2, fill = 1, rect = None):
+        """
+        Draw an outline around the window.
+
+        * **colour** can be either an integer or one of 'red', 'green', 'blue'
+          (default 'green')
+        * **thickness** thickness of rectangle (default 2)
+        * **fill** how to fill in the rectangle (default BS_NULL)
+        * **rect** the coordinates of the rectangle to draw (defaults to
+          the rectangle of the control)
+        """
+        colours = {"green": 0x00ff00,"blue": 0xff0000,"red": 0x0000ff,'yellow':0x00aaff}
+
+        # if it's a known colour
+        if colour in colours : colour = colours[colour]
+
+        if rect is None:
+            h=elem.__getattr__("Height")
+            w=elem.__getattr__("Width")
+            l=elem.__getattr__("ScreenLeft")
+            t=elem.__getattr__("ScreenTop")
+            r=l+w
+            b=t+h
+            rect={
+                'left' : l,
+                'top' : t,
+                'right' : r,
+                'bottom' : b
+            }
+
+        # create the pen(outline)
+        pen_handle = ctypes.windll.gdi32.CreatePen( 0 , thickness, colour )
+
+        # create the brush (inside)
+        brush = LOGBRUSH()
+        brush.lbStyle = fill
+        brush.lbHatch = 5 # Variable c_int
+        brush_handle = ctypes.windll.gdi32.CreateBrushIndirect(ctypes.byref(brush))
+
+        # get the Device Context
+        dc = ctypes.windll.gdi32.CreateDCW("DISPLAY", None, None, None )
+
+        # push our objects into it
+        ctypes.windll.gdi32.SelectObject(dc, brush_handle)
+        ctypes.windll.gdi32.SelectObject(dc, pen_handle)
+
+        # draw the rectangle to the DC
+        ctypes.windll.gdi32.Rectangle( dc, rect['left'], rect['top'], rect['right'], rect['bottom'] )
+
+        # Delete the brush and pen we created
+        ctypes.windll.gdi32.DeleteObject(brush_handle)
+        ctypes.windll.gdi32.DeleteObject(pen_handle)
+
+        # delete the Display context that we created
+        ctypes.windll.gdi32.DeleteDC(dc)
