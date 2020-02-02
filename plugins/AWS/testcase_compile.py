@@ -33,7 +33,7 @@ class TestcaseCompile():
         mobile_keywords=dir(self.mob_actions)
         generic_keywords=dir(self.gen_actions)
         spinner_keywords=dir(self.spinner_actions)
-        self.cur_date=cur_date
+        self.cur_date=cur_date.replace("-","_")
 
         self.mobile_keywords_dict = { i.replace('_','').lower():i for i in mobile_keywords}
         self.generic_keywords_dict = { i.replace('_','').lower():i for i in generic_keywords}
@@ -64,7 +64,7 @@ class TestcaseCompile():
         launch_status=False
         log.info("Compiling Scenario "+str(scenario_counter)+':'+scenario_name)
         logger.print_on_console("Compiling Scenario "+str(scenario_counter)+':'+scenario_name)
-        filename='test_scenario'+str(scenario_counter)+'_'+scenario_name+'_'+self.cur_date
+        filename='Scenario'+str(scenario_counter)+'_'+scenario_name+'_'+self.cur_date
         pytest_file=filename+'.py'
         f=open(pytest_file,"w")
         code="""import pytest
@@ -79,14 +79,13 @@ logging.basicConfig(filemode='a',
                             format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
                             datefmt='%H:%M:%S',
                             level=logging.INFO)
-log=logging.getLogger('test.py')
+log=logging.getLogger('"""+pytest_file+""".py')
 
-def test_scenario():
+def scenario(driver):
 \tmob_obj=MobileOpeartions()
 \tgen_obj=GenericOperations()
 \tspinner_obj=Spinner_Keywords()
-\ttime.sleep(5)
-\tmob_obj.start_server()"""
+"""
         f.write(code)
         launch_status=False
         # counter=1
@@ -96,7 +95,7 @@ def test_scenario():
             inputs[0]=inputs[0].strip()
             if t.name.lower() in self.mobile_keywords_dict:
                 if t.name.lower()=='launchapplication':
-                    
+
                     if inputs[0]!='':
                         inputs[1]=inputs[0].split(os.sep)[-1]
                         launch_status=self.save_config(['apkpath','appname'],[inputs[0],inputs[1]])
@@ -110,10 +109,10 @@ def test_scenario():
                         break
                 elif t.name.lower()=='waitforelementexists':
                     inputs[0]=t.objectname
-                               
+
                 f.write("\n\ttime.sleep(2)")
-                f.write("\n\tmob_ele=mob_obj.getMobileElement"+"('"+t.objectname+"')")
-                f.write("\n\t"+"result=mob_obj."+self.mobile_keywords_dict[t.name.lower()]+"(mob_ele,*"+str(inputs)+")")
+                f.write("\n\tmob_ele=mob_obj.getMobileElement"+"(driver,'"+t.objectname+"')")
+                f.write("\n\t"+"result=mob_obj."+self.mobile_keywords_dict[t.name.lower()]+"(driver,mob_ele,*"+str(inputs)+")")
                 # if counter==1:
                 #     f.write("\n\tif result[0]==TEST_RESULT_FAIL:")
                 #     f.write('\n\t\tmob_obj.driver.press_keycode(4)')
@@ -121,8 +120,8 @@ def test_scenario():
                 #     counter+=1
             elif t.name.lower() in self.spinner_keywords_dict:
                 f.write("\n\ttime.sleep(2)")
-                f.write("\n\tmob_ele=mob_obj.getMobileElement"+"('"+t.objectname+"')")
-                f.write("\n\t"+"result=spinner_obj."+self.spinner_keywords_dict[t.name.lower()]+"(mob_obj.driver,mob_ele,*"+str(t.inputval[0].split(';'))+")")
+                f.write("\n\tmob_ele=mob_obj.getMobileElement"+"(driver,'"+t.objectname+"')")
+                f.write("\n\t"+"result=spinner_obj."+self.spinner_keywords_dict[t.name.lower()]+"(driver,mob_ele,*"+str(t.inputval[0].split(';'))+")")
             elif t.name.lower() in self.generic_keywords_dict:
                 f.write("\n\ttime.sleep(2)")
                 f.write("\n\t"+"result=gen_obj."+self.generic_keywords_dict[t.name.lower()]+"(*"+str(t.inputval[0].split(';'))+")")
@@ -137,12 +136,40 @@ def test_scenario():
         f.close()
         dest_folder=AWS_assets+os.sep+bundle_name+os.sep+'tests'+os.sep+pytest_file
         shutil.move(pytest_file, dest_folder)
-        # if launch_status:
-        #     self.make_zip(pytest_file)
-
+       
         log.info("Completed Compiling Scenario "+str(scenario_counter)+':'+scenario_name)
         logger.print_on_console("Completed Compiling Scenario "+str(scenario_counter)+':'+scenario_name)
         return compile_status,pytest_file
+
+
+    def create_test_file(self,pytest_files):
+        pytest_file='test_scenario.py'
+        f=open(pytest_file,"w")
+        code="""import pytest
+import time
+import logging
+import os
+from android_operations_keywords import MobileOpeartions
+logging.basicConfig(filemode='a',format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',datefmt='%H:%M:%S',level=logging.INFO)
+log=logging.getLogger('test_scenario.py')\n"""
+        f.write(code)
+        call_scenarios="\n"
+        s_counter=1
+        for scenario in pytest_files:
+            f.write("import "+scenario[:-3]+" as s"+str(s_counter)+"\n")
+            call_scenarios+="\ts"+str(s_counter)+".scenario(driver)\n"
+            s_counter+=1
+        code="""def test_scenario():\n\tmob_obj=MobileOpeartions()\n\tdriver=mob_obj.start_server()"""
+
+        f.write(code)
+        f.write(call_scenarios)
+        f.close()
+        dest_folder=AWS_assets+os.sep+bundle_name+os.sep+'tests'+os.sep+pytest_file
+        shutil.move(pytest_file, dest_folder)
+        
+
+
+
 
     def make_zip(self,pytest_files):
         """
@@ -154,8 +181,8 @@ def test_scenario():
                      dependencies are already present
 
         """
-        # dest_folder=AWS_assets+os.sep+bundle_name+os.sep+'tests'+os.sep+pytest_file
-        # shutil.move(pytest_file, dest_folder)
+        self.create_test_file(pytest_files)
+        pytest_files.append("test_scenario.py")
         filelist=os.listdir(AWS_Path)
         for f in filelist:
             if f not in ['testcase_compile.py','aws_operations.py','AWS_assets','__pycache__']:
@@ -171,7 +198,7 @@ def test_scenario():
             for filename in files:
                 # join the two strings in order to form the full filepath.
                 filepath = os.path.join(root, filename)
-                if (filename.startswith('test_scenario') and filename not in pytest_files) or ((filename.endswith('.zip') and filename != test_bundle)):
+                if (filename.startswith('Scenario') and filename not in pytest_files) or ((filename.endswith('.zip') and filename != test_bundle)):
                     os.remove(filepath)
                     continue
                 if test_bundle not in filename:

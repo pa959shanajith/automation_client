@@ -1114,7 +1114,7 @@ class Controller():
                             report_json=con.reporting_obj.report_json[OVERALLSTATUS]
             if aws_mode:
                 tc_obj.make_zip(pytest_files)
-                execution_status=aws_obj.run_aws_android_tests()
+                # execution_status=aws_obj.run_aws_android_tests()
             log.info('---------------------------------------------------------------------')
             print('=======================================================================================================')
             log.info('***SUITE '+ str(j) +' EXECUTION COMPLETED***')

@@ -20,7 +20,7 @@ log = logging.getLogger('android_operations_keywords.py')
 # import testcase_compile
 ##testcase_compile.keywords_list=[]
 
-from test_constants import *
+from testmobile_constants import *
 
 class MobileOpeartions():
     """Basis for all tests."""
@@ -35,6 +35,7 @@ class MobileOpeartions():
             SYSTEM_OS = 'Darwin'
         desired_caps = {}
         self.driver = webdriver.Remote(url, desired_caps)
+        return driver
 
     def launch_application(self,apk_path):
         status=TEST_RESULT_FAIL
@@ -51,7 +52,7 @@ class MobileOpeartions():
     def send_value(self,element,input_val,*args):
         return self.set_text(element,input_val,*args)
 
-    def set_text(self, element,input_val,*args):
+    def set_text(self, driver,element,input_val,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -113,7 +114,7 @@ class MobileOpeartions():
             log.error(e)
         return status,methodoutput,output,err_msg
 
-    def press(self, element,*args):
+    def press(self, driver,element,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -127,7 +128,7 @@ class MobileOpeartions():
                     log.info('element is Enabled')
                     if enable:
                         log.info('performing the action')
-                        action = TouchAction(self.driver)
+                        action = TouchAction(driver)
                         action.tap(element).perform()
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
@@ -142,7 +143,7 @@ class MobileOpeartions():
         return status,methodoutput,output,err_msg
 
 
-    def long_press(self, element,*args):
+    def long_press(self, driver,element,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -157,7 +158,7 @@ class MobileOpeartions():
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
                         log.debug('performing the action')
-                        action = TouchAction(self.driver)
+                        action = TouchAction(driver)
                         action.long_press(element).perform()
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
@@ -171,7 +172,7 @@ class MobileOpeartions():
             log.error(e)
         return status,methodoutput,output,err_msg
 
-    def get_button_name(self, webelement,*args):
+    def get_button_name(self, driver,webelement,*args):
         status=TEST_RESULT_FAIL
         result=TEST_RESULT_FALSE
         output=None
@@ -189,7 +190,7 @@ class MobileOpeartions():
                 log.error(e)
         return status,result,output,err_msg
 
-    def verify_button_name(self, webelement,input,*args):
+    def verify_button_name(self, driver,webelement,input,*args):
         status=TEST_RESULT_FAIL
         result=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -210,7 +211,7 @@ class MobileOpeartions():
                 log.error(e)
         return status,result,output,err_msg
 
-    def get_text(self, webelement,*args):
+    def get_text(self, driver,webelement,*args):
         status=TEST_RESULT_FAIL
         result=TEST_RESULT_FALSE
         output=None
@@ -232,7 +233,7 @@ class MobileOpeartions():
             log.error(e)
         return status,result,output,err_msg
 
-    def verify_text(self, webelement,input,*args):
+    def verify_text(self, driver,webelement,input,*args):
         status=TEST_RESULT_FAIL
         result=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -257,7 +258,7 @@ class MobileOpeartions():
             log.error(e)
         return status,result,output,err_msg
 
-    def toggle_on(self, element,*args):
+    def toggle_on(self, driver,element,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -276,7 +277,7 @@ class MobileOpeartions():
                         log.debug('Result is ' + str(res))
                         ios = str(res)
                         if ios == 'False' or res.upper() == 'OFF':
-                            action = TouchAction(self.driver)
+                            action = TouchAction(driver)
                             action.tap(element).perform()
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
@@ -314,7 +315,7 @@ class MobileOpeartions():
                             res=webelement.text
                             ios = str(res)
                             if ios == 'True' or res.upper()=='ON':
-                                action = TouchAction(self.driver)
+                                action = TouchAction(driver)
                                 action.tap(webelement).perform()
                                 status=TEST_RESULT_PASS
                                 methodoutput=TEST_RESULT_TRUE
@@ -331,7 +332,7 @@ class MobileOpeartions():
                 log.error(e)
         return status,methodoutput,output,err_msg
 
-    def verify_enabled(self, element,*args):
+    def verify_enabled(self, driver,element,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -358,7 +359,7 @@ class MobileOpeartions():
             log.error(e)
         return status,methodoutput,output,err_msg
 
-    def verify_disabled(self, element,*args):
+    def verify_disabled(self, driver,element,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -386,7 +387,7 @@ class MobileOpeartions():
             log.error(e)
         return status,methodoutput,output,err_msg
 
-    def verify_visible(self, element,*args):
+    def verify_visible(self, driver,element,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -406,7 +407,7 @@ class MobileOpeartions():
             log.error(e)
         return status,methodoutput,output,err_msg
 
-    def verify_hidden(self, element,*args):
+    def verify_hidden(self, driver,element,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -426,7 +427,7 @@ class MobileOpeartions():
             log.error(e)
         return status,methodoutput,output,err_msg
 
-    def verify_exists(self, element,*args):
+    def verify_exists(self, driver,element,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -444,7 +445,7 @@ class MobileOpeartions():
             log.error(e)
         return status,methodoutput,output,err_msg
 
-    def verify_does_not_exists(self, element,*args):
+    def verify_does_not_exists(self, driver,element,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -462,33 +463,41 @@ class MobileOpeartions():
             log.error(e)
         return status,methodoutput,output,err_msg
 
-    def getMobileElement(self,objectname):
+    def getMobileElement(self,objectname,*args):
         mobileElement = None
+        print_loggers=True
+        if len(args)>0 and args[0]=='waitforelement_exists':
+            print_loggers=False
+            log.info('Waiting for the element')
         if objectname.strip() != '':
             if SYSTEM_OS=='Darwin':
                 objectname = objectname.replace("/AppiumAUT[1]/", "/")
                 log.info(objectname)
             else:
                 identifiers = objectname.split(';')
-                log.info('Identifiers are ')
-                log.info(identifiers)
+                if print_loggers:
+                    log.info('Identifiers are ')
+                    log.info(identifiers)
             try:
                 if SYSTEM_OS=='Darwin':
-                    mobileElement = self.driver.find_element_by_xpath(objectname)
+                    mobileElement = driver.find_element_by_xpath(objectname)
                 else:
-                    log.debug('trying to find mobileElement by Xpath')
-                    mobileElement = self.driver.find_element_by_id(identifiers[1])
+                    if print_loggers:
+                        log.debug('trying to find mobileElement by Xpath')
+                    mobileElement = driver.find_element_by_xpath(identifiers[1])
             except Exception as Ex:
                 if(identifiers[0]):
                     try:
-                        log.info('Webelement not found by XPath')
-                        log.debug('trying to find mobileElement by ID')
-                        mobileElement = self.driver.find_element_by_xpath(identifiers[0])
-                        log.info('Web element found')
+                        if print_loggers:
+                            log.info('Webelement not found by XPath')
+                            log.debug('trying to find mobileElement by ID')
+                        mobileElement = driver.find_element_by_id(identifiers[0])
                     except Exception as Ex:
                         log.info('Webelement not found')
                         err_msg=str(Ex)
                         log.error(err_msg)
+        if mobileElement is not None:
+            log.info('Web element found')
         return mobileElement
 
     def waitforelement_exists(self, mob_ele,object_name,*args):
@@ -500,12 +509,16 @@ class MobileOpeartions():
         try:
             # configvalues = readconfig.configvalues
             # timeout= configvalues['timeOut']
-            timeout='10'
-            #print ("------",object_name)
+            timeout='5'
+            if len(args)>0:
+                try:
+                    timeout=int(args[0])
+                except:
+                    pass
             if timeout!=None:
                 start_time = time.time()
                 while True:
-                    element=self.getMobileElement(object_name)
+                    element=self.getMobileElement(object_name,'waitforelement_exists')
                     later=time.time()
                     if int(later-start_time)>=int(timeout):
                         log.info('Delay timeout')
@@ -543,7 +556,7 @@ class MobileOpeartions():
                         start_y=location['y'] + (size['height']/2)
                         end_x=location['x']
                         end_y=location['y'] + (size['height']/2)
-                        driver=self.driver
+                        
                         driver.swipe(start_x,start_y,end_x,end_y,3000)
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
@@ -584,7 +597,7 @@ class MobileOpeartions():
             log.error(e)
         return status,methodoutput,output,err_msg
 
-    def Set_Max_Value(self, webelement,*args):
+    def Set_Max_Value(self, driver,webelement,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -604,7 +617,7 @@ class MobileOpeartions():
                        start_y=location['y'] + (size['height']/2)
                        end_x=location['x'] + (size['width'])
                        end_y=start_y
-                       driver=self.driver
+                       
                        driver.swipe(start_x,start_y,end_x,end_y,3000)
                        status=TEST_RESULT_PASS
                        methodoutput=TEST_RESULT_TRUE
@@ -618,7 +631,7 @@ class MobileOpeartions():
             log.error(e)
         return status,methodoutput,output,err_msg
 
-    def select_radio_button(self, element,*args):
+    def select_radio_button(self, driver,element,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -633,7 +646,7 @@ class MobileOpeartions():
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
                         log.debug('performing the action')
-                        action = TouchAction(self.driver)
+                        action = TouchAction(driver)
                         action.tap(element).perform()
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
@@ -647,7 +660,7 @@ class MobileOpeartions():
             log.error(e)
         return status,methodoutput,output,err_msg
 
-    def get_status(self, webelement,*args):
+    def get_status(self, driver,webelement,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=None
@@ -694,7 +707,7 @@ class MobileOpeartions():
             log.error(e)
         return status,methodoutput,output,err_msg
 
-    def select_checkbox(self, element,*args):
+    def select_checkbox(self, driver,element,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -709,7 +722,7 @@ class MobileOpeartions():
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
                         log.debug('performing the action')
-                        action = TouchAction(self.driver)
+                        action = TouchAction(driver)
                         action.tap(element).perform()
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
@@ -723,7 +736,7 @@ class MobileOpeartions():
             log.error(e)
         return status,methodoutput,output,err_msg
 
-    def unselect_checkbox(self, element,*args):
+    def unselect_checkbox(self, driver,element,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -738,7 +751,7 @@ class MobileOpeartions():
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
                         log.debug('performing the action')
-                        action = TouchAction(self.driver)
+                        action = TouchAction(driver)
                         action.tap(element).perform()
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
@@ -752,7 +765,7 @@ class MobileOpeartions():
             log.error(e)
         return status,methodoutput,output,err_msg
 
-    def Select_Number(self, element,input,*args):
+    def Select_Number(self, driver,element,input,*args):
         status=TEST_RESULT_FAIL
         result=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -775,8 +788,8 @@ class MobileOpeartions():
                             op = subprocess.check_output(cmd)
                             #configvalues = readconfig.configvalues
                             hide_soft_key = 'Yes'
-                            if self.driver.is_keyboard_shown() and hide_soft_key == "Yes":
-                                self.driver.hide_keyboard()
+                            if driver.is_keyboard_shown() and hide_soft_key == "Yes":
+                                driver.hide_keyboard()
                             if (element.text == input_val):
                                 status=TEST_RESULT_PASS
                                 result=TEST_RESULT_TRUE
@@ -794,7 +807,7 @@ class MobileOpeartions():
             log.error(e)
         return status,result,output,err_msg
 
-    def Get_Selected_Number(self, element,*args):
+    def Get_Selected_Number(self, driver,element,*args):
         status=TEST_RESULT_FAIL
         result=TEST_RESULT_FALSE
         output=None
@@ -818,7 +831,7 @@ class MobileOpeartions():
             log.error(e)
         return status,result,output,err_msg
 
-    def Verify_Selected_Number(self, element,input,*args):
+    def Verify_Selected_Number(self, driver,element,input,*args):
         status=TEST_RESULT_FAIL
         result=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -857,7 +870,7 @@ class MobileOpeartions():
         return status,result,output,err_msg
 
 
-    def Set_Time(self, webelement,input,*args):
+    def Set_Time(self, driver,webelement,input,*args):
         status=TEST_RESULT_FAIL
         result=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -879,7 +892,6 @@ class MobileOpeartions():
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
                         log.debug('performing the action')
-                        driver=self.driver
                         action = TouchAction(driver)
                         Date_picker=driver.find_elements_by_class_name('android.widget.TimePicker')
                         count= len(Date_picker)
@@ -980,7 +992,7 @@ class MobileOpeartions():
                 log.error(e)
         return status,result,output,err_msg
 
-    def Get_Time(self, webelement,input,*args):
+    def Get_Time(self, driver,webelement,input,*args):
         status=TEST_RESULT_FAIL
         result=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -999,14 +1011,13 @@ class MobileOpeartions():
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
                         log.debug('performing the action')
-                        driver1=self.driver
-                        Date_picker=driver1.find_elements_by_class_name('android.widget.TimePicker')
+                        Date_picker=driver.find_elements_by_class_name('android.widget.TimePicker')
                         count= len(Date_picker)
-                        Date_picker2=driver1.find_elements_by_class_name('android.widget.RadialTimePickerView$RadialPickerTouchHelper')
+                        Date_picker2=driver.find_elements_by_class_name('android.widget.RadialTimePickerView$RadialPickerTouchHelper')
                         count2= len(Date_picker2)
                         if count2 == 12 :
-                            element1=driver1.find_elements_by_class_name('android.widget.TextView')
-                            AmorPm=driver1.find_elements_by_class_name('android.widget.RadioButton')
+                            element1=driver.find_elements_by_class_name('android.widget.TextView')
+                            AmorPm=driver.find_elements_by_class_name('android.widget.RadioButton')
                             Hour=element1[0].text
                             Min=element1[2].text
                             if AmorPm[0].get_attribute("checked"):
@@ -1018,7 +1029,7 @@ class MobileOpeartions():
                             result=TEST_RESULT_TRUE
 
                         elif count == 1 :
-                            element=driver1.find_elements_by_class_name('android.widget.EditText')
+                            element=driver.find_elements_by_class_name('android.widget.EditText')
                             Hour=element[0].text
                             Min=element[1].text
                             AMorPM=element[2].text
@@ -1058,7 +1069,7 @@ class MobileOpeartions():
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
                         log.debug('performing the action')
-                        driver=self.driver
+                        
                         action = TouchAction(driver)
                         Date_picker=driver.find_elements_by_class_name('android.widget.DatePicker')
                         count = len(Date_picker)
@@ -1146,7 +1157,6 @@ class MobileOpeartions():
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
                         log.debug('performing the action')
-                        driver=self.driver
                         Date_picker=driver.find_elements_by_class_name('android.widget.DatePicker')
                         count= len(Date_picker)
                         if count == 1 :
@@ -1171,7 +1181,7 @@ class MobileOpeartions():
         return status,methodoutput,output,err_msg
 
     def find_coordinates_horizontal(self):
-        size=self.driver.get_window_size()
+        size=driver.get_window_size()
         log.debug('Window size is '+str(size))
         startx=(size['width']*0.75)
         endx=(size['width']/4)
@@ -1181,7 +1191,7 @@ class MobileOpeartions():
 
 
     def find_coordinates_vertical(self):
-        size=self.driver.get_window_size()
+        size=driver.get_window_size()
         log.debug('Window size is '+str(size))
         min_y=(size['height']/4)
         max_y=(size['height']*0.75)
@@ -1199,7 +1209,7 @@ class MobileOpeartions():
         try:
             startx,starty,endx=self.find_coordinates_horizontal()
             #Swipe from Right to Left
-            self.driver.swipe(startx, starty, endx, starty, 3000)
+            driver.swipe(startx, starty, endx, starty, 3000)
             time.sleep(2)
             status=TEST_RESULT_PASS
             methodoutput=TEST_RESULT_TRUE
@@ -1218,7 +1228,7 @@ class MobileOpeartions():
         try:
             startx,starty,endx=self.find_coordinates_horizontal()
             #Swipe from left to Right
-            self.driver.swipe(endx, starty, startx, starty, 3000)
+            driver.swipe(endx, starty, startx, starty, 3000)
             time.sleep(2)
             status=TEST_RESULT_PASS
             methodoutput=TEST_RESULT_TRUE
@@ -1237,7 +1247,7 @@ class MobileOpeartions():
         try:
             x_Value,max_y,min_y=self.find_coordinates_vertical()
             #Swipe from bottom to top
-            self.driver.swipe(x_Value, max_y, x_Value, min_y, 3000)
+            driver.swipe(x_Value, max_y, x_Value, min_y, 3000)
             time.sleep(2)
             status=TEST_RESULT_PASS
             methodoutput=TEST_RESULT_TRUE
@@ -1256,7 +1266,7 @@ class MobileOpeartions():
         try:
             x_Value,max_y,min_y=self.find_coordinates_vertical()
             #Swipe from top to bottom
-            self.driver.swipe(x_Value, min_y, x_Value, max_y, 3000)
+            driver.swipe(x_Value, min_y, x_Value, max_y, 3000)
             time.sleep(2)
             status=TEST_RESULT_PASS
             methodoutput=TEST_RESULT_TRUE
@@ -1274,7 +1284,7 @@ class MobileOpeartions():
         err_msg=None
 
         try:
-            self.driver.keyevent(4)
+            driver.keyevent(4)
             time.sleep(1)
             status=TEST_RESULT_PASS
             methodoutput=TEST_RESULT_TRUE

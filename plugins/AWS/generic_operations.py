@@ -14,7 +14,7 @@ import logging
 ##import testcase_compile
 dynamic_variable_map = {}
 
-from test_constants import *
+from testmobile_constants import *
 log = logging.getLogger('generic_operations.py')
 
 class GenericOperations:

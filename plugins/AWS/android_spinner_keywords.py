@@ -15,6 +15,7 @@ from appium.webdriver.common.touch_action import TouchAction
 import logging
 # import logger
 import time
+from testmobile_constants import *
 # driver_obj = None
 
 log = logging.getLogger('spinner_keywords.py')
@@ -29,7 +30,7 @@ class Spinner_Keywords():
         err_msg=None
         text=[]
         obj=[]
-        
+
         try:
             if webelement is not None:
                 visibility=webelement.is_displayed()
@@ -39,7 +40,7 @@ class Spinner_Keywords():
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
                         log.debug('performing the action')
-                        
+
                         action = TouchAction(driver)
                         action.tap(webelement).perform()
                         while(True):
@@ -125,7 +126,7 @@ class Spinner_Keywords():
         err_msg=None
         text=[]
         obj=[]
-        
+
         try:
             if webelement is not None:
                 visibility=webelement.is_displayed()
@@ -135,7 +136,7 @@ class Spinner_Keywords():
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
                         log.debug('performing the action')
-                        
+
                         action = TouchAction(driver)
                         action.tap(webelement).perform()
                         while(True):
@@ -240,7 +241,7 @@ class Spinner_Keywords():
         obj=[]
         global flag
         flag=False
-        
+
         try:
             if webelement is not None:
                 visibility=webelement.is_displayed()
@@ -250,7 +251,7 @@ class Spinner_Keywords():
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
                         log.debug('performing the action')
-                        
+
                         action = TouchAction(driver)
                         action.tap(webelement).perform()
                         while(True):
@@ -378,7 +379,7 @@ class Spinner_Keywords():
         global flag
         flag=False
 
-        
+
         try:
             if webelement is not None:
                 visibility=webelement.is_displayed()
@@ -388,7 +389,7 @@ class Spinner_Keywords():
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
                         log.debug('performing the action')
-                        
+
                         action = TouchAction(driver)
                         action.tap(webelement).perform()
                         while(True):
@@ -539,7 +540,7 @@ class Spinner_Keywords():
         obj=[]
         global flag
         flag=False
-        
+
         try:
             if webelement is not None:
                 visibility=webelement.is_displayed()
@@ -549,7 +550,7 @@ class Spinner_Keywords():
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
                         log.debug('performing the action')
-                        
+
                         action = TouchAction(driver)
                         action.tap(webelement).perform()
                         while(True):
@@ -677,7 +678,7 @@ class Spinner_Keywords():
         className=''
         global flag
         flag=False
-        
+
         try:
             if webelement is not None:
                 visibility=webelement.is_displayed()
@@ -687,7 +688,7 @@ class Spinner_Keywords():
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
                         log.debug('performing the action')
-                        
+
                         action = TouchAction(driver)
                         action.tap(webelement).perform()
                         while(True):
@@ -755,7 +756,7 @@ class Spinner_Keywords():
         obj=[]
         global flag
         flag=False
-        
+
         try:
             if webelement is not None:
                 visibility=webelement.is_displayed()
@@ -765,7 +766,7 @@ class Spinner_Keywords():
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
                         log.debug('performing the action')
-                        
+
                         action = TouchAction(driver)
                         action.tap(webelement).perform()
                         while(True):
@@ -834,7 +835,7 @@ class Spinner_Keywords():
         obj=[]
 ##        input=int(input)
         count=0
-        
+
         try:
             if webelement is not None:
                 visibility=webelement.is_displayed()
@@ -844,7 +845,7 @@ class Spinner_Keywords():
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
                         log.debug('performing the action')
-                        
+
                         action = TouchAction(driver)
                         action.tap(webelement).perform()
                         while(True):
@@ -963,7 +964,7 @@ class Spinner_Keywords():
 ##        input=int(input[0])
         global flag
         flag=False
-        
+
         try:
             if webelement is not None:
                 visibility=webelement.is_displayed()
@@ -973,7 +974,7 @@ class Spinner_Keywords():
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
                         log.debug('performing the action')
-                        
+
                         action = TouchAction(driver)
                         action.tap(webelement).perform()
                         while(True):
@@ -1069,7 +1070,7 @@ class Spinner_Keywords():
         obj=[]
 ##        input=int(input)
         count=0
-        
+
         try:
             if webelement is not None:
                 visibility=webelement.is_displayed()
@@ -1079,7 +1080,7 @@ class Spinner_Keywords():
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
                         log.debug('performing the action')
-                        
+
                         action = TouchAction(driver)
                         action.tap(webelement).perform()
                         while(True):
@@ -1184,7 +1185,7 @@ class Spinner_Keywords():
         text=[]
         obj=[]
         className=''
-        
+
         try:
             if webelement is not None:
                 eles = webelement.get_attribute("className")
@@ -1195,7 +1196,7 @@ class Spinner_Keywords():
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
                         log.debug('performing the action')
-                        
+
                         action = TouchAction(driver)
                         action.tap(webelement).perform()
                         while(True):
@@ -1295,7 +1296,7 @@ class Spinner_Keywords():
         text=[]
         className=''
         obj=[]
-        
+
         try:
             if webelement is not None:
                 visibility=webelement.is_displayed()
@@ -1305,7 +1306,7 @@ class Spinner_Keywords():
                     log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
                         log.debug('performing the action')
-                        
+
                         action = TouchAction(driver)
                         action.tap(webelement).perform()
                         while(True):
