@@ -15,29 +15,17 @@ import shutil
 import os
 from zipfile import ZipFile
 from datetime import datetime
-keywords_list=[]
-keywords_dict={}
-from generic_operations import GenericOperations
-from android_spinner_keywords import Spinner_Keywords
-from android_operations_keywords import MobileOpeartions
-import aws_operations
+from aws_keywords import *
+import logger
+import logging
+log = logging.getLogger("testcase_compile.py")
 from aws_operations import *
 
 
 class TestcaseCompile():
 
     def __init__(self,cur_date):
-        self.mob_actions=MobileOpeartions()
-        self.gen_actions=GenericOperations()
-        self.spinner_actions=Spinner_Keywords()
-        mobile_keywords=dir(self.mob_actions)
-        generic_keywords=dir(self.gen_actions)
-        spinner_keywords=dir(self.spinner_actions)
-        self.cur_date=cur_date.replace("-","_")
-
-        self.mobile_keywords_dict = { i.replace('_','').lower():i for i in mobile_keywords}
-        self.generic_keywords_dict = { i.replace('_','').lower():i for i in generic_keywords}
-        self.spinner_keywords_dict = { i.replace('_','').lower():i for i in spinner_keywords}
+        self.cur_date=cur_date.replace("-","_")      
 
     def save_config(self,keys,values):
         status=True
@@ -93,7 +81,7 @@ def scenario(driver):
 
             inputs=t.inputval[0].split(';')
             inputs[0]=inputs[0].strip()
-            if t.name.lower() in self.mobile_keywords_dict:
+            if t.name.lower() in mobile_keywords:
                 if t.name.lower()=='launchapplication':
 
                     if inputs[0]!='':
@@ -112,19 +100,15 @@ def scenario(driver):
 
                 f.write("\n\ttime.sleep(2)")
                 f.write("\n\tmob_ele=mob_obj.getMobileElement"+"(driver,'"+t.objectname+"')")
-                f.write("\n\t"+"result=mob_obj."+self.mobile_keywords_dict[t.name.lower()]+"(driver,mob_ele,*"+str(inputs)+")")
+                f.write("\n\t"+"result="+mobile_keywords[t.name.lower()]+"(driver,mob_ele,*"+str(inputs)+")")
                 # if counter==1:
                 #     f.write("\n\tif result[0]==TEST_RESULT_FAIL:")
                 #     f.write('\n\t\tmob_obj.driver.press_keycode(4)')
                 #     f.write('\n\t\tmob_obj.driver.swipe(1,1,2,2, 3000)')
                 #     counter+=1
-            elif t.name.lower() in self.spinner_keywords_dict:
+            elif t.name.lower() in generic_keywords:
                 f.write("\n\ttime.sleep(2)")
-                f.write("\n\tmob_ele=mob_obj.getMobileElement"+"(driver,'"+t.objectname+"')")
-                f.write("\n\t"+"result=spinner_obj."+self.spinner_keywords_dict[t.name.lower()]+"(driver,mob_ele,*"+str(t.inputval[0].split(';'))+")")
-            elif t.name.lower() in self.generic_keywords_dict:
-                f.write("\n\ttime.sleep(2)")
-                f.write("\n\t"+"result=gen_obj."+self.generic_keywords_dict[t.name.lower()]+"(*"+str(t.inputval[0].split(';'))+")")
+                f.write("\n\t"+"result=gen_obj."+generic_keywords[t.name.lower()]+"(*"+str(t.inputval[0].split(';'))+")")
             else:
                 logger.print_on_console (t.name,' is not supported')
                 log.error(t.name+' is not supported')

@@ -22,6 +22,7 @@ import logger
 import logging
 from core_utils import CoreUtils
 import threading
+from aws_keywords import *
 local_handler = threading.local()
 
 
@@ -169,7 +170,7 @@ class Handler():
                 if('apptype' in json_data and json_data['apptype']=="Mobility"):
                     local_handler.awsKeywords[json_data["testcasename"]]=set()
                     for i in range(0,len(testcase)):
-                        if(testcase[i]["keywordVal"] in constants.AWSKEYWORDS):
+                        if(testcase[i]["keywordVal"] in aws_supported_keywords):
                             local_handler.awsKeywords[json_data["testcasename"]].add(testcase[i]["keywordVal"])
                 #passing test case value to ftfy module to handle special charcter
 ##                if(type(testcase) == 'unicode'):

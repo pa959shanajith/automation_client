@@ -1006,7 +1006,6 @@ class Controller():
                             if aws_mode:
                                 compile_status,pytest_file=tc_obj.compile_tc(tsplist,i+1,scenario_name)
                                 pytest_files.append(pytest_file)
-                                i+=1
                                 msg='***Scenario'+str(i + 1)+': '+scenario_name+' Compiled for AWS Execution***'
                                 print('=======================================================================================================')
                                 logger.print_on_console(msg)
@@ -1014,6 +1013,7 @@ class Controller():
                                 log.info('=======================================================================================================')
                                 log.info(msg)
                                 log.info('=======================================================================================================')
+                                i+=1
                                 execute_flag=False
                             if flag and execute_flag :
                                 #check for temrinate flag before execution
