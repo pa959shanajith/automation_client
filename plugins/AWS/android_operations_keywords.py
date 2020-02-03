@@ -50,8 +50,8 @@ class MobileOpeartions():
             methodoutput=TEST_RESULT_TRUE
         return status,methodoutput,output,err_msg
 
-    def send_value(self,element,input_val,*args):
-        return self.set_text(element,input_val,*args)
+    def send_value(self,driver,element,input_val,*args):
+        return self.set_text(driver,element,input_val,*args)
 
     def set_text(self, driver,element,input_val,*args):
         status=TEST_RESULT_FAIL
@@ -87,7 +87,7 @@ class MobileOpeartions():
             log.error(e)
         return status,methodoutput,output,err_msg
 
-    def clear_text(self,element,*args):
+    def clear_text(self,driver,element,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -198,18 +198,14 @@ class MobileOpeartions():
         err_msg=None
 
         try:
-            input_val=input[0]
-            if len(input_val)>0 :
-                if type(webelement) is list:
-                       webelement=webelement[0]
+            if len(input)>0 :
                 if webelement is not None:
-                            log.debug(WEB_ELEMENT_ENABLED)
-                            if webelement.text==input_val:
-                                log.debug('text matched')
-                                status=TEST_RESULT_PASS
-                                result=TEST_RESULT_TRUE
+                    if webelement.text==input:
+                        log.debug('text matched')
+                        status=TEST_RESULT_PASS
+                        result=TEST_RESULT_TRUE
         except Exception as e:
-                log.error(e)
+            log.error(e)
         return status,result,output,err_msg
 
     def get_text(self, driver,webelement,*args):
@@ -241,14 +237,11 @@ class MobileOpeartions():
         err_msg=None
 
         try:
-            input_val=input[0]
-            if len(input_val)>0 :
-                if type(webelement) is list:
-                       webelement=webelement[0]
+            if len(input)>0 :
                 if webelement is not None:
                     if webelement.is_enabled():
                         log.debug(WEB_ELEMENT_ENABLED)
-                        if webelement.text==input_val:
+                        if webelement.text==input:
                             log.debug('text matched')
                             status=TEST_RESULT_PASS
                             result=TEST_RESULT_TRUE
@@ -370,7 +363,7 @@ class MobileOpeartions():
             if element is not None:
                 visibility=element.is_displayed()
                 if visibility:
-                    log.debug(ERROR_CODE_DICT['ERR_OBJECT_VISIBLE'])
+                    log.debug(ELEMENT_VISIBLE)
                     enable=element.is_enabled()
                     if not(enable):
                         log.info(ERROR_CODE_DICT['ERR_WEB_ELEMENT_DISABLED'])
@@ -398,7 +391,7 @@ class MobileOpeartions():
             if element is not None:
                 visibility=element.is_displayed()
                 if visibility:
-                    log.info(ERROR_CODE_DICT['ERR_OBJECT_VISIBLE'])
+                    log.info(ELEMENT_VISIBLE)
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
                 else:
@@ -497,6 +490,7 @@ class MobileOpeartions():
                         log.info('Webelement not found')
                         err_msg=str(Ex)
                         log.error(err_msg)
+            
         if mobileElement is not None:
             log.info('Web element found')
         return mobileElement

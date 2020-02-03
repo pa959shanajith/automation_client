@@ -21,7 +21,7 @@ WEB_ELEMENT_ENABLED = 'Element is enabled'
 
 ELEMENT_EXISTS= 'Element Exists'
 
-ELEMENT_VISIBLE= 'ELement is Visible'
+ELEMENT_VISIBLE= 'Element is Visible'
 
 ERROR_CODE_DICT ={
                     'ERR_INVALID_INPUT':'Input error: please provide the valid input.',
