@@ -91,8 +91,8 @@ class InstallAndLaunch():
                 #self.desired_caps['Ip_Address'] = udid
                 self.desired_caps['udid'] = udid
                 self.desired_caps['fullReset'] = False
-                self.desired_caps['xcodeConfigFile']:os.environ["NINETEEN68_HOME"]+ '/assets/appium.xcconfig'
-                self.desired_caps['showXcodeLog']:True
+                self.desired_caps['xcodeConfigFile'] = os.environ["NINETEEN68_HOME"]+ '/assets/appium.xcconfig'
+                self.desired_caps['showXcodeLog'] = True
                 #self.desired_caps['newCommandTimeout'] = 3600
                 #self.desired_caps['launchTimeout'] = 180000
                 self.desired_caps['app'] = apk_path
