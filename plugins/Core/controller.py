@@ -225,6 +225,7 @@ class Controller():
     def __load_aws(self):
         try:
             core_utils.get_all_the_imports('AWS')
+            
         except Exception as e:
             logger.print_on_console('Error loading AWS plugin')
             log.error(e)
@@ -1114,7 +1115,7 @@ class Controller():
                             report_json=con.reporting_obj.report_json[OVERALLSTATUS]
             if aws_mode:
                 tc_obj.make_zip(pytest_files)
-                # execution_status=aws_obj.run_aws_android_tests()
+                execution_status=aws_obj.run_aws_android_tests()
             log.info('---------------------------------------------------------------------')
             print('=======================================================================================================')
             log.info('***SUITE '+ str(j) +' EXECUTION COMPLETED***')

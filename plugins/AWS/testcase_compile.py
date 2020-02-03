@@ -62,7 +62,7 @@ import os
 from generic_operations import GenericOperations
 from android_spinner_keywords import Spinner_Keywords
 from android_operations_keywords import MobileOpeartions
-from test_constants import *
+from testmobile_constants import *
 logging.basicConfig(filemode='a',
                             format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
                             datefmt='%H:%M:%S',

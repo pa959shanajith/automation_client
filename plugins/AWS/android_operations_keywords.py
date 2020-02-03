@@ -27,6 +27,7 @@ class MobileOpeartions():
 
     def start_server(self):
         """Sets up desired capabilities and the Appium driver."""
+        driver=None
         import platform
         if platform.system() != 'Darwin':
             url = 'http://127.0.0.1:4723/wd/hub'
@@ -34,7 +35,7 @@ class MobileOpeartions():
             url = 'http://0.0.0.0:4723/wd/hub'
             SYSTEM_OS = 'Darwin'
         desired_caps = {}
-        self.driver = webdriver.Remote(url, desired_caps)
+        driver = webdriver.Remote(url, desired_caps)
         return driver
 
     def launch_application(self,apk_path):
@@ -294,7 +295,7 @@ class MobileOpeartions():
             log.error(e)
         return status,methodoutput,output,err_msg
 
-    def toggle_off(self,webelement,*args):
+    def toggle_off(self.driver,webelement,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         visibilityFlag=True
@@ -463,7 +464,7 @@ class MobileOpeartions():
             log.error(e)
         return status,methodoutput,output,err_msg
 
-    def getMobileElement(self,objectname,*args):
+    def getMobileElement(self,driver,objectname,*args):
         mobileElement = None
         print_loggers=True
         if len(args)>0 and args[0]=='waitforelement_exists':
@@ -500,7 +501,7 @@ class MobileOpeartions():
             log.info('Web element found')
         return mobileElement
 
-    def waitforelement_exists(self, mob_ele,object_name,*args):
+    def waitforelement_exists(self, driver,mob_ele,object_name,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -518,7 +519,7 @@ class MobileOpeartions():
             if timeout!=None:
                 start_time = time.time()
                 while True:
-                    element=self.getMobileElement(object_name,'waitforelement_exists')
+                    element=self.getMobileElement(driver,object_name,'waitforelement_exists')
                     later=time.time()
                     if int(later-start_time)>=int(timeout):
                         log.info('Delay timeout')
@@ -535,7 +536,7 @@ class MobileOpeartions():
             log.error(e)
         return status,methodoutput,output,err_msg
 
-    def Set_Min_Value(self,webelement,*args):
+    def Set_Min_Value(self.driver,webelement,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -570,7 +571,7 @@ class MobileOpeartions():
             log.error(e)
         return status,methodoutput,output,err_msg
 
-    def Set_Mid_Value(self,webelement,*args):
+    def Set_Mid_Value(self.driver,webelement,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -1046,7 +1047,7 @@ class MobileOpeartions():
                 log.error(e)
         return status,result,output,err_msg
 
-    def Set_Date(self,webelement,input,*args):
+    def Set_Date(self.driver,webelement,input,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -1138,7 +1139,7 @@ class MobileOpeartions():
                 log.error(e)
         return status,methodoutput,output,err_msg
 
-    def Get_Date(self,webelement,input,*args):
+    def Get_Date(self.driver,webelement,input,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
