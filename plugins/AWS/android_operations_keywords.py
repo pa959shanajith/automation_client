@@ -295,7 +295,7 @@ class MobileOpeartions():
             log.error(e)
         return status,methodoutput,output,err_msg
 
-    def toggle_off(self.driver,webelement,*args):
+    def toggle_off(self,driver,webelement,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         visibilityFlag=True
@@ -536,7 +536,7 @@ class MobileOpeartions():
             log.error(e)
         return status,methodoutput,output,err_msg
 
-    def Set_Min_Value(self.driver,webelement,*args):
+    def Set_Min_Value(self,driver,webelement,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -571,7 +571,7 @@ class MobileOpeartions():
             log.error(e)
         return status,methodoutput,output,err_msg
 
-    def Set_Mid_Value(self.driver,webelement,*args):
+    def Set_Mid_Value(self,driver,webelement,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -1047,7 +1047,7 @@ class MobileOpeartions():
                 log.error(e)
         return status,result,output,err_msg
 
-    def Set_Date(self.driver,webelement,input,*args):
+    def Set_Date(self,driver,webelement,input,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -1139,7 +1139,7 @@ class MobileOpeartions():
                 log.error(e)
         return status,methodoutput,output,err_msg
 
-    def Get_Date(self.driver,webelement,input,*args):
+    def Get_Date(self,driver,webelement,input,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
