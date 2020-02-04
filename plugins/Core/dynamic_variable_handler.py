@@ -124,7 +124,7 @@ class DynamicVariables:
         status = TEST_RESULT_FALSE
         json_flag=False
         if outputval != None and outputval != '':
-            if outputval.startswith('{') and outputval.endswith('}'):
+            if (outputval.startswith('{') and outputval.endswith('}')) or (outputval.startswith('[') and outputval.endswith(']')) :
                 try:
                     if type(outputval)==dict:
                         status = TEST_RESULT_FALSE
@@ -165,6 +165,11 @@ class DynamicVariables:
         status = TEST_RESULT_FALSE
         nested_variable=None
         if (inputvar.startswith('{') and inputvar.endswith('}')) or (inputvar.count('{') > 0 and inputvar.count('}') > 0):
+            try:
+                if type(eval(inputvar))==list:
+                    return status,nested_variable
+            except Exception as e:
+                pass
             pattern = '\\[(.*?)\\]'
             regularexp = re.compile(pattern)
             nested_variable = regularexp.findall(inputvar)
