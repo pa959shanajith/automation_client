@@ -207,13 +207,21 @@ class MainNamespace(BaseNamespace):
             logger.print_on_console(err_msg)
             log.error(e,exc_info=True)
 
+    def check_aws_mode(self,data):
+        status=False
+        if len(data)>0 and data[0]['apptype']=='MobileApp':
+            if data[0]['suitedetails'][0]['browserType'][0]=='2':
+                status=True
+        return status
+
     def on_executeTestSuite(self, *args):
         try:
             global wxObject,socketIO,execution_flag
             args=list(args)
+            aws_mode=self.check_aws_mode(args)
             if(not execution_flag):
                 socketIO.emit('return_status_executeTestSuite',{'status':'success'})
-                wxObject.mythread = TestThread(wxObject,EXECUTE,args[0],wxObject.debug_mode)
+                wxObject.mythread = TestThread(wxObject,EXECUTE,args[0],wxObject.debug_mode,aws_mode)
             else:
                 obj = handler.Handler()
                 suiteId_list,suite_details,browser_type,scenarioIds,suite_data,execution_id,condition_check,dataparam_path,exec_mode=obj.parse_json_execute(args[0])
@@ -234,7 +242,7 @@ class MainNamespace(BaseNamespace):
             if check_execution_lic("result_debugTestCase"): return None
             global wxObject
             args=list(args)
-            wxObject.mythread = TestThread(wxObject,DEBUG,args[0],wxObject.debug_mode)
+            wxObject.mythread = TestThread(wxObject,DEBUG,args[0],wxObject.debug_mode,False)
             wxObject.choice=wxObject.rbox.GetStringSelection()
             logger.print_on_console(str(wxObject.choice)+' is Selected')
             if wxObject.choice == 'Normal':
@@ -784,12 +792,13 @@ class TestThread(threading.Thread):
     """Test Worker Thread Class."""
 
     #----------------------------------------------------------------------
-    def __init__(self,wxObject,action,json_data,debug_mode):
+    def __init__(self,wxObject,action,json_data,debug_mode,aws_mode):
         """Init Worker Thread Class."""
         super(TestThread, self).__init__()
         self.wxObject = wxObject
          #flag to pause thread
         self.paused = False
+        self.aws_mode=aws_mode
         # Explicitly using Lock over RLock since the use of self.paused
         # break reentrancy anyway, and I believe using Lock could allow
         # one thread to pause the worker, while another resumes; haven't
@@ -801,6 +810,7 @@ class TestThread(threading.Thread):
         self.action=action.lower()
         self.json_data=json_data
         self.debug_mode=debug_mode
+        self.aws_mode=aws_mode
         self.start()    # start the thread
 
     #should just resume the thread
@@ -848,7 +858,7 @@ class TestThread(threading.Thread):
                 logger.print_on_console('This app type is not part of the license.')
                 status=TERMINATE
             else:
-                status = self.con.invoke_controller(self.action,self,self.debug_mode,runfrom_step,self.json_data,self.wxObject,socketIO,soc)
+                status = self.con.invoke_controller(self.action,self,self.debug_mode,runfrom_step,self.json_data,self.wxObject,socketIO,soc,self.aws_mode)
 
             logger.print_on_console('Execution status '+status)
 
@@ -880,7 +890,7 @@ class TestThread(threading.Thread):
             elif self.action==EXECUTE:
                 socketIO.emit('result_executeTestSuite',status)
         except Exception as e:
-            log.error(e)
+            log.error(e,exc_info=True)
             status=TERMINATE
             if socketIO is not None:
                 if self.action==DEBUG:
@@ -1587,6 +1597,7 @@ class Config_window(wx.Frame):
             "High_ch":[(260,378)],
             "Save":[(135,458),(100, 28)],
             "C_Timeout" :[(12,218),(120, 28),(180,218), (80,-1)],
+            "Delay_Stringinput":[(225,218),(140, 28),(360,218), (85,-1)],
             "Iris_prediction":[(12,398)],
             "hide_soft_key":[(180,398)],
             "extn_enabled":[(370,428)],

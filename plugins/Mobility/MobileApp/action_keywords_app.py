@@ -62,7 +62,7 @@ class Action_Key_App():
             }
             adb=os.environ['ANDROID_HOME']+"\\platform-tools\\adb.exe"
             if (len(inputs)==1):
-                inp_val = inputs[0]
+                inp_val = inputs[0].replace(" ","\ ")
                 if device is not None:
                     cmd = adb + ' -s '+ device+' shell input text '+inp_val
                 else:
