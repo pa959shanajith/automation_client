@@ -35,7 +35,12 @@ class MobileOpeartions():
             url = 'http://0.0.0.0:4723/wd/hub'
             SYSTEM_OS = 'Darwin'
         desired_caps = {}
-        driver = webdriver.Remote(url, desired_caps)
+        try:
+            driver = webdriver.Remote(url, desired_caps)
+        except Exception as e:
+            logger.print_on_console('Error in webdriver')
+            log.error(e)
+            return None
         return driver
 
     def launch_application(self,apk_path):
