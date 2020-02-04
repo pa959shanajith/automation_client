@@ -497,6 +497,33 @@ class Table_keywords():
             logger.print_on_console( 'Error occured in selectRow' )
         return status, result, value, err_msg
 
+    def selectColumn(self, sap_id, input_val, *args):
+        status = sap_constants.TEST_RESULT_FAIL
+        result = sap_constants.TEST_RESULT_FALSE
+        value = OUTPUT_CONSTANT
+        err_msg = None
+        try:
+            self.lk.setWindowToForeground(sap_id)
+            id, ses = self.uk.getSapElement(sap_id)
+            if ( id and ses ):
+                colNum = int(input_val[0])-1
+                elem = ses.FindById(id)
+                columns = elem.Columns
+                column_to_select = columns[colNum]
+                if( elem.ColSelectMode != 0 ):
+                    column_to_select.selected = True
+                    status = sap_constants.TEST_RESULT_PASS
+                    result = sap_constants.TEST_RESULT_TRUE
+                else : err_msg = sap_constants.INVALID_ELELMENT_TYPE
+            else : err_msg = sap_constants.ELELMENT_NOT_FOUND
+            if ( err_msg ):
+                log.info(err_msg)
+                logger.print_on_console(err_msg)
+        except Exception as e:
+            err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
+            log.error( err_msg )
+            logger.print_on_console( 'Error occured in selectColumn' )
+        return status, result, value, err_msg
 
 
     def unselectRow(self, sap_id, input_val, *args):
@@ -527,6 +554,34 @@ class Table_keywords():
             err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
             log.error( err_msg )
             logger.print_on_console( 'Error occured in unselectRow' )
+        return status, result, value, err_msg
+
+    def unselectColumn(self, sap_id, input_val, *args):
+        status = sap_constants.TEST_RESULT_FAIL
+        result = sap_constants.TEST_RESULT_FALSE
+        value = OUTPUT_CONSTANT
+        err_msg = None
+        try:
+            self.lk.setWindowToForeground(sap_id)
+            id, ses = self.uk.getSapElement(sap_id)
+            if ( id and ses ):
+                colNum = int(input_val[0])-1
+                elem = ses.FindById(id)
+                columns = elem.Columns
+                column_to_select = columns[colNum]
+                if( elem.ColSelectMode != 0 ):
+                    column_to_select.selected = True
+                    status = sap_constants.TEST_RESULT_PASS
+                    result = sap_constants.TEST_RESULT_TRUE
+                else : err_msg = sap_constants.INVALID_ELELMENT_TYPE
+            else : err_msg = sap_constants.ELELMENT_NOT_FOUND
+            if ( err_msg ):
+                log.info( err_msg )
+                logger.print_on_console( err_msg )
+        except Exception as e:
+            err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
+            log.error( err_msg )
+            logger.print_on_console( 'Error occured in unselectColumn' )
         return status, result, value, err_msg
 
 
