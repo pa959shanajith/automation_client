@@ -237,7 +237,7 @@ def socketIO_on_data_ack(self, pack_id, *args):
         self._io.activeTimer.cancel()
     idx = pack_id.split('_')
     idx = idx[1] if len(idx) == 2 else None
-    print("Ack'd "+str(pack_id))
+    #print("Ack'd "+str(pack_id))
     if idx == "eof": return None # EOF ACK packets always emit one more ACK. So ignore current one
     if len(args) > 0 and args[0] == "paginate_fail":
         pckt = store.get_packet(int(pack_id.split('_')[0]), "PAGIN")
@@ -253,8 +253,7 @@ def socketIO_save_pckt(self, packid, event, *fargs, **fkw):
     idx = packid.split('_')
     send_now = not store.has_packet
     store.save_packet(int(idx[0]), (idx[1] if len(idx) == 2 else None), [event, fargs, fkw])
-    if send_now and store.get_packet(store.next_id, "EMPTQ"):
-        self.send_pckt(event, *fargs, **fkw)
+    if send_now: self.send_pckt(event, *fargs, **fkw)
 
 """ Override SocketIO library's emit method used for sending data.
     This is needed because this library doesn't support packet size larger than 100 MB
@@ -284,7 +283,7 @@ def socketIO_emit(self, event, *args, **kw):
             del payload
 
 def socketIO_send_pckt(self, event, *args, **kw):
-    print("Sending "+str(args[0]))
+    #print("Sending "+str(args[0]))
     try:
         self._emit(event, *args, **kw)
     except:

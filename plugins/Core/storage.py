@@ -69,17 +69,14 @@ class InMemory(AbstractStorage):
         if subid == "PAGIN":
             pckt = pckt[PAGINATE_INDEX]
         elif type(pckt) == dict:
-            if subid == "EMPTQ": return (len(pckt.keys()) == 1)
             try:
                 if subid == "" or subid is None: subid = PAGINATE_INDEX
                 elif subid == PAGINATE_INDEX: subid = 1
                 else: subid = int(subid) + 1
-                if (subid + 1) == len(pckt): subid = "eof"
+                if type(subid) == int and (subid + 1) == len(pckt): subid = "eof"
                 pckt = pckt[str(subid)]
             except:
-                print(list(self.packets.keys()))
-                print(list(pckt.keys()))
-                print(packetid, subid)
+                pass
         return pckt
 
     def delete_packet(self, packetid):
@@ -92,11 +89,10 @@ class SQLite(AbstractStorage):
     def __init__(self):
         super(SQLite, self).__init__()
         db_path = os.environ["NINETEEN68_HOME"]+os.sep+'assets'+os.sep+'packets.db'
-        #os.remove(db_path)  #####   DELETE ME
+        #os.remove(db_path)  #####
         connection = sqlite3.connect(db_path, check_same_thread=False)
         connection.isolation_level = None
         self.db = connection.cursor()
-        self.db.execute("VACUUM")
         Timer(5, compact_db, (self.db,)).start()
         self.db.execute("CREATE TABLE IF NOT EXISTS packets (packetid integer, subpacketid text, packet text)")
         last_pcktid = self.db.execute("SELECT packetid from packets").fetchall()[-1:]
@@ -120,7 +116,6 @@ class SQLite(AbstractStorage):
 
     def get_packet(self, packetid, subid = None):
         subpack_count = len(self.db.execute("SELECT subpacketid FROM packets WHERE packetid=?",(packetid,)).fetchall())
-        if subid == "EMPTQ": return (subpack_count == 1)
         if subpack_count > 1:
             if subid == "PAGIN" or subid == "" or subid is None: subid = PAGINATE_INDEX
             elif subid == PAGINATE_INDEX: subid = 1
