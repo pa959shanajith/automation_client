@@ -17,15 +17,22 @@ import logging
 from uuid import uuid4 as uuid
 from threading import Timer
 import socketIO_client
+import storage
 from socketIO_client.exceptions import *
 from socketIO_client.transports import *
 
 CHUNK_MAX_LIMIT = 15*1024*1024 # 15 MB
-CHUNK_SIZE = 15*1024*1024 # 10 MB
-PACKET_TIMEOUT = 10 # Seconds
+CHUNK_SIZE = 10*1024*1024 # 10 MB
+PACKET_TIMEOUT = 60 # Seconds
 VERIFY_HOSTNAME = False
 PAGINATE_INDEX = "p@gIn8"
-pckts = {}
+
+try:
+    store = storage.SQLite()
+    #store = storage.InMemory()
+except:
+    store = storage.InMemory()
+
 
 __all__ = ['SocketIO','BaseNamespace']
 
@@ -229,50 +236,33 @@ def socketIO_on_data_ack(self, pack_id, *args):
     if (self._io.activeTimer != None and self._io.activeTimer.isAlive()):
         self._io.activeTimer.cancel()
     idx = pack_id.split('_')
-    idx = idx[1] if len(idx) == 2 else ""
+    idx = idx[1] if len(idx) == 2 else None
     print("Ack'd "+str(pack_id))
     if idx == "eof": return None # EOF ACK packets always emit one more ACK. So ignore current one
     if len(args) > 0 and args[0] == "paginate_fail":
-        pckt = pckts[pack_id.split('_')[0]][PAGINATE_INDEX]  ####### get someid
+        pckt = store.get_packet(int(pack_id.split('_')[0]), "PAGIN")
         self._io.send_pckt(pckt[0], *pckt[1], **pckt[2])
     else:
-        # delete packets from $db
-        if pack_id in pckts: del pckts[pack_id]
-        if len(pckts) > 0:
-            pckt = pckts[list(pckts.keys())[0]]  ####### get someid
-            if type(pckt) == dict:
-                try:
-                    if idx == "": idx = PAGINATE_INDEX
-                    elif idx == PAGINATE_INDEX: idx = 1
-                    else: idx = int(idx) + 1
-                    if (idx + 1) == len(pckt): idx = "eof"
-                    pckt = pckt[str(idx)]  ####### get someid
-                except:
-                    print(list(pckts.keys()))
-                    print(list(pckt.keys()))
-                    print(pack_id, idx)
-            self._io.send_pckt(pckt[0], *pckt[1], **pckt[2])
+        store.delete_packet(pack_id)
+        if store.has_packet:
+            pckt = store.get_packet(store.next_id, idx)
+            if pckt: self._io.send_pckt(pckt[0], *pckt[1], **pckt[2])
 
-def socketIO_save_pckt(self, pack_id, event, *fargs, **fkw):
-    fargs = (pack_id,) + fargs
-    idx = pack_id.split('_')
-    pack_id = idx[0]
-    if len(idx) == 2:
-        if pack_id not in pckts: pckts[pack_id] = {idx[1]: [event, fargs, fkw]}
-        else: pckts[pack_id][idx[1]] = [event, fargs, fkw]
-    else: pckts[pack_id] = [event, fargs, fkw]
-    if len(pckts) == 1:
-        pckt = pckts[list(pckts.keys())[0]]
-        if type(pckt) != dict or (type(pckt) == dict and len(pckt.keys()) == 1):
-            self.send_pckt(event, *fargs, **fkw)
+def socketIO_save_pckt(self, packid, event, *fargs, **fkw):
+    fargs = (packid,) + fargs
+    idx = packid.split('_')
+    send_now = not store.has_packet
+    store.save_packet(int(idx[0]), (idx[1] if len(idx) == 2 else None), [event, fargs, fkw])
+    if send_now and store.get_packet(store.next_id, "EMPTQ"):
+        self.send_pckt(event, *fargs, **fkw)
 
 """ Override SocketIO library's emit method used for sending data.
     This is needed because this library doesn't support packet size larger than 100 MB
 """
 def socketIO_emit(self, event, *args, **kw):
-    self.pckt_id += 1
+    pack_id = store.get_id
     if len(args) == 0 or (len(args) > 0 and type(args[0]) == bool):
-        self.save_pckt(str(self.pckt_id), event, *args, **kw)
+        self.save_pckt(pack_id, event, *args, **kw)
     else: # Check for pagination
         payload = args[0]
         stringify = False
@@ -281,16 +271,16 @@ def socketIO_emit(self, event, *args, **kw):
             payload = json.dumps(payload)
         size = len(payload)
         # Increasing 45 bytes in check limit (36 bytes for uuid, 2 bytes for separator, 7 bytes for index)
-        if not (size > CHUNK_MAX_LIMIT+45): self.save_pckt(str(self.pckt_id), event, *args, **kw)
+        if not (size > CHUNK_MAX_LIMIT+45): self.save_pckt(pack_id, event, *args, **kw)
         else: # Pagination begins
             sub_pack_id = str(uuid())
             blocks = int(size/CHUNK_SIZE) + 1
             pckt = (';'.join([sub_pack_id,str(size),str(blocks),str(stringify)]))
-            self.save_pckt(str(self.pckt_id)+"_"+PAGINATE_INDEX, event, pckt, **kw)
+            self.save_pckt(pack_id+"_"+PAGINATE_INDEX, event, pckt, **kw)
             for i in range(blocks):
                 pckt = (sub_pack_id+';'+payload[CHUNK_SIZE*i : CHUNK_SIZE*(i+1)])
-                self.save_pckt(str(self.pckt_id)+'_'+str(i+1), event, pckt, **kw)
-            self.save_pckt(str(self.pckt_id)+"_eof", event, sub_pack_id, **kw)
+                self.save_pckt(pack_id+'_'+str(i+1), event, pckt, **kw)
+            self.save_pckt(pack_id+"_eof", event, sub_pack_id, **kw)
             del payload
 
 def socketIO_send_pckt(self, event, *args, **kw):
@@ -299,9 +289,9 @@ def socketIO_send_pckt(self, event, *args, **kw):
         self._emit(event, *args, **kw)
     except:
         pass
-    args = (event,) + args
-    self.activeTimer = Timer(PACKET_TIMEOUT, self.send_pckt, args, kw)
+    self.activeTimer = Timer(PACKET_TIMEOUT, self.send_pckt, (event,) + args, kw)
     self.activeTimer.start()
+    del args
 
 
 socketIO_client.parsers._read_packet_length = socketIO_read_packet_length
@@ -321,7 +311,6 @@ socketIO_client.SocketIO._transport = socketIO_transport
 socketIO_client.SocketIO.waiting_for_close = socketIO_waiting_for_close
 socketIO_client.SocketIO.wait = socketIO_wait
 socketIO_client.SocketIO.activeTimer = None
-socketIO_client.SocketIO.pckt_id = 0
 
 SocketIO = socketIO_client.SocketIO
 BaseNamespace = socketIO_client.BaseNamespace
