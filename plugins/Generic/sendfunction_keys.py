@@ -58,7 +58,7 @@ class SendFunctionKeys:
                     def enum_cb(hwnd, results):
                         winlist.append((hwnd, win32gui.GetWindowText(hwnd)))
                     win32gui.EnumWindows(enum_cb, toplist)
-                    app = [(hwnd, title) for hwnd, title in winlist if ((("Chrome" in title) or ("Firefox" in title) or ("Explorer" in title)) and (win32process.GetWindowThreadProcessId(hwnd)[1] == pid))]
+                    app = [(hwnd, title) for hwnd, title in winlist if ((("Chrome" in title) or ("Firefox" in title) or ("Edge" in title) or ("Explorer" in title)) and (win32process.GetWindowThreadProcessId(hwnd)[1] == pid))]
                     if(len(app)==1):
                         app = app[0]
                         handle = app[0]
