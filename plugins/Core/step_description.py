@@ -344,7 +344,7 @@ class StepDescription:
         def verifybuttonname():
             return 'Verify ' +"'"+ input +"'"+  'is the name of ' + "'" + tsp.custname + "'"
         def getbuttonname():
-            return 'Get the name of the ' + "'" + tsp.custname + "'" + 'and save the '+output+'' in ' + tsp.outputval
+            return 'Get the name of the ' + "'" + tsp.custname + "'" + 'and save the '+output+' in ' + tsp.outputval
         def getlinktext():
             return 'Get text From ' + "'" + tsp.custname + "'" + ' and save the text \'' + output + '\' in ' + tsp.outputval
         def verifylinktext():
