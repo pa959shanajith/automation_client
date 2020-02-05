@@ -190,6 +190,7 @@ class MobileOpeartions():
             if webelement is not None:
                         log.debug(WEB_ELEMENT_ENABLED)
                         output=webelement.text
+                        log.info("Button name: "+output)
                         status=TEST_RESULT_PASS
                         result=TEST_RESULT_TRUE
         except Exception as e:
@@ -207,6 +208,7 @@ class MobileOpeartions():
                 if webelement is not None:
                     if webelement.text==input:
                         log.debug('text matched')
+                        log.info("Button name: "+input)
                         status=TEST_RESULT_PASS
                         result=TEST_RESULT_TRUE
         except Exception as e:
@@ -226,6 +228,7 @@ class MobileOpeartions():
                 if webelement.is_enabled():
                     log.debug(WEB_ELEMENT_ENABLED)
                     output=webelement.text
+                    log.info("Element text: "+output)
                     status=TEST_RESULT_PASS
                     result=TEST_RESULT_TRUE
                 else:
@@ -248,6 +251,7 @@ class MobileOpeartions():
                         log.debug(WEB_ELEMENT_ENABLED)
                         if webelement.text==input:
                             log.debug('text matched')
+                            log.info("Element text: "+input)
                             status=TEST_RESULT_PASS
                             result=TEST_RESULT_TRUE
                     else:
@@ -281,7 +285,9 @@ class MobileOpeartions():
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
                         else:
-                            err_msg='TOGGLE_ON'
+                            status=TEST_RESULT_PASS
+                            methodoutput=TEST_RESULT_TRUE
+                            err_msg='Toggle is already ON'
                     else:
                         err_msg=ERROR_CODE_DICT['ERR_WEB_ELEMENT_DISABLED']
 
@@ -301,34 +307,35 @@ class MobileOpeartions():
         err_msg=None
         status=None
 
-        if webelement is not None:
-            try:
-                if webelement is not None:
-                    visibility=webelement.is_displayed()
-                    log.debug('element is visible')
-                    if visibility:
-                        enable=webelement.is_enabled()
-                        if enable:
-                            log.debug(WEB_ELEMENT_ENABLED)
-                            log.debug('performing the action')
-                            res=webelement.text
-                            ios = str(res)
-                            if ios == 'True' or res.upper()=='ON':
-                                action = TouchAction(driver)
-                                action.tap(webelement).perform()
-                                status=TEST_RESULT_PASS
-                                methodoutput=TEST_RESULT_TRUE
-                            else:
-                                 err_msg='TOGGLE_OFF'
-
+        try:
+            if webelement is not None:
+                visibility=webelement.is_displayed()
+                log.debug('element is visible')
+                if visibility:
+                    enable=webelement.is_enabled()
+                    if enable:
+                        log.debug(WEB_ELEMENT_ENABLED)
+                        log.debug('performing the action')
+                        res=webelement.text
+                        ios = str(res)
+                        if ios == 'True' or res.upper()=='ON':
+                            action = TouchAction(driver)
+                            action.tap(webelement).perform()
+                            status=TEST_RESULT_PASS
+                            methodoutput=TEST_RESULT_TRUE
                         else:
-                            err_msg=ERROR_CODE_DICT['ERR_WEB_ELEMENT_DISABLED']
+                            status=TEST_RESULT_PASS
+                            methodoutput=TEST_RESULT_TRUE
+                            err_msg='Toggle is already OFF'
+
                     else:
-                        err_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
-                if err_msg:
-                    log.error(err_msg)
-            except Exception as e:
-                log.error(e)
+                        err_msg=ERROR_CODE_DICT['ERR_WEB_ELEMENT_DISABLED']
+                else:
+                    err_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
+            if err_msg:
+                log.error(err_msg)
+        except Exception as e:
+            log.error(e)
         return status,methodoutput,output,err_msg
 
     def verify_enabled(self, driver,element,*args):
@@ -377,7 +384,6 @@ class MobileOpeartions():
                         methodoutput=TEST_RESULT_TRUE
                     else:
                         err_msg=WEB_ELEMENT_ENABLED
-
                 else:
                     err_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
             if err_msg:
@@ -818,7 +824,7 @@ class MobileOpeartions():
                 if element.is_enabled():
                     log.debug(ELEMENT_ENABLED)
                     output = element.text
-                    print("Selected number: "+output)
+                    log.info("Selected number: "+output)
                     status=TEST_RESULT_PASS
                     result=TEST_RESULT_TRUE
                 else:
@@ -847,20 +853,20 @@ class MobileOpeartions():
                         log.debug(ELEMENT_ENABLED)
                         if elem_text==input_val:
                             log.debug('text matched')
-                            print("Selected number: "+elem_text)
+                            log.info("Selected number: "+elem_text)
                             status=TEST_RESULT_PASS
                             result=TEST_RESULT_TRUE
                         else:
-                            print("Selected number: "+elem_text)
+                            log.info("Selected number: "+elem_text)
                     else:
                         log.error('ELEMENT_DISABLED')
                         if elem_text==input_val:
                             log.debug('text matched')
-                            print("Selected number: "+elem_text)
+                            log.info("Selected number: "+elem_text)
                             status=TEST_RESULT_PASS
                             result=TEST_RESULT_TRUE
                         else:
-                            print("Selected number: ;"+elem_text)
+                            log.info("Selected number: ;"+elem_text)
                 else:
                     log.error('ELEMENT DOES NOT EXIST')
             else:
@@ -915,7 +921,7 @@ class MobileOpeartions():
                                                 else:
                                                     action.tap(ampm[1]).perform()
                                             else:
-                                                print("More RadioButtons before Timepicker")
+                                                log.info("More RadioButtons before Timepicker")
                                             status=TEST_RESULT_PASS
                                             result=TEST_RESULT_TRUE
                                         else:
@@ -1025,6 +1031,7 @@ class MobileOpeartions():
                             else:
                                 AMorPM="PM"
                             output=Hour+':'+Min+':'+AMorPM
+                            log.info("Time: "+output)
                             status=TEST_RESULT_PASS
                             result=TEST_RESULT_TRUE
 
@@ -1034,6 +1041,7 @@ class MobileOpeartions():
                             Min=element[1].text
                             AMorPM=element[2].text
                             output=Hour+':'+Min+':'+AMorPM
+                            log.info("Time: "+output)
                             status=TEST_RESULT_PASS
                             result=TEST_RESULT_TRUE
                     else:
@@ -1165,6 +1173,7 @@ class MobileOpeartions():
                             Date=element[1].text
                             Year=element[2].text
                             output=Month+'/'+Date+'/'+Year
+                            log.info("Date: "+output)
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
                         else :

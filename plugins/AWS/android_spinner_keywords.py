@@ -100,6 +100,7 @@ class Spinner_Keywords():
                             length2=len(text)
                             if (length1==length2):
                                 output=length1
+                                log.info("Output: "+output)
                                 status=TEST_RESULT_PASS
                                 result=TEST_RESULT_TRUE
                                 break
@@ -208,14 +209,14 @@ class Spinner_Keywords():
                             driver.back()
                         if (input==len(text)):
                                 log.debug('count matched')
+                                log.info("Count: "+len(text))
                                 status=TEST_RESULT_PASS
                                 result=TEST_RESULT_TRUE
                         else :
                                 err_msg='count not matching'
                                 log.error('count not matching')
                                 print(err_msg)
-
-
+                                log.info("Count: "+len(text))
                     else:
                         err_msg='element is disabled'
                         log.error('element is disabled')
@@ -443,6 +444,7 @@ class Spinner_Keywords():
                                                 flag=True
                                                 driver.back()
                                                 var = 'true'
+                                                log.info("Selected: "+input)
                                                 status=TEST_RESULT_PASS
                                                 result=TEST_RESULT_TRUE
                                                 break
@@ -474,6 +476,7 @@ class Spinner_Keywords():
                                                 selected=j.get_attribute("checked")
                                                 if str(selected)== 'true':
                                                     if input == j.text :
+                                                        log.info("Selected: "+input)
                                                         status=TEST_RESULT_PASS
                                                         result=TEST_RESULT_TRUE
                                                         if var=='' :
@@ -926,6 +929,7 @@ class Spinner_Keywords():
                                     ##output=temp[0]
                             if k<=len(obj):
                                 output= obj[k].text
+                                log.info("Output: "+output)
                                 status=TEST_RESULT_PASS
                                 result=TEST_RESULT_TRUE
                                 break
@@ -1025,6 +1029,7 @@ class Spinner_Keywords():
                                     selected=j.get_attribute("checked")
                                     if str(selected) == 'true':
                                         output=j.text
+                                        log.info("Selected: "+output)
                                         status=TEST_RESULT_PASS
                                         result=TEST_RESULT_TRUE
                                         flag=True
@@ -1036,6 +1041,7 @@ class Spinner_Keywords():
                                     if str(selected) == 'true':
                                         output=j.text
                                         flag=True
+                                        log.info("Selected: "+output)
                                         status=TEST_RESULT_PASS
                                         result=TEST_RESULT_TRUE
                                         break
@@ -1143,19 +1149,16 @@ class Spinner_Keywords():
 
                                 if len(input) ==  len(temp):
                                     output=temp
+                                    log.info("Output: "+output)
                                     status=TEST_RESULT_PASS
                                     result=TEST_RESULT_TRUE
                                     break
-
 
                                 else :
                                         err_msg='invalid input'
                                         log.error('invalid input')
                                         print(err_msg)
                                         break
-
-
-
 
                         if className != 'RadioButton' :
                             driver.back()
@@ -1168,9 +1171,6 @@ class Spinner_Keywords():
                     log.error('element is not visible')
                     print(err_msg)
         except Exception as e:
-
-
-
                 log.error(e)
 
         return status,result,output,err_msg
@@ -1261,11 +1261,13 @@ class Spinner_Keywords():
 
                             if (length1==length2):
                                 output=text
+                                log.info("Output: "+output)
                                 status=TEST_RESULT_PASS
                                 result=TEST_RESULT_TRUE
                                 break
                             else:
                                 output=text
+                                log.info("Output: "+output)
                                 status=TEST_RESULT_PASS
                                 result=TEST_RESULT_TRUE
                                 break
@@ -1376,6 +1378,7 @@ class Spinner_Keywords():
                                             print(err_msg)
                                             break
                                     if count==len(input):
+                                        log.info("Output: "+text)
                                         status=TEST_RESULT_PASS
                                         result=TEST_RESULT_TRUE
 
