@@ -166,7 +166,7 @@ class Clickandadd():
             driver.switch_to.window(currenthandle)
             driver.switch_to_default_content()
 
-            if (isinstance(driver,webdriver.Firefox) or isinstance(driver,webdriver.Chrome)):
+            if (isinstance(driver,webdriver.Firefox) or isinstance(driver,webdriver.Chrome) or isinstance(driver,webdriver.Edge)):
                 screen = webscrape_utils_obj.fullpage_screenshot(driver, screen_shot_path )
             else:
                 screen = driver.get_screenshot_as_base64()
