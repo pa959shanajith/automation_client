@@ -753,7 +753,7 @@ class StepDescription:
         def findwindowandattach():
             return 'Find window and attach is executed.'
         def selectmenu():
-            return " '"+input+"'"+' menu selected.'
+            return "'"+input+"'"+' menu selected.'
         def maximizewindow():
             return 'Perform maximize window operation on the window.'
         def minimizewindow():
