@@ -181,7 +181,7 @@ class MobileDispatcher:
 
 #################################                 IOS                ###################################
                 # input[0]=bundleid,input[1]=os version ,input[2]=IP,,input[3]=device_name
-                if SYSTEM_OS == 'Darwin':
+                if SYSTEM_OS == 'wDarwin':
 
 
                     #current_dir = (os.getcwd())
