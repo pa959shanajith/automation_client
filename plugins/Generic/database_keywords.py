@@ -37,29 +37,30 @@ class DatabaseOperation():
         result=generic_constants.TEST_RESULT_FALSE
         verb = OUTPUT_CONSTANT
         err_msg=None
+        cursor = None
         try:
             cnxn = self.connection(dbtype, ip , port , dbName, userName , password)
-            cursor = cnxn.cursor()
-            statement = ['create','update','insert','CREATE','UPDATE','INSERT']
-            if any(x in query for x in statement ):
-                log.debug('Inside IF condition')
-                cursor.execute(query)
-                cnxn.commit()
-                status=generic_constants.TEST_RESULT_PASS
-                result=generic_constants.TEST_RESULT_TRUE
-            else:
-                log.debug('Inside else condition')
-                cursor.execute(query)
-                status=generic_constants.TEST_RESULT_PASS
-                result=generic_constants.TEST_RESULT_TRUE
-
+            if cnxn is not None:
+                cursor = cnxn.cursor()
+                statement = ['create','update','insert','CREATE','UPDATE','INSERT']
+                if any(x in query for x in statement ):
+                    log.debug('Inside IF condition')
+                    cursor.execute(query)
+                    cnxn.commit()
+                    status=generic_constants.TEST_RESULT_PASS
+                    result=generic_constants.TEST_RESULT_TRUE
+                else:
+                    log.debug('Inside else condition')
+                    cursor.execute(query)
+                    status=generic_constants.TEST_RESULT_PASS
+                    result=generic_constants.TEST_RESULT_TRUE
         except Exception as e:
             log.error(e)
             logger.print_on_console(e)
-            err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+            err_msg = str(e)
         finally:
-            cursor.close()
-            cnxn.close()
+            if cursor is not None: cursor.close()
+            if cnxn is not None: cnxn.close()
         return status,result,verb,err_msg
 
     def secureRunQuery(self, ip , port , userName , password, dbName, query, dbtype):
@@ -98,24 +99,7 @@ class DatabaseOperation():
         details = []
         cnxn=None
         try:
-##            if len(args)>0 :
             cnxn = self.connection(dbtype, ip , port , dbName, userName , password)
-##            out_tuple = args
-##            out_tuple=''.join(out_tuple)
-##            import re
-##            data = re.findall(r'\[([^]]*)\]',out_tuple)
-##            row = data[0]
-##            col = data[1]
-##            row = int(row)
-##            col = int(col)
-##            cursor = cnxn.cursor()
-##            cursor.execute(query)
-##            rows = cursor.fetchall()
-##            value = rows[row][col]
-##            log.info('Value obtained :')
-##            log.info(value)
-##            for row in rows:
-##                logger.print_on_console(row)
             if cnxn is not None:
                 details.append(ip)
                 details.append(port)
@@ -126,50 +110,47 @@ class DatabaseOperation():
                 details.append(dbtype)
                 status=generic_constants.TEST_RESULT_PASS
                 result=generic_constants.TEST_RESULT_TRUE
-##            else:
-##                log.info('Output column missing required value')
-##                logger.print_on_console('Output column missing required value')
         except Exception as e:
             log.error(e)
             err_msg = 'Database Login failed'
             logger.print_on_console(err_msg)
         finally:
-            ##            cursor.close()
-            if cnxn!=None:
-                cnxn.close()
+            if cnxn is not None: cnxn.close()
         return status,result,details,err_msg
 
 
     def fetchData(self,input_val,*args):
         value = None
+        cursor = None
         if(len(input_val)== 8):
             try:
                 cnxn = self.connection(input_val[6], input_val[0] , input_val[1] , input_val[4], input_val[2] , input_val[3])
-                import re
-                data = re.findall(r'\[([^]]*)\]',input_val[7])
-                row = data[0]
-                col = data[1]
-                row = int(row)
-                col = int(col)
-                row_no = row - 1
-                col_no = col - 1
-                cursor = cnxn.cursor()
-                cursor.execute(input_val[5])
-                rows = cursor.fetchall()
-                value = rows[row_no][col_no]
-                ##if condition added to fix issue:304-Generic : getData keyword:  Actual data  is not getting stored in dynamic variable instead "null" is stored.
-                ##changes done by jayashree.r
-                if value == None:
-                    value = 'None'
-                log.info('Value obtained :')
-                log.info(value)
+                if cnxn is not None:
+                    import re
+                    data = re.findall(r'\[([^]]*)\]',input_val[7])
+                    row = data[0]
+                    col = data[1]
+                    row = int(row)
+                    col = int(col)
+                    row_no = row - 1
+                    col_no = col - 1
+                    cursor = cnxn.cursor()
+                    cursor.execute(input_val[5])
+                    rows = cursor.fetchall()
+                    value = rows[row_no][col_no]
+                    ##if condition added to fix issue:304-Generic : getData keyword:  Actual data  is not getting stored in dynamic variable instead "null" is stored.
+                    ##changes done by jayashree.r
+                    if value == None:
+                        value = 'None'
+                    log.info('Value obtained :')
+                    log.info(value)
             except Exception as e:
                 log.error(e)
-                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                err_msg = str(e)
                 logger.print_on_console(err_msg)
             finally:
-                cursor.close()
-                cnxn.close()
+                if cursor is not None: cursor.close()
+                if cnxn is not None: cnxn.close()
             return value
 
     def secureGetData(self, ip , port , userName , password, dbName, query, dbtype,*args):
@@ -205,6 +186,7 @@ class DatabaseOperation():
         result=generic_constants.TEST_RESULT_FALSE
         verb = OUTPUT_CONSTANT
         err_msg=None
+        cursor=None
         try:
             ext = self.get_ext(inp_file)
             if ext == '.xls':
@@ -215,65 +197,29 @@ class DatabaseOperation():
                 file_path=self.create_file_csv()
 
             cnxn = self.connection(dbtype, ip , port , dbName, userName , password)
-            cursor = cnxn.cursor()
-            cursor.execute(query)
-            rows = cursor.fetchall()
-            columns = [column[0] for column in cursor.description]
-            verify = os.path.isfile(file_path)
-            if (verify == True):
-                ext = self.get_ext(file_path)
-                if (ext == '.xls' or ext == '.xlsx'):
-                    work_book = xlwt.Workbook(encoding="utf-8")
-                    work_sheet = work_book.add_sheet(generic_constants.DATABASE_SHEET)
-                    i=0
-                    j=0
-                    for x in columns:
-                        work_sheet.write(i,j,x)
-                        j=j+1
-                    b=0
-                    k=1
-                    for row in rows:
-                        l=0
-                        for y in row:
-                            try:
-                                work_sheet.write(k,l,y)
-                            except Exception as e:
-                                if 'character' in str(e):
-                                    i = str(e).index('character')
-                                    err_new=str(e)[:i+len('character')]
-                                    if err_new==generic_constants.UNICODE_ERR:
-                                        newrow=[]
-                                        for ele in row:
-                                            if type(ele) == str:
-                                                 ele = ele.encode('utf-8')
-                                                 newrow.append(ele)
-                                            else:
-                                                newrow.append(ele)
-                                    row = tuple(newrow)
-                                    work_sheet.write(k,l,y)
-                            l+=1
-                        k+=1
-                    work_book.save(file_path)
-                    obj = file_operations.FileOperations()
-                    output = obj.compare_content(file_path,generic_constants.DATABASE_SHEET,inp_file,inp_sheet)
-                    if output[1] == "True":
-                        status=generic_constants.TEST_RESULT_PASS
-                        result=generic_constants.TEST_RESULT_TRUE
-                    else:
-                        status=generic_constants.TEST_RESULT_FAIL
-                        result=generic_constants.TEST_RESULT_FALSE
-                elif (ext == '.csv'):
-                    try:
-                        columns = [column[0] for column in cursor.description]
-                        path = file_path
-                        with open(path,'w') as csvfile:
-                            writer = csv.writer(csvfile,lineterminator='\n')
-                            writer.writerow(columns)
-
-                            for row in rows:
+            if cnxn is not None:
+                cursor = cnxn.cursor()
+                cursor.execute(query)
+                rows = cursor.fetchall()
+                columns = [column[0] for column in cursor.description]
+                verify = os.path.isfile(file_path)
+                if (verify == True):
+                    ext = self.get_ext(file_path)
+                    if (ext == '.xls' or ext == '.xlsx'):
+                        work_book = xlwt.Workbook(encoding="utf-8")
+                        work_sheet = work_book.add_sheet(generic_constants.DATABASE_SHEET)
+                        i=0
+                        j=0
+                        for x in columns:
+                            work_sheet.write(i,j,x)
+                            j=j+1
+                        b=0
+                        k=1
+                        for row in rows:
+                            l=0
+                            for y in row:
                                 try:
-                                    writer.writerow(row)
-                                    num=num+1
+                                    work_sheet.write(k,l,y)
                                 except Exception as e:
                                     if 'character' in str(e):
                                         i = str(e).index('character')
@@ -287,33 +233,71 @@ class DatabaseOperation():
                                                 else:
                                                     newrow.append(ele)
                                         row = tuple(newrow)
+                                        work_sheet.write(k,l,y)
+                                l+=1
+                            k+=1
+                        work_book.save(file_path)
+                        obj = file_operations.FileOperations()
+                        output = obj.compare_content(file_path,generic_constants.DATABASE_SHEET,inp_file,inp_sheet)
+                        if output[1] == "True":
+                            status=generic_constants.TEST_RESULT_PASS
+                            result=generic_constants.TEST_RESULT_TRUE
+                        else:
+                            status=generic_constants.TEST_RESULT_FAIL
+                            result=generic_constants.TEST_RESULT_FALSE
+                    elif (ext == '.csv'):
+                        try:
+                            columns = [column[0] for column in cursor.description]
+                            path = file_path
+                            with open(path,'w') as csvfile:
+                                writer = csv.writer(csvfile,lineterminator='\n')
+                                writer.writerow(columns)
+
+                                for row in rows:
+                                    try:
                                         writer.writerow(row)
-                        csvfile.close()
-                    except Exception as e:
-                        log.error(e)
-                        err_msg = e
-                    obj = file_operations.FileOperations()
-                    output = obj.compare_content(file_path,inp_file)
-                    if output[1] == "True":
-                        status=generic_constants.TEST_RESULT_PASS
-                        result=generic_constants.TEST_RESULT_TRUE
+                                        num=num+1
+                                    except Exception as e:
+                                        if 'character' in str(e):
+                                            i = str(e).index('character')
+                                            err_new=str(e)[:i+len('character')]
+                                            if err_new==generic_constants.UNICODE_ERR:
+                                                newrow=[]
+                                                for ele in row:
+                                                    if type(ele) == str:
+                                                         ele = ele.encode('utf-8')
+                                                         newrow.append(ele)
+                                                    else:
+                                                        newrow.append(ele)
+                                            row = tuple(newrow)
+                                            writer.writerow(row)
+                            csvfile.close()
+                        except Exception as e:
+                            log.error(e)
+                            err_msg = e
+                        obj = file_operations.FileOperations()
+                        output = obj.compare_content(file_path,inp_file)
+                        if output[1] == "True":
+                            status=generic_constants.TEST_RESULT_PASS
+                            result=generic_constants.TEST_RESULT_TRUE
+                        else:
+                            status=generic_constants.TEST_RESULT_FAIL
+                            result=generic_constants.TEST_RESULT_FALSE
                     else:
-                        status=generic_constants.TEST_RESULT_FAIL
-                        result=generic_constants.TEST_RESULT_FALSE
-                else:
-                    logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                    log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                    err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                        logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                        log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                        err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
             else:
                 logger.print_on_console(generic_constants.FILE_NOT_EXISTS)
         except Exception as e:
-            log.error(e)
             err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
             logger.print_on_console(err_msg)
+            log.error(err_msg)
+            log.error(e)
         finally:
             os.remove(file_path)
-            cursor.close()
-            cnxn.close()
+            if cursor is not None: cursor.close()
+            if cnxn is not None: cnxn.close()
         return status,result,verb,err_msg
 
     def secureVerifyData(self, ip , port , userName , password, dbName, query, dbtype,inp_file,inp_sheet):
@@ -348,59 +332,92 @@ class DatabaseOperation():
         result=generic_constants.TEST_RESULT_FALSE
         verb = OUTPUT_CONSTANT
         err_msg=None
+        cursor = None
         try:
             cnxn = self.connection(dbtype, ip , port , dbName, userName , password)
-            cursor = cnxn.cursor()
-            cursor.execute(query)
-            rows = cursor.fetchall()
-            columns = [column[0] for column in cursor.description]
-            ##logic for output col reading
-            out_tuple = args
-            fields = out_tuple[0]
-            inp_sheet = None
-            path=None
-##            if ';' in fields:
-##                inp_sheet=fields.split(';')[1]
-##                fields=fields.split(';')[0]
-##            verify = os.path.isfile(fields)
-##            if (verify == True):
-            ext = self.get_ext(fields)
-            if (ext == '.xls' or ext == '.xlsx'):
-                verify = os.path.isfile(fields)
-                try:
-                    if(verify == False):
-                        try:
-                            work_book = xlwt.Workbook(encoding="utf-8") #Changed code
-                            if(inp_sheet is None or inp_sheet == ''):
-                                inp_sheet = generic_constants.DATABASE_SHEET
-                                work_sheet = work_book.add_sheet(inp_sheet)
-                            else:
-                                work_sheet = work_book.add_sheet(inp_sheet)
-                                log.debug('Input Sheet and file path while creating file :')
-                                log.debug(inp_sheet)
-                                log.debug(fields)
-                        except Exception as e:
-                            log.error(e)
-                            logger.print_on_console(e)
-                            err_msg = str(e) #Changed on 23/1/2020
-                    if(inp_sheet is None or inp_sheet == ''):
-                        inp_sheet = generic_constants.DATABASE_SHEET
-                        log.debug('Input Sheet is :')
-                        log.debug(inp_sheet)
-                        work_book = xlwt.Workbook(encoding="utf-8")
-                        work_sheet = work_book.add_sheet(inp_sheet)
-                    i=0
-                    j=0
-                    for x in columns:
-                        work_sheet.write(i,j,x)
-                        j=j+1
-                    b=0
-                    k=1
-                    for row in rows:
-                        l=0
-                        for y in row:
+            if cnxn is not None:
+                cursor = cnxn.cursor()
+                cursor.execute(query)
+                rows = cursor.fetchall()
+                columns = [column[0] for column in cursor.description]
+                ##logic for output col reading
+                out_tuple = args
+                fields = out_tuple[0]
+                inp_sheet = None
+                path=None
+    ##            if ';' in fields:
+    ##                inp_sheet=fields.split(';')[1]
+    ##                fields=fields.split(';')[0]
+    ##            verify = os.path.isfile(fields)
+    ##            if (verify == True):
+                ext = self.get_ext(fields)
+                if (ext == '.xls' or ext == '.xlsx'):
+                    verify = os.path.isfile(fields)
+                    try:
+                        if(verify == False):
                             try:
-                                work_sheet.write(k,l,y)
+                                work_book = xlwt.Workbook(encoding="utf-8") #Changed code
+                                if(inp_sheet is None or inp_sheet == ''):
+                                    inp_sheet = generic_constants.DATABASE_SHEET
+                                    work_sheet = work_book.add_sheet(inp_sheet)
+                                else:
+                                    work_sheet = work_book.add_sheet(inp_sheet)
+                                    log.debug('Input Sheet and file path while creating file :')
+                                    log.debug(inp_sheet)
+                                    log.debug(fields)
+                            except Exception as e:
+                                log.error(e)
+                                logger.print_on_console(e)
+                                err_msg = str(e) #Changed on 23/1/2020
+                        if(inp_sheet is None or inp_sheet == ''):
+                            inp_sheet = generic_constants.DATABASE_SHEET
+                            log.debug('Input Sheet is :')
+                            log.debug(inp_sheet)
+                            work_book = xlwt.Workbook(encoding="utf-8")
+                            work_sheet = work_book.add_sheet(inp_sheet)
+                        i=0
+                        j=0
+                        for x in columns:
+                            work_sheet.write(i,j,x)
+                            j=j+1
+                        b=0
+                        k=1
+                        for row in rows:
+                            l=0
+                            for y in row:
+                                try:
+                                    work_sheet.write(k,l,y)
+                                except Exception as e:
+                                    if 'character' in str(e):
+                                        i = str(e).index('character')
+                                        err_new=str(e)[:i+len('character')]
+                                        if err_new==generic_constants.UNICODE_ERR:
+                                            newrow=[]
+                                            for ele in row:
+                                                if type(ele) == str:
+                                                     ele = ele.encode('utf-8')
+                                                     newrow.append(ele)
+                                                else:
+                                                    newrow.append(ele)
+                                        row = tuple(newrow)
+                                        work_sheet.write(k,l,y)
+                                l+=1
+                            k+=1
+                        work_book.save(fields)
+                    except Exception as e:
+                        err_msg = str(e) #Changed on 23/1/2020
+                        logger.print_on_console(e)
+                    status=generic_constants.TEST_RESULT_PASS
+                    result=generic_constants.TEST_RESULT_TRUE
+
+                elif(ext == '.csv'): #Code changed to write csv files
+                    path = fields
+                    with open(path,'w') as csvfile:
+                        writer = csv.writer(csvfile,lineterminator='\n')
+                        writer.writerow(columns)
+                        for row in rows:
+                            try:
+                                writer.writerow(row)
                             except Exception as e:
                                 if 'character' in str(e):
                                     i = str(e).index('character')
@@ -413,56 +430,26 @@ class DatabaseOperation():
                                                  newrow.append(ele)
                                             else:
                                                 newrow.append(ele)
+
                                     row = tuple(newrow)
-                                    work_sheet.write(k,l,y)
-                            l+=1
-                        k+=1
-                    work_book.save(fields)
-                except Exception as e:
-                    err_msg = str(e) #Changed on 23/1/2020
-                    logger.print_on_console(e)
-                status=generic_constants.TEST_RESULT_PASS
-                result=generic_constants.TEST_RESULT_TRUE
-
-            elif(ext == '.csv'): #Code changed to write csv files
-                path = fields
-                with open(path,'w') as csvfile:
-                    writer = csv.writer(csvfile,lineterminator='\n')
-                    writer.writerow(columns)
-                    for row in rows:
-                        try:
-                            writer.writerow(row)
-                        except Exception as e:
-                            if 'character' in str(e):
-                                i = str(e).index('character')
-                                err_new=str(e)[:i+len('character')]
-                                if err_new==generic_constants.UNICODE_ERR:
-                                    newrow=[]
-                                    for ele in row:
-                                        if type(ele) == str:
-                                             ele = ele.encode('utf-8')
-                                             newrow.append(ele)
-                                        else:
-                                            newrow.append(ele)
-
-                                row = tuple(newrow)
-                                writer.writerow(row)
-                csvfile.close()
-                status=generic_constants.TEST_RESULT_PASS
-                result=generic_constants.TEST_RESULT_TRUE
-            else:
-                #logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                #log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-##            else:
-##                logger.print_on_console(generic_constants.FILE_NOT_EXISTS)
+                                    writer.writerow(row)
+                    csvfile.close()
+                    status=generic_constants.TEST_RESULT_PASS
+                    result=generic_constants.TEST_RESULT_TRUE
+                else:
+                    #logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                    #log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                    err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+    ##            else:
+    ##                logger.print_on_console(generic_constants.FILE_NOT_EXISTS)
         except Exception as e:
-            log.error(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
             err_msg = str(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+            log.error(err_msg)
+            log.error(e)
             logger.print_on_console(err_msg)
         finally:
-            cursor.close()
-            cnxn.close()
+            if cursor is not None: cursor.close()
+            if cnxn is not None: cnxn.close()
         if err_msg!=None:
             logger.print_on_console(err_msg)
         return status,result,verb,err_msg
@@ -509,11 +496,11 @@ class DatabaseOperation():
                 self.cnxn = ibm_db_dbi.Connection(cnxn)
             return self.cnxn
         except Exception as e:
-            log.error(e)
             err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-        if err_msg!=None:
-            logger.print_on_console(err_msg)    
-        return err_msg
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
+            log.error(e)
+        return None
 
 
     def get_ext(self,input_path):
