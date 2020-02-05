@@ -1451,7 +1451,7 @@ class ClientWindow(wx.Frame):
             log.error(e,exc_info=True)
 
     def verifyMACAddress(self):
-        flag = True
+        flag = False
         core_utils_obj = core_utils.CoreUtils()
         system_mac = core_utils_obj.getMacAddress()
         mac_verification_key = "".join(['N','1','i','1','N','2','e','3','T','5','e','8','E','1','3','n','2','1','S','i','X','t','Y','3','4','e','I','g','H','t','5','5'])
@@ -1493,8 +1493,6 @@ class ClientWindow(wx.Frame):
             logger.print_on_console(msg)
             log.error(msg)
         else: self.EnableAll()
-        irisFlag = True
-        controller.iris_flag = True
         return flag
 
     def DisableAll(self):
