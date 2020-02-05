@@ -102,6 +102,20 @@ class WebScrape_Utils:
                 for rectangle in rectangles:
                     if not previous is None:
                         driver.execute_script("window.scrollTo({0}, {1})".format(rectangle[0], rectangle[1]))
+                        #new code added 
+                        code = '''
+                        var elems = document.body.getElementsByTagName("*");
+                        var len = elems.length;
+                        document.body.style.setProperty('max-width','100%');
+                        document.body.style.setProperty('overflow-x','hidden');
+                        console.log(document.body.style.maxWidth);
+                        for (var i=0;i<len;i++) {
+                            if (window.getComputedStyle(elems[i],null).getPropertyValue('position') == 'fixed') {
+                                elems[i].style.setProperty('opacity', 0);
+                            }
+                        }
+                        '''
+                        driver.execute_script(code)
                         time.sleep(0.2)
                     file_name = "part_{0}.png".format(part)
                     driver.get_screenshot_as_file(file_name)
