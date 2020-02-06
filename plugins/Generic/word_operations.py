@@ -14,7 +14,8 @@ import logging
 log = logging.getLogger('word_operations.py')
 import logger
 import platform
-import fitz
+if SYSTEM_OS != 'Darwin':
+    import fitz
 
 class WordFile():
     def writeWordFile(self, filename, filetext, operation, file_encoding = None, *args):
