@@ -49,6 +49,9 @@ class WatchThread(threading.Thread):
                 log.debug(">>>>>>>>"+source+'/'+filename)
                 try:
                     with open(report_path, 'wb+') as output, open(source+'/'+filename, 'rb') as input:
+                        if not (("overallstatus" in json_data) and ("rows" in json_data)):
+                            logger.print_on_console(str(filename)+" is invalid report JSON file.")
+                            continue
                         output.write(input.read())
                         #output.write(data)
                     #shutil.copyfile(source, os.getcwd())
@@ -120,8 +123,12 @@ class GeneratePDFReportBatch(wx.Frame):
 
         error_flag = False
         if source.strip()=='' or target.strip()=='':
-            self.l4.SetLabel("No input feild can be left empty!")
+            self.l4.SetLabel("No input field can be left empty!")
             error_flag = True
+        elif not (os.path.isdir(target) and os.path.exists(source)):
+            self.l4.SetLabel("Entered paths are Invalid") 
+            error_flag = True
+
         if error_flag: return False
 
         self.btn.SetLabel("Start" if self.started else "Stop")
