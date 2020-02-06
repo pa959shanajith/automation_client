@@ -118,7 +118,7 @@ class GeneratePDFReport(wx.Frame):
             self.l4.SetLabel("No input field can be left empty!")
             error_flag = True
         elif not (os.path.isdir(target) and os.path.exists(source)):
-            self.l4.SetLabel("Entered paths are Invalid") 
+            self.l4.SetLabel("Either Source or Target path is Invalid!") 
             error_flag = True
         elif source.split('.')[-1].lower() != 'json':
             self.l4.SetLabel("Source is not a JSON File")
@@ -127,7 +127,7 @@ class GeneratePDFReport(wx.Frame):
             with open(source, 'r') as read_file:
                 json_data = json.load(read_file)
                 if not (("overallstatus" in json_data) and ("rows" in json_data)):
-                    self.l4.SetLabel("Invalid JSON File")
+                    self.l4.SetLabel("Invalid report JSON File")
                     error_flag = True
         except:
             self.l4.SetLabel("Invalid JSON File")
