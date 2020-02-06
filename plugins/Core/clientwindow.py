@@ -290,7 +290,8 @@ class MainNamespace(BaseNamespace):
                         browsername = '2'
                     elif str(task) == 'OPEN BROWSER EDGE':
                         browsername = '7'
-                wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
+                if not bool(wxObject.scrapewindow):
+                    wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
         except Exception as e:
             err_msg='Error while Scraping Web application'
             log.error(err_msg)
