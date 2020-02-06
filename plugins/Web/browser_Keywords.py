@@ -651,7 +651,7 @@ class BrowserKeywords():
         output=OUTPUT_CONSTANT
         err_msg=None
         try:
-            if local_bk.driver_obj != None and isinstance(local_bk.driver_obj,webdriver.Ie):
+            if local_bk.driver_obj != None and (isinstance(local_bk.driver_obj,webdriver.Ie) or isinstance(local_bk.driver_obj,webdriver.Edge)):
                 #get all the cookies
                 cookies=local_bk.driver_obj.get_cookies()
                 if len(cookies)>0:
@@ -673,6 +673,7 @@ class BrowserKeywords():
             #clear cache for chrome driver.
             elif local_bk.driver_obj != None and isinstance(local_bk.driver_obj,webdriver.Chrome):
                     local_bk.driver_obj.get('chrome://settings/clearBrowserData')
+                    time.sleep(0.5)
                     local_bk.driver_obj.execute_script('return document.querySelector("body > settings-ui").shadowRoot.querySelector("#main").shadowRoot.querySelector("settings-basic-page").shadowRoot.querySelector("#advancedPage > settings-section:nth-child(1) > settings-privacy-page").shadowRoot.querySelector("settings-clear-browsing-data-dialog").shadowRoot.querySelector("#clearBrowsingDataConfirm").click();')
                     logger.print_on_console('Cleared cache')
                     local_bk.log.info('Cleared Cache')
