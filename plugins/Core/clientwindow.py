@@ -395,7 +395,7 @@ class MainNamespace(BaseNamespace):
             global pdfScrapeObj,pdfScrapeFlag
             global browsername
             browsername = args[0]
-#           con =controller.Controller()
+            #con =controller.Controller()
             core_utils.get_all_the_imports('PDF')
             import pdf_scrape_dispatcher
             pdfScrapeObj=pdf_scrape_dispatcher
@@ -1308,7 +1308,7 @@ class ClientWindow(wx.Frame):
             if socketIO is not None:
                 if disconn:
                     log.info('Sending socket disconnect request')
-                    socketIO.emit('unavailableLocalServer')
+                    socketIO.send('unavailableLocalServer')
                 socketIO.disconnect()
                 del socketIO
                 socketIO = None
@@ -2579,3 +2579,4 @@ def check_update(flag):
             logger.print_on_console( UPDATE_MSG )
             log.info( UPDATE_MSG )
     return False,l_ver
+
