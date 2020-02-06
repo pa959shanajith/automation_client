@@ -113,28 +113,27 @@ class GeneratePDFReport(wx.Frame):
         target = self.t2.GetValue()
         dest_file = self.t3.GetValue()
         
-        #changed code --start
+        error_flag = False
         if source.strip()=='' or target.strip()=='' or dest_file.strip()=='':
             self.l4.SetLabel("No input field can be left empty!")
-            return
+            error_flag = True
         elif not (os.path.isdir(target) and os.path.exists(source)):
             self.l4.SetLabel("Entered paths are Invalid") 
-            return
+            error_flag = True
         elif source.split('.')[-1].lower() != 'json':
             self.l4.SetLabel("Source is not a JSON File")
-            return
-        
+            error_flag = True
         try:
             with open(source, 'r') as read_file:
                 json_data = json.load(read_file)
-            if (json_data["overallstatus"] and json_data["rows"] and json_data["remarksLength"] and json_data["commentsLength"]):
-                return                    
-        except Exception as e:
+                if not (("overallstatus" in json_data) and ("rows" in json_data)):
+                    self.l4.SetLabel("Invalid JSON File")
+                    error_flag = True
+        except:
             self.l4.SetLabel("Invalid JSON File")
-            return
-            
-        # //changed code --end
+            error_flag = True
 
+        if error_flag: return False
         self.l4.SetLabel("Processing...")
         self.setEnable(False)
         self.watchThread = WatchThread(self,source,target,dest_file)

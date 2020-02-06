@@ -117,9 +117,13 @@ class GeneratePDFReportBatch(wx.Frame):
         self.l4.SetLabel(" ")
         source = self.t1.GetValue()
         target = self.t2.GetValue()
+
+        error_flag = False
         if source.strip()=='' or target.strip()=='':
             self.l4.SetLabel("No input feild can be left empty!")
-            return
+            error_flag = True
+        if error_flag: return False
+
         self.btn.SetLabel("Start" if self.started else "Stop")
         self.setEnable(self.started)
         if self.started:
