@@ -25,7 +25,31 @@ import logging
 from constants import *
 log = logging.getLogger('database_keywords.py')
 
+
 class DatabaseOperation():
+    def processException(self, e):
+        etype = type(e)
+        ae = None
+        if etype == pyodbc.OperationalError:
+            if hasattr(e, 'args') and len(e.args) > 1: ae = e.args[1].split(';')[0]
+            err_msg = ERROR_CODE_DICT["ERR_DB_CONNECTION"]
+        elif etype in [pyodbc.IntegrityError, pyodbc.InterfaceError, pyodbc.InternalError]:
+            if hasattr(e, 'args') and len(e.args) > 1: ae = e.args[1].split(';')[0]
+            err_msg = ERROR_CODE_DICT["ERR_DB_OPS"]
+        elif etype in [pyodbc.DataError, pyodbc.ProgrammingError, pyodbc.NotSupportedError]:
+            if hasattr(e, 'args') and len(e.args) > 1: ae = e.args[1].split(';')[0]
+            err_msg = ERROR_CODE_DICT["ERR_DB_QUERY"]
+        else:
+            err_msg = ERROR_CODE_DICT['ERR_DB_OPS']
+        logger.print_on_console(err_msg) 
+        log.error(err_msg)
+        if ae is not None:
+            logger.print_on_console(ae) 
+            log.error(ae)
+            err_msg = ae
+        log.error(e)
+        return err_msg
+
     def runQuery(self, ip , port , userName , password, dbName, query, dbtype):
         """
         def : runQuery
@@ -55,16 +79,7 @@ class DatabaseOperation():
                     status=generic_constants.TEST_RESULT_PASS
                     result=generic_constants.TEST_RESULT_TRUE
         except Exception as e:
-                if e.__class__.__name__=="ProgrammingError":
-                    err_msg = "Invalid Query"
-                    log.error(err_msg)
-                    logger.print_on_console(err_msg) 
-                else:
-                    log.error(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                    err_msg = str(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                    logger.print_on_console(err_msg)
-               
-            
+            err_msg = self.processException(e)
         finally:
             if cursor is not None: cursor.close()
             if cnxn is not None: cnxn.close()
@@ -86,14 +101,7 @@ class DatabaseOperation():
             decrypted_password = encryption_obj.decrypt(password)
             status,result,verb,err_msg=self.runQuery(ip,port,userName,decrypted_password,dbName,query,dbtype)
         except Exception as e:
-            if e.__class__.__name__=="ProgrammingError":
-                err_msg = "Invalid Query"
-                log.error(err_msg)
-                logger.print_on_console(err_msg) 
-            else:
-                log.error(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                err_msg = str(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                logger.print_on_console(err_msg)
+            err_msg = self.processException(e)
         return status,result,verb,err_msg
 
 
@@ -123,9 +131,7 @@ class DatabaseOperation():
                 status=generic_constants.TEST_RESULT_PASS
                 result=generic_constants.TEST_RESULT_TRUE
         except Exception as e:
-            log.error(e)
-            err_msg = 'Database Login failed'
-            logger.print_on_console(err_msg)
+            err_msg = self.processException(e)
         finally:
             if cnxn is not None: cnxn.close()
         return status,result,details,err_msg
@@ -157,9 +163,7 @@ class DatabaseOperation():
                     log.info('Value obtained :')
                     log.info(value)
             except Exception as e:
-                log.error(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                err_msg = str(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                logger.print_on_console(err_msg)
+                self.processException(e)
             finally:
                 if cursor is not None: cursor.close()
                 if cnxn is not None: cnxn.close()
@@ -182,14 +186,7 @@ class DatabaseOperation():
             temp = args
             status,result,value,err_msg=self.getData(ip,port,userName,decrypted_password,dbName,query,dbtype,temp)
         except Exception as e:
-            if e.__class__.__name__=="ProgrammingError":
-                err_msg = "Invalid Query"
-                log.error(err_msg)
-                logger.print_on_console(err_msg) 
-            else:
-                log.error(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                err_msg = str(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                logger.print_on_console(err_msg)
+            err_msg = self.processException(e)
         return status,result,value,err_msg
 
     def verifyData(self, ip , port , userName , password, dbName, query, dbtype,inp_file,inp_sheet):
@@ -290,8 +287,9 @@ class DatabaseOperation():
                                             writer.writerow(row)
                             csvfile.close()
                         except Exception as e:
+                            err_msg = "Error while writing to csv"
+                            log.error(err_msg)
                             log.error(e)
-                            err_msg = e
                         obj = file_operations.FileOperations()
                         output = obj.compare_content(file_path,inp_file)
                         if output[1] == "True":
@@ -301,20 +299,13 @@ class DatabaseOperation():
                             status=generic_constants.TEST_RESULT_FAIL
                             result=generic_constants.TEST_RESULT_FALSE
                     else:
-                        logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                        log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                         err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                        logger.print_on_console(err_msg)
+                        log.info(err_msg)
             else:
                 logger.print_on_console(generic_constants.FILE_NOT_EXISTS)
         except Exception as e:
-            if e.__class__.__name__=="ProgrammingError":
-                err_msg = "Invalid Query"
-                log.error(err_msg)
-                logger.print_on_console(err_msg) 
-            else:
-                log.error(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                err_msg = str(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                logger.print_on_console(err_msg)
+            err_msg = self.processException(e)
         finally:
             os.remove(file_path)
             if cursor is not None: cursor.close()
@@ -337,14 +328,7 @@ class DatabaseOperation():
             decrypted_password = encryption_obj.decrypt(password)
             status,result,verb,err_msg=self.verifyData(ip,port,userName,decrypted_password,dbName, query, dbtype,inp_file,inp_sheet)
         except Exception as e:
-            if e.__class__.__name__=="ProgrammingError":
-                err_msg = "Invalid Query"
-                log.error(err_msg)
-                logger.print_on_console(err_msg) 
-            else:
-                log.error(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                err_msg = str(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                logger.print_on_console(err_msg)
+            err_msg = self.processException(e)
         return status,result,verb,err_msg
 
     def exportData(self, ip , port , userName , password, dbName, query, dbtype, *args):
@@ -376,11 +360,6 @@ class DatabaseOperation():
                 fields = out_tuple[0]
                 inp_sheet = None
                 path=None
-    ##            if ';' in fields:
-    ##                inp_sheet=fields.split(';')[1]
-    ##                fields=fields.split(';')[0]
-    ##            verify = os.path.isfile(fields)
-    ##            if (verify == True):
                 ext = self.get_ext(fields)
                 if (ext == '.xls' or ext == '.xlsx'):
                     verify = os.path.isfile(fields)
@@ -397,9 +376,10 @@ class DatabaseOperation():
                                     log.debug(inp_sheet)
                                     log.debug(fields)
                             except Exception as e:
+                                err_msg = ERROR_CODE_DICT["ERR_FILE_WRITE"]
+                                logger.print_on_console(err_msg)
+                                log.error(err_msg)
                                 log.error(e)
-                                logger.print_on_console(e)
-                                err_msg = str(e) #Changed on 23/1/2020
                         if(inp_sheet is None or inp_sheet == ''):
                             inp_sheet = generic_constants.DATABASE_SHEET
                             log.debug('Input Sheet is :')
@@ -411,7 +391,6 @@ class DatabaseOperation():
                         for x in columns:
                             work_sheet.write(i,j,x)
                             j=j+1
-                        b=0
                         k=1
                         for row in rows:
                             l=0
@@ -436,8 +415,10 @@ class DatabaseOperation():
                             k+=1
                         work_book.save(fields)
                     except Exception as e:
-                        err_msg = str(e) #Changed on 23/1/2020
-                        logger.print_on_console(e)
+                        err_msg = ERROR_CODE_DICT["ERR_FILE_WRITE"]
+                        logger.print_on_console(err_msg)
+                        log.error(err_msg)
+                        log.error(e)
                     status=generic_constants.TEST_RESULT_PASS
                     result=generic_constants.TEST_RESULT_TRUE
 
@@ -461,27 +442,17 @@ class DatabaseOperation():
                                                  newrow.append(ele)
                                             else:
                                                 newrow.append(ele)
-
                                     row = tuple(newrow)
                                     writer.writerow(row)
                     csvfile.close()
                     status=generic_constants.TEST_RESULT_PASS
                     result=generic_constants.TEST_RESULT_TRUE
                 else:
-                    #logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                    #log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                     err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-    ##            else:
-    ##                logger.print_on_console(generic_constants.FILE_NOT_EXISTS)
+                    logger.print_on_console(err_msg)
+                    log.error(err_msg)
         except Exception as e:
-            if e.__class__.__name__=="ProgrammingError":
-                err_msg = "Invalid Query"
-                log.error(err_msg)
-                logger.print_on_console(err_msg) 
-            else:
-                log.error(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                err_msg = str(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                logger.print_on_console(err_msg)
+            err_msg = self.processException(e)
         finally:
             if cursor is not None: cursor.close()
             if cnxn is not None: cnxn.close()
@@ -506,14 +477,7 @@ class DatabaseOperation():
             out_col = args
             status,result,verb,err_msg=self.exportData(ip,port,userName,decrypted_password,dbName, query, dbtype, out_col[0])
         except Exception as e:
-            if e.__class__.__name__=="ProgrammingError":
-                err_msg = "Invalid Query"
-                log.error(err_msg)
-                logger.print_on_console(err_msg) 
-            else:
-                log.error(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                err_msg = str(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                logger.print_on_console(err_msg)
+            err_msg = self.processException(e)
         return status,result,verb,err_msg
 
     def connection(self,dbtype, ip , port , dbName, userName , password):
@@ -523,7 +487,7 @@ class DatabaseOperation():
         param : database type, IP, port number , database name, username , password , query
         return : connection object
         """
-        dbNumber = {4:'{SQL Server}',5:'{Microdsoft ODBC for Oracle}'}#,2:'{IBM DB2 ODBC DRIVER}'}
+        dbNumber = {4:'{SQL Server}',5:'{Microsoft ODBC for Oracle}'}#,2:'{IBM DB2 ODBC DRIVER}'}
         err_msg=None
         try:
             dbtype= int(dbtype)
@@ -536,12 +500,8 @@ class DatabaseOperation():
                 self.cnxn = ibm_db_dbi.Connection(cnxn)
             return self.cnxn
         except Exception as e:
-            err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-            logger.print_on_console(err_msg)
-            log.error(err_msg)
-            log.error(e)
+            err_msg = self.processException(e)
         return None
-
 
     def get_ext(self,input_path):
         """
@@ -552,16 +512,14 @@ class DatabaseOperation():
         """
         status=False
         try:
-            filename,file_ext=os.path.splitext(input_path)
+            filename, file_ext=os.path.splitext(input_path)
             if file_ext in generic_constants.FILE_TYPES:
                 status=True
             else:
                 logger.print_on_console(generic_constants.INVALID_FILE_FORMAT)
             return file_ext
-        except Exception as e:
-            log.error(e)
-            err_msg = str(e)
-            logger.print_on_console(err_msg)
+        except:
+            pass
         return '',status
 
     def create_file_xls(self): #Method to create xls file
@@ -580,8 +538,6 @@ class DatabaseOperation():
             wb.save(path)
         except Exception as e:
             log.error(e)
-            logger.print_on_console(e)
-            err_msg = e
         return path
 
     def create_file_xlsx(self): #Method to create xlsx file
@@ -600,8 +556,6 @@ class DatabaseOperation():
             wb.save(path)
         except Exception as e:
             log.error(e)
-            logger.print_on_console(e)
-            err_msg = e
         return path
 
     def create_file_csv(self): #Method to create csv file
@@ -620,8 +574,6 @@ class DatabaseOperation():
             file.close()
         except Exception as e:
             log.error(e)
-            logger.print_on_console(e)
-            err_msg = e
         return path
 
 
