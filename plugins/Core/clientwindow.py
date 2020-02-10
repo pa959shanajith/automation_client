@@ -63,7 +63,7 @@ ICE_CONST= NINETEEN68_HOME + "/assets/ice_const.json"
 CONFIG_PATH= NINETEEN68_HOME + "/assets/config.json"
 CERTIFICATE_PATH = NINETEEN68_HOME + "/assets/CA_BUNDLE"
 LOGCONFIG_PATH = NINETEEN68_HOME + "/assets/logging.conf"
-DRIVERS_PATH = NINETEEN68_HOME + "/Lib/Drivers"
+DRIVERS_PATH = NINETEEN68_HOME + "/lib/Drivers"
 CHROME_DRIVER_PATH = DRIVERS_PATH + "/chromedriver"
 GECKODRIVER_PATH = DRIVERS_PATH + "/geckodriver"
 if SYSTEM_OS == "Windows":
@@ -1886,7 +1886,10 @@ class Config_window(wx.Frame):
         data['update_check']= update_check.strip()
         data['delay_stringinput']=delay_string_in.strip()
         config_data=data
-        if data['server_ip']!='' and data['server_port']!='' and data['server_cert']!='' and data['chrome_path']!='' and data['queryTimeOut']!='' and data['logFile_Path']!='' and data['delay']!='' and data['timeOut']!='' and data['stepExecutionWait']!='' and data['displayVariableTimeOut']!='' and data['firefox_path']!='' and  data['connection_timeout']>='':
+        if (data['server_ip']!='' and data['server_port']!='' and data['server_cert']!='' and
+            data['chrome_path']!='' and data['queryTimeOut']!='' and data['logFile_Path']!='' and
+            data['delay']!='' and data['timeOut']!='' and data['stepExecutionWait']!='' and
+            data['displayVariableTimeOut']!='' and data['firefox_path']!='' and  data['connection_timeout']>=''):
             #---------------------------------------resetting the static texts
             self.error_msg.SetLabel("")
             self.sev_add.SetLabel('Server Address')
@@ -2421,9 +2424,9 @@ def check_browser():
             import subprocess
             from selenium import webdriver
             from selenium.webdriver import ChromeOptions
-            p = subprocess.Popen('chromedriver.exe --version', stdout=subprocess.PIPE, bufsize=1,cwd=DRIVERS_PATH,shell=True)
-            a=p.stdout.readline()
-            a=a.decode('utf-8')[13:17]
+            p = subprocess.Popen(CHROME_DRIVER_PATH + ' --version', stdout=subprocess.PIPE, bufsize=1, shell=True)
+            a = p.stdout.readline()
+            a = a.decode('utf-8')[13:17]
             choptions1 = webdriver.ChromeOptions()
             if str(configvalues['chrome_path']).lower()!="default":
                 choptions1.binary_location=str(configvalues['chrome_path'])
@@ -2436,8 +2439,7 @@ def check_browser():
                 browser_ver = driver.capabilities['version']
             elif 'browserVersion' in  driver.capabilities.keys():
                 browser_ver = driver.capabilities['browserVersion']
-            browser_ver1 = browser_ver.encode('utf-8')
-            browser_ver = int(browser_ver1[:2])
+            browser_ver = int(browser_ver.encode('utf-8')[:2])
             try:
                 driver.close()
                 driver.quit()
@@ -2455,9 +2457,9 @@ def check_browser():
             log.error("Error in checking chrome version")
             log.error(e,exc_info=True)
         try:
-            p = subprocess.Popen('geckodriver.exe --version', stdout=subprocess.PIPE, bufsize=1,cwd=DRIVERS_PATH,shell=True)
-            a=p.stdout.readline()
-            a=a.decode('utf-8')[12:16]
+            p = subprocess.Popen(GECKODRIVER_PATH + ' --version', stdout=subprocess.PIPE, bufsize=1, shell=True)
+            a = p.stdout.readline()
+            a = a.decode('utf-8')[12:16]
             caps=webdriver.DesiredCapabilities.FIREFOX
             caps['marionette'] = True
             from selenium.webdriver.firefox.options import Options
@@ -2469,9 +2471,7 @@ def check_browser():
                 driver = webdriver.Firefox(capabilities=caps,firefox_options=options,firefox_binary=binary, executable_path=GECKODRIVER_PATH)
             else:
                 driver = webdriver.Firefox(capabilities=caps,firefox_options=options, executable_path=GECKODRIVER_PATH)
-            browser_ver=driver.capabilities['browserVersion']
-            browser_ver1 = browser_ver.encode('utf-8')
-            browser_ver = float(browser_ver1[:4])
+            browser_ver = float(driver.capabilities['browserVersion'].encode('utf-8')[:4])
             try:
                 driver.close()
                 driver.quit()
