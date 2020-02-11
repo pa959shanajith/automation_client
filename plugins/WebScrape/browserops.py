@@ -106,13 +106,14 @@ class BrowserOperations():
             '2':webdriver.Firefox,
             '3':webdriver.Ie,
             '6':webdriver.Safari,
-            '7':webdriver.Edge
+            '7':webdriver.Edge,
+            '8':webdriver.Edge
         }
         if len(browser_Keywords.drivermap) > 0:
             for i in browser_Keywords.drivermap:
                 if isinstance(i,instance[browserType]):
                     try:
-                        if (browserType == '1') or (browserType == '2'):
+                        if (browserType == '1') or (browserType == '2') or (browserType == '7') or (browserType == '8'):
                             if len (i.window_handles) > 0:
                                 d = i
                         else:

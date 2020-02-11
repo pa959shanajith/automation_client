@@ -37,6 +37,8 @@ CHROME_DRIVER_PATH = drivers_path + "\\chromedriver.exe"
 #Edge path
 EDGE_DRIVER_PATH = drivers_path + "\\MicrosoftWebDriver.exe"
 
+EDGE_CHROMIUM_DRIVER_PATH = drivers_path + "\\msedgedriver.exe"
+
 IE_DRIVER_PATH_64 =  drivers_path +'\\IEDriverServer64.exe'
 
 IE_DRIVER_PATH_32 =   drivers_path +'\\IEDriverServer.exe'
