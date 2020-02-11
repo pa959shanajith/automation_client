@@ -89,6 +89,7 @@ class SQLite(AbstractStorage):
     def __init__(self):
         super(SQLite, self).__init__()
         db_path = os.environ["NINETEEN68_HOME"]+os.sep+'assets'+os.sep+'packets.db'
+        os.rename(db_path, db_path[:-2]+str(int(time()*100000))+".db")
         #os.remove(db_path)  #####
         connection = sqlite3.connect(db_path, check_same_thread=False)
         connection.isolation_level = None
