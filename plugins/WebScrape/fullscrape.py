@@ -142,7 +142,7 @@ class Fullscrape():
             log.info('json operations dumps and loads are performed on the return data')
             scrape_time = time.clock() - start_time
             log.info("Time taken in fullscrape: %s seconds",str(scrape_time))
-            if (isinstance(driver,webdriver.Firefox) or isinstance(driver,webdriver.Chrome)):
+            if (isinstance(driver,webdriver.Firefox) or isinstance(driver,webdriver.Chrome) or isinstance(driver,webdriver.Edge)):
                 screen = webscrape_utils_obj.fullpage_screenshot(driver, screen_shot_path )
             else:
                 screen = driver.get_screenshot_as_base64()
@@ -153,6 +153,10 @@ class Fullscrape():
                 scrapedin =  'IE'
             elif browserops.browser == 1:
                 scrapedin =  'CH'
+            elif browserops.browser == 7:
+                scrapedin = 'EDGE'
+            elif browserops.browser == 8:
+                scrapedin = 'EDGE CHROMIUM'
             data['scrapetype'] = 'fs'
             data['scrapedin'] = scrapedin
             data['view'] = tempne
