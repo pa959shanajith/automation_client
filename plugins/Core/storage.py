@@ -80,6 +80,7 @@ class InMemory(AbstractStorage):
         return pckt
 
     def delete_packet(self, packetid):
+        if packetid.isnumeric(): packetid = int(packetid)
         if packetid in self.packets:
             del self.packets[packetid]
 
@@ -87,9 +88,10 @@ class InMemory(AbstractStorage):
 class SQLite(AbstractStorage):
 
     def __init__(self):
+        self.db = None
         super(SQLite, self).__init__()
         db_path = os.environ["NINETEEN68_HOME"]+os.sep+'assets'+os.sep+'packets.db'
-        os.rename(db_path, db_path[:-2]+str(int(time()*100000))+".db")
+        if os.path.isfile(db_path): os.rename(db_path, db_path[:-2]+str(int(time()*100000))+".db")
         #os.remove(db_path)  #####
         connection = sqlite3.connect(db_path, check_same_thread=False)
         connection.isolation_level = None
