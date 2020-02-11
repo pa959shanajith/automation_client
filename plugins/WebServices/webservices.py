@@ -272,12 +272,12 @@ class WSkeywords:
                 for x in header:
                     if ':' in x:
                         index=x.index(':')
-                        header_dict[x[0:index].strip()]=x[index+1:].strip()
+                        header_dict[x[0:index].strip().lower()]=x[index+1:].strip()
                 if len(header_dict) !=0:
                     self.baseReqHeader=header_dict
                     log.info(header_dict)
-                    if 'Content-Type' in header_dict.keys():
-                        self.content_type=header_dict['Content-Type']
+                    if 'Content-Type'.lower() in header_dict.keys():
+                        self.content_type=header_dict['Content-Type'.lower()]
                 else:
                     self.baseReqHeader=header[0]
                 log.info('Header is set')
@@ -346,9 +346,6 @@ class WSkeywords:
             log.info('Status code: ')
             log.info(response.status_code)
             self.baseResHeader=response.headers
-            #Collecting the cookies from the response:
-            self.cookies=response.cookies
-            log.info(ws_constants.COOKIES+'\n'+self.cookies.get_dict())
             #added status code
             self.baseResHeader['StatusCode']=response.status_code
             log.info(ws_constants.RESPONSE_HEADER+'\n'+str(self.baseResHeader))
@@ -369,14 +366,29 @@ class WSkeywords:
         log.info(RETURN_RESULT)
         return status,methodoutput,output
 
+
+     def get_cookies(self):
+        #supporting the cookies: getting the cookies from the header.
+        cookies_jar = requests.cookies.RequestsCookieJar()
+        if self.baseReqHeader!='' and len(self.baseReqHeader.items())>0:
+            for key_in,value_in in self.baseReqHeader.items():
+                if key_in.lower()=='cookie':
+                    for each_cookies in value_in.split(';'):
+                        if each_cookies.find("=")!=-1:
+                            cookies_list = each_cookies.split("=")
+                            cookies_jar.set(cookies_list[0],cookies_list[1])
+                        else:
+                            logger.print_on_console("Found Invalid Cookie")
+                    
+                    logger.print_on_console("Value of Cookie {}".format(cookies_jar.get_dict()))
+        self.sessioncookies = cookies_jar
+
      def post(self):
         status = ws_constants.TEST_RESULT_FAIL
         methodoutput = ws_constants.TEST_RESULT_FALSE
         log.debug(STATUS_METHODOUTPUT_LOCALVARIABLES)
         output=OUTPUT_CONSTANT
         err_msg=None
-        header_in = {}
-        cookies_jar = requests.cookies.RequestsCookieJar()
         try:
             if ws_constants.CONTENT_TYPE_JSON in self.content_type.lower():
 
@@ -394,32 +406,9 @@ class WSkeywords:
                     try:
                         req_body=json.loads(self.baseReqBody)
                     except:
-                        for key_in,value_in in self.baseReqHeader.items():
-                            if key_in.lower()=='content-type':
-                                header_in[key_in] = value_in
-                            elif key_in.lower()=='cookie':
-                                #logger.print_on_console("COOKIE SET")
-                                
-                                for each_cookies in value_in.split(';'):
-                                    if each_cookies.find("=")!=-1:
-                                        cookies_list = each_cookies.split("=")
-                                        cookies_jar.set(cookies_list[0],cookies_list[1])
-                                    else:
-                                        logger.print_on_console("Found Invalid Cookie")
-                                
-                                logger.print_on_console("Value of Cookie {}".format(cookies_jar.get_dict()))
-                        req_body=self.baseReqHeader
-                                
-                    self.sessioncookies = cookies_jar
-                    logger.print_on_console("Requested Cookie is : {}".format(self.sessioncookies))
-                        
-                        
-                    #logger.print_on_console("CHECK THE COOKIES OF STROED IN JAR {}".format(self.sessioncookies))
-                    if self.sessioncookies!='' or self.sessioncookies.items()!=[]:
-                        response = requests.post(self.baseEndPointURL,data = json.dumps(req_body), headers=self.baseReqHeader,cookies=self.sessioncookies,verify=False)
-                    else:
-                        response = requests.post(self.baseEndPointURL,data = json.dumps(req_body), headers=self.baseReqHeader,verify=False)
-
+                        req_body=self.baseReqBody
+                    self.get_cookies()
+                    response = requests.post(self.baseEndPointURL,data = json.dumps(req_body), headers=self.baseReqHeader,verify=False)
                 if response != None and response != False:
                     self.clearCertFiles()
                     status,methodoutput,output=self.__saveResults(response)
@@ -439,31 +428,8 @@ class WSkeywords:
                         #if only server certificate
                         response = self.server_Verification()
                     else:
-                        for key_in,value_in in self.baseReqHeader.items():
-                            if key_in.lower()=='content-type':
-                                header_in[key_in] = value_in
-                            elif key_in.lower()=='cookie':
-                                #logger.print_on_console("COOKIE SET")
-                                
-                                for each_cookies in value_in.split(';'):
-                                    if each_cookies.find("=")!=-1:
-                                        cookies_list = each_cookies.split("=")
-                                        cookies_jar.set(cookies_list[0],cookies_list[1])
-                                    else:
-                                        logger.print_on_console("Found Invalid Cookie")
-                                
-                                logger.print_on_console("Value of Cookie {}".format(cookies_jar.get_dict()))
-                        req_body=self.baseReqHeader
-                                
-                    self.sessioncookies = cookies_jar
-                    logger.print_on_console("Requested Cookie is : {}".format(self.sessioncookies))
-                        
-                        
-                    #logger.print_on_console("CHECK THE COOKIES OF STROED IN JAR {}".format(self.sessioncookies))
-                    if self.sessioncookies!='' or self.sessioncookies.items()!=[]:
-                        response = requests.post(self.baseEndPointURL,data = json.dumps(req_body), headers=self.baseReqHeader,cookies=self.sessioncookies,verify=False)
-                    else:
-                        response = requests.post(self.baseEndPointURL,data = json.dumps(req_body), headers=self.baseReqHeader,verify=False)
+                        self.get_cookies()   
+                        response = requests.post(self.baseEndPointURL,data = self.baseReqBody, headers=self.baseReqHeader,cookies=self.sessioncookies,verify=False)
 
                     if response != None and response != False:
                         self.clearCertFiles()
@@ -488,31 +454,8 @@ class WSkeywords:
                         #if only server certificate
                         response = self.server_Verification()
                     else:
-                        for key_in,value_in in self.baseReqHeader.items():
-                            if key_in.lower()=='content-type':
-                                header_in[key_in] = value_in
-                            elif key_in.lower()=='cookie':
-                                #logger.print_on_console("COOKIE SET")
-                                
-                                for each_cookies in value_in.split(';'):
-                                    if each_cookies.find("=")!=-1:
-                                        cookies_list = each_cookies.split("=")
-                                        cookies_jar.set(cookies_list[0],cookies_list[1])
-                                    else:
-                                        logger.print_on_console("Found Invalid Cookie")
-                                
-                                logger.print_on_console("Value of Cookie {}".format(cookies_jar.get_dict()))
-                        req_body=self.baseReqHeader
-                                
-                    self.sessioncookies = cookies_jar
-                    logger.print_on_console("Requested Cookie is : {}".format(self.sessioncookies))
-                        
-                        
-                    #logger.print_on_console("CHECK THE COOKIES OF STROED IN JAR {}".format(self.sessioncookies))
-                    if self.sessioncookies!='' or self.sessioncookies.items()!=[]:
-                        response = requests.post(self.baseEndPointURL,data = json.dumps(req_body), headers=self.baseReqHeader,cookies=self.sessioncookies,verify=False)
-                    else:
-                        response = requests.post(self.baseEndPointURL,data = json.dumps(req_body), headers=self.baseReqHeader,verify=False)
+                        self.get_cookies()   
+                        response = requests.post(self.baseEndPointURL,data = self.baseReqBody, headers=self.baseReqHeader,cookies=self.sessioncookies,verify=False)
 
                     if response != None and response != False:
                         self.clearCertFiles()
@@ -548,30 +491,8 @@ class WSkeywords:
                 req=self.baseEndPointURL+'/'+self.baseOperation+'?'+self.baseReqHeader
             elif not (self.baseEndPointURL is ''):
                 req=self.baseEndPointURL
-            #response=requests.get(req)
-            else:
-                logger.print_on_console("Nothing Set (URL,Header,Operation)")
-            if not (self.baseReqHeader is ''):
-                for key_in,value_in in self.baseReqHeader.items():
-                    if key_in.lower()=='content-type':
-                        header_in[key_in] = value_in
-                    elif key_in.lower()=='cookie':
-                        logger.print_on_console("COOKIE SET")
-                        for each_cookies in value_in.split(';'):
-                            if each_cookies.find("=")!=-1:
-                                cookies_list = each_cookies.split("=")
-                                cookies_jar.set(cookies_list[0],cookies_list[1])
-                            else:
-                                logger.print_on_console("Found Invalid Cookie")
-                        logger.print_on_console("Value of Cookie {}".format(cookies_jar.get_dict()))
-                                
-            self.sessioncookies = cookies_jar
-            logger.print_on_console("Requested Cookie is {}".format(self.sessioncookies))
-                
-            if self.sessioncookies!='' or self.sessioncookies.items()!=[]:
-                response=requests.get(req,cookies=self.sessioncookies,verify=False)
-            else:
-                response=requests.get(req,verify=False)
+            self.get_cookies()
+            response=requests.get(req,cookies=self.sessioncookies,verify=False)
             logger.print_on_console('Response: ',response)
             log.info(response)
             status,methodoutput,output=self.__saveResults(response)
