@@ -498,7 +498,7 @@ class DatabaseOperation():
                 self.cnxn = ibm_db_dbi.Connection(cnxn)
             elif dbtype == 6:
                 import cx_Oracle
-                path=os.environ["NINETEEN68_HOME"] + "/assets/instantclient/"
+                path=os.environ["NINETEEN68_HOME"] + "/Lib/instantclient"
                 os.environ["PATH"] += os.pathsep + path
                 host = str(ip)+":"+str(port)+"/"+dbName
                 self.cnxn = cx_Oracle.connect(userName, password, host, encoding="UTF-8")
