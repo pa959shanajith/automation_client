@@ -491,17 +491,24 @@ class DatabaseOperation():
         err_msg=None
         try:
             dbtype= int(dbtype)
-            if dbtype != 2:
-                self.cnxn = pyodbc.connect('driver=%s;SERVER=%s;PORT=%s;DATABASE=%s;UID=%s;PWD=%s' % ( dbNumber[dbtype], ip, port, dbName, userName ,password ) )
-            else:
+            if dbtype == 2:
                 import ibm_db
                 cnxn = ibm_db.connect('database=%s;hostname=%s;port=%s;protocol=TCPIP;uid=%s;pwd=%s'%(dbName,ip,port,userName,password), '', '')
                 import ibm_db_dbi
                 self.cnxn = ibm_db_dbi.Connection(cnxn)
+            elif dbtype == 6:
+                import cx_Oracle
+                path=os.environ["NINETEEN68_HOME"] + "/assets/instantclient/"
+                os.environ["PATH"] += os.pathsep + path
+                host = str(ip)+":"+str(port)+"/"+dbName
+                self.cnxn = cx_Oracle.connect(userName, password, host, encoding="UTF-8")
+            else:
+                self.cnxn = pyodbc.connect('driver=%s;SERVER=%s;PORT=%s;DATABASE=%s;UID=%s;PWD=%s' % ( dbNumber[dbtype], ip, port, dbName, userName ,password ) )
             return self.cnxn
         except Exception as e:
-            err_msg = self.processException(e)
-        return None
+            log.error(e)
+            err_msg = e.msg
+        return err_msg
 
     def get_ext(self,input_path):
         """
