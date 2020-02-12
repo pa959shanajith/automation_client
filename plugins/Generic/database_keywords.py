@@ -498,7 +498,7 @@ class DatabaseOperation():
                 self.cnxn = ibm_db_dbi.Connection(cnxn)
             elif dbtype == 6:
                 import cx_Oracle
-                path=os.environ["NINETEEN68_HOME"] + "/Lib/instantclient"
+                path = os.path.normpath(os.environ["NINETEEN68_HOME"] + "/Lib/instantclient")
                 os.environ["PATH"] += os.pathsep + path
                 host = str(ip)+":"+str(port)+"/"+dbName
                 self.cnxn = cx_Oracle.connect(userName, password, host, encoding="UTF-8")
@@ -506,9 +506,8 @@ class DatabaseOperation():
                 self.cnxn = pyodbc.connect('driver=%s;SERVER=%s;PORT=%s;DATABASE=%s;UID=%s;PWD=%s' % ( dbNumber[dbtype], ip, port, dbName, userName ,password ) )
             return self.cnxn
         except Exception as e:
-            log.error(e)
-            err_msg = e.msg
-        return err_msg
+            self.processException(e)
+        return None
 
     def get_ext(self,input_path):
         """
