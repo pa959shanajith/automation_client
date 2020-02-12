@@ -21,6 +21,7 @@ import requests
 import io
 import handler
 import update_module
+import bench_mark
 try:
     from socketlib_override import SocketIO,BaseNamespace
 except ImportError:
@@ -116,10 +117,11 @@ class MainNamespace(BaseNamespace):
             elif(str(args[0]) == 'schedulingEnabled'):
                 logger.print_on_console('Schedule Mode Enabled')
                 log.info('Schedule Mode Enabled')
-
+                bench_mark.init(socketIO)
             elif(str(args[0]) == 'schedulingDisabled'):
                 logger.print_on_console('Schedule Mode Disabled')
                 log.info('Schedule Mode Disabled')
+                bench_mark.stop()
 
             elif(str(args[0]) == 'checkConnection'):
                 try:
