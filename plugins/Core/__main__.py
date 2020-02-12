@@ -43,6 +43,7 @@ if __name__ == "__main__":
     path = args.NINETEEN68_HOME+os.sep
     if not os.path.exists(path+"logs"): os.mkdir(path+"logs")
     if not os.path.exists(path+"output"): os.mkdir(path+"output")
+    sys.path.append(path + "assets")
     import clientwindow as cw_obj
     cw_obj.configvalues = configvalues
     cw = cw_obj.ClientWindow(appName)
