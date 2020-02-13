@@ -46,10 +46,21 @@ class WatchThread(threading.Thread):
                 file_name=filename.split('.')[0]
                 if(extn != 'json'):
                     continue
-                log.debug(">>>>>>>>"+source+'/'+filename)
+                log.debug(">>>>>>>>"+source+os.sep+filename)
                 try:
-                    with open(report_path, 'wb+') as output, open(source+'/'+filename, 'rb') as input:
-                        output.write(input.read())
+                    with open(report_path, 'wb+') as output, open(source+os.sep+filename, 'rb') as src_path:
+                        emsg = None
+                        try:
+                            json_data = json.load(src_path)
+                            if not (("overallstatus" in json_data) and ("rows" in json_data)):
+                                emsg = str(filename)+" is invalid report JSON file."
+                        except:
+                            emsg = str(filename)+" is not a valid JSON file."
+                        if emsg is not None:
+                            logger.print_on_console(emsg)
+                            log.error(emsg)
+                            continue
+                        output.write(src_path.read())
                         #output.write(data)
                     #shutil.copyfile(source, os.getcwd())
                     #os.rename(filename, report_path)
@@ -117,9 +128,17 @@ class GeneratePDFReportBatch(wx.Frame):
         self.l4.SetLabel(" ")
         source = self.t1.GetValue()
         target = self.t2.GetValue()
+
+        error_flag = False
         if source.strip()=='' or target.strip()=='':
-            self.l4.SetLabel("No input feild can be left empty!")
-            return
+            self.l4.SetLabel("No input field can be left empty!")
+            error_flag = True
+        elif not (os.path.isdir(target) and os.path.exists(source)):
+            self.l4.SetLabel("Either Source or Target path is Invalid!") 
+            error_flag = True
+
+        if error_flag: return False
+
         self.btn.SetLabel("Start" if self.started else "Stop")
         self.setEnable(self.started)
         if self.started:

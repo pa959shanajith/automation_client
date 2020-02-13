@@ -507,7 +507,8 @@ class Controller():
                         logger.print_on_console('Response Body: \n',respBody,'\n')
                     else:
                         logger.print_on_console('NON SOAP XML')
-                        logger.print_on_console('Response Body: \n',display_keyword_response[1][2:-1].replace("\\n","\n").replace("\\r","\r").replace("\\t","\t"),'\n')
+                        logger.print_on_console('Response Body: \n',display_keyword_response[1].replace("\\n","\n").replace("\\r","\r").replace("\\t","\t"),'\n')
+                        #logger.print_on_console('Response Body: \n',display_keyword_response[1][2:-1].replace("\\n","\n").replace("\\r","\r").replace("\\t","\t"),'\n')
                 else:
                     logger.print_on_console('Response Body exceeds max. Limit, please use writeToFile keyword.')
                     log.info('Result obtained is: ')

@@ -1031,8 +1031,8 @@ class DropdownKeywords():
                                         result = webconstants.TEST_RESULT_TRUE
                                         local_ddl.log.info(STATUS_METHODOUTPUT_UPDATE)
                                 else:
-                                    err_msg = 'Element is not displayed or enabled '
-                                    logger.print_on_console('Element is not displayed or enabled ')
+                                    err_msg = 'Element is disabled'
+                                    logger.print_on_console('Element is disabled ')
                                     local_ddl.log.info(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
                                     local_ddl.log.info(ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED'])
                         else:
