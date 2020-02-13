@@ -21,7 +21,9 @@ import radio_checkbox_keywords_sap
 import saputil_operations
 import sap_table_keywords
 import sap_shell_keywords
+import sap_shell_gridview_toolbar_keywords
 import sap_shell_tree_keywords
+import sap_shell_calendar_keywords
 #-------------------------------------------------------------
 import sap_constants
 import constants
@@ -39,7 +41,9 @@ class SAPDispatcher:
     saputil_keywords_obj = saputil_operations.SapUtilKeywords()
     table_keywords_obj = sap_table_keywords.Table_keywords()
     shell_keywords_obj = sap_shell_keywords.Shell_Keywords()
+    shell_gridview_toolbar_keywords_obj = sap_shell_gridview_toolbar_keywords.Shell_GridView_Toolbar_Keywords()
     shell_tree_keywords_obj = sap_shell_tree_keywords.Shell_Tree_Keywords()
+    shell_calendar_keywords_obj = sap_shell_calendar_keywords.Shell_Calendar_Keywords()
     sap_dict = {
             #------------------------------------------------------launch keywords
             'launchapplication' : launch_keywords_obj.launch_application,
@@ -120,8 +124,11 @@ class SAPDispatcher:
             'getcellstatus' : table_keywords_obj.getStatus,
             'selectrow' : table_keywords_obj.selectRow,
             'unselectrow' : table_keywords_obj.unselectRow,
+            'selectcolumn' : table_keywords_obj.selectColumn,
+            'unselectColumn' : table_keywords_obj.unselectColumn,
             'setcelltext' : table_keywords_obj.setCellText,
-            #-----------------------------------------------------shell keywords
+            #Shell keywords
+            #-----------------------------------------------------gridviewkeywords
             'getcountofrows' : shell_keywords_obj.get_rowCount,
             'getcountofcolumns' : shell_keywords_obj.get_colCount,
             'selectrows' : shell_keywords_obj.selectRows,
@@ -146,7 +153,12 @@ class SAPDispatcher:
             'getcolvaluecorrtoselectednode' : shell_tree_keywords_obj.getColValueCorrToSelectedNode,
             'selecttreenode' : shell_tree_keywords_obj.selectTreeNode,
             'getnodenamebyindex' : shell_tree_keywords_obj.getNodeNameByIndex,
-            'verifytreepath' : shell_tree_keywords_obj.verifyTreePath
+            'verifytreepath' : shell_tree_keywords_obj.verifyTreePath,
+            #------------------------------------------------------callenderkeywords
+            'selectdate' : shell_calendar_keywords_obj.select_date,
+            'selectrange':shell_calendar_keywords_obj.select_range,
+            'selectmonth':shell_calendar_keywords_obj.select_month,
+            'selectweek':shell_calendar_keywords_obj.select_week
             }
 
     def __init__(self):
