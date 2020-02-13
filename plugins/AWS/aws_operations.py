@@ -61,6 +61,7 @@ class AWS_Operations:
             self.file_path=params['filepath']
             self.android_test_spec=params['android_testspec']
             self.ios_test_spec=params['ios_testspec']
+            self.test_run_arn = None
             # self.test_spec_path=AWS_assets+os.sep+params['testspec']
 
 
@@ -269,7 +270,7 @@ class AWS_Operations:
         try:
             name='Test_Run_'+self.cur_date
 
-            test_run_arn = self.schedule_run(
+            self.test_run_arn = self.schedule_run(
                     project_arn,
                     name=name,
                     device_pool_arn=device_pool_arn,
@@ -282,10 +283,10 @@ class AWS_Operations:
 
 
             # print (self.get_run_web_url(project_arn,test_run_arn))
-            run_status=self.wait_for_run(test_run_arn,340)
+            run_status=self.wait_for_run(self.test_run_arn,340)
             logger.print_on_console('Run completed')
             log.info('Run completed')
-            self.download_results(test_run_arn,download_type,AWS_output_path)
+            self.download_results(self.test_run_arn,download_type,AWS_output_path)
         except Exception as e:
             logger.print_on_console('Error while performing run')
             log.error(e)
@@ -349,25 +350,40 @@ class AWS_Operations:
             log.info('Outputs are stored here '+output_dir)
             if not os.path.exists(output_dir):
                 os.mkdir(output_dir)
-            for a in artifcats:
-                msg='Downloading ',a['type'],a['name']
-                if a['type'] in ['CUSTOMER_ARTIFACT','VIDEO','TESTSPEC_OUTPUT']:
-                    logger.print_on_console(msg)
-                    log.info(msg)
-                    output_file=output_dir+"/"+a['name']+'.'+a['extension']
-                    output_url=a['url']
-                    r=requests.get(output_url)
-                    fd=open(output_file,'wb')
-                    fd.write(r.content)
-                    fd.close()
-                    time.sleep(1)
-            msg="All files downloaded into"
-            logger.print_on_console(msg)
-            log.info(msg)
+            if len(artifcats) > 0:
+                for a in artifcats:
+                    msg='Downloading ',a['type'],a['name']
+                    if a['type'] in ['CUSTOMER_ARTIFACT','VIDEO','TESTSPEC_OUTPUT']:
+                        logger.print_on_console(msg)
+                        log.info(msg)
+                        output_file=output_dir+"/"+a['name']+'.'+a['extension']
+                        output_url=a['url']
+                        r=requests.get(output_url)
+                        fd=open(output_file,'wb')
+                        fd.write(r.content)
+                        fd.close()
+                        time.sleep(1)
+                msg="All files downloaded into"
+                logger.print_on_console(msg)
+                log.info(msg)
+            else:
+                logger.print_on_console("Error while fetching results")
+                log.info("Error while fetching results")
         except Exception as e:
             logger.print_on_console('Error while downloading results')
             log.error(e)
 
+    def stop_job(self):
+        try:
+            if self.test_run_arn is not None:
+                self.dc.stop_run(
+                    arn=self.test_run_arn
+                )
+                #self.test_run_arn = None
+                logger.print_on_console("Stop initiated on current AWS run")
+        except Exception as e:
+            logger.print_on_console("Error while stopping run")
+            log.error(e)
 
 
 

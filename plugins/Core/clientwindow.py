@@ -1251,6 +1251,11 @@ class ClientWindow(wx.Frame):
         logger.print_on_console(msg)
         log.info(msg)
         controller.terminate_flag=True
+        #Calling AWS stop job on terminate (if present)
+        try:
+            wxObject.mythread.con.aws_obj.stop_job()
+        except:
+            pass
         #Handling the case where user clicks terminate when the execution is paused
         #Resume the execution
         if controller.pause_flag:
