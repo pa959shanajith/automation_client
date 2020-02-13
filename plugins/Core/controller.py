@@ -910,14 +910,14 @@ class Controller():
         logger.print_on_console('No  of Suites : ',str(len(suiteId_list)))
         j=1
         tc_obj=None
-        aws_obj=None
+        self.aws_obj=None
         if aws_mode:
             self.__load_aws()
             from testcase_compile import TestcaseCompile
             from aws_operations import AWS_Operations
             cur_date=str(datetime.now()).replace(' ','_').replace('.','_').replace(':','_')
             tc_obj=TestcaseCompile(cur_date)
-            aws_obj=AWS_Operations(cur_date)
+            self.aws_obj=AWS_Operations(cur_date)
         #Iterate through the suites-list
         for suite,suite_id,suite_id_data in zip(suite_details,suiteId_list,suite_data):
             #EXECUTION GOES HERE
@@ -1116,7 +1116,7 @@ class Controller():
                             report_json=con.reporting_obj.report_json[OVERALLSTATUS]
             if aws_mode:
                 tc_obj.make_zip(pytest_files)
-                execution_status=aws_obj.run_aws_android_tests()
+                execution_status=self.aws_obj.run_aws_android_tests()
             log.info('---------------------------------------------------------------------')
             print('=======================================================================================================')
             log.info('***SUITE '+ str(j) +' EXECUTION COMPLETED***')

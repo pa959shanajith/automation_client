@@ -138,7 +138,7 @@ class ScrapeWindow(wx.Frame):
                 self.socketIO.emit('scrape','Error in scraping')
             self.parent.schedule.Enable()
             self.Close()
-            log_info('Fullscrape completed')
+            log.info('Fullscrape completed')
         except Exception as e:
             self.print_error("Error occurred in FullScrape")
             log.error(e, exc_info=True)

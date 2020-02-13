@@ -35,7 +35,12 @@ class MobileOpeartions():
             url = 'http://0.0.0.0:4723/wd/hub'
             SYSTEM_OS = 'Darwin'
         desired_caps = {}
-        driver = webdriver.Remote(url, desired_caps)
+        try:
+            driver = webdriver.Remote(url, desired_caps)
+        except Exception as e:
+            log.error('Error in webdriver')
+            log.error(e)
+            return None
         return driver
 
     def launch_application(self,apk_path):
@@ -185,6 +190,7 @@ class MobileOpeartions():
             if webelement is not None:
                         log.debug(WEB_ELEMENT_ENABLED)
                         output=webelement.text
+                        log.info("Button name: "+output)
                         status=TEST_RESULT_PASS
                         result=TEST_RESULT_TRUE
         except Exception as e:
@@ -202,6 +208,7 @@ class MobileOpeartions():
                 if webelement is not None:
                     if webelement.text==input:
                         log.debug('text matched')
+                        log.info("Button name: "+input)
                         status=TEST_RESULT_PASS
                         result=TEST_RESULT_TRUE
         except Exception as e:
@@ -221,6 +228,7 @@ class MobileOpeartions():
                 if webelement.is_enabled():
                     log.debug(WEB_ELEMENT_ENABLED)
                     output=webelement.text
+                    log.info("Element text: "+output)
                     status=TEST_RESULT_PASS
                     result=TEST_RESULT_TRUE
                 else:
@@ -243,6 +251,7 @@ class MobileOpeartions():
                         log.debug(WEB_ELEMENT_ENABLED)
                         if webelement.text==input:
                             log.debug('text matched')
+                            log.info("Element text: "+input)
                             status=TEST_RESULT_PASS
                             result=TEST_RESULT_TRUE
                     else:
@@ -276,7 +285,9 @@ class MobileOpeartions():
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
                         else:
-                            err_msg='TOGGLE_ON'
+                            status=TEST_RESULT_PASS
+                            methodoutput=TEST_RESULT_TRUE
+                            err_msg='Toggle is already ON'
                     else:
                         err_msg=ERROR_CODE_DICT['ERR_WEB_ELEMENT_DISABLED']
 
@@ -296,34 +307,35 @@ class MobileOpeartions():
         err_msg=None
         status=None
 
-        if webelement is not None:
-            try:
-                if webelement is not None:
-                    visibility=webelement.is_displayed()
-                    log.debug('element is visible')
-                    if visibility:
-                        enable=webelement.is_enabled()
-                        if enable:
-                            log.debug(WEB_ELEMENT_ENABLED)
-                            log.debug('performing the action')
-                            res=webelement.text
-                            ios = str(res)
-                            if ios == 'True' or res.upper()=='ON':
-                                action = TouchAction(driver)
-                                action.tap(webelement).perform()
-                                status=TEST_RESULT_PASS
-                                methodoutput=TEST_RESULT_TRUE
-                            else:
-                                 err_msg='TOGGLE_OFF'
-
+        try:
+            if webelement is not None:
+                visibility=webelement.is_displayed()
+                log.debug('element is visible')
+                if visibility:
+                    enable=webelement.is_enabled()
+                    if enable:
+                        log.debug(WEB_ELEMENT_ENABLED)
+                        log.debug('performing the action')
+                        res=webelement.text
+                        ios = str(res)
+                        if ios == 'True' or res.upper()=='ON':
+                            action = TouchAction(driver)
+                            action.tap(webelement).perform()
+                            status=TEST_RESULT_PASS
+                            methodoutput=TEST_RESULT_TRUE
                         else:
-                            err_msg=ERROR_CODE_DICT['ERR_WEB_ELEMENT_DISABLED']
+                            status=TEST_RESULT_PASS
+                            methodoutput=TEST_RESULT_TRUE
+                            err_msg='Toggle is already OFF'
+
                     else:
-                        err_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
-                if err_msg:
-                    log.error(err_msg)
-            except Exception as e:
-                log.error(e)
+                        err_msg=ERROR_CODE_DICT['ERR_WEB_ELEMENT_DISABLED']
+                else:
+                    err_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
+            if err_msg:
+                log.error(err_msg)
+        except Exception as e:
+            log.error(e)
         return status,methodoutput,output,err_msg
 
     def verify_enabled(self, driver,element,*args):
@@ -372,7 +384,6 @@ class MobileOpeartions():
                         methodoutput=TEST_RESULT_TRUE
                     else:
                         err_msg=WEB_ELEMENT_ENABLED
-
                 else:
                     err_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
             if err_msg:
@@ -813,7 +824,7 @@ class MobileOpeartions():
                 if element.is_enabled():
                     log.debug(ELEMENT_ENABLED)
                     output = element.text
-                    print("Selected number: "+output)
+                    log.info("Selected number: "+output)
                     status=TEST_RESULT_PASS
                     result=TEST_RESULT_TRUE
                 else:
@@ -842,20 +853,20 @@ class MobileOpeartions():
                         log.debug(ELEMENT_ENABLED)
                         if elem_text==input_val:
                             log.debug('text matched')
-                            print("Selected number: "+elem_text)
+                            log.info("Selected number: "+elem_text)
                             status=TEST_RESULT_PASS
                             result=TEST_RESULT_TRUE
                         else:
-                            print("Selected number: "+elem_text)
+                            log.info("Selected number: "+elem_text)
                     else:
                         log.error('ELEMENT_DISABLED')
                         if elem_text==input_val:
                             log.debug('text matched')
-                            print("Selected number: "+elem_text)
+                            log.info("Selected number: "+elem_text)
                             status=TEST_RESULT_PASS
                             result=TEST_RESULT_TRUE
                         else:
-                            print("Selected number: ;"+elem_text)
+                            log.info("Selected number: ;"+elem_text)
                 else:
                     log.error('ELEMENT DOES NOT EXIST')
             else:
@@ -910,7 +921,7 @@ class MobileOpeartions():
                                                 else:
                                                     action.tap(ampm[1]).perform()
                                             else:
-                                                print("More RadioButtons before Timepicker")
+                                                log.info("More RadioButtons before Timepicker")
                                             status=TEST_RESULT_PASS
                                             result=TEST_RESULT_TRUE
                                         else:
@@ -1020,6 +1031,7 @@ class MobileOpeartions():
                             else:
                                 AMorPM="PM"
                             output=Hour+':'+Min+':'+AMorPM
+                            log.info("Time: "+output)
                             status=TEST_RESULT_PASS
                             result=TEST_RESULT_TRUE
 
@@ -1029,6 +1041,7 @@ class MobileOpeartions():
                             Min=element[1].text
                             AMorPM=element[2].text
                             output=Hour+':'+Min+':'+AMorPM
+                            log.info("Time: "+output)
                             status=TEST_RESULT_PASS
                             result=TEST_RESULT_TRUE
                     else:
@@ -1160,6 +1173,7 @@ class MobileOpeartions():
                             Date=element[1].text
                             Year=element[2].text
                             output=Month+'/'+Date+'/'+Year
+                            log.info("Date: "+output)
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
                         else :
@@ -1175,7 +1189,7 @@ class MobileOpeartions():
                 log.error(e)
         return status,methodoutput,output,err_msg
 
-    def find_coordinates_horizontal(self):
+    def find_coordinates_horizontal(self,driver):
         size=driver.get_window_size()
         log.debug('Window size is '+str(size))
         startx=(size['width']*0.75)
@@ -1185,7 +1199,7 @@ class MobileOpeartions():
         return startx,starty,endx
 
 
-    def find_coordinates_vertical(self):
+    def find_coordinates_vertical(self,driver):
         size=driver.get_window_size()
         log.debug('Window size is '+str(size))
         min_y=(size['height']/4)
@@ -1195,84 +1209,84 @@ class MobileOpeartions():
         return x_Value,max_y,min_y
 
 
-    def swipe_left(self,*args):
+    def swipe_left(self,driver,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
 
         try:
-            startx,starty,endx=self.find_coordinates_horizontal()
+            startx,starty,endx=self.find_coordinates_horizontal(driver)
             #Swipe from Right to Left
             driver.swipe(startx, starty, endx, starty, 3000)
             time.sleep(2)
             status=TEST_RESULT_PASS
             methodoutput=TEST_RESULT_TRUE
         except Exception as e:
-            logger.print_on_console("Error occurred in SwipeLeft")
+            log.error("Error occurred in SwipeLeft")
             log.error(e,exc_info=True)
         return status,methodoutput,output,err_msg
 
 
-    def swipe_right(self,*args):
+    def swipe_right(self,driver,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
 
         try:
-            startx,starty,endx=self.find_coordinates_horizontal()
+            startx,starty,endx=self.find_coordinates_horizontal(driver)
             #Swipe from left to Right
             driver.swipe(endx, starty, startx, starty, 3000)
             time.sleep(2)
             status=TEST_RESULT_PASS
             methodoutput=TEST_RESULT_TRUE
         except Exception as e:
-            logger.print_on_console("Error occurred in SwipeRight")
+            log.error("Error occurred in SwipeRight")
             log.error(e,exc_info=True)
         return status,methodoutput,output,err_msg
 
 
-    def swipe_up(self,*args):
+    def swipe_up(self,driver,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
 
         try:
-            x_Value,max_y,min_y=self.find_coordinates_vertical()
+            x_Value,max_y,min_y=self.find_coordinates_vertical(driver)
             #Swipe from bottom to top
             driver.swipe(x_Value, max_y, x_Value, min_y, 3000)
             time.sleep(2)
             status=TEST_RESULT_PASS
             methodoutput=TEST_RESULT_TRUE
         except Exception as e:
-            logger.print_on_console("Error occurred in SwipeUp")
+            log.error("Error occurred in SwipeUp")
             log.error(e,exc_info=True)
         return status,methodoutput,output,err_msg
 
 
-    def swipe_down(self,*args):
+    def swipe_down(self,driver,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
 
         try:
-            x_Value,max_y,min_y=self.find_coordinates_vertical()
+            x_Value,max_y,min_y=self.find_coordinates_vertical(driver)
             #Swipe from top to bottom
             driver.swipe(x_Value, min_y, x_Value, max_y, 3000)
             time.sleep(2)
             status=TEST_RESULT_PASS
             methodoutput=TEST_RESULT_TRUE
         except Exception as e:
-            logger.print_on_console("Error occurred in SwipeDown")
+            log.error("Error occurred in SwipeDown")
             log.error(e,exc_info=True)
         return status,methodoutput,output,err_msg
 
 
 
-    def backPress(self,inputval,*args):
+    def backPress(self,driver,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -1284,7 +1298,7 @@ class MobileOpeartions():
             status=TEST_RESULT_PASS
             methodoutput=TEST_RESULT_TRUE
         except Exception as e:
-            logger.print_on_console("Error occurred in BackPress")
+            log.error("Error occurred in BackPress")
             log.error(e,exc_info=True)
             return status,methodoutput,output,err_msg
 

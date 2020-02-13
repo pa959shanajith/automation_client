@@ -167,7 +167,7 @@ class Handler():
                 except Exception as e:
                     local_handler.log.error(e)
                 
-                if('apptype' in json_data and json_data['apptype']=="Mobility"):
+                if('apptype' in json_data and json_data['apptype']=="MobileApp"):
                     local_handler.awsKeywords[json_data["testcasename"]]=set()
                     for i in range(0,len(testcase)):
                         if(testcase[i]["keywordVal"] in aws_supported_keywords):
