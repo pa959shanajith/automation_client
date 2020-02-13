@@ -95,6 +95,10 @@ class InstallAndLaunch():
                 self.desired_caps['showXcodeLog'] = True
                 #self.desired_caps['newCommandTimeout'] = 3600
                 #self.desired_caps['launchTimeout'] = 180000
+                self.desired_caps['noReset'] = True
+                self.desired_caps['newCommandTimeout'] = 0
+                self.desired_caps['sessionOverride'] = True
+                self.desired_caps['log_level'] = False
                 self.desired_caps['app'] = apk_path
                 driver = webdriver.Remote('http://0.0.0.0:4723/wd/hub', self.desired_caps)
                 # current_dir = (os.getcwd())
@@ -309,8 +313,8 @@ class BuildJson:
             'android.widget.RelativeLayout' : '_relativelayout',
             'android.widget.ScrollView' : '_scrollview',
             'android.view.View' : '_view',
-            'android.view.ViewGroup' : '_viewgroup'
-            ##has to be done for iOS
+            'android.view.ViewGroup' : '_viewgroup',
+            ##for iOS
         }
         for i in range(len(XpathList)):
             text=''
@@ -341,7 +345,16 @@ class BuildJson:
                         text=text+str(counter) + '_elmnt'
                         custnamelist.append(text)
                         counter=counter+1
-            #else part for iOS
+            else:#else part for iOS
+                #class_name[i] = class_name[i].replace("XCUIElementType","")
+                text1 = text + '_' + class_name[i].replace("XCUIElementType","").lower()
+                if text1 not in custnamelist:
+                    text = text1
+                    custnamelist.append(text)
+                else:
+                    text=text+str(counter) + '_' + class_name[i].replace("XCUIElementType","").lower()
+                    custnamelist.append(text)
+                    counter=counter+1
             if SYSTEM_OS!='Darwin':
                 xpath = resource_id[i] + ';' + XpathList[i]
                 ele_bounds=re.findall('\d+',rectangle[i])
@@ -428,13 +441,13 @@ class Exact(xml.sax.handler.ContentHandler):
                 # if x.lower()=='text':
                 if x.lower() == 'label':
                     ##            if(value == ''):
-                    ##		      label.append(qName)
+                    ##              label.append(qName)
                     ##            else:
                     label_flag = True
                     label.append(value)
                     name.append(qName)
                     # elif x.lower()=='bounds':
-                # 	rectangle.append(value)
+                #     rectangle.append(value)
 
                 elif x.lower() == 'enabled':
                     enabled.append(value)
@@ -455,25 +468,25 @@ class Exact(xml.sax.handler.ContentHandler):
                     height.append(value)
 
                     # elif x.lower()=='resource-id':
-                # 	resource_id.append(value)
+                #     resource_id.append(value)
 
                 # elif x.lower()=='focusable':
-                # 	focusable.append(value)
+                #     focusable.append(value)
 
                 elif x.lower() == 'type':
                     class_name.append(value)
 
                     # elif x.lower()=='content-desc':
-                    # 	content_desc.append(value)
+                    #     content_desc.append(value)
 
                     # elif x.lower()=='checked':
-                    # 	checked.append(value)
+                    #     checked.append(value)
             if SYSTEM_OS!='Darwin':
                 value=attrs.getValue(x)
 
                 if x.lower()=='text':
         ##            if(value == ''):
-        ##		      label.append(qName)
+        ##              label.append(qName)
         ##            else:
                     label.append(value)
 
@@ -501,7 +514,7 @@ class Exact(xml.sax.handler.ContentHandler):
                         checked.append(value)
         if SYSTEM_OS == 'Darwin':
             if label_flag == False and len(elements_list) > 0:
-                label.append(qName)
+                label.append('Noname')
         curobj=self
         child = Exact(childXPath,self.parser,curobj)
         self.parser.setContentHandler(child)
