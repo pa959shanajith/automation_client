@@ -38,7 +38,7 @@ class MobileOpeartions():
         try:
             driver = webdriver.Remote(url, desired_caps)
         except Exception as e:
-            logger.print_on_console('Error in webdriver')
+            log.error('Error in webdriver')
             log.error(e)
             return None
         return driver
@@ -1189,7 +1189,7 @@ class MobileOpeartions():
                 log.error(e)
         return status,methodoutput,output,err_msg
 
-    def find_coordinates_horizontal(self):
+    def find_coordinates_horizontal(self,driver):
         size=driver.get_window_size()
         log.debug('Window size is '+str(size))
         startx=(size['width']*0.75)
@@ -1199,7 +1199,7 @@ class MobileOpeartions():
         return startx,starty,endx
 
 
-    def find_coordinates_vertical(self):
+    def find_coordinates_vertical(self,driver):
         size=driver.get_window_size()
         log.debug('Window size is '+str(size))
         min_y=(size['height']/4)
@@ -1209,84 +1209,84 @@ class MobileOpeartions():
         return x_Value,max_y,min_y
 
 
-    def swipe_left(self,*args):
+    def swipe_left(self,driver,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
 
         try:
-            startx,starty,endx=self.find_coordinates_horizontal()
+            startx,starty,endx=self.find_coordinates_horizontal(driver)
             #Swipe from Right to Left
             driver.swipe(startx, starty, endx, starty, 3000)
             time.sleep(2)
             status=TEST_RESULT_PASS
             methodoutput=TEST_RESULT_TRUE
         except Exception as e:
-            logger.print_on_console("Error occurred in SwipeLeft")
+            log.error("Error occurred in SwipeLeft")
             log.error(e,exc_info=True)
         return status,methodoutput,output,err_msg
 
 
-    def swipe_right(self,*args):
+    def swipe_right(self,driver,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
 
         try:
-            startx,starty,endx=self.find_coordinates_horizontal()
+            startx,starty,endx=self.find_coordinates_horizontal(driver)
             #Swipe from left to Right
             driver.swipe(endx, starty, startx, starty, 3000)
             time.sleep(2)
             status=TEST_RESULT_PASS
             methodoutput=TEST_RESULT_TRUE
         except Exception as e:
-            logger.print_on_console("Error occurred in SwipeRight")
+            log.error("Error occurred in SwipeRight")
             log.error(e,exc_info=True)
         return status,methodoutput,output,err_msg
 
 
-    def swipe_up(self,*args):
+    def swipe_up(self,driver,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
 
         try:
-            x_Value,max_y,min_y=self.find_coordinates_vertical()
+            x_Value,max_y,min_y=self.find_coordinates_vertical(driver)
             #Swipe from bottom to top
             driver.swipe(x_Value, max_y, x_Value, min_y, 3000)
             time.sleep(2)
             status=TEST_RESULT_PASS
             methodoutput=TEST_RESULT_TRUE
         except Exception as e:
-            logger.print_on_console("Error occurred in SwipeUp")
+            log.error("Error occurred in SwipeUp")
             log.error(e,exc_info=True)
         return status,methodoutput,output,err_msg
 
 
-    def swipe_down(self,*args):
+    def swipe_down(self,driver,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
 
         try:
-            x_Value,max_y,min_y=self.find_coordinates_vertical()
+            x_Value,max_y,min_y=self.find_coordinates_vertical(driver)
             #Swipe from top to bottom
             driver.swipe(x_Value, min_y, x_Value, max_y, 3000)
             time.sleep(2)
             status=TEST_RESULT_PASS
             methodoutput=TEST_RESULT_TRUE
         except Exception as e:
-            logger.print_on_console("Error occurred in SwipeDown")
+            log.error("Error occurred in SwipeDown")
             log.error(e,exc_info=True)
         return status,methodoutput,output,err_msg
 
 
 
-    def backPress(self,inputval,*args):
+    def backPress(self,driver,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -1298,7 +1298,7 @@ class MobileOpeartions():
             status=TEST_RESULT_PASS
             methodoutput=TEST_RESULT_TRUE
         except Exception as e:
-            logger.print_on_console("Error occurred in BackPress")
+            log.error("Error occurred in BackPress")
             log.error(e,exc_info=True)
             return status,methodoutput,output,err_msg
 
