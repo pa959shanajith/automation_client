@@ -64,7 +64,7 @@ ICE_CONST= NINETEEN68_HOME + "/assets/ice_const.json"
 CONFIG_PATH= NINETEEN68_HOME + "/assets/config.json"
 CERTIFICATE_PATH = NINETEEN68_HOME + "/assets/CA_BUNDLE"
 LOGCONFIG_PATH = NINETEEN68_HOME + "/assets/logging.conf"
-DRIVERS_PATH = NINETEEN68_HOME + "/Lib/Drivers"
+DRIVERS_PATH = NINETEEN68_HOME + "/lib/Drivers"
 CHROME_DRIVER_PATH = DRIVERS_PATH + "/chromedriver"
 EDGE_DRIVER_PATH = DRIVERS_PATH + "/MicrosoftWebDriver"
 EDGE_CHROMIUM_DRIVER_PATH = DRIVERS_PATH + "/msedgedriver"
@@ -1577,19 +1577,19 @@ class Config_window(wx.Frame):
         }
         else:
             config_fields={
-            "Frame":[(300, 150),(555,540)],
+            "Frame":[(300, 150),(600,700)],
             "S_address":[(12,8),(90,28),(116,8 ),(140,-1)],
             "S_port": [(352,8),(70,28),(430,8 ),(105,-1)],
             "Chrm_path":[(12,38),(80,28),(116,38),(382,-1),(504,38),(30, -1)],
             "Ffox_path":[(12,68),(80,28),(116,68),(382,-1),(504,68),(30, -1)],
             "Log_path":[(12,98),(80, 28),(116,98),(382,-1),(504,98),(30, -1)],
             "Q_timeout":[(12,128),(85, 28),(116,128), (80,-1)],
-            "Timeout":[(225,128),(50, 28),(290,128),(80,-1)],
+            "Timeout":[(225,130),(50, 28),(290,130),(80,-1)],
             "Delay":[(404,128),(40, 28),(448,128), (85,-1)],
             "Step_exec":[(12,158),(120, 28),(142,158),(80,-1)],
             "Disp_var":[(288,158),(140, 28),(448,158),(85,-1)],
             "S_cert":[(12,188),(85, 28),(116,188),(382,-1),(504,188),(30, -1)],
-            "Ignore_cert":[(12,318)],
+            "Ignore_cert":[(20,318)],
             "IE_arch":[(158,258)],
             "Dis_s_cert":[(335,258)],
             "Ex_flag":[(12,258)],
@@ -1599,12 +1599,14 @@ class Config_window(wx.Frame):
             "En_secu_check":[(358,318)],
             "Brow_ch":[(130,378)],
             "High_ch":[(260,378)],
-            "Save":[(135,458),(100, 28)],
+            "Save":[(130,550),(100, 28)],
             "C_Timeout" :[(12,218),(120, 28),(180,218), (80,-1)],
-            "Iris_prediction":[(12,398)],
-            "hide_soft_key":[(180,398)],
-            "extn_enabled":[(370,428)],
-            "Close":[(285,458),(100, 28)]
+            "Delay_Stringinput":[(288,218),(140, 28),(448,218), (85,-1)],
+            "Iris_prediction":[(12,428)],
+            "hide_soft_key":[(230,428)],
+            "extn_enabled":[(400,428)],
+            "update_check":[(12,480)],
+            "Close":[(370,550),(120, 28)]
         }
         wx.Frame.__init__(self, parent, title=title,
                    pos=config_fields["Frame"][0], size=config_fields["Frame"][1], style = wx.CAPTION|wx.CLIP_CHILDREN)
@@ -1896,7 +1898,10 @@ class Config_window(wx.Frame):
         data['update_check']= update_check.strip()
         data['delay_stringinput']=delay_string_in.strip()
         config_data=data
-        if data['server_ip']!='' and data['server_port']!='' and data['server_cert']!='' and data['chrome_path']!='' and data['queryTimeOut']!='' and data['logFile_Path']!='' and data['delay']!='' and data['timeOut']!='' and data['stepExecutionWait']!='' and data['displayVariableTimeOut']!='' and data['firefox_path']!='' and  data['connection_timeout']>='':
+        if (data['server_ip']!='' and data['server_port']!='' and data['server_cert']!='' and
+            data['chrome_path']!='' and data['queryTimeOut']!='' and data['logFile_Path']!='' and
+            data['delay']!='' and data['timeOut']!='' and data['stepExecutionWait']!='' and
+            data['displayVariableTimeOut']!='' and data['firefox_path']!='' and  data['connection_timeout']>=''):
             #---------------------------------------resetting the static texts
             self.error_msg.SetLabel("")
             self.sev_add.SetLabel('Server Address')
@@ -2437,9 +2442,9 @@ def check_browser():
             import subprocess
             from selenium import webdriver
             from selenium.webdriver import ChromeOptions
-            p = subprocess.Popen('chromedriver.exe --version', stdout=subprocess.PIPE, bufsize=1,cwd=DRIVERS_PATH,shell=True)
-            a=p.stdout.readline()
-            a=a.decode('utf-8')[13:17]
+            p = subprocess.Popen(CHROME_DRIVER_PATH + ' --version', stdout=subprocess.PIPE, bufsize=1, shell=True)
+            a = p.stdout.readline()
+            a = a.decode('utf-8')[13:17]
             choptions1 = webdriver.ChromeOptions()
             if str(configvalues['chrome_path']).lower()!="default":
                 choptions1.binary_location=str(configvalues['chrome_path'])
@@ -2452,8 +2457,7 @@ def check_browser():
                 browser_ver = driver.capabilities['version']
             elif 'browserVersion' in  driver.capabilities.keys():
                 browser_ver = driver.capabilities['browserVersion']
-            browser_ver1 = browser_ver.encode('utf-8')
-            browser_ver = int(browser_ver1[:2])
+            browser_ver = int(browser_ver.encode('utf-8')[:2])
             try:
                 driver.close()
                 driver.quit()
@@ -2471,9 +2475,9 @@ def check_browser():
             log.error("Error in checking chrome version")
             log.error(e,exc_info=True)
         try:
-            p = subprocess.Popen('geckodriver.exe --version', stdout=subprocess.PIPE, bufsize=1,cwd=DRIVERS_PATH,shell=True)
-            a=p.stdout.readline()
-            a=a.decode('utf-8')[12:16]
+            p = subprocess.Popen(GECKODRIVER_PATH + ' --version', stdout=subprocess.PIPE, bufsize=1, shell=True)
+            a = p.stdout.readline()
+            a = a.decode('utf-8')[12:16]
             caps=webdriver.DesiredCapabilities.FIREFOX
             caps['marionette'] = True
             from selenium.webdriver.firefox.options import Options
@@ -2485,9 +2489,7 @@ def check_browser():
                 driver = webdriver.Firefox(capabilities=caps,firefox_options=options,firefox_binary=binary, executable_path=GECKODRIVER_PATH)
             else:
                 driver = webdriver.Firefox(capabilities=caps,firefox_options=options, executable_path=GECKODRIVER_PATH)
-            browser_ver=driver.capabilities['browserVersion']
-            browser_ver1 = browser_ver.encode('utf-8')
-            browser_ver = float(browser_ver1[:4])
+            browser_ver = float(driver.capabilities['browserVersion'].encode('utf-8')[:4])
             try:
                 driver.close()
                 driver.quit()

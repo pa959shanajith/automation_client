@@ -13,7 +13,6 @@
 import json
 import time
 import logging
-#from io import StringIO
 from uuid import uuid4 as uuid
 from threading import Timer
 import socketIO_client
@@ -28,8 +27,8 @@ VERIFY_HOSTNAME = False
 PAGINATE_INDEX = "p@gIn8"
 
 try:
-    store = storage.SQLite()
-    #store = storage.InMemory()
+    #store = storage.SQLite()
+    store = storage.InMemory()
 except:
     store = storage.InMemory()
 
