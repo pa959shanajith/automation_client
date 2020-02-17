@@ -27,8 +27,7 @@ VERIFY_HOSTNAME = False
 PAGINATE_INDEX = "p@gIn8"
 
 try:
-    #store = storage.SQLite()
-    store = storage.InMemory()
+    store = storage.SQLite()
 except:
     store = storage.InMemory()
 
