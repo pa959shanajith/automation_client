@@ -122,6 +122,7 @@ ICON_BITMAP = {'S_OKAY':'CHECKED',
 
 GET_KEYWORDS = ['gettext','gettextboxlength','getstatus','getbuttonname','getselected','getcount','getelementtext','gettooltiptext','geticonname','getinputhelp','getrowcount','getcolumncount','getcolnumbytext','getrownumbytext','getcellvalue','getcellstatus','getcountofrows','getcountofcolumns','getcelltext','getrowcolbytext','getcellcolor','gettreenodetext','gettreenodecount','getcolvaluecorrtoselectednode','getnodenamebyindex']
 
+#-----------------SAP Shell Calender Constants---------------------------------------------
 #Dictonary to hold key name and Virtual Key value(used for keyboard inputs)
 VK_CODE = {'backspace':0x08,
            'tab':0x09,
@@ -269,3 +270,19 @@ VK_CODE = {'backspace':0x08,
            ']':0xDD,
            "'":0xDE,
            '`':0xC0}
+
+date_day = { 'MO' : 1,'TU' : 2,'WE' : 3,'TH' : 4,'FR' : 5,'SA' : 6,'SU' : 7 }
+
+Month = {'jan' : 1,'january' : 1,
+        'feb' : 2,'february' : 2,
+        'mar' :3,'march' :3,
+        'apr' :4,'april' :4,
+        'may' :5,
+        'jun' :6,'june' :6,
+        'jul' :7,'july' :7,
+        'aug' :8,'august' :8,
+        'sept' :9,'september' :9,
+        'oct' :10,'october' :10,
+        'nov' :11,'november' :11,
+        'dec' :12,'december' :12}
+#-----------------SAP Shell Calender Constants---------------------------------------------

@@ -158,6 +158,7 @@ class SAPDispatcher:
             'verifytreepath' : shell_tree_keywords_obj.verifyTreePath,
             #------------------------------------------------------callenderkeywords
             'selectdate' : shell_calendar_keywords_obj.select_date,
+            #'selecttodaysdate' : shell_calendar_keywords_obj.select_todays_date,
             'selectrange':shell_calendar_keywords_obj.select_range,
             'selectmonth':shell_calendar_keywords_obj.select_month,
             'selectweek':shell_calendar_keywords_obj.select_week

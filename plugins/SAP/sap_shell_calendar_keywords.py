@@ -17,6 +17,8 @@ import logging
 import win32api
 import time
 from datetime import date
+import pythoncom
+
 log = logging.getLogger("sap_shell_calendar_keywords.py")
 
 """
@@ -38,23 +40,6 @@ In-built functions for calender shell objects (common things : <date> format: YY
 15.SelectContextMenuItemByText(<Text(str)>)
 16.ContextMenu(<CtxMenuId(int)>,<CtxMenuCellRow(int)>,<CtxMenuCellCol(int)>,<DateBegin(str)>,<DateEnd(str)>)
 """
-
-
-Month = {'jan' : 1,'january' : 1,
-        'feb' : 2,'february' : 2,
-        'mar' :3,'march' :3,
-        'apr' :4,'april' :4,
-        'may' :5,
-        'jun' :6,'june' :6,
-        'jul' :7,'july' :7,
-        'aug' :8,'august' :8,
-        'sept' :9,'september' :9,
-        'oct' :10,'october' :10,
-        'nov' :11,'november' :11,
-        'dec' :12,'december' :12}
-
-date_day = { 'MO':1,'TU':2,'WE':3,'TH':4,'FR':5,'SA':6,'SU':7 }
-
 flag_message = ['ERROR: Given date is of incorrect format/value',
                 'Date value is not an integer',
                 'Month value is incorrect',
@@ -107,7 +92,7 @@ class Shell_Calendar_Keywords():
         value = OUTPUT_CONSTANT
         flag = [False,False,False]
         flag_message = ['Day value is not an integer','Month value is not an integer','Year value is not an integer']
-        er=[]
+        er =[]
         for i in range(0,len(input_val)):#check if input values are of int type
             try:
                 if( int(input_val[i]) ):
@@ -142,9 +127,13 @@ class Shell_Calendar_Keywords():
     def navigate_to(self, elem, input_val):
         status_flag = False
         fdate = elem.FocusDate
+        log.debug("Focused Date is : ",fdate)
         fday = elem.GetWeekDay(str(fdate))
+        log.debug("Focused day of the week is : ",fday)
         dday = elem.GetWeekDay(str(input_val))
-        horizontal_movement = date_day[fday] - date_day[dday]
+        log.debug("To focus date is : ",dday)
+        horizontal_movement = sap_constants.date_day[fday] - sap_constants.date_day[dday]
+        log.debug("Horizontal Movement is : ",horizontal_movement)
         # if pos move right ,if neg move left ,if zero stay there
         try : elem.SelectRange(str(input_val),str(input_val))
         except : pass
@@ -152,14 +141,14 @@ class Shell_Calendar_Keywords():
             elem.FocusDate
         elif ( horizontal_movement > 0 ):
             elem.FocusDate
-            for i in range(0,horizontal_movement):
-                win32api.keybd_event(VK_CODE['left_arrow'], 0,0,0)#left_arrow
-                time.sleep(0.20)
+            for i in range(0, horizontal_movement):
+                win32api.keybd_event(sap_constants.VK_CODE['left_arrow'], 0, 0, 0)#left_arrow
+                time.sleep(0.10)
         elif ( horizontal_movement < 0 ):
             elem.FocusDate
             for i in range(0,abs(horizontal_movement)):
-                win32api.keybd_event(VK_CODE['right_arrow'], 0,0,0)#right_arrow
-                time.sleep(0.20)
+                win32api.keybd_event(sap_constants.VK_CODE['right_arrow'], 0, 0, 0)#right_arrow
+                time.sleep(0.10)
         #if focusdate is lesser or greater that date to focus
         fdate = elem.FocusDate
         vertical_movement = int(fdate) - int(input_val)
@@ -173,8 +162,8 @@ class Shell_Calendar_Keywords():
                     status_flag = True
                     breakloop_flag = False
                 else:
-                    win32api.keybd_event(VK_CODE['up_arrow'], 0,0,0)#up_arrow
-                    time.sleep(0.20)
+                    win32api.keybd_event(sap_constants.VK_CODE['up_arrow'], 0, 0, 0)#up_arrow
+                    time.sleep(0.10)
         elif( vertical_movement < 0 ):
             breakloop_flag = True
             while breakloop_flag :
@@ -182,8 +171,8 @@ class Shell_Calendar_Keywords():
                     status_flag = True
                     breakloop_flag = False
                 else:
-                    win32api.keybd_event(VK_CODE['down_arrow'], 0,0,0)#down_arrow
-                    time.sleep(0.20)
+                    win32api.keybd_event(sap_constants.VK_CODE['down_arrow'], 0, 0, 0)#down_arrow
+                    time.sleep(0.10)
         return status_flag
 
     def select_week(self, sap_id, input_val, *args):
@@ -242,7 +231,7 @@ class Shell_Calendar_Keywords():
         flag = [False,False]
         er=[]
         #---------month
-        if ( type(input_val[0]) == str and input_val[0].lower() in Month.keys() ) : input_val[0] = Month[input_val[0]]
+        if ( type(input_val[0]) == str and input_val[0].lower() in sap_constants.Month.keys() ) : input_val[0] = sap_constants.Month[input_val[0]]
         try:
             if ( int(input_val[0]) <= 12 and int(input_val[0]) >= 1): flag[0] = True
             else : er.append(flag_message[2])
@@ -299,9 +288,10 @@ class Shell_Calendar_Keywords():
                 id, ses = self.uk.getSapElement(sap_id)
                 if ( id and ses):
                     elem = ses.FindById(id)
+                    self.navigate_to(elem, input_val[0])
                     if ( elem.type == 'GuiShell' and elem.SubType == 'Calendar'): #identify if its a shell and calender
                         try : elem.SelectRange(int(input_val[0]),int(input_val[1]))
-                        except Exception as e : log.info('WARNING: Following issue found in SelectWeek ', e)
+                        except Exception as e : log.info('WARNING: Following issue found in Select Range ', e)
                         status = sap_constants.TEST_RESULT_PASS
                         result = sap_constants.TEST_RESULT_TRUE
                     else : err_msg = 'Element is not a shell-calender object'
@@ -318,19 +308,20 @@ class Shell_Calendar_Keywords():
         return status, result, value, err_msg
 
 
-    def select_date(self, sap_id, input_val, *args):
+    def select_todays_date(self, sap_id, *args):
         """
-        input_val : date(YYYYMMDD)
         output : pass/fail
         operation : will select the dates in the given range
+        Steps: select todays date by default(REASON: If any date element is not focused , the date functions do not work and throw error: 'Sufficient data not provided')
         """
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
         err_msg = None
         value = OUTPUT_CONSTANT
-        er, flag = self.date_validator(input_val[0])
         status_flag = False
         try:
+            s,r,v,er = self.create_date(sap_id,[date.today().day, date.today().month, date.today().year])
+            er, flag = self.date_validator(v)
             if ( flag == True and len(er) == 0 ):
                 self.lk.setWindowToForeground(sap_id)
                 id, ses = self.uk.getSapElement(sap_id)
@@ -338,15 +329,16 @@ class Shell_Calendar_Keywords():
                     elem = ses.FindById(id)
                     if ( elem.type == 'GuiShell' and elem.SubType == 'Calendar'): #identify if its a shell and calender
                         try:
-                            status_flag = self.navigate_to(elem,input_val[0])
-                            if( status_flag and elem.FocusDate == str(input_val[0]) ):
-                                win32api.keybd_event(VK_CODE['enter'], 0,0,0)#enter
+                            status_flag = self.navigate_to(elem, v)
+                            if( status_flag and elem.FocusDate == str( v ) ):
+                                win32api.keybd_event(sap_constants.VK_CODE['enter'], 0, 0, 0)#enter
+                                value = v
                                 status = sap_constants.TEST_RESULT_PASS
                                 result = sap_constants.TEST_RESULT_TRUE
-                            elif(status_flag and elem.FocusDate != str(input_val[0]) ):
+                            else:
                                 err_msg = 'Unable to focus the input date'
                         except Exception as e:
-                            log.info('WARNING: Following issue found in SelectMonth ',e)
+                            log.info( 'WARNING: Following issue found in Select Todays Date ',e)
                     else : err_msg = 'Element is not a shell-calender object'
                 else : err_msg = sap_constants.ELELMENT_NOT_FOUND
             else : err_msg = 'Wrong input data provided error : ' + str(er[:])[1:len(str(er))-1]
@@ -357,5 +349,50 @@ class Shell_Calendar_Keywords():
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG + ' : ' + str( e )
             log.error( err_msg )
-            logger.print_on_console( 'Error occured in Select Date' )
+            logger.print_on_console( 'Error occured in Select Todays Date' )
+        return status, result, value, err_msg
+
+
+    def select_date(self, sap_id, input_val, *args):
+        """
+        input_val : date(YYYYMMDD)
+        output : pass/fail
+        operation : will select the dates in the given range
+        Steps: select todays date by default(REASON: If any date element is not focused , the date functions do not work and throw error: 'Sufficient data not provided')
+        """
+        status = sap_constants.TEST_RESULT_FAIL
+        result = sap_constants.TEST_RESULT_FALSE
+        err_msg = None
+        status_flag = False
+        value = OUTPUT_CONSTANT
+        if ( len(input_val[0]) != 0 ):
+            er, flag = self.date_validator(input_val[0])
+            try:
+                if ( flag == True and len(er) == 0 ):
+                    self.lk.setWindowToForeground(sap_id)
+                    id, ses = self.uk.getSapElement(sap_id)
+                    if ( id and ses):
+                        elem = ses.FindById(id)
+                        if ( elem.type == 'GuiShell' and elem.SubType == 'Calendar'): #identify if its a shell and calender
+                            status_flag = self.navigate_to( elem, input_val[0] )
+                            if( status_flag and elem.FocusDate == str( input_val[0]) ):
+                                win32api.keybd_event(sap_constants.VK_CODE['enter'], 0, 0, 0)#enter
+                                log.info('Selected date : ' + str(input_val[0]))
+                                status = sap_constants.TEST_RESULT_PASS
+                                result = sap_constants.TEST_RESULT_TRUE
+                            elif( status_flag and elem.FocusDate != str( input_val[0]) ):
+                                err_msg = 'Unable to focus the input date'
+                        else : err_msg = 'Element is not a shell-calender object'
+                    else : err_msg = sap_constants.ELELMENT_NOT_FOUND
+                else : err_msg = 'Wrong input data provided error : ' + str(er[:])[1:len(str(er))-1]
+                #----------------------------------logging
+                if ( err_msg ):
+                    log.info( err_msg )
+                    logger.print_on_console( err_msg )
+            except Exception as e:
+                err_msg = sap_constants.ERROR_MSG + ' : ' + str( e )
+                log.error( err_msg )
+                logger.print_on_console( 'Error occured in Select Date' )
+        else:
+            status, result, value, err_msg = self.select_todays_date(sap_id)
         return status, result, value, err_msg
