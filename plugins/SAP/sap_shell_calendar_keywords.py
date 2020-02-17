@@ -17,7 +17,6 @@ import logging
 import win32api
 import time
 from datetime import date
-import pythoncom
 
 log = logging.getLogger("sap_shell_calendar_keywords.py")
 
