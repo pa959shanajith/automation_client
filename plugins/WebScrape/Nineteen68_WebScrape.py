@@ -47,7 +47,7 @@ class ScrapeWindow(wx.Frame):
         self.parent = parent
         if status == False:
             self.socketIO.emit('scrape',status)
-            self.driver.close()
+            if self.driver is not None: self.driver.close()
             self.parent.schedule.Enable()
             self.Close()
         else:

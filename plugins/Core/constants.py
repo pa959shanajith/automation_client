@@ -111,7 +111,7 @@ PARALLEL = 'parallel'
 
 SERIAL = 'serial'
 
-ERROR_CODE_DICT ={
+ERROR_CODE_DICT = {
                     'MSG_STATUS' : 'Executed and the status is:',
                     'ERR_INVALID_INPUT':'Input error: please provide the valid input.',
                     'INCORRECT_VARIABLE_FORMAT':'Incorrect variable format to store custom object',
@@ -282,7 +282,12 @@ ERROR_CODE_DICT ={
                     #JumpBy error messages
                     """ERR_JUMPY_STEP_DOESN'T_EXISTS""" : """Invalid input, jumpBy Step doesn't exist""",
                     """ERR_JUMPBY_CAN'T_BE_0""":"""Invalid input, jumpBy Step?cannot be '0'""",
-                    'ERR_CUSTOM_ELE_NOTFOUND':'Error occured in finding Custom element'
+                    'ERR_CUSTOM_ELE_NOTFOUND':'Error occured in finding Custom element',
+                    # Database Keywords
+                    "ERR_DB_CONNECTION": "Error with database connection",
+                    "ERR_DB_OPS": "Error with database operation",
+                    "ERR_DB_QUERY": "Error with database query",
+                    "ERR_FILE_WRITE": "Error writing to file",
                 }
 
 STOP='stop'
