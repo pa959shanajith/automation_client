@@ -316,68 +316,70 @@ class BuildJson:
             'android.view.ViewGroup' : '_viewgroup',
             ##for iOS
         }
-        for i in range(len(XpathList)):
-            text=''
-            # print SYSTEM_OS
-            if label[i] != '':
-                text=label[i]
-            elif content_desc[i]  != '':
-                text=content_desc[i]
-            if text=='' or text==None:
-                text='NONAME'
+        try:
+            for i in range(len(XpathList)):
+                text=''
+                # print SYSTEM_OS
+                if label[i] != '':
+                    text=label[i]
+                elif SYSTEM_OS!='Darwin' and content_desc[i]  != '':
+                    text=content_desc[i]
+                if text=='' or text==None:
+                    text='NONAME'
 
-            if SYSTEM_OS!='Darwin':
-                if class_name[i] in object_type:
-                    text1 = text + object_type[class_name[i]]
+                if SYSTEM_OS!='Darwin':
+                    if class_name[i] in object_type:
+                        text1 = text + object_type[class_name[i]]
+                        if text1 not in custnamelist:
+                            text = text1
+                            custnamelist.append(text)
+                        else:
+                            text=text+str(counter) + object_type[class_name[i]]
+                            custnamelist.append(text)
+                            counter=counter+1
+                    else:
+                        text1 = text + '_elmnt'
+                        if text1 not in custnamelist:
+                            text = text1
+                            custnamelist.append(text)
+                        else:
+                            text=text+str(counter) + '_elmnt'
+                            custnamelist.append(text)
+                            counter=counter+1
+                else:#else part for iOS
+                    #class_name[i] = class_name[i].replace("XCUIElementType","")
+                    text1 = text + '_' + class_name[i].replace("XCUIElementType","").lower()
                     if text1 not in custnamelist:
                         text = text1
                         custnamelist.append(text)
                     else:
-                        text=text+str(counter) + object_type[class_name[i]]
+                        text=text+str(counter) + '_' + class_name[i].replace("XCUIElementType","").lower()
                         custnamelist.append(text)
                         counter=counter+1
-                else:
-                    text1 = text + '_elmnt'
-                    if text1 not in custnamelist:
-                        text = text1
-                        custnamelist.append(text)
-                    else:
-                        text=text+str(counter) + '_elmnt'
-                        custnamelist.append(text)
-                        counter=counter+1
-            else:#else part for iOS
-                #class_name[i] = class_name[i].replace("XCUIElementType","")
-                text1 = text + '_' + class_name[i].replace("XCUIElementType","").lower()
-                if text1 not in custnamelist:
-                    text = text1
-                    custnamelist.append(text)
-                else:
-                    text=text+str(counter) + '_' + class_name[i].replace("XCUIElementType","").lower()
-                    custnamelist.append(text)
-                    counter=counter+1
-            if SYSTEM_OS!='Darwin':
-                xpath = resource_id[i] + ';' + XpathList[i]
-                ele_bounds=re.findall('\d+',rectangle[i])
-    ##            bounds={'x':ele_bounds[0],
-    ##            'y':ele_bounds[1],
-    ##            'height':ele_bounds[3],
-    ##            'width':ele_bounds[2]}
-                width=int(ele_bounds[2])-int(ele_bounds[0])
-                height=int(ele_bounds[3])-int(ele_bounds[1])
-                ScrapeList.append({'xpath': xpath, 'tag': class_name[i],
-                    'text': text,
-                    'id': resource_id[i], 'custname': text,
-                    'reference': str(uuid.uuid4()),'enabled':enabled[i],'left':ele_bounds[0],'top':ele_bounds[1],'width':width,'height':height})
-            elif SYSTEM_OS=='Darwin':
-                xpath =  XpathList[i]
-                ScrapeList.append({'xpath': xpath, 'tag': class_name[i],
-                   'text': text,
-                   'custname': text,
-                   'reference': str(uuid.uuid4()),
-                   # 'visible': visible[i],
-                   'enabled': enabled[i], 'left': x_coordinate[i], 'top': y_coordinate[i],
-                   'width': width[i], 'height': height[i]})
-
+                if SYSTEM_OS!='Darwin':
+                    xpath = resource_id[i] + ';' + XpathList[i]
+                    ele_bounds=re.findall('\d+',rectangle[i])
+        ##            bounds={'x':ele_bounds[0],
+        ##            'y':ele_bounds[1],
+        ##            'height':ele_bounds[3],
+        ##            'width':ele_bounds[2]}
+                    width=int(ele_bounds[2])-int(ele_bounds[0])
+                    height=int(ele_bounds[3])-int(ele_bounds[1])
+                    ScrapeList.append({'xpath': xpath, 'tag': class_name[i],
+                        'text': text,
+                        'id': resource_id[i], 'custname': text,
+                        'reference': str(uuid.uuid4()),'enabled':enabled[i],'left':ele_bounds[0],'top':ele_bounds[1],'width':width,'height':height})
+                elif SYSTEM_OS=='Darwin':
+                    xpath =  XpathList[i]
+                    ScrapeList.append({'xpath': xpath, 'tag': class_name[i],
+                       'text': text,
+                       'custname': text,
+                       'reference': str(uuid.uuid4()),
+                       # 'visible': visible[i],
+                       'enabled': enabled[i], 'left': x_coordinate[i], 'top': y_coordinate[i],
+                       'width': width[i], 'height': height[i]})
+        except Exception as e:
+            log.error(e)
         XpathList = []
         label = []
         content_desc = []
@@ -395,18 +397,21 @@ class BuildJson:
 
 
     def save_json(self,scrape_data,driver):
-        jsonArray=OrderedDict()
-        jsonArray['view']= scrape_data
-##        jsonArray['mirror']='IMAGEEEEE'
-        jsonArray['mirror']=driver.get_screenshot_as_base64()
-        dimension = driver.get_window_size()
-        jsonArray['mirrorwidth'] = dimension['width']
-        jsonArray['mirrorheight'] = dimension['height']
-        file_path_json=os.environ["NINETEEN68_HOME"] + '/output/domelements_Android.json'
-        with open(file_path_json, 'w') as outfile:
-            logger.print_on_console('Writing scrape data to domelements.json file')
-            json.dump(jsonArray, outfile, indent=4, sort_keys=False)
-            outfile.close()
+        try:
+            jsonArray=OrderedDict()
+            jsonArray['view']= scrape_data
+    ##        jsonArray['mirror']='IMAGEEEEE'
+            jsonArray['mirror']=driver.get_screenshot_as_base64()
+            dimension = driver.get_window_size()
+            jsonArray['mirrorwidth'] = dimension['width']
+            jsonArray['mirrorheight'] = dimension['height']
+            file_path_json=os.environ["NINETEEN68_HOME"] + '/output/domelements_Android.json'
+            with open(file_path_json, 'w') as outfile:
+                logger.print_on_console('Writing scrape data to domelements.json file')
+                json.dump(jsonArray, outfile, indent=4, sort_keys=False)
+                outfile.close()
+        except Exception as e:
+            log.error(e)
         return jsonArray
 
 
@@ -423,111 +428,111 @@ class Exact(xml.sax.handler.ContentHandler):
 
 
     def startElement(self, qName, attrs):
-        count = self.elementNameCount.get(qName)
-        if count==None:
-            count=1
-        else:
-            count=count+1
-        self.elementNameCount[qName]=count
-        childXPath = self.xPath + "/" + qName + "[" + str(count) + "]"
-        attsLength = len(attrs)
-        if(attsLength>1):
-            XpathList.append(childXPath)
-        elements_list = attrs.getQNames()
-        label_flag = False
-        for x in attrs.getQNames():
-            if SYSTEM_OS=='Darwin':
-                value = attrs.getValue(x)
-                # if x.lower()=='text':
-                if x.lower() == 'label':
-                    ##            if(value == ''):
-                    ##              label.append(qName)
-                    ##            else:
-                    label_flag = True
-                    label.append(value)
-                    name.append(qName)
-                    # elif x.lower()=='bounds':
-                #     rectangle.append(value)
+        try:
+            count = self.elementNameCount.get(qName)
+            if count==None:
+                count=1
+            else:
+                count=count+1
+            self.elementNameCount[qName]=count
+            childXPath = self.xPath + "/" + qName + "[" + str(count) + "]"
+            attsLength = len(attrs)
+            if(attsLength>1):
+                XpathList.append(childXPath)
+            elements_list = attrs.getQNames()
+            label_flag = False
+            for x in attrs.getQNames():
+                if SYSTEM_OS=='Darwin':
+                    value = attrs.getValue(x)
+                    # if x.lower()=='text':
+                    if x.lower() == 'label':
+                        ##            if(value == ''):
+                        ##              label.append(qName)
+                        ##            else:
+                        label_flag = True
+                        label.append(value)
+                        name.append(qName)
+                        # elif x.lower()=='bounds':
+                    #     rectangle.append(value)
 
-                elif x.lower() == 'enabled':
-                    enabled.append(value)
-
-                # elif x.lower() == 'visible':
-                #     visible.append(value)
-
-                elif x.lower() == 'x':
-                    x_coordinate.append(value)
-
-                elif x.lower() == 'y':
-                    y_coordinate.append(value)
-
-                elif x.lower() == 'width':
-                    width.append(value)
-
-                elif x.lower() == 'height':
-                    height.append(value)
-
-                    # elif x.lower()=='resource-id':
-                #     resource_id.append(value)
-
-                # elif x.lower()=='focusable':
-                #     focusable.append(value)
-
-                elif x.lower() == 'type':
-                    class_name.append(value)
-
-                    # elif x.lower()=='content-desc':
-                    #     content_desc.append(value)
-
-                    # elif x.lower()=='checked':
-                    #     checked.append(value)
-            if SYSTEM_OS!='Darwin':
-                value=attrs.getValue(x)
-
-                if x.lower()=='text':
-        ##            if(value == ''):
-        ##              label.append(qName)
-        ##            else:
-                    label.append(value)
-
-                    name.append(qName)
-
-                elif x.lower()=='bounds':
-                        rectangle.append(value)
-
-                elif x.lower()=='enabled':
+                    elif x.lower() == 'enabled':
                         enabled.append(value)
 
-                elif x.lower()=='resource-id':
-                        resource_id.append(value)
+                    # elif x.lower() == 'visible':
+                    #     visible.append(value)
 
-                elif x.lower()=='focusable':
-                        focusable.append(value)
+                    elif x.lower() == 'x':
+                        x_coordinate.append(value)
 
-                elif x.lower()=='class':
+                    elif x.lower() == 'y':
+                        y_coordinate.append(value)
+
+                    elif x.lower() == 'width':
+                        width.append(value)
+
+                    elif x.lower() == 'height':
+                        height.append(value)
+
+                        # elif x.lower()=='resource-id':
+                    #     resource_id.append(value)
+
+                    # elif x.lower()=='focusable':
+                    #     focusable.append(value)
+
+                    elif x.lower() == 'type':
                         class_name.append(value)
 
-                elif x.lower()=='content-desc':
-                        content_desc.append(value)
+                        # elif x.lower()=='content-desc':
+                        #     content_desc.append(value)
 
-                elif x.lower()=='checked':
-                        checked.append(value)
-        if SYSTEM_OS == 'Darwin':
-            if label_flag == False and len(elements_list) > 0:
-                label.append('Noname')
-        curobj=self
-        child = Exact(childXPath,self.parser,curobj)
-        self.parser.setContentHandler(child)
+                        # elif x.lower()=='checked':
+                        #     checked.append(value)
+                if SYSTEM_OS!='Darwin':
+                    value=attrs.getValue(x)
 
+                    if x.lower()=='text':
+            ##            if(value == ''):
+            ##              label.append(qName)
+            ##            else:
+                        label.append(value)
+
+                        name.append(qName)
+
+                    elif x.lower()=='bounds':
+                            rectangle.append(value)
+
+                    elif x.lower()=='enabled':
+                            enabled.append(value)
+
+                    elif x.lower()=='resource-id':
+                            resource_id.append(value)
+
+                    elif x.lower()=='focusable':
+                            focusable.append(value)
+
+                    elif x.lower()=='class':
+                            class_name.append(value)
+
+                    elif x.lower()=='content-desc':
+                            content_desc.append(value)
+
+                    elif x.lower()=='checked':
+                            checked.append(value)
+            if SYSTEM_OS == 'Darwin':
+                if label_flag == False and len(elements_list) > 0:
+                    label.append('Noname')
+            curobj=self
+            child = Exact(childXPath,self.parser,curobj)
+            self.parser.setContentHandler(child)
+        except Exception as e:
+            log.error(e)
 
     def endElement(self, name):
         value = self.buffer.strip()
         if(value != ''):
             log.info(self.xPath + "='" + self.buffer.toString() + "'")
-
         self.parser.setContentHandler(self.parent)
 
 
     def characters(self, data):
         self.buffer += data
-
