@@ -32,6 +32,7 @@ log = logging.getLogger('clientwindow.py')
 wxObject = None
 browsername = None
 qcdata = None
+qcObject = None
 soc=None
 pdfgentool = None
 qcConFlag=False
@@ -493,51 +494,37 @@ class MainNamespace(BaseNamespace):
             log.error(e,exc_info=True)
 
     def on_qclogin(self, *args):
-        global qcdata
-        global soc
-        global socketIO
-        server_data=b''
-        data_stream=None
-        client_data=None
-        EOF_QC = b'#E&D@Q!C#'
         try:
-            if SYSTEM_OS == "Windows":
-                if len(args) > 0:
-                    qcdata = args[0]
-                    if soc is None:
-                        import subprocess
-                        path = NINETEEN68_HOME + "/plugins/Qc/QcController.exe"
-                        pid = subprocess.Popen(path, shell=True)
-                        soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                        try:
-                            soc.connect(("localhost",10000))
-                        except socket.error as e:
-                            log.error(e)
-                            if '[Errno 10061]' in str(e):
-                                time.sleep(15)
-                                soc.connect(("localhost",10000))
+            global qcObject
+            if(qcObject == None):
+                core_utils.get_all_the_imports('Qc')
+                import QcController
+                qcObject = QcController.QcWindow()
 
-                    data_to_send = json.dumps(qcdata).encode('utf-8')
-                    data_to_send+=EOF_QC
-                    soc.send(data_to_send)
-                    while True:
-                        data_stream= soc.recv(1024)
-                        server_data+=data_stream
-                        if EOF_QC in server_data:
-                            break
-                    client_data= server_data[:server_data.find(EOF_QC)].decode('utf-8')
-                    if('Fail@f@!l' in client_data):
-                        client_data=client_data[:client_data.find('@f@!l')]
-                        logger.print_on_console('Error occurred in QC')
-                        socketIO.emit('qcresponse','Error:Qc Operations')
-                    else:
-                        socketIO.emit('qcresponse',client_data)
-                else:
-                    socketIO.emit('qcresponse','Error:data recevied empty')
-            else:
-                 socketIO.emit('qcresponse','Error:Failed in running Qc')
+            global socketIO
+            qcdata = args[0]
+
+            if qcdata['qcaction'] == 'domain':
+                check = qcObject.Login1(qcdata)
+                socketIO.emit('qcresponse',check)
+            elif qcdata['qcaction'] == 'project':
+                check = qcObject.getProjects(qcdata)
+                socketIO.emit('qcresponse',check)
+            elif qcdata['qcaction'] == 'folder':
+                check = qcObject.ListTestSetFolder(qcdata)
+                socketIO.emit('qcresponse',check)
+            elif qcdata['qcaction'] == 'testcase':
+                check = qcObject.test_case_generator(qcdata,socketIO)
+                socketIO.emit('qcresponse',check)
+            elif qcdata['qcaction'] == 'qcupdate':
+                check = qcObject.update_qc_details(qcdata,socketIO)
+                socketIO.emit('qcresponse',check)
+            elif qcdata['qcaction'] == 'qcquit':   
+                check = qcObject.quit_qc(qcdata,socketIO)
+                socketIO.emit('qcresponse',check)
+
         except Exception as e:
-            err_msg='Error in ALM Operations '
+            err_msg='Error in QC operations'
             log.error(err_msg)
             logger.print_on_console(err_msg)
             log.error(e,exc_info=True)

@@ -9,88 +9,76 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 
-import win32com.client
 import json
-import socket
 import os
-TD=None
-loginflag=False
-urlflag=False
-dictFolderJson=None
-con = None
-sent=0
+from requests.auth import HTTPBasicAuth
+import requests
+import logger
+import logging
+log = logging.getLogger("Qccontroller.py")
+
 
 class QcWindow():
+    dictFolderJson=None
+    cookies = None
+    headers = None
+    _headers = None
+    Qc_Url = None
 
-    def __init__(self,filePath):
+    def __init__(self):
+        pass
+
+    def Login1(self,filePath):
         status=None
         try:
-            global sent,loginflag,TD,urlflag
-            flag=0
             if(filePath["qcaction"]=='domain'):
                 try:
                     user_name=filePath["qcUsername"]
                     pass_word=filePath["qcPassword"]
-                    Qc_Url=filePath["qcURL"]
-                    domain_dict={}
-                    key="view"
-                    domain_dict.setdefault(key, [])
+                    self.Qc_Url=filePath["qcURL"]
                     loginflag=False
-                    TD = win32com.client.Dispatch("TDApiOle80.TDConnection")
-                    urlflag=False
-                    TD.InitConnectionEx(str(Qc_Url))
-                    urlflag=True
-                    un=str(user_name)
-                    pw=str(pass_word)
-                    TD.Login(un,pw)
-                    loginflag=True
-                    status = self.getDomain(filePath)
+                    self.headers = {'cache-control': "no-cache"}
+                    login_url = self.Qc_Url + '/authentication-point/authenticate'
+                    resp = requests.post(login_url, auth=HTTPBasicAuth(user_name, pass_word),  headers=self.headers)
+                    if resp.status_code == 200:
+                        cookieName = resp.headers.get('Set-Cookie')
+                        LWSSO_COOKIE_KEY = cookieName[cookieName.index("=") + 1: cookieName.index(";")]
+                        self.cookies = {'LWSSO_COOKIE_KEY': LWSSO_COOKIE_KEY}
+                    qcSessionEndPoint = self.Qc_Url + "/rest/site-session"    
+                    response = requests.post(qcSessionEndPoint, headers=self.headers, cookies=self.cookies)
+                    if response.status_code == 200 | response.status_code == 201:
+                        cookieName = response.headers.get('Set-Cookie').split(",")[1]
+                        QCSession = cookieName[cookieName.index("=") + 1: cookieName.index(";")]
+                        self.cookies['QCSession'] = QCSession
+                
+                    #fetching domains
+                    dictFolderJson=None
+                    domain_dict={}
+                    key="domain"
+                    domain_dict.setdefault(key, [])
+                    domain_dict['login_status']=True
+                    self._headers = {
+                        'accept': 'application/json'
+                    }
+                    
+                    DomainURL = self.Qc_Url + '/rest/domains/'
+                    _resp = requests.get(DomainURL, headers=self._headers, cookies=self.cookies)   
+                    JsonObject = _resp.json()
+                    DomainList = [item['Name'] for item in JsonObject['Domains']['Domain']]
+                    if(len(DomainList)>0):
+                        for dom in DomainList:
+                            domain_dict[key].append(str(dom))
+                    dictFolder = json.dumps(domain_dict)
+                    dictFolderJson=json.loads(dictFolder)
+                    return dictFolderJson
                 except Exception as eqc:
                     self.quit_qc()
                     flag=1
-            elif(filePath["qcaction"]=='project'):
-                status = self.getProjects(filePath)
-            elif(filePath["qcaction"]=='folder'):
-                status = self.ListTestSetFolder(filePath)
-            elif(filePath["qcaction"]=='testcase'):
-                status = self.test_case_generator(filePath)
-            elif(filePath["qcaction"]=='qcupdate'):
-                status = self.update_qc_details(filePath)
-            elif(filePath["qcaction"]=='qcquit'):
-                status = self.quit_qc()
-                flag=1
-            if not flag:
-                if status!=None:
-                    self.emit_data()
-                else:
-                    con.send("Fail@f@!l#E&D@Q!C#")
             else:
                 pass
         except Exception as e:
             print('Error in Qc action')
-            con.send('Fail@f@!l#E&D@Q!C#')
-            sent=1
-
-    def getDomain(self,filePath):
-        try:
-            global dictFolderJson
-            domain_dict={}
-            key="domain"
-            domain_dict.setdefault(key, [])
-            if(TD.connected==True):
-                domain_dict['login_status']=True
-                listDomains=TD.VisibleDomains
-                if(len(listDomains)>0):
-                    for dom in listDomains:
-                        domain_dict[key].append(str(dom))
-            dictFolder = json.dumps(domain_dict)
-            dictFolderJson=json.loads(dictFolder)
-        except Exception as e:
-            print('Error in getting domains')
-            dictFolderJson=None
-
-        return dictFolderJson
-
+        
 
     def getProjects(self,filePath):
         try:
@@ -99,19 +87,25 @@ class QcWindow():
             projects_dict={}
             key="project"
             projects_dict.setdefault(key, [])
-            if(TD.connected==True):
-                list_projects=TD.VisibleProjects(domain_name)
-                if(len(list_projects)>0):
-                    for pro in list_projects:
-                        projects_dict[key].append(str(pro))
-                    dictFolder = json.dumps(projects_dict)
-                    dictFolderJson=json.loads(dictFolder)
-                else:
-                    print('Invalid domain selected')
+            ProjectURL = self.Qc_Url + '/rest/domains/' + domain_name + '/projects'
+            resp = requests.get(ProjectURL, headers=self._headers, cookies=self.cookies)
+            JsonObject = resp.json()
+            if type(JsonObject['Projects']['Project']) is list:
+                list_projects = [item['Name'] for item in JsonObject['Projects']['Project']]
+            if type(JsonObject['Projects']['Project']) is dict:
+                list_projects = [JsonObject['Projects']['Project']['Name']]
+
+            if(len(list_projects)>0):
+                for pro in list_projects:
+                    projects_dict[key].append(str(pro))
+                dictFolder = json.dumps(projects_dict)
+                dictFolderJson=json.loads(dictFolder)
+                return dictFolderJson
+            else:
+                print('Invalid domain selected')
         except Exception as eproject:
             print('Error in fetching projects')
             dictFolderJson=None
-        return dictFolderJson
 
     def ListTestSetFolder(self,filePath):
         ##The final list which contains the testsets and testset under the specified path
@@ -119,7 +113,14 @@ class QcWindow():
             global dictFolderJson
             testsetpath=filePath["foldername"]
             domain_name=filePath["domain"]
-            project_name=filePath["project"]
+            project_name=filePath["project"]       
+            test_plan_path=filePath["foldername"]
+
+            json_str =json.loads(self.find_folder_id(test_plan_path.split("\\"), "test-set-folders", 0, "id", domain_name, project_name ))
+            if 'entities' in json_str:
+                return create_key_value(json_str['entities'][0]['Fields'])
+            else:
+                return create_key_value(json_str['Fields'])
 
             folder_dict={}
             TestSet_dict={}
@@ -134,6 +135,20 @@ class QcWindow():
                 TD.connect(domain_name, project_name)
                 testset_folder = TD.TestSetTreeManager.NodeByPath(testsetpath)
                 treeList=testset_folder.newlist()
+                
+                """
+                This procedure will return list of test-instances in a given test set
+                :param hp: HP object
+                :param tid: integer test set identifier
+                :returns: list test instances list
+                """
+                '''
+                params = '{cycle-id[' + tid + ']}'
+                url = self.base_url + '/qcbin/rest/domains/' + domain_name + '/projects/' + project_name + '/test-instances'
+                response = requests.get(url, params=params, headers=self.getheaders())
+                test_inst = text_to_xml(response.content, "Entity/Fields/Field\[@Name='test-instance'\]/Value/text()")
+                '''
+
                 if (len(treeList)>0):
                     for folder in treeList:
                         temp_dict={}
@@ -191,6 +206,64 @@ class QcWindow():
             return dictFolderJson
 
 
+
+    
+    def find_folder_id(self, arrFolder, strAPI, parentID, fields, almDomain, almProject):
+        try:
+            response = ""
+
+            midPoint = "/rest/domains/" + almDomain + "/projects/" + almProject 
+
+
+            URL = self.Qc_Url + midPoint + "/" + strAPI
+            
+            for folderName in arrFolder:
+                #payload = {"query": "{name['" + "Subject" + "'];parent-id[" + str(parentID) + "]}", "fields": fields}
+                payload = {"query": "{name['" + folderName + "']}"}
+                response = requests.get(URL, params=payload, headers=self.headers, cookies=self.cookies)
+                
+                
+                obj = json.loads(response.text)
+                if obj["TotalResults"] >= 1:
+                    parentID = get_field_value(obj['entities'][0]['Fields'], "id")
+                    # print("folder id of " + folderName + " is " + str(parentID))
+                else:
+                    # print("Folder " + folderName + " does not exists")
+                    data = "<Entity Type=" + chr(34) + strAPI[0:len(strAPI) - 1] + chr(34) + "><Fields><Field Name=" + chr(
+                        34) + "name" + chr(
+                        34) + "><Value>" + folderName + "</Value></Field><Field Name=" + chr(34) + "parent-id" + chr(
+                        34) + "><Value>" + str(parentID) + "</Value></Field></Fields> </Entity>"
+                    response = requests.post(almURL + midPoint + "/" + strAPI, data=data, headers=self.headers, cookies=self.cookies)
+                    obj = json.loads(response.text)
+                    if response.status_code == 200 | response.status_code == 201:
+                        parentID = get_field_value(obj['Fields'], "id")
+                        # print("folder id of " + folderName + " is " + str(parentID))
+            return response.text
+            #return parentID  it should be returning this
+
+
+        except Exception as e:
+            print('Error while fetching testsets')
+            dictFolderJson=None    
+
+    def get_field_value(self, obj, field_name):
+        try:
+            for field in obj:
+                if field['Name'] == field_name:
+                    return field['values'][0]['value']
+        except Exception as e:
+            print('Error ')
+
+    def create_key_value(self, obj_json):
+        try:
+            final_dic = {}
+            for elem in obj_json:
+                if len(elem['values']) >= 1:
+                    if 'value' in elem['values'][0]:
+                        final_dic[elem["Name"]] = elem["values"][0]['value']
+            return final_dic        
+        except Exception as e:
+            print('Error')
 
     def test_case_generator(self,filePath):
         try:
@@ -306,30 +379,3 @@ class QcWindow():
         except Exception as e:
             print('Error while emitting data')
 
-if __name__ == '__main__':
-    host = 'localhost'
-    port = 10000
-    try:
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.bind((host, port))
-        s.listen(30)
-        con, addr = s.accept()
-        client_data =''
-        while(True):
-            try:
-                data_stream = con.recv(1024)
-                client_data+=data_stream
-                if('#E&D@Q!C#' in data_stream):
-                    parsed_data = client_data[:client_data.find('#E&D@Q!C#')]
-                    data_to_use = json.loads(parsed_data.decode('utf-8'))
-                    qc_ref = QcWindow(data_to_use)
-                    client_data=''
-                    if(sent!=1):
-                        con.send("Fail@f@!l#E&D@Q!C#")
-                    else:
-                        sent=0
-            except Exception as e:
-                con.send("Fail@f@!l#E&D@Q!C#")
-                break
-    except Exception as e:
-        print("Exception occured in QC")
