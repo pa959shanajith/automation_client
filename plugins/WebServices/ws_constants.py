@@ -61,6 +61,8 @@ TEST_RESULT_TRUE = "True";
 
 TEST_RESULT_FALSE = "False";
 
+COOKIES = "Requested Cookie is";
+
 
 
 
