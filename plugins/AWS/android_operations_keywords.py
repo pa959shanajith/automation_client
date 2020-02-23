@@ -100,11 +100,11 @@ class MobileOpeartions():
         try:
             if element is not None:
                 visibility=element.is_displayed()
-                log.info(ELEMENT_VISIBLE)
                 if visibility:
+                    log.info(ELEMENT_VISIBLE)
                     enable=element.is_enabled()
-                    log.info(WEB_ELEMENT_ENABLED)
                     if enable:
+                        log.info(WEB_ELEMENT_ENABLED)
                         if len(element.text)>0:
                             log.info('clearing  the existing text')
                             element.clear()
@@ -128,12 +128,12 @@ class MobileOpeartions():
         try:
             if element is not None:
                 visibility=element.is_displayed()
-                log.info('element is visible')
                 if visibility:
+                    log.info('element is visible')
                     enable=element.is_enabled()
-                    log.info('element is Enabled')
                     if enable:
-                        log.info('performing the action')
+                        log.info('element is Enabled')
+                        log.debug('performing the action')
                         action = TouchAction(driver)
                         action.tap(element).perform()
                         status=TEST_RESULT_PASS
@@ -158,11 +158,11 @@ class MobileOpeartions():
         try:
             if element is not None:
                 visibility=element.is_displayed()
-                log.debug('element is visible')
                 if visibility:
+                    log.info(ELEMENT_VISIBLE)
                     enable=element.is_enabled()
-                    log.debug(WEB_ELEMENT_ENABLED)
                     if enable:
+                        log.info(WEB_ELEMENT_ENABLED)
                         log.debug('performing the action')
                         action = TouchAction(driver)
                         action.long_press(element).perform()
@@ -185,14 +185,12 @@ class MobileOpeartions():
         err_msg=None
 
         try:
-            if type(webelement) is list:
-                   webelement=webelement[0]
             if webelement is not None:
-                        log.debug(WEB_ELEMENT_ENABLED)
-                        output=webelement.text
-                        log.info("Button name: "+output)
-                        status=TEST_RESULT_PASS
-                        result=TEST_RESULT_TRUE
+                log.debug(WEB_ELEMENT_ENABLED)
+                output=webelement.text
+                log.info('The output is '+str(output))
+                status=TEST_RESULT_PASS
+                result=TEST_RESULT_TRUE
         except Exception as e:
                 log.error(e)
         return status,result,output,err_msg
@@ -204,13 +202,19 @@ class MobileOpeartions():
         err_msg=None
 
         try:
-            if len(input)>0 :
+            
+            if input is not None:
+                log.info('Expected Text : '+str(input))
                 if webelement is not None:
+                    log.info('Actual Text : '+str(webelement.text))
                     if webelement.text==input:
-                        log.debug('text matched')
-                        log.info("Button name: "+input)
+                        log.info('Text matched')
                         status=TEST_RESULT_PASS
                         result=TEST_RESULT_TRUE
+                else:
+                    err_msg=ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                    log.error(err_msg)
+
         except Exception as e:
             log.error(e)
         return status,result,output,err_msg
@@ -222,18 +226,11 @@ class MobileOpeartions():
         err_msg=None
 
         try:
-            if type(webelement) is list:
-                webelement=webelement[0]
             if webelement is not None:
-                if webelement.is_enabled():
-                    log.debug(WEB_ELEMENT_ENABLED)
-                    output=webelement.text
-                    log.info("Element text: "+output)
-                    status=TEST_RESULT_PASS
-                    result=TEST_RESULT_TRUE
-                else:
-                    err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
-                    log.error(err_msg)
+                output=webelement.text
+                log.info("Output is ",str(output))
+                status=TEST_RESULT_PASS
+                result=TEST_RESULT_TRUE
         except Exception as e:
             log.error(e)
         return status,result,output,err_msg
@@ -245,18 +242,17 @@ class MobileOpeartions():
         err_msg=None
 
         try:
-            if len(input)>0 :
+            if input is not None and input != "":
                 if webelement is not None:
-                    if webelement.is_enabled():
-                        log.debug(WEB_ELEMENT_ENABLED)
-                        if webelement.text==input:
-                            log.debug('text matched')
-                            log.info("Element text: "+input)
+                    log.info('Expected Text : '+str(input))
+                    log.info('Actual Text : '+str(webelement.text))
+                    if webelement.text==input:
+                        log.info('Text matched')
                             status=TEST_RESULT_PASS
                             result=TEST_RESULT_TRUE
-                    else:
-                        err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
-                        log.error(err_msg)
+            else:
+                err_msg=ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                log.error(err_msg)           
         except Exception as e:
             log.error(e)
         return status,result,output,err_msg
@@ -506,7 +502,7 @@ class MobileOpeartions():
             log.info('Web element found')
         return mobileElement
 
-    def waitforelement_exists(self, driver,mob_ele,object_name,*args):
+    def waitforelement_exists(self, driver,element,object_name,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -524,16 +520,17 @@ class MobileOpeartions():
             if timeout!=None:
                 start_time = time.time()
                 while True:
-                    element=self.getMobileElement(driver,object_name,'waitforelement_exists')
-                    later=time.time()
-                    if int(later-start_time)>=int(timeout):
-                        log.info('Delay timeout')
-                        break
                     if element!=None:
                         log.info(ELEMENT_EXISTS)
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
                         break
+                    element=self.getMobileElement(driver,object_name,'waitforelement_exists')
+                    later=time.time()
+                    if int(later-start_time)>=int(timeout):
+                        log.info('Delay timeout')
+                        break
+                    
             else:
                 err_msg=ERROR_CODE_DICT['ERR_INVALID_INPUT']
                 log.error(err_msg)
@@ -700,7 +697,7 @@ class MobileOpeartions():
                         else :
                             output=webelement.get_attribute("checked")
                         if output!=None:
-                            log.info(output)
+                            log.info('The status is '+output)
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
                     else:

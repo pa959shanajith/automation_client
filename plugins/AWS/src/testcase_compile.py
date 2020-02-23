@@ -52,7 +52,7 @@ class TestcaseCompile():
         launch_status=False
         log.info("Compiling Scenario "+str(scenario_counter)+':'+scenario_name)
         logger.print_on_console("Compiling Scenario "+str(scenario_counter)+':'+scenario_name)
-        filename='Scenario'+str(scenario_counter)+'_'+scenario_name+'_'+self.cur_date
+        filename='scenario'+str(scenario_counter)+'_'+scenario_name+'_'+self.cur_date
         pytest_file=filename+'.py'
         f=open(pytest_file,"w")
         code="""import pytest
@@ -112,22 +112,24 @@ def scenario(driver):
             else:
                 logger.print_on_console (t.name,' is not supported')
                 log.error(t.name+' is not supported')
+                compile_status=False
                 continue
             f.write("\n\tlog.info('Step %s : %s is executed and result is %s' % ('"+str(t.stepnum)+"','"+t.name+"',result[0]))")
             f.write("\n\tlog.info('----------------------------------------------------------------------------------')")
 
 
         f.close()
-        dest_folder=AWS_assets+os.sep+bundle_name+os.sep+'tests'+os.sep+pytest_file
-        shutil.move(pytest_file, dest_folder)
-       
-        log.info("Completed Compiling Scenario "+str(scenario_counter)+':'+scenario_name)
-        logger.print_on_console("Completed Compiling Scenario "+str(scenario_counter)+':'+scenario_name)
+        if compile_status:
+            dest_folder=AWS_assets+os.sep+bundle_name+os.sep+'tests'+os.sep+pytest_file
+            shutil.move(pytest_file, dest_folder)
+        
+            log.info("Compilation Completed "+str(scenario_counter)+':'+scenario_name)
+            logger.print_on_console("Compilation Completed "+str(scenario_counter)+':'+scenario_name)
         return compile_status,pytest_file
 
 
     def create_test_file(self,pytest_files):
-        pytest_file='test_scenario.py'
+        pytest_file='test_scenario_'+self.cur_date+'.py'
         f=open(pytest_file,"w")
         code="""import pytest
 import time
@@ -150,6 +152,7 @@ log=logging.getLogger('test_scenario.py')\n"""
         f.close()
         dest_folder=AWS_assets+os.sep+bundle_name+os.sep+'tests'+os.sep+pytest_file
         shutil.move(pytest_file, dest_folder)
+        pytest_files.append(pytest_file)
         
 
 
@@ -165,12 +168,13 @@ log=logging.getLogger('test_scenario.py')\n"""
                      dependencies are already present
 
         """
+        logger.print_on_console('Creating Test Bundle...')
+        log.info('Creating Test Bundle...')
         self.create_test_file(pytest_files)
-        pytest_files.append("test_scenario.py")
         filelist=os.listdir(AWS_Path)
         for f in filelist:
-            if f not in ['testcase_compile.py','aws_operations.py','AWS_assets','__pycache__']:
-                destination=AWS_assets+os.sep+bundle_name+os.sep+'tests'+os.sep+f
+            if f not in ['src','AWS_assets','__pycache__']:
+                destination=AWS_tests_path+os.sep+f
                 shutil.copy(AWS_Path+os.sep+f,destination)
         cur_dir=os.getcwd()
         os.chdir(AWS_assets+os.sep+bundle_name+os.sep)
@@ -182,13 +186,14 @@ log=logging.getLogger('test_scenario.py')\n"""
             for filename in files:
                 # join the two strings in order to form the full filepath.
                 filepath = os.path.join(root, filename)
-                if (filename.startswith('Scenario') and filename not in pytest_files) or ((filename.endswith('.zip') and filename != test_bundle)):
+                if (filename.find('scenario')>-1 and filename not in pytest_files) or (filename.endswith('.zip') and filename != test_bundle):
                     os.remove(filepath)
                     continue
                 if test_bundle not in filename:
                     zip_file.write(filepath)
 
         zip_file.close()
+
         bundle_path=AWS_assets+os.sep+bundle_name+os.sep+test_bundle
         self.save_config(['packagename','filepath'],[test_bundle,bundle_path])
         os.chdir(cur_dir)

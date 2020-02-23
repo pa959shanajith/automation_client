@@ -23,12 +23,14 @@ log = logging.getLogger('aws_operations.py')
 RUN_TIMEOUT_SECONDS = 60 * 10
 WEB_URL_TEMPLATE = 'https://us-west-2.console.aws.amazon.com/devicefarm/home#/projects/%s/runs/%s'
 
+bundle_name='Test_Bundle'
 AWS_Path=os.environ['NINETEEN68_HOME']+os.sep+'plugins'+os.sep+'AWS'
 AWS_assets=os.environ['NINETEEN68_HOME']+os.sep+'plugins'+os.sep+'AWS'+os.sep+'AWS_assets'
 AWS_config_path=AWS_assets+os.sep+'AWS_config.json'
 AWS_cred_path=AWS_assets+os.sep+'config'
 AWS_output_path=AWS_assets+os.sep+'output'
-bundle_name='Test_Bundle'
+AWS_tests_path=AWS_assets+os.sep+bundle_name+os.sep+'tests'
+
 
 os.environ["AWS_SHARED_CREDENTIALS_FILE"]=AWS_cred_path+os.sep+'credentials'
 os.environ["AWS_CONFIG_FILE"]=AWS_cred_path+os.sep+'config'
@@ -42,6 +44,7 @@ class AWS_Operations:
         self.session=boto3.Session(profile_name=profile_name)
         self.dc=self.session.client('devicefarm')
         self.cur_date=cur_date
+        self.terminateFlag=False
 
 
 
@@ -71,6 +74,7 @@ class AWS_Operations:
 
 
     def create_project(self,project_name):
+        result = None
         try:
             p_arn=self.dc.create_project(name=project_name,defaultJobTimeoutMinutes=150)
             result = p_arn['project']['arn']
@@ -81,7 +85,9 @@ class AWS_Operations:
 
     def create_upload(self,project_arn, upload_type, name, file_path):
         # name needs to be a file name like app-releaseProduction.apk, not "Android App"
-    ##    logger.info('Uploading %s %r' % (upload_type, file_path))
+        log.info('Uploading %s %r' % (upload_type, file_path))
+        logger.print_on_console("Uploading ",name)
+        result = None
         try:
             result = self.dc.create_upload(
                 projectArn=project_arn,
@@ -98,6 +104,7 @@ class AWS_Operations:
         return result
 
     def wait_for_upload(self,arn):
+        result = None
         try:
             result = self._poll_until(
                 self.dc.get_upload,
@@ -121,16 +128,21 @@ class AWS_Operations:
             logger.print_on_console('Error while uploading presigned URL')
             log.error(e)
 
-    def _poll_until(self,method, arn, get_status_callable, success_statuses, check_every_seconds=10,timeout_seconds=180):
+    def _poll_until(self,method, arn, get_status_callable, success_statuses, check_every_seconds=5,timeout_seconds=180):
         # check_every_seconds = 10
         #if timeout_seconds == RUN_TIMEOUT_SECONDS else 1
+        result=False
         try:
             start = time.time()
             while True:
+                if self.terminateFlag:
+                    break
                 result = method(arn=arn)
                 current_status = get_status_callable(result)
                 if current_status in success_statuses:
                     return result
+                elif current_status == 'FAILED':
+                    raise StopIteration('Upload Failed for %r' % arn)
                 log.info('Waiting for %r status %r to be in %r' % (arn, current_status, success_statuses))
                 now = time.time()
                 if now - start > timeout_seconds:
@@ -139,10 +151,12 @@ class AWS_Operations:
         except Exception as e:
             logger.print_on_console('Error / Time out while polling')
             log.error(e)
+        return result
 
     def get_run_web_url(self,project_arn, test_run_arn):
     # project_arn = arn:aws:devicefarm:us-west-2:foo:project:NEW-ARN-HERE
     # test_run_arn = arn:aws:devicefarm:us-west-2:foo:run:project-arn/NEW-ARN-HERE
+        result = None
         try:
             project_arn_id = project_arn.split(':')[6]
             test_run_arid = test_run_arn.split('/')[1]
@@ -191,15 +205,18 @@ class AWS_Operations:
 
 
     def get_app_arn(self,project_arn,upload_type,upload_file_name,*args):
+        app_arn=None
         try:
-            app_arn=None
-            a_list=self.dc.list_uploads(arn=project_arn,type=upload_type)['uploads']
-            for a in a_list:
-                if a['name']==upload_file_name and a['status']=='SUCCEEDED':
-                    app_arn=a['arn']
-                    break
-            if app_arn==None:
-                app_arn=self.create_upload(project_arn, upload_type, upload_file_name, args[0])
+            if not(self.terminateFlag):
+                a_list=self.dc.list_uploads(arn=project_arn,type=upload_type)['uploads']
+                for a in a_list:
+                    if a['name']==upload_file_name and a['status']=='SUCCEEDED':
+                        app_arn=a['arn']
+                        log.info("Fetching "+str(upload_file_name))
+                        logger.print_on_console("Fetching ",upload_file_name)
+                        break
+                if app_arn==None:
+                    app_arn=self.create_upload(project_arn, upload_type, upload_file_name, args[0])
         except Exception as e:
             logger.print_on_console('Error while fetching app arn')
             log.error(e)
@@ -219,6 +236,7 @@ class AWS_Operations:
 
 
     def schedule_run(self,project_arn, name, device_pool_arn, app_arn, test_package_arn,spec_arn):
+        res = None
         try:
             logger.print_on_console('Scheduling test run %r' % name)
             result = self.dc.schedule_run(
@@ -236,14 +254,16 @@ class AWS_Operations:
             run = result['run']
             logger.print_on_console('Run Scheduled')
             log.info(run)
+            res = run['arn']
         except Exception as e:
             logger.print_on_console('Error while Scheduling run')
             log.error(e)
-        return run['arn']
+        return res
 
 
 
     def wait_for_run(self,test_run_arn,timeout):
+        result = False
         try:
             result = self._poll_until(
                 self.dc.get_run,
@@ -254,18 +274,22 @@ class AWS_Operations:
                 timeout_seconds=timeout,
                 
             )
-            final_run = result['run']
-            logger.print_on_console('Final run counts: %(counters)s' % final_run)
-            log.info('Final run counts: %(counters)s' % final_run)
-            res = (final_run['result'] == 'PASSED')
+            if result:
+                final_run = result['run']
+                logger.print_on_console('Final run counts: %(counters)s' % final_run)
+                log.info('Final run counts: %(counters)s' % final_run)
+                result = (final_run['result'] == 'PASSED')
+                logger.print_on_console('Run completed')
+                log.info('Run completed')
         except Exception as e:
             logger.print_on_console('Error while waiting for run')
             log.error(e)
-        return res
+        return result
 
 
 
     def run_test(self,project_arn,app_arn,tp_arn,spec_arn,device_pool_arn):
+        run_status = False
         # time=str(datetime.now())
         try:
             name='Test_Run_'+self.cur_date
@@ -279,53 +303,51 @@ class AWS_Operations:
                     spec_arn=spec_arn
                 )
             download_type='FILE'
+            run_status=self.wait_for_run(self.test_run_arn,9000)
             
-
-
-            # print (self.get_run_web_url(project_arn,test_run_arn))
-            run_status=self.wait_for_run(self.test_run_arn,340)
-            logger.print_on_console('Run completed')
-            log.info('Run completed')
-            self.download_results(self.test_run_arn,download_type,AWS_output_path)
+            if not(self.terminateFlag):
+                self.download_results(self.test_run_arn,download_type,AWS_output_path)
         except Exception as e:
             logger.print_on_console('Error while performing run')
             log.error(e)
         return run_status
 
     def configure_run(self,project_name,app_name,package_name,pool_name):
+        project_arn=app_arn=tp_arn=spec_arn=device_pool_arn=None
         try:
-            #get the project Arn
-            project_arn=self.get_project(project_name)
-            log.debug ('project_arn',project_arn)
+            if not(self.terminateFlag):
+                #get the project Arn
+                project_arn=self.get_project(project_name)
+                log.debug ('project_arn',str(project_arn))
 
-            #get device pool
-            device_pool_arn=self.get_device_pool(project_arn,pool_name)
-            log.debug ('device_pool_arn',device_pool_arn)
+                #get device pool
+                device_pool_arn=self.get_device_pool(project_arn,pool_name)
+                log.debug ('device_pool_arn',str(device_pool_arn))
 
-            if self.apk_path[-3:] == 'ipa':
-                app_arn=self.get_app_arn(project_arn,'IOS_APP',app_name,self.apk_path)
-            else:
-                app_arn=self.get_app_arn(project_arn,'ANDROID_APP',app_name,self.apk_path)
-            status=self.wait_for_upload(app_arn)
-            log.debug ('app_arn',app_arn)
+                if self.apk_path[-3:] == 'ipa':
+                    app_arn=self.get_app_arn(project_arn,'IOS_APP',app_name,self.apk_path)
+                else:
+                    app_arn=self.get_app_arn(project_arn,'ANDROID_APP',app_name,self.apk_path)
+                status=self.wait_for_upload(app_arn)
+                log.debug ('app_arn',str(app_arn))
 
-            #get test package name
-            ##tp_arn=get_app_arn(project_arn,upload_type2,'TEST1.zip')
-            tp_arn=self.get_app_arn(project_arn,'APPIUM_PYTHON_TEST_PACKAGE',package_name,self.file_path)
-            status=self.wait_for_upload(tp_arn)
-            log.debug ('tp_arn',tp_arn)
+                #get test package name
+                ##tp_arn=get_app_arn(project_arn,upload_type2,'TEST1.zip')
+                tp_arn=self.get_app_arn(project_arn,'APPIUM_PYTHON_TEST_PACKAGE',package_name,self.file_path)
+                status=self.wait_for_upload(tp_arn)
+                log.debug ('tp_arn',str(tp_arn))
 
-            #get test spec name
-            if self.apk_path[-3:] == 'ipa':
-                # spec_arn=self.get_app_arn(project_arn,'APPIUM_PYTHON_TEST_SPEC','Default TestSpec for iOS Appium 1.9.1 Python (Support for iOS 12)')
-                spec_arn=self.get_app_arn(project_arn,'APPIUM_PYTHON_TEST_SPEC',self.ios_test_spec,AWS_assets+os.sep+self.ios_test_spec)
-            else:
-                # spec_arn=self.get_app_arn(project_arn,'APPIUM_PYTHON_TEST_SPEC','Default TestSpec for Android Appium Python')
-                spec_arn=self.get_app_arn(project_arn,'APPIUM_PYTHON_TEST_SPEC',self.android_test_spec,AWS_assets+os.sep+self.android_test_spec)
-            log.debug ('spec_arn',spec_arn)
-            info_msg="All details fetched to Schedule Run"
-            log.info(info_msg)
-            logger.print_on_console(info_msg)
+                #get test spec name
+                if self.apk_path[-3:] == 'ipa':
+                    # spec_arn=self.get_app_arn(project_arn,'APPIUM_PYTHON_TEST_SPEC','Default TestSpec for iOS Appium 1.9.1 Python (Support for iOS 12)')
+                    spec_arn=self.get_app_arn(project_arn,'APPIUM_PYTHON_TEST_SPEC',self.ios_test_spec,AWS_assets+os.sep+self.ios_test_spec)
+                else:
+                    # spec_arn=self.get_app_arn(project_arn,'APPIUM_PYTHON_TEST_SPEC','Default TestSpec for Android Appium Python')
+                    spec_arn=self.get_app_arn(project_arn,'APPIUM_PYTHON_TEST_SPEC',self.android_test_spec,AWS_assets+os.sep+self.android_test_spec)
+                log.debug ('spec_arn',str(spec_arn))
+                info_msg="All details fetched to Schedule Run"
+                log.info(info_msg)
+                logger.print_on_console(info_msg)
         except Exception as e:
             logger.print_on_console('Error while Configuring run')
             log.error(e)
@@ -333,10 +355,18 @@ class AWS_Operations:
 
 
     def run_aws_android_tests(self):
+        result = False
         try:
-            self.get_run_configurations()
-            project_arn,app_arn,tp_arn,spec_arn,device_pool_arn=self.configure_run(self.project_name,self.app_name,self.package_name,self.pool_name)
-            result = self.run_test(project_arn,app_arn,tp_arn,spec_arn,device_pool_arn)
+            if not(self.terminateFlag):
+                self.get_run_configurations()
+                project_arn,app_arn,tp_arn,spec_arn,device_pool_arn=self.configure_run(self.project_name,self.app_name,self.package_name,self.pool_name)
+                if(project_arn and app_arn and tp_arn and spec_arn and device_pool_arn) is not None:
+                    result = self.run_test(project_arn,app_arn,tp_arn,spec_arn,device_pool_arn)
+                else:
+                    if not(self.terminateFlag):
+                        msg='Error in Configuring AWS run'
+                        log.error(msg)
+                        logger.print_on_console(msg)
         except Exception as e:
             logger.print_on_console('Error in running aws tests')
             log.error(e)
@@ -346,11 +376,11 @@ class AWS_Operations:
     ##    artifcats=self.dc.list_artifacts(arn='arn:aws:devicefarm:us-west-2:197128414257:run:02a594e3-ea23-48f8-a630-eac93487a7b1/25self.dc69bc-2907-4612-b890-92a66c0377d0',type='FILE')['artifacts']
         try:
             artifcats=self.dc.list_artifacts(arn=test_run_arn,type=download_type)['artifacts']
-            logger.print_on_console('Outputs are stored here '+output_dir)
-            log.info('Outputs are stored here '+output_dir)
             if not os.path.exists(output_dir):
                 os.mkdir(output_dir)
             if len(artifcats) > 0:
+                logger.print_on_console('Outputs are stored here '+output_dir)
+                log.info('Outputs are stored here '+output_dir)
                 for a in artifcats:
                     msg='Downloading ',a['type'],a['name']
                     if a['type'] in ['CUSTOMER_ARTIFACT','VIDEO','TESTSPEC_OUTPUT']:
@@ -363,23 +393,25 @@ class AWS_Operations:
                         fd.write(r.content)
                         fd.close()
                         time.sleep(1)
-                msg="All files downloaded into"
+                
+                msg="Download Successfull"
                 logger.print_on_console(msg)
                 log.info(msg)
             else:
-                logger.print_on_console("Error while fetching results")
-                log.info("Error while fetching results")
+                logger.print_on_console("No results to fetch")
+                log.info("No results to fetch")
         except Exception as e:
             logger.print_on_console('Error while downloading results')
             log.error(e)
 
     def stop_job(self):
+        self.terminateFlag=True
+        logger.print_on_console("Termination initiated on current AWS run")
         try:
             if self.test_run_arn is not None:
                 self.dc.stop_run(
                     arn=self.test_run_arn
                 )
-                #self.test_run_arn = None
                 logger.print_on_console("Stop initiated on current AWS run")
         except Exception as e:
             logger.print_on_console("Error while stopping run")
