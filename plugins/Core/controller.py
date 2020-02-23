@@ -224,7 +224,7 @@ class Controller():
 
     def __load_aws(self):
         try:
-            core_utils.get_all_the_imports('AWS')
+            core_utils.get_all_the_imports('AWS/src')
             
         except Exception as e:
             logger.print_on_console('Error loading AWS plugin')
@@ -850,10 +850,10 @@ class Controller():
         self.action=DEBUG
         handler.local_handler.tspList=[]
         scenario=[json_data]
-        print('=======================================================================================================')
+        print(line_separator)
         log.info('***DEBUG STARTED***')
         logger.print_on_console('***DEBUG STARTED***')
-        print('=======================================================================================================')
+        print(line_separator)
         for d in scenario:
             flag,browser_type,last_tc_num,testcase_empty_flag,empty_testcase_names=obj.parse_json(d)
             if flag == False:
@@ -875,15 +875,15 @@ class Controller():
         else:
             logger.print_on_console('Invalid script')
         if (handler.local_handler.awsKeywords):
-            testcases=[]
-            for x in range(0,len(json_data)-1):
-                testcases.append(json_data[x]["testcasename"])
-            logger.print_on_console("Following Testcases "+", ".join(testcases)+" are not AWS Compatible because of the following keywords")
-            logger.print_on_console(", ".join(handler.local_handler.awsKeywords[json_data[0]["testcasename"]]))
-        print('=======================================================================================================')
+            logger.print_on_console("***Following Testcases are not AWS Compatible because of the following keywords :***")
+            log.info("***Following Testcases are not AWS Compatible because of the following keywords :***")
+            for k,v in handler.local_handler.awsKeywords.items():
+                logger.print_on_console(k,':',list(v))
+                log.info(k+':'+str(list(v)))
+        print(line_separator)
         log.info('***DEBUG COMPLETED***')
         logger.print_on_console('***DEBUG COMPLETED***')
-        print('=======================================================================================================')
+        print(line_separator)
         #clearing of dynamic variables
         obj.clearList(self)
         #clearing dynamic variables at the end of execution to support dynamic variable at the scenario level
@@ -928,11 +928,11 @@ class Controller():
 ##                break
             suite_name=json_data['suitedetails'][j-1]["testsuitename"]
             log.info('---------------------------------------------------------------------')
-            print('=======================================================================================================')
+            print(line_separator)
             log.info('***SUITE '+str( j) +': '+suite_name+' EXECUTION STARTED***')
             logger.print_on_console('***SUITE '+str( j) +': '+suite_name+' EXECUTION STARTED***')
             log.info('-----------------------------------------------')
-            print('=======================================================================================================')
+            print(line_separator)
             do_not_execute = False
             #Check for the disabled scenario
             if not (do_not_execute) :
@@ -960,9 +960,9 @@ class Controller():
                              #check for temrinate flag before printing loggers
                             scenario_name=json_data['suitedetails'][j-1]["scenarioNames"][i]
                             if not(terminate_flag):
-                                print('=======================================================================================================')
+                                print(line_separator)
                                 logger.print_on_console( '***Scenario '+str(i+1)+ ': '+scenario_name+' execution started***')
-                                print('=======================================================================================================')
+                                print(line_separator)
                                 log.info('***Scenario '  + str(i+1)+ ': '+scenario_name+ ' execution started***')
                             if(len(scenario)==3 and len(scenario['qcdetails'])==7):
                                 qc_details_creds=scenario['qccredentials']
@@ -1006,15 +1006,26 @@ class Controller():
                                                     if not (IGNORE_THIS_STEP in tsplist[k].inputval[0].split(';')):
                                                             tsplist[k].inputval = [browser]
                             if aws_mode:
-                                compile_status,pytest_file=tc_obj.compile_tc(tsplist,i+1,scenario_name)
-                                pytest_files.append(pytest_file)
-                                msg='***Scenario'+str(i + 1)+': '+scenario_name+' Compiled for AWS Execution***'
-                                print('=======================================================================================================')
-                                logger.print_on_console(msg)
-                                print('=======================================================================================================')
-                                log.info('=======================================================================================================')
-                                log.info(msg)
-                                log.info('=======================================================================================================')
+                                compile_status=False
+                                if not terminate_flag:
+                                    compile_status,pytest_file=tc_obj.compile_tc(tsplist,i+1,scenario_name)
+                                if compile_status:
+                                    pytest_files.append(pytest_file)
+                                    msg='***Scenario'+str(i + 1)+': '+scenario_name+' Compiled for AWS Execution***'
+                                    print(line_separator)
+                                    logger.print_on_console(msg)
+                                    print(line_separator)
+                                    log.info(line_separator)
+                                    log.info(msg)
+                                    log.info(line_separator)
+                                else:
+                                    terminate_flag=True
+                                    msg='***Scenario'+str(i + 1)+': '+scenario_name+' is Terminated ***'
+                                    logger.print_on_console(msg)
+                                    log.info(msg)
+                                    tsplist=[]
+
+
                                 i+=1
                                 execute_flag=False
                             if flag and execute_flag :
@@ -1025,12 +1036,12 @@ class Controller():
                                     con.conthread=mythread
                                     con.tsp_list=tsplist
                                     status = con.executor(tsplist,EXECUTE,last_tc_num,1,con.conthread,json_data,[j-1,i])
-                                    print('=======================================================================================================')
+                                    print(line_separator)
                                     logger.print_on_console( '***Scenario' ,str(i + 1) ,' execution completed***')
-                                    print('=======================================================================================================')
-                                    log.info('=======================================================================================================')
+                                    print(line_separator)
+                                    log.info(line_separator)
                                     log.info( '***Scenario' ,str(i + 1) ,' execution completed***')
-                                    log.info('=======================================================================================================')
+                                    log.info(line_separator)
                             if execute_flag:
                                 #Saving the report for the scenario
                                 logger.print_on_console( '***Saving report of Scenario' ,str(i  + 1 ),'***')
@@ -1114,22 +1125,24 @@ class Controller():
                             i+=1
                             #logic for condition check
                             report_json=con.reporting_obj.report_json[OVERALLSTATUS]
-            if aws_mode:
+            if aws_mode and not terminate_flag:
                 tc_obj.make_zip(pytest_files)
                 execution_status=self.aws_obj.run_aws_android_tests()
+                if not(execution_status):
+                    status=TERMINATE
             log.info('---------------------------------------------------------------------')
-            print('=======================================================================================================')
+            print(line_separator)
             log.info('***SUITE '+ str(j) +' EXECUTION COMPLETED***')
             #clearing dynamic variables at the end of execution to support dynamic variable at the scenario level
             obj.clear_dyn_variables()
             logger.print_on_console('***SUITE ', str(j) ,' EXECUTION COMPLETED***')
             log.info('-----------------------------------------------')
-            print('=======================================================================================================')
+            print(line_separator)
             j=j+1
         if status==TERMINATE:
-            print('=======================================================================================================')
+            print(line_separator)
             logger.print_on_console( '***Terminating the Execution***')
-            print('=======================================================================================================')
+            print(line_separator)
         return status
 
     #Building of Dictionary to send back toserver to save the data
