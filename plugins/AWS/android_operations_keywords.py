@@ -248,8 +248,8 @@ class MobileOpeartions():
                     log.info('Actual Text : '+str(webelement.text))
                     if webelement.text==input:
                         log.info('Text matched')
-                            status=TEST_RESULT_PASS
-                            result=TEST_RESULT_TRUE
+                        status=TEST_RESULT_PASS
+                        result=TEST_RESULT_TRUE
             else:
                 err_msg=ERROR_CODE_DICT['ERR_INVALID_INPUT']
                 log.error(err_msg)           
