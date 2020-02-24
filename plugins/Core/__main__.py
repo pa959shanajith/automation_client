@@ -27,14 +27,14 @@ which is our log file.
 if sys.platform == 'win32':
     from ctypes import *
     import msvcrt
-    __builtins__open = __builtins__["open"]
+    __builtins__open = __builtins__.open
     def __open_inheritance_hack(*args, **kwargs):
         result = __builtins__open(*args, **kwargs)
         handle = msvcrt.get_osfhandle(result.fileno())
         if configvalues["logFile_Path"] in args:
             windll.kernel32.SetHandleInformation(handle, 1, 0)
         return result
-    __builtins__["open"] = __open_inheritance_hack
+    __builtins__.open = __open_inheritance_hack
 
 if __name__ == "__main__":
     app = wx.App()
