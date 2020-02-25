@@ -514,13 +514,13 @@ class MainNamespace(BaseNamespace):
                 check = qcObject.ListTestSetFolder(qcdata)
                 socketIO.emit('qcresponse',check)
             elif qcdata['qcaction'] == 'testcase':
-                check = qcObject.test_case_generator(qcdata,socketIO)
+                check = qcObject.test_case_generator(qcdata)
                 socketIO.emit('qcresponse',check)
             elif qcdata['qcaction'] == 'qcupdate':
-                check = qcObject.update_qc_details(qcdata,socketIO)
+                check = qcObject.update_qc_details(qcdata)
                 socketIO.emit('qcresponse',check)
             elif qcdata['qcaction'] == 'qcquit':   
-                check = qcObject.quit_qc(qcdata,socketIO)
+                check = qcObject.quit_qc(qcdata)
                 socketIO.emit('qcresponse',check)
 
         except Exception as e:

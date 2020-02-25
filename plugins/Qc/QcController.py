@@ -15,8 +15,8 @@ from requests.auth import HTTPBasicAuth
 import requests
 import logger
 import logging
+import xmltodict
 log = logging.getLogger("Qccontroller.py")
-
 
 class QcWindow():
     dictFolderJson=None
@@ -60,7 +60,6 @@ class QcWindow():
                     self._headers = {
                         'accept': 'application/json'
                     }
-                    
                     DomainURL = self.Qc_Url + '/rest/domains/'
                     _resp = requests.get(DomainURL, headers=self._headers, cookies=self.cookies)   
                     JsonObject = _resp.json()
@@ -79,7 +78,6 @@ class QcWindow():
         except Exception as e:
             print('Error in Qc action')
         
-
     def getProjects(self,filePath):
         try:
             global dictFolderJson
@@ -94,7 +92,6 @@ class QcWindow():
                 list_projects = [item['Name'] for item in JsonObject['Projects']['Project']]
             if type(JsonObject['Projects']['Project']) is dict:
                 list_projects = [JsonObject['Projects']['Project']['Name']]
-
             if(len(list_projects)>0):
                 for pro in list_projects:
                     projects_dict[key].append(str(pro))
@@ -115,76 +112,35 @@ class QcWindow():
             domain_name=filePath["domain"]
             project_name=filePath["project"]       
             test_plan_path=filePath["foldername"]
-
-            json_str =json.loads(self.find_folder_id(test_plan_path.split("\\"), "test-set-folders", 0, "id", domain_name, project_name ))
-            if 'entities' in json_str:
-                return create_key_value(json_str['entities'][0]['Fields'])
-            else:
-                return create_key_value(json_str['Fields'])
-
+            json_str =(self.find_folder_and_testsets(test_plan_path.split("\\"), "test-set-folders", 0, "parent-id", domain_name, project_name ))
             folder_dict={}
             TestSet_dict={}
             key="testfolder"
             keyTS="TestSet"
             folder_dict.setdefault(key, [])
             TestSet_dict.setdefault(keyTS,[])
-            ##Contains the list of testsets which is fetched from the given parent folder
-            dictTestSet={}
-            dictsub={}
-            if(TD.connected==True):
-                TD.connect(domain_name, project_name)
-                testset_folder = TD.TestSetTreeManager.NodeByPath(testsetpath)
-                treeList=testset_folder.newlist()
-                
-                """
-                This procedure will return list of test-instances in a given test set
-                :param hp: HP object
-                :param tid: integer test set identifier
-                :returns: list test instances list
-                """
-                '''
-                params = '{cycle-id[' + tid + ']}'
-                url = self.base_url + '/qcbin/rest/domains/' + domain_name + '/projects/' + project_name + '/test-instances'
-                response = requests.get(url, params=params, headers=self.getheaders())
-                test_inst = text_to_xml(response.content, "Entity/Fields/Field\[@Name='test-instance'\]/Value/text()")
-                '''
-
-                if (len(treeList)>0):
-                    for folder in treeList:
-                        temp_dict={}
-                        temp_dict['foldername']=str(folder.name)
-                        temp_dict['folderpath']=str(testsetpath+"\\"+str(folder.name))
-                        folder_dict[key].append(temp_dict)
-                tsList = testset_folder.FindTestSets("")
+            treeList = json_str['folderl']
+            if (len(treeList)>0):
+                for folder in treeList:
+                    temp_dict={}
+                    temp_dict['foldername']=str(folder)
+                    temp_dict['folderpath']=str(testsetpath+"\\"+str(folder))
+                    folder_dict[key].append(temp_dict)
+            tsList = json_str['testn']
+            if(len(tsList)>0):
+                for testset in tsList:
+                    try:
+                        TestSet_dict[keyTS].append(str(testset[0])+";"+str(testset[1]))
+                    except:
+                        TestSet_dict[keyTS].append(((testset[0]).encode('utf-8'))+";"+str(testset[1]))
+            else:
+                tsList = json_str['testn']
                 if(len(tsList)>0):
                     for testset in tsList:
                         try:
-                            TestSet_dict[keyTS].append(str(testset.name)+";"+str(testset.id))
+                            TestSet_dict[keyTS].append(str(testset[0])+";"+str(testset[1]))
                         except:
-                            TestSet_dict[keyTS].append(((testset.name).encode('utf-8'))+";"+str(testset.id))
-                else:
-                    tsList = testset_folder.FindTestSets("")
-                    if(len(tsList)>0):
-                        for testset in tsList:
-                            try:
-                                TestSet_dict[keyTS].append(str(testset.name)+";"+str(testset.id))
-                            except:
-                                TestSet_dict[keyTS].append(((testset.name).encode('utf-8'))+";"+str(testset.id))
-                ice_list_folder=folder_dict['testfolder']
-                if(type(ice_list_folder)==list):
-                    for fol in ice_list_folder:
-                        delfolder = TD.TestSetTreeManager.NodeByPath(fol['folderpath'])
-                        delTestSetList = delfolder.FindTestSets("")
-                        if(delTestSetList != None):
-                            for ts in delTestSetList:
-                                try:
-                                    remID=str(ts.name)+";"+str(ts.id)
-                                except:
-                                    remID=((ts.name).encode('utf-8'))+";"+str(ts.id)
-                                ice_list=TestSet_dict['TestSet']
-                                ice_list.remove(remID)
-            else:
-                print('Invalid connection')
+                            TestSet_dict[keyTS].append(((testset[0]).encode('utf-8'))+";"+str(testset[1]))
             temp_dict_ts={}
             key="TestSet"
             temp_dict_ts.setdefault(key, [])
@@ -205,65 +161,96 @@ class QcWindow():
         finally:
             return dictFolderJson
 
-
-
-    
-    def find_folder_id(self, arrFolder, strAPI, parentID, fields, almDomain, almProject):
+    def find_folder_and_testsets(self, arrFolder, strAPI, parentID, fields, almDomain, almProject):
         try:
             response = ""
-
             midPoint = "/rest/domains/" + almDomain + "/projects/" + almProject 
-
-
             URL = self.Qc_Url + midPoint + "/" + strAPI
-            
-            for folderName in arrFolder:
-                #payload = {"query": "{name['" + "Subject" + "'];parent-id[" + str(parentID) + "]}", "fields": fields}
-                payload = {"query": "{name['" + folderName + "']}"}
+            URL_for_testsets = self.Qc_Url + midPoint + "/" + "test-sets"
+            #URL_for_testsets = self.Qc_Url + midPoint + "/" + "tests"
+            #for folderName in arrFolder:
+            if(arrFolder[arrFolder.__len__()-1] != None) :
+                folderName = arrFolder[arrFolder.__len__()-1]
+                payload = {"query": "{name['" + folderName + "']}", "fields": fields}
                 response = requests.get(URL, params=payload, headers=self.headers, cookies=self.cookies)
-                
-                
-                obj = json.loads(response.text)
-                if obj["TotalResults"] >= 1:
-                    parentID = get_field_value(obj['entities'][0]['Fields'], "id")
-                    # print("folder id of " + folderName + " is " + str(parentID))
-                else:
-                    # print("Folder " + folderName + " does not exists")
-                    data = "<Entity Type=" + chr(34) + strAPI[0:len(strAPI) - 1] + chr(34) + "><Fields><Field Name=" + chr(
-                        34) + "name" + chr(
-                        34) + "><Value>" + folderName + "</Value></Field><Field Name=" + chr(34) + "parent-id" + chr(
-                        34) + "><Value>" + str(parentID) + "</Value></Field></Fields> </Entity>"
-                    response = requests.post(almURL + midPoint + "/" + strAPI, data=data, headers=self.headers, cookies=self.cookies)
-                    obj = json.loads(response.text)
-                    if response.status_code == 200 | response.status_code == 201:
-                        parentID = get_field_value(obj['Fields'], "id")
-                        # print("folder id of " + folderName + " is " + str(parentID))
-            return response.text
-            #return parentID  it should be returning this
+                o = xmltodict.parse(response.content)
+                x = json.dumps(o)
+                y = json.loads(x)
+                k=y["Entities"]["Entity"]["Fields"]["Field"]
 
+                #fetching folder parent id for given folder name
+                for i in k:
+                    if i["@Name"] == "id":
+                        parentID=i['Value']
 
+                fields = "id,name"
+                payload1 = {"query": "{parent-id[" + str(parentID) + "]}", "fields": fields}
+                res = requests.get(URL, params=payload1, headers=self.headers, cookies=self.cookies)
+                o1 = xmltodict.parse(res.content)
+                x1 = json.dumps(o1)
+                y1 = json.loads(x1)
+                fol_list = []
+                if(int(y1["Entities"]["@TotalResults"]) >1 ):
+                    k1 = y1["Entities"]["Entity"]
+                #contains all the folder names
+                    for f in k1:
+                        l = f["Fields"]["Field"]
+                        for n in l:
+                            if n["@Name"] == "name" :
+                                fol_name = n["Value"]
+                                fol_list.append(fol_name)
+                elif (int(y1["Entities"]["@TotalResults"]) == 1 ):
+                    k1 = y1["Entities"]["Entity"]
+                    l = k1["Fields"]["Field"]
+                    for n in l:
+                        if n["@Name"] == "name" :
+                            fol_name = n["Value"]
+                            fol_list.append(fol_name)
+                #fetching testsets
+                payload = {"query": "{parent-id[" + str(parentID) + "]}", "fields": fields}
+                fields = "id,name"
+                res1 = requests.get(URL_for_testsets, params=payload, headers=self.headers, cookies=self.cookies)
+                o2 = xmltodict.parse(res1.content)
+                x2 = json.dumps(o2)
+                y2 = json.loads(x2)
+                tests_list = []    #contains name
+                tests_list_1 = []  #contains id
+                if(int(y2["Entities"]["@TotalResults"]) >1 ):
+                    k2 = y2["Entities"]["Entity"]
+                    for c in k2:
+                        l = c["Fields"]["Field"]
+                        test_name_id = []
+                        for t in l:
+                            if t["@Name"] == "name" :
+                                test_name = t["Value"]
+                                test_name_id.append(test_name)
+                            elif t["@Name"] == "id" :
+                                test_id = t["Value"]
+                                test_name_id.append(test_id)
+                        tests_list_1.append(test_name_id) 
+                        test_name_id = []       
+                elif (int(y2["Entities"]["@TotalResults"]) == 1 ):
+                    k2 = y2["Entities"]["Entity"]
+                    l = k2["Fields"]["Field"]
+                    test_name_id = []
+                    for n in l:
+                        if n["@Name"] == "name" :
+                            test_name = n["Value"]
+                            test_name_id.append(test_name)
+                        elif n["@Name"] == "id" :
+                            test_id = n["Value"]
+                            test_name_id.append(test_id)    
+                    tests_list_1.append(test_name_id)
+                    test_name_id = []
+                ans = {}
+                key = "folderl"
+                key1 = "testn"
+                ans[key] = fol_list
+                ans[key1] = tests_list_1
+            return ans    
         except Exception as e:
             print('Error while fetching testsets')
             dictFolderJson=None    
-
-    def get_field_value(self, obj, field_name):
-        try:
-            for field in obj:
-                if field['Name'] == field_name:
-                    return field['values'][0]['value']
-        except Exception as e:
-            print('Error ')
-
-    def create_key_value(self, obj_json):
-        try:
-            final_dic = {}
-            for elem in obj_json:
-                if len(elem['values']) >= 1:
-                    if 'value' in elem['values'][0]:
-                        final_dic[elem["Name"]] = elem["values"][0]['value']
-            return final_dic        
-        except Exception as e:
-            print('Error')
 
     def test_case_generator(self,filePath):
         try:
@@ -272,25 +259,98 @@ class QcWindow():
             key="testcase"
             testsetpath=filePath["foldername"]
             test_set_name=filePath["testset"]
-            domain_name=filePath["domain"]
-            project_name=filePath["project"]
+            almDomain=filePath["domain"]
+            almProject=filePath["project"]
             test_case_dict.setdefault(key, [])
-            TD.connect(domain_name, project_name)
-            testCaseList = TD.TestSetTreeManager.NodeByPath(testsetpath)
-            listTC=testCaseList.FindTestSets("")
-            i=0
-            for test_case_ind in listTC:
-                if (test_case_ind.name).encode('utf-8')==(test_set_name).encode('utf-8'):
-                   abc=listTC[i].tsTestFactory
-                   qc_ts=abc.NewList("")
-                   for tsname in qc_ts:
-                       try:
-                           ts_complete_name = tsname.name + '/'+ tsname.testid
-                           test_case_dict[key].append(str(ts_complete_name))
-                       except:
-                           ts_complete_name = (tsname.name).encode('utf-8') + '/'+ tsname.testid
-                           test_case_dict[key].append((ts_complete_name).encode('utf-8'))
-                i=i+1
+            response = ""
+            midPoint = "/rest/domains/" + almDomain + "/projects/" + almProject 
+            URL = self.Qc_Url + midPoint + "/" + "test-set-folders"
+            URL_for_testsets = self.Qc_Url + midPoint + "/" + "test-sets"
+            URL_for_testcases = self.Qc_Url + midPoint + "/" + "test-instances"
+            arrFolder = testsetpath.split("\\")
+            if(arrFolder[arrFolder.__len__()-1] != None) :
+                folderName = arrFolder[arrFolder.__len__()-1]
+                fields = "parent-id"
+                payload = {"query": "{name['" + folderName + "']}", "fields": fields}
+                response = requests.get(URL, params=payload, headers=self.headers, cookies=self.cookies)
+                o = xmltodict.parse(response.content)
+                x = json.dumps(o)
+                y = json.loads(x)
+                k=y["Entities"]["Entity"]["Fields"]["Field"]
+                #fetching folder parent id for given folder name
+                for i in k:
+                    if i["@Name"] == "id":
+                        parentID=i['Value']
+            #fetching testsets
+            fields = "id,name"
+            payload = {"query": "{parent-id[" + str(parentID) + "]}", "fields": fields}
+            res1 = requests.get(URL_for_testsets, params=payload, headers=self.headers, cookies=self.cookies)
+            o2 = xmltodict.parse(res1.content)
+            x2 = json.dumps(o2)
+            y2 = json.loads(x2)
+            test_id = None
+            if(int(y2["Entities"]["@TotalResults"]) >1 ):
+                k2 = y2["Entities"]["Entity"]
+                for c in k2:
+                    l = c["Fields"]["Field"]
+                    flag = 0
+                    for t in l:
+                        if t["@Name"] == "name" :
+                            if( t["Value"] == test_set_name ):
+                                flag =1
+                        elif( t["@Name"] == "id" and  flag == 1):
+                            test_id = t["Value"]
+            elif (int(y2["Entities"]["@TotalResults"]) == 1 ):
+                k2 = y2["Entities"]["Entity"]
+                l = k2["Fields"]["Field"]
+                flag = 0
+                for t in l:
+                    if t["@Name"] == "name" :
+                        if( t["Value"] == test_set_name ):
+                            flag =1
+                    elif( t["@Name"] == "id" and  flag == 1):
+                        test_id = t["Value"]
+            fields = "test-id,name,status"
+            payload = {"query": "{cycle-id[" + str(test_id) + "]}", "fields": fields}
+            response = requests.get(URL_for_testcases , params=payload, headers=self.headers, cookies=self.cookies)
+            o = xmltodict.parse(response.content)
+            x = json.dumps(o)
+            y = json.loads(x)
+            testc_list = []
+            if(int(y["Entities"]["@TotalResults"]) >1 ):
+                k2 = y["Entities"]["Entity"]
+                for c in k2:
+                    l = c["Fields"]["Field"]
+                    testc_name_id = []
+                    for n in l:                    
+                        if n["@Name"] == "test-id" :
+                            test_id = n["Value"]
+                            testc_name_id.append(test_id)
+                        elif n["@Name"] == "name" :
+                            test_name = n["Value"]
+                            testc_name_id.append(test_name)    
+                    testc_list.append(testc_name_id) 
+                    testc_name_id = []       
+            elif (int(y2["Entities"]["@TotalResults"]) == 1 ):
+                k2 = y2["Entities"]["Entity"]
+                l = k2["Fields"]["Field"]
+                testc_name_id = []
+                for n in l:
+                    if n["@Name"] == "test-id" :
+                        test_id = n["Value"]
+                        testc_name_id.append(test_id)
+                    elif n["@Name"] == "name" :
+                        test_name = n["Value"]
+                        testc_name_id.append(test_name)      
+                testc_list.append(testc_name_id)
+                testc_name_id = []
+            for tsname in testc_list:
+                try:
+                    ts_complete_name = tsname[0] + '/'+ tsname[1]
+                    test_case_dict[key].append(str(ts_complete_name))
+                except:
+                    ts_complete_name = (tsname[0]).encode('utf-8') + '/'+ tsname[1]
+                    test_case_dict[key].append((ts_complete_name).encode('utf-8'))
             OverallList=[]
             OverallList.append(test_case_dict)
             dictFolderJson = json.dumps(OverallList)
@@ -309,23 +369,23 @@ class QcWindow():
             tsList = data['qc_tsList']
             testrunname = data['qc_testrunname']
             result =  data['qc_update_status']
-            if(TD.connected==True):
-                TD.Connect(qcDomain,qcProject)
-                TSetFact = TD.TestSetFactory
+            if(TD.connected==True):                              #######
+                TD.Connect(qcDomain,qcProject)                      ########
+                TSetFact = TD.TestSetFactory                        ##3###
                 #Getting the test set factory
-                tsTreeMgr = TD.testsettreemanager
-                tsFolder = tsTreeMgr.NodeByPath(tsFolder)
-                tsList = tsFolder.FindTestSets(tsList)
+                tsTreeMgr = TD.testsettreemanager                           ######
+                tsFolder = tsTreeMgr.NodeByPath(tsFolder)                           #######
+                tsList = tsFolder.FindTestSets(tsList)                          #####
                 #Getting the test lists
-                theTestSet = tsList.Item(1)
+                theTestSet = tsList.Item(1)                             ######
                 #Getting the test set
-                tsFolder = theTestSet.TestSetFolder
-                tsTestFactory = theTestSet.tsTestFactory
-                tsTestList = tsTestFactory.NewList("")
+                tsFolder = theTestSet.TestSetFolder                                 ####
+                tsTestFactory = theTestSet.tsTestFactory                            ######
+                tsTestList = tsTestFactory.NewList("")                              ######
                 for tsTest in tsTestList:
                     #Iterate the Test list
                     if tsTest.Name == testrunname:
-                        RunFactory = tsTest.RunFactory
+                        RunFactory = tsTest.RunFactory                                  #######
                         #RunFactory object created
                         obj_theRun = RunFactory.AddItem(testrunname)
                         #Updating the details in QC
@@ -350,19 +410,23 @@ class QcWindow():
             dictFolderJson = {'QC_UpdateStatus':False}
         return status
 
-    def quit_qc(self):
+    def quit_qc(self,filepath):
         try:
+            ProjectURL = self.Qc_Url + '/authentication-point/logout'
+            resp = requests.get(ProjectURL)
+            return "closedqc"
+            
             global sent,dictFolderJson
             sent=1
-            if TD.connected==True and loginflag==True:
+            if TD.connected==True and loginflag==True:                          ########
                 con.send('closedqc#E&D@Q!C#')
-                TD.Logout()
-                TD.releaseconnection()
+                TD.Logout()                                             #####
+                TD.releaseconnection()                                      #####
             elif urlflag==False:
                 con.send('invalidurl#E&D@Q!C#')
             else:
                 con.send('invalidcredentials#E&D@Q!C#')
-                TD.releaseconnection()
+                TD.releaseconnection()                              #####
             dictFolderJson=None
             return True
         except Exception as e:
@@ -373,9 +437,26 @@ class QcWindow():
         try:
             global dictFolderJson,sent
             data_to_send = json.dumps(dictFolderJson).encode('utf-8')
-            data_to_send+='#E&D@Q!C#'
+            #data_to_send+='#E&D@Q!C#'
             sent=1
-            con.send(data_to_send)
+            return data_to_send
+            #con.send(data_to_send)
         except Exception as e:
             print('Error while emitting data')
 
+
+
+
+
+        """
+        This procedure will return list of test-instances in a given test set
+        :param hp: HP object
+        :param tid: integer test set identifier
+        :returns: list test instances list
+        """
+        '''
+        params = '{cycle-id[' + tid + ']}'
+        url = self.base_url + '/qcbin/rest/domains/' + domain_name + '/projects/' + project_name + '/test-instances'
+        response = requests.get(url, params=params, headers=self.getheaders())
+        test_inst = text_to_xml(response.content, "Entity/Fields/Field\[@Name='test-instance'\]/Value/text()")
+        '''
