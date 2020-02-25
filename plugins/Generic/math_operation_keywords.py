@@ -144,6 +144,7 @@ class NumericStringParser(object):
                 if isinstance(output,float):
                     if output % 1 == 0.0:
                         output = int(output)
+                    output=round(output,2)
                 elif isinstance(output,int):
                     output=str(output)
                 log.debug('Got the result : %s', output)
