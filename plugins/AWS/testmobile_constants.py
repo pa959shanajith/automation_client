@@ -19,6 +19,12 @@ TEST_RESULT_FALSE=False
 
 WEB_ELEMENT_ENABLED = 'Element is enabled'
 
+VERIFY_DOESNOT_EXISTS = 'verifydoesnotexists'
+
+WAIT_FOR_ELEMENT_EXISTS = 'waitforelementexists'
+
+INVALID_INPUT = 'Invalid input'
+
 ELEMENT_EXISTS= 'Element Exists'
 
 ELEMENT_VISIBLE= 'Element is Visible'

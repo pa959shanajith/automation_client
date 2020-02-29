@@ -52,11 +52,13 @@ mobile_keywords={
     'selectvaluebytext': 'spinner_obj.select_value_by_text',
     'verifyallvalues': 'spinner_obj.verify_all_values',
     'verifycount': 'spinner_obj.verify_count',
-    'verifyselectedvalue': 'spinner_obj.verify_selected_value'
+    'verifyselectedvalue': 'spinner_obj.verify_selected_value',
+    'setsecuretext': 'mob_obj.set_secure_text',
+    'hidesoftkeyboard': 'mob_obj.hide_soft_keyboard'
 }
 
 generic_keywords={
- 'createdynamicvariable': 'gen_obj.create_dynamic_variable',
+ 'createdynvariable': 'gen_obj.create_dynamic_variable',
  'wait': 'gen_obj.wait'
 }
 

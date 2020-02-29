@@ -81,6 +81,7 @@ def scenario(driver):
 
             inputs=t.inputval[0].split(';')
             inputs[0]=inputs[0].strip()
+            ele_str = "(driver,'"+t.objectname+"')"
             if t.name.lower() in mobile_keywords:
                 if t.name.lower()=='launchapplication':
 
@@ -95,12 +96,25 @@ def scenario(driver):
                         logger.print_on_console(err_msg)
                         log.error(err_msg)
                         break
-                elif t.name.lower()=='waitforelementexists':
+
+                elif (t.custname not in ["@Android_Custom", "@CustomiOS"]) and (t.name.lower()=='waitforelementexists'):
                     inputs[0]=t.objectname
 
+                elif t.custname in ["@Android_Custom", "@CustomiOS"]:
+                    t.objectname = inputs,t.name.lower()
+                    if t.name.lower()=='waitforelementexists':
+                        inputs = t.objectname
+                    elif len(inputs) == 3:
+                        inputs = [""]
+                    elif len(inputs) > 3:
+                        inputs = inputs[3:]
+                    ele_str = "(driver,\""+str(t.objectname)+"\")"
+                
+                
+                inp_str = "(driver,mob_ele,*"+str(inputs)+")"
                 f.write("\n\ttime.sleep(2)")
-                f.write("\n\tmob_ele=mob_obj.getMobileElement"+"(driver,'"+t.objectname+"')")
-                f.write("\n\t"+"result="+mobile_keywords[t.name.lower()]+"(driver,mob_ele,*"+str(inputs)+")")
+                f.write("\n\tmob_ele=mob_obj.getMobileElement"+ele_str)
+                f.write("\n\t"+"result="+mobile_keywords[t.name.lower()]+inp_str)
                 # if counter==1:
                 #     f.write("\n\tif result[0]==TEST_RESULT_FAIL:")
                 #     f.write('\n\t\tmob_obj.driver.press_keycode(4)')
@@ -122,7 +136,7 @@ def scenario(driver):
         if compile_status:
             dest_folder=AWS_assets+os.sep+bundle_name+os.sep+'tests'+os.sep+pytest_file
             shutil.move(pytest_file, dest_folder)
-        
+
             log.info("Compilation Completed "+str(scenario_counter)+':'+scenario_name)
             logger.print_on_console("Compilation Completed "+str(scenario_counter)+':'+scenario_name)
         return compile_status,pytest_file

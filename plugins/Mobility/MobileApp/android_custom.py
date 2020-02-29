@@ -58,12 +58,30 @@ class custom():
                             "verifyenabled", "verifyexists", "verifyvisible", "verifytext",
                             "verifyhidden", "waitforelementexists"],
                 'text': ["gettext", "longpress", "press", "verifydisabled", "verifydoesnotexists",
-                        "verifyenabled", "verifyexists", "verifyvisible", "verifytext",
-                        "verifyhidden", "waitforelementexists"],
+                            "verifyenabled", "verifyexists", "verifyvisible", "verifytext",
+                            "verifyhidden", "waitforelementexists"],
                 'image': ["gettext", "longpress", "press", "verifydisabled", "verifydoesnotexists",
-                        "verifyenabled", "verifyexists", "verifyvisible", "verifytext",
-                        "verifyhidden", "waitforelementexists"],
+                            "verifyenabled", "verifyexists", "verifyvisible", "verifytext",
+                            "verifyhidden", "waitforelementexists"],
                 'layout': ["gettext", "longpress", "press", "verifydisabled", "verifydoesnotexists",
+                            "verifyenabled", "verifyexists", "verifyvisible", "verifytext",
+                            "verifyhidden", "waitforelementexists"],
+                'picker': ["gettext", "longpress", "press", "verifydisabled", "verifydoesnotexists",
+                            "verifyenabled", "verifyexists", "verifyvisible", "verifytext",
+                            "verifyhidden", "waitforelementexists"],
+                'slider': ["gettext", "longpress", "press", "verifydisabled", "verifydoesnotexists",
+                            "verifyenabled", "verifyexists", "verifyvisible", "verifytext",
+                            "verifyhidden", "waitforelementexists"],
+                'link': ["gettext", "longpress", "press", "verifydisabled", "verifydoesnotexists",
+                            "verifyenabled", "verifyexists", "verifyvisible", "verifytext",
+                            "verifyhidden", "waitforelementexists"],
+                'table': ["getcellvalue", "cellclick", "getrowcount", "verifyrowcount", "verifydisabled", "verifydoesnotexists",
+                            "verifyenabled", "verifyexists", "verifyvisible", "verifycellvalue",
+                            "verifyhidden", "waitforelementexists"],
+                'cell' : ["gettext", "longpress", "press", "verifydisabled", "verifydoesnotexists",
+                            "verifyenabled", "verifyexists", "verifyvisible", "verifytext",
+                            "verifyhidden", "waitforelementexists"],
+                'key' : ["gettext", "longpress", "press", "verifydisabled", "verifydoesnotexists",
                             "verifyenabled", "verifyexists", "verifyvisible", "verifytext",
                             "verifyhidden", "waitforelementexists"]
             }
@@ -87,6 +105,23 @@ class custom():
         visible_text = input[1]
         #logger.print_on_console(input)
         driver = android_scrapping.driver
+        classes_ios = {
+            'textbox': ['XCUIElementTypeTextField','XCUIElementTypeSearchField','XCUIElementTypeSecureTextField'],
+            'radio': ['XCUIElementTypeRadioButton'],
+            'button': ['XCUIElementTypeButton'],
+            'switch': ['XCUIElementTypeSwitch','XCUIElementTypeToggle'],
+            'checkbox': ['XCUIElementTypeCheckBox'],
+            'picker': ['XCUIElementTypePickerWheel'],
+            'numberpicker': ['XCUIElementType'],
+            'slider': ['XCUIElementTypeSlider'],
+            'link': ['XCUIElementTypeLink'],
+            'text': ['XCUIElementTypeStaticText','XCUIElementTypeTextView'],
+            'image': ['XCUIElementTypeImage','XCUIElementTypeIcon'],
+            'table': ['XCUIElementTypeTable'],
+            'cell' : ['XCUIElementTypeCell'],
+            'key' : ['XCUIElementTypeKey'],
+            'element': ['XCUIElementTypeApplication','XCUIElementTypeWindow','XCUIElementTypeOther','XCUIElementTypeNavigationBar','XCUIElementTypeScrollView','XCUIElementTypeSheet','XCUIElementTypeAlert']
+        }
         classes = {
             'textbox': ['android.widget.EditText'],
             'timepicker': ['android.widget.TimePicker'],
@@ -107,21 +142,32 @@ class custom():
         element_list = []
         try:
             index = int(input[2])
-            processes = psutil.net_connections()
-            for line in processes:
-                p = line.laddr
-                if p[1] == 4723 and driver is not None:
-                    driver_flag = True
-                    break
+            if SYSTEM_OS != 'Darwin':
+                processes = psutil.net_connections()
+                for line in processes:
+                    p = line.laddr
+                    if p[1] == 4723 and driver is not None:
+                        driver_flag = True
+                        break
+            else: driver_flag = True
             if driver_flag is True:
                 elem_count = 0
                 if len(visible_text) > 0:
-                    for item in classes[object_name]:
-                        xpath_str = '//'+item+'[@text="'+visible_text+'"]'
-                        element_list = element_list + driver.find_elements_by_xpath(xpath_str)
+                    if SYSTEM_OS != 'Darwin':
+                        for item in classes[object_name]:
+                            xpath_str = '//'+item+'[@text="'+visible_text+'"]'
+                            element_list = element_list + driver.find_elements_by_xpath(xpath_str)
+                    else:
+                        for item in classes_ios[object_name]:
+                            xpath_str = '//'+item+'[@text="'+visible_text+'"]'
+                            element_list = element_list + driver.find_elements_by_xpath(xpath_str)
                 else:
-                    for item in classes[object_name]:
-                        element_list = element_list + driver.find_elements_by_class_name(item)
+                    if SYSTEM_OS != 'Darwin':
+                        for item in classes[object_name]:
+                            element_list = element_list + driver.find_elements_by_class_name(item)
+                    else:
+                        for item in classes_ios[object_name]:
+                            element_list = element_list + driver.find_elements_by_class_name(item)
                 if index < len(element_list):
                     log.info(CUSTOM_ELEMENT_FOUND)
                     logger.print_on_console(CUSTOM_ELEMENT_FOUND)

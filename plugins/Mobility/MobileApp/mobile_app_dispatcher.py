@@ -389,7 +389,7 @@ class MobileDispatcher:
 #################################                 Android                ###################################
                 else:
                     driver = android_scrapping.driver
-                    if teststepproperty.custname == "@Android_Custom":
+                    if teststepproperty.custname in ["@Android_Custom", "@CustomiOS"]:
                         if (input[0] and (input[1] is not None) and input[2]):
                             logger.print_on_console("Element type is ",input[0])
                             logger.print_on_console("Visible text is ",input[1])

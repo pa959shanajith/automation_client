@@ -78,8 +78,12 @@ class MobileOpeartions():
                         if SYSTEM_OS != 'Darwin': element.set_text(input_val)
                         else: element.set_value(input_val)
                         time.sleep(2)
-                        status=TEST_RESULT_PASS
-                        methodoutput=TEST_RESULT_TRUE
+                        hide_soft_key = 'Yes'
+                        if driver.is_keyboard_shown() and hide_soft_key == "Yes":
+                            driver.hide_keyboard()
+                        if (element.text == input_val):
+                            status=TEST_RESULT_PASS
+                            methodoutput=TEST_RESULT_TRUE
                     else:
                         err_msg=ERROR_CODE_DICT['ERR_ERR_WEB_ELEMENT_DISABLED']
 
@@ -88,6 +92,56 @@ class MobileOpeartions():
             if err_msg:
                 log.error(err_msg)
 
+        except Exception as e:
+            log.error(e)
+        return status,methodoutput,output,err_msg
+
+    def set_secure_text(self,driver,element,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        visibilityFlag=True
+        output=OUTPUT_CONSTANT
+        err_msg=None
+        #log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        try:
+            if element is not None:
+                visibility=element.is_displayed()
+                visibility=True
+                log.info('element is visible')
+                if visibility:
+                    enable=element.is_enabled()
+                    log.info(WEB_ELEMENT_ENABLED)
+                    if enable:
+                        if len(args)>0 and args[0] != '':
+                            visibilityFlag=args[0]
+                        input=input[0]
+                        log.info(input)
+                        if input != '' and input is not None:
+                            if len(element.text)>0:
+                                log.debug('clearing  the existing text')
+                                element.clear()
+                            #need to put these modules in requirements.txt
+                            from Crypto.Cipher import AES
+                            import base64
+                            unpad = lambda s : s[0:-ord(s[-1])]
+                            enc = base64.b64decode(input)
+                            cipher = AES.new(b'\x74\x68\x69\x73\x49\x73\x41\x53\x65\x63\x72\x65\x74\x4b\x65\x79', AES.MODE_ECB)
+                            input_val = unpad(cipher.decrypt(enc).decode('utf-8'))
+                            if SYSTEM_OS != 'Darwin': element.set_text(input_val)
+                            else: element.set_value(input_val)
+                            time.sleep(2)
+                            hide_soft_key = 'Yes'
+                            if driver.is_keyboard_shown() and hide_soft_key == "Yes":
+                                driver.hide_keyboard()
+                            if (element.text == input_val):
+                                status=TEST_RESULT_PASS
+                                methodoutput=TEST_RESULT_TRUE
+                    else:
+                        err_msg=ERROR_CODE_DICT['ERR_ERR_WEB_ELEMENT_DISABLED']
+                else:
+                    err_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
+            if err_msg:
+                log.error(err_msg)
         except Exception as e:
             log.error(e)
         return status,methodoutput,output,err_msg
@@ -108,6 +162,9 @@ class MobileOpeartions():
                         if len(element.text)>0:
                             log.info('clearing  the existing text')
                             element.clear()
+                        hide_soft_key = 'Yes'
+                        if driver.is_keyboard_shown() and hide_soft_key == "Yes":
+                            driver.hide_keyboard()
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
                     else:
@@ -228,7 +285,7 @@ class MobileOpeartions():
         try:
             if webelement is not None:
                 output=webelement.text
-                log.info("Output is ",str(output))
+                log.info("Output is "+str(output))
                 status=TEST_RESULT_PASS
                 result=TEST_RESULT_TRUE
         except Exception as e:
@@ -467,36 +524,63 @@ class MobileOpeartions():
     def getMobileElement(self,driver,objectname,*args):
         mobileElement = None
         print_loggers=True
-        if len(args)>0 and args[0]=='waitforelement_exists':
-            print_loggers=False
-            log.info('Waiting for the element')
-        if objectname.strip() != '':
-            if SYSTEM_OS=='Darwin':
-                objectname = objectname.replace("/AppiumAUT[1]/", "/")
-                log.info(objectname)
-            else:
-                identifiers = objectname.split(';')
-                if print_loggers:
-                    log.info('Identifiers are ')
-                    log.info(identifiers)
-            try:
-                if SYSTEM_OS=='Darwin':
-                    mobileElement = driver.find_element_by_xpath(objectname)
+        objectname1 = None
+        try:
+            objectname1 = eval(objectname)
+            objectname = ""
+        except:
+            pass
+        if isinstance(objectname1,tuple):
+            import custom_aws
+            custom_object = custom_aws.custom()
+            inputs, keyword = objectname1
+            if (inputs[0] and (inputs[1] is not None) and inputs[2]):
+                log.info("Element type is "+str(inputs[0]))
+                log.info("Visible text is "+str(inputs[1]))
+                log.info("Index is "+str(inputs[2]))
+                if custom_object.custom_check(inputs,keyword) == False:
+                    log.info("The object and the keyword do not match")
+                    #result=TERMINATE
                 else:
+                    mobileElement=custom_object.custom_element(driver,inputs,keyword)
+                    #result=self.mob_dict[keyword](element,inputs)
+            else:
+                log.info("Invalid input: NULL object used in input")
+                return None
+            if mobileElement is not None:
+                log.info('Web element found')
+            return mobileElement
+        else:
+            if len(args)>0 and args[0]=='waitforelement_exists':
+                print_loggers=False
+                log.info('Waiting for the element')
+            if objectname.strip() != '':
+                if SYSTEM_OS=='Darwin':
+                    objectname = objectname.replace("/AppiumAUT[1]/", "/")
+                    log.info(objectname)
+                else:
+                    identifiers = objectname.split(';')
                     if print_loggers:
-                        log.debug('trying to find mobileElement by Xpath')
-                    mobileElement = driver.find_element_by_xpath(identifiers[1])
-            except Exception as Ex:
-                if(identifiers[0]):
-                    try:
+                        log.info('Identifiers are ')
+                        log.info(identifiers)
+                try:
+                    if SYSTEM_OS=='Darwin':
+                        mobileElement = driver.find_element_by_xpath(objectname)
+                    else:
                         if print_loggers:
-                            log.info('Webelement not found by XPath')
-                            log.debug('trying to find mobileElement by ID')
-                        mobileElement = driver.find_element_by_id(identifiers[0])
-                    except Exception as Ex:
-                        log.info('Webelement not found')
-                        err_msg=str(Ex)
-                        log.error(err_msg)
+                            log.debug('trying to find mobileElement by Xpath')
+                        mobileElement = driver.find_element_by_xpath(identifiers[1])
+                except Exception as Ex:
+                    if(identifiers[0]):
+                        try:
+                            if print_loggers:
+                                log.info('Webelement not found by XPath')
+                                log.debug('trying to find mobileElement by ID')
+                            mobileElement = driver.find_element_by_id(identifiers[0])
+                        except Exception as Ex:
+                            log.info('Webelement not found')
+                            err_msg=str(Ex)
+                            log.error(err_msg)
             
         if mobileElement is not None:
             log.info('Web element found')
@@ -511,29 +595,38 @@ class MobileOpeartions():
         try:
             # configvalues = readconfig.configvalues
             # timeout= configvalues['timeOut']
-            timeout='5'
-            if len(args)>0:
-                try:
-                    timeout=int(args[0])
-                except:
-                    pass
-            if timeout!=None:
-                start_time = time.time()
-                while True:
-                    if element!=None:
-                        log.info(ELEMENT_EXISTS)
-                        status=TEST_RESULT_PASS
-                        methodoutput=TEST_RESULT_TRUE
-                        break
-                    element=self.getMobileElement(driver,object_name,'waitforelement_exists')
-                    later=time.time()
-                    if int(later-start_time)>=int(timeout):
-                        log.info('Delay timeout')
-                        break
-                    
+            if isinstance(object_name,tuple):
+                import custom_aws
+                custom_object = custom_aws.custom()
+                inputs, keyword = object_name
+                if (inputs[0] and (inputs[1] is not None) and inputs[2]):
+                    result=custom_object.waitforelement_exists(inputs)
+                else:
+                    log.info("Invalid input: NULL object used in input")
             else:
-                err_msg=ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                log.error(err_msg)
+                timeout='5'
+                if len(args)>0:
+                    try:
+                        timeout=int(args[0])
+                    except:
+                        pass
+                if timeout!=None:
+                    start_time = time.time()
+                    while True:
+                        if element!=None:
+                            log.info(ELEMENT_EXISTS)
+                            status=TEST_RESULT_PASS
+                            methodoutput=TEST_RESULT_TRUE
+                            break
+                        element=self.getMobileElement(driver,object_name,'waitforelement_exists')
+                        later=time.time()
+                        if int(later-start_time)>=int(timeout):
+                            log.info('Delay timeout')
+                            break
+                        
+                else:
+                    err_msg=ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                    log.error(err_msg)
         except Exception as e:
             log.error(e)
         return status,methodoutput,output,err_msg
@@ -697,7 +790,7 @@ class MobileOpeartions():
                         else :
                             output=webelement.get_attribute("checked")
                         if output!=None:
-                            log.info('The status is '+output)
+                            log.info('The status is '+str(output))
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
                     else:
@@ -821,7 +914,7 @@ class MobileOpeartions():
                 if element.is_enabled():
                     log.debug(ELEMENT_ENABLED)
                     output = element.text
-                    log.info("Selected number: "+output)
+                    log.info("Selected number: "+str(output))
                     status=TEST_RESULT_PASS
                     result=TEST_RESULT_TRUE
                 else:
@@ -850,20 +943,20 @@ class MobileOpeartions():
                         log.debug(ELEMENT_ENABLED)
                         if elem_text==input_val:
                             log.debug('text matched')
-                            log.info("Selected number: "+elem_text)
+                            log.info("Selected number: "+str(elem_text))
                             status=TEST_RESULT_PASS
                             result=TEST_RESULT_TRUE
                         else:
-                            log.info("Selected number: "+elem_text)
+                            log.info("Selected number: "+str(elem_text))
                     else:
                         log.error('ELEMENT_DISABLED')
                         if elem_text==input_val:
                             log.debug('text matched')
-                            log.info("Selected number: "+elem_text)
+                            log.info("Selected number: "+str(elem_text))
                             status=TEST_RESULT_PASS
                             result=TEST_RESULT_TRUE
                         else:
-                            log.info("Selected number: ;"+elem_text)
+                            log.info("Selected number: ;"+str(elem_text))
                 else:
                     log.error('ELEMENT DOES NOT EXIST')
             else:
@@ -1028,7 +1121,7 @@ class MobileOpeartions():
                             else:
                                 AMorPM="PM"
                             output=Hour+':'+Min+':'+AMorPM
-                            log.info("Time: "+output)
+                            log.info("Time: "+str(output))
                             status=TEST_RESULT_PASS
                             result=TEST_RESULT_TRUE
 
@@ -1038,7 +1131,7 @@ class MobileOpeartions():
                             Min=element[1].text
                             AMorPM=element[2].text
                             output=Hour+':'+Min+':'+AMorPM
-                            log.info("Time: "+output)
+                            log.info("Time: "+str(output))
                             status=TEST_RESULT_PASS
                             result=TEST_RESULT_TRUE
                     else:
@@ -1170,7 +1263,7 @@ class MobileOpeartions():
                             Date=element[1].text
                             Year=element[2].text
                             output=Month+'/'+Date+'/'+Year
-                            log.info("Date: "+output)
+                            log.info("Date: "+str(output))
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
                         else :
@@ -1298,6 +1391,23 @@ class MobileOpeartions():
             log.error("Error occurred in BackPress")
             log.error(e,exc_info=True)
             return status,methodoutput,output,err_msg
+
+    def hide_soft_keyboard(self,driver,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        output=OUTPUT_CONSTANT
+        err_msg=None
+        #log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        try:
+            if driver.is_keyboard_shown():
+                driver.hide_keyboard()
+            time.sleep(1)
+            status=TEST_RESULT_PASS
+            methodoutput=TEST_RESULT_TRUE
+        except Exception as e:
+            log.error("Error occurred in HideSoftKeyboard")
+            log.error(e,exc_info=True)
+        return status,methodoutput,output,err_msg
 
 
 

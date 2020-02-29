@@ -874,12 +874,18 @@ class Controller():
                 log.info('Invalid step number!! Please provide run from step number')
         else:
             logger.print_on_console('Invalid script')
+        temp={}
         if (handler.local_handler.awsKeywords):
-            logger.print_on_console("***Following Testcases are not AWS Compatible because of the following keywords :***")
-            log.info("***Following Testcases are not AWS Compatible because of the following keywords :***")
             for k,v in handler.local_handler.awsKeywords.items():
-                logger.print_on_console(k,':',list(v))
-                log.info(k+':'+str(list(v)))
+                if list(v) != []:
+                    temp[k]=list(v)
+            handler.local_handler.awsKeywords=temp
+            if (handler.local_handler.awsKeywords):
+                logger.print_on_console("***Following Testcases are not AWS Compatible because of the following keywords :***")
+                log.info("***Following Testcases are not AWS Compatible because of the following keywords :***")
+                for k,v in handler.local_handler.awsKeywords.items():
+                    logger.print_on_console(k,':',list(v))
+                    log.info(k+':'+str(list(v)))
         print(line_separator)
         log.info('***DEBUG COMPLETED***')
         logger.print_on_console('***DEBUG COMPLETED***')
