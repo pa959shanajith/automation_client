@@ -66,7 +66,7 @@ class InstallAndLaunch():
                 logger.print_on_console('Server started')
             else:
                 path = curdir + '/plugins/Mobility/MobileApp/node_modules/appium/build/lib/main.js'
-                nodePath = curdir + '/plugins/Mobility/MobileApp/node_modules/node'
+                nodePath = curdir + '/plugins/Mobility/MobileApp/node_modules/node_appium'
                 proc = subprocess.Popen([nodePath, path], shell=False, stdin=None, stdout=None, stderr=None, close_fds=True)
                 time.sleep(25)
                 logger.print_on_console('Server started')

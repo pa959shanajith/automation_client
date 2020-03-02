@@ -1267,7 +1267,7 @@ def kill_process():
         try:
             os.system("killall -9 Safari")
             os.system("killall -9 safaridriver")
-            os.system("killall -9 node")
+            os.system("killall -9 node_appium")
             os.system("killall -9 xcodebuild")
         except Exception as e:
             logger.print_on_console('Exception in stopping server')
