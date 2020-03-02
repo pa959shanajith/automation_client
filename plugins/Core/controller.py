@@ -1247,21 +1247,21 @@ def kill_process():
             import browserops_MW
             browserops_MW.driver.quit()
         except Exception as e:
-            logger.print_on_console('Error in stopping scraping driver as driver is already closed')
+            #logger.print_on_console('Error in stopping scraping driver as driver is already closed')
             log.error(e)
 
         try:
             import browser_Keywords_MW
             browser_Keywords_MW.driver_obj.quit()
         except Exception as e:
-            logger.print_on_console('Error in stopping browser driver as driver is already closed')
+            #logger.print_on_console('Error in stopping browser driver as driver is already closed')
             log.error(e)
 
         try:
             import install_and_launch
             install_and_launch.driver.quit()
         except Exception as e:
-            logger.print_on_console('Error in stopping application driver as driver is already closed')
+            #logger.print_on_console('Error in stopping application driver as driver is already closed')
             log.error(e)
 
         try:
@@ -1269,6 +1269,8 @@ def kill_process():
             os.system("killall -9 safaridriver")
             os.system("killall -9 node_appium")
             os.system("killall -9 xcodebuild")
+            os.system("killall -9 chromedriver")
+            os.system("killall -9 geckodriver")
         except Exception as e:
             logger.print_on_console('Exception in stopping server')
             log.error(e)
