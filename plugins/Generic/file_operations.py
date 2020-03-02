@@ -15,7 +15,7 @@ import logger
 import generic_constants
 from constants import *
 import folder_operations
-from file_comparison_operations import TextFile,PdfFile,XML
+from file_comparison_operations import TextFile,PdfFile,XML,JSON
 import excel_operations
 import core_utils
 import urllib.request, urllib.error, urllib.parse
@@ -34,6 +34,7 @@ class FileOperations:
         self.txt=TextFile()
         self.pdf=PdfFile()
         self.xml=XML()
+        self.json=JSON()
         self.folder=folder_operations.FolderOperations()
         self.xls_obj=excel_operations.ExcelXLS()
         self.xlsx_obj=excel_operations.ExcelXLSX()
@@ -44,6 +45,7 @@ class FileOperations:
               '.xls_write_to_file':self.xls_obj.write_to_file_xls,
               '.xlsx_write_to_file':self.xlsx_obj.write_to_file_xlsx,
               '.xml_write_to_file':self.xml.write_to_file,
+              '.json_write_to_file':self.json.write_to_file,
 
               '.xls_verify_content':self.xls_obj.verify_content_xls,
               '.xlsx_verify_content':self.xlsx_obj.verify_content_xlsx,
@@ -498,11 +500,16 @@ class FileOperations:
             err_msg=None
             output_res=OUTPUT_CONSTANT
             log.debug('reading the inputs')
-            params=self.__split(input_path,content,*args)
+            params=[]
             log.debug('verifying whether the file exists')
             result=self.verify_file_exists(params[0],'')
             if result[1]==TEST_RESULT_TRUE:
                 file_ext,res=self.__get_ext(params[0])
+                if file_ext.lower()=='.json':
+                    params.append(input_path)
+                    params.append(content)
+                else:
+                    params=self.__split(input_path,content,*args)
                 if res == True:
                     log.debug('writing to the file')
                     res,err_msg = self.dict[file_ext+'_write_to_file'](*params)
