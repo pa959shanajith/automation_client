@@ -912,9 +912,9 @@ class Controller():
             do_not_execute = False
             #Check for the disabled scenario
             if not (do_not_execute) :
-                i=0
                  #Logic to Execute each suite for each of the browser
                 for browser in browser_type[suite_id]:
+                    i=0
                     #Logic to iterate through each scenario in the suite
                     for scenario,scenario_id,condition_check_value,dataparam_path_value in zip(suite_id_data,scenarioIds[suite_id],condition_check[suite_id],dataparam_path[suite_id]):
                         execute_flag=True

@@ -43,9 +43,9 @@ import handler
 log = logging.getLogger('webservices.py')
 class WSkeywords:
 
-     """The instantiation operation __init__ creates an empty object of the class WSkeywords when it is instantiated"""
+    """The instantiation operation __init__ creates an empty object of the class WSkeywords when it is instantiated"""
 
-     def __init__(self):
+    def __init__(self):
         self.baseEndPointURL=''
         self.baseOperation=''
         self.baseMethod=''
@@ -54,18 +54,15 @@ class WSkeywords:
         self.baseResHeader = None
         self.baseResBody=None
         self.modifiedTemplate = ''
-        self.verify=''
         self.content_type=''
         # Certificate elements
-        self.server_cert_path = None
-        self.server_key_path = None
-        self.client_cert_path = None
-        self.client_key_path = None
+        self.server_cert = False
+        self.client_cert = None
         self.certdetails = {}
-        self.auth_uname = ''
-        self.auth_pass = ''
+        self.req_auth = None
+        self.req_cookies = None
 
-     def clearValues(self):
+    def clearValues(self):
         self.baseEndPointURL=''
         self.baseOperation=''
         self.baseMethod=''
@@ -74,17 +71,15 @@ class WSkeywords:
         self.baseResHeader = None
         self.baseResBody=None
         self.modifiedTemplate = ''
-        self.verify=''
         self.content_type=''
         # Certificate elements
-        self.server_cert_path = None
-        self.server_key_path = None
-        self.client_cert_path = None
-        self.client_key_path = None
+        self.server_cert = False
+        self.client_cert = None
         self.certdetails = {}
-        self.auth_uname = ''
-        self.auth_pass = ''
-     def clearCertFiles(self):
+        self.req_auth = None
+        self.req_cookies = None
+
+    def clearCertFiles(self):
         try:
             os.remove("PRIVATECERT.pem")
             os.remove("PRIVATEKEY.pem")
@@ -92,10 +87,10 @@ class WSkeywords:
             os.remove("TRUSTSTORECERT.pem")
         except Exception as fileremovalexc:
             log.error(fileremovalexc)
-            if self.client_cert_path != '' and self.client_cert_path != None:
-                logger.print_on_console('Cannot find the Certificate' )
+            if self.client_cert is not None and self.client_cert[0] != '' and self.client_cert[0] != None:
+                    logger.print_on_console('Cannot find the Certificate')
 
-     def setEndPointURL(self,url):
+    def setEndPointURL(self,url):
         """
         def : setEndPointURL
         purpose : sets the endpoint url provided in param url
@@ -131,7 +126,7 @@ class WSkeywords:
         log.info(RETURN_RESULT)
         return status,methodoutput,output,err_msg
 
-     def setOperations(self,operation):
+    def setOperations(self,operation):
         """
         def : setOperations
         purpose : sets the operation provided in param operation
@@ -167,7 +162,7 @@ class WSkeywords:
         log.info(RETURN_RESULT)
         return status,methodoutput,output,err_msg
 
-     def setMethods(self,method):
+    def setMethods(self,method):
         """
         def : setMethods
         purpose : sets the method provided in param method
@@ -207,7 +202,7 @@ class WSkeywords:
         log.info(RETURN_RESULT)
         return status,methodoutput,output,err_msg
 
-     def setHeaderTemplate(self,header):
+    def setHeaderTemplate(self,header):
         """
         def : setHeader
         purpose : sets the header provided in param header
@@ -243,7 +238,7 @@ class WSkeywords:
         return status,methodoutput,output,err_msg
 
 
-     def setHeader(self,header):
+    def setHeader(self,header):
         """
         def : setHeader
         purpose : sets the header provided in param header
@@ -269,12 +264,12 @@ class WSkeywords:
                 for x in header:
                     if ':' in x:
                         index=x.index(':')
-                        header_dict[x[0:index].strip()]=x[index+1:].strip()
+                        header_dict[x[0:index].strip().lower()]=x[index+1:].strip()
                 if len(header_dict) !=0:
                     self.baseReqHeader=header_dict
                     log.info(header_dict)
-                    if 'Content-Type' in header_dict.keys():
-                        self.content_type=header_dict['Content-Type']
+                    if 'Content-Type'.lower() in header_dict.keys():
+                        self.content_type=header_dict['Content-Type'.lower()]
                 else:
                     self.baseReqHeader=header[0]
                 log.info('Header is set')
@@ -294,9 +289,7 @@ class WSkeywords:
         log.info(RETURN_RESULT)
         return status,methodoutput,output,err_msg
 
-
-
-     def setWholeBody(self,body):
+    def setWholeBody(self,body):
         """
         def : setWholeBody
         purpose : sets the body provided in param body
@@ -331,7 +324,7 @@ class WSkeywords:
         return status,methodoutput,output,err_msg
 
 
-     def __saveResults(self,response):
+    def __saveResults(self,response):
         status = ws_constants.TEST_RESULT_FAIL
         methodoutput = ws_constants.TEST_RESULT_FALSE
         log.debug(STATUS_METHODOUTPUT_LOCALVARIABLES)
@@ -363,31 +356,39 @@ class WSkeywords:
         log.info(RETURN_RESULT)
         return status,methodoutput,output
 
-     def post(self):
+
+    def get_cookies(self):
+        #supporting the cookies: getting the cookies from the header.
+        cookies_jar = requests.cookies.RequestsCookieJar()
+        if self.baseReqHeader!='' and len(self.baseReqHeader.items())>0:
+            for key_in,value_in in self.baseReqHeader.items():
+                if key_in.lower()=='cookie':
+                    for each_cookies in value_in.split(';'):
+                        if each_cookies.find("=")!=-1:
+                            cookies_list = each_cookies.split("=")
+                            cookies_jar.set(cookies_list[0],cookies_list[1])
+                        else:
+                            logger.print_on_console("Found Invalid Cookie")
+                    logger.print_on_console("Value of Cookie {}".format(cookies_jar.get_dict()))
+        self.req_cookies = cookies_jar
+
+    def post(self):
         status = ws_constants.TEST_RESULT_FAIL
         methodoutput = ws_constants.TEST_RESULT_FALSE
         log.debug(STATUS_METHODOUTPUT_LOCALVARIABLES)
         output=OUTPUT_CONSTANT
         err_msg=None
         try:
-            if ws_constants.CONTENT_TYPE_JSON in self.content_type.lower():
-
-                if (not(self.client_cert_path == '' or self.client_cert_path == None)):
-                    #if client certificates exists
-                    response,err_msg = self.client_Authentication()
-                elif(not(self.auth_uname == '' or self.auth_uname == None)
-                        and not (self.auth_pass == '' or self.auth_pass == None)):
-                    #if only basic authentication required
-                    response = self.basic_Authentication()
-                elif(not(self.server_cert_path == '' or self.server_cert_path == None)):
-                    #if only server certificate
-                    response = self.server_Verification()
-                else:
+            self.get_cookies()
+            if not (self.baseEndPointURL is '' and self.baseReqBody is '' and self.baseReqHeader is ''):
+                if ws_constants.CONTENT_TYPE_JSON in self.content_type.lower():
                     try:
-                        req_body=json.loads(self.baseReqBody)
+                        req_body=json.dumps(json.loads(self.baseReqBody))
                     except:
-                        req_body=self.baseReqBody
-                    response = requests.post(self.baseEndPointURL,data = json.dumps(req_body), headers=self.baseReqHeader)
+                        req_body=json.dumps(self.baseReqBody)
+                else:
+                    req_body=self.baseReqBody
+                response = requests.post(self.baseEndPointURL, data = req_body, headers=self.baseReqHeader, cookies=self.req_cookies, cert=self.client_cert, verify=self.server_cert, auth=self.req_auth)
 
                 if response != None and response != False:
                     self.clearCertFiles()
@@ -395,56 +396,6 @@ class WSkeywords:
                 else:
                     err_msg=ws_constants.METHOD_INVALID_INPUT
                     log.error(err_msg)
-            elif ws_constants.CONTENT_TYPE_XML in self.content_type.lower() or ws_constants.CONTENT_TYPE_SOAP_XML in self.content_type.lower():
-                if not (self.baseEndPointURL is '' and self.baseReqBody is '' and self.baseReqHeader is ''):
-                    if (not(self.client_cert_path == '' or self.client_cert_path == None)):
-                        #if client certificates exists
-                        response = self.client_Authentication()
-                    elif(not(self.auth_uname == '' or self.auth_uname == None)
-                            and not (self.auth_pass == '' or self.auth_pass == None)):
-                        #if only basic authentication required
-                        response = self.basic_Authentication()
-                    elif(not(self.server_cert_path == '' or self.server_cert_path == None)):
-                        #if only server certificate
-                        response = self.server_Verification()
-                    else:
-                        response = requests.post(self.baseEndPointURL,data=self.baseReqBody,headers=self.baseReqHeader)
-
-                    if response != None and response != False:
-                        self.clearCertFiles()
-                        status,methodoutput,output=self.__saveResults(response)
-                    else:
-                        err_msg=ws_constants.METHOD_INVALID_INPUT
-                        log.error(err_msg)
-                else:
-                    err_msg=ws_constants.METHOD_INVALID_INPUT
-                    log.error(err_msg)
-                    logger.print_on_console(ws_constants.METHOD_INVALID_INPUT)
-            elif "x-www-form-urlencoded" in self.content_type.lower():
-                if not (self.baseEndPointURL is '' and self.baseReqBody is '' and self.baseReqHeader is ''):
-                    if (not(self.client_cert_path == '' or self.client_cert_path == None)):
-                        #if client certificates exists
-                        response = self.client_Authentication()
-                    elif(not(self.auth_uname == '' or self.auth_uname == None)
-                            and not (self.auth_pass == '' or self.auth_pass == None)):
-                        #if only basic authentication required
-                        response = self.basic_Authentication()
-                    elif(not(self.server_cert_path == '' or self.server_cert_path == None)):
-                        #if only server certificate
-                        response = self.server_Verification()
-                    else:
-                        response = requests.post(self.baseEndPointURL,data=self.baseReqBody,headers=self.baseReqHeader)
-
-                    if response != None and response != False:
-                        self.clearCertFiles()
-                        status,methodoutput,output=self.__saveResults(response)
-                    else:
-                        err_msg=ws_constants.METHOD_INVALID_INPUT
-                        log.error(err_msg)
-                else:
-                    err_msg=ws_constants.METHOD_INVALID_INPUT
-                    log.error(err_msg)
-                    logger.print_on_console(ws_constants.METHOD_INVALID_INPUT)
             else:
                 err_msg=ws_constants.METHOD_INVALID_INPUT
                 log.error(err_msg)
@@ -456,7 +407,7 @@ class WSkeywords:
         log.info(RETURN_RESULT)
         return status,methodoutput,output,err_msg
 
-     def get(self):
+    def get(self):
         status = ws_constants.TEST_RESULT_FAIL
         methodoutput = ws_constants.TEST_RESULT_FALSE
         output=None
@@ -467,7 +418,8 @@ class WSkeywords:
                 req=self.baseEndPointURL+'/'+self.baseOperation+'?'+self.baseReqHeader
             elif not (self.baseEndPointURL is ''):
                 req=self.baseEndPointURL
-            response=requests.get(req)
+            self.get_cookies()
+            response=requests.get(req, cookies=self.req_cookies, verify=self.server_cert)
             logger.print_on_console('Response: ',response)
             log.info(response)
             status,methodoutput,output=self.__saveResults(response)
@@ -478,7 +430,7 @@ class WSkeywords:
         log.debug(RETURN_RESULT)
         return status,methodoutput,output,err_msg
 
-     def put(self):
+    def put(self):
         status = ws_constants.TEST_RESULT_FAIL
         methodoutput = ws_constants.TEST_RESULT_FALSE
         output=None
@@ -503,7 +455,7 @@ class WSkeywords:
         log.debug(RETURN_RESULT)
         return status,methodoutput,output,err_msg
 
-     def delete(self):
+    def delete(self):
         status = ws_constants.TEST_RESULT_FAIL
         methodoutput = ws_constants.TEST_RESULT_FALSE
         log.debug(STATUS_METHODOUTPUT_LOCALVARIABLES)
@@ -528,7 +480,7 @@ class WSkeywords:
         log.debug(RETURN_RESULT)
         return status,methodoutput,output,err_msg
 
-     def head(self):
+    def head(self):
         status = ws_constants.TEST_RESULT_FAIL
         methodoutput = ws_constants.TEST_RESULT_FALSE
         output=None
@@ -560,7 +512,7 @@ class WSkeywords:
         log.debug(RETURN_RESULT)
         return status,methodoutput,output,err_msg
 
-     def executeRequest(self,*args):
+    def executeRequest(self,*args):
         testcasename = handler.local_handler.testcasename
         status = ws_constants.TEST_RESULT_FAIL
         methodoutput = ws_constants.TEST_RESULT_FALSE
@@ -619,7 +571,7 @@ class WSkeywords:
             log.error(e,exc_info=True)
         return result
 
-     def getHeader(self,*args):
+    def getHeader(self,*args):
         status = ws_constants.TEST_RESULT_FAIL
         methodoutput = ws_constants.TEST_RESULT_FALSE
         err_msg=None
@@ -629,7 +581,7 @@ class WSkeywords:
             if len(args) == 1:
                 key=args[0]
                 if key!= None and key != '':
-##                    logger.print_on_console(ws_constants.RESULT,str(self.baseResHeader[key]))
+            
                     log.debug(STATUS_METHODOUTPUT_UPDATE)
                     status = ws_constants.TEST_RESULT_PASS
                     methodoutput = ws_constants.TEST_RESULT_TRUE
@@ -639,7 +591,7 @@ class WSkeywords:
                         output = 'null'
                         logger.print_on_console('Please provide valid Input - Invalid Header Key ='+key)
                 else:
-##                    logger.print_on_console(ws_constants.RESULT,str(self.baseResHeader))
+                
                     log.debug(STATUS_METHODOUTPUT_UPDATE)
                     if self.baseResHeader != None:
                         status = ws_constants.TEST_RESULT_PASS
@@ -650,7 +602,7 @@ class WSkeywords:
                 for i in range(0,len(args)):
                     key = args[i]
                     if key!= None and key != '':
-##                    logger.print_on_console(ws_constants.RESULT,str(self.baseResHeader[key]))
+
                         log.debug(STATUS_METHODOUTPUT_UPDATE)
                         status = ws_constants.TEST_RESULT_PASS
                         methodoutput = ws_constants.TEST_RESULT_TRUE
@@ -660,7 +612,7 @@ class WSkeywords:
                             output.append('null')
                             logger.print_on_console('Please provide valid Input - Invalid Header Key ='+key)
                     else:
-    ##                    logger.print_on_console(ws_constants.RESULT,str(self.baseResHeader))
+
                         log.debug(STATUS_METHODOUTPUT_UPDATE)
                         if self.baseResHeader != None:
                             status = ws_constants.TEST_RESULT_PASS
@@ -679,47 +631,44 @@ class WSkeywords:
         return status,methodoutput,output,err_msg
 
 
-     def getBody(self,*args):
+    def getBody(self,*args):
         status = ws_constants.TEST_RESULT_FAIL
         methodoutput = ws_constants.TEST_RESULT_FALSE
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         err_msg=None
         output=None
         try:
-            if len(args) == 1:
-##                    logger.print_on_console(ws_constants.RESULT,self.baseResBody)
-                    log.debug(STATUS_METHODOUTPUT_UPDATE)
-                    try:
-                        flag=0
-                        if self.baseResBody != None:
-                            status = ws_constants.TEST_RESULT_PASS
-                            methodoutput = ws_constants.TEST_RESULT_TRUE
-                            if 'soap:Envelope' in self.baseResBody:
-                                from lxml import etree as et
-                                root = et.fromstring(self.baseResBody)
-                                #root = et.fromstring(bytes(self.baseResBody,'utf-8'))
-                                respBody = str(et.tostring(root,pretty_print=True))
-                                if respBody.find(args[0])==-1:
-                                    status = ws_constants.TEST_RESULT_FAIL
-                                    methodoutput = ws_constants.TEST_RESULT_FALSE
-                                    logger.print_on_console("Input error: please provide the valid input")
-                                    flag=1
-                                else:
+            if len(args) == 1:                    
+                log.debug(STATUS_METHODOUTPUT_UPDATE)
+                try:
+                    flag=0
+                    if self.baseResBody != None:
+                        status = ws_constants.TEST_RESULT_PASS
+                        methodoutput = ws_constants.TEST_RESULT_TRUE
+                        if 'soap:Envelope' in self.baseResBody:
+                            from lxml import etree as et
+                            root = et.fromstring(self.baseResBody)
+                            
+                            respBody = str(et.tostring(root,pretty_print=True))
+                            if respBody.find(args[0])==-1:
+                                status = ws_constants.TEST_RESULT_FAIL
+                                methodoutput = ws_constants.TEST_RESULT_FALSE
+                                logger.print_on_console("Input error: please provide the valid input")
+                                flag=1
+                            else:
                                     self.baseResBody = respBody
-                        if not flag:
-                            output= self.baseResBody
-                    except Exception as e:
-                        log.error(e)
+                    if not flag:
                         output= self.baseResBody
+                except Exception as e:
+                    log.error(e)
+                    output= self.baseResBody
             elif len(args) == 2:
-                key=args[0]
                 if not(self.baseResBody is None):
                     response_body=self.baseResBody
                     if args[0] !='' and args[1]!='' and args[0] !=None and args[1]!=None:
                         start=response_body.find(args[0])+len(args[0])
                         end=response_body.find(args[1])
-                        response_body=response_body[start:end]
-##                        logger.print_on_console(ws_constants.RESULT,response_body)
+                        response_body=response_body[start:end]                       
                         log.debug(STATUS_METHODOUTPUT_UPDATE)
                         status = ws_constants.TEST_RESULT_PASS
                         methodoutput = ws_constants.TEST_RESULT_TRUE
@@ -744,17 +693,13 @@ class WSkeywords:
     # CERT/CER/CRT-KEY
     # input: <<clcert.cert>>;<<clkey.cert>>;<<certpass>>(opt);<<servcert.cert>>(opt)
 
-     def addClientCertificate(self,client_cert,client_key,keystore_pass,server_cert):
+    def addClientCertificate(self,client_cert,client_key,keystore_pass):
         status = ws_constants.TEST_RESULT_FAIL
         methodoutput = ws_constants.TEST_RESULT_FALSE
         err_msg=None
         output=OUTPUT_CONSTANT
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
-##            response=requests.get(url, cert=(filepath_cert, filepath_key))
-##            log.debug(STATUS_METHODOUTPUT_UPDATE)
-##            status = ws_constants.TEST_RESULT_PASS
-##            methodoutput = ws_constants.TEST_RESULT_TRUE
             if (client_cert != '' and client_cert != None):
                 if (os.path.exists(client_cert) == True):
                     # if client trusted cert and client trusted key files are given seperate
@@ -797,7 +742,7 @@ class WSkeywords:
         log.info(RETURN_RESULT)
         return status,methodoutput,output,err_msg
 
-     def extract_pem(self,client_cert,keystore_pass):
+    def extract_pem(self,client_cert,keystore_pass):
         import pem
         extract_status = False
         try:
@@ -823,23 +768,23 @@ class WSkeywords:
                 filecreated = open(each.replace(" ","")+".pem","w")
                 filecreated.write(self.certdetails[each])
                 filecreated.close()
-                self.client_cert_path = "PRIVATECERT.pem"
+                client_cert_path = "PRIVATECERT.pem"
                 if self.certdetails['RSA PRIVATE KEY'] == "":
-                    self.client_key_path = "PRIVATEKEY.pem"
+                    client_key_path = "PRIVATEKEY.pem"
                 else:
-                    self.client_key_path = "RSAPRIVATEKEY.pem"
-
+                    client_key_path = "RSAPRIVATEKEY.pem"
+                self.client_cert = (client_cert_path, client_key_path)
                 try:
-                    self.server_cert_path = "TRUSTSTORECERT.pem"
+                    self.server_cert = "TRUSTSTORECERT.pem"
                 except Exception as e:
                     log.error(e)
-                    self.server_cert_path =''
+                    self.server_cert = False
         except Exception as e:
             log.error(e)
             logger.print_on_console(str(e))
         return extract_status
 
-     def extract_jks(self,client_cert,keystore_pass):
+    def extract_jks(self,client_cert,keystore_pass):
         extract_status = False
         try:
             import jks
@@ -873,8 +818,7 @@ class WSkeywords:
                 logger.print_on_console("Secret key: %s" % secretkey.alias)
                 logger.print_on_console(" Algorithm: %s" % secretkey.algorithm)
                 logger.print_on_console(" Key size: %d bits" % secretkey.key_size)
-                logger.print_on_console(" Key: %s" % "".join("{:02x"
-                +"}".format(bytedata) for bytedata in bytearray(secretkey.key)))
+                logger.print_on_console(" Key: %s" % "".join("{:02x}".format(bytedata) for bytedata in bytearray(secretkey.key)))
                 logger.print_on_console("------------------------------------")
 
             for each in self.certdetails:
@@ -882,26 +826,27 @@ class WSkeywords:
                 filecreated = open(each.replace(" ","")+".pem","w")
                 filecreated.write(self.certdetails[each])
                 filecreated.close()
-                self.client_cert_path = "PRIVATECERT.pem"
+                client_cert_path = "PRIVATECERT.pem"
                 if self.certdetails['RSA PRIVATE KEY'] == "":
-                    self.client_key_path = "PRIVATEKEY.pem"
+                    client_key_path = "PRIVATEKEY.pem"
                 else:
-                    self.client_key_path = "RSAPRIVATEKEY.pem"
+                    client_key_path = "RSAPRIVATEKEY.pem"
+                self.client_cert = (client_cert_path, client_key_path)
                 try:
-                    self.server_cert_path = "TRUSTSTORECERT.pem"
+                    self.server_cert = "TRUSTSTORECERT.pem"
                 except Exception as e:
                     log.error(e)
-                    self.server_cert_path =''
+                    self.server_cert = False
         except Exception as e:
             log.error(e)
             logger.print_on_console(str(e))
         return extract_status
 
 
-     def cert_formatter(self,certdata_bytes,certtype):
+    def cert_formatter(self,certdata_bytes,certtype):
+        pemfile = ""
         try:
             import base64, textwrap
-            pemfile = ""
             pemfile=("-----BEGIN "+ certtype+"-----\n"
             +"\n".join(textwrap.wrap(base64.b64encode(certdata_bytes).decode('ascii'), 64))
             +"\n-----END "+certtype+"-----")
@@ -910,69 +855,7 @@ class WSkeywords:
             logger.print_on_console(e)
         return pemfile
 
-
-     def server_Verification(self):
-        logger.print_on_console('This feature is not available')
-        return ''
-
-     def basic_Authentication(self):
-        logger.print_on_console('This feature is not available')
-        return ''
-
-
-     def client_Authentication(self):
-        response=False
-        err_msg = None
-        try:
-            cert = (self.client_cert_path, self.client_key_path)
-            if (cert != (None, None)):
-            # if basic auth details are available
-                if not((self.auth_uname == '' or self.auth_uname == None) and (self.auth_pass == '' or self.auth_pass == None)):
-                    # if server side certificates are available
-                    if (not (self.server_cert_path == '' or self.server_cert_path == None)):
-                        log.debug('TWO WAY HANDSHAKE with basic authentication')
-                        response = requests.post(self.baseEndPointURL,
-                                                data = self.baseReqBody,
-                                                headers=self.baseReqHeader,
-                                                cert=cert,
-                                                verify=self.server_cert_path,
-                                                auth=(self.auth_uname,self.auth_pass))
-                    else:
-                        log.debug('ONE WAY HANDSHAKE with basic authentication')
-                        response = requests.post(self.baseEndPointURL,
-                                                data = self.baseReqBody,
-                                                headers=self.baseReqHeader,
-                                                cert=cert,
-                                                verify=False,
-                                                auth=(self.auth_uname,self.auth_pass))
-                else:
-                    if (not (self.server_cert_path == '' or self.server_cert_path == None)):
-                        log.debug('TWO WAY HANDSHAKE without basic authentication')
-                        response = requests.post(self.baseEndPointURL,
-                                                data = self.baseReqBody,
-                                                headers=self.baseReqHeader,
-                                                cert=cert,
-                                                verify=self.server_cert_path)
-                    else:
-                        log.debug('ONE WAY HANDSHAKE without basic authentication')
-                        response = requests.post(self.baseEndPointURL,
-                                                data = self.baseReqBody,
-                                                headers=self.baseReqHeader,
-                                                cert=cert,
-                                                verify=False)
-            else:
-                response = requests.post(self.baseEndPointURL,data=self.baseReqBody,headers=self.baseReqHeader)
-        except Exception as e:
-            log.error(e)
-            if '[SSL: CERTIFICATE_VERIFY_FAILED]' in str(e):
-                err_msg = 'Certificate Mismatched.'
-            else:
-                err_msg=ws_constants.METHOD_INVALID_INPUT
-            log.error(e)
-            logger.print_on_console(err_msg)
-        return response,err_msg
-
-     def parse_xml(self,input_xml,path,value,attribute_name,flag):
+    def parse_xml(self,input_xml,path,value,attribute_name,flag):
         template = etree.fromstring(input_xml)
         index=0
         new_path=path.split('/')
@@ -985,7 +868,7 @@ class WSkeywords:
         result=etree.tostring(template)
         return result
 
-     def actual_parser(self,element_to_change,value,obj,index,attribute_name,flag):
+    def actual_parser(self,element_to_change,value,obj,index,attribute_name,flag):
         index+=1
         for body_object in obj:
             if flag == 'tagname':
@@ -1002,7 +885,7 @@ class WSkeywords:
                             break
             self.actual_parser(element_to_change,value,body_object,index,attribute_name,flag)
 
-     def setTagAttribute(self,attribute_value,element_path):
+    def setTagAttribute(self,attribute_value,element_path):
         status = ws_constants.TEST_RESULT_FAIL
         methodoutput = ws_constants.TEST_RESULT_FALSE
         err_msg=None
@@ -1038,7 +921,7 @@ class WSkeywords:
         return status,methodoutput,output,err_msg
 
 
-     def setTagValue(self,value,element_path):
+    def setTagValue(self,value,element_path):
         status = ws_constants.TEST_RESULT_FAIL
         methodoutput = ws_constants.TEST_RESULT_FALSE
         err_msg=None
@@ -1072,7 +955,7 @@ class WSkeywords:
         return status,methodoutput,output,err_msg
 
 
-     def getServerCertificate(self,url,filepath):
+    def getServerCertificate(self,url,filepath):
         status = ws_constants.TEST_RESULT_FAIL
         methodoutput = ws_constants.TEST_RESULT_FALSE
         err_msg=None
@@ -1113,7 +996,7 @@ class WSkeywords:
         log.info(RETURN_RESULT)
         return status,methodoutput,output,err_msg
 
-     def setBasicAuth(self,uname,password):
+    def setBasicAuth(self,uname,password):
         status = ws_constants.TEST_RESULT_FAIL
         methodoutput = ws_constants.TEST_RESULT_FALSE
         err_msg=None
@@ -1122,8 +1005,7 @@ class WSkeywords:
         try:
             if (not(uname == '' and uname == None) and
                 not(password == '' and password == None)):
-                    self.auth_uname = uname
-                    self.auth_pass = self.aes_decript(password)
+                    self.req_auth = (uname, self.aes_decript(password))
                     log.debug(STATUS_METHODOUTPUT_UPDATE)
                     logger.print_on_console('Basic Authentication enabled.')
                     status = ws_constants.TEST_RESULT_PASS
@@ -1139,7 +1021,7 @@ class WSkeywords:
         log.info(RETURN_RESULT)
         return status,methodoutput,output,err_msg
 
-     def aes_decript(self,encrypted_data):
+    def aes_decript(self,encrypted_data):
         decrypted_data = ''
         try:
             encrypt_obj=encryption_utility.AESCipher()
