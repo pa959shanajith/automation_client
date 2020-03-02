@@ -153,11 +153,11 @@ class custom():
                 if len(visible_text) > 0:
                     if SYSTEM_OS != 'Darwin':
                         for item in classes[object_name]:
-                            xpath_str = '//'+item+'[@text="'+visible_text+'"]'
+                            xpath_str = "//"+item+"[starts-with(@text,'"+visible_text+"')]"
                             element_list = element_list + driver.find_elements_by_xpath(xpath_str)
                     else:
                         for item in classes_ios[object_name]:
-                            xpath_str = '//'+item+'[@text="'+visible_text+'"]'
+                            xpath_str = "//"+item+"[starts-with(@text,'"+visible_text+"')]"
                             element_list = element_list + driver.find_elements_by_xpath(xpath_str)
                 else:
                     if SYSTEM_OS != 'Darwin':
