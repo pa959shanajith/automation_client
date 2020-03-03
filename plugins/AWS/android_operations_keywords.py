@@ -661,7 +661,7 @@ class MobileOpeartions():
                 else:
                     err_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
             if err_msg:
-                log.erro(err_msg)
+                log.error(err_msg)
         except Exception as e:
             log.error(e)
         return status,methodoutput,output,err_msg
@@ -688,7 +688,7 @@ class MobileOpeartions():
                 else:
                     err_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
             if err_msg:
-                log.erro(err_msg)
+                log.error(err_msg)
         except Exception as e:
             log.error(e)
         return status,methodoutput,output,err_msg
@@ -722,7 +722,7 @@ class MobileOpeartions():
                 else:
                     err_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
             if err_msg:
-                log.erro(err_msg)
+                log.error(err_msg)
         except Exception as e:
             log.error(e)
         return status,methodoutput,output,err_msg
@@ -751,7 +751,7 @@ class MobileOpeartions():
                 else:
                     err_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
             if err_msg:
-                log.erro(err_msg)
+                log.error(err_msg)
         except Exception as e:
             log.error(e)
         return status,methodoutput,output,err_msg
@@ -798,7 +798,7 @@ class MobileOpeartions():
                 else:
                     err_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
             if err_msg:
-                log.erro(err_msg)
+                log.error(err_msg)
         except Exception as e:
             log.error(e)
         return status,methodoutput,output,err_msg
@@ -827,7 +827,7 @@ class MobileOpeartions():
                 else:
                     err_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
             if err_msg:
-                log.erro(err_msg)
+                log.error(err_msg)
         except Exception as e:
             log.error(e)
         return status,methodoutput,output,err_msg
@@ -856,7 +856,7 @@ class MobileOpeartions():
                 else:
                     err_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
             if err_msg:
-                log.erro(err_msg)
+                log.error(err_msg)
         except Exception as e:
             log.error(e)
         return status,methodoutput,output,err_msg
@@ -898,7 +898,7 @@ class MobileOpeartions():
                 else:
                     err_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
             if err_msg:
-                log.erro(err_msg)
+                log.error(err_msg)
         except Exception as e:
             log.error(e)
         return status,result,output,err_msg
@@ -922,7 +922,7 @@ class MobileOpeartions():
             else:
                 err_msg=ERROR_CODE_DICT['ERR_ELEMENT_NOT_EXISTS']
             if err_msg:
-                log.erro(err_msg)
+                log.error(err_msg)
         except Exception as e:
             log.error(e)
         return status,result,output,err_msg
