@@ -1265,6 +1265,18 @@ def kill_process():
             log.error(e)
 
         try:
+            import browser_Keywords
+            del browser_Keywords.drivermap[:]
+            if hasattr(browser_Keywords.local_bk, 'driver_obj'):
+                if (browser_Keywords.local_bk.driver_obj):
+                    browser_Keywords.local_bk.driver_obj = None
+            if hasattr(browser_Keywords.local_bk, 'pid_set'):
+                if (browser_Keywords.local_bk.pid_set):
+                    del browser_Keywords.local_bk.pid_set[:]
+        except Exception as e:
+            log.error(e)
+
+        try:
             os.system("killall -9 Safari")
             os.system("killall -9 safaridriver")
             os.system("killall -9 node_appium")
@@ -1274,6 +1286,7 @@ def kill_process():
         except Exception as e:
             logger.print_on_console('Exception in stopping server')
             log.error(e)
+
         log.info('Stale processes killed')
         logger.print_on_console('Stale processes killed')
     else:
