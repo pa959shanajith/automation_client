@@ -116,7 +116,7 @@ class MainNamespace(BaseNamespace):
             elif(str(args[0]) == 'schedulingEnabled'):
                 logger.print_on_console('Schedule Mode Enabled')
                 log.info('Schedule Mode Enabled')
-
+                
             elif(str(args[0]) == 'schedulingDisabled'):
                 logger.print_on_console('Schedule Mode Disabled')
                 log.info('Schedule Mode Disabled')
@@ -253,8 +253,9 @@ class MainNamespace(BaseNamespace):
 
     def on_webscrape(self,*args):
         try:
-            if check_execution_lic("scrape"): return None
             global action,wxObject,browsername,desktopScrapeFlag,data,socketIO
+            if check_execution_lic("scrape"): return None
+            if bool(wxObject.scrapewindow): return None
             args = list(args)
             d = args[0]
             action = d['action']
@@ -285,9 +286,7 @@ class MainNamespace(BaseNamespace):
                         browsername = '3'
                     elif str(task) == 'OPEN BROWSER FX':
                         browsername = '2'
-
-                if not bool(wxObject.scrapewindow):
-                    wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
+                wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
         except Exception as e:
             err_msg='Error while Scraping Web application'
             log.error(err_msg)
@@ -297,6 +296,7 @@ class MainNamespace(BaseNamespace):
     def on_LAUNCH_DESKTOP(self, *args):
         try:
             if check_execution_lic("scrape"): return None
+            elif bool(wxObject.scrapewindow): return None
             #con = controller.Controller()
             global browsername
             browsername = args
@@ -316,6 +316,8 @@ class MainNamespace(BaseNamespace):
     def on_LAUNCH_SAP(self, *args):
         try:
             if check_execution_lic("scrape"): return None
+            elif bool(wxObject.scrapewindow): return None
+
             #con = controller.Controller()
             global browsername
             browsername = args[0]
@@ -335,6 +337,7 @@ class MainNamespace(BaseNamespace):
     def on_LAUNCH_MOBILE(self, *args):
         try:
             if check_execution_lic("scrape"): return None
+            elif bool(wxObject.scrapewindow): return None
             global browsername
             #con = controller.Controller()
             if str(args[0]).endswith('apk'):
@@ -367,6 +370,7 @@ class MainNamespace(BaseNamespace):
     def on_LAUNCH_MOBILE_WEB(self, *args):
         try:
             if check_execution_lic("scrape"): return None
+            elif bool(wxObject.scrapewindow): return None
             global mobileWebScrapeObj,mobileWebScrapeFlag
             #con = controller.Controller()
             global browsername
@@ -388,6 +392,7 @@ class MainNamespace(BaseNamespace):
     def on_PDF_SCRAPE(self, *args):
         try:
             if check_execution_lic("scrape"): return None
+            elif bool(wxObject.scrapewindow): return None
             logger.print_on_console(" Entering inside PDF scrape")
             global pdfScrapeObj,pdfScrapeFlag
             global browsername
@@ -407,6 +412,7 @@ class MainNamespace(BaseNamespace):
     def on_LAUNCH_OEBS(self, *args):
         try:
             if check_execution_lic("scrape"): return None
+            elif bool(wxObject.scrapewindow): return None
             global oebsScrapeObj,oebsScrapeFlag
             #con = controller.Controller()
             global browsername
