@@ -1277,7 +1277,9 @@ def kill_process():
             log.error(e)
 
         try:
-            os.system("killall -9 Safari")
+            # os.system("killall -9 Safari") 
+                # This kills all instances of safari browser even if it is not opened by nineteen68.
+                # Issue when Nineteen68 is opened in Safari browser
             os.system("killall -9 safaridriver")
             os.system("killall -9 node_appium")
             os.system("killall -9 xcodebuild")

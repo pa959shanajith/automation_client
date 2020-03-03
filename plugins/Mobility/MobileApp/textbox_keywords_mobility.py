@@ -46,7 +46,8 @@ class Textbox_keywords():
                         if len(element.text)>0:
                             log.debug('clearing  the existing text')
                             element.clear()
-                        element.set_text(text)
+                        if SYSTEM_OS != 'Darwin': element.set_text(text)
+                        else: element.set_value(text)
                         configvalues = readconfig.configvalues
                         hide_soft_key = configvalues['hide_soft_key']
                         if android_scrapping.driver.is_keyboard_shown() and (hide_soft_key == "Yes"):
@@ -121,7 +122,8 @@ class Textbox_keywords():
                                 element.clear()
                             encryption_obj = AESCipher()
                             input_val = encryption_obj.decrypt(input)
-                            element.set_text(input_val)
+                            if SYSTEM_OS != 'Darwin': element.set_text(input_val)
+                            else: element.set_value(input_val)
                             configvalues = readconfig.configvalues
                             hide_soft_key = configvalues['hide_soft_key']
                             if android_scrapping.driver.is_keyboard_shown() and (hide_soft_key == "Yes"):

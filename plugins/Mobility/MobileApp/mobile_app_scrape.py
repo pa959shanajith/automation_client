@@ -48,12 +48,19 @@ class ScrapeWindow(wx.Frame):
                 self.x_Value=(size['width']*0.50)
             else:
                 self.print_error(DRIVER_ERROR)
-        elif filePath.split(';')[4]== "ios":
+        else:
             deviceName = filePath.split(';')[0]
             platform_version = filePath.split(';')[1]
             bundle_id = filePath.split(';')[2]
             Ip_Address = filePath.split(';')[3]
-            status = obj.installApplication(deviceName, platform_version,bundle_id,Ip_Address,"ios")
+            status = obj.installApplication(deviceName, platform_version,bundle_id,Ip_Address)
+            if android_scrapping.driver is not None:
+                size=android_scrapping.driver.get_window_size()
+                self.min_y=(size['height']/4)
+                self.max_y=(size['height']*0.75)
+                self.x_Value=(size['width']*0.50)
+            else:
+                self.print_error(DRIVER_ERROR)
         if status!=None:
             self.panel = wx.Panel(self)
             self.fullscrapebutton = wx.Button(self.panel, label="Full Scrape",pos=(12, 28), size=(150, 28))

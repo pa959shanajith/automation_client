@@ -39,7 +39,7 @@ class LaunchAndInstall():
         logger.print_on_console('Input is ',input_val)
         global driver, device_keywords_object
         try:
-            driver = install_obj.installApplication(input_val[0], input_val[1], input_val[2], None)
+            driver = install_obj.installApplication(input_val[0], input_val[1], input_val[2], input_val[3])
             if driver is not None:
                 status = mobile_app_constants.TEST_RESULT_PASS
                 result = mobile_app_constants.TEST_RESULT_TRUE
@@ -68,7 +68,7 @@ class LaunchAndInstall():
                         status = mobile_app_constants.TEST_RESULT_PASS
                         result = mobile_app_constants.TEST_RESULT_TRUE
             else:
-                os.system("killall -9 node")
+                os.system("killall -9 node_appium")
                 status = mobile_app_constants.TEST_RESULT_PASS
                 result = mobile_app_constants.TEST_RESULT_TRUE
         except Exception as e:
@@ -100,7 +100,7 @@ class LaunchAndInstall():
                 status = mobile_app_constants.TEST_RESULT_PASS
                 result = mobile_app_constants.TEST_RESULT_TRUE
             elif SYSTEM_OS == 'Darwin':
-                driver.remove_app(package_name)
+                driver.remove_app(apk_loc)#input for darwin should be bundleid
                 status = mobile_app_constants.TEST_RESULT_PASS
                 result = mobile_app_constants.TEST_RESULT_TRUE
             else:
@@ -124,6 +124,11 @@ class LaunchAndInstall():
             logger.print_on_console("Package name to be terminated:",android_scrapping.packageName)
             if SYSTEM_OS != 'Darwin':
                 err_msg = device_keywords_object.close_app(android_scrapping.packageName, android_scrapping.device_id)
+            else:
+                if (inputval):
+                    driver.terminate_app(inputval[0])
+                else:
+                    driver.close_app()
             if err_msg is None:
                 status=mobile_app_constants.TEST_RESULT_PASS
                 result=mobile_app_constants.TEST_RESULT_TRUE
