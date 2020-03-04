@@ -24,7 +24,7 @@ if SYSTEM_OS != 'Darwin':
     import utils_web
     import win32process
     import win32con
-    from pywinauto import Application
+#    from pywinauto import Application
 import psutil
 import readconfig
 import core_utils
@@ -68,7 +68,10 @@ class BrowserKeywords():
         err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         logger.print_on_console(err_msg)
         return err_msg
-
+    def _browser_not_avail(self,e):
+        err_msg='BROWSER NOT AVAILABLE'
+        logger.print_on_console(err_msg)
+        return err_msg
     def openBrowser(self,webelement,browser_num,*args):
         global local_bk, driver_pre, drivermap
         status=webconstants.TEST_RESULT_FAIL
@@ -207,8 +210,32 @@ class BrowserKeywords():
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
         return status,result,output,err_msg
+    def openNewTab(self ,*args):
+        global local_bk
+        status=webconstants.TEST_RESULT_FAIL
+        result=webconstants.TEST_RESULT_FALSE
+        output=OUTPUT_CONSTANT
+        err_msg=None
+        try:
+              logger.print_on_console(local_bk.driver_obj)
+              local_bk.driver_obj.execute_script("window.open('');")
+            
+              handles=local_bk.driver_obj.window_handles
+              size = len(handles)
+              local_bk.driver_obj.switch_to.window(handles[-1] )
+              h=local_bk.driver_obj.current_window_handle
+              local_bk.all_handles.append(h)
+              local_bk.recent_handles.append(h)
+             
+              status=webconstants.TEST_RESULT_PASS
+              result=webconstants.TEST_RESULT_TRUE
 
-    def refresh(self,*args):
+        except Exception as e:
+            err_msg=self._browser_not_avail(e)
+        return status,result,output,err_msg
+
+        
+    def refresh(self,webelement,*args):
         global local_bk
         status=webconstants.TEST_RESULT_FAIL
         result=webconstants.TEST_RESULT_FALSE
@@ -238,6 +265,7 @@ class BrowserKeywords():
                 if url[0:7].lower()!='http://' and url[0:8].lower()!='https://' and url[0:5].lower()!='file:':
                     url='http://'+url
                 local_bk.driver_obj.get(url)
+
                 #ignore certificate implementation
                 try:
                     ignore_certificate = readconfig.configvalues['ignore_certificate']

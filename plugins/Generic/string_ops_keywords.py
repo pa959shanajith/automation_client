@@ -10,6 +10,7 @@
 #-------------------------------------------------------------------------------
 import string
 import random
+import re
 import logger
 import generic_constants
 import core_utils
@@ -278,6 +279,7 @@ class StringOperation:
         result=generic_constants.TEST_RESULT_FALSE
         err_msg=None
         output=OUTPUT_CONSTANT
+        position=[]
         try:
             if not (actual_string is None or actual_string is ''):
                 if not (to_find is None or to_find is ''):
@@ -286,13 +288,20 @@ class StringOperation:
                     actual_string=unidecode(actual_string)
                     to_find=coreutilsobj.get_UTF_8(to_find)
                     output_val = actual_string.find(to_find)
+                    for m in re.finditer(to_find,actual_string):
+                        position.append(m.start())
+                    if len(position)>1:
+                        pos=position
+                    else:
+                        pos=position[0]    
                     if(output_val == -1):
                         logger.print_on_console('The Original String is:',actual_string ,'and' , actual_string , 'does not Contain', to_find )
                     else:
                         log.info('Result : ')
                         log.info(output_val)
                         status=generic_constants.TEST_RESULT_PASS
-                        result=generic_constants.TEST_RESULT_TRUE
+                        result=pos
+                        output=generic_constants.TEST_RESULT_TRUE
             else:
                 #log.error(INVALID_INPUT)
                 err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
@@ -302,7 +311,7 @@ class StringOperation:
             logger.print_on_console(e)
         if err_msg!=None:
             logger.print_on_console(err_msg)
-        return status,result,output,err_msg
+        return status,result,output,err_msg,pos
 
     def replace(self, actual_string, to_be_replaced , value ):
         """
@@ -405,6 +414,7 @@ class StringOperation:
         output=None
         try:
             input_vals = args
+            
             len_input_val = len(input_vals)
             if len_input_val >= 2:
 ##                output = ''.join(input_vals)
@@ -441,6 +451,7 @@ class StringOperation:
         result=generic_constants.TEST_RESULT_FALSE
         err_msg=None
         output=None
+        index=str(index)
         try:
             if not (actual_string is None or actual_string is ''):
                 coreutilsobj=core_utils.CoreUtils()

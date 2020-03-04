@@ -169,8 +169,8 @@ class Dispatcher:
             'verifypagetitle':local_Wd.browser_object.verify_page_title,
             'clearcache':local_Wd.browser_object.clear_cache,
             'navigatewithauthenticate':local_Wd.browser_object.navigate_with_authenticate,
-            'navigateback':local_Wd.browser_object.navigate_back
-
+            'navigateback':local_Wd.browser_object.navigate_back,
+            'opennewtab':local_Wd.browser_object.openNewTab
         }
         self.exception_flag=''
         self.action=None
