@@ -868,8 +868,8 @@ class TestThread(threading.Thread):
             self.wxObject.rbox.Enable()
             self.wxObject.breakpoint.Enable()
             self.wxObject.cancelbutton.Enable()
-            testcasename = handler.local_handler.testcasename
             if self.action==DEBUG:
+                testcasename = handler.local_handler.testcasename
                 self.wxObject.killChildWindow(debug=True)
                 if (len(testcasename) > 0 or apptype.lower() not in plugins_list):
                     if('UserObjectScrape' in sys.modules):
