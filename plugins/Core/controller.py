@@ -875,7 +875,7 @@ class Controller():
         return status
 
     def invoke_execution(self,mythread,json_data,socketIO,wxObject,configvalues,qc_soc):
-        global terminate_flag,count
+        global terminate_flag,count,status_percentage
         qc_url=''
         qc_password=''
         qc_username=''
