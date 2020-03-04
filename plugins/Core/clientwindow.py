@@ -255,7 +255,7 @@ class MainNamespace(BaseNamespace):
         try:
             global action,wxObject,browsername,desktopScrapeFlag,data,socketIO
             if check_execution_lic("scrape"): return None
-            if bool(wxObject.scrapewindow): return None
+            elif bool(wxObject.scrapewindow): return None
             args = list(args)
             d = args[0]
             action = d['action']
@@ -888,7 +888,7 @@ class TestThread(threading.Thread):
             elif self.action==EXECUTE:
                 socketIO.emit('result_executeTestSuite',status)
         except Exception as e:
-            log.error(e)
+            log.error(e,exc_info=True)
             status=TERMINATE
             if socketIO is not None:
                 if self.action==DEBUG:

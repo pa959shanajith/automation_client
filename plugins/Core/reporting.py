@@ -419,9 +419,14 @@ class Reporting:
                 report_json[OVERALLSTATUS][0][PROJECT_NAME]=json_data["suitedetails"][i["s_index"]]['projectname']
                 report_json[OVERALLSTATUS][0][SCENARIO_NAME]=json_data["suitedetails"][i["s_index"]]['scenarioNames'][i["index"]]
                 report_json[OVERALLSTATUS][0][CYCLE_NAME]=json_data["suitedetails"][i["s_index"]]['cyclename']
-                report_json[OVERALLSTATUS][0]["pass"]=str(round(i["Pass"]/i['total']*100,2))
-                report_json[OVERALLSTATUS][0]["fail"]=str(round(i["Fail"]/i['total']*100,2))
-                report_json[OVERALLSTATUS][0]["terminate"]=str(round(i["Terminate"]/i['total']*100,2))
+                if i['total']>0:
+                    report_json[OVERALLSTATUS][0]["pass"]=str(round(i["Pass"]/i['total']*100,2))
+                    report_json[OVERALLSTATUS][0]["fail"]=str(round(i["Fail"]/i['total']*100,2))
+                    report_json[OVERALLSTATUS][0]["terminate"]=str(round(i["Terminate"]/i['total']*100,2))
+                else:
+                    report_json_condition_check[OVERALLSTATUS][0]["pass"]="0"
+                    report_json_condition_check[OVERALLSTATUS][0]["fail"]="0"
+                    report_json_condition_check[OVERALLSTATUS][0]["terminate"]="0"
             with open(filename, 'w') as outfile:
                     log.info('Writing report data to the file '+filename)
                     json.dump(report_json, outfile, indent=4, sort_keys=False)
@@ -442,9 +447,15 @@ class Reporting:
                 report_json_condition_check[OVERALLSTATUS][0][PROJECT_NAME]=json_data["suitedetails"][i["s_index"]]['projectname']
                 report_json_condition_check[OVERALLSTATUS][0][SCENARIO_NAME]=json_data["suitedetails"][i["s_index"]]['scenarioNames'][i["index"]]
                 report_json_condition_check[OVERALLSTATUS][0][CYCLE_NAME]=json_data["suitedetails"][i["s_index"]]['cyclename']
-                report_json_condition_check[OVERALLSTATUS][0]["pass"]=str(round(i["Pass"]/i['total']*100,2))
-                report_json_condition_check[OVERALLSTATUS][0]["fail"]=str(round(i["Fail"]/i['total']*100,2))
-                report_json_condition_check[OVERALLSTATUS][0]["terminate"]=str(round(i["Terminate"]/i['total']*100,2))
+                if i['total']>0:
+                    report_json_condition_check[OVERALLSTATUS][0]["pass"]=str(round(i["Pass"]/i['total']*100,2))
+                    report_json_condition_check[OVERALLSTATUS][0]["fail"]=str(round(i["Fail"]/i['total']*100,2))
+                    report_json_condition_check[OVERALLSTATUS][0]["terminate"]=str(round(i["Terminate"]/i['total']*100,2))
+                else:
+                    report_json_condition_check[OVERALLSTATUS][0]["pass"]="0"
+                    report_json_condition_check[OVERALLSTATUS][0]["fail"]="0"
+                    report_json_condition_check[OVERALLSTATUS][0]["terminate"]="0"
+
             with open(filename, 'w') as outfile:
                     log.info('Writing report data to the file '+filename)
                     json.dump(report_json_condition_check, outfile, indent=4, sort_keys=False)
@@ -465,9 +476,14 @@ class Reporting:
                 report_json_condition_check_testcase_empty[OVERALLSTATUS][0][PROJECT_NAME]=json_data["suitedetails"][i["s_index"]]['projectname']
                 report_json_condition_check_testcase_empty[OVERALLSTATUS][0][SCENARIO_NAME]=json_data["suitedetails"][i["s_index"]]['scenarioNames'][i["index"]]
                 report_json_condition_check_testcase_empty[OVERALLSTATUS][0][CYCLE_NAME]=json_data["suitedetails"][i["s_index"]]['cyclename']
-                report_json_condition_check_testcase_empty[OVERALLSTATUS][0]["pass"]=str(round(i["Pass"]/i['total']*100,2))
-                report_json_condition_check_testcase_empty[OVERALLSTATUS][0]["fail"]=str(round(i["Fail"]/i['total']*100,2))
-                report_json_condition_check_testcase_empty[OVERALLSTATUS][0]["terminate"]=str(round(i["Terminate"]/i['total']*100,2))
+                if i['total']>0:
+                    report_json_condition_check_testcase_empty[OVERALLSTATUS][0]["pass"]=str(round(i["Pass"]/i['total']*100,2))
+                    report_json_condition_check_testcase_empty[OVERALLSTATUS][0]["fail"]=str(round(i["Fail"]/i['total']*100,2))
+                    report_json_condition_check_testcase_empty[OVERALLSTATUS][0]["terminate"]=str(round(i["Terminate"]/i['total']*100,2))
+                else:
+                    report_json_condition_check[OVERALLSTATUS][0]["pass"]="0"
+                    report_json_condition_check[OVERALLSTATUS][0]["fail"]="0"
+                    report_json_condition_check[OVERALLSTATUS][0]["terminate"]="0"
             with open(filename, 'w') as outfile:
                     log.info('Writing report data to the file '+filename)
                     json.dump(report_json_condition_check_testcase_empty, outfile, indent=4, sort_keys=False)
