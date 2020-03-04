@@ -56,6 +56,10 @@ class SAPDispatcher:
             'toolbaraction' : launch_keywords_obj.toolbar_actions,
             'selectmenu': launch_keywords_obj.selectMenu,
             'doubleclickstatusbar': launch_keywords_obj.doubleClickStatusBar,
+            "closedialogwindow": launch_keywords_obj.close_modal_window,
+            "maximizedialogwindow": launch_keywords_obj.maximize_modal_window,
+            "restoredialogwindow": launch_keywords_obj.restore_modal_window,
+            "getdialogwindowname": launch_keywords_obj.getWindowName,
             #------------------------------------------------------textbox keywords
             'settext' : editable_text_obj.setText,
             'setsecuretext' : editable_text_obj.setSecureText,
