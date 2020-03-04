@@ -250,7 +250,13 @@ class QcWindow():
             return ans    
         except Exception as e:
             print('Error while fetching testsets')
-            dictFolderJson=None    
+            ans = {} 
+            fol_list = []
+            tests_list_1 = []
+            key = "folderl"
+            key1 = "testn"
+            ans[key] = fol_list   
+            ans[key1] = tests_list_1
 
     def test_case_generator(self,filePath):
         try:
@@ -312,6 +318,7 @@ class QcWindow():
                         test_id = t["Value"]
             fields = "test-id,name,status"
             payload = {"query": "{cycle-id[" + str(test_id) + "]}", "fields": fields}
+            #fetching test cases 
             response = requests.get(URL_for_testcases , params=payload, headers=self.headers, cookies=self.cookies)
             o = xmltodict.parse(response.content)
             x = json.dumps(o)
@@ -363,51 +370,103 @@ class QcWindow():
         status = False
         try:
             global dictFolderJson
-            qcDomain =  data['qc_domain']
-            qcProject = data['qc_project']
+            almDomain =  data['qc_domain']
+            almProject = data['qc_project']
             tsFolder = data['qc_folder']
             tsList = data['qc_tsList']
             testrunname = data['qc_testrunname']
-            result =  data['qc_update_status']
-            if(TD.connected==True):                              #######
-                TD.Connect(qcDomain,qcProject)                      ########
-                TSetFact = TD.TestSetFactory                        ##3###
-                #Getting the test set factory
-                tsTreeMgr = TD.testsettreemanager                           ######
-                tsFolder = tsTreeMgr.NodeByPath(tsFolder)                           #######
-                tsList = tsFolder.FindTestSets(tsList)                          #####
-                #Getting the test lists
-                theTestSet = tsList.Item(1)                             ######
-                #Getting the test set
-                tsFolder = theTestSet.TestSetFolder                                 ####
-                tsTestFactory = theTestSet.tsTestFactory                            ######
-                tsTestList = tsTestFactory.NewList("")                              ######
-                for tsTest in tsTestList:
-                    #Iterate the Test list
-                    if tsTest.Name == testrunname:
-                        RunFactory = tsTest.RunFactory                                  #######
-                        #RunFactory object created
-                        obj_theRun = RunFactory.AddItem(testrunname)
-                        #Updating the details in QC
-                        obj_theRun.Status = result
-                        #Scenario execution status updated
-                        obj_theRun.Post()
-                        obj_theRun.Refresh()
-                        status = True
-            else:
-                print('Qc is disconnected')
+            response = ""
+            midPoint = "/rest/domains/" + almDomain + "/projects/" + almProject 
+            URL = self.Qc_Url + midPoint + "/" + "test-set-folders"
+            URL_for_testsets = self.Qc_Url + midPoint + "/" + "test-sets"
+            URL_for_testcases = self.Qc_Url + midPoint + "/" + "test-instances"
+            arrFolder = tsFolder.split("\\")
+            if(arrFolder[arrFolder.__len__()-1] != None) :
+                folderName = arrFolder[arrFolder.__len__()-1]
+                fields = "parent-id"
+                payload = {"query": "{name['" + folderName + "']}", "fields": fields}
+                response = requests.get(URL, params=payload, headers=self.headers, cookies=self.cookies)
+                o = xmltodict.parse(response.content)
+                x = json.dumps(o)
+                y = json.loads(x)
+                k=y["Entities"]["Entity"]["Fields"]["Field"]
+                #fetching folder parent id for given folder name
+                for i in k:
+                    if i["@Name"] == "id":
+                        parentID=i['Value']
+            #fetching testset id
+            fields = "id,name"
+            payload = {"query": "{parent-id[" + str(parentID) + "]}", "fields": fields}
+            res1 = requests.get(URL_for_testsets, params=payload, headers=self.headers, cookies=self.cookies)
+            o2 = xmltodict.parse(res1.content)
+            x2 = json.dumps(o2)
+            y2 = json.loads(x2)
+            test_id = None
+            if(int(y2["Entities"]["@TotalResults"]) >1 ):
+                k2 = y2["Entities"]["Entity"]
+                for c in k2:
+                    l = c["Fields"]["Field"]
+                    flag = 0
+                    for t in l:
+                        if t["@Name"] == "name" :
+                            if( t["Value"] == tsList ):
+                                flag =1
+                        elif( t["@Name"] == "id" and  flag == 1):
+                            test_id = t["Value"]
+            elif (int(y2["Entities"]["@TotalResults"]) == 1 ):
+                k2 = y2["Entities"]["Entity"]
+                l = k2["Fields"]["Field"]
+                flag = 0
+                for t in l:
+                    if t["@Name"] == "name" :
+                        if( t["Value"] == tsList ):
+                            flag =1
+                    elif( t["@Name"] == "id" and  flag == 1):
+                        test_id = t["Value"]
+            fields = "name"
+            payload = {"query": "{cycle-id[" + str(test_id) + "]}", "fields": fields}
+            #fetching test case id 
+            response = requests.get(URL_for_testcases , params=payload, headers=self.headers, cookies=self.cookies)
+            o = xmltodict.parse(response.content)
+            x = json.dumps(o)
+            y = json.loads(x)
+            testc_list = []
+            tsn = testrunname    
+            tsn1 = tsn.split("]")
+            tsn = tsn1[1] + " " + tsn1[0] + "]"
+            if(int(y["Entities"]["@TotalResults"]) >1 ):
+                k2 = y["Entities"]["Entity"]
+                for c in k2:
+                    l = c["Fields"]["Field"]
+                    flag = 0
+                    for n in l:      
+                        if n["@Name"] == "name" :
+                            if( n["Value"] == tsn ):
+                                flag = 1                
+                        elif n["@Name"] == "id" and flag == 1:
+                            testc_id = n["Value"]                  
+            elif (int(y2["Entities"]["@TotalResults"]) == 1 ):
+                k2 = y2["Entities"]["Entity"]
+                l = k2["Fields"]["Field"]
+                flag = 0
+                for n in l:
+                    if n["@Name"] == "name" :
+                        if( n["Value"] == tsn ):
+                            flag = 1                
+                    elif n["@Name"] == "id" and flag == 1:
+                        testc_id = n["Value"] 
+            #updating status             
+            result =  data['qc_update_status'] 
+            URL_for_testcase_update = self.Qc_Url + midPoint + "/" + "test-instances"  + "/" + testc_id
+            data1 ='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Entity Type="test-instance"><Fields><Field Name="status"><Value>'+ result +'</Value></Field></Fields></Entity>'
+            payload = { "body": data1, "data": data1}
+            self.headers = {'Content-Type': "application/xml",
+                            'Accept': "application/xml"}
+            respons = requests.put(URL_for_testcase_update , data= data1, headers=self.headers, cookies=self.cookies)
+            status = True
         except Exception as e:
             print('Error while updating QC')
             status = False
-        if(status):
-            dictFolderJson = {'QC_UpdateStatus':True}
-            """
-            TD.Logout()
-            TD.releaseconnection()
-            print 'closing_connection'
-            """
-        else:
-            dictFolderJson = {'QC_UpdateStatus':False}
         return status
 
     def quit_qc(self,filepath):
@@ -415,48 +474,5 @@ class QcWindow():
             ProjectURL = self.Qc_Url + '/authentication-point/logout'
             resp = requests.get(ProjectURL)
             return "closedqc"
-            
-            global sent,dictFolderJson
-            sent=1
-            if TD.connected==True and loginflag==True:                          ########
-                con.send('closedqc#E&D@Q!C#')
-                TD.Logout()                                             #####
-                TD.releaseconnection()                                      #####
-            elif urlflag==False:
-                con.send('invalidurl#E&D@Q!C#')
-            else:
-                con.send('invalidcredentials#E&D@Q!C#')
-                TD.releaseconnection()                              #####
-            dictFolderJson=None
-            return True
         except Exception as e:
             print('Error while quitting qc')
-            con.send("Fail@f@!l#E&D@Q!C#")
-
-    def emit_data(self):
-        try:
-            global dictFolderJson,sent
-            data_to_send = json.dumps(dictFolderJson).encode('utf-8')
-            #data_to_send+='#E&D@Q!C#'
-            sent=1
-            return data_to_send
-            #con.send(data_to_send)
-        except Exception as e:
-            print('Error while emitting data')
-
-
-
-
-
-        """
-        This procedure will return list of test-instances in a given test set
-        :param hp: HP object
-        :param tid: integer test set identifier
-        :returns: list test instances list
-        """
-        '''
-        params = '{cycle-id[' + tid + ']}'
-        url = self.base_url + '/qcbin/rest/domains/' + domain_name + '/projects/' + project_name + '/test-instances'
-        response = requests.get(url, params=params, headers=self.getheaders())
-        test_inst = text_to_xml(response.content, "Entity/Fields/Field\[@Name='test-instance'\]/Value/text()")
-        '''
