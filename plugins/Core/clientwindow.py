@@ -212,7 +212,7 @@ class MainNamespace(BaseNamespace):
             global wxObject,socketIO,execution_flag
             args=list(args)
             if(not execution_flag):
-                socketIO.emit('return_status_executeTestSuite',{'status':'success'})
+                socketIO.emit('return_status_executeTestSuite',{'status':'success','executionId':(args[0])['executionId']})
                 wxObject.mythread = TestThread(wxObject,EXECUTE,args[0],wxObject.debug_mode)
             else:
                 obj = handler.Handler()
@@ -222,7 +222,7 @@ class MainNamespace(BaseNamespace):
                 log.warn(emsg)
                 logger.print_on_console(emsg)
                 """sending scenario details for skipped execution to update the same in reports."""
-                socketIO.emit('return_status_executeTestSuite',{'status':'skipped','data':data})
+                socketIO.emit('return_status_executeTestSuite',{'status':'skipped','data':data,'executionId':(args[0])['executionId']})
         except Exception as e:
             err_msg='Error while Executing'
             log.error(err_msg)
@@ -868,8 +868,8 @@ class TestThread(threading.Thread):
             self.wxObject.rbox.Enable()
             self.wxObject.breakpoint.Enable()
             self.wxObject.cancelbutton.Enable()
-            testcasename = handler.local_handler.testcasename
             if self.action==DEBUG:
+                testcasename = handler.local_handler.testcasename
                 self.wxObject.killChildWindow(debug=True)
                 if (len(testcasename) > 0 or apptype.lower() not in plugins_list):
                     if('UserObjectScrape' in sys.modules):

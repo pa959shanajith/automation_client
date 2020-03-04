@@ -1155,7 +1155,7 @@ class Controller():
                     pass
         except Exception as e:
             logger.print_on_console("Exception in Parallel Execution")
-            log("Exception in Parallel Execution"+str(e))
+            log.error("Exception in Parallel Execution"+str(e))
         if not(terminate_flag):
             status =COMPLETED
         return status
