@@ -1,3 +1,4 @@
+
 #-------------------------------------------------------------------------------
 # Name:        controller.py
 # Purpose:
@@ -229,7 +230,6 @@ class Controller():
         except Exception as e:
             logger.print_on_console('Error loading AWS plugin')
             log.error(e)
-
     def dangling_status(self,index):
         step=handler.local_handler.tspList[index]
         return step.executed
@@ -730,8 +730,9 @@ class Controller():
         else:
             return index,TERMINATE
 
-    def executor(self,tsplist,action,last_tc_num,debugfrom_step,mythread,json_data,index):
+    def executor(self,tsplist,action,last_tc_num,debugfrom_step,mythread):
         global status_percentage
+        status_percentage = {TEST_RESULT_PASS:0,TEST_RESULT_FAIL:0,TERMINATE:0,"total":0}
         i=0
         status=True
         self.scenario_start_time=datetime.now()
@@ -787,12 +788,9 @@ class Controller():
             self.reporting_obj.user_termination=True
             status_percentage[TERMINATE]+=1
             status_percentage["total"]+=1
-        status_percentage["s_index"]=index[0]
-        status_percentage["index"]=index[1]
-        self.reporting_obj.build_overallstatus(self.scenario_start_time,self.scenario_end_time,self.scenario_ellapsed_time,json_data,status_percentage)
+        self.reporting_obj.build_overallstatus(self.scenario_start_time,self.scenario_end_time,self.scenario_ellapsed_time)
         logger.print_on_console('Step Elapsed time is : ',str(self.scenario_ellapsed_time))
-        status_percentage = {TEST_RESULT_PASS:0,TEST_RESULT_FAIL:0,TERMINATE:0,"total":0}
-        return status
+        return status,status_percentage
 
     def invokegenerickeyword(self,teststepproperty,dispatcher_obj,inputval):
         res = dispatcher_obj.dispatcher(teststepproperty,self.wx_object,self.conthread,*inputval)
@@ -850,10 +848,10 @@ class Controller():
         self.action=DEBUG
         handler.local_handler.tspList=[]
         scenario=[json_data]
-        print(line_separator)
+        print('=======================================================================================================')
         log.info('***DEBUG STARTED***')
         logger.print_on_console('***DEBUG STARTED***')
-        print(line_separator)
+        print('=======================================================================================================')
         for d in scenario:
             flag,browser_type,last_tc_num,testcase_empty_flag,empty_testcase_names=obj.parse_json(d)
             if flag == False:
@@ -868,7 +866,7 @@ class Controller():
         if flag:
             if runfrom_step > 0 and runfrom_step <= tsplist[len(tsplist)-1].stepnum:
                 self.conthread=mythread
-                status = self.executor(tsplist,DEBUG,last_tc_num,runfrom_step,mythread,json_data,[0,0])
+                status,status_percentage = self.executor(tsplist,DEBUG,last_tc_num,runfrom_step,mythread)
             else:
                 logger.print_on_console( 'Invalid step number!! Please provide run from step number from 1 to ',tsplist[len(tsplist)-1].stepnum,'\n')
                 log.info('Invalid step number!! Please provide run from step number')
@@ -886,10 +884,10 @@ class Controller():
                 for k,v in handler.local_handler.awsKeywords.items():
                     logger.print_on_console(k,':',list(v))
                     log.info(k+':'+str(list(v)))
-        print(line_separator)
+        print('=======================================================================================================')
         log.info('***DEBUG COMPLETED***')
         logger.print_on_console('***DEBUG COMPLETED***')
-        print(line_separator)
+        print('=======================================================================================================')
         #clearing of dynamic variables
         obj.clearList(self)
         #clearing dynamic variables at the end of execution to support dynamic variable at the scenario level
@@ -932,13 +930,12 @@ class Controller():
             if terminate_flag:
                 status=TERMINATE
 ##                break
-            suite_name=json_data['suitedetails'][j-1]["testsuitename"]
             log.info('---------------------------------------------------------------------')
-            print(line_separator)
-            log.info('***SUITE '+str( j) +': '+suite_name+' EXECUTION STARTED***')
-            logger.print_on_console('***SUITE '+str( j) +': '+suite_name+' EXECUTION STARTED***')
+            print('=======================================================================================================')
+            log.info('***SUITE '+str( j) +' EXECUTION STARTED***')
+            logger.print_on_console('***SUITE ', str(j) ,' EXECUTION STARTED***')
             log.info('-----------------------------------------------')
-            print(line_separator)
+            print('=======================================================================================================')
             do_not_execute = False
             #Check for the disabled scenario
             if not (do_not_execute) :
@@ -947,7 +944,6 @@ class Controller():
                  #Logic to Execute each suite for each of the browser
                 for browser in browser_type[suite_id]:
                     i=0
-                    
                     #Logic to iterate through each scenario in the suite
                     for scenario,scenario_id,condition_check_value,dataparam_path_value in zip(suite_id_data,scenarioIds[suite_id],condition_check[suite_id],dataparam_path[suite_id]):
                         execute_flag=True
@@ -964,12 +960,11 @@ class Controller():
                         #condition check for scenario execution and reporting for condition check
                         if not(condition_check_flag):
                              #check for temrinate flag before printing loggers
-                            scenario_name=json_data['suitedetails'][j-1]["scenarioNames"][i]
                             if not(terminate_flag):
-                                print(line_separator)
-                                logger.print_on_console( '***Scenario '+str(i+1)+ ': '+scenario_name+' execution started***')
-                                print(line_separator)
-                                log.info('***Scenario '  + str(i+1)+ ': '+scenario_name+ ' execution started***')
+                                print('=======================================================================================================')
+                                logger.print_on_console( '***Scenario ' ,str(i+1) ,' execution started***')
+                                print('=======================================================================================================')
+                                log.info('***Scenario '  + str(i+1)+ ' execution started***')
                             if(len(scenario)==3 and len(scenario['qcdetails'])==7):
                                 qc_details_creds=scenario['qccredentials']
                                 qc_username=qc_details_creds['qcusername']
@@ -1018,12 +1013,12 @@ class Controller():
                                 if compile_status:
                                     pytest_files.append(pytest_file)
                                     msg='***Scenario'+str(i + 1)+': '+scenario_name+' Compiled for AWS Execution***'
-                                    print(line_separator)
+                                    print('=======================================================================================================')
                                     logger.print_on_console(msg)
-                                    print(line_separator)
-                                    log.info(line_separator)
+                                    print('=======================================================================================================')
+                                    log.info('=======================================================================================================')
                                     log.info(msg)
-                                    log.info(line_separator)
+                                    log.info('=======================================================================================================')
                                 else:
                                     terminate_flag=True
                                     msg='***Scenario'+str(i + 1)+': '+scenario_name+' is Terminated ***'
@@ -1041,13 +1036,13 @@ class Controller():
                                     con.action=EXECUTE
                                     con.conthread=mythread
                                     con.tsp_list=tsplist
-                                    status = con.executor(tsplist,EXECUTE,last_tc_num,1,con.conthread,json_data,[j-1,i])
-                                    print(line_separator)
+                                    status,status_percentage = con.executor(tsplist,EXECUTE,last_tc_num,1,con.conthread)
+                                    print('=======================================================================================================')
                                     logger.print_on_console( '***Scenario' ,str(i + 1) ,' execution completed***')
-                                    print(line_separator)
-                                    log.info(line_separator)
+                                    print('=======================================================================================================')
+                                    log.info('=======================================================================================================')
                                     log.info( '***Scenario' ,str(i + 1) ,' execution completed***')
-                                    log.info(line_separator)
+                                    log.info('=======================================================================================================')
                             if execute_flag:
                                 #Saving the report for the scenario
                                 logger.print_on_console( '***Saving report of Scenario' ,str(i  + 1 ),'***')
@@ -1059,7 +1054,9 @@ class Controller():
                                 if terminate_flag ==True and execute_flag==True:
                                     if con.reporting_obj.report_json['rows']==[] and con.reporting_obj.report_json['overallstatus']==[]:
                                         con.reporting_obj.add_to_reporting_obj()
-                                con.reporting_obj.save_report_json(filename)
+                                status_percentage["s_index"]=j-1
+                                status_percentage["index"]=i
+                                con.reporting_obj.save_report_json(filename,json_data,status_percentage)
                                 socketIO.emit('result_executeTestSuite',self.getreport_data(suite_id,scenario_id,con,execution_id))
                                 obj.clearList(con)
                                 i+=1
@@ -1102,7 +1099,7 @@ class Controller():
 
                                 #Check is made to fix issue #401
                                 if len(report_json)>0:
-                                    overall_status=report_json[0]['overAllStatus']
+                                    overall_status=report_json[0]['overallstatus']
                                     if(condition_check_value==1):
                                         if(overall_status==TEST_RESULT_PASS):
                                             continue
@@ -1115,7 +1112,9 @@ class Controller():
                                 os.chdir(self.cur_dir)
                                 filename='Scenario'+str(count  + 1)+'.json'
                                 count+=1
-                                con.reporting_obj.save_report_json_conditioncheck_testcase_empty(filename,info_msg)
+                                status_percentage["s_index"]=j-1
+                                status_percentage["index"]=i
+                                con.reporting_obj.save_report_json_conditioncheck_testcase_empty(filename,info_msg,json_data,status_percentage)
                                 socketIO.emit('result_executeTestSuite',self.getreport_data_conditioncheck_testcase_empty(suite_id,scenario_id,con,execution_id))
                                 obj.clearList(con)
                                 i+=1
@@ -1125,7 +1124,9 @@ class Controller():
                             os.chdir(self.cur_dir)
                             filename='Scenario'+str(count  + 1)+'.json'
                             count+=1
-                            con.reporting_obj.save_report_json_conditioncheck(filename)
+                            status_percentage["s_index"]=j-1
+                            status_percentage["index"]=i
+                            con.reporting_obj.save_report_json_conditioncheck(filename,json_data,status_percentage)
                             socketIO.emit('result_executeTestSuite',self.getreport_data_conditioncheck(suite_id,scenario_id,con,execution_id))
                             obj.clearList(con)
                             i+=1
@@ -1137,18 +1138,18 @@ class Controller():
                 if not(execution_status):
                     status=TERMINATE
             log.info('---------------------------------------------------------------------')
-            print(line_separator)
+            print('=======================================================================================================')
             log.info('***SUITE '+ str(j) +' EXECUTION COMPLETED***')
             #clearing dynamic variables at the end of execution to support dynamic variable at the scenario level
             obj.clear_dyn_variables()
             logger.print_on_console('***SUITE ', str(j) ,' EXECUTION COMPLETED***')
             log.info('-----------------------------------------------')
-            print(line_separator)
+            print('=======================================================================================================')
             j=j+1
         if status==TERMINATE:
-            print(line_separator)
+            print('=======================================================================================================')
             logger.print_on_console( '***Terminating the Execution***')
-            print(line_separator)
+            print('=======================================================================================================')
         return status
 
     #Building of Dictionary to send back toserver to save the data
@@ -1288,7 +1289,6 @@ def kill_process():
         except Exception as e:
             logger.print_on_console('Exception in stopping server')
             log.error(e)
-
         log.info('Stale processes killed')
         logger.print_on_console('Stale processes killed')
     else:
