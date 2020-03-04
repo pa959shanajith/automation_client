@@ -38,9 +38,7 @@ pause_flag=False
 iris_flag = False
 iris_constant_step = -1
 socket_object = None
-count = 0
 log = logging.getLogger("controller.py")
-status_percentage = {TEST_RESULT_PASS:0,TEST_RESULT_FAIL:0,TERMINATE:0,"total":0}
 
 
 class Controller():
@@ -499,8 +497,7 @@ class Controller():
                         logger.print_on_console('Response Body: \n',respBody,'\n')
                     else:
                         logger.print_on_console('NON SOAP XML')
-                        logger.print_on_console('Response Body: \n',display_keyword_response[1].replace("\\n","\n").replace("\\r","\r").replace("\\t","\t"),'\n')
-                        #logger.print_on_console('Response Body: \n',display_keyword_response[1][2:-1].replace("\\n","\n").replace("\\r","\r").replace("\\t","\t"),'\n')
+                        logger.print_on_console('Response Body: \n',display_keyword_response[1][2:-1].replace("\\n","\n").replace("\\r","\r").replace("\\t","\t"),'\n')
                 else:
                     logger.print_on_console('Response Body exceeds max. Limit, please use writeToFile keyword.')
                     log.info('Result obtained is: ')
@@ -560,7 +557,7 @@ class Controller():
             self.dynamic_var_handler_obj.store_dynamic_value(output[1],result[1],tsp.name)
 
     def keywordinvocation(self,index,inpval,*args):
-        global socket_object,iris_constant_step,status_percentage
+        global socket_object,iris_constant_step
         configvalues = self.configvalues
         try:
             import time
@@ -710,8 +707,6 @@ class Controller():
                 index=result
                 self.status=result
             #Fixing issue #382
-            status_percentage[self.keyword_status]+=1
-            status_percentage["total"]+=1
             logger.print_on_console(keyword+' executed and the status is '+self.keyword_status+'\n')
             log.info(keyword+' executed and the status is '+self.keyword_status+'\n')
             #Checking for stop keyword
@@ -722,8 +717,7 @@ class Controller():
         else:
             return index,TERMINATE
 
-    def executor(self,tsplist,action,last_tc_num,debugfrom_step,mythread,json_data,index):
-        global status_percentage
+    def executor(self,tsplist,action,last_tc_num,debugfrom_step,mythread):
         i=0
         status=True
         self.scenario_start_time=datetime.now()
@@ -745,8 +739,6 @@ class Controller():
                     if i== TERMINATE:
                         #Changing the overallstatus of the report_obj to Terminate - (Sushma)
                         self.reporting_obj.overallstatus=TERMINATE
-                        status_percentage[TERMINATE]+=1
-                        status_percentage["total"]+=1
                         logger.print_on_console('Terminating the execution')
                         status=i
                         break
@@ -777,13 +769,8 @@ class Controller():
         if terminate_flag:
             #Indication of user_termination to report_obj to add a proper description in report - (Sushma)
             self.reporting_obj.user_termination=True
-            status_percentage[TERMINATE]+=1
-            status_percentage["total"]+=1
-        status_percentage["s_index"]=index[0]
-        status_percentage["index"]=index[1]
-        self.reporting_obj.build_overallstatus(self.scenario_start_time,self.scenario_end_time,self.scenario_ellapsed_time,json_data,status_percentage)
+        self.reporting_obj.build_overallstatus(self.scenario_start_time,self.scenario_end_time,self.scenario_ellapsed_time)
         logger.print_on_console('Step Elapsed time is : ',str(self.scenario_ellapsed_time))
-        status_percentage = {TEST_RESULT_PASS:0,TEST_RESULT_FAIL:0,TERMINATE:0,"total":0}
         return status
 
     def invokegenerickeyword(self,teststepproperty,dispatcher_obj,inputval):
@@ -860,7 +847,7 @@ class Controller():
         if flag:
             if runfrom_step > 0 and runfrom_step <= tsplist[len(tsplist)-1].stepnum:
                 self.conthread=mythread
-                status = self.executor(tsplist,DEBUG,last_tc_num,runfrom_step,mythread,json_data,[0,0])
+                status = self.executor(tsplist,DEBUG,last_tc_num,runfrom_step,mythread)
             else:
                 logger.print_on_console( 'Invalid step number!! Please provide run from step number from 1 to ',tsplist[len(tsplist)-1].stepnum,'\n')
                 log.info('Invalid step number!! Please provide run from step number')
@@ -876,8 +863,8 @@ class Controller():
         obj.clear_dyn_variables()
         return status
 
-    def invoke_execution(self,mythread,json_data,socketIO,wxObject,configvalues,qc_soc):
-        global terminate_flag,count
+    def invoke_execution(self,mythread,json_data,socketIO,wxObject,configvalues,qcObject):
+        global terminate_flag
         qc_url=''
         qc_password=''
         qc_username=''
@@ -936,7 +923,7 @@ class Controller():
                                 logger.print_on_console( '***Scenario ' ,str(i+1) ,' execution started***')
                                 print('=======================================================================================================')
                                 log.info('***Scenario '  + str(i+1)+ ' execution started***')
-                            if(len(scenario)==3 and len(scenario['qcdetails'])==7):
+                            if(len(scenario)==3 and len(scenario['qcdetails'])==10):
                                 qc_details_creds=scenario['qccredentials']
                                 qc_username=qc_details_creds['qcusername']
                                 qc_password=qc_details_creds['qcpassword']
@@ -983,7 +970,7 @@ class Controller():
                                     con.action=EXECUTE
                                     con.conthread=mythread
                                     con.tsp_list=tsplist
-                                    status = con.executor(tsplist,EXECUTE,last_tc_num,1,con.conthread,json_data,[j-1,i])
+                                    status = con.executor(tsplist,EXECUTE,last_tc_num,1,con.conthread)
                                     print('=======================================================================================================')
                                     logger.print_on_console( '***Scenario' ,str(i + 1) ,' execution completed***')
                                     print('=======================================================================================================')
@@ -992,8 +979,7 @@ class Controller():
                                 logger.print_on_console( '***Saving report of Scenario' ,str(i  + 1 ),'***')
                                 log.info( '***Saving report of Scenario' +str(i  + 1 )+'***')
                                 os.chdir(self.cur_dir)
-                                filename='Scenario'+str(count  + 1)+'.json'
-                                count+=1
+                                filename='Scenario'+str(i  + 1)+'.json'
                                 #check if user has manually terminated during execution, then check if the teststep data and overallstatus is [] if so poputale default values in teststep data and overallstatus
                                 if terminate_flag ==True and execute_flag==True:
                                     if con.reporting_obj.report_json['rows']==[] and con.reporting_obj.report_json['overallstatus']==[]:
@@ -1004,7 +990,7 @@ class Controller():
                                 i+=1
                                 #logic for condition check
                                 report_json=con.reporting_obj.report_json[OVERALLSTATUS]
-                                if len(scenario['qcdetails'])==7 and (qc_url!='' and qc_password!='' and  qc_username!=''):
+                                if len(scenario['qcdetails'])==10 and (qc_url!='' and qc_password!='' and  qc_username!=''):
                                     qc_status_over=report_json[0]
                                     qc_update_status=qc_status_over['overallstatus']
                                     if(str(qc_update_status).lower()=='pass'):
@@ -1023,17 +1009,12 @@ class Controller():
                                         qc_status['qc_testrunname']=qc_testrunname
                                         qc_status['qc_update_status'] = qc_update_status
                                         logger.print_on_console('****Updating QCDetails****')
-                                        if qc_soc is not None:
-                                            data_to_send = json.dumps(qc_status).encode('utf-8')
-                                            data_to_send+='#E&D@Q!C#'
-                                            qc_soc.send(data_to_send)
-                                            data_stream= qc_soc.recv(1024)
-                                            server_data = data_stream[:data_stream.find('#E&D@Q!C#')]
-                                            parsed_data = json.loads(server_data.decode('utf-8'))
-                                            if parsed_data['QC_UpdateStatus']:
+                                        if qcObject is not None:
+                                            status = qcObject.update_qc_details(qc_status)
+                                            if status:
                                                 logger.print_on_console('****Updated QCDetails****')
                                             else:
-                                                logger.print_on_console('****Failed to Update QCDetails****')
+                                               logger.print_on_console('****Failed to Update QCDetails****')
                                         else:
                                             logger.print_on_console('****Failed to Update QCDetails****')
                                     except Exception as e:
@@ -1041,7 +1022,7 @@ class Controller():
 
                                 #Check is made to fix issue #401
                                 if len(report_json)>0:
-                                    overall_status=report_json[0]['overAllStatus']
+                                    overall_status=report_json[0]['overallstatus']
                                     if(condition_check_value==1):
                                         if(overall_status==TEST_RESULT_PASS):
                                             continue
@@ -1052,8 +1033,7 @@ class Controller():
                                 logger.print_on_console( '***Saving report of Scenario' ,str(i  + 1 ),'***')
                                 log.info( '***Saving report of Scenario' +str(i  + 1 )+'***')
                                 os.chdir(self.cur_dir)
-                                filename='Scenario'+str(count  + 1)+'.json'
-                                count+=1
+                                filename='Scenario'+str(i  + 1)+'.json'
                                 con.reporting_obj.save_report_json_conditioncheck_testcase_empty(filename,info_msg)
                                 socketIO.emit('result_executeTestSuite',self.getreport_data_conditioncheck_testcase_empty(suite_id,scenario_id,con,execution_id))
                                 obj.clearList(con)
@@ -1062,8 +1042,7 @@ class Controller():
                             logger.print_on_console( '***Saving report of Scenario' ,str(i  + 1 ),'***')
                             log.info( '***Saving report of Scenario' +str(i  + 1 )+'***')
                             os.chdir(self.cur_dir)
-                            filename='Scenario'+str(count  + 1)+'.json'
-                            count+=1
+                            filename='Scenario'+str(i  + 1)+'.json'
                             con.reporting_obj.save_report_json_conditioncheck(filename)
                             socketIO.emit('result_executeTestSuite',self.getreport_data_conditioncheck(suite_id,scenario_id,con,execution_id))
                             obj.clearList(con)
