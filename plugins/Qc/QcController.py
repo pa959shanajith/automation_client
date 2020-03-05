@@ -44,6 +44,7 @@ class QcWindow():
                         cookieName = resp.headers.get('Set-Cookie')
                         LWSSO_COOKIE_KEY = cookieName[cookieName.index("=") + 1: cookieName.index(";")]
                         self.cookies = {'LWSSO_COOKIE_KEY': LWSSO_COOKIE_KEY}
+
                     qcSessionEndPoint = self.Qc_Url + "/rest/site-session"    
                     response = requests.post(qcSessionEndPoint, headers=self.headers, cookies=self.cookies)
                     if response.status_code == 200 | response.status_code == 201:
@@ -71,8 +72,7 @@ class QcWindow():
                     dictFolderJson=json.loads(dictFolder)
                     return dictFolderJson
                 except Exception as eqc:
-                    self.quit_qc()
-                    flag=1
+                    return "invalidcredentials"
             else:
                 pass
         except Exception as e:
@@ -433,7 +433,10 @@ class QcWindow():
             testc_list = []
             tsn = testrunname    
             tsn1 = tsn.split("]")
-            tsn = tsn1[1] + " " + tsn1[0] + "]"
+            tsn2 = tsn1[1] + " " + tsn1[0] + "]"
+            tsn = tsn2[1:]
+
+
             if(int(y["Entities"]["@TotalResults"]) >1 ):
                 k2 = y["Entities"]["Entity"]
                 for c in k2:
