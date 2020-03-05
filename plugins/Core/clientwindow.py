@@ -886,7 +886,7 @@ class TestThread(threading.Thread):
                 else:
                     socketIO.emit('result_debugTestCaseWS',status)
             elif self.action==EXECUTE:
-                socketIO.emit('result_executeTestSuite',status)
+                socketIO.emit('result_executeTestSuite',{"status":status,"executionId":self.json_data["executionId"]})
         except Exception as e:
             log.error(e,exc_info=True)
             status=TERMINATE
@@ -895,7 +895,7 @@ class TestThread(threading.Thread):
                     self.wxObject.killChildWindow(debug=True)
                     socketIO.emit('result_debugTestCase',status)
                 elif self.action==EXECUTE:
-                    socketIO.emit('result_executeTestSuite',status)
+                    socketIO.emit('result_executeTestSuite',{"status":status,"executionId":self.json_data["executionId"]})
         if closeActiveConnection:
             closeActiveConnection = False
             connection_Timer = threading.Timer(300, wxObject.closeConnection)
