@@ -43,6 +43,8 @@ class AbstractStorage(object):
     def delete_packet(self, packetid):
         pass
 
+    def clear(self):
+        pass
 
 class InMemory(AbstractStorage):
 
@@ -85,6 +87,10 @@ class InMemory(AbstractStorage):
         if packetid in self.packets:
             del self.packets[packetid]
 
+    def clear(self):
+        for key in self.packets:
+            del self.packets[key]
+
 
 class SQLite(AbstractStorage):
 
@@ -92,8 +98,8 @@ class SQLite(AbstractStorage):
         self.db = None
         super(SQLite, self).__init__()
         db_path = os.environ["NINETEEN68_HOME"]+os.sep+'assets'+os.sep+'packets.db'
-        if os.path.isfile(db_path): os.rename(db_path, db_path[:-2]+str(int(time()*100000))+".db")
-        #os.remove(db_path)  #####
+        #if os.path.isfile(db_path): os.rename(db_path, db_path[:-2]+str(int(time()*100000))+".db")
+        if os.path.isfile(db_path): os.remove(db_path)  #####
         connection = sqlite3.connect(db_path, check_same_thread=False)
         connection.isolation_level = None
         self.db = connection.cursor()
@@ -152,6 +158,14 @@ class SQLite(AbstractStorage):
         try:
             sqlite_lock.acquire(True)
             self.db.execute("DELETE FROM packets WHERE packetid=?",(packetid,))
+        finally: sqlite_lock.release()
+
+    def clear(self):
+        try:
+            sqlite_lock.acquire(True)
+            self.db.execute("DELETE FROM packets")
+            self.db.execute("SELECT name FROM sqlite_master where name = packets")
+            self.compact_db()
         finally: sqlite_lock.release()
 
     def compact_db(self):

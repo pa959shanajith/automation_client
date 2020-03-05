@@ -1311,7 +1311,7 @@ class ClientWindow(wx.Frame):
             if socketIO is not None:
                 if disconn:
                     log.info('Sending socket disconnect request')
-                    socketIO.send('unavailableLocalServer')
+                    socketIO.send('unavailableLocalServer', dnack = True)
                 socketIO.disconnect()
                 del socketIO
                 socketIO = None
