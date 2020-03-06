@@ -75,6 +75,116 @@ class Launch_Keywords():
             logger.print_on_console( sap_constants.NO_INSTANCE_OPEN_ERROR )
         return ses, wnd
 
+    def close_modal_window(self, *args):
+        """Closes the popup/ModalWindow"""
+        status = sap_constants.TEST_RESULT_FAIL
+        result = sap_constants.TEST_RESULT_FALSE
+        err_msg  = None
+        value = OUTPUT_CONSTANT
+        try:
+            ses, wnd = self.getSessWindow()
+            if ( ses and wnd ):
+                wndId =  wnd.__getattr__('id')
+                if( ses.FindById(wndId).type == "GuiModalWindow" ):
+                    ses.FindById(wndId).Close()
+                    status = sap_constants.TEST_RESULT_PASS
+                    result = sap_constants.TEST_RESULT_TRUE
+                else:
+                    err_msg = 'Element is not GuiModalWindow type'
+            else:
+                err_msg = sap_constants.ELELMENT_NOT_FOUND
+            if ( err_msg ):
+                log.info( err_msg )
+                logger.print_on_console( err_msg )
+        except Exception as e:
+            err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
+            log.error( err_msg )
+            logger.print_on_console( "Error occured in Close Modal Window" )
+        return status, result, value, err_msg
+
+
+    def maximize_modal_window(self, *args):
+        """Raximizes the popup/ModalWindow"""
+        status = sap_constants.TEST_RESULT_FAIL
+        result = sap_constants.TEST_RESULT_FALSE
+        err_msg  = None
+        value = OUTPUT_CONSTANT
+        try:
+            ses, wnd = self.getSessWindow()
+            if ( ses and wnd ):
+                wndId =  wnd.__getattr__('id')
+                if( ses.FindById(wndId).type == "GuiModalWindow" ):
+                    ses.FindById(wndId).Maximize()
+                    status = sap_constants.TEST_RESULT_PASS
+                    result = sap_constants.TEST_RESULT_TRUE
+                else:
+                    err_msg = 'Element is not GuiModalWindow type'
+            else:
+                err_msg = sap_constants.ELELMENT_NOT_FOUND
+            if ( err_msg ):
+                log.info( err_msg )
+                logger.print_on_console( err_msg )
+        except Exception as e:
+            err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
+            log.error( err_msg )
+            logger.print_on_console( "Error occured in Maximize Modal Window" )
+        return status, result, value, err_msg
+
+    def restore_modal_window(self, *args):
+        """Restores the popup/ModalWindow"""
+        status = sap_constants.TEST_RESULT_FAIL
+        result = sap_constants.TEST_RESULT_FALSE
+        err_msg  = None
+        value = OUTPUT_CONSTANT
+        try:
+            ses, wnd = self.getSessWindow()
+            if ( ses and wnd ):
+                wndId =  wnd.__getattr__('id')
+                if( ses.FindById(wndId).type == "GuiModalWindow" ):
+                    ses.FindById(wndId).Restore()
+                    status = sap_constants.TEST_RESULT_PASS
+                    result = sap_constants.TEST_RESULT_TRUE
+                else:
+                    err_msg = 'Element is not GuiModalWindow type'
+            else:
+                err_msg = sap_constants.ELELMENT_NOT_FOUND
+            if ( err_msg ):
+                log.info( err_msg )
+                logger.print_on_console( err_msg )
+        except Exception as e:
+            err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
+            log.error( err_msg )
+            logger.print_on_console( "Error occured in Restore Modal Window" )
+        return status, result, value, err_msg
+
+    def getWindowName(self, *args):
+        """Retrives popup-dialog/window text"""
+        status = sap_constants.TEST_RESULT_FAIL
+        result = sap_constants.TEST_RESULT_FALSE
+        err_msg  = None
+        value = OUTPUT_CONSTANT
+        try:
+            ses, wnd = self.getSessWindow()
+            if ( ses and wnd ):
+                wndId =  wnd.__getattr__('id')
+                if( ses.FindById(wndId).type == "GuiModalWindow" ):
+                    value = ses.FindById(wndId).PopupDialogText
+                    if not(value):
+                        value = ses.FindById(wndId).Text
+                    status = sap_constants.TEST_RESULT_PASS
+                    result = sap_constants.TEST_RESULT_TRUE
+                else:
+                    err_msg = 'Element is not GuiModalWindow type'
+            else:
+                err_msg = sap_constants.ELELMENT_NOT_FOUND
+            if ( err_msg ):
+                log.info( err_msg )
+                logger.print_on_console( err_msg )
+        except Exception as e:
+            err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
+            log.error( err_msg )
+            logger.print_on_console( "Error occured in Get Window Name" )
+        return status, result, value, err_msg
     def getStatusBarMessage(self, *args):
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE

@@ -1,4 +1,3 @@
-
 #-------------------------------------------------------------------------------
 # Name:        controller.py
 # Purpose:
@@ -895,7 +894,7 @@ class Controller():
         return status
 
     def invoke_execution(self,mythread,json_data,socketIO,wxObject,configvalues,qc_soc,aws_mode):
-        global terminate_flag,count
+        global terminate_flag,count,status_percentage
         qc_url=''
         qc_password=''
         qc_username=''
@@ -1220,7 +1219,7 @@ class Controller():
                     pass
         except Exception as e:
             logger.print_on_console("Exception in Parallel Execution")
-            log("Exception in Parallel Execution"+str(e))
+            log.error("Exception in Parallel Execution"+str(e))
         if not(terminate_flag):
             status =COMPLETED
         return status
@@ -1248,21 +1247,21 @@ def kill_process():
             import browserops_MW
             browserops_MW.driver.quit()
         except Exception as e:
-            #logger.print_on_console('Error in stopping scraping driver as driver is already closed')
+            # logger.print_on_console('Error in stopping scraping driver as driver is already closed')
             log.error(e)
 
         try:
             import browser_Keywords_MW
             browser_Keywords_MW.driver_obj.quit()
         except Exception as e:
-            #logger.print_on_console('Error in stopping browser driver as driver is already closed')
+            # logger.print_on_console('Error in stopping browser driver as driver is already closed')
             log.error(e)
 
         try:
             import install_and_launch
             install_and_launch.driver.quit()
         except Exception as e:
-            #logger.print_on_console('Error in stopping application driver as driver is already closed')
+            # logger.print_on_console('Error in stopping application driver as driver is already closed')
             log.error(e)
 
         try:
