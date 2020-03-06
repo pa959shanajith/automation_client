@@ -117,11 +117,12 @@ class MainNamespace(BaseNamespace):
             elif(str(args[0]) == 'schedulingEnabled'):
                 logger.print_on_console('Schedule Mode Enabled')
                 log.info('Schedule Mode Enabled')
-                bench_mark.init(socketIO)
+                #bench_mark.init(socketIO)
+                
             elif(str(args[0]) == 'schedulingDisabled'):
                 logger.print_on_console('Schedule Mode Disabled')
                 log.info('Schedule Mode Disabled')
-                bench_mark.stop()
+                #bench_mark.stop()
 
             elif(str(args[0]) == 'checkConnection'):
                 try:
@@ -214,7 +215,7 @@ class MainNamespace(BaseNamespace):
             global wxObject,socketIO,execution_flag
             args=list(args)
             if(not execution_flag):
-                socketIO.emit('return_status_executeTestSuite',{'status':'success'})
+                socketIO.emit('return_status_executeTestSuite',{'status':'success','executionId':(args[0])['executionId']})
                 wxObject.mythread = TestThread(wxObject,EXECUTE,args[0],wxObject.debug_mode)
             else:
                 obj = handler.Handler()
@@ -224,7 +225,7 @@ class MainNamespace(BaseNamespace):
                 log.warn(emsg)
                 logger.print_on_console(emsg)
                 """sending scenario details for skipped execution to update the same in reports."""
-                socketIO.emit('return_status_executeTestSuite',{'status':'skipped','data':data})
+                socketIO.emit('return_status_executeTestSuite',{'status':'skipped','data':data,'executionId':(args[0])['executionId']})
         except Exception as e:
             err_msg='Error while Executing'
             log.error(err_msg)
@@ -255,8 +256,9 @@ class MainNamespace(BaseNamespace):
 
     def on_webscrape(self,*args):
         try:
-            if check_execution_lic("scrape"): return None
             global action,wxObject,browsername,desktopScrapeFlag,data,socketIO
+            if check_execution_lic("scrape"): return None
+            elif bool(wxObject.scrapewindow): return None
             args = list(args)
             d = args[0]
             action = d['action']
@@ -287,9 +289,7 @@ class MainNamespace(BaseNamespace):
                         browsername = '3'
                     elif str(task) == 'OPEN BROWSER FX':
                         browsername = '2'
-
-                if not bool(wxObject.scrapewindow):
-                    wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
+                wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId()))
         except Exception as e:
             err_msg='Error while Scraping Web application'
             log.error(err_msg)
@@ -299,6 +299,7 @@ class MainNamespace(BaseNamespace):
     def on_LAUNCH_DESKTOP(self, *args):
         try:
             if check_execution_lic("scrape"): return None
+            elif bool(wxObject.scrapewindow): return None
             #con = controller.Controller()
             global browsername
             browsername = args
@@ -318,6 +319,8 @@ class MainNamespace(BaseNamespace):
     def on_LAUNCH_SAP(self, *args):
         try:
             if check_execution_lic("scrape"): return None
+            elif bool(wxObject.scrapewindow): return None
+
             #con = controller.Controller()
             global browsername
             browsername = args[0]
@@ -337,6 +340,7 @@ class MainNamespace(BaseNamespace):
     def on_LAUNCH_MOBILE(self, *args):
         try:
             if check_execution_lic("scrape"): return None
+            elif bool(wxObject.scrapewindow): return None
             global browsername
             #con = controller.Controller()
             if str(args[0]).endswith('apk'):
@@ -369,6 +373,7 @@ class MainNamespace(BaseNamespace):
     def on_LAUNCH_MOBILE_WEB(self, *args):
         try:
             if check_execution_lic("scrape"): return None
+            elif bool(wxObject.scrapewindow): return None
             global mobileWebScrapeObj,mobileWebScrapeFlag
             #con = controller.Controller()
             global browsername
@@ -390,6 +395,7 @@ class MainNamespace(BaseNamespace):
     def on_PDF_SCRAPE(self, *args):
         try:
             if check_execution_lic("scrape"): return None
+            elif bool(wxObject.scrapewindow): return None
             logger.print_on_console(" Entering inside PDF scrape")
             global pdfScrapeObj,pdfScrapeFlag
             global browsername
@@ -409,6 +415,7 @@ class MainNamespace(BaseNamespace):
     def on_LAUNCH_OEBS(self, *args):
         try:
             if check_execution_lic("scrape"): return None
+            elif bool(wxObject.scrapewindow): return None
             global oebsScrapeObj,oebsScrapeFlag
             #con = controller.Controller()
             global browsername
@@ -864,8 +871,8 @@ class TestThread(threading.Thread):
             self.wxObject.rbox.Enable()
             self.wxObject.breakpoint.Enable()
             self.wxObject.cancelbutton.Enable()
-            testcasename = handler.local_handler.testcasename
             if self.action==DEBUG:
+                testcasename = handler.local_handler.testcasename
                 self.wxObject.killChildWindow(debug=True)
                 if (len(testcasename) > 0 or apptype.lower() not in plugins_list):
                     if('UserObjectScrape' in sys.modules):
@@ -882,16 +889,16 @@ class TestThread(threading.Thread):
                 else:
                     socketIO.emit('result_debugTestCaseWS',status)
             elif self.action==EXECUTE:
-                socketIO.emit('result_executeTestSuite',status)
+                socketIO.emit('result_executeTestSuite',{"status":status,"executionId":self.json_data["executionId"]})
         except Exception as e:
-            log.error(e)
+            log.error(e,exc_info=True)
             status=TERMINATE
             if socketIO is not None:
                 if self.action==DEBUG:
                     self.wxObject.killChildWindow(debug=True)
                     socketIO.emit('result_debugTestCase',status)
                 elif self.action==EXECUTE:
-                    socketIO.emit('result_executeTestSuite',status)
+                    socketIO.emit('result_executeTestSuite',{"status":status,"executionId":self.json_data["executionId"]})
         if closeActiveConnection:
             closeActiveConnection = False
             connection_Timer = threading.Timer(300, wxObject.closeConnection)
@@ -1307,7 +1314,7 @@ class ClientWindow(wx.Frame):
             if socketIO is not None:
                 if disconn:
                     log.info('Sending socket disconnect request')
-                    socketIO.send('unavailableLocalServer')
+                    socketIO.send('unavailableLocalServer', dnack = True)
                 socketIO.disconnect()
                 del socketIO
                 socketIO = None
