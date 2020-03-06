@@ -38,6 +38,7 @@ qcConFlag=False
 browsercheckFlag=False
 updatecheckFlag=False
 chromeFlag=False
+edgeFlag=False
 chromiumFlag=False
 firefoxFlag=False
 desktopScrapeFlag=False
