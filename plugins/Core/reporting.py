@@ -15,6 +15,7 @@ import reporting_pojo
 import logger
 import logging
 import step_description
+import copy
 from datetime import datetime
 import core_utils
 log = logging.getLogger("reporting.py")
@@ -119,7 +120,7 @@ class Reporting:
         return description
 
 
-    def build_overallstatus(self,start_time,end_time,ellapsed_time,json_data,i):
+    def build_overallstatus(self,start_time,end_time,ellapsed_time):
         """
         def : build_overallstatus
         purpose : builds the overallstatus field of report_json
@@ -136,17 +137,8 @@ class Reporting:
         obj[END_TIME]=self.end_time
         obj[BROWSER_VERSION]=self.browser_version
         obj[START_TIME]=self.start_time
-        obj[OVERALLSTATUSREPORT]=self.overallstatus
+        obj[OVERALLSTATUS]=self.overallstatus
         obj[BROWSER_TYPE]=self.browser_type
-        if ("suitedetails" in json_data):
-            obj[RELEASE_NAME]=json_data["suitedetails"][i["s_index"]]['releaseid']
-            obj[DOMAIN_NAME]=json_data["suitedetails"][i["s_index"]]['domainname']
-            obj[PROJECT_NAME]=json_data["suitedetails"][i["s_index"]]['projectname']
-            obj[SCENARIO_NAME]=json_data["suitedetails"][i["s_index"]]['scenarioNames'][i["index"]]
-            obj[CYCLE_NAME]=json_data["suitedetails"][i["s_index"]]['cyclename']
-            obj["pass"]=str(round(i["Pass"]/i['total']*100,2))
-            obj["fail"]=str(round(i["Fail"]/i['total']*100,2))
-            obj["terminate"]=str(round(i["Terminate"]/i['total']*100,2))
         self.overallstatus_array.append(obj)
 
     def build_overallstatus_conditionCheck(self):
@@ -417,42 +409,87 @@ class Reporting:
 
 
 
-    def save_report_json(self,filename):
+    def save_report_json(self,filename,json_data,i):
         try:
+            report_json=copy.deepcopy(self.report_json)
             log.debug('Saving report json to a file')
+            if ("suitedetails" in json_data):
+                report_json[OVERALLSTATUS][0][RELEASE_NAME]=json_data["suitedetails"][i["s_index"]]['releaseid']
+                report_json[OVERALLSTATUS][0][DOMAIN_NAME]=json_data["suitedetails"][i["s_index"]]['domainname']
+                report_json[OVERALLSTATUS][0][PROJECT_NAME]=json_data["suitedetails"][i["s_index"]]['projectname']
+                report_json[OVERALLSTATUS][0][SCENARIO_NAME]=json_data["suitedetails"][i["s_index"]]['scenarioNames'][i["index"]]
+                report_json[OVERALLSTATUS][0][CYCLE_NAME]=json_data["suitedetails"][i["s_index"]]['cyclename']
+                if i['total']>0:
+                    report_json[OVERALLSTATUS][0]["pass"]=str(round(i["Pass"]/i['total']*100,2))
+                    report_json[OVERALLSTATUS][0]["fail"]=str(round(i["Fail"]/i['total']*100,2))
+                    report_json[OVERALLSTATUS][0]["terminate"]=str(round(i["Terminate"]/i['total']*100,2))
+                else:
+                    report_json_condition_check[OVERALLSTATUS][0]["pass"]="0"
+                    report_json_condition_check[OVERALLSTATUS][0]["fail"]="0"
+                    report_json_condition_check[OVERALLSTATUS][0]["terminate"]="0"
             with open(filename, 'w') as outfile:
                     log.info('Writing report data to the file '+filename)
-                    json.dump(self.report_json, outfile, indent=4, sort_keys=False)
+                    json.dump(report_json, outfile, indent=4, sort_keys=False)
             outfile.close()
         except Exception as e:
-            log.debug(self.report_json)
+            log.debug(report_json)
             log.error(e,exc_info=True)
 
 
-    def save_report_json_conditioncheck(self,filename):
+    def save_report_json_conditioncheck(self,filename,json_data,i):
         try:
             log.debug('Saving report json to a file')
             self.build_overallstatus_conditionCheck()
+            report_json_condition_check=copy.deepcopy(self.report_json_condition_check)
+            if ("suitedetails" in json_data):
+                report_json_condition_check[OVERALLSTATUS][0][RELEASE_NAME]=json_data["suitedetails"][i["s_index"]]['releaseid']
+                report_json_condition_check[OVERALLSTATUS][0][DOMAIN_NAME]=json_data["suitedetails"][i["s_index"]]['domainname']
+                report_json_condition_check[OVERALLSTATUS][0][PROJECT_NAME]=json_data["suitedetails"][i["s_index"]]['projectname']
+                report_json_condition_check[OVERALLSTATUS][0][SCENARIO_NAME]=json_data["suitedetails"][i["s_index"]]['scenarioNames'][i["index"]]
+                report_json_condition_check[OVERALLSTATUS][0][CYCLE_NAME]=json_data["suitedetails"][i["s_index"]]['cyclename']
+                if i['total']>0:
+                    report_json_condition_check[OVERALLSTATUS][0]["pass"]=str(round(i["Pass"]/i['total']*100,2))
+                    report_json_condition_check[OVERALLSTATUS][0]["fail"]=str(round(i["Fail"]/i['total']*100,2))
+                    report_json_condition_check[OVERALLSTATUS][0]["terminate"]=str(round(i["Terminate"]/i['total']*100,2))
+                else:
+                    report_json_condition_check[OVERALLSTATUS][0]["pass"]="0"
+                    report_json_condition_check[OVERALLSTATUS][0]["fail"]="0"
+                    report_json_condition_check[OVERALLSTATUS][0]["terminate"]="0"
+
             with open(filename, 'w') as outfile:
                     log.info('Writing report data to the file '+filename)
-                    json.dump(self.report_json_condition_check, outfile, indent=4, sort_keys=False)
+                    json.dump(report_json_condition_check, outfile, indent=4, sort_keys=False)
             outfile.close()
         except Exception as e:
-            log.debug(self.report_json_condition_check)
+            log.debug(report_json_condition_check)
             log.error(e,exc_info=True)
 
-    def save_report_json_conditioncheck_testcase_empty(self,filename,description):
+    def save_report_json_conditioncheck_testcase_empty(self,filename,description,json_data,i):
         try:
             log.debug('Saving report json to a file')
             self.add_report_testcase_empty(description)
             self.build_overallstatus_conditionCheck_testcase_empty()
-
+            report_json_condition_check_testcase_empty=copy.deepcopy(self.report_json_condition_check_testcase_empty)
+            if ("suitedetails" in json_data):
+                report_json_condition_check_testcase_empty[OVERALLSTATUS][0][RELEASE_NAME]=json_data["suitedetails"][i["s_index"]]['releaseid']
+                report_json_condition_check_testcase_empty[OVERALLSTATUS][0][DOMAIN_NAME]=json_data["suitedetails"][i["s_index"]]['domainname']
+                report_json_condition_check_testcase_empty[OVERALLSTATUS][0][PROJECT_NAME]=json_data["suitedetails"][i["s_index"]]['projectname']
+                report_json_condition_check_testcase_empty[OVERALLSTATUS][0][SCENARIO_NAME]=json_data["suitedetails"][i["s_index"]]['scenarioNames'][i["index"]]
+                report_json_condition_check_testcase_empty[OVERALLSTATUS][0][CYCLE_NAME]=json_data["suitedetails"][i["s_index"]]['cyclename']
+                if i['total']>0:
+                    report_json_condition_check_testcase_empty[OVERALLSTATUS][0]["pass"]=str(round(i["Pass"]/i['total']*100,2))
+                    report_json_condition_check_testcase_empty[OVERALLSTATUS][0]["fail"]=str(round(i["Fail"]/i['total']*100,2))
+                    report_json_condition_check_testcase_empty[OVERALLSTATUS][0]["terminate"]=str(round(i["Terminate"]/i['total']*100,2))
+                else:
+                    report_json_condition_check[OVERALLSTATUS][0]["pass"]="0"
+                    report_json_condition_check[OVERALLSTATUS][0]["fail"]="0"
+                    report_json_condition_check[OVERALLSTATUS][0]["terminate"]="0"
             with open(filename, 'w') as outfile:
                     log.info('Writing report data to the file '+filename)
-                    json.dump(self.report_json_condition_check_testcase_empty, outfile, indent=4, sort_keys=False)
+                    json.dump(report_json_condition_check_testcase_empty, outfile, indent=4, sort_keys=False)
             outfile.close()
         except Exception as e:
-            log.debug(self.report_json_condition_check_testcase_empty)
+            log.debug(report_json_condition_check_testcase_empty)
             log.error(e,exc_info=True)
 
     def add_to_reporting_obj(self):

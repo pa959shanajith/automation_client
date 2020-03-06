@@ -718,6 +718,8 @@ class Controller():
             return index,TERMINATE
 
     def executor(self,tsplist,action,last_tc_num,debugfrom_step,mythread):
+        global status_percentage
+        status_percentage = {TEST_RESULT_PASS:0,TEST_RESULT_FAIL:0,TERMINATE:0,"total":0}
         i=0
         status=True
         self.scenario_start_time=datetime.now()
@@ -769,9 +771,11 @@ class Controller():
         if terminate_flag:
             #Indication of user_termination to report_obj to add a proper description in report - (Sushma)
             self.reporting_obj.user_termination=True
+            status_percentage[TERMINATE]+=1
+            status_percentage["total"]+=1
         self.reporting_obj.build_overallstatus(self.scenario_start_time,self.scenario_end_time,self.scenario_ellapsed_time)
         logger.print_on_console('Step Elapsed time is : ',str(self.scenario_ellapsed_time))
-        return status
+        return status,status_percentage
 
     def invokegenerickeyword(self,teststepproperty,dispatcher_obj,inputval):
         res = dispatcher_obj.dispatcher(teststepproperty,self.wx_object,self.conthread,*inputval)
@@ -847,7 +851,7 @@ class Controller():
         if flag:
             if runfrom_step > 0 and runfrom_step <= tsplist[len(tsplist)-1].stepnum:
                 self.conthread=mythread
-                status = self.executor(tsplist,DEBUG,last_tc_num,runfrom_step,mythread)
+                status,status_percentage = self.executor(tsplist,DEBUG,last_tc_num,runfrom_step,mythread)
             else:
                 logger.print_on_console( 'Invalid step number!! Please provide run from step number from 1 to ',tsplist[len(tsplist)-1].stepnum,'\n')
                 log.info('Invalid step number!! Please provide run from step number')
@@ -863,8 +867,8 @@ class Controller():
         obj.clear_dyn_variables()
         return status
 
-    def invoke_execution(self,mythread,json_data,socketIO,wxObject,configvalues,qcObject):
-        global terminate_flag
+    def invoke_execution(self,mythread,json_data,socketIO,wxObject,configvalues,qc_soc):
+        global terminate_flag,count,status_percentage
         qc_url=''
         qc_password=''
         qc_username=''
@@ -899,9 +903,9 @@ class Controller():
             do_not_execute = False
             #Check for the disabled scenario
             if not (do_not_execute) :
-                i=0
                  #Logic to Execute each suite for each of the browser
                 for browser in browser_type[suite_id]:
+                    i=0
                     #Logic to iterate through each scenario in the suite
                     for scenario,scenario_id,condition_check_value,dataparam_path_value in zip(suite_id_data,scenarioIds[suite_id],condition_check[suite_id],dataparam_path[suite_id]):
                         execute_flag=True
@@ -970,7 +974,7 @@ class Controller():
                                     con.action=EXECUTE
                                     con.conthread=mythread
                                     con.tsp_list=tsplist
-                                    status = con.executor(tsplist,EXECUTE,last_tc_num,1,con.conthread)
+                                    status,status_percentage = con.executor(tsplist,EXECUTE,last_tc_num,1,con.conthread)
                                     print('=======================================================================================================')
                                     logger.print_on_console( '***Scenario' ,str(i + 1) ,' execution completed***')
                                     print('=======================================================================================================')
@@ -984,7 +988,9 @@ class Controller():
                                 if terminate_flag ==True and execute_flag==True:
                                     if con.reporting_obj.report_json['rows']==[] and con.reporting_obj.report_json['overallstatus']==[]:
                                         con.reporting_obj.add_to_reporting_obj()
-                                con.reporting_obj.save_report_json(filename)
+                                status_percentage["s_index"]=j-1
+                                status_percentage["index"]=i
+                                con.reporting_obj.save_report_json(filename,json_data,status_percentage)
                                 socketIO.emit('result_executeTestSuite',self.getreport_data(suite_id,scenario_id,con,execution_id))
                                 obj.clearList(con)
                                 i+=1
@@ -1033,8 +1039,11 @@ class Controller():
                                 logger.print_on_console( '***Saving report of Scenario' ,str(i  + 1 ),'***')
                                 log.info( '***Saving report of Scenario' +str(i  + 1 )+'***')
                                 os.chdir(self.cur_dir)
-                                filename='Scenario'+str(i  + 1)+'.json'
-                                con.reporting_obj.save_report_json_conditioncheck_testcase_empty(filename,info_msg)
+                                filename='Scenario'+str(count  + 1)+'.json'
+                                count+=1
+                                status_percentage["s_index"]=j-1
+                                status_percentage["index"]=i
+                                con.reporting_obj.save_report_json_conditioncheck_testcase_empty(filename,info_msg,json_data,status_percentage)
                                 socketIO.emit('result_executeTestSuite',self.getreport_data_conditioncheck_testcase_empty(suite_id,scenario_id,con,execution_id))
                                 obj.clearList(con)
                                 i+=1
@@ -1042,8 +1051,11 @@ class Controller():
                             logger.print_on_console( '***Saving report of Scenario' ,str(i  + 1 ),'***')
                             log.info( '***Saving report of Scenario' +str(i  + 1 )+'***')
                             os.chdir(self.cur_dir)
-                            filename='Scenario'+str(i  + 1)+'.json'
-                            con.reporting_obj.save_report_json_conditioncheck(filename)
+                            filename='Scenario'+str(count  + 1)+'.json'
+                            count+=1
+                            status_percentage["s_index"]=j-1
+                            status_percentage["index"]=i
+                            con.reporting_obj.save_report_json_conditioncheck(filename,json_data,status_percentage)
                             socketIO.emit('result_executeTestSuite',self.getreport_data_conditioncheck(suite_id,scenario_id,con,execution_id))
                             obj.clearList(con)
                             i+=1
@@ -1130,7 +1142,7 @@ class Controller():
                     pass
         except Exception as e:
             logger.print_on_console("Exception in Parallel Execution")
-            log("Exception in Parallel Execution"+str(e))
+            log.error("Exception in Parallel Execution"+str(e))
         if not(terminate_flag):
             status =COMPLETED
         return status

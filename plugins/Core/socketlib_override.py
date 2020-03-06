@@ -231,11 +231,13 @@ def socketIO_wait(self, seconds=None, **kw):
     This is needed to free up memory consumed by stored packet, send next packet in queue.
 """
 def socketIO_on_data_ack(self, pack_id, *args):
+    #print("Ack'd "+str(pack_id))
+    # Check if ack recieved matches with the packet sent, Only then process the ACK
+    if (str(self._io.last_packet_sent) != str(pack_id)): return None
     if (self._io.activeTimer != None and self._io.activeTimer.isAlive()):
         self._io.activeTimer.cancel()
     idx = pack_id.split('_')
     idx = idx[1] if len(idx) == 2 else None
-    #print("Ack'd "+str(pack_id))
     if idx == "eof": return None # EOF ACK packets always emit one more ACK. So ignore current one
     if len(args) > 0 and args[0] == "paginate_fail":
         pckt = store.get_packet(int(pack_id.split('_')[0]), "PAGIN")
@@ -282,12 +284,15 @@ def socketIO_emit(self, event, *args, **kw):
 
 def socketIO_send_pckt(self, event, *args, **kw):
     #print("Sending "+str(args[0]))
+    self.last_packet_sent = args[0]
     try:
         self._emit(event, *args, **kw)
     except:
         pass
-    self.activeTimer = Timer(PACKET_TIMEOUT, self.send_pckt, (event,) + args, kw)
-    self.activeTimer.start()
+    if "dnack" in kw and kw["knack"]: store.clear()
+    else:
+        self.activeTimer = Timer(PACKET_TIMEOUT, self.send_pckt, (event,) + args, kw)
+        self.activeTimer.start()
     del args
 
 
@@ -308,6 +313,7 @@ socketIO_client.SocketIO._transport = socketIO_transport
 socketIO_client.SocketIO.waiting_for_close = socketIO_waiting_for_close
 socketIO_client.SocketIO.wait = socketIO_wait
 socketIO_client.SocketIO.activeTimer = None
+socketIO_client.SocketIO.last_packet_sent = None
 
 SocketIO = socketIO_client.SocketIO
 BaseNamespace = socketIO_client.BaseNamespace

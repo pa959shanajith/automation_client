@@ -298,8 +298,6 @@ ROWS='rows'
 
 OVERALLSTATUS='overallstatus'
 
-OVERALLSTATUSREPORT='overAllStatus'
-
 ID='id'
 
 PARENT_ID='parentId'
