@@ -1672,7 +1672,7 @@ class Config_window(wx.Frame):
             self.delay.SetValue("0.3")
 
         #Delay input box kept for provide the delay in typestring.
-        self.Delay_input=wx.StaticText(self.panel, label="Delay for StringInput", pos=config_fields["Delay_Stringinput"][0],size=config_fields["Delay_Stringinput"][1], style=0, name="")
+        self.delay_stringinput=wx.StaticText(self.panel, label="Delay for StringInput", pos=config_fields["Delay_Stringinput"][0],size=config_fields["Delay_Stringinput"][1], style=0, name="")
         self.Delay_input=wx.TextCtrl(self.panel, pos=config_fields["Delay_Stringinput"][2], size=config_fields["Delay_Stringinput"][3])
         if isConfigJson!=False:
             self.Delay_input.SetValue(isConfigJson['delay_stringinput'])
@@ -1690,6 +1690,8 @@ class Config_window(wx.Frame):
         self.disp_var_timeout=wx.TextCtrl(self.panel, pos=config_fields["Disp_var"][2], size=config_fields["Disp_var"][3])
         if isConfigJson!=False:
             self.disp_var_timeout.SetValue(isConfigJson['displayVariableTimeOut'])
+        
+        
 
         self.sev_cert=wx.StaticText(self.panel, label="Server Cert", pos=config_fields["S_cert"][0],size=config_fields["S_cert"][1], style=0, name="")
         self.server_cert=wx.TextCtrl(self.panel, pos=config_fields["S_cert"][2], size=config_fields["S_cert"][3])
@@ -1702,11 +1704,43 @@ class Config_window(wx.Frame):
 
         self.connection_timeout=wx.StaticText(self.panel, label="Connection Timeout", pos=config_fields["C_Timeout"][0],size=config_fields["C_Timeout"][1], style=0, name="")
         self.conn_timeout=wx.TextCtrl(self.panel, pos=config_fields["C_Timeout"][2], size=config_fields["C_Timeout"][3])
-
+        self.conn_timeout.Bind(wx.EVT_CHAR, self.handle_keypress)
+        self.conn_timeout.Bind(wx.EVT_SET_FOCUS,self.toggle1_conn_timeout)
+        self.conn_timeout.Bind(wx.EVT_KILL_FOCUS,self.toggle2_conn_timeout)
         if isConfigJson!=False and int(isConfigJson['connection_timeout'])>=8:
             self.conn_timeout.SetValue(isConfigJson['connection_timeout'])
         else:
             self.conn_timeout.SetValue("0")
+        
+        ## Binding placeholders and restricting textareas to just numeric characters 
+        self.disp_var_timeout.Bind(wx.EVT_SET_FOCUS,self.toggle1_disp_var_timeout)
+        self.disp_var_timeout.Bind(wx.EVT_KILL_FOCUS,self.toggle2_disp_var_timeout)
+        self.disp_var_timeout.Bind(wx.EVT_CHAR, self.handle_keypress)
+        
+        self.query_timeout.Bind(wx.EVT_SET_FOCUS,self.toggle1_query_timeout)
+        self.query_timeout.Bind(wx.EVT_KILL_FOCUS,self.toggle2_query_timeout)
+        self.query_timeout.Bind(wx.EVT_CHAR, self.handle_keypress)
+
+        self.time_out.Bind(wx.EVT_SET_FOCUS,self.toggle1_time_out)
+        self.time_out.Bind(wx.EVT_KILL_FOCUS,self.toggle2_time_out)
+        self.time_out.Bind(wx.EVT_CHAR, self.handle_keypress)
+        
+        self.delay.Bind(wx.EVT_SET_FOCUS,self.toggle1_delay)
+        self.delay.Bind(wx.EVT_KILL_FOCUS,self.toggle2_delay)
+        self.delay.Bind(wx.EVT_CHAR, self.handle_keypress)
+        
+        self.Delay_input.Bind(wx.EVT_SET_FOCUS,self.toggle1_Delay_input)
+        self.Delay_input.Bind(wx.EVT_KILL_FOCUS,self.toggle2_Delay_input)
+        self.Delay_input.Bind(wx.EVT_CHAR, self.handle_keypress)
+        
+        self.step_exe_wait.Bind(wx.EVT_SET_FOCUS,self.toggle1_step_exe_wait)
+        self.step_exe_wait.Bind(wx.EVT_KILL_FOCUS,self.toggle2_step_exe_wait)
+        self.step_exe_wait.Bind(wx.EVT_CHAR, self.handle_keypress)
+
+        self.conn_timeout.Bind(wx.EVT_CHAR, self.handle_keypress)
+        self.conn_timeout.Bind(wx.EVT_SET_FOCUS,self.toggle1_conn_timeout)
+        self.conn_timeout.Bind(wx.EVT_KILL_FOCUS,self.toggle2_conn_timeout)
+
 
         lblList = ['Yes', 'No']
         lblList2 = ['64-bit', '32-bit']
@@ -1830,6 +1864,116 @@ class Config_window(wx.Frame):
         wx.Frame(self.panel)
         self.Show()
 
+    def handle_keypress(self, event):
+        keycode = event.GetKeyCode()
+            # valid ASCII
+        if chr(keycode) in ['0','1','2','3','4','5','6','7','8','9','.','\x08','ĺ','ļ','Ĺ','ĸ','\x7f']:
+            # Valid alphanumeric character
+            event.Skip()
+
+    def toggle1_disp_var_timeout(self,evt):
+        if self.disp_var_timeout.GetValue() == "sec":
+            self.disp_var_timeout.SetValue("")
+            font = wx.Font(10, wx.DEFAULT, wx.FONTSTYLE_NORMAL, wx.NORMAL)
+            self.disp_var_timeout.SetFont(font)
+            self.disp_var_timeout.SetForegroundColour('#000000')
+        evt.Skip()
+    def toggle1_query_timeout(self,evt):
+        if self.query_timeout.GetValue() == "sec":
+            self.query_timeout.SetValue("")
+            font = wx.Font(10, wx.DEFAULT, wx.FONTSTYLE_NORMAL, wx.NORMAL)
+            self.query_timeout.SetFont(font)
+            self.query_timeout.SetForegroundColour('#000000')
+        evt.Skip()
+    def toggle1_time_out(self,evt):
+        if self.time_out.GetValue() == "sec":
+            self.time_out.SetValue("")
+            font = wx.Font(10, wx.DEFAULT, wx.FONTSTYLE_NORMAL, wx.NORMAL)
+            self.time_out.SetFont(font)
+            self.time_out.SetForegroundColour('#000000')
+        evt.Skip()
+    def toggle1_delay(self,evt):
+        if self.delay.GetValue() == "sec":
+            self.delay.SetValue("")
+            font = wx.Font(10, wx.DEFAULT, wx.FONTSTYLE_NORMAL, wx.NORMAL)
+            self.delay.SetFont(font)
+            self.delay.SetForegroundColour('#000000')
+        evt.Skip()
+    def toggle1_Delay_input(self,evt):
+        if self.Delay_input.GetValue() == "sec":
+            self.Delay_input.SetValue("")
+            font = wx.Font(10, wx.DEFAULT, wx.FONTSTYLE_NORMAL, wx.NORMAL)
+            self.Delay_input.SetFont(font)
+            self.Delay_input.SetForegroundColour('#000000')
+        evt.Skip()
+    def toggle1_step_exe_wait(self,evt):
+        if self.step_exe_wait.GetValue() == "sec":
+            self.step_exe_wait.SetValue("")
+            font = wx.Font(10, wx.DEFAULT, wx.FONTSTYLE_NORMAL, wx.NORMAL)
+            self.step_exe_wait.SetFont(font)
+            self.step_exe_wait.SetForegroundColour('#000000')
+        evt.Skip()
+    def toggle1_conn_timeout(self,evt):
+        if self.conn_timeout.GetValue() == "0 or >8 hrs":
+            self.conn_timeout.SetValue("")
+            font = wx.Font(10, wx.DEFAULT, wx.FONTSTYLE_NORMAL, wx.NORMAL)
+            self.conn_timeout.SetFont(font)
+            self.conn_timeout.SetForegroundColour('#000000')
+        evt.Skip()
+
+    
+    def toggle2_disp_var_timeout(self,evt):
+        if self.disp_var_timeout.GetValue() == "":
+            self.disp_var_timeout.SetValue("sec")
+            font = wx.Font(10, wx.DEFAULT, wx.FONTSTYLE_ITALIC, wx.NORMAL)
+            self.disp_var_timeout.SetFont(font)
+            self.disp_var_timeout.SetForegroundColour('#848484')
+        evt.Skip()
+    def toggle2_query_timeout(self,evt):
+        if self.query_timeout.GetValue() == "":
+            self.query_timeout.SetValue("sec")
+            font = wx.Font(10, wx.DEFAULT, wx.FONTSTYLE_ITALIC, wx.NORMAL)
+            self.query_timeout.SetFont(font)
+            self.query_timeout.SetForegroundColour('#848484')
+        evt.Skip()
+    def toggle2_time_out(self,evt):
+        if self.time_out.GetValue() == "":
+            self.time_out.SetValue("sec")
+            font = wx.Font(10, wx.DEFAULT, wx.FONTSTYLE_ITALIC, wx.NORMAL)
+            self.time_out.SetFont(font)
+            self.time_out.SetForegroundColour('#848484')
+        evt.Skip()
+    def toggle2_delay(self,evt):
+        if self.delay.GetValue() == "":
+            self.delay.SetValue("sec")
+            font = wx.Font(10, wx.DEFAULT, wx.FONTSTYLE_ITALIC, wx.NORMAL)
+            self.delay.SetFont(font)
+            self.delay.SetForegroundColour('#848484')
+        evt.Skip()
+    def toggle2_Delay_input(self,evt):
+        if self.Delay_input.GetValue() == "":
+            self.Delay_input.SetValue("sec")
+            font = wx.Font(10, wx.DEFAULT, wx.FONTSTYLE_ITALIC, wx.NORMAL)
+            self.Delay_input.SetFont(font)
+            self.Delay_input.SetForegroundColour('#848484')
+        evt.Skip()
+    def toggle2_step_exe_wait(self,evt):
+        if self.step_exe_wait.GetValue() == "":
+            self.step_exe_wait.SetValue("sec")
+            font = wx.Font(10, wx.DEFAULT, wx.FONTSTYLE_ITALIC, wx.NORMAL)
+            self.step_exe_wait.SetFont(font)
+            self.step_exe_wait.SetForegroundColour('#848484')
+        evt.Skip()
+    def toggle2_conn_timeout(self,evt):
+        if self.conn_timeout.GetValue() == "":
+            self.conn_timeout.SetValue("0 or >8 hrs")
+            font = wx.Font(10, wx.DEFAULT, wx.FONTSTYLE_ITALIC, wx.NORMAL)
+            self.conn_timeout.SetFont(font)
+            self.conn_timeout.SetForegroundColour('#848484')
+        evt.Skip()
+
+
+
     """This method verifies and checks if correct data is present,then creates a dictionary and sends this dictionary to jsonCreater()"""
     def config_check(self,event):
         data = {}
@@ -1893,9 +2037,9 @@ class Config_window(wx.Frame):
         data['delay_stringinput']=delay_string_in.strip()
         config_data=data
         if (data['server_ip']!='' and data['server_port']!='' and data['server_cert']!='' and
-            data['chrome_path']!='' and data['queryTimeOut']!='' and data['logFile_Path']!='' and
-            data['delay']!='' and data['timeOut']!='' and data['stepExecutionWait']!='' and
-            data['displayVariableTimeOut']!='' and data['firefox_path']!='' and  data['connection_timeout']>=''):
+            data['chrome_path']!='' and data['queryTimeOut'] not in ['','sec'] and data['logFile_Path']!='' and
+            data['delay'] not in ['','sec'] and data['timeOut'] not in ['','sec'] and data['stepExecutionWait'] not in ['','sec'] and
+            data['displayVariableTimeOut'] not in ['','sec'] and data['delay_stringinput'] not in ['','sec'] and data['firefox_path']!='' and  data['connection_timeout'] not in ['','0 or >8 hrs']):
             #---------------------------------------resetting the static texts
             self.error_msg.SetLabel("")
             self.sev_add.SetLabel('Server Address')
@@ -1991,7 +2135,13 @@ class Config_window(wx.Frame):
             else:
                 self.log_fpath.SetLabel('Log File Path')
                 self.log_fpath.SetForegroundColour((0,0,0))
-            if data['queryTimeOut']=='':
+            if data['delay_stringinput']=="sec":
+                self.delay_stringinput.SetLabel('Delay for stringinput*')
+                self.delay_stringinput.SetForegroundColour((255,0,0))
+            else:
+                self.delay_stringinput.SetLabel('Query Timeout')
+                self.delay_stringinput.SetForegroundColour((0,0,0))
+            if data['queryTimeOut']=="sec":
                 self.qu_timeout.SetLabel('Query Timeout*')
                 self.qu_timeout.SetForegroundColour((255,0,0))
             else:
@@ -2015,31 +2165,32 @@ class Config_window(wx.Frame):
             else:
                 self.ff_path.SetLabel('Firefox Path')
                 self.ff_path.SetForegroundColour((0,0,0))
-            if data['delay']=='':
+            if data['delay']=="sec":
                 self.delayText.SetLabel('Delay*')
                 self.delayText.SetForegroundColour((255,0,0))
             else:
                 self.delayText.SetLabel('Delay')
                 self.delayText.SetForegroundColour((0,0,0))
-            if data['timeOut']=='':
+            if data['timeOut']=="sec":
                 self.timeOut.SetLabel('Time Out*')
                 self.timeOut.SetForegroundColour((255,0,0))
             else:
                 self.timeOut.SetLabel('Time Out')
                 self.timeOut.SetForegroundColour((0,0,0))
-            if data['stepExecutionWait']=='':
+            if data['stepExecutionWait']=="sec":
+                # self.error_msg.SetLabel("Do not leave marked '*' fields empty, Data not saved")
                 self.stepExecWait.SetLabel('Step Execution Wait*')
                 self.stepExecWait.SetForegroundColour((255,0,0))
             else:
                 self.stepExecWait.SetLabel('Step Execution Wait')
                 self.stepExecWait.SetForegroundColour((0,0,0))
-            if data['displayVariableTimeOut']=='':
+            if data['displayVariableTimeOut']=="sec":
                 self.dispVarTimeOut.SetLabel('Display Variable Timeout*')
                 self.dispVarTimeOut.SetForegroundColour((255,0,0))
             else:
                 self.dispVarTimeOut.SetLabel('Display Variable Timeout')
                 self.dispVarTimeOut.SetForegroundColour((0,0,0))
-            if data['connection_timeout']=='':
+            if data['connection_timeout']=="0 or >8 hrs":
                 self.connection_timeout.SetLabel('Connection Timeout*')
                 self.connection_timeout.SetForegroundColour((255,0,0))
             else:
