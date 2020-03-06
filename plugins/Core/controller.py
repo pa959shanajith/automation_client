@@ -867,7 +867,7 @@ class Controller():
         obj.clear_dyn_variables()
         return status
 
-    def invoke_execution(self,mythread,json_data,socketIO,wxObject,configvalues,qc_soc):
+    def invoke_execution(self,mythread,json_data,socketIO,wxObject,configvalues,qcObject):
         global terminate_flag,count,status_percentage
         qc_url=''
         qc_password=''
