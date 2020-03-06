@@ -22,6 +22,7 @@ import logging
 from constants import *
 import core_utils
 import threading
+from string_ops_keywords import *
 local_blk = threading.local()
 ##text_javascript = """function stext_content(f) {     var sfirstText = '';     var stextdisplay = '';     for (var z = 0; z < f.childNodes.length; z++) {         var scurNode = f.childNodes[z];         swhitespace = /^\s*$/;         if (scurNode.nodeName === '#text' && !(swhitespace.test(scurNode.nodeValue))) {             sfirstText = scurNode.nodeValue;             stextdisplay = stextdisplay + sfirstText;         }     }     return (stextdisplay); }; return stext_content(arguments[0])"""
 class ButtonLinkKeyword():
@@ -499,8 +500,8 @@ class ButtonLinkKeyword():
             robot.key_release(Keys.n)
             robot.key_release(Keys.alt)
             robot.sleep(0.5)
-            robot.type_string(str(self.copy_text),0.005)
-            #robot.paste()
+            copy_text=r'{}'.format(self.copy_text[2])
+            robot.type_string(copy_text,0.005)
             robot.sleep(0.5)
             robot.key_press(Keys.enter)
             robot.sleep(0.5)
@@ -517,10 +518,13 @@ class ButtonLinkKeyword():
     def __set_clipboard_data(self,inputfile):
         status = False
         try:
-            robot = Robot()
+            #robot = Robot()
+            so = StringOperation()
             local_blk.log.debug('Copying input file path to the clipboard')
-            robot.add_to_clipboard(inputfile.encode(encoding='utf8'))
-            self.copy_text=robot.get_clipboard_data().decode('utf8')
+            # robot.add_to_clipboard(inputfile.encode(encoding='utf8'))
+            # self.copy_text=robot.get_clipboard_data().decode('utf8')
+            so.save_to_clip_board(inputfile.encode(encoding='utf8'))
+            self.copy_text=so.get_from_clip_board()
             local_blk.log.debug(' input file path Copied to  clipboard')
             status = True
         except Exception as e:
