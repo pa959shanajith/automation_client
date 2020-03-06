@@ -22,7 +22,7 @@ class Dispatcher:
         err_msg=None
         result=[constants.TEST_RESULT_FAIL,constants.TEST_RESULT_FALSE,constants.OUTPUT_CONSTANT,err_msg]
         try:
-            dict={'setendpointurl': self.webservice.setEndPointURL,
+            ws_dict={'setendpointurl': self.webservice.setEndPointURL,
                   'setoperations' : self.webservice.setOperations,
                   'setmethods'    : self.webservice.setMethods,
                   'setheader'     : self.webservice.setHeader,
@@ -38,7 +38,7 @@ class Dispatcher:
                   # Authentication methods
                   'setbasicauth': self.webservice.setBasicAuth
                 }
-            if keyword in dict.keys():
+            if keyword in ws_dict.keys():
                 if keyword in ['settagvalue','settagattribute']:
                     message=list(message)
                     message.append(tsp.objectname)
@@ -46,7 +46,7 @@ class Dispatcher:
                     message=list(message)
                     message.append(socketIO)
 
-                result= dict[keyword](*message)
+                result= ws_dict[keyword](*message)
             else:
                 err_msg=ws_constants.METHOD_INVALID
                 result[3]=err_msg

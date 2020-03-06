@@ -56,6 +56,8 @@ class WatchThread(threading.Thread):
                                 emsg = str(filename)+" is invalid report JSON file."
                         except:
                             emsg = str(filename)+" is not a valid JSON file."
+                        finally:
+                            src_path.seek(0)
                         if emsg is not None:
                             logger.print_on_console(emsg)
                             log.error(emsg)

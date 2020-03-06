@@ -74,7 +74,7 @@ class SendFunctionKeys:
                             win32gui.ShowWindow(handle,5)
                     time.sleep(1)
         except Exception as e:
-            log.error("Web plugin not loaded")
+            log.error("Error in sendfunction_keys : ",e)
         try:
             log.debug('reading the inputs')
             input=str(input)
@@ -149,7 +149,7 @@ class SendFunctionKeys:
         else:
             robot=Robot()
             robot.key_release(key)
-        
+
     def get_args(self,args):
         value=1
         if len(args)>1 :

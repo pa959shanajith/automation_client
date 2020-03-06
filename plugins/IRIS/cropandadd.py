@@ -126,7 +126,7 @@ class Cropandadd():
             im = PIL.ImageGrab.grab()
             im.save('out.png')
             with open("out.png", "rb") as imageFile:
-                self.data['mirror'] = str(base64.b64encode(imageFile.read()))
+                self.data['mirror'] = base64.b64encode(imageFile.read()).decode('UTF-8').strip()
             os.remove('out.png')
             with open(os.environ["NINETEEN68_HOME"] + '/output/domelements.json', 'w') as outfile:
                 log.info('Opening domelements.json file to write scraped objects')
