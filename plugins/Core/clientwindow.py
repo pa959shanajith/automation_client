@@ -214,7 +214,7 @@ class MainNamespace(BaseNamespace):
             global wxObject,socketIO,execution_flag
             args=list(args)
             if(not execution_flag):
-                socketIO.emit('return_status_executeTestSuite',{'status':'success'})
+                socketIO.emit('return_status_executeTestSuite',{'status':'success','executionId':(args[0])['executionId']})
                 wxObject.mythread = TestThread(wxObject,EXECUTE,args[0],wxObject.debug_mode)
             else:
                 obj = handler.Handler()
@@ -224,7 +224,7 @@ class MainNamespace(BaseNamespace):
                 log.warn(emsg)
                 logger.print_on_console(emsg)
                 """sending scenario details for skipped execution to update the same in reports."""
-                socketIO.emit('return_status_executeTestSuite',{'status':'skipped','data':data})
+                socketIO.emit('return_status_executeTestSuite',{'status':'skipped','data':data,'executionId':(args[0])['executionId']})
         except Exception as e:
             err_msg='Error while Executing'
             log.error(err_msg)
@@ -870,8 +870,8 @@ class TestThread(threading.Thread):
             self.wxObject.rbox.Enable()
             self.wxObject.breakpoint.Enable()
             self.wxObject.cancelbutton.Enable()
-            testcasename = handler.local_handler.testcasename
             if self.action==DEBUG:
+                testcasename = handler.local_handler.testcasename
                 self.wxObject.killChildWindow(debug=True)
                 if (len(testcasename) > 0 or apptype.lower() not in plugins_list):
                     if('UserObjectScrape' in sys.modules):
@@ -888,7 +888,7 @@ class TestThread(threading.Thread):
                 else:
                     socketIO.emit('result_debugTestCaseWS',status)
             elif self.action==EXECUTE:
-                socketIO.emit('result_executeTestSuite',status)
+                socketIO.emit('result_executeTestSuite',{"status":status,"executionId":self.json_data["executionId"]})
         except Exception as e:
             log.error(e,exc_info=True)
             status=TERMINATE
@@ -897,7 +897,7 @@ class TestThread(threading.Thread):
                     self.wxObject.killChildWindow(debug=True)
                     socketIO.emit('result_debugTestCase',status)
                 elif self.action==EXECUTE:
-                    socketIO.emit('result_executeTestSuite',status)
+                    socketIO.emit('result_executeTestSuite',{"status":status,"executionId":self.json_data["executionId"]})
         if closeActiveConnection:
             closeActiveConnection = False
             connection_Timer = threading.Timer(300, wxObject.closeConnection)
@@ -1314,7 +1314,7 @@ class ClientWindow(wx.Frame):
             if socketIO is not None:
                 if disconn:
                     log.info('Sending socket disconnect request')
-                    socketIO.emit('unavailableLocalServer')
+                    socketIO.send('unavailableLocalServer', dnack = True)
                 socketIO.disconnect()
                 del socketIO
                 socketIO = None
@@ -1623,14 +1623,13 @@ class Config_window(wx.Frame):
         
         
         self.sev_add=wx.StaticText(self.panel, label="Server Address", pos=config_fields["S_address"][0],size=config_fields["S_address"][1], style=0, name="")
-        self.sev_add.SetToolTip(wx.ToolTip("Server Address"))
-                
+       
+
         self.server_add=wx.TextCtrl(self.panel, pos=config_fields["S_address"][2], size=config_fields["S_address"][3])
         if isConfigJson!=False:
             self.server_add.SetValue(isConfigJson['server_ip'])
 
         self.sev_port=wx.StaticText(self.panel, label="Server Port", pos=config_fields["S_port"][0],size=config_fields["S_port"][1], style=0, name="")
-        self.sev_port.SetToolTip(wx.ToolTip("Server Port"))
 
         self.server_port=wx.TextCtrl(self.panel, pos=config_fields["S_port"][2], size=config_fields["S_port"][3])
         if isConfigJson!=False:
@@ -1639,7 +1638,6 @@ class Config_window(wx.Frame):
             self.server_port.SetValue("8443")
 
         self.ch_path=wx.StaticText(self.panel, label="Chrome Path", pos=config_fields["Chrm_path"][0],size=config_fields["Chrm_path"][1], style=0, name="")
-        self.ch_path.SetToolTip(wx.ToolTip(" Chrome installation path or default"))
 
         self.ch_path.SetToolTip(wx.ToolTip("set your chrome path"))
         self.chrome_path=wx.TextCtrl(self.panel, pos=config_fields["Chrm_path"][2], size=config_fields["Chrm_path"][3])
@@ -1651,7 +1649,6 @@ class Config_window(wx.Frame):
             self.chrome_path.SetValue('default')
 
         self.ff_path=wx.StaticText(self.panel, label="Firefox Path", pos=config_fields["Ffox_path"][0],size=config_fields["Ffox_path"][1], style=0, name="")
-        self.ff_path.SetToolTip(wx.ToolTip("Firefox installation path or default"))
 
         self.firefox_path=wx.TextCtrl(self.panel, pos=config_fields["Ffox_path"][2], size=config_fields["Ffox_path"][3])
         self.firefox_path_btn=wx.Button(self.panel, label="...", pos=config_fields["Ffox_path"][4], size=config_fields["Ffox_path"][5])
@@ -1662,7 +1659,6 @@ class Config_window(wx.Frame):
             self.firefox_path.SetValue('default')
 
         self.log_fpath=wx.StaticText(self.panel, label="Log File Path", pos=config_fields["Log_path"][0],size=config_fields["Log_path"][1], style=0, name="")
-        self.log_fpath.SetToolTip(wx.ToolTip(" ICE Log file path"))
 
         self.log_file_path=wx.TextCtrl(self.panel, pos=config_fields["Log_path"][2], size=config_fields["Log_path"][3])
         self.log_file_path_btn=wx.Button(self.panel, label="...",pos=config_fields["Log_path"][4], size=config_fields["Log_path"][5])
@@ -1673,7 +1669,6 @@ class Config_window(wx.Frame):
             self.log_file_path.SetValue(isConfigJson['logFile_Path'])
 
         self.qu_timeout=wx.StaticText(self.panel, label="Query Timeout", pos=config_fields["Q_timeout"][0],size=config_fields["Q_timeout"][1], style=0, name="")
-        self.qu_timeout.SetToolTip(wx.ToolTip("Timeout for database queries"))
 
         self.query_timeout=wx.TextCtrl(self.panel, pos=config_fields["Q_timeout"][2], size=config_fields["Q_timeout"][3])
         if isConfigJson!=False:
@@ -1682,7 +1677,6 @@ class Config_window(wx.Frame):
             self.query_timeout.SetValue("3")
 
         self.timeOut=wx.StaticText(self.panel, label="Time Out", pos=config_fields["Timeout"][0],size=config_fields["Timeout"][1], style=0, name="")
-        self.timeOut.SetToolTip(wx.ToolTip("Timeout for waitForElementVisible[in seconds]"))
         self.time_out=wx.TextCtrl(self.panel, pos=config_fields["Timeout"][2], size=config_fields["Timeout"][3])
         if isConfigJson!=False:
             self.time_out.SetValue(isConfigJson['timeOut'])
@@ -1690,7 +1684,6 @@ class Config_window(wx.Frame):
             self.time_out.SetValue("1")
 
         self.delayText=wx.StaticText(self.panel, label="Delay", pos=config_fields["Delay"][0],size=config_fields["Delay"][1], style=0, name="")
-        self.delayText.SetToolTip(wx.ToolTip("Delay to switch between browser tabs[seconds]"))
 
         self.delay=wx.TextCtrl(self.panel, pos=config_fields["Delay"][2], size=config_fields["Delay"][3])
         if isConfigJson!=False:
@@ -1700,7 +1693,6 @@ class Config_window(wx.Frame):
 
         #Delay input box kept for provide the delay in typestring.
         self.Delay_input=wx.StaticText(self.panel, label="Delay for StringInput", pos=config_fields["Delay_Stringinput"][0],size=config_fields["Delay_Stringinput"][1], style=0, name="")
-        self.Delay_input.SetToolTip(wx.ToolTip("Character input delay for sendFunctionKeys"))
 
         self.Delay_input=wx.TextCtrl(self.panel, pos=config_fields["Delay_Stringinput"][2], size=config_fields["Delay_Stringinput"][3])
         if isConfigJson!=False:
@@ -1709,7 +1701,6 @@ class Config_window(wx.Frame):
             self.Delay_input.SetValue("0.005")
 
         self.stepExecWait=wx.StaticText(self.panel, label="Step Execution Wait", pos=config_fields["Step_exec"][0],size=config_fields["Step_exec"][1], style=0, name="")
-        self.stepExecWait.SetToolTip(wx.ToolTip("Delay between each step[in seconds]"))
 
         self.step_exe_wait=wx.TextCtrl(self.panel, pos=config_fields["Step_exec"][2], size=config_fields["Step_exec"][3])
         if isConfigJson!=False:
@@ -1718,7 +1709,6 @@ class Config_window(wx.Frame):
             self.step_exe_wait.SetValue("1")
 
         self.dispVarTimeOut=wx.StaticText(self.panel, label="Display Variable Timeout", pos=config_fields["Disp_var"][0],size=config_fields["Disp_var"][1], style=0, name="")
-        self.dispVarTimeOut.SetToolTip(wx.ToolTip("displayVariable popup duration[in seconds]"))
 
         self.disp_var_timeout=wx.TextCtrl(self.panel, pos=config_fields["Disp_var"][2], size=config_fields["Disp_var"][3])
         if isConfigJson!=False:
@@ -1726,7 +1716,6 @@ class Config_window(wx.Frame):
 
         
         self.sev_cert=wx.StaticText(self.panel, label="Server Cert", pos=config_fields["S_cert"][0],size=config_fields["S_cert"][1], style=0, name="")
-        self.sev_cert.SetToolTip(wx.ToolTip("Server certificate file path"))
 
         self.server_cert=wx.TextCtrl(self.panel, pos=config_fields["S_cert"][2], size=config_fields["S_cert"][3])
         self.server_cert_btn=wx.Button(self.panel, label="...",pos=config_fields["S_cert"][4], size=config_fields["S_cert"][5])
@@ -1737,7 +1726,6 @@ class Config_window(wx.Frame):
             self.server_cert.SetValue(isConfigJson['server_cert'])
 
         self.connection_timeout=wx.StaticText(self.panel, label="Connection Timeout", pos=config_fields["C_Timeout"][0],size=config_fields["C_Timeout"][1], style=0, name="")
-        self.connection_timeout.SetToolTip(wx.ToolTip("Timeout from server [in hours 0 or >8]"))
 
         self.conn_timeout=wx.TextCtrl(self.panel, pos=config_fields["C_Timeout"][2], size=config_fields["C_Timeout"][3])
 
@@ -1749,6 +1737,22 @@ class Config_window(wx.Frame):
         font = wx.Font(9, wx.DEFAULT, wx.NORMAL, wx.NORMAL)
         font.SetUnderlined(True)
         self.config_param.SetFont(font)
+
+
+        #ToolTips for static texts boxes 
+        self.sev_add.SetToolTip(wx.ToolTip("Server Address"))
+        self.sev_port.SetToolTip(wx.ToolTip("Server Port"))
+        self.ch_path.SetToolTip(wx.ToolTip(" Chrome installation path or default"))
+        self.ff_path.SetToolTip(wx.ToolTip("Firefox installation path or default"))
+        self.log_fpath.SetToolTip(wx.ToolTip(" ICE Log file path"))
+        self.qu_timeout.SetToolTip(wx.ToolTip("Timeout for database queries"))
+        self.timeOut.SetToolTip(wx.ToolTip("Timeout for waitForElementVisible[in seconds]"))
+        self.delayText.SetToolTip(wx.ToolTip("Delay to switch between browser tabs[seconds]"))
+        self.Delay_input.SetToolTip(wx.ToolTip("Character input delay for sendFunctionKeys"))
+        self.stepExecWait.SetToolTip(wx.ToolTip("Delay between each step[in seconds]"))
+        self.dispVarTimeOut.SetToolTip(wx.ToolTip("displayVariable popup duration[in seconds]"))
+        self.sev_cert.SetToolTip(wx.ToolTip("Server certificate file path"))
+        self.connection_timeout.SetToolTip(wx.ToolTip("Timeout from server [in hours 0 or >8]"))
         
         lblList = ['Yes', 'No']
         lblList2 = ['64-bit', '32-bit']
