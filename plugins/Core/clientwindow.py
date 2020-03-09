@@ -866,7 +866,7 @@ class TestThread(threading.Thread):
             #Removed execute,debug button
             self.wxObject.breakpoint.Clear()
             self.wxObject.rbox.Enable()
-            self.wxObject.breakpoint.Enable()
+            self.wxObject.breakpoint.Disable()
             self.wxObject.cancelbutton.Enable()
             if self.action==DEBUG:
                 testcasename = handler.local_handler.testcasename
@@ -1203,7 +1203,7 @@ class ClientWindow(wx.Frame):
             self.breakpoint.Disable()
             self.killChildWindow(debug=True)
         self.debug_mode=False
-        self.breakpoint.Disable()
+        # self.breakpoint.Disable()
         if self.choice in ['Stepwise','RunfromStep']:
             self.debug_mode=True
             ##if self.debugwindow == None:
