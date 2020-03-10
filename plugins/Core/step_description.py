@@ -475,13 +475,13 @@ class StepDescription:
             return 'Get pop-up text and save the text ' + "'" + output + "'" + ' in ' + "'" + tsp.outputval + "'" + '.'
         def serverconnect():
             return 'Connect to SAP server ' + "'" + inputval + "'" + '.'
-        def closedialogwindow()
+        def closedialogwindow():
             return 'Closeing the Dialog Window.'
-        def maximizedialogwindow()
+        def maximizedialogwindow():
             return 'Maximizing the Dialog Window.'
-        def restoredialogwindow()
+        def restoredialogwindow():
             return 'Restoring the Dialog Window.'
-        def getdialogwindowname()
+        def getdialogwindowname():
             return 'The Dialog Window Name is '+ "'" + output + "'" + ' and is saved in the variable ' + "'" + tsp.outputval + "'" + '.'
 
 
