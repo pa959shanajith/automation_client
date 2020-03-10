@@ -465,8 +465,6 @@ class StepDescription:
             return 'The page title is '+ "'" + output + "'" + ' and is saved  in the variable ' + "'" + tsp.outputval + "'" + '.'
         def closeapplication():
             return 'The application is closed' + '.'
-        def geterrormessage():
-            return 'Get the error message ' + "'" +output + "'" + '.'
         def starttransaction():
             return 'Start the transaction with ID' + "'" + inputval + "'" + '.'
         def toolbaraction():
@@ -483,6 +481,12 @@ class StepDescription:
             return 'Restoring the Dialog Window.'
         def getdialogwindowname():
             return 'The Dialog Window Name is '+ "'" + output + "'" + ' and is saved in the variable ' + "'" + tsp.outputval + "'" + '.'
+        def getstatusbarmessage():
+            return 'Get the Statusbar message ' + "'" +output + "'" + '.'
+        def selectmenu():
+            return 'Select Menu :' + "'" + inputval + "'" + ' and the result '+ "'" +output + "'" + ' is saved in the variable ' + "'" + tsp.outputval + "'" +  '.'
+        def doubleclickstatusbar():
+            return 'Double Clicked the Statusbar' + '.'
 
 
         #Textbox keywords
