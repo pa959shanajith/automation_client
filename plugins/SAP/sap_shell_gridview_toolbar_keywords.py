@@ -297,27 +297,18 @@ class Shell_GridView_Toolbar_Keywords():
                             result = sap_constants.TEST_RESULT_TRUE
                         else:
                             if ( len(input_val) >= 2 ):
+                                """Functions for ButtonAndMenu
+                                    SelectContextMenuItem(FunctionCode)
+                                    SelectContextMenuItemByPosition(PositionDesc)
+                                    SelectContextMenuItemByText(Text)
+                                    SelectMenuItem(Id) -  This function emulates selecting the menu item with the given id.
+                                    SelectMenuItemByText(strText) - This function emulates selecting the menu item by menu item text.
+                                    ShowContextMenu()
+                                """
                                 elem.PressContextButton(btn_id)
-##                                self.menuItem_list=input_val[1:]
-##                                self.count = 0
-##                                def recq_call(elem, menuItem):
-##                                    print('1', elem, menuItem)
-##                                    try:
-##                                        print(elem.CurrentContextMenu())
-##                                    except:
-##                                        pass
-##                                    temp_elem = elem.SelectContextMenuItemByText(menuItem)
-##                                    self.count = self.count + 1
-##                                    print(count)
-##                                    print(len(self.menuItem_list))
-##                                    if count == len(self.menuItem_list):
-##                                        return
-##                                    else:
-##                                        recq_call(temp_elem,self.menuItem_list[self.count])
-##                                recq_call(elem,self.menuItem_list[self.count])
-                                menuItem = str(input_val[1]).strip()
-##                                elem.PressContextButton(btn_id)
-                                elem.SelectContextMenuItemByText(menuItem)
+                                for i in range(1,len(input_val)):
+                                    menuItem = str(input_val[i]).strip()
+                                    elem.SelectMenuItemByText(menuItem)
                                 status = sap_constants.TEST_RESULT_PASS
                                 result = sap_constants.TEST_RESULT_TRUE
                             else:
@@ -682,7 +673,7 @@ class Shell_GridView_Toolbar_Keywords():
                     for col_name in input_val:
                         for i in range(0,len(bList)):
                             if( col_name in list(elem.GetColumnTitles(str(bList[i]))) and col_name == elem.GetDisplayedColumnTitle(str(bList[i]))):
-                                log.info("Column found at position : ",elem.GetColumnPosition(str(bList[i])))
+                                log.info("Column found at position : ",str(elem.GetColumnPosition(str(bList[i]))))
                                 elem.SelectColumn(str(bList[i]))
                                 status = sap_constants.TEST_RESULT_PASS
                                 result = sap_constants.TEST_RESULT_TRUE
@@ -722,7 +713,7 @@ class Shell_GridView_Toolbar_Keywords():
                     for col_name in input_val:
                         for i in range(0,len(bList)):
                             if( col_name in list(elem.GetColumnTitles(str(bList[i]))) and col_name == elem.GetDisplayedColumnTitle(str(bList[i]))):
-                                log.info("Column found at position : ",elem.GetColumnPosition(str(bList[i])))
+                                log.info("Column found at position : ",str(elem.GetColumnPosition(str(bList[i]))))
                                 elem.DeselectColumn(str(bList[i]))
                                 status = sap_constants.TEST_RESULT_PASS
                                 result = sap_constants.TEST_RESULT_TRUE
