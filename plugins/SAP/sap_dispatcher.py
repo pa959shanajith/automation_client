@@ -129,7 +129,7 @@ class SAPDispatcher:
             'selectrow' : table_keywords_obj.selectRow,
             'unselectrow' : table_keywords_obj.unselectRow,
             'selectcolumn' : table_keywords_obj.selectColumn,
-            'unselectColumn' : table_keywords_obj.unselectColumn,
+            'unselectcolumn' : table_keywords_obj.unselectColumn,
             'setcelltext' : table_keywords_obj.setCellText,
             #Shell keywords
             #-----------------------------------------------------shell_basic_keywords
@@ -150,6 +150,9 @@ class SAPDispatcher:
             'unselectallselections' : shell_gridview_toolbar_keywords_obj.unselectAllSelections,
             'scrolltorownumber' : shell_gridview_toolbar_keywords_obj.scrollToRowNumber,
             'getcellcolor' : shell_gridview_toolbar_keywords_obj.getCellColor,
+            'selectcolumns' : shell_gridview_toolbar_keywords_obj.selectColumns,
+            'unselectcolumns' : shell_gridview_toolbar_keywords_obj.unSelectColumns,
+            'getallcolumnheaders' : shell_gridview_toolbar_keywords_obj.getAllColumnHeaders,
             #------------------------------------------------------treekeywords
             'selecttreeelement' : shell_tree_keywords_obj.selectTreeElement,
             'gettreenodetext' : shell_tree_keywords_obj.getTreeNodeText,

@@ -475,6 +475,14 @@ class StepDescription:
             return 'Get pop-up text and save the text ' + "'" + output + "'" + ' in ' + "'" + tsp.outputval + "'" + '.'
         def serverconnect():
             return 'Connect to SAP server ' + "'" + inputval + "'" + '.'
+        def closedialogwindow()
+            return 'Closeing the Dialog Window.'
+        def maximizedialogwindow()
+            return 'Maximizing the Dialog Window.'
+        def restoredialogwindow()
+            return 'Restoring the Dialog Window.'
+        def getdialogwindowname()
+            return 'The Dialog Window Name is '+ "'" + output + "'" + ' and is saved in the variable ' + "'" + tsp.outputval + "'" + '.'
 
 
         #Textbox keywords
@@ -594,6 +602,12 @@ class StepDescription:
             return 'Move tab '+ "'" + tsp.custname + "'"+'to left and store the output as '+"'"+output+"'"+'.'
 
         #Shell(Grid) Keywords
+        def selectcolumns():
+            return 'Selecting Column/Columns '+ "'" + input[0] + "'" + 'and store the output as ' + "'" + output + "'" + '.'
+        def unselectcolumns():
+            return 'Unselecting Column/Columns '+ "'" + input[0] + "'" + 'and store the output as ' + "'" + output + "'" + '.'
+        def getallcolumnheaders():
+            return 'Get all Column Headers of '+ "'" + tsp.custname + "'" + ' and save the output as ' + "'"+output+"'" + ' in '+"'"+ tsp.outputval+"'"+'.'
         def presstoolbarbutton():
             return 'Pressing Toolbar Button '+"'"+input[0]+"' of '"+tsp.custname+"'"+' and store the output as '+"'"+output+"'"+'.'
         def selectrows():
