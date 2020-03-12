@@ -930,11 +930,11 @@ class Controller():
                 status=TERMINATE
 ##                break
             suite_name=json_data['suitedetails'][j-1]["testsuitename"]
-            log.info('---------------------------------------------------------------------')
+            log.info(line_separator)
             print(line_separator)
             log.info('***SUITE '+str( j) +' EXECUTION STARTED***')
             logger.print_on_console('***SUITE ', str(j) ,' EXECUTION STARTED***')
-            log.info('-----------------------------------------------')
+            log.info(line_separator)
             print(line_separator)
             do_not_execute = False
             #Check for the disabled scenario
@@ -1017,9 +1017,9 @@ class Controller():
                                     print(line_separator)
                                     logger.print_on_console(msg)
                                     print(line_separator)
-                                    log.info('=======================================================================================================')
+                                    log.info(line_separator)
                                     log.info(msg)
-                                    log.info('=======================================================================================================')
+                                    log.info(line_separator)
                                 else:
                                     terminate_flag=True
                                     msg='***Scenario'+str(i + 1)+': '+scenario_name+' is Terminated ***'
@@ -1041,9 +1041,9 @@ class Controller():
                                     print(line_separator)
                                     logger.print_on_console( '***Scenario' ,str(i + 1) ,' execution completed***')
                                     print(line_separator)
-                                    log.info('=======================================================================================================')
+                                    log.info(line_separator)
                                     log.info( '***Scenario' ,str(i + 1) ,' execution completed***')
-                                    log.info('=======================================================================================================')
+                                    log.info(line_separator)
                             if execute_flag:
                                 #Saving the report for the scenario
                                 logger.print_on_console( '***Saving report of Scenario' ,str(i  + 1 ),'***')
@@ -1138,13 +1138,13 @@ class Controller():
                 execution_status=self.aws_obj.run_aws_android_tests()
                 if not(execution_status):
                     status=TERMINATE
-            log.info('---------------------------------------------------------------------')
+            log.info(line_separator)
             print(line_separator)
             log.info('***SUITE '+ str(j) +' EXECUTION COMPLETED***')
             #clearing dynamic variables at the end of execution to support dynamic variable at the scenario level
             obj.clear_dyn_variables()
             logger.print_on_console('***SUITE ', str(j) ,' EXECUTION COMPLETED***')
-            log.info('-----------------------------------------------')
+            log.info(line_separator)
             print(line_separator)
             j=j+1
         if status==TERMINATE:
