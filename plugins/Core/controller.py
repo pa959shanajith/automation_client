@@ -847,10 +847,10 @@ class Controller():
         self.action=DEBUG
         handler.local_handler.tspList=[]
         scenario=[json_data]
-        print('=======================================================================================================')
+        print(line_separator)
         log.info('***DEBUG STARTED***')
         logger.print_on_console('***DEBUG STARTED***')
-        print('=======================================================================================================')
+        print(line_separator)
         for d in scenario:
             flag,browser_type,last_tc_num,testcase_empty_flag,empty_testcase_names=obj.parse_json(d)
             if flag == False:
@@ -883,10 +883,10 @@ class Controller():
                 for k,v in handler.local_handler.awsKeywords.items():
                     logger.print_on_console(k,':',list(v))
                     log.info(k+':'+str(list(v)))
-        print('=======================================================================================================')
+        print(line_separator)
         log.info('***DEBUG COMPLETED***')
         logger.print_on_console('***DEBUG COMPLETED***')
-        print('=======================================================================================================')
+        print(line_separator)
         #clearing of dynamic variables
         obj.clearList(self)
         #clearing dynamic variables at the end of execution to support dynamic variable at the scenario level
@@ -929,12 +929,13 @@ class Controller():
             if terminate_flag:
                 status=TERMINATE
 ##                break
+            suite_name=json_data['suitedetails'][j-1]["testsuitename"]
             log.info('---------------------------------------------------------------------')
-            print('=======================================================================================================')
+            print(line_separator)
             log.info('***SUITE '+str( j) +' EXECUTION STARTED***')
             logger.print_on_console('***SUITE ', str(j) ,' EXECUTION STARTED***')
             log.info('-----------------------------------------------')
-            print('=======================================================================================================')
+            print(line_separator)
             do_not_execute = False
             #Check for the disabled scenario
             if not (do_not_execute) :
@@ -959,10 +960,11 @@ class Controller():
                         #condition check for scenario execution and reporting for condition check
                         if not(condition_check_flag):
                              #check for temrinate flag before printing loggers
+                            scenario_name=json_data['suitedetails'][j-1]["scenarioNames"][i]
                             if not(terminate_flag):
-                                print('=======================================================================================================')
+                                print(line_separator)
                                 logger.print_on_console( '***Scenario ' ,str(i+1) ,' execution started***')
-                                print('=======================================================================================================')
+                                print(line_separator)
                                 log.info('***Scenario '  + str(i+1)+ ' execution started***')
                             if(len(scenario)==3 and len(scenario['qcdetails'])==7):
                                 qc_details_creds=scenario['qccredentials']
@@ -1012,9 +1014,9 @@ class Controller():
                                 if compile_status:
                                     pytest_files.append(pytest_file)
                                     msg='***Scenario'+str(i + 1)+': '+scenario_name+' Compiled for AWS Execution***'
-                                    print('=======================================================================================================')
+                                    print(line_separator)
                                     logger.print_on_console(msg)
-                                    print('=======================================================================================================')
+                                    print(line_separator)
                                     log.info('=======================================================================================================')
                                     log.info(msg)
                                     log.info('=======================================================================================================')
@@ -1036,9 +1038,9 @@ class Controller():
                                     con.conthread=mythread
                                     con.tsp_list=tsplist
                                     status,status_percentage = con.executor(tsplist,EXECUTE,last_tc_num,1,con.conthread)
-                                    print('=======================================================================================================')
+                                    print(line_separator)
                                     logger.print_on_console( '***Scenario' ,str(i + 1) ,' execution completed***')
-                                    print('=======================================================================================================')
+                                    print(line_separator)
                                     log.info('=======================================================================================================')
                                     log.info( '***Scenario' ,str(i + 1) ,' execution completed***')
                                     log.info('=======================================================================================================')
@@ -1137,18 +1139,18 @@ class Controller():
                 if not(execution_status):
                     status=TERMINATE
             log.info('---------------------------------------------------------------------')
-            print('=======================================================================================================')
+            print(line_separator)
             log.info('***SUITE '+ str(j) +' EXECUTION COMPLETED***')
             #clearing dynamic variables at the end of execution to support dynamic variable at the scenario level
             obj.clear_dyn_variables()
             logger.print_on_console('***SUITE ', str(j) ,' EXECUTION COMPLETED***')
             log.info('-----------------------------------------------')
-            print('=======================================================================================================')
+            print(line_separator)
             j=j+1
         if status==TERMINATE:
-            print('=======================================================================================================')
+            print(line_separator)
             logger.print_on_console( '***Terminating the Execution***')
-            print('=======================================================================================================')
+            print(line_separator)
         return status
 
     #Building of Dictionary to send back toserver to save the data
