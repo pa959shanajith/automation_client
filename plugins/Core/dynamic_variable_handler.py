@@ -97,10 +97,8 @@ class DynamicVariables:
         else:
             variable=variable[0:len(variable)-1]
             for i in range(len(value)):
-                p=i+1
                 for j in range(len(value[i])):
-                    q=j+1
-                    local_dynamic.dynamic_variable_map[variable+'['+str(p)+']['+str(q)+']}']=value[i][j]
+                    local_dynamic.dynamic_variable_map[variable+'['+str(i)+']['+str(j)+']}']=value[i][j]
             local_dynamic.dynamic_variable_map[variable+'}'] = value
 
 
