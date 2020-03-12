@@ -504,3 +504,32 @@ class XML:
             logger.print_on_console(err_msg)
         return status,err_msg
 
+
+class JSON:
+
+    def write_to_file(self,*args):
+        """
+        def : write_to_file
+        purpose : writes the content to given json file
+        param : input_path,content
+        return : bool
+
+        """
+        status=False
+        err_msg=None
+        coreutilsobj=core_utils.CoreUtils()
+        input_path=coreutilsobj.get_UTF_8(args[0])
+        log.info('Writing ',args[1],' to json file ',input_path)
+        try:
+            json.loads(args[1])
+            with open(input_path,'w') as file_write:
+                json.dump(args[1],file_write)
+            status=True
+        except Exception as e:
+            err_msg=generic_constants.ERR_MSG1+'Writing to JSON '+generic_constants.ERR_MSG2
+            log.error(e)
+        log.info('Status is ',status)
+        if err_msg!=None:
+            logger.print_on_console(err_msg)
+        return status,err_msg
+
