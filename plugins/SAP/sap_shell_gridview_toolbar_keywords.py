@@ -107,7 +107,7 @@ class Shell_GridView_Toolbar_Keywords():
                                 dataRow.append(str(col + 1))
                                 cnt = cnt + 1
                                 data.append(dataRow)
-                    log.info('Value detected in '+ str(cnt) +'row and columns.')
+                    log.info('Value detected :'+ str(cnt) +' times.')
                     value = data
                     status = sap_constants.TEST_RESULT_PASS
                     result = sap_constants.TEST_RESULT_TRUE
