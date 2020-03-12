@@ -96,17 +96,18 @@ class Shell_GridView_Toolbar_Keywords():
                     col_count = elem.columnCount
                     for col in range(col_count):
                         colOrder.append(elem.columnorder(col))
-                    data = {}
+                    data = []
                     cnt = 0
                     for row in range(row_count):
-                        dataRow = {}
                         for col in range(col_count):
+                            dataRow = []
                             valFromTable = elem.getCellValue(row, colOrder[col])
                             if ( checkVal == valFromTable ):
-                                dataRow['Row'] = str(row + 1)
-                                dataRow['Col'] = str(col + 1)
+                                dataRow.append(str(row + 1))
+                                dataRow.append(str(col + 1))
                                 cnt = cnt + 1
-                                data[cnt] = dataRow
+                                data.append(dataRow)
+                    log.info('Value detected in '+ str(cnt) +'row and columns.')
                     value = data
                     status = sap_constants.TEST_RESULT_PASS
                     result = sap_constants.TEST_RESULT_TRUE
