@@ -284,7 +284,7 @@
                     {{/ifEquals}}
                     {{#ifnotEquals testcase_details.testcaseDetails ""}}
                        {{#ifnotEquals testcase_details undefined}}
-                        <td class="rDExpectedRes tabCont" style="padding-left: 10px;">{{StepDescription}}<br/> Expected Result is: {{testcase_details.testcaseDetails}}</td>
+                        <td class="rDExpectedRes tabCont" style="padding-left: 10px;">{{StepDescription}}<br/>{{testcase_details.testcaseDetails}}</td>
                        {{/ifnotEquals}}
                     {{/ifnotEquals}} 
 
@@ -301,7 +301,7 @@
                           <td class="rDActualRes tabCont" style="padding-left: 10px;"><a style="color: {{getColor status}};text-decoration:none" href="{{validateImageID screenshot_path slno}}">{{status}}</a></td>
                         {{/ifEquals}}
                         {{#ifnotEquals testcase_details.actualResult_pass ""}}
-                           <td class="rDActualRes tabCont" style="padding-left: 10px;">{{testcase_details.actualResult_pass}},<a style="color: {{getColor status}};text-decoration:none" href="{{validateImageID screenshot_path slno}}">{{status}}</a></td>
+                           <td class="rDActualRes tabCont" style="padding-left: 10px;">{{testcase_details.actualResult_pass}}<a style="color: {{getColor status}};text-decoration:none" href="{{validateImageID screenshot_path slno}}">{{status}}</a></td>
                         {{/ifnotEquals}}
                     {{/ifEquals}}
 
@@ -360,7 +360,7 @@
             {{#ifnotEquals ../overallstatus.0.browserType "MobileApp"}}
                 <img id="img-{{slno}}" src="{{screenshot_path}}" style="width:100%;display:block;" alt="Image for Sl No. {{slno}}">
             {{/ifnotEquals}}
-            <a href="#report-slno{{slno}}">Above Image belongs to Sl No. {{slno}}</a>
+            <a href="#report-slno{{slno}}">Above image belongs to Sl No. {{slno}}</a>
         </div>
         {{/each}}
     </div>
