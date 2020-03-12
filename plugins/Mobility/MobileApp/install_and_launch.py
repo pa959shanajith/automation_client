@@ -39,7 +39,10 @@ class LaunchAndInstall():
         logger.print_on_console('Input is ',input_val)
         global driver, device_keywords_object
         try:
-            driver = install_obj.installApplication(input_val[0], input_val[1], input_val[2], input_val[3])
+            if SYSTEM_OS != 'Darwin':
+                driver = install_obj.installApplication(input_val[0], input_val[1], input_val[2], None)
+            else:
+                driver = install_obj.installApplication(input_val[0], input_val[1], input_val[2], input_val[3])
             if driver is not None:
                 status = mobile_app_constants.TEST_RESULT_PASS
                 result = mobile_app_constants.TEST_RESULT_TRUE
