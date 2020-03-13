@@ -82,6 +82,9 @@ class custom():
                             "verifyhidden", "waitforelementexists"],
                 'key' : ["gettext", "longpress", "press", "verifydisabled", "verifydoesnotexists",
                             "verifyenabled", "verifyexists", "verifyvisible", "verifytext",
+                            "verifyhidden", "waitforelementexists"],
+                'view': ["gettext", "longpress", "press", "verifydisabled", "verifydoesnotexists",
+                            "verifyenabled", "verifyexists", "verifyvisible", "verifytext",
                             "verifyhidden", "waitforelementexists"]
             }
             try:
@@ -135,7 +138,8 @@ class custom():
             'text': ['android.widget.TextView'],
             'image': ['android.widget.ImageView'],
             'layout': ['android.widget.LinearLayout','android.widget.RelativeLayout'],
-            'element': ['android.widget.ScrollView','android.view.View','android.view.ViewGroup','android.widget.FrameLayout']
+            'view': ['android.view.View'],
+            'element': ['android.widget.ScrollView','android.view.ViewGroup','android.widget.FrameLayout']
         }
         element_list = []
         try:
