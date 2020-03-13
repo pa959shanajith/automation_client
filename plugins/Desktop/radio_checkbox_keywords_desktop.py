@@ -86,7 +86,7 @@ class Radio_Checkbox_keywords():
                             err_msg = 'Check box is already checked'
                         else:
                             if ( element.backend.name == 'win32' ):
-                                element.check()
+                                element.CheckByClick()
                             elif ( element.backend.name == 'uia' ):
                                 element.toggle()
                             status = desktop_constants.TEST_RESULT_PASS
@@ -130,7 +130,7 @@ class Radio_Checkbox_keywords():
                             err_msg = 'Check box is already unchecked'
                         else:
                             if ( element.backend.name =='win32' ):
-                                element.uncheck()
+                                element.UncheckByClick()
                             elif ( element.backend.name =='uia' ):
                                 element.toggle()
                             status = desktop_constants.TEST_RESULT_PASS
