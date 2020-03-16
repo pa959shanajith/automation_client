@@ -929,7 +929,7 @@ class Controller():
             if terminate_flag:
                 status=TERMINATE
 ##                break
-            suite_name=json_data['suitedetails'][j-1]["testsuitename"]
+            ## suite_name=json_data['suitedetails'][j-1]["testsuitename"]
             log.info(line_separator)
             print(line_separator)
             log.info('***SUITE '+str( j) +' EXECUTION STARTED***')
@@ -960,7 +960,6 @@ class Controller():
                         #condition check for scenario execution and reporting for condition check
                         if not(condition_check_flag):
                              #check for temrinate flag before printing loggers
-                            scenario_name=json_data['suitedetails'][j-1]["scenarioNames"][i]
                             if not(terminate_flag):
                                 print(line_separator)
                                 logger.print_on_console( '***Scenario ' ,str(i+1) ,' execution started***')
@@ -1009,6 +1008,7 @@ class Controller():
                                                             tsplist[k].inputval = [browser]
                             if aws_mode:
                                 compile_status=False
+                                scenario_name=json_data['suitedetails'][j-1]["scenarioNames"][i]
                                 if not terminate_flag:
                                     compile_status,pytest_file=tc_obj.compile_tc(tsplist,i+1,scenario_name)
                                 if compile_status:
