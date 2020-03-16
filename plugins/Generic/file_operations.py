@@ -797,6 +797,7 @@ class FileOperations:
         else:	
             logger.print_on_console(input, 'This file has not been found. Enter correct path. ')	
             return input	
+
     def beautify_xml_file(self,input):	
         pretty_xml_as_string = ''	
         flag = False	
@@ -816,6 +817,7 @@ class FileOperations:
             logger.print_on_console('Unable to beautify')	
             # self.file_get_contents(input)	
         return pretty_xml_as_string	
+
     def beautify_json_file(self,input):	
         pretty_json_as_string = ''	
         flag = False	
@@ -834,6 +836,7 @@ class FileOperations:
             logger.print_on_console('Unable to beautify')	
             # self.file_get_contents(input)	
         return pretty_json_as_string	
+
     def beautify_file(self, input_val, *args):	
         """	
         def : beautify_file	
@@ -846,10 +849,15 @@ class FileOperations:
         err_msg = None	
         value = OUTPUT_CONSTANT	
         beautified_output = None	
+        output_path = None
         try:	
-            if ( len(input_val) == 2 or len(input_val) == 3):	
+            if ( len(input_val) == 2):	
                 iv1 = input_val[0]	
-                iv2 = input_val[1]	
+                iv2 = input_val[1]
+                if ( args[0] ) : 	
+                    out_path = args[0].split(";")[0]		
+                    if(not out_path.startswith("{")):	
+                        output_path = out_path	
                 if (str(iv2).lower() == 'json'):	
                     beautified_output = self.beautify_json_file(iv1)	
                 elif (str(iv2).lower() == 'xml'):	
@@ -859,10 +867,9 @@ class FileOperations:
                 if(beautified_output):	
                     flg = True	
                     try:	
-                        if(len(input_val)==3):	
-                            iv3 = input_val[2]	
-                            if(os.path.isfile(iv3) or os.path.exists(os.path.dirname(iv3))):	
-                                with open(iv3,'w') as f:	
+                        if(output_path):	
+                            if(os.path.isfile(output_path) or os.path.exists(os.path.dirname(output_path))):	
+                                with open(output_path,'w') as f:	
                                     f.write(beautified_output)	
                             else:	
                                 flg = False	
@@ -885,6 +892,7 @@ class FileOperations:
             log.error( err_msg )	
             logger.print_on_console( "Error occured in Beautify File" )	
         return status, result, value ,err_msg	
+
     def compare_inputs(self,input_val,*args):	
         """	
         def : compare_inputs	
@@ -950,6 +958,7 @@ class FileOperations:
             log.error( err_msg )	
             logger.print_on_console( "Error occured in Compare Inputs" )	
         return status, result, value ,err_msg	
+
     def compare_texts(self,text1,text2):	
         """	
         def : compare_texts	
@@ -971,6 +980,7 @@ class FileOperations:
             logger.print_on_console("Exception occurred in compare_texts while comparing two texts")	
             log.error("Exception occurred in compare_texts while comparing two texts"+str(e))	
         return out	
+
     def compare_xmls(self, xml_input1, xml_input2):	
         """	
         def : compare_xmls	
@@ -992,6 +1002,7 @@ class FileOperations:
             logger.print_on_console("Exception occurred in compare_xmls while comparing two texts")	
             log.error("Exception occurred in compare_xmls while comparing two texts"+str(e))	
         return out	
+
     def compare_files(self,input_val,*args):	
         """	
         def : compare_file	
@@ -1071,6 +1082,7 @@ class FileOperations:
             log.error( err_msg )	
             logger.print_on_console( "Error occured in Compare Files" )	
         return status, result, value ,err_msg	
+
     def get_diff_count(self,output_response):	
         """	
         def : get_diff_count	
@@ -1099,6 +1111,7 @@ class FileOperations:
                     num_que=0  	
                 prev_sign='?'                  	
         return num_diff,ch_lines	
+
     def get_diff_count_xml(self,output_response):	
         """	
         def : get_diff_count_xml	
