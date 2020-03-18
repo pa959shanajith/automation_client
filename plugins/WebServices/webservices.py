@@ -390,7 +390,7 @@ class WSkeywords:
                         req_body=json.dumps(self.baseReqBody)
                 else:
                     req_body=self.baseReqBody
-                response = requests.post(self.baseEndPointURL, data = req_body, headers=self.baseReqHeader, cookies=self.req_cookies, cert=self.client_cert, verify=self.server_cert, auth=self.req_auth)
+                response = requests.post(self.baseEndPointURL, data = req_body, headers=self.baseReqHeader, cookies=self.req_cookies, proxies=self.proxies, cert=self.client_cert, verify=self.server_cert, auth=self.req_auth)
 
                 if response != None and response != False:
                     self.clearCertFiles()
@@ -421,7 +421,7 @@ class WSkeywords:
             elif not (self.baseEndPointURL is ''):
                 req=self.baseEndPointURL
             self.get_cookies()
-            response=requests.get(req, cookies=self.req_cookies, verify=self.server_cert)
+            response=requests.get(req, cookies=self.req_cookies, proxies=self.proxies, verify=self.server_cert)
             logger.print_on_console('Response: ',response)
             log.info(response)
             status,methodoutput,output=self.__saveResults(response)
