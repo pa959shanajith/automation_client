@@ -61,6 +61,8 @@ class WSkeywords:
         self.certdetails = {}
         self.req_auth = None
         self.req_cookies = None
+        self.proxies = {}
+
 
     def clearValues(self):
         self.baseEndPointURL=''
@@ -78,6 +80,7 @@ class WSkeywords:
         self.certdetails = {}
         self.req_auth = None
         self.req_cookies = None
+        self.proxies = {}
 
     def clearCertFiles(self):
         try:
@@ -388,7 +391,7 @@ class WSkeywords:
                         req_body=json.dumps(self.baseReqBody)
                 else:
                     req_body=self.baseReqBody
-                response = requests.post(self.baseEndPointURL, data = req_body, headers=self.baseReqHeader, cookies=self.req_cookies, cert=self.client_cert, verify=self.server_cert, auth=self.req_auth)
+                response = requests.post(self.baseEndPointURL, data = req_body, headers=self.baseReqHeader, cookies=self.req_cookies, proxies=self.proxies, cert=self.client_cert, verify=self.server_cert, auth=self.req_auth)
 
                 if response != None and response != False:
                     self.clearCertFiles()
@@ -419,7 +422,7 @@ class WSkeywords:
             elif not (self.baseEndPointURL is ''):
                 req=self.baseEndPointURL
             self.get_cookies()
-            response=requests.get(req, cookies=self.req_cookies, verify=self.server_cert)
+            response=requests.get(req, cookies=self.req_cookies, proxies=self.proxies, verify=self.server_cert)
             logger.print_on_console('Response: ',response)
             log.info(response)
             status,methodoutput,output=self.__saveResults(response)
@@ -993,6 +996,39 @@ class WSkeywords:
            else:
                 logger.print_on_console(e)
                 err_msg = e
+        log.info(RETURN_RESULT)
+        return status,methodoutput,output,err_msg
+
+
+    def setProxies(self,*args):
+        print(args)
+        status = ws_constants.TEST_RESULT_FAIL
+        methodoutput = ws_constants.TEST_RESULT_FALSE
+        err_msg=None
+        output=OUTPUT_CONSTANT
+        log.debug(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        try:
+            if len(args)!=0 and len(args)==3:
+                if(not(args[0]==''and args[1]=='' and args[2]=='') and 
+                   not (args[0]==None and args[1]==None and args[2]==None)):
+                   service=args[0].strip().split(":")
+                   proxie=str(service[0])+"://"+str(args[1].strip())+":"+str(self.aes_decript(args[2].strip()))+"@"+str(service[1].strip().strip("//"))+":"+str(service[-1])+"/"
+                   self.proxies[service[0]]=proxie
+                   log.debug(STATUS_METHODOUTPUT_UPDATE)
+                   status = ws_constants.TEST_RESULT_PASS
+                   methodoutput = ws_constants.TEST_RESULT_TRUE
+                else:
+                    log.info("empty/None parameters passed")
+                    err_msg = "empty/None parameters passed"
+                    logger.print_on_console("empty/None parameters passed")
+            else:
+                log.info(ws_constants.METHOD_INVALID_INPUT)
+                err_msg = ws_constants.METHOD_INVALID_INPUT
+                logger.print_on_console(ws_constants.METHOD_INVALID_INPUT)
+        except Exception as e:
+            log.error(e)
+            err_msg = e
+            logger.print_on_console(e)
         log.info(RETURN_RESULT)
         return status,methodoutput,output,err_msg
 
