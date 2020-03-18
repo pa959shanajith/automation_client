@@ -1000,27 +1000,21 @@ class WSkeywords:
         return status,methodoutput,output,err_msg
 
 
-    def setProxies(self,*args):
-        print(args)
+    def setProxies(self,url,username,password):
         status = ws_constants.TEST_RESULT_FAIL
         methodoutput = ws_constants.TEST_RESULT_FALSE
         err_msg=None
         output=OUTPUT_CONSTANT
         log.debug(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
-            if len(args)!=0 and len(args)==3:
-                if(not(args[0]==''and args[1]=='' and args[2]=='') and 
-                   not (args[0]==None and args[1]==None and args[2]==None)):
-                   service=args[0].strip().split(":")
-                   proxie=str(service[0])+"://"+str(args[1].strip())+":"+str(self.aes_decript(args[2].strip()))+"@"+str(service[1].strip().strip("//"))+":"+str(service[-1])+"/"
-                   self.proxies[service[0]]=proxie
-                   log.debug(STATUS_METHODOUTPUT_UPDATE)
-                   status = ws_constants.TEST_RESULT_PASS
-                   methodoutput = ws_constants.TEST_RESULT_TRUE
-                else:
-                    log.info("empty/None parameters passed")
-                    err_msg = "empty/None parameters passed"
-                    logger.print_on_console("empty/None parameters passed")
+            if(not(args[0]==''and args[1]=='' and args[2]=='') and 
+                not (args[0]==None and args[1]==None and args[2]==None)):
+                service=args[0].strip().split(":")
+                proxie=str(service[0])+"://"+str(args[1].strip())+":"+str(self.aes_decript(args[2].strip()))+"@"+str(service[1].strip().strip("//"))+":"+str(service[-1])+"/"
+                self.proxies[service[0]]=proxie
+                log.debug(STATUS_METHODOUTPUT_UPDATE)
+                status = ws_constants.TEST_RESULT_PASS
+                methodoutput = ws_constants.TEST_RESULT_TRUE
             else:
                 log.info(ws_constants.METHOD_INVALID_INPUT)
                 err_msg = ws_constants.METHOD_INVALID_INPUT
