@@ -293,7 +293,7 @@ class FileOperations:
         try:
             status=False
             filename,file_ext=os.path.splitext(input_path)
-            if file_ext in generic_constants.FILE_TYPES:
+            if file_ext.lower() in generic_constants.FILE_TYPES:
                 status=True
             else:
                 log.info(generic_constants.INVALID_FILE_FORMAT)
@@ -502,12 +502,12 @@ class FileOperations:
             log.debug('reading the inputs')
             params=[]
             log.debug('verifying whether the file exists')
-            result=self.verify_file_exists(params[0],'')
+            result=self.verify_file_exists(input_path,'')
             if result[1]==TEST_RESULT_TRUE:
-                file_ext,res=self.__get_ext(params[0])
+                file_ext,res=self.__get_ext(input_path)
                 if file_ext.lower()=='.json':
                     params.append(input_path)
-                    params.append(content)
+                    params.append(args[0])
                 else:
                     params=self.__split(input_path,content,*args)
                 if res == True:
