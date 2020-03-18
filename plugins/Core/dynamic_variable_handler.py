@@ -19,6 +19,7 @@ import logging
 #log = logging.getLogger('dynamic_variable_handler.py')
 import ast
 import threading
+import json
 local_dynamic = threading.local()
 
 class DynamicVariables:
