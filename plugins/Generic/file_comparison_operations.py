@@ -524,6 +524,7 @@ class JSON:
             json.loads(content)
             with open(input_path,'w') as file_write:
                 json.dump(content,file_write)
+                file_write.close()
             status=True
         except Exception as e:
             err_msg=generic_constants.ERR_MSG1+'Writing to JSON '+generic_constants.ERR_MSG2
