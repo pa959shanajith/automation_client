@@ -298,6 +298,8 @@ ROWS='rows'
 
 OVERALLSTATUS='overallstatus'
 
+COMMENTS_LENGTH='commentsLength'
+
 ID='id'
 
 PARENT_ID='parentId'
