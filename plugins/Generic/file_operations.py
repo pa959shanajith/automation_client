@@ -1127,7 +1127,7 @@ class FileOperations:
         return : count of differences	
         """	
         ch_lines = []	
-        num_diff = str(output_response).count("diff:")	
+        num_diff = int(str(output_response).count("diff:"))-int(str(output_response).count("/diff:"))
         for line in output_response:	
             if(line.find("diff:") != -1):	
                 ch_lines.append(line)	
