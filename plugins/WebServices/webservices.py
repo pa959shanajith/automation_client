@@ -63,7 +63,6 @@ class WSkeywords:
         self.req_cookies = None
         self.proxies = {}
 
-
     def clearValues(self):
         self.baseEndPointURL=''
         self.baseOperation=''
