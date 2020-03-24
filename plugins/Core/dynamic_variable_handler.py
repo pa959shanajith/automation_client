@@ -19,6 +19,7 @@ import logging
 #log = logging.getLogger('dynamic_variable_handler.py')
 import ast
 import threading
+import json
 local_dynamic = threading.local()
 
 class DynamicVariables:
@@ -139,11 +140,17 @@ class DynamicVariables:
                             logger.print_on_console(err_msg)
                             local_dynamic.log.error(err_msg)
                     else:
-                        ast.literal_eval(str(outputval))
+                        #Changed the code as we are getting malformed string using ast.literal_eval for JSON
+                        json.loads(outputval)
                         status = TEST_RESULT_FALSE
                         json_flag=True
                 except Exception as e:
-                    local_dynamic.log.debug('Not a json input')
+                    try:
+                        ast.literal_eval(str(outputval))
+                        status = TEST_RESULT_FALSE
+                        json_flag=True
+                    except Exception as e:
+                        local_dynamic.log.debug('Not a json input')
             if not(json_flag):
                 if '{' in outputval and '}' in outputval:
                     var_list=re.findall("\{(.*?)\}",outputval)

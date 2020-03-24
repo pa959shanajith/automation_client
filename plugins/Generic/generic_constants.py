@@ -29,7 +29,7 @@ FOLDER_NOT_EXISTS='Folder does not exists'
 
 FILE_PATH_NOT_SET='Excel File path is not set'
 
-FILE_TYPES=['.txt','.xls','.xlsx','.pdf','.xml','.csv']
+FILE_TYPES=['.txt','.xls','.xlsx','.pdf','.xml','.csv','.json']
 
 EXCEL_TYPES=['.xls','.xlsx']
 
