@@ -90,7 +90,7 @@ class Controller():
     def __load_generic(self):
         try:
             if local_cont.generic_dispatcher_obj==None:
-                core_utils.get_all_the_imports('ImageProcessing')
+                # core_utils.get_all_the_imports('ImageProcessing')
                 core_utils.get_all_the_imports('Generic')
                 import generic_dispatcher
                 local_cont.generic_dispatcher_obj = generic_dispatcher.GenericKeywordDispatcher()
@@ -710,8 +710,9 @@ class Controller():
                 index=result
                 self.status=result
             #Fixing issue #382
-            status_percentage[self.keyword_status]+=1
-            status_percentage["total"]+=1
+            if teststepproperty.outputval.split(";")[-1].strip() != STEPSTATUS_INREPORTS_ZERO:
+                status_percentage[self.keyword_status]+=1
+                status_percentage["total"]+=1
             logger.print_on_console(keyword+' executed and the status is '+self.keyword_status+'\n')
             log.info(keyword+' executed and the status is '+self.keyword_status+'\n')
             #Checking for stop keyword
@@ -1164,13 +1165,8 @@ class Controller():
         #325 : Report - Skip status in report by providing value 0 in the output column in testcase grid is not handled.
         outputstring = teststepproperty.outputval
         nostatusflag = False
-        if len(outputstring) > 0  and outputstring != None:
-            if (outputstring.find(';') > 0):
-                index = outputstring.rfind(';')
-                if outputstring[index + 1:] == STEPSTATUS_INREPORTS_ZERO:
-                    nostatusflag = True
-            elif outputstring== STEPSTATUS_INREPORTS_ZERO:
-                nostatusflag = True
+        if teststepproperty.outputval.split(";")[-1].strip() == STEPSTATUS_INREPORTS_ZERO:
+            nostatusflag=True
         return nostatusflag
 
 
