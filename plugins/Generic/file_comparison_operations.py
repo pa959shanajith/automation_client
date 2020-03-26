@@ -434,7 +434,7 @@ class TextFile:
 
 class XML:
 
-    def write_to_file(self,input_path,sheet_name,content):
+    def write_to_file(self,input_path,content):
         """
         def : write_to_file
         purpose : writes the content to given XML file
