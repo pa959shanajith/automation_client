@@ -492,10 +492,9 @@ class FileOperations:
         """
         # Defect #872 Special Language Support using unicode to address the issue (Himanshu)
         coreutilsobj=core_utils.CoreUtils()
-        input_path=coreutilsobj.get_UTF_8(input_path)
-        content=coreutilsobj.get_UTF_8(content)
-
         try:
+            input_path=coreutilsobj.get_UTF_8(input_path)
+            content=coreutilsobj.get_UTF_8(content)
             if SYSTEM_OS != 'Darwin':
                 import win32com.client
             status=TEST_RESULT_FAIL
@@ -510,7 +509,7 @@ class FileOperations:
                 file_ext,res=self.__get_ext(input_path)
                 if file_ext.lower()=='.json':
                     params.append(input_path)
-                    params.append(args[0])
+                    params.append(content)
                 else:
                     params=self.__split(input_path,content,*args)
                 if res == True:
