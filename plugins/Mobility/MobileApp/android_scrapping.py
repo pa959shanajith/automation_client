@@ -57,22 +57,39 @@ class InstallAndLaunch():
 
     def start_server(self,platform_name=""):
         try:
+            err_msg = None
             curdir = os.environ["NINETEEN68_HOME"]
             if (SYSTEM_OS != 'Darwin'):
                 path = curdir + '/plugins/Mobility/MobileApp/node_modules/appium/build/lib/main.js'
                 nodePath = os.environ["NINETEEN68_HOME"] + "/Lib/Drivers/node.exe"
                 proc = subprocess.Popen([nodePath, path], shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)
-                time.sleep(25)
-                logger.print_on_console('Server started')
+                start = time.time()
+                timeout = 120 #tentative; as it depends on the system performance.
+                while(True): #4257 : Displays Fails if the server starts after the timeout.
+                    if int(time.time()-start) >= timeout:
+                        err_msg = self.print_error('Timeout starting the Appium server')
+                        break
+                    processes = psutil.net_connections()
+                    for line in processes:
+                        p = line.laddr
+                        if p[1] == 4723:
+                            time.sleep(2)
+                            break
+                    time.sleep(5)
+                if err_msg is None:
+                    logger.print_on_console('Server started')
+                    return True
             else:
                 path = curdir + '/plugins/Mobility/MobileApp/node_modules/appium/build/lib/main.js'
                 nodePath = curdir + '/plugins/Mobility/MobileApp/node_modules/node_appium'
                 proc = subprocess.Popen([nodePath, path], shell=False, stdin=None, stdout=None, stderr=None, close_fds=True)
-                time.sleep(25)
+                time.sleep(25) # psutil.net_connections() doesn't work on Mac, insearch of alternatives
                 logger.print_on_console('Server started')
+                return True
         except Exception as e:
             self.print_error('Error while starting server')
             log.error(e,exc_info=True)
+        return False
 
 
     def installApplication(self, apk_path, platform_version, device_name, udid, *args):
@@ -81,26 +98,26 @@ class InstallAndLaunch():
         from appium import webdriver
         try:
             if SYSTEM_OS == 'Darwin' :
-                self.start_server()
-                self.desired_caps = {}
-                self.desired_caps['platformName'] = 'iOS'
-                self.desired_caps['automationName'] = 'XCUITest'
-                self.desired_caps['platformVersion'] = platform_version  #ios version
-                #self.desired_caps['bundle_id'] = device_name             # bundleid
-                self.desired_caps['deviceName'] = device_name               #device name
-                #self.desired_caps['Ip_Address'] = udid
-                self.desired_caps['udid'] = udid
-                self.desired_caps['fullReset'] = False
-                self.desired_caps['xcodeConfigFile'] = os.environ["NINETEEN68_HOME"]+ '/assets/appium.xcconfig'
-                self.desired_caps['showXcodeLog'] = True
-                #self.desired_caps['newCommandTimeout'] = 3600
-                #self.desired_caps['launchTimeout'] = 180000
-                self.desired_caps['noReset'] = True
-                self.desired_caps['newCommandTimeout'] = 0
-                self.desired_caps['sessionOverride'] = True
-                self.desired_caps['log_level'] = False
-                self.desired_caps['app'] = apk_path
-                driver = webdriver.Remote('http://0.0.0.0:4723/wd/hub', self.desired_caps)
+                if self.start_server():
+                    self.desired_caps = {}
+                    self.desired_caps['platformName'] = 'iOS'
+                    self.desired_caps['automationName'] = 'XCUITest'
+                    self.desired_caps['platformVersion'] = platform_version  #ios version
+                    #self.desired_caps['bundle_id'] = device_name             # bundleid
+                    self.desired_caps['deviceName'] = device_name               #device name
+                    #self.desired_caps['Ip_Address'] = udid
+                    self.desired_caps['udid'] = udid
+                    self.desired_caps['fullReset'] = False
+                    self.desired_caps['xcodeConfigFile'] = os.environ["NINETEEN68_HOME"]+ '/assets/appium.xcconfig'
+                    self.desired_caps['showXcodeLog'] = True
+                    #self.desired_caps['newCommandTimeout'] = 3600
+                    #self.desired_caps['launchTimeout'] = 180000
+                    self.desired_caps['noReset'] = True
+                    self.desired_caps['newCommandTimeout'] = 0
+                    self.desired_caps['sessionOverride'] = True
+                    self.desired_caps['log_level'] = False
+                    self.desired_caps['app'] = apk_path
+                    driver = webdriver.Remote('http://0.0.0.0:4723/wd/hub', self.desired_caps)
                 # current_dir = (os.getcwd())
                 # dir_path = os.path.dirname(os.path.realpath(__file__))
                 # # set IP
@@ -174,30 +191,30 @@ class InstallAndLaunch():
                     if p[1] == 4723 and driver is not None:
                         return driver
                 try:
-                    if device_name == 'wifi':
-                        device_name = device_keywords_object.wifi_connect()
-                    if device_name != '':
-                        activityName = device_keywords_object.activity_name(apk_path)
-                        packageName = device_keywords_object.package_name(apk_path)
-                        logger.print_on_console("Connected device name:",device_name)
-                        logger.print_on_console("App package name:",packageName)
-                        self.start_server()
-                        self.desired_caps = {}
-                        if platform_version is not None:
-                            self.desired_caps['platformVersion'] = platform_version
-                        self.desired_caps['platformName'] = 'Android'
-                        self.desired_caps['deviceName'] = device_name
-                        self.desired_caps['udid'] = device_name
-                        self.desired_caps['noReset'] = True
-                        self.desired_caps['newCommandTimeout'] = 0
-                        self.desired_caps['app'] = apk_path
-                        self.desired_caps['sessionOverride'] = True
-                        self.desired_caps['fullReset'] = False
-                        self.desired_caps['log_level'] = False
-                        self.desired_caps['appPackage'] = packageName
-                        self.desired_caps['appActivity'] = activityName
-                        driver = webdriver.Remote('http://localhost:4723/wd/hub', self.desired_caps)
-                        device_id = device_name
+                    if self.start_server():
+                        if device_name == 'wifi':
+                            device_name = device_keywords_object.wifi_connect()
+                        if device_name != '':
+                            activityName = device_keywords_object.activity_name(apk_path)
+                            packageName = device_keywords_object.package_name(apk_path)
+                            logger.print_on_console("Connected device name:",device_name)
+                            logger.print_on_console("App package name:",packageName)
+                            self.desired_caps = {}
+                            if platform_version is not None:
+                                self.desired_caps['platformVersion'] = platform_version
+                            self.desired_caps['platformName'] = 'Android'
+                            self.desired_caps['deviceName'] = device_name
+                            self.desired_caps['udid'] = device_name
+                            self.desired_caps['noReset'] = True
+                            self.desired_caps['newCommandTimeout'] = 0
+                            self.desired_caps['app'] = apk_path
+                            self.desired_caps['sessionOverride'] = True
+                            self.desired_caps['fullReset'] = False
+                            self.desired_caps['log_level'] = False
+                            self.desired_caps['appPackage'] = packageName
+                            self.desired_caps['appActivity'] = activityName
+                            driver = webdriver.Remote('http://localhost:4723/wd/hub', self.desired_caps)
+                            device_id = device_name
                 except Exception as e:
                     self.print_error("Not able to install or launch application")
                     log.error(e,exc_info=True)

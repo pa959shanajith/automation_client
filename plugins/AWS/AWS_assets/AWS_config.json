@@ -1,11 +1,11 @@
 {
-    "projectname": "Android_App_Testing",
+    "projectname": "<>",
     "profilename": "default",
-    "poolname": "My_Devices",
-    "apkpath": "D:\\cleartrip_latest.apk",
-    "appname": "cleartrip_latest.apk",
-    "packagename": "Test_Bundle2020-01-29_16_29_49_489605.zip",
-    "filepath": "D:\\Sprint4_Server\\ICE\\plugins\\AWS\\AWS_assets\\Test_Bundle\\Test_Bundle2020-01-29_16_29_49_489605.zip",
+    "poolname": "<>",
+    "apkpath": "<>",
+    "appname": "<>",
+    "packagename": "<>",
+    "filepath": "<>",
     "android_testspec": "custom_spec.yml",
     "ios_testspec": "ios_custom_spec.yml"
 }

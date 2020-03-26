@@ -328,7 +328,7 @@ class List_Keywords():
         output=None
         err_msg=None
         text=[]
-        obj=[]
+        #obj=[]
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if element is not None:
@@ -338,34 +338,43 @@ class List_Keywords():
                         log.debug(ELEMENT_ENABLED)
                         log.debug('performing the action')
                         driver=android_scrapping.driver
+                        elementlist_curr = []
                         while(True):
-                            elementlist=driver.find_elements_by_class_name('android.widget.CheckedTextView')
-                            for i in elementlist:
-                                if i.text not in text:
-                                    text.append(i.text)
-                                    obj.append(i)
-                            length1=len(text)
-                            if length1 >4 :
-                                scrollele1=obj[length1-1]
-                                scrollele2=obj[length1-2]
-
-                                time.sleep(3)
-                                driver.scroll(scrollele1,scrollele2)
-                            elementlist=driver.find_elements_by_class_name('android.widget.CheckedTextView')
-                            for i in elementlist:
-                                if i.text not in text:
-                                    text.append(i.text)
-                                    obj.append(i)
-                            length2=len(text)
-                            time.sleep(3)
-                            driver.scroll(scrollele1,scrollele2)
-
-                            if (length1==length2):
-                                output=length1
+                            elementlist=element.find_elements_by_class_name('android.view.View')
+                            if (elementlist == elementlist_curr) or (elementlist == []):
+                                output=len(text)
                                 logger.print_on_console("Count: "+output)
                                 status=TEST_RESULT_PASS
                                 result=TEST_RESULT_TRUE
                                 break
+                            for i in elementlist:
+                                if (i.text) and (i.text not in text):
+                                    text.append(i.text)
+                                    #obj.append(i)
+                            elementlist_curr = elementlist
+                            driver.scroll(elementlist_curr[-1],elementlist_curr[-2])
+                            # length1=len(text)
+                            # if length1 >4 :
+                            #     scrollele1=obj[length1-1]
+                            #     scrollele2=obj[length1-2]
+
+                            #     time.sleep(3)
+                            #     driver.scroll(scrollele1,scrollele2)
+                            # elementlist=element.find_elements_by_class_name('android.widget.CheckedTextView')
+                            # for i in elementlist:
+                            #     if (i.text) and (i.text not in text):
+                            #         text.append(i.text)
+                            #         obj.append(i)
+                            # length2=len(text)
+                            # time.sleep(3)
+                            # driver.scroll(scrollele1,scrollele2)
+
+                            # if (length1==length2):
+                            #     output=length1
+                            #     logger.print_on_console("Count: "+output)
+                            #     status=TEST_RESULT_PASS
+                            #     result=TEST_RESULT_TRUE
+                            #     break
                     else:
                         err_msg=self.print_error(ELEMENT_DISABLED)
                 else:
@@ -386,7 +395,7 @@ class List_Keywords():
         input=int(input[0])
         err_msg=None
         text=[]
-        obj=[]
+        #obj=[]
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if element is not None:
@@ -397,29 +406,34 @@ class List_Keywords():
                         log.debug('performing the action')
                         driver=android_scrapping.driver
                         while(True):
-                            elementlist=driver.find_elements_by_class_name('android.widget.CheckedTextView')
-                            for i in elementlist:
-                                if i.text not in text:
-                                    text.append(i.text)
-                                    obj.append(i)
-                            length1=len(text)
-                            if length1 >4 :
-                                scrollele1=obj[length1-1]
-                                scrollele2=obj[length1-2]
-                                time.sleep(3)
-                                driver.scroll(scrollele1,scrollele2)
-                            elementlist=driver.find_elements_by_class_name('android.widget.CheckedTextView')
-                            for i in elementlist:
-                                if i.text not in text:
-                                    text.append(i.text)
-                                    obj.append(i)
-                            length2=len(text)
-                            time.sleep(3)
-                            driver.scroll(scrollele1,scrollele2)
-
-                            if (length1==length2):
-                                count=length1
+                            elementlist=element.find_elements_by_class_name('android.view.View')
+                            if (elementlist == elementlist_curr) or (elementlist == []):
+                                count=len(text)
                                 break
+                            for i in elementlist:
+                                if (i.text) and (i.text not in text):
+                                    text.append(i.text)
+                                    #obj.append(i)
+                            elementlist_curr = elementlist
+                            driver.scroll(elementlist_curr[-1],elementlist_curr[-2])
+                        #     length1=len(text)
+                        #     if length1 >4 :
+                        #         scrollele1=obj[length1-1]
+                        #         scrollele2=obj[length1-2]
+                        #         time.sleep(3)
+                        #         driver.scroll(scrollele1,scrollele2)
+                        #     elementlist=driver.find_elements_by_class_name('android.widget.CheckedTextView')
+                        #     for i in elementlist:
+                        #         if i.text not in text:
+                        #             text.append(i.text)
+                        #             obj.append(i)
+                        #     length2=len(text)
+                        #     time.sleep(3)
+                        #     driver.scroll(scrollele1,scrollele2)
+
+                        #     if (length1==length2):
+                        #         count=length1
+                        #         break
 
                         if (input==count):
                             log.debug('count matched')
@@ -456,50 +470,70 @@ class List_Keywords():
                     if element.is_enabled():
                         log.debug(ELEMENT_ENABLED)
                         log.debug('performing the action')
-                        driver=android_scrapping.driver
-                        while(True):
-                            elementlist=driver.find_elements_by_class_name('android.widget.CheckedTextView')
-                            for i in elementlist:
-                                if i.text not in text:
-                                    text.append(i.text)
-                                    obj.append(i)
-                            for j in obj:
-                                if input is not None:
-                                    if input == j.text :
-                                        j.click()
-                                        status=TEST_RESULT_PASS
-                                        result=TEST_RESULT_TRUE
-                                        flag=True
-                                else :
+                        if (input):
+                            driver=android_scrapping.driver
+                            while(True):
+                                elementlist=element.find_elements_by_class_name('android.view.View')
+                                if (elementlist == elementlist_curr) or (elementlist == []):
+                                    #count=len(text)
                                     err_msg=self.print_error(INVALID_INPUT)
-                            length1=len(text)
-                            if length1 >4 :
-                                scrollele1=obj[length1-1]
-                                scrollele2=obj[length1-2]
-                                time.sleep(3)
-                                driver.scroll(scrollele1,scrollele2)
-                            elementlist=driver.find_elements_by_class_name('android.widget.CheckedTextView')
-                            for i in elementlist:
-                                if i.text not in text:
-                                    text.append(i.text)
-                                    obj.append(i)
-                            if flag == False:
-                                if input is not None:
-                                    if input == j.text :
-                                        j.click()
-                                        status=TEST_RESULT_PASS
-                                        result=TEST_RESULT_TRUE
-                                        flag=True
-                                else :
-                                    err_msg=self.print_error(INVALID_INPUT)
-                            length2=len(text)
-                            time.sleep(3)
-                            driver.scroll(scrollele1,scrollele2)
+                                    break
+                                for i in elementlist:
+                                    if (i.text) and (i.text not in text):
+                                        text.append(i.text)
+                                        if (i.text == input):
+                                            i.click()
+                                            status=TEST_RESULT_PASS
+                                            result=TEST_RESULT_TRUE
+                                            break
+                                    #text.append(i.text)
+                                    #obj.append(i)
+                                elementlist_curr = elementlist
+                                driver.scroll(elementlist_curr[-1],elementlist_curr[-2])
+                                # elementlist=driver.find_elements_by_class_name('android.widget.CheckedTextView')
+                                # for i in elementlist:
+                                #     if i.text not in text:
+                                #         text.append(i.text)
+                                #         obj.append(i)
+                                # for j in obj:
+                                #     if input is not None:
+                                #         if input == j.text :
+                                #             j.click()
+                                #             status=TEST_RESULT_PASS
+                                #             result=TEST_RESULT_TRUE
+                                #             flag=True
+                                #     else :
+                                #         err_msg=self.print_error(INVALID_INPUT)
+                                # length1=len(text)
+                                # if length1 >4 :
+                                #     scrollele1=obj[length1-1]
+                                #     scrollele2=obj[length1-2]
+                                #     time.sleep(3)
+                                #     driver.scroll(scrollele1,scrollele2)
+                                # elementlist=driver.find_elements_by_class_name('android.widget.CheckedTextView')
+                                # for i in elementlist:
+                                #     if i.text not in text:
+                                #         text.append(i.text)
+                                #         obj.append(i)
+                                # if flag == False:
+                                #     if input is not None:
+                                #         if input == j.text :
+                                #             j.click()
+                                #             status=TEST_RESULT_PASS
+                                #             result=TEST_RESULT_TRUE
+                                #             flag=True
+                                #     else :
+                                #         err_msg=self.print_error(INVALID_INPUT)
+                                # length2=len(text)
+                                # time.sleep(3)
+                                # driver.scroll(scrollele1,scrollele2)
 
-                            if (length1==length2):
-                                if flag == False:
-                                    err_msg=self.print_error(INVALID_INPUT)
-                                break
+                                # if (length1==length2):
+                                #     if flag == False:
+                                #         err_msg=self.print_error(INVALID_INPUT)
+                                #     break
+                        else:
+                            err_msg=self.print_error(INVALID_INPUT)
                     else:
                         err_msg=self.print_error(ELEMENT_DISABLED)
                 else:
@@ -522,7 +556,7 @@ class List_Keywords():
         err_msg=None
         text=[]
         input=int(input[0])
-        obj=[]
+        #obj=[]
         flag=False
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
@@ -532,51 +566,56 @@ class List_Keywords():
                     if element.is_enabled():
                         log.debug(ELEMENT_ENABLED)
                         log.debug('performing the action')
-                        driver=android_scrapping.driver
-                        while(True):
-                            elementlist=driver.find_elements_by_class_name('android.widget.CheckedTextView')
-                            for i in elementlist:
-                                if i.text not in text:
-                                    text.append(i.text)
-                                    obj.append(i)
-                            for j in obj:
-                                if flag == False:
-                                    if input is not None:
-                                        if input<len(obj) :
-                                            obj[input].click()
+                        if (input):
+                            index = -1
+                            driver=android_scrapping.driver
+                            while(True):
+                                elementlist=element.find_elements_by_class_name('android.view.View')
+                                if (elementlist == elementlist_curr) or (elementlist == []):
+                                    #count=len(text)
+                                    err_msg=self.print_error(INVALID_INPUT)
+                                    break
+                                for i in elementlist:
+                                    if (i.text) and (i.text not in text):
+                                        text.append(i.text)
+                                        index += 1
+                                        if (index == input):
+                                            i.click()
                                             status=TEST_RESULT_PASS
                                             result=TEST_RESULT_TRUE
-                                            flag=True
-                                    else :
-                                        err_msg=self.print_error(INVALID_INPUT)
-                            length1=len(text)
-                            if length1 >4 :
-                                scrollele1=obj[length1-1]
-                                scrollele2=obj[length1-2]
-                                time.sleep(3)
-                                driver.scroll(scrollele1,scrollele2)
-                            elementlist=driver.find_elements_by_class_name('android.widget.CheckedTextView')
-                            for i in elementlist:
-                                if i.text not in text:
-                                    text.append(i.text)
-                                    obj.append(i)
-                            if flag == False:
-                                if input is not None:
-                                   if input<len(obj) :
-                                        obj[input].click()
-                                        status=TEST_RESULT_PASS
-                                        result=TEST_RESULT_TRUE
-                                        flag=True
-                                else :
-                                    err_msg=self.print_error(INVALID_INPUT)
-                            length2=len(text)
-                            time.sleep(3)
-                            driver.scroll(scrollele1,scrollele2)
+                                            break
+                                    #text.append(i.text)
+                                    #obj.append(i)
+                                elementlist_curr = elementlist
+                                driver.scroll(elementlist_curr[-1],elementlist_curr[-2])
+                                # length1=len(text)
+                                # if length1 >4 :
+                                #     scrollele1=obj[length1-1]
+                                #     scrollele2=obj[length1-2]
+                                #     time.sleep(3)
+                                #     driver.scroll(scrollele1,scrollele2)
+                                # elementlist=driver.find_elements_by_class_name('android.widget.CheckedTextView')
+                                # for i in elementlist:
+                                #     if i.text not in text:
+                                #         text.append(i.text)
+                                #         obj.append(i)
+                                # if flag == False:
+                                #     if input is not None:
+                                #     if input<len(obj) :
+                                #             obj[input].click()
+                                #             status=TEST_RESULT_PASS
+                                #             result=TEST_RESULT_TRUE
+                                #             flag=True
+                                #     else :
+                                #         err_msg=self.print_error(INVALID_INPUT)
+                                # length2=len(text)
+                                # time.sleep(3)
+                                # driver.scroll(scrollele1,scrollele2)
 
-                            if (length1==length2):
-                                if flag == False:
-                                    err_msg=self.print_error(INVALID_INPUT)
-                                break
+                                # if (length1==length2):
+                                #     if flag == False:
+                                #         err_msg=self.print_error(INVALID_INPUT)
+                                #     break
                     else:
                         err_msg=self.print_error(ELEMENT_DISABLED)
                 else:
@@ -607,51 +646,61 @@ class List_Keywords():
                     if element.is_enabled():
                         log.debug(ELEMENT_ENABLED)
                         log.debug('performing the action')
-                        driver=android_scrapping.driver
-                        while(True):
-                            elementlist=driver.find_elements_by_class_name('android.widget.CheckedTextView')
-                            for i in elementlist:
-                                if i.text not in text:
-                                    text.append(str(i.text))
-                                    obj.append(i)
-
-                                k=int(input[0])
-                                if k<len(obj) :
-                                    if text[k] not in temp:
-                                        temp.append(text[k])
-                                        count=count+1
-
-                            length1=len(text)
-                            if length1 >4 :
-                                scrollele1=obj[length1-1]
-                                scrollele2=obj[length1-2]
-                                time.sleep(3)
-                                driver.scroll(scrollele1,scrollele2)
-                            elementlist=driver.find_elements_by_class_name('android.widget.CheckedTextView')
-                            for i in elementlist:
-                                if i.text not in text:
-                                    text.append(str(i.text))
-                                    obj.append(i)
-
-                                k=int(input[0])
-                                if k<len(obj) :
-                                    if text[k] not in temp:
-                                        temp.append(text[k])
-                                        count=count+1
-                            length2=len(text)
-                            time.sleep(3)
-                            driver.scroll(scrollele1,scrollele2)
-
-                            if (length1==length2):
-                                if len(input) == count:
-                                    output=temp[0]
-                                    logger.print_on_console("Output: "+output)
-                                    status=TEST_RESULT_PASS
-                                    result=TEST_RESULT_TRUE
-                                    break
-                                else :
+                        if (input):
+                            index = -1
+                            driver=android_scrapping.driver
+                            while(True):
+                                elementlist=element.find_elements_by_class_name('android.view.View')
+                                if (elementlist == elementlist_curr) or (elementlist == []):
+                                    #count=len(text)
                                     err_msg=self.print_error(INVALID_INPUT)
                                     break
+                                for i in elementlist:
+                                    if (i.text) and (i.text not in text):
+                                        text.append(i.text)
+                                        index += 1
+                                        if (index == input):
+                                            output = i.text
+                                            logger.print_on_console("Output: "+output)
+                                            status=TEST_RESULT_PASS
+                                            result=TEST_RESULT_TRUE
+                                            break
+                                    #text.append(i.text)
+                                    #obj.append(i)
+                                elementlist_curr = elementlist
+                                driver.scroll(elementlist_curr[-1],elementlist_curr[-2])
+
+                                # length1=len(text)
+                                # if length1 >4 :
+                                #     scrollele1=obj[length1-1]
+                                #     scrollele2=obj[length1-2]
+                                #     time.sleep(3)
+                                #     driver.scroll(scrollele1,scrollele2)
+                                # elementlist=driver.find_elements_by_class_name('android.widget.CheckedTextView')
+                                # for i in elementlist:
+                                #     if i.text not in text:
+                                #         text.append(str(i.text))
+                                #         obj.append(i)
+
+                                #     k=int(input[0])
+                                #     if k<len(obj) :
+                                #         if text[k] not in temp:
+                                #             temp.append(text[k])
+                                #             count=count+1
+                                # length2=len(text)
+                                # time.sleep(3)
+                                # driver.scroll(scrollele1,scrollele2)
+
+                                # if (length1==length2):
+                                #     if len(input) == count:
+                                #         output=temp[0]
+                                #         logger.print_on_console("Output: "+output)
+                                #         status=TEST_RESULT_PASS
+                                #         result=TEST_RESULT_TRUE
+                                #         break
+                                #     else :
+                                #         err_msg=self.print_error(INVALID_INPUT)
+                                #         break
                     else:
                         err_msg=self.print_error(ELEMENT_DISABLED)
                 else:
@@ -759,32 +808,45 @@ class List_Keywords():
                         driver=android_scrapping.driver
 
                         while(True):
-                            elementlist=driver.find_elements_by_class_name('android.widget.CheckedTextView')
-                            for i in elementlist:
-                                if i.text not in text:
-                                    text.append(str(i.text))
-                                    obj.append(i)
-                            length1=len(text)
-                            if length1 >4 :
-                                scrollele1=obj[length1-1]
-                                scrollele2=obj[length1-2]
-                                time.sleep(3)
-                                driver.scroll(scrollele1,scrollele2)
-                            elementlist=driver.find_elements_by_class_name('android.widget.CheckedTextView')
-                            for i in elementlist:
-                                if i.text not in text:
-                                    text.append(i.text)
-                                    obj.append(i)
-                            length2=len(text)
-                            time.sleep(3)
-                            driver.scroll(scrollele1,scrollele2)
-
-                            if (length1==length2):
+                            elementlist=element.find_elements_by_class_name('android.view.View')
+                            if (elementlist == elementlist_curr) or (elementlist == []):
                                 output=text
-                                logger.print_on_console("Output: "+output)
+                                logger.print_on_console("Count: "+output)
                                 status=TEST_RESULT_PASS
                                 result=TEST_RESULT_TRUE
                                 break
+                            for i in elementlist:
+                                if (i.text) and (i.text not in text):
+                                    text.append(i.text)
+                                    #obj.append(i)
+                            elementlist_curr = elementlist
+                            driver.scroll(elementlist_curr[-1],elementlist_curr[-2])
+                            # elementlist=driver.find_elements_by_class_name('android.widget.CheckedTextView')
+                            # for i in elementlist:
+                            #     if i.text not in text:
+                            #         text.append(str(i.text))
+                            #         obj.append(i)
+                            # length1=len(text)
+                            # if length1 >4 :
+                            #     scrollele1=obj[length1-1]
+                            #     scrollele2=obj[length1-2]
+                            #     time.sleep(3)
+                            #     driver.scroll(scrollele1,scrollele2)
+                            # elementlist=driver.find_elements_by_class_name('android.widget.CheckedTextView')
+                            # for i in elementlist:
+                            #     if i.text not in text:
+                            #         text.append(i.text)
+                            #         obj.append(i)
+                            # length2=len(text)
+                            # time.sleep(3)
+                            # driver.scroll(scrollele1,scrollele2)
+
+                            # if (length1==length2):
+                            #     output=text
+                            #     logger.print_on_console("Output: "+output)
+                            #     status=TEST_RESULT_PASS
+                            #     result=TEST_RESULT_TRUE
+                            #     break
                     else:
                         err_msg=self.print_error(ELEMENT_DISABLED)
                 else:
@@ -815,27 +877,8 @@ class List_Keywords():
                         log.debug('performing the action')
                         driver=android_scrapping.driver
                         while(True):
-                            elementlist=driver.find_elements_by_class_name('android.widget.CheckedTextView')
-                            for i in elementlist:
-                                if i.text not in text:
-                                    text.append(str(i.text))
-                                    obj.append(i)
-                            length1=len(text)
-                            if length1 >4 :
-                                scrollele1=obj[length1-1]
-                                scrollele2=obj[length1-2]
-                                time.sleep(3)
-                                driver.scroll(scrollele1,scrollele2)
-                            elementlist=driver.find_elements_by_class_name('android.widget.CheckedTextView')
-                            for i in elementlist:
-                                if i.text not in text:
-                                    text.append(i.text)
-                                    obj.append(i)
-                            length2=len(text)
-                            time.sleep(3)
-                            driver.scroll(scrollele1,scrollele2)
-
-                            if (length1==length2):
+                            elementlist=element.find_elements_by_class_name('android.view.View')
+                            if (elementlist == elementlist_curr) or (elementlist == []):
                                 if len(input) == len(text):
                                     for k in input :
                                         if k in text:
@@ -846,12 +889,53 @@ class List_Keywords():
                                     if count==len(input):
                                         status=TEST_RESULT_PASS
                                         result=TEST_RESULT_TRUE
+                                        break
                                 else :
                                     err_msg=self.print_error(INVALID_INPUT)
                                     break
+                            for i in elementlist:
+                                if (i.text) and (i.text not in text):
+                                    text.append(i.text)
+                                    #obj.append(i)
+                            elementlist_curr = elementlist
+                            driver.scroll(elementlist_curr[-1],elementlist_curr[-2])
+                            # elementlist=driver.find_elements_by_class_name('android.widget.CheckedTextView')
+                            # for i in elementlist:
+                            #     if i.text not in text:
+                            #         text.append(str(i.text))
+                            #         obj.append(i)
+                            # length1=len(text)
+                            # if length1 >4 :
+                            #     scrollele1=obj[length1-1]
+                            #     scrollele2=obj[length1-2]
+                            #     time.sleep(3)
+                            #     driver.scroll(scrollele1,scrollele2)
+                            # elementlist=driver.find_elements_by_class_name('android.widget.CheckedTextView')
+                            # for i in elementlist:
+                            #     if i.text not in text:
+                            #         text.append(i.text)
+                            #         obj.append(i)
+                            # length2=len(text)
+                            # time.sleep(3)
+                            # driver.scroll(scrollele1,scrollele2)
 
-                            if (length1==length2):
-                                break
+                            # if (length1==length2):
+                            #     if len(input) == len(text):
+                            #         for k in input :
+                            #             if k in text:
+                            #                 count=count+1
+                            #             else :
+                            #                 err_msg=self.print_error(INVALID_INPUT)
+                            #                 break
+                            #         if count==len(input):
+                            #             status=TEST_RESULT_PASS
+                            #             result=TEST_RESULT_TRUE
+                            #     else :
+                            #         err_msg=self.print_error(INVALID_INPUT)
+                            #         break
+
+                            # if (length1==length2):
+                            #     break
                     else:
                         err_msg=self.print_error(ELEMENT_DISABLED)
                 else:

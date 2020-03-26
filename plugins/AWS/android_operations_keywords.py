@@ -25,16 +25,17 @@ from testmobile_constants import *
 class MobileOpeartions():
     """Basis for all tests."""
 
-    def start_server(self):
+    def start_server(self,*args):
         """Sets up desired capabilities and the Appium driver."""
         driver=None
-        import platform
-        if platform.system() != 'Darwin':
+        desired_caps = {}
+        if len(args)==2 and (args[0] != "" and args[1] != ""):
             url = 'http://127.0.0.1:4723/wd/hub'
+            desired_caps['appPackage'] = args[0]
+            desired_caps['appActivity'] = args[1]
         else:
             url = 'http://0.0.0.0:4723/wd/hub'
             SYSTEM_OS = 'Darwin'
-        desired_caps = {}
         try:
             driver = webdriver.Remote(url, desired_caps)
         except Exception as e:
@@ -193,6 +194,35 @@ class MobileOpeartions():
                         log.debug('performing the action')
                         action = TouchAction(driver)
                         action.tap(element).perform()
+                        status=TEST_RESULT_PASS
+                        methodoutput=TEST_RESULT_TRUE
+                    else:
+                        err_msg=ERROR_CODE_DICT['ERR_WEB_ELEMENT_DISABLED']
+                else:
+                    err_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
+            if err_msg:
+                log.error(err_msg)
+        except Exception as e:
+            log.error(e)
+        return status,methodoutput,output,err_msg
+
+    def click(self, driver,element,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        output=OUTPUT_CONSTANT
+        err_msg=None
+        try:
+            if element is not None:
+                visibility=element.is_displayed()
+                if visibility:
+                    log.info('element is visible')
+                    enable=element.is_enabled()
+                    if enable:
+                        log.info('element is Enabled')
+                        log.debug('performing the action')
+                        element.click()
+                        # action = TouchAction(driver)
+                        # action.tap(element).perform()
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
                     else:

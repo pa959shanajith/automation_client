@@ -25,7 +25,8 @@ from aws_operations import *
 class TestcaseCompile():
 
     def __init__(self,cur_date):
-        self.cur_date=cur_date.replace("-","_")      
+        self.cur_date=cur_date.replace("-","_")
+        self.apk_path = None
 
     def save_config(self,keys,values):
         status=True
@@ -73,6 +74,7 @@ def scenario(driver):
 \tmob_obj=MobileOpeartions()
 \tgen_obj=GenericOperations()
 \tspinner_obj=Spinner_Keywords()
+\tres={}
 """
         f.write(code)
         launch_status=False
@@ -84,7 +86,7 @@ def scenario(driver):
             ele_str = "(driver,'"+t.objectname+"')"
             if t.name.lower() in mobile_keywords:
                 if t.name.lower()=='launchapplication':
-
+                    self.apk_path = inputs[0]
                     if inputs[0]!='':
                         inputs[1]=inputs[0].split(os.sep)[-1]
                         launch_status=self.save_config(['apkpath','appname'],[inputs[0],inputs[1]])
@@ -130,8 +132,9 @@ def scenario(driver):
                 continue
             f.write("\n\tlog.info('Step %s : %s is executed and result is %s' % ('"+str(t.stepnum)+"','"+t.name+"',result[0]))")
             f.write("\n\tlog.info('----------------------------------------------------------------------------------')")
-
-
+            f.write("\n\tres['"+str(t.stepnum)+"'] = result")
+        f.write("\n\tprint('result:')")
+        f.write("\n\tprint(res)")
         f.close()
         if compile_status:
             dest_folder=AWS_assets+os.sep+bundle_name+os.sep+'tests'+os.sep+pytest_file
@@ -159,8 +162,12 @@ log=logging.getLogger('test_scenario.py')\n"""
             f.write("import "+scenario[:-3]+" as s"+str(s_counter)+"\n")
             call_scenarios+="\ts"+str(s_counter)+".scenario(driver)\n"
             s_counter+=1
-        code="""def test_scenario():\n\tmob_obj=MobileOpeartions()\n\tdriver=mob_obj.start_server()"""
-
+        import platform
+        if platform.system() == 'Darwin':
+            code="""def test_scenario():\n\tmob_obj=MobileOpeartions()\n\tdriver=mob_obj.start_server()"""
+        else:
+            package_name, activity_name = self.get_package_activity()
+            code="""def test_scenario():\n\tmob_obj=MobileOpeartions()\n\tdriver=mob_obj.start_server('"""+package_name+"""','"""+activity_name+"""')"""
         f.write(code)
         f.write(call_scenarios)
         f.close()
@@ -214,3 +221,31 @@ log=logging.getLogger('test_scenario.py')\n"""
 
 
 
+    def get_package_activity(self):
+        package_name = activity_name = ""
+        if self.apk_path == None:
+            return package_name, activity_name
+        else:
+            try:
+                aapt_home=os.environ['AAPT_HOME']
+                cur_dir=os.getcwd()
+                os.chdir(aapt_home)
+                aapt_home = aapt_home + 'aapt.exe'
+                import subprocess
+                out = subprocess.Popen([aapt_home, 'dump','badging',self.apk_path],stdout= subprocess.PIPE, close_fds=True)
+                for line in out.stdout.readlines():
+                    curr_line = str(line)[2:-1]
+                    if ('package:' in curr_line) and (package_name == ""):
+                        curr_line = curr_line.strip().split()
+                        package_name = curr_line[1][6:-1]
+                        if (package_name != "" and activity_name != ""):
+                            break
+                    if ('launchable' in curr_line) and (activity_name == ""):
+                        curr_line = curr_line.strip().split()
+                        activity_name = curr_line[1][6:-1]
+                        if (package_name != "" and activity_name != ""):
+                            break
+                os.chdir(cur_dir)
+            except Exception as e:
+                log.error(e,exc_info = True)
+            return package_name, activity_name

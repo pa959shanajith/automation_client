@@ -78,6 +78,7 @@ class MobileDispatcher:
         'selectcheckbox' : radio_button_object.select_checkbox,
         'unselectcheckbox' : radio_button_object.unselect_checkbox,
         'press' : button_link_object.press,
+        'click' : button_link_object.click,
         'longpress' : button_link_object.long_press,
         'getbuttonname' : button_link_object.get_button_name,
         'verifybuttonname' : button_link_object.verify_button_name,
@@ -446,7 +447,7 @@ class MobileDispatcher:
         if objectname.strip() != '':
             if SYSTEM_OS=='Darwin':
                 objectname = objectname.replace("/AppiumAUT[1]/", "/")
-                print(objectname)
+                log.debug(objectname)
             else:
                 identifiers = objectname.split(';')
                 id = identifiers[0]
