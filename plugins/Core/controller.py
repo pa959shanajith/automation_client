@@ -710,8 +710,9 @@ class Controller():
                 index=result
                 self.status=result
             #Fixing issue #382
-            status_percentage[self.keyword_status]+=1
-            status_percentage["total"]+=1
+            if teststepproperty.outputval.split(";")[-1] !='0':
+                status_percentage[self.keyword_status]+=1
+                status_percentage["total"]+=1
             logger.print_on_console(keyword+' executed and the status is '+self.keyword_status+'\n')
             log.info(keyword+' executed and the status is '+self.keyword_status+'\n')
             #Checking for stop keyword
@@ -778,8 +779,8 @@ class Controller():
         if terminate_flag:
             #Indication of user_termination to report_obj to add a proper description in report - (Sushma)
             self.reporting_obj.user_termination=True
-            #status_percentage[TERMINATE]+=1
-            #status_percentage["total"]+=1
+            status_percentage[TERMINATE]+=1
+            status_percentage["total"]+=1
         self.reporting_obj.build_overallstatus(self.scenario_start_time,self.scenario_end_time,self.scenario_ellapsed_time)
         logger.print_on_console('Step Elapsed time is : ',str(self.scenario_ellapsed_time))
         return status,status_percentage
