@@ -183,7 +183,7 @@ class SapUtilKeywords:
             logger.print_on_console( "Error occured in Verify Visible" )
         return status, result, value, err_msg
 
-    def getobjectforcustom(self, sap_id, eleType, eleIndex):
+    def getobjectforcustom(self, sap_id, eleType, visible_text, eleIndex):
         data = []
         xpath = None
         err_msg = None
@@ -196,11 +196,22 @@ class SapUtilKeywords:
                 wnd_title = wnd.__getattr__("Text")
                 scrapingObj = Scrape()
                 data = scrapingObj.full_scrape(reference_elem, wnd_title)
+                elemList = []
+                vTextList = []
                 for elem in data:
                     if ( elem['tag'].lower() == eleType.strip().lower() ):
-                        eleIndex = int(eleIndex) - 1
-                        if ( eleIndex == 0 ):
-                            xpath = elem['xpath']
+                        elemList.append(elem)#make list of elements with same tags
+                if( visible_text ):
+                    log.info('Identifying element with visible text and index')
+                    for elem in elemList:
+                        if (elem['text'] == visible_text):
+                            vTextList.append(elem)
+                    #to get element of  index when visible text is given
+                    xpath = vTextList[int(eleIndex)]['xpath']
+                else:
+                    log.info('Identifying element with only index')
+                    #get element with element index
+                    xpath = elemList[int(eleIndex)]['xpath']
             else:
                 err_msg = sap_constants.ELELMENT_NOT_FOUND
             if ( err_msg ):

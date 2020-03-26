@@ -129,7 +129,7 @@ class SAPDispatcher:
             'selectrow' : table_keywords_obj.selectRow,
             'unselectrow' : table_keywords_obj.unselectRow,
             'selectcolumn' : table_keywords_obj.selectColumn,
-            'unselectColumn' : table_keywords_obj.unselectColumn,
+            'unselectcolumn' : table_keywords_obj.unselectColumn,
             'setcelltext' : table_keywords_obj.setCellText,
             #Shell keywords
             #-----------------------------------------------------shell_basic_keywords
@@ -150,6 +150,9 @@ class SAPDispatcher:
             'unselectallselections' : shell_gridview_toolbar_keywords_obj.unselectAllSelections,
             'scrolltorownumber' : shell_gridview_toolbar_keywords_obj.scrollToRowNumber,
             'getcellcolor' : shell_gridview_toolbar_keywords_obj.getCellColor,
+            'selectcolumns' : shell_gridview_toolbar_keywords_obj.selectColumns,
+            'unselectcolumns' : shell_gridview_toolbar_keywords_obj.unSelectColumns,
+            'getallcolumnheaders' : shell_gridview_toolbar_keywords_obj.getAllColumnHeaders,
             #------------------------------------------------------treekeywords
             'selecttreeelement' : shell_tree_keywords_obj.selectTreeElement,
             'gettreenodetext' : shell_tree_keywords_obj.getTreeNodeText,
@@ -174,8 +177,9 @@ class SAPDispatcher:
         self.action = None
 #-----------------------------------------------------------------for custom objects
     custom_dict = {
-                    "click" : ['radiobutton', 'checkbox', 'input', 'button', 'select', 'table'],
-                    "getelementtext" : ['radiobutton', 'checkbox', 'input', 'button', 'select', 'table'],
+                    "click" : ['radiobutton', 'checkbox', 'input', 'button', 'select', 'table', 'label'],
+                    "doubleclick" : ['radiobutton', 'checkbox', 'input', 'button', 'select', 'table', 'label'],
+                    "getelementtext" : ['radiobutton', 'checkbox', 'input', 'button', 'select', 'table', 'label'],
                     "getstatus" : ['radiobutton', 'checkbox'],
                     "gettext" : ['input'],
                     "selectcheckbox" : ['checkbox'],
@@ -195,6 +199,7 @@ class SAPDispatcher:
                     'textbox' : 'input',
                     'button' : 'button',
                     'table' : 'table',
+                    'label' : 'label'
                     }
 #-----------------------------------------------------------------for custom objects
 
@@ -214,7 +219,7 @@ class SAPDispatcher:
                     ele_type = self.get_ele_type[ele_type]
                 parent_xpath = teststepproperty.parent_xpath
                 if ( keyword in self.custom_dict and ele_type in self.custom_dict[keyword] ):
-                    custom_sap_element = self.saputil_keywords_obj.getobjectforcustom(parent_xpath, ele_type, input[1])
+                    custom_sap_element = self.saputil_keywords_obj.getobjectforcustom(parent_xpath, ele_type, input[1], input[2])
                     if ( custom_sap_element != '' or None ):
                         objectname = custom_sap_element
         except Exception as e:

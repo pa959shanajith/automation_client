@@ -15,6 +15,7 @@ import logging
 import constants
 import core_utils
 import os
+import json
 
 log = logging.getLogger('file_comparison_operations.py')
 
