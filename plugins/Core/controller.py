@@ -778,8 +778,8 @@ class Controller():
         if terminate_flag:
             #Indication of user_termination to report_obj to add a proper description in report - (Sushma)
             self.reporting_obj.user_termination=True
-            status_percentage[TERMINATE]+=1
-            status_percentage["total"]+=1
+            #status_percentage[TERMINATE]+=1
+            #status_percentage["total"]+=1
         self.reporting_obj.build_overallstatus(self.scenario_start_time,self.scenario_end_time,self.scenario_ellapsed_time)
         logger.print_on_console('Step Elapsed time is : ',str(self.scenario_ellapsed_time))
         return status,status_percentage
