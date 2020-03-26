@@ -90,7 +90,7 @@ class Controller():
     def __load_generic(self):
         try:
             if local_cont.generic_dispatcher_obj==None:
-                core_utils.get_all_the_imports('ImageProcessing')
+                # core_utils.get_all_the_imports('ImageProcessing')
                 core_utils.get_all_the_imports('Generic')
                 import generic_dispatcher
                 local_cont.generic_dispatcher_obj = generic_dispatcher.GenericKeywordDispatcher()
