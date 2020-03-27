@@ -316,8 +316,6 @@ STEP_DESCRIPTION='StepDescription'
 
 ELLAPSED_TIME='EllapsedTime'
 
-STEP='Step '
-
 REMARKS='Remark'
 
 TESTCASE_DETAILS='testcase_details'
