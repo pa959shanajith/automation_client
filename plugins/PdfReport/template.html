@@ -256,7 +256,7 @@
             <tbody class="reportsDetail" >
                 {{#each rows}}
                  {{#ifnotEquals hidestep "true"}}
-                <tr id="report-slno{{slno}}" style="width: 100%;" class="reportdetailsrow">
+                <tr id="report-slno{{id}}" style="width: 100%;" class="reportdetailsrow">
                     <td class="rDid tabCont">{{id}}</td>
                     {{#ifnotEquals Step undefined}}
                         <td class="rDstep tabCont">{{Step}}</td>
@@ -303,10 +303,10 @@
 
                     {{#ifEquals status "Fail"}}
                         {{#ifEquals testcase_details.actualResult_fail ""}}
-                            <td class="rDActualRes tabCont" style="padding-left: 10px;"><a style="color: {{getColor status}};text-decoration:none" href="{{validateImageID screenshot_path slno}}">{{status}}</a></td>
+                            <td class="rDActualRes tabCont" style="padding-left: 10px;"><a style="color: {{getColor status}};text-decoration:none" href="{{validateImageID screenshot_path id}}">{{status}}</a></td>
                         {{/ifEquals}}
                         {{#ifnotEquals testcase_details.actualResult_fail ""}}
-                           <td class="rDActualRes tabCont" style="padding-left: 10px;">{{testcase_details.actualResult_fail}}<a style="color: {{getColor status}};text-decoration:none" href="{{validateImageID screenshot_path slno}}">{{status}}</a></td>
+                           <td class="rDActualRes tabCont" style="padding-left: 10px;">{{testcase_details.actualResult_fail}}<a style="color: {{getColor status}};text-decoration:none" href="{{validateImageID screenshot_path id}}">{{status}}</a></td>
                         {{/ifnotEquals}}
                     {{/ifEquals}}
                        
@@ -322,7 +322,8 @@
                     {{/ifEquals}}
 					{{/ifnotEquals}}
 
-                    <td class="rDstatus tabCont" style=" padding-left: 10px; color: {{getColor status}}"><a style="color:inherit;text-decoration:none" href="{{validateImageID screenshot_path slno}}">{{status}}</a></td>
+                    <td class="rDstatus tabCont" style=" padding-left: 10px; color: {{getColor status}}">
+                        <a style="color:inherit;text-decoration:none" href="{{validateImageID screenshot_path id}}">{{status}}</a></td>
                     <td class="rDellaps tabCont">{{EllapsedTime}}</td>
                     {{#ifnotEquals ../commentsLength 0}}
                     <td class="rDcomments tabCont" style="padding-left: 10px;">{{Comments}}</td>
@@ -356,12 +357,12 @@
         {{#each rows}}
         <div class="screenshot-container" style="display:{{validateImagePath screenshot_path}}">
             {{#ifEquals ../overallstatus.0.browserType "MobileApp"}}
-                <img id="img-{{slno}}" src="{{screenshot_path}}" style="width:70%;display:block;" alt="Image for Sl No. {{slno}}">
+                <img id="img-{{id}}" src="{{screenshot_path}}" style="width:70%;display:block;" alt="Image for Sl No. {{id}}">
             {{/ifEquals}}
             {{#ifnotEquals ../overallstatus.0.browserType "MobileApp"}}
-                <img id="img-{{slno}}" src="{{screenshot_path}}" style="width:100%;display:block;" alt="Image for Sl No. {{slno}}">
+                <img id="img-{{id}}" src="{{screenshot_path}}" style="width:100%;display:block;" alt="Image for Sl No. {{id}}">
             {{/ifnotEquals}}
-            <a href="#report-slno{{slno}}">Above Image belongs to Sl No. {{slno}}</a>
+            <a href="#report-slno{{id}}">Above Image belongs to Sl No. {{id}}</a>
         </div>
         {{/each}}
     </div>

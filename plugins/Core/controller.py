@@ -39,6 +39,7 @@ iris_flag = False
 iris_constant_step = -1
 socket_object = None
 count = 0
+test_case_number = 0
 log = logging.getLogger("controller.py")
 status_percentage = {TEST_RESULT_PASS:0,TEST_RESULT_FAIL:0,TERMINATE:0,"total":0}
 
@@ -306,11 +307,19 @@ class Controller():
                 self.conthread.pause_cond.wait()
 
     def methodinvocation(self,index,*args):
-        global pause_flag
+        global pause_flag, test_case_number
         result=(TEST_RESULT_FAIL,TEST_RESULT_FALSE,OUTPUT_CONSTANT,None)
 		#COmapring breakpoint with the step number of tsp instead of index - (Sushma)
         tsp = handler.local_handler.tspList[index]
         testcase_details_orig=tsp.testcase_details
+        if test_case_number != tsp.testcase_num :
+            test_case_number = tsp.testcase_num
+            log.info('---------------------------------------------------------------------')
+            print('-------------------------------------------------------------------------------------------------------')
+            logger.print_on_console('***Test case name: '+str(tsp.testscript_name)+'***')
+            log.info('***Test case name: '+str(tsp.testscript_name)+'***')
+            print('-------------------------------------------------------------------------------------------------------')
+            log.info('---------------------------------------------------------------------')
         #logic to handle step by step debug
         if self.debug_mode and tsp.testcase_num==self.last_tc_num:
             #logic to handle run from setp debug
