@@ -426,10 +426,10 @@ class Reporting:
                     report_json[OVERALLSTATUS][0]["fail"]=str(round(i["Fail"]/i['total']*100,2))
                     report_json[OVERALLSTATUS][0]["terminate"]=str(round(i["Terminate"]/i['total']*100,2))
                 else:
-                    report_json_condition_check[OVERALLSTATUS][0]["pass"]="0"
-                    report_json_condition_check[OVERALLSTATUS][0]["fail"]="0"
-                    report_json_condition_check[OVERALLSTATUS][0]["terminate"]="0"
-            if len(report_json) != 0 and len(report_json["rows"]) != 0:
+                    report_json[OVERALLSTATUS][0]["pass"]="0"
+                    report_json[OVERALLSTATUS][0]["fail"]="0"
+                    report_json[OVERALLSTATUS][0]["terminate"]="0"
+            if len(report_json["rows"]) != 0:
                 for i in report_json["rows"]:
                     if i[COMMENTS]:
                         report_json[COMMENTS_LENGTH].append(i[COMMENTS])
@@ -487,9 +487,9 @@ class Reporting:
                     report_json_condition_check_testcase_empty[OVERALLSTATUS][0]["fail"]=str(round(i["Fail"]/i['total']*100,2))
                     report_json_condition_check_testcase_empty[OVERALLSTATUS][0]["terminate"]=str(round(i["Terminate"]/i['total']*100,2))
                 else:
-                    report_json_condition_check[OVERALLSTATUS][0]["pass"]="0"
-                    report_json_condition_check[OVERALLSTATUS][0]["fail"]="0"
-                    report_json_condition_check[OVERALLSTATUS][0]["terminate"]="0"
+                    report_json_condition_check_testcase_empty[OVERALLSTATUS][0]["pass"]="0"
+                    report_json_condition_check_testcase_empty[OVERALLSTATUS][0]["fail"]="0"
+                    report_json_condition_check_testcase_empty[OVERALLSTATUS][0]["terminate"]="0"
             with open(filename, 'w') as outfile:
                     log.info('Writing report data to the file '+filename)
                     json.dump(report_json_condition_check_testcase_empty, outfile, indent=4, sort_keys=False)
