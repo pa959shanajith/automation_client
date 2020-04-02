@@ -39,15 +39,13 @@ iris_flag = False
 iris_constant_step = -1
 socket_object = None
 count = 0
-test_case_number = 0
+# test_case_number = 0
 log = logging.getLogger("controller.py")
 status_percentage = {TEST_RESULT_PASS:0,TEST_RESULT_FAIL:0,TERMINATE:0,"total":0}
 
 
 class Controller():
-##    generic_dispatcher_obj = None
     mobile_web_dispatcher_obj = None
-##    web_dispatcher_obj = None
     oebs_dispatcher_obj = None
     webservice_dispatcher_obj = None
     outlook_dispatcher_obj = None
@@ -61,6 +59,7 @@ class Controller():
         global local_cont
         local_cont.web_dispatcher_obj = None
         local_cont.generic_dispatcher_obj = None
+        local_cont.test_case_number = 0
         self.action=None
         core_utils.get_all_the_imports(CORE)
         self.cur_dir= os.getcwd()
@@ -91,7 +90,6 @@ class Controller():
     def __load_generic(self):
         try:
             if local_cont.generic_dispatcher_obj==None:
-                core_utils.get_all_the_imports('ImageProcessing')
                 core_utils.get_all_the_imports('Generic')
                 import generic_dispatcher
                 local_cont.generic_dispatcher_obj = generic_dispatcher.GenericKeywordDispatcher()
@@ -307,13 +305,13 @@ class Controller():
                 self.conthread.pause_cond.wait()
 
     def methodinvocation(self,index,*args):
-        global pause_flag, test_case_number
+        global pause_flag
         result=(TEST_RESULT_FAIL,TEST_RESULT_FALSE,OUTPUT_CONSTANT,None)
 		#COmapring breakpoint with the step number of tsp instead of index - (Sushma)
         tsp = handler.local_handler.tspList[index]
         testcase_details_orig=tsp.testcase_details
-        if test_case_number != tsp.testcase_num :
-            test_case_number = tsp.testcase_num
+        if local_cont.test_case_number != tsp.testcase_num :
+            local_cont.test_case_number = tsp.testcase_num
             log.info('---------------------------------------------------------------------')
             print('-------------------------------------------------------------------------------------------------------')
             logger.print_on_console('***Test case name: '+str(tsp.testscript_name)+'***')
@@ -719,7 +717,7 @@ class Controller():
                 index=result
                 self.status=result
             #Fixing issue #382
-            if teststepproperty.outputval.split(";")[-1].strip() !='0':
+            if teststepproperty.outputval.split(";")[-1].strip() !=STEPSTATUS_INREPORTS_ZERO:
                 status_percentage[self.keyword_status]+=1
                 status_percentage["total"]+=1
             logger.print_on_console(keyword+' executed and the status is '+self.keyword_status+'\n')
