@@ -719,7 +719,7 @@ class Controller():
                 index=result
                 self.status=result
             #Fixing issue #382
-            if teststepproperty.outputval.split(";")[-1] !='0':
+            if teststepproperty.outputval.split(";")[-1].strip() !='0':
                 status_percentage[self.keyword_status]+=1
                 status_percentage["total"]+=1
             logger.print_on_console(keyword+' executed and the status is '+self.keyword_status+'\n')
