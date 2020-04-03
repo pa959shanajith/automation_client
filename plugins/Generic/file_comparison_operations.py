@@ -508,7 +508,7 @@ class XML:
 
 class JSON:
 
-    def write_to_file(self,input_path,content):
+    def write_to_file(self,input_path,content,*args):
         """
         def : write_to_file
         purpose : writes the content to given json file
