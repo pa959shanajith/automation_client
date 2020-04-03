@@ -200,7 +200,6 @@ class ScrapeDispatcher(wx.Frame):
         try:
             state = event.GetEventObject().GetValue()
             global cropandaddobj
-            obj = desktop_launch_keywords.Launch_Keywords()
             if ( state == True ):
                 event.GetEventObject().SetLabel("Stop IRIS")
                 self.startbutton.Disable()
@@ -211,7 +210,6 @@ class ScrapeDispatcher(wx.Frame):
                 if (self.delay_time_map[self.scrapeDelaydropdown.GetValue()]>0):
                     time.sleep(self.delay_time_map[self.scrapeDelaydropdown.GetValue()])
                 else:
-                    obj.set_to_foreground()
                     time.sleep(1)
                 status = cropandaddobj.startcropandadd(self)
             else:
