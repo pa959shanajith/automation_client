@@ -144,9 +144,12 @@ class DynamicVariables:
                         json_flag=True
                 except Exception as e:
                     try:
-                        ast.literal_eval(str(outputval))
-                        status = TEST_RESULT_FALSE
-                        json_flag=True
+                        value=ast.literal_eval(str(outputval))
+                        if type(value)==set:
+                            json_flag=False
+                        else:
+                            status = TEST_RESULT_FALSE
+                            json_flag=True
                     except Exception as e:
                         local_dynamic.log.debug('Not a json input')
             if not(json_flag):

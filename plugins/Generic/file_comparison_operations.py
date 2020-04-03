@@ -508,7 +508,7 @@ class XML:
 
 class JSON:
 
-    def write_to_file(self,*args):
+    def write_to_file(self,input_path,content,*args):
         """
         def : write_to_file
         purpose : writes the content to given json file
@@ -519,12 +519,13 @@ class JSON:
         status=False
         err_msg=None
         coreutilsobj=core_utils.CoreUtils()
-        input_path=coreutilsobj.get_UTF_8(args[0])
-        log.info('Writing ',args[1],' to json file ',input_path)
         try:
-            json.loads(args[1])
+            input_path=coreutilsobj.get_UTF_8(input_path)
+            log.info('Writing ',content,' to json file ',input_path)
+            json.loads(content)
             with open(input_path,'w') as file_write:
-                json.dump(args[1],file_write)
+                file_write.write(content)
+                file_write.close()
             status=True
         except Exception as e:
             err_msg=generic_constants.ERR_MSG1+'Writing to JSON '+generic_constants.ERR_MSG2
