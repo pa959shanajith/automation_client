@@ -89,7 +89,6 @@ class FullScrape:
         if curaccinfo.accessibleText == 1:
             charinfo = acc.getAccessibleTextInfo(0,1)
             text = acc.getAccessibleTextRange(0,charinfo.charCount - 1)
-        text = text.encode('utf-8').strip()
         text = str(text)
         text = text.strip()
         if len(text) == 0:
@@ -106,6 +105,7 @@ class FullScrape:
         parentindex = 'null'
         parentxpathtemp = 'null'
         parentxpath = 'null'
+        hiddentag = True
         if (curaccinfo.name):
             name = curaccinfo.name
         else:
@@ -139,58 +139,56 @@ class FullScrape:
                     parentxpath = str(parentxpathtemp) + str(parenttag) + '[' + str(parentindex) + ']'
 
         if 'showing' in  curaccinfo.states:
-            if len(name.strip() ) == 0:
-                name = ''
-            if len(parentname.strip()) == 0:
-                parentname = ''
-            if len(curaccinfo.name) == 0 :
-                tagname = curaccinfo.role
-            if curaccinfo.description is not None:
-                description = curaccinfo.description
-            else:
-                description = ''
-            if curaccinfo.accessibleText == 1:
-                charinfo = acc.getAccessibleTextInfo(0,1)
-                text = acc.getAccessibleTextRange(0,charinfo.charCount - 1)
-            text = text.encode('utf-8').strip()
-            text = str(text)
-            text = text.strip()
-            #Calculating co ordinates for embedded screenshots
+            hiddentag = False
+        if len(name.strip() ) == 0:
+            name = ''
+        if len(parentname.strip()) == 0:
+            parentname = ''
+        if len(curaccinfo.name) == 0 :
+            tagname = curaccinfo.role
+        if curaccinfo.description is not None:
+            description = curaccinfo.description
+        else:
+            description = ''
+        if curaccinfo.accessibleText == 1:
+            charinfo = acc.getAccessibleTextInfo(0,1)
+            text = acc.getAccessibleTextRange(0,charinfo.charCount - 1)
+        text = str(text)
+        text = text.strip()
+        #Calculating co ordinates for embedded screenshots
 ##            utils_obj=utils.Utils()
 ##            isjavares, hwnd = utils_obj.isjavawindow(window)
 ##            win_rect= win32gui.GetWindowRect(hwnd)
-            x1_win = win_rect[0]
-            y1_win = win_rect[1]
-            x2_win = win_rect[2]
-            y2_win = win_rect[3]
-            width_win = x2_win - x1_win
-            height_win = y2_win - y1_win
+        x1_win = win_rect[0]
+        y1_win = win_rect[1]
+        x2_win = win_rect[2]
+        y2_win = win_rect[3]
+        width_win = x2_win - x1_win
+        height_win = y2_win - y1_win
 
-            x_coor=curaccinfo.x
-            y_coor=curaccinfo.y
-            width=curaccinfo.width
-            height=curaccinfo.height
+        x_coor=curaccinfo.x
+        y_coor=curaccinfo.y
+        width=curaccinfo.width
+        height=curaccinfo.height
 
-            left_need = x_coor - x1_win
-            top_need =  y_coor - y1_win
+        left_need = x_coor - x1_win
+        top_need =  y_coor - y1_win
 
-            if len(text) == 0:
-                text = tagname
-            text = text.replace('<','')
-            text = text.replace('>','')
-            tempne.append({"custname":text.strip(),
-                    "tag":curaccinfo.role,
-                    "xpath":path + ';' + name.strip() + ';' + str(indexInParent)  + ';' + str(childrencount) + ';'+ str(parentname).strip() + ';' + str(parentxpath) + ';' + str(parentchildcount) + ';' + str(parentindex)+ ';' + str(parenttag)+ ';' + str(curaccinfo.role) + ';' + description,
-                    'hiddentag':'No',
-                    'id':'null',
-                    "text":text.strip(),
-                    "url":window,
-                    "left":left_need,
-                    "top":top_need,
-                    "width":width,
-                    "height":height})
+        if len(text) == 0:
+            text = tagname
+        text = text.replace('<','')
+        text = text.replace('>','')
+        tempne.append({"custname":text.strip(),
+                "tag":curaccinfo.role,
+                "xpath":path + ';' + name.strip() + ';' + str(indexInParent)  + ';' + str(childrencount) + ';'+ str(parentname).strip() + ';' + str(parentxpath) + ';' + str(parentchildcount) + ';' + str(parentindex)+ ';' + str(parenttag)+ ';' + str(curaccinfo.role) + ';' + description,
+                'hiddentag':str(hiddentag),
+                'id':'null',
+                "text":text.strip(),
+                "url":window,
+                "left":left_need,
+                "top":top_need,
+                "width":width,
+                "height":height})
         for i in range(curaccinfo.childrenCount):
             childacc = acc.getAccessibleChildFromContext(i)
             self.acccontext(childacc, tempne,path,i,window)
-
-
