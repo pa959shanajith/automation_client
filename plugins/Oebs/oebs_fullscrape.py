@@ -178,7 +178,11 @@ class FullScrape:
             text = tagname
         text = text.replace('<','')
         text = text.replace('>','')
-        tempne.append({"custname":text.strip(),
+        #----------------------------------------custname
+        custname = None
+        custname = self.postfixCustname(str(curaccinfo.role),text.strip())
+        #----------------------------------------custname
+        tempne.append({"custname":custname,
                 "tag":curaccinfo.role,
                 "xpath":path + ';' + name.strip() + ';' + str(indexInParent)  + ';' + str(childrencount) + ';'+ str(parentname).strip() + ';' + str(parentxpath) + ';' + str(parentchildcount) + ';' + str(parentindex)+ ';' + str(parenttag)+ ';' + str(curaccinfo.role) + ';' + description,
                 'hiddentag':str(hiddentag),
@@ -192,3 +196,28 @@ class FullScrape:
         for i in range(curaccinfo.childrenCount):
             childacc = acc.getAccessibleChildFromContext(i)
             self.acccontext(childacc, tempne,path,i,window)
+
+    def postfixCustname(self,role,custname):
+        if(role in ['push button','toggle button']):
+            custname = custname + "_btn"
+        elif(role in ['edit','Edit Box','text','password text']):
+            custname = custname + "_txtbox"
+        elif(role == 'combo box'):
+            custname = custname +"_select"
+        elif(role == 'radio button'):
+            custname = custname + "_radiobtn"
+        elif(role == 'check box'):
+            custname = custname + "_chkbox"
+        elif(role == 'table'):
+            custname = custname + "_table"
+        elif(role in ['list item','list']):
+            custname = custname + "_lst"
+        elif(role == 'internal frame'):
+            custname = custname + "_internalframe"
+        elif(role == "scroll bar"):
+            custname = custname + "_scroll"
+        elif(role in ['hyperlink','Static']):
+            custname = custname + "_link"
+        else:
+            custname = custname + "_elmnt"
+        return custname
