@@ -989,6 +989,7 @@ class Controller():
                                     con.action=EXECUTE
                                     con.conthread=mythread
                                     con.tsp_list=tsplist
+                                    local_cont.test_case_number=0
                                     status,status_percentage = con.executor(tsplist,EXECUTE,last_tc_num,1,con.conthread)
                                     print('=======================================================================================================')
                                     logger.print_on_console( '***Scenario' ,str(i + 1) ,' execution completed***')
