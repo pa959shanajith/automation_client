@@ -34,7 +34,6 @@ class Reporting:
         self.overallstatus_array=[]
         self.comments_length=[]
         self.overallstatus_array_incomplete = []
-
         self.report_json={ROWS:self.report_string,OVERALLSTATUS:self.overallstatus_array,COMMENTS_LENGTH:self.comments_length}
         self.report_json_condition_check={ROWS:self.report_string,OVERALLSTATUS:self.overallstatus_array_incomplete,COMMENTS_LENGTH:self.comments_length}
         self.report_json_condition_check_testcase_empty={ROWS:self.report_string_testcase_empty,OVERALLSTATUS:self.overallstatus_array_incomplete,COMMENTS_LENGTH:self.comments_length}
