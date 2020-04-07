@@ -162,7 +162,7 @@ class FileOperations:
         except Exception as e:
             err_msg=generic_constants.ERR_MSG1+'Verifying'+generic_constants.ERR_MSG2
             log.error(e)
-        if err_msg!=None:
+        if err_msg:
             log.error(err_msg)
             logger.print_on_console(err_msg)
         return status,methodoutput,output_res,err_msg
@@ -489,10 +489,9 @@ class FileOperations:
         """
         # Defect #872 Special Language Support using unicode to address the issue (Himanshu)
         coreutilsobj=core_utils.CoreUtils()
-        input_path=coreutilsobj.get_UTF_8(input_path)
-        content=coreutilsobj.get_UTF_8(content)
-
         try:
+            input_path=coreutilsobj.get_UTF_8(input_path)
+            content=coreutilsobj.get_UTF_8(content)
             if SYSTEM_OS != 'Darwin':
                 import win32com.client
             status=TEST_RESULT_FAIL
@@ -507,7 +506,7 @@ class FileOperations:
                 file_ext,res=self.__get_ext(input_path)
                 if file_ext.lower()=='.json':
                     params.append(input_path)
-                    params.append(args[0])
+                    params.append(content)
                 else:
                     params=self.__split(input_path,content,*args)
                 if res == True:
@@ -523,7 +522,7 @@ class FileOperations:
         except Exception as e:
             err_msg=generic_constants.ERR_MSG1+'Writing to'+generic_constants.ERR_MSG2
             log.error(e)
-        if err_msg!=None:
+        if err_msg:
             log.error(err_msg)
             logger.print_on_console(err_msg)
         return status,methodoutput,output_res,err_msg

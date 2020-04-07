@@ -297,6 +297,8 @@ STOP='stop'
 ROWS='rows'
 
 OVERALLSTATUS='overallstatus'
+	
+COMMENTS_LENGTH='commentsLength'
 
 ID='id'
 
@@ -313,8 +315,6 @@ SCREENSHOT_PATH = 'screenshot_path'
 STEP_DESCRIPTION='StepDescription'
 
 ELLAPSED_TIME='EllapsedTime'
-
-STEP='Step '
 
 REMARKS='Remark'
 
