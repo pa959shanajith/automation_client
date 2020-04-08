@@ -1007,13 +1007,13 @@ class WSkeywords:
         log.debug(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if(not(url==''and username=='' and password=='') and 
-                   not (url==None and username==None and password==None)):
-                   service=url.strip().split(":")
-                   proxie=str(service[0])+"://"+str(username.strip())+":"+str(self.aes_decript(password.strip()))+"@"+str(service[1].strip().strip("//"))+":"+str(service[-1])+"/"
-                   self.proxies[service[0]]=proxie
-                   log.debug(STATUS_METHODOUTPUT_UPDATE)
-                   status = ws_constants.TEST_RESULT_PASS
-                   methodoutput = ws_constants.TEST_RESULT_TRUE
+                not (url==None and username==None and password==None)):
+                service=url.strip().split(":")
+                proxie=str(service[0])+"://"+str(username.strip())+":"+str(self.aes_decript(password.strip()))+"@"+str(service[1].strip().strip("//"))+":"+str(service[-1])+"/"
+                self.proxies[service[0]]=proxie
+                log.debug(STATUS_METHODOUTPUT_UPDATE)
+                status = ws_constants.TEST_RESULT_PASS
+                methodoutput = ws_constants.TEST_RESULT_TRUE
             else:
                 log.info(ws_constants.METHOD_INVALID_INPUT)
                 err_msg = ws_constants.METHOD_INVALID_INPUT

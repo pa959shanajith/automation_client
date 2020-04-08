@@ -505,7 +505,6 @@ class XML:
             logger.print_on_console(err_msg)
         return status,err_msg
 
-
 class JSON:
 
     def write_to_file(self,input_path,content,*args):

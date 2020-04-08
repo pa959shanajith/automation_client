@@ -63,7 +63,6 @@ class DynamicVariables:
                         db_result=self.getDBdata(value,con_obj)
                         actual_value=db_result[1]
                         
-
             elif self.check_for_dynamicvariables(input_var,keyword)==TEST_RESULT_TRUE:
                 temp_value=self.get_dynamic_value(input_var)
                 if temp_value is None:
