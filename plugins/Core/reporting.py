@@ -32,10 +32,11 @@ class Reporting:
         self.report_string=[]
         self.report_string_testcase_empty = []
         self.overallstatus_array=[]
+        self.comments_length=[]
         self.overallstatus_array_incomplete = []
-        self.report_json={ROWS:self.report_string,OVERALLSTATUS:self.overallstatus_array}
-        self.report_json_condition_check={ROWS:self.report_string,OVERALLSTATUS:self.overallstatus_array_incomplete}
-        self.report_json_condition_check_testcase_empty={ROWS:self.report_string_testcase_empty,OVERALLSTATUS:self.overallstatus_array_incomplete}
+        self.report_json={ROWS:self.report_string,OVERALLSTATUS:self.overallstatus_array,COMMENTS_LENGTH:self.comments_length}
+        self.report_json_condition_check={ROWS:self.report_string,OVERALLSTATUS:self.overallstatus_array_incomplete,COMMENTS_LENGTH:self.comments_length}
+        self.report_json_condition_check_testcase_empty={ROWS:self.report_string_testcase_empty,OVERALLSTATUS:self.overallstatus_array_incomplete,COMMENTS_LENGTH:self.comments_length}
 
         self.nested_flag=False
         self.pid_list=[]
@@ -424,9 +425,13 @@ class Reporting:
                     report_json[OVERALLSTATUS][0]["fail"]=str(round(i["Fail"]/i['total']*100,2))
                     report_json[OVERALLSTATUS][0]["terminate"]=str(round(i["Terminate"]/i['total']*100,2))
                 else:
-                    report_json_condition_check[OVERALLSTATUS][0]["pass"]="0"
-                    report_json_condition_check[OVERALLSTATUS][0]["fail"]="0"
-                    report_json_condition_check[OVERALLSTATUS][0]["terminate"]="0"
+                    report_json[OVERALLSTATUS][0]["pass"]="0"
+                    report_json[OVERALLSTATUS][0]["fail"]="0"
+                    report_json[OVERALLSTATUS][0]["terminate"]="0"
+            if len(report_json["rows"]) != 0:
+                for i in report_json["rows"]:
+                    if i[COMMENTS]:
+                        report_json[COMMENTS_LENGTH].append(i[COMMENTS])
             with open(filename, 'w') as outfile:
                     log.info('Writing report data to the file '+filename)
                     json.dump(report_json, outfile, indent=4, sort_keys=False)
@@ -481,9 +486,9 @@ class Reporting:
                     report_json_condition_check_testcase_empty[OVERALLSTATUS][0]["fail"]=str(round(i["Fail"]/i['total']*100,2))
                     report_json_condition_check_testcase_empty[OVERALLSTATUS][0]["terminate"]=str(round(i["Terminate"]/i['total']*100,2))
                 else:
-                    report_json_condition_check[OVERALLSTATUS][0]["pass"]="0"
-                    report_json_condition_check[OVERALLSTATUS][0]["fail"]="0"
-                    report_json_condition_check[OVERALLSTATUS][0]["terminate"]="0"
+                    report_json_condition_check_testcase_empty[OVERALLSTATUS][0]["pass"]="0"
+                    report_json_condition_check_testcase_empty[OVERALLSTATUS][0]["fail"]="0"
+                    report_json_condition_check_testcase_empty[OVERALLSTATUS][0]["terminate"]="0"
             with open(filename, 'w') as outfile:
                     log.info('Writing report data to the file '+filename)
                     json.dump(report_json_condition_check_testcase_empty, outfile, indent=4, sort_keys=False)
@@ -524,3 +529,8 @@ class Reporting:
         row_obj[SCREENSHOT_PATH]=None
         row_array.append(row_obj)
         self.report_json['rows']=row_array
+        comments_Length=[]
+        for i in row_array:
+            if COMMENTS in i:
+                comments_Length.append(i[COMMENTS])
+        self.report_json['commentsLength']=comments_Length

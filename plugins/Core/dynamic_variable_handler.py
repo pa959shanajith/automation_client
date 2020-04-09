@@ -63,7 +63,6 @@ class DynamicVariables:
                         db_result=self.getDBdata(value,con_obj)
                         actual_value=db_result[1]
                         
-
             elif self.check_for_dynamicvariables(input_var,keyword)==TEST_RESULT_TRUE:
                 temp_value=self.get_dynamic_value(input_var)
                 if temp_value is None:
@@ -144,9 +143,12 @@ class DynamicVariables:
                         json_flag=True
                 except Exception as e:
                     try:
-                        ast.literal_eval(str(outputval))
-                        status = TEST_RESULT_FALSE
-                        json_flag=True
+                        value=ast.literal_eval(str(outputval))
+                        if type(value)==set:
+                            json_flag=False
+                        else:
+                            status = TEST_RESULT_FALSE
+                            json_flag=True
                     except Exception as e:
                         local_dynamic.log.debug('Not a json input')
             if not(json_flag):

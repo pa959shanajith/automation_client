@@ -39,14 +39,13 @@ iris_flag = False
 iris_constant_step = -1
 socket_object = None
 count = 0
+# test_case_number = 0
 log = logging.getLogger("controller.py")
 status_percentage = {TEST_RESULT_PASS:0,TEST_RESULT_FAIL:0,TERMINATE:0,"total":0}
 
 
 class Controller():
-##    generic_dispatcher_obj = None
     mobile_web_dispatcher_obj = None
-##    web_dispatcher_obj = None
     oebs_dispatcher_obj = None
     webservice_dispatcher_obj = None
     outlook_dispatcher_obj = None
@@ -60,6 +59,7 @@ class Controller():
         global local_cont
         local_cont.web_dispatcher_obj = None
         local_cont.generic_dispatcher_obj = None
+        local_cont.test_case_number = 0
         self.action=None
         core_utils.get_all_the_imports(CORE)
         self.cur_dir= os.getcwd()
@@ -90,7 +90,6 @@ class Controller():
     def __load_generic(self):
         try:
             if local_cont.generic_dispatcher_obj==None:
-                core_utils.get_all_the_imports('ImageProcessing')
                 core_utils.get_all_the_imports('Generic')
                 import generic_dispatcher
                 local_cont.generic_dispatcher_obj = generic_dispatcher.GenericKeywordDispatcher()
@@ -318,6 +317,14 @@ class Controller():
 		#COmapring breakpoint with the step number of tsp instead of index - (Sushma)
         tsp = handler.local_handler.tspList[index]
         testcase_details_orig=tsp.testcase_details
+        if local_cont.test_case_number != tsp.testcase_num :
+            local_cont.test_case_number = tsp.testcase_num
+            log.info(line_separator)
+            print(line_separator)
+            logger.print_on_console('***Test case name: '+str(tsp.testscript_name)+'***')
+            log.info('***Test case name: '+str(tsp.testscript_name)+'***')
+            print(line_separator)
+            log.info(line_separator)
         #logic to handle step by step debug
         if self.debug_mode and tsp.testcase_num==self.last_tc_num:
             #logic to handle run from setp debug
@@ -717,8 +724,9 @@ class Controller():
                 index=result
                 self.status=result
             #Fixing issue #382
-            status_percentage[self.keyword_status]+=1
-            status_percentage["total"]+=1
+            if teststepproperty.outputval.split(";")[-1].strip() != STEPSTATUS_INREPORTS_ZERO:
+                status_percentage[self.keyword_status]+=1
+                status_percentage["total"]+=1
             logger.print_on_console(keyword+' executed and the status is '+self.keyword_status+'\n')
             log.info(keyword+' executed and the status is '+self.keyword_status+'\n')
             #Checking for stop keyword
@@ -1230,13 +1238,8 @@ class Controller():
         #325 : Report - Skip status in report by providing value 0 in the output column in testcase grid is not handled.
         outputstring = teststepproperty.outputval
         nostatusflag = False
-        if len(outputstring) > 0  and outputstring != None:
-            if (outputstring.find(';') > 0):
-                index = outputstring.rfind(';')
-                if outputstring[index + 1:] == STEPSTATUS_INREPORTS_ZERO:
-                    nostatusflag = True
-            elif outputstring== STEPSTATUS_INREPORTS_ZERO:
-                nostatusflag = True
+        if teststepproperty.outputval.split(";")[-1].strip() == STEPSTATUS_INREPORTS_ZERO:
+            nostatusflag = True
         return nostatusflag
 
 

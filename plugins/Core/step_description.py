@@ -59,7 +59,11 @@ class StepDescription:
         def getcontent():
             return "Get content from the file '"+ input+"' and save it in '"+ tsp.outputval+"'"
         def comparefiles():
-            return "Compare the contents of file '"+ inputval[0] + "' and '"+ inputval[1]+"'"
+            return "Compared the contents of files '"+ inputval[0] + "' and '"+ inputval[1]+"'"
+        def compareinputs():
+            return "Compared the inputs '"+ inputval[0] + "' and '"+ inputval[1]+"'"
+        def beautify():
+            return "Beautified the "+inputval[1]+" input '"+ inputval[0]+"'"
         def executescript():
             return "Perform execution of the script '"+ input+"'"
         def writetofile():
@@ -114,8 +118,8 @@ class StepDescription:
         #Math opeartions
         def add():
             return "Add the numbers '"+ input+"' and save the value '"+output +"' in '"+ tsp.outputval+"'"
-        ##def evaluate():
-            ##return "Evaluate Mathematical expression '"+ input+"' and save the result '"+ output +"' in '"+ tsp.outputval+"'"
+        def evaluate():
+            return "Evaluate Mathematical expression '"+ input+"' and save the result '"+ output +"' in '"+ tsp.outputval+"'"
 
         #Compare keywords
         def verifyobjects():
