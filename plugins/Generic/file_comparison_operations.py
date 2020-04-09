@@ -15,6 +15,7 @@ import logging
 import constants
 import core_utils
 import os
+import json
 
 log = logging.getLogger('file_comparison_operations.py')
 
@@ -433,7 +434,7 @@ class TextFile:
 
 class XML:
 
-    def write_to_file(self,input_path,content):
+    def write_to_file(self,input_path,sheet_name,content):
         """
         def : write_to_file
         purpose : writes the content to given XML file
@@ -445,14 +446,14 @@ class XML:
         err_msg=None
 ##        logger.print_on_console('Writing '+str(content)+' to XML file '+str(input_path))
 ##        log.info('Writing '+str(content)+' to XML file '+str(input_path))
-        log.info('Writing '+content+' to XML file '+input_path)
         coreutilsobj=core_utils.CoreUtils()
-        input_path=coreutilsobj.get_UTF_8(input_path)
         import xml.dom.minidom as minidom
         from xml.etree import ElementTree as ET
         from xml.etree import ElementTree
         try:
         #872 Unicode file write support for XML (Himanshu)
+            log.info('Writing '+content+' to XML file '+input_path)
+            input_path=coreutilsobj.get_UTF_8(input_path)
             try:
                 tree = ET.XML(content)
             except:
@@ -460,8 +461,8 @@ class XML:
             rough_string = ElementTree.tostring(tree,'utf-8')
             reparsed = minidom.parseString(rough_string)
             val=reparsed.toprettyxml(indent="\t")
-            with open(input_path, 'a') as file:
-                val=val.encode('utf-8')
+            with open(input_path, 'w') as file:
+                #val=val.encode('utf-8')
                 file.write(val)
                 file.close()
                 log.debug('Content is written successfully')
@@ -500,6 +501,35 @@ class XML:
             err_msg=generic_constants.ERR_MSG1+'Clearing XML '+generic_constants.ERR_MSG2
             log.error(e)
         log.info('Status is '+str(status))
+        if err_msg!=None:
+            logger.print_on_console(err_msg)
+        return status,err_msg
+
+class JSON:
+
+    def write_to_file(self,input_path,content,*args):
+        """
+        def : write_to_file
+        purpose : writes the content to given json file
+        param : input_path,content
+        return : bool
+
+        """
+        status=False
+        err_msg=None
+        coreutilsobj=core_utils.CoreUtils()
+        try:
+            input_path=coreutilsobj.get_UTF_8(input_path)
+            log.info('Writing ',content,' to json file ',input_path)
+            json.loads(content)
+            with open(input_path,'w') as file_write:
+                file_write.write(content)
+                file_write.close()
+            status=True
+        except Exception as e:
+            err_msg=generic_constants.ERR_MSG1+'Writing to JSON '+generic_constants.ERR_MSG2
+            log.error(e)
+        log.info('Status is ',status)
         if err_msg!=None:
             logger.print_on_console(err_msg)
         return status,err_msg

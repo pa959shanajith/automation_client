@@ -35,6 +35,7 @@ class Dispatcher:
                   'getservercertificate' : self.webservice.getServerCertificate,
                   'settagattribute':self.webservice.setTagAttribute,
                   'setheadertemplate':self.webservice.setHeaderTemplate,
+                  'setproxies':self.webservice.setProxies,
                   # Authentication methods
                   'setbasicauth': self.webservice.setBasicAuth
                 }
