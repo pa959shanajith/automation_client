@@ -41,7 +41,7 @@ socket_object = None
 count = 0
 # test_case_number = 0
 log = logging.getLogger("controller.py")
-
+status_percentage = {TEST_RESULT_PASS:0,TEST_RESULT_FAIL:0,TERMINATE:0,"total":0}
 
 class Controller():
     mobile_web_dispatcher_obj = None
@@ -505,7 +505,8 @@ class Controller():
                         logger.print_on_console('Response Body: \n',respBody,'\n')
                     else:
                         logger.print_on_console('NON SOAP XML')
-                        logger.print_on_console('Response Body: \n',display_keyword_response[1][2:-1].replace("\\n","\n").replace("\\r","\r").replace("\\t","\t"),'\n')
+                        logger.print_on_console('Response Body: \n',display_keyword_response[1].replace("\\n","\n").replace("\\r","\r").replace("\\t","\t"),'\n')
+                        #logger.print_on_console('Response Body: \n',display_keyword_response[1][2:-1].replace("\\n","\n").replace("\\r","\r").replace("\\t","\t"),'\n')
                 else:
                     logger.print_on_console('Response Body exceeds max. Limit, please use writeToFile keyword.')
                     log.info('Result obtained is: ')
@@ -565,7 +566,7 @@ class Controller():
             self.dynamic_var_handler_obj.store_dynamic_value(output[1],result[1],tsp.name)
 
     def keywordinvocation(self,index,inpval,*args):
-        global socket_object,iris_constant_step
+        global socket_object,iris_constant_step,status_percentage
         configvalues = self.configvalues
         try:
             import time
@@ -752,6 +753,8 @@ class Controller():
                     if i== TERMINATE:
                         #Changing the overallstatus of the report_obj to Terminate - (Sushma)
                         self.reporting_obj.overallstatus=TERMINATE
+                        status_percentage[TERMINATE]+=1
+                        status_percentage["total"]+=1
                         logger.print_on_console('Terminating the execution')
                         status=i
                         break
