@@ -500,41 +500,27 @@ class MainNamespace(BaseNamespace):
             log.error(e,exc_info=True)
 
     def on_qclogin(self, *args):
+        global qcObject
+        err_msg = None
         try:
-            global qcObject
             if(qcObject == None):
                 core_utils.get_all_the_imports('Qc')
                 import QcController
                 qcObject = QcController.QcWindow()
 
-            global socketIO
             qcdata = args[0]
-
-            if qcdata['qcaction'] == 'domain':
-                check = qcObject.Login1(qcdata)
-                socketIO.emit('qcresponse',check)
-            elif qcdata['qcaction'] == 'project':
-                check = qcObject.getProjects(qcdata)
-                socketIO.emit('qcresponse',check)
-            elif qcdata['qcaction'] == 'folder':
-                check = qcObject.ListTestSetFolder(qcdata)
-                socketIO.emit('qcresponse',check)
-            elif qcdata['qcaction'] == 'testcase':
-                check = qcObject.test_case_generator(qcdata)
-                socketIO.emit('qcresponse',check)
-            elif qcdata['qcaction'] == 'qcupdate':
-                check = qcObject.update_qc_details(qcdata)
-                socketIO.emit('qcresponse',check)
-            elif qcdata['qcaction'] == 'qcquit':   
-                check = qcObject.quit_qc(qcdata)
-                socketIO.emit('qcresponse',check)
-
+            response = qcObject.qc_dict[qcdata.pop('qcaction')](qcdata)
+            socketIO.emit('qcresponse', response)
+        except KeyError:
+            err_msg = 'Invalid ALM operation'
         except Exception as e:
-            err_msg='Error in QC operations'
+            err_msg = 'Error in ALM operations'
+            log.error(e, exc_info=True)
+        if err_msg is not None:
             log.error(err_msg)
             logger.print_on_console(err_msg)
-            log.error(e,exc_info=True)
-            socketIO.emit('qcresponse','Error:Qc Operations')
+            try: socketIO.emit('qcresponse','Error:Qc Operations')
+            except: pass
 
     def on_render_screenshot(self,*args):
         try:
@@ -1216,7 +1202,6 @@ class ClientWindow(wx.Frame):
         self.Destroy()
         controller.kill_process()
         if SYSTEM_OS == "Windows":
-            os.system("TASKKILL /F /IM QcController.exe")
             os.system("TASKKILL /F /IM nineteen68MFapi.exe")
         sys.exit(0)
 
