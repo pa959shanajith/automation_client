@@ -19,7 +19,10 @@ from file_comparison_operations import TextFile,PdfFile,XML,JSON
 import excel_operations
 import core_utils
 import urllib.request, urllib.error, urllib.parse
-
+import xml.dom.minidom	
+import json	
+import difflib	
+from xmldiff import main, formatting
 
 import logging
 
@@ -162,7 +165,7 @@ class FileOperations:
         except Exception as e:
             err_msg=generic_constants.ERR_MSG1+'Verifying'+generic_constants.ERR_MSG2
             log.error(e)
-        if err_msg!=None:
+        if err_msg:
             log.error(err_msg)
             logger.print_on_console(err_msg)
         return status,methodoutput,output_res,err_msg
@@ -293,7 +296,7 @@ class FileOperations:
         try:
             status=False
             filename,file_ext=os.path.splitext(input_path)
-            if file_ext in generic_constants.FILE_TYPES:
+            if file_ext.lower() in generic_constants.FILE_TYPES:
                 status=True
             else:
                 log.info(generic_constants.INVALID_FILE_FORMAT)
@@ -489,10 +492,9 @@ class FileOperations:
         """
         # Defect #872 Special Language Support using unicode to address the issue (Himanshu)
         coreutilsobj=core_utils.CoreUtils()
-        input_path=coreutilsobj.get_UTF_8(input_path)
-        content=coreutilsobj.get_UTF_8(content)
-
         try:
+            input_path=coreutilsobj.get_UTF_8(input_path)
+            content=coreutilsobj.get_UTF_8(content)
             if SYSTEM_OS != 'Darwin':
                 import win32com.client
             status=TEST_RESULT_FAIL
@@ -502,9 +504,9 @@ class FileOperations:
             log.debug('reading the inputs')
             params=[]
             log.debug('verifying whether the file exists')
-            result=self.verify_file_exists(params[0],'')
+            result=self.verify_file_exists(input_path,'')
             if result[1]==TEST_RESULT_TRUE:
-                file_ext,res=self.__get_ext(params[0])
+                file_ext,res=self.__get_ext(input_path)
                 if file_ext.lower()=='.json':
                     params.append(input_path)
                     params.append(content)
@@ -523,7 +525,7 @@ class FileOperations:
         except Exception as e:
             err_msg=generic_constants.ERR_MSG1+'Writing to'+generic_constants.ERR_MSG2
             log.error(e)
-        if err_msg!=None:
+        if err_msg:
             log.error(err_msg)
             logger.print_on_console(err_msg)
         return status,methodoutput,output_res,err_msg
@@ -790,5 +792,345 @@ class FileOperations:
         "\\u017E": "\x9E", # LATIN SMALL LETTER Z WITH CARON
         "\\u0178": "\x9F", # LATIN CAPITAL LETTER Y WITH DIAERESIS
     }
+
+    	#--------------------------------------------------------------------------------File compare	
+    def file_get_contents(self,input):	
+        if os.path.isfile(input):	
+            logger.print_on_console(input, 'This file has been found. ')	
+            with file(input) as f:	
+                s = f.read()	
+            return s	
+        else:	
+            logger.print_on_console(input, 'This file has not been found. Enter correct path. ')	
+            return input	
+
+    def beautify_xml_file(self,input):	
+        pretty_xml_as_string = ''	
+        flag = False	
+        try:	
+            if os.path.isfile(input):	
+                dom = xml.dom.minidom.parse(input)	
+            else:	
+                dom = xml.dom.minidom.parseString(input)	
+            xml_string = dom.toprettyxml()	
+            pretty_xml_as_string = xml_string.replace('<?xml version="1.0" ?>\n','',1)	
+            pretty_xml_as_string = os.linesep.join([s for s in pretty_xml_as_string.splitlines() if s.strip()])	
+            flag = True	
+        except Exception as e:	
+            logger.print_on_console('Invalid xml input ')	
+            log.error(e)	
+        if not (flag):	
+            logger.print_on_console('Unable to beautify')	
+            # self.file_get_contents(input)	
+        return pretty_xml_as_string	
+
+    def beautify_json_file(self,input):	
+        pretty_json_as_string = ''	
+        flag = False	
+        try:	
+            if os.path.isfile(input):	
+                with open(input, 'r') as handle:	
+                    parsed = json.load(handle)	
+            else:	
+                parsed = json.loads(input)	
+            pretty_json_as_string = json.dumps(parsed, indent=4)	
+            flag = True	
+        except Exception as e:	
+            logger.print_on_console('Invalid json input ')	
+            log.error(e)	
+        if not (flag):	
+            logger.print_on_console('Unable to beautify')	
+            # self.file_get_contents(input)	
+        return pretty_json_as_string	
+
+    def beautify_file(self, input_val, *args):	
+        """	
+        def : beautify_file	
+        purpose : beautifies/pretifies a file/string of type json or xml	
+        param : inputpath,file type	
+        return : beautified text, bool	
+        """	
+        status = TEST_RESULT_FAIL	
+        result = TEST_RESULT_FALSE	
+        err_msg = None	
+        value = OUTPUT_CONSTANT	
+        beautified_output = None	
+        output_path = None
+        try:	
+            if ( len(input_val) == 2):	
+                iv1 = input_val[0]	
+                iv2 = input_val[1]
+                if ( args[0] ) : 	
+                    out_path = args[0].split(";")[0]		
+                    if(not out_path.startswith("{")):	
+                        output_path = out_path	
+                if (str(iv2).lower() == 'json'):	
+                    beautified_output = self.beautify_json_file(iv1)	
+                elif (str(iv2).lower() == 'xml'):	
+                    beautified_output = self.beautify_xml_file(iv1)	
+                else:	
+                    err_msg = 'File format not supported'	
+                if(beautified_output):	
+                    flg = True	
+                    try:	
+                        if(output_path):	
+                            if(os.path.isfile(output_path) or os.path.exists(os.path.dirname(output_path))):	
+                                with open(output_path,'w') as f:	
+                                    f.write(beautified_output)	
+                            else:	
+                                flg = False	
+                                err_msg='Wrong file path entered'	
+                    except Exception as ex:	
+                        err_msg = ("Exception occurred while writing to output file in beautify_file : "+str(ex))	
+                        log.error( err_msg )	
+                        logger.print_on_console( "Error occured while writing to output file in Beautify File" )	
+                    if(flg):	
+                        value = beautified_output	
+                        status=TEST_RESULT_PASS	
+                        result=TEST_RESULT_TRUE	
+            else:	
+                err_msg = 'Invalid number of inputs'	
+            if ( err_msg != None ):	
+                log.error(err_msg)	
+                logger.print_on_console(err_msg)	
+        except Exception as e:	
+            err_msg = ("Exception occurred in beautify_file : "+str(e))	
+            log.error( err_msg )	
+            logger.print_on_console( "Error occured in Beautify File" )	
+        return status, result, value ,err_msg	
+
+    def compare_inputs(self,input_val,*args):	
+        """	
+        def : compare_inputs	
+        purpose : compares two text inputs	
+        param : inputtext-1,inputtext-2	
+        return : differed text, bool	
+        """	
+        status = TEST_RESULT_FAIL	
+        result = TEST_RESULT_FALSE	
+        err_msg = None	
+        value = OUTPUT_CONSTANT	
+        beautified_output = None	
+        res_opt = 'all'		
+        output_path = None	
+        try:	
+            if ( len(input_val) == 2 or len(input_val) == 3):	
+                inputtext1 = input_val[0]	
+                inputtext2 = input_val[1]	
+                if (len(inputtext1)!=0 and len(inputtext2)!=0):	
+                    log.info("Comparing texts...")	
+                    if ( args[0] ) : 	
+                        out_path = args[0].split(";")[0]		
+                        if(not out_path.startswith("{")):	
+                            output_path = out_path	
+                    if ( len(input_val) == 3 and (input_val[2] != None or input_val[2] != '' )) : res_opt = input_val[2].strip().lower()	
+                    output_res = self.compare_texts(inputtext1,inputtext2)	
+                    if ( output_res ):	
+                        flg = True	
+                        try:	
+                            num_diff,ch_lines = self.get_diff_count(output_res)	
+                            if(num_diff):	
+                                logger.print_on_console("The number of differences in compare_inputs are: ",num_diff)	
+                            if ( res_opt == 'selective' or res_opt == 'all') :		
+                                log.info("Result to be displayed is : " + str(res_opt))		
+                                logger.print_on_console("Result to be displayed is : " + str(res_opt))		
+                                if (res_opt == 'selective') : output_res = ch_lines	
+                            output_res = '\n'.join(output_res)	
+                            if(output_path):	
+                                if(os.path.isfile(output_path) or os.path.exists(os.path.dirname(output_path))):	
+                                    with open(output_path,'w') as f:	
+                                        f.write(output_res)	
+                                else:	
+                                    err_msg='Wrong file path entered'	
+                                    flg = False	
+                        except Exception as ex:	
+                            err_msg = ("Exception occurred while writing to output file in compare_inputs : "+str(ex))	
+                            log.error( err_msg )	
+                            logger.print_on_console( "Error occured while writing to output file in Compare Inputs" )	
+                        if(flg):	
+                            log.info("Comparision of texts completed")	
+                            value = output_res	
+                            status = TEST_RESULT_PASS	
+                            result = TEST_RESULT_TRUE	
+                else:	
+                    err_msg = 'Empty inputs'	
+            else:	
+                err_msg = 'Invalid number of inputs'	
+            if ( err_msg != None ):	
+                log.error(err_msg)	
+                logger.print_on_console(err_msg)	
+        except Exception as e:	
+            err_msg = ("Exception occurred in compare_inputs while comparing inputs"+str(e))	
+            log.error( err_msg )	
+            logger.print_on_console( "Error occured in Compare Inputs" )	
+        return status, result, value ,err_msg	
+
+    def compare_texts(self,text1,text2):	
+        """	
+        def : compare_texts	
+        purpose : compares both texts line by line	
+        param : text1,text2	
+        return : list of differences in texts	
+        """	
+        out = None	
+        try:	
+            text1_lines = text1.splitlines()	
+            text2_lines = text2.splitlines()	
+            if(text1_lines==text2_lines):	
+                logger.print_on_console( "Inputs are same" )	
+                log.info( "Inputs are same" )	
+                out = list(difflib.Differ().compare(text1_lines, text2_lines))	
+            else:	
+                out = list(difflib.Differ().compare(text1_lines, text2_lines))	
+        except Exception as e:	
+            logger.print_on_console("Exception occurred in compare_texts while comparing two texts")	
+            log.error("Exception occurred in compare_texts while comparing two texts"+str(e))	
+        return out	
+
+    def compare_xmls(self, xml_input1, xml_input2):	
+        """	
+        def : compare_xmls	
+        purpose : compares two xml files	
+        param : inputPath-1,inputPath-2	
+        return : differed xml	
+        """	
+        out = None	
+        try:	
+            text1_lines = xml_input1.splitlines()	
+            text2_lines = xml_input2.splitlines()	
+            if(text1_lines==text2_lines):	
+                logger.print_on_console( "Inputs are same" )	
+                log.info( "Inputs are same" )	
+                out = main.diff_files(xml_input1, xml_input2,diff_options={'fast_match': True},formatter=formatting.XMLFormatter(normalize=formatting.WS_BOTH)).split("\n")	
+            else:	
+                out = main.diff_files(xml_input1, xml_input2,diff_options={'fast_match': True},formatter=formatting.XMLFormatter(normalize=formatting.WS_BOTH)).split("\n")	
+        except Exception as e:	
+            logger.print_on_console("Exception occurred in compare_xmls while comparing two texts")	
+            log.error("Exception occurred in compare_xmls while comparing two texts"+str(e))	
+        return out	
+
+    def compare_files(self,input_val,*args):	
+        """	
+        def : compare_file	
+        purpose : compares two files	
+        param : inputPath-1,inputPath-2	
+        return : differed text, bool	
+        """	
+        status = TEST_RESULT_FAIL	
+        result = TEST_RESULT_FALSE	
+        err_msg = None	
+        value = OUTPUT_CONSTANT	
+        res_opt = 'all'		
+        output_path = None	
+        try:	
+            if ( len(input_val) == 2 or len(input_val) == 3):	
+                filePathA = input_val[0]	
+                filePathB = input_val[1]	
+                if ( args[0] ) : 	
+                    out_path = args[0].split(";")[0]		
+                    if(not out_path.startswith("{")):	
+                        output_path = out_path		
+                if ( len(input_val) == 3 and (input_val[2] != None or input_val[2] != '' )) : res_opt = input_val[2].strip().lower()	
+                if ( os.path.isfile(filePathA) and os.path.isfile(filePathB) ):	
+                    if( os.path.getsize(filePathA)>0 and os.path.getsize(filePathB)>0):	
+                        fileNameA, fileExtensionA = os.path.splitext(filePathA)	
+                        fileNameB, fileExtensionB = os.path.splitext(filePathB)	
+                        log.info("Comparing files...")	
+                        with open(filePathA) as fa, open(filePathB) as fb:	
+                            file1_lines=fa.read()	
+                            file2_lines=fb.read()	
+                        if(fileExtensionA == '.xml' and fileExtensionB == '.xml'):	
+                            output_res = self.compare_xmls(filePathA,filePathB)	
+                            if(output_res):	
+                                num_diff,ch_lines = self.get_diff_count_xml(output_res)	
+                        else:	
+                            output_res = self.compare_texts(file1_lines,file2_lines)	
+                            if(output_res):	
+                                num_diff,ch_lines = self.get_diff_count(output_res)		
+                                	
+                        if ( output_res ):	
+                            flg = True	
+                            try:	
+                                if ( res_opt == 'selective' or res_opt == 'all') :		
+                                    log.info("Result to be displayed is : " + str(res_opt))		
+                                    logger.print_on_console("Result to be displayed is : " + str(res_opt))		
+                                    if (res_opt == 'selective') : output_res = ch_lines	
+                                output_res = '\n'.join(output_res)	
+                                if(num_diff):	
+                                    logger.print_on_console("The number of differences in compare_file are: ",num_diff)	
+                                if(output_path):	
+                                    if(os.path.exists(output_path) or os.path.exists(os.path.dirname(output_path))):	
+                                        with open(output_path,'w') as f:	
+                                            f.write(output_res)	
+                                    else:	
+                                        err_msg='Wrong file path entered'	
+                                        flg = False	
+                            except Exception as ex:	
+                                err_msg = ("Exception occurred while writing to output file in compare_file : "+str(ex))	
+                                log.error( err_msg )	
+                                logger.print_on_console( "Error occured while writing to output file in Compare File" )	
+                            if(flg):	
+                                log.info("Comparision of files completed")	
+                                value = output_res	
+                                status = TEST_RESULT_PASS	
+                                result = TEST_RESULT_TRUE	
+                    else:	
+                        err_msg = 'One or more files are empty'	
+                else:	
+                    err_msg = 'Invalid file paths'	
+            else:	
+                err_msg = 'Invalid number of inputs'	
+            if ( err_msg != None ):	
+                log.error(err_msg)	
+                logger.print_on_console(err_msg)	
+        except Exception as e:	
+            err_msg = ("Exception occurred in compare_files while comparing two files"+str(e))	
+            log.error( err_msg )	
+            logger.print_on_console( "Error occured in Compare Files" )	
+        return status, result, value ,err_msg	
+
+    def get_diff_count(self,output_response):	
+        """	
+        def : get_diff_count	
+        purpose : counts number of differences between inputs	
+        param : difference of inputs	
+        return : count of differences	
+        """	
+        num_que = 0	
+        num_diff = 0	
+        prev_sign = ''	
+        ch_lines = []	
+        for line in output_response:	
+            if(prev_sign=='+' and (not line.startswith('?')) and num_que==1):	
+                num_diff-=1	
+                num_que=0	
+            elif(line.startswith(('-','+'))):	
+                num_diff+=1	
+                ch_lines.append(line)	
+                prev_sign=line[0]	
+            elif(line.startswith('?')):	
+                ch_lines.append(line)	
+                if(prev_sign=='-'):	
+                    num_que+=1	
+                elif(prev_sign=='+'):	
+                    num_diff-=1	
+                    num_que=0  	
+                prev_sign='?'                  	
+        return num_diff,ch_lines	
+
+    def get_diff_count_xml(self,output_response):	
+        """	
+        def : get_diff_count_xml	
+        purpose : counts number of differences between xml inputs	
+        param : difference of inputs	
+        return : count of differences	
+        """	
+        ch_lines = []	
+        num_diff = int(str(output_response).count("diff:"))-int(str(output_response).count("/diff:"))
+        for line in output_response:	
+            if(line.find("diff:") != -1):	
+                ch_lines.append(line)	
+        return num_diff,ch_lines	
+#--------------------------------------------------------------------------------File compare
 
 

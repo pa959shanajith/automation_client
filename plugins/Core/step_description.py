@@ -59,7 +59,11 @@ class StepDescription:
         def getcontent():
             return "Get content from the file '"+ input+"' and save it in '"+ tsp.outputval+"'"
         def comparefiles():
-            return "Compare the contents of file '"+ inputval[0] + "' and '"+ inputval[1]+"'"
+            return "Compared the contents of files '"+ inputval[0] + "' and '"+ inputval[1]+"'"
+        def compareinputs():
+            return "Compared the inputs '"+ inputval[0] + "' and '"+ inputval[1]+"'"
+        def beautify():
+            return "Beautified the "+inputval[1]+" input '"+ inputval[0]+"'"
         def executescript():
             return "Perform execution of the script '"+ input+"'"
         def writetofile():
@@ -114,8 +118,8 @@ class StepDescription:
         #Math opeartions
         def add():
             return "Add the numbers '"+ input+"' and save the value '"+output +"' in '"+ tsp.outputval+"'"
-        ##def evaluate():
-            ##return "Evaluate Mathematical expression '"+ input+"' and save the result '"+ output +"' in '"+ tsp.outputval+"'"
+        def evaluate():
+            return "Evaluate Mathematical expression '"+ input+"' and save the result '"+ output +"' in '"+ tsp.outputval+"'"
 
         #Compare keywords
         def verifyobjects():
@@ -465,8 +469,6 @@ class StepDescription:
             return 'The page title is '+ "'" + output + "'" + ' and is saved  in the variable ' + "'" + tsp.outputval + "'" + '.'
         def closeapplication():
             return 'The application is closed' + '.'
-        def geterrormessage():
-            return 'Get the error message ' + "'" +output + "'" + '.'
         def starttransaction():
             return 'Start the transaction with ID' + "'" + inputval + "'" + '.'
         def toolbaraction():
@@ -475,6 +477,20 @@ class StepDescription:
             return 'Get pop-up text and save the text ' + "'" + output + "'" + ' in ' + "'" + tsp.outputval + "'" + '.'
         def serverconnect():
             return 'Connect to SAP server ' + "'" + inputval + "'" + '.'
+        def closedialogwindow():
+            return 'Closeing the Dialog Window.'
+        def maximizedialogwindow():
+            return 'Maximizing the Dialog Window.'
+        def restoredialogwindow():
+            return 'Restoring the Dialog Window.'
+        def getdialogwindowname():
+            return 'The Dialog Window Name is '+ "'" + output + "'" + ' and is saved in the variable ' + "'" + tsp.outputval + "'" + '.'
+        def getstatusbarmessage():
+            return 'Get the Statusbar message ' + "'" +output + "'" + '.'
+        def selectmenu():
+            return 'Select Menu :' + "'" + inputval + "'" + ' and the result '+ "'" +output + "'" + ' is saved in the variable ' + "'" + tsp.outputval + "'" +  '.'
+        def doubleclickstatusbar():
+            return 'Double Clicked the Statusbar' + '.'
 
 
         #Textbox keywords
@@ -594,8 +610,18 @@ class StepDescription:
             return 'Move tab '+ "'" + tsp.custname + "'"+'to left and store the output as '+"'"+output+"'"+'.'
 
         #Shell(Grid) Keywords
+        def selectcolumns():
+            return 'Selecting Column/Columns '+ "'" + input[0] + "'" + 'and store the output as ' + "'" + output + "'" + '.'
+        def unselectcolumns():
+            return 'Unselecting Column/Columns '+ "'" + input[0] + "'" + 'and store the output as ' + "'" + output + "'" + '.'
+        def getallcolumnheaders():
+            return 'Get all Column Headers of '+ "'" + tsp.custname + "'" + ' and save the output as ' + "'"+output+"'" + ' in '+"'"+ tsp.outputval+"'"+'.'
         def presstoolbarbutton():
-            return 'Pressing Toolbar Button '+"'"+input[0]+"' of '"+tsp.custname+"'"+' and store the output as '+"'"+output+"'"+'.'
+            if (type(input) == list):
+                temp_input = input[0]
+                for i in range(1,len(input)):temp_input = temp_input + ' -> ' + str(input[i])
+                input = temp_input
+            return 'Pressing Toolbar Button '+"'"+input+"' of '"+tsp.custname+"'"+' and store the output as '+"'"+output+"'"+'.'
         def selectrows():
             return 'Selecting Row/Rows'+"'"+input[0]+"'"+'and store the output as '+"'"+output+"'"+'.'
         def getcountofrows():

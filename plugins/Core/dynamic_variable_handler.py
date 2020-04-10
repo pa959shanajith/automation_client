@@ -19,6 +19,7 @@ import logging
 #log = logging.getLogger('dynamic_variable_handler.py')
 import ast
 import threading
+import json
 local_dynamic = threading.local()
 
 class DynamicVariables:
@@ -62,7 +63,6 @@ class DynamicVariables:
                         db_result=self.getDBdata(value,con_obj)
                         actual_value=db_result[1]
                         
-
             elif self.check_for_dynamicvariables(input_var,keyword)==TEST_RESULT_TRUE:
                 temp_value=self.get_dynamic_value(input_var)
                 if temp_value is None:
@@ -98,10 +98,8 @@ class DynamicVariables:
         else:
             variable=variable[0:len(variable)-1]
             for i in range(len(value)):
-                p=i+1
                 for j in range(len(value[i])):
-                    q=j+1
-                    local_dynamic.dynamic_variable_map[variable+'['+str(p)+']['+str(q)+']}']=value[i][j]
+                    local_dynamic.dynamic_variable_map[variable+'['+str(i)+']['+str(j)+']}']=value[i][j]
             local_dynamic.dynamic_variable_map[variable+'}'] = value
 
 
@@ -139,11 +137,20 @@ class DynamicVariables:
                             logger.print_on_console(err_msg)
                             local_dynamic.log.error(err_msg)
                     else:
-                        ast.literal_eval(str(outputval))
+                        #Changed the code as we are getting malformed string using ast.literal_eval for JSON
+                        json.loads(outputval)
                         status = TEST_RESULT_FALSE
                         json_flag=True
                 except Exception as e:
-                    local_dynamic.log.debug('Not a json input')
+                    try:
+                        value=ast.literal_eval(str(outputval))
+                        if type(value)==set:
+                            json_flag=False
+                        else:
+                            status = TEST_RESULT_FALSE
+                            json_flag=True
+                    except Exception as e:
+                        local_dynamic.log.debug('Not a json input')
             if not(json_flag):
                 if '{' in outputval and '}' in outputval:
                     var_list=re.findall("\{(.*?)\}",outputval)
