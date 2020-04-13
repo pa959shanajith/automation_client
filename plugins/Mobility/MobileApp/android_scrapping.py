@@ -65,6 +65,7 @@ class InstallAndLaunch():
                 proc = subprocess.Popen([nodePath, path], shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)
                 start = time.time()
                 timeout = 120 #tentative; as it depends on the system performance.
+                server_flag = False
                 while(True): #4257 : Displays Fails if the server starts after the timeout.
                     if int(time.time()-start) >= timeout:
                         err_msg = self.print_error('Timeout starting the Appium server')
@@ -74,7 +75,9 @@ class InstallAndLaunch():
                         p = line.laddr
                         if p[1] == 4723:
                             time.sleep(2)
+                            server_flag = True
                             break
+                    if server_flag: break
                     time.sleep(5)
                 if err_msg is None:
                     logger.print_on_console('Server started')
