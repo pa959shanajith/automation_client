@@ -43,7 +43,6 @@ count = 0
 log = logging.getLogger("controller.py")
 status_percentage = {TEST_RESULT_PASS:0,TEST_RESULT_FAIL:0,TERMINATE:0,"total":0}
 
-
 class Controller():
     mobile_web_dispatcher_obj = None
     oebs_dispatcher_obj = None
@@ -882,7 +881,7 @@ class Controller():
         obj.clear_dyn_variables()
         return status
 
-    def invoke_execution(self,mythread,json_data,socketIO,wxObject,configvalues,qc_soc):
+    def invoke_execution(self,mythread,json_data,socketIO,wxObject,configvalues,qcObject):
         global terminate_flag,count,status_percentage
         qc_url=''
         qc_password=''
@@ -942,7 +941,7 @@ class Controller():
                                 logger.print_on_console( '***Scenario ' ,str(i+1) ,' execution started***')
                                 print('=======================================================================================================')
                                 log.info('***Scenario '  + str(i+1)+ ' execution started***')
-                            if(len(scenario)==3 and len(scenario['qcdetails'])==7):
+                            if(len(scenario)==3 and len(scenario['qcdetails'])==10):
                                 qc_details_creds=scenario['qccredentials']
                                 qc_username=qc_details_creds['qcusername']
                                 qc_password=qc_details_creds['qcpassword']
@@ -998,8 +997,7 @@ class Controller():
                                 logger.print_on_console( '***Saving report of Scenario' ,str(i  + 1 ),'***')
                                 log.info( '***Saving report of Scenario' +str(i  + 1 )+'***')
                                 os.chdir(self.cur_dir)
-                                filename='Scenario'+str(count  + 1)+'.json'
-                                count+=1
+                                filename='Scenario'+str(i  + 1)+'.json'
                                 #check if user has manually terminated during execution, then check if the teststep data and overallstatus is [] if so poputale default values in teststep data and overallstatus
                                 if terminate_flag ==True and execute_flag==True:
                                     if con.reporting_obj.report_json['rows']==[] and con.reporting_obj.report_json['overallstatus']==[]:
@@ -1012,7 +1010,7 @@ class Controller():
                                 i+=1
                                 #logic for condition check
                                 report_json=con.reporting_obj.report_json[OVERALLSTATUS]
-                                if len(scenario['qcdetails'])==7 and (qc_url!='' and qc_password!='' and  qc_username!=''):
+                                if len(scenario['qcdetails'])==10 and (qc_url!='' and qc_password!='' and  qc_username!=''):
                                     qc_status_over=report_json[0]
                                     qc_update_status=qc_status_over['overallstatus']
                                     if(str(qc_update_status).lower()=='pass'):
@@ -1031,17 +1029,12 @@ class Controller():
                                         qc_status['qc_testrunname']=qc_testrunname
                                         qc_status['qc_update_status'] = qc_update_status
                                         logger.print_on_console('****Updating QCDetails****')
-                                        if qc_soc is not None:
-                                            data_to_send = json.dumps(qc_status).encode('utf-8')
-                                            data_to_send+='#E&D@Q!C#'
-                                            qc_soc.send(data_to_send)
-                                            data_stream= qc_soc.recv(1024)
-                                            server_data = data_stream[:data_stream.find('#E&D@Q!C#')]
-                                            parsed_data = json.loads(server_data.decode('utf-8'))
-                                            if parsed_data['QC_UpdateStatus']:
+                                        if qcObject is not None:
+                                            status = qcObject.update_qc_details(qc_status)
+                                            if status:
                                                 logger.print_on_console('****Updated QCDetails****')
                                             else:
-                                                logger.print_on_console('****Failed to Update QCDetails****')
+                                               logger.print_on_console('****Failed to Update QCDetails****')
                                         else:
                                             logger.print_on_console('****Failed to Update QCDetails****')
                                     except Exception as e:
