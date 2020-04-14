@@ -895,7 +895,7 @@ class Controller():
 ##        t = test.Test()
 ##        suites_list,flag = t.gettsplist()
         #Getting all the details by parsing the json_data
-        suiteId_list,suite_details,browser_type,scenarioIds,suite_data,execution_id,condition_check,dataparam_path,self.execution_mode=obj.parse_json_execute(json_data)
+        suiteId_list,suite_details,browser_type,scenarioIds,suite_data,execution_ids,batch_id,condition_check,dataparam_path,self.execution_mode,qc_creds=obj.parse_json_execute(json_data)
         self.action=EXECUTE
         log.info( 'No  of Suites : '+str(len(suiteId_list)))
         logger.print_on_console('No  of Suites : ',str(len(suiteId_list)))
@@ -907,45 +907,44 @@ class Controller():
             flag=True
             if terminate_flag:
                 status=TERMINATE
-##                break
             log.info('---------------------------------------------------------------------')
             print('=======================================================================================================')
-            log.info('***SUITE '+str( j) +' EXECUTION STARTED***')
+            log.info('***SUITE '+str(j) +' EXECUTION STARTED***')
             logger.print_on_console('***SUITE ', str(j) ,' EXECUTION STARTED***')
             log.info('-----------------------------------------------')
             print('=======================================================================================================')
             do_not_execute = False
             #Check for the disabled scenario
-            if not (do_not_execute) :
+            if not (do_not_execute):
                  #Logic to Execute each suite for each of the browser
                 for browser in browser_type[suite_id]:
                     i=0
                     #Logic to iterate through each scenario in the suite
                     for scenario,scenario_id,condition_check_value,dataparam_path_value in zip(suite_id_data,scenarioIds[suite_id],condition_check[suite_id],dataparam_path[suite_id]):
                         execute_flag=True
-                        ''' To fix Bug 653: Web Browser and Dynamic variables do not work across Scenarios
-                            Controller object should be created for each execution and not for each scenario
-                            Hence commenting the creation of controller object in this block
-                        '''
-                        #con =Controller()
                         con.reporting_obj=reporting.Reporting()
                         con.configvalues=configvalues
                         con.exception_flag=self.exception_flag
                         con.wx_object=wxObject
                         handler.local_handler.tspList=[]
+                        execute_result_data = {
+                            'testsuiteId': suite_id,
+                            'scenarioId': scenario_id,
+                            'batchId': batch_id,
+                            'executionId': execution_ids[j-1],
+                            'reportData': None}
                         #condition check for scenario execution and reporting for condition check
                         if not(condition_check_flag):
-                             #check for temrinate flag before printing loggers
+                             #check for terminate flag before printing loggers
                             if not(terminate_flag):
                                 print('=======================================================================================================')
                                 logger.print_on_console( '***Scenario ' ,str(i+1) ,' execution started***')
                                 print('=======================================================================================================')
                                 log.info('***Scenario '  + str(i+1)+ ' execution started***')
-                            if(len(scenario)==3 and len(scenario['qcdetails'])==10):
-                                qc_details_creds=scenario['qccredentials']
-                                qc_username=qc_details_creds['qcusername']
-                                qc_password=qc_details_creds['qcpassword']
-                                qc_url=qc_details_creds['qcurl']
+                            if(len(scenario)==2 and len(scenario['qcdetails'])==10):
+                                qc_username=qc_creds['qcusername']
+                                qc_password=qc_creds['qcpassword']
+                                qc_url=qc_creds['qcurl']
                                 qc_sceanrio_data=scenario['qcdetails']
                                 qc_domain=qc_sceanrio_data['qcdomain']
                                 qc_project=qc_sceanrio_data['qcproject']
@@ -1005,7 +1004,8 @@ class Controller():
                                 status_percentage["s_index"]=j-1
                                 status_percentage["index"]=i
                                 con.reporting_obj.save_report_json(filename,json_data,status_percentage)
-                                socketIO.emit('result_executeTestSuite',self.getreport_data(suite_id,scenario_id,con,execution_id))
+                                execute_result_data["reportData"] = con.reporting_obj.report_json
+                                socketIO.emit('result_executeTestSuite', execute_result_data)
                                 obj.clearList(con)
                                 i+=1
                                 #logic for condition check
@@ -1058,7 +1058,8 @@ class Controller():
                                 status_percentage["s_index"]=j-1
                                 status_percentage["index"]=i
                                 con.reporting_obj.save_report_json_conditioncheck_testcase_empty(filename,info_msg,json_data,status_percentage)
-                                socketIO.emit('result_executeTestSuite',self.getreport_data_conditioncheck_testcase_empty(suite_id,scenario_id,con,execution_id))
+                                execute_result_data["reportData"] = con.reporting_obj.report_json_condition_check_testcase_empty
+                                socketIO.emit('result_executeTestSuite', execute_result_data)
                                 obj.clearList(con)
                                 i+=1
                         else:
@@ -1070,7 +1071,8 @@ class Controller():
                             status_percentage["s_index"]=j-1
                             status_percentage["index"]=i
                             con.reporting_obj.save_report_json_conditioncheck(filename,json_data,status_percentage)
-                            socketIO.emit('result_executeTestSuite',self.getreport_data_conditioncheck(suite_id,scenario_id,con,execution_id))
+                            execute_result_data["reportData"] = con.reporting_obj.report_json_condition_check
+                            socketIO.emit('result_executeTestSuite', execute_result_data)
                             obj.clearList(con)
                             i+=1
                             #logic for condition check
@@ -1089,30 +1091,6 @@ class Controller():
             logger.print_on_console( '***Terminating the Execution***')
             print('=======================================================================================================')
         return status
-
-    #Building of Dictionary to send back toserver to save the data
-    def getreport_data(self,testsuite_id,scenario_id,con,execution_id):
-        obj={'testsuiteId':testsuite_id,
-        'scenarioId':scenario_id,
-        'reportData':con.reporting_obj.report_json,
-        'executionId':execution_id}
-        return obj
-
-    #Building of Dictionary to send back toserver to save the data for condition check
-    def getreport_data_conditioncheck(self,testsuite_id,scenario_id,con,execution_id):
-        obj={'testsuiteId':testsuite_id,
-        'scenarioId':scenario_id,
-        'reportData':con.reporting_obj.report_json_condition_check,
-        'executionId':execution_id}
-        return obj
-
-    #Building of Dictionary to send back toserver to save the data for condition check for testcase empty
-    def getreport_data_conditioncheck_testcase_empty(self,testsuite_id,scenario_id,con,execution_id):
-        obj={'testsuiteId':testsuite_id,
-        'scenarioId':scenario_id,
-        'reportData':con.reporting_obj.report_json_condition_check_testcase_empty,
-        'executionId':execution_id}
-        return obj
 
     def invoke_controller(self,action,mythread,debug_mode,runfrom_step,json_data,wxObject,socketIO,qc_soc,*args):
         status = COMPLETED

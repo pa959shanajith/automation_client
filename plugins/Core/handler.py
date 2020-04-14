@@ -210,46 +210,34 @@ class Handler():
 
         """
         logger.print_on_console('Parsing')
-        json_string = json.dumps(test_data)
-        new_obj = json.loads(json_string)
+        new_obj = json.loads(json.dumps(test_data))
         suite_data=[]
         scenarioIds={}
         browser_type={}
         dataparam_path={}
         condition_check={}
-        suiteId_list=[]
-        suite_details=[]
-        execution_id=[]
-        exec_mode = None
         #Iterating through json array
-
         try:
-            #Getting suite_data
             suite_details=new_obj['suitedetails']
-            #Getting suite_ids
             suiteId_list=new_obj['testsuiteIds']
-            execution_id=new_obj['executionId']
+            batch_id=new_obj['batchId']
+            execution_ids=new_obj['executionIds']
             exec_mode=new_obj['exec_mode']
+            qc_creds=new_obj['qccredentials']
             for json_data,suite_id in zip(suite_details,suiteId_list):
-                if type(suite_id)==str:
-                    suite_id=str(suite_id)
-
                 suite_data.append(json_data[suite_id])
                 if 'scenarioIds' in json_data:
                     scenarioIds[suite_id]=json_data['scenarioIds']
-
                 if 'browserType' in json_data:
                     browser_type[suite_id]=json_data['browserType']
-
                 if 'condition' in json_data:
                     condition_check[suite_id]=json_data['condition']
-
                 if 'dataparampath' in json_data:
                     dataparam_path[suite_id]=json_data['dataparampath']
         except Exception as e:
             local_handler.log.error("Error while parsing data")
             local_handler.log.error(e,exc_info=True)
-        return suiteId_list,suite_details,browser_type,scenarioIds,suite_data,execution_id,condition_check,dataparam_path,exec_mode
+        return suiteId_list,suite_details,browser_type,scenarioIds,suite_data,execution_ids,batch_id,condition_check,dataparam_path,exec_mode,qc_creds
 
     def validate(self,start,end):
         """
