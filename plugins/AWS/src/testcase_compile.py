@@ -124,7 +124,7 @@ def scenario(driver):
                 #     counter+=1
             elif t.name.lower() in generic_keywords:
                 f.write("\n\ttime.sleep(2)")
-                f.write("\n\t"+"result=gen_obj."+generic_keywords[t.name.lower()]+"(*"+str(t.inputval[0].split(';'))+")")
+                f.write("\n\t"+"result="+generic_keywords[t.name.lower()]+"(*"+str(t.inputval[0].split(';'))+")")
             else:
                 logger.print_on_console (t.name,' is not supported')
                 log.error(t.name+' is not supported')
