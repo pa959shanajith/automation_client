@@ -405,6 +405,7 @@ class List_Keywords():
                         log.debug(ELEMENT_ENABLED)
                         log.debug('performing the action')
                         driver=android_scrapping.driver
+                        elementlist_curr = []
                         while(True):
                             elementlist=element.find_elements_by_class_name('android.view.View')
                             if (elementlist == elementlist_curr) or (elementlist == []):
@@ -472,6 +473,7 @@ class List_Keywords():
                         log.debug('performing the action')
                         if (input):
                             driver=android_scrapping.driver
+                            elementlist_curr = []
                             while(True):
                                 elementlist=element.find_elements_by_class_name('android.view.View')
                                 if (elementlist == elementlist_curr) or (elementlist == []):
@@ -569,6 +571,7 @@ class List_Keywords():
                         if (input):
                             index = -1
                             driver=android_scrapping.driver
+                            elementlist_curr = []
                             while(True):
                                 elementlist=element.find_elements_by_class_name('android.view.View')
                                 if (elementlist == elementlist_curr) or (elementlist == []):
@@ -649,6 +652,7 @@ class List_Keywords():
                         if (input):
                             index = -1
                             driver=android_scrapping.driver
+                            elementlist_curr = []
                             while(True):
                                 elementlist=element.find_elements_by_class_name('android.view.View')
                                 if (elementlist == elementlist_curr) or (elementlist == []):
@@ -806,7 +810,7 @@ class List_Keywords():
                         log.debug(ELEMENT_ENABLED)
                         log.debug('performing the action')
                         driver=android_scrapping.driver
-
+                        elementlist_curr = []
                         while(True):
                             elementlist=element.find_elements_by_class_name('android.view.View')
                             if (elementlist == elementlist_curr) or (elementlist == []):
@@ -876,6 +880,7 @@ class List_Keywords():
                         log.debug(ELEMENT_ENABLED)
                         log.debug('performing the action')
                         driver=android_scrapping.driver
+                        elementlist_curr = []
                         while(True):
                             elementlist=element.find_elements_by_class_name('android.view.View')
                             if (elementlist == elementlist_curr) or (elementlist == []):
