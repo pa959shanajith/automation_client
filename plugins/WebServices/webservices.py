@@ -934,14 +934,27 @@ class WSkeywords:
         try:
             if value != None and value != '' and element_path != None and element_path != '':
                 if self.baseReqBody != None and self.baseReqBody != '':
-                    result=self.parse_xml(self.baseReqBody,element_path,value,'','tagname')
+                    result=None
+                    if ws_constants.CONTENT_TYPE_JSON in self.content_type.lower():
+                        try:
+                            req_body=json.loads(self.baseReqBody)
+                            for k,v in req_body.items():
+                                if element_path==k:
+                                    req_body[k]=value
+                                    break
+                            result=req_body
+                        except:
+                            err_msg=ws_constants.METHOD_INVALID_INPUT
+                    else:
+                        req_body=self.baseReqBody
+                        result=self.parse_xml(self.baseReqBody,element_path,value,'','tagname')
                     if result != None:
                         self.baseReqBody=result
                         handler.local_handler.ws_template=self.baseReqBody
                         log.debug(STATUS_METHODOUTPUT_UPDATE)
                         status = ws_constants.TEST_RESULT_PASS
                         methodoutput = ws_constants.TEST_RESULT_TRUE
-                        logger.print_on_console('Tag Value changed to :',self.baseReqBody)
+                        logger.print_on_console('Tag ',element_path, ' Value changed to :',value)
                 else:
                     err_msg=ws_constants.ERR_SET_TAG_VALUE
             else:

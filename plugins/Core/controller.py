@@ -992,6 +992,8 @@ class Controller():
                                     print('=======================================================================================================')
                                     logger.print_on_console( '***Scenario' ,str(i + 1) ,' execution completed***')
                                     print('=======================================================================================================')
+                                    del con.tsp_list
+                                    del tsplist
                             if execute_flag:
                                 #Saving the report for the scenario
                                 logger.print_on_console( '***Saving report of Scenario' ,str(i  + 1 ),'***')
@@ -1081,6 +1083,8 @@ class Controller():
             #clearing dynamic variables at the end of execution to support dynamic variable at the scenario level
             obj.clear_dyn_variables()
             logger.print_on_console('***SUITE ', str(j) ,' EXECUTION COMPLETED***')
+            del con
+            del obj
             log.info('-----------------------------------------------')
             print('=======================================================================================================')
             j=j+1
