@@ -16,6 +16,7 @@ import imutils
 import sys,math
 from uuid import uuid4
 import codecs
+from encryption_utility import AESCipher
 if SYSTEM_OS != 'Darwin':
     from pyrobot import Robot
     import pythoncom
@@ -457,6 +458,55 @@ class IRISKeywords():
         except Exception as e:
             log.error("Error occurred in SetTextIris, Err_Msg : ",e)
             logger.print_on_console("Error occurred in SetTextIris")
+        return status,result,value,err_msg
+
+    def setsecuretextiris(self,element,*args):
+        log.info('Inside setsecuretextiris and No. of arguments passed are : '+str(len(args)))
+        status = TEST_RESULT_FAIL
+        result = TEST_RESULT_FALSE
+        err_msg=None
+        value = OUTPUT_CONSTANT
+        try:
+            img = None
+            if(len(args) == 3 and args[2]!='' and len(verifyexists)>0):
+                elem_coordinates = element['coordinates']
+                const_coordintes = args[2]['coordinates']
+                elements = [(const_coordintes[0],const_coordintes[1]),
+                        (const_coordintes[2],const_coordintes[3]),
+                        (elem_coordinates[0], elem_coordinates[1]),
+                        (elem_coordinates[2], elem_coordinates[3])]
+                img,res = find_relative_image(elements, verifyexists)
+                width = res[2] - res[0]
+                height = res[3] - res[1]
+                pyautogui.moveTo(res[0]+ int(width/2),res[1] + int(height/2))
+            else:
+                res = gotoobject(element)
+            if(len(res)>0):
+                encryption_obj = AESCipher()
+                input_val_temp = encryption_obj.decrypt( args[0][0] )
+                if SYSTEM_OS != 'Darwin':
+                    pythoncom.CoInitialize()
+                    pyautogui.click()
+                    robot = Robot()
+                    robot.ctrl_press('a')
+                    time.sleep(1)
+                    robot.key_press('backspace')
+                    time.sleep(1)
+                    robot.type_string(input_val_temp, delay=0.2)
+                else:
+                    pyautogui.click()
+                    pyautogui.hotkey('ctrl','a')
+                    time.sleep(1)
+                    pyautogui.press('backspace')
+                    time.sleep(1)
+                    pyautogui.typewrite(input_val_temp) ## Pending
+                status= TEST_RESULT_PASS
+                result = TEST_RESULT_TRUE
+            else:
+                logger.print_on_console("Object not found")
+        except Exception as e:
+            log.error("Error occurred in SetTextIris, Err_Msg : ",e)
+            logger.print_on_console("Error occurred in SetSecureTextIris")
         return status,result,value,err_msg
 
     def gettextiris(self,element,*args):

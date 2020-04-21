@@ -200,6 +200,7 @@ class OebsDispatcher:
                 dict['doubleclickiris'] = iris_object.doubleclickiris
                 dict['rightclickiris'] = iris_object.rightclickiris
                 dict['settextiris'] = iris_object.settextiris
+                dict['setsecuretextiris'] = iris_object.setsecuretextiris
                 dict['gettextiris'] = iris_object.gettextiris
                 dict['getrowcountiris'] = iris_object.getrowcountiris
                 dict['getcolcountiris'] = iris_object.getcolcountiris
