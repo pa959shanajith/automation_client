@@ -665,6 +665,19 @@ class Launch_Keywords():
         #img.save(r'.\screenshot.png')
         return img
 
+    def capture_window(self, handle):
+        img = None
+        bbox = None
+        toplist, winlist = [], []
+        def enum_cb(hwnd, results):
+            winlist.append((hwnd, win32gui.GetWindowText(hwnd)))
+        win32gui.EnumWindows(enum_cb, toplist)
+        hwnd = win32gui.GetForegroundWindow()
+        win32gui.SetForegroundWindow(handle)
+        bbox = win32gui.GetWindowRect(handle)
+        img = ImageGrab.grab(bbox)
+        return img
+
     def setWindowToForeground(self, sap_id):
         try:
             i = sap_id.index("/")
