@@ -32,6 +32,7 @@ log = logging.getLogger('clientwindow.py')
 wxObject = None
 browsername = None
 qcdata = None
+qcObject = None
 soc=None
 pdfgentool = None
 qcConFlag=False
@@ -499,55 +500,27 @@ class MainNamespace(BaseNamespace):
             log.error(e,exc_info=True)
 
     def on_qclogin(self, *args):
-        global qcdata
-        global soc
-        global socketIO
-        server_data=b''
-        data_stream=None
-        client_data=None
-        EOF_QC = b'#E&D@Q!C#'
+        global qcObject
+        err_msg = None
         try:
-            if SYSTEM_OS == "Windows":
-                if len(args) > 0:
-                    qcdata = args[0]
-                    if soc is None:
-                        import subprocess
-                        path = NINETEEN68_HOME + "/plugins/Qc/QcController.exe"
-                        pid = subprocess.Popen(path, shell=True)
-                        soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                        try:
-                            soc.connect(("localhost",10000))
-                        except socket.error as e:
-                            log.error(e)
-                            if '[Errno 10061]' in str(e):
-                                time.sleep(15)
-                                soc.connect(("localhost",10000))
+            if(qcObject == None):
+                core_utils.get_all_the_imports('Qc')
+                import QcController
+                qcObject = QcController.QcWindow()
 
-                    data_to_send = json.dumps(qcdata).encode('utf-8')
-                    data_to_send+=EOF_QC
-                    soc.send(data_to_send)
-                    while True:
-                        data_stream= soc.recv(1024)
-                        server_data+=data_stream
-                        if EOF_QC in server_data:
-                            break
-                    client_data= server_data[:server_data.find(EOF_QC)].decode('utf-8')
-                    if('Fail@f@!l' in client_data):
-                        client_data=client_data[:client_data.find('@f@!l')]
-                        logger.print_on_console('Error occurred in QC')
-                        socketIO.emit('qcresponse','Error:Qc Operations')
-                    else:
-                        socketIO.emit('qcresponse',client_data)
-                else:
-                    socketIO.emit('qcresponse','Error:data recevied empty')
-            else:
-                 socketIO.emit('qcresponse','Error:Failed in running Qc')
+            qcdata = args[0]
+            response = qcObject.qc_dict[qcdata.pop('qcaction')](qcdata)
+            socketIO.emit('qcresponse', response)
+        except KeyError:
+            err_msg = 'Invalid ALM operation'
         except Exception as e:
-            err_msg='Error in ALM Operations '
+            err_msg = 'Error in ALM operations'
+            log.error(e, exc_info=True)
+        if err_msg is not None:
             log.error(err_msg)
             logger.print_on_console(err_msg)
-            log.error(e,exc_info=True)
-            socketIO.emit('qcresponse','Error:Qc Operations')
+            try: socketIO.emit('qcresponse','Error:Qc Operations')
+            except: pass
 
     def on_render_screenshot(self,*args):
         try:
@@ -856,7 +829,7 @@ class TestThread(threading.Thread):
                 logger.print_on_console('This app type is not part of the license.')
                 status=TERMINATE
             else:
-                status = self.con.invoke_controller(self.action,self,self.debug_mode,runfrom_step,self.json_data,self.wxObject,socketIO,soc)
+                status = self.con.invoke_controller(self.action,self,self.debug_mode,runfrom_step,self.json_data,self.wxObject,socketIO,qcObject)
 
             logger.print_on_console('Execution status '+status)
 
@@ -1229,7 +1202,6 @@ class ClientWindow(wx.Frame):
         self.Destroy()
         controller.kill_process()
         if SYSTEM_OS == "Windows":
-            os.system("TASKKILL /F /IM QcController.exe")
             os.system("TASKKILL /F /IM nineteen68MFapi.exe")
         sys.exit(0)
 
