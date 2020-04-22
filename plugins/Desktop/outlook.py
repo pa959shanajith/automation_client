@@ -12,9 +12,11 @@ from  win32com.client import Dispatch
 import outlook_constants
 from   pywintypes import  com_error
 import random
+from outlook_constants import fldname
 import string
 import desktop_constants
 import logging
+import platform
 from constants import *
 import logger
 import pythoncom
@@ -78,17 +80,18 @@ class OutlookKeywords:
                 while '' in folders:
                     folders.remove('')
                 #---------------------------------
+                
                 accountname = folders[0]
-                self.outlook = self.getOutlookComObj(1)
-#               get the message stores in outlook
-                stores = self.outlook.Stores
+                self.outlook = self.getOutlookComObj(2)
+                #get the message stores in outlook
+                stores = self.outlook.Folders
                 if ( accountname != '' ):
                     for store in stores:
-                        if ( store.DisplayName == accountname ):
+                        if ( store.Name == accountname ):
                             self.store = store
-                            if ( folders[1].strip() == 'Inbox' ):
-                                inbox_folder = store.GetDefaultFolder(outlook_constants.INBOX_FOLDER)
-                                index = 0;
+                            if ( folders[1].strip() in fldname.keys() ):
+                                inbox_folder = self.outlook.GetDefaultFolder(outlook_constants.fldname[folders[1]])
+                                index = 0
                                 folder = None
                                 for foldername in folders:
                                     if ( index == 0 or index == 1 ):
@@ -105,14 +108,28 @@ class OutlookKeywords:
                                     status = desktop_constants.TEST_RESULT_PASS
                                     method_output = desktop_constants.TEST_RESULT_TRUE
                             else:
-                                error_msg = 'The given path is invalid'
+                                folder_obj = stores.Item(1)#getobj
+                                def recursive_call(fld_obj,fld_name):#recursive call to get sub-folder objects
+                                    new_fld_obj = fld_obj.Folders[fld_name]
+                                    return new_fld_obj
+                                for i in range (1,len(folders)):
+                                    fld_name = folders[i]
+                                    folder_obj = recursive_call(folder_obj,fld_name)
+                                self.targetFolder = folder_obj
+                                if ( self.targetFolder == None ):
+                                    error_msg = 'Unable to find the target folder'
+                                    break
+                                else:
+                                    status = desktop_constants.TEST_RESULT_PASS
+                                    method_output = desktop_constants.TEST_RESULT_TRUE
+                        else:
+                            error_msg = 'Account name mismatch'
                 else:
-                    error_msg = 'Check the path given'
+                    error_msg = 'Incorrect path'
                 if ( error_msg ):
                     log.info( error_msg )
                     logger.print_on_console( error_msg )
             except Exception as e:
-                logger.print_on_console( 'Check the given path' )
                 error_msg = desktop_constants.ERROR_MSG + ' : ' + str(e)
                 log.error( error_msg )
                 logger.print_on_console( error_msg )
@@ -186,7 +203,7 @@ class OutlookKeywords:
                 logger.print_on_console( 'Error: No such mail found' )
                 error_msg = desktop_constants.ERROR_MSG + ' : ' + str(e)
                 log.error( error_msg )
-                logger.print_on_console( error_msg )
+                # logger.print_on_console( error_msg )
             return status, method_output, result, error_msg
 
         def GetFromMailId(self, input, *args):
