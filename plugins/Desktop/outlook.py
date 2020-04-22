@@ -605,8 +605,12 @@ class OutlookKeywords:
             if ( self.sendFlag == True ):
                 try:
                     MsgObj = self.Msg
+                    Msgsub = MsgObj.Subject
                     if ( input == "ignore subject" ):
-                        d1, d2, d3, d4 = self.send_subject(" ")
+                        if (len(Msgsub)==0):
+                            d1, d2, d3, d4 = self.send_subject(" ")
+                        else:
+                            d1, d2, d3, d4 = self.send_subject([Msgsub])
                         if ( self.subjectFlag == True ):
                             MsgObj.Display()
                             import time
