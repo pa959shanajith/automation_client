@@ -169,4 +169,7 @@ class SQLite(AbstractStorage):
         finally: sqlite_lock.release()
 
     def compact_db(self):
-        self.db.execute("VACUUM")
+        try:
+            sqlite_lock.acquire(True)
+            self.db.execute("VACUUM")
+        finally: sqlite_lock.release()

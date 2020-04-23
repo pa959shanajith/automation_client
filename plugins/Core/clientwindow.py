@@ -217,15 +217,10 @@ class MainNamespace(BaseNamespace):
                 socketIO.emit('return_status_executeTestSuite', {'status': 'success', 'batchId': batch_id})
                 wxObject.mythread = TestThread(wxObject, EXECUTE, exec_data)
             else:
-                #obj = handler.Handler()
-                #_,_,_,scenarioIds,_,_,_,_,_,_,_ = obj.parse_json_execute(exec_data)
-                #data = {'scenario_ids': scenarioIds, 'batchId': batch_id, 'time': str(datetime.now())}
-                data = {'execution_id': exec_data['executionIds'], 'time': str(datetime.now())}
+                socketIO.emit('return_status_executeTestSuite', {'status': 'skipped', 'batchId': batch_id})
                 emsg = 'Execution already in progress. Skipping current request.'
                 log.warn(emsg)
                 logger.print_on_console(emsg)
-                """ Sending scenario details for skipped execution to update the same in reports. """
-                socketIO.emit('return_status_executeTestSuite',{'status':'skipped', 'data':data, 'batchId': batch_id})
         except Exception as e:
             err_msg='Error while Executing'
             log.error(err_msg)
