@@ -309,7 +309,7 @@ class Controller():
 		#COmapring breakpoint with the step number of tsp instead of index - (Sushma)
         tsp = handler.local_handler.tspList[index]
         testcase_details_orig=tsp.testcase_details
-        if local_cont.test_case_number != tsp.testcase_num :
+        if local_cont.test_case_number != tsp.testcase_num and tsp.testscript_name:
             local_cont.test_case_number = tsp.testcase_num
             log.info('---------------------------------------------------------------------')
             print('-------------------------------------------------------------------------------------------------------')
