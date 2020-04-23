@@ -1083,11 +1083,11 @@ class Controller():
             #clearing dynamic variables at the end of execution to support dynamic variable at the scenario level
             obj.clear_dyn_variables()
             logger.print_on_console('***SUITE ', str(j) ,' EXECUTION COMPLETED***')
-            del con
-            del obj
             log.info('-----------------------------------------------')
             print('=======================================================================================================')
             j=j+1
+        del con
+        del obj
         if status==TERMINATE:
             print('=======================================================================================================')
             logger.print_on_console( '***Terminating the Execution***')
