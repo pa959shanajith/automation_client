@@ -18,6 +18,7 @@ from uuid import uuid4
 import codecs
 from encryption_utility import AESCipher
 if SYSTEM_OS != 'Darwin':
+    import win32clipboard
     from pyrobot import Robot
     import pythoncom
 vertical = []
@@ -540,13 +541,33 @@ class IRISKeywords():
                 text = ''
                 if(len(args[0])==1 and args[0][0].lower().strip() == 'select'):
                     if SYSTEM_OS != 'Darwin':
+                        import pythoncom
+                        pythoncom.CoInitialize()
+                        win32clipboard.OpenClipboard()
+                        win32clipboard.EmptyClipboard()
+                        win32clipboard.CloseClipboard()
                         robot = Robot()
                         height = int(element['coordinates'][3]) - int(element['coordinates'][1])
-                        pyautogui.moveTo(int(element['coordinates'][2]),int(element['coordinates'][3])-int(height/2))
-                        pyautogui.dragTo(int(element['coordinates'][0]),int(element['coordinates'][1])+int(height/2),button='left')
-                        robot.ctrl_press('c')
-                        time.sleep(1)
-                        text = robot.get_clipboard_data()
+                        opt = None
+                        if (len(args[0])==2 and args[0][1].lower().strip()=='left'):opt='left'
+                        elif ((len(args[0])==2 and args[0][1].lower().strip()=='right') or len(args[0])==1):opt='right'
+                        if (opt):
+                            if (opt=='left'):
+                                #L-R
+                                pyautogui.moveTo(int(element['coordinates'][0]),int(element['coordinates'][1])+int(height/2))
+                                pyautogui.dragTo(int(element['coordinates'][2]),int(element['coordinates'][3])-int(height/2),button='left')
+                            elif (opt=='right'):
+                                #R-L
+                                pyautogui.moveTo(int(element['coordinates'][2]),int(element['coordinates'][3])-int(height/2))
+                                pyautogui.dragTo(int(element['coordinates'][0]),int(element['coordinates'][1])+int(height/2),button='left')
+                            robot.ctrl_press('c')
+                            time.sleep(1)
+                            win32clipboard.OpenClipboard()
+                            text = win32clipboard.GetClipboardData()
+                            win32clipboard.CloseClipboard()
+                        else:
+                            log.error("Error : Invalid option")
+                        del opt,height,robot,args,image
                 elif(len(args[0])==1 and args[0][0].lower().strip() == 'date'):
                     img = Image.open('cropped.png')
                     imgr = img.resize((img.size[0] * 10, img.size[1] * 10), Image.ANTIALIAS)
