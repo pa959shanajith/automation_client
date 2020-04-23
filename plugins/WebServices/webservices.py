@@ -938,11 +938,7 @@ class WSkeywords:
                     if ws_constants.CONTENT_TYPE_JSON in self.content_type.lower():
                         try:
                             req_body=json.loads(self.baseReqBody)
-                            for k,v in req_body.items():
-                                if element_path==k:
-                                    req_body[k]=value
-                                    break
-                            result=req_body
+                            result=self.set_key_value(req_body,"","",element_path,value)
                         except:
                             err_msg=ws_constants.METHOD_INVALID_INPUT
                     else:
@@ -1073,3 +1069,36 @@ class WSkeywords:
             logger.print_on_console(e)
         return decrypted_data
 
+
+    def set_key_value(self,json_obj,base_key,cur_key,input_key,new_value):
+        try:
+            for k,v in json_obj.items():
+                if isinstance(v,dict):
+                    if base_key!="": base_key+='/'+k
+                    else : base_key=k
+                    if base_key==input_key:
+                        print(v)
+                        json_obj[k]=new_value
+                        return json_obj
+                    json_obj=self.set_key_value(v,base_key,k,input_key,new_value)
+                    base_key=base_key[0:-len(k)-1]
+
+                elif isinstance(v,list):
+                    for v1 in range(len(v)):
+                        base_key+=k+"["+str(v1)+"]"
+                        if base_key==input_key:
+                            print(v)
+                            json_obj[k]=new_value
+                            return json_obj
+                        json_obj=self.set_key_value(v[v1],base_key,k,input_key,new_value)
+                else:
+                    if base_key+'/'+k==input_key:
+                        print(v)
+                        json_obj[k]=new_value
+                        return json_obj
+
+            base_key=base_key[0:-len(cur_key)]
+        except Exception as e:
+            log.error(e)
+            logger.print_on_console("Error while setting the tag value")
+        return json_obj
