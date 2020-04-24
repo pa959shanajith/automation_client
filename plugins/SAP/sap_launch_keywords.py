@@ -367,7 +367,7 @@ class Launch_Keywords():
                 if ( flag1 == True and flag2 == True ):
                     status = sap_constants.TEST_RESULT_PASS
                     result = sap_constants.TEST_RESULT_TRUE
-                elif( flag1 != False ):
+                elif( flag1 != False or flag2 == False ):
                     err_msg = "Unable to find the menu item"
             else:
                 err_msg = sap_constants.SESSION_AND_WINDOW_ERROR
