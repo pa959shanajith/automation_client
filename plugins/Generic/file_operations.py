@@ -60,6 +60,7 @@ class FileOperations:
               '.xlsx_compare_content':self.xlsx_obj.compare_content_xlsx,
               '.pdf_compare_content':self.pdf.compare_content,
               '.csv_compare_content':self.csv_obj.compare_content_csv,
+              '.json_compare_content':self.json.compare_content,
 
               '.txt_clear_content':self.txt.clear_content,
               '.xls_clear_content':self.xls_obj.clear_content_xls,
@@ -738,6 +739,73 @@ class FileOperations:
         except Exception as e:
             log.error(e)
             err_msg=generic_constants.ERR_MSG1+'Saving'+generic_constants.ERR_MSG2
+        if err_msg!=None:
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
+        return status,methodoutput,output_res,err_msg
+
+    def json_compare_content(self,input_path1,input_path2,*args):
+        """
+        def : verify_Json_content
+        purpose : calls the respective method to compare the content of 2 Json
+        param : input_path1,input_path2
+        return : bool
+
+        """
+
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_res=OUTPUT_CONSTANT
+        try:
+
+            file_ext1,status1=self.__get_ext(input_path1)
+            file_ext2,status2=self.__get_ext(input_path2)
+            
+            if status1 == True and status2==True and file_ext1==file_ext2:
+                log.debug('verifying whether the files exists')
+                result1=self.verify_file_exists(input_path1,'')
+                result2=self.verify_file_exists(input_path2,'')
+                if result1[1] == TEST_RESULT_TRUE and result2[1]==TEST_RESULT_TRUE :
+                    content1 = json.dumps(input_path1)
+                    with open(input_path1) as file_open:
+                        content1=json.dumps((json.load(file_open)))
+                        file_open.close()
+
+                    with open(input_path2) as file_open:
+                        content2=json.dumps((json.load(file_open)))
+                        file_open.close()
+                    params=[content1,content2]
+                    res,err_msg=self.dict[file_ext1.lower()+'_compare_content'](*params)
+                    if res:
+                        log.info('files contents are same')
+                        logger.print_on_console('files contents are same')
+                        status=TEST_RESULT_PASS
+                        methodoutput=TEST_RESULT_TRUE
+                else:
+                    err_msg=result1[3]
+                    if err_msg==None:
+                        err_msg=result2[3]
+
+            else:
+                err_msg=ERROR_CODE_DICT['ERR_FILE_EXT_MISMATCH']
+                try:
+                    json.loads(input_path1)
+                    json.loads(input_path2)
+                    params=[input_path1,input_path2]
+                    res,err_msg=self.dict['.json_compare_content'](*params)
+                    if res:
+                        log.info('files contents are same')
+                        logger.print_on_console('files contents are same')
+                        status=TEST_RESULT_PASS
+                        methodoutput=TEST_RESULT_TRUE
+                except Exception as e:
+                    if err_msg==None:
+                        err_msg="Failed to load the JSON"
+                    log.error(e)  
+        except Exception as e:
+            err_msg=generic_constants.ERR_MSG1+'Comapring content of'+generic_constants.ERR_MSG2
+            log.error(e)
         if err_msg!=None:
             log.error(err_msg)
             logger.print_on_console(err_msg)

@@ -242,7 +242,10 @@ class XMLOperations():
             #else the regular flow continues
             if 'Envelope' in root.tag and root.tag.split('}')[1] == 'Envelope':
                 for elem in root.iter():
-                    tag = elem.tag.split('}')[1]
+                    if elem.tag.find('}')!=-1:
+                        tag = elem.tag.split('}')[1]
+                    else:
+                        tag = elem.tag
                     if tag == input_tag:
                         items.append(elem)
             else:
