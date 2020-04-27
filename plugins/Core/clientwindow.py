@@ -792,10 +792,11 @@ class TestThread(threading.Thread):
         """Run Worker Thread."""
         # This is the code executing in the new thread.
         global socketIO, execution_flag, closeActiveConnection,connection_Timer
-        batch_id = self.json_data["batchId"]
+        batch_id = None
         try:
             runfrom_step=1
-            if self.action==DEBUG:
+            if self.action==EXECUTE: batch_id = self.json_data["batchId"]
+            elif self.action==DEBUG:
                 self.debug_mode=False
                 self.wxObject.breakpoint.Disable()
                 if self.wxObject.choice in ['Stepwise','RunfromStep']:
