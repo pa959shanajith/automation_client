@@ -991,6 +991,8 @@ class Controller():
                                     print('=======================================================================================================')
                                     logger.print_on_console( '***Scenario' ,str(i + 1) ,' execution completed***')
                                     print('=======================================================================================================')
+                                    del con.tsp_list
+                                    del tsplist
                             if execute_flag:
                                 #Saving the report for the scenario
                                 logger.print_on_console( '***Saving report of Scenario' ,str(i  + 1 ),'***')
@@ -1086,6 +1088,8 @@ class Controller():
             log.info('-----------------------------------------------')
             print('=======================================================================================================')
             j=j+1
+        del con
+        del obj
         if status==TERMINATE:
             print('=======================================================================================================')
             logger.print_on_console( '***Terminating the Execution***')
