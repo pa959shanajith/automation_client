@@ -617,11 +617,12 @@ class StepDescription:
         def getallcolumnheaders():
             return 'Get all Column Headers of '+ "'" + tsp.custname + "'" + ' and save the output as ' + "'"+output+"'" + ' in '+"'"+ tsp.outputval+"'"+'.'
         def presstoolbarbutton():
-            if (type(input) == list):
-                temp_input = input[0]
-                for i in range(1,len(input)):temp_input = temp_input + ' -> ' + str(input[i])
-                input = temp_input
-            return 'Pressing Toolbar Button '+"'"+input+"' of '"+tsp.custname+"'"+' and store the output as '+"'"+output+"'"+'.'
+            inp = input
+            if (type(inp) == list):
+                temp_input = inp[0]
+                for i in range(1,len(inp)):temp_input = temp_input + ' -> ' + str(inp[i])
+                inp = temp_input
+            return 'Pressing Toolbar Button '+"'"+inp+"' of '"+tsp.custname+"'"+' and store the output as '+"'"+output+"'"+'.'
         def selectrows():
             return 'Selecting Row/Rows'+"'"+input[0]+"'"+'and store the output as '+"'"+output+"'"+'.'
         def getcountofrows():
