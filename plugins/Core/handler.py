@@ -162,16 +162,7 @@ class Handler():
                         continue
                 except Exception as e:
                     local_handler.log.error(e)
-
-                # passing test case value to ftfy module to handle special charcter
-                # if(type(testcase) == 'unicode'):
-                #     temp_testcase = ftfy.fix_text(testcase)
-                #     script.append(temp_testcase)
-                # else:
-                # script.append(testcase)
                 script.append(testcase)
-            if 'comments' in json_data:
-                comments=json_data['comments']
             # Checking if the testcase has key 'testscript_name' or 'testcasename'
             # adding the template to dict if available
             if 'testscript_name' in json_data:
@@ -192,7 +183,7 @@ class Handler():
                 browser_type=json_data['browsertype']
             elif 'browserType' in json_data:
                 browser_type=json_data['browserType']
-        if(data_param_path is None or data_param_path == ''):
+        if(data_param_path is None or str(data_param_path).strip() == ''):
             flag=self.create_list(script,testcasename_list)
         else:
             flag=self.create_list(script,testcasename_list,extract_path)
