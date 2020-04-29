@@ -937,7 +937,9 @@ class WSkeywords:
                     result=None
                     if ws_constants.CONTENT_TYPE_JSON in self.content_type.lower():
                         try:
-                            req_body=json.loads(self.baseReqBody)
+                            req_body=self.baseReqBody
+                            if type(req_body) != dict:
+                                req_body=json.loads(req_body)
                             result=self.set_key_value(req_body,"","",element_path,value)
                         except:
                             err_msg=ws_constants.METHOD_INVALID_INPUT
