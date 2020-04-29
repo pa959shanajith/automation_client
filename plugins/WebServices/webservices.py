@@ -941,7 +941,8 @@ class WSkeywords:
                             if type(req_body) != dict:
                                 req_body=json.loads(req_body)
                             result=self.set_key_value(req_body,"","",element_path,value)
-                        except:
+                        except Exception as e:
+                            log.error(e)
                             err_msg=ws_constants.METHOD_INVALID_INPUT
                     else:
                         req_body=self.baseReqBody
