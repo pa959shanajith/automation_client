@@ -55,6 +55,15 @@ class Textbox_keywords():
                         if (text == element.text):
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
+                        else:
+                            try:
+                                element_type = element.get_attribute('type')
+                            except:
+                                element_type = 'None'
+                            if 'Secure' in element_type:
+                                log.error('Element text can\'t be verified:'+str(element.text))
+                                status=TEST_RESULT_PASS
+                                methodoutput=TEST_RESULT_TRUE
                     else:
                         err_msg=self.print_error(ELEMENT_DISABLED)
                 else:

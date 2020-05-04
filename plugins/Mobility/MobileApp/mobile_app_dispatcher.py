@@ -129,7 +129,7 @@ class MobileDispatcher:
         'verifyselectedviews':list_view_keywords_object.verify_selected_views,
         'selectmultipleviewsbyindexes':list_view_keywords_object.select_multiple_views_by_indexes,
         'selectmultipleviewsbytext':list_view_keywords_object.select_multiple_views_by_text,
-        'setvalue': seekBar_object.Set_Mid_Value,
+        'setvalue': seekBar_object.Set_Mid_Value if (SYSTEM_OS != 'Darwin') else picker_wheel_keywords_object.set_value,
         'getvalue': picker_wheel_keywords_object.get_value,
         'getrowcount':table_keywords_object.get_row_count,
         'verifyrowcount':table_keywords_object.verify_row_count,

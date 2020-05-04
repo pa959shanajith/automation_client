@@ -66,10 +66,10 @@ class custom():
                 'layout': ["gettext", "longpress", "press", "click", "verifydisabled", "verifydoesnotexists",
                             "verifyenabled", "verifyexists", "verifyvisible", "verifytext",
                             "verifyhidden", "waitforelementexists"],
-                'picker': ["gettext", "longpress", "press", "click", "verifydisabled", "verifydoesnotexists",
+                'picker': ["setvalue", "gettext", "longpress", "press", "click", "verifydisabled", "verifydoesnotexists",
                             "verifyenabled", "verifyexists", "verifyvisible", "verifytext",
                             "verifyhidden", "waitforelementexists"],
-                'slider': ["gettext", "longpress", "press", "click", "verifydisabled", "verifydoesnotexists",
+                'slider': ["setslidevalue", "verifydisabled", "verifydoesnotexists",
                             "verifyenabled", "verifyexists", "verifyvisible", "verifytext",
                             "verifyhidden", "waitforelementexists"],
                 'link': ["gettext", "longpress", "press", "click", "verifydisabled", "verifydoesnotexists",
@@ -135,11 +135,11 @@ class custom():
             if driver_flag is True:
                 elem_count = 0
                 if len(visible_text) > 0:
-                   for item in classes_ios[object_name]:
+                   for item in classes[object_name]:
                         xpath_str = "//"+item+"[starts-with(@text,'"+visible_text+"')]"
                         element_list = element_list + driver.find_elements_by_xpath(xpath_str)
                 else:
-                    for item in classes_ios[object_name]:
+                    for item in classes[object_name]:
                         element_list = element_list + driver.find_elements_by_class_name(item)
                 if index < len(element_list):
                     log.info(CUSTOM_ELEMENT_FOUND)
