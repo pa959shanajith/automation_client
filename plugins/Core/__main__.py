@@ -37,27 +37,30 @@ if sys.platform == 'win32':
     __builtins__.open = __open_inheritance_hack
 
 if __name__ == "__main__":
-    app = wx.App()
-    appName = "Nineteen68 ICE"
-    constants.SYSTEM_OS = platform.system()
-    path = args.NINETEEN68_HOME+os.sep
-    if not os.path.exists(path+"logs"): os.mkdir(path+"logs")
-    if not os.path.exists(path+"output"): os.mkdir(path+"output")
-    import clientwindow as cw_obj
-    cw_obj.configvalues = configvalues
-    cw = cw_obj.ClientWindow(appName)
-    if cw.is_config_missing:
-        err = "Configure "+appName+" by navigating to Edit -> Configuration"
-        logger.print_on_console(err)
-        log.info(err)
-    elif cw.is_config_invalid:
-        err = "[Error]: Syntax error in config file.\n"+str(configvalues['errorflag'])+ " config field is missing. Please check and restart "+appName+"."
-        logger.print_on_console(err)
-        log.info(err)
-        log.error(configvalues['errorflag'])
-    elif cw.logfilename_error_flag:
-        err = "[Error]: Please provide a valid logfile path in config file and restart "+appName+"."
-        logger.print_on_console(err)
-        log.info(err)
-        cw.logfilename_error_flag = False
-    app.MainLoop()
+    try:
+        app = wx.App()
+        appName = "Nineteen68 ICE"
+        constants.SYSTEM_OS = platform.system()
+        path = args.NINETEEN68_HOME+os.sep
+        if not os.path.exists(path+"logs"): os.mkdir(path+"logs")
+        if not os.path.exists(path+"output"): os.mkdir(path+"output")
+        import clientwindow as cw_obj
+        cw_obj.configvalues = configvalues
+        cw = cw_obj.ClientWindow(appName)
+        if cw.is_config_missing:
+            err = "Configure "+appName+" by navigating to Edit -> Configuration"
+            logger.print_on_console(err)
+            log.info(err)
+        elif cw.is_config_invalid:
+            err = "[Error]: Syntax error in config file.\n"+str(configvalues['errorflag'])+ " config field is missing. Please check and restart "+appName+"."
+            logger.print_on_console(err)
+            log.info(err)
+            log.error(configvalues['errorflag'])
+        elif cw.logfilename_error_flag:
+            err = "[Error]: Please provide a valid logfile path in config file and restart "+appName+"."
+            logger.print_on_console(err)
+            log.info(err)
+            cw.logfilename_error_flag = False
+        app.MainLoop()
+    except Exception as e:
+        log.error(e,exc_info=True)

@@ -229,6 +229,7 @@ class Dispatcher:
             self.web_dict['doubleclickiris'] = iris_object.doubleclickiris
             self.web_dict['rightclickiris'] = iris_object.rightclickiris
             self.web_dict['settextiris'] = iris_object.settextiris
+            self.web_dict['setsecuretextiris'] = iris_object.setsecuretextiris
             self.web_dict['gettextiris'] = iris_object.gettextiris
             self.web_dict['getrowcountiris'] = iris_object.getrowcountiris
             self.web_dict['getcolcountiris'] = iris_object.getcolcountiris

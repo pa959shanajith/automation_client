@@ -401,7 +401,6 @@ class ClickAndAdd:
                                         if curaccinfo.accessibleText == 1:
                                             charinfo = acc.getAccessibleTextInfo(0,1)
                                             text = acc.getAccessibleTextRange(0,charinfo.charCount - 1)
-                                        text = text.encode('utf-8').strip()
                                         text = str(text)
                                         text = text.strip()
                                         if len(text) == 0:
@@ -409,11 +408,14 @@ class ClickAndAdd:
                                         text = text.replace('<','')
                                         text = text.replace('>','')
                                         global e
-
-                                        e.append({"custname":text,
+                                        #----------------------------------------custname
+                                        custname = None
+                                        custname = self.postfixCustname(str(curaccinfo.role),text.strip())
+                                        #----------------------------------------custname
+                                        e.append({"custname":custname,
                                                 "tag":curaccinfo.role,
                                                 "xpath":key + ';' + name.strip() + ';' + str(indexInParent)  + ';' + str(childrencount) + ';'+ str(parentname).strip() + ';' + str(parentxpath) + ';' + str(parentchildcount) + ';' + str(parentindex)+ ';' + str(parenttag)+ ';' + str(curaccinfo.role) + ';' + description ,
-                                                "hiddentag":'No',
+                                                "hiddentag":str(False),
                                                 "id":'null',
                                                 "text":text,
                                                 "url":window,
@@ -458,6 +460,30 @@ class ClickAndAdd:
                         #calling buildJson method with key(resultant xpath)
                         buildJson(acc,key,'',0,windowname)
 
+                    def postfixCustname(self,role,custname):
+                        if(role in ['push button','toggle button']):
+                            custname = custname + "_btn"
+                        elif(role in ['edit','Edit Box','text','password text']):
+                            custname = custname + "_txtbox"
+                        elif(role == 'combo box'):
+                            custname = custname +"_select"
+                        elif(role == 'radio button'):
+                            custname = custname + "_radiobtn"
+                        elif(role == 'check box'):
+                            custname = custname + "_chkbox"
+                        elif(role == 'table'):
+                            custname = custname + "_table"
+                        elif(role in ['list item','list']):
+                            custname = custname + "_lst"
+                        elif(role == 'internal frame'):
+                            custname = custname + "_internalframe"
+                        elif(role == "scroll bar"):
+                            custname = custname + "_scroll"
+                        elif(role in ['hyperlink','Static']):
+                            custname = custname + "_link"
+                        else:
+                            custname = custname + "_elmnt"
+                        return custname
 
                     def abort(self):
                         self._want_continue = 0

@@ -9,327 +9,311 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 
-import win32com.client
 import json
-import socket
 import os
-TD=None
-loginflag=False
-urlflag=False
-dictFolderJson=None
-con = None
-sent=0
+from requests.auth import HTTPBasicAuth
+import requests
+import logger
+import logging
+import xmltodict
+log = logging.getLogger("Qccontroller.py")
 
 class QcWindow():
+    cookies = None
+    headers = None
+    _headers = None
+    Qc_Url = None
 
-    def __init__(self,filePath):
-        status=None
-        try:
-            global sent,loginflag,TD,urlflag
-            flag=0
-            if(filePath["qcaction"]=='domain'):
-                try:
-                    user_name=filePath["qcUsername"]
-                    pass_word=filePath["qcPassword"]
-                    Qc_Url=filePath["qcURL"]
-                    domain_dict={}
-                    key="view"
-                    domain_dict.setdefault(key, [])
-                    loginflag=False
-                    TD = win32com.client.Dispatch("TDApiOle80.TDConnection")
-                    urlflag=False
-                    TD.InitConnectionEx(str(Qc_Url))
-                    urlflag=True
-                    un=str(user_name)
-                    pw=str(pass_word)
-                    TD.Login(un,pw)
-                    loginflag=True
-                    status = self.getDomain(filePath)
-                except Exception as eqc:
-                    self.quit_qc()
-                    flag=1
-            elif(filePath["qcaction"]=='project'):
-                status = self.getProjects(filePath)
-            elif(filePath["qcaction"]=='folder'):
-                status = self.ListTestSetFolder(filePath)
-            elif(filePath["qcaction"]=='testcase'):
-                status = self.test_case_generator(filePath)
-            elif(filePath["qcaction"]=='qcupdate'):
-                status = self.update_qc_details(filePath)
-            elif(filePath["qcaction"]=='qcquit'):
-                status = self.quit_qc()
-                flag=1
-            if not flag:
-                if status!=None:
-                    self.emit_data()
-                else:
-                    con.send("Fail@f@!l#E&D@Q!C#")
-            else:
-                pass
-        except Exception as e:
-            print('Error in Qc action')
-            con.send('Fail@f@!l#E&D@Q!C#')
-            sent=1
+    def __init__(self):
+        self.qc_dict = {
+            'domain': self.login,
+            'project': self.get_projects,
+            'folder': self.list_test_set_folder,
+            'testcase': self.test_case_generator,
+            'qcupdate': self.update_qc_details,
+            'qcquit': self.quit_qc
+        }
 
-    def getDomain(self,filePath):
+    def login(self,filePath):
+        res = "invalidcredentials"
         try:
-            global dictFolderJson
+            user_name=filePath["qcUsername"]
+            pass_word=filePath["qcPassword"]
+            self.Qc_Url=filePath["qcURL"]
+            self.headers = {'cache-control': "no-cache"}
+            login_url = self.Qc_Url + '/authentication-point/authenticate'
+            resp = requests.post(login_url, auth=HTTPBasicAuth(user_name, pass_word),  headers=self.headers)
+            if resp.status_code == 200:
+                cookieName = resp.headers.get('Set-Cookie')
+                LWSSO_COOKIE_KEY = cookieName[cookieName.index("=") + 1: cookieName.index(";")]
+                self.cookies = {'LWSSO_COOKIE_KEY': LWSSO_COOKIE_KEY}
+
+            qcSessionEndPoint = self.Qc_Url + "/rest/site-session"    
+            response = requests.post(qcSessionEndPoint, headers=self.headers, cookies=self.cookies)
+            if response.status_code == 200 | response.status_code == 201:
+                cookieName = response.headers.get('Set-Cookie').split(",")[1]
+                QCSession = cookieName[cookieName.index("=") + 1: cookieName.index(";")]
+                self.cookies['QCSession'] = QCSession
+        
+            #fetching domains
             domain_dict={}
             key="domain"
             domain_dict.setdefault(key, [])
-            if(TD.connected==True):
-                domain_dict['login_status']=True
-                listDomains=TD.VisibleDomains
-                if(len(listDomains)>0):
-                    for dom in listDomains:
-                        domain_dict[key].append(str(dom))
-            dictFolder = json.dumps(domain_dict)
-            dictFolderJson=json.loads(dictFolder)
+            domain_dict['login_status']=True
+            self._headers = {
+                'accept': 'application/json'
+            }
+            DomainURL = self.Qc_Url + '/rest/domains/'
+            _resp = requests.get(DomainURL, headers=self._headers, cookies=self.cookies)   
+            JsonObject = _resp.json()
+            DomainList = [item['Name'] for item in JsonObject['Domains']['Domain']]
+            if(len(DomainList)>0):
+                for dom in DomainList:
+                    domain_dict[key].append(str(dom))
+            res = json.loads(json.dumps(domain_dict))
         except Exception as e:
-            print('Error in getting domains')
-            dictFolderJson=None
-
-        return dictFolderJson
-
-
-    def getProjects(self,filePath):
+            err_msg='Error while Login in ALM'
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
+            log.error(e, exc_info=True)
+        return res
+        
+    def get_projects(self,filePath):
+        res = {"project": []}
         try:
-            global dictFolderJson
-            domain_name=filePath["domain"]
-            projects_dict={}
-            key="project"
-            projects_dict.setdefault(key, [])
-            if(TD.connected==True):
-                list_projects=TD.VisibleProjects(domain_name)
-                if(len(list_projects)>0):
-                    for pro in list_projects:
-                        projects_dict[key].append(str(pro))
-                    dictFolder = json.dumps(projects_dict)
-                    dictFolderJson=json.loads(dictFolder)
-                else:
-                    print('Invalid domain selected')
-        except Exception as eproject:
-            print('Error in fetching projects')
-            dictFolderJson=None
-        return dictFolderJson
-
-    def ListTestSetFolder(self,filePath):
-        ##The final list which contains the testsets and testset under the specified path
-        try:
-            global dictFolderJson
-            testsetpath=filePath["foldername"]
-            domain_name=filePath["domain"]
-            project_name=filePath["project"]
-
-            folder_dict={}
-            TestSet_dict={}
-            key="testfolder"
-            keyTS="TestSet"
-            folder_dict.setdefault(key, [])
-            TestSet_dict.setdefault(keyTS,[])
-            ##Contains the list of testsets which is fetched from the given parent folder
-            dictTestSet={}
-            dictsub={}
-            if(TD.connected==True):
-                TD.connect(domain_name, project_name)
-                testset_folder = TD.TestSetTreeManager.NodeByPath(testsetpath)
-                treeList=testset_folder.newlist()
-                if (len(treeList)>0):
-                    for folder in treeList:
-                        temp_dict={}
-                        temp_dict['foldername']=str(folder.name)
-                        temp_dict['folderpath']=str(testsetpath+"\\"+str(folder.name))
-                        folder_dict[key].append(temp_dict)
-                tsList = testset_folder.FindTestSets("")
-                if(len(tsList)>0):
-                    for testset in tsList:
-                        try:
-                            TestSet_dict[keyTS].append(str(testset.name)+";"+str(testset.id))
-                        except:
-                            TestSet_dict[keyTS].append(((testset.name).encode('utf-8'))+";"+str(testset.id))
-                else:
-                    tsList = testset_folder.FindTestSets("")
-                    if(len(tsList)>0):
-                        for testset in tsList:
-                            try:
-                                TestSet_dict[keyTS].append(str(testset.name)+";"+str(testset.id))
-                            except:
-                                TestSet_dict[keyTS].append(((testset.name).encode('utf-8'))+";"+str(testset.id))
-                ice_list_folder=folder_dict['testfolder']
-                if(type(ice_list_folder)==list):
-                    for fol in ice_list_folder:
-                        delfolder = TD.TestSetTreeManager.NodeByPath(fol['folderpath'])
-                        delTestSetList = delfolder.FindTestSets("")
-                        if(delTestSetList != None):
-                            for ts in delTestSetList:
-                                try:
-                                    remID=str(ts.name)+";"+str(ts.id)
-                                except:
-                                    remID=((ts.name).encode('utf-8'))+";"+str(ts.id)
-                                ice_list=TestSet_dict['TestSet']
-                                ice_list.remove(remID)
+            domain_name = filePath["domain"]
+            projects = []
+            ProjectURL = self.Qc_Url + '/rest/domains/' + domain_name + '/projects'
+            resp = requests.get(ProjectURL, headers=self._headers, cookies=self.cookies)
+            JsonObject = resp.json()
+            list_projects = []
+            if type(JsonObject['Projects']['Project']) is list:
+                list_projects = [item['Name'] for item in JsonObject['Projects']['Project']]
+            if type(JsonObject['Projects']['Project']) is dict:
+                list_projects = [JsonObject['Projects']['Project']['Name']]
+            if(len(list_projects)>0):
+                for pro in list_projects:
+                    projects.append(str(pro))
+                res["project"] = projects
             else:
-                print('Invalid connection')
-            temp_dict_ts={}
-            key="TestSet"
-            temp_dict_ts.setdefault(key, [])
-            for i in TestSet_dict['TestSet']:
-                tsp={}
-                tsp['testset']=str(i).split(";")[0]
-                tsp['testsetid']=str(i).split(";")[1]
-                tsp['testsetpath']=testsetpath
-                temp_dict_ts[key].append(tsp)
-            OverallList=[]
-            OverallList.append(folder_dict)
-            OverallList.append(temp_dict_ts)
-            dictFolderJson = json.dumps(OverallList)
-            dictFolderJson=json.loads(dictFolderJson)
+                err_msg = 'Selected ALM domain has no projects'
+                log.error(err_msg)
+                logger.print_on_console(err_msg)
+        except Exception as eproject:
+            err_msg = 'Error while fetching projects from ALM'
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
+            log.error(eproject, exc_info=True)
+        return res
+
+    def get_folder_parent_id(self, URL, folderName):
+        parentID = 0
+        payload = {"query": "{name['" + folderName + "']}", "fields": "parent-id"}
+        try:
+            response = requests.get(URL, params=payload, headers=self.headers, cookies=self.cookies)
+            o = xmltodict.parse(response.content)
+            y = json.loads(json.dumps(o))
+            k = y["Entities"]["Entity"]["Fields"]["Field"]
+            #fetching folder parent id for given folder name
+            for i in k:
+                if i["@Name"] == "id":
+                    parentID = i['Value']
+        except:
+            pass
+        return str(parentID)
+
+    def list_test_set_folder(self,filePath):
+        ##The final list which contains the testsets and testset under the specified path
+        res = None
+        try:
+            testsetpath = str(filePath["foldername"])
+            almDomain = filePath["domain"]
+            almProject = filePath["project"]
+            folderName = testsetpath.split("\\")[-1]
+            midPoint = "/rest/domains/" + almDomain + "/projects/" + almProject 
+            URL = self.Qc_Url + midPoint + "/" + "test-set-folders"
+            URL_for_testsets = self.Qc_Url + midPoint + "/" + "test-sets"
+            parentID = self.get_folder_parent_id(URL, folderName)
+            payload1 = {"query": "{parent-id[" + parentID + "]}", "fields": "id,name"}
+            response1 = requests.get(URL, params=payload1, headers=self.headers, cookies=self.cookies)
+            o1 = xmltodict.parse(response1.content)
+            y1 = json.loads(json.dumps(o1))
+            folder_list = []
+            entity_len = int(y1["Entities"]["@TotalResults"])
+            if (entity_len == 1): y1["Entities"]["Entity"] = [y1["Entities"]["Entity"]]
+            if (entity_len > 0):
+                k1 = y1["Entities"]["Entity"] #contains all the folder names
+                for f in k1:
+                    l = f["Fields"]["Field"]
+                    for n in l:
+                        if n["@Name"] == "name":
+                            folder = str(n["Value"])
+                            folder_list.append({"foldername": folder, "folderpath": testsetpath + "\\" + folder})
+
+            #fetching testsets
+            payload = {"query": "{parent-id[" + parentID + "]}", "fields": "id,name"}
+            res1 = requests.get(URL_for_testsets, params=payload, headers=self.headers, cookies=self.cookies)
+            o2 = xmltodict.parse(res1.content)
+            y2 = json.loads(json.dumps(o2))
+            tests_list = []
+            entity_len = int(y2["Entities"]["@TotalResults"])
+            if (entity_len == 1): y2["Entities"]["Entity"] = [y2["Entities"]["Entity"]]
+            if (entity_len > 0):
+                k2 = y2["Entities"]["Entity"]
+                for c in k2:
+                    l = c["Fields"]["Field"]
+                    test_name = ""
+                    test_id = ""
+                    for t in l:
+                        if t["@Name"] == "name":
+                            test_name = str(t["Value"])
+                        elif t["@Name"] == "id" :
+                            test_id = str(t["Value"])
+                    tests_list.append({'testset': test_name, 'testsetid': test_id, 'testsetpath': testsetpath})
+            res = [{"testfolder": folder_list, "TestSet": tests_list}]
         except Exception as e:
-            print('Error while fetching testsets')
-            dictFolderJson=None
-        finally:
-            return dictFolderJson
-
-
+            err_msg = 'Error while fetching testsets from ALM'
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
+            log.error(e, exc_info=True)
+        return res
 
     def test_case_generator(self,filePath):
+        res = None
         try:
-            global dictFolderJson
-            test_case_dict={}
-            key="testcase"
             testsetpath=filePath["foldername"]
             test_set_name=filePath["testset"]
-            domain_name=filePath["domain"]
-            project_name=filePath["project"]
-            test_case_dict.setdefault(key, [])
-            TD.connect(domain_name, project_name)
-            testCaseList = TD.TestSetTreeManager.NodeByPath(testsetpath)
-            listTC=testCaseList.FindTestSets("")
-            i=0
-            for test_case_ind in listTC:
-                if (test_case_ind.name).encode('utf-8')==(test_set_name).encode('utf-8'):
-                   abc=listTC[i].tsTestFactory
-                   qc_ts=abc.NewList("")
-                   for tsname in qc_ts:
-                       try:
-                           ts_complete_name = tsname.name + '/'+ tsname.testid
-                           test_case_dict[key].append(str(ts_complete_name))
-                       except:
-                           ts_complete_name = (tsname.name).encode('utf-8') + '/'+ tsname.testid
-                           test_case_dict[key].append((ts_complete_name).encode('utf-8'))
-                i=i+1
-            OverallList=[]
-            OverallList.append(test_case_dict)
-            dictFolderJson = json.dumps(OverallList)
-            dictFolderJson=json.loads(dictFolderJson)
+            almDomain=filePath["domain"]
+            almProject=filePath["project"]
+            response = ""
+            midPoint = "/rest/domains/" + almDomain + "/projects/" + almProject 
+            URL = self.Qc_Url + midPoint + "/" + "test-set-folders"
+            URL_for_testsets = self.Qc_Url + midPoint + "/" + "test-sets"
+            URL_for_testcases = self.Qc_Url + midPoint + "/" + "test-instances"
+            folderName = testsetpath.split("\\")[-1]
+            parentID = self.get_folder_parent_id(URL, folderName)
+            #fetching testsets
+            payload = {"query": "{parent-id[" + parentID + "]}", "fields": "id,name"}
+            res1 = requests.get(URL_for_testsets, params=payload, headers=self.headers, cookies=self.cookies)
+            o2 = xmltodict.parse(res1.content)
+            y2 = json.loads(json.dumps(o2))
+            test_id = None
+            entity_len = int(y2["Entities"]["@TotalResults"])
+            if (entity_len == 1): y2["Entities"]["Entity"] = [y2["Entities"]["Entity"]]
+            if (entity_len > 0):
+                k2 = y2["Entities"]["Entity"]
+                for c in k2:
+                    l = c["Fields"]["Field"]
+                    flag = 0
+                    for t in l:
+                        if t["@Name"] == "name" :
+                            if t["Value"] == test_set_name: flag =1
+                        elif (t["@Name"] == "id" and flag == 1):
+                            test_id = t["Value"]
+
+            payload = {"query": "{cycle-id[" + str(test_id) + "]}", "fields": "test-id,name,status"}
+            #fetching test cases 
+            response = requests.get(URL_for_testcases , params=payload, headers=self.headers, cookies=self.cookies)
+            o = xmltodict.parse(response.content)
+            y = json.loads(json.dumps(o))
+            test_case_list = []
+            entity_len = int(y["Entities"]["@TotalResults"])
+            if (entity_len == 1): y["Entities"]["Entity"] = [y["Entities"]["Entity"]]
+            if (entity_len > 0):
+                k2 = y["Entities"]["Entity"]
+                for c in k2:
+                    l = c["Fields"]["Field"]
+                    test_id = ""
+                    test_name = ""
+                    for n in l:
+                        if n["@Name"] == "test-id": test_id = str(n["Value"])
+                        elif n["@Name"] == "name": test_name = str(n["Value"])
+                    test_case_list.append(test_name + '/'+ test_id)
+            res = [{"testcase": test_case_list}]
         except Exception as e:
-            print('Error while fetching testcases')
-        return dictFolderJson
+            err_msg = 'Error while fetching testcases from ALM'
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
+            log.error(e, exc_info=True)
+        return res
 
     def update_qc_details(self,data):
         status = False
         try:
-            global dictFolderJson
-            qcDomain =  data['qc_domain']
-            qcProject = data['qc_project']
+            almDomain =  data['qc_domain']
+            almProject = data['qc_project']
             tsFolder = data['qc_folder']
             tsList = data['qc_tsList']
             testrunname = data['qc_testrunname']
-            result =  data['qc_update_status']
-            if(TD.connected==True):
-                TD.Connect(qcDomain,qcProject)
-                TSetFact = TD.TestSetFactory
-                #Getting the test set factory
-                tsTreeMgr = TD.testsettreemanager
-                tsFolder = tsTreeMgr.NodeByPath(tsFolder)
-                tsList = tsFolder.FindTestSets(tsList)
-                #Getting the test lists
-                theTestSet = tsList.Item(1)
-                #Getting the test set
-                tsFolder = theTestSet.TestSetFolder
-                tsTestFactory = theTestSet.tsTestFactory
-                tsTestList = tsTestFactory.NewList("")
-                for tsTest in tsTestList:
-                    #Iterate the Test list
-                    if tsTest.Name == testrunname:
-                        RunFactory = tsTest.RunFactory
-                        #RunFactory object created
-                        obj_theRun = RunFactory.AddItem(testrunname)
-                        #Updating the details in QC
-                        obj_theRun.Status = result
-                        #Scenario execution status updated
-                        obj_theRun.Post()
-                        obj_theRun.Refresh()
-                        status = True
-            else:
-                print('Qc is disconnected')
+            midPoint = "/rest/domains/" + almDomain + "/projects/" + almProject 
+            URL = self.Qc_Url + midPoint + "/" + "test-set-folders"
+            URL_for_testsets = self.Qc_Url + midPoint + "/" + "test-sets"
+            URL_for_testcases = self.Qc_Url + midPoint + "/" + "test-instances"
+            folderName = tsFolder.split("\\")[-1]
+            parentID = self.get_folder_parent_id(URL, folderName)
+            #fetching testset id
+            payload = {"query": "{parent-id[" + str(parentID) + "]}", "fields": "id,name"}
+            res1 = requests.get(URL_for_testsets, params=payload, headers=self.headers, cookies=self.cookies)
+            o2 = xmltodict.parse(res1.content)
+            y2 = json.loads(json.dumps(o2))
+            test_id = None
+            entity_len = int(y2["Entities"]["@TotalResults"])
+            if (entity_len == 1): y2["Entities"]["Entity"] = [y2["Entities"]["Entity"]]
+            if (entity_len > 0):
+                k2 = y2["Entities"]["Entity"]
+                for c in k2:
+                    l = c["Fields"]["Field"]
+                    flag = 0
+                    for t in l:
+                        if t["@Name"] == "name" :
+                            if(t["Value"] == tsList): flag = 1
+                        elif( t["@Name"] == "id" and flag == 1):
+                            test_id = t["Value"]
+            payload = {"query": "{cycle-id[" + str(test_id) + "]}", "fields": "name"}
+            #fetching test case id 
+            response = requests.get(URL_for_testcases , params=payload, headers=self.headers, cookies=self.cookies)
+            o = xmltodict.parse(response.content)
+            y = json.loads(json.dumps(o))
+            tsn1 = testrunname.split("]")
+            tsn = (tsn1[1] + " " + tsn1[0] + "]")[1:]
+            testc_id = ''
+            entity_len = int(y["Entities"]["@TotalResults"])
+            if (entity_len == 1): y["Entities"]["Entity"] = [y["Entities"]["Entity"]]
+            if (entity_len > 0):
+                k2 = y["Entities"]["Entity"]
+                for c in k2:
+                    l = c["Fields"]["Field"]
+                    flag = 0
+                    for n in l:      
+                        if n["@Name"] == "name":
+                            if n["Value"] == tsn: flag = 1                
+                        elif n["@Name"] == "id" and flag == 1:
+                            testc_id = n["Value"]                  
+            #updating status             
+            result =  data['qc_update_status'] 
+            URL_for_testcase_update = self.Qc_Url + midPoint + "/" + "test-instances"  + "/" + testc_id
+            data1 ='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Entity Type="test-instance"><Fields><Field Name="status"><Value>'+ result +'</Value></Field></Fields></Entity>'
+            payload = { "body": data1, "data": data1}
+            self.headers = {'Content-Type': "application/xml", 'Accept': "application/xml"}
+            response = requests.put(URL_for_testcase_update , data= data1, headers=self.headers, cookies=self.cookies)
+            #status = response.status_code == 200
+            status = True
         except Exception as e:
-            print('Error while updating QC')
-            status = False
-        if(status):
-            dictFolderJson = {'QC_UpdateStatus':True}
-            """
-            TD.Logout()
-            TD.releaseconnection()
-            print 'closing_connection'
-            """
-        else:
-            dictFolderJson = {'QC_UpdateStatus':False}
+            err_msg = 'Error while updating data in ALM'
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
+            log.error(e, exc_info=True)
         return status
 
-    def quit_qc(self):
+    def quit_qc(self,filepath):
+        res = None
         try:
-            global sent,dictFolderJson
-            sent=1
-            if TD.connected==True and loginflag==True:
-                con.send('closedqc#E&D@Q!C#')
-                TD.Logout()
-                TD.releaseconnection()
-            elif urlflag==False:
-                con.send('invalidurl#E&D@Q!C#')
-            else:
-                con.send('invalidcredentials#E&D@Q!C#')
-                TD.releaseconnection()
-            dictFolderJson=None
-            return True
+            resp = requests.get(self.Qc_Url + '/authentication-point/logout')
+            #status = resp.status_code == 200
+            res = "closedqc"
         except Exception as e:
-            print('Error while quitting qc')
-            con.send("Fail@f@!l#E&D@Q!C#")
-
-    def emit_data(self):
-        try:
-            global dictFolderJson,sent
-            data_to_send = json.dumps(dictFolderJson).encode('utf-8')
-            data_to_send+='#E&D@Q!C#'
-            sent=1
-            con.send(data_to_send)
-        except Exception as e:
-            print('Error while emitting data')
-
-if __name__ == '__main__':
-    host = 'localhost'
-    port = 10000
-    try:
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.bind((host, port))
-        s.listen(30)
-        con, addr = s.accept()
-        client_data =''
-        while(True):
-            try:
-                data_stream = con.recv(1024)
-                client_data+=data_stream
-                if('#E&D@Q!C#' in data_stream):
-                    parsed_data = client_data[:client_data.find('#E&D@Q!C#')]
-                    data_to_use = json.loads(parsed_data.decode('utf-8'))
-                    qc_ref = QcWindow(data_to_use)
-                    client_data=''
-                    if(sent!=1):
-                        con.send("Fail@f@!l#E&D@Q!C#")
-                    else:
-                        sent=0
-            except Exception as e:
-                con.send("Fail@f@!l#E&D@Q!C#")
-                break
-    except Exception as e:
-        print("Exception occured in QC")
+            err_msg = 'Error while logging off from ALM'
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
+            log.error(e, exc_info=True)
+        return res

@@ -109,12 +109,9 @@ class SQLite(AbstractStorage):
         if len(last_pcktid) != 0: self._packet_id = last_pcktid[0][0] + 1
 
     def __del__(self):
-        try:
-            sqlite_lock.acquire(True)
-            if bool(self.db):
-                self.compact_db()
-                self.db.connection.close()
-        finally: sqlite_lock.release()
+        if bool(self.db):
+            self.compact_db()
+            self.db.connection.close()
 
     @property
     def has_packet(self):
@@ -169,4 +166,7 @@ class SQLite(AbstractStorage):
         finally: sqlite_lock.release()
 
     def compact_db(self):
-        self.db.execute("VACUUM")
+        try:
+            sqlite_lock.acquire(True)
+            self.db.execute("VACUUM")
+        finally: sqlite_lock.release()

@@ -47,6 +47,7 @@ class  JumpTo():
         return_value=self.index+1
         error_msg=None
         output=OUTPUT_CONSTANT
+        no_Of_Test_steps = -1
         try:
             log.debug('Get the tsp list')
             tspList=handler.local_handler.tspList
@@ -58,8 +59,7 @@ class  JumpTo():
                 inputVal=input[0]
                 if inputVal==tsp.testscript_name:
                     flag=True
-                    log.debug('Found  target index in tsp list')
-##                    logger.print_on_console('Target index ' +str(i))
+                    log.debug('Found target index in tsp list')
                     logger.print_on_console('Jump to Testcase:' +tsp.testscript_name)
                     log.info('Jump to Testcase:' +tsp.testscript_name)
                     return_value=i
@@ -70,10 +70,7 @@ class  JumpTo():
                 logger.print_on_console('Test script name not found')
         except Exception as e:
             log.error(e)
-
-            logger.print_on_console(e)
-
-
+            logger.print_on_console("Error While performing action JumpTo")
         #Reporting part
         self.step_description='JumpTo executed and the result is '+ str(self.status)
         self.parent_id=reporting_obj.get_pid()
