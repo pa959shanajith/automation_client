@@ -54,7 +54,8 @@ mobile_keywords={
     'verifycount': 'spinner_obj.verify_count',
     'verifyselectedvalue': 'spinner_obj.verify_selected_value',
     'setsecuretext': 'mob_obj.set_secure_text',
-    'hidesoftkeyboard': 'mob_obj.hide_soft_keyboard'
+    'hidesoftkeyboard': 'mob_obj.hide_soft_keyboard',
+    'click': 'mob_obj.click'
 }
 
 generic_keywords={
