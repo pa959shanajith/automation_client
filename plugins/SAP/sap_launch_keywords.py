@@ -367,7 +367,7 @@ class Launch_Keywords():
                 if ( flag1 == True and flag2 == True ):
                     status = sap_constants.TEST_RESULT_PASS
                     result = sap_constants.TEST_RESULT_TRUE
-                elif( flag1 != False ):
+                elif( flag1 != False or flag2 == False ):
                     err_msg = "Unable to find the menu item"
             else:
                 err_msg = sap_constants.SESSION_AND_WINDOW_ERROR
@@ -663,6 +663,19 @@ class Launch_Keywords():
             log.error( error )
             logger.print_on_console( "Error has occured while capturing screenshot" )
         #img.save(r'.\screenshot.png')
+        return img
+
+    def capture_window(self, handle):
+        img = None
+        bbox = None
+        toplist, winlist = [], []
+        def enum_cb(hwnd, results):
+            winlist.append((hwnd, win32gui.GetWindowText(hwnd)))
+        win32gui.EnumWindows(enum_cb, toplist)
+        hwnd = win32gui.GetForegroundWindow()
+        win32gui.SetForegroundWindow(handle)
+        bbox = win32gui.GetWindowRect(handle)
+        img = ImageGrab.grab(bbox)
         return img
 
     def setWindowToForeground(self, sap_id):

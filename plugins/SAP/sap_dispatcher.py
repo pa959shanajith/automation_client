@@ -235,6 +235,7 @@ class SAPDispatcher:
                 self.sap_dict['doubleclickiris'] = iris_object.doubleclickiris
                 self.sap_dict['rightclickiris'] = iris_object.rightclickiris
                 self.sap_dict['settextiris'] = iris_object.settextiris
+                self.sap_dict['setsecuretextiris'] = iris_object.setsecuretextiris
                 self.sap_dict['gettextiris'] = iris_object.gettextiris
                 self.sap_dict['getrowcountiris'] = iris_object.getrowcountiris
                 self.sap_dict['getcolcountiris'] = iris_object.getcolcountiris

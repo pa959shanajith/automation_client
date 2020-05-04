@@ -261,10 +261,13 @@ class Shell_GridView_Toolbar_Keywords():
                                 elmID = elem.GetToolbarButtonId(x)
                                 if ( (elem.GetToolbarButtonType(x) == "Menu" or "ButtonAndMenu") and len(input_val) > 1 ):
                                     menuItem = str(input_val[1]).strip()
-                                    elem.PressToolbarContextButton(elmID)
-                                    elem.SelectContextMenuItemByText(menuItem)
+                                    try:elem.PressToolbarContextButton(elmID)
+                                    except Exception as e: log.info('Warning! in PressToolbarContextButton : ' + str(e))
+                                    try:elem.SelectContextMenuItemByText(menuItem)
+                                    except Exception as e: log.info('Warning! in SelectContextMenuItemByText : ' + str(e))
                                 else:
-                                    elem.PressToolbarButton(elmID)
+                                    try:elem.PressToolbarButton(elmID)
+                                    except Exception as e:log.info('Warning! in PressToolbarButton : ' + str(e))
                                 status = sap_constants.TEST_RESULT_PASS
                                 result = sap_constants.TEST_RESULT_TRUE
                                 break
