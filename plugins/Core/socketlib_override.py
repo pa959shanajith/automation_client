@@ -198,6 +198,8 @@ def socketIO_get_response(request, *args, **kw):
 def socketIO_wait(self, seconds=None, **kw):
     self._heartbeat_thread.hurry()
     #self._transport.set_timeout(seconds=1)
+    #print(self._transport._connection.gettimeout())
+    time.sleep(1)
     warning_screen = self._yield_warning_screen(seconds)
     for elapsed_time in warning_screen:
         if self._should_stop_waiting(**kw):
@@ -299,6 +301,14 @@ def socketIO_send_pckt(self, event, *args, **kw):
     del args
 
 
+def socketIO_send(self, data='', callback=None, **kw):
+    if 'path' not in kw: kw['path'] = ''
+    args = [data]
+    if callback:
+        args.append(callback)
+    self.emit('message', *args, **kw)
+
+
 socketIO_client.parsers._read_packet_length = socketIO_read_packet_length
 socketIO_client.parsers._read_packet_text = socketIO_read_packet_text
 socketIO_client.transports.get_response = socketIO_get_response
@@ -310,6 +320,8 @@ socketIO_client.SocketIO.save_pckt = socketIO_save_pckt
 socketIO_client.SocketIO.send_pckt = socketIO_send_pckt
 socketIO_client.SocketIO._emit = socketIO_client.SocketIO.emit
 socketIO_client.SocketIO.emit = socketIO_emit
+socketIO_client.SocketIO._send = socketIO_client.SocketIO.send
+socketIO_client.SocketIO.send = socketIO_send
 socketIO_client.SocketIO._warn = socketIO_warn
 socketIO_client.SocketIO._close = socketIO_close
 socketIO_client.SocketIO._transport = socketIO_transport
