@@ -199,8 +199,11 @@ class Shell_Calendar_Keywords():
                     elem = ses.FindById(id)
                     if ( elem.type == 'GuiShell' and elem.SubType == 'Calendar' ): #identify if its a shell and calender
                         try : elem.SelectWeek( int(input_val[0]), int(input_val[1]) )
-                        except Exception as e : log.info('WARNING: Following issue found in SelectWeek ', e)
-                        self.navigate_to(elem, elem.SelectionInterval[0])
+                        except Exception as e : log.info('WARNING: Following issue found in SelectWeek ' + str(e))
+                        nav = elem.SelectionInterval
+                        if (type(nav) == str): nav = nav.split(',')
+                        self.navigate_to(elem, nav[0])
+                        del nav
                         status = sap_constants.TEST_RESULT_PASS
                         result = sap_constants.TEST_RESULT_TRUE
                     else : err_msg = 'Element is not a shell-calender object'
@@ -230,7 +233,7 @@ class Shell_Calendar_Keywords():
         flag = [False,False]
         er=[]
         #---------month
-        if ( type(input_val[0]) == str and input_val[0].lower() in sap_constants.Month.keys() ) : input_val[0] = sap_constants.Month[input_val[0]]
+        if ( type(input_val[0]) == str and input_val[0].lower() in sap_constants.Month.keys() ) : input_val[0] = sap_constants.Month[input_val[0].lower()]
         try:
             if ( int(input_val[0]) <= 12 and int(input_val[0]) >= 1): flag[0] = True
             else : er.append(flag_message[2])
@@ -247,7 +250,7 @@ class Shell_Calendar_Keywords():
                     self.navigate_to(elem, v)
                     if ( elem.type == 'GuiShell' and elem.SubType=='Calendar'): #identify if its a shell and calender
                         try : elem.SelectMonth(int(input_val[0]),int(input_val[1]))
-                        except Exception as e : log.info('WARNING: Following issue found in SelectMonth ', e)
+                        except Exception as e : log.info('WARNING: Following issue found in SelectMonth ' + str(e))
                         status = sap_constants.TEST_RESULT_PASS
                         result = sap_constants.TEST_RESULT_TRUE
                     else : err_msg = 'Element is not a shell-calender object'
@@ -290,7 +293,7 @@ class Shell_Calendar_Keywords():
                     self.navigate_to(elem, input_val[0])
                     if ( elem.type == 'GuiShell' and elem.SubType == 'Calendar'): #identify if its a shell and calender
                         try : elem.SelectRange(int(input_val[0]),int(input_val[1]))
-                        except Exception as e : log.info('WARNING: Following issue found in Select Range ', e)
+                        except Exception as e : log.info('WARNING: Following issue found in Select Range ' + str(e))
                         status = sap_constants.TEST_RESULT_PASS
                         result = sap_constants.TEST_RESULT_TRUE
                     else : err_msg = 'Element is not a shell-calender object'
@@ -337,7 +340,7 @@ class Shell_Calendar_Keywords():
                             else:
                                 err_msg = 'Unable to focus the input date'
                         except Exception as e:
-                            log.info( 'WARNING: Following issue found in Select Todays Date ',e)
+                            log.info( 'WARNING: Following issue found in Select Todays Date ' + str(e))
                     else : err_msg = 'Element is not a shell-calender object'
                 else : err_msg = sap_constants.ELELMENT_NOT_FOUND
             else : err_msg = 'Wrong input data provided error : ' + str(er[:])[1:len(str(er))-1]
