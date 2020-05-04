@@ -9,6 +9,7 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 from mobile_app_constants import *
+from constants import *
 import android_scrapping
 import wx
 from socketIO_client import SocketIO,BaseNamespace
@@ -34,26 +35,46 @@ class ScrapeWindow(wx.Frame):
         self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
         self.core_utilsobject = core_utils.CoreUtils()
         self.parent = parent
-        self.scrapeoptions = ["Full",'Textbox','Timepicker','Datepicker','Radio','Button','Switch','Checkbox','Spinner','Numberpicker','Seekbar','Text','Image','Layout','View','Element']
-        self.classes = {
-            'textbox': ['android.widget.EditText'],
-            'timepicker': ['android.widget.TimePicker'],
-            'datepicker': ['android.widget.DatePicker'],
-            'radio': ['android.widget.RadioButton'],
-            'button': ['android.widget.Button','android.widget.ImageButton'],
-            'switch': ['android.widget.Switch'],
-            'checkbox': ['android.widget.CheckBox'],
-            'spinner': ['android.widget.Spinner'],
-            'numberpicker': ['android.widget.NumberPicker'],
-            'seekbar': ['android.widget.SeekBar'],
-            'listview': ['android.widget.ListView'],
-            'text': ['android.widget.TextView'],
-            'image': ['android.widget.ImageView'],
-            'layout': ['android.widget.LinearLayout','android.widget.RelativeLayout'],
-            'view':['android.view.View'],
-            'element': ['android.widget.ScrollView','android.view.ViewGroup','android.widget.FrameLayout','android.widget.LinearLayout','android.widget.RelativeLayout']
-        }
+        if (SYSTEM_OS != 'Darwin'):
+            self.scrapeoptions = ["Full",'Textbox','Timepicker','Datepicker','Radio','Button','Switch','Checkbox','Spinner','Numberpicker','Seekbar','Text','Image','Layout','View','Element']
+            self.classes = {
+                'textbox': ['android.widget.EditText'],
+                'timepicker': ['android.widget.TimePicker'],
+                'datepicker': ['android.widget.DatePicker'],
+                'radio': ['android.widget.RadioButton'],
+                'button': ['android.widget.Button','android.widget.ImageButton'],
+                'switch': ['android.widget.Switch'],
+                'checkbox': ['android.widget.CheckBox'],
+                'spinner': ['android.widget.Spinner'],
+                'numberpicker': ['android.widget.NumberPicker'],
+                'seekbar': ['android.widget.SeekBar'],
+                'listview': ['android.widget.ListView'],
+                'text': ['android.widget.TextView'],
+                'image': ['android.widget.ImageView'],
+                'layout': ['android.widget.LinearLayout','android.widget.RelativeLayout'],
+                'view':['android.view.View'],
+                'element': ['android.widget.ScrollView','android.view.ViewGroup','android.widget.FrameLayout','android.widget.LinearLayout','android.widget.RelativeLayout']
+            }
+        else:
+            self.scrapeoptions = ["Full",'Textbox','Radio','Button','Switch','Checkbox','Picker','Slider','Link','Text','Image','Table','Cell','Key','Element']
+            self.classes = {
+                'textbox': ['XCUIElementTypeTextField','XCUIElementTypeSearchField','XCUIElementTypeSecureTextField'],
+                'radio': ['XCUIElementTypeRadioButton'],
+                'button': ['XCUIElementTypeButton'],
+                'switch': ['XCUIElementTypeSwitch','XCUIElementTypeToggle'],
+                'checkbox': ['XCUIElementTypeCheckBox'],
+                'picker': ['XCUIElementTypePickerWheel'],
+                'slider': ['XCUIElementTypeSlider'],
+                'link': ['XCUIElementTypeLink'],
+                'text': ['XCUIElementTypeStaticText','XCUIElementTypeTextView'],
+                'image': ['XCUIElementTypeImage','XCUIElementTypeIcon'],
+                'table': ['XCUIElementTypeTable'],
+                'cell' : ['XCUIElementTypeCell'],
+                'key' : ['XCUIElementTypeKey'],
+                'element': ['XCUIElementTypeApplication','XCUIElementTypeWindow','XCUIElementTypeOther','XCUIElementTypeNavigationBar','XCUIElementTypeScrollView','XCUIElementTypeSheet','XCUIElementTypeAlert']
+            }
         self.scrape_selected_option = ["full"]
+        self.selected_choice = "Full"
         
         global obj
         

@@ -106,43 +106,21 @@ class custom():
         driver_flag = False
         object_name = input[0].lower()
         visible_text = input[1]
-        #logger.print_on_console(input)
         driver = android_scrapping.driver
-        classes_ios = {
-            'textbox': ['XCUIElementTypeTextField','XCUIElementTypeSearchField','XCUIElementTypeSecureTextField'],
-            'radio': ['XCUIElementTypeRadioButton'],
-            'button': ['XCUIElementTypeButton'],
-            'switch': ['XCUIElementTypeSwitch','XCUIElementTypeToggle'],
-            'checkbox': ['XCUIElementTypeCheckBox'],
-            'picker': ['XCUIElementTypePickerWheel'],
-            'numberpicker': ['XCUIElementType'],
-            'slider': ['XCUIElementTypeSlider'],
-            'link': ['XCUIElementTypeLink'],
-            'text': ['XCUIElementTypeStaticText','XCUIElementTypeTextView'],
-            'image': ['XCUIElementTypeImage','XCUIElementTypeIcon'],
-            'table': ['XCUIElementTypeTable'],
-            'cell' : ['XCUIElementTypeCell'],
-            'key' : ['XCUIElementTypeKey'],
-            'element': ['XCUIElementTypeApplication','XCUIElementTypeWindow','XCUIElementTypeOther','XCUIElementTypeNavigationBar','XCUIElementTypeScrollView','XCUIElementTypeSheet','XCUIElementTypeAlert']
-        }
-        classes = {
-            'textbox': ['android.widget.EditText'],
-            'timepicker': ['android.widget.TimePicker'],
-            'datepicker': ['android.widget.DatePicker'],
-            'radio': ['android.widget.RadioButton'],
-            'button': ['android.widget.Button','android.widget.ImageButton'],
-            'switch': ['android.widget.Switch'],
-            'checkbox': ['android.widget.CheckBox'],
-            'spinner': ['android.widget.Spinner'],
-            'numberpicker': ['android.widget.NumberPicker'],
-            'seekbar': ['android.widget.SeekBar'],
-            'listview': ['android.widget.ListView'],
-            'text': ['android.widget.TextView'],
-            'image': ['android.widget.ImageView'],
-            'layout': ['android.widget.LinearLayout','android.widget.RelativeLayout'],
-            'view':['android.view.View'],
-            'element': ['android.widget.ScrollView','android.view.ViewGroup','android.widget.FrameLayout','android.widget.LinearLayout','android.widget.RelativeLayout']
-        }
+        if SYSTEM_OS != 'Darwin':
+            classes = {
+                'textbox': ['android.widget.EditText'], 'timepicker': ['android.widget.TimePicker'], 'datepicker': ['android.widget.DatePicker'], 'radio': ['android.widget.RadioButton'], 'button': ['android.widget.Button','android.widget.ImageButton'], 'switch': ['android.widget.Switch'], 'checkbox': ['android.widget.CheckBox'],
+                'spinner': ['android.widget.Spinner'], 'numberpicker': ['android.widget.NumberPicker'], 'seekbar': ['android.widget.SeekBar'], 'listview': ['android.widget.ListView'], 'text': ['android.widget.TextView'], 'image': ['android.widget.ImageView'],
+                'layout': ['android.widget.LinearLayout','android.widget.RelativeLayout'], 'view':['android.view.View'], 'element': ['android.widget.ScrollView','android.view.ViewGroup','android.widget.FrameLayout','android.widget.LinearLayout','android.widget.RelativeLayout']
+            }
+        else:
+            classes = {
+                'textbox': ['XCUIElementTypeTextField','XCUIElementTypeSearchField','XCUIElementTypeSecureTextField'], 'radio': ['XCUIElementTypeRadioButton'], 'button': ['XCUIElementTypeButton'], 'switch': ['XCUIElementTypeSwitch','XCUIElementTypeToggle'],
+                'checkbox': ['XCUIElementTypeCheckBox'], 'picker': ['XCUIElementTypePickerWheel'], 'slider': ['XCUIElementTypeSlider'], 'link': ['XCUIElementTypeLink'], 'text': ['XCUIElementTypeStaticText','XCUIElementTypeTextView'],
+                'image': ['XCUIElementTypeImage','XCUIElementTypeIcon'], 'table': ['XCUIElementTypeTable'], 'cell' : ['XCUIElementTypeCell'], 'key' : ['XCUIElementTypeKey'],
+                'element': ['XCUIElementTypeApplication','XCUIElementTypeWindow','XCUIElementTypeOther','XCUIElementTypeNavigationBar','XCUIElementTypeScrollView','XCUIElementTypeSheet','XCUIElementTypeAlert']
+            }
+            
         element_list = []
         try:
             index = int(input[2])
@@ -157,21 +135,12 @@ class custom():
             if driver_flag is True:
                 elem_count = 0
                 if len(visible_text) > 0:
-                    if SYSTEM_OS != 'Darwin':
-                        for item in classes[object_name]:
-                            xpath_str = "//"+item+"[starts-with(@text,'"+visible_text+"')]"
-                            element_list = element_list + driver.find_elements_by_xpath(xpath_str)
-                    else:
-                        for item in classes_ios[object_name]:
-                            xpath_str = "//"+item+"[starts-with(@text,'"+visible_text+"')]"
-                            element_list = element_list + driver.find_elements_by_xpath(xpath_str)
+                   for item in classes_ios[object_name]:
+                        xpath_str = "//"+item+"[starts-with(@text,'"+visible_text+"')]"
+                        element_list = element_list + driver.find_elements_by_xpath(xpath_str)
                 else:
-                    if SYSTEM_OS != 'Darwin':
-                        for item in classes[object_name]:
-                            element_list = element_list + driver.find_elements_by_class_name(item)
-                    else:
-                        for item in classes_ios[object_name]:
-                            element_list = element_list + driver.find_elements_by_class_name(item)
+                    for item in classes_ios[object_name]:
+                        element_list = element_list + driver.find_elements_by_class_name(item)
                 if index < len(element_list):
                     log.info(CUSTOM_ELEMENT_FOUND)
                     logger.print_on_console(CUSTOM_ELEMENT_FOUND)
@@ -208,8 +177,6 @@ class custom():
                         err_msg = self.print_error('Delay timeout')
                         break
                     if element is not None:
-                        #log.info(CUSTOM_ELEMENT_FOUND)
-                        #logger.print_on_console(CUSTOM_ELEMENT_FOUND)
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
                         break

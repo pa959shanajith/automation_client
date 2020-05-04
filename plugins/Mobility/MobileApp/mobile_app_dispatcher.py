@@ -446,30 +446,40 @@ class MobileDispatcher:
         id = None
         if objectname.strip() != '':
             if SYSTEM_OS=='Darwin':
-                objectname = objectname.replace("/AppiumAUT[1]/", "/")
+                xpath = objectname.replace("/AppiumAUT[1]/", "/")
                 log.debug(objectname)
             else:
                 identifiers = objectname.split(';')
-                id = identifiers[0]
+                if identifiers[0]!='': id = identifiers[0]
                 xpath = identifiers[1]
                 log.debug('Identifiers are ')
                 log.debug(identifiers)
             try:
-                log.debug('trying to find mobileElement by xpath')
-                if SYSTEM_OS=='Darwin':
-                    mobileElement = driver.find_element_by_xpath(objectname)
+                if id:
+                    log.debug('trying to find mobileElement by id')
+                    mobileElement = driver.find_element_by_id(id)
                 else:
-                    mobileElement = driver.find_element_by_xpath(xpath)
-            except Exception as Ex:
-                log.debug(str(Ex))
-                log.debug('Element not found by xpath')
-                if (id):
                     try:
-                        log.debug('trying to find mobileElement by id')
-                        mobileElement = driver.find_element_by_id(id)
+                        log.debug('trying to find mobileElement by xpath')
+                        if xpath:
+                            mobileElement = driver.find_element_by_xpath(xpath)
+                        else:
+                            log.debug('Invalid Element')
                     except Exception as Ex:
                         log.debug('Element not found')
                         log.debug(str(Ex))
+            except Exception as Ex:
+                log.debug(str(Ex))
+                log.debug('Element not found by id')
+                try:
+                    if xpath:
+                        log.debug('trying to find mobileElement by xpath')
+                        mobileElement = driver.find_element_by_xpath(xpath)
+                    else:
+                        log.debug('Invalid Element')
+                except Exception as Ex:
+                    log.debug('Element not found')
+                    log.debug(str(Ex))
         if mobileElement==None:
             ELEMENT_FOUND=False
         return mobileElement, xpath
