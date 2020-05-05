@@ -209,21 +209,18 @@ class MainNamespace(BaseNamespace):
             log.error(e,exc_info=True)
 
     def on_executeTestSuite(self, *args):
+        global wxObject, execution_flag
         try:
-            global wxObject,socketIO,execution_flag
-            args=list(args)
+            exec_data = args[0]
+            batch_id = exec_data["batchId"]
             if(not execution_flag):
-                socketIO.emit('return_status_executeTestSuite',{'status':'success','executionId':(args[0])['executionId']})
-                wxObject.mythread = TestThread(wxObject,EXECUTE,args[0],wxObject.debug_mode)
+                socketIO.emit('return_status_executeTestSuite', {'status': 'success', 'batchId': batch_id})
+                wxObject.mythread = TestThread(wxObject, EXECUTE, exec_data)
             else:
-                obj = handler.Handler()
-                suiteId_list,suite_details,browser_type,scenarioIds,suite_data,execution_id,condition_check,dataparam_path,exec_mode=obj.parse_json_execute(args[0])
-                data = {'scenario_ids':scenarioIds,'execution_id':execution_id,'time':str(datetime.now())}
-                emsg='Execution already in progress. Skipping current request.'
+                socketIO.emit('return_status_executeTestSuite', {'status': 'skipped', 'batchId': batch_id})
+                emsg = 'Execution already in progress. Skipping current request.'
                 log.warn(emsg)
                 logger.print_on_console(emsg)
-                """sending scenario details for skipped execution to update the same in reports."""
-                socketIO.emit('return_status_executeTestSuite',{'status':'skipped','data':data,'executionId':(args[0])['executionId']})
         except Exception as e:
             err_msg='Error while Executing'
             log.error(err_msg)
@@ -231,11 +228,11 @@ class MainNamespace(BaseNamespace):
             log.error(e,exc_info=True)
 
     def on_debugTestCase(self, *args):
+        global wxObject
         try:
             if check_execution_lic("result_debugTestCase"): return None
-            global wxObject
-            args=list(args)
-            wxObject.mythread = TestThread(wxObject,DEBUG,args[0],wxObject.debug_mode)
+            exec_data = args[0]
+            wxObject.mythread = TestThread(wxObject, DEBUG, exec_data)
             wxObject.choice=wxObject.rbox.GetStringSelection()
             logger.print_on_console(str(wxObject.choice)+' is Selected')
             if wxObject.choice == 'Normal':
@@ -765,7 +762,7 @@ class TestThread(threading.Thread):
     """Test Worker Thread Class."""
 
     #----------------------------------------------------------------------
-    def __init__(self,wxObject,action,json_data,debug_mode):
+    def __init__(self, wxObject, action, json_data):
         """Init Worker Thread Class."""
         super(TestThread, self).__init__()
         self.wxObject = wxObject
@@ -778,10 +775,10 @@ class TestThread(threading.Thread):
         # prevent that. In Python 2, use of Lock instead of RLock also
         # boosts performance.
         self.pause_cond = threading.Condition(threading.Lock())
-        self.con=''
-        self.action=action.lower()
-        self.json_data=json_data
-        self.debug_mode=debug_mode
+        self.con = ''
+        self.action = action.lower()
+        self.json_data = json_data
+        self.debug_mode = wxObject.debug_mode
         self.start()    # start the thread
 
     #should just resume the thread
@@ -795,9 +792,11 @@ class TestThread(threading.Thread):
         """Run Worker Thread."""
         # This is the code executing in the new thread.
         global socketIO, execution_flag, closeActiveConnection,connection_Timer
+        batch_id = None
         try:
             runfrom_step=1
-            if self.action==DEBUG:
+            if self.action==EXECUTE: batch_id = self.json_data["batchId"]
+            elif self.action==DEBUG:
                 self.debug_mode=False
                 self.wxObject.breakpoint.Disable()
                 if self.wxObject.choice in ['Stepwise','RunfromStep']:
@@ -859,16 +858,16 @@ class TestThread(threading.Thread):
                 else:
                     socketIO.emit('result_debugTestCaseWS',status)
             elif self.action==EXECUTE:
-                socketIO.emit('result_executeTestSuite',{"status":status,"executionId":self.json_data["executionId"]})
+                socketIO.emit('result_executeTestSuite', {"status":status, "batchId": batch_id})
         except Exception as e:
-            log.error(e,exc_info=True)
+            log.error(e, exc_info=True)
             status=TERMINATE
             if socketIO is not None:
                 if self.action==DEBUG:
                     self.wxObject.killChildWindow(debug=True)
                     socketIO.emit('result_debugTestCase',status)
                 elif self.action==EXECUTE:
-                    socketIO.emit('result_executeTestSuite',{"status":status,"executionId":self.json_data["executionId"]})
+                    socketIO.emit('result_executeTestSuite', {"status":status, "batchId": batch_id})
         if closeActiveConnection:
             closeActiveConnection = False
             connection_Timer = threading.Timer(300, wxObject.closeConnection)

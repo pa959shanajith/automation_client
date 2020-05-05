@@ -158,7 +158,7 @@ class Controller():
 
     def __load_web(self):
         try:
-##            core_utils.get_all_the_imports('ImageProcessing')
+            # core_utils.get_all_the_imports('ImageProcessing')
             core_utils.get_all_the_imports('WebScrape')
             core_utils.get_all_the_imports('Web')
             if iris_flag:
@@ -421,7 +421,7 @@ class Controller():
             elif self.status == TERMINATE:
                 self.reporting_obj.overallstatus=self.status
         if self.action==EXECUTE:
-##            self.reporting_obj.generate_report_step(tsp,self.status,tsp.name+' EXECUTED and the result is  '+self.status,ellapsed_time,keyword_flag,result[3])
+            # self.reporting_obj.generate_report_step(tsp,self.status,tsp.name+' EXECUTED and the result is  '+self.status,ellapsed_time,keyword_flag,result[3])
             if statusflag:
                 self.reporting_obj.generate_report_step(tsp,'',self,ellapsed_time,keyword_flag,result,ignore_stat,inpval)
             else:
@@ -429,7 +429,7 @@ class Controller():
             if tsp.name.lower()=='verifyvalues' or tsp.name.lower()=='verifytextiris':
                 tsp.testcase_details=testcase_details_orig
 
-##      Issue #160
+        # Issue #160
         if index==STOP:
             return index
         if len(self.counter)>0 and self.counter[-1]>-1 and self.counter[-1]-index==0:
@@ -703,7 +703,7 @@ class Controller():
                     temp_result=temp_result[0:-1]
             if pause_flag:
                 self.pause_execution()
-##            logger.print_on_console( 'Result in methodinvocation : ', teststepproperty.name,' : ',temp_result)
+            # logger.print_on_console( 'Result in methodinvocation : ', teststepproperty.name,' : ',temp_result)
             log.info('Result in methodinvocation : '+ str(teststepproperty.name)+' : ')
             log.info(result)
             self.keyword_status=TEST_RESULT_FAIL
@@ -851,8 +851,8 @@ class Controller():
         log.info('***DEBUG STARTED***')
         logger.print_on_console('***DEBUG STARTED***')
         print('=======================================================================================================')
-        for d in scenario:
-            flag,browser_type,last_tc_num,testcase_empty_flag,empty_testcase_names=obj.parse_json(d)
+        for testcase in scenario:
+            flag,browser_type,last_tc_num,testcase_empty_flag,empty_testcase_names=obj.parse_json(testcase)
             if flag == False:
                 break
             print('\n')
@@ -886,20 +886,20 @@ class Controller():
         qc_url=''
         qc_password=''
         qc_username=''
-        con =Controller()
+        con = Controller()
         obj = handler.Handler()
         status=COMPLETED
         condition_check_flag = False
         testcase_empty_flag = False
         info_msg=''
-##        t = test.Test()
-##        suites_list,flag = t.gettsplist()
+        # t = test.Test()
+        # suites_list,flag = t.gettsplist()
         #Getting all the details by parsing the json_data
-        suiteId_list,suite_details,browser_type,scenarioIds,suite_data,execution_id,condition_check,dataparam_path,self.execution_mode=obj.parse_json_execute(json_data)
+        suiteId_list,suite_details,browser_type,scenarioIds,suite_data,execution_ids,batch_id,condition_check,dataparam_path,self.execution_mode,qc_creds=obj.parse_json_execute(json_data)
         self.action=EXECUTE
         log.info( 'No  of Suites : '+str(len(suiteId_list)))
         logger.print_on_console('No  of Suites : ',str(len(suiteId_list)))
-        j=1
+        suite_idx=1
         #Iterate through the suites-list
         for suite,suite_id,suite_id_data in zip(suite_details,suiteId_list,suite_data):
             #EXECUTION GOES HERE
@@ -907,45 +907,44 @@ class Controller():
             flag=True
             if terminate_flag:
                 status=TERMINATE
-##                break
             log.info('---------------------------------------------------------------------')
             print('=======================================================================================================')
-            log.info('***SUITE '+str( j) +' EXECUTION STARTED***')
-            logger.print_on_console('***SUITE ', str(j) ,' EXECUTION STARTED***')
+            log.info('***SUITE '+str(suite_idx) +' EXECUTION STARTED***')
+            logger.print_on_console('***SUITE ', str(suite_idx) ,' EXECUTION STARTED***')
             log.info('-----------------------------------------------')
             print('=======================================================================================================')
             do_not_execute = False
             #Check for the disabled scenario
-            if not (do_not_execute) :
+            if not (do_not_execute):
                  #Logic to Execute each suite for each of the browser
                 for browser in browser_type[suite_id]:
-                    i=0
+                    sc_idx = 0
                     #Logic to iterate through each scenario in the suite
                     for scenario,scenario_id,condition_check_value,dataparam_path_value in zip(suite_id_data,scenarioIds[suite_id],condition_check[suite_id],dataparam_path[suite_id]):
                         execute_flag=True
-                        ''' To fix Bug 653: Web Browser and Dynamic variables do not work across Scenarios
-                            Controller object should be created for each execution and not for each scenario
-                            Hence commenting the creation of controller object in this block
-                        '''
-                        #con =Controller()
                         con.reporting_obj=reporting.Reporting()
                         con.configvalues=configvalues
                         con.exception_flag=self.exception_flag
                         con.wx_object=wxObject
                         handler.local_handler.tspList=[]
+                        execute_result_data = {
+                            'testsuiteId': suite_id,
+                            'scenarioId': scenario_id,
+                            'batchId': batch_id,
+                            'executionId': execution_ids[suite_idx-1],
+                            'reportData': None}
                         #condition check for scenario execution and reporting for condition check
                         if not(condition_check_flag):
-                             #check for temrinate flag before printing loggers
+                             #check for terminate flag before printing loggers
                             if not(terminate_flag):
                                 print('=======================================================================================================')
-                                logger.print_on_console( '***Scenario ' ,str(i+1) ,' execution started***')
+                                logger.print_on_console( '***Scenario ' ,str(sc_idx + 1) ,' execution started***')
                                 print('=======================================================================================================')
-                                log.info('***Scenario '  + str(i+1)+ ' execution started***')
-                            if(len(scenario)==3 and len(scenario['qcdetails'])==10):
-                                qc_details_creds=scenario['qccredentials']
-                                qc_username=qc_details_creds['qcusername']
-                                qc_password=qc_details_creds['qcpassword']
-                                qc_url=qc_details_creds['qcurl']
+                                log.info('***Scenario '  + str(sc_idx + 1)+ ' execution started***')
+                            if(len(scenario)==2 and len(scenario['qcdetails'])==10):
+                                qc_username=qc_creds['qcusername']
+                                qc_password=qc_creds['qcpassword']
+                                qc_url=qc_creds['qcurl']
                                 qc_sceanrio_data=scenario['qcdetails']
                                 qc_domain=qc_sceanrio_data['qcdomain']
                                 qc_project=qc_sceanrio_data['qcproject']
@@ -954,12 +953,11 @@ class Controller():
                                 qc_testrunname=qc_sceanrio_data['qctestcase']
 
                             #Iterating through each test case in the scenario
-                            for d in [eval(scenario[scenario_id])]:
+                            for testcase in [eval(scenario[scenario_id])]:
                                 #check for temrinate flag before parsing tsp list
                                 if terminate_flag:
                                     break
-                                flag,browser_temp,last_tc_num,testcase_empty_flag,empty_testcase_names=obj.parse_json(d,dataparam_path_value)
-
+                                flag,_,last_tc_num,testcase_empty_flag,empty_testcase_names=obj.parse_json(testcase,dataparam_path_value)
                                 if flag == False:
                                     break
                                 print('\n')
@@ -991,24 +989,27 @@ class Controller():
                                     local_cont.test_case_number=0
                                     status,status_percentage = con.executor(tsplist,EXECUTE,last_tc_num,1,con.conthread)
                                     print('=======================================================================================================')
-                                    logger.print_on_console( '***Scenario' ,str(i + 1) ,' execution completed***')
+                                    logger.print_on_console( '***Scenario' ,str(sc_idx + 1) ,' execution completed***')
                                     print('=======================================================================================================')
+                                    del con.tsp_list
+                                    del tsplist
                             if execute_flag:
                                 #Saving the report for the scenario
-                                logger.print_on_console( '***Saving report of Scenario' ,str(i  + 1 ),'***')
-                                log.info( '***Saving report of Scenario' +str(i  + 1 )+'***')
+                                logger.print_on_console( '***Saving report of Scenario' ,str(sc_idx  + 1 ),'***')
+                                log.info( '***Saving report of Scenario' +str(sc_idx + 1)+'***')
                                 os.chdir(self.cur_dir)
-                                filename='Scenario'+str(i  + 1)+'.json'
+                                filename='Scenario'+str(sc_idx + 1)+'.json'
                                 #check if user has manually terminated during execution, then check if the teststep data and overallstatus is [] if so poputale default values in teststep data and overallstatus
                                 if terminate_flag ==True and execute_flag==True:
                                     if con.reporting_obj.report_json['rows']==[] and con.reporting_obj.report_json['overallstatus']==[]:
                                         con.reporting_obj.add_to_reporting_obj()
-                                status_percentage["s_index"]=j-1
-                                status_percentage["index"]=i
+                                status_percentage["s_index"]=suite_idx-1
+                                status_percentage["index"]=sc_idx
                                 con.reporting_obj.save_report_json(filename,json_data,status_percentage)
-                                socketIO.emit('result_executeTestSuite',self.getreport_data(suite_id,scenario_id,con,execution_id))
+                                execute_result_data["reportData"] = con.reporting_obj.report_json
+                                socketIO.emit('result_executeTestSuite', execute_result_data)
                                 obj.clearList(con)
-                                i+=1
+                                sc_idx += 1
                                 #logic for condition check
                                 report_json=con.reporting_obj.report_json[OVERALLSTATUS]
                                 if len(scenario['qcdetails'])==10 and (qc_url!='' and qc_password!='' and  qc_username!=''):
@@ -1051,69 +1052,49 @@ class Controller():
                                             condition_check_flag = True
                                             logger.print_on_console('Condition Check: Terminated by program ')
                             elif (True in testcase_empty_flag):
-                                logger.print_on_console( '***Saving report of Scenario' ,str(i  + 1 ),'***')
-                                log.info( '***Saving report of Scenario' +str(i  + 1 )+'***')
+                                logger.print_on_console( '***Saving report of Scenario' ,str(sc_idx + 1),'***')
+                                log.info( '***Saving report of Scenario' +str(sc_idx + 1)+'***')
                                 os.chdir(self.cur_dir)
                                 filename='Scenario'+str(count  + 1)+'.json'
                                 count+=1
-                                status_percentage["s_index"]=j-1
-                                status_percentage["index"]=i
+                                status_percentage["s_index"]=suite_idx-1
+                                status_percentage["index"]=sc_idx
                                 con.reporting_obj.save_report_json_conditioncheck_testcase_empty(filename,info_msg,json_data,status_percentage)
-                                socketIO.emit('result_executeTestSuite',self.getreport_data_conditioncheck_testcase_empty(suite_id,scenario_id,con,execution_id))
+                                execute_result_data["reportData"] = con.reporting_obj.report_json_condition_check_testcase_empty
+                                socketIO.emit('result_executeTestSuite', execute_result_data)
                                 obj.clearList(con)
-                                i+=1
+                                sc_idx += 1
                         else:
-                            logger.print_on_console( '***Saving report of Scenario' ,str(i  + 1 ),'***')
-                            log.info( '***Saving report of Scenario' +str(i  + 1 )+'***')
+                            logger.print_on_console( '***Saving report of Scenario' ,str(sc_idx + 1),'***')
+                            log.info( '***Saving report of Scenario' +str(sc_idx + 1)+'***')
                             os.chdir(self.cur_dir)
                             filename='Scenario'+str(count  + 1)+'.json'
                             count+=1
-                            status_percentage["s_index"]=j-1
-                            status_percentage["index"]=i
+                            status_percentage["s_index"]=suite_idx-1
+                            status_percentage["index"]=sc_idx
                             con.reporting_obj.save_report_json_conditioncheck(filename,json_data,status_percentage)
-                            socketIO.emit('result_executeTestSuite',self.getreport_data_conditioncheck(suite_id,scenario_id,con,execution_id))
+                            execute_result_data["reportData"] = con.reporting_obj.report_json_condition_check
+                            socketIO.emit('result_executeTestSuite', execute_result_data)
                             obj.clearList(con)
-                            i+=1
+                            sc_idx += 1
                             #logic for condition check
                             report_json=con.reporting_obj.report_json[OVERALLSTATUS]
             log.info('---------------------------------------------------------------------')
             print('=======================================================================================================')
-            log.info('***SUITE '+ str(j) +' EXECUTION COMPLETED***')
+            log.info('***SUITE '+ str(suite_idx) +' EXECUTION COMPLETED***')
             #clearing dynamic variables at the end of execution to support dynamic variable at the scenario level
             obj.clear_dyn_variables()
-            logger.print_on_console('***SUITE ', str(j) ,' EXECUTION COMPLETED***')
+            logger.print_on_console('***SUITE ', str(suite_idx) ,' EXECUTION COMPLETED***')
             log.info('-----------------------------------------------')
             print('=======================================================================================================')
-            j=j+1
+            suite_idx += 1
+        del con
+        del obj
         if status==TERMINATE:
             print('=======================================================================================================')
             logger.print_on_console( '***Terminating the Execution***')
             print('=======================================================================================================')
         return status
-
-    #Building of Dictionary to send back toserver to save the data
-    def getreport_data(self,testsuite_id,scenario_id,con,execution_id):
-        obj={'testsuiteId':testsuite_id,
-        'scenarioId':scenario_id,
-        'reportData':con.reporting_obj.report_json,
-        'executionId':execution_id}
-        return obj
-
-    #Building of Dictionary to send back toserver to save the data for condition check
-    def getreport_data_conditioncheck(self,testsuite_id,scenario_id,con,execution_id):
-        obj={'testsuiteId':testsuite_id,
-        'scenarioId':scenario_id,
-        'reportData':con.reporting_obj.report_json_condition_check,
-        'executionId':execution_id}
-        return obj
-
-    #Building of Dictionary to send back toserver to save the data for condition check for testcase empty
-    def getreport_data_conditioncheck_testcase_empty(self,testsuite_id,scenario_id,con,execution_id):
-        obj={'testsuiteId':testsuite_id,
-        'scenarioId':scenario_id,
-        'reportData':con.reporting_obj.report_json_condition_check_testcase_empty,
-        'executionId':execution_id}
-        return obj
 
     def invoke_controller(self,action,mythread,debug_mode,runfrom_step,json_data,wxObject,socketIO,qc_soc,*args):
         status = COMPLETED
@@ -1139,32 +1120,32 @@ class Controller():
         if status != TERMINATE:
             status=COMPLETED
         return status
+
     def invoke_parralel_exe(self,mythread,json_data,socketIO,wxObject,configvalues,qc_soc):
         try:
             import copy
             browsers_data = json_data['suitedetails'][0]['browserType']
-            jsondata_dict = {0:None,1:None,2:None}
-            th={1:None,2:None,3:None}
+            jsondata_dict = {}
+            th={}
             for i in range (len(browsers_data)):
                 jsondata_dict[i] = copy.deepcopy(json_data)
-                jsondata_dict[i]['suitedetails'][0]['browserType']=[browsers_data[i]]
-                th[i+1] = threading.Thread(target = self.invoke_execution, args = (mythread,jsondata_dict[i],socketIO,wxObject,configvalues,qc_soc,))
-                th[i+1].start()
-            for i in range (1,len(browsers_data)):
+                for j in range(len(jsondata_dict[i]['suitedetails'])):
+                    jsondata_dict[i]['suitedetails'][j]['browserType'] = [browsers_data[i]]
+                th[i] = threading.Thread(target = self.invoke_execution, args = (mythread,jsondata_dict[i],socketIO,wxObject,configvalues,qc_soc))
+                th[i].start()
+            for i in th:
                 th[i].join()
             for i in th:
-                while th[i].is_alive():
-                    pass
+                while th[i].is_alive(): pass
         except Exception as e:
             logger.print_on_console("Exception in Parallel Execution")
-            log.error("Exception in Parallel Execution"+str(e))
+            log.error("Exception in Parallel Execution. Error: " + str(e))
         if not(terminate_flag):
-            status =COMPLETED
+            status = COMPLETED
         return status
 
     def step_execution_status(self,teststepproperty):
         #325 : Report - Skip status in report by providing value 0 in the output column in testcase grid is not handled.
-        outputstring = teststepproperty.outputval
         nostatusflag = False
         if teststepproperty.outputval.split(";")[-1].strip() == STEPSTATUS_INREPORTS_ZERO:
             nostatusflag=True
@@ -1179,6 +1160,7 @@ def kill_process():
         try:
             import browserops_MW
             browserops_MW.driver.quit()
+        except ImportError: pass
         except Exception as e:
             logger.print_on_console('Error in stopping scraping driver as driver is already closed')
             log.error(e)
@@ -1186,6 +1168,7 @@ def kill_process():
         try:
             import browser_Keywords_MW
             browser_Keywords_MW.driver_obj.quit()
+        except ImportError: pass
         except Exception as e:
             logger.print_on_console('Error in stopping browser driver as driver is already closed')
             log.error(e)
@@ -1193,6 +1176,7 @@ def kill_process():
         try:
             import install_and_launch
             install_and_launch.driver.quit()
+        except ImportError: pass
         except Exception as e:
             logger.print_on_console('Error in stopping application driver as driver is already closed')
             log.error(e)
@@ -1214,7 +1198,7 @@ def kill_process():
             wmi=win32com.client.GetObject('winmgmts:')
             for p in wmi.InstancesOf('win32_process'):
                 if p.Name in my_processes:
-                    os.system("TASKKILL /F /IM " + p.Name )
+                    os.system("TASKKILL /F /T /IM " + p.Name )
         except Exception as e:
             log.error(e)
 
@@ -1225,7 +1209,7 @@ def kill_process():
                 if p[1] == 4723:
                     log.info( 'Pid Found' )
                     log.info(line.pid)
-                    os.system("TASKKILL /F /PID " + str(line.pid))
+                    os.system("TASKKILL /F /T /PID " + str(line.pid))
         except Exception as e:
             log.error(e)
 
@@ -1243,10 +1227,11 @@ def kill_process():
                         log.info( 'Pid Found' )
                         log.info(pid)
                         try:
-                            os.system("TASKKILL /F /PID " + str(pid))
+                            os.system("TASKKILL /F /T /PID " + str(pid))
                         except Exception as e:
                             log.error(e)
                 del browser_Keywords.local_bk.pid_set[:]
+        except ImportError: pass
         except Exception as e:
             log.error(e,exc_info=True)
         time.sleep(3)
