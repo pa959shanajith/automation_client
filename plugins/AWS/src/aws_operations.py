@@ -39,38 +39,48 @@ os.environ["AWS_CONFIG_FILE"]=AWS_cred_path+os.sep+'config'
 class AWS_Operations:
 
     def __init__(self,cur_date,profile_name=None):
-        if profile_name is None:
-            profile_name='default'
-        self.session=boto3.Session(profile_name=profile_name)
-        self.dc=self.session.client('devicefarm')
-        self.cur_date=cur_date
-        self.terminateFlag=False
-
+        try:
+            if profile_name is None:
+                profile_name='default'
+            self.session=boto3.Session(profile_name=profile_name)
+            self.cur_date=cur_date
+            self.terminateFlag=False
+            conf = open(AWS_config_path, 'r')
+            self.params = json.load(conf)
+            conf.close()
+            if 'url' in self.params and self.params['url'].strip() not in ['','<>']:
+                from botocore.config import Config
+                from urllib.parse import quote_plus as encodeURL
+                proxy_usrl = encodeURL(self.params['username'])+":"+encodeURL(self.params['password'])+"@"+self.params['url']
+                self.proxies = {'http':'http://'+proxy_url,
+                            'https':'https://'+proxy_url}
+                self.dc=self.session.client('devicefarm',config=Config(proxies=self.proxies),verify=False)
+            else:
+                self.dc=self.session.client('devicefarm')
+        except Exception as e:
+            log.error(e,exc_info=True)
 
 
     def get_run_configurations(self):
         try:
-            conf = open(AWS_config_path, 'r')
-            params = json.load(conf)
-            conf.close()
             self.profile_name=None
-            if 'profilename' in params:
-                self.profile_name=params['profilename']
-            self.project_name=params['projectname']
-            self.pool_name=params['poolname']
-            self.apk_path=params['apkpath']
-            self.app_name=params['appname']
-            self.package_name=params['packagename']
-            self.file_path=params['filepath']
-            self.android_test_spec=params['android_testspec']
-            self.ios_test_spec=params['ios_testspec']
+            if 'profilename' in self.params:
+                self.profile_name=self.params['profilename']
+            self.project_name=self.params['projectname']
+            self.pool_name=self.params['poolname']
+            self.apk_path=self.params['apkpath']
+            self.app_name=self.params['appname']
+            self.package_name=self.params['packagename']
+            self.file_path=self.params['filepath']
+            self.android_test_spec=self.params['android_testspec']
+            self.ios_test_spec=self.params['ios_testspec']
             self.test_run_arn = None
             # self.test_spec_path=AWS_assets+os.sep+params['testspec']
 
 
         except Exception as e:
             logger.print_on_console('Error while getting Run configurations')
-            log.error(e)
+            log.error(e,exc_info=True)
 
 
     def create_project(self,project_name):

@@ -352,7 +352,7 @@ class List_Keywords():
                                     text.append(i.text)
                                     #obj.append(i)
                             elementlist_curr = elementlist
-                            driver.scroll(elementlist_curr[-1],elementlist_curr[-2])
+                            # driver.scroll(elementlist_curr[-1],elementlist_curr[-2])
                             # length1=len(text)
                             # if length1 >4 :
                             #     scrollele1=obj[length1-1]
@@ -473,6 +473,7 @@ class List_Keywords():
                         log.debug('performing the action')
                         if (input):
                             driver=android_scrapping.driver
+                            end_flag = False
                             elementlist_curr = []
                             while(True):
                                 elementlist=element.find_elements_by_class_name('android.view.View')
@@ -487,11 +488,13 @@ class List_Keywords():
                                             i.click()
                                             status=TEST_RESULT_PASS
                                             result=TEST_RESULT_TRUE
+                                            end_flag = True
                                             break
                                     #text.append(i.text)
                                     #obj.append(i)
+                                if end_flag: break
                                 elementlist_curr = elementlist
-                                driver.scroll(elementlist_curr[-1],elementlist_curr[-2])
+                                # driver.scroll(elementlist_curr[-1],elementlist_curr[-2])
                                 # elementlist=driver.find_elements_by_class_name('android.widget.CheckedTextView')
                                 # for i in elementlist:
                                 #     if i.text not in text:
@@ -571,6 +574,7 @@ class List_Keywords():
                         if (input):
                             index = -1
                             driver=android_scrapping.driver
+                            end_flag = False
                             elementlist_curr = []
                             while(True):
                                 elementlist=element.find_elements_by_class_name('android.view.View')
@@ -586,11 +590,13 @@ class List_Keywords():
                                             i.click()
                                             status=TEST_RESULT_PASS
                                             result=TEST_RESULT_TRUE
+                                            end_flag = True
                                             break
                                     #text.append(i.text)
                                     #obj.append(i)
+                                if end_flag: break
                                 elementlist_curr = elementlist
-                                driver.scroll(elementlist_curr[-1],elementlist_curr[-2])
+                                # driver.scroll(elementlist_curr[-1],elementlist_curr[-2])
                                 # length1=len(text)
                                 # if length1 >4 :
                                 #     scrollele1=obj[length1-1]
@@ -626,7 +632,7 @@ class List_Keywords():
             else:
                 err_msg=self.print_error(ELEMENT_NOT_EXIST)
         except Exception as e:
-            err_msg=self.print_error("Error occurred in SelectViewsByText")
+            err_msg=self.print_error("Error occurred in SelectViewsByIndex")
             log.error(e,exc_info=True)
         return status,result,output,err_msg
 
@@ -652,6 +658,7 @@ class List_Keywords():
                         if (input):
                             index = -1
                             driver=android_scrapping.driver
+                            end_flag = False
                             elementlist_curr = []
                             while(True):
                                 elementlist=element.find_elements_by_class_name('android.view.View')
@@ -668,11 +675,13 @@ class List_Keywords():
                                             logger.print_on_console("Output: "+output)
                                             status=TEST_RESULT_PASS
                                             result=TEST_RESULT_TRUE
+                                            end_flag = True
                                             break
                                     #text.append(i.text)
                                     #obj.append(i)
+                                if end_flag: break
                                 elementlist_curr = elementlist
-                                driver.scroll(elementlist_curr[-1],elementlist_curr[-2])
+                                # driver.scroll(elementlist_curr[-1],elementlist_curr[-2])
 
                                 # length1=len(text)
                                 # if length1 >4 :
@@ -824,7 +833,7 @@ class List_Keywords():
                                     text.append(i.text)
                                     #obj.append(i)
                             elementlist_curr = elementlist
-                            driver.scroll(elementlist_curr[-1],elementlist_curr[-2])
+                            # driver.scroll(elementlist_curr[-1],elementlist_curr[-2])
                             # elementlist=driver.find_elements_by_class_name('android.widget.CheckedTextView')
                             # for i in elementlist:
                             #     if i.text not in text:
@@ -903,7 +912,7 @@ class List_Keywords():
                                     text.append(i.text)
                                     #obj.append(i)
                             elementlist_curr = elementlist
-                            driver.scroll(elementlist_curr[-1],elementlist_curr[-2])
+                            # driver.scroll(elementlist_curr[-1],elementlist_curr[-2])
                             # elementlist=driver.find_elements_by_class_name('android.widget.CheckedTextView')
                             # for i in elementlist:
                             #     if i.text not in text:

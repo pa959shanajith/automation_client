@@ -66,7 +66,7 @@ class InstallAndLaunch():
                 start = time.time()
                 timeout = 120 #tentative; as it depends on the system performance.
                 server_flag = False
-                while(True): #4257 : Displays Fails if the server starts after the timeout.
+                while(True):
                     if int(time.time()-start) >= timeout:
                         err_msg = self.print_error('Timeout starting the Appium server')
                         break
@@ -97,7 +97,6 @@ class InstallAndLaunch():
 
     def installApplication(self, apk_path, platform_version, device_name, udid, *args):
         global driver
-        #import appium
         from appium import webdriver
         try:
             if SYSTEM_OS == 'Darwin' :
@@ -105,86 +104,19 @@ class InstallAndLaunch():
                     self.desired_caps = {}
                     self.desired_caps['platformName'] = 'iOS'
                     self.desired_caps['automationName'] = 'XCUITest'
-                    self.desired_caps['platformVersion'] = platform_version  #ios version
-                    #self.desired_caps['bundle_id'] = device_name             # bundleid
-                    self.desired_caps['deviceName'] = device_name               #device name
-                    #self.desired_caps['Ip_Address'] = udid
+                    self.desired_caps['platformVersion'] = platform_version
+                    self.desired_caps['deviceName'] = device_name
                     self.desired_caps['udid'] = udid
                     self.desired_caps['fullReset'] = False
                     self.desired_caps['xcodeConfigFile'] = os.environ["NINETEEN68_HOME"]+ '/assets/appium.xcconfig'
                     self.desired_caps['showXcodeLog'] = True
-                    #self.desired_caps['newCommandTimeout'] = 3600
-                    #self.desired_caps['launchTimeout'] = 180000
+                    # self.desired_caps['launchTimeout'] = 120000
                     self.desired_caps['noReset'] = True
                     self.desired_caps['newCommandTimeout'] = 0
                     self.desired_caps['sessionOverride'] = True
                     self.desired_caps['log_level'] = False
                     self.desired_caps['app'] = apk_path
                     driver = webdriver.Remote('http://0.0.0.0:4723/wd/hub', self.desired_caps)
-                # current_dir = (os.getcwd())
-                # dir_path = os.path.dirname(os.path.realpath(__file__))
-                # # set IP
-                # if (subprocess.getoutput('pgrep xcodebuild') == ''):
-                #     try:
-                #         with open(dir_path + "/Nineteen68UITests/data.txt",'wb') as f:
-                #             f.write(self.desired_caps['Ip_Address'])  # send IP
-                #     except Exception as e:
-                #         log.error(e)
-                #     # set run command
-                #     self.desired_caps["deviceName"] = self.desired_caps["deviceName"].split(" ")
-                #     self.desired_caps["deviceName"] = "\ ".join(self.desired_caps["deviceName"])
-                #     if (self.desired_caps["deviceName"].split("=")[0] == "id"):
-                #         name = self.desired_caps["deviceName"]
-                #     else:
-                #         name = "name=" + self.desired_caps["deviceName"]
-                #     try:
-                #         with open(dir_path + "/run.command", "wb") as f:
-                #             f.write("#! /bin/bash \n")
-                #             f.write(
-                #                 "cd " + dir_path + "\n")
-                #             f.write(
-                #                 "xcodebuild -workspace Nineteen68.xcworkspace -scheme Nineteen68 -destination " +
-                #                 name + " OS=" + self.desired_caps["platformVersion"] +" >/dev/null "+ " test")
-                #     except Exception as e:
-                #         log.error(e)
-                #     # subprocess.call("chmod a+x run.command")
-                #     try:
-                #         subprocess.Popen(dir_path + "/run.command", shell=True)
-                #     except:
-                #         log.error(ERROR_CODE_DICT["ERR_XCODE_DOWN"])
-                #     timer = 0
-                #     while True:
-                #         try:
-                #             clientsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                #             clientsocket.connect((self.desired_caps['Ip_Address'], 8022))
-                #             clientsocket.send(XCODE_EXECUTE)
-                #             keyword = "launchapplication"
-                #             length_keyword = len(keyword.encode('utf-8'))
-                #             clientsocket.send(str(len(str(length_keyword))))
-                #             clientsocket.send(str(length_keyword))
-                #             clientsocket.send(keyword)
-                #             clientsocket.send("0")
-                #             clientsocket.send("0")
-                #             input_text = self.desired_caps['bundle_id']
-                #             length_input_text = len(input_text.encode('utf-8'))
-                #             clientsocket.send(str(len(str(length_input_text))))
-                #             clientsocket.send(str(length_input_text))
-                #             clientsocket.send(input_text)
-                #             data = clientsocket.recv(100000)
-                #             string_data = data.decode('utf-8')
-                #             if string_data == "":
-                #                 continue
-                #             break
-                #         except:
-                #             timer+=1
-                #             if timer == 130:
-                #                 log.error(ERROR_CODE_DICT["ERR_TIMEOUT"])
-                #                 break
-                #             time.sleep(1)
-                #     return self.driver
-                # return self.driver
-
-
 
             else:
                 global device_id, packageName, device_keywords_object
@@ -214,8 +146,15 @@ class InstallAndLaunch():
                             self.desired_caps['sessionOverride'] = True
                             self.desired_caps['fullReset'] = False
                             self.desired_caps['log_level'] = False
-                            self.desired_caps['appPackage'] = packageName
-                            self.desired_caps['appActivity'] = activityName
+                            if packageName is not None:
+                                self.desired_caps['appPackage'] = packageName
+                                self.desired_caps['appActivity'] = activityName
+                                self.desired_caps['skipUnlock'] = True
+                                self.desired_caps['automationName'] = 'UiAutomator2'
+                                self.desired_caps['ignoreUnimportantViews'] = True
+                                self.desired_caps['uiautomator2ServerInstallTimeout'] = 120000
+                                self.desired_caps['uiautomator2ServerLaunchTimeout'] = 120000
+                                self.desired_caps['adbExecTimeout'] = 120000
                             driver = webdriver.Remote('http://localhost:4723/wd/hub', self.desired_caps)
                             device_id = device_name
                 except Exception as e:
@@ -232,39 +171,6 @@ class InstallAndLaunch():
 
 
     def scrape(self):
-        # if SYSTEM_OS == 'Darwin':
-                                 
-        #     EOF = "final"
-        #     fragments = ""
-        #     bundle_id = self.desired_caps['bundle_id']
-        #     length = len(bundle_id.encode('utf-8'))
-        #     clientsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        #     clientsocket.connect((self.desired_caps['Ip_Address'], 8022))
-        #     clientsocket.send(XCODE_SCRAPE)
-        #     clientsocket.send(str(length))
-        #     clientsocket.send(bundle_id)
-        #     while True:
-        #         chunck = clientsocket.recv(10000)
-        #         if chunck.endswith(EOF):
-        #             idx = chunck.index(EOF)
-        #             fragments += chunck[:idx]
-        #             break
-        #         fragments += chunck
-        #     data = fragments.split("!@#$%^&*()")[0]
-        #     image_data = fragments.split("!@#$%^&*()")[1]
-        #     height_data = fragments.split("!@#$%^&*()")[2]
-        #     width_data = fragments.split("!@#$%^&*()")[3]
-        #     data = json.loads(data)
-        #     jsonArray = OrderedDict()
-        #     jsonArray['view'] = data
-        #     jsonArray['mirror'] = image_data
-        #     jsonArray['mirrorwidth'] = width_data
-        #     jsonArray['mirrorheight'] = height_data
-        #     with open("savefile.json", 'w') as outfile:
-        #         logger.print_on_console('Writing scrape data to domelements.json file')
-        #         json.dump(jsonArray, outfile, indent=4, sort_keys=False)
-        #     return jsonArray
-        # elif driver is not None:
         if driver is not None:
             finalJson=''
             page_source=driver.page_source
@@ -297,49 +203,29 @@ class BuildJson:
 
     def xmltojson(self,driver):
         import re
-        global ScrapeList
-        global XpathList
-        global label
-        global content_desc
-        global class_name
-        global resource_id
-        global enabled
-        global rectangle
-        # global visible
-        global x_coordinate
-        global y_coordinate
-        global width
-        global height
+        global ScrapeList,XpathList,label,content_desc,class_name,resource_id,enabled,rectangle,x_coordinate,y_coordinate,width,height#,visible
         ScrapeList=[]
         custnamelist=[]
         global counter
         object_type = {
-            'android.widget.TimePicker' : '_timepicker',
-            'android.widget.DatePicker' : '_datepicker',
-            'android.widget.RadioButton' : '_radiobtn',
-            'android.widget.Button' : '_btn',
-            'android.widget.EditText' : '_txtbox',
-            'android.widget.Switch' : '_switch',
-            'android.widget.CheckBox' : '_chkbox',
-            'android.widget.Spinner' : '_spinner',
-            'android.widget.NumberPicker' : '_numberpicker',
-            'android.widget.SeekBar' : '_seekbar',
-            'android.widget.ListView' : '_listview',
-            'android.widget.ImageButton' : '_imagebtn',
-            'android.widget.LinearLayout' : '_linearlayout',
-            'android.widget.TextView' : '_txtview',
-            'android.widget.FrameLayout' : '_framelayout',
-            'android.widget.ImageView' : '_img',
-            'android.widget.RelativeLayout' : '_relativelayout',
-            'android.widget.ScrollView' : '_scrollview',
-            'android.view.View' : '_view',
-            'android.view.ViewGroup' : '_viewgroup',
-            ##for iOS
+            #Android
+            'android.widget.TimePicker' : '_timepicker', 'android.widget.DatePicker' : '_datepicker', 'android.widget.RadioButton' : '_radiobtn', 'android.widget.Button' : '_btn',
+            'android.widget.EditText' : '_txtbox', 'android.widget.Switch' : '_switch', 'android.widget.CheckBox' : '_chkbox', 'android.widget.Spinner' : '_spinner',
+            'android.widget.NumberPicker' : '_numberpicker', 'android.widget.SeekBar' : '_seekbar', 'android.widget.ListView' : '_listview', 'android.widget.ImageButton' : '_imagebtn',
+            'android.widget.LinearLayout' : '_linearlayout', 'android.widget.TextView' : '_txtview', 'android.widget.FrameLayout' : '_framelayout', 'android.widget.ImageView' : '_img',
+            'android.widget.RelativeLayout' : '_relativelayout', 'android.widget.ScrollView' : '_scrollview', 'android.view.ViewGroup' : '_viewgroup',
+            #iOS
+            'XCUIElementTypeTextField' : '_textfield', 'XCUIElementTypeSearchField' : '_searchfield', 'XCUIElementTypeSecureTextField' : '_securetextfield', 'XCUIElementTypeRadioButton' : '_radio',
+            'XCUIElementTypeButton' : '_button', 'XCUIElementTypeSwitch' : '_switch', 'XCUIElementTypeToggle' : '_toggle', 'XCUIElementTypeCheckBox' : '_checkbox',
+            'XCUIElementTypePickerWheel' : '_picker', 'XCUIElementTypeSlider': '_slider', 'XCUIElementTypeLink' : '_link', 'XCUIElementTypeTextView' : '_text', 'XCUIElementTypeStaticText' : '_text',
+            'XCUIElementTypeImage' : '_image', 'XCUIElementTypeIcon' : '_icon', 'XCUIElementTypeTable' : '_table', 'XCUIElementTypeCell' : '_cell', 'XCUIElementTypeKey'  : '_key'
         }
         try:
+            ##Changes done for appium upgrade from 1.7.2 to 1.16.0
+            # if XpathList[0] == '//hierarchy[1]':
+            #     del XpathList[0],rectangle[0],label[0],content_desc[0],class_name[0],resource_id[0],enabled[0]
             for i in range(len(XpathList)):
                 text=''
-                # print SYSTEM_OS
                 if label[i] != '':
                     text=label[i]
                 elif SYSTEM_OS!='Darwin' and content_desc[i]  != '':
@@ -347,48 +233,37 @@ class BuildJson:
                 if text=='' or text==None:
                     text='NONAME'
 
-                if SYSTEM_OS!='Darwin':
-                    if class_name[i] in object_type:
-                        text1 = text + object_type[class_name[i]]
-                        if text1 not in custnamelist:
-                            text = text1
-                            custnamelist.append(text)
-                        else:
-                            text=text+str(counter) + object_type[class_name[i]]
-                            custnamelist.append(text)
-                            counter=counter+1
-                    else:
-                        text1 = text + '_elmnt'
-                        if text1 not in custnamelist:
-                            text = text1
-                            custnamelist.append(text)
-                        else:
-                            text=text+str(counter) + '_elmnt'
-                            custnamelist.append(text)
-                            counter=counter+1
-                else:#else part for iOS
-                    #class_name[i] = class_name[i].replace("XCUIElementType","")
-                    text1 = text + '_' + class_name[i].replace("XCUIElementType","").lower()
+                if class_name[i] in object_type:
+                    text1 = text + object_type[class_name[i]]
                     if text1 not in custnamelist:
                         text = text1
                         custnamelist.append(text)
                     else:
-                        text=text+str(counter) + '_' + class_name[i].replace("XCUIElementType","").lower()
+                        text=text+str(counter) + object_type[class_name[i]]
                         custnamelist.append(text)
                         counter=counter+1
+                else:
+                    text1 = text + '_elmnt'
+                    if text1 not in custnamelist:
+                        text = text1
+                        custnamelist.append(text)
+                    else:
+                        text=text+str(counter) + '_elmnt'
+                        custnamelist.append(text)
+                        counter=counter+1
+
                 if SYSTEM_OS!='Darwin':
                     xpath = resource_id[i] + ';' + XpathList[i]
                     ele_bounds=re.findall('\d+',rectangle[i])
-        ##            bounds={'x':ele_bounds[0],
-        ##            'y':ele_bounds[1],
-        ##            'height':ele_bounds[3],
-        ##            'width':ele_bounds[2]}
-                    width=int(ele_bounds[2])-int(ele_bounds[0])
-                    height=int(ele_bounds[3])-int(ele_bounds[1])
+                    width_=(int(ele_bounds[2])-int(ele_bounds[0])) if len(ele_bounds)==4 else ""
+                    height_=int(ele_bounds[3])-int(ele_bounds[1]) if len(ele_bounds)==4 else ""
+                    left = ele_bounds[0] if len(ele_bounds)==4 else ""
+                    top = ele_bounds[1] if len(ele_bounds)==4 else ""
                     ScrapeList.append({'xpath': xpath, 'tag': class_name[i],
                         'text': text,
                         'id': resource_id[i], 'custname': text,
-                        'reference': str(uuid.uuid4()),'enabled':enabled[i],'left':ele_bounds[0],'top':ele_bounds[1],'width':width,'height':height})
+                        'reference': str(uuid.uuid4()),'enabled':enabled[i],'left':left,'top':top,'width':width_,'height':height_})
+                    del top,left,ele_bounds,width_,height_,xpath
                 elif SYSTEM_OS=='Darwin':
                     xpath =  XpathList[i]
                     ScrapeList.append({'xpath': xpath, 'tag': class_name[i],
@@ -398,21 +273,10 @@ class BuildJson:
                        # 'visible': visible[i],
                        'enabled': enabled[i], 'left': x_coordinate[i], 'top': y_coordinate[i],
                        'width': width[i], 'height': height[i]})
+                    del xpath
         except Exception as e:
-            log.error(e)
-        XpathList = []
-        label = []
-        content_desc = []
-        class_name = []
-        resource_id = []
-        enabled = []
-        # visible = []
-        rectangle=[]
-        x_coordinate = []
-        y_coordinate = []
-        width = []
-        height = []
-        # print 'the json is', self.save_json(ScrapeList)
+            log.error(e,exc_info=True)
+        XpathList=label=content_desc=class_name=resource_id=enabled=rectangle=x_coordinate=y_coordinate=width=height = [] #visible
         return self.save_json(ScrapeList, driver)
 
 
@@ -420,7 +284,6 @@ class BuildJson:
         try:
             jsonArray=OrderedDict()
             jsonArray['view']= scrape_data
-    ##        jsonArray['mirror']='IMAGEEEEE'
             jsonArray['mirror']=driver.get_screenshot_as_base64()
             dimension = driver.get_window_size()
             jsonArray['mirrorwidth'] = dimension['width']
@@ -430,6 +293,7 @@ class BuildJson:
                 logger.print_on_console('Writing scrape data to domelements.json file')
                 json.dump(jsonArray, outfile, indent=4, sort_keys=False)
                 outfile.close()
+            del dimension
         except Exception as e:
             log.error(e)
         return jsonArray
@@ -456,96 +320,47 @@ class Exact(xml.sax.handler.ContentHandler):
                 count=count+1
             self.elementNameCount[qName]=count
             childXPath = self.xPath + "/" + qName + "[" + str(count) + "]"
-            attsLength = len(attrs)
-            if(attsLength>1):
-                XpathList.append(childXPath)
-            elements_list = attrs.getQNames()
-            label_flag = False
-            for x in attrs.getQNames():
+            if self.xPath == '/':
+                curobj=self
+                child = Exact(childXPath,self.parser,curobj)
+                self.parser.setContentHandler(child)
+            else:
+                attsLength = len(attrs)
+                if(attsLength>1):# and childXPath != '//hierarchy[1]':
+                    XpathList.append(childXPath)
+                elements_list = attrs.getQNames()
+                label_flag = False
                 if SYSTEM_OS=='Darwin':
-                    value = attrs.getValue(x)
-                    # if x.lower()=='text':
-                    if x.lower() == 'label':
-                        ##            if(value == ''):
-                        ##              label.append(qName)
-                        ##            else:
-                        label_flag = True
-                        label.append(value)
-                        name.append(qName)
-                        # elif x.lower()=='bounds':
-                    #     rectangle.append(value)
+                    label.append(attrs.getValue('label') if 'label' in elements_list else "")
+                    name.append(qName if 'label' in elements_list else "")
+                    if 'label' in elements_list: label_flag = True 
+                    enabled.append(attrs.getValue('enabled') if 'enabled' in elements_list else "")
+                    #visible.append(attrs.getValue('visible') if 'visible' in elements_list else "")
+                    x_coordinate.append(attrs.getValue('x') if 'x' in elements_list else "")
+                    y_coordinate.append(attrs.getValue('y') if 'y' in elements_list else "")
+                    width.append(attrs.getValue('width') if 'width' in elements_list else "")
+                    height.append(attrs.getValue('height') if 'height' in elements_list else "")
+                    class_name.append(attrs.getValue('type') if 'type' in elements_list else "")
 
-                    elif x.lower() == 'enabled':
-                        enabled.append(value)
-
-                    # elif x.lower() == 'visible':
-                    #     visible.append(value)
-
-                    elif x.lower() == 'x':
-                        x_coordinate.append(value)
-
-                    elif x.lower() == 'y':
-                        y_coordinate.append(value)
-
-                    elif x.lower() == 'width':
-                        width.append(value)
-
-                    elif x.lower() == 'height':
-                        height.append(value)
-
-                        # elif x.lower()=='resource-id':
-                    #     resource_id.append(value)
-
-                    # elif x.lower()=='focusable':
-                    #     focusable.append(value)
-
-                    elif x.lower() == 'type':
-                        class_name.append(value)
-
-                        # elif x.lower()=='content-desc':
-                        #     content_desc.append(value)
-
-                        # elif x.lower()=='checked':
-                        #     checked.append(value)
                 if SYSTEM_OS!='Darwin':
-                    value=attrs.getValue(x)
+                    label.append(attrs.getValue('text') if 'text' in elements_list else "")
+                    name.append(qName if 'text' in elements_list else "")
+                    rectangle.append(attrs.getValue('bounds') if 'bounds' in elements_list else "")
+                    enabled.append(attrs.getValue('enabled') if 'enabled' in elements_list else "")
+                    resource_id.append(attrs.getValue('resource_id') if 'resource_id' in elements_list else "")
+                    focusable.append(attrs.getValue('focusable') if 'focusable' in elements_list else "")
+                    class_name.append(attrs.getValue('class') if 'class' in elements_list else "")
+                    content_desc.append(attrs.getValue('content-desc') if 'content-desc' in elements_list else "")
+                    checked.append(attrs.getValue('checked') if 'checked' in elements_list else "")
 
-                    if x.lower()=='text':
-            ##            if(value == ''):
-            ##              label.append(qName)
-            ##            else:
-                        label.append(value)
-
-                        name.append(qName)
-
-                    elif x.lower()=='bounds':
-                            rectangle.append(value)
-
-                    elif x.lower()=='enabled':
-                            enabled.append(value)
-
-                    elif x.lower()=='resource-id':
-                            resource_id.append(value)
-
-                    elif x.lower()=='focusable':
-                            focusable.append(value)
-
-                    elif x.lower()=='class':
-                            class_name.append(value)
-
-                    elif x.lower()=='content-desc':
-                            content_desc.append(value)
-
-                    elif x.lower()=='checked':
-                            checked.append(value)
-            if SYSTEM_OS == 'Darwin':
-                if label_flag == False and len(elements_list) > 0:
-                    label.append('Noname')
-            curobj=self
-            child = Exact(childXPath,self.parser,curobj)
-            self.parser.setContentHandler(child)
+                if SYSTEM_OS == 'Darwin':
+                    if label_flag == False and len(elements_list) > 0:
+                        label.append('Noname')
+                curobj=self
+                child = Exact(childXPath,self.parser,curobj)
+                self.parser.setContentHandler(child)
         except Exception as e:
-            log.error(e)
+            log.error(e,exc_info = True)
 
     def endElement(self, name):
         value = self.buffer.strip()
