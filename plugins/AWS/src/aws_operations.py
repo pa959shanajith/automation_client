@@ -48,10 +48,11 @@ class AWS_Operations:
             conf = open(AWS_config_path, 'r')
             self.params = json.load(conf)
             conf.close()
+            self.proxies={}
             if 'url' in self.params and self.params['url'].strip() not in ['','<>']:
                 from botocore.config import Config
                 from urllib.parse import quote_plus as encodeURL
-                proxy_usrl = encodeURL(self.params['username'])+":"+encodeURL(self.params['password'])+"@"+self.params['url']
+                proxy_url = encodeURL(self.params['username'])+":"+encodeURL(self.params['password'])+"@"+self.params['url']
                 self.proxies = {'http':'http://'+proxy_url,
                             'https':'https://'+proxy_url}
                 self.dc=self.session.client('devicefarm',config=Config(proxies=self.proxies),verify=False)
@@ -135,7 +136,10 @@ class AWS_Operations:
         try:
             with open(file_path,"rb") as fp:
                 data = fp.read()
-                result = requests.put(url,proxies=self.proxies,verify=False, data=data)
+                if len(self.proxies)>0:
+                    result = requests.put(url,proxies=self.proxies,verify=False, data=data)
+                else:
+                    result = requests.put(url, data=data)
                 assert result.status_code == 200
         except Exception as e:
             logger.print_on_console('Error while uploading presigned URL')

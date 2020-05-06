@@ -6,13 +6,23 @@ phases:
   # Default dependencies for testing frameworks supported on Device Farm are already installed.
   install:
     commands:
-      # By default, Appium server version used is 1.7.2.
-      # You can switch to an alternate supported version from 1.6.5, 1.7.1, 1.7.2, 1.8.0 or 1.8.1 by using a command like "avm 1.7.1"
-      # OR
-      # To install a newer version of Appium use the following commands:
-      # - export APPIUM_VERSION=1.8.1
-      # - avm $APPIUM_VERSION
-      # - ln -s /usr/local/avm/versions/$APPIUM_VERSION/node_modules/.bin/appium  /usr/local/avm/versions/$APPIUM_VERSION/node_modules/appium/bin/appium.js
+      # Device Farm support two major versions of Python, each with one minor version: 2 (minor version 2.7), and 3 (minor version 3.7.4).
+      # The default Python version is 2, but you can switch to 3 by setting the following variable to 3:
+      - export PYTHON_VERSION=2
+
+      # This command will install your dependencies and verify that they're using the proper versions that you specified in your requirements.txt file. Because Device Farm preconfigures your environment within a
+      # Python Virtual Environment in its setup phase, you can use pip to install any Python packages just as you would locally.
+      - cd $DEVICEFARM_TEST_PACKAGE_PATH
+      - . bin/activate
+      - pip install -r requirements.txt
+
+      # This test execution environment uses Appium version 1.9.1 by default, however we enable you to change it using the Appium version manager (avm). An
+      # example "avm" command below changes the version to 1.14.2.
+      # For your convenience, we have preinstalled the following versions: 1.9.1, 1.10.1, 1.11.1, 1.12.1, 1.13.0, 1.14.1, 1.14.2, 1.15.1 or 1.16.0.
+      # To use one of these Appium versions, change the version number in the "avm" command below to your desired version:
+      - export APPIUM_VERSION=1.16.0
+      - avm $APPIUM_VERSION
+      - ln -s /usr/local/avm/versions/$APPIUM_VERSION/node_modules/.bin/appium  /usr/local/avm/versions/$APPIUM_VERSION/node_modules/appium/bin/appium.js
 
   # The pre-test phase includes commands that setup your test environment.
   pre_test:
@@ -22,10 +32,12 @@ phases:
       # The environment variables below will be auto-populated during run time.
       - echo "Start appium server"
       - >-
-        appium --log-timestamp --device-name $DEVICEFARM_DEVICE_NAME
-        --platform-name $DEVICEFARM_DEVICE_PLATFORM_NAME --app $DEVICEFARM_APP_PATH
-        --udid $DEVICEFARM_DEVICE_UDID --chromedriver-executable $DEVICEFARM_CHROMEDRIVER_EXECUTABLE  >> $DEVICEFARM_LOG_DIR/appiumlog.txt 2>&1 &
-      
+        appium --log-timestamp
+        --default-capabilities "{\"deviceName\": \"$DEVICEFARM_DEVICE_NAME\", \"platformName\":\"$DEVICEFARM_DEVICE_PLATFORM_NAME\",
+        \"app\":\"$DEVICEFARM_APP_PATH\", \"udid\":\"$DEVICEFARM_DEVICE_UDID\", \"platformVersion\":\"$DEVICEFARM_DEVICE_OS_VERSION\",
+        \"chromedriverExecutable\":\"$DEVICEFARM_CHROMEDRIVER_EXECUTABLE\"}"
+        >> $DEVICEFARM_LOG_DIR/appiumlog.txt 2>&1 &
+
       - >-
         start_appium_timeout=0;
         while [ true ];
@@ -45,7 +57,7 @@ phases:
                 sleep 1;
                 start_appium_timeout=$((start_appium_timeout+1));
             fi;
-        done; 
+        done;
 
   # The test phase includes commands that run your test suite execution.
   test:
@@ -61,7 +73,7 @@ phases:
       # Alternatively, You may specify your customized command.
       # Note: For most use cases, the default command works fine.
       # Please refer "https://docs.pytest.org/en/latest/usage.html" for more options on running pytests from command line.
-      - bin/py.test -s tests/ --junit-xml $DEVICEFARM_LOG_DIR/junitreport.xml
+      - py.test -s tests/ --junit-xml $DEVICEFARM_LOG_DIR/junitreport.xml
 
   # The post test phase includes are commands that are run after your tests are executed.
   post_test:
