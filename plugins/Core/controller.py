@@ -1012,12 +1012,12 @@ class Controller():
                                                             tsplist[k].inputval = [browser]
                             if aws_mode:
                                 compile_status=False
-                                scenario_name=json_data['suitedetails'][j-1]["scenarioNames"][i]
+                                scenario_name=json_data['suitedetails'][suite_idx-1]["scenarioNames"][sc_idx]
                                 if not terminate_flag:
-                                    compile_status,pytest_file=tc_obj.compile_tc(tsplist,i+1,scenario_name)
+                                    compile_status,pytest_file=tc_obj.compile_tc(tsplist,sc_idx+1,scenario_name)
                                 if compile_status:
                                     pytest_files.append(pytest_file)
-                                    msg='***Scenario'+str(i + 1)+': '+scenario_name+' Compiled for AWS Execution***'
+                                    msg='***Scenario'+str(sc_idx + 1)+': '+scenario_name+' Compiled for AWS Execution***'
                                     print(line_separator)
                                     logger.print_on_console(msg)
                                     print(line_separator)
@@ -1026,7 +1026,7 @@ class Controller():
                                     log.info(line_separator)
                                 else:
                                     terminate_flag=True
-                                    msg='***Scenario'+str(i + 1)+': '+scenario_name+' is Terminated ***'
+                                    msg='***Scenario'+str(sc_idx+ 1)+': '+scenario_name+' is Terminated ***'
                                     logger.print_on_console(msg)
                                     log.info(msg)
                                     tsplist=[]
