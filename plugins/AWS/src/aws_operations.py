@@ -132,7 +132,7 @@ class AWS_Operations:
         try:
             with open(file_path,"rb") as fp:
                 data = fp.read()
-                result = requests.put(url, data=data)
+                result = requests.put(url,proxies=self.proxies,verify=False, data=data)
                 assert result.status_code == 200
         except Exception as e:
             logger.print_on_console('Error while uploading presigned URL')
