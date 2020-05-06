@@ -63,6 +63,9 @@ class AWS_Operations:
 
     def get_run_configurations(self):
         try:
+            conf = open(AWS_config_path, 'r')
+            self.params = json.load(conf)
+            conf.close()
             self.profile_name=None
             if 'profilename' in self.params:
                 self.profile_name=self.params['profilename']
