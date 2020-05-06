@@ -1032,7 +1032,7 @@ class Controller():
                                     tsplist=[]
 
 
-                                i+=1
+                                sc_idx+=1
                                 execute_flag=False
                             if flag and execute_flag :
                                 #check for temrinate flag before execution
