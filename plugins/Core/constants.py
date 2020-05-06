@@ -330,6 +330,10 @@ BROWSER_VERSION='browserVersion'
 
 BROWSER_TYPE='browserType'
 
+DATE='date'
+
+TIME='time'
+
 START_TIME='StartTime'
 
 TIME_FORMAT='%Y-%m-%d %H:%M:%S'
