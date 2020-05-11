@@ -208,19 +208,16 @@ class MainNamespace(BaseNamespace):
             logger.print_on_console(err_msg)
             log.error(e,exc_info=True)
 
-    def check_aws_mode(self,data):
-        status=False
-        if len(data)>0 and data[0]['apptype']=='MobileApp':
-            if data[0]['suitedetails'][0]['browserType'][0]=='2':
-                status=True
-        return status
 
     def on_executeTestSuite(self, *args):
         global wxObject, execution_flag
         try:
             exec_data = args[0]
             batch_id = exec_data["batchId"]
-            aws_mode = self.check_aws_mode(args)
+            aws_mode=False
+            if len(data)>0 and data[0]['apptype']=='MobileApp':
+                if data[0]['suitedetails'][0]['browserType'][0]=='2':
+                    aws_mode = True
             if(not execution_flag):
                 socketIO.emit('return_status_executeTestSuite', {'status': 'success', 'batchId': batch_id})
                 wxObject.mythread = TestThread(wxObject, EXECUTE, exec_data, aws_mode)
