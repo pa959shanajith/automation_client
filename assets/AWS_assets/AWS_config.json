@@ -1,0 +1,15 @@
+{
+    "projectname": "<>",
+    "profilename": "default",
+    "poolname": "<>",
+    "apkpath": "<>",
+    "appname": "<>",
+    "packagename": "<>",
+    "filepath": "<>",
+    "android_testspec": "custom_spec.yml",
+    "ios_testspec": "ios_custom_spec.yml",
+    //proxy configs: leave it as is if not needed.
+    "url":"<>",
+    "username":"<>",
+    "password":"<>"
+}
