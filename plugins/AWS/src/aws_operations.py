@@ -25,7 +25,7 @@ WEB_URL_TEMPLATE = 'https://us-west-2.console.aws.amazon.com/devicefarm/home#/pr
 
 bundle_name='Test_Bundle'
 AWS_Path=os.environ['NINETEEN68_HOME']+os.sep+'plugins'+os.sep+'AWS'
-AWS_assets=os.environ['NINETEEN68_HOME']+os.sep+'plugins'+os.sep+'AWS'+os.sep+'AWS_assets'
+AWS_assets=os.environ['NINETEEN68_HOME']+os.sep+'assets'+os.sep+'AWS_assets'
 AWS_config_path=AWS_assets+os.sep+'AWS_config.json'
 AWS_cred_path=AWS_assets+os.sep+'config'
 AWS_output_path=AWS_assets+os.sep+'output'
