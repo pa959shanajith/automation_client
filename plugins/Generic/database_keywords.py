@@ -10,8 +10,6 @@
 #-------------------------------------------------------------------------------
 
 ##prerequistes - Respective database drivers should be avialable in client machine
-
-import pyodbc
 import csv
 import file_operations
 import excel_operations
@@ -21,6 +19,10 @@ import os
 import logger
 from encryption_utility import AESCipher
 import logging
+try:
+    import pyodbc
+except:
+    pass
 
 from constants import *
 log = logging.getLogger('database_keywords.py')

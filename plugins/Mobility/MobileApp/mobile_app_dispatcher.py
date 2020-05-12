@@ -78,6 +78,7 @@ class MobileDispatcher:
         'selectcheckbox' : radio_button_object.select_checkbox,
         'unselectcheckbox' : radio_button_object.unselect_checkbox,
         'press' : button_link_object.press,
+        'click' : button_link_object.click,
         'longpress' : button_link_object.long_press,
         'getbuttonname' : button_link_object.get_button_name,
         'verifybuttonname' : button_link_object.verify_button_name,
@@ -128,7 +129,7 @@ class MobileDispatcher:
         'verifyselectedviews':list_view_keywords_object.verify_selected_views,
         'selectmultipleviewsbyindexes':list_view_keywords_object.select_multiple_views_by_indexes,
         'selectmultipleviewsbytext':list_view_keywords_object.select_multiple_views_by_text,
-        'setvalue': seekBar_object.Set_Mid_Value,
+        'setvalue': seekBar_object.Set_Mid_Value if (SYSTEM_OS != 'Darwin') else picker_wheel_keywords_object.set_value,
         'getvalue': picker_wheel_keywords_object.get_value,
         'getrowcount':table_keywords_object.get_row_count,
         'verifyrowcount':table_keywords_object.verify_row_count,
@@ -181,7 +182,7 @@ class MobileDispatcher:
 
 #################################                 IOS                ###################################
                 # input[0]=bundleid,input[1]=os version ,input[2]=IP,,input[3]=device_name
-                if SYSTEM_OS == 'Darwin':
+                if SYSTEM_OS == 'wDarwin':
 
 
                     #current_dir = (os.getcwd())
@@ -389,7 +390,7 @@ class MobileDispatcher:
 #################################                 Android                ###################################
                 else:
                     driver = android_scrapping.driver
-                    if teststepproperty.custname == "@Android_Custom":
+                    if teststepproperty.custname in ["@Android_Custom", "@CustomiOS"]:
                         if (input[0] and (input[1] is not None) and input[2]):
                             logger.print_on_console("Element type is ",input[0])
                             logger.print_on_console("Visible text is ",input[1])
@@ -442,32 +443,43 @@ class MobileDispatcher:
         mobileElement = None
         global ELEMENT_FOUND
         xpath = None
+        id = None
         if objectname.strip() != '':
             if SYSTEM_OS=='Darwin':
-                objectname = objectname.replace("/AppiumAUT[1]/", "/")
-                print(objectname)
-            identifiers = objectname.split(';')
-            id = identifiers[0]
-            xpath = identifiers[1]
-            log.debug('Identifiers are ')
-            log.debug(identifiers)
+                xpath = objectname.replace("/AppiumAUT[1]/", "/")
+                log.debug(objectname)
+            else:
+                identifiers = objectname.split(';')
+                if identifiers[0]!='': id = identifiers[0]
+                xpath = identifiers[1]
+                log.debug('Identifiers are ')
+                log.debug(identifiers)
             try:
-                log.debug('trying to find mobileElement by xpath')
-                import platform
-                if SYSTEM_OS=='Darwin':
-                    mobileElement = driver.find_element_by_xpath(objectname)
+                if id:
+                    log.debug('trying to find mobileElement by id')
+                    mobileElement = driver.find_element_by_id(id)
                 else:
-                    mobileElement = driver.find_element_by_xpath(xpath)
-            except Exception as Ex:
-                log.debug(str(Ex))
-                log.debug('Element not found by xpath')
-                if (id):
                     try:
-                        log.debug('trying to find mobileElement by id')
-                        mobileElement = driver.find_element_by_id(id)
+                        log.debug('trying to find mobileElement by xpath')
+                        if xpath:
+                            mobileElement = driver.find_element_by_xpath(xpath)
+                        else:
+                            log.debug('Invalid Element')
                     except Exception as Ex:
                         log.debug('Element not found')
                         log.debug(str(Ex))
+            except Exception as Ex:
+                log.debug(str(Ex))
+                log.debug('Element not found by id')
+                try:
+                    if xpath:
+                        log.debug('trying to find mobileElement by xpath')
+                        mobileElement = driver.find_element_by_xpath(xpath)
+                    else:
+                        log.debug('Invalid Element')
+                except Exception as Ex:
+                    log.debug('Element not found')
+                    log.debug(str(Ex))
         if mobileElement==None:
             ELEMENT_FOUND=False
         return mobileElement, xpath

@@ -22,6 +22,7 @@ import logger
 import logging
 from core_utils import CoreUtils
 import threading
+from aws_keywords import *
 local_handler = threading.local()
 
 
@@ -122,6 +123,7 @@ class Handler():
         local_handler.tspIndex2 = -1
         local_handler.tspIndex = -1
         local_handler.tspList = []
+        local_handler.awsKeywords = {}
 
     def parse_json(self,test_data,data_param_path=None):
         """
@@ -162,6 +164,10 @@ class Handler():
                         continue
                 except Exception as e:
                     local_handler.log.error(e)
+                appType=None
+                if('apptype' in json_data and json_data['apptype']=="MobileApp"):
+                    local_handler.awsKeywords[json_data["testcasename"]]=set()
+                    appType="MobileApp"
                 script.append(testcase)
             # Checking if the testcase has key 'testscript_name' or 'testcasename'
             # adding the template to dict if available
@@ -184,9 +190,9 @@ class Handler():
             elif 'browserType' in json_data:
                 browser_type=json_data['browserType']
         if(data_param_path is None or str(data_param_path).strip() == ''):
-            flag=self.create_list(script,testcasename_list)
+            flag=self.create_list(script,testcasename_list,None,appType)
         else:
-            flag=self.create_list(script,testcasename_list,extract_path)
+            flag=self.create_list(script,testcasename_list,extract_path,appType)
         return flag,browser_type,len(script),testcase_empty_flag,empty_testcase_names
 
 
@@ -405,25 +411,29 @@ class Handler():
         elif flag==3:
             return self.getparam_index(keyword,keyword_index)
 
-    def parse_condition(self,testcase):
+
+
+    def parse_condition(self,testcase,testscript_name,aws_flag=False):
         """
         def : parse_condition
         purpose : parses entire testcript json to map the corresponding start and end of if,for,getparam
-        param : keyword_index,keyword,start_index
+        param : testcase,testscript_name,aws_flag
         return : bool
         """
         flag=True
-
         for x in range(0,len(testcase)):
             step=testcase[x]
             keyword=step['keywordVal']
-            outputval=step['outputVal'].strip()
-            outputArray=outputval.split(';')
-            if not (len(outputArray)>=1 and not(outputval.endswith('##;')) and outputval.split(';') and '##' in outputArray[len(outputArray)-1] ):
+            outputArray=step['outputVal'].strip().split(';')
+            if not (len(outputArray)>=1 and  '##' == outputArray[-1] ):
                 logger.print_on_console('keyword: '+keyword)
                 local_handler.log.info('keyword: '+keyword)
                 local_handler.log.debug(str(x)+'keyword: '+keyword)
                 keyword=keyword.lower()
+                if aws_flag:
+                    if(keyword not in aws_supported_keywords):
+                        local_handler.awsKeywords[testscript_name].add(step['keywordVal'])
+
                 local_handler.tspIndex+=1
 
                 #getting 'for' info
@@ -553,13 +563,13 @@ class Handler():
         additionalinfo = ''
         outputArray=outputval.split(';')
         #check if the step is commented before adding to the tsplist
-        if not (len(outputArray)>=1 and not(outputval.endswith('##;')) and outputval.split(';') and '##' in outputArray[len(outputArray)-1] ):
+        if not (len(outputArray)>=1 and  '##' == outputArray[-1] ):
             local_handler.tspIndex2+=1
             return self.create_step(local_handler.tspIndex2,keyword,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo,i,remark,testcase_details,cord,extract_path)
         return None
 
 
-    def create_list(self,testcase,testscript_name,extract_path= None):
+    def create_list(self,testcase,testscript_name,extract_path= None,appType=None):
         """
         def : create_list
         purpose : appends each test case step into gloabl tsplist
@@ -573,6 +583,8 @@ class Handler():
         #In First for loop, complete json data is parsed to build info_dict of getparam,for,if and in second for loop creation of
         #each step is done
         #Earlier the whole process was done for single testcase at a time, now it's done for entire scenario at once
+        aws_flag=False
+        if appType is not None : aws_flag=True
         testcase_copy=[]
         for i in range(len(testcase)):
             try:
@@ -582,7 +594,7 @@ class Handler():
             if len(d)>0 and 'comments' in d[len(d)-1]:
                 d.pop()
             testcase_copy.append(d)
-            self.parse_condition(d)
+            self.parse_condition(d,testscript_name[i],aws_flag)
 
         for i in range(len(testcase_copy)):
             for x in testcase_copy[i]:
