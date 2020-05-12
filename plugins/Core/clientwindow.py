@@ -773,7 +773,6 @@ class TestThread(threading.Thread):
         self.wxObject = wxObject
          #flag to pause thread
         self.paused = False
-        self.aws_mode=aws_mode
         # Explicitly using Lock over RLock since the use of self.paused
         # break reentrancy anyway, and I believe using Lock could allow
         # one thread to pause the worker, while another resumes; haven't
