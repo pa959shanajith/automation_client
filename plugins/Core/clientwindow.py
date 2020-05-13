@@ -215,8 +215,8 @@ class MainNamespace(BaseNamespace):
             exec_data = args[0]
             batch_id = exec_data["batchId"]
             aws_mode=False
-            if len(data)>0 and data[0]['apptype']=='MobileApp':
-                if data[0]['suitedetails'][0]['browserType'][0]=='2':
+            if len(args)>0 and args[0]['apptype']=='MobileApp':
+                if args[0]['suitedetails'][0]['browserType'][0]=='2':
                     aws_mode = True
             if(not execution_flag):
                 socketIO.emit('return_status_executeTestSuite', {'status': 'success', 'batchId': batch_id})
