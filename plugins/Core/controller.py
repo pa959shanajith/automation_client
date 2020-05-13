@@ -577,7 +577,7 @@ class Controller():
         configvalues = self.configvalues
         try:
             import time
-            time.sleep(int(configvalues['stepExecutionWait']))
+            time.sleep(float(configvalues['stepExecutionWait']))
         except Exception as e:
             log.error('stepExecutionWait should be a integer, please change it in config.json')
             logger.print_on_console('stepExecutionWait should be a integer, please change it in config.json')
