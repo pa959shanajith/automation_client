@@ -840,15 +840,11 @@ class TestThread(threading.Thread):
 
             if status==TERMINATE:
                 logger.print_on_console('---------Termination Completed-------')
-                if self.wxObject.choice=='RunfromStep':
-                    self.wxObject.breakpoint.Enable()
-                else:
-                    self.wxObject.breakpoint.Disable()
+            if self.wxObject.choice=='RunfromStep':
+                self.wxObject.breakpoint.Enable()
             else:
-                if self.wxObject.choice=='RunfromStep':
-                    self.wxObject.breakpoint.Enable()
-                else:
-                    self.wxObject.breakpoint.Disable()
+                self.wxObject.breakpoint.Disable()
+            
 
 
             #Removed execute,debug button
@@ -2582,7 +2578,7 @@ def check_browser():
                 driver = webdriver.Firefox(capabilities=caps,firefox_options=options,firefox_binary=binary, executable_path=GECKODRIVER_PATH)
             else:
                 driver = webdriver.Firefox(capabilities=caps,firefox_options=options, executable_path=GECKODRIVER_PATH)
-            browser_ver = float(driver.capabilities['browserVersion'].encode('utf-8')[:2])
+            browser_ver = float(driver.capabilities['browserVersion'].encode('utf-8')[:4])
             try:
                 driver.close()
                 driver.quit()
