@@ -41,9 +41,11 @@ class LaunchAndInstall():
         try:
             if SYSTEM_OS != 'Darwin':
                 driver = install_obj.installApplication(input_val[0], input_val[1], input_val[2], None)
-                if driver is not None:
-                    status = mobile_app_constants.TEST_RESULT_PASS
-                    result = mobile_app_constants.TEST_RESULT_TRUE
+            else:
+                driver = install_obj.installApplication(input_val[0], input_val[1], input_val[2], input_val[3])
+            if driver is not None:
+                status = mobile_app_constants.TEST_RESULT_PASS
+                result = mobile_app_constants.TEST_RESULT_TRUE
         except Exception as e:
             err_msg = self.print_error("Not able to install or launch application")
             log.error(e,exc_info=True)
@@ -69,7 +71,7 @@ class LaunchAndInstall():
                         status = mobile_app_constants.TEST_RESULT_PASS
                         result = mobile_app_constants.TEST_RESULT_TRUE
             else:
-                os.system("killall -9 node")
+                os.system("killall -9 node_appium")
                 status = mobile_app_constants.TEST_RESULT_PASS
                 result = mobile_app_constants.TEST_RESULT_TRUE
         except Exception as e:
@@ -88,15 +90,20 @@ class LaunchAndInstall():
         try:
             logger.print_on_console('Input is ',input_val)
             apk_loc = input_val[0]
-            package_name = device_keywords_object.package_name(apk_loc)
-            processes = psutil.net_connections()
-            for line in processes:
-                p = line.laddr
-                if p[1] == 4723 and driver is not None:
-                    driver_flag = True
-                    break
-            if driver_flag is True:
+            if SYSTEM_OS != 'Darwin':
+                package_name = device_keywords_object.package_name(apk_loc)
+                processes = psutil.net_connections()
+                for line in processes:
+                    p = line.laddr
+                    if p[1] == 4723 and driver is not None:
+                        driver_flag = True
+                        break
+            if driver_flag is True and SYSTEM_OS != 'Darwin':
                 driver.remove_app(package_name)
+                status = mobile_app_constants.TEST_RESULT_PASS
+                result = mobile_app_constants.TEST_RESULT_TRUE
+            elif SYSTEM_OS == 'Darwin':
+                driver.remove_app(apk_loc)#input for darwin should be bundleid
                 status = mobile_app_constants.TEST_RESULT_PASS
                 result = mobile_app_constants.TEST_RESULT_TRUE
             else:
@@ -118,7 +125,13 @@ class LaunchAndInstall():
         global driver, device_keywords_object
         try:
             logger.print_on_console("Package name to be terminated:",android_scrapping.packageName)
-            err_msg = device_keywords_object.close_app(android_scrapping.packageName, android_scrapping.device_id)
+            if SYSTEM_OS != 'Darwin':
+                err_msg = device_keywords_object.close_app(android_scrapping.packageName, android_scrapping.device_id)
+            else:
+                if (inputval):
+                    driver.terminate_app(inputval[0])
+                else:
+                    driver.close_app()
             if err_msg is None:
                 status=mobile_app_constants.TEST_RESULT_PASS
                 result=mobile_app_constants.TEST_RESULT_TRUE
@@ -136,14 +149,16 @@ class LaunchAndInstall():
         output = OUTPUT_CONSTANT
         global driver,device_keywords_object
         apk_path = input_val[0]
-        package_name = device_keywords_object.package_name(apk_path)
+        if SYSTEM_OS != 'Darwin':
+            package_name = device_keywords_object.package_name(apk_path)
         try:
-            processes = psutil.net_connections()
-            for line in processes:
-                p = line.laddr
-                if p[1] == 4723 and driver is not None:
-                    driver_flag = True
-                    break
+            if SYSTEM_OS != 'Darwin':
+                processes = psutil.net_connections()
+                for line in processes:
+                    p = line.laddr
+                    if p[1] == 4723 and driver is not None:
+                        driver_flag = True
+                        break
             if driver_flag is True:
                 android_scrapping.packageName = package_name
                 activity_name = device_keywords_object.activity_name(apk_path)

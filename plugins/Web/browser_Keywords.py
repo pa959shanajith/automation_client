@@ -415,6 +415,24 @@ class BrowserKeywords():
             err_msg=self.__web_driver_exception(e)
         return status,result,output,err_msg
 
+    def execute_js(self, inputval, *args):
+        """performs a back operation"""
+        global local_bk
+        status=webconstants.TEST_RESULT_FAIL
+        result=webconstants.TEST_RESULT_FALSE
+        output=OUTPUT_CONSTANT
+        err_msg=None
+        try:
+            inputval="return window."+args[0][0]
+            op=local_bk.driver_obj.execute_script(inputval)
+            if(op!=None):
+                output=op
+            status=webconstants.TEST_RESULT_PASS
+            result=webconstants.TEST_RESULT_TRUE
+        except Exception as e:
+            err_msg=self.__web_driver_exception(e)
+        return status,result,output,err_msg
+
     def getPageTitle(self,*args):
         global local_bk
         status=webconstants.TEST_RESULT_FAIL
@@ -665,7 +683,7 @@ class BrowserKeywords():
             #clear cache for chrome driver.
             elif local_bk.driver_obj != None and isinstance(local_bk.driver_obj,webdriver.Chrome):
                     local_bk.driver_obj.get('chrome://settings/clearBrowserData')
-                    local_bk.driver_obj.execute_script('return document.querySelector("body > settings-ui").shadowRoot.querySelector("#main").shadowRoot.querySelector("settings-basic-page").shadowRoot.querySelector("#advancedPage > settings-section:nth-child(1) > settings-privacy-page").shadowRoot.querySelector("settings-clear-browsing-data-dialog").shadowRoot.querySelector("#clearBrowsingDataConfirm").click();')
+                    local_bk.driver_obj.execute_script('return document.querySelector("body > settings-ui").shadowRoot.querySelector("#container").querySelector("#main").shadowRoot.querySelector("settings-basic-page").shadowRoot.querySelector("settings-privacy-page").shadowRoot.querySelector("settings-clear-browsing-data-dialog").shadowRoot.querySelector("#clearBrowsingDataDialog").querySelector("#clearBrowsingDataConfirm").click();')
                     logger.print_on_console('Cleared cache')
                     local_bk.log.info('Cleared Cache')
                     status=webconstants.TEST_RESULT_PASS

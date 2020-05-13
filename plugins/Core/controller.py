@@ -220,6 +220,13 @@ class Controller():
             log.error(e)
 
 
+    def __load_aws(self):
+        try:
+            core_utils.get_all_the_imports('AWS/src')
+            
+        except Exception as e:
+            logger.print_on_console('Error loading AWS plugin')
+            log.error(e)
     def dangling_status(self,index):
         step=handler.local_handler.tspList[index]
         return step.executed
@@ -871,6 +878,18 @@ class Controller():
                 log.info('Invalid step number!! Please provide run from step number')
         else:
             logger.print_on_console('Invalid script')
+        temp={}
+        if (handler.local_handler.awsKeywords):
+            for k,v in handler.local_handler.awsKeywords.items():
+                if list(v) != []:
+                    temp[k]=list(v)
+            handler.local_handler.awsKeywords=temp
+            if (handler.local_handler.awsKeywords):
+                logger.print_on_console("***Following Testcases are not AWS Compatible because of the following keywords :***")
+                log.info("***Following Testcases are not AWS Compatible because of the following keywords :***")
+                for k,v in handler.local_handler.awsKeywords.items():
+                    logger.print_on_console(k,':',list(v))
+                    log.info(k+':'+str(list(v)))
         print('=======================================================================================================')
         log.info('***DEBUG COMPLETED***')
         logger.print_on_console('***DEBUG COMPLETED***')
@@ -881,7 +900,7 @@ class Controller():
         obj.clear_dyn_variables()
         return status
 
-    def invoke_execution(self,mythread,json_data,socketIO,wxObject,configvalues,qcObject):
+    def invoke_execution(self,mythread,json_data,socketIO,wxObject,configvalues,qcObject,aws_mode):
         global terminate_flag,count,status_percentage
         qc_url=''
         qc_password=''
@@ -900,6 +919,15 @@ class Controller():
         log.info( 'No  of Suites : '+str(len(suiteId_list)))
         logger.print_on_console('No  of Suites : ',str(len(suiteId_list)))
         suite_idx=1
+        tc_obj=None
+        self.aws_obj=None
+        if aws_mode:
+            self.__load_aws()
+            from testcase_compile import TestcaseCompile
+            from aws_operations import AWS_Operations
+            cur_date=str(datetime.now()).replace(' ','_').replace('.','_').replace(':','_')
+            tc_obj=TestcaseCompile(cur_date)
+            self.aws_obj=AWS_Operations(cur_date)
         #Iterate through the suites-list
         for suite,suite_id,suite_id_data in zip(suite_details,suiteId_list,suite_data):
             #EXECUTION GOES HERE
@@ -916,6 +944,8 @@ class Controller():
             do_not_execute = False
             #Check for the disabled scenario
             if not (do_not_execute):
+                if aws_mode:
+                    pytest_files=[]
                  #Logic to Execute each suite for each of the browser
                 for browser in browser_type[suite_id]:
                     sc_idx = 0
@@ -974,11 +1004,36 @@ class Controller():
                                     tsplist = handler.local_handler.tspList
                                     if len(tsplist)==0:
                                         continue
-                                    for k in range(len(tsplist)):
-                                        if tsplist[k].name.lower() == 'openbrowser':
-                                            if tsplist[k].apptype.lower()=='web':
-                                                if not (IGNORE_THIS_STEP in tsplist[k].inputval[0].split(';')):
-                                                        tsplist[k].inputval = [browser]
+                                    if not(aws_mode):
+                                        for k in range(len(tsplist)):
+                                            if tsplist[k].name.lower() == 'openbrowser':
+                                                if tsplist[k].apptype.lower()=='web':
+                                                    if not (IGNORE_THIS_STEP in tsplist[k].inputval[0].split(';')):
+                                                            tsplist[k].inputval = [browser]
+                            if aws_mode:
+                                compile_status=False
+                                scenario_name=json_data['suitedetails'][suite_idx-1]["scenarioNames"][sc_idx]
+                                if not terminate_flag:
+                                    compile_status,pytest_file=tc_obj.compile_tc(tsplist,sc_idx+1,scenario_name)
+                                if compile_status:
+                                    pytest_files.append(pytest_file)
+                                    msg='***Scenario'+str(sc_idx + 1)+': '+scenario_name+' Compiled for AWS Execution***'
+                                    print(line_separator)
+                                    logger.print_on_console(msg)
+                                    print(line_separator)
+                                    log.info(line_separator)
+                                    log.info(msg)
+                                    log.info(line_separator)
+                                else:
+                                    terminate_flag=True
+                                    msg='***Scenario'+str(sc_idx+ 1)+': '+scenario_name+' is Terminated ***'
+                                    logger.print_on_console(msg)
+                                    log.info(msg)
+                                    tsplist=[]
+
+
+                                sc_idx+=1
+                                execute_flag=False
                             if flag and execute_flag :
                                 #check for temrinate flag before execution
                                 tsplist = obj.read_step()
@@ -986,7 +1041,7 @@ class Controller():
                                     con.action=EXECUTE
                                     con.conthread=mythread
                                     con.tsp_list=tsplist
-                                    local_cont.test_case_number=0
+									local_cont.test_case_number=0
                                     status,status_percentage = con.executor(tsplist,EXECUTE,last_tc_num,1,con.conthread)
                                     print('=======================================================================================================')
                                     logger.print_on_console( '***Scenario' ,str(sc_idx + 1) ,' execution completed***')
@@ -1079,6 +1134,11 @@ class Controller():
                             sc_idx += 1
                             #logic for condition check
                             report_json=con.reporting_obj.report_json[OVERALLSTATUS]
+            if aws_mode and not terminate_flag:
+                tc_obj.make_zip(pytest_files)
+                execution_status=self.aws_obj.run_aws_android_tests()
+                if not(execution_status):
+                    status=TERMINATE
             log.info('---------------------------------------------------------------------')
             print('=======================================================================================================')
             log.info('***SUITE '+ str(suite_idx) +' EXECUTION COMPLETED***')
@@ -1107,12 +1167,14 @@ class Controller():
             local_cont.web_dispatcher_obj.action=action
         self.debug_choice=wxObject.choice
         if action==EXECUTE:
+            if len(args)>0:
+                aws_mode=args[0]
             self.execution_mode = json_data['exec_mode'].lower()
             kill_process()
             if self.execution_mode == SERIAL:
-                status=self.invoke_execution(mythread,json_data,socketIO,wxObject,self.configvalues,qc_soc)
+                status=self.invoke_execution(mythread,json_data,socketIO,wxObject,self.configvalues,qc_soc,aws_mode)
             elif self.execution_mode == PARALLEL:
-                status = self.invoke_parralel_exe(mythread,json_data,socketIO,wxObject,self.configvalues,qc_soc)
+                status = self.invoke_parralel_exe(mythread,json_data,socketIO,wxObject,self.configvalues,qc_soc,aws_mode)
         elif action==DEBUG:
             self.debug_mode=debug_mode
             self.wx_object=wxObject
@@ -1182,10 +1244,26 @@ def kill_process():
             log.error(e)
 
         try:
-            os.system("killall -9 Safari")
+            import browser_Keywords
+            del browser_Keywords.drivermap[:]
+            if hasattr(browser_Keywords.local_bk, 'driver_obj'):
+                if (browser_Keywords.local_bk.driver_obj):
+                    browser_Keywords.local_bk.driver_obj = None
+            if hasattr(browser_Keywords.local_bk, 'pid_set'):
+                if (browser_Keywords.local_bk.pid_set):
+                    del browser_Keywords.local_bk.pid_set[:]
+        except Exception as e:
+            log.error(e)
+
+        try:
+            # os.system("killall -9 Safari") 
+                # This kills all instances of safari browser even if it is not opened by nineteen68.
+                # Issue when Nineteen68 is opened in Safari browser
             os.system("killall -9 safaridriver")
-            os.system("killall -9 node")
+            os.system("killall -9 node_appium")
             os.system("killall -9 xcodebuild")
+            os.system("killall -9 chromedriver")
+            os.system("killall -9 geckodriver")
         except Exception as e:
             logger.print_on_console('Exception in stopping server')
             log.error(e)

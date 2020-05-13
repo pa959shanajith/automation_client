@@ -57,6 +57,34 @@ class Button_Keywords():
         return status,methodoutput,output,err_msg
 
 
+    def click(self, element,input_val,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        output=OUTPUT_CONSTANT
+        err_msg=None
+        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        try:
+            if element is not None:
+                if element.is_displayed():
+                    log.debug(ELEMENT_VISIBLE)
+                    if element.is_enabled():
+                        log.debug(ELEMENT_ENABLED)
+                        log.debug('performing the action')
+                        element.click()
+                        status=TEST_RESULT_PASS
+                        methodoutput=TEST_RESULT_TRUE
+                    else:
+                        err_msg = self.print_error(ELEMENT_DISABLED)
+                else:
+                    err_msg = self.print_error(ELEMENT_HIDDEN)
+            else:
+                err_msg = self.print_error(ELEMENT_NOT_EXIST)
+        except Exception as e:
+            err_msg = self.print_error("Error occurred in Click")
+            log.error(e,exc_info = True)
+        return status,methodoutput,output,err_msg
+
+
     def long_press(self, element,input_val,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE

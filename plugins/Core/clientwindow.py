@@ -208,14 +208,19 @@ class MainNamespace(BaseNamespace):
             logger.print_on_console(err_msg)
             log.error(e,exc_info=True)
 
+
     def on_executeTestSuite(self, *args):
         global wxObject, execution_flag
         try:
             exec_data = args[0]
             batch_id = exec_data["batchId"]
+            aws_mode=False
+            if len(data)>0 and data[0]['apptype']=='MobileApp':
+                if data[0]['suitedetails'][0]['browserType'][0]=='2':
+                    aws_mode = True
             if(not execution_flag):
                 socketIO.emit('return_status_executeTestSuite', {'status': 'success', 'batchId': batch_id})
-                wxObject.mythread = TestThread(wxObject, EXECUTE, exec_data)
+                wxObject.mythread = TestThread(wxObject, EXECUTE, exec_data, aws_mode)
             else:
                 socketIO.emit('return_status_executeTestSuite', {'status': 'skipped', 'batchId': batch_id})
                 emsg = 'Execution already in progress. Skipping current request.'
@@ -232,7 +237,7 @@ class MainNamespace(BaseNamespace):
         try:
             if check_execution_lic("result_debugTestCase"): return None
             exec_data = args[0]
-            wxObject.mythread = TestThread(wxObject, DEBUG, exec_data)
+            wxObject.mythread = TestThread(wxObject, DEBUG, exec_data, False)
             wxObject.choice=wxObject.rbox.GetStringSelection()
             logger.print_on_console(str(wxObject.choice)+' is Selected')
             if wxObject.choice == 'Normal':
@@ -762,7 +767,7 @@ class TestThread(threading.Thread):
     """Test Worker Thread Class."""
 
     #----------------------------------------------------------------------
-    def __init__(self, wxObject, action, json_data):
+    def __init__(self, wxObject, action, json_data, aws_mode):
         """Init Worker Thread Class."""
         super(TestThread, self).__init__()
         self.wxObject = wxObject
@@ -779,6 +784,7 @@ class TestThread(threading.Thread):
         self.action = action.lower()
         self.json_data = json_data
         self.debug_mode = wxObject.debug_mode
+        self.aws_mode = aws_mode
         self.start()    # start the thread
 
     #should just resume the thread
@@ -828,7 +834,7 @@ class TestThread(threading.Thread):
                 logger.print_on_console('This app type is not part of the license.')
                 status=TERMINATE
             else:
-                status = self.con.invoke_controller(self.action,self,self.debug_mode,runfrom_step,self.json_data,self.wxObject,socketIO,qcObject)
+                status = self.con.invoke_controller(self.action,self,self.debug_mode,runfrom_step,self.json_data,self.wxObject,socketIO,qcObject,self.aws_mode)
 
             logger.print_on_console('Execution status '+status)
 
@@ -1220,6 +1226,11 @@ class ClientWindow(wx.Frame):
         logger.print_on_console(msg)
         log.info(msg)
         controller.terminate_flag=True
+        #Calling AWS stop job on terminate (if present)
+        try:
+            wxObject.mythread.con.aws_obj.stop_job()
+        except:
+            pass
         #Handling the case where user clicks terminate when the execution is paused
         #Resume the execution
         if controller.pause_flag:

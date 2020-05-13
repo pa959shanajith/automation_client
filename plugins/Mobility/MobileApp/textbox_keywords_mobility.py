@@ -46,7 +46,8 @@ class Textbox_keywords():
                         if len(element.text)>0:
                             log.debug('clearing  the existing text')
                             element.clear()
-                        element.set_text(text)
+                        if SYSTEM_OS != 'Darwin': element.set_text(text)
+                        else: element.set_value(text)
                         configvalues = readconfig.configvalues
                         hide_soft_key = configvalues['hide_soft_key']
                         if android_scrapping.driver.is_keyboard_shown() and (hide_soft_key == "Yes"):
@@ -54,6 +55,15 @@ class Textbox_keywords():
                         if (text == element.text):
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
+                        else:
+                            try:
+                                element_type = element.get_attribute('type')
+                            except:
+                                element_type = 'None'
+                            if 'Secure' in element_type:
+                                log.error('Element text can\'t be verified:'+str(element.text))
+                                status=TEST_RESULT_PASS
+                                methodoutput=TEST_RESULT_TRUE
                     else:
                         err_msg=self.print_error(ELEMENT_DISABLED)
                 else:
@@ -121,7 +131,8 @@ class Textbox_keywords():
                                 element.clear()
                             encryption_obj = AESCipher()
                             input_val = encryption_obj.decrypt(input)
-                            element.set_text(input_val)
+                            if SYSTEM_OS != 'Darwin': element.set_text(input_val)
+                            else: element.set_value(input_val)
                             configvalues = readconfig.configvalues
                             hide_soft_key = configvalues['hide_soft_key']
                             if android_scrapping.driver.is_keyboard_shown() and (hide_soft_key == "Yes"):

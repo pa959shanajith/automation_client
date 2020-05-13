@@ -40,6 +40,7 @@ import logging
 from constants import *
 import encryption_utility
 import handler
+from OpenSSL import crypto
 log = logging.getLogger('webservices.py')
 class WSkeywords:
 
@@ -257,8 +258,12 @@ class WSkeywords:
             if header != None and header.strip() != '':
                 header = str(header).replace('\n','').replace("'",'').strip()
                 log.debug('Removed new line and single quote from the input header')
-                header=header.split('##')
-                log.debug('Header is split with ##')
+                if header.find("##")!=-1:
+                    header=header.split('##')
+                    log.debug('Header is split with ##')
+                else:
+                    header=header.split()
+                    log.debug('Header is split with spaces')
                 header_dict={}
                 if self.baseReqHeader is not None and isinstance(self.baseReqHeader,dict):
                     header_dict=self.baseReqHeader
@@ -342,6 +347,11 @@ class WSkeywords:
             self.baseResHeader['StatusCode']=response.status_code
             log.info(ws_constants.RESPONSE_HEADER+'\n'+str(self.baseResHeader))
             brb=response.content
+            if brb.find(b'Content-Type: image/png')!=-1:
+                ch=brb.split(b'\r\n')
+                for each_ch in ch:
+                   if each_ch.find(b'<?')!=-1:
+                      brb=each_ch
             if (type(brb)==bytes):brb = brb.decode('utf8') #convertes bytes to string
             brb = brb.translate(str.maketrans('', '', ''.join([chr(char) for char in range(1, 32)])))#removes escape sequences if any
             self.baseResBody=str(brb).replace("&gt;",">").replace("&lt;","<")
@@ -721,6 +731,8 @@ class WSkeywords:
                                 extract_status = self.extract_jks(client_cert,keystore_pass)
                             elif file_ext.lower() == '.pem':
                                 extract_status = self.extract_pem(client_cert,keystore_pass)
+                            elif file_ext.lower() == '.pkcs12':
+                                extract_status = self.extract_pkcs12(client_cert,keystore_pass)
                             else:
                                 err_msg = 'Invalid Input'
                                 logger.print_on_console('Invalid Input')
@@ -839,6 +851,40 @@ class WSkeywords:
                 except Exception as e:
                     log.error(e)
                     self.server_cert = False
+        except Exception as e:
+            log.error(e)
+            logger.print_on_console(str(e))
+        return extract_status
+
+    def extract_pkcs12(self,client_cert,keystore_pass):
+        extract_status = False
+        try:
+            with open(client_cert, "rb") as file:
+                p12 = crypto.load_pkcs12(file.read(),str(keystore_pass))
+                file.close()
+
+            try:
+                
+                with open("PRIVATECERT.pem",'w') as file_pem:
+                    file_pem.write(crypto.dump_certificate(crypto.FILETYPE_PEM, p12.get_certificate()).decode("utf8"))
+                    file_pem.close()
+
+                with open("PRIVATEKEY.pem",'w') as file_key:
+                    file_key.write(crypto.dump_privatekey(crypto.FILETYPE_PEM, p12.get_privatekey()).decode("utf8"))
+                    file_key.close()
+                client_cert_path = "PRIVATECERT.pem"
+                client_key_path = "PRIVATEKEY.pem"
+                self.client_cert = (client_cert_path, client_key_path)
+                extract_status=True
+                try:
+                    self.server_cert = False
+                except Exception as e:
+                    log.error(e)
+                    self.server_cert = False
+            except Exception as e:
+                log.error(e)
+                logger.print_on_console(str(e))
+            
         except Exception as e:
             log.error(e)
             logger.print_on_console(str(e))
