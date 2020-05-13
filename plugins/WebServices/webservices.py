@@ -258,8 +258,12 @@ class WSkeywords:
             if header != None and header.strip() != '':
                 header = str(header).replace('\n','').replace("'",'').strip()
                 log.debug('Removed new line and single quote from the input header')
-                header=header.split('##')
-                log.debug('Header is split with ##')
+                if header.find("##")!=-1:
+                    header=header.split('##')
+                    log.debug('Header is split with ##')
+                else:
+                    header=header.split()
+                    log.debug('Header is split with spaces')
                 header_dict={}
                 if self.baseReqHeader is not None and isinstance(self.baseReqHeader,dict):
                     header_dict=self.baseReqHeader
@@ -343,6 +347,11 @@ class WSkeywords:
             self.baseResHeader['StatusCode']=response.status_code
             log.info(ws_constants.RESPONSE_HEADER+'\n'+str(self.baseResHeader))
             brb=response.content
+            if brb.find(b'Content-Type: image/png')!=-1:
+                ch=brb.split(b'\r\n')
+                for each_ch in ch:
+                   if each_ch.find(b'<?')!=-1:
+                      brb=each_ch
             if (type(brb)==bytes):brb = brb.decode('utf8') #convertes bytes to string
             brb = brb.translate(str.maketrans('', '', ''.join([chr(char) for char in range(1, 32)])))#removes escape sequences if any
             self.baseResBody=str(brb).replace("&gt;",">").replace("&lt;","<")
