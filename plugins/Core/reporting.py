@@ -49,6 +49,8 @@ class Reporting:
         self.start_time=''
         self.end_time=''
         self.ellapsed_time=''
+        self.date=''
+        self.time=''
         self.name=''
         self.user_termination=False
         self.step_description_obj=step_description.StepDescription()
@@ -133,6 +135,10 @@ class Reporting:
         self.start_time=str(start_time)
         self.end_time=str(end_time)
         self.ellapsed_time=str(ellapsed_time)
+        getTym = self.end_time.split(".")[0]
+        getDat = getTym.split(" ")[0].split("-")
+        self.date = getDat[1] + "/" + getDat[2] + "/" + getDat[0]
+        self.time = getTym.split(" ")[1]
         obj={}
         obj[ELLAPSED_TIME]=self.ellapsed_time
         obj[END_TIME]=self.end_time
@@ -140,6 +146,8 @@ class Reporting:
         obj[START_TIME]=self.start_time
         obj[OVERALLSTATUS]=self.overallstatus
         obj[BROWSER_TYPE]=self.browser_type
+        obj[DATE]=self.date
+        obj[TIME]=self.time
         self.overallstatus_array.append(obj)
 
     def build_overallstatus_conditionCheck(self):
@@ -151,6 +159,10 @@ class Reporting:
             self.start_time = datetime.now()
             self.end_time = datetime.now()
             self.ellapsed_time = self.end_time - self.start_time
+            getTym = self.end_time.split(".")[0]
+            getDat = getTym.split(" ")[0].split("-")
+            self.date = getDat[1] + "/" + getDat[2] + "/" + getDat[0]
+            self.time = getTym.split(" ")[1]
             obj={}
             obj[ELLAPSED_TIME]=str(self.ellapsed_time)
             obj[END_TIME]=str(self.end_time)
@@ -159,6 +171,8 @@ class Reporting:
             obj[OVERALLSTATUS]=INCOMPLETE
             # Bug #246 (Himanshu) browser type should not be empty or null for reports
             obj[BROWSER_TYPE]=self.browser_type
+            obj[DATE]=self.date
+            obj[TIME]=self.time
             self.overallstatus_array_incomplete.append(obj)
 
     def build_overallstatus_conditionCheck_testcase_empty(self):
@@ -170,6 +184,10 @@ class Reporting:
             self.start_time = datetime.now()
             self.end_time = datetime.now()
             self.ellapsed_time = self.end_time - self.start_time
+            getTym = self.end_time.split(".")[0]
+            getDat = getTym.split(" ")[0].split("-")
+            self.date = getDat[1] + "/" + getDat[2] + "/" + getDat[0]
+            self.time = getTym.split(" ")[1]
             obj={}
             obj[ELLAPSED_TIME]=str(self.ellapsed_time)
             obj[END_TIME]=str(self.end_time)
@@ -178,6 +196,8 @@ class Reporting:
             obj[OVERALLSTATUS]=TERMINATE
             # Bug #246 (Himanshu) browser type should not be empty or null for reports
             obj[BROWSER_TYPE]=self.browser_type
+            obj[DATE]=self.date
+            obj[TIME]=self.time
             self.overallstatus_array_incomplete.append(obj)
 
     def get_pid(self):
