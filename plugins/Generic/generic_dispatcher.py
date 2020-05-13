@@ -90,6 +90,7 @@ class GenericKeywordDispatcher:
             'deletefolder':local_generic.genric_folder.delete_folder,
             'verifyfolderexists':local_generic.genric_folder.verify_folder_exists,
             'comparecontent':local_generic.generic_file.compare_content,
+            'comparejsoncontent':local_generic.generic_file.json_compare_content,
             'replacecontent':local_generic.generic_file.replace_content,
             'verifycontent':local_generic.generic_file.verify_content,
             'clearfilecontent':local_generic.generic_file.clear_content,
