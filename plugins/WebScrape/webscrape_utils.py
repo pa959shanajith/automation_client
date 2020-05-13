@@ -107,6 +107,9 @@ class WebScrape_Utils:
                     os.remove(file_name)
                     part = part + 1
                     previous = rectangle
+                    driver.execute_script("window.scrollTo({0}, {1})".format(rectangle[0], rectangle[1]))
+                    code = '''var elems = document.body.getElementsByTagName("*"); var len = elems.length; document.body.style.removeProperty('max-width'); document.body.style.removeProperty('overflow-x'); for (var i=0;i<len;i++) { 	if (window.getComputedStyle(elems[i],null).getPropertyValue('position') == 'fixed') { 		elems[i].style.removeProperty('opacity'); 	} }'''
+                    driver.execute_script(code)
                 stitched_image.save(screen_shot_path)
                 with open(screen_shot_path, "rb") as f:
                     b64_screen = base64.b64encode(f.read())
