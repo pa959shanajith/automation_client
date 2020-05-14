@@ -123,6 +123,19 @@ class Shell_Calendar_Keywords():
             logger.print_on_console( 'Error occured in Create Date' )
         return status, result, value, err_msg
 
+    def quickNav(self,elem,input_val):
+        status = False
+        try:
+            elem.firstVisibleDate = input_val
+            elem.focusDate = input_val
+            elem.selectionInterval = input_val+ ',' + input_val
+            status = True
+        except Exception as e:
+            err_msg = sap_constants.ERROR_MSG + ' : ' + str( e )
+            log.error( err_msg )
+            logger.print_on_console( 'Error occured in quickNav' )
+        return status
+
     def navigate_to(self, elem, input_val):
         status_flag = False
         fdate = elem.FocusDate
@@ -202,7 +215,8 @@ class Shell_Calendar_Keywords():
                         except Exception as e : log.info('WARNING: Following issue found in SelectWeek ' + str(e))
                         nav = elem.SelectionInterval
                         if (type(nav) == str): nav = nav.split(',')
-                        self.navigate_to(elem, nav[0])
+                        #self.navigate_to(elem, nav[0])
+                        self.quickNav(elem,str(nav[0]))
                         del nav
                         status = sap_constants.TEST_RESULT_PASS
                         result = sap_constants.TEST_RESULT_TRUE
@@ -247,7 +261,8 @@ class Shell_Calendar_Keywords():
                 id, ses = self.uk.getSapElement(sap_id)
                 if ( id and ses):
                     elem = ses.FindById(id)
-                    self.navigate_to(elem, v)
+                    #self.navigate_to(elem, v)
+                    self.quickNav(elem,str(v))
                     if ( elem.type == 'GuiShell' and elem.SubType=='Calendar'): #identify if its a shell and calender
                         try : elem.SelectMonth(int(input_val[0]),int(input_val[1]))
                         except Exception as e : log.info('WARNING: Following issue found in SelectMonth ' + str(e))
@@ -290,7 +305,8 @@ class Shell_Calendar_Keywords():
                 id, ses = self.uk.getSapElement(sap_id)
                 if ( id and ses):
                     elem = ses.FindById(id)
-                    self.navigate_to(elem, input_val[0])
+                    #self.navigate_to(elem, input_val[0])
+                    self.quickNav(elem,str(input_val[0]))
                     if ( elem.type == 'GuiShell' and elem.SubType == 'Calendar'): #identify if its a shell and calender
                         try : elem.SelectRange(int(input_val[0]),int(input_val[1]))
                         except Exception as e : log.info('WARNING: Following issue found in Select Range ' + str(e))
@@ -331,7 +347,8 @@ class Shell_Calendar_Keywords():
                     elem = ses.FindById(id)
                     if ( elem.type == 'GuiShell' and elem.SubType == 'Calendar'): #identify if its a shell and calender
                         try:
-                            status_flag = self.navigate_to(elem, v)
+                            #status_flag = self.navigate_to(elem, v)
+                            status_flag = self.quickNav(elem,str(v))
                             if( status_flag and elem.FocusDate == str( v ) ):
                                 win32api.keybd_event(sap_constants.VK_CODE['enter'], 0, 0, 0)#enter
                                 value = v
@@ -376,7 +393,8 @@ class Shell_Calendar_Keywords():
                     if ( id and ses):
                         elem = ses.FindById(id)
                         if ( elem.type == 'GuiShell' and elem.SubType == 'Calendar'): #identify if its a shell and calender
-                            status_flag = self.navigate_to( elem, input_val[0] )
+                            #status_flag = self.navigate_to( elem, input_val[0] )
+                            status_flag = self.quickNav( elem, str(input_val[0]) )
                             if( status_flag and elem.FocusDate == str( input_val[0]) ):
                                 win32api.keybd_event(sap_constants.VK_CODE['enter'], 0, 0, 0)#enter
                                 log.info('Selected date : ' + str(input_val[0]))
