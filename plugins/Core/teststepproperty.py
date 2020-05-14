@@ -13,7 +13,7 @@ import logging
 import constants
 
 log = logging.getLogger('teststepproperty.py')
-class TestStepProperty():
+class TestStepProperty(): 
 
     def __init__(self,name,index,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo,testcase_num,remark,testcase_details,cord):
         self.name=name
