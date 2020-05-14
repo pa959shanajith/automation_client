@@ -316,14 +316,14 @@ class Controller():
 		#COmapring breakpoint with the step number of tsp instead of index - (Sushma)
         tsp = handler.local_handler.tspList[index]
         testcase_details_orig=tsp.testcase_details
-        if local_cont.test_case_number != tsp.testcase_num :
+        if local_cont.test_case_number != tsp.testcase_num and tsp.testscript_name:
             local_cont.test_case_number = tsp.testcase_num
-            log.info(line_separator)
-            print(line_separator)
+            log.info('---------------------------------------------------------------------')
+            print('-------------------------------------------------------------------------------------------------------')
             logger.print_on_console('***Test case name: '+str(tsp.testscript_name)+'***')
             log.info('***Test case name: '+str(tsp.testscript_name)+'***')
-            log.info(line_separator)
-            print(line_separator)
+            print('-------------------------------------------------------------------------------------------------------')
+            log.info('---------------------------------------------------------------------')
         #logic to handle step by step debug
         if self.debug_mode and tsp.testcase_num==self.last_tc_num:
             #logic to handle run from setp debug
@@ -1041,6 +1041,7 @@ class Controller():
                                     con.action=EXECUTE
                                     con.conthread=mythread
                                     con.tsp_list=tsplist
+									local_cont.test_case_number=0
                                     status,status_percentage = con.executor(tsplist,EXECUTE,last_tc_num,1,con.conthread)
                                     print('=======================================================================================================')
                                     logger.print_on_console( '***Scenario' ,str(sc_idx + 1) ,' execution completed***')
