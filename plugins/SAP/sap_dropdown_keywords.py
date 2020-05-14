@@ -139,7 +139,7 @@ class Dropdown_Keywords():
             id, ses = self.uk.getSapElement(sap_id)
             if ( id and ses ):
                 if ( len(input_val) > 1 ):
-                    text = input_val[2]
+                    text = input_val[3]
                 else:
                     text = input_val[0]
                 i = 0
