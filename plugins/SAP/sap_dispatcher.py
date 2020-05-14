@@ -165,15 +165,15 @@ class SAPDispatcher:
             'selecttreenode' : shell_tree_keywords_obj.selectTreeNode,
             'getnodenamebyindex' : shell_tree_keywords_obj.getNodeNameByIndex,
             'verifytreepath' : shell_tree_keywords_obj.verifyTreePath,
-            #------------------------------------------------------callenderkeywords
+            #------------------------------------------------------calendarkeywords
             'selectdate' : shell_calendar_keywords_obj.select_date,
             #'selecttodaysdate' : shell_calendar_keywords_obj.select_todays_date,
             'selectrange':shell_calendar_keywords_obj.select_range,
             'selectmonth':shell_calendar_keywords_obj.select_month,
             'selectweek':shell_calendar_keywords_obj.select_week,
             #------------------------------------------------------scontainerkeywords
-            'getrowcount':scontainer_keywords_obj.getRowCount,
-            'getcolcount':scontainer_keywords_obj.getColCount,
+            'getrowcountofcontainer':scontainer_keywords_obj.getRowCount,
+            'getcolcountofcontainer':scontainer_keywords_obj.getColCount,
             'gettypeofcell':scontainer_keywords_obj.getTypeOfCell,
             'gettextofcell':scontainer_keywords_obj.getTextOfCell,
             'verifytextofcell':scontainer_keywords_obj.verifyTextOfCell,
