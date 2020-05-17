@@ -59,6 +59,10 @@ class InstallAndLaunch():
         try:
             err_msg = None
             curdir = os.environ["NINETEEN68_HOME"]
+            path_node_modules = curdir + '/plugins/Mobility/MobileApp/node_modules'
+            if not os.path.exists(path_node_modules):
+                self.print_error('node_modules Directory not Found in /plugins/Mobility/MobileApp')
+                return False
             if (SYSTEM_OS != 'Darwin'):
                 path = curdir + '/plugins/Mobility/MobileApp/node_modules/appium/build/lib/main.js'
                 nodePath = os.environ["NINETEEN68_HOME"] + "/Lib/Drivers/node.exe"
@@ -222,8 +226,10 @@ class BuildJson:
         }
         try:
             ##Changes done for appium upgrade from 1.7.2 to 1.16.0
-            # if XpathList[0] == '//hierarchy[1]':
-            #     del XpathList[0],rectangle[0],label[0],content_desc[0],class_name[0],resource_id[0],enabled[0]
+            if XpathList[0] == '//hierarchy[1]':
+                del XpathList[0],rectangle[0],label[0],content_desc[0],class_name[0],resource_id[0],enabled[0]
+            elif (len(class_name) == len(XpathList) + 1) and class_name[0] == "":
+                del label[0],class_name[0],enabled[0],x_coordinate[0],y_coordinate[0],width[0],height[0]
             for i in range(len(XpathList)):
                 text=''
                 if label[i] != '':
@@ -263,7 +269,6 @@ class BuildJson:
                         'text': text,
                         'id': resource_id[i], 'custname': text,
                         'reference': str(uuid.uuid4()),'enabled':enabled[i],'left':left,'top':top,'width':width_,'height':height_})
-                    del top,left,ele_bounds,width_,height_,xpath
                 elif SYSTEM_OS=='Darwin':
                     xpath =  XpathList[i]
                     ScrapeList.append({'xpath': xpath, 'tag': class_name[i],
@@ -273,10 +278,19 @@ class BuildJson:
                        # 'visible': visible[i],
                        'enabled': enabled[i], 'left': x_coordinate[i], 'top': y_coordinate[i],
                        'width': width[i], 'height': height[i]})
-                    del xpath
         except Exception as e:
             log.error(e,exc_info=True)
-        XpathList=label=content_desc=class_name=resource_id=enabled=rectangle=x_coordinate=y_coordinate=width=height = [] #visible
+        XpathList=[]
+        label=[]
+        content_desc=[]
+        class_name=[]
+        resource_id=[]
+        enabled=[]
+        rectangle=[]
+        x_coordinate=[]
+        y_coordinate=[]
+        width=[]
+        height=[] #visible
         return self.save_json(ScrapeList, driver)
 
 
@@ -293,7 +307,6 @@ class BuildJson:
                 logger.print_on_console('Writing scrape data to domelements.json file')
                 json.dump(jsonArray, outfile, indent=4, sort_keys=False)
                 outfile.close()
-            del dimension
         except Exception as e:
             log.error(e)
         return jsonArray
@@ -320,45 +333,36 @@ class Exact(xml.sax.handler.ContentHandler):
                 count=count+1
             self.elementNameCount[qName]=count
             childXPath = self.xPath + "/" + qName + "[" + str(count) + "]"
-            if self.xPath == '/':
-                curobj=self
-                child = Exact(childXPath,self.parser,curobj)
-                self.parser.setContentHandler(child)
-            else:
-                attsLength = len(attrs)
-                if(attsLength>1):# and childXPath != '//hierarchy[1]':
-                    XpathList.append(childXPath)
-                elements_list = attrs.getQNames()
-                label_flag = False
-                if SYSTEM_OS=='Darwin':
-                    label.append(attrs.getValue('label') if 'label' in elements_list else "")
-                    name.append(qName if 'label' in elements_list else "")
-                    if 'label' in elements_list: label_flag = True 
-                    enabled.append(attrs.getValue('enabled') if 'enabled' in elements_list else "")
-                    #visible.append(attrs.getValue('visible') if 'visible' in elements_list else "")
-                    x_coordinate.append(attrs.getValue('x') if 'x' in elements_list else "")
-                    y_coordinate.append(attrs.getValue('y') if 'y' in elements_list else "")
-                    width.append(attrs.getValue('width') if 'width' in elements_list else "")
-                    height.append(attrs.getValue('height') if 'height' in elements_list else "")
-                    class_name.append(attrs.getValue('type') if 'type' in elements_list else "")
+            attsLength = len(attrs)
+            if(attsLength>1):# and childXPath != '//hierarchy[1]':
+                XpathList.append(childXPath)
+            elements_list = attrs.getQNames()
+            label_flag = False
+            if SYSTEM_OS=='Darwin':
+                label.append(attrs.getValue('label') if 'label' in elements_list else "")
+                name.append(qName if 'label' in elements_list else "")
+                enabled.append(attrs.getValue('enabled') if 'enabled' in elements_list else "")
+                #visible.append(attrs.getValue('visible') if 'visible' in elements_list else "")
+                x_coordinate.append(attrs.getValue('x') if 'x' in elements_list else "")
+                y_coordinate.append(attrs.getValue('y') if 'y' in elements_list else "")
+                width.append(attrs.getValue('width') if 'width' in elements_list else "")
+                height.append(attrs.getValue('height') if 'height' in elements_list else "")
+                class_name.append(attrs.getValue('type') if 'type' in elements_list else "")
 
-                if SYSTEM_OS!='Darwin':
-                    label.append(attrs.getValue('text') if 'text' in elements_list else "")
-                    name.append(qName if 'text' in elements_list else "")
-                    rectangle.append(attrs.getValue('bounds') if 'bounds' in elements_list else "")
-                    enabled.append(attrs.getValue('enabled') if 'enabled' in elements_list else "")
-                    resource_id.append(attrs.getValue('resource_id') if 'resource_id' in elements_list else "")
-                    focusable.append(attrs.getValue('focusable') if 'focusable' in elements_list else "")
-                    class_name.append(attrs.getValue('class') if 'class' in elements_list else "")
-                    content_desc.append(attrs.getValue('content-desc') if 'content-desc' in elements_list else "")
-                    checked.append(attrs.getValue('checked') if 'checked' in elements_list else "")
+            if SYSTEM_OS!='Darwin':
+                label.append(attrs.getValue('text') if 'text' in elements_list else "")
+                name.append(qName if 'text' in elements_list else "")
+                rectangle.append(attrs.getValue('bounds') if 'bounds' in elements_list else "")
+                enabled.append(attrs.getValue('enabled') if 'enabled' in elements_list else "")
+                resource_id.append(attrs.getValue('resource_id') if 'resource_id' in elements_list else "")
+                focusable.append(attrs.getValue('focusable') if 'focusable' in elements_list else "")
+                class_name.append(attrs.getValue('class') if 'class' in elements_list else "")
+                content_desc.append(attrs.getValue('content-desc') if 'content-desc' in elements_list else "")
+                checked.append(attrs.getValue('checked') if 'checked' in elements_list else "")
 
-                if SYSTEM_OS == 'Darwin':
-                    if label_flag == False and len(elements_list) > 0:
-                        label.append('Noname')
-                curobj=self
-                child = Exact(childXPath,self.parser,curobj)
-                self.parser.setContentHandler(child)
+            curobj=self
+            child = Exact(childXPath,self.parser,curobj)
+            self.parser.setContentHandler(child)
         except Exception as e:
             log.error(e,exc_info = True)
 
