@@ -1183,7 +1183,7 @@ class Controller():
             status=COMPLETED
         return status
 
-    def invoke_parralel_exe(self,mythread,json_data,socketIO,wxObject,configvalues,qc_soc):
+    def invoke_parralel_exe(self,mythread,json_data,socketIO,wxObject,configvalues,qc_soc,aws_mode):
         try:
             import copy
             browsers_data = json_data['suitedetails'][0]['browserType']
@@ -1193,7 +1193,7 @@ class Controller():
                 jsondata_dict[i] = copy.deepcopy(json_data)
                 for j in range(len(jsondata_dict[i]['suitedetails'])):
                     jsondata_dict[i]['suitedetails'][j]['browserType'] = [browsers_data[i]]
-                th[i] = threading.Thread(target = self.invoke_execution, args = (mythread,jsondata_dict[i],socketIO,wxObject,configvalues,qc_soc))
+                th[i] = threading.Thread(target = self.invoke_execution, args = (mythread,jsondata_dict[i],socketIO,wxObject,configvalues,qc_soc,aws_mode))
                 th[i].start()
             for i in th:
                 th[i].join()
