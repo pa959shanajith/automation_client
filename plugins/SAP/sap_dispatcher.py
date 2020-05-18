@@ -24,6 +24,7 @@ import sap_shell_keywords
 import sap_shell_gridview_toolbar_keywords
 import sap_shell_tree_keywords
 import sap_shell_calendar_keywords
+import sap_scontainer_keywords
 #-------------------------------------------------------------
 import sap_constants
 import constants
@@ -44,6 +45,7 @@ class SAPDispatcher:
     shell_gridview_toolbar_keywords_obj = sap_shell_gridview_toolbar_keywords.Shell_GridView_Toolbar_Keywords()
     shell_tree_keywords_obj = sap_shell_tree_keywords.Shell_Tree_Keywords()
     shell_calendar_keywords_obj = sap_shell_calendar_keywords.Shell_Calendar_Keywords()
+    scontainer_keywords_obj = sap_scontainer_keywords.SContainer_Keywords()
     sap_dict = {
             #------------------------------------------------------launch keywords
             'launchapplication' : launch_keywords_obj.launch_application,
@@ -163,12 +165,22 @@ class SAPDispatcher:
             'selecttreenode' : shell_tree_keywords_obj.selectTreeNode,
             'getnodenamebyindex' : shell_tree_keywords_obj.getNodeNameByIndex,
             'verifytreepath' : shell_tree_keywords_obj.verifyTreePath,
-            #------------------------------------------------------callenderkeywords
+            #------------------------------------------------------calendarkeywords
             'selectdate' : shell_calendar_keywords_obj.select_date,
             #'selecttodaysdate' : shell_calendar_keywords_obj.select_todays_date,
             'selectrange':shell_calendar_keywords_obj.select_range,
             'selectmonth':shell_calendar_keywords_obj.select_month,
-            'selectweek':shell_calendar_keywords_obj.select_week
+            'selectweek':shell_calendar_keywords_obj.select_week,
+            #------------------------------------------------------scontainerkeywords
+            'getrowcountofcontainer':scontainer_keywords_obj.getRowCount,
+            'getcolcountofcontainer':scontainer_keywords_obj.getColCount,
+            'gettypeofcell':scontainer_keywords_obj.getTypeOfCell,
+            'gettextofcell':scontainer_keywords_obj.getTextOfCell,
+            'verifytextofcell':scontainer_keywords_obj.verifyTextOfCell,
+            'clickoncell':scontainer_keywords_obj.clickOnCell,
+            'doubleclickoncell':scontainer_keywords_obj.doubleClickOnCell,
+            'rightclickoncell':scontainer_keywords_obj.rightClickOnCell,
+            'setcellfocus' : scontainer_keywords_obj.setCellFocus
             }
 
     def __init__(self):

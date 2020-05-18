@@ -59,7 +59,7 @@ class ElementKeywords():
             if ( id and ses ):
                 if ( len(input_val) != 0 ):
                     if ( len(input_val) > 1 ):
-                        input = input_val[2]
+                        input = input_val[3]
                     else:
                         input = input_val[0]
 
@@ -398,6 +398,10 @@ class ElementKeywords():
                         row = int(args[0][0]) - 1
                         col = int(args[0][1]) - 1
                         elem = elem.GetCell(row, col)
+                    elif ( len(args[0]) > 2 ):
+                        row = int(args[0][3]) - 1
+                        col = int(args[0][4]) - 1
+                        elem = elem.GetCell(row, col)
                     else:
                         elem = None
                         flag = True
@@ -448,8 +452,8 @@ class ElementKeywords():
                         col = int(args[0][1])-1
                         elem = elem.GetCell(row, col)
                     elif ( len(args[0]) > 2 ):
-                        row = int(args[0][2]) - 1
-                        col = int(args[0][3]) - 1
+                        row = int(args[0][3]) - 1
+                        col = int(args[0][4]) - 1
                         elem = elem.GetCell(row, col)
                     else:
                         elem = None

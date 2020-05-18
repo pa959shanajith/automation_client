@@ -426,8 +426,16 @@ class StepDescription:
             return 'Perform toggle maximize operation on ' + "'" + tsp.custname + "'"
         def toggleminimize():
             return 'Perform toggle minimize operation on ' + "'" + tsp.custname + "'"
+
+        #iris keywords
         def clickiris():
             return 'Click on '+ "'" +tsp.custname+ "'" +'.'
+        def doubleclickiris():
+            return 'Double click on '+ "'" +tsp.custname+ "'" +'.'
+        def rightclickiris():
+            return 'Right click on '+ "'" +tsp.custname+ "'" +'.'
+        def setsecuretextiris():
+            return 'Enter secure text '+"'"+ input+"'"+ ' in ' + "'" + tsp.custname + "'"+ '.'
         def settextiris():
             return 'Enter text '+"'"+ input+"'"+ ' in ' + "'" + tsp.custname + "'"+ '.'
         def gettextiris():
@@ -597,29 +605,33 @@ class StepDescription:
 
         #Scroll Keywords
         def scrolldown():
-            return 'Scroll down by '+ "'"+inputval+"'"+' units and store the output as '+"'"+output+"'"+'.'
+            return 'Scroll down by ' + "'" + inputval + "'" + ' units and store the output as ' + "'" + output + "'" + '.'
         def scrollleft():
-            return 'Scroll left by '+"'"+inputval+"'"+' units and store the output as '+"'"+output+"'"+'.'
+            return 'Scroll left by ' + "'" + inputval + "'" + ' units and store the output as ' + "'" + output + "'" + '.'
         def scrollright():
-            return 'Scroll right by '+"'"+inputval+"'"+' units and store the output as '+"'"+output+"'"+'.'
+            return 'Scroll right by ' + "'" + inputval + "'" + ' units and store the output as ' + "'" + output + "'" + '.'
         def scrollup():
-            return 'Scroll up by '+"'"+inputval+"'"+' units and store the output as '+"'"+output+"'"+'.'
+            return 'Scroll up by ' + "'" + inputval + "'" + ' units and store the output as ' + "'" + output + "'" + '.'
 
         #Tab Keywords
         def movetabs():
-            return 'Move tab '+ "'" + tsp.custname + "'"+'to left and store the output as '+"'"+output+"'"+'.'
+            return 'Move tab ' + "'" + tsp.custname + "'" + 'to left and store the output as ' + "'" + output + "'" + '.'
 
-        #Shell(Grid) Keywords
+        #Shell(generic) keywords
+        def selectcontextmenubytext():
+            return 'Select the contextmenu item ' + "'" + inputval + "'" + ' and store the output as ' + "'" + output + "'" + '.'
+
+        #Grid Keywords
         def selectcolumns():
             inp = input
             if(len(inputval)>1):
                 inp = ', '.join(inputval)
-            return 'Selecting Column/Columns '+ "'" + inp + "'" + 'and store the output as ' + "'" + output + "'" + '.'
+            return 'Selecting Column/Columns '+ "'" + inp + "'" + ' and store the output as ' + "'" + output + "'" + '.'
         def unselectcolumns():
             inp = input
             if(len(inputval)>1):
                 inp = ', '.join(inputval)
-            return 'Unselecting Column/Columns '+ "'" + inp + "'" + 'and store the output as ' + "'" + output + "'" + '.'
+            return 'Unselecting Column/Columns '+ "'" + inp + "'" + ' and store the output as ' + "'" + output + "'" + '.'
         def getallcolumnheaders():
             return 'Get all Column Headers of '+ "'" + tsp.custname + "'" + ' and save the output as ' + "'"+output+"'" + ' in '+"'"+ tsp_outputval+"'"+'.'
         def presstoolbarbutton():
@@ -638,16 +650,6 @@ class StepDescription:
             return 'Get column count of ' + "'" + tsp.custname + "'" + ' and save the count ' + "'"+output+"'" + ' in '+"'"+ tsp_outputval+"'"+'.'
         def getcelltext():
             return 'Get cell text of row '+"'"+input[0]+"'"+'and column '+"'"+input[1]+"'"+' and store the output as '+"'"+output+"'" + ' in '+"'"+ tsp_outputval+"'"+'.'
-        def selecttreenode():
-            inp = input
-            if(len(inputval)>1):
-                inp = '->'.join(inputval)
-            return 'Select node '+"'"+inp+"'"+' in '+"'"+tsp.custname+"'"+'.'
-        def getnodenamebyindex():
-            inp = input
-            if(len(inputval)>1):
-                inp = '->'.join(inputval)
-            return 'Get name of node at index' + "'" + inp + "'" + ' and store the output as ' + "'" + output + "'" + ' in ' + "'" + tsp_outputval + "'" + '.'
         def setshelltext():
             return 'Set cell text of row '+ "'" + input[0] + "'" + 'and column ' + "'" + input[1] + "'" + ' and store the output as '+ "'" + output + "'" + ' in ' + "'" + tsp_outputval + "'" + '.'
         def getrowcolbytext():
@@ -664,6 +666,32 @@ class StepDescription:
             return 'Scroll to row number ' + "'" + input[0] + "'" + 'and save the value '+ "'" + output + "'" + " in " + "'" + tsp_outputval + "'" +'.'
         def getcellcolor():
             return 'Get cell colour of row' + "'" + input[0] + "'" +' and column ' + "'" + input[1] + "'" + ' and store the output as ' + "'" + output + "'" + ' in '+ "'" + tsp_outputval + "'" +'.'
+
+        #calendar keywords
+        def selectdate():
+            return 'Select the date ' + "'" + input[0] + "'" + " in " + "'" + tsp.custname + "'" + '.'
+        def selectrange():
+            return 'Select range from ' + "'" + input[0] + "'" + ' to ' + "'" + input[1] + " in " + "'" + tsp.custname + "'" + '.'
+        def selectmonth():
+            return 'Select the month ' + "'" + input[0] + "'" + 'in the year' + "'" + input[1] + " in " + "'" + tsp.custname + "'" + '.'
+        def selectweek():
+            return 'Select the week ' + "'" + input[0] + "'" + 'in the year' + "'" + input[1] + " in " + "'" + tsp.custname + "'" + '.'
+
+        #tree keywords
+        def selecttreenode():
+            inp = input
+            if(len(inputval)>1):
+                inp = '->'.join(inputval)
+            return 'Select node '+"'"+inp+"'"+' in '+"'"+tsp.custname+"'"+'.'
+        def getnodenamebyindex():
+            inp = input
+            if(len(inputval)>1):
+                inp = '->'.join(inputval)
+            return 'Get name of node at index' + "'" + inp + "'" + ' and store the output as ' + "'" + output + "'" + ' in ' + "'" + tsp_outputval + "'" + '.'
+        def verifytreepath():
+            return 'Verify tree path and save the result as '+ "'" + output + "'" + " in " + "'" + tsp_outputval + "'" +'.'
+        def getcolvaluecorrtoselectednode():
+            return 'Get the column corresponding to the node and save the result as '+ "'" + output + "'" + " in " + "'" + tsp_outputval + "'" +'.'
         def selecttreeelement():
             return 'Select the tree element and save the result as '+ "'" + output + "'" + " in " + "'" + tsp_outputval + "'" +'.'
         def gettreenodetext():
@@ -674,14 +702,37 @@ class StepDescription:
             return 'Get the single parent node of the selected node and save the result as '+ "'" + output + "'" + " in " + "'" + tsp_outputval + "'" +'.'
         def collapsetree():
             return 'Collapse tree and save the result as '+ "'" + output + "'" + " in " + "'" + tsp_outputval + "'" +'.'
-        def getcolvaluecorrtoselectednode():
-            return 'Get the column corresponding to the node and save the result as '+ "'" + output + "'" + " in " + "'" + tsp_outputval + "'" +'.'
-        def verifytreepath():
-            return 'Verify tree path and save the result as '+ "'" + output + "'" + " in " + "'" + tsp_outputval + "'" +'.'
 
-        #iris
+
+        #scontainer keywords
+        def getrowcountofcontainer():
+            return 'Get row count ' + "'" + output + "'" + " of " + "'" + tsp.custname + "'" +'.'
+        def getcolcountofcontainer():
+            return 'Get column count ' + "'" + output + "'" + " of " + "'" + tsp.custname + "'" +'.'
+        def gettypeofcell():
+            return 'Get cell type of ' + "'" + tsp.custname + "'" +' in row number ' + "'" + input[0] + "'" +' and column number ' + "'" + input[1] + "'" + 'in the simple-container and save the value '+"'"+ output +"'"+ " in " +"'"+ tsp_outputval +"'"+'.'
+        def gettextofcell():
+            return 'Get cell text of ' + "'" + tsp.custname + "'" +' in row number ' + "'" + input[0] + "'" +' and column number ' + "'" + input[1] + "'" + 'in the simple-container and save the value '+"'"+ output +"'"+ " in " +"'"+ tsp_outputval +"'"+'.'
+        def verifytextofcell():
+            return 'Verify cell text of ' + "'" + tsp.custname + "'" +' in row number ' + "'" + input[0] + "'" +' and column number '+ "'" + input[1] + "'" + 'in the simple-container and save the value '+"'"+ output +"'"+ " in " +"'"+ tsp_outputval +"'"+'.'
+        def clickoncell():
+            return 'Click on cell in row  ' + "'" + input[0] + "'" +' and column  ' + "'" + input[1] + "' of '" +tsp.custname+ "'" +'.'
+        def doubleclickoncell():
+            return 'Double click on cell in row  ' + "'" + input[0] + "'" +' and column  ' + "'" + input[1] + "' of '" +tsp.custname+ "'" +'.'
+        def rightclickoncell():
+            return 'Right click on cell in row  ' + "'" + input[0] + "'" +' and column  ' + "'" + input[1] + "' of '" +tsp.custname+ "'" +'.'
+        def setcellfocus():
+            return 'Set focus on cell in row  ' + "'" + input[0] + "'" +' and column  ' + "'" + input[1] + "' of '" +tsp.custname+ "'" +'.'
+
+        #iris keywords
         def clickiris():
             return 'Click on '+ "'" +tsp.custname+ "'" +'.'
+        def doubleclickiris():
+            return 'Double click on '+ "'" +tsp.custname+ "'" +'.'
+        def rightclickiris():
+            return 'Right click on '+ "'" +tsp.custname+ "'" +'.'
+        def setsecuretextiris():
+            return 'Enter secure text '+"'"+ input+"'"+ ' in ' + "'" + tsp.custname + "'"+ '.'
         def settextiris():
             return 'Enter text '+"'"+ input+"'"+ ' in ' + "'" + tsp.custname + "'"+ '.'
         def gettextiris():
@@ -914,8 +965,16 @@ class StepDescription:
             except:
                 input1=input
             return 'Select the tree node  '+"'"+input1+"'."
+
+        #iris keywords
         def clickiris():
             return 'Click on '+ "'" +tsp.custname+ "'" +'.'
+        def doubleclickiris():
+            return 'Double click on '+ "'" +tsp.custname+ "'" +'.'
+        def rightclickiris():
+            return 'Right click on '+ "'" +tsp.custname+ "'" +'.'
+        def setsecuretextiris():
+            return 'Enter secure text '+"'"+ input+"'"+ ' in ' + "'" + tsp.custname + "'"+ '.'
         def settextiris():
             return 'Enter text '+"'"+ input+"'"+ ' in ' + "'" + tsp.custname + "'"+ '.'
         def gettextiris():
@@ -1390,8 +1449,16 @@ class StepDescription:
         #custom keyword
         def getobjectcount():
             return 'Get Object count of the type '+"'" +ele_type+"'" +' and save the count '+"'" +output+"'" +' in '+"'"+tsp.outputval+"'"
+
+        #iris keywords
         def clickiris():
             return 'Click on '+ "'" +tsp.custname+ "'" +'.'
+        def doubleclickiris():
+            return 'Double click on '+ "'" +tsp.custname+ "'" +'.'
+        def rightclickiris():
+            return 'Right click on '+ "'" +tsp.custname+ "'" +'.'
+        def setsecuretextiris():
+            return 'Enter secure text '+"'"+ input+"'"+ ' in ' + "'" + tsp.custname + "'"+ '.'
         def settextiris():
             return 'Enter text '+"'"+ input+"'"+ ' in ' + "'" + tsp.custname + "'"+ '.'
         def gettextiris():
