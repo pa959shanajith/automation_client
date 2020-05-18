@@ -683,6 +683,7 @@ class BrowserKeywords():
             #clear cache for chrome driver.
             elif local_bk.driver_obj != None and isinstance(local_bk.driver_obj,webdriver.Chrome):
                     local_bk.driver_obj.get('chrome://settings/clearBrowserData')
+                    time.sleep(2)
                     local_bk.driver_obj.execute_script('return document.querySelector("body > settings-ui").shadowRoot.querySelector("#container").querySelector("#main").shadowRoot.querySelector("settings-basic-page").shadowRoot.querySelector("settings-privacy-page").shadowRoot.querySelector("settings-clear-browsing-data-dialog").shadowRoot.querySelector("#clearBrowsingDataDialog").querySelector("#clearBrowsingDataConfirm").click();')
                     logger.print_on_console('Cleared cache')
                     local_bk.log.info('Cleared Cache')
