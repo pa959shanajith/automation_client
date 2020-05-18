@@ -840,11 +840,17 @@ class TestThread(threading.Thread):
 
             if status==TERMINATE:
                 logger.print_on_console('---------Termination Completed-------')
+            if self.wxObject.choice=='RunfromStep':
+                self.wxObject.breakpoint.Enable()
+            else:
+                self.wxObject.breakpoint.Disable()
+            
+
 
             #Removed execute,debug button
             self.wxObject.breakpoint.Clear()
             self.wxObject.rbox.Enable()
-            self.wxObject.breakpoint.Disable()
+            # self.wxObject.breakpoint.Disable()
             self.wxObject.cancelbutton.Enable()
             if self.action==DEBUG:
                 testcasename = handler.local_handler.testcasename
@@ -2581,7 +2587,7 @@ def check_browser():
             driver=None
             for k,v in list(FIREFOX_BROWSER_VERSION.items()):
                 if a == k:
-                    if browser_ver >= v[0] or browser_ver <= v[1]:
+                    if browser_ver >= v[0] and browser_ver <= v[1]:
                         firefoxFlag=True
             if firefoxFlag == False:
                 logger.print_on_console('WARNING!! : Firefox version ',str(browser_ver),' is not supported.')
