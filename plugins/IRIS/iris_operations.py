@@ -21,6 +21,7 @@ if SYSTEM_OS != 'Darwin':
     import win32clipboard
     from pyrobot import Robot
     import pythoncom
+    import pywinauto
 vertical = []
 horizontal = []
 verifyexists = []
@@ -541,33 +542,78 @@ class IRISKeywords():
                 text = ''
                 if(len(args[0])==1 and args[0][0].lower().strip() == 'select'):
                     if SYSTEM_OS != 'Darwin':
-                        import pythoncom
-                        pythoncom.CoInitialize()
                         win32clipboard.OpenClipboard()
                         win32clipboard.EmptyClipboard()
                         win32clipboard.CloseClipboard()
-                        robot = Robot()
                         height = int(element['coordinates'][3]) - int(element['coordinates'][1])
                         opt = None
                         if (len(args[0])==2 and args[0][1].lower().strip()=='left'):opt='left'
                         elif ((len(args[0])==2 and args[0][1].lower().strip()=='right') or len(args[0])==1):opt='right'
                         if (opt):
-                            if (opt=='left'):
-                                #L-R
-                                pyautogui.moveTo(int(element['coordinates'][0]),int(element['coordinates'][1])+int(height/2))
-                                pyautogui.dragTo(int(element['coordinates'][2]),int(element['coordinates'][3])-int(height/2),button='left')
-                            elif (opt=='right'):
-                                #R-L
-                                pyautogui.moveTo(int(element['coordinates'][2]),int(element['coordinates'][3])-int(height/2))
-                                pyautogui.dragTo(int(element['coordinates'][0]),int(element['coordinates'][1])+int(height/2),button='left')
-                            robot.ctrl_press('c')
-                            time.sleep(1)
-                            win32clipboard.OpenClipboard()
-                            text = win32clipboard.GetClipboardData()
-                            win32clipboard.CloseClipboard()
+                            def heightDiff(height,opt):
+                                h1 = h2 = None
+                                if (opt == 'right'):
+                                    h1 = -int(height/2)
+                                    h2 = int(height/2)
+                                else:
+                                    h1 = int(height/2)
+                                    h2 = -int(height/2)
+                                del opt,height
+                                return h1,h2
+                            def getFromClipboard(flag):
+                                text = None
+                                robot = Robot()
+                                robot.ctrl_press('c')
+                                time.sleep(1)
+                                win32clipboard.OpenClipboard()
+                                try:text = win32clipboard.GetClipboardData()
+                                except : flag = False
+                                win32clipboard.CloseClipboard()
+                                del robot
+                                return text,flag
+                            def dragFunctionA(c1, c2, c3, c4, h, opt):
+                                log.debug('Entering dragFunctionA ')
+                                text = None
+                                flag = True
+                                h1, h2 = heightDiff(h, opt)
+                                pyautogui.moveTo( c1, c2 + h1 )
+                                pyautogui.dragTo( c3, c4 + h2 , button = 'left')
+                                text, flag = getFromClipboard(flag)
+                                if not(text and flag):
+                                    text,flag = dragFunctionB( c1, c2, c3, c4, h, opt )
+                                del c1, c2, c3, c4, opt, h, h1, h2
+                                return text,flag
+                            def dragFunctionB(c1, c2, c3, c4, h, opt):
+                                log.debug('Entering dragFunctionB ,dragFunctionA did not work')
+                                text = None
+                                flag = True
+                                h1, h2 = heightDiff(h, opt)
+                                pyautogui.moveTo( c1, c2 + h1 )
+                                pyautogui.drag( c3, c4 + h2 , button = 'left')
+                                text, flag = getFromClipboard(flag)
+                                if not(text and flag):
+                                    text,flag = dragFunctionC( c1, c2, c3, c4, h, opt )
+                                del c1, c2, c3, c4, opt, h, h1, h2
+                                return text, flag
+                            def dragFunctionC(c1, c2, c3, c4, h, opt):
+                                log.debug('Entering dragFunctionC ,dragFunctionB did not work')
+                                text = None
+                                flag = True
+                                h1, h2 = heightDiff(h, opt)
+                                pywinauto.mouse.press(button = 'left', coords=(c1, c2 + h1))
+                                pywinauto.mouse.release(button = 'left', coords=(c3, c4 + h2))
+                                text, flag = getFromClipboard(flag)
+                                del c1, c2, c3, c4, opt, h, h1, h2
+                                return text, flag
+                            if (opt=='left'):#L-R
+                                text, flag = dragFunctionA(int(element['coordinates'][0]),int(element['coordinates'][1]),int(element['coordinates'][2]),int(element['coordinates'][3]) ,height ,opt)
+                            elif (opt=='right'): #R-L
+                                text, flag = dragFunctionA(int(element['coordinates'][2]),int(element['coordinates'][3]),int(element['coordinates'][0]),int(element['coordinates'][1]) ,height ,opt)
+                            if not(text and flag):
+                                err_msg = "Unable to select the text"
                         else:
-                            log.error("Error : Invalid option")
-                        del opt,height,robot,args,image
+                            err_msg = "Error : Invalid option"
+                        del opt, height, args, image
                 elif(len(args[0])==1 and args[0][0].lower().strip() == 'date'):
                     img = Image.open('cropped.png')
                     imgr = img.resize((img.size[0] * 10, img.size[1] * 10), Image.ANTIALIAS)
@@ -608,12 +654,16 @@ class IRISKeywords():
                         os.remove('demo_cropped.png')
                 else:
                     text = get_ocr(image)
-                status= TEST_RESULT_PASS
-                result = TEST_RESULT_TRUE
-                value = text
+                if not( err_msg ):
+                    status= TEST_RESULT_PASS
+                    result = TEST_RESULT_TRUE
+                    value = text
                 os.remove('cropped.png')
             else:
-                log.error("Tesseract module not found.")
+                err_msg = "Tesseract module not found."
+            if ( err_msg ):
+                log.info( err_msg )
+                logger.print_on_console( err_msg )
         except Exception as e:
             log.error("Error occurred in GetTextIris, Err_Msg : ",e)
             logger.print_on_console("Error occurred in GetTextIris")
