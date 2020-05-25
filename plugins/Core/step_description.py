@@ -1070,6 +1070,8 @@ class StepDescription:
             return 'Verify text ' +"'"+input +"'"+' is the name of the '+ "'" + tsp.custname + "'"
         def press():
             return 'Press on the '+ "'" + tsp.custname + "'"
+        def click():
+            return 'Click on '+ "'" + tsp.custname + "'"
         def longpress():
             return 'Long press on the '+ "'" + tsp.custname + "'"
         #Radio checkbox keywords

@@ -1420,7 +1420,7 @@ class MobileOpeartions():
         except Exception as e:
             log.error("Error occurred in BackPress")
             log.error(e,exc_info=True)
-            return status,methodoutput,output,err_msg
+        return status,methodoutput,output,err_msg
 
     def hide_soft_keyboard(self,driver,*args):
         status=TEST_RESULT_FAIL
