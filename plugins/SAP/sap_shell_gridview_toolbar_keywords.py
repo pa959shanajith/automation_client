@@ -772,3 +772,44 @@ class Shell_GridView_Toolbar_Keywords():
             log.error( err_msg )
             logger.print_on_console( 'Error occured in Get All Column Headers' )
         return status,result,value,err_msg
+
+    def getColNumByColHeaders(self, sap_id, input_val, *args):
+        status = sap_constants.TEST_RESULT_FAIL
+        result = sap_constants.TEST_RESULT_FALSE
+        err_msg = None
+        value = OUTPUT_CONSTANT
+        bList = []
+        vList = []
+        try:
+            self.lk.setWindowToForeground(sap_id)
+            id, ses = self.uk.getSapElement(sap_id)
+            if ( id and ses ):
+                elem = ses.FindById(id)
+                d1,d2,imax,d3 = self.get_colCount(sap_id)
+                if ( elem.type == 'GuiShell' ):
+                    #----------------------------------function to append columnorder
+                    for i in range(0,imax):
+                        b=elem.columnorder(i)
+                        bList.append(b)
+                    #----------------------------------function to append columnorder
+                    for i in range(0,len(bList)):
+                        vList.append(elem.GetDisplayedColumnTitle(str(bList[i])))
+                    for i in range(0,len(vList)):
+                        if (input_val[0].strip() == vList[i]):
+                            value = i
+                            status = sap_constants.TEST_RESULT_PASS
+                            result = sap_constants.TEST_RESULT_TRUE
+                            break
+                else:
+                    err_msg = 'Element is not a shell object'
+            else:
+                err_msg = sap_constants.ELELMENT_NOT_FOUND
+            #----------------------------------logging
+            if ( err_msg ):
+                log.info( err_msg )
+                logger.print_on_console( err_msg )
+        except Exception as e:
+            err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
+            log.error( err_msg )
+            logger.print_on_console( 'Error occured in Get All Column Headers' )
+        return status,result,value,err_msg

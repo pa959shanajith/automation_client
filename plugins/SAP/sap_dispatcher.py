@@ -89,6 +89,9 @@ class SAPDispatcher:
             'verifyselectedvalue' : dropdown_keywords_obj.verifySelectedValue,
             'verifyvaluesexists' : dropdown_keywords_obj.verifyValuesExists,
             'verifyallvalues' : dropdown_keywords_obj.verifyAllValues,
+            'getallkeyvaluepairs' : dropdown_keywords_obj.getAllKeyValuePairs,
+            'selectkeybytext' : dropdown_keywords_obj.selectKeyByText,
+            'getkeybyindex' : dropdown_keywords_obj.getKeyByIndex,
             #------------------------------------------------------element keywords
             'click' : element_keywords_obj.click,
             'rightclick' : element_keywords_obj.rightClick,
@@ -155,6 +158,7 @@ class SAPDispatcher:
             'selectcolumns' : shell_gridview_toolbar_keywords_obj.selectColumns,
             'unselectcolumns' : shell_gridview_toolbar_keywords_obj.unSelectColumns,
             'getallcolumnheaders' : shell_gridview_toolbar_keywords_obj.getAllColumnHeaders,
+            'getcolnumbycolheaders' : shell_gridview_toolbar_keywords_obj.getColNumByColHeaders,
             #------------------------------------------------------treekeywords
             'selecttreeelement' : shell_tree_keywords_obj.selectTreeElement,
             'gettreenodetext' : shell_tree_keywords_obj.getTreeNodeText,

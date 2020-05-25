@@ -55,7 +55,8 @@ class Dropdown_Keywords():
         value = OUTPUT_CONSTANT
         err_msg = None
         i = 0
-        arr = []
+        arr_v = []
+        arr_k = []
         try:
             self.lk.setWindowToForeground(sap_id)
             id, ses = self.uk.getSapElement(sap_id)
@@ -64,12 +65,13 @@ class Dropdown_Keywords():
                     entries = ses.FindById(id).Entries
                     while True:
                         try:
-                            arr.append(entries(i).value)
+                            arr_v.append(entries(i).value)
+                            arr_k.append(entries(i).key)
                         except :
                             break
                         i = i + 1
                     try:
-                        ses.FindById(id).value = arr[int(input_val[0])]
+                        ses.FindById(id).key = arr_k[int(input_val[0])]
                         status = sap_constants.TEST_RESULT_PASS
                         result = sap_constants.TEST_RESULT_TRUE
                     except Exception as e:
@@ -129,6 +131,46 @@ class Dropdown_Keywords():
             logger.print_on_console( "Error occured in getValueByIndex" )
         return status, result, value, err_msg
 
+    def getKeyByIndex(self, sap_id, input_val, *args):
+        status = sap_constants.TEST_RESULT_FAIL
+        result = sap_constants.TEST_RESULT_FALSE
+        value = OUTPUT_CONSTANT
+        err_msg = None
+        i = 0
+        arr = []
+        try:
+            self.lk.setWindowToForeground(sap_id)
+            id, ses = self.uk.getSapElement(sap_id)
+            if ( id and ses ):
+                if ( ses.FindById(id).Changeable == True ):
+                    entries = ses.FindById(id).Entries
+                    while True:
+                        try:
+                            arr.append(entries(i).key)
+                        except :
+                            break
+                        i = i + 1
+                    try:
+                        value = arr[int(input_val[0])]
+                        status = sap_constants.TEST_RESULT_PASS
+                        result = sap_constants.TEST_RESULT_TRUE
+                    except Exception as e:
+                        err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
+                        log.error( err_msg )
+                        logger.print_on_console( "Error occured : Index out of bound" )
+                else:
+                    err_msg = sap_constants.ELEMENT_NOT_CHANGEABLE
+            else:
+                err_msg = sap_constants.ELELMENT_NOT_FOUND
+            if ( err_msg ):
+                log.info( err_msg )
+                logger.print_on_console( err_msg )
+        except Exception as e:
+            err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
+            log.error( err_msg )
+            logger.print_on_console( "Error occured in Get Key By Index" )
+        return status, result, value, err_msg
+
     def selectValueByText(self, sap_id, input_val, *args):
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
@@ -168,6 +210,44 @@ class Dropdown_Keywords():
             logger.print_on_console( "Error occured in Select Value By Text" )
         return status, result, value, err_msg
 
+    def selectKeyByText(self, sap_id, input_val, *args):
+        status = sap_constants.TEST_RESULT_FAIL
+        result = sap_constants.TEST_RESULT_FALSE
+        value = OUTPUT_CONSTANT
+        err_msg = None
+        try:
+            self.lk.setWindowToForeground(sap_id)
+            id, ses = self.uk.getSapElement(sap_id)
+            if ( id and ses ):
+                if ( len(input_val) > 1 ):
+                    text = input_val[3]
+                else:
+                    text = input_val[0]
+                i = 0
+                if ( ses.FindById(id).Changeable == True ):
+                    entries = ses.FindById(id).Entries
+                    while True:
+                        try:
+                            if ( entries(i).key.strip() == text.strip() ):
+                                ses.FindById(id).key = text
+                                status = sap_constants.TEST_RESULT_PASS
+                                result = sap_constants.TEST_RESULT_TRUE
+                        except:
+                            break
+                        i = i + 1
+                else:
+                    err_msg = sap_constants.ELEMENT_NOT_CHANGEABLE
+            else:
+                err_msg = sap_constants.ELELMENT_NOT_FOUND
+            #------------------------logging error messages
+            if ( err_msg ):
+                log.info( err_msg )
+                logger.print_on_console( err_msg )
+        except Exception as e:
+            err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
+            log.error( err_msg )
+            logger.print_on_console( "Error occured in Select Key By Text" )
+        return status, result, value, err_msg
 
     def verifySelectedValue(self, sap_id, input_val ,*args):
         status = sap_constants.TEST_RESULT_FAIL
@@ -313,6 +393,44 @@ class Dropdown_Keywords():
             log.error( err_msg )
             logger.print_on_console( "Error occured in Verify Values Exists" )
         return status, result, verb, err_msg
+
+    def getAllKeyValuePairs(self, sap_id, input_val, *args):
+        status = sap_constants.TEST_RESULT_FAIL
+        result = sap_constants.TEST_RESULT_FALSE
+        err_msg = None
+        value = OUTPUT_CONSTANT
+        i = 0
+        dd_entries = []
+        try:
+            self.lk.setWindowToForeground(sap_id)
+            id,ses = self.uk.getSapElement(sap_id)
+            if ( id and ses ):
+                entries = ses.FindById(id).Entries
+                while True:
+                    try:
+                        kv_entries = []
+                        kv_entries.append(str(entries(i).key))
+                        kv_entries.append(str(entries(i).value))
+                        dd_entries.append(kv_entries)
+                        i = i + 1
+                    except:
+                        break
+                    value = dd_entries
+                    status = sap_constants.TEST_RESULT_PASS
+                    result = sap_constants.TEST_RESULT_TRUE
+                else:
+                    err_msg = "No matching data found"
+            else:
+                err_msg = sap_constants.ELELMENT_NOT_FOUND
+            #------------------------logging error messages
+            if ( err_msg ):
+                log.info( err_msg )
+                logger.print_on_console( err_msg )
+        except Exception as e:
+            err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
+            log.error( err_msg )
+            logger.print_on_console( "Error occured in Get All Key Value Pair" )
+        return status, result, value, err_msg
 
 
     def verifyAllValues(self, sap_id, input_val, *args):
