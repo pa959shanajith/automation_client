@@ -422,6 +422,8 @@ class SContainer_Keywords():
             - have everything in scontainers
         3.Steploop Containers.
             - all items in this container are not in scontainers
+        4.Without Headers Type 2
+            - has everything in a single scontainers, inconsistant with rows and columns.
         """
         flag_h = False
         flag_s = False
@@ -436,6 +438,34 @@ class SContainer_Keywords():
             if( c.Type == 'GuiSimpleContainer' ):
                 flag_s=True
                 #its a header container
+
+        def getColNum(element):
+            """Returs column value if present in element ID"""
+            col = None
+            eid = element.Id
+            num=eid[eid.rindex('/'):][eid[eid.rindex('/'):].index('[')+1:eid[eid.rindex('/'):].index(']')]
+            col=num.split(',')[0]
+            #check if col exists and is a number
+            try:
+                int(col)
+                if(int(col)==0 and len(col)):log.debug(('Element id has no col value'))
+            except:log.error('Element id has no col value')
+            del eid,num
+            return col
+        def getRowNum(element):
+            """Returs row value if present in element ID"""
+            row = None
+            eid = element.Id
+            num=eid[eid.rindex('/'):][eid[eid.rindex('/'):].index('[')+1:eid[eid.rindex('/'):].index(']')]
+            row=num.split(',')[1]
+            #check if row exists and is a number
+            try:
+                int(row)
+                if(int(row)==0 and len(row)):log.debug(('Element id has no row value'))
+            except:log.error('Element id has no row value')
+            del eid,num
+            return row
+
         if (flag_s == True and sL_flag == False):
             #set headers
             #header elements are not simple containers any element is a header
@@ -449,20 +479,6 @@ class SContainer_Keywords():
             for c in ch:
                 if( c.Type == 'GuiSimpleContainer' ):
                     rList.append(c) #adds to header list
-
-            def getColNum(element):
-                """Returs column value if present in element ID"""
-                col = None
-                eid = element.Id
-                num=eid[eid.rindex('/'):][eid[eid.rindex('/'):].index('[')+1:eid[eid.rindex('/'):].index(']')]
-                col=num.split(',')[0]
-                #check if col exists and is a number
-                try:
-                    int(col)
-                    if(int(col)==0 and len(col)):log.debug(('Element id has no col value'))
-                except:log.error('Element id has no col value')
-                del eid,num
-                return col
 
             if ( flag_h == True ):
                 """Checks if the objects have inconsistant column headers"""
@@ -519,6 +535,38 @@ class SContainer_Keywords():
                             newrList.append(rListItems[i])
                     tableObj.append(newrList)
                 del newrList,rListItems
+
+        elif( not flag_h and not sL_flag and not flag_s):
+            """
+                Identified as a header-deficient table - type2
+                Assumptions : number of columns at are non-uniform compared to each row, and there are no neaders and all elements are within a scontainer
+            """
+            logger.print_on_console( 'Table is of type : Header-deficient table - type2' )
+            logger.print_on_console( 'Warning! : This type of table has inconsistancy with column positions' )
+            self.tableType = 4
+            tableObj=[]
+            rHList =[]
+            for i in range(0,len(ch)):
+                r1=r2=rPrev=None
+                r1 = getRowNum(ch[i])
+                try:r2 = getRowNum(ch[i+1])
+                except Exception as e: log.info('Exception at r2:',e)
+                try : rPrev = getRowNum(ch[i-1])
+                except Exception as e: log.info('Exception at rPrev:',e)
+                if(r1 == r2):
+                    rHList.append(ch[i])
+                elif(r2 and r1!=r2):
+                    if (r1 == rPrev):
+                        rHList.append(ch[i])
+                        tableObj.append(rHList)
+                        rHList=[]
+                    else:
+                        tableObj.append(rHList)
+                        rHList=[]
+                        rHList.append(ch[i])
+                        tableObj.append(rHList)
+            del rHList,r1,r2,rPrev
+
         elif ( sL_flag == True ):
             """
                 Identified as a step-loop table
