@@ -780,6 +780,8 @@ class Shell_GridView_Toolbar_Keywords():
         value = OUTPUT_CONSTANT
         bList = []
         vList = []
+        vList_temp = []
+        allTrueFlag = True
         try:
             self.lk.setWindowToForeground(sap_id)
             id, ses = self.uk.getSapElement(sap_id)
@@ -794,12 +796,20 @@ class Shell_GridView_Toolbar_Keywords():
                     #----------------------------------function to append columnorder
                     for i in range(0,len(bList)):
                         vList.append(elem.GetDisplayedColumnTitle(str(bList[i])))
-                    for i in range(0,len(vList)):
-                        if (input_val[0].strip() == vList[i]):
-                            value = i
-                            status = sap_constants.TEST_RESULT_PASS
-                            result = sap_constants.TEST_RESULT_TRUE
+                    for iv in input_val:
+                        if iv in vList:
+                            i = None
+                            i = vList.index(iv)
+                            vList_temp.append(i)
+                        else :
+                            allTrueFlag = False
                             break
+                    if ( allTrueFlag ):
+                        value = vList_temp
+                        status = sap_constants.TEST_RESULT_PASS
+                        result = sap_constants.TEST_RESULT_TRUE
+                    else:
+                        err_msg = 'Column header/headers do not exist'
                 else:
                     err_msg = 'Element is not a shell object'
             else:
@@ -811,5 +821,6 @@ class Shell_GridView_Toolbar_Keywords():
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
             log.error( err_msg )
-            logger.print_on_console( 'Error occured in Get All Column Headers' )
+            logger.print_on_console( 'Error occured in GetColNumByColHeaders' )
+        del bList,vList,vList_temp,allTrueFlag
         return status,result,value,err_msg
