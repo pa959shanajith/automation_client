@@ -546,6 +546,12 @@ class StepDescription:
             return 'Verify '+ "'" + input + "'"+ ' is the text of '+"'" + tsp.custname + "'"+'.'
         def verifyiconname():
             return 'Verify '+ "'" + input + "'"+ ' is the icon name of '+"'" + tsp.custname + "'"+'.'
+        def getkeybyindex():
+            return 'Get the key by index ' + "'" + input + "'" + ' of ' + tsp.custname + "'" + ' and save the result ' + "'" + output + "'"  + ' in ' + "'" + tsp_outputval  + "'"  + '.'
+        def selectkeybytext():
+            return 'Select key by text ' + "'" + input + "'" + ' in '+ "'" + tsp.custname + "'" +'.'
+        def getallkeyvaluepairs():
+            return 'Get all key-value pairs of ' + tsp.custname + "'" + ' and save the result ' + "'" + output + "'"+ ' in ' +  "'" + tsp_outputval + "'" + '.'
 
         #Radio checkbox keywords
         def selectradiobutton():
@@ -634,6 +640,11 @@ class StepDescription:
             return 'Unselecting Column/Columns '+ "'" + inp + "'" + ' and store the output as ' + "'" + output + "'" + '.'
         def getallcolumnheaders():
             return 'Get all Column Headers of '+ "'" + tsp.custname + "'" + ' and save the output as ' + "'"+output+"'" + ' in '+"'"+ tsp_outputval+"'"+'.'
+        def getcolnumbycolheaders():
+            inp = input
+            if(len(inputval)>1):
+                inp = ', '.join(inputval)
+            return 'Get Column number from header/headers '+ "'" + inp + "'" + ' and save the output as ' + "'"+output+"'" + ' in '+"'"+ tsp_outputval+"'"+'.'
         def presstoolbarbutton():
             inp = input
             if(len(inputval)>1):
