@@ -981,6 +981,7 @@ class Singleton_DriverUtil():
         if (browser_num == '1'):
             try:
                 chrome_path = configvalues['chrome_path']
+                chrome_profile=configvalues["chrome_profile"]
                 exec_path = webconstants.CHROME_DRIVER_PATH
                 if  SYSTEM_OS == "Darwin":
                     exec_path = webconstants.drivers_path+"/chromedriver"
@@ -1000,6 +1001,9 @@ class Singleton_DriverUtil():
                         choptions.add_argument('--disable-extensions')
                     if ((str(chrome_path).lower()) != 'default'):
                         choptions.binary_location=str(chrome_path)
+                    if ((str(chrome_profile).lower()) != 'default'):
+                        choptions.add_argument("user-data-dir="+chrome_profile)
+                    
                     driver = webdriver.Chrome(executable_path=exec_path,chrome_options=choptions)
                     ##driver = webdriver.Chrome(desired_capabilities= choptions.to_capabilities(), executable_path = exec_path)
                     drivermap.append(driver)
