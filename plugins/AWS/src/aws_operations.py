@@ -307,6 +307,7 @@ class AWS_Operations:
 
     def run_test(self,project_arn,app_arn,tp_arn,spec_arn,device_pool_arn):
         run_status = False
+        step_result=[]
         # time=str(datetime.now())
         try:
             name='Test_Run_'+self.cur_date
@@ -323,11 +324,11 @@ class AWS_Operations:
             run_status=self.wait_for_run(self.test_run_arn,9000)
             
             if not(self.terminateFlag):
-                self.download_results(self.test_run_arn,download_type,AWS_output_path)
+                step_result=self.download_results(self.test_run_arn,download_type,AWS_output_path)
         except Exception as e:
             logger.print_on_console('Error while performing run')
             log.error(e)
-        return run_status
+        return run_status,step_result
 
     def configure_run(self,project_name,app_name,package_name,pool_name):
         project_arn=app_arn=tp_arn=spec_arn=device_pool_arn=None
@@ -373,12 +374,13 @@ class AWS_Operations:
 
     def run_aws_android_tests(self):
         result = False
+        result=[]
         try:
             if not(self.terminateFlag):
                 self.get_run_configurations()
                 project_arn,app_arn,tp_arn,spec_arn,device_pool_arn=self.configure_run(self.project_name,self.app_name,self.package_name,self.pool_name)
                 if(project_arn and app_arn and tp_arn and spec_arn and device_pool_arn) is not None:
-                    result = self.run_test(project_arn,app_arn,tp_arn,spec_arn,device_pool_arn)
+                    result_status,result = self.run_test(project_arn,app_arn,tp_arn,spec_arn,device_pool_arn)
                 else:
                     if not(self.terminateFlag):
                         msg='Error in Configuring AWS run'
@@ -387,10 +389,12 @@ class AWS_Operations:
         except Exception as e:
             logger.print_on_console('Error in running aws tests')
             log.error(e)
-        return result
+        return result_status,result
 
     def download_results(self,test_run_arn,download_type,output_dir):
     ##    artifcats=self.dc.list_artifacts(arn='arn:aws:devicefarm:us-west-2:197128414257:run:02a594e3-ea23-48f8-a630-eac93487a7b1/25self.dc69bc-2907-4612-b890-92a66c0377d0',type='FILE')['artifacts']
+        result_file=''
+        result_step=[]
         try:
             artifcats=self.dc.list_artifacts(arn=test_run_arn,type=download_type)['artifacts']
             if not os.path.exists(output_dir):
@@ -404,6 +408,8 @@ class AWS_Operations:
                         logger.print_on_console(msg)
                         log.info(msg)
                         output_file=output_dir+"/"+a['name']+'.'+a['extension']
+                        if a['extension']=='txt':
+                            result_file=output_file
                         output_url=a['url']
                         r=requests.get(output_url)
                         fd=open(output_file,'wb')
@@ -412,6 +418,8 @@ class AWS_Operations:
                         time.sleep(1)
                 
                 msg="Download Successfull"
+                if result_file is not None:
+                    result_step=self.fetch_step_results(result_file)
                 logger.print_on_console(msg)
                 log.info(msg)
             else:
@@ -420,6 +428,30 @@ class AWS_Operations:
         except Exception as e:
             logger.print_on_console('Error while downloading results')
             log.error(e)
+        return result_step
+
+    def fetch_step_results(self,path_file):
+        scenario_list=[]
+        last_scenario=[]
+        data=''
+        try:
+            with open(path_file,"r") as fp:
+                data = fp.read()       
+            scenario_result=data.split('result:')
+            del scenario_result[0]
+            last_scenario = scenario_result[-1].split("\n")
+            scenario_list=[]
+            for scenario in scenario_result[0:-1]:
+                scenario.strip()
+                scenario_list.append(eval(scenario))
+            scenario_list.append(eval(last_scenario[1]))
+            scenario_list.append(last_scenario[2])
+        except FileNotFoundError:
+            logger.print_on_console('File does not exist')
+        except Exception as e:
+            logger.print_on_console("Error while fetching step results")
+            log.error(e)
+        return scenario_list
 
     def stop_job(self):
         self.terminateFlag=True
