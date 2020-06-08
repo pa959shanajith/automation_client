@@ -21,6 +21,7 @@ import requests
 import io
 import handler
 import update_module
+from icetoken import ICEToken
 try:
     from socketlib_override import SocketIO,BaseNamespace
 except ImportError:
@@ -47,7 +48,7 @@ mobileWebScrapeFlag=False
 pdfScrapeFlag = False
 debugFlag = False
 oebsScrapeFlag = False
-irisFlag = False
+irisFlag = True
 executionOnly=False
 socketIO = None
 allow_connect = False
@@ -75,15 +76,21 @@ LOC_7Z = NINETEEN68_HOME + '/Lib/7zip/7z.exe'
 UPDATER_LOC = NINETEEN68_HOME + '/assets/Update.exe'
 if (os.path.exists(UPDATER_LOC[:-3] + "py")): UPDATER_LOC = UPDATER_LOC[:-3] + "py"
 SERVER_LOC = None
+communication_token=None
+
 
 class MainNamespace(BaseNamespace):
     core_utils_obj = core_utils.CoreUtils()
 
     def on_message(self, *args):
-        global action,wxObject,browsername,desktopScrapeFlag,allow_connect,browsercheckFlag,connection_Timer,updatecheckFlag
+        global action,wxObject,browsername,desktopScrapeFlag,allow_connect,browsercheckFlag,connection_Timer,updatecheckFlag,communication_token
         try:
             if(str(args[0]) == 'connected'):
                 if(allow_connect):
+                    ice_ndac_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
+                        'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
+                    response = json.loads(self.core_utils_obj.unwrap(str(args[1]), ice_ndac_key))
+                    communication_token=response["ct"]
                     wxObject.schedule.Enable()
                     wxObject.cancelbutton.Enable()
                     wxObject.terminatebutton.Enable()
@@ -141,6 +148,9 @@ class MainNamespace(BaseNamespace):
                         threading.Timer(0.5,wxObject.killSocket).start()
                     else:
                         allow_connect = True
+                        #To save the token after successful registration
+                        if wxObject.token_action=="register":
+                            ICEToken().save_token(wxObject.ice_token)
                         wxObject.connectbutton.SetBitmapLabel(wxObject.disconnect_img)
                         wxObject.connectbutton.SetName("disconnect")
                         wxObject.connectbutton.SetToolTip(wx.ToolTip("Disconnect from Nineteen68 Server"))
@@ -711,9 +721,10 @@ class SocketThread(threading.Thread):
     """Test Worker Thread Class."""
     daemon = True
 
-    def __init__(self):
+    def __init__(self,ice_token):
         """Init Worker Thread Class."""
         super(SocketThread, self).__init__()
+        self.ice_token=ice_token
         self.start()
 
     def run(self):
@@ -736,15 +747,18 @@ class SocketThread(threading.Thread):
             key='USER'
         username=str(os.environ[key]).lower()
         core_utils_obj = core_utils.CoreUtils()
+        hostname=socket.gethostname()
         icesession = {
             'ice_id': str(uuid.uuid4()),
             'connect_time': str(datetime.now()),
-            'username': username
+            'username': username,
+            'hostname': hostname
         }
         ice_ndac_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
             'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
         icesession_enc = core_utils_obj.wrap(json.dumps(icesession), ice_ndac_key)
-        params={'username':username,'icesession': icesession_enc}
+        token_enc=core_utils_obj.wrap(self.ice_token, ice_ndac_key)
+        params={'username':username,'icesession': icesession_enc,'icetoken': token_enc}
         try:
             socketIO = SocketIO(temp_server_IP,server_port,MainNamespace,verify=server_cert,cert=client_cert,params=params)
             socketIO.wait()
@@ -921,14 +935,16 @@ class ClientWindow(wx.Frame):
         self.mainclass = self
         self.mythread = None
         self.action=''
+        self.token_action=None
         self.debug_mode=False
         self.choice='Normal'
         global wxObject,browsercheckFlag,updatecheckFlag
-        wxObject = self
+        self.ice_token=None
         self.iconpath = IMAGES_PATH +"slk.ico"
         self.connect_img=wx.Image(IMAGES_PATH +"connect.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
         self.disconnect_img=wx.Image(IMAGES_PATH +"disconnect.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
         self.enabledStatus = [False,False,False,False,False,False,False,False]
+        wxObject = self
 
         """
         Creating Root Logger using logger file config and setting logfile path,which is in config.json
@@ -1008,6 +1024,8 @@ class ClientWindow(wx.Frame):
         self.schedule.Bind(wx.EVT_CHECKBOX,self.onChecked_Schedule)
         self.schedule.Disable()
 
+        # self.Registerbutton = wx.BitmapButton(self.panel, bitmap=self.connect_img,pos=(210, 10), size=(100, 25), name='connect')
+
         box.Add(self.log, 1, wx.ALL|wx.EXPAND, 5)
 
         #Radio buttons
@@ -1055,7 +1073,8 @@ class ClientWindow(wx.Frame):
         updatecheckFlag = configvalues['update_check'].lower() == 'no'
         browsercheckFlag = configvalues['browser_check'].lower() == 'no'
         self.OnClear(wx.EVT_LEFT_DOWN)
-        self.verifyMACAddress()
+        self.verifyRegistration()
+        # self.EnableAll()
         self.connectbutton.SetFocus()
 
     """
@@ -1257,13 +1276,25 @@ class ClientWindow(wx.Frame):
             name = self.connectbutton.GetName()
             self.connectbutton.Disable()
             if(name == 'connect'):
-                port = int(configvalues['server_port'])
-                conn = http.client.HTTPConnection(configvalues['server_ip'],port)
-                conn.connect()
-                conn.close()
-                self.socketthread = SocketThread()
-                self.rollbackItem.Enable(True)
-                self.updateItem.Enable(True)
+                server_ip=configvalues['server_ip']
+                server_port=configvalues['server_port']
+                if self.ice_token:
+                    if self.token_action=="register":
+                        url=self.url.split(":")
+                        server_ip=url[0]
+                        server_port=url[1]
+
+                    port = int(server_port)
+                    conn = http.client.HTTPConnection(server_ip,port)
+                    conn.connect()
+                    conn.close()
+                    self.socketthread = SocketThread(self.ice_token)
+                    self.rollbackItem.Enable(True)
+                    self.updateItem.Enable(True)
+                else:
+                    self.verifyRegistration()
+
+                    
             else:
                 self.OnTerminate(event,"term_exec")
                 self.killSocket(True)
@@ -1444,50 +1475,18 @@ class ClientWindow(wx.Frame):
         except Exception as e:
             log.error(e,exc_info=True)
 
-    def verifyMACAddress(self):
-        flag = False
-        core_utils_obj = core_utils.CoreUtils()
-        system_mac = core_utils_obj.getMacAddress()
-        mac_verification_key = "".join(['N','1','i','1','N','2','e','3','T','5','e','8','E','1','3','n','2','1','S','i','X','t','Y','3','4','e','I','g','H','t','5','5'])
-        irisMAC = []
-        execMAC=[]
-        global irisFlag
-        global executionOnly
+    def verifyRegistration(self):
         try:
-            with open(CERTIFICATE_PATH+'/license.key', mode='r') as f:
-                key = "".join(f.readlines()[1:-1]).replace("\n","").replace("\r","")
-                key = core_utils_obj.unwrap(key, mac_verification_key)
-                mac_addr = key[36:-36]
-                mac_addr = (mac_addr.replace('-',':').replace(' ','')).lower().split(",")
-                index = 0
-                for mac in mac_addr:
-                    iris_index=-1
-                    if "iris" in mac:
-                        iris_index=mac.index("iris")+4
-                        mac_addr[index] = mac[iris_index:]
-                        irisMAC.append(mac[iris_index:])
-                    if "exec_only" in mac:
-                        exec_index=mac.index("exec_only")+9
-                        if iris_index > -1:
-                            exec_index=iris_index
-                        mac_addr[index] = mac[exec_index:]
-                        execMAC.append(mac[exec_index:])
-                    index = index + 1
-                if(system_mac in mac_addr):
-                    flag = True
-                    if system_mac in execMAC:
-                        executionOnly=True
-                    if ((system_mac in irisMAC) and os.path.isdir(NINETEEN68_HOME+'/plugins/IRIS')):
-                        irisFlag = True
-                        controller.iris_flag = True
+            token_obj=ICEToken()
+            if not(token_obj.token):
+                token_obj.token_window(self,IMAGES_PATH)
+            else:
+                self.ice_token=token_obj.token
+                self.EnableAll()
         except Exception as e:
-            log.error(e,exc_info=True)
-        if not flag:
-            msg = "Unauthorized: Access denied, system is not registered with Nineteen68"
-            logger.print_on_console(msg)
-            log.error(msg)
-        else: self.EnableAll()
-        return flag
+            log.error(e)
+            logger.print_on_console(e)
+        
 
     def DisableAll(self):
         self.enabledStatus = [self.menubar.IsEnabledTop(0),self.menubar.IsEnabledTop(1),
@@ -1530,30 +1529,31 @@ class Config_window(wx.Frame):
             "S_address":[(12,8 ),(90, 28),(100,8 ),(140,-1)],
             "S_port": [(270,8 ),(70, 28),(340,8 ), (105,-1)],
             "Chrm_path":[(12,38),(80, 28),(100,38), (310,-1),(415,38),(30, -1)],
-            "Ffox_path":[(12,68),(80, 28),(100,68), (310,-1),(415,68),(30, -1)],
-            "Log_path":[(12,98),(80, 28),(100,98), (310,-1),(415,98),(30, -1)],
-            "Q_timeout":[(12,128),(85, 28),(100,128), (80,-1)],
-            "Timeout":[(185,128),(50, 28),(240,128), (80,-1)],
-            "Delay":[(325,128),(40, 28),(360,128), (85,-1)],
-            "Step_exec":[(12,158),(120, 28),(130,158),(80,-1)],
-            "Disp_var":[(225,158),(140, 28),(360,158), (85,-1)],
-            "S_cert":[(12,188),(85, 28),(100,188),(310,-1),(415,188),(30, -1)],
-            "C_Timeout" :[(12,218),(120, 28),(130,218), (80,-1)],
-            "Delay_Stringinput":[(225,218),(140, 28),(360,218), (85,-1)],
-            "Ignore_cert":[(12,248)],
-            "IE_arch":[(150,248)],
-            "Dis_s_cert":[(290,248)],
-            "Ex_flag":[(12,308)],
-            "Ignore_v_check":[(150,308)],
-            "S_flag":[(340,368)],
-            "Ret_url":[(12,368)],
-            "En_secu_check":[(308,308)],
-            "Brow_ch":[(115,368)],
-            "High_ch":[ (225,368)],
-            "Iris_prediction":[(12,428)],
-            "hide_soft_key":[(180,428)],
-            "extn_enabled":[(320,428)],
-            "update_check":[(12,488)],
+            "Chrm_profile":[(12,68),(80, 28),(100,68), (310,-1),(415,68),(30, -1)],
+            "Ffox_path":[(12,98),(80, 28),(100,98), (310,-1),(415,98),(30, -1)],
+            "Log_path":[(12,128),(80, 28),(100,128), (310,-1),(415,128),(30, -1)],
+            "Q_timeout":[(12,158),(85, 28),(100,158), (80,-1)],
+            "Timeout":[(185,158),(50, 28),(240,158), (80,-1)],
+            "Delay":[(325,158),(40, 28),(360,158), (85,-1)],
+            "Step_exec":[(12,188),(120, 28),(130,188),(80,-1)],
+            "Disp_var":[(225,188),(140, 28),(360,188), (85,-1)],
+            "S_cert":[(12,218),(85, 28),(100,218),(310,-1),(415,218),(30, -1)],
+            "C_Timeout" :[(12,248),(120, 28),(130,248), (80,-1)],
+            "Delay_Stringinput":[(225,248),(140, 28),(360,248), (85,-1)],
+            "Ignore_cert":[(12,308)],
+            "IE_arch":[(150,308)],
+            "Dis_s_cert":[(290,308)],
+            "Ex_flag":[(12,368)],
+            "Ignore_v_check":[(150,368)],
+            "S_flag":[(340,428)],
+            "Ret_url":[(12,428)],
+            "En_secu_check":[(308,368)],
+            "Brow_ch":[(115,428)],
+            "High_ch":[ (225,428)],
+            "Iris_prediction":[(12,488)],
+            "hide_soft_key":[(180,488)],
+            "extn_enabled":[(320,488)],
+            "update_check":[(12,548)],
             "Save":[(100,608), (100, 28)],
             "Close":[(250,608), (100, 28)]
         }
@@ -1563,7 +1563,8 @@ class Config_window(wx.Frame):
             "S_address":[(12,8),(90,28),(116,8 ),(140,-1)],
             "S_port": [(352,8),(70,28),(430,8 ),(105,-1)],
             "Chrm_path":[(12,38),(80,28),(116,38),(382,-1),(504,38),(30, -1)],
-            "Ffox_path":[(12,68),(80,28),(116,68),(382,-1),(504,68),(30, -1)],
+            "Chrm_profile":[(12,68),(80,28),(116,68),(382,-1),(504,68),(30, -1)],
+            "Ffox_path":[(12,98),(80,28),(116,68),(382,-1),(504,68),(30, -1)],
             "Log_path":[(12,98),(80, 28),(116,98),(382,-1),(504,98),(30, -1)],
             "Q_timeout":[(12,128),(85, 28),(116,128), (80,-1)],
             "Timeout":[(225,130),(50, 28),(290,130),(80,-1)],
@@ -1619,6 +1620,15 @@ class Config_window(wx.Frame):
             self.chrome_path.SetValue(isConfigJson['chrome_path'])
         else:
             self.chrome_path.SetValue('default')
+
+        self.ch_profile=wx.StaticText(self.panel, label="Chrome Profile", pos=config_fields["Chrm_profile"][0],size=config_fields["Chrm_path"][1], style=0, name="")
+        self.chrome_profile=wx.TextCtrl(self.panel, pos=config_fields["Chrm_profile"][2], size=config_fields["Chrm_profile"][3])
+        self.chrome_profile_btn=wx.Button(self.panel, label="...", pos=config_fields["Chrm_profile"][4], size=config_fields["Chrm_profile"][5])
+        self.chrome_profile_btn.Bind(wx.EVT_BUTTON, self.fileBrowser_chprofile)
+        if isConfigJson!=False:
+            self.chrome_profile.SetValue(isConfigJson['chrome_profile'])
+        else:
+            self.chrome_profile.SetValue('default')
 
         self.ff_path=wx.StaticText(self.panel, label="Firefox Path", pos=config_fields["Ffox_path"][0],size=config_fields["Ffox_path"][1], style=0, name="")
         self.firefox_path=wx.TextCtrl(self.panel, pos=config_fields["Ffox_path"][2], size=config_fields["Ffox_path"][3])
@@ -1940,6 +1950,7 @@ class Config_window(wx.Frame):
         server_add=self.server_add.GetValue()
         server_port=self.server_port.GetValue()
         chrome_path=self.chrome_path.GetValue()
+        chrome_profile=self.chrome_profile.GetValue()
         firefox_path=self.firefox_path.GetValue()
         logFile_Path=self.log_file_path.GetValue()
         queryTimeOut=self.query_timeout.GetValue()
@@ -1962,6 +1973,7 @@ class Config_window(wx.Frame):
         data['server_port'] = server_port.strip()
         data['ignore_certificate'] = ignore_certificate.strip()
         data['chrome_path'] = chrome_path.strip() if chrome_path.strip().lower()!='default' else 'default'
+        data['chrome_profile'] = chrome_profile.strip() if chrome_profile.strip().lower()!='default' else 'default'
         data['firefox_path'] = firefox_path.strip() if firefox_path.strip().lower()!='default' else 'default'
         data['bit_64'] = bit_64.strip()
         data['logFile_Path'] = logFile_Path.strip()
@@ -2182,6 +2194,13 @@ class Config_window(wx.Frame):
         if dlg.ShowModal() == wx.ID_OK:
             path = dlg.GetPath()
             self.chrome_path.SetValue(path)
+        dlg.Destroy()
+
+    def fileBrowser_chprofile(self,event):
+        dlg = wx.DirDialog(self, message="Choose a folder ...",defaultPath=NINETEEN68_HOME, style=wx.DD_DEFAULT_STYLE | wx.DD_NEW_DIR_BUTTON)
+        if dlg.ShowModal() == wx.ID_OK:
+            path = dlg.GetPath()
+            self.chrome_profile.SetValue(path)
         dlg.Destroy()
     """This method open a file selector dialog , from where file path can be set """
     def fileBrowser_ffpath(self,event):
