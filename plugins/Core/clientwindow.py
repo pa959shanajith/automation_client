@@ -90,7 +90,7 @@ class MainNamespace(BaseNamespace):
                     ice_ndac_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
                         'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
                     response = json.loads(self.core_utils_obj.unwrap(str(args[1]), ice_ndac_key))
-                    communication_token=response["ct"]
+                    # communication_token=response["ct"]
                     wxObject.schedule.Enable()
                     wxObject.cancelbutton.Enable()
                     wxObject.terminatebutton.Enable()
@@ -143,19 +143,27 @@ class MainNamespace(BaseNamespace):
                         if('err_msg' in response):
                             err_res=response['err_msg']
                     if(err_res is not None):
+                        wxObject.ice_token=None
                         logger.print_on_console(err_res)
                         log.info(err_res)
                         threading.Timer(0.5,wxObject.killSocket).start()
                     else:
-                        allow_connect = True
-                        #To save the token after successful registration
-                        if wxObject.token_action=="register":
+                        if(response['res']=='validICE'):
+                            #To save the token after successful registration
                             ICEToken().save_token(wxObject.ice_token)
-                        wxObject.connectbutton.SetBitmapLabel(wxObject.disconnect_img)
-                        wxObject.connectbutton.SetName("disconnect")
-                        wxObject.connectbutton.SetToolTip(wx.ToolTip("Disconnect from Nineteen68 Server"))
-                        controller.disconnect_flag=False
-                    wxObject.connectbutton.Enable()
+                            msg=response["icename"]+" : ICE Regsitartion successful"
+                            logger.print_on_console(msg)
+                            log.info(msg)
+                        else:
+                            allow_connect = True
+                            wxObject.connectbutton.SetBitmapLabel(wxObject.disconnect_img)
+                            wxObject.connectbutton.SetName("disconnect")
+                            wxObject.connectbutton.SetToolTip(wx.ToolTip("Disconnect from Nineteen68 Server"))
+                            controller.disconnect_flag=False
+                    if wxObject.ice_action == "register" and wxObject.ice_token is None:
+                        ICEToken().token_window(wxObject,IMAGES_PATH)
+                    else:
+                        wxObject.connectbutton.Enable()
                 except Exception as e:
                     logger.print_on_console('Error while checking connection request')
                     log.info('Error while checking connection request')
@@ -721,10 +729,11 @@ class SocketThread(threading.Thread):
     """Test Worker Thread Class."""
     daemon = True
 
-    def __init__(self,ice_token):
+    def __init__(self,ice_token,ice_action):
         """Init Worker Thread Class."""
         super(SocketThread, self).__init__()
         self.ice_token=ice_token
+        self.ice_action=ice_action
         self.start()
 
     def run(self):
@@ -752,13 +761,15 @@ class SocketThread(threading.Thread):
             'ice_id': str(uuid.uuid4()),
             'connect_time': str(datetime.now()),
             'username': username,
-            'hostname': hostname
+            'hostname': hostname,
+            'iceaction':self.ice_action
         }
         ice_ndac_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
             'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
+        token_dec=core_utils_obj.unwrap(self.ice_token, ice_ndac_key)
+        icename=token_dec.split("@")[1]
         icesession_enc = core_utils_obj.wrap(json.dumps(icesession), ice_ndac_key)
-        token_enc=core_utils_obj.wrap(self.ice_token, ice_ndac_key)
-        params={'username':username,'icesession': icesession_enc,'icetoken': token_enc}
+        params={'username':username,'hostname': hostname,'icename': icename,'ice_action':self.ice_action,'icesession': icesession_enc,'icetoken': self.ice_token}
         try:
             socketIO = SocketIO(temp_server_IP,server_port,MainNamespace,verify=server_cert,cert=client_cert,params=params)
             socketIO.wait()
@@ -935,7 +946,7 @@ class ClientWindow(wx.Frame):
         self.mainclass = self
         self.mythread = None
         self.action=''
-        self.token_action=None
+        self.ice_action="connect"
         self.debug_mode=False
         self.choice='Normal'
         global wxObject,browsercheckFlag,updatecheckFlag
@@ -1279,16 +1290,18 @@ class ClientWindow(wx.Frame):
                 server_ip=configvalues['server_ip']
                 server_port=configvalues['server_port']
                 if self.ice_token:
-                    if self.token_action=="register":
+                    if self.ice_action=="register":
                         url=self.url.split(":")
                         server_ip=url[0]
                         server_port=url[1]
+
+
 
                     port = int(server_port)
                     conn = http.client.HTTPConnection(server_ip,port)
                     conn.connect()
                     conn.close()
-                    self.socketthread = SocketThread(self.ice_token)
+                    self.socketthread = SocketThread(self.ice_token,self.ice_action)
                     self.rollbackItem.Enable(True)
                     self.updateItem.Enable(True)
                 else:
