@@ -142,8 +142,10 @@ class MainNamespace(BaseNamespace):
                     if(response['res'] != 'success'):
                         if('err_msg' in response):
                             err_res=response['err_msg']
+                    if(response['res']=="InvalidToken" or response["res"]=="InvalidICE"):
+                        wxObject.ice_action = "register" 
+                        wxObject.ice_token = None
                     if(err_res is not None):
-                        wxObject.ice_token=None
                         logger.print_on_console(err_res)
                         log.info(err_res)
                         threading.Timer(0.5,wxObject.killSocket).start()
@@ -156,14 +158,14 @@ class MainNamespace(BaseNamespace):
                             controller.disconnect_flag=False
                         else:
                              #To save the token after successful registration
-                            ICEToken().save_token(wxObject.ice_token)
-                            msg=response["icename"]+" : ICE Regsitartion successful"
+                            wxObject.ice_action="connect"
+                            wxObject.token_obj.save_token(wxObject.ice_token)
+                            msg=response["icename"]+" : ICE registered successfully with Nineteen68"
                             logger.print_on_console(msg)
                             log.info(msg)
                     if wxObject.ice_action == "register" and wxObject.ice_token is None:
-                        ICEToken().token_window(wxObject,IMAGES_PATH)
-                    else:
-                        wxObject.connectbutton.Enable()
+                        logger.print_on_console("ICE is not registered with Nineteen68 : Click on Connect to Register")
+                    wxObject.connectbutton.Enable()
                 except Exception as e:
                     logger.print_on_console('Error while checking connection request')
                     log.info('Error while checking connection request')
@@ -1238,7 +1240,7 @@ class ClientWindow(wx.Frame):
             log.info("Connection Timeout timer Stopped")
             connection_Timer.cancel()
             connection_Timer=None
-        stat = self.killChildWindow(True,True,True,True)
+        stat = self.killChildWindow(True,True,True,True,True)
         if stat[1]: socketIO.emit('scrape','Terminate')
         self.killSocket(True)
         self.Destroy()
@@ -1303,7 +1305,7 @@ class ClientWindow(wx.Frame):
                     self.rollbackItem.Enable(True)
                     self.updateItem.Enable(True)
                 else:
-                    self.verifyRegistration()
+                    self.verifyRegistration(True)
             else:
                 self.OnTerminate(event,"term_exec")
                 self.killSocket(True)
@@ -1323,6 +1325,9 @@ class ClientWindow(wx.Frame):
                     connection_Timer=None
         except Exception as e:
             emsg="Forbidden request, Connection refused, please configure server ip and server port in Edit -> Configuration, and re-connect."
+            if self.ice_action=="register":
+                emsg="Connection refused : Invalid Server URL. Click on Connect to retry Registration" 
+                self.ice_token=None
             logger.print_on_console(emsg)
             log.error(emsg)
             self.cancelbutton.Disable()
@@ -1366,8 +1371,10 @@ class ClientWindow(wx.Frame):
             log.error(err_msg)
             log.error(e)
 
-    def killChildWindow(self, debug=False, scrape=False, display=False, pdf=False):
+    def killChildWindow(self, debug=False, scrape=False, display=False, pdf=False,register=False):
         #Close the debug window
+        if register:
+            self.token_obj.kill_window()
         stat = []
         flag=False
         if debug:
@@ -1484,14 +1491,17 @@ class ClientWindow(wx.Frame):
         except Exception as e:
             log.error(e,exc_info=True)
 
-    def verifyRegistration(self):
+    def verifyRegistration(self,show_window=False):
         try:
-            token_obj=ICEToken()
-            if not(token_obj.token):
-                token_obj.token_window(self,IMAGES_PATH)
+            self.token_obj=ICEToken()
+            if not(show_window):
+                if not(self.token_obj.token):
+                    self.token_obj.token_window(self,IMAGES_PATH)
+                else:
+                    self.ice_token=self.token_obj.token
+                    self.EnableAll()
             else:
-                self.ice_token=token_obj.token
-                self.EnableAll()
+                self.token_obj.token_window(self,IMAGES_PATH)
         except Exception as e:
             log.error(e)
             logger.print_on_console(e)
