@@ -46,8 +46,8 @@ class ScrapeWindow(wx.Frame):
         input_val.append(windowname)
         status = obj.launch_application(input_val)
         self.irisFlag = irisFlag
-        self.scrapeoptions = ['Full', 'Button', 'Textbox', 'Dropdown', 'Label', 'Radiobutton', 'Checkbox', 'Table', 'Scroll Bar', 'Tab', 'Shell', 'Other Tags']
-        self.tag_map = {'Full':'full','Button':'button', 'Textbox':'input', 'Dropdown':'select', 'Label':'GuiLabel', 'Radiobutton':'radiobutton', 'Checkbox':'checkbox', 'Table':'table', 'Scroll Bar':'GuiScrollContainer', 'Tab':'GuiTab', 'Shell':'shell', 'Other Tags':'others'}
+        self.scrapeoptions = ['Full', 'Button', 'Textbox', 'Dropdown', 'Label', 'Radiobutton', 'Checkbox', 'Table', 'Scroll Bar', 'Tab', 'Shell', 'SContainer', 'Other Tags']
+        self.tag_map = {'Full':'full','Button':'button', 'Textbox':'input', 'Dropdown':'select', 'Label':'label', 'Radiobutton':'radiobutton', 'Checkbox':'checkbox', 'Table':'table', 'Scroll Bar':'GuiScrollContainer', 'Tab':'GuiTab', 'Shell':'shell', 'SContainer':'scontainer', 'Other Tags':'others'}
         if ( status != TERMINATE ):
             try:
                 self.panel = wx.Panel(self)
@@ -188,7 +188,7 @@ class ScrapeWindow(wx.Frame):
                 new_data = scrape_data
             elif ( tag_choice == 'others' ):
                 for data in scrape_data:
-                    if ( data['tag'] != 'button' and data['tag'] != 'input' and data['tag'] != 'select' and data['tag'] != 'GuiLabel' and data['tag'] != 'radiobutton' and data['tag'] != 'checkbox' and data['tag'] != 'table' and data['tag'] != 'GuiScrollContainer' and data['tag'] != 'GuiTab' and data['tag'] != 'shell' ):
+                    if ( data['tag'] != 'button' and data['tag'] != 'input' and data['tag'] != 'select' and data['tag'] != 'label' and data['tag'] != 'radiobutton' and data['tag'] != 'checkbox' and data['tag'] != 'table' and data['tag'] != 'GuiScrollContainer' and data['tag'] != 'GuiTab' and data['tag'] != 'shell' and data['tag'] != 'scontainer' ):
                         new_data.append(data)
             else:
                 for data in scrape_data:
