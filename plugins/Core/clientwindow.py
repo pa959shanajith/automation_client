@@ -87,9 +87,9 @@ class MainNamespace(BaseNamespace):
         try:
             if(str(args[0]) == 'connected'):
                 if(allow_connect):
-                    ice_ndac_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
-                        'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
-                    response = json.loads(self.core_utils_obj.unwrap(str(args[1]), ice_ndac_key))
+                    # ice_ndac_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
+                    #     'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
+                    # response = json.loads(self.core_utils_obj.unwrap(str(args[1]), ice_ndac_key))
                     # communication_token=response["ct"]
                     wxObject.schedule.Enable()
                     wxObject.cancelbutton.Enable()
@@ -148,18 +148,18 @@ class MainNamespace(BaseNamespace):
                         log.info(err_res)
                         threading.Timer(0.5,wxObject.killSocket).start()
                     else:
-                        if(response['res']=='validICE'):
-                            #To save the token after successful registration
-                            ICEToken().save_token(wxObject.ice_token)
-                            msg=response["icename"]+" : ICE Regsitartion successful"
-                            logger.print_on_console(msg)
-                            log.info(msg)
-                        else:
+                        if(response['res']=='success'):
                             allow_connect = True
                             wxObject.connectbutton.SetBitmapLabel(wxObject.disconnect_img)
                             wxObject.connectbutton.SetName("disconnect")
                             wxObject.connectbutton.SetToolTip(wx.ToolTip("Disconnect from Nineteen68 Server"))
                             controller.disconnect_flag=False
+                        else:
+                             #To save the token after successful registration
+                            ICEToken().save_token(wxObject.ice_token)
+                            msg=response["icename"]+" : ICE Regsitartion successful"
+                            logger.print_on_console(msg)
+                            log.info(msg)
                     if wxObject.ice_action == "register" and wxObject.ice_token is None:
                         ICEToken().token_window(wxObject,IMAGES_PATH)
                     else:
@@ -762,7 +762,8 @@ class SocketThread(threading.Thread):
             'connect_time': str(datetime.now()),
             'username': username,
             'hostname': hostname,
-            'iceaction':self.ice_action
+            'iceaction': self.ice_action,
+            'icetype': 'normal'
         }
         ice_ndac_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
             'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
@@ -1294,9 +1295,6 @@ class ClientWindow(wx.Frame):
                         url=self.url.split(":")
                         server_ip=url[0]
                         server_port=url[1]
-
-
-
                     port = int(server_port)
                     conn = http.client.HTTPConnection(server_ip,port)
                     conn.connect()
@@ -1306,8 +1304,6 @@ class ClientWindow(wx.Frame):
                     self.updateItem.Enable(True)
                 else:
                     self.verifyRegistration()
-
-                    
             else:
                 self.OnTerminate(event,"term_exec")
                 self.killSocket(True)
