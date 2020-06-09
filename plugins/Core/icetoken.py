@@ -34,9 +34,6 @@ class ICEToken():
             with open(self.file, "r") as f:
                 token=f.read()
             if token != "" :
-                # token_key = "".join(['h','j','k','(','f','I','H','F','E','o','w','#','D','j',
-                #     'g','L',')','q','o','c','n','^','8','s','j','p','2','c','f','Y','&','d'])
-                # self.token = self.enc_obj.unwrap(token,token_key)
                 self.token=token
         return self.token
 
@@ -46,11 +43,8 @@ class ICEToken():
 
     """ Save the encrypted token in the localappdata folder """
     def save_token(self,token):
-        # token_key = "".join(['h','j','k','(','f','I','H','F','E','o','w','#','D','j',
-        #                 'g','L',')','q','o','c','n','^','8','s','j','p','2','c','f','Y','&','d'])
         if not os.path.exists(self.token_folder):
             os.makedirs(self.token_folder)
-        # enc_token=self.enc_obj.wrap(token,token_key)
         with open(self.file, "w") as f:
             f.write(token)
 
