@@ -1175,6 +1175,15 @@ class Controller():
         inpval=[]
         keyword_flag=True
         ignore_stat=False
+        #  path_file=os.environ['NINETEEN68_HOME']+os.sep+'output'
+        # os.chdir(path_file)
+        # with open("step_result.txt","w") as fp:
+        #     for line in step_results:
+        #         fp.write(str(line))
+        path_file=os.environ['NINETEEN68_HOME']+os.sep+'output'
+        os.chdir(path_file)
+        f=open("step_result.txt","w")
+        f.writelines(str(step_results))
         list_time=step_results[-1]
         del step_results[-1]
         list_time=eval(list_time)
