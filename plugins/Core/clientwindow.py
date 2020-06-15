@@ -65,7 +65,7 @@ ICE_CONST= NINETEEN68_HOME + "/assets/ice_const.json"
 CONFIG_PATH= NINETEEN68_HOME + "/assets/config.json"
 CERTIFICATE_PATH = NINETEEN68_HOME + "/assets/CA_BUNDLE"
 LOGCONFIG_PATH = NINETEEN68_HOME + "/assets/logging.conf"
-DRIVERS_PATH = NINETEEN68_HOME + "/lib/Drivers"
+DRIVERS_PATH = NINETEEN68_HOME + "/Lib/Drivers"
 CHROME_DRIVER_PATH = DRIVERS_PATH + "/chromedriver"
 GECKODRIVER_PATH = DRIVERS_PATH + "/geckodriver"
 if SYSTEM_OS == "Windows":
@@ -118,12 +118,10 @@ class MainNamespace(BaseNamespace):
             elif(str(args[0]) == 'schedulingEnabled'):
                 logger.print_on_console('Schedule Mode Enabled')
                 log.info('Schedule Mode Enabled')
-                #bench_mark.init(socketIO)
                 
             elif(str(args[0]) == 'schedulingDisabled'):
                 logger.print_on_console('Schedule Mode Disabled')
                 log.info('Schedule Mode Disabled')
-                #bench_mark.stop()
 
             elif(str(args[0]) == 'checkConnection'):
                 try:
@@ -599,7 +597,9 @@ class MainNamespace(BaseNamespace):
             log.error(e,exc_info=True)
 
     def on_update_screenshot_path(self,*args):
+        global socketIO
         spath=args[0]
+        bench_mark.init(args[1],socketIO)
         import constants
         if(SYSTEM_OS=='Darwin'):
             spath=spath["mac"]
@@ -830,6 +830,7 @@ class TestThread(threading.Thread):
                 apptype = (self.json_data)[0]['apptype']
             else:
                 execution_flag = True
+                bench_mark.stop(True)
                 apptype =(self.json_data)['apptype']
             if(apptype == "DesktopJava"):
                 apptype = "oebs"
@@ -1230,8 +1231,10 @@ class ClientWindow(wx.Frame):
             controller.disconnect_flag=True
             print("")
             msg = "---------Terminating all active operations-------"
+            bench_mark.stop(False)
         else:
             msg ="---------Termination Started-------"
+            bench_mark.stop(True)
         logger.print_on_console(msg)
         log.info(msg)
         controller.terminate_flag=True
