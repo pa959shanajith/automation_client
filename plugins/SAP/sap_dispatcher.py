@@ -24,6 +24,7 @@ import sap_shell_keywords
 import sap_shell_gridview_toolbar_keywords
 import sap_shell_tree_keywords
 import sap_shell_calendar_keywords
+import sap_scontainer_keywords
 #-------------------------------------------------------------
 import sap_constants
 import constants
@@ -44,6 +45,7 @@ class SAPDispatcher:
     shell_gridview_toolbar_keywords_obj = sap_shell_gridview_toolbar_keywords.Shell_GridView_Toolbar_Keywords()
     shell_tree_keywords_obj = sap_shell_tree_keywords.Shell_Tree_Keywords()
     shell_calendar_keywords_obj = sap_shell_calendar_keywords.Shell_Calendar_Keywords()
+    scontainer_keywords_obj = sap_scontainer_keywords.SContainer_Keywords()
     sap_dict = {
             #------------------------------------------------------launch keywords
             'launchapplication' : launch_keywords_obj.launch_application,
@@ -87,6 +89,9 @@ class SAPDispatcher:
             'verifyselectedvalue' : dropdown_keywords_obj.verifySelectedValue,
             'verifyvaluesexists' : dropdown_keywords_obj.verifyValuesExists,
             'verifyallvalues' : dropdown_keywords_obj.verifyAllValues,
+            'getallkeyvaluepairs' : dropdown_keywords_obj.getAllKeyValuePairs,
+            'selectkeybytext' : dropdown_keywords_obj.selectKeyByText,
+            'getkeybyindex' : dropdown_keywords_obj.getKeyByIndex,
             #------------------------------------------------------element keywords
             'click' : element_keywords_obj.click,
             'rightclick' : element_keywords_obj.rightClick,
@@ -153,6 +158,7 @@ class SAPDispatcher:
             'selectcolumns' : shell_gridview_toolbar_keywords_obj.selectColumns,
             'unselectcolumns' : shell_gridview_toolbar_keywords_obj.unSelectColumns,
             'getallcolumnheaders' : shell_gridview_toolbar_keywords_obj.getAllColumnHeaders,
+            'getcolnumbycolheaders' : shell_gridview_toolbar_keywords_obj.getColNumByColHeaders,
             #------------------------------------------------------treekeywords
             'selecttreeelement' : shell_tree_keywords_obj.selectTreeElement,
             'gettreenodetext' : shell_tree_keywords_obj.getTreeNodeText,
@@ -163,12 +169,22 @@ class SAPDispatcher:
             'selecttreenode' : shell_tree_keywords_obj.selectTreeNode,
             'getnodenamebyindex' : shell_tree_keywords_obj.getNodeNameByIndex,
             'verifytreepath' : shell_tree_keywords_obj.verifyTreePath,
-            #------------------------------------------------------callenderkeywords
+            #------------------------------------------------------calendarkeywords
             'selectdate' : shell_calendar_keywords_obj.select_date,
             #'selecttodaysdate' : shell_calendar_keywords_obj.select_todays_date,
             'selectrange':shell_calendar_keywords_obj.select_range,
             'selectmonth':shell_calendar_keywords_obj.select_month,
-            'selectweek':shell_calendar_keywords_obj.select_week
+            'selectweek':shell_calendar_keywords_obj.select_week,
+            #------------------------------------------------------scontainerkeywords
+            'getrowcountofcontainer':scontainer_keywords_obj.getRowCount,
+            'getcolcountofcontainer':scontainer_keywords_obj.getColCount,
+            'gettypeofcell':scontainer_keywords_obj.getTypeOfCell,
+            'gettextofcell':scontainer_keywords_obj.getTextOfCell,
+            'verifytextofcell':scontainer_keywords_obj.verifyTextOfCell,
+            'clickoncell':scontainer_keywords_obj.clickOnCell,
+            'doubleclickoncell':scontainer_keywords_obj.doubleClickOnCell,
+            'rightclickoncell':scontainer_keywords_obj.rightClickOnCell,
+            'setcellfocus' : scontainer_keywords_obj.setCellFocus
             }
 
     def __init__(self):
@@ -235,6 +251,7 @@ class SAPDispatcher:
                 self.sap_dict['doubleclickiris'] = iris_object.doubleclickiris
                 self.sap_dict['rightclickiris'] = iris_object.rightclickiris
                 self.sap_dict['settextiris'] = iris_object.settextiris
+                self.sap_dict['setsecuretextiris'] = iris_object.setsecuretextiris
                 self.sap_dict['gettextiris'] = iris_object.gettextiris
                 self.sap_dict['getrowcountiris'] = iris_object.getrowcountiris
                 self.sap_dict['getcolcountiris'] = iris_object.getcolcountiris

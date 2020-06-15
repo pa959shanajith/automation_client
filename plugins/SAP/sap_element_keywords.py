@@ -15,6 +15,7 @@ from constants import *
 import logger
 from saputil_operations import SapUtilKeywords
 from sendfunction_keys import SendFunctionKeys
+from sap_scontainer_keywords import SContainer_Keywords
 import logging
 log = logging.getLogger('sap_element_keywords.py')
 
@@ -22,6 +23,7 @@ class ElementKeywords():
     def __init__(self):
         self.uk = SapUtilKeywords()
         self.lk = Launch_Keywords()
+        self.sc = SContainer_Keywords()
 
     def get_element_text(self, sap_id, *args):
         status = sap_constants.TEST_RESULT_FAIL
@@ -59,7 +61,7 @@ class ElementKeywords():
             if ( id and ses ):
                 if ( len(input_val) != 0 ):
                     if ( len(input_val) > 1 ):
-                        input = input_val[2]
+                        input = input_val[3]
                     else:
                         input = input_val[0]
 
@@ -105,8 +107,22 @@ class ElementKeywords():
                     else:
                         elem = None
                         flag = True
-                        err_msg = 'Invalid Arguments Passed'
+                        err_msg = sap_constants.INVALID_INPUT
                 #------------------------------Condition to check if its a table element
+                #------------------------------Condition to check if its a simple-container element
+                elif ( elem.type == 'GuiSimpleContainer' ):
+                    arg = args[0]
+                    if ( len(arg) == 1 and arg[0] == '' ):
+                        pass
+                    elif ( len( arg ) == 2 ):
+                        row = int(arg[0])-1
+                        col = int(arg[1])-1
+                        elem = self.sc.getElementFromCell(self.sc.createCustomTable(elem),row,col)
+                    else:
+                        elem = None
+                        flag = True
+                        err_msg = sap_constants.INVALID_INPUT
+                #------------------------------Condition to check if its a simple-container element
                 if ( not flag ):
                         value = elem.tooltip
                         if ( value == '' ):
@@ -156,6 +172,20 @@ class ElementKeywords():
                         elem = None
                         flag = True
                         err_msg = sap_constants.INVALID_INPUT
+                #------------------------------Condition to check if its a simple-container element
+                elif ( elem.type == 'GuiSimpleContainer' ):
+                    arg = args[0]
+                    if ( len(arg) == 1 and arg[0] == '' ):
+                        pass
+                    elif ( len( arg ) == 2 ):
+                        row = int(arg[0])-1
+                        col = int(arg[1])-1
+                        elem = self.sc.getElementFromCell(self.sc.createCustomTable(elem),row,col)
+                    else:
+                        elem = None
+                        flag = True
+                        err_msg = sap_constants.INVALID_INPUT
+                #------------------------------Condition to check if its a simple-container element
                 if ( not flag ):
                     #--------------------changing Null to ''
                     if ( input_val.strip() == "Null" ):
@@ -398,6 +428,10 @@ class ElementKeywords():
                         row = int(args[0][0]) - 1
                         col = int(args[0][1]) - 1
                         elem = elem.GetCell(row, col)
+                    elif ( len(args[0]) > 2 ):
+                        row = int(args[0][3]) - 1
+                        col = int(args[0][4]) - 1
+                        elem = elem.GetCell(row, col)
                     else:
                         elem = None
                         flag = True
@@ -448,8 +482,8 @@ class ElementKeywords():
                         col = int(args[0][1])-1
                         elem = elem.GetCell(row, col)
                     elif ( len(args[0]) > 2 ):
-                        row = int(args[0][2]) - 1
-                        col = int(args[0][3]) - 1
+                        row = int(args[0][3]) - 1
+                        col = int(args[0][4]) - 1
                         elem = elem.GetCell(row, col)
                     else:
                         elem = None

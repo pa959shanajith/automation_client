@@ -33,6 +33,7 @@ log = logging.getLogger('clientwindow.py')
 wxObject = None
 browsername = None
 qcdata = None
+qcObject = None
 soc=None
 pdfgentool = None
 qcConFlag=False
@@ -210,22 +211,24 @@ class MainNamespace(BaseNamespace):
             logger.print_on_console(err_msg)
             log.error(e,exc_info=True)
 
+
     def on_executeTestSuite(self, *args):
+        global wxObject, execution_flag
         try:
-            global wxObject,socketIO,execution_flag
-            args=list(args)
+            exec_data = args[0]
+            batch_id = exec_data["batchId"]
+            aws_mode=False
+            if len(args)>0 and args[0]['apptype']=='MobileApp':
+                if args[0]['suitedetails'][0]['browserType'][0]=='2':
+                    aws_mode = True
             if(not execution_flag):
-                socketIO.emit('return_status_executeTestSuite',{'status':'success','executionId':(args[0])['executionId']})
-                wxObject.mythread = TestThread(wxObject,EXECUTE,args[0],wxObject.debug_mode)
+                socketIO.emit('return_status_executeTestSuite', {'status': 'success', 'batchId': batch_id})
+                wxObject.mythread = TestThread(wxObject, EXECUTE, exec_data, aws_mode)
             else:
-                obj = handler.Handler()
-                suiteId_list,suite_details,browser_type,scenarioIds,suite_data,execution_id,condition_check,dataparam_path,exec_mode=obj.parse_json_execute(args[0])
-                data = {'scenario_ids':scenarioIds,'execution_id':execution_id,'time':str(datetime.now())}
-                emsg='Execution already in progress. Skipping current request.'
+                socketIO.emit('return_status_executeTestSuite', {'status': 'skipped', 'batchId': batch_id})
+                emsg = 'Execution already in progress. Skipping current request.'
                 log.warn(emsg)
                 logger.print_on_console(emsg)
-                """sending scenario details for skipped execution to update the same in reports."""
-                socketIO.emit('return_status_executeTestSuite',{'status':'skipped','data':data,'executionId':(args[0])['executionId']})
         except Exception as e:
             err_msg='Error while Executing'
             log.error(err_msg)
@@ -233,11 +236,11 @@ class MainNamespace(BaseNamespace):
             log.error(e,exc_info=True)
 
     def on_debugTestCase(self, *args):
+        global wxObject
         try:
             if check_execution_lic("result_debugTestCase"): return None
-            global wxObject
-            args=list(args)
-            wxObject.mythread = TestThread(wxObject,DEBUG,args[0],wxObject.debug_mode)
+            exec_data = args[0]
+            wxObject.mythread = TestThread(wxObject, DEBUG, exec_data, False)
             wxObject.choice=wxObject.rbox.GetStringSelection()
             logger.print_on_console(str(wxObject.choice)+' is Selected')
             if wxObject.choice == 'Normal':
@@ -502,55 +505,27 @@ class MainNamespace(BaseNamespace):
             log.error(e,exc_info=True)
 
     def on_qclogin(self, *args):
-        global qcdata
-        global soc
-        global socketIO
-        server_data=b''
-        data_stream=None
-        client_data=None
-        EOF_QC = b'#E&D@Q!C#'
+        global qcObject
+        err_msg = None
         try:
-            if SYSTEM_OS == "Windows":
-                if len(args) > 0:
-                    qcdata = args[0]
-                    if soc is None:
-                        import subprocess
-                        path = NINETEEN68_HOME + "/plugins/Qc/QcController.exe"
-                        pid = subprocess.Popen(path, shell=True)
-                        soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                        try:
-                            soc.connect(("localhost",10000))
-                        except socket.error as e:
-                            log.error(e)
-                            if '[Errno 10061]' in str(e):
-                                time.sleep(15)
-                                soc.connect(("localhost",10000))
+            if(qcObject == None):
+                core_utils.get_all_the_imports('Qc')
+                import QcController
+                qcObject = QcController.QcWindow()
 
-                    data_to_send = json.dumps(qcdata).encode('utf-8')
-                    data_to_send+=EOF_QC
-                    soc.send(data_to_send)
-                    while True:
-                        data_stream= soc.recv(1024)
-                        server_data+=data_stream
-                        if EOF_QC in server_data:
-                            break
-                    client_data= server_data[:server_data.find(EOF_QC)].decode('utf-8')
-                    if('Fail@f@!l' in client_data):
-                        client_data=client_data[:client_data.find('@f@!l')]
-                        logger.print_on_console('Error occurred in QC')
-                        socketIO.emit('qcresponse','Error:Qc Operations')
-                    else:
-                        socketIO.emit('qcresponse',client_data)
-                else:
-                    socketIO.emit('qcresponse','Error:data recevied empty')
-            else:
-                 socketIO.emit('qcresponse','Error:Failed in running Qc')
+            qcdata = args[0]
+            response = qcObject.qc_dict[qcdata.pop('qcaction')](qcdata)
+            socketIO.emit('qcresponse', response)
+        except KeyError:
+            err_msg = 'Invalid ALM operation'
         except Exception as e:
-            err_msg='Error in ALM Operations '
+            err_msg = 'Error in ALM operations'
+            log.error(e, exc_info=True)
+        if err_msg is not None:
             log.error(err_msg)
             logger.print_on_console(err_msg)
-            log.error(e,exc_info=True)
-            socketIO.emit('qcresponse','Error:Qc Operations')
+            try: socketIO.emit('qcresponse','Error:Qc Operations')
+            except: pass
 
     def on_render_screenshot(self,*args):
         try:
@@ -795,7 +770,7 @@ class TestThread(threading.Thread):
     """Test Worker Thread Class."""
 
     #----------------------------------------------------------------------
-    def __init__(self,wxObject,action,json_data,debug_mode):
+    def __init__(self, wxObject, action, json_data, aws_mode):
         """Init Worker Thread Class."""
         super(TestThread, self).__init__()
         self.wxObject = wxObject
@@ -808,10 +783,11 @@ class TestThread(threading.Thread):
         # prevent that. In Python 2, use of Lock instead of RLock also
         # boosts performance.
         self.pause_cond = threading.Condition(threading.Lock())
-        self.con=''
-        self.action=action.lower()
-        self.json_data=json_data
-        self.debug_mode=debug_mode
+        self.con = ''
+        self.action = action.lower()
+        self.json_data = json_data
+        self.debug_mode = wxObject.debug_mode
+        self.aws_mode = aws_mode
         self.start()    # start the thread
 
     #should just resume the thread
@@ -825,9 +801,11 @@ class TestThread(threading.Thread):
         """Run Worker Thread."""
         # This is the code executing in the new thread.
         global socketIO, execution_flag, closeActiveConnection,connection_Timer
+        batch_id = None
         try:
             runfrom_step=1
-            if self.action==DEBUG:
+            if self.action==EXECUTE: batch_id = self.json_data["batchId"]
+            elif self.action==DEBUG:
                 self.debug_mode=False
                 self.wxObject.breakpoint.Disable()
                 if self.wxObject.choice in ['Stepwise','RunfromStep']:
@@ -859,17 +837,23 @@ class TestThread(threading.Thread):
                 logger.print_on_console('This app type is not part of the license.')
                 status=TERMINATE
             else:
-                status = self.con.invoke_controller(self.action,self,self.debug_mode,runfrom_step,self.json_data,self.wxObject,socketIO,soc)
+                status = self.con.invoke_controller(self.action,self,self.debug_mode,runfrom_step,self.json_data,self.wxObject,socketIO,qcObject,self.aws_mode)
 
             logger.print_on_console('Execution status '+status)
 
             if status==TERMINATE:
                 logger.print_on_console('---------Termination Completed-------')
+            if self.wxObject.choice=='RunfromStep':
+                self.wxObject.breakpoint.Enable()
+            else:
+                self.wxObject.breakpoint.Disable()
+            
+
 
             #Removed execute,debug button
             self.wxObject.breakpoint.Clear()
             self.wxObject.rbox.Enable()
-            self.wxObject.breakpoint.Disable()
+            # self.wxObject.breakpoint.Disable()
             self.wxObject.cancelbutton.Enable()
             if self.action==DEBUG:
                 testcasename = handler.local_handler.testcasename
@@ -889,16 +873,16 @@ class TestThread(threading.Thread):
                 else:
                     socketIO.emit('result_debugTestCaseWS',status)
             elif self.action==EXECUTE:
-                socketIO.emit('result_executeTestSuite',{"status":status,"executionId":self.json_data["executionId"]})
+                socketIO.emit('result_executeTestSuite', {"status":status, "batchId": batch_id})
         except Exception as e:
-            log.error(e,exc_info=True)
+            log.error(e, exc_info=True)
             status=TERMINATE
             if socketIO is not None:
                 if self.action==DEBUG:
                     self.wxObject.killChildWindow(debug=True)
                     socketIO.emit('result_debugTestCase',status)
                 elif self.action==EXECUTE:
-                    socketIO.emit('result_executeTestSuite',{"status":status,"executionId":self.json_data["executionId"]})
+                    socketIO.emit('result_executeTestSuite', {"status":status, "batchId": batch_id})
         if closeActiveConnection:
             closeActiveConnection = False
             connection_Timer = threading.Timer(300, wxObject.closeConnection)
@@ -1232,7 +1216,6 @@ class ClientWindow(wx.Frame):
         self.Destroy()
         controller.kill_process()
         if SYSTEM_OS == "Windows":
-            os.system("TASKKILL /F /IM QcController.exe")
             os.system("TASKKILL /F /IM nineteen68MFapi.exe")
         sys.exit(0)
 
@@ -1252,6 +1235,11 @@ class ClientWindow(wx.Frame):
         logger.print_on_console(msg)
         log.info(msg)
         controller.terminate_flag=True
+        #Calling AWS stop job on terminate (if present)
+        try:
+            wxObject.mythread.con.aws_obj.stop_job()
+        except:
+            pass
         #Handling the case where user clicks terminate when the execution is paused
         #Resume the execution
         if controller.pause_flag:
@@ -2602,7 +2590,7 @@ def check_browser():
             driver=None
             for k,v in list(FIREFOX_BROWSER_VERSION.items()):
                 if a == k:
-                    if browser_ver >= v[0] or browser_ver <= v[1]:
+                    if browser_ver >= v[0] and browser_ver <= v[1]:
                         firefoxFlag=True
             if firefoxFlag == False:
                 logger.print_on_console('WARNING!! : Firefox version ',str(browser_ver),' is not supported.')

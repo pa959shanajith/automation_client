@@ -261,10 +261,13 @@ class Shell_GridView_Toolbar_Keywords():
                                 elmID = elem.GetToolbarButtonId(x)
                                 if ( (elem.GetToolbarButtonType(x) == "Menu" or "ButtonAndMenu") and len(input_val) > 1 ):
                                     menuItem = str(input_val[1]).strip()
-                                    elem.PressToolbarContextButton(elmID)
-                                    elem.SelectContextMenuItemByText(menuItem)
+                                    try:elem.PressToolbarContextButton(elmID)
+                                    except Exception as e: log.info('Warning! in PressToolbarContextButton : ' + str(e))
+                                    try:elem.SelectContextMenuItemByText(menuItem)
+                                    except Exception as e: log.info('Warning! in SelectContextMenuItemByText : ' + str(e))
                                 else:
-                                    elem.PressToolbarButton(elmID)
+                                    try:elem.PressToolbarButton(elmID)
+                                    except Exception as e:log.info('Warning! in PressToolbarButton : ' + str(e))
                                 status = sap_constants.TEST_RESULT_PASS
                                 result = sap_constants.TEST_RESULT_TRUE
                                 break
@@ -768,4 +771,56 @@ class Shell_GridView_Toolbar_Keywords():
             err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
             log.error( err_msg )
             logger.print_on_console( 'Error occured in Get All Column Headers' )
+        return status,result,value,err_msg
+
+    def getColNumByColHeaders(self, sap_id, input_val, *args):
+        status = sap_constants.TEST_RESULT_FAIL
+        result = sap_constants.TEST_RESULT_FALSE
+        err_msg = None
+        value = OUTPUT_CONSTANT
+        bList = []
+        vList = []
+        vList_temp = []
+        allTrueFlag = True
+        try:
+            self.lk.setWindowToForeground(sap_id)
+            id, ses = self.uk.getSapElement(sap_id)
+            if ( id and ses ):
+                elem = ses.FindById(id)
+                d1,d2,imax,d3 = self.get_colCount(sap_id)
+                if ( elem.type == 'GuiShell' ):
+                    #----------------------------------function to append columnorder
+                    for i in range(0,imax):
+                        b=elem.columnorder(i)
+                        bList.append(b)
+                    #----------------------------------function to append columnorder
+                    for i in range(0,len(bList)):
+                        vList.append(elem.GetDisplayedColumnTitle(str(bList[i])))
+                    for iv in input_val:
+                        if iv in vList:
+                            i = None
+                            i = vList.index(iv)
+                            vList_temp.append(i+1)
+                        else :
+                            allTrueFlag = False
+                            break
+                    if ( allTrueFlag ):
+                        value = vList_temp
+                        status = sap_constants.TEST_RESULT_PASS
+                        result = sap_constants.TEST_RESULT_TRUE
+                    else:
+                        err_msg = 'Column header/headers do not exist'
+                else:
+                    err_msg = 'Element is not a shell object'
+            else:
+                err_msg = sap_constants.ELELMENT_NOT_FOUND
+            #----------------------------------logging
+            if ( err_msg ):
+                log.info( err_msg )
+                logger.print_on_console( err_msg )
+        except Exception as e:
+            err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
+            log.error( err_msg )
+            logger.print_on_console( 'Error occured in GetColNumByColHeaders' )
+        del bList,vList,vList_temp,allTrueFlag
         return status,result,value,err_msg

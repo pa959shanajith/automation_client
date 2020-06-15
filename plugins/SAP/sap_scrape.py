@@ -21,6 +21,7 @@ log = logging.getLogger('sap_scrape.py')
 from saputil_operations import SapUtilKeywords
 import time
 import base64
+import win32gui
 import core_utils
 cropandaddobj = None
 obj=None
@@ -45,8 +46,8 @@ class ScrapeWindow(wx.Frame):
         input_val.append(windowname)
         status = obj.launch_application(input_val)
         self.irisFlag = irisFlag
-        self.scrapeoptions = ['Full', 'Button', 'Textbox', 'Dropdown', 'Label', 'Radiobutton', 'Checkbox', 'Table', 'Scroll Bar', 'Tab', 'Shell', 'Other Tags']
-        self.tag_map = {'Full':'full','Button':'button', 'Textbox':'input', 'Dropdown':'select', 'Label':'GuiLabel', 'Radiobutton':'radiobutton', 'Checkbox':'checkbox', 'Table':'table', 'Scroll Bar':'GuiScrollContainer', 'Tab':'GuiTab', 'Shell':'shell', 'Other Tags':'others'}
+        self.scrapeoptions = ['Full', 'Button', 'Textbox', 'Dropdown', 'Label', 'Radiobutton', 'Checkbox', 'Table', 'Scroll Bar', 'Tab', 'Shell', 'SContainer', 'Other Tags']
+        self.tag_map = {'Full':'full','Button':'button', 'Textbox':'input', 'Dropdown':'select', 'Label':'label', 'Radiobutton':'radiobutton', 'Checkbox':'checkbox', 'Table':'table', 'Scroll Bar':'GuiScrollContainer', 'Tab':'GuiTab', 'Shell':'shell', 'SContainer':'scontainer', 'Other Tags':'others'}
         if ( status != TERMINATE ):
             try:
                 self.panel = wx.Panel(self)
@@ -96,16 +97,9 @@ class ScrapeWindow(wx.Frame):
             wndname = sap_scraping_obj.getWindow(SapGui)
             wnd_title = wndname.__getattr__("Text")
             wnd_id = wndname.__getattr__("Id")
-            try:
-                self.Hide()
-                time.sleep(1)
-                img = obj.captureScreenshot(wnd_title, wnd_id)
-                img.save('out.png')
-                with open("out.png", "rb") as image_file:
-                          encoded_string = base64.b64encode(image_file.read())
-            except Exception as e:
-                logger.print_on_console( 'Error occured while capturing Screenshot' )
-                log.error(e)
+            self.Hide()
+            time.sleep(1)
+            encoded_string = self.screenShot(wnd_title,wnd_id)
             data['mirror'] = encoded_string.decode('UTF-8').strip()
             data['view'] = d
             # 10 is the limit of MB set as per Nineteen68 standards
@@ -132,14 +126,7 @@ class ScrapeWindow(wx.Frame):
         obj = sap_launch_keywords.Launch_Keywords()
         self.Hide()
         time.sleep(1)
-        try:
-            img = obj.captureScreenshot(wnd_title,wnd_id)
-            img.save('out.png')
-            with open("out.png", "rb") as image_file:
-                      encoded_string = base64.b64encode(image_file.read())
-        except Exception as e:
-            logger.print_on_console( 'Error occured while capturing Screenshot' )
-            log.error(e)
+        encoded_string = self.screenShot(wnd_title,wnd_id)
         data['mirror'] = encoded_string.decode('UTF-8').strip()
         data['view'] = scraped_data
         # 10 is the limit of MB set as per Nineteen68 standards
@@ -151,6 +138,27 @@ class ScrapeWindow(wx.Frame):
         self.parent.schedule.Enable()
         os.remove("out.png")
         self.Close()
+
+    def screenShot(self,wnd_title,wnd_id):
+        encoded_string = None
+        img = None
+        try:
+            img = obj.captureScreenshot(wnd_title,wnd_id)
+            img.save('out.png')
+            with open("out.png", "rb") as image_file:
+                      encoded_string = base64.b64encode(image_file.read())
+        except Exception as e:
+            log.error('Error occurred while capturing screenshot of window handle, proceeding to screenshot entire screen')
+            try:
+                img = obj.capture_window( win32gui.GetDesktopWindow())
+                img.save('out.png')
+                with open("out.png", "rb") as image_file:
+                    encoded_string = base64.b64encode(image_file.read())
+            except Exception as e:
+                logger.print_on_console( 'Error occured while capturing Screenshot' )
+                log.error(e)
+        del img
+        return encoded_string
 
     def cropandadd(self,event):
         SapGui = self.uk.getSapObject()
@@ -180,7 +188,7 @@ class ScrapeWindow(wx.Frame):
                 new_data = scrape_data
             elif ( tag_choice == 'others' ):
                 for data in scrape_data:
-                    if ( data['tag'] != 'button' and data['tag'] != 'input' and data['tag'] != 'select' and data['tag'] != 'GuiLabel' and data['tag'] != 'radiobutton' and data['tag'] != 'checkbox' and data['tag'] != 'table' and data['tag'] != 'GuiScrollContainer' and data['tag'] != 'GuiTab' and data['tag'] != 'shell' ):
+                    if ( data['tag'] != 'button' and data['tag'] != 'input' and data['tag'] != 'select' and data['tag'] != 'label' and data['tag'] != 'radiobutton' and data['tag'] != 'checkbox' and data['tag'] != 'table' and data['tag'] != 'GuiScrollContainer' and data['tag'] != 'GuiTab' and data['tag'] != 'shell' and data['tag'] != 'scontainer' ):
                         new_data.append(data)
             else:
                 for data in scrape_data:
