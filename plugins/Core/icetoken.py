@@ -10,19 +10,20 @@
 #-------------------------------------------------------------------------------
 import os
 import sys
-import socket
 from core_utils import CoreUtils
 import wx
 import logging
 import logger
+import json
 
 log = logging.getLogger('icetoken.py')
 
 class ICEToken():
     def __init__(self):
         self.token=None
+        self.enc_obj=CoreUtils()
         self.check_token()
-
+        
     """ Check for the ICE token
         if exists , returns decrypted token """
     def check_token(self):
@@ -30,12 +31,13 @@ class ICEToken():
         self.file=self.token_folder+os.sep+"token.enc"
         if os.path.exists(self.file):
             log.info("Token path exists")
-            ice_ndac_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
-                        'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
+            """ Decrypt the token with token key """
+            token_key = "".join(['a','s','i','d','f','n','H','T','E','o','w','#','D','j',
+                        'g','L','I','$','o','K','n','^','8','s','j','p','2','h','9','Y','&','d'])
             with open(self.file, "r") as f:
                 token=f.read()
-            if token != "" and CoreUtils().unwrap(token,ice_ndac_key) is not None:
-                self.token=token
+            if token != "" and self.enc_obj.unwrap(token,token_key) is not None:
+                self.token=json.loads(self.enc_obj.unwrap(token,token_key))
         return self.token
 
     """ Registration window for token """
@@ -51,8 +53,12 @@ class ICEToken():
     def save_token(self,token):
         if not os.path.exists(self.token_folder):
             os.makedirs(self.token_folder)
+        """ Encrypt the token with token key"""
+        token_key = "".join(['a','s','i','d','f','n','H','T','E','o','w','#','D','j',
+                        'g','L','I','$','o','K','n','^','8','s','j','p','2','h','9','Y','&','d'])
+        token=self.enc_obj.wrap(json.dumps(token),token_key)
         with open(self.file, "w") as f:
-            f.write(token)
+            f.write(token.decode("utf-8"))
 
     """ Deletes the token in the appdatafolder """
     def delete_token(self):
@@ -101,13 +107,18 @@ class Token_window(wx.Frame):
         token=self.token_name.GetValue()
         ice_ndac_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
                         'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
-        if (url.strip()!="" and token.strip() !="" and CoreUtils().unwrap(token,ice_ndac_key) is not None 
-        and  url.lower().strip()!="server-ip:port" and token.lower().strip()!="token"):
-            self.parent.url=url
-            self.parent.ice_token=token
-            self.parent.ice_action="register"
-            self.parent.OnNodeConnect(event)
-            self.Destroy()
+        try:
+            token_dec=CoreUtils().unwrap(token,ice_ndac_key).split("@")
+            if (url.strip()!="" and token.strip() !="" and  token_dec is not None 
+            and  url.lower().strip()!="server-ip:port" and token.lower().strip()!="token"):
+                self.parent.url=url
+                token_info={'token':token_dec[0],'icename':token_dec[1]}
+                self.parent.ice_token=token_info
+                self.parent.ice_action="register"
+                self.parent.OnNodeConnect(event)
+                self.Destroy()
+        except Exception as e:
+            log.error(e)
     
 
         

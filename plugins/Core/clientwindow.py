@@ -136,15 +136,16 @@ class MainNamespace(BaseNamespace):
                         'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
                     response = json.loads(self.core_utils_obj.unwrap(str(args[1]), ice_ndac_key))
                     plugins_list = response['plugins']
+                    """In case of InvalidToken and InvalidICE response from NDAC set ICEtoken to None"""
+                    if(response['res']=="InvalidToken" or response["res"]=="InvalidICE"):
+                        wxObject.ice_action = "register" 
+                        wxObject.ice_token = None
                     err_res = None
                     if(response['id'] != icesession['ice_id'] and response['connect_time'] != icesession['connect_time']):
                         err_res="Invalid response received"
                     if(response['res'] != 'success'):
                         if('err_msg' in response):
                             err_res=response['err_msg']
-                    if(response['res']=="InvalidToken" or response["res"]=="InvalidICE"):
-                        wxObject.ice_action = "register" 
-                        wxObject.ice_token = None
                     if(err_res is not None):
                         logger.print_on_console(err_res)
                         log.info(err_res)
@@ -157,12 +158,14 @@ class MainNamespace(BaseNamespace):
                             wxObject.connectbutton.SetToolTip(wx.ToolTip("Disconnect from Nineteen68 Server"))
                             controller.disconnect_flag=False
                         else:
-                             #To save the token after successful registration
+                            """To save the token after successful registration"""
                             wxObject.ice_action="connect"
+                            wxObject.ice_token["hostname"]=socket.gethostname()
                             wxObject.token_obj.save_token(wxObject.ice_token)
                             msg=response["icename"]+" : ICE registered successfully with Nineteen68"
                             logger.print_on_console(msg)
                             log.info(msg)
+                    """Enables Connect button again to re-register ICE with valid token"""
                     if wxObject.ice_action == "register" and wxObject.ice_token is None:
                         logger.print_on_console("ICE is not registered with Nineteen68 : Click on Connect to Register")
                     wxObject.connectbutton.Enable()
@@ -699,12 +702,17 @@ class MainNamespace(BaseNamespace):
             icesession['connect_time'] = str(datetime.now())
             icesession = self.core_utils_obj.wrap(json.dumps(icesession), ice_ndac_key)
             socketIO._http_session.params['icesession'] = icesession
-            msg = 'Connectivity issue with Nineteen68 Server. Attempting to restore connectivity...'
-            logger.print_on_console(msg)
-            log.error(msg)
             if not bool(wxObject): return
             wxObject.schedule.Disable()
             wxObject.connectbutton.Disable()
+            """Enables the connect button , if disconnection happened due to Invalid Token"""
+            if wxObject.ice_token is None:
+                wxObject.connectbutton.Enable()
+            else:
+                msg = 'Connectivity issue with Nineteen68 Server. Attempting to restore connectivity...'
+                logger.print_on_console(msg)
+                log.error(msg)
+            
         if not bool(wxObject): return
         wxObject.connectbutton.SetBitmapLabel(wxObject.connect_img)
         wxObject.connectbutton.SetName('connect')
@@ -769,25 +777,32 @@ class SocketThread(threading.Thread):
         }
         ice_ndac_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
             'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
-        token_dec=core_utils_obj.unwrap(self.ice_token, ice_ndac_key)
-        icename=token_dec.split("@")[1]
-        icesession_enc = core_utils_obj.wrap(json.dumps(icesession), ice_ndac_key)
-        params={'username':username,'hostname': hostname,'icename': icename,'ice_action':self.ice_action,'icesession': icesession_enc,'icetoken': self.ice_token}
+        icename=self.ice_token["icename"]
+        reg_hostname=hostname
+        err_msg=None
+        if "hostname" in self.ice_token:
+            reg_hostname=self.ice_token["hostname"]
         try:
-            socketIO = SocketIO(temp_server_IP,server_port,MainNamespace,verify=server_cert,cert=client_cert,params=params)
-            socketIO.wait()
+            """Check if registered hostname in the Token matches with the current hostname"""
+            if reg_hostname==hostname:
+                icesession_enc = core_utils_obj.wrap(json.dumps(icesession), ice_ndac_key)
+                icetoken_enc = core_utils_obj.wrap(json.dumps(self.ice_token), ice_ndac_key)
+                params={'username':username,'icename': icename,'ice_action':self.ice_action,'icesession': icesession_enc,'icetoken': icetoken_enc}
+                socketIO = SocketIO(temp_server_IP,server_port,MainNamespace,verify=server_cert,cert=client_cert,params=params)
+                socketIO.wait()
+            else:
+                err_msg="Access denied : Hostname doesn't match. ICE is registered with hostname "+reg_hostname
+                self.ice_token=None
         except ValueError as e:
-            msg = str(e).replace("[engine.io waiting for connection] ",'').replace("[SSL: CERTIFICATE_VERIFY_FAILED] ",'')
-            if "_ssl.c" in msg:
-                msg = msg[:msg.index("(_ssl")]
-            logger.print_on_console(msg)
-            log.error(msg)
-            wxObject.connectbutton.Enable()
+            err_msg = str(e).replace("[engine.io waiting for connection] ",'').replace("[SSL: CERTIFICATE_VERIFY_FAILED] ",'')
+            if "_ssl.c" in err_msg:
+                err_msg = msg[:msg.index("(_ssl")]
         except Exception as e:
-            msg = "Error in server connection"
+            err_msg = "Error in server connection"
+            log.error(e,exc_info=True)
+        if (err_msg):
             logger.print_on_console(msg)
             log.error(msg)
-            log.error(e,exc_info=True)
             wxObject.connectbutton.Enable()
 
 
@@ -1503,7 +1518,7 @@ class ClientWindow(wx.Frame):
             else:
                 self.token_obj.token_window(self,IMAGES_PATH)
         except Exception as e:
-            log.error(e)
+            log.error(e,exc_info=True)
             logger.print_on_console(e)
         
 
