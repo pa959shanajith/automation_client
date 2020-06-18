@@ -41,6 +41,10 @@ def init(times,socket):
 def start(t,name,schedTime):
     global bench_thread,threadNames,terminated
     terminated = False
+    for i in range(len(threadNames)):
+        if threadNames[i].getName() is name:
+            threadNames[i].cancel()
+            time.sleep(1)
     bench_thread = threading.Timer(t, execute,[name,schedTime])
     bench_thread.setName(name)
     threadNames.append(bench_thread)
@@ -60,8 +64,17 @@ def stop(terminateExec):
     return
    
 def delete_memory_test_file():
+    global terminated
     if os.path.exists('output.txt'):
-        os.unlink('output.txt')
+        try:
+            os.unlink('output.txt')
+            return True
+        except Exception as e:
+            log.error(e)
+            terminated = True
+            logger.print_on_console("Another instance of benchmark running, terminating.")
+
+
 
 def cpu():
     global terminated
@@ -105,8 +118,8 @@ def memory():
             if os.path.exists("output.txt"):
                 outputFile = os.stat("output.txt")
                 if outputFile.st_size/100000 > 4000:
-                    os.unlink("output.txt")
-            for i in range(40):
+                    delete_memory_test_file()
+            for i in range(30):
                 if terminated:
                     return -99
                 f = open("output.txt", "a")
@@ -118,7 +131,7 @@ def memory():
                 f = open("output.txt", "r")
                 f.read()
                 f.close()
-            os.unlink("output.txt")
+            delete_memory_test_file()
             afterFile = time.time()
             resArray.append(afterFile - beforeFile)
         sum = 0
@@ -187,11 +200,14 @@ def execute(name,schedTime):
     global string,resArray,terminated,socketIO
     timeNow =  datetime.datetime.today()
     delta = schedTime - timeNow
-    start(delta.seconds,name,schedTime)
+    
     if clientwindow.execution_flag:
-        logger.print_on_console("Execution in progress, t erminating Benchmark Execution")
+        logger.print_on_console("Execution in progress, terminating Benchmark Execution")
+        start(delta.seconds,name,schedTime)
         return
     if terminated:
+        logger.print_on_console("Benchmark execution terminating.")
+        start(delta.seconds,name,schedTime)
         return
     try:
         string = ""
@@ -200,19 +216,25 @@ def execute(name,schedTime):
         a,percent = network()
         b = cpu()
         c = memory()
+        timeNow =  datetime.datetime.today()
+        delta = schedTime - timeNow
         if a == -99 or b == -99 or c == -99:
             logger.print_on_console("Terminating Benchmark Execution")
+            start(delta.seconds,name,schedTime)
             return
         result = (a+b+c)/3
         logger.print_on_console("Benchmark result: ",result)
         if terminated:
             logger.print_on_console("Terminating Benchmark Execution")
+            start(delta.seconds,name,schedTime)
             return 
         socketIO.emit('benchmark_ping',{'cpuscore':b,"memoryscore":c,"networkscore":a,"percent_received":str(percent * 100) + '%',"hostip":socket.gethostbyname(socket.gethostname()),"hostname":os.environ['username'],"systemscore":result,"time":str(datetime.datetime.isoformat(datetime.datetime.now()))})
+        start(delta.seconds,name,schedTime)
         return
     except Exception as e:
         delete_memory_test_file()
         logger.print_on_console("Error in Benchmark Execution, terminating.")
         log.error(e)
+        start(delta.seconds,name,schedTime)
         return
 
