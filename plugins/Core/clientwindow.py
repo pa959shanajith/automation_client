@@ -83,7 +83,7 @@ class MainNamespace(BaseNamespace):
     core_utils_obj = core_utils.CoreUtils()
 
     def on_message(self, *args):
-        global action,wxObject,browsername,desktopScrapeFlag,allow_connect,browsercheckFlag,connection_Timer,updatecheckFlag,communication_token
+        global action,wxObject,browsername,desktopScrapeFlag,allow_connect,browsercheckFlag,connection_Timer,updatecheckFlag,communication_token,configvalues
         try:
             if(str(args[0]) == 'connected'):
                 if(allow_connect):
@@ -162,12 +162,19 @@ class MainNamespace(BaseNamespace):
                             wxObject.ice_action="connect"
                             wxObject.ice_token["hostname"]=socket.gethostname()
                             wxObject.token_obj.save_token(wxObject.ice_token)
+                            url=wxObject.url.split(':')
+                            configvalues['server_ip']=url[0]
+                            configvalues['server_port']=url[1]
                             msg=response["icename"]+" : ICE registered successfully with Nineteen68"
+                            wxObject.connectbutton.SetBitmapLabel(wxObject.connect_img)
+                            wxObject.connectbutton.SetName('connect')
+                            wxObject.connectbutton.SetToolTip(wx.ToolTip("Connect to Nineteen68 Server"))
                             logger.print_on_console(msg)
                             log.info(msg)
                     """Enables Connect button again to re-register ICE with valid token"""
                     if wxObject.ice_action == "register" and wxObject.ice_token is None:
-                        logger.print_on_console("ICE is not registered with Nineteen68 : Click on Connect to Register")
+                        logger.print_on_console("ICE is not registered with Nineteen68 : Click to Register")
+                        wxObject.enable_register()
                     wxObject.connectbutton.Enable()
                 except Exception as e:
                     logger.print_on_console('Error while checking connection request')
@@ -705,17 +712,19 @@ class MainNamespace(BaseNamespace):
             if not bool(wxObject): return
             wxObject.schedule.Disable()
             wxObject.connectbutton.Disable()
-            """Enables the connect button , if disconnection happened due to Invalid Token"""
+            """Enables the Register button , if disconnection happened due to Invalid Token"""
             if wxObject.ice_token is None:
-                wxObject.connectbutton.Enable()
+                wxObject.enable_register()
+                return
             else:
                 msg = 'Connectivity issue with Nineteen68 Server. Attempting to restore connectivity...'
                 logger.print_on_console(msg)
                 log.error(msg)
             
         if not bool(wxObject): return
-        wxObject.connectbutton.SetBitmapLabel(wxObject.connect_img)
-        wxObject.connectbutton.SetName('connect')
+        if wxObject.ice_token:
+            wxObject.connectbutton.SetBitmapLabel(wxObject.connect_img)
+            wxObject.connectbutton.SetName('connect')
 
     def on_irisOperations(self, *args):
         try:
@@ -767,17 +776,19 @@ class SocketThread(threading.Thread):
         username=str(os.environ[key]).lower()
         core_utils_obj = core_utils.CoreUtils()
         hostname=socket.gethostname()
+        ice_type='normal'
         icesession = {
             'ice_id': str(uuid.uuid4()),
             'connect_time': str(datetime.now()),
             'username': username,
             'hostname': hostname,
             'iceaction': self.ice_action,
-            'icetype': 'normal'
+            'icetype': ice_type
         }
         ice_ndac_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
             'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
         icename=self.ice_token["icename"]
+        self.ice_token["icetype"]=ice_type
         reg_hostname=hostname
         err_msg=None
         if "hostname" in self.ice_token:
@@ -793,6 +804,7 @@ class SocketThread(threading.Thread):
             else:
                 err_msg="Access denied : Hostname doesn't match. ICE is registered with hostname "+reg_hostname
                 self.ice_token=None
+                wxObject.enable_register()
         except ValueError as e:
             err_msg = str(e).replace("[engine.io waiting for connection] ",'').replace("[SSL: CERTIFICATE_VERIFY_FAILED] ",'')
             if "_ssl.c" in err_msg:
@@ -969,9 +981,11 @@ class ClientWindow(wx.Frame):
         self.choice='Normal'
         global wxObject,browsercheckFlag,updatecheckFlag
         self.ice_token=None
+        self.url=None
         self.iconpath = IMAGES_PATH +"slk.ico"
         self.connect_img=wx.Image(IMAGES_PATH +"connect.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
         self.disconnect_img=wx.Image(IMAGES_PATH +"disconnect.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+        self.register_img=wx.Image(IMAGES_PATH +"register.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
         self.enabledStatus = [False,False,False,False,False,False,False,False]
         wxObject = self
 
@@ -1304,7 +1318,7 @@ class ClientWindow(wx.Frame):
             global socketIO, connection_Timer
             name = self.connectbutton.GetName()
             self.connectbutton.Disable()
-            if(name == 'connect'):
+            if(name == 'connect' or name == 'register'):
                 server_ip=configvalues['server_ip']
                 server_port=configvalues['server_port']
                 if self.ice_token:
@@ -1343,6 +1357,7 @@ class ClientWindow(wx.Frame):
             if self.ice_action=="register":
                 emsg="Connection refused : Invalid Server URL. Click on Connect to retry Registration" 
                 self.ice_token=None
+                self.enable_register()
             logger.print_on_console(emsg)
             log.error(emsg)
             self.cancelbutton.Disable()
@@ -1351,6 +1366,12 @@ class ClientWindow(wx.Frame):
             self.connectbutton.Enable()
             self.rbox.Disable()
             log.error(e,exc_info=True)
+
+    def enable_register(self):
+        self.connectbutton.SetBitmapLabel(self.register_img)
+        self.connectbutton.SetName("register")
+        self.connectbutton.SetToolTip(wx.ToolTip("Register ICE with Nineteen68 Server"))
+        self.connectbutton.Enable()
 
     def killSocket(self, disconn=False):
         #Disconnects socket client
@@ -1509,6 +1530,8 @@ class ClientWindow(wx.Frame):
     def verifyRegistration(self,show_window=False):
         try:
             self.token_obj=ICEToken()
+            if configvalues:
+                self.url= configvalues['server_ip']+':'+configvalues['server_port']
             if not(show_window):
                 if not(self.token_obj.token):
                     self.token_obj.token_window(self,IMAGES_PATH)

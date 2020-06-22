@@ -94,6 +94,8 @@ class Token_window(wx.Frame):
             self.submit_btn=wx.Button(self.panel, label="Submit",pos=(60,110), size=(60,28))
             self.submit_btn.Bind(wx.EVT_BUTTON, self.submit_token)
             self.url.SetValue('server-ip:port')
+            if self.parent.url.strip()!=':':
+                self.url.SetValue(self.parent.url)
             self.token_name.SetValue('Token')
             self.Centre()
             wx.Frame(self.panel)
