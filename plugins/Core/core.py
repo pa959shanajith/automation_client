@@ -37,7 +37,6 @@ browsername = None
 qcdata = None
 qcObject = None
 soc=None
-qcConFlag=False
 browsercheckFlag=False
 updatecheckFlag=False
 chromeFlag=False
@@ -79,7 +78,7 @@ class MainNamespace(BaseNamespace):
     core_utils_obj = core_utils.CoreUtils()
 
     def on_message(self, *args):
-        global action,cw,browsername,desktopScrapeFlag,allow_connect,browsercheckFlag,connection_Timer,updatecheckFlag,communication_token
+        global action,cw,browsername,desktopScrapeFlag,allow_connect,browsercheckFlag,connection_Timer,updatecheckFlag
         try:
             if(str(args[0]) == 'connected'):
                 if(allow_connect):
@@ -97,11 +96,11 @@ class MainNamespace(BaseNamespace):
                         cw.rbox.Enable()
                     if browsercheckFlag == False:
                         browsercheckFlag = check_browser()
-                    if updatecheckFlag == False:
+                    if updatecheckFlag == False and root.gui:
                         msg='Checking for client package updates'
                         logger.print_on_console(msg)
                         log.info(msg)
-                        updatecheckFlag = check_update(True)
+                        updatecheckFlag = clientwindow.check_update(True)
                     if executionOnly:
                         msg='Execution only Mode enabled'
                         logger.print_on_console(msg)
@@ -523,8 +522,8 @@ class MainNamespace(BaseNamespace):
             responseHeader = stringHeader
             logger.print_on_console('responseHeader after:::',responseHeader)
             logger.print_on_console('responseBody:::::',responseBody)
-            log.info('responseHeader after:::',responseHeader)
-            log.info('responseBody:::::',responseBody)
+            log.info('responseHeader after:::' + str(responseHeader))
+            log.info('responseBody:::::' + str(responseBody))
             response=responseHeader+"rEsPONseBOdY:"+responseBody
             response=str(response)
             logger.print_on_console(response)
@@ -802,6 +801,7 @@ class SocketThread(threading.Thread):
             'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
         err_msg=None
         try:
+            core_utils_obj = core_utils.CoreUtils()
             icesession_enc = core_utils_obj.wrap(json.dumps(icesession), ice_ndac_key)
             icetoken_enc = core_utils_obj.wrap(json.dumps(self.ice_token), ice_ndac_key)
             params={'username':username,'icename': icename,'ice_action':self.ice_action,'icesession': icesession_enc,'icetoken': icetoken_enc}
@@ -1080,7 +1080,7 @@ class Main():
             global connection_Timer
             if mode == 'connect' or mode == 'register':
                 if self.ice_token:
-                    port = int(server_port)
+                    port = int(port)
                     conn = http.client.HTTPConnection(ip,port)
                     conn.connect()
                     conn.close()
@@ -1172,9 +1172,9 @@ class Main():
             logger.print_on_console(emsg)
             log.error(emsg)
 
-    def debug_scrape_event(self):
+    def debug_scrape(self):
         try:
-            global mobileScrapeFlag,qcConFlag,mobileWebScrapeFlag,desktopScrapeFlag, pdfScrapeFlag
+            global mobileScrapeFlag,mobileWebScrapeFlag,desktopScrapeFlag, pdfScrapeFlag
             global sapScrapeFlag,debugFlag,browsername,action,oebsScrapeFlag
             global socketIO,data
             cw.schedule.Disable()
@@ -1183,9 +1183,6 @@ class Main():
             if mobileScrapeFlag==True:
                 cw.scrapewindow = mobileScrapeObj.ScrapeWindow(parent = cw,id = -1, title="SLK Nineteen68 - Mobile Scrapper",filePath = browsername,socketIO = socketIO)
                 mobileScrapeFlag=False
-            elif qcConFlag==True:
-                cw.scrapewindow = qcConObj.QcWindow(parent = cw,id = -1, title="SLK Nineteen68 - Mobile Scrapper",filePath = qcdata,socketIO = socketIO)
-                qcConFlag=False
             elif mobileWebScrapeFlag==True:
                 cw.scrapewindow = mobileWebScrapeObj.ScrapeWindow(parent = cw,id = -1, title="SLK Nineteen68 - Mobile Scrapper",browser = browsername,socketIO = socketIO)
                 mobileWebScrapeFlag=False
@@ -1203,7 +1200,7 @@ class Main():
                 cw.scrapewindow = pdfScrapeObj.ScrapeDispatcher(parent = cw,id = -1, title="SLK Nineteen68 - PDF Scrapper",filePath = browsername,socketIO = socketIO,irisFlag = irisFlag)
                 pdfScrapeFlag=False
             elif debugFlag == True:
-                cw.debugwindow = DebugWindow(parent = cw,id = -1, title="Debugger")
+                cw.debugwindow = clientwindow.DebugWindow(parent = cw,id = -1, title="Debugger")
                 debugFlag = False
             else:
                 browsernumbers = ['1','2','3','6']

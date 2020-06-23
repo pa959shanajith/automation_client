@@ -24,6 +24,7 @@ icesession = None
 configvalues = None
 update_obj = None
 SERVER_LOC = None
+pdfgentool = None
 NINETEEN68_HOME = os.environ["NINETEEN68_HOME"]
 IMAGES_PATH = NINETEEN68_HOME + "/assets/images/"
 os.environ["IMAGES_PATH"] = IMAGES_PATH
