@@ -1156,16 +1156,16 @@ class Controller():
             print('=======================================================================================================')
         return status
 
-    def invoke_controller(self,action,mythread,debug_mode,runfrom_step,json_data,wxObject,socketIO,qc_soc,*args):
+    def invoke_controller(self,action,mythread,debug_mode,runfrom_step,json_data,root_obj,socketIO,qc_soc,*args):
         status = COMPLETED
         global terminate_flag,pause_flag,socket_object
         self.conthread=mythread
         self.clear_data()
+        wxObject = root_obj.cw
         socket_object = socketIO
         #Logic to make sure that logic of usage of existing driver is not applicable to execution
         if local_cont.web_dispatcher_obj != None:
             local_cont.web_dispatcher_obj.action=action
-        self.debug_choice=wxObject.choice
         if action==EXECUTE:
             if len(args)>0:
                 aws_mode=args[0]
@@ -1176,6 +1176,7 @@ class Controller():
             elif self.execution_mode == PARALLEL:
                 status = self.invoke_parralel_exe(mythread,json_data,socketIO,wxObject,self.configvalues,qc_soc,aws_mode)
         elif action==DEBUG:
+            self.debug_choice=wxObject.choice
             self.debug_mode=debug_mode
             self.wx_object=wxObject
             status=self.invoke_debug(mythread,runfrom_step,json_data)
