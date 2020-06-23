@@ -172,6 +172,7 @@ class MainNamespace(BaseNamespace):
                                 cw.connectbutton.SetToolTip(wx.ToolTip("Connect to Nineteen68 Server"))
                             logger.print_on_console(msg)
                             log.info(msg)
+                            if not self.gui: root._wants_to_close = True
                     """Enables Connect button again to re-register ICE with valid token"""
                     if root.ice_action == "register" and root.ice_token is None:
                         if root.gui:
@@ -179,11 +180,13 @@ class MainNamespace(BaseNamespace):
                             cw.enable_register()
                         else:
                             logger.print_on_console("ICE is not registered with Nineteen68. Try Again")
+                            if not self.gui: root._wants_to_close = True
                     if root.gui: cw.connectbutton.Enable()
                 except Exception as e:
                     logger.print_on_console('Error while checking connection request')
                     log.info('Error while checking connection request')
                     log.error(e)
+                    if not self.gui: root._wants_to_close = True
 
             elif(str(args[0]) == 'fail'):
                 fail_msg = "Fail"
@@ -1028,14 +1031,13 @@ class Main():
                 server_ip = configvalues['server_ip']
                 server_port = configvalues['server_port']
                 self.connection("connect", server_ip, server_port)
-                try:
-                    signal.signal(signal.SIGINT, self.close)
-                    while True:
-                        time.sleep(3)
-                        if self._wants_to_close: break
-                except KeyboardInterrupt: pass
-                finally: self.close()
-            else: self.close()
+            try:
+                signal.signal(signal.SIGINT, self.close)
+                while True:
+                    time.sleep(3)
+                    if self._wants_to_close: break
+            except KeyboardInterrupt: pass
+            finally: self.close()
 
     def close(self, *args):
         global connection_Timer
@@ -1095,7 +1097,7 @@ class Main():
                     log.info("Connection Timeout Timer Stopped")
                     connection_Timer.cancel()
                     connection_Timer=None
-                if self.gui: self._wants_to_close = True
+                if not self.gui: self._wants_to_close = True
         except Exception as e:
             emsg="Forbidden request, Connection refused, please configure server ip and server port in "
             if self.gui: emsg += "Edit -> Configuration"
