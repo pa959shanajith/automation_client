@@ -22,7 +22,7 @@
     "retrieveURL": "Yes",
     "screenShot_Flag": "All",
     "server_cert": "./assets/CA_BUNDLE/server.crt",
-    "server_ip": "<server-address>",
+    "server_ip": "sib-lt105120",
     "server_port": "8443",
     "stepExecutionWait": "1",
     "timeOut": "1",

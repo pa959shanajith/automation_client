@@ -23,7 +23,7 @@ os.environ["NINETEEN68_HOME"] = args.NINETEEN68_HOME
 if args.connect and args.register:
     parser.error("Register operation cannot be used with connect option")
 if (not args.register) and (args.host or args.token):
-    parser.error("Host/Token arguments can only be used with register operation")
+    parser.error("Host/Token arguments can only be used with register option")
 if args.register:
     if args.token is None:
         parser.error("Token cannot be empty for register operation")

@@ -150,6 +150,7 @@ class MainNamespace(BaseNamespace):
                         log.info(err_res)
                         threading.Timer(0.5,root.killSocket).start()
                     else:
+                        root.ice_action="connect"
                         if(response['res']=='success'):
                             allow_connect = True
                             if root.gui:
@@ -159,12 +160,12 @@ class MainNamespace(BaseNamespace):
                             controller.disconnect_flag=False
                         else:
                             """To save the token after successful registration"""
-                            root.ice_action="connect"
                             root.ice_token["hostname"]=socket.gethostname()
                             root.token_obj.save_token(root.ice_token)
-                            url = root.server_url.split(':')
-                            configvalues['server_ip']=url[0]
-                            configvalues['server_port']=url[1]
+                            with io.open(clientwindow.CONFIG_PATH, 'w', encoding='utf8') as outfile:
+                                str_ = json.dumps(configvalues,indent=4, sort_keys=True,separators=(',', ': '), ensure_ascii=False)
+                                outfile.write(str(str_))
+                            clientwindow.configvalues=configvalues
                             msg=response["icename"]+" : ICE registered successfully with Nineteen68"
                             if root.gui:
                                 cw.connectbutton.SetBitmapLabel(cw.connect_img)
@@ -172,7 +173,7 @@ class MainNamespace(BaseNamespace):
                                 cw.connectbutton.SetToolTip(wx.ToolTip("Connect to Nineteen68 Server"))
                             logger.print_on_console(msg)
                             log.info(msg)
-                            if not self.gui: root._wants_to_close = True
+                            if not root.gui: root._wants_to_close = True
                     """Enables Connect button again to re-register ICE with valid token"""
                     if root.ice_action == "register" and root.ice_token is None:
                         if root.gui:
@@ -180,13 +181,13 @@ class MainNamespace(BaseNamespace):
                             cw.enable_register()
                         else:
                             logger.print_on_console("ICE is not registered with Nineteen68. Try Again")
-                            if not self.gui: root._wants_to_close = True
+                            if not root.gui: root._wants_to_close = True
                     if root.gui: cw.connectbutton.Enable()
                 except Exception as e:
                     logger.print_on_console('Error while checking connection request')
                     log.info('Error while checking connection request')
                     log.error(e)
-                    if not self.gui: root._wants_to_close = True
+                    if not root.gui: root._wants_to_close = True
 
             elif(str(args[0]) == 'fail'):
                 fail_msg = "Fail"
@@ -790,7 +791,7 @@ class SocketThread(threading.Thread):
             key='USER'
         username=str(os.environ[key]).lower()
         icename=self.ice_token["icename"]
-        ice_type='normal'
+        ice_type='normal' if root.gui else 'ci-cd'
         self.ice_token["icetype"]=ice_type
         icesession = {
             'ice_id': str(uuid.uuid4()),
@@ -847,7 +848,7 @@ class TestThread(threading.Thread):
         self.con = ''
         self.action = action.lower()
         self.json_data = json_data
-        self.debug_mode = cw.debug_mode
+        self.debug_mode = False if not(self.cw) else self.cw.debug_mode
         self.aws_mode = aws_mode
         self.start()    # start the thread
 
@@ -962,6 +963,7 @@ class Main():
         self.socketthread = None
         self.ice_token = None
         self.server_url = None
+        self._wants_to_close=False
         self.opts = args
         global root, cw, browsercheckFlag, updatecheckFlag
         os.environ["ice_mode"] = "gui" if self.gui else "cli"
@@ -1073,6 +1075,8 @@ class Main():
                 url = url.split(":")
                 ## <<<< Add URL Validation >>>>
                 self.ice_token = token_info
+                configvalues['server_ip']=url[0]
+                configvalues['server_port']=url[1]
                 self.connection("connect", url[0], url[1], "register")
         except Exception as e:
             log.error(e)
