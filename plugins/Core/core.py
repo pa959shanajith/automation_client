@@ -78,7 +78,7 @@ class MainNamespace(BaseNamespace):
     core_utils_obj = core_utils.CoreUtils()
 
     def on_message(self, *args):
-        global action,cw,browsername,desktopScrapeFlag,allow_connect,browsercheckFlag,connection_Timer,updatecheckFlag
+        global action,cw,browsername,desktopScrapeFlag,allow_connect,browsercheckFlag,connection_Timer,updatecheckFlag,executionOnly
         try:
             if(str(args[0]) == 'connected'):
                 if(allow_connect):
@@ -139,6 +139,7 @@ class MainNamespace(BaseNamespace):
                     if(response['res']=="InvalidToken" or response["res"]=="InvalidICE"):
                         root.ice_action = "register" 
                         root.ice_token = None
+                        root.token_obj.delete_token()
                     err_res = None
                     if(response['id'] != icesession['ice_id'] and response['connect_time'] != icesession['connect_time']):
                         err_res="Invalid response received"
@@ -162,6 +163,7 @@ class MainNamespace(BaseNamespace):
                             """To save the token after successful registration"""
                             root.ice_token["hostname"]=socket.gethostname()
                             root.token_obj.save_token(root.ice_token)
+                            executionOnly = root.ice_token["icetype"] != "normal"
                             with io.open(clientwindow.CONFIG_PATH, 'w', encoding='utf8') as outfile:
                                 str_ = json.dumps(configvalues,indent=4, sort_keys=True,separators=(',', ': '), ensure_ascii=False)
                                 outfile.write(str(str_))
@@ -1065,13 +1067,11 @@ class Main():
         ice_ndac_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
             'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
         try:
-            try:
-                token_dec = core_utils.CoreUtils().unwrap(token,ice_ndac_key).split("@")
-            except: pass
+            token_dec = core_utils.CoreUtils().unwrap(token,ice_ndac_key).split("@")
             url = self.server_url
             if (url != "" and token != "" and  token_dec is not None 
             and url.lower() != "server-ip:port" and token.lower() != "token"):
-                token_info = {'token':token_dec[0], 'icename':token_dec[1]}
+                token_info = {'token':token_dec[0],'icetype':token_dec[1] ,'icename':token_dec[2]}
                 url = url.split(":")
                 ## <<<< Add URL Validation >>>>
                 self.ice_token = token_info
@@ -1079,6 +1079,7 @@ class Main():
                 configvalues['server_port']=url[1]
                 self.connection("connect", url[0], url[1], "register")
         except Exception as e:
+            if root.gui : self.cw.enable_register()
             log.error(e)
 
     def connection(self, mode, ip = None, port = None, action = "connect"):

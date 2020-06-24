@@ -16,7 +16,7 @@ import threading
 import os
 from constants import *
 import logging
-import clientwindow
+import core
 import platform
 if SYSTEM_OS != 'Darwin':
     import win32gui
@@ -992,7 +992,7 @@ class Singleton_DriverUtil():
 ##                flag1 = self.chrome_version(driver)
 ##                driver = None
                 ##print clientwindow.chromeFlag
-                if( clientwindow.chromeFlag == True ):
+                if( core.chromeFlag == True ):
                     choptions = webdriver.ChromeOptions()
                     choptions.add_argument('start-maximized')
                     if configvalues['extn_enabled'].lower()=='yes' and os.path.exists(webconstants.EXTENSION_PATH):
@@ -1027,7 +1027,7 @@ class Singleton_DriverUtil():
                     exec_path = webconstants.drivers_path+"/geckodriver"
                 else:
                     exec_path = webconstants.GECKODRIVER_PATH
-                if(clientwindow.firefoxFlag == True):
+                if(core.firefoxFlag == True):
                     if str(configvalues['firefox_path']).lower()!="default":
                         from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
                         binary = FirefoxBinary(str(configvalues['firefox_path']))

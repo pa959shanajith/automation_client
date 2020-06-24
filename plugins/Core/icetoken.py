@@ -65,6 +65,7 @@ class ICEToken():
     def delete_token(self):
         if os.path.exists(self.token_file):
             os.remove(self.token_file)
+        self.token=None
 
     """ Returns the appdatafolder based on the platform """
     def get_token_folder(self):
