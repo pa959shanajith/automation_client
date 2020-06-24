@@ -54,7 +54,7 @@ socketIO = None
 allow_connect = False
 icesession = None
 plugins_list = []
-configvalues = None
+configvalues = {}
 execution_flag = False
 closeActiveConnection = False
 connection_Timer = None
@@ -1079,7 +1079,7 @@ class Main():
                 configvalues['server_port']=url[1]
                 self.connection("connect", url[0], url[1], "register")
         except Exception as e:
-            if root.gui : self.cw.enable_register()
+            if root.gui: self.cw.enable_register()
             log.error(e)
 
     def connection(self, mode, ip = None, port = None, action = "connect"):
