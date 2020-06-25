@@ -1071,9 +1071,9 @@ class Main():
             url = self.server_url
             token_info = {'token':token_dec[0],'icetype':token_dec[1] ,'icename':token_dec[2]}
             url = url.split(":")
-            ## <<<< Add URL Validation >>>>
             self.ice_token = token_info
             configvalues['server_ip']=url[0]
+            if len(url) == 1: url.append("443")
             configvalues['server_port']=url[1]
             self.connection("connect", url[0], url[1], "register")
         except Exception as e:
@@ -1082,7 +1082,6 @@ class Main():
             log.error(e)
             if root.gui: self.cw.enable_register()
             else: self._wants_to_close = True
-            
 
     def connection(self, mode, ip = None, port = None, action = "connect"):
         try:
@@ -1166,7 +1165,7 @@ class Main():
                 self.ice_token = self.token_obj.token
                 executionOnly = self.ice_token["icetype"] != "normal"
                 if self.gui: cw.EnableAll()
-                elif self.opts.register : 
+                elif self.opts.register:
                     emsg = "Registration denied: ICE already Registered."
                     log.error(emsg)
                     logger.print_on_console(emsg)

@@ -14,7 +14,7 @@ parser.add_argument('-v', '--version', action='version', version='Nineteen68 ICE
 parser.add_argument('--register', action='store_true', help='Register Nineteen68 ICE with Nineteen68 Web Application.')
 reg_group = parser.add_argument_group("register")
 reg_group.add_argument('--host', type=str, help='Nineteen68 Web Application URL. Eg: https://example.com:8443. If no value is provided then value is read from configuration file.')
-reg_group.add_argument('--token', type=str, help='Registration token obtained during ICE Provisioning.')
+reg_group.add_argument('--token', type=str, help='Registration token obtained during ICE Provisioning. Input can be file or text.')
 parser.add_argument('--connect', action='store_true', help='Establish a connection between Nineteen68 Web Application and ICE.')
 args = parser.parse_args()
 if args.NINETEEN68_HOME and not os.path.exists(args.NINETEEN68_HOME+os.sep+'/plugins'):
@@ -27,6 +27,11 @@ if (not args.register) and (args.host or args.token):
 if args.register:
     if args.token is None:
         parser.error("Token cannot be empty for register operation")
+    elif os.path.exists(args.token):
+        try:
+            with open(args.token) as token_file:
+                args.token = token_file.read().replace('\n','').replace('\r','').strip()
+        except: parser.error("Invalid Token provided for register operation")
     if  args.host is None:
         print("No value provided for host. Reading values from configuration file")
 configvalues = readconfig.readConfig().readJson()

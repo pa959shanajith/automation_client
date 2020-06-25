@@ -20,8 +20,9 @@ log = logging.getLogger('icetoken.py')
 
 class ICEToken():
     def __init__(self):
-        self.token=None
-        self.enc_obj=CoreUtils()
+        self.token = None
+        self.tokenwindow = None
+        self.enc_obj = CoreUtils()
         self.check_token()
 
     """ Check for the ICE token. If exists, returns decrypted token """
@@ -44,7 +45,7 @@ class ICEToken():
     """ Registration window for token """
     def token_window(self,parent,images_path):
         self.tokenwindow=Token_window(parent = parent, id = -1, title="Nineteen68 Registration",images_path=images_path)
-    
+
     """ Registration window for token """
     def kill_window(self):
         if self.tokenwindow:
