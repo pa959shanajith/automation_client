@@ -1063,24 +1063,26 @@ class Main():
         sys.exit(0)
 
     def register(self, token):
-        token_dec = None
         ice_ndac_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
             'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
+        emsg = "Error: Invalid Server address or Token . Please try again"
         try:
             token_dec = core_utils.CoreUtils().unwrap(token,ice_ndac_key).split("@")
             url = self.server_url
-            if (url != "" and token != "" and  token_dec is not None 
-            and url.lower() != "server-ip:port" and token.lower() != "token"):
-                token_info = {'token':token_dec[0],'icetype':token_dec[1] ,'icename':token_dec[2]}
-                url = url.split(":")
-                ## <<<< Add URL Validation >>>>
-                self.ice_token = token_info
-                configvalues['server_ip']=url[0]
-                configvalues['server_port']=url[1]
-                self.connection("connect", url[0], url[1], "register")
+            token_info = {'token':token_dec[0],'icetype':token_dec[1] ,'icename':token_dec[2]}
+            url = url.split(":")
+            ## <<<< Add URL Validation >>>>
+            self.ice_token = token_info
+            configvalues['server_ip']=url[0]
+            configvalues['server_port']=url[1]
+            self.connection("connect", url[0], url[1], "register")
         except Exception as e:
-            if root.gui: self.cw.enable_register()
+            logger.print_on_console(emsg)
+            log.error(emsg)
             log.error(e)
+            if root.gui: self.cw.enable_register()
+            else: self._wants_to_close = True
+            
 
     def connection(self, mode, ip = None, port = None, action = "connect"):
         try:
@@ -1164,6 +1166,12 @@ class Main():
                 self.ice_token = self.token_obj.token
                 executionOnly = self.ice_token["icetype"] != "normal"
                 if self.gui: cw.EnableAll()
+                elif self.opts.register : 
+                    emsg = "Registration denied: ICE already Registered."
+                    log.error(emsg)
+                    logger.print_on_console(emsg)
+                    self._wants_to_close=True
+
             else:
                 if self.gui: self.token_obj.token_window(self, IMAGES_PATH)
                 else:
