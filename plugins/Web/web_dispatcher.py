@@ -350,23 +350,17 @@ class Dispatcher:
                 if(reporting_obj.browser_version == '' or reporting_obj.browser_version == None):
                     reporting_obj.browser_version= browser_info['browserVersion']
                 reporting_obj.browser_type=browser_info.get('browserName')
-                local_Wd.log.info(reporting_obj.browser_version)
-                local_Wd.log.info(reporting_obj.browser_type)
             elif browser_Keywords.local_bk.driver_obj is None:
-                reporting_obj.browser_type=BROWSER_NAME[int(input[0])]
-                reporting_obj.browser_version= 'N/A'
-                local_Wd.log.info(reporting_obj.browser_version)
-                local_Wd.log.info(reporting_obj.browser_type)
+                brws_num = int(input[0])
+                reporting_obj.browser_type = BROWSER_NAME[brws_num] if brws_num in BROWSER_NAME else 'N/A'
+                reporting_obj.browser_version = 'N/A'
+            local_Wd.log.info(reporting_obj.browser_version)
+            local_Wd.log.info(reporting_obj.browser_type)
 
 
         try:
             window_ops_list=['click','press','doubleclick','rightclick','uploadfile','acceptpopup','dismisspopup','selectradiobutton','selectcheckbox','unselectcheckbox','cellclick','clickelement','drag','drop','settext','sendvalue','cleartext','setsecuretext','sendsecurevalue','selectvaluebyindex','selectvaluebytext','selectallvalues','selectmultiplevaluesbyindexes','selectmultiplevaluesbytext','verifyvaluesexists','deselectall','setfocus','mousehover','tab','sendfunctionkeys','rightclick','mouseclick','openbrowser','navigatetourl','opennewbrowser','refresh','closebrowser','closesubwindows','switchtowindow','clearcache','navigatewithauthenticate']
-            if browser_Keywords.local_bk.driver_obj is not None:
-                browser_info=browser_Keywords.local_bk.driver_obj.capabilities
-                reporting_obj.browser_type=browser_info.get('browserName')
-                reporting_obj.browser_version=browser_info.get('version')
-                if(reporting_obj.browser_version == '' or reporting_obj.browser_version == None):
-                    reporting_obj.browser_version= browser_info['browserVersion']
+            if browser_Keywords.local_bk.driver_obj is not None: find_browser_info(reporting_obj)
             if keyword in list(self.web_dict.keys()):
                 flag=False
                 #Finding the webelement for NON_WEBELEMENT_KEYWORDS
@@ -424,19 +418,17 @@ class Dispatcher:
                     if flag and webelement==None and teststepproperty.custname!='@Browser':
                         result=list(result)
                         result[3]=WEB_ELEMENT_NOT_FOUND
+
                     if keyword == GET_INNER_TABLE and (output != '' and output.startswith('{') and output.endswith('}')):
                         local_Wd.webelement_map[output]=result[2]
-
                     elif keyword not in [OPEN_BROWSER,OPEN_NEW_BROWSER,CLOSE_BROWSER,GET_POPUP_TEXT,VERIFY_POPUP_TEXT]:
                         if configvalues['retrieveURL'].lower() == 'yes':
                             if result[0].lower() == 'fail':
                                 res,value=self.check_url_error_code()
                                 if res:
                                     result=TERMINATE
-
                     elif keyword==OPEN_BROWSER:
                         find_browser_info(reporting_obj)
-
 
             else:
                 err_msg=INVALID_KEYWORD

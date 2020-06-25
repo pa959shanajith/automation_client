@@ -865,10 +865,8 @@ class Controller():
             print('\n')
             tsplist = obj.read_step()
             for k in range(len(tsplist)):
-                if tsplist[k].name.lower() == 'openbrowser':
-                    if tsplist[k].apptype.lower()=='web':
-                        if not (IGNORE_THIS_STEP in tsplist[k].inputval[0].split(';')):
-                            tsplist[k].inputval = browser_type
+                if tsplist[k].name.lower() == 'openbrowser' and tsplist[k].apptype.lower()=='web' and (IGNORE_THIS_STEP not in tsplist[k].inputval[0].split(';')):
+                    tsplist[k].inputval = browser_type
         if flag:
             if runfrom_step > 0 and runfrom_step <= tsplist[len(tsplist)-1].stepnum:
                 self.conthread=mythread
@@ -1006,10 +1004,8 @@ class Controller():
                                         continue
                                     if not(aws_mode):
                                         for k in range(len(tsplist)):
-                                            if tsplist[k].name.lower() == 'openbrowser':
-                                                if tsplist[k].apptype.lower()=='web':
-                                                    if not (IGNORE_THIS_STEP in tsplist[k].inputval[0].split(';')):
-                                                            tsplist[k].inputval = [browser]
+                                            if tsplist[k].name.lower() == 'openbrowser' and tsplist[k].apptype.lower()=='web' and (IGNORE_THIS_STEP not in tsplist[k].inputval[0].split(';')):
+                                                tsplist[k].inputval = [browser]
                             if aws_mode:
                                 compile_status=False
                                 scenario_name=json_data['suitedetails'][suite_idx-1]["scenarioNames"][sc_idx]
@@ -1030,8 +1026,6 @@ class Controller():
                                     logger.print_on_console(msg)
                                     log.info(msg)
                                     tsplist=[]
-
-
                                 sc_idx+=1
                                 execute_flag=False
                             if flag and execute_flag :
