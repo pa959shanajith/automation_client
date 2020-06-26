@@ -11,6 +11,7 @@
     "exception_flag": "false",
     "extn_enabled": "No",
     "firefox_path": "default",
+	"headless_mode": "No",
     "hide_soft_key": "Yes",
     "highlight_check": "No",
     "ignoreVisibilityCheck": "No",

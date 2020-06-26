@@ -1554,6 +1554,7 @@ class Config_window(wx.Frame):
             "hide_soft_key":[(180,428)],
             "extn_enabled":[(320,428)],
             "update_check":[(12,488)],
+            "Headless_mode":[(150,488)],
             "Save":[(100,608), (100, 28)],
             "Close":[(250,608), (100, 28)]
         }
@@ -1588,6 +1589,7 @@ class Config_window(wx.Frame):
             "hide_soft_key":[(230,428)],
             "extn_enabled":[(400,428)],
             "update_check":[(12,480)],
+            "Headless_mode":[(130,480)],
             "Close":[(370,550),(120, 28)]
         }
         wx.Frame.__init__(self, parent, title=title,
@@ -1859,6 +1861,13 @@ class Config_window(wx.Frame):
             self.rbox14.SetSelection(0)
         else:
             self.rbox14.SetSelection(1)
+            
+        self.rbox15 = wx.RadioBox(self.panel, label = "Headless Mode", pos = config_fields["Headless_mode"][0], choices = lblList,
+         majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
+        if isConfigJson != False and isConfigJson['headless_mode'].title() == lblList[0]:
+            self.rbox15.SetSelection(0)
+        else:
+            self.rbox15.SetSelection(1)    
 
         self.error_msg=wx.StaticText(self.panel, label="", pos=(85,568),size=(350, 28), style=0, name="")
         self.save_btn=wx.Button(self.panel, label="Save",pos=config_fields["Save"][0], size=config_fields["Save"][1])
@@ -1956,6 +1965,7 @@ class Config_window(wx.Frame):
         conn_timeout = self.conn_timeout.GetValue()
         extn_enabled = self.rbox13.GetStringSelection()
         update_check = self.rbox14.GetStringSelection()
+        headless_mode = self.rbox15.GetStringSelection()
         delay_string_in = self.Delay_input.GetValue()
         #----------------creating data dictionary
         data['server_ip'] = server_add.strip()
@@ -1984,6 +1994,7 @@ class Config_window(wx.Frame):
         data['connection_timeout']= conn_timeout.strip()
         data['extn_enabled']= extn_enabled.strip()
         data['update_check']= update_check.strip()
+        data['headless_mode']=headless_mode.strip()
         data['delay_stringinput']=delay_string_in.strip()
         config_data=data
         if (data['server_ip']!='' and data['server_port']!='' and data['server_cert']!='' and

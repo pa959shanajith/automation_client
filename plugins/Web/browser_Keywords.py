@@ -993,7 +993,9 @@ class Singleton_DriverUtil():
                 ##print clientwindow.chromeFlag
                 if( clientwindow.chromeFlag == True ):
                     choptions = webdriver.ChromeOptions()
-                    choptions.add_argument('start-maximized')
+                    #choptions.add_argument('start-maximized')
+                    if str(configvalues['headless_mode'])=='Yes':
+                        choptions.add_argument('--headless')
                     if configvalues['extn_enabled'].lower()=='yes' and os.path.exists(webconstants.EXTENSION_PATH):
                         choptions.add_extension(webconstants.EXTENSION_PATH)
                     else:
@@ -1001,11 +1003,18 @@ class Singleton_DriverUtil():
                     if ((str(chrome_path).lower()) != 'default'):
                         choptions.binary_location=str(chrome_path)
                     driver = webdriver.Chrome(executable_path=exec_path,chrome_options=choptions)
+                    driver.navigate().refresh()
                     ##driver = webdriver.Chrome(desired_capabilities= choptions.to_capabilities(), executable_path = exec_path)
                     drivermap.append(driver)
                     driver.maximize_window()
-                    logger.print_on_console('Chrome browser started')
-                    local_bk.log.info('Chrome browser started')
+                    #logger.print_on_console('Chrome browser started')
+                    #local_bk.log.info('Chrome browser started')
+                    if str(configvalues['headless_mode'])=='Yes':
+                        logger.print_on_console('Headless Chrome browser started')
+                        local_bk.log.info('Headless Chrome browser started')
+                    else:    
+                        logger.print_on_console('Chrome browser started')
+                        local_bk.log.info('Chrome browser started') 
                 else:
                     logger.print_on_console('Chrome browser version not supported')
                     local_bk.log.info('Chrome browser version not supported')
@@ -1019,6 +1028,10 @@ class Singleton_DriverUtil():
             try:
                 caps=webdriver.DesiredCapabilities.FIREFOX
                 caps['marionette'] = True
+                from selenium.webdriver.firefox.options import Options
+                firefox_options = Options()
+                if str(configvalues['headless_mode'])=='Yes':
+                        firefox_options.add_argument('--headless')
                 if SYSTEM_OS == "Darwin":
                     exec_path = webconstants.drivers_path+"/geckodriver"
                 else:
@@ -1027,11 +1040,15 @@ class Singleton_DriverUtil():
                     if str(configvalues['firefox_path']).lower()!="default":
                         from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
                         binary = FirefoxBinary(str(configvalues['firefox_path']))
-                        driver = webdriver.Firefox(capabilities=caps, firefox_binary=binary, executable_path=exec_path)
+                        #driver = webdriver.Firefox(capabilities=caps, firefox_binary=binary, executable_path=exec_path)
+                        driver = webdriver.Firefox(capabilities=caps, firefox_binary=binary, executable_path=exec_path,options=firefox_options)
+                        driver.navigate().refresh()
                     else:
-                        driver = webdriver.Firefox(capabilities=caps,executable_path=exec_path)
+                        #driver = webdriver.Firefox(capabilities=caps,executable_path=exec_path)
+                        driver = webdriver.Firefox(capabilities=caps,executable_path=exec_path,options=firefox_options)
+                        driver.navigate().refresh()
                     drivermap.append(driver)
-                    driver.maximize_window()
+                    #driver.maximize_window()
                     logger.print_on_console('Firefox browser started using geckodriver')
                     local_bk.log.info('Firefox browser started using geckodriver ')
                 else:
