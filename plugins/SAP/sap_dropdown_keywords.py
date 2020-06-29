@@ -71,9 +71,14 @@ class Dropdown_Keywords():
                             break
                         i = i + 1
                     try:
-                        ses.FindById(id).key = arr_k[int(input_val[0])]
+                        if ( len(input_val) > 1 ):
+                            inp = input_val[3]
+                        else:
+                            inp = input_val[0]
+                        ses.FindById(id).key = arr_k[int(inp)]
                         status = sap_constants.TEST_RESULT_PASS
                         result = sap_constants.TEST_RESULT_TRUE
+                        del inp, entries, id, ses
                     except Exception as e:
                         err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
                         log.error( err_msg )
@@ -89,6 +94,7 @@ class Dropdown_Keywords():
             err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
             log.error( err_msg )
             logger.print_on_console( "Error occured in getValueByIndex" )
+        del i, arr_key, arr_val, sap_id, input_val
         return status, result, value, err_msg
 
     def getValueByIndex(self, sap_id, input_val, *args):
