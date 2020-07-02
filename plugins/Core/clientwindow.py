@@ -350,9 +350,7 @@ class ClientWindow(wx.Frame):
             name = self.connectbutton.GetName()
             self.connectbutton.Disable()
             if(name == 'connect' or name == 'register'):
-                server_ip=configvalues['server_ip']
-                server_port=configvalues['server_port']
-                root.connection(name, server_ip, server_port)
+                root.connection(name)
             else:
                 self.OnTerminate(event,"term_exec")
                 root.connection(name)

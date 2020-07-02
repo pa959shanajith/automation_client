@@ -10,6 +10,7 @@ import platform
 import uuid
 import signal
 from datetime import datetime
+from random import random
 import core_utils
 import logger
 import threading
@@ -52,12 +53,12 @@ irisFlag = True
 executionOnly=False
 socketIO = None
 allow_connect = False
-icesession = None
 plugins_list = []
 configvalues = {}
 execution_flag = False
 closeActiveConnection = False
 connection_Timer = None
+core_utils_obj = core_utils.CoreUtils()
 NINETEEN68_HOME = os.environ["NINETEEN68_HOME"]
 IMAGES_PATH = NINETEEN68_HOME + "/assets/images/"
 os.environ["IMAGES_PATH"] = IMAGES_PATH
@@ -73,19 +74,13 @@ if SYSTEM_OS == "Windows":
     GECKODRIVER_PATH += ".exe"
 
 
-
 class MainNamespace(BaseNamespace):
-    core_utils_obj = core_utils.CoreUtils()
-
     def on_message(self, *args):
         global action,cw,browsername,desktopScrapeFlag,allow_connect,browsercheckFlag,connection_Timer,updatecheckFlag,executionOnly
+        kill_conn = False
         try:
             if(str(args[0]) == 'connected'):
                 if(allow_connect):
-                    # ice_ndac_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
-                    #     'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
-                    # response = json.loads(self.core_utils_obj.unwrap(str(args[1]), ice_ndac_key))
-                    # communication_token=response["ct"]
                     if root.gui:
                         cw.schedule.Enable()
                         cw.cancelbutton.Enable()
@@ -94,6 +89,15 @@ class MainNamespace(BaseNamespace):
                         cw.rollbackItem.Enable(True)
                         cw.updateItem.Enable(True)
                         cw.rbox.Enable()
+                        sch_mode = cw.schedule.GetValue()
+                    else: sch_mode = False
+                    if sch_mode: socketIO.emit('toggle_schedule',sch_mode)
+                    msg = ("Schedule" if sch_mode else "Normal") + " Mode: Connection to the Nineteen68 Server established"
+                    logger.print_on_console(msg)
+                    log.info(msg)
+                    msg = "ICE Name: " + root.ice_token["icename"]
+                    logger.print_on_console(msg)
+                    log.info(msg)
                     if browsercheckFlag == False:
                         browsercheckFlag = check_browser()
                     if updatecheckFlag == False and root.gui:
@@ -105,20 +109,13 @@ class MainNamespace(BaseNamespace):
                         msg='Execution only Mode enabled'
                         logger.print_on_console(msg)
                         log.info(msg)
-                    if root.gui: sch_mode = cw.schedule.GetValue()
-                    else: sch_mode = False
-                    if sch_mode: socketIO.emit('toggle_schedule',sch_mode)
-                    msg = ("Schedule" if sch_mode else "Normal") + " Mode: Connection to the Nineteen68 Server established"
-                    logger.print_on_console(msg)
-                    log.info(msg)
                     conn_time = float(configvalues['connection_timeout'])
                     if (not (connection_Timer != None and connection_Timer.isAlive())
                      and (conn_time >= 8)):
                         log.info("Connection Timeout timer Started")
                         connection_Timer = threading.Timer(conn_time*60*60, root.closeConnection)
                         connection_Timer.start()
-                else:
-                    threading.Timer(1,root.killSocket).start()
+                else: kill_conn = True
 
             elif(str(args[0]) == 'schedulingEnabled'):
                 logger.print_on_console('Schedule Mode Enabled')
@@ -129,67 +126,52 @@ class MainNamespace(BaseNamespace):
                 log.info('Schedule Mode Disabled')
 
             elif(str(args[0]) == 'checkConnection'):
+                err_res = None
+                enable_reregister = False
                 try:
-                    global icesession,plugins_list
+                    global plugins_list
                     ice_ndac_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
                         'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
-                    response = json.loads(self.core_utils_obj.unwrap(str(args[1]), ice_ndac_key))
-                    plugins_list = response['plugins']
-                    """In case of InvalidToken and InvalidICE response from NDAC set ICEtoken to None"""
-                    if(response['res']=="InvalidToken" or response["res"]=="InvalidICE"):
-                        root.ice_action = "register" 
-                        root.ice_token = None
-                        root.token_obj.delete_token()
-                    err_res = None
-                    if(response['id'] != icesession['ice_id'] and response['connect_time'] != icesession['connect_time']):
+                    response = json.loads(core_utils_obj.unwrap(str(args[1]), ice_ndac_key))
+                    if(response['id'] != root.icesession['ice_id'] or response['connect_time'] != root.icesession['connect_time']):
                         err_res="Invalid response received"
-                    if(response['res'] != 'success'):
-                        if('err_msg' in response):
-                            err_res=response['err_msg']
-                    if(err_res is not None):
                         logger.print_on_console(err_res)
                         log.info(err_res)
-                        threading.Timer(0.5,root.killSocket).start()
+                        kill_conn = True
                     else:
-                        root.ice_action="connect"
-                        if(response['res']=='success'):
+                        if response['status'] != "allow": enable_reregister = True
+                        if response['res'] == 'success':
+                            executionOnly = root.ice_token["icetype"] != "normal"
                             allow_connect = True
+                            plugins_list = response['plugins']
                             if root.gui:
                                 cw.connectbutton.SetBitmapLabel(cw.disconnect_img)
                                 cw.connectbutton.SetName("disconnect")
                                 cw.connectbutton.SetToolTip(wx.ToolTip("Disconnect from Nineteen68 Server"))
                             controller.disconnect_flag=False
                         else:
-                            """To save the token after successful registration"""
-                            root.ice_token["hostname"]=socket.gethostname()
-                            root.token_obj.save_token(root.ice_token)
-                            executionOnly = root.ice_token["icetype"] != "normal"
-                            with io.open(clientwindow.CONFIG_PATH, 'w', encoding='utf8') as outfile:
-                                str_ = json.dumps(configvalues,indent=4, sort_keys=True,separators=(',', ': '), ensure_ascii=False)
-                                outfile.write(str(str_))
-                            clientwindow.configvalues=configvalues
-                            msg=response["icename"]+" : ICE registered successfully with Nineteen68"
-                            if root.gui:
-                                cw.connectbutton.SetBitmapLabel(cw.connect_img)
-                                cw.connectbutton.SetName('connect')
-                                cw.connectbutton.SetToolTip(wx.ToolTip("Connect to Nineteen68 Server"))
-                            logger.print_on_console(msg)
-                            log.info(msg)
-                            if not root.gui: root._wants_to_close = True
-                    """Enables Connect button again to re-register ICE with valid token"""
-                    if root.ice_action == "register" and root.ice_token is None:
-                        if root.gui:
-                            logger.print_on_console("ICE is not registered with Nineteen68 : Click to Register")
-                            cw.enable_register()
-                        else:
-                            logger.print_on_console("ICE is not registered with Nineteen68. Try Again")
-                            if not root.gui: root._wants_to_close = True
-                    if root.gui: cw.connectbutton.Enable()
+                            if 'err_msg' in response: err_res = response['err_msg']
+                            else: err_res = "Unable to Connect to Server"
+                            logger.print_on_console(err_res)
+                            log.info(err_res)
+                            kill_conn = True
                 except Exception as e:
-                    logger.print_on_console('Error while checking connection request')
-                    log.info('Error while checking connection request')
+                    err_res = 'Error while checking connection request'
+                    logger.print_on_console(err_res)
+                    log.info(err_res)
                     log.error(e)
-                    if not root.gui: root._wants_to_close = True
+                    kill_conn = True
+
+                if enable_reregister:
+                    root.ice_action = "register"
+                    root.ice_token = None
+                    root.token_obj.delete_token()
+                    if root.gui:
+                        logger.print_on_console("ICE is not registered with Nineteen68. Click to Register")
+                        cw.enable_register()
+                    else:
+                        logger.print_on_console("ICE is not registered with Nineteen68. Try Again")
+                if root.gui: cw.connectbutton.Enable()
 
             elif(str(args[0]) == 'fail'):
                 fail_msg = "Fail"
@@ -199,13 +181,18 @@ class MainNamespace(BaseNamespace):
                     fail_msg+="ed to disconnect from Nineteen68 Server"
                 logger.print_on_console(fail_msg)
                 log.info(fail_msg)
-                threading.Timer(0.1,root.killSocket).start()
+                kill_conn = True
 
         except Exception as e:
             err_msg='Error while Connecting to Server'
             log.error(err_msg)
             logger.print_on_console(err_msg)
             log.error(e,exc_info=True)
+            kill_conn = True
+
+        if kill_conn:
+            if root.gui: threading.Timer(0.5,root.killSocket).start()
+            else: root._wants_to_close = True
 
     def on_focus(self, *args):
         try:
@@ -714,10 +701,8 @@ class MainNamespace(BaseNamespace):
         if (socketIO is not None) and (not socketIO.waiting_for_close):
             ice_ndac_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
                 'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
-            icesession=json.loads(self.core_utils_obj.unwrap(socketIO._http_session.params['icesession'], ice_ndac_key))
-            icesession['connect_time'] = str(datetime.now())
-            icesession = self.core_utils_obj.wrap(json.dumps(icesession), ice_ndac_key)
-            socketIO._http_session.params['icesession'] = icesession
+            root.icesession['connect_time'] = str(datetime.now())
+            socketIO._http_session.params['icesession'] = core_utils_obj.wrap(json.dumps(root.icesession), ice_ndac_key)
             if root.gui:
                 if not bool(cw): return
                 cw.schedule.Disable()
@@ -752,35 +737,16 @@ class MainNamespace(BaseNamespace):
             log.error(e,exc_info=True)
 
 
-class SocketThread(threading.Thread):
+class ConnectionThread(threading.Thread):
     """Test Worker Thread Class."""
     daemon = True
 
-    def __init__(self, ice_token, ice_action):
+    def __init__(self, ice_action):
         """Init Worker Thread Class."""
-        super(SocketThread, self).__init__()
-        self.ice_token = ice_token
+        super(ConnectionThread, self).__init__()
         self.ice_action = ice_action
-        self.start()
 
-    def run(self):
-        """Run Worker Thread."""
-        # This is the code executing in the new thread.
-        reg_hostname = hostname = socket.gethostname()
-        if "hostname" in self.ice_token: reg_hostname=self.ice_token["hostname"]
-        """Check if registered hostname in the Token matches with the current hostname"""
-        if reg_hostname != hostname:
-            msg="Access denied: Hostname doesn't match. ICE is registered with a  different hostname "+reg_hostname
-            logger.print_on_console(msg)
-            log.error(msg)
-            self.ice_token = None
-            if root.gui: cw.enable_register()
-            return False
-
-        global socketIO, icesession, allow_connect
-        allow_connect = False
-        server_port = int(configvalues['server_port'])
-        server_IP = 'https://' + configvalues['server_ip']
+    def get_ice_session(self):
         server_cert = configvalues['server_cert']
         if configvalues["disable_server_cert"] == "Yes":
             server_cert = False
@@ -791,29 +757,48 @@ class SocketThread(threading.Thread):
         key='USERNAME'
         if key not in os.environ:
             key='USER'
-        username=str(os.environ[key]).lower()
-        icename=self.ice_token["icename"]
-        ice_type='normal' if root.gui else 'ci-cd'
-        self.ice_token["icetype"]=ice_type
-        icesession = {
+        username = str(os.environ[key]).lower()
+        # <<<< ICE TYPE CHECK CAN BE DONE HERE INSTEAD OF SERVER >>>>
+        root.ice_token["icetype"] = 'normal' if root.gui else 'ci-cd'
+        root.ice_token["hostname"] = socket.gethostname()
+        root.icesession = {
             'ice_id': str(uuid.uuid4()),
             'connect_time': str(datetime.now()),
             'username': username,
-            'hostname': hostname,
             'iceaction': self.ice_action,
-            'icetype': ice_type
+            'icetoken': root.ice_token,
+            'data': random()*100000000000000
         }
         ice_ndac_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
             'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
+        icesession_enc = core_utils_obj.wrap(json.dumps(root.icesession), ice_ndac_key)
+        params={'username': username, 'icename': root.ice_token["icename"],
+            'ice_action': self.ice_action, 'icesession': icesession_enc}
+        args = {"cert": client_cert, "params": params}
+        if server_cert != "default": args["verify"] = server_cert
+        return args
+
+    def run(self):
+        """Run Worker Thread."""
+        # This is the code executing in the new thread.
+        reg_hostname = hostname = socket.gethostname()
+        if "hostname" in root.ice_token: reg_hostname=root.ice_token["hostname"]
+        """Check if registered hostname in the Token matches with the current hostname"""
+        if reg_hostname != hostname:
+            msg="Access denied: Hostname doesn't match. ICE is registered with a  different hostname "+reg_hostname
+            logger.print_on_console(msg)
+            log.error(msg)
+            root.ice_token = None
+            if root.gui: cw.enable_register()
+            return False
+        global socketIO, allow_connect
+        allow_connect = False
         err_msg=None
+        server_port = int(configvalues['server_port'])
+        server_IP = 'https://' + configvalues['server_ip']
         try:
-            core_utils_obj = core_utils.CoreUtils()
-            icesession_enc = core_utils_obj.wrap(json.dumps(icesession), ice_ndac_key)
-            icetoken_enc = core_utils_obj.wrap(json.dumps(self.ice_token), ice_ndac_key)
-            params={'username':username,'icename': icename,'ice_action':self.ice_action,'icesession': icesession_enc,'icetoken': icetoken_enc}
-            kw_args = {"cert": client_cert, "params": params}
-            if server_cert != "default": kw_args["verify"] = server_cert
-            socketIO = SocketIO(server_IP,server_port,MainNamespace, **kw_args)
+            kw_args = self.get_ice_session()
+            socketIO = SocketIO(server_IP, server_port, MainNamespace, **kw_args)
             root.socketIO = socketIO
             socketIO.wait()
         except ValueError as e:
@@ -838,7 +823,7 @@ class TestThread(threading.Thread):
         super(TestThread, self).__init__()
         self.main = main
         self.cw = main.cw
-         #flag to pause thread
+        #flag to pause thread
         self.paused = False
         # Explicitly using Lock over RLock since the use of self.paused
         # break reentrancy anyway, and I believe using Lock could allow
@@ -964,8 +949,9 @@ class Main():
         self.testthread = None
         self.socketthread = None
         self.ice_token = None
+        self.icesession = None
         self.server_url = None
-        self._wants_to_close=False
+        self._wants_to_close = False
         self.opts = args
         global root, cw, browsercheckFlag, updatecheckFlag
         os.environ["ice_mode"] = "gui" if self.gui else "cli"
@@ -1032,9 +1018,13 @@ class Main():
             wx_app.MainLoop()
         else:
             if self.opts.connect:
-                server_ip = configvalues['server_ip']
-                server_port = configvalues['server_port']
-                self.connection("connect", server_ip, server_port)
+                connectmode = "connect"
+                if self.opts.token:
+                    msg = "Connecting ICE in guest mode"
+                    logger.print_on_console(msg)
+                    log.info(msg)
+                    connectmode = "guestconnect"
+                self.connection(connectmode)
             try:
                 signal.signal(signal.SIGINT, self.close)
                 while True:
@@ -1047,7 +1037,7 @@ class Main():
         global connection_Timer
         controller.terminate_flag = True
         controller.disconnect_flag = True
-        logger.print_on_console('Disconnected from Nineteen68 server')
+        if self.socketthread: logger.print_on_console('Disconnected from Nineteen68 server')
         if (connection_Timer != None and connection_Timer.isAlive()):
             log.info("Connection Timeout timer Stopped")
             connection_Timer.cancel()
@@ -1062,43 +1052,109 @@ class Main():
             os.system("TASKKILL /F /IM nineteen68MFapi.exe")
         sys.exit(0)
 
-    def register(self, token):
+    def register(self, token, hold = False):
         ice_ndac_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
             'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
         emsg = "Error: Invalid Server address or Token . Please try again"
         try:
-            token_dec = core_utils.CoreUtils().unwrap(token,ice_ndac_key).split("@")
-            url = self.server_url
+            token_dec = core_utils_obj.unwrap(token,ice_ndac_key).split("@")
             token_info = {'token':token_dec[0],'icetype':token_dec[1] ,'icename':token_dec[2]}
-            url = url.split(":")
             self.ice_token = token_info
+            url = self.server_url.split(":")
             configvalues['server_ip']=url[0]
             if len(url) == 1: url.append("443")
             configvalues['server_port']=url[1]
-            self.connection("connect", url[0], url[1], "register")
+            if not hold: self.connection("register")
         except Exception as e:
             logger.print_on_console(emsg)
             log.error(emsg)
             log.error(e)
-            if root.gui: self.cw.enable_register()
+            if self.gui: self.cw.enable_register()
             else: self._wants_to_close = True
 
-    def connection(self, mode, ip = None, port = None, action = "connect"):
+    def connection(self, mode):
         try:
-            global connection_Timer
-            if mode == 'connect' or mode == 'register':
+            if mode == 'register':
+                if self.ice_token is None:
+                    self.verifyRegistration()
+                    return None
+                kw_args = ConnectionThread(mode).get_ice_session()
+                data = kw_args.pop('params')
+                del data['username']
+                del data['ice_action']
+                server_url = "https://"+self.server_url+"/ICE_provisioning_register"
+                res = requests.post(server_url, data=data, **kw_args)
+                response = res.content
+                try:
+                    err_res = None
+                    enable_reregister = False
+                    if response == "fail":
+                        err_res = "ICE registration failed."
+                    else:
+                        ice_ndac_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
+                            'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
+                        response = json.loads(core_utils_obj.unwrap(response, ice_ndac_key))
+                    if err_res or response['id'] != self.icesession['ice_id'] or response['connect_time'] != self.icesession['connect_time']:
+                        if not err_res: err_res = "Invalid response received"
+                        logger.print_on_console(err_res)
+                        log.info(err_res)
+                        enable_reregister = True
+                    else:
+                        if response['res'] != 'success' and 'err_msg' in response: err_res = response['err_msg']
+                        if response['status'] != "validICE":
+                            enable_reregister = True
+                        if err_res is not None:
+                            logger.print_on_console(err_res)
+                            log.info(err_res)
+                        else:
+                            self.ice_action="connect"
+                            """To save the token after successful registration"""
+                            self.token_obj.save_token(self.ice_token)
+                            with io.open(clientwindow.CONFIG_PATH, 'w', encoding='utf8') as outfile:
+                                str_ = json.dumps(configvalues,indent=4, sort_keys=True,separators=(',', ': '), ensure_ascii=False)
+                                outfile.write(str(str_))
+                            clientwindow.configvalues = configvalues
+                            if self.gui:
+                                cw.connectbutton.SetBitmapLabel(cw.connect_img)
+                                cw.connectbutton.SetName('connect')
+                                cw.connectbutton.SetToolTip(wx.ToolTip("Connect to Nineteen68 Server"))
+                            msg='ICE "'+data["icename"]+'" registered successfully with Nineteen68'
+                            logger.print_on_console(msg)
+                            log.info(msg)
+                except Exception as e:
+                    err_res = 'Error in ICE Registration'
+                    logger.print_on_console(err_res)
+                    log.info(err_res)
+                    log.error(e, exc_info=True)
+                    enable_reregister = True
+                if enable_reregister:
+                    self.ice_action = "register"
+                    self.ice_token = None
+                    self.token_obj.delete_token()
+                    if self.gui:
+                        logger.print_on_console("ICE is not registered with Nineteen68. Click to Register")
+                        cw.enable_register()
+                    else:
+                        logger.print_on_console("ICE is not registered with Nineteen68. Try Again")
+                self.ice_token = None # Re-Check token ile on connection
+                if self.gui: cw.connectbutton.Enable()
+                else: self._wants_to_close = True
+            elif mode == 'connect' or "guestconnect":
                 if self.ice_token:
-                    port = int(port)
+                    ip = configvalues['server_ip']
+                    port = int(configvalues['server_port'])
                     conn = http.client.HTTPConnection(ip,port)
                     conn.connect()
                     conn.close()
-                    self.socketthread = SocketThread(self.ice_token, action)
+                    self.socketthread = ConnectionThread(mode)
+                    self.socketthread.start()
                 else:
                     self.verifyRegistration()
             else:
                 self.killSocket(True)
                 log.info('Disconnected from Nineteen68 server')
                 logger.print_on_console('Disconnected from Nineteen68 server')
+                global connection_Timer
                 if (connection_Timer != None and connection_Timer.isAlive()):
                     log.info("Connection Timeout Timer Stopped")
                     connection_Timer.cancel()
@@ -1109,7 +1165,7 @@ class Main():
             if self.gui: emsg += "Edit -> Configuration"
             else: emsg += "configuration file located at NINETEEN68_HOME/assets/config.json"
             emsg += ", and retry."
-            if action == "register":
+            if mode == "register":
                 self.ice_token=None
                 emsg = "Connection refused: Invalid Server URL."
                 if self.gui:
@@ -1131,7 +1187,7 @@ class Main():
                 socketIO.disconnect()
                 del socketIO
                 socketIO = None
-                root.socketthread.join()
+                self.socketthread.join()
                 log.info('Connection Closed')
         except Exception as e:
             log.error("Error while closing connection")
@@ -1163,20 +1219,32 @@ class Main():
             self.server_url = configvalues['server_ip']+':'+configvalues['server_port']
             if self.token_obj.token:
                 self.ice_token = self.token_obj.token
-                executionOnly = self.ice_token["icetype"] != "normal"
-                if self.gui: cw.EnableAll()
-                elif self.opts.register:
-                    emsg = "Registration denied: ICE already Registered."
+                emsg = None
+                icetype = self.ice_token["icetype"]
+                name = self.ice_token["icename"]
+                if self.gui:
+                    if icetype != "normal":
+                        emsg = "Access denied: "+name+" is registered for CI-CD mode. ICE has to run in command line mode"
+                    else:
+                        executionOnly = False
+                        cw.EnableAll()
+                else:
+                    if icetype != "ci-cd":
+                        emsg = "Access denied: "+name+" is registered for Normal mode. ICE has to run in GUI mode"
+                    elif self.opts.register:
+                        emsg = "Registration denied: ICE already Registered."
+                if emsg:
                     log.error(emsg)
                     logger.print_on_console(emsg)
-                    self._wants_to_close=True
-
+                    if not self.gui: self._wants_to_close=True
             else:
                 if self.gui: self.token_obj.token_window(self, IMAGES_PATH)
                 else:
+                    if self.opts.host is not None: self.server_url = self.opts.host
                     if self.opts.register:
-                        if self.opts.host is not None: self.server_url = self.opts.host
                         self.register(self.opts.token)
+                    elif self.opts.connect and self.opts.token:
+                        self.register(self.opts.token, hold=True)
                     else:
                         logger.print_on_console(emsg)
                         log.error(emsg)

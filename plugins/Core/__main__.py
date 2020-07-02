@@ -21,19 +21,22 @@ if args.NINETEEN68_HOME and not os.path.exists(args.NINETEEN68_HOME+os.sep+'/plu
     parser.error("Invalid path provided for NINETEEN68_HOME")
 os.environ["NINETEEN68_HOME"] = args.NINETEEN68_HOME
 if args.connect and args.register:
-    parser.error("Register operation cannot be used with connect option")
-if (not args.register) and (args.host or args.token):
-    parser.error("Host/Token arguments can only be used with register operation")
-if args.register:
+    parser.error("Register operation cannot be used with connect operation")
+if not (args.register or args.connect) and (args.host or args.token):
+    parser.error("Host/Token arguments can only be used with register/connect operation")
+if args.register or args.connect:
     if args.token is None:
-        parser.error("Token cannot be empty for register operation")
-    elif os.path.exists(args.token):
-        try:
-            with open(args.token) as token_file:
-                args.token = token_file.read().replace('\n','').replace('\r','').strip()
-        except: parser.error("Invalid Token provided for register operation")
-    if  args.host is None:
-        print("No value provided for host. Reading values from configuration file")
+        if args.register: parser.error("Token cannot be empty for register operation")
+        elif args.host is not None:
+            parser.error("Host cannot be specified without token")
+    else:
+        if os.path.exists(args.token):
+            try:
+                with open(args.token) as token_file:
+                    args.token = token_file.read().replace('\n','').replace('\r','').strip()
+            except: parser.error("Invalid Token provided for register operation")
+        if args.host is None:
+            print("No value provided for host. Reading values from configuration file")
 configvalues = readconfig.readConfig().readJson()
 
 """
