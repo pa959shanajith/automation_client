@@ -473,36 +473,36 @@ class Config_window(wx.Frame):
         if SYSTEM_OS=='Windows':
             config_fields= {
             "Frame":[(300, 150),(470,700)],
-            "S_address":[(12,8 ),(90, 28),(100,8 ),(140,-1)],
-            "S_port": [(270,8 ),(70, 28),(340,8 ), (105,-1)],
-            "Chrm_path":[(12,38),(80, 28),(100,38), (310,-1),(415,38),(30, -1)],
-            "Chrm_profile":[(12,68),(80, 28),(100,68), (310,-1),(415,68),(30, -1)],
-            "Ffox_path":[(12,98),(80, 28),(100,98), (310,-1),(415,98),(30, -1)],
-            "Log_path":[(12,128),(80, 28),(100,128), (310,-1),(415,128),(30, -1)],
-            "Q_timeout":[(12,158),(85, 28),(100,158), (80,-1)],
-            "Timeout":[(185,158),(50, 28),(240,158), (80,-1)],
-            "Delay":[(325,158),(40, 28),(360,158), (85,-1)],
-            "Step_exec":[(12,188),(120, 28),(130,188),(80,-1)],
-            "Disp_var":[(225,188),(140, 28),(360,188), (85,-1)],
-            "S_cert":[(12,218),(85, 28),(100,218),(310,-1),(415,218),(30, -1)],
-            "C_Timeout" :[(12,248),(120, 28),(130,248), (80,-1)],
-            "Delay_Stringinput":[(225,248),(140, 28),(360,248), (85,-1)],
-            "Ignore_cert":[(12,308)],
-            "IE_arch":[(150,308)],
-            "Dis_s_cert":[(290,308)],
-            "Ex_flag":[(12,368)],
-            "Ignore_v_check":[(150,368)],
-            "S_flag":[(340,428)],
-            "Ret_url":[(12,428)],
-            "En_secu_check":[(308,368)],
-            "Brow_ch":[(115,428)],
-            "High_ch":[ (225,428)],
-            "Iris_prediction":[(12,488)],
-            "hide_soft_key":[(180,488)],
-            "extn_enabled":[(320,488)],
-            "update_check":[(12,548)],
-            "Save":[(100,608), (100, 28)],
-            "Close":[(250,608), (100, 28)]
+            "S_address":[(12,12),(85, 25),(100,8),(140,-1)],
+            "S_port": [(270,12),(70, 25),(340,8), (105,-1)],
+            "Chrm_path":[(12,42),(80, 25),(100,38), (310,-1),(415,38),(30, -1)],
+            "Chrm_profile":[(12,72),(80, 25),(100,68), (310,-1),(415,68),(30, -1)],
+            "Ffox_path":[(12,102),(80, 25),(100,98), (310,-1),(415,98),(30, -1)],
+            "Log_path":[(12,132),(80, 25),(100,128), (310,-1),(415,128),(30, -1)],
+            "Q_timeout":[(12,162),(85, 25),(100,158), (70,-1)],
+            "Timeout":[(180,162),(50, 25),(240,158), (70,-1)],
+            "Delay":[(333,162),(40, 25),(375,158), (70,-1)],
+            "Step_exec":[(12,192),(110, 25),(135,188),(70,-1)],
+            "Disp_var":[(235,192),(135, 25),(375,188), (70,-1)],
+            "S_cert":[(12,222),(85, 25),(100,218),(310,-1),(415,218),(30, -1)],
+            "C_Timeout" :[(12,252),(120, 25),(135,248), (70,-1)],
+            "Delay_Stringinput":[(235,252),(130, 25),(375,248), (70,-1)],
+            "Ignore_cert":[(12,282)],
+            "IE_arch":[(150,282)],
+            "Dis_s_cert":[(290,282)],
+            "Ex_flag":[(12,348)],
+            "Ignore_v_check":[(150,348)],
+            "En_secu_check":[(308,348)],
+            "S_flag":[(340,408)],
+            "Ret_url":[(12,408)],
+            "Brow_ch":[(115,408)],
+            "High_ch":[ (225,408)],
+            "Iris_prediction":[(12,468)],
+            "hide_soft_key":[(180,468)],
+            "extn_enabled":[(320,468)],
+            "update_check":[(12,528)],
+            "Save":[(100,618), (100, 28)],
+            "Close":[(250,618), (100, 28)]
         }
         else:
             config_fields={
@@ -818,7 +818,7 @@ class Config_window(wx.Frame):
         else:
             self.rbox14.SetSelection(1)
 
-        self.error_msg=wx.StaticText(self.panel, label="", pos=(85,568),size=(350, 28), style=0, name="")
+        self.error_msg=wx.StaticText(self.panel, label="", pos=(85,588),size=(350, 25), style=0, name="")
         self.save_btn=wx.Button(self.panel, label="Save",pos=config_fields["Save"][0], size=config_fields["Save"][1])
         self.save_btn.Bind(wx.EVT_BUTTON, self.config_check)
         self.close_btn=wx.Button(self.panel, label="Close",pos=config_fields["Close"][0], size=config_fields["Close"][1])
@@ -1180,6 +1180,7 @@ class Config_window(wx.Frame):
         self.Destroy()
         global configvalues
         configvalues = readconfig.readConfig().readJson() # Re-reading config values
+        core.configvalues = configvalues
         core.browsercheckFlag=False
         if configvalues['browser_check'].lower() == 'no':
             core.browsercheckFlag=True

@@ -758,8 +758,6 @@ class ConnectionThread(threading.Thread):
         if key not in os.environ:
             key='USER'
         username = str(os.environ[key]).lower()
-        # <<<< ICE TYPE CHECK CAN BE DONE HERE INSTEAD OF SERVER >>>>
-        root.ice_token["icetype"] = 'normal' if root.gui else 'ci-cd'
         root.ice_token["hostname"] = socket.gethostname()
         root.icesession = {
             'ice_id': str(uuid.uuid4()),
@@ -1059,6 +1057,12 @@ class Main():
         try:
             token_dec = core_utils_obj.unwrap(token,ice_ndac_key).split("@")
             token_info = {'token':token_dec[0],'icetype':token_dec[1] ,'icename':token_dec[2]}
+            if self.gui and token_info["ice_type"] != "normal":
+                emsg = "Token is provisioned for CI-CD ICE. Either use a token provisioned for Normal mode or register ICE in command line mode."
+                raise ValueError("Invalid Token/ICE mode")
+            if not self.gui and token_info["ice_type"] == "normal":
+                emsg = "Token is provisioned for Normal ICE. Either use a token provisioned for CI-CD mode or register ICE in GUI mode."
+                raise ValueError("Invalid Token/ICE mode")
             self.ice_token = token_info
             url = self.server_url.split(":")
             configvalues['server_ip']=url[0]
@@ -1136,10 +1140,10 @@ class Main():
                         cw.enable_register()
                     else:
                         logger.print_on_console("ICE is not registered with Nineteen68. Try Again")
-                self.ice_token = None # Re-Check token ile on connection
+                self.ice_token = None # Re-Check token file on connection
                 if self.gui: cw.connectbutton.Enable()
                 else: self._wants_to_close = True
-            elif mode == 'connect' or "guestconnect":
+            elif mode == 'connect' or mode == "guestconnect":
                 if self.ice_token:
                     ip = configvalues['server_ip']
                     port = int(configvalues['server_port'])
