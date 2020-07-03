@@ -1057,10 +1057,10 @@ class Main():
         try:
             token_dec = core_utils_obj.unwrap(token,ice_ndac_key).split("@")
             token_info = {'token':token_dec[0],'icetype':token_dec[1] ,'icename':token_dec[2]}
-            if self.gui and token_info["ice_type"] != "normal":
+            if self.gui and token_info["icetype"] != "normal":
                 emsg = "Token is provisioned for CI-CD ICE. Either use a token provisioned for Normal mode or register ICE in command line mode."
                 raise ValueError("Invalid Token/ICE mode")
-            if not self.gui and token_info["ice_type"] == "normal":
+            if not self.gui and token_info["icetype"] == "normal":
                 emsg = "Token is provisioned for Normal ICE. Either use a token provisioned for CI-CD mode or register ICE in GUI mode."
                 raise ValueError("Invalid Token/ICE mode")
             self.ice_token = token_info
