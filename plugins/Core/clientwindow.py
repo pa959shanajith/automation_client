@@ -354,12 +354,13 @@ class ClientWindow(wx.Frame):
             else:
                 self.OnTerminate(event,"term_exec")
                 root.connection(name)
-                self.connectbutton.SetBitmapLabel(self.connect_img)
-                self.connectbutton.SetName('connect')
-                self.connectbutton.SetToolTip(wx.ToolTip("Connect to Nineteen68 Server"))
+                if self.connectbutton.GetName() != "register":
+                    self.connectbutton.SetBitmapLabel(self.connect_img)
+                    self.connectbutton.SetName('connect')
+                    self.connectbutton.SetToolTip(wx.ToolTip("Connect to Nineteen68 Server"))
+                    self.connectbutton.Enable()
                 self.schedule.SetValue(False)
                 self.schedule.Disable()
-                self.connectbutton.Enable()
                 self.rollbackItem.Enable(False)
                 self.updateItem.Enable(False)
         except:

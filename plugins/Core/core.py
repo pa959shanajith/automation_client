@@ -76,11 +76,19 @@ if SYSTEM_OS == "Windows":
 
 class MainNamespace(BaseNamespace):
     def on_message(self, *args):
-        global action,cw,browsername,desktopScrapeFlag,allow_connect,browsercheckFlag,connection_Timer,updatecheckFlag,executionOnly
+        global action,cw,browsername,desktopScrapeFlag,allow_connect,connection_Timer,updatecheckFlag,executionOnly
         kill_conn = False
         try:
             if(str(args[0]) == 'connected'):
-                if(allow_connect):
+                if allow_connect:
+                    sch_mode = cw.schedule.GetValue() if root.gui else False
+                    if sch_mode: socketIO.emit('toggle_schedule',sch_mode)
+                    msg = ("Schedule" if sch_mode else "Normal") + " Mode: Connection to the Nineteen68 Server established"
+                    logger.print_on_console(msg)
+                    log.info(msg)
+                    msg = "ICE Name: " + root.ice_token["icename"]
+                    logger.print_on_console(msg)
+                    log.info(msg)
                     if root.gui:
                         cw.schedule.Enable()
                         cw.cancelbutton.Enable()
@@ -89,17 +97,8 @@ class MainNamespace(BaseNamespace):
                         cw.rollbackItem.Enable(True)
                         cw.updateItem.Enable(True)
                         cw.rbox.Enable()
-                        sch_mode = cw.schedule.GetValue()
-                    else: sch_mode = False
-                    if sch_mode: socketIO.emit('toggle_schedule',sch_mode)
-                    msg = ("Schedule" if sch_mode else "Normal") + " Mode: Connection to the Nineteen68 Server established"
-                    logger.print_on_console(msg)
-                    log.info(msg)
-                    msg = "ICE Name: " + root.ice_token["icename"]
-                    logger.print_on_console(msg)
-                    log.info(msg)
                     if browsercheckFlag == False:
-                        browsercheckFlag = check_browser()
+                        check_browser()
                     if updatecheckFlag == False and root.gui:
                         msg='Checking for client package updates'
                         logger.print_on_console(msg)
@@ -688,6 +687,11 @@ class MainNamespace(BaseNamespace):
             msg = 'Connection termination request triggered remotely by ' + args[0]
             logger.print_on_console(msg)
             log.info(msg)
+            if (len(args) > 1 and args[1 == "dereg"]):
+                msg = 'ICE "'+root.ice_token["icename"]+'" is Deregistered.'
+                logger.print_on_console(msg)
+                log.info(msg)
+                root.token_obj.delete_token()
             if root.gui: threading.Timer(1,cw.OnNodeConnect,[wx.EVT_BUTTON]).start()
             else: threading.Timer(1,root.connection,["disconnect"]).start()
         except Exception as e:
@@ -1119,6 +1123,7 @@ class Main():
                                 outfile.write(str(str_))
                             clientwindow.configvalues = configvalues
                             if self.gui:
+                                cw.EnableAll()
                                 cw.connectbutton.SetBitmapLabel(cw.connect_img)
                                 cw.connectbutton.SetName('connect')
                                 cw.connectbutton.SetToolTip(wx.ToolTip("Connect to Nineteen68 Server"))
@@ -1140,20 +1145,33 @@ class Main():
                         cw.enable_register()
                     else:
                         logger.print_on_console("ICE is not registered with Nineteen68. Try Again")
-                self.ice_token = None # Re-Check token file on connection
                 if self.gui: cw.connectbutton.Enable()
                 else: self._wants_to_close = True
             elif mode == 'connect' or mode == "guestconnect":
-                if self.ice_token:
-                    ip = configvalues['server_ip']
-                    port = int(configvalues['server_port'])
-                    conn = http.client.HTTPConnection(ip,port)
-                    conn.connect()
-                    conn.close()
-                    self.socketthread = ConnectionThread(mode)
-                    self.socketthread.start()
-                else:
-                    self.verifyRegistration()
+                # Re-Check token file on connection
+                status = self.verifyRegistration(verifyonly = True)
+                if status == False:
+                    self.ice_action = "register"
+                    self.ice_token = None
+                    msg = "ICE is not registered with Nineteen68."
+                    if self.gui:
+                        msg += " Click to Register"
+                        logger.print_on_console(msg)
+                        log.error(msg)
+                        cw.enable_register()
+                    else:
+                        logger.print_on_console(msg)
+                        log.error(msg)
+                        self._wants_to_close = True
+                    return None
+                # ICE is registered
+                ip = configvalues['server_ip']
+                port = int(configvalues['server_port'])
+                conn = http.client.HTTPConnection(ip,port)
+                conn.connect()
+                conn.close()
+                self.socketthread = ConnectionThread(mode)
+                self.socketthread.start()
             else:
                 self.killSocket(True)
                 log.info('Disconnected from Nineteen68 server')
@@ -1162,8 +1180,10 @@ class Main():
                 if (connection_Timer != None and connection_Timer.isAlive()):
                     log.info("Connection Timeout Timer Stopped")
                     connection_Timer.cancel()
-                    connection_Timer=None
+                    connection_Timer = None
                 if not self.gui: self._wants_to_close = True
+                else:
+                    if not self.token_obj.token: cw.enable_register()
         except Exception as e:
             emsg="Forbidden request, Connection refused, please configure server ip and server port in "
             if self.gui: emsg += "Edit -> Configuration"
@@ -1214,7 +1234,7 @@ class Main():
             log.error(err_msg)
             log.error(e)
 
-    def verifyRegistration(self):
+    def verifyRegistration(self, verifyonly = False):
         global executionOnly
         emsg = "Nineteen68 ICE is not registered."
         executionOnly = True
@@ -1232,6 +1252,7 @@ class Main():
                     else:
                         executionOnly = False
                         cw.EnableAll()
+                        if verifyonly: cw.connectbutton.Disable()
                 else:
                     if icetype != "ci-cd":
                         emsg = "Access denied: "+name+" is registered for Normal mode. ICE has to run in GUI mode"
@@ -1241,8 +1262,11 @@ class Main():
                     log.error(emsg)
                     logger.print_on_console(emsg)
                     if not self.gui: self._wants_to_close=True
+                    return False
+                return True
             else:
-                if self.gui: self.token_obj.token_window(self, IMAGES_PATH)
+                if self.gui:
+                    if not verifyonly: self.token_obj.token_window(self, IMAGES_PATH)
                 else:
                     if self.opts.host is not None: self.server_url = self.opts.host
                     if self.opts.register:
@@ -1253,6 +1277,7 @@ class Main():
                         logger.print_on_console(emsg)
                         log.error(emsg)
                         self.close()
+                return False
         except Exception as e:
             log.error(e,exc_info=True)
             logger.print_on_console(emsg)
@@ -1319,6 +1344,7 @@ class Main():
 
 
 def check_browser():
+    global browsercheckFlag
     try:
         try:
             try:
@@ -1336,7 +1362,7 @@ def check_browser():
                 logger.print_on_console("Unable to locate ICE parameters")
                 log.error(e)
             global chromeFlag,firefoxFlag
-            logger.print_on_console('Checking for browser versions...')
+            logger.print_on_console('Browser compatibility check started')
             import subprocess
             from selenium import webdriver
             from selenium.webdriver import ChromeOptions
@@ -1406,12 +1432,16 @@ def check_browser():
             log.error(e,exc_info=True)
         if chromeFlag == True and firefoxFlag == True:
             logger.print_on_console('Current version of browsers are supported')
-        return True
+        browsercheckFlag = True
     except Exception as e:
-        logger.print_on_console("Error while checking browser compatibility")
-        log.debug("Error while checking browser compatibility")
+        err = "Error while checking for browser compatibility"
+        logger.print_on_console(err)
+        log.debug(err)
         log.debug(e)
-    return False
+        browsercheckFlag = False
+    finally:
+        logger.print_on_console('Browser compatibility check completed')
+    return browsercheckFlag
 
 
 def check_execution_lic(event):
