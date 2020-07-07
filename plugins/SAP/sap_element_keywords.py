@@ -428,7 +428,7 @@ class ElementKeywords():
                         row = int(args[0][0]) - 1
                         col = int(args[0][1]) - 1
                         elem = elem.GetCell(row, col)
-                    elif ( len(args[0]) > 2 ):
+                    elif ( len(args[0]) > 2 and len(args[0])==5 ):
                         row = int(args[0][3]) - 1
                         col = int(args[0][4]) - 1
                         elem = elem.GetCell(row, col)
@@ -481,7 +481,7 @@ class ElementKeywords():
                         row = int(args[0][0])-1
                         col = int(args[0][1])-1
                         elem = elem.GetCell(row, col)
-                    elif ( len(args[0]) > 2 ):
+                    elif ( len(args[0]) > 2 and len(args[0])==5 ):
                         row = int(args[0][3]) - 1
                         col = int(args[0][4]) - 1
                         elem = elem.GetCell(row, col)
