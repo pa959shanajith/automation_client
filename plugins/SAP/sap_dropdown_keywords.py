@@ -94,7 +94,7 @@ class Dropdown_Keywords():
             err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
             log.error( err_msg )
             logger.print_on_console( "Error occured in getValueByIndex" )
-        del i, arr_key, arr_val, sap_id, input_val
+        del i, arr_k, arr_v, sap_id, input_val
         return status, result, value, err_msg
 
     def getValueByIndex(self, sap_id, input_val, *args):
