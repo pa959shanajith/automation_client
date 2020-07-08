@@ -692,6 +692,7 @@ class MainNamespace(BaseNamespace):
                 logger.print_on_console(msg)
                 log.info(msg)
                 root.token_obj.delete_token()
+                root.ice_token = None
             if root.gui: threading.Timer(1,cw.OnNodeConnect,[wx.EVT_BUTTON]).start()
             else: threading.Timer(1,root.connection,["disconnect"]).start()
         except Exception as e:
