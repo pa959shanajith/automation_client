@@ -9,6 +9,7 @@ import base64
 import platform
 import uuid
 import signal
+import subprocess
 from datetime import datetime
 from random import random
 import core_utils
@@ -702,6 +703,7 @@ class MainNamespace(BaseNamespace):
             log.error(e,exc_info=True)
 
     def on_disconnect(self, *args):
+        if not allow_connect: return
         log.info('Disconnect triggered')
         if (socketIO is not None) and (not socketIO.waiting_for_close):
             ice_ndac_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
@@ -720,8 +722,8 @@ class MainNamespace(BaseNamespace):
                 msg = 'Connectivity issue with Nineteen68 Server. Attempting to restore connectivity...'
                 logger.print_on_console(msg)
                 log.error(msg)
-        if not bool(cw): return
         if root.ice_token:
+            if not bool(cw): return
             cw.connectbutton.SetBitmapLabel(cw.connect_img)
             cw.connectbutton.SetName('connect')
 
@@ -1034,7 +1036,6 @@ class Main():
                     time.sleep(3)
                     if self._wants_to_close: break
             except KeyboardInterrupt: pass
-            finally: self.close()
 
     def close(self, *args):
         global connection_Timer
@@ -1052,7 +1053,8 @@ class Main():
         self.killSocket(True)
         controller.kill_process()
         if SYSTEM_OS == "Windows":
-            os.system("TASKKILL /F /IM nineteen68MFapi.exe")
+            nul = subprocess.DEVNULL
+            subprocess.Popen("TASKKILL /F /IM nineteen68MFapi.exe", stdout=nul, stderr=nul)
         sys.exit(0)
 
     def register(self, token, hold = False):
@@ -1149,8 +1151,10 @@ class Main():
                 if self.gui: cw.connectbutton.Enable()
                 else: self._wants_to_close = True
             elif mode == 'connect' or mode == "guestconnect":
-                # Re-Check token file on connection
-                status = self.verifyRegistration(verifyonly = True)
+                if mode == "guestconnect": status = True
+                else:
+                    # Re-Check token file on connection
+                    status = self.verifyRegistration(verifyonly = True)
                 if status == False:
                     self.ice_action = "register"
                     self.ice_token = None
@@ -1364,7 +1368,6 @@ def check_browser():
                 log.error(e)
             global chromeFlag,firefoxFlag
             logger.print_on_console('Browser compatibility check started')
-            import subprocess
             from selenium import webdriver
             from selenium.webdriver import ChromeOptions
             p = subprocess.Popen(CHROME_DRIVER_PATH + ' --version', stdout=subprocess.PIPE, bufsize=1, shell=True)
