@@ -174,12 +174,12 @@ class ElementKeywords():
                         err_msg = sap_constants.INVALID_INPUT
                 #------------------------------Condition to check if its a simple-container element
                 elif ( elem.type == 'GuiSimpleContainer' ):
-                    arg = args[0]
-                    if ( len(arg) == 1 and arg[0] == '' ):
+                    if (len(args[0]) == 1 and args[0][0] == ''):
                         pass
-                    elif ( len( arg ) == 2 ):
-                        row = int(arg[0])-1
-                        col = int(arg[1])-1
+                    elif len(args[0]) == 3:
+                        row = int(args[0][0]) - 1
+                        col = int(args[0][1]) - 1
+                        input_val = args[0][2]
                         elem = self.sc.getElementFromCell(self.sc.createCustomTable(elem),row,col)
                     else:
                         elem = None
@@ -428,7 +428,7 @@ class ElementKeywords():
                         row = int(args[0][0]) - 1
                         col = int(args[0][1]) - 1
                         elem = elem.GetCell(row, col)
-                    elif ( len(args[0]) > 2 ):
+                    elif ( len(args[0]) > 2 and len(args[0])==5 ):
                         row = int(args[0][3]) - 1
                         col = int(args[0][4]) - 1
                         elem = elem.GetCell(row, col)
@@ -481,7 +481,7 @@ class ElementKeywords():
                         row = int(args[0][0])-1
                         col = int(args[0][1])-1
                         elem = elem.GetCell(row, col)
-                    elif ( len(args[0]) > 2 ):
+                    elif ( len(args[0]) > 2 and len(args[0])==5 ):
                         row = int(args[0][3]) - 1
                         col = int(args[0][4]) - 1
                         elem = elem.GetCell(row, col)
