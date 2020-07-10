@@ -62,8 +62,6 @@ class MobileDispatcher:
     number_picker_object=Number_picker_Keywords.Number_Picker()
     seekBar_object=seekBar_Mobility.Seek_Bar_Keywords()
     custom_object=android_custom.custom()
-    def __init__(self):
-        self.exception_flag=''
 
     mob_dict={
         'settext':textbox_keywords_object.set_text,
@@ -151,268 +149,38 @@ class MobileDispatcher:
     }
 
     def dispatcher(self,teststepproperty,input,reporting_obj):
-
-        global ELEMENT_FOUND,apptypes,ip
-        #result=(TEST_RESULT_FAIL,TEST_RESULT_FALSE)
-
+        global apptypes,ip
         objectname = teststepproperty.objectname
         object_name_ios = objectname
-
-
-
-
-
         output = teststepproperty.outputval
         objectname = objectname.strip()
-
-
         keyword = teststepproperty.name.lower()
-        #hello= teststepproperty.custname
-        #print keyword
-        #print input
-
         apptypes=teststepproperty.apptype
         err_msg=None
         result=[TEST_RESULT_FAIL,TEST_RESULT_FALSE,OUTPUT_CONSTANT,err_msg]
 
         try:
-            ELEMENT_FOUND=True
             if keyword in list(self.mob_dict.keys()):
-
-
-#################################                 IOS                ###################################
-                # input[0]=bundleid,input[1]=os version ,input[2]=IP,,input[3]=device_name
-                if SYSTEM_OS == 'wDarwin':
-
-
-                    #current_dir = (os.getcwd())
-                    dir_path = os.path.dirname(os.path.realpath(__file__))
-
-
-
-                    # set IP
-                    if (subprocess.getoutput('pgrep xcodebuild') == ''):
-
-                        try:
-
-                            with open(
-                                            dir_path + "/Nineteen68UITests/data.txt",
-                                    'wb') as f:
-                                f.write(input[2])  # send IP
-                        except Exception as e:
-                            log.error(e)
-
-                    # set run command
-                        input[3] = input[3].split(" ")
-                        input[3] = "\ ".join(input[3])
-                        if (input[3].split("=")[0] == "id"):
-                            name = input[3]
+                if teststepproperty.custname in ["@Android_Custom", "@CustomiOS"]:
+                    if (input[0] and (input[1] is not None) and input[2]):
+                        logger.print_on_console("Element type is ",input[0])
+                        logger.print_on_console("Visible text is ",input[1])
+                        logger.print_on_console("Index is ",input[2])
+                        if self.custom_object.custom_check(input,keyword) == False:
+                            logger.print_on_console("The object and the keyword do not match")
+                        elif (keyword==WAIT_FOR_ELEMENT_EXISTS):
+                            result=self.custom_object.waitforelement_exists(input)
                         else:
-                            name = "name=" + input[3]
-
-                        try:
-                            with open(dir_path + "/run.command", "wb") as f:
-                                f.write("#! /bin/bash \n")
-                                f.write(
-                                    "cd " + dir_path + "\n")
-                                f.write(
-                                    "xcodebuild -workspace Nineteen68.xcworkspace -scheme Nineteen68 -destination " +
-                                    name + " OS=" + input[1] +" >/dev/null "+ " test")
-
-                        except Exception as e:
-                            log.error(e)
-
-                        # subprocess.call("chmod a+x run.command")
-                        try:
-                            subprocess.Popen( dir_path +"/run.command", shell=True)
-
-                        except:
-                            log.error(ERROR_CODE_DICT["ERR_XCODE_DOWN"])
-
-                    if(keyword == "launchapplication"):
-                        ip = input[2]
-
-
-                    if object_name_ios == " " or keyword == "launchapplication":
-                        label = ""
-                        label_type = ""
+                            element,input=self.custom_object.custom_element(input,keyword)
+                            result=self.mob_dict[keyword](element,input)
                     else:
-                        label = object_name_ios.split("&$#")[0]
-                        label_type =object_name_ios.split("&$#")[1]
-
-                    input_text=input[0]
-                    #print "keyword = "+ keyword
-                    #print "label = "+ label
-                    #print "labeltype = "+ label_type
-                    #print "input = "+ input_text
-
-
-                    length_keyword = len(keyword.encode('utf-8'))
-                    length_input_text = len(input_text.encode('utf-8'))
-                    try:
-                        length_label = len(label.encode('utf-8'))
-                    except:
-                        length_label = len(label.decode('utf-8').encode('utf-8'))
-
-                    length_label_type = len(label_type.encode('utf-8'))
-
-
-                    # create socket
-                    timer = 0
-                    while True:
-                        try:
-                            clientsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                            clientsocket.connect((ip, 8022))
-                            clientsocket.send(XCODE_EXECUTE)
-                            break
-                        except:
-                            timer+=1
-                            if timer == 130:
-                                log.error(ERROR_CODE_DICT["ERR_TIMEOUT"])
-                                break
-                            time.sleep(1)
-
-
-                    # keyword
-                    clientsocket.send(str(len(str(length_keyword))))
-                    clientsocket.send(str(length_keyword))
-                    clientsocket.send(keyword)
-
-                    # label
-                    if label == "":
-                        clientsocket.send("0")
-                    else:
-                        clientsocket.send(str(len(str(length_label))))
-                        clientsocket.send(str(length_label))
-                        clientsocket.send(label)
-
-                    # label type
-                    if label_type == "":
-                        clientsocket.send("0")
-                    else:
-                        clientsocket.send(str(len(str(length_label_type))))
-                        clientsocket.send(str(length_label_type))
-                        clientsocket.send(label_type)
-
-                    # input
-                    if input_text == "":
-                        clientsocket.send("0")
-                    else:
-                        clientsocket.send(str(len(str(length_input_text))))
-                        clientsocket.send(str(length_input_text))
-                        clientsocket.send(input_text)
-                    #edit
-                    EOF="terminate"
-                    fragments=""
-                    while True:
-                        chunck = clientsocket.recv(10000)
-                        if chunck.endswith(EOF):
-                            idx = chunck.index(EOF)
-                            fragments += chunck[:idx]
-                            break
-                        fragments += chunck
-
-                    img_data = fragments.split("!@#$%^&*()")[0]
-                    data = fragments.split("!@#$%^&*()")[1]
-                    try:
-                        string_value = fragments.split("!@#$%^&*()")[2]
-                    except:
-                        string_value = ""
-
-                    #edit
-
-                    string_data = data.decode('utf-8')
-
-
-
-                    if (keyword == "launchapplication" and string_data == ""):
-                        result = MobileDispatcher().dispatcher(teststepproperty,input,reporting_obj)
-                        return result
-
-                    if ( string_data == "" ):
-                        result = MobileDispatcher().dispatcher(teststepproperty,input,reporting_obj)
-                        return result
-
-
-                    if string_data == XCODE_ERROR:
-                        log.error(string_value)
-                        logger.print_on_console(string_value)
-                        status = TEST_RESULT_FAIL
-                        result1 = TEST_RESULT_FALSE
-                        output = None
-                        err_msg = None
-
-
-                    elif string_data == (XCODE_PASSVALUE) or string_data == (XCODE_PASS):
-                        if string_data == (XCODE_PASSVALUE):
-                            string_value = string_value.decode('utf-8')
-                            output = string_value
-
-                            #print output
-                        if string_data == (XCODE_PASS):
-                            output = None
-                        status = TEST_RESULT_PASS
-                        result1 = TEST_RESULT_TRUE
-                        err_msg = None
-                    else:
-                        status = TEST_RESULT_FAIL
-                        result1 = False
-                        output = None
-                        err_msg = None
-                    result=(status,result1,output,err_msg)
-                    if keyword not in NON_WEBELEMENT_KEYWORDS:
-                        if self.action == 'execute':
-                            result=list(result)
-                            screen_shot_obj = mob_screenshot.Screenshot()
-                            configobj = readconfig.readConfig()
-                            configvalues = configobj.readJson()
-                            if configvalues['screenShot_Flag'].lower() == 'fail':
-                                if result[0].lower() == 'fail':
-                                    file_path =screen_shot_obj.captureScreenshot()
-                                    result.append(file_path[2])
-                            elif configvalues['screenShot_Flag'].lower() == 'all':
-                                file_path = screen_shot_obj.captureScreenshot()
-                                result.append(file_path[2])
-                            import base64
-                            try:
-                                if img_data == "":
-                                        log.error("screenshot capture failed")
-                                else:
-                                    img_data += "=" * ((4 - len(img_data) % 4) % 4)
-                                    png_recovered = base64.decodestring(img_data)
-                                    f = open(file_path[2], "w")
-                                    f.write(png_recovered)
-                                    f.close()
-                            except Exception as e:
-                                log.error(e)
-
-
-#################################                 Android                ###################################
+                        logger.print_on_console(INVALID_INPUT,": NULL object used in input")
+                        result[3]=INVALID_INPUT+": NULL object used in input"
+                elif keyword==WAIT_FOR_ELEMENT_EXISTS:
+                    result=self.mob_dict[keyword](objectname,input)
                 else:
-                    driver = android_scrapping.driver
-                    if teststepproperty.custname in ["@Android_Custom", "@CustomiOS"]:
-                        if (input[0] and (input[1] is not None) and input[2]):
-                            logger.print_on_console("Element type is ",input[0])
-                            logger.print_on_console("Visible text is ",input[1])
-                            logger.print_on_console("Index is ",input[2])
-                            if self.custom_object.custom_check(input,keyword) == False:
-                                logger.print_on_console("The object and the keyword do not match")
-                                result=TERMINATE
-                            elif (keyword==WAIT_FOR_ELEMENT_EXISTS):
-                                result=self.custom_object.waitforelement_exists(input)
-                            else:
-                                element,input=self.custom_object.custom_element(input,keyword)
-                                result=self.mob_dict[keyword](element,input)
-                        else:
-                            logger.print_on_console(INVALID_INPUT,": NULL object used in input")
-                            result[3]=INVALID_INPUT+": NULL object used in input"
-                    elif keyword==WAIT_FOR_ELEMENT_EXISTS:
-                        result=self.mob_dict[keyword](objectname,input)
-                    else:
-                        element, xpath=self.getMobileElement(driver,objectname)
-                        result=self.mob_dict[keyword](element,input,xpath)
-                if not(ELEMENT_FOUND) and self.exception_flag:
-                    result=TERMINATE
+                    element, xpath=self.getMobileElement(android_scrapping.driver,objectname)
+                    result=self.mob_dict[keyword](element,input,xpath)
             else:
                 err_msg=INVALID_KEYWORD
                 result[3]=err_msg
@@ -441,7 +209,6 @@ class MobileDispatcher:
     def getMobileElement(self,driver,objectname):
         objectname = str(objectname)
         mobileElement = None
-        global ELEMENT_FOUND
         xpath = None
         id = None
         if objectname.strip() != '':
@@ -480,6 +247,4 @@ class MobileDispatcher:
                 except Exception as Ex:
                     log.debug('Element not found')
                     log.debug(str(Ex))
-        if mobileElement==None:
-            ELEMENT_FOUND=False
         return mobileElement, xpath

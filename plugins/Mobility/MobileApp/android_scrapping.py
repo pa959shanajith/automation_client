@@ -104,6 +104,8 @@ class InstallAndLaunch():
         from appium import webdriver
         try:
             if SYSTEM_OS == 'Darwin' :
+                if driver is not None:
+                    return driver
                 if self.start_server():
                     self.desired_caps = {}
                     self.desired_caps['platformName'] = 'iOS'
@@ -121,7 +123,9 @@ class InstallAndLaunch():
                     self.desired_caps['log_level'] = False
                     self.desired_caps['app'] = apk_path
                     driver = webdriver.Remote('http://0.0.0.0:4723/wd/hub', self.desired_caps)
-
+                else:
+                    driver = None
+                    return None
             else:
                 global device_id, packageName, device_keywords_object
                 processes = psutil.net_connections()
@@ -161,6 +165,10 @@ class InstallAndLaunch():
                                 self.desired_caps['adbExecTimeout'] = 120000
                             driver = webdriver.Remote('http://localhost:4723/wd/hub', self.desired_caps)
                             device_id = device_name
+                    else:
+                        driver = None
+                        device_id = None
+                        return None
                 except Exception as e:
                     self.print_error("Not able to install or launch application")
                     log.error(e,exc_info=True)
@@ -214,14 +222,14 @@ class BuildJson:
         object_type = {
             #Android
             'android.widget.TimePicker' : '_timepicker', 'android.widget.DatePicker' : '_datepicker', 'android.widget.RadioButton' : '_radiobtn', 'android.widget.Button' : '_btn',
-            'android.widget.EditText' : '_txtbox', 'android.widget.Switch' : '_switch', 'android.widget.CheckBox' : '_chkbox', 'android.widget.Spinner' : '_spinner',
+            'android.widget.EditText' : '_txtbox', 'android.widget.Switch' : '_switch', 'android.widget.CheckBox' : '_chkbox', 'android.widget.CheckedTextView' : '_chkdtxtview', 'android.widget.Spinner' : '_spinner',
             'android.widget.NumberPicker' : '_numberpicker', 'android.widget.SeekBar' : '_seekbar', 'android.widget.ListView' : '_listview', 'android.widget.ImageButton' : '_imagebtn',
             'android.widget.LinearLayout' : '_linearlayout', 'android.widget.TextView' : '_txtview', 'android.widget.FrameLayout' : '_framelayout', 'android.widget.ImageView' : '_img',
-            'android.widget.RelativeLayout' : '_relativelayout', 'android.widget.ScrollView' : '_scrollview', 'android.view.ViewGroup' : '_viewgroup',
+            'android.widget.RelativeLayout' : '_relativelayout', 'android.view.View' : '_view',
             #iOS
             'XCUIElementTypeTextField' : '_textfield', 'XCUIElementTypeSearchField' : '_searchfield', 'XCUIElementTypeSecureTextField' : '_securetextfield', 'XCUIElementTypeRadioButton' : '_radio',
             'XCUIElementTypeButton' : '_button', 'XCUIElementTypeSwitch' : '_switch', 'XCUIElementTypeToggle' : '_toggle', 'XCUIElementTypeCheckBox' : '_checkbox',
-            'XCUIElementTypePickerWheel' : '_picker', 'XCUIElementTypeSlider': '_slider', 'XCUIElementTypeLink' : '_link', 'XCUIElementTypeTextView' : '_text', 'XCUIElementTypeStaticText' : '_text',
+            'XCUIElementTypePickerWheel' : '_picker', 'XCUIElementTypeSlider': '_slider', 'XCUIElementTypeLink' : '_link', 'XCUIElementTypeTextView' : '_txtview', 'XCUIElementTypeStaticText' : '_statictxt',
             'XCUIElementTypeImage' : '_image', 'XCUIElementTypeIcon' : '_icon', 'XCUIElementTypeTable' : '_table', 'XCUIElementTypeCell' : '_cell', 'XCUIElementTypeKey'  : '_key'
         }
         try:

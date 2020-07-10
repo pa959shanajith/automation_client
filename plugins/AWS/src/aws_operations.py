@@ -287,7 +287,7 @@ class AWS_Operations:
                 test_run_arn,
                 get_status_callable=lambda x: x['run']['status'],
                 success_statuses=('COMPLETED', ),
-                check_every_seconds=60,
+                check_every_seconds=20,
                 timeout_seconds=timeout,
                 
             )
