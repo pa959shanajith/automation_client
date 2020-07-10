@@ -12,11 +12,12 @@ import subprocess
 import threading
 import socket
 import datetime
-import clientwindow
-log = logging.getLogger('bench_mark.py')
+import core
+
+log = logging.getLogger('benchmark.py')
 resArray = []
 string = ""
-host = ["10.41.31.99", "google.com"]
+host = [core.configvalues["server_ip"], "google.com"]
 socketIO = None
 bench_thread = []
 threadNames = []
@@ -201,7 +202,7 @@ def execute(name,schedTime):
     timeNow =  datetime.datetime.today()
     delta = schedTime - timeNow
     
-    if clientwindow.execution_flag:
+    if core.execution_flag:
         logger.print_on_console("Execution in progress, terminating Benchmark Execution")
         start(delta.seconds,name,schedTime)
         return

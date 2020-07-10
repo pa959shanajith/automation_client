@@ -156,18 +156,20 @@ class Reporting:
             purpose : builds the overallstatus field of condition check report_json
 
             """
-            self.start_time = datetime.now()
-            self.end_time = datetime.now()
-            self.ellapsed_time = self.end_time - self.start_time
+            start_time = datetime.now()
+            end_time = datetime.now()
+            self.ellapsed_time = str(end_time - start_time)
+            self.start_time=str(start_time)
+            self.end_time=str(end_time)
             getTym = self.end_time.split(".")[0]
             getDat = getTym.split(" ")[0].split("-")
             self.date = getDat[1] + "/" + getDat[2] + "/" + getDat[0]
             self.time = getTym.split(" ")[1]
             obj={}
-            obj[ELLAPSED_TIME]=str(self.ellapsed_time)
-            obj[END_TIME]=str(self.end_time)
+            obj[ELLAPSED_TIME]=self.ellapsed_time
+            obj[END_TIME]=self.end_time
             obj[BROWSER_VERSION]=self.browser_version
-            obj[START_TIME]=str(self.start_time)
+            obj[START_TIME]=self.start_time
             obj[OVERALLSTATUS]=INCOMPLETE
             # Bug #246 (Himanshu) browser type should not be empty or null for reports
             obj[BROWSER_TYPE]=self.browser_type
@@ -181,18 +183,20 @@ class Reporting:
             purpose : builds the overallstatus field of condition check if any testcase is empty report_json
 
             """
-            self.start_time = datetime.now()
-            self.end_time = datetime.now()
-            self.ellapsed_time = self.end_time - self.start_time
+            start_time = datetime.now()
+            end_time = datetime.now()
+            self.ellapsed_time = str(end_time - start_time)
+            self.start_time=str(start_time)
+            self.end_time=str(end_time)
             getTym = self.end_time.split(".")[0]
             getDat = getTym.split(" ")[0].split("-")
             self.date = getDat[1] + "/" + getDat[2] + "/" + getDat[0]
             self.time = getTym.split(" ")[1]
             obj={}
-            obj[ELLAPSED_TIME]=str(self.ellapsed_time)
-            obj[END_TIME]=str(self.end_time)
+            obj[ELLAPSED_TIME]=self.ellapsed_time
+            obj[END_TIME]=self.end_time
             obj[BROWSER_VERSION]=self.browser_version
-            obj[START_TIME]=str(self.start_time)
+            obj[START_TIME]=self.start_time
             obj[OVERALLSTATUS]=TERMINATE
             # Bug #246 (Himanshu) browser type should not be empty or null for reports
             obj[BROWSER_TYPE]=self.browser_type

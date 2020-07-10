@@ -865,10 +865,8 @@ class Controller():
             print('\n')
             tsplist = obj.read_step()
             for k in range(len(tsplist)):
-                if tsplist[k].name.lower() == 'openbrowser':
-                    if tsplist[k].apptype.lower()=='web':
-                        if not (IGNORE_THIS_STEP in tsplist[k].inputval[0].split(';')):
-                            tsplist[k].inputval = browser_type
+                if tsplist[k].name.lower() == 'openbrowser' and tsplist[k].apptype.lower()=='web' and (IGNORE_THIS_STEP not in tsplist[k].inputval[0].split(';')):
+                    tsplist[k].inputval = browser_type
         if flag:
             if runfrom_step > 0 and runfrom_step <= tsplist[len(tsplist)-1].stepnum:
                 self.conthread=mythread
@@ -1006,10 +1004,8 @@ class Controller():
                                         continue
                                     if not(aws_mode):
                                         for k in range(len(tsplist)):
-                                            if tsplist[k].name.lower() == 'openbrowser':
-                                                if tsplist[k].apptype.lower()=='web':
-                                                    if not (IGNORE_THIS_STEP in tsplist[k].inputval[0].split(';')):
-                                                            tsplist[k].inputval = [browser]
+                                            if tsplist[k].name.lower() == 'openbrowser' and tsplist[k].apptype.lower()=='web' and (IGNORE_THIS_STEP not in tsplist[k].inputval[0].split(';')):
+                                                tsplist[k].inputval = [browser]
                             if aws_mode:
                                 compile_status=False
                                 scenario_name=json_data['suitedetails'][suite_idx-1]["scenarioNames"][sc_idx]
@@ -1030,8 +1026,6 @@ class Controller():
                                     logger.print_on_console(msg)
                                     log.info(msg)
                                     tsplist=[]
-
-
                                 sc_idx+=1
                                 execute_flag=False
                             if flag and execute_flag :
@@ -1156,16 +1150,16 @@ class Controller():
             print('=======================================================================================================')
         return status
 
-    def invoke_controller(self,action,mythread,debug_mode,runfrom_step,json_data,wxObject,socketIO,qc_soc,*args):
+    def invoke_controller(self,action,mythread,debug_mode,runfrom_step,json_data,root_obj,socketIO,qc_soc,*args):
         status = COMPLETED
         global terminate_flag,pause_flag,socket_object
         self.conthread=mythread
         self.clear_data()
+        wxObject = root_obj.cw
         socket_object = socketIO
         #Logic to make sure that logic of usage of existing driver is not applicable to execution
         if local_cont.web_dispatcher_obj != None:
             local_cont.web_dispatcher_obj.action=action
-        self.debug_choice=wxObject.choice
         if action==EXECUTE:
             if len(args)>0:
                 aws_mode=args[0]
@@ -1176,6 +1170,7 @@ class Controller():
             elif self.execution_mode == PARALLEL:
                 status = self.invoke_parralel_exe(mythread,json_data,socketIO,wxObject,self.configvalues,qc_soc,aws_mode)
         elif action==DEBUG:
+            self.debug_choice=wxObject.choice
             self.debug_mode=debug_mode
             self.wx_object=wxObject
             status=self.invoke_debug(mythread,runfrom_step,json_data)

@@ -1,22 +1,42 @@
-import wx
 import sys
 import os
 import logging
-import logging.config
 import argparse
 import logger
 import readconfig
 import platform
 import constants
-log = logging.getLogger('main.py')
+log = logging.getLogger('Nineteen68')
 
-parser = argparse.ArgumentParser(description="Nineteen68 Platform")
-parser.add_argument('--NINETEEN68_HOME', type=str, help='A Required path to Nineteen68 root location')
+parser = argparse.ArgumentParser(description="Nineteen68 ICE Platform")
+parser.add_argument('-n', '--NINETEEN68_HOME', required=True, type=str, help='A Required path to Nineteen68 root location')
+parser.add_argument('-v', '--version', action='version', version='Nineteen68 ICE 2.0', help='Show Nineteen68 ICE version information')
+parser.add_argument('--register', action='store_true', help='Register Nineteen68 ICE with Nineteen68 Web Application.')
+reg_group = parser.add_argument_group("register")
+reg_group.add_argument('--host', type=str, help='Nineteen68 Web Application URL. Eg: https://example.com:8443. If no value is provided then value is read from configuration file.')
+reg_group.add_argument('--token', type=str, help='Registration token obtained during ICE Provisioning. Input can be file or text.')
+parser.add_argument('--connect', action='store_true', help='Establish a connection between Nineteen68 Web Application and ICE.')
 args = parser.parse_args()
-if args.NINETEEN68_HOME is None:
-    parser.error("Required at least 1 argument")
+if args.NINETEEN68_HOME and not os.path.exists(args.NINETEEN68_HOME+os.sep+'/plugins'):
+    parser.error("Invalid path provided for NINETEEN68_HOME")
 os.environ["NINETEEN68_HOME"] = args.NINETEEN68_HOME
-
+if args.connect and args.register:
+    parser.error("Register operation cannot be used with connect operation")
+if not (args.register or args.connect) and (args.host or args.token):
+    parser.error("Host/Token arguments can only be used with register/connect operation")
+if args.register or args.connect:
+    if args.token is None:
+        if args.register: parser.error("Token cannot be empty for register operation")
+        elif args.host is not None:
+            parser.error("Host cannot be specified without token")
+    else:
+        if os.path.exists(args.token):
+            try:
+                with open(args.token) as token_file:
+                    args.token = token_file.read().replace('\n','').replace('\r','').strip()
+            except: parser.error("Invalid Token provided for register operation")
+        if args.host is None:
+            print("No value provided for host. Reading values from configuration file")
 configvalues = readconfig.readConfig().readJson()
 
 """
@@ -25,7 +45,7 @@ parent process to child process. We are applying the same for only on file
 which is our log file.
 """
 if sys.platform == 'win32':
-    from ctypes import *
+    from ctypes import windll
     import msvcrt
     __builtins__open = __builtins__.open
     def __open_inheritance_hack(*args, **kwargs):
@@ -38,31 +58,13 @@ if sys.platform == 'win32':
 
 if __name__ == "__main__":
     try:
-        app = wx.App()
         appName = "Nineteen68 ICE"
         constants.SYSTEM_OS = platform.system()
-        path = args.NINETEEN68_HOME+os.sep
+        path = os.environ["NINETEEN68_HOME"]+os.sep
         if not os.path.exists(path+"logs"): os.mkdir(path+"logs")
         if not os.path.exists(path+"output"): os.mkdir(path+"output")
-        sys.path.append(path + "assets")
-        import clientwindow as cw_obj
-        sys.path.append(path + "assets")
-        cw_obj.configvalues = configvalues
-        cw = cw_obj.ClientWindow(appName)
-        if cw.is_config_missing:
-            err = "Configure "+appName+" by navigating to Edit -> Configuration"
-            logger.print_on_console(err)
-            log.info(err)
-        elif cw.is_config_invalid:
-            err = "[Error]: Syntax error in config file.\n"+str(configvalues['errorflag'])+ " config field is missing. Please check and restart "+appName+"."
-            logger.print_on_console(err)
-            log.info(err)
-            log.error(configvalues['errorflag'])
-        elif cw.logfilename_error_flag:
-            err = "[Error]: Please provide a valid logfile path in config file and restart "+appName+"."
-            logger.print_on_console(err)
-            log.info(err)
-            cw.logfilename_error_flag = False
-        app.MainLoop()
+        import core
+        core.configvalues = configvalues
+        core.Main(appName, args)
     except Exception as e:
-        log.error(e,exc_info=True)
+        log.error(e, exc_info=True)
