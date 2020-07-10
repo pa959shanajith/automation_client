@@ -64,7 +64,7 @@ class Controller():
         self.cur_dir= os.getcwd()
         self.previous_step=''
         self.verify_dict={'web':VERIFY_EXISTS,
-        'desktopjava':VERIFY_VISIBLE,'sap':VERIFY_EXISTS,'desktop':VERIFY_EXISTS}
+        'oebs':VERIFY_VISIBLE,'sap':VERIFY_EXISTS,'desktop':VERIFY_EXISTS}
         self.dynamic_var_handler_obj=dynamic_variable_handler.DynamicVariables()
         self.status=TEST_RESULT_FAIL
         self.scenario_start_time=''
@@ -223,7 +223,7 @@ class Controller():
     def __load_aws(self):
         try:
             core_utils.get_all_the_imports('AWS/src')
-            
+
         except Exception as e:
             logger.print_on_console('Error loading AWS plugin')
             log.error(e)
@@ -557,7 +557,7 @@ class Controller():
             else:
                 logger.print_on_console('Result obtained exceeds max. Limit, please use writeToFile keyword.')
         log.info('Result obtained is: '+str(display_keyword_response))
-        if tsp.apptype.lower()=='desktop' or tsp.apptype.lower()=='sap' or tsp.apptype.lower()=='desktopjava' or (tsp.cord!='' and tsp.cord!=None):
+        if tsp.apptype.lower()=='desktop' or tsp.apptype.lower()=='sap' or tsp.apptype.lower()=='oebs' or (tsp.cord!='' and tsp.cord!=None):
             if result[2]!='9cc33d6fe25973868b30f4439f09901a' and tsp.name.lower()!='verifytextiris':
                 logger.print_on_console('Result obtained is: ',result[2])
             elif result:
@@ -1349,7 +1349,7 @@ def kill_process():
             log.error(e)
 
         try:
-            # os.system("killall -9 Safari") 
+            # os.system("killall -9 Safari")
                 # This kills all instances of safari browser even if it is not opened by nineteen68.
                 # Issue when Nineteen68 is opened in Safari browser
             os.system("killall -9 safaridriver")

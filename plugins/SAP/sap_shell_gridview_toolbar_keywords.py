@@ -800,7 +800,7 @@ class Shell_GridView_Toolbar_Keywords():
                         if iv in vList:
                             i = None
                             i = vList.index(iv)
-                            vList_temp.append(i)
+                            vList_temp.append(i+1)
                         else :
                             allTrueFlag = False
                             break
