@@ -26,6 +26,7 @@ import io
 import handler
 import update_module
 from icetoken import ICEToken
+import benchmark
 try:
     from socketlib_override import SocketIO,BaseNamespace
 except ImportError:
@@ -622,7 +623,9 @@ class MainNamespace(BaseNamespace):
             log.error(e,exc_info=True)
 
     def on_update_screenshot_path(self,*args):
+        global socketIO
         spath=args[0]
+        if root.gui: benchmark.init(args[1],socketIO)
         import constants
         if(SYSTEM_OS=='Darwin'):
             spath=spath["mac"]
@@ -885,9 +888,9 @@ class TestThread(threading.Thread):
                 apptype = (self.json_data)[0]['apptype']
             else:
                 execution_flag = True
+                if root.gui: benchmark.stop(True)
                 apptype =(self.json_data)['apptype']
-            if(apptype == "DesktopJava"):
-                apptype = "oebs"
+            if(apptype == "DesktopJava"): apptype = "oebs"
             if(apptype.lower() not in plugins_list):
                 logger.print_on_console('This app type is not part of the license.')
                 status=TERMINATE

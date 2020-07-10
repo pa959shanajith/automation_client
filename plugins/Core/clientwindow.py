@@ -15,6 +15,7 @@ import requests
 import io
 import handler
 import update_module
+import benchmark
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 log = logging.getLogger('clientwindow.py')
@@ -321,8 +322,10 @@ class ClientWindow(wx.Frame):
             controller.disconnect_flag=True
             print("")
             msg = "---------Terminating all active operations-------"
+            if root.gui: benchmark.stop(False)
         else:
-            msg ="---------Termination Started-------"
+            msg = "---------Termination Started-------"
+            if root.gui: benchmark.stop(True)
         logger.print_on_console(msg)
         log.info(msg)
         controller.terminate_flag=True
