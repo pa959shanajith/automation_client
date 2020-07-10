@@ -38,11 +38,11 @@ class custom():
         if len(input) >= 3 and input[0] != "" and isinstance(input[2], int) and isinstance(input[1], str):
             class_name = input[0].lower()
             custom_dict = {
-                'button': ["getbuttonname", "longpress", "press", "verifybuttonname", "verifydisabled", "verifyenabled", "verifyexists", "verifydoesnotexists", "verifyhidden", "verifyvisible", "waitforelementexists"],
-                'element': ["gettext", "longpress", "press", "verifydisabled", "verifydoesnotexists",
+                'button': ["getbuttonname", "longpress", "press", "click", "verifybuttonname", "verifydisabled", "verifyenabled", "verifyexists", "verifydoesnotexists", "verifyhidden", "verifyvisible", "waitforelementexists"],
+                'element': ["gettext", "longpress", "press", "click", "verifydisabled", "verifydoesnotexists",
                             "verifyenabled", "verifyexists", "verifyvisible", "verifytext",
                             "verifyhidden", "waitforelementexists"],
-                'textbox': ["cleartext", "gettext", "longpress", "press", "sendvalue", "setsecuretext", "settext",
+                'textbox': ["cleartext", "gettext", "longpress", "press", "click", "sendvalue", "setsecuretext", "settext",
                              "verifydisabled", "verifyenabled", "verifyexists", "verifydoesnotexists", "verifyhidden", "verifytext",
                              "verifyvisible", "waitforelementexists"],
                 'timepicker': ["gettime", "settime", "verifydisabled", "verifyenabled", "verifyexists", "verifydoesnotexists", "verifyhidden", "verifytime", "verifyvisible", "waitforelementexists"],
@@ -54,16 +54,37 @@ class custom():
                             "verifydisabled", "verifyenabled", "verifyexists", "verifydoesnotexists", "verifyhidden", "verifyvisible", "waitforelementexists"],
                 'numberpicker': ["setnumber", "getnumber", "verifynumber", "verifydisabled", "verifyenabled", "verifyexists", "verifydoesnotexists", "verifyhidden", "verifyvisible", "waitforelementexists"],
                 'seekbar': ["setvalue", "setmaxvalue", "setmidvalue", "setminvalue", "verifydisabled", "verifyenabled", "verifyexists", "verifyhidden", "verifyvisible", "verifydoesnotexists", "waitforelementexists"],
-                'listview':["gettext", "longpress", "press", "verifydisabled", "verifydoesnotexists",
+                'listview':["gettext", "longpress", "press", "click", "verifydisabled", "verifydoesnotexists",
                             "verifyenabled", "verifyexists", "verifyvisible", "verifytext",
                             "verifyhidden", "waitforelementexists"],
-                'text': ["gettext", "longpress", "press", "verifydisabled", "verifydoesnotexists",
-                        "verifyenabled", "verifyexists", "verifyvisible", "verifytext",
-                        "verifyhidden", "waitforelementexists"],
-                'image': ["gettext", "longpress", "press", "verifydisabled", "verifydoesnotexists",
-                        "verifyenabled", "verifyexists", "verifyvisible", "verifytext",
-                        "verifyhidden", "waitforelementexists"],
-                'layout': ["gettext", "longpress", "press", "verifydisabled", "verifydoesnotexists",
+                'text': ["gettext", "longpress", "press", "click", "verifydisabled", "verifydoesnotexists",
+                            "verifyenabled", "verifyexists", "verifyvisible", "verifytext",
+                            "verifyhidden", "waitforelementexists"],
+                'image': ["gettext", "longpress", "press", "click", "verifydisabled", "verifydoesnotexists",
+                            "verifyenabled", "verifyexists", "verifyvisible", "verifytext",
+                            "verifyhidden", "waitforelementexists"],
+                'layout': ["gettext", "longpress", "press", "click", "verifydisabled", "verifydoesnotexists",
+                            "verifyenabled", "verifyexists", "verifyvisible", "verifytext",
+                            "verifyhidden", "waitforelementexists"],
+                'picker': ["setvalue", "gettext", "longpress", "press", "click", "verifydisabled", "verifydoesnotexists",
+                            "verifyenabled", "verifyexists", "verifyvisible", "verifytext",
+                            "verifyhidden", "waitforelementexists"],
+                'slider': ["setslidevalue", "verifydisabled", "verifydoesnotexists",
+                            "verifyenabled", "verifyexists", "verifyvisible", "verifytext",
+                            "verifyhidden", "waitforelementexists"],
+                'link': ["gettext", "longpress", "press", "click", "verifydisabled", "verifydoesnotexists",
+                            "verifyenabled", "verifyexists", "verifyvisible", "verifytext",
+                            "verifyhidden", "waitforelementexists"],
+                'table': ["getcellvalue", "cellclick", "getrowcount", "verifyrowcount", "verifydisabled", "verifydoesnotexists",
+                            "verifyenabled", "verifyexists", "verifyvisible", "verifycellvalue",
+                            "verifyhidden", "waitforelementexists"],
+                'cell' : ["gettext", "longpress", "press", "click", "verifydisabled", "verifydoesnotexists",
+                            "verifyenabled", "verifyexists", "verifyvisible", "verifytext",
+                            "verifyhidden", "waitforelementexists"],
+                'key' : ["gettext", "longpress", "press", "click", "verifydisabled", "verifydoesnotexists",
+                            "verifyenabled", "verifyexists", "verifyvisible", "verifytext",
+                            "verifyhidden", "waitforelementexists"],
+                'view' : ["gettext", "longpress", "press", "click", "verifydisabled", "verifydoesnotexists",
                             "verifyenabled", "verifyexists", "verifyvisible", "verifytext",
                             "verifyhidden", "waitforelementexists"]
             }
@@ -85,39 +106,37 @@ class custom():
         driver_flag = False
         object_name = input[0].lower()
         visible_text = input[1]
-        #logger.print_on_console(input)
         driver = android_scrapping.driver
-        classes = {
-            'textbox': ['android.widget.EditText'],
-            'timepicker': ['android.widget.TimePicker'],
-            'datepicker': ['android.widget.DatePicker'],
-            'radio': ['android.widget.RadioButton'],
-            'button': ['android.widget.Button','android.widget.ImageButton'],
-            'switch': ['android.widget.Switch'],
-            'checkbox': ['android.widget.CheckBox'],
-            'spinner': ['android.widget.Spinner'],
-            'numberpicker': ['android.widget.NumberPicker'],
-            'seekbar': ['android.widget.SeekBar'],
-            'listview': ['android.widget.ListView'],
-            'text': ['android.widget.TextView'],
-            'image': ['android.widget.ImageView'],
-            'layout': ['android.widget.LinearLayout','android.widget.RelativeLayout'],
-            'element': ['android.widget.ScrollView','android.view.View','android.view.ViewGroup','android.widget.FrameLayout']
-        }
+        if SYSTEM_OS != 'Darwin':
+            classes = {
+                'textbox': ['android.widget.EditText'], 'timepicker': ['android.widget.TimePicker'], 'datepicker': ['android.widget.DatePicker'], 'radio': ['android.widget.RadioButton'], 'button': ['android.widget.Button','android.widget.ImageButton'], 'switch': ['android.widget.Switch'], 'checkbox': ['android.widget.CheckBox'],
+                'spinner': ['android.widget.Spinner'], 'numberpicker': ['android.widget.NumberPicker'], 'seekbar': ['android.widget.SeekBar'], 'listview': ['android.widget.ListView'], 'text': ['android.widget.TextView'], 'image': ['android.widget.ImageView'],
+                'layout': ['android.widget.LinearLayout','android.widget.RelativeLayout'], 'view':['android.view.View'], 'element': ['android.widget.ScrollView','android.view.ViewGroup','android.widget.FrameLayout','android.widget.LinearLayout','android.widget.RelativeLayout']
+            }
+        else:
+            classes = {
+                'textbox': ['XCUIElementTypeTextField','XCUIElementTypeSearchField','XCUIElementTypeSecureTextField'], 'radio': ['XCUIElementTypeRadioButton'], 'button': ['XCUIElementTypeButton'], 'switch': ['XCUIElementTypeSwitch','XCUIElementTypeToggle'],
+                'checkbox': ['XCUIElementTypeCheckBox'], 'picker': ['XCUIElementTypePickerWheel'], 'slider': ['XCUIElementTypeSlider'], 'link': ['XCUIElementTypeLink'], 'text': ['XCUIElementTypeStaticText','XCUIElementTypeTextView'],
+                'image': ['XCUIElementTypeImage','XCUIElementTypeIcon'], 'table': ['XCUIElementTypeTable'], 'cell' : ['XCUIElementTypeCell'], 'key' : ['XCUIElementTypeKey'],
+                'element': ['XCUIElementTypeApplication','XCUIElementTypeWindow','XCUIElementTypeOther','XCUIElementTypeNavigationBar','XCUIElementTypeScrollView','XCUIElementTypeSheet','XCUIElementTypeAlert']
+            }
+            
         element_list = []
         try:
             index = int(input[2])
-            processes = psutil.net_connections()
-            for line in processes:
-                p = line.laddr
-                if p[1] == 4723 and driver is not None:
-                    driver_flag = True
-                    break
+            if SYSTEM_OS != 'Darwin':
+                processes = psutil.net_connections()
+                for line in processes:
+                    p = line.laddr
+                    if p[1] == 4723 and driver is not None:
+                        driver_flag = True
+                        break
+            else: driver_flag = True
             if driver_flag is True:
                 elem_count = 0
                 if len(visible_text) > 0:
-                    for item in classes[object_name]:
-                        xpath_str = '//'+item+'[@text="'+visible_text+'"]'
+                   for item in classes[object_name]:
+                        xpath_str = "//"+item+"[starts-with(@text,'"+visible_text+"')]"
                         element_list = element_list + driver.find_elements_by_xpath(xpath_str)
                 else:
                     for item in classes[object_name]:
@@ -158,8 +177,6 @@ class custom():
                         err_msg = self.print_error('Delay timeout')
                         break
                     if element is not None:
-                        #log.info(CUSTOM_ELEMENT_FOUND)
-                        #logger.print_on_console(CUSTOM_ELEMENT_FOUND)
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
                         break

@@ -170,7 +170,8 @@ class Dispatcher:
             'clearcache':local_Wd.browser_object.clear_cache,
             'navigatewithauthenticate':local_Wd.browser_object.navigate_with_authenticate,
             'navigateback':local_Wd.browser_object.navigate_back,
-            'opennewtab':local_Wd.browser_object.openNewTab
+            'opennewtab':local_Wd.browser_object.openNewTab,
+            'execute_js':local_Wd.browser_object.execute_js
         }
         self.exception_flag=''
         self.action=None
@@ -228,6 +229,7 @@ class Dispatcher:
             self.web_dict['doubleclickiris'] = iris_object.doubleclickiris
             self.web_dict['rightclickiris'] = iris_object.rightclickiris
             self.web_dict['settextiris'] = iris_object.settextiris
+            self.web_dict['setsecuretextiris'] = iris_object.setsecuretextiris
             self.web_dict['gettextiris'] = iris_object.gettextiris
             self.web_dict['getrowcountiris'] = iris_object.getrowcountiris
             self.web_dict['getcolcountiris'] = iris_object.getcolcountiris

@@ -379,7 +379,7 @@ class Scrape:
             tag = "select"
         elif ( type == "GuiLabel" ):
             custname = elem.__getattr__("Name") + "_lbl"
-            tag = type
+            tag = "label"
         elif ( type == "GuiRadioButton" ):
             custname = elem.__getattr__("Name") + "_radiobtn"
             tag = "radiobutton"
@@ -397,7 +397,7 @@ class Scrape:
             tag = type
         elif ( type == "GuiSimpleContainer" ):
             custname = elem.__getattr__("Name") + "_scontainer"
-            tag = type
+            tag = 'scontainer'
         elif ( type == "GuiShell" ):
             """Shell has subtypes, filtering via 'custname' and 'tag' type accordingly"""
             Subtype = None

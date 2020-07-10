@@ -19,6 +19,7 @@ import logging
 #log = logging.getLogger('dynamic_variable_handler.py')
 import ast
 import threading
+import json
 local_dynamic = threading.local()
 
 class DynamicVariables:
@@ -61,7 +62,7 @@ class DynamicVariables:
                     if actual_value==None:
                         db_result=self.getDBdata(value,con_obj)
                         actual_value=db_result[1]
-
+                        
             elif self.check_for_dynamicvariables(input_var,keyword)==TEST_RESULT_TRUE:
                 temp_value=self.get_dynamic_value(input_var)
                 if temp_value is None:
@@ -97,10 +98,8 @@ class DynamicVariables:
         else:
             variable=variable[0:len(variable)-1]
             for i in range(len(value)):
-                p=i+1
                 for j in range(len(value[i])):
-                    q=j+1
-                    local_dynamic.dynamic_variable_map[variable+'['+str(p)+']['+str(q)+']}']=value[i][j]
+                    local_dynamic.dynamic_variable_map[variable+'['+str(i)+']['+str(j)+']}']=value[i][j]
             local_dynamic.dynamic_variable_map[variable+'}'] = value
 
 
@@ -138,11 +137,20 @@ class DynamicVariables:
                             logger.print_on_console(err_msg)
                             local_dynamic.log.error(err_msg)
                     else:
-                        ast.literal_eval(str(outputval))
+                        #Changed the code as we are getting malformed string using ast.literal_eval for JSON
+                        json.loads(outputval)
                         status = TEST_RESULT_FALSE
                         json_flag=True
                 except Exception as e:
-                    local_dynamic.log.debug('Not a json input')
+                    try:
+                        value=ast.literal_eval(str(outputval))
+                        if type(value)==set:
+                            json_flag=False
+                        else:
+                            status = TEST_RESULT_FALSE
+                            json_flag=True
+                    except Exception as e:
+                        local_dynamic.log.debug('Not a json input')
             if not(json_flag):
                 if '{' in outputval and '}' in outputval:
                     var_list=re.findall("\{(.*?)\}",outputval)
@@ -207,7 +215,7 @@ class DynamicVariables:
             input_var='('+input_var[0]+')'
         else:
             return [INVALID,None]
-        local_dynamic.log.debug('___INPUT: ',input_var)
+        local_dynamic.log.debug('___INPUT: %s',input_var)
         disp_expression=''
         invalid_flag=False
         invalid_msg=''
@@ -231,7 +239,7 @@ class DynamicVariables:
                     log.error(keyword+': Expression must have atleast two operands present for comparision')
             for i in range(len(input_list)):
                 input_list[i]=input_list[i].strip()
-            local_dynamic.log.debug('Stage 0: ',input_list)
+            local_dynamic.log.debug('Stage 0: %s',input_list)
             exp=';'.join(input_list)
             exp=re.sub(r'[)][\s]*AND[\s]*[(]', ')and(',exp)
             exp=re.sub(r'[)][\s]*OR[\s]*[(]', ')or(',exp)
@@ -249,7 +257,7 @@ class DynamicVariables:
             exp=exp.replace('+~$(','+(').replace('-~$(','-(').replace('*~$(','*(').replace('/~$(','/(').replace('^~$(','^(').replace(')$~+',')+').replace(')$~-',')-').replace(')$~*',')*').replace(')$~/',')/').replace(')$~^',')^')
         exp=re.sub(r'[(][\s]*', '(',exp)
         exp=re.sub(r'[\s]*[)]', ')',exp)
-        local_dynamic.log.debug('Stage 1: ',exp)
+        local_dynamic.log.debug('Stage 1: %s',exp)
         dv_flag=i=0
         paran_cnt=0
         try:
@@ -276,10 +284,10 @@ class DynamicVariables:
                     invalid_flag=True
                     invalid_msg=keyword+': Expression must be enclosed within "(" and ")" and balanced\n'
                 i+=1
-            local_dynamic.log.debug('Stage 2: ',exp)
+            local_dynamic.log.debug('Stage 2: %s',exp)
             inp_err_list=exp.split('~')
             exp=exp.split('~')
-            local_dynamic.log.debug('Stage 3: ',exp)
+            local_dynamic.log.debug('Stage 3: %s',exp)
             for i in range(len(exp)):
                 if exp[i][0]=='$' and exp[i][-1]!='$':
                     inp_err_list[i]=inp_err_list[i][1:]
@@ -309,10 +317,17 @@ class DynamicVariables:
                             invalid_flag=True
                             inp_err_list[i]=' "'+exp[i]+'" '
                         exp[i]="'"+exp[i].replace("\\","\\\\").replace("'","\\'")+"'"
-            local_dynamic.log.debug('Stage 4: ',exp)
+            local_dynamic.log.debug('Stage 4: %s',exp)
         except Exception as e:
             local_dynamic.log.error(e)
             return [input_var,e]
+
+        # Python3 issue fix. 020 is not a valid number
+        for i in range(len(exp)):
+            try:
+                part = int(exp[i])
+                exp[i] = str(part)
+            except: pass
 
         ## Issue #156 None is getting stored in dynamic variable instead of null if no value is assigned
         none_count=0
@@ -334,5 +349,5 @@ class DynamicVariables:
 
         if invalid_flag:
             return [disp_expression,invalid_msg]
-        local_dynamic.log.debug('__OUTPUT: ',exp)
+        local_dynamic.log.debug('__OUTPUT: %s',exp)
         return [exp,None,disp_expression]

@@ -216,6 +216,7 @@ class DesktopDispatcher:
             self.desktop_dict['doubleclickiris'] = iris_object.doubleclickiris
             self.desktop_dict['rightclickiris'] = iris_object.rightclickiris
             self.desktop_dict['settextiris'] = iris_object.settextiris
+            self.desktop_dict['setsecuretextiris'] = iris_object.setsecuretextiris
             self.desktop_dict['gettextiris'] = iris_object.gettextiris
             self.desktop_dict['getrowcountiris'] = iris_object.getrowcountiris
             self.desktop_dict['getcolcountiris'] = iris_object.getcolcountiris

@@ -34,6 +34,7 @@ log = logging.getLogger('clientwindow.py')
 wxObject = None
 browsername = None
 qcdata = None
+qcObject = None
 soc=None
 pdfgentool = None
 qcConFlag=False
@@ -209,22 +210,24 @@ class MainNamespace(BaseNamespace):
             logger.print_on_console(err_msg)
             log.error(e,exc_info=True)
 
+
     def on_executeTestSuite(self, *args):
+        global wxObject, execution_flag
         try:
-            global wxObject,socketIO,execution_flag
-            args=list(args)
+            exec_data = args[0]
+            batch_id = exec_data["batchId"]
+            aws_mode=False
+            if len(args)>0 and args[0]['apptype']=='MobileApp':
+                if args[0]['suitedetails'][0]['browserType'][0]=='2':
+                    aws_mode = True
             if(not execution_flag):
-                socketIO.emit('return_status_executeTestSuite',{'status':'success','executionId':(args[0])['executionId']})
-                wxObject.mythread = TestThread(wxObject,EXECUTE,args[0],wxObject.debug_mode)
+                socketIO.emit('return_status_executeTestSuite', {'status': 'success', 'batchId': batch_id})
+                wxObject.mythread = TestThread(wxObject, EXECUTE, exec_data, aws_mode)
             else:
-                obj = handler.Handler()
-                suiteId_list,suite_details,browser_type,scenarioIds,suite_data,execution_id,condition_check,dataparam_path,exec_mode=obj.parse_json_execute(args[0])
-                data = {'scenario_ids':scenarioIds,'execution_id':execution_id,'time':str(datetime.now())}
-                emsg='Execution already in progress. Skipping current request.'
+                socketIO.emit('return_status_executeTestSuite', {'status': 'skipped', 'batchId': batch_id})
+                emsg = 'Execution already in progress. Skipping current request.'
                 log.warn(emsg)
                 logger.print_on_console(emsg)
-                """sending scenario details for skipped execution to update the same in reports."""
-                socketIO.emit('return_status_executeTestSuite',{'status':'skipped','data':data,'executionId':(args[0])['executionId']})
         except Exception as e:
             err_msg='Error while Executing'
             log.error(err_msg)
@@ -232,11 +235,11 @@ class MainNamespace(BaseNamespace):
             log.error(e,exc_info=True)
 
     def on_debugTestCase(self, *args):
+        global wxObject
         try:
             if check_execution_lic("result_debugTestCase"): return None
-            global wxObject
-            args=list(args)
-            wxObject.mythread = TestThread(wxObject,DEBUG,args[0],wxObject.debug_mode)
+            exec_data = args[0]
+            wxObject.mythread = TestThread(wxObject, DEBUG, exec_data, False)
             wxObject.choice=wxObject.rbox.GetStringSelection()
             logger.print_on_console(str(wxObject.choice)+' is Selected')
             if wxObject.choice == 'Normal':
@@ -399,7 +402,7 @@ class MainNamespace(BaseNamespace):
             global pdfScrapeObj,pdfScrapeFlag
             global browsername
             browsername = args[0]
-#           con =controller.Controller()
+            #con =controller.Controller()
             core_utils.get_all_the_imports('PDF')
             import pdf_scrape_dispatcher
             pdfScrapeObj=pdf_scrape_dispatcher
@@ -501,55 +504,27 @@ class MainNamespace(BaseNamespace):
             log.error(e,exc_info=True)
 
     def on_qclogin(self, *args):
-        global qcdata
-        global soc
-        global socketIO
-        server_data=b''
-        data_stream=None
-        client_data=None
-        EOF_QC = b'#E&D@Q!C#'
+        global qcObject
+        err_msg = None
         try:
-            if SYSTEM_OS == "Windows":
-                if len(args) > 0:
-                    qcdata = args[0]
-                    if soc is None:
-                        import subprocess
-                        path = NINETEEN68_HOME + "/plugins/Qc/QcController.exe"
-                        pid = subprocess.Popen(path, shell=True)
-                        soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                        try:
-                            soc.connect(("localhost",10000))
-                        except socket.error as e:
-                            log.error(e)
-                            if '[Errno 10061]' in str(e):
-                                time.sleep(15)
-                                soc.connect(("localhost",10000))
+            if(qcObject == None):
+                core_utils.get_all_the_imports('Qc')
+                import QcController
+                qcObject = QcController.QcWindow()
 
-                    data_to_send = json.dumps(qcdata).encode('utf-8')
-                    data_to_send+=EOF_QC
-                    soc.send(data_to_send)
-                    while True:
-                        data_stream= soc.recv(1024)
-                        server_data+=data_stream
-                        if EOF_QC in server_data:
-                            break
-                    client_data= server_data[:server_data.find(EOF_QC)].decode('utf-8')
-                    if('Fail@f@!l' in client_data):
-                        client_data=client_data[:client_data.find('@f@!l')]
-                        logger.print_on_console('Error occurred in QC')
-                        socketIO.emit('qcresponse','Error:Qc Operations')
-                    else:
-                        socketIO.emit('qcresponse',client_data)
-                else:
-                    socketIO.emit('qcresponse','Error:data recevied empty')
-            else:
-                 socketIO.emit('qcresponse','Error:Failed in running Qc')
+            qcdata = args[0]
+            response = qcObject.qc_dict[qcdata.pop('qcaction')](qcdata)
+            socketIO.emit('qcresponse', response)
+        except KeyError:
+            err_msg = 'Invalid ALM operation'
         except Exception as e:
-            err_msg='Error in ALM Operations '
+            err_msg = 'Error in ALM operations'
+            log.error(e, exc_info=True)
+        if err_msg is not None:
             log.error(err_msg)
             logger.print_on_console(err_msg)
-            log.error(e,exc_info=True)
-            socketIO.emit('qcresponse','Error:Qc Operations')
+            try: socketIO.emit('qcresponse','Error:Qc Operations')
+            except: pass
 
     def on_render_screenshot(self,*args):
         try:
@@ -794,7 +769,7 @@ class TestThread(threading.Thread):
     """Test Worker Thread Class."""
 
     #----------------------------------------------------------------------
-    def __init__(self,wxObject,action,json_data,debug_mode):
+    def __init__(self, wxObject, action, json_data, aws_mode):
         """Init Worker Thread Class."""
         super(TestThread, self).__init__()
         self.wxObject = wxObject
@@ -807,10 +782,11 @@ class TestThread(threading.Thread):
         # prevent that. In Python 2, use of Lock instead of RLock also
         # boosts performance.
         self.pause_cond = threading.Condition(threading.Lock())
-        self.con=''
-        self.action=action.lower()
-        self.json_data=json_data
-        self.debug_mode=debug_mode
+        self.con = ''
+        self.action = action.lower()
+        self.json_data = json_data
+        self.debug_mode = wxObject.debug_mode
+        self.aws_mode = aws_mode
         self.start()    # start the thread
 
     #should just resume the thread
@@ -824,9 +800,11 @@ class TestThread(threading.Thread):
         """Run Worker Thread."""
         # This is the code executing in the new thread.
         global socketIO, execution_flag, closeActiveConnection,connection_Timer
+        batch_id = None
         try:
             runfrom_step=1
-            if self.action==DEBUG:
+            if self.action==EXECUTE: batch_id = self.json_data["batchId"]
+            elif self.action==DEBUG:
                 self.debug_mode=False
                 self.wxObject.breakpoint.Disable()
                 if self.wxObject.choice in ['Stepwise','RunfromStep']:
@@ -840,7 +818,7 @@ class TestThread(threading.Thread):
                             runfrom_step=0
             self.wxObject.schedule.Disable()
             self.wxObject.rbox.Disable()
-            # self.wxObject.breakpoint.Disable()
+            self.wxObject.breakpoint.Disable()
             self.con = controller.Controller()
             self.wxObject.terminatebutton.Enable()
             self.con.configvalues=configvalues
@@ -858,17 +836,19 @@ class TestThread(threading.Thread):
                 logger.print_on_console('This app type is not part of the license.')
                 status=TERMINATE
             else:
-                status = self.con.invoke_controller(self.action,self,self.debug_mode,runfrom_step,self.json_data,self.wxObject,socketIO,soc)
+                status = self.con.invoke_controller(self.action,self,self.debug_mode,runfrom_step,self.json_data,self.wxObject,socketIO,qcObject,self.aws_mode)
 
             logger.print_on_console('Execution status '+status)
 
             if status==TERMINATE:
                 logger.print_on_console('---------Termination Completed-------')
-
+            if self.wxObject.choice=='RunfromStep':
+                self.wxObject.breakpoint.Enable()
+            else:
+                self.wxObject.breakpoint.Disable()
             #Removed execute,debug button
             # self.wxObject.breakpoint.Clear()
             self.wxObject.rbox.Enable()
-            self.wxObject.breakpoint.Enable()
             self.wxObject.cancelbutton.Enable()
             if self.action==DEBUG:
                 testcasename = handler.local_handler.testcasename
@@ -888,16 +868,16 @@ class TestThread(threading.Thread):
                 else:
                     socketIO.emit('result_debugTestCaseWS',status)
             elif self.action==EXECUTE:
-                socketIO.emit('result_executeTestSuite',{"status":status,"executionId":self.json_data["executionId"]})
+                socketIO.emit('result_executeTestSuite', {"status":status, "batchId": batch_id})
         except Exception as e:
-            log.error(e,exc_info=True)
+            log.error(e, exc_info=True)
             status=TERMINATE
             if socketIO is not None:
                 if self.action==DEBUG:
                     self.wxObject.killChildWindow(debug=True)
                     socketIO.emit('result_debugTestCase',status)
                 elif self.action==EXECUTE:
-                    socketIO.emit('result_executeTestSuite',{"status":status,"executionId":self.json_data["executionId"]})
+                    socketIO.emit('result_executeTestSuite', {"status":status, "batchId": batch_id})
         if closeActiveConnection:
             closeActiveConnection = False
             connection_Timer = threading.Timer(300, wxObject.closeConnection)
@@ -969,7 +949,6 @@ class ClientWindow(wx.Frame):
         # selenium_log.setLevel(logging.CRITICAL)
 
         self.panel = wx.Panel(self)
-        
         self.sizer = wx.GridBagSizer(6, 5)
         self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
         self.SetIcon(self.wicon)
@@ -1037,7 +1016,7 @@ class ClientWindow(wx.Frame):
         self.rbox.Bind(wx.EVT_RADIOBOX,self.onRadioBox)
         self.breakpoint = wx.TextCtrl(self.panel, wx.ID_ANY, pos=(225, 595), size=(60,20), style = wx.TE_RICH)
         box.Add(self.breakpoint, 1, wx.ALL|wx.EXPAND, 5)
-        # self.breakpoint.Disable()
+        self.breakpoint.Disable()
 
         self.cancelbutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap(IMAGES_PATH +"killStaleProcess.png", wx.BITMAP_TYPE_ANY), wx.Point(360, 555), wx.Size(50, 42))
         self.cancelbutton.Bind(wx.EVT_LEFT_DOWN, self.OnKillProcess)
@@ -1206,7 +1185,6 @@ class ClientWindow(wx.Frame):
             self.breakpoint.Disable()
             self.killChildWindow(debug=True)
         self.debug_mode=False
-        self.breakpoint.Disable()
         if self.choice in ['Stepwise','RunfromStep']:
             self.debug_mode=True
             ##if self.debugwindow == None:
@@ -1232,7 +1210,6 @@ class ClientWindow(wx.Frame):
         self.Destroy()
         controller.kill_process()
         if SYSTEM_OS == "Windows":
-            os.system("TASKKILL /F /IM QcController.exe")
             os.system("TASKKILL /F /IM nineteen68MFapi.exe")
         sys.exit(0)
 
@@ -1252,6 +1229,11 @@ class ClientWindow(wx.Frame):
         logger.print_on_console(msg)
         log.info(msg)
         controller.terminate_flag=True
+        #Calling AWS stop job on terminate (if present)
+        try:
+            wxObject.mythread.con.aws_obj.stop_job()
+        except:
+            pass
         #Handling the case where user clicks terminate when the execution is paused
         #Resume the execution
         if controller.pause_flag:
@@ -1435,7 +1417,6 @@ class ClientWindow(wx.Frame):
                 if browsername in browsernumbers:
                     logger.print_on_console('Browser name : '+str(browsername))
                     #con = controller.Controller()
-                    
                     core_utils.get_all_the_imports('Web')
                     core_utils.get_all_the_imports('WebScrape')
                     import Nineteen68_WebScrape
@@ -1461,7 +1442,7 @@ class ClientWindow(wx.Frame):
             log.error(e,exc_info=True)
 
     def verifyMACAddress(self):
-        flag = True
+        flag = False
         core_utils_obj = core_utils.CoreUtils()
         system_mac = core_utils_obj.getMacAddress()
         mac_verification_key = "".join(['N','1','i','1','N','2','e','3','T','5','e','8','E','1','3','n','2','1','S','i','X','t','Y','3','4','e','I','g','H','t','5','5'])
@@ -1503,8 +1484,6 @@ class ClientWindow(wx.Frame):
             logger.print_on_console(msg)
             log.error(msg)
         else: self.EnableAll()
-        irisFlag = True
-        controller.iris_flag = True
         return flag
 
     def DisableAll(self):
@@ -1607,30 +1586,24 @@ class Config_window(wx.Frame):
             "Close":[(285,458),(100, 28)]
         }
         wx.Frame.__init__(self, parent, title=title,
-                   pos=config_fields["Frame"][0], size=config_fields["Frame"][1],style = wx.CAPTION|wx.CLIP_CHILDREN)
-        
+            pos=config_fields["Frame"][0], size=config_fields["Frame"][1],style = wx.CAPTION|wx.CLIP_CHILDREN)
+
         self.iconpath = IMAGES_PATH +"slk.ico"
         self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
         self.SetIcon(self.wicon)
         self.updated = False
         self.panel = wx.Panel(self)
         
-        
-        #This is the panle which will have scrolling panel and which will contain the radiobuttons 
+        #This is the panel which will have scrolling panel and which will contain the radiobuttons 
         self.panel1 = wx.lib.scrolledpanel.ScrolledPanel(self.panel,-1,size=(440,195), pos=(8,285))
         self.panel1.SetupScrolling()
-        
-        
-        
-        self.sev_add=wx.StaticText(self.panel, label="Server Address", pos=config_fields["S_address"][0],size=config_fields["S_address"][1], style=0, name="")
-       
 
+        self.sev_add=wx.StaticText(self.panel, label="Server Address", pos=config_fields["S_address"][0],size=config_fields["S_address"][1], style=0, name="")
         self.server_add=wx.TextCtrl(self.panel, pos=config_fields["S_address"][2], size=config_fields["S_address"][3])
         if isConfigJson!=False:
             self.server_add.SetValue(isConfigJson['server_ip'])
 
         self.sev_port=wx.StaticText(self.panel, label="Server Port", pos=config_fields["S_port"][0],size=config_fields["S_port"][1], style=0, name="")
-
         self.server_port=wx.TextCtrl(self.panel, pos=config_fields["S_port"][2], size=config_fields["S_port"][3])
         if isConfigJson!=False:
             self.server_port.SetValue(isConfigJson['server_port'])
@@ -1638,8 +1611,6 @@ class Config_window(wx.Frame):
             self.server_port.SetValue("8443")
 
         self.ch_path=wx.StaticText(self.panel, label="Chrome Path", pos=config_fields["Chrm_path"][0],size=config_fields["Chrm_path"][1], style=0, name="")
-
-        self.ch_path.SetToolTip(wx.ToolTip("set your chrome path"))
         self.chrome_path=wx.TextCtrl(self.panel, pos=config_fields["Chrm_path"][2], size=config_fields["Chrm_path"][3])
         self.chrome_path_btn=wx.Button(self.panel, label="...", pos=config_fields["Chrm_path"][4], size=config_fields["Chrm_path"][5])
         self.chrome_path_btn.Bind(wx.EVT_BUTTON, self.fileBrowser_chpath)
@@ -1649,7 +1620,6 @@ class Config_window(wx.Frame):
             self.chrome_path.SetValue('default')
 
         self.ff_path=wx.StaticText(self.panel, label="Firefox Path", pos=config_fields["Ffox_path"][0],size=config_fields["Ffox_path"][1], style=0, name="")
-
         self.firefox_path=wx.TextCtrl(self.panel, pos=config_fields["Ffox_path"][2], size=config_fields["Ffox_path"][3])
         self.firefox_path_btn=wx.Button(self.panel, label="...", pos=config_fields["Ffox_path"][4], size=config_fields["Ffox_path"][5])
         self.firefox_path_btn.Bind(wx.EVT_BUTTON, self.fileBrowser_ffpath)
@@ -1659,7 +1629,6 @@ class Config_window(wx.Frame):
             self.firefox_path.SetValue('default')
 
         self.log_fpath=wx.StaticText(self.panel, label="Log File Path", pos=config_fields["Log_path"][0],size=config_fields["Log_path"][1], style=0, name="")
-
         self.log_file_path=wx.TextCtrl(self.panel, pos=config_fields["Log_path"][2], size=config_fields["Log_path"][3])
         self.log_file_path_btn=wx.Button(self.panel, label="...",pos=config_fields["Log_path"][4], size=config_fields["Log_path"][5])
         self.log_file_path_btn.Bind(wx.EVT_BUTTON, self.fileBrowser_logfilepath)
@@ -1668,55 +1637,73 @@ class Config_window(wx.Frame):
         else:
             self.log_file_path.SetValue(isConfigJson['logFile_Path'])
 
+        font_italic = wx.Font(10, wx.DEFAULT, wx.FONTSTYLE_ITALIC, wx.NORMAL)
         self.qu_timeout=wx.StaticText(self.panel, label="Query Timeout", pos=config_fields["Q_timeout"][0],size=config_fields["Q_timeout"][1], style=0, name="")
-
         self.query_timeout=wx.TextCtrl(self.panel, pos=config_fields["Q_timeout"][2], size=config_fields["Q_timeout"][3])
-        if isConfigJson!=False:
+        if isConfigJson['queryTimeOut']=="":
+            self.query_timeout.SetValue("sec")
+            self.query_timeout.SetFont(font_italic)
+            self.query_timeout.SetForegroundColour('#848484')
+        elif isConfigJson!=False:
             self.query_timeout.SetValue(isConfigJson['queryTimeOut'])
         else:
             self.query_timeout.SetValue("3")
 
         self.timeOut=wx.StaticText(self.panel, label="Time Out", pos=config_fields["Timeout"][0],size=config_fields["Timeout"][1], style=0, name="")
         self.time_out=wx.TextCtrl(self.panel, pos=config_fields["Timeout"][2], size=config_fields["Timeout"][3])
-        if isConfigJson!=False:
+        if isConfigJson['timeOut']=="":
+            self.time_out.SetValue("sec")
+            self.time_out.SetFont(font_italic)
+            self.time_out.SetForegroundColour('#848484')
+        elif isConfigJson!=False:
             self.time_out.SetValue(isConfigJson['timeOut'])
         else:
             self.time_out.SetValue("1")
 
         self.delayText=wx.StaticText(self.panel, label="Delay", pos=config_fields["Delay"][0],size=config_fields["Delay"][1], style=0, name="")
-
         self.delay=wx.TextCtrl(self.panel, pos=config_fields["Delay"][2], size=config_fields["Delay"][3])
-        if isConfigJson!=False:
+        if isConfigJson['delay']=="":
+            self.delay.SetValue("sec")
+            self.delay.SetFont(font_italic)
+            self.delay.SetForegroundColour('#848484')
+        elif isConfigJson!=False:
             self.delay.SetValue(isConfigJson['delay'])
         else:
             self.delay.SetValue("0.3")
 
         #Delay input box kept for provide the delay in typestring.
-        self.Delay_input=wx.StaticText(self.panel, label="Delay for StringInput", pos=config_fields["Delay_Stringinput"][0],size=config_fields["Delay_Stringinput"][1], style=0, name="")
-
+        self.delay_stringinput=wx.StaticText(self.panel, label="Delay for String Input", pos=config_fields["Delay_Stringinput"][0],size=config_fields["Delay_Stringinput"][1], style=0, name="")
         self.Delay_input=wx.TextCtrl(self.panel, pos=config_fields["Delay_Stringinput"][2], size=config_fields["Delay_Stringinput"][3])
-        if isConfigJson!=False:
+        if isConfigJson['delay_stringinput']=="":
+            self.Delay_input.SetValue("sec")
+            self.Delay_input.SetFont(font_italic)
+            self.Delay_input.SetForegroundColour('#848484')
+        elif isConfigJson!=False:
             self.Delay_input.SetValue(isConfigJson['delay_stringinput'])
         else:
             self.Delay_input.SetValue("0.005")
 
         self.stepExecWait=wx.StaticText(self.panel, label="Step Execution Wait", pos=config_fields["Step_exec"][0],size=config_fields["Step_exec"][1], style=0, name="")
-
         self.step_exe_wait=wx.TextCtrl(self.panel, pos=config_fields["Step_exec"][2], size=config_fields["Step_exec"][3])
-        if isConfigJson!=False:
+        if isConfigJson['stepExecutionWait']=="":
+            self.step_exe_wait.SetValue("sec")
+            self.step_exe_wait.SetFont(font_italic)
+            self.step_exe_wait.SetForegroundColour('#848484')
+        elif isConfigJson!=False:
             self.step_exe_wait.SetValue(isConfigJson['stepExecutionWait'])
         else:
             self.step_exe_wait.SetValue("1")
 
         self.dispVarTimeOut=wx.StaticText(self.panel, label="Display Variable Timeout", pos=config_fields["Disp_var"][0],size=config_fields["Disp_var"][1], style=0, name="")
-
         self.disp_var_timeout=wx.TextCtrl(self.panel, pos=config_fields["Disp_var"][2], size=config_fields["Disp_var"][3])
-        if isConfigJson!=False:
+        if isConfigJson['displayVariableTimeOut']=="":
+            self.disp_var_timeout.SetValue("sec")
+            self.disp_var_timeout.SetFont(font_italic)
+            self.disp_var_timeout.SetForegroundColour('#848484')
+        else:
             self.disp_var_timeout.SetValue(isConfigJson['displayVariableTimeOut'])
 
-        
         self.sev_cert=wx.StaticText(self.panel, label="Server Cert", pos=config_fields["S_cert"][0],size=config_fields["S_cert"][1], style=0, name="")
-
         self.server_cert=wx.TextCtrl(self.panel, pos=config_fields["S_cert"][2], size=config_fields["S_cert"][3])
         self.server_cert_btn=wx.Button(self.panel, label="...",pos=config_fields["S_cert"][4], size=config_fields["S_cert"][5])
         self.server_cert_btn.Bind(wx.EVT_BUTTON, self.fileBrowser_servcert)
@@ -1726,18 +1713,16 @@ class Config_window(wx.Frame):
             self.server_cert.SetValue(isConfigJson['server_cert'])
 
         self.connection_timeout=wx.StaticText(self.panel, label="Connection Timeout", pos=config_fields["C_Timeout"][0],size=config_fields["C_Timeout"][1], style=0, name="")
-
-        self.conn_timeout=wx.TextCtrl(self.panel, pos=config_fields["C_Timeout"][2], size=config_fields["C_Timeout"][3])
-
+        self.conn_timeout=wx.TextCtrl(self.panel, id=9, pos=config_fields["C_Timeout"][2], size=config_fields["C_Timeout"][3])
         if isConfigJson!=False and int(isConfigJson['connection_timeout'])>=8:
             self.conn_timeout.SetValue(isConfigJson['connection_timeout'])
         else:
             self.conn_timeout.SetValue("0")
+
         self.config_param=wx.StaticText(self.panel,label="Config Parameters",pos=(10,260),size=(100,30), style=0, name="")    
         font = wx.Font(9, wx.DEFAULT, wx.NORMAL, wx.NORMAL)
         font.SetUnderlined(True)
         self.config_param.SetFont(font)
-
 
         #ToolTips for static texts boxes 
         self.sev_add.SetToolTip(wx.ToolTip("Server Address"))
@@ -1748,36 +1733,58 @@ class Config_window(wx.Frame):
         self.qu_timeout.SetToolTip(wx.ToolTip("Timeout for database queries"))
         self.timeOut.SetToolTip(wx.ToolTip("Timeout for waitForElementVisible[in seconds]"))
         self.delayText.SetToolTip(wx.ToolTip("Delay to switch between browser tabs[seconds]"))
-        self.Delay_input.SetToolTip(wx.ToolTip("Character input delay for sendFunctionKeys"))
+        self.delay_stringinput.SetToolTip(wx.ToolTip("Character input delay for sendFunctionKeys"))
         self.stepExecWait.SetToolTip(wx.ToolTip("Delay between each step[in seconds]"))
         self.dispVarTimeOut.SetToolTip(wx.ToolTip("displayVariable popup duration[in seconds]"))
         self.sev_cert.SetToolTip(wx.ToolTip("Server certificate file path"))
         self.connection_timeout.SetToolTip(wx.ToolTip("Timeout from server [in hours 0 or >8]"))
         
+        ## Binding placeholders and restricting textareas to just numeric characters
+        self.disp_var_timeout.Bind(wx.EVT_SET_FOCUS,self.toggle1_generic)
+        self.disp_var_timeout.Bind(wx.EVT_KILL_FOCUS,self.toggle2_generic)
+        self.disp_var_timeout.Bind(wx.EVT_CHAR, self.handle_keypress)
+        
+        self.query_timeout.Bind(wx.EVT_SET_FOCUS,self.toggle1_generic)
+        self.query_timeout.Bind(wx.EVT_KILL_FOCUS,self.toggle2_generic)
+        self.query_timeout.Bind(wx.EVT_CHAR, self.handle_keypress)
+
+        self.time_out.Bind(wx.EVT_SET_FOCUS,self.toggle1_generic)
+        self.time_out.Bind(wx.EVT_KILL_FOCUS,self.toggle2_generic)
+        self.time_out.Bind(wx.EVT_CHAR, self.handle_keypress)
+        
+        self.delay.Bind(wx.EVT_SET_FOCUS,self.toggle1_generic)
+        self.delay.Bind(wx.EVT_KILL_FOCUS,self.toggle2_generic)
+        self.delay.Bind(wx.EVT_CHAR, self.handle_keypress)
+        
+        self.Delay_input.Bind(wx.EVT_SET_FOCUS,self.toggle1_generic)
+        self.Delay_input.Bind(wx.EVT_KILL_FOCUS,self.toggle2_generic)
+        self.Delay_input.Bind(wx.EVT_CHAR, self.handle_keypress)
+        
+        self.step_exe_wait.Bind(wx.EVT_SET_FOCUS,self.toggle1_generic)
+        self.step_exe_wait.Bind(wx.EVT_KILL_FOCUS,self.toggle2_generic)
+        self.step_exe_wait.Bind(wx.EVT_CHAR, self.handle_keypress)
+
+        self.conn_timeout.Bind(wx.EVT_SET_FOCUS,self.toggle1_generic)
+        self.conn_timeout.Bind(wx.EVT_KILL_FOCUS,self.toggle2_generic)
+        self.conn_timeout.Bind(wx.EVT_CHAR, self.handle_keypress)
+
         lblList = ['Yes', 'No']
         lblList2 = ['64-bit', '32-bit']
         lblList3 = ['All', 'Fail']
         lblList4 = ['False', 'True']
-        # self.rbox1_Text=wx.StaticText(self.panel1,label="Ignore Certificate",pos=(8,11),size=(200, 28), style=0, name="")
-        # self.rbox1 = wx.RadioBox(self.panel1, label = '',pos=(150,8 ), choices = lblList,
-        # majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
-        # if isConfigJson!=False and isConfigJson['ignore_certificate'].title()==lblList[0]:
-        #     self.rbox1.SetSelection(0)
-        # else:
-        #     self.rbox1.SetSelection(1)
         self.bSizer = wx.BoxSizer( wx.VERTICAL )
        
 
         self.rbox1 = wx.RadioBox(self.panel1, label = 'Ignore Certificate', choices = lblList,
-        majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
+            majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
         self.rbox1.SetToolTip(wx.ToolTip("Indicates if the errors of the AUT website's security certificates are to be ignored or not. It is applicable only for IE"))
-
         if isConfigJson!=False and isConfigJson['ignore_certificate'].title()==lblList[0]:
             self.rbox1.SetSelection(0)
         else:
             self.rbox1.SetSelection(1)
+
         self.rbox2 = wx.RadioBox(self.panel1, label = 'IE Architecture Type', choices = lblList2,
-         majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
+            majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
         if isConfigJson!=False and isConfigJson['bit_64'].title() != 'Yes':
             self.rbox2.SetSelection(1)
         else:
@@ -1785,7 +1792,7 @@ class Config_window(wx.Frame):
         self.rbox2.SetToolTip(wx.ToolTip("Checks if the Client machine is a 64-bit machine or 32-bit"))
     
         self.rbox9 = wx.RadioBox(self.panel1, label = 'Disable Server Cert Check', pos=config_fields["S_address"][2], choices = lblList,
-         majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
+            majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
         if isConfigJson!=False and isConfigJson['disable_server_cert'].title() == lblList[0]:
             self.rbox9.SetSelection(0)
         else:
@@ -1793,7 +1800,7 @@ class Config_window(wx.Frame):
         self.rbox9.SetToolTip(wx.ToolTip("Gives the user an option to bypass certificate verification of secure websites in case of unavailability of a valid certificate"))
 
         self.rbox5 = wx.RadioBox(self.panel1, label = 'Exception Flag',choices = lblList4,
-         majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
+            majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
         if isConfigJson!=False and isConfigJson['exception_flag'].title()!=lblList4[0]:
             self.rbox5.SetSelection(1)
         else:
@@ -1801,7 +1808,7 @@ class Config_window(wx.Frame):
         self.rbox5.SetToolTip(wx.ToolTip("Determines whether to terminate the scenario and continue execution from the next scenario in the Test Suite or to continue executing the next step in case of the error (Object is not found)"))
 
         self.rbox6 = wx.RadioBox(self.panel1, label = 'Ignore Visibility Check',  choices = lblList,
-         majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
+            majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
         if isConfigJson!=False and isConfigJson['ignoreVisibilityCheck'].title()==lblList[0]:
             self.rbox6.SetSelection(0)
         else:
@@ -1809,7 +1816,7 @@ class Config_window(wx.Frame):
         self.rbox6.SetToolTip(wx.ToolTip("Checks the visibility of the element during execution and is applicable only for Web Applications"))
 
         self.rbox3 = wx.RadioBox(self.panel1, label = 'ScreenShot Flag', choices = lblList3,
-         majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
+            majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
         if isConfigJson!=False and isConfigJson['screenShot_Flag'].title()!=lblList3[0]:
             self.rbox3.SetSelection(1)
         else:
@@ -1817,31 +1824,31 @@ class Config_window(wx.Frame):
         self.rbox3.SetToolTip(wx.ToolTip("Facilitates capturing the screenshots of the test steps based on its value"))
 
         self.rbox4 = wx.RadioBox(self.panel1, label = 'Retrieve URL', choices = lblList,
-         majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
+            majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
         if isConfigJson!=False and isConfigJson['retrieveURL'].title()!=lblList[0]:
             self.rbox4.SetSelection(1)
         else:
             self.rbox4.SetSelection(0)
         self.rbox4.SetToolTip(wx.ToolTip("Determines whether to continue to debug/execute or stop in case of AUT website status code errors like 400, 401, 404, 500 et al. It is applicable only for Web Applications. "))
 
-        
-
         self.rbox8 = wx.RadioBox(self.panel1, label ='Browser Check', choices = lblList,
-         majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
+            majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
         if isConfigJson!=False and isConfigJson['browser_check'].title()!=lblList[0]:
             self.rbox8.SetSelection(1)
         else:
             self.rbox8.SetSelection(0)
         self.rbox8.SetToolTip(wx.ToolTip("Enables or disables Browser Compatibility check based on the selection."))
+
         self.rbox7 = wx.RadioBox(self.panel1, label = 'Enable Security Check', choices = lblList,
-         majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
+            majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
         if isConfigJson!=False and isConfigJson['enableSecurityCheck'].title()==lblList[0]:
             self.rbox7.SetSelection(0)
         else:
             self.rbox7.SetSelection(1)
         self.rbox7.SetToolTip(wx.ToolTip("Provides an option for the IE browser to set all the security zones to the same level while executing the openBrowser/openNewBrowser keywords. It is applicable only when automating Web Applications in IE browser"))
+
         self.rbox10 = wx.RadioBox(self.panel1, label = 'Highlight Check', choices = lblList,
-         majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
+            majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
         if isConfigJson!=False and isConfigJson['highlight_check'].title()==lblList[0]:
             self.rbox10.SetSelection(0)
         else:
@@ -1849,7 +1856,7 @@ class Config_window(wx.Frame):
         self.rbox10.SetToolTip(wx.ToolTip("When the user verifies the existence of an element using the verifyExists keyword, the radio button for Highlight Check highlights the element (or not) based on the selection. It is applicable only for the verifyExists keyword"))
 
         self.rbox11 = wx.RadioBox(self.panel1, label = 'Prediction for IRIS Objects', choices = lblList,
-         majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
+            majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
         if isConfigJson!=False and isConfigJson['prediction_for_iris_objects'].title()==lblList[0]:
             self.rbox11.SetSelection(0)
         else:
@@ -1857,7 +1864,7 @@ class Config_window(wx.Frame):
         self.rbox11.SetToolTip(wx.ToolTip("Enables or disables IRIS prediction based on its value"))
 
         self.rbox12 = wx.RadioBox(self.panel1, label = "Hide Soft. Keyboard", choices = lblList,
-         majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
+            majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
         if isConfigJson != False and isConfigJson['hide_soft_key'].title() == lblList[0]:
             self.rbox12.SetSelection(0)
         else:
@@ -1865,7 +1872,7 @@ class Config_window(wx.Frame):
         self.rbox12.SetToolTip(wx.ToolTip('Indicates if the keypad, in Android devices, shows or not. It is applicable only for Android-based applications'))
 
         self.rbox13 = wx.RadioBox(self.panel1, label = "Extension Enable", choices = lblList,
-         majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
+            majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
         if isConfigJson != False and isConfigJson['extn_enabled'].title() == lblList[0]:
             self.rbox13.SetSelection(0)
         else:
@@ -1873,62 +1880,25 @@ class Config_window(wx.Frame):
         self.rbox13.SetToolTip(wx.ToolTip("Enables browser extension for Advanced debug mode."))
 
         self.rbox14 = wx.RadioBox(self.panel1, label = "Update Check", choices = lblList,
-         majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
+            majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
         if isConfigJson != False and isConfigJson['update_check'].title() == lblList[0]:
             self.rbox14.SetSelection(0)
         else:
             self.rbox14.SetSelection(1)
         self.rbox14.SetToolTip(wx.ToolTip("Checks for the availability of ICE updates"))
+
         #Adding GridSizer which will show the radio buttons into grid of 7 rows and 2 colums it can be changed based on the requirements 
         self.gs=wx.GridSizer(7,2,5,5)
-        self.gs.AddMany([(self.rbox1,0,wx.EXPAND),
-                    (self.rbox2,0,wx.EXPAND),
-                    (self.rbox9,0,wx.EXPAND),
-                    (self.rbox5,0,wx.EXPAND),
-                    (self.rbox6,0,wx.EXPAND),
-                    (self.rbox3,0,wx.EXPAND),
-                    (self.rbox4,0,wx.EXPAND),
-                    
-                    (self.rbox8,0,wx.EXPAND),
-                    (self.rbox7,0,wx.EXPAND),
-                    (self.rbox10,0,wx.EXPAND),
-                    (self.rbox11,0,wx.EXPAND),
-                    (self.rbox12,0,wx.EXPAND),
-                    (self.rbox13,0,wx.EXPAND),
-                    (self.rbox14,0,wx.EXPAND)
-                    ])    
+        self.gs.AddMany([(self.rbox1,0,wx.EXPAND), (self.rbox2,0,wx.EXPAND), (self.rbox9,0,wx.EXPAND),
+            (self.rbox5,0,wx.EXPAND), (self.rbox6,0,wx.EXPAND), (self.rbox3,0,wx.EXPAND),
+            (self.rbox4,0,wx.EXPAND), (self.rbox8,0,wx.EXPAND), (self.rbox7,0,wx.EXPAND),
+            (self.rbox10,0,wx.EXPAND), (self.rbox11,0,wx.EXPAND), (self.rbox12,0,wx.EXPAND),
+            (self.rbox13,0,wx.EXPAND), (self.rbox14,0,wx.EXPAND)])    
        
         #adding  GridSizer to bSizer which is a box sizer
         self.bSizer.Add(self.gs, 1, wx.EXPAND | wx.TOP, 5)
         #now setting that boxsizer to our panel1
         self.panel1.SetSizer(self.bSizer)
-        
-        
-       
-        
-        
-        # # self.rbox2 = wx.RadioBox(self.panel, label = 'IE Architecture Type', pos = config_fields["IE_arch"][0], choices = lblList2,
-        # #  majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
-        # # if isConfigJson!=False and isConfigJson['bit_64'].title() != 'Yes':
-        # #     self.rbox2.SetSelection(1)
-        # # else:
-        # #     self.rbox2.SetSelection(0)
-
-      
-  
-        
-
-        
-        # self.bSizer.Add(self.sev_add1,0,wx.ALL,5)
-        # # # self.bSizer.Add(self.rbox2,0,wx.ALL)
-        # # # self.bSizer.Add(self.rbox9,0,wx.ALL)
-        # # # self.bSizer.Add(self.rbox5,0,wx.ALL)
-        # # # self.bSizer.Add(self.rbox6,0,wx.ALL)
-        # # # self.bSizer.Add(self.rbox3,0,wx.ALL)
-        # self.panel1.setSizer(self.bSizer)
-
-        
-      
 
         self.error_msg=wx.StaticText(self.panel, label="", pos=(85,450),size=(350, 28), style=0, name="")
         self.save_btn=wx.Button(self.panel, label="Save",pos=config_fields["Save"][0], size=config_fields["Save"][1])
@@ -1949,6 +1919,31 @@ class Config_window(wx.Frame):
         self.Centre()
         wx.Frame(self.panel)
         self.Show()
+
+    #allows only integer and float values 
+    def handle_keypress(self, event):
+        keycode = event.GetKeyCode()
+        if chr(keycode) in ['0','1','2','3','4','5','6','7','8','9','.','\x08','ĺ','ļ','Ĺ','ĸ','\x7f']:
+            event.Skip()
+
+    def toggle1_generic(self,evt):
+        self.demo=evt.EventObject
+        if (self.demo.Id == 9 and self.demo.GetValue()=="0 or >=8 hrs") or self.demo.GetValue()=="sec":
+            self.demo.SetValue("")
+            font = wx.Font(10, wx.DEFAULT, wx.FONTSTYLE_NORMAL, wx.NORMAL)
+            self.demo.SetFont(font)
+            self.demo.SetForegroundColour('#000000')
+        evt.Skip()
+
+    def toggle2_generic(self,evt):
+        self.demo=evt.EventObject
+        if self.demo.GetValue() == "":
+            if self.demo.Id == 9: self.demo.SetValue("0 or >=8 hrs")
+            else: self.demo.SetValue("sec")
+            font = wx.Font(10, wx.DEFAULT, wx.FONTSTYLE_ITALIC, wx.NORMAL)
+            self.demo.SetFont(font)
+            self.demo.SetForegroundColour('#848484')
+        evt.Skip()
 
     """This method verifies and checks if correct data is present,then creates a dictionary and sends this dictionary to jsonCreater()"""
     def config_check(self,event):
@@ -2012,7 +2007,10 @@ class Config_window(wx.Frame):
         data['update_check']= update_check.strip()
         data['delay_stringinput']=delay_string_in.strip()
         config_data=data
-        if data['server_ip']!='' and data['server_port']!='' and data['server_cert']!='' and data['chrome_path']!='' and data['queryTimeOut']!='' and data['logFile_Path']!='' and data['delay']!='' and data['timeOut']!='' and data['stepExecutionWait']!='' and data['displayVariableTimeOut']!='' and data['firefox_path']!='' and  data['connection_timeout']>='':
+        if (data['server_ip']!='' and data['server_port']!='' and data['server_cert']!='' and
+            data['chrome_path']!='' and data['queryTimeOut'] not in ['','sec'] and data['logFile_Path']!='' and
+            data['delay'] not in ['','sec'] and data['timeOut'] not in ['','sec'] and data['stepExecutionWait'] not in ['','sec'] and
+            data['displayVariableTimeOut'] not in ['','sec'] and data['delay_stringinput'] not in ['','sec'] and data['firefox_path']!='' and  data['connection_timeout'] not in ['','0 or >=8 hrs']):
             #---------------------------------------resetting the static texts
             self.error_msg.SetLabel("")
             self.sev_add.SetLabel('Server Address')
@@ -2056,7 +2054,8 @@ class Config_window(wx.Frame):
                     self.error_msg.SetLabel("Connection Timeout must be greater than or equal to 8")
                     self.error_msg.SetForegroundColour((255,0,0))
                     self.connection_timeout.SetForegroundColour((255,0,0))
-                self.jsonCreater(config_data)
+                else:
+                    self.jsonCreater(config_data)
             else:
                 self.error_msg.SetLabel("Marked fields '^' contain invalid path, Data not saved")
                 self.error_msg.SetForegroundColour((0,0,255))
@@ -2108,7 +2107,13 @@ class Config_window(wx.Frame):
             else:
                 self.log_fpath.SetLabel('Log File Path')
                 self.log_fpath.SetForegroundColour((0,0,0))
-            if data['queryTimeOut']=='':
+            if data['delay_stringinput']=="sec":
+                self.delay_stringinput.SetLabel('Delay for String Input*')
+                self.delay_stringinput.SetForegroundColour((255,0,0))
+            else:
+                self.delay_stringinput.SetLabel('Delay for String Input')
+                self.delay_stringinput.SetForegroundColour((0,0,0))
+            if data['queryTimeOut']=="sec":
                 self.qu_timeout.SetLabel('Query Timeout*')
                 self.qu_timeout.SetForegroundColour((255,0,0))
             else:
@@ -2132,31 +2137,31 @@ class Config_window(wx.Frame):
             else:
                 self.ff_path.SetLabel('Firefox Path')
                 self.ff_path.SetForegroundColour((0,0,0))
-            if data['delay']=='':
+            if data['delay']=="sec":
                 self.delayText.SetLabel('Delay*')
                 self.delayText.SetForegroundColour((255,0,0))
             else:
                 self.delayText.SetLabel('Delay')
                 self.delayText.SetForegroundColour((0,0,0))
-            if data['timeOut']=='':
+            if data['timeOut']=="sec":
                 self.timeOut.SetLabel('Time Out*')
                 self.timeOut.SetForegroundColour((255,0,0))
             else:
                 self.timeOut.SetLabel('Time Out')
                 self.timeOut.SetForegroundColour((0,0,0))
-            if data['stepExecutionWait']=='':
+            if data['stepExecutionWait']=="sec":
                 self.stepExecWait.SetLabel('Step Execution Wait*')
                 self.stepExecWait.SetForegroundColour((255,0,0))
             else:
                 self.stepExecWait.SetLabel('Step Execution Wait')
                 self.stepExecWait.SetForegroundColour((0,0,0))
-            if data['displayVariableTimeOut']=='':
+            if data['displayVariableTimeOut']=="sec":
                 self.dispVarTimeOut.SetLabel('Display Variable Timeout*')
                 self.dispVarTimeOut.SetForegroundColour((255,0,0))
             else:
                 self.dispVarTimeOut.SetLabel('Display Variable Timeout')
                 self.dispVarTimeOut.SetForegroundColour((0,0,0))
-            if data['connection_timeout']=='':
+            if data['connection_timeout']=="0 or >=8 hrs":
                 self.connection_timeout.SetLabel('Connection Timeout*')
                 self.connection_timeout.SetForegroundColour((255,0,0))
             else:
@@ -2547,9 +2552,9 @@ def check_browser():
             import subprocess
             from selenium import webdriver
             from selenium.webdriver import ChromeOptions
-            p = subprocess.Popen('chromedriver.exe --version', stdout=subprocess.PIPE, bufsize=1,cwd=DRIVERS_PATH,shell=True)
-            a=p.stdout.readline()
-            a=a.decode('utf-8')[13:17]
+            p = subprocess.Popen(CHROME_DRIVER_PATH + ' --version', stdout=subprocess.PIPE, bufsize=1, shell=True)
+            a = p.stdout.readline()
+            a = a.decode('utf-8')[13:17]
             choptions1 = webdriver.ChromeOptions()
             if str(configvalues['chrome_path']).lower()!="default":
                 choptions1.binary_location=str(configvalues['chrome_path'])
@@ -2562,8 +2567,7 @@ def check_browser():
                 browser_ver = driver.capabilities['version']
             elif 'browserVersion' in  driver.capabilities.keys():
                 browser_ver = driver.capabilities['browserVersion']
-            browser_ver1 = browser_ver.encode('utf-8')
-            browser_ver = int(browser_ver1[:2])
+            browser_ver = int(browser_ver.encode('utf-8')[:2])
             try:
                 driver.close()
                 driver.quit()
@@ -2581,9 +2585,9 @@ def check_browser():
             log.error("Error in checking chrome version")
             log.error(e,exc_info=True)
         try:
-            p = subprocess.Popen('geckodriver.exe --version', stdout=subprocess.PIPE, bufsize=1,cwd=DRIVERS_PATH,shell=True)
-            a=p.stdout.readline()
-            a=a.decode('utf-8')[12:16]
+            p = subprocess.Popen(GECKODRIVER_PATH + ' --version', stdout=subprocess.PIPE, bufsize=1, shell=True)
+            a = p.stdout.readline()
+            a = a.decode('utf-8')[12:16]
             caps=webdriver.DesiredCapabilities.FIREFOX
             caps['marionette'] = True
             from selenium.webdriver.firefox.options import Options
@@ -2595,9 +2599,7 @@ def check_browser():
                 driver = webdriver.Firefox(capabilities=caps,firefox_options=options,firefox_binary=binary, executable_path=GECKODRIVER_PATH)
             else:
                 driver = webdriver.Firefox(capabilities=caps,firefox_options=options, executable_path=GECKODRIVER_PATH)
-            browser_ver=driver.capabilities['browserVersion']
-            browser_ver1 = browser_ver.encode('utf-8')
-            browser_ver = float(browser_ver1[:4])
+            browser_ver = float(driver.capabilities['browserVersion'].encode('utf-8')[:4])
             try:
                 driver.close()
                 driver.quit()
@@ -2606,7 +2608,7 @@ def check_browser():
             driver=None
             for k,v in list(FIREFOX_BROWSER_VERSION.items()):
                 if a == k:
-                    if browser_ver >= v[0] or browser_ver <= v[1]:
+                    if browser_ver >= v[0] and browser_ver <= v[1]:
                         firefoxFlag=True
             if firefoxFlag == False:
                 logger.print_on_console('WARNING!! : Firefox version ',str(browser_ver),' is not supported.')

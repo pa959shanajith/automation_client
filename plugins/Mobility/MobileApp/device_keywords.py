@@ -172,7 +172,7 @@ class Device_Keywords():
                 cmd=aapt_home
                 os.chdir(cmd)
                 cmd = cmd + 'aapt.exe'
-                out = subprocess.Popen([cmd, 'dump','badging',apk],stdout= subprocess.PIPE)
+                out = subprocess.Popen([cmd, 'dump','badging',apk],stdout= subprocess.PIPE, close_fds=True)
                 for line in out.stdout.readlines():
                     curr_line = str(line)[2:-1]
                     if 'package:' in curr_line:
@@ -197,7 +197,7 @@ class Device_Keywords():
                 cmd=aapt_home
                 os.chdir(cmd)
                 cmd = cmd + 'aapt.exe'
-                out = subprocess.Popen([cmd, 'dump', 'badging', apk],stdout= subprocess.PIPE)
+                out = subprocess.Popen([cmd, 'dump', 'badging', apk],stdout= subprocess.PIPE, close_fds=True)
                 for line in out.stdout.readlines():
                     curr_line = str(line)[2:-1]
                     if 'launchable' in curr_line:

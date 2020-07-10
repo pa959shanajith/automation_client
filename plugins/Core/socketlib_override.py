@@ -198,6 +198,8 @@ def socketIO_get_response(request, *args, **kw):
 def socketIO_wait(self, seconds=None, **kw):
     self._heartbeat_thread.hurry()
     #self._transport.set_timeout(seconds=1)
+    #print(self._transport._connection.gettimeout())
+    time.sleep(1)
     warning_screen = self._yield_warning_screen(seconds)
     for elapsed_time in warning_screen:
         if self._should_stop_waiting(**kw):
@@ -232,8 +234,8 @@ def socketIO_wait(self, seconds=None, **kw):
 """
 def socketIO_on_data_ack(self, pack_id, *args):
     #print("Ack'd "+str(pack_id))
-    # Check if ack recieved matches with the packet sent, Only then process the ACK
-    if (str(self._io.last_packet_sent) != str(pack_id)): return None
+    # Check if ack recieved matches with the packet sent, Only then process the ACK. Also match id_eof with id
+    if (self._io.last_packet_sent != str(pack_id)) and (self._io.last_packet_sent.replace("_eof", '') != str(pack_id)): return None
     if (self._io.activeTimer != None and self._io.activeTimer.isAlive()):
         self._io.activeTimer.cancel()
     idx = pack_id.split('_')
@@ -252,8 +254,12 @@ def socketIO_save_pckt(self, packid, event, *fargs, **fkw):
     fargs = (packid,) + fargs
     idx = packid.split('_')
     send_now = not store.has_packet
-    store.save_packet(int(idx[0]), (idx[1] if len(idx) == 2 else None), [event, fargs, fkw])
+    if not ("dnack" in fkw and fkw["dnack"]):
+        store.save_packet(int(idx[0]), (idx[1] if len(idx) == 2 else None), [event, fargs, fkw])
     if send_now: self.send_pckt(event, *fargs, **fkw)
+    elif not (self.activeTimer != None and self.activeTimer.isAlive()):
+        pckt = store.get_packet(store.next_id)
+        if pckt: self.send_pckt(pckt[0], *pckt[1], **pckt[2])
 
 """ Override SocketIO library's emit method used for sending data.
     This is needed because this library doesn't support packet size larger than 100 MB
@@ -284,16 +290,23 @@ def socketIO_emit(self, event, *args, **kw):
 
 def socketIO_send_pckt(self, event, *args, **kw):
     #print("Sending "+str(args[0]))
-    self.last_packet_sent = args[0]
+    self.last_packet_sent = str(args[0])
     try:
         self._emit(event, *args, **kw)
     except:
         pass
-    if "dnack" in kw and kw["knack"]: store.clear()
-    else:
+    if not ("dnack" in kw and kw["dnack"]):
         self.activeTimer = Timer(PACKET_TIMEOUT, self.send_pckt, (event,) + args, kw)
         self.activeTimer.start()
     del args
+
+
+def socketIO_send(self, data='', callback=None, **kw):
+    if 'path' not in kw: kw['path'] = ''
+    args = [data]
+    if callback:
+        args.append(callback)
+    self.emit('message', *args, **kw)
 
 
 socketIO_client.parsers._read_packet_length = socketIO_read_packet_length
@@ -307,6 +320,8 @@ socketIO_client.SocketIO.save_pckt = socketIO_save_pckt
 socketIO_client.SocketIO.send_pckt = socketIO_send_pckt
 socketIO_client.SocketIO._emit = socketIO_client.SocketIO.emit
 socketIO_client.SocketIO.emit = socketIO_emit
+socketIO_client.SocketIO._send = socketIO_client.SocketIO.send
+socketIO_client.SocketIO.send = socketIO_send
 socketIO_client.SocketIO._warn = socketIO_warn
 socketIO_client.SocketIO._close = socketIO_close
 socketIO_client.SocketIO._transport = socketIO_transport

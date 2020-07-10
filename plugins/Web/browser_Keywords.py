@@ -24,7 +24,7 @@ if SYSTEM_OS != 'Darwin':
     import utils_web
     import win32process
     import win32con
-#    from pywinauto import Application
+    from pywinauto import Application
 import psutil
 import readconfig
 import core_utils
@@ -68,10 +68,7 @@ class BrowserKeywords():
         err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         logger.print_on_console(err_msg)
         return err_msg
-    def _browser_not_avail(self,e):
-        err_msg='BROWSER NOT AVAILABLE'
-        logger.print_on_console(err_msg)
-        return err_msg
+
     def openBrowser(self,webelement,browser_num,*args):
         global local_bk, driver_pre, drivermap
         status=webconstants.TEST_RESULT_FAIL
@@ -210,6 +207,8 @@ class BrowserKeywords():
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
         return status,result,output,err_msg
+
+
     def openNewTab(self ,*args):
         global local_bk
         status=webconstants.TEST_RESULT_FAIL
@@ -217,25 +216,21 @@ class BrowserKeywords():
         output=OUTPUT_CONSTANT
         err_msg=None
         try:
-              logger.print_on_console(local_bk.driver_obj)
-              local_bk.driver_obj.execute_script("window.open('');")
-            
-              handles=local_bk.driver_obj.window_handles
-              size = len(handles)
-              local_bk.driver_obj.switch_to.window(handles[-1] )
-              h=local_bk.driver_obj.current_window_handle
-              local_bk.all_handles.append(h)
-              local_bk.recent_handles.append(h)
-             
-              status=webconstants.TEST_RESULT_PASS
-              result=webconstants.TEST_RESULT_TRUE
-
+            logger.print_on_console(local_bk.driver_obj)
+            local_bk.driver_obj.execute_script("window.open('');")
+            handles = local_bk.driver_obj.window_handles
+            local_bk.driver_obj.switch_to.window(handles[-1])
+            h=local_bk.driver_obj.current_window_handle
+            local_bk.all_handles.append(h)
+            local_bk.recent_handles.append(h)
+            status=webconstants.TEST_RESULT_PASS
+            result=webconstants.TEST_RESULT_TRUE
         except Exception as e:
-            err_msg=self._browser_not_avail(e)
+            err_msg=self.__web_driver_exception(e)
         return status,result,output,err_msg
 
         
-    def refresh(self,webelement,*args):
+    def refresh(self,*args):
         global local_bk
         status=webconstants.TEST_RESULT_FAIL
         result=webconstants.TEST_RESULT_FALSE
@@ -265,7 +260,6 @@ class BrowserKeywords():
                 if url[0:7].lower()!='http://' and url[0:8].lower()!='https://' and url[0:5].lower()!='file:':
                     url='http://'+url
                 local_bk.driver_obj.get(url)
-
                 #ignore certificate implementation
                 try:
                     ignore_certificate = readconfig.configvalues['ignore_certificate']
@@ -437,6 +431,24 @@ class BrowserKeywords():
         err_msg=None
         try:
             local_bk.driver_obj.execute_script("window.history.go(-1)")
+            status=webconstants.TEST_RESULT_PASS
+            result=webconstants.TEST_RESULT_TRUE
+        except Exception as e:
+            err_msg=self.__web_driver_exception(e)
+        return status,result,output,err_msg
+
+    def execute_js(self, inputval, *args):
+        """performs a back operation"""
+        global local_bk
+        status=webconstants.TEST_RESULT_FAIL
+        result=webconstants.TEST_RESULT_FALSE
+        output=OUTPUT_CONSTANT
+        err_msg=None
+        try:
+            inputval="return window."+args[0][0]
+            op=local_bk.driver_obj.execute_script(inputval)
+            if(op!=None):
+                output=op
             status=webconstants.TEST_RESULT_PASS
             result=webconstants.TEST_RESULT_TRUE
         except Exception as e:
@@ -693,7 +705,8 @@ class BrowserKeywords():
             #clear cache for chrome driver.
             elif local_bk.driver_obj != None and isinstance(local_bk.driver_obj,webdriver.Chrome):
                     local_bk.driver_obj.get('chrome://settings/clearBrowserData')
-                    local_bk.driver_obj.execute_script('return document.querySelector("body > settings-ui").shadowRoot.querySelector("#main").shadowRoot.querySelector("settings-basic-page").shadowRoot.querySelector("#advancedPage > settings-section:nth-child(1) > settings-privacy-page").shadowRoot.querySelector("settings-clear-browsing-data-dialog").shadowRoot.querySelector("#clearBrowsingDataConfirm").click();')
+                    time.sleep(2)
+                    local_bk.driver_obj.execute_script('return document.querySelector("body > settings-ui").shadowRoot.querySelector("#container").querySelector("#main").shadowRoot.querySelector("settings-basic-page").shadowRoot.querySelector("settings-privacy-page").shadowRoot.querySelector("settings-clear-browsing-data-dialog").shadowRoot.querySelector("#clearBrowsingDataDialog").querySelector("#clearBrowsingDataConfirm").click();')
                     logger.print_on_console('Cleared cache')
                     local_bk.log.info('Cleared Cache')
                     status=webconstants.TEST_RESULT_PASS

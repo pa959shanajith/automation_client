@@ -22,6 +22,7 @@ import logger
 import logging
 from core_utils import CoreUtils
 import threading
+from aws_keywords import *
 local_handler = threading.local()
 
 
@@ -122,6 +123,7 @@ class Handler():
         local_handler.tspIndex2 = -1
         local_handler.tspIndex = -1
         local_handler.tspList = []
+        local_handler.awsKeywords = {}
 
     def parse_json(self,test_data,data_param_path=None):
         """
@@ -129,9 +131,7 @@ class Handler():
         purpose : parses the given json and passes it to create list
         param : test_data (json list)
         return : None
-
         """
-##        import  ftfy
         local_handler.log.debug('Parsing')
         local_handler.log.debug('-------------------------')
         local_handler.log.debug('TSP list')
@@ -164,18 +164,13 @@ class Handler():
                         continue
                 except Exception as e:
                     local_handler.log.error(e)
-
-                #passing test case value to ftfy module to handle special charcter
-##                if(type(testcase) == 'unicode'):
-##                    temp_testcase = ftfy.fix_text(testcase)
-##                    script.append(temp_testcase)
-##                else:
-##                script.append(testcase)
+                appType=None
+                if('apptype' in json_data and json_data['apptype']=="MobileApp"):
+                    local_handler.awsKeywords[json_data["testcasename"]]=set()
+                    appType="MobileApp"
                 script.append(testcase)
-            if 'comments' in json_data:
-                comments=json_data['comments']
-            #Checking if the testcase has key 'testscript_name' or 'testcasename'
-            #adding the template to dict if available
+            # Checking if the testcase has key 'testscript_name' or 'testcasename'
+            # adding the template to dict if available
             if 'testscript_name' in json_data:
                 testscript_name=json_data['testscript_name']
                 if 'template' in json_data:
@@ -194,10 +189,10 @@ class Handler():
                 browser_type=json_data['browsertype']
             elif 'browserType' in json_data:
                 browser_type=json_data['browserType']
-        if(data_param_path is None or data_param_path == ''):
-            flag=self.create_list(script,testcasename_list)
+        if(data_param_path is None or str(data_param_path).strip() == ''):
+            flag=self.create_list(script,testcasename_list,None,appType)
         else:
-            flag=self.create_list(script,testcasename_list,extract_path)
+            flag=self.create_list(script,testcasename_list,extract_path,appType)
         return flag,browser_type,len(script),testcase_empty_flag,empty_testcase_names
 
 
@@ -207,49 +202,36 @@ class Handler():
         purpose : parses the given json and passes it to create list
         param : test_data (json list)
         return : None
-
         """
         logger.print_on_console('Parsing')
-        json_string = json.dumps(test_data)
-        new_obj = json.loads(json_string)
+        new_obj = json.loads(json.dumps(test_data))
         suite_data=[]
         scenarioIds={}
         browser_type={}
         dataparam_path={}
         condition_check={}
-        suiteId_list=[]
-        suite_details=[]
-        execution_id=[]
-        exec_mode = None
         #Iterating through json array
-
         try:
-            #Getting suite_data
             suite_details=new_obj['suitedetails']
-            #Getting suite_ids
             suiteId_list=new_obj['testsuiteIds']
-            execution_id=new_obj['executionId']
+            batch_id=new_obj['batchId']
+            execution_ids=new_obj['executionIds']
             exec_mode=new_obj['exec_mode']
+            qc_creds=new_obj['qccredentials']
             for json_data,suite_id in zip(suite_details,suiteId_list):
-                if type(suite_id)==str:
-                    suite_id=str(suite_id)
-
                 suite_data.append(json_data[suite_id])
                 if 'scenarioIds' in json_data:
                     scenarioIds[suite_id]=json_data['scenarioIds']
-
                 if 'browserType' in json_data:
                     browser_type[suite_id]=json_data['browserType']
-
                 if 'condition' in json_data:
                     condition_check[suite_id]=json_data['condition']
-
                 if 'dataparampath' in json_data:
                     dataparam_path[suite_id]=json_data['dataparampath']
         except Exception as e:
             local_handler.log.error("Error while parsing data")
             local_handler.log.error(e,exc_info=True)
-        return suiteId_list,suite_details,browser_type,scenarioIds,suite_data,execution_id,condition_check,dataparam_path,exec_mode
+        return suiteId_list,suite_details,browser_type,scenarioIds,suite_data,execution_ids,batch_id,condition_check,dataparam_path,exec_mode,qc_creds
 
     def validate(self,start,end):
         """
@@ -257,7 +239,6 @@ class Handler():
         purpose : validates whether the start and end is proper based on 'start_end_dict' info
         param : start,end keywords
         return : bool
-
         """
         return end in local_handler.start_end_dict[start]
 
@@ -267,7 +248,6 @@ class Handler():
         purpose : inserts the '(indexOfFor,for)' as 'key' and its respective endfor step as value 'indexofEndfor:endfor' and vice versa
         param : keyword_index,keyword,start_index
         return :
-
         """
         if start_index is not None:
             local_handler.for_info[start_index]=[{keyword_index:keyword}]
@@ -282,7 +262,6 @@ class Handler():
         purpose : inserts the '(indexOfgetParam,getparam)' as 'key' and its respective startLoop and endLoop as values and vice versa
         param : keyword_index,keyword,start_index
         return :
-
         """
         if start_index is not None:
             if not(start_index[1] == constants.ENDLOOP and keyword==constants.ENDLOOP):
@@ -299,7 +278,6 @@ class Handler():
         purpose : inserts the '(indexOfif,If)' as 'key' and its immediate end and its respective endIf step as values and vice versa
         param : keyword_index,keyword,start_index
         return :
-
         """
         if start_index is not None:
             if not(start_index[1] == constants.ENDIF and keyword==constants.ENDIF):
@@ -317,13 +295,12 @@ class Handler():
         purpose : finds the last value in 'for_keywords' dict, if it is 'endfor' then calls insert_into_fordict method
         param : keyword_index,keyword,start_index
         return : bool
-
         """
         flag=True
 
         if len(local_handler.for_keywords) != 0:
             start_index=list(local_handler.for_keywords.items())[-1]
-##            if keyword == constants.ENDFOR and self.validate(keyword,start_index[1]):
+            # if keyword == constants.ENDFOR and self.validate(keyword,start_index[1]):
             if keyword == constants.ENDFOR:
                 self.insert_into_fordict(keyword_index,keyword,start_index)
             elif keyword== constants.ENDFOR:
@@ -334,7 +311,6 @@ class Handler():
                 self.insert_into_fordict(keyword_index,keyword,None)
         else:
             self.insert_into_fordict(keyword_index,keyword,None)
-
         return flag
 
 
@@ -345,7 +321,6 @@ class Handler():
         purpose : finds the last value in 'condition_keywords' dict, if it is valid 'end step', calls insert_into_ifdict method
         param : keyword_index,keyword,start_index
         return : bool
-
         """
         flag=True
         if len(local_handler.condition_keywords)>0:
@@ -382,11 +357,9 @@ class Handler():
                     flag=constants.ENDIF
 
             elif keyword==constants.IF:
-##                self.insert_into_ifdict(keyword_index,keyword,None)
-                  #New change to Map 'if' to 'if'
-                  self.insert_into_ifdict(keyword_index,keyword,(keyword_index,keyword))
-
-
+                # self.insert_into_ifdict(keyword_index,keyword,None)
+                # New change to Map 'if' to 'if'
+                self.insert_into_ifdict(keyword_index,keyword,(keyword_index,keyword))
         else:
             self.insert_into_ifdict(keyword_index,keyword,(keyword_index,keyword))
         return flag
@@ -397,7 +370,6 @@ class Handler():
         purpose : finds the last value in 'getparam_keywords' dict, if it is valid 'end step', calls insert_into_getParamdict method
         param : keyword_index,keyword,start_index
         return : bool
-
         """
         flag=True
         if len(local_handler.getparam_keywords)>0:
@@ -431,7 +403,6 @@ class Handler():
         purpose : calls respective method to find the start step of the given keyword
         param : keyword_index,keyword,start_index
         return : bool
-
         """
         if flag==1:
             return self.for_index(keyword,keyword_index)
@@ -442,27 +413,27 @@ class Handler():
 
 
 
-    def parse_condition(self,testcase):
+    def parse_condition(self,testcase,testscript_name,aws_flag=False):
         """
         def : parse_condition
         purpose : parses entire testcript json to map the corresponding start and end of if,for,getparam
-        param : keyword_index,keyword,start_index
+        param : testcase,testscript_name,aws_flag
         return : bool
-
         """
         flag=True
-
         for x in range(0,len(testcase)):
             step=testcase[x]
-
             keyword=step['keywordVal']
-            outputval=step['outputVal'].strip()
-            outputArray=outputval.split(';')
-            if not (len(outputArray)>=1 and not(outputval.endswith('##;')) and outputval.split(';') and '##' in outputArray[len(outputArray)-1] ):
+            outputArray=step['outputVal'].strip().split(';')
+            if not (len(outputArray)>=1 and  '##' == outputArray[-1] ):
                 logger.print_on_console('keyword: '+keyword)
                 local_handler.log.info('keyword: '+keyword)
                 local_handler.log.debug(str(x)+'keyword: '+keyword)
                 keyword=keyword.lower()
+                if aws_flag:
+                    if(keyword not in aws_supported_keywords):
+                        local_handler.awsKeywords[testscript_name].add(step['keywordVal'])
+
                 local_handler.tspIndex+=1
 
                 #getting 'for' info
@@ -494,17 +465,13 @@ class Handler():
                 logger.print_on_console('Commented step '+str(step['stepNo']))
         return flag
 
-
-
     def create_step(self,index,keyword,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo,i,remark,testcase_details,cord,extract_path=None):
         """
         def : create_step
         purpose : creates an object of each step
         param : keyword_index,keyword,start_index
         return : object
-
         """
-
         key_lower=keyword.lower()
         key=(index,key_lower)
         tsp_step=None
@@ -514,7 +481,7 @@ class Handler():
                 if not(key in local_handler.for_info):
                     self.insert_into_fordict(index,key_lower,None)
                     local_handler.log.error('Dangling if/for/getparam in testcase: '+str(testscript_name))
-##                    logger.print_on_console('Dangling if/for/getparam in testcase: '+str(testscript_name))
+                    # logger.print_on_console('Dangling if/for/getparam in testcase: '+str(testscript_name))
                 tsp_step=for_step.For(index,keyword,inputval,outputval,stepnum,testscript_name,local_handler.for_info[key],False,apptype,additionalinfo,i,remark,testcase_details)
 
             #block which creates the step of instances (if,elseIf,else,endIf)
@@ -522,7 +489,7 @@ class Handler():
                 if not(key in local_handler.if_info):
                     self.insert_into_ifdict(index,key_lower,None)
                     local_handler.log.error('Dangling if/for/getparam in testcase: '+str(testscript_name))
-##                    logger.print_on_console('Dangling if/for/getparam in testcase: '+str(testscript_name))
+                    # logger.print_on_console('Dangling if/for/getparam in testcase: '+str(testscript_name))
 
                 tsp_step=if_step.If(index,keyword,inputval,outputval,stepnum,testscript_name,local_handler.if_info[key],False,apptype,additionalinfo,i,remark,testcase_details)
 
@@ -531,7 +498,7 @@ class Handler():
                 if not(key in local_handler.get_param_info):
                     self.insert_into_getParamdict(index,key_lower,None)
                     local_handler.log.error('Dangling if/for/getparam in testcase: '+str(testscript_name))
-##                    logger.print_on_console('Dangling if/for/getparam in testcase: '+str(testscript_name))
+                    # logger.print_on_console('Dangling if/for/getparam in testcase: '+str(testscript_name))
 
                 if(extract_path==None):
                     tsp_step=getparam.GetParam(index,keyword,inputval,outputval,stepnum,testscript_name,local_handler.get_param_info[key],False,apptype,additionalinfo,i,remark,testcase_details)
@@ -573,7 +540,6 @@ class Handler():
         purpose : extracts the value of each key present in test step json
         param : test_step,index,testscript_name
         return : object/None
-
         """
         keyword=step['keywordVal']
         apptype=step['appType']
@@ -597,13 +563,13 @@ class Handler():
         additionalinfo = ''
         outputArray=outputval.split(';')
         #check if the step is commented before adding to the tsplist
-        if not (len(outputArray)>=1 and not(outputval.endswith('##;')) and outputval.split(';') and '##' in outputArray[len(outputArray)-1] ):
+        if not (len(outputArray)>=1 and  '##' == outputArray[-1] ):
             local_handler.tspIndex2+=1
             return self.create_step(local_handler.tspIndex2,keyword,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo,i,remark,testcase_details,cord,extract_path)
         return None
 
 
-    def create_list(self,testcase,testscript_name,extract_path= None):
+    def create_list(self,testcase,testscript_name,extract_path= None,appType=None):
         """
         def : create_list
         purpose : appends each test case step into gloabl tsplist
@@ -612,22 +578,23 @@ class Handler():
 
         """
         #popping the comments key in testcase json before parsing if it has
-
         #To fix the UAT defect #3390:
         #If We are giving the start loop in one script and end loop in another script it?s not working.
         #In First for loop, complete json data is parsed to build info_dict of getparam,for,if and in second for loop creation of
         #each step is done
         #Earlier the whole process was done for single testcase at a time, now it's done for entire scenario at once
+        aws_flag=False
+        if appType is not None : aws_flag=True
         testcase_copy=[]
         for i in range(len(testcase)):
             try:
                 d=eval(testcase[i])
-            except Exception as e:
+            except:
                 d=testcase[i]
             if len(d)>0 and 'comments' in d[len(d)-1]:
                 d.pop()
             testcase_copy.append(d)
-            flag=self.parse_condition(d)
+            self.parse_condition(d,testscript_name[i],aws_flag)
 
         for i in range(len(testcase_copy)):
             for x in testcase_copy[i]:
@@ -641,17 +608,12 @@ class Handler():
                     return step
         return True
 
-
-
-
-
     def read_step(self):
         """
         def : read_step
         purpose : prints the global tsp list
         param : dict
         return :
-
         """
         local_handler.log.info('Printing each step in TSP')
         local_handler.log.info('-------------------------')
@@ -659,7 +621,7 @@ class Handler():
         local_handler.log.info('-------------------------')
         for x in local_handler.tspList:
             x.print_step()
-##            logger.print_on_console('\n')
+            # logger.print_on_console('\n')
         return local_handler.tspList
 
     def print_dict(self,d):
@@ -668,7 +630,6 @@ class Handler():
         purpose : utility method to print the dictionary
         param : dict
         return :
-
         """
         if len(d)==0:
             print(d,' is empty')
@@ -681,7 +642,6 @@ class Handler():
         purpose : Reset all global variables after the execution of each Scenario
         param : dict
         return :
-
         """
         global local_handler
         import dynamic_variable_handler
@@ -699,11 +659,12 @@ class Handler():
         local_handler.if_info.clear()
         local_handler.get_param_info.clear()
         local_handler.ws_template=''
-        local_handler.ws_templates_dict.clear();
+        local_handler.ws_templates_dict.clear()
         #dynamic_variable_handler.dynamic_variable_map.clear()
         if con.oebs_dispatcher_obj != None:
             con.oebs_dispatcher_obj.clear_oebs_window_name()
-            	##        dynamic_variable_handler.dynamic_variable_map.clear()
+            # dynamic_variable_handler.dynamic_variable_map.clear()
+
     def clear_dyn_variables(self):
         import dynamic_variable_handler
         dynamic_variable_handler.local_dynamic.dynamic_variable_map.clear()

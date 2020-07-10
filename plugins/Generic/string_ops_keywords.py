@@ -287,21 +287,19 @@ class StringOperation:
                     actual_string=coreutilsobj.get_UTF_8(actual_string)
                     actual_string=unidecode(actual_string)
                     to_find=coreutilsobj.get_UTF_8(to_find)
-                    output_val = actual_string.find(to_find)
+                    #output_val = actual_string.find(to_find)
                     for m in re.finditer(to_find,actual_string):
                         position.append(m.start())
-                    if len(position)>1:
-                        pos=position
-                    else:
-                        pos=position[0]    
-                    if(output_val == -1):
+                    output_val = len(position)
+                    if len(position) == 1: position=position[0]
+                    if(output_val == 0):
                         logger.print_on_console('The Original String is:',actual_string ,'and' , actual_string , 'does not Contain', to_find )
                     else:
                         log.info('Result : ')
                         log.info(output_val)
                         status=generic_constants.TEST_RESULT_PASS
-                        result=pos
-                        output=generic_constants.TEST_RESULT_TRUE
+                        result=generic_constants.TEST_RESULT_TRUE
+                        output=position
             else:
                 #log.error(INVALID_INPUT)
                 err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
@@ -311,7 +309,7 @@ class StringOperation:
             logger.print_on_console(e)
         if err_msg!=None:
             logger.print_on_console(err_msg)
-        return status,result,output,err_msg,pos
+        return status,result,output,err_msg
 
     def replace(self, actual_string, to_be_replaced , value ):
         """
@@ -356,7 +354,6 @@ class StringOperation:
 ##                logger.print_on_console(INVALID_INPUT)
         except Exception as e:
             log.error(e)
-
             logger.print_on_console(e)
         if err_msg!=None:
             logger.print_on_console(err_msg)
@@ -414,7 +411,6 @@ class StringOperation:
         output=None
         try:
             input_vals = args
-            
             len_input_val = len(input_vals)
             if len_input_val >= 2:
 ##                output = ''.join(input_vals)
@@ -489,7 +485,6 @@ class StringOperation:
                 #logger.print_on_console(INVALID_INPUT)
         except Exception as e:
             log.error(e)
-
             logger.print_on_console(e)
         if err_msg!=None:
             logger.print_on_console(err_msg)
@@ -540,7 +535,6 @@ class StringOperation:
 ##                logger.print_on_console(INVALID_INPUT)
         except Exception as e:
             log.error(e)
-
             logger.print_on_console(e)
         if err_msg!=None:
             logger.print_on_console(err_msg)
