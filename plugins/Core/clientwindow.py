@@ -299,7 +299,7 @@ class MainNamespace(BaseNamespace):
                         browsername = '2'
                     elif str(task) == 'OPEN BROWSER EDGE':
                         browsername = '7'
-                    elif str(task) == 'OPEN BROWSER EDGE CHROMIUM':
+                    elif str(task) == 'OPEN BROWSER CHROMIUM':
                         browsername = '8'
                 wx.PostEvent(wxObject.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wxObject.GetId())) 
         except Exception as e:
@@ -2635,10 +2635,10 @@ def check_browser():
                     if str(browser_ver) >= v[0] or str(browser_ver) <= v[1]:
                         edgeFlag = True
             if edgeFlag == False:
-                logger.print_on_console('WARNING!! : Edge version ',str(browser_ver),' is not supported.')
+                logger.print_on_console('WARNING!! : Edge Legacy version ',str(browser_ver),' is not supported.')
         except Exception as e:
-            logger.print_on_console("Error in checking Microsoft Edge version")
-            log.error("Error in checking Microsoft Edge version")
+            logger.print_on_console("Error in checking Edge Legacy version")
+            log.error("Error in checking Edge Legacy version")
             log.error(e,exc_info=True)
 
         #checking browser for microsoft edge(chromium based)
@@ -2664,8 +2664,8 @@ def check_browser():
             if chromiumFlag == False :
                 logger.print_on_console('WARNING!! : Edge Chromium version ',str(browser_ver),' is not supported.')
         except Exception as e:
-            logger.print_on_console("Error in checking edge chromium version")
-            log.error("Error in checking edge chromium version")
+            logger.print_on_console("Error in checking Edge Chromium version")
+            log.error("Error in checking Edge Chromium version")
             log.error(e,exc_info=True)
 
         if chromeFlag == True and firefoxFlag == True and edgeFlag == True and chromiumFlag == True:

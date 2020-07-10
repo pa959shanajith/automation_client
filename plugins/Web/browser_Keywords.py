@@ -90,7 +90,7 @@ class BrowserKeywords():
                     #stale logic
                     try:
                         import win32com.client
-                        my_processes = ['msedgedriver.exe','MicrosoftWebDriver.exe','MicrosoftEdge.exe','chromedriver.exe','IEDriverServer.exe','IEDriverServer64.exe','CobraWinLDTP.exe','phantomjs.exe']
+                        my_processes = ['chromedriver.exe','msedgedriver.exe','MicrosoftWebDriver.exe','MicrosoftEdge.exe','IEDriverServer.exe','IEDriverServer64.exe','CobraWinLDTP.exe','phantomjs.exe']
                         wmi=win32com.client.GetObject('winmgmts:')
                         for p in wmi.InstancesOf('win32_process'):
                             if p.Name in my_processes:
@@ -674,7 +674,7 @@ class BrowserKeywords():
         output=OUTPUT_CONSTANT
         err_msg=None
         try:
-            if local_bk.driver_obj != None and (isinstance(local_bk.driver_obj,webdriver.Ie) or isinstance(local_bk.driver_obj,webdriver.Edge)):
+            if local_bk.driver_obj != None and isinstance(local_bk.driver_obj,webdriver.Ie) or isinstance(local_bk.driver_obj,webdriver.Edge):
                 #get all the cookies
                 cookies=local_bk.driver_obj.get_cookies()
                 if len(cookies)>0:
@@ -791,6 +791,7 @@ class BrowserKeywords():
                 pidie = p.children()[0]
                 pid = pidie.pid
                 local_bk.pid_set.append(pid)
+
             elif(self.browser_num == '7'):
                 if enableSecurityFlag:
                     local_bk.driver_obj = obj.set_security_zones(
@@ -799,6 +800,7 @@ class BrowserKeywords():
                 pidedge = p.children()[0]
                 pid = pidedge.pid
                 local_bk.pid_set.append(pid)
+
             elif (self.browser_num == '8'):
                 p = psutil.Process(local_bk.driver_obj.edge_service.process.pid)
                 pidchromium = p.children()[0]
@@ -990,10 +992,23 @@ class Singleton_DriverUtil():
                         except Exception as e:
                             d = 'stale'
                             break
-        elif browserType == '7' or browserType == '8':
+        elif browserType == '7':
             if len(drivermap) > 0:
                 for i in drivermap:
-                    if isinstance(i,webdriver.Edge ):
+                    if isinstance(i, webdriver.Edge) and i.name=='MicrosoftEdge':
+                        try:
+                            if len (i.window_handles) == 0:
+                                d = 'stale'
+                                break
+                            else:
+                                d = i
+                        except Exception as e:
+                            d = 'stale'
+                            break
+        elif browserType == '8':
+            if len(drivermap) > 0:
+                for i in drivermap:
+                    if isinstance(i, webdriver.Edge) and i.name=='msedge':
                         try:
                             if len (i.window_handles) == 0:
                                 d = 'stale'
@@ -1156,8 +1171,8 @@ class Singleton_DriverUtil():
                 driver = webdriver.Edge(capabilities=caps,executable_path=edgepath)
                 drivermap.append(driver)
                 driver.maximize_window()
-                logger.print_on_console('edge browser started')
-                local_bk.log.info('edge browser started')
+                logger.print_on_console('Edge Legacy browser started')
+                local_bk.log.info('Edge Legacy browser started')
             except Exception as e:
                 logger.print_on_console("Requested browser is not available")
                 local_bk.log.info('Requested browser is not available')
@@ -1173,8 +1188,8 @@ class Singleton_DriverUtil():
                 driver = webdriver.Edge(capabilities=caps1,executable_path=chromium_path)
                 drivermap.append(driver)
                 driver.maximize_window()
-                logger.print_on_console('edge chromium browser started')
-                local_bk.log.info('edge chromium browser started')
+                logger.print_on_console('Edge Chromium browser started')
+                local_bk.log.info('Edge Chromium browser started')
             except Exception as e:
                 logger.print_on_console("Requested browser is not available")
                 local_bk.log.info('Requested browser is not available')
