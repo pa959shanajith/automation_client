@@ -30,8 +30,8 @@ from xlrd.sheet import ctype_text
 import itertools
 import csv
 import platform
-import win32com.client
 if SYSTEM_OS == "Windows":
+    import win32com.client
     import win32api
 if SYSTEM_OS == 'Darwin':
     import pandas

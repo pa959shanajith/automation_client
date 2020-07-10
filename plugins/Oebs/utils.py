@@ -22,6 +22,7 @@ import json
 from PIL import ImageGrab
 import ctypes
 from ctypes import wintypes
+import os
 
 
 
@@ -250,7 +251,6 @@ class Utils:
         err_msg=None
         try:
         # check file exists
-            import os
             if len(input_val)==2:
                 filePath,window_name=str(input_val[0]),str(input_val[1])
                 timeout=5

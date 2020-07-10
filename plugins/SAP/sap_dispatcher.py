@@ -24,6 +24,7 @@ import sap_shell_keywords
 import sap_shell_gridview_toolbar_keywords
 import sap_shell_tree_keywords
 import sap_shell_calendar_keywords
+import sap_scontainer_keywords
 #-------------------------------------------------------------
 import sap_constants
 import constants
@@ -44,6 +45,7 @@ class SAPDispatcher:
     shell_gridview_toolbar_keywords_obj = sap_shell_gridview_toolbar_keywords.Shell_GridView_Toolbar_Keywords()
     shell_tree_keywords_obj = sap_shell_tree_keywords.Shell_Tree_Keywords()
     shell_calendar_keywords_obj = sap_shell_calendar_keywords.Shell_Calendar_Keywords()
+    scontainer_keywords_obj = sap_scontainer_keywords.SContainer_Keywords()
     sap_dict = {
             #------------------------------------------------------launch keywords
             'launchapplication' : launch_keywords_obj.launch_application,
@@ -87,6 +89,9 @@ class SAPDispatcher:
             'verifyselectedvalue' : dropdown_keywords_obj.verifySelectedValue,
             'verifyvaluesexists' : dropdown_keywords_obj.verifyValuesExists,
             'verifyallvalues' : dropdown_keywords_obj.verifyAllValues,
+            'getallkeyvaluepairs' : dropdown_keywords_obj.getAllKeyValuePairs,
+            'selectkeybytext' : dropdown_keywords_obj.selectKeyByText,
+            'getkeybyindex' : dropdown_keywords_obj.getKeyByIndex,
             #------------------------------------------------------element keywords
             'click' : element_keywords_obj.click,
             'rightclick' : element_keywords_obj.rightClick,
@@ -129,7 +134,7 @@ class SAPDispatcher:
             'selectrow' : table_keywords_obj.selectRow,
             'unselectrow' : table_keywords_obj.unselectRow,
             'selectcolumn' : table_keywords_obj.selectColumn,
-            'unselectColumn' : table_keywords_obj.unselectColumn,
+            'unselectcolumn' : table_keywords_obj.unselectColumn,
             'setcelltext' : table_keywords_obj.setCellText,
             #Shell keywords
             #-----------------------------------------------------shell_basic_keywords
@@ -150,6 +155,10 @@ class SAPDispatcher:
             'unselectallselections' : shell_gridview_toolbar_keywords_obj.unselectAllSelections,
             'scrolltorownumber' : shell_gridview_toolbar_keywords_obj.scrollToRowNumber,
             'getcellcolor' : shell_gridview_toolbar_keywords_obj.getCellColor,
+            'selectcolumns' : shell_gridview_toolbar_keywords_obj.selectColumns,
+            'unselectcolumns' : shell_gridview_toolbar_keywords_obj.unSelectColumns,
+            'getallcolumnheaders' : shell_gridview_toolbar_keywords_obj.getAllColumnHeaders,
+            'getcolnumbycolheaders' : shell_gridview_toolbar_keywords_obj.getColNumByColHeaders,
             #------------------------------------------------------treekeywords
             'selecttreeelement' : shell_tree_keywords_obj.selectTreeElement,
             'gettreenodetext' : shell_tree_keywords_obj.getTreeNodeText,
@@ -160,12 +169,22 @@ class SAPDispatcher:
             'selecttreenode' : shell_tree_keywords_obj.selectTreeNode,
             'getnodenamebyindex' : shell_tree_keywords_obj.getNodeNameByIndex,
             'verifytreepath' : shell_tree_keywords_obj.verifyTreePath,
-            #------------------------------------------------------callenderkeywords
+            #------------------------------------------------------calendarkeywords
             'selectdate' : shell_calendar_keywords_obj.select_date,
             #'selecttodaysdate' : shell_calendar_keywords_obj.select_todays_date,
             'selectrange':shell_calendar_keywords_obj.select_range,
             'selectmonth':shell_calendar_keywords_obj.select_month,
-            'selectweek':shell_calendar_keywords_obj.select_week
+            'selectweek':shell_calendar_keywords_obj.select_week,
+            #------------------------------------------------------scontainerkeywords
+            'getrowcountofcontainer':scontainer_keywords_obj.getRowCount,
+            'getcolcountofcontainer':scontainer_keywords_obj.getColCount,
+            'gettypeofcell':scontainer_keywords_obj.getTypeOfCell,
+            'gettextofcell':scontainer_keywords_obj.getTextOfCell,
+            'verifytextofcell':scontainer_keywords_obj.verifyTextOfCell,
+            'clickoncell':scontainer_keywords_obj.clickOnCell,
+            'doubleclickoncell':scontainer_keywords_obj.doubleClickOnCell,
+            'rightclickoncell':scontainer_keywords_obj.rightClickOnCell,
+            'setcellfocus' : scontainer_keywords_obj.setCellFocus
             }
 
     def __init__(self):
@@ -174,8 +193,9 @@ class SAPDispatcher:
         self.action = None
 #-----------------------------------------------------------------for custom objects
     custom_dict = {
-                    "click" : ['radiobutton', 'checkbox', 'input', 'button', 'select', 'table'],
-                    "getelementtext" : ['radiobutton', 'checkbox', 'input', 'button', 'select', 'table'],
+                    "click" : ['radiobutton', 'checkbox', 'input', 'button', 'select', 'table', 'label'],
+                    "doubleclick" : ['radiobutton', 'checkbox', 'input', 'button', 'select', 'table', 'label'],
+                    "getelementtext" : ['radiobutton', 'checkbox', 'input', 'button', 'select', 'table', 'label'],
                     "getstatus" : ['radiobutton', 'checkbox'],
                     "gettext" : ['input'],
                     "selectcheckbox" : ['checkbox'],
@@ -195,6 +215,7 @@ class SAPDispatcher:
                     'textbox' : 'input',
                     'button' : 'button',
                     'table' : 'table',
+                    'label' : 'label'
                     }
 #-----------------------------------------------------------------for custom objects
 
@@ -214,7 +235,7 @@ class SAPDispatcher:
                     ele_type = self.get_ele_type[ele_type]
                 parent_xpath = teststepproperty.parent_xpath
                 if ( keyword in self.custom_dict and ele_type in self.custom_dict[keyword] ):
-                    custom_sap_element = self.saputil_keywords_obj.getobjectforcustom(parent_xpath, ele_type, input[1])
+                    custom_sap_element = self.saputil_keywords_obj.getobjectforcustom(parent_xpath, ele_type, input[1], input[2])
                     if ( custom_sap_element != '' or None ):
                         objectname = custom_sap_element
         except Exception as e:
@@ -230,6 +251,7 @@ class SAPDispatcher:
                 self.sap_dict['doubleclickiris'] = iris_object.doubleclickiris
                 self.sap_dict['rightclickiris'] = iris_object.rightclickiris
                 self.sap_dict['settextiris'] = iris_object.settextiris
+                self.sap_dict['setsecuretextiris'] = iris_object.setsecuretextiris
                 self.sap_dict['gettextiris'] = iris_object.gettextiris
                 self.sap_dict['getrowcountiris'] = iris_object.getrowcountiris
                 self.sap_dict['getcolcountiris'] = iris_object.getcolcountiris

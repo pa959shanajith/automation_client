@@ -59,7 +59,7 @@ APPTYPE_DESKTOP = 'desktop'
 
 APPTYPE_SAP = 'sap'
 
-APPTYPE_DESKTOP_JAVA = 'desktopjava'
+APPTYPE_DESKTOP_JAVA = 'oebs'
 
 APPTYPE_MOBILE='mobileweb'
 
@@ -298,6 +298,8 @@ ROWS='rows'
 
 OVERALLSTATUS='overallstatus'
 
+COMMENTS_LENGTH='commentsLength'
+
 ID='id'
 
 PARENT_ID='parentId'
@@ -314,8 +316,6 @@ STEP_DESCRIPTION='StepDescription'
 
 ELLAPSED_TIME='EllapsedTime'
 
-STEP='Step '
-
 REMARKS='Remark'
 
 TESTCASE_DETAILS='testcase_details'
@@ -329,6 +329,10 @@ END_TIME='EndTime'
 BROWSER_VERSION='browserVersion'
 
 BROWSER_TYPE='browserType'
+
+DATE='date'
+
+TIME='time'
 
 START_TIME='StartTime'
 
@@ -451,3 +455,7 @@ EDGE_VERSION = {"10.0.17763.1":[44.17763,44.17763]}
 EDGE_CHROMIUM_VERSION = {"80.0":[80,80]}
 
 SYSTEM_OS = 'Windows'
+
+AWSKEYWORDS=[]
+
+line_separator = "======================================================================================================="

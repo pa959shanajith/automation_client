@@ -32,10 +32,11 @@ class Reporting:
         self.report_string=[]
         self.report_string_testcase_empty = []
         self.overallstatus_array=[]
+        self.comments_length=[]
         self.overallstatus_array_incomplete = []
-        self.report_json={ROWS:self.report_string,OVERALLSTATUS:self.overallstatus_array}
-        self.report_json_condition_check={ROWS:self.report_string,OVERALLSTATUS:self.overallstatus_array_incomplete}
-        self.report_json_condition_check_testcase_empty={ROWS:self.report_string_testcase_empty,OVERALLSTATUS:self.overallstatus_array_incomplete}
+        self.report_json={ROWS:self.report_string,OVERALLSTATUS:self.overallstatus_array,COMMENTS_LENGTH:self.comments_length}
+        self.report_json_condition_check={ROWS:self.report_string,OVERALLSTATUS:self.overallstatus_array_incomplete,COMMENTS_LENGTH:self.comments_length}
+        self.report_json_condition_check_testcase_empty={ROWS:self.report_string_testcase_empty,OVERALLSTATUS:self.overallstatus_array_incomplete,COMMENTS_LENGTH:self.comments_length}
 
         self.nested_flag=False
         self.pid_list=[]
@@ -48,6 +49,8 @@ class Reporting:
         self.start_time=''
         self.end_time=''
         self.ellapsed_time=''
+        self.date=''
+        self.time=''
         self.name=''
         self.user_termination=False
         self.step_description_obj=step_description.StepDescription()
@@ -132,6 +135,10 @@ class Reporting:
         self.start_time=str(start_time)
         self.end_time=str(end_time)
         self.ellapsed_time=str(ellapsed_time)
+        getTym = self.end_time.split(".")[0]
+        getDat = getTym.split(" ")[0].split("-")
+        self.date = getDat[1] + "/" + getDat[2] + "/" + getDat[0]
+        self.time = getTym.split(" ")[1]
         obj={}
         obj[ELLAPSED_TIME]=self.ellapsed_time
         obj[END_TIME]=self.end_time
@@ -139,6 +146,8 @@ class Reporting:
         obj[START_TIME]=self.start_time
         obj[OVERALLSTATUS]=self.overallstatus
         obj[BROWSER_TYPE]=self.browser_type
+        obj[DATE]=self.date
+        obj[TIME]=self.time
         self.overallstatus_array.append(obj)
 
     def build_overallstatus_conditionCheck(self):
@@ -150,6 +159,10 @@ class Reporting:
             self.start_time = datetime.now()
             self.end_time = datetime.now()
             self.ellapsed_time = self.end_time - self.start_time
+            getTym = self.end_time.split(".")[0]
+            getDat = getTym.split(" ")[0].split("-")
+            self.date = getDat[1] + "/" + getDat[2] + "/" + getDat[0]
+            self.time = getTym.split(" ")[1]
             obj={}
             obj[ELLAPSED_TIME]=str(self.ellapsed_time)
             obj[END_TIME]=str(self.end_time)
@@ -158,6 +171,8 @@ class Reporting:
             obj[OVERALLSTATUS]=INCOMPLETE
             # Bug #246 (Himanshu) browser type should not be empty or null for reports
             obj[BROWSER_TYPE]=self.browser_type
+            obj[DATE]=self.date
+            obj[TIME]=self.time
             self.overallstatus_array_incomplete.append(obj)
 
     def build_overallstatus_conditionCheck_testcase_empty(self):
@@ -169,6 +184,10 @@ class Reporting:
             self.start_time = datetime.now()
             self.end_time = datetime.now()
             self.ellapsed_time = self.end_time - self.start_time
+            getTym = self.end_time.split(".")[0]
+            getDat = getTym.split(" ")[0].split("-")
+            self.date = getDat[1] + "/" + getDat[2] + "/" + getDat[0]
+            self.time = getTym.split(" ")[1]
             obj={}
             obj[ELLAPSED_TIME]=str(self.ellapsed_time)
             obj[END_TIME]=str(self.end_time)
@@ -177,6 +196,8 @@ class Reporting:
             obj[OVERALLSTATUS]=TERMINATE
             # Bug #246 (Himanshu) browser type should not be empty or null for reports
             obj[BROWSER_TYPE]=self.browser_type
+            obj[DATE]=self.date
+            obj[TIME]=self.time
             self.overallstatus_array_incomplete.append(obj)
 
     def get_pid(self):
@@ -424,9 +445,13 @@ class Reporting:
                     report_json[OVERALLSTATUS][0]["fail"]=str(round(i["Fail"]/i['total']*100,2))
                     report_json[OVERALLSTATUS][0]["terminate"]=str(round(i["Terminate"]/i['total']*100,2))
                 else:
-                    report_json_condition_check[OVERALLSTATUS][0]["pass"]="0"
-                    report_json_condition_check[OVERALLSTATUS][0]["fail"]="0"
-                    report_json_condition_check[OVERALLSTATUS][0]["terminate"]="0"
+                    report_json[OVERALLSTATUS][0]["pass"]="0"
+                    report_json[OVERALLSTATUS][0]["fail"]="0"
+                    report_json[OVERALLSTATUS][0]["terminate"]="0"
+            if len(report_json["rows"]) != 0:
+                for i in report_json["rows"]:
+                    if i[COMMENTS]:
+                        report_json[COMMENTS_LENGTH].append(i[COMMENTS])
             with open(filename, 'w') as outfile:
                     log.info('Writing report data to the file '+filename)
                     json.dump(report_json, outfile, indent=4, sort_keys=False)
@@ -481,9 +506,9 @@ class Reporting:
                     report_json_condition_check_testcase_empty[OVERALLSTATUS][0]["fail"]=str(round(i["Fail"]/i['total']*100,2))
                     report_json_condition_check_testcase_empty[OVERALLSTATUS][0]["terminate"]=str(round(i["Terminate"]/i['total']*100,2))
                 else:
-                    report_json_condition_check[OVERALLSTATUS][0]["pass"]="0"
-                    report_json_condition_check[OVERALLSTATUS][0]["fail"]="0"
-                    report_json_condition_check[OVERALLSTATUS][0]["terminate"]="0"
+                    report_json_condition_check_testcase_empty[OVERALLSTATUS][0]["pass"]="0"
+                    report_json_condition_check_testcase_empty[OVERALLSTATUS][0]["fail"]="0"
+                    report_json_condition_check_testcase_empty[OVERALLSTATUS][0]["terminate"]="0"
             with open(filename, 'w') as outfile:
                     log.info('Writing report data to the file '+filename)
                     json.dump(report_json_condition_check_testcase_empty, outfile, indent=4, sort_keys=False)
@@ -524,3 +549,8 @@ class Reporting:
         row_obj[SCREENSHOT_PATH]=None
         row_array.append(row_obj)
         self.report_json['rows']=row_array
+        comments_Length=[]
+        for i in row_array:
+            if COMMENTS in i:
+                comments_Length.append(i[COMMENTS])
+        self.report_json['commentsLength']=comments_Length

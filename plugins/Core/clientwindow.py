@@ -32,6 +32,7 @@ log = logging.getLogger('clientwindow.py')
 wxObject = None
 browsername = None
 qcdata = None
+qcObject = None
 soc=None
 pdfgentool = None
 qcConFlag=False
@@ -211,22 +212,24 @@ class MainNamespace(BaseNamespace):
             logger.print_on_console(err_msg)
             log.error(e,exc_info=True)
 
+
     def on_executeTestSuite(self, *args):
+        global wxObject, execution_flag
         try:
-            global wxObject,socketIO,execution_flag
-            args=list(args)
+            exec_data = args[0]
+            batch_id = exec_data["batchId"]
+            aws_mode=False
+            if len(args)>0 and args[0]['apptype']=='MobileApp':
+                if args[0]['suitedetails'][0]['browserType'][0]=='2':
+                    aws_mode = True
             if(not execution_flag):
-                socketIO.emit('return_status_executeTestSuite',{'status':'success','executionId':(args[0])['executionId']})
-                wxObject.mythread = TestThread(wxObject,EXECUTE,args[0],wxObject.debug_mode)
+                socketIO.emit('return_status_executeTestSuite', {'status': 'success', 'batchId': batch_id})
+                wxObject.mythread = TestThread(wxObject, EXECUTE, exec_data, aws_mode)
             else:
-                obj = handler.Handler()
-                suiteId_list,suite_details,browser_type,scenarioIds,suite_data,execution_id,condition_check,dataparam_path,exec_mode=obj.parse_json_execute(args[0])
-                data = {'scenario_ids':scenarioIds,'execution_id':execution_id,'time':str(datetime.now())}
-                emsg='Execution already in progress. Skipping current request.'
+                socketIO.emit('return_status_executeTestSuite', {'status': 'skipped', 'batchId': batch_id})
+                emsg = 'Execution already in progress. Skipping current request.'
                 log.warn(emsg)
                 logger.print_on_console(emsg)
-                """sending scenario details for skipped execution to update the same in reports."""
-                socketIO.emit('return_status_executeTestSuite',{'status':'skipped','data':data,'executionId':(args[0])['executionId']})
         except Exception as e:
             err_msg='Error while Executing'
             log.error(err_msg)
@@ -234,11 +237,11 @@ class MainNamespace(BaseNamespace):
             log.error(e,exc_info=True)
 
     def on_debugTestCase(self, *args):
+        global wxObject
         try:
             if check_execution_lic("result_debugTestCase"): return None
-            global wxObject
-            args=list(args)
-            wxObject.mythread = TestThread(wxObject,DEBUG,args[0],wxObject.debug_mode)
+            exec_data = args[0]
+            wxObject.mythread = TestThread(wxObject, DEBUG, exec_data, False)
             wxObject.choice=wxObject.rbox.GetStringSelection()
             logger.print_on_console(str(wxObject.choice)+' is Selected')
             if wxObject.choice == 'Normal':
@@ -511,55 +514,27 @@ class MainNamespace(BaseNamespace):
             log.error(e,exc_info=True)
 
     def on_qclogin(self, *args):
-        global qcdata
-        global soc
-        global socketIO
-        server_data=b''
-        data_stream=None
-        client_data=None
-        EOF_QC = b'#E&D@Q!C#'
+        global qcObject
+        err_msg = None
         try:
-            if SYSTEM_OS == "Windows":
-                if len(args) > 0:
-                    qcdata = args[0]
-                    if soc is None:
-                        import subprocess
-                        path = NINETEEN68_HOME + "/plugins/Qc/QcController.exe"
-                        pid = subprocess.Popen(path, shell=True)
-                        soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                        try:
-                            soc.connect(("localhost",10000))
-                        except socket.error as e:
-                            log.error(e)
-                            if '[Errno 10061]' in str(e):
-                                time.sleep(15)
-                                soc.connect(("localhost",10000))
+            if(qcObject == None):
+                core_utils.get_all_the_imports('Qc')
+                import QcController
+                qcObject = QcController.QcWindow()
 
-                    data_to_send = json.dumps(qcdata).encode('utf-8')
-                    data_to_send+=EOF_QC
-                    soc.send(data_to_send)
-                    while True:
-                        data_stream= soc.recv(1024)
-                        server_data+=data_stream
-                        if EOF_QC in server_data:
-                            break
-                    client_data= server_data[:server_data.find(EOF_QC)].decode('utf-8')
-                    if('Fail@f@!l' in client_data):
-                        client_data=client_data[:client_data.find('@f@!l')]
-                        logger.print_on_console('Error occurred in QC')
-                        socketIO.emit('qcresponse','Error:Qc Operations')
-                    else:
-                        socketIO.emit('qcresponse',client_data)
-                else:
-                    socketIO.emit('qcresponse','Error:data recevied empty')
-            else:
-                 socketIO.emit('qcresponse','Error:Failed in running Qc')
+            qcdata = args[0]
+            response = qcObject.qc_dict[qcdata.pop('qcaction')](qcdata)
+            socketIO.emit('qcresponse', response)
+        except KeyError:
+            err_msg = 'Invalid ALM operation'
         except Exception as e:
-            err_msg='Error in ALM Operations '
+            err_msg = 'Error in ALM operations'
+            log.error(e, exc_info=True)
+        if err_msg is not None:
             log.error(err_msg)
             logger.print_on_console(err_msg)
-            log.error(e,exc_info=True)
-            socketIO.emit('qcresponse','Error:Qc Operations')
+            try: socketIO.emit('qcresponse','Error:Qc Operations')
+            except: pass
 
     def on_render_screenshot(self,*args):
         try:
@@ -804,7 +779,7 @@ class TestThread(threading.Thread):
     """Test Worker Thread Class."""
 
     #----------------------------------------------------------------------
-    def __init__(self,wxObject,action,json_data,debug_mode):
+    def __init__(self, wxObject, action, json_data, aws_mode):
         """Init Worker Thread Class."""
         super(TestThread, self).__init__()
         self.wxObject = wxObject
@@ -817,10 +792,11 @@ class TestThread(threading.Thread):
         # prevent that. In Python 2, use of Lock instead of RLock also
         # boosts performance.
         self.pause_cond = threading.Condition(threading.Lock())
-        self.con=''
-        self.action=action.lower()
-        self.json_data=json_data
-        self.debug_mode=debug_mode
+        self.con = ''
+        self.action = action.lower()
+        self.json_data = json_data
+        self.debug_mode = wxObject.debug_mode
+        self.aws_mode = aws_mode
         self.start()    # start the thread
 
     #should just resume the thread
@@ -834,9 +810,11 @@ class TestThread(threading.Thread):
         """Run Worker Thread."""
         # This is the code executing in the new thread.
         global socketIO, execution_flag, closeActiveConnection,connection_Timer
+        batch_id = None
         try:
             runfrom_step=1
-            if self.action==DEBUG:
+            if self.action==EXECUTE: batch_id = self.json_data["batchId"]
+            elif self.action==DEBUG:
                 self.debug_mode=False
                 self.wxObject.breakpoint.Disable()
                 if self.wxObject.choice in ['Stepwise','RunfromStep']:
@@ -868,17 +846,23 @@ class TestThread(threading.Thread):
                 logger.print_on_console('This app type is not part of the license.')
                 status=TERMINATE
             else:
-                status = self.con.invoke_controller(self.action,self,self.debug_mode,runfrom_step,self.json_data,self.wxObject,socketIO,soc)
+                status = self.con.invoke_controller(self.action,self,self.debug_mode,runfrom_step,self.json_data,self.wxObject,socketIO,qcObject,self.aws_mode)
 
             logger.print_on_console('Execution status '+status)
 
             if status==TERMINATE:
                 logger.print_on_console('---------Termination Completed-------')
+            if self.wxObject.choice=='RunfromStep':
+                self.wxObject.breakpoint.Enable()
+            else:
+                self.wxObject.breakpoint.Disable()
+            
+
 
             #Removed execute,debug button
             self.wxObject.breakpoint.Clear()
             self.wxObject.rbox.Enable()
-            self.wxObject.breakpoint.Enable()
+            # self.wxObject.breakpoint.Disable()
             self.wxObject.cancelbutton.Enable()
             if self.action==DEBUG:
                 testcasename = handler.local_handler.testcasename
@@ -898,16 +882,16 @@ class TestThread(threading.Thread):
                 else:
                     socketIO.emit('result_debugTestCaseWS',status)
             elif self.action==EXECUTE:
-                socketIO.emit('result_executeTestSuite',{"status":status,"executionId":self.json_data["executionId"]})
+                socketIO.emit('result_executeTestSuite', {"status":status, "batchId": batch_id})
         except Exception as e:
-            log.error(e,exc_info=True)
+            log.error(e, exc_info=True)
             status=TERMINATE
             if socketIO is not None:
                 if self.action==DEBUG:
                     self.wxObject.killChildWindow(debug=True)
                     socketIO.emit('result_debugTestCase',status)
                 elif self.action==EXECUTE:
-                    socketIO.emit('result_executeTestSuite',{"status":status,"executionId":self.json_data["executionId"]})
+                    socketIO.emit('result_executeTestSuite', {"status":status, "batchId": batch_id})
         if closeActiveConnection:
             closeActiveConnection = False
             connection_Timer = threading.Timer(300, wxObject.closeConnection)
@@ -1215,7 +1199,7 @@ class ClientWindow(wx.Frame):
             self.breakpoint.Disable()
             self.killChildWindow(debug=True)
         self.debug_mode=False
-        self.breakpoint.Disable()
+        # self.breakpoint.Disable()
         if self.choice in ['Stepwise','RunfromStep']:
             self.debug_mode=True
             ##if self.debugwindow == None:
@@ -1241,7 +1225,6 @@ class ClientWindow(wx.Frame):
         self.Destroy()
         controller.kill_process()
         if SYSTEM_OS == "Windows":
-            os.system("TASKKILL /F /IM QcController.exe")
             os.system("TASKKILL /F /IM nineteen68MFapi.exe")
         sys.exit(0)
 
@@ -1261,6 +1244,11 @@ class ClientWindow(wx.Frame):
         logger.print_on_console(msg)
         log.info(msg)
         controller.terminate_flag=True
+        #Calling AWS stop job on terminate (if present)
+        try:
+            wxObject.mythread.con.aws_obj.stop_job()
+        except:
+            pass
         #Handling the case where user clicks terminate when the execution is paused
         #Resume the execution
         if controller.pause_flag:
@@ -1666,44 +1654,76 @@ class Config_window(wx.Frame):
 
         self.qu_timeout=wx.StaticText(self.panel, label="Query Timeout", pos=config_fields["Q_timeout"][0],size=config_fields["Q_timeout"][1], style=0, name="")
         self.query_timeout=wx.TextCtrl(self.panel, pos=config_fields["Q_timeout"][2], size=config_fields["Q_timeout"][3])
-        if isConfigJson!=False:
+        if isConfigJson['queryTimeOut']=="":
+            self.query_timeout.SetValue("sec")
+            font = wx.Font(10, wx.DEFAULT, wx.FONTSTYLE_ITALIC, wx.NORMAL)
+            self.query_timeout.SetFont(font)
+            self.query_timeout.SetForegroundColour('#848484')
+        elif isConfigJson!=False:
             self.query_timeout.SetValue(isConfigJson['queryTimeOut'])
         else:
             self.query_timeout.SetValue("3")
 
         self.timeOut=wx.StaticText(self.panel, label="Time Out", pos=config_fields["Timeout"][0],size=config_fields["Timeout"][1], style=0, name="")
         self.time_out=wx.TextCtrl(self.panel, pos=config_fields["Timeout"][2], size=config_fields["Timeout"][3])
-        if isConfigJson!=False:
+        if isConfigJson['timeOut']=="":
+            self.time_out.SetValue("sec")
+            font = wx.Font(10, wx.DEFAULT, wx.FONTSTYLE_ITALIC, wx.NORMAL)
+            self.time_out.SetFont(font)
+            self.time_out.SetForegroundColour('#848484')
+        elif isConfigJson!=False:
             self.time_out.SetValue(isConfigJson['timeOut'])
         else:
             self.time_out.SetValue("1")
 
         self.delayText=wx.StaticText(self.panel, label="Delay", pos=config_fields["Delay"][0],size=config_fields["Delay"][1], style=0, name="")
         self.delay=wx.TextCtrl(self.panel, pos=config_fields["Delay"][2], size=config_fields["Delay"][3])
-        if isConfigJson!=False:
+        if isConfigJson['delay']=="":
+            self.delay.SetValue("sec")
+            font = wx.Font(10, wx.DEFAULT, wx.FONTSTYLE_ITALIC, wx.NORMAL)
+            self.delay.SetFont(font)
+            self.delay.SetForegroundColour('#848484')
+        elif isConfigJson!=False:
             self.delay.SetValue(isConfigJson['delay'])
         else:
             self.delay.SetValue("0.3")
 
         #Delay input box kept for provide the delay in typestring.
-        self.Delay_input=wx.StaticText(self.panel, label="Delay for StringInput", pos=config_fields["Delay_Stringinput"][0],size=config_fields["Delay_Stringinput"][1], style=0, name="")
+        self.delay_stringinput=wx.StaticText(self.panel, label="Delay for StringInput", pos=config_fields["Delay_Stringinput"][0],size=config_fields["Delay_Stringinput"][1], style=0, name="")
         self.Delay_input=wx.TextCtrl(self.panel, pos=config_fields["Delay_Stringinput"][2], size=config_fields["Delay_Stringinput"][3])
-        if isConfigJson!=False:
+        if isConfigJson['delay_stringinput']=="":
+            self.Delay_input.SetValue("sec")
+            font = wx.Font(10, wx.DEFAULT, wx.FONTSTYLE_ITALIC, wx.NORMAL)
+            self.Delay_input.SetFont(font)
+            self.Delay_input.SetForegroundColour('#848484')
+        elif isConfigJson!=False:
             self.Delay_input.SetValue(isConfigJson['delay_stringinput'])
         else:
             self.Delay_input.SetValue("0.005")
 
         self.stepExecWait=wx.StaticText(self.panel, label="Step Execution Wait", pos=config_fields["Step_exec"][0],size=config_fields["Step_exec"][1], style=0, name="")
         self.step_exe_wait=wx.TextCtrl(self.panel, pos=config_fields["Step_exec"][2], size=config_fields["Step_exec"][3])
-        if isConfigJson!=False:
+        if isConfigJson['stepExecutionWait']=="":
+            self.step_exe_wait.SetValue("sec")
+            font = wx.Font(10, wx.DEFAULT, wx.FONTSTYLE_ITALIC, wx.NORMAL)
+            self.step_exe_wait.SetFont(font)
+            self.step_exe_wait.SetForegroundColour('#848484')
+        elif isConfigJson!=False:
             self.step_exe_wait.SetValue(isConfigJson['stepExecutionWait'])
         else:
             self.step_exe_wait.SetValue("1")
 
         self.dispVarTimeOut=wx.StaticText(self.panel, label="Display Variable Timeout", pos=config_fields["Disp_var"][0],size=config_fields["Disp_var"][1], style=0, name="")
         self.disp_var_timeout=wx.TextCtrl(self.panel, pos=config_fields["Disp_var"][2], size=config_fields["Disp_var"][3])
-        if isConfigJson!=False:
+        if isConfigJson['displayVariableTimeOut']=="":
+            self.disp_var_timeout.SetValue("sec")
+            font = wx.Font(10, wx.DEFAULT, wx.FONTSTYLE_ITALIC, wx.NORMAL)
+            self.disp_var_timeout.SetFont(font)
+            self.disp_var_timeout.SetForegroundColour('#848484')
+        else:
             self.disp_var_timeout.SetValue(isConfigJson['displayVariableTimeOut'])
+        
+        
 
         self.sev_cert=wx.StaticText(self.panel, label="Server Cert", pos=config_fields["S_cert"][0],size=config_fields["S_cert"][1], style=0, name="")
         self.server_cert=wx.TextCtrl(self.panel, pos=config_fields["S_cert"][2], size=config_fields["S_cert"][3])
@@ -1715,12 +1735,42 @@ class Config_window(wx.Frame):
             self.server_cert.SetValue(isConfigJson['server_cert'])
 
         self.connection_timeout=wx.StaticText(self.panel, label="Connection Timeout", pos=config_fields["C_Timeout"][0],size=config_fields["C_Timeout"][1], style=0, name="")
-        self.conn_timeout=wx.TextCtrl(self.panel, pos=config_fields["C_Timeout"][2], size=config_fields["C_Timeout"][3])
-
+        self.conn_timeout=wx.TextCtrl(self.panel,id=9,pos=config_fields["C_Timeout"][2], size=config_fields["C_Timeout"][3])
+        
         if isConfigJson!=False and int(isConfigJson['connection_timeout'])>=8:
             self.conn_timeout.SetValue(isConfigJson['connection_timeout'])
         else:
             self.conn_timeout.SetValue("0")
+        
+        ## Binding placeholders and restricting textareas to just numeric characters
+        self.disp_var_timeout.Bind(wx.EVT_SET_FOCUS,self.toggle1_generic)
+        self.disp_var_timeout.Bind(wx.EVT_KILL_FOCUS,self.toggle2_generic)
+        self.disp_var_timeout.Bind(wx.EVT_CHAR, self.handle_keypress)
+        
+        self.query_timeout.Bind(wx.EVT_SET_FOCUS,self.toggle1_generic)
+        self.query_timeout.Bind(wx.EVT_KILL_FOCUS,self.toggle2_generic)
+        self.query_timeout.Bind(wx.EVT_CHAR, self.handle_keypress)
+
+        self.time_out.Bind(wx.EVT_SET_FOCUS,self.toggle1_generic)
+        self.time_out.Bind(wx.EVT_KILL_FOCUS,self.toggle2_generic)
+        self.time_out.Bind(wx.EVT_CHAR, self.handle_keypress)
+        
+        self.delay.Bind(wx.EVT_SET_FOCUS,self.toggle1_generic)
+        self.delay.Bind(wx.EVT_KILL_FOCUS,self.toggle2_generic)
+        self.delay.Bind(wx.EVT_CHAR, self.handle_keypress)
+        
+        self.Delay_input.Bind(wx.EVT_SET_FOCUS,self.toggle1_generic)
+        self.Delay_input.Bind(wx.EVT_KILL_FOCUS,self.toggle2_generic)
+        self.Delay_input.Bind(wx.EVT_CHAR, self.handle_keypress)
+        
+        self.step_exe_wait.Bind(wx.EVT_SET_FOCUS,self.toggle1_generic)
+        self.step_exe_wait.Bind(wx.EVT_KILL_FOCUS,self.toggle2_generic)
+        self.step_exe_wait.Bind(wx.EVT_CHAR, self.handle_keypress)
+
+        self.conn_timeout.Bind(wx.EVT_SET_FOCUS,self.toggle1_generic)
+        self.conn_timeout.Bind(wx.EVT_KILL_FOCUS,self.toggle2_generic)
+        self.conn_timeout.Bind(wx.EVT_CHAR, self.handle_keypress)
+
 
         lblList = ['Yes', 'No']
         lblList2 = ['64-bit', '32-bit']
@@ -1844,6 +1894,50 @@ class Config_window(wx.Frame):
         wx.Frame(self.panel)
         self.Show()
 
+    #allows only integer and float values 
+    def handle_keypress(self, event):
+        keycode = event.GetKeyCode()
+        if chr(keycode) in ['0','1','2','3','4','5','6','7','8','9','.','\x08','ĺ','ļ','Ĺ','ĸ','\x7f']:
+            event.Skip()
+
+    def toggle1_generic(self,evt):
+        self.demo=evt.EventObject
+        if self.demo.Id == 9:
+            if self.demo.GetValue()=="0 or >=8 hrs":
+                self.demo.SetValue("")
+                font = wx.Font(10, wx.DEFAULT, wx.FONTSTYLE_NORMAL, wx.NORMAL)
+                self.demo.SetFont(font)
+                self.demo.SetForegroundColour('#000000')
+            evt.Skip()
+        else:
+            if self.demo.GetValue()=="sec":
+                self.demo.SetValue("")
+                font = wx.Font(10, wx.DEFAULT, wx.FONTSTYLE_NORMAL, wx.NORMAL)
+                self.demo.SetFont(font)
+                self.demo.SetForegroundColour('#000000')
+            evt.Skip()
+    
+    
+
+    def toggle2_generic(self,evt):
+        self.demo=evt.EventObject
+        if self.demo.Id == 9:
+            if self.demo.GetValue() == "":
+                self.demo.SetValue("0 or >=8 hrs")
+                font = wx.Font(10, wx.DEFAULT, wx.FONTSTYLE_ITALIC, wx.NORMAL)
+                self.demo.SetFont(font)
+                self.demo.SetForegroundColour('#848484')
+            evt.Skip()
+        else:
+            if self.demo.GetValue() == "":
+                self.demo.SetValue("sec")
+                font = wx.Font(10, wx.DEFAULT, wx.FONTSTYLE_ITALIC, wx.NORMAL)
+                self.demo.SetFont(font)
+                self.demo.SetForegroundColour('#848484')
+            evt.Skip()
+
+
+
     """This method verifies and checks if correct data is present,then creates a dictionary and sends this dictionary to jsonCreater()"""
     def config_check(self,event):
         data = {}
@@ -1907,9 +2001,9 @@ class Config_window(wx.Frame):
         data['delay_stringinput']=delay_string_in.strip()
         config_data=data
         if (data['server_ip']!='' and data['server_port']!='' and data['server_cert']!='' and
-            data['chrome_path']!='' and data['queryTimeOut']!='' and data['logFile_Path']!='' and
-            data['delay']!='' and data['timeOut']!='' and data['stepExecutionWait']!='' and
-            data['displayVariableTimeOut']!='' and data['firefox_path']!='' and  data['connection_timeout']>=''):
+            data['chrome_path']!='' and data['queryTimeOut'] not in ['','sec'] and data['logFile_Path']!='' and
+            data['delay'] not in ['','sec'] and data['timeOut'] not in ['','sec'] and data['stepExecutionWait'] not in ['','sec'] and
+            data['displayVariableTimeOut'] not in ['','sec'] and data['delay_stringinput'] not in ['','sec'] and data['firefox_path']!='' and  data['connection_timeout'] not in ['','0 or >=8 hrs']):
             #---------------------------------------resetting the static texts
             self.error_msg.SetLabel("")
             self.sev_add.SetLabel('Server Address')
@@ -1953,7 +2047,8 @@ class Config_window(wx.Frame):
                     self.error_msg.SetLabel("Connection Timeout must be greater than or equal to 8")
                     self.error_msg.SetForegroundColour((255,0,0))
                     self.connection_timeout.SetForegroundColour((255,0,0))
-                self.jsonCreater(config_data)
+                else:
+                    self.jsonCreater(config_data)
             else:
                 self.error_msg.SetLabel("Marked fields '^' contain invalid path, Data not saved")
                 self.error_msg.SetForegroundColour((0,0,255))
@@ -2005,7 +2100,13 @@ class Config_window(wx.Frame):
             else:
                 self.log_fpath.SetLabel('Log File Path')
                 self.log_fpath.SetForegroundColour((0,0,0))
-            if data['queryTimeOut']=='':
+            if data['delay_stringinput']=="sec":
+                self.delay_stringinput.SetLabel('Delay for stringinput*')
+                self.delay_stringinput.SetForegroundColour((255,0,0))
+            else:
+                self.delay_stringinput.SetLabel('Delay for stringinput')
+                self.delay_stringinput.SetForegroundColour((0,0,0))
+            if data['queryTimeOut']=="sec":
                 self.qu_timeout.SetLabel('Query Timeout*')
                 self.qu_timeout.SetForegroundColour((255,0,0))
             else:
@@ -2029,31 +2130,31 @@ class Config_window(wx.Frame):
             else:
                 self.ff_path.SetLabel('Firefox Path')
                 self.ff_path.SetForegroundColour((0,0,0))
-            if data['delay']=='':
+            if data['delay']=="sec":
                 self.delayText.SetLabel('Delay*')
                 self.delayText.SetForegroundColour((255,0,0))
             else:
                 self.delayText.SetLabel('Delay')
                 self.delayText.SetForegroundColour((0,0,0))
-            if data['timeOut']=='':
+            if data['timeOut']=="sec":
                 self.timeOut.SetLabel('Time Out*')
                 self.timeOut.SetForegroundColour((255,0,0))
             else:
                 self.timeOut.SetLabel('Time Out')
                 self.timeOut.SetForegroundColour((0,0,0))
-            if data['stepExecutionWait']=='':
+            if data['stepExecutionWait']=="sec":
                 self.stepExecWait.SetLabel('Step Execution Wait*')
                 self.stepExecWait.SetForegroundColour((255,0,0))
             else:
                 self.stepExecWait.SetLabel('Step Execution Wait')
                 self.stepExecWait.SetForegroundColour((0,0,0))
-            if data['displayVariableTimeOut']=='':
+            if data['displayVariableTimeOut']=="sec":
                 self.dispVarTimeOut.SetLabel('Display Variable Timeout*')
                 self.dispVarTimeOut.SetForegroundColour((255,0,0))
             else:
                 self.dispVarTimeOut.SetLabel('Display Variable Timeout')
                 self.dispVarTimeOut.SetForegroundColour((0,0,0))
-            if data['connection_timeout']=='':
+            if data['connection_timeout']=="0 or >=8 hrs":
                 self.connection_timeout.SetLabel('Connection Timeout*')
                 self.connection_timeout.SetForegroundColour((255,0,0))
             else:
@@ -2506,7 +2607,7 @@ def check_browser():
             driver=None
             for k,v in list(FIREFOX_BROWSER_VERSION.items()):
                 if a == k:
-                    if browser_ver >= v[0] or browser_ver <= v[1]:
+                    if browser_ver >= v[0] and browser_ver <= v[1]:
                         firefoxFlag=True
             if firefoxFlag == False:
                 logger.print_on_console('WARNING!! : Firefox version ',str(browser_ver),' is not supported.')

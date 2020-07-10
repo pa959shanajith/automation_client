@@ -25,6 +25,7 @@ from appium.webdriver.common.touch_action import TouchAction
 from selenium.webdriver.common.action_chains import ActionChains
 import os
 import subprocess
+log = logging.getLogger('action_keywords_app.py')
 
 class Action_Key_App():
 
@@ -45,6 +46,8 @@ class Action_Key_App():
             'enter':' shell input keyevent 66',
             'keydown':' shell input keyevent 20',
             'keyup':' shell input keyevent 19',
+            'keyleft':' shell input keyevent 21',
+            'keyright':' shell input keyevent 22',
             'tab' :' shell input keyevent 61',
             'contacts':' shell input keyevent 207',
             'menu':' shell input keyevent 82',
@@ -62,7 +65,7 @@ class Action_Key_App():
             }
             adb=os.environ['ANDROID_HOME']+"\\platform-tools\\adb.exe"
             if (len(inputs)==1):
-                inp_val = inputs[0]
+                inp_val = inputs[0].replace(" ","\ ")
                 if device is not None:
                     cmd = adb + ' -s '+ device+' shell input text '+inp_val
                 else:
@@ -87,11 +90,11 @@ class Action_Key_App():
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
                     else:
-                        err_msg = self.print_error(INVALID_INPUT,': Value 2 cannot be zero or less')
+                        err_msg = self.print_error(INVALID_INPUT+': Value 2 cannot be zero or less')
                 else:
-                    err_msg = self.print_error(INVALID_INPUT,': action not supported')
+                    err_msg = self.print_error(INVALID_INPUT+': action not supported')
             else:
-                err_msg = self.print_error(INVALID_INPUT,': Maximum two inputs Accepted')
+                err_msg = self.print_error(INVALID_INPUT+': Maximum two inputs Accepted')
         except Exception as e:
             err_msg = self.print_error("Error occurred in Action Key")
             log.error(e, exc_info=True)

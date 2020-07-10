@@ -90,6 +90,7 @@ class GenericKeywordDispatcher:
             'deletefolder':local_generic.genric_folder.delete_folder,
             'verifyfolderexists':local_generic.genric_folder.verify_folder_exists,
             'comparecontent':local_generic.generic_file.compare_content,
+            'comparejsoncontent':local_generic.generic_file.json_compare_content,
             'replacecontent':local_generic.generic_file.replace_content,
             'verifycontent':local_generic.generic_file.verify_content,
             'clearfilecontent':local_generic.generic_file.clear_content,
@@ -142,7 +143,10 @@ class GenericKeywordDispatcher:
             'readjson': local_generic.generic_word.readjson,
             'readxml': local_generic.generic_word.readxml,
             'readpdf': local_generic.generic_word.readPdf,
-            'getkeyvalue': local_generic.json_oper.get_key_value
+            'getkeyvalue': local_generic.json_oper.get_key_value,
+            'comparefiles': local_generic.generic_file.compare_files,	
+            'beautify': local_generic.generic_file.beautify_file,	
+            'compareinputs': local_generic.generic_file.compare_inputs
             }
 	#Call to fetch data in database keywords
     def fetch_data(self,input):
@@ -199,7 +203,12 @@ class GenericKeywordDispatcher:
                             var = str(output[0])[1:len(str(output[0]))-1]
                             output[0] = data[var][0]
                     message.extend(output)
-                result= self.generic_dict[keyword](*message)
+                if( keyword in ['comparefiles','beautify','compareinputs'] ):	
+                    input = list(message)	
+                    output = tsp.outputval	
+                    result= self.generic_dict[keyword](input,output)	
+                else:
+                    result= self.generic_dict[keyword](*message)
             else:
                 err_msg=generic_constants.INVALID_KEYWORD
                 result[3]=err_msg

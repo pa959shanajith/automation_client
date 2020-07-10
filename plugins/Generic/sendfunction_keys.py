@@ -122,13 +122,13 @@ class SendFunctionKeys:
             for key in keys_list:
                 self.release_key(key)
 
-    def type(self,input):
+    def type(self,input,delay_stringinput):
         try:
             if SYSTEM_OS == "Darwin":
                 pyautogui.typewrite(str(input))
             else:
                 robot=Robot()
-                robot.type_string(str(input),1)
+                robot.type_string(str(input),delay_stringinput)
         except Exception as e:
             log.error(e)
             logger.print_on_console(e)

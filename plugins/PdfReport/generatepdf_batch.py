@@ -81,6 +81,11 @@ class WatchThread(threading.Thread):
                         log.error(e)
                 except Exception as e:
                     log.error(e)
+            self.wxObj.l4.SetLabel("Reports generated successfully")
+            self.wxObj.btn.SetLabel("Start")
+            self.wxObj.watchThread.keep_running = False
+            self.wxObj.watchThread= None
+            self.wxObj.started = False
 
 class GeneratePDFReportBatch(wx.Frame):
     def __init__(self, title, conf):

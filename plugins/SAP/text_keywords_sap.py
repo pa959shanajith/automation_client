@@ -62,7 +62,7 @@ class Text_Keywords():
                     if ( ses.FindById(id).type == 'GuiCTextField' or 'GuiTextField'  or 'GuiPasswordField' ):
                         try:
                             if(len(input_val) > 1):
-                                text = input_val[2]
+                                text = input_val[3]
                             else:
                                 text = input_val[0]
                             ses.FindById(id).text = text
@@ -97,7 +97,7 @@ class Text_Keywords():
             if ( id and ses ):
                 if ( ses.FindById(id).Changeable == True ):
                     if ( len(input_val) > 1 ):
-                        text = input_val[2]
+                        text = input_val[3]
                     else:
                         text = input_val[0]
                     encryption_obj = AESCipher()

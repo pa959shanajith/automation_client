@@ -502,6 +502,7 @@ class ButtonLinkKeyword():
             robot.sleep(0.5)
             copy_text=r'{}'.format(self.copy_text[2])
             robot.type_string(copy_text,0.005)
+            #robot.paste()
             robot.sleep(0.5)
             robot.key_press(Keys.enter)
             robot.sleep(0.5)
@@ -519,12 +520,12 @@ class ButtonLinkKeyword():
         status = False
         try:
             #robot = Robot()
-            so = StringOperation()
+            SO = StringOperation()
             local_blk.log.debug('Copying input file path to the clipboard')
-            # robot.add_to_clipboard(inputfile.encode(encoding='utf8'))
-            # self.copy_text=robot.get_clipboard_data().decode('utf8')
-            so.save_to_clip_board(inputfile.encode(encoding='utf8'))
-            self.copy_text=so.get_from_clip_board()
+            #robot.add_to_clipboard(inputfile.encode(encoding='utf8'))
+            SO.save_to_clip_board(inputfile.encode(encoding='utf8'))
+            #self.copy_text=robot.get_clipboard_data().decode('utf8')
+            self.copy_text=SO.get_from_clip_board()
             local_blk.log.debug(' input file path Copied to  clipboard')
             status = True
         except Exception as e:

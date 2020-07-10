@@ -108,11 +108,12 @@ class Table_keywords():
                 no_of_rows = elem.RowCount
                 for i in range(-1, no_of_rows):
                     for j in range(-1, no_of_cols):
+                        cell = None
                         try:
                             cell = elem.GetCell(i,j)
                         except:
-                            break
-                        if ( colText in elem.GetCell(i,j).text ):
+                            pass
+                        if (cell and colText in cell.text ):
                             value = j+1
                             flag = True
                             break

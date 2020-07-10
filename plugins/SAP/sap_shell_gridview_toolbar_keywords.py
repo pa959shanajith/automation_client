@@ -96,17 +96,18 @@ class Shell_GridView_Toolbar_Keywords():
                     col_count = elem.columnCount
                     for col in range(col_count):
                         colOrder.append(elem.columnorder(col))
-                    data = {}
+                    data = []
                     cnt = 0
                     for row in range(row_count):
-                        dataRow = {}
                         for col in range(col_count):
+                            dataRow = []
                             valFromTable = elem.getCellValue(row, colOrder[col])
                             if ( checkVal == valFromTable ):
-                                dataRow['Row'] = str(row + 1)
-                                dataRow['Col'] = str(col + 1)
+                                dataRow.append(str(row + 1))
+                                dataRow.append(str(col + 1))
                                 cnt = cnt + 1
-                                data[cnt] = dataRow
+                                data.append(dataRow)
+                    log.info('Value detected :'+ str(cnt) +' times.')
                     value = data
                     status = sap_constants.TEST_RESULT_PASS
                     result = sap_constants.TEST_RESULT_TRUE
@@ -260,10 +261,13 @@ class Shell_GridView_Toolbar_Keywords():
                                 elmID = elem.GetToolbarButtonId(x)
                                 if ( (elem.GetToolbarButtonType(x) == "Menu" or "ButtonAndMenu") and len(input_val) > 1 ):
                                     menuItem = str(input_val[1]).strip()
-                                    elem.PressToolbarContextButton(elmID)
-                                    elem.SelectContextMenuItemByText(menuItem)
+                                    try:elem.PressToolbarContextButton(elmID)
+                                    except Exception as e: log.info('Warning! in PressToolbarContextButton : ' + str(e))
+                                    try:elem.SelectContextMenuItemByText(menuItem)
+                                    except Exception as e: log.info('Warning! in SelectContextMenuItemByText : ' + str(e))
                                 else:
-                                    elem.PressToolbarButton(elmID)
+                                    try:elem.PressToolbarButton(elmID)
+                                    except Exception as e:log.info('Warning! in PressToolbarButton : ' + str(e))
                                 status = sap_constants.TEST_RESULT_PASS
                                 result = sap_constants.TEST_RESULT_TRUE
                                 break
@@ -297,27 +301,18 @@ class Shell_GridView_Toolbar_Keywords():
                             result = sap_constants.TEST_RESULT_TRUE
                         else:
                             if ( len(input_val) >= 2 ):
+                                """Functions for ButtonAndMenu
+                                    SelectContextMenuItem(FunctionCode)
+                                    SelectContextMenuItemByPosition(PositionDesc)
+                                    SelectContextMenuItemByText(Text)
+                                    SelectMenuItem(Id) -  This function emulates selecting the menu item with the given id.
+                                    SelectMenuItemByText(strText) - This function emulates selecting the menu item by menu item text.
+                                    ShowContextMenu()
+                                """
                                 elem.PressContextButton(btn_id)
-##                                self.menuItem_list=input_val[1:]
-##                                self.count = 0
-##                                def recq_call(elem, menuItem):
-##                                    print('1', elem, menuItem)
-##                                    try:
-##                                        print(elem.CurrentContextMenu())
-##                                    except:
-##                                        pass
-##                                    temp_elem = elem.SelectContextMenuItemByText(menuItem)
-##                                    self.count = self.count + 1
-##                                    print(count)
-##                                    print(len(self.menuItem_list))
-##                                    if count == len(self.menuItem_list):
-##                                        return
-##                                    else:
-##                                        recq_call(temp_elem,self.menuItem_list[self.count])
-##                                recq_call(elem,self.menuItem_list[self.count])
-                                menuItem = str(input_val[1]).strip()
-##                                elem.PressContextButton(btn_id)
-                                elem.SelectContextMenuItemByText(menuItem)
+                                for i in range(1,len(input_val)):
+                                    menuItem = str(input_val[i]).strip()
+                                    elem.SelectMenuItemByText(menuItem)
                                 status = sap_constants.TEST_RESULT_PASS
                                 result = sap_constants.TEST_RESULT_TRUE
                             else:
@@ -644,3 +639,188 @@ class Shell_GridView_Toolbar_Keywords():
             log.error( err_msg )
             logger.print_on_console('Error occured in getCellColor')
         return status, result, value, err_msg
+
+#--------------------------------------------------------------------------------grid cloumn keywords
+    """Methods for grid column :
+    GetColumnDataType(column) - Returns the data type of the column according to the 'built-in datatypes' of the XML schema standard.
+    GetColumnPosition(column) - Returns the position of the column as shown on the screen, starting from 1.
+    GetColumnSortType(column) - Returns the sort type of the column. Possible values are:1.None 2.Ascending 3.Descending
+    GetColumnTitles(column) - This function returns a collection of strings that are used to display the title of a column. The control chooses the appropriate title according to the width of the column
+    GetColumnTooltip(column) - The tooltip of a column contains a text which is designed to help the user understands the meaning of the column.
+    GetColumnTotalType(column) - Returns the total type of the column. Possible values are: 1.None 2.Total 3.Subtotal
+    GetDisplayedColumnTitle(column) - This function returns the title of the column that is currently displayed. This text is one of the values of the collection returned from the function ?getColumnTitles?.
+    SelectColumn(column) - This function adds the specified column to the collection of the selected columns.
+    DeselectColumn(column) - This function removes the specified column from the collection of the selected columns.
+    SelectAll() - This function selects the whole grid content (i.e. all rows and all columns).
+    SetColumnWidth(column,width) - The width of a column can be set using this function. The width is given in characters. For proportional fonts this refers to the width of an average character. Depending on the contents of the cell more or less characters may fit in the column. If the parameter is invalid an exception is raised.
+    PressColumnHeader(column) - This function emulates a mouse click on the header of the column if the parameter identifies a valid column and raises an exception otherwise.
+    IsColumnKey(column) - Returns True if the column is marked as a key column."""
+
+    def selectColumns(self, sap_id, input_val, *args):
+        status = sap_constants.TEST_RESULT_FAIL
+        result = sap_constants.TEST_RESULT_FALSE
+        err_msg = None
+        value = OUTPUT_CONSTANT
+        bList = []
+        try:
+            self.lk.setWindowToForeground(sap_id)
+            id, ses = self.uk.getSapElement(sap_id)
+            if ( id and ses ):
+                elem = ses.FindById(id)
+                d1,d2,imax,d3 = self.get_colCount(sap_id)
+                if ( elem.type == 'GuiShell' ):
+                    #----------------------------------function to append columnorder
+                    for i in range(0,imax):
+                        b=elem.columnorder(i)
+                        bList.append(b)
+                    #----------------------------------function to append columnorder
+                    for col_name in input_val:
+                        for i in range(0,len(bList)):
+                            if( col_name in list(elem.GetColumnTitles(str(bList[i]))) and col_name == elem.GetDisplayedColumnTitle(str(bList[i]))):
+                                log.info("Column found at position : ",str(elem.GetColumnPosition(str(bList[i]))))
+                                elem.SelectColumn(str(bList[i]))
+                                status = sap_constants.TEST_RESULT_PASS
+                                result = sap_constants.TEST_RESULT_TRUE
+                                break
+                else:
+                    err_msg = 'Element is not a shell object'
+            else:
+                err_msg = sap_constants.ELELMENT_NOT_FOUND
+            #----------------------------------logging
+            if ( err_msg ):
+                log.info( err_msg )
+                logger.print_on_console( err_msg )
+        except Exception as e:
+            err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
+            log.error( err_msg )
+            logger.print_on_console( 'Error occured in Select Column' )
+        return status,result,value,err_msg
+
+    def unSelectColumns(self, sap_id, input_val, *args):
+        status = sap_constants.TEST_RESULT_FAIL
+        result = sap_constants.TEST_RESULT_FALSE
+        err_msg = None
+        value = OUTPUT_CONSTANT
+        bList = []
+        try:
+            self.lk.setWindowToForeground(sap_id)
+            id, ses = self.uk.getSapElement(sap_id)
+            if ( id and ses ):
+                elem = ses.FindById(id)
+                d1,d2,imax,d3 = self.get_colCount(sap_id)
+                if ( elem.type == 'GuiShell' ):
+                    #----------------------------------function to append columnorder
+                    for i in range(0,imax):
+                        b=elem.columnorder(i)
+                        bList.append(b)
+                    #----------------------------------function to append columnorder
+                    for col_name in input_val:
+                        for i in range(0,len(bList)):
+                            if( col_name in list(elem.GetColumnTitles(str(bList[i]))) and col_name == elem.GetDisplayedColumnTitle(str(bList[i]))):
+                                log.info("Column found at position : ",str(elem.GetColumnPosition(str(bList[i]))))
+                                elem.DeselectColumn(str(bList[i]))
+                                status = sap_constants.TEST_RESULT_PASS
+                                result = sap_constants.TEST_RESULT_TRUE
+                else:
+                    err_msg = 'Element is not a shell object'
+            else:
+                err_msg = sap_constants.ELELMENT_NOT_FOUND
+            #----------------------------------logging
+            if ( err_msg ):
+                log.info( err_msg )
+                logger.print_on_console( err_msg )
+        except Exception as e:
+            err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
+            log.error( err_msg )
+            logger.print_on_console( 'Error occured in Unselect Column' )
+        return status,result,value,err_msg
+
+    def getAllColumnHeaders(self, sap_id, input_val, *args):
+        status = sap_constants.TEST_RESULT_FAIL
+        result = sap_constants.TEST_RESULT_FALSE
+        err_msg = None
+        value = OUTPUT_CONSTANT
+        bList = []
+        vList = []
+        try:
+            self.lk.setWindowToForeground(sap_id)
+            id, ses = self.uk.getSapElement(sap_id)
+            if ( id and ses ):
+                elem = ses.FindById(id)
+                d1,d2,imax,d3 = self.get_colCount(sap_id)
+                if ( elem.type == 'GuiShell' ):
+                    #----------------------------------function to append columnorder
+                    for i in range(0,imax):
+                        b=elem.columnorder(i)
+                        bList.append(b)
+                    #----------------------------------function to append columnorder
+                    for i in range(0,len(bList)):
+                        vList.append(elem.GetDisplayedColumnTitle(str(bList[i])))
+                    value = vList
+                    status = sap_constants.TEST_RESULT_PASS
+                    result = sap_constants.TEST_RESULT_TRUE
+                else:
+                    err_msg = 'Element is not a shell object'
+            else:
+                err_msg = sap_constants.ELELMENT_NOT_FOUND
+            #----------------------------------logging
+            if ( err_msg ):
+                log.info( err_msg )
+                logger.print_on_console( err_msg )
+        except Exception as e:
+            err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
+            log.error( err_msg )
+            logger.print_on_console( 'Error occured in Get All Column Headers' )
+        return status,result,value,err_msg
+
+    def getColNumByColHeaders(self, sap_id, input_val, *args):
+        status = sap_constants.TEST_RESULT_FAIL
+        result = sap_constants.TEST_RESULT_FALSE
+        err_msg = None
+        value = OUTPUT_CONSTANT
+        bList = []
+        vList = []
+        vList_temp = []
+        allTrueFlag = True
+        try:
+            self.lk.setWindowToForeground(sap_id)
+            id, ses = self.uk.getSapElement(sap_id)
+            if ( id and ses ):
+                elem = ses.FindById(id)
+                d1,d2,imax,d3 = self.get_colCount(sap_id)
+                if ( elem.type == 'GuiShell' ):
+                    #----------------------------------function to append columnorder
+                    for i in range(0,imax):
+                        b=elem.columnorder(i)
+                        bList.append(b)
+                    #----------------------------------function to append columnorder
+                    for i in range(0,len(bList)):
+                        vList.append(elem.GetDisplayedColumnTitle(str(bList[i])))
+                    for iv in input_val:
+                        if iv in vList:
+                            i = None
+                            i = vList.index(iv)
+                            vList_temp.append(i+1)
+                        else :
+                            allTrueFlag = False
+                            break
+                    if ( allTrueFlag ):
+                        value = vList_temp
+                        status = sap_constants.TEST_RESULT_PASS
+                        result = sap_constants.TEST_RESULT_TRUE
+                    else:
+                        err_msg = 'Column header/headers do not exist'
+                else:
+                    err_msg = 'Element is not a shell object'
+            else:
+                err_msg = sap_constants.ELELMENT_NOT_FOUND
+            #----------------------------------logging
+            if ( err_msg ):
+                log.info( err_msg )
+                logger.print_on_console( err_msg )
+        except Exception as e:
+            err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
+            log.error( err_msg )
+            logger.print_on_console( 'Error occured in GetColNumByColHeaders' )
+        del bList,vList,vList_temp,allTrueFlag
+        return status,result,value,err_msg
