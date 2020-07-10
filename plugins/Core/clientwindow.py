@@ -21,8 +21,6 @@ import requests
 import io
 import handler
 import update_module
-import wx.lib.scrolledpanel
-
 try:
     from socketlib_override import SocketIO,BaseNamespace
 except ImportError:
@@ -66,7 +64,7 @@ ICE_CONST= NINETEEN68_HOME + "/assets/ice_const.json"
 CONFIG_PATH= NINETEEN68_HOME + "/assets/config.json"
 CERTIFICATE_PATH = NINETEEN68_HOME + "/assets/CA_BUNDLE"
 LOGCONFIG_PATH = NINETEEN68_HOME + "/assets/logging.conf"
-DRIVERS_PATH = NINETEEN68_HOME + "/Lib/Drivers"
+DRIVERS_PATH = NINETEEN68_HOME + "/lib/Drivers"
 CHROME_DRIVER_PATH = DRIVERS_PATH + "/chromedriver"
 GECKODRIVER_PATH = DRIVERS_PATH + "/geckodriver"
 if SYSTEM_OS == "Windows":
