@@ -202,6 +202,7 @@ class SAPDispatcher:
                     "selectradiobutton" : ['radiobutton'],
                     "setsecuretext" : ['input'],
                     "selectvaluebytext" : ['select'],
+                    "selectvaluebyindex" : ['select'],
                     "settext" : ['input'],
                     "unselectcheckbox" : ['checkbox'],
                     "verifyelementtext" : ['radiobutton', 'checkbox', 'input', 'button', 'select', 'table'],

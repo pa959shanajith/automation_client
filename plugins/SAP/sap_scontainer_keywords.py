@@ -465,6 +465,26 @@ class SContainer_Keywords():
             except:log.error('Element id has no row value')
             del eid,num
             return row
+        def reArrangeRows(row_list):
+            """
+            This function is to arrange rList in order as in SAPGUI 730 , the scontainers are populated haphazardly
+            There are 3 ways to arrange 1.row number 2.last index in name 3.Top/ScreenTop
+            Input : rList (its a list of rows within a simple container)
+            Output : rList (arranged list)
+            """
+            tempList = []
+            properList = []
+            for r in row_list:
+                rNum = getRowNum(r)
+                tempList.append(int(rNum))
+            tempList.sort() #also sorted(tempList)
+            for t in tempList:
+                for r in row_list:
+                    rNum = getRowNum(r)
+                    if ( int(rNum) == t ):
+                        properList.append(r)
+            del tempList, row_list, rNum, t, r
+            return properList
 
         if (flag_s == True and sL_flag == False):
             #set headers
@@ -479,6 +499,8 @@ class SContainer_Keywords():
             for c in ch:
                 if( c.Type == 'GuiSimpleContainer' ):
                     rList.append(c) #adds to header list
+
+            rList = reArrangeRows(rList)
 
             if ( flag_h == True ):
                 """Checks if the objects have inconsistant column headers"""
@@ -523,7 +545,7 @@ class SContainer_Keywords():
                 Identified as a header-deficient table
                 Assumptions : number of columns at are non-uniform compared to each row
                 """
-                logger.print_on_console( 'Table is of type : Header-deficient table' )
+                logger.print_on_console( 'Table is of type : Header-deficient table - type1' )
                 logger.print_on_console( 'Warning! : This type of table has inconsistancy with column positions' )
                 self.tableType = 2
                 tableObj = []
@@ -555,7 +577,7 @@ class SContainer_Keywords():
                 except Exception as e: log.info('Exception at rPrev:',e)
                 if(r1 == r2):
                     rHList.append(ch[i])
-                elif(r2 and r1!=r2):
+                elif( (r2 and r1!=r2) or (r1 and not(r2)) ):
                     if (r1 == rPrev):
                         rHList.append(ch[i])
                         tableObj.append(rHList)

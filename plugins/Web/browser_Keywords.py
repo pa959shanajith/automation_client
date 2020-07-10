@@ -16,7 +16,7 @@ import threading
 import os
 from constants import *
 import logging
-import clientwindow
+import core
 import platform
 if SYSTEM_OS != 'Darwin':
     import win32gui
@@ -173,7 +173,6 @@ class BrowserKeywords():
         driver_pre = local_bk.driver_obj
         return status,result,output,err_msg
 
-
     def openNewBrowser(self,*args):
         global local_bk
         status=webconstants.TEST_RESULT_FAIL
@@ -276,8 +275,6 @@ class BrowserKeywords():
         tid, current_pid = win32process.GetWindowThreadProcessId(hwnd)
         if pid == current_pid and win32gui.IsWindowVisible(hwnd):
             self.windows.append(hwnd)
-
-
 
     def princon(self,hwnd, lparam):
         if win32gui.GetClassName(hwnd)=="Edit":
@@ -492,7 +489,6 @@ class BrowserKeywords():
             err_msg=self.__web_driver_exception(e)
         return status,result,output,err_msg
 
-
     def getCurrentURL(self,*args):
         global local_bk
         status=webconstants.TEST_RESULT_FAIL
@@ -548,7 +544,6 @@ class BrowserKeywords():
             err_msg=self.__web_driver_exception(e)
         return status,result,output,err_msg
 
-
     def closeBrowser(self,*args):
         global local_bk
         status=webconstants.TEST_RESULT_FAIL
@@ -567,6 +562,7 @@ class BrowserKeywords():
                         break
                 count = count - 2
                 local_bk.webdriver_list[driver_instance].quit()
+                local_bk.driver_obj = None
                 if SYSTEM_OS == 'Darwin':
                     os.system("killall -9 Safari")
                 logger.print_on_console('browser closed')
@@ -584,7 +580,6 @@ class BrowserKeywords():
             logger.print_on_console(err_msg)
             local_bk.log.error(err_msg)
         return status,result,output,err_msg
-
 
     def maximizeBrowser(self,*args):
         global local_bk
@@ -606,7 +601,6 @@ class BrowserKeywords():
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
         return status,result,output,err_msg
-
 
     def closeSubWindows(self,*args):
         global local_bk
@@ -873,50 +867,11 @@ class BrowserKeywords():
 
 
 class Singleton_DriverUtil():
-##    def check_available_driver(self,browser_num):
-##        global driver_obj
-##        import os
-##        try:
-##            import browserops
-##            log.debug("browserops.driver ",browserops.driver)
-####            scrapedriver = browserops.driver
-##            toCheck = browserops.driver.window_handles
-##            print toCheck
-##            if(len(toCheck)== 0):
-##                import win32com.client
-##                my_processes = ['IEDriverServer.exe','IEDriverServer64.exe']
-##                wmi=win32com.client.GetObject('winmgmts:')
-##                for p in wmi.InstancesOf('win32_process'):
-##                    if p.Name in my_processes:
-##                        os.system("TASKKILL /F /IM " + p.Name)
-##                if browserops.driver.name == 'internet explorer':
-##                    driver_instance = self.driver('3')
-##                    return driver_instance
-##            else:
-##                return browserops.driver
-##
-##
-##        except Exception as e:
-##            import win32com.client
-##            my_processes = ['chromedriver.exe','phantomjs.exe','geckodriver.exe']
-##            wmi=win32com.client.GetObject('winmgmts:')
-##            for p in wmi.InstancesOf('win32_process'):
-##                if p.Name in my_processes:
-##                    os.system("TASKKILL /F /IM " + p.Name)
-##            if browserops.driver == None:
-##                return self.driver(browser_num)
-##            else:
-##                if browserops.driver.name == 'chrome':
-##                    driver_instance =self.driver('1')
-##                    return driver_instance
-##                elif browserops.driver.name == 'firefox':
-##                    driver_instance =self.driver('2')
-##                    return driver_instance
 
     def chech_if_driver_exists_in_map(self,browserType):
         global local_bk, drivermap
         d = None
-##        drivermap.reverse()
+        # drivermap.reverse()
         if browserType == '1':
             if len(drivermap) > 0:
                 for i in drivermap:
@@ -976,22 +931,21 @@ class Singleton_DriverUtil():
         local_bk.log.debug('BROWSER NUM: ')
         local_bk.log.debug(browser_num)
         logger.print_on_console( 'BROWSER NUM: ',str(browser_num))
-        flag1 = 0
         configvalues = readconfig.configvalues
         if (browser_num == '1'):
             try:
                 chrome_path = configvalues['chrome_path']
+                chrome_profile=configvalues["chrome_profile"]
                 exec_path = webconstants.CHROME_DRIVER_PATH
                 if  SYSTEM_OS == "Darwin":
                     exec_path = webconstants.drivers_path+"/chromedriver"
-##                choptions1 = webdriver.ChromeOptions()
-##                # --headless helps to run chrome without browser window
-##                choptions1.add_argument('--headless')
-##                driver = webdriver.Chrome(chrome_options=choptions1, executable_path=exec_path)
-##                flag1 = self.chrome_version(driver)
-##                driver = None
-                ##print clientwindow.chromeFlag
-                if( clientwindow.chromeFlag == True ):
+                # choptions1 = webdriver.ChromeOptions()
+                # # --headless helps to run chrome without browser window
+                # choptions1.add_argument('--headless')
+                # driver = webdriver.Chrome(chrome_options=choptions1, executable_path=exec_path)
+                # flag1 = self.chrome_version(driver)
+                # driver = None
+                if core.chromeFlag:
                     choptions = webdriver.ChromeOptions()
                     choptions.add_argument('start-maximized')
                     if configvalues['extn_enabled'].lower()=='yes' and os.path.exists(webconstants.EXTENSION_PATH):
@@ -1000,6 +954,9 @@ class Singleton_DriverUtil():
                         choptions.add_argument('--disable-extensions')
                     if ((str(chrome_path).lower()) != 'default'):
                         choptions.binary_location=str(chrome_path)
+                    if ((str(chrome_profile).lower()) != 'default'):
+                        choptions.add_argument("user-data-dir="+chrome_profile)
+                    
                     driver = webdriver.Chrome(executable_path=exec_path,chrome_options=choptions)
                     ##driver = webdriver.Chrome(desired_capabilities= choptions.to_capabilities(), executable_path = exec_path)
                     drivermap.append(driver)
@@ -1023,7 +980,7 @@ class Singleton_DriverUtil():
                     exec_path = webconstants.drivers_path+"/geckodriver"
                 else:
                     exec_path = webconstants.GECKODRIVER_PATH
-                if(clientwindow.firefoxFlag == True):
+                if(core.firefoxFlag == True):
                     if str(configvalues['firefox_path']).lower()!="default":
                         from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
                         binary = FirefoxBinary(str(configvalues['firefox_path']))
@@ -1056,21 +1013,21 @@ class Singleton_DriverUtil():
                 else:
                     iepath = webconstants.IE_DRIVER_PATH_64
                 driver = webdriver.Ie(capabilities=caps,executable_path=iepath)
-##                browser_ver=driver.capabilities['version']
-##                browser_ver1 = browser_ver.encode('utf-8')
-##                browser_ver = int(browser_ver1)
-##                if(browser_ver >= int(webconstants.IE_BROWSER_VERSION[0]) and browser_ver <= int(webconstants.IE_BROWSER_VERSION[1])):
+                # browser_ver=driver.capabilities['version']
+                # browser_ver1 = browser_ver.encode('utf-8')
+                # browser_ver = int(browser_ver1)
+                # if(browser_ver >= int(webconstants.IE_BROWSER_VERSION[0]) and browser_ver <= int(webconstants.IE_BROWSER_VERSION[1])):
                 drivermap.append(driver)
                 driver.maximize_window()
                 logger.print_on_console('IE browser started')
                 local_bk.log.info('IE browser started')
-##                else:
-##                    driver.close()
-##                    driver = None
-##                    logger.print_on_console("IE browser version not supported")
-##                    log.info('IE browser version not supported')
-####                    logger.print_on_console("Browser version:",browser_ver)
-##                    log.info('Browser version:',browser_ver)
+                # else:
+                #     driver.close()
+                #     driver = None
+                #     logger.print_on_console("IE browser version not supported")
+                #     log.info('IE browser version not supported')
+                #     logger.print_on_console("Browser version:",browser_ver)
+                #     log.info('Browser version:',browser_ver)
             except Exception as e:
                 logger.print_on_console("Requested browser is not available")
                 local_bk.log.info('Requested browser is not available')
@@ -1201,7 +1158,6 @@ class Singleton_DriverUtil():
                 logger.print_on_console('error in setting updated zones data.'
                                         , set_security_zonesexc)
 
-
     def chrome_version(self,driver):
         browser_ver = driver.capabilities['version']
         browser_ver1 = browser_ver.encode('utf-8')
@@ -1210,21 +1166,12 @@ class Singleton_DriverUtil():
         driver_ver = driver.capabilities['chrome']['chromedriverVersion']
         driver_ver1 = driver_ver.encode('utf-8')
         driver_ver = float(driver_ver1[:4])
-##        logger.print_on_console('Driver version:',driver_ver)
         local_bk.log.info('Driver version:',str(driver_ver))
-
-##        logger.print_on_console(webconstants.CHROME_DRIVER_VERSION[0][0])
-##        logger.print_on_console(type(webconstants.CHROME_DRIVER_VERSION[0][0]))
+        flag1 = 0
         for i in range(0,len(webconstants.CHROME_DRIVER_VERSION)):
-##            print i
             if(driver_ver == float(webconstants.CHROME_DRIVER_VERSION[i][0]) and browser_ver >= int(webconstants.CHROME_DRIVER_VERSION[i][1]) and browser_ver <= int(webconstants.CHROME_DRIVER_VERSION[i][2])):
                 flag1 = 1
-##                logger.print_on_console('Flag:',flag1)
-                local_bk.log.info('Flag:',str(flag1))
-                return flag1
-            else:
-                flag1 = 0
-##        logger.print_on_console('Flag:',flag1)
+                break
         local_bk.log.info('Flag:',str(flag1))
         return flag1
 

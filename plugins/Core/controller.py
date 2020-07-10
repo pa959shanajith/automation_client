@@ -64,7 +64,7 @@ class Controller():
         self.cur_dir= os.getcwd()
         self.previous_step=''
         self.verify_dict={'web':VERIFY_EXISTS,
-        'desktopjava':VERIFY_VISIBLE,'sap':VERIFY_EXISTS,'desktop':VERIFY_EXISTS}
+        'oebs':VERIFY_VISIBLE,'sap':VERIFY_EXISTS,'desktop':VERIFY_EXISTS}
         self.dynamic_var_handler_obj=dynamic_variable_handler.DynamicVariables()
         self.status=TEST_RESULT_FAIL
         self.scenario_start_time=''
@@ -223,7 +223,7 @@ class Controller():
     def __load_aws(self):
         try:
             core_utils.get_all_the_imports('AWS/src')
-            
+
         except Exception as e:
             logger.print_on_console('Error loading AWS plugin')
             log.error(e)
@@ -557,7 +557,7 @@ class Controller():
             else:
                 logger.print_on_console('Result obtained exceeds max. Limit, please use writeToFile keyword.')
         log.info('Result obtained is: '+str(display_keyword_response))
-        if tsp.apptype.lower()=='desktop' or tsp.apptype.lower()=='sap' or tsp.apptype.lower()=='desktopjava' or (tsp.cord!='' and tsp.cord!=None):
+        if tsp.apptype.lower()=='desktop' or tsp.apptype.lower()=='sap' or tsp.apptype.lower()=='oebs' or (tsp.cord!='' and tsp.cord!=None):
             if result[2]!='9cc33d6fe25973868b30f4439f09901a' and tsp.name.lower()!='verifytextiris':
                 logger.print_on_console('Result obtained is: ',result[2])
             elif result:
@@ -865,10 +865,8 @@ class Controller():
             print('\n')
             tsplist = obj.read_step()
             for k in range(len(tsplist)):
-                if tsplist[k].name.lower() == 'openbrowser':
-                    if tsplist[k].apptype.lower()=='web':
-                        if not (IGNORE_THIS_STEP in tsplist[k].inputval[0].split(';')):
-                            tsplist[k].inputval = browser_type
+                if tsplist[k].name.lower() == 'openbrowser' and tsplist[k].apptype.lower()=='web' and (IGNORE_THIS_STEP not in tsplist[k].inputval[0].split(';')):
+                    tsplist[k].inputval = browser_type
         if flag:
             if runfrom_step > 0 and runfrom_step <= tsplist[len(tsplist)-1].stepnum:
                 self.conthread=mythread
@@ -1006,10 +1004,8 @@ class Controller():
                                         continue
                                     if not(aws_mode):
                                         for k in range(len(tsplist)):
-                                            if tsplist[k].name.lower() == 'openbrowser':
-                                                if tsplist[k].apptype.lower()=='web':
-                                                    if not (IGNORE_THIS_STEP in tsplist[k].inputval[0].split(';')):
-                                                            tsplist[k].inputval = [browser]
+                                            if tsplist[k].name.lower() == 'openbrowser' and tsplist[k].apptype.lower()=='web' and (IGNORE_THIS_STEP not in tsplist[k].inputval[0].split(';')):
+                                                tsplist[k].inputval = [browser]
                             if aws_mode:
                                 compile_status=False
                                 scenario_name=json_data['suitedetails'][suite_idx-1]["scenarioNames"][sc_idx]
@@ -1030,8 +1026,6 @@ class Controller():
                                     logger.print_on_console(msg)
                                     log.info(msg)
                                     tsplist=[]
-
-
                                 sc_idx+=1
                                 execute_flag=False
                             if flag and execute_flag :
@@ -1156,16 +1150,16 @@ class Controller():
             print('=======================================================================================================')
         return status
 
-    def invoke_controller(self,action,mythread,debug_mode,runfrom_step,json_data,wxObject,socketIO,qc_soc,*args):
+    def invoke_controller(self,action,mythread,debug_mode,runfrom_step,json_data,root_obj,socketIO,qc_soc,*args):
         status = COMPLETED
         global terminate_flag,pause_flag,socket_object
         self.conthread=mythread
         self.clear_data()
+        wxObject = root_obj.cw
         socket_object = socketIO
         #Logic to make sure that logic of usage of existing driver is not applicable to execution
         if local_cont.web_dispatcher_obj != None:
             local_cont.web_dispatcher_obj.action=action
-        self.debug_choice=wxObject.choice
         if action==EXECUTE:
             if len(args)>0:
                 aws_mode=args[0]
@@ -1176,6 +1170,7 @@ class Controller():
             elif self.execution_mode == PARALLEL:
                 status = self.invoke_parralel_exe(mythread,json_data,socketIO,wxObject,self.configvalues,qc_soc,aws_mode)
         elif action==DEBUG:
+            self.debug_choice=wxObject.choice
             self.debug_mode=debug_mode
             self.wx_object=wxObject
             status=self.invoke_debug(mythread,runfrom_step,json_data)
@@ -1256,7 +1251,7 @@ def kill_process():
             log.error(e)
 
         try:
-            # os.system("killall -9 Safari") 
+            # os.system("killall -9 Safari")
                 # This kills all instances of safari browser even if it is not opened by nineteen68.
                 # Issue when Nineteen68 is opened in Safari browser
             os.system("killall -9 safaridriver")

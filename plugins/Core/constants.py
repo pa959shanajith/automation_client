@@ -59,7 +59,7 @@ APPTYPE_DESKTOP = 'desktop'
 
 APPTYPE_SAP = 'sap'
 
-APPTYPE_DESKTOP_JAVA = 'desktopjava'
+APPTYPE_DESKTOP_JAVA = 'oebs'
 
 APPTYPE_MOBILE='mobileweb'
 
@@ -297,7 +297,7 @@ STOP='stop'
 ROWS='rows'
 
 OVERALLSTATUS='overallstatus'
-	
+
 COMMENTS_LENGTH='commentsLength'
 
 ID='id'
