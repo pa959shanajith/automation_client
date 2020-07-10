@@ -66,7 +66,12 @@ class QcWindow():
             DomainURL = self.Qc_Url + '/rest/domains/'
             _resp = requests.get(DomainURL, headers=self._headers, cookies=self.cookies)   
             JsonObject = _resp.json()
-            DomainList = [item['Name'] for item in JsonObject['Domains']['Domain']]
+            domain_obj=JsonObject['Domains']['Domain']
+            DomainList=[]
+            if type(domain_obj)==list:
+                DomainList = [item['Name'] for item in domain_obj]
+            elif type(domain_obj)==dict:
+                DomainList = [v for k,v in domain_obj.items()]
             if(len(DomainList)>0):
                 for dom in DomainList:
                     domain_dict[key].append(str(dom))
