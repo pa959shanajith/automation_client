@@ -476,19 +476,19 @@ class Config_window(wx.Frame):
         #------------------------------------Different co-ordinates for Windows and Mac
         if SYSTEM_OS=='Windows':
             config_fields= {
-            "Frame":[(300, 150),(470,680)],
-            "S_address":[(12,12),(85, 25),(100,8),(140,-1)],
+            "Frame":[(300, 150),(470,640)],
+            "S_address":[(12,12),(85, 25),(110,8),(140,-1)],
             "S_port": [(270,12),(70, 25),(340,8), (105,-1)],
-            "Chrm_path":[(12,42),(80, 25),(100,38), (310,-1),(415,38),(30, -1)],
-            "Chrm_profile":[(12,72),(80, 25),(100,68), (310,-1),(415,68),(30, -1)],
-            "Ffox_path":[(12,102),(80, 25),(100,98), (310,-1),(415,98),(30, -1)],
-            "Log_path":[(12,132),(80, 25),(100,128), (310,-1),(415,128),(30, -1)],
-            "Q_timeout":[(12,162),(85, 25),(100,158), (70,-1)],
-            "Timeout":[(180,162),(50, 25),(240,158), (70,-1)],
-            "Delay":[(333,162),(40, 25),(375,158), (70,-1)],
-            "Step_exec":[(12,192),(110, 25),(135,188),(70,-1)],
-            "Disp_var":[(235,192),(135, 25),(375,188), (70,-1)],
-            "S_cert":[(12,222),(85, 25),(100,218),(310,-1),(415,218),(30, -1)],
+            "Chrm_path":[(12,42),(80, 25),(110,38), (300,-1),(415,38),(30, -1)],
+            "Chrm_profile":[(12,72),(80, 25),(110,68), (300,-1),(415,68),(30, -1)],
+            "Ffox_path":[(12,102),(80, 25),(110,98), (300,-1),(415,98),(30, -1)],
+            "Log_path":[(12,132),(80, 25),(110,128), (300,-1),(415,128),(30, -1)],
+            "S_cert":[(12,162),(95, 25),(110,158),(300,-1),(415,158),(30, -1)],
+            "Q_timeout":[(12,192),(85, 25),(110,188), (70,-1)],
+            "Timeout":[(190,192),(50, 25),(250,188), (70,-1)],
+            "Delay":[(333,192),(40, 25),(375,188), (70,-1)],
+            "Step_exec":[(12,222),(110, 25),(135,218),(70,-1)],
+            "Disp_var":[(235,222),(135, 25),(375,218), (70,-1)],
             "C_Timeout" :[(12,252),(120, 25),(135,248), (70,-1)],
             "Delay_Stringinput":[(235,252),(130, 25),(375,248), (70,-1)],
             "Ignore_cert":[(12,308)],
@@ -500,45 +500,49 @@ class Config_window(wx.Frame):
             "S_flag":[(340,428)],
             "Ret_url":[(12,428)],
             "Brow_ch":[(115,428)],
-            "High_ch":[ (225,428)],
+            "High_ch":[(225,428)],
             "Iris_prediction":[(12,488)],
             "hide_soft_key":[(180,488)],
             "extn_enabled":[(320,488)],
             "update_check":[(12,548)],
-            "Save":[(100,560), (100, 28)],
-            "Close":[(250,560), (100, 28)]
+            "err_text":[(85,525),(350, 25)],
+            "Save":[(100,550), (100, 28)],
+            "Close":[(250,550), (100, 28)]
             }
         else:
             config_fields={
-            "Frame":[(300, 150),(555,540)],
-            "S_address":[(12,8),(90,28),(116,8 ),(140,-1)],
-            "S_port": [(352,8),(70,28),(430,8 ),(105,-1)],
-            "Chrm_path":[(12,38),(80,28),(116,38),(382,-1),(504,38),(30, -1)],
-            "Chrm_profile":[(12,68),(80,28),(116,68),(382,-1),(504,68),(30, -1)],
-            "Ffox_path":[(12,98),(80,28),(116,68),(382,-1),(504,68),(30, -1)],
-            "Log_path":[(12,98),(80, 28),(116,98),(382,-1),(504,98),(30, -1)],
-            "Q_timeout":[(12,128),(85, 28),(116,128), (80,-1)],
-            "Timeout":[(225,128),(50, 28),(290,128),(80,-1)],
-            "Delay":[(404,128),(40, 28),(448,128), (85,-1)],
-            "Step_exec":[(12,158),(120, 28),(142,158),(80,-1)],
-            "Disp_var":[(288,158),(140, 28),(448,158),(85,-1)],
-            "S_cert":[(12,188),(85, 28),(116,188),(382,-1),(504,188),(30, -1)],
-            "Ignore_cert":[(12,320)],
-            "IE_arch":[(158,258)],
-            "Dis_s_cert":[(335,258)],
-            "Ex_flag":[(12,258)],
-            "Ignore_v_check":[(170,318)],
-            "S_flag":[(396,378)],
-            "Ret_url":[(12,378)],
-            "En_secu_check":[(358,318)],
-            "Brow_ch":[(130,378)],
-            "High_ch":[(260,378)],
-            "Save":[(135,458),(100, 28)],
-            "C_Timeout" :[(12,218),(120, 28),(180,218), (80,-1)],
-            "Iris_prediction":[(12,398)],
-            "hide_soft_key":[(180,398)],
-            "extn_enabled":[(370,428)],
-            "Close":[(285,458),(100, 28)]
+            "Frame":[(300, 150),(600,640)],
+            "S_address":[(12,12),(90,25),(116,8),(140,-1)],
+            "S_port": [(352,12),(70,25),(430,8), (105,-1)],
+            "Chrm_path":[(12,42),(80,25),(116,38),(382,-1),(504,38),(30, -1)],
+            "Chrm_profile":[(12,72),(80,25),(116,68),(382,-1),(504,68),(30, -1)],
+            "Ffox_path":[(12,102),(80,25),(116,98),(382,-1),(504,98),(30, -1)],
+            "Log_path":[(12,132),(80, 25),(116,128),(382,-1),(504,128),(30, -1)],
+            "S_cert":[(12,162),(85, 25),(116,158),(382,-1),(504,158),(30, -1)],
+            "Q_timeout":[(12,192),(85, 25),(116,188), (80,-1)],
+            "Timeout":[(225,192),(50, 25),(290,188),(80,-1)],
+            "Delay":[(404,192),(40, 25),(448,188), (85,-1)],
+            "Step_exec":[(12,222),(120, 25),(142,218),(80,-1)],
+            "Disp_var":[(288,222),(140, 25),(448,218),(85,-1)],
+            "C_Timeout" :[(12,252),(120, 25),(180,248), (80,-1)],
+            "Delay_Stringinput":[(288,252),(140, 25),(448,248), (85,-1)],
+            "Ignore_cert":[(12,308)],
+            "IE_arch":[(170,308)],
+            "Dis_s_cert":[(344,308)],
+            "Ex_flag":[(12,368)],
+            "Ignore_v_check":[(146,368)],
+            "En_secu_check":[(334,368)],
+            "S_flag":[(396,428)],
+            "Ret_url":[(12,428)],
+            "Brow_ch":[(130,428)],
+            "High_ch":[(260,428)],
+            "Iris_prediction":[(12,488)],
+            "hide_soft_key":[(230,488)],
+            "extn_enabled":[(400,488)],
+            "update_check":[(12,548)],
+            "err_text":[(85,525),(350, 25)],
+            "Save":[(130,550),(100, 28)],
+            "Close":[(370,550),(120, 28)]
             }
         wx.Frame.__init__(self, parent, title=title,
             pos=config_fields["Frame"][0], size=config_fields["Frame"][1],style = wx.CAPTION|wx.CLIP_CHILDREN)
@@ -667,7 +671,7 @@ class Config_window(wx.Frame):
         else:
             self.disp_var_timeout.SetValue(isConfigJson['displayVariableTimeOut'])
 
-        self.sev_cert=wx.StaticText(self.panel, label="Server Cert", pos=config_fields["S_cert"][0],size=config_fields["S_cert"][1], style=0, name="")
+        self.sev_cert=wx.StaticText(self.panel, label="Server Certificate", pos=config_fields["S_cert"][0],size=config_fields["S_cert"][1], style=0, name="")
         self.server_cert=wx.TextCtrl(self.panel, pos=config_fields["S_cert"][2], size=config_fields["S_cert"][3])
         self.server_cert_btn=wx.Button(self.panel, label="...",pos=config_fields["S_cert"][4], size=config_fields["S_cert"][5])
         self.server_cert_btn.Bind(wx.EVT_BUTTON, self.fileBrowser_servcert)
@@ -685,14 +689,14 @@ class Config_window(wx.Frame):
 
         self.config_param=wx.StaticText(self.panel,label="Config Parameters",pos=(10,290),size=(100,30), style=0, name="")    
         font = wx.Font(9, wx.DEFAULT, wx.NORMAL, wx.NORMAL)
-        font.SetUnderlined(True)
+        #font.SetUnderlined(True)
         self.config_param.SetFont(font)
 
         #ToolTips for static texts boxes
         self.sev_add.SetToolTip(wx.ToolTip("Server Address"))
         self.sev_port.SetToolTip(wx.ToolTip("Server Port"))
         self.ch_path.SetToolTip(wx.ToolTip("Chrome installation path or default"))
-        self.ch_profile.SetToolTip(wx.ToolTip("Chrome Path path or default"))
+        self.ch_profile.SetToolTip(wx.ToolTip("Chrome profile path or default"))
         self.ff_path.SetToolTip(wx.ToolTip("Firefox installation path or default"))
         self.log_fpath.SetToolTip(wx.ToolTip(" ICE Log file path"))
         self.qu_timeout.SetToolTip(wx.ToolTip("Timeout for database queries"))
@@ -701,7 +705,7 @@ class Config_window(wx.Frame):
         self.delay_stringinput.SetToolTip(wx.ToolTip("Character input delay for sendFunctionKeys"))
         self.stepExecWait.SetToolTip(wx.ToolTip("Delay between each step[in seconds]"))
         self.dispVarTimeOut.SetToolTip(wx.ToolTip("displayVariable popup duration[in seconds]"))
-        self.sev_cert.SetToolTip(wx.ToolTip("Server certificate file path"))
+        self.sev_cert.SetToolTip(wx.ToolTip("Server certificate file path or default"))
         self.connection_timeout.SetToolTip(wx.ToolTip("Timeout from server [in hours 0 or >8]"))
         
         ## Binding placeholders and restricting textareas to just numeric characters
@@ -739,7 +743,6 @@ class Config_window(wx.Frame):
         lblList3 = ['All', 'Fail']
         lblList4 = ['False', 'True']
         self.bSizer = wx.BoxSizer( wx.VERTICAL )
-       
 
         self.rbox1 = wx.RadioBox(self.panel1, label = 'Ignore Certificate', choices = lblList,
             majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
@@ -866,13 +869,13 @@ class Config_window(wx.Frame):
         #now setting that boxsizer to our panel1
         self.panel1.SetSizer(self.bSizer)
 
-        self.error_msg=wx.StaticText(self.panel, label="", pos=(85,480),size=(350, 28), style=0, name="")
+        self.error_msg=wx.StaticText(self.panel, label="", pos=config_fields["err_text"][0],size=config_fields["err_text"][1], style=0, name="")
         self.save_btn=wx.Button(self.panel, label="Save",pos=config_fields["Save"][0], size=config_fields["Save"][1])
         self.save_btn.Bind(wx.EVT_BUTTON, self.config_check)
         self.close_btn=wx.Button(self.panel, label="Close",pos=config_fields["Close"][0], size=config_fields["Close"][1])
         self.close_btn.Bind(wx.EVT_BUTTON, self.close)
         self.Bind(wx.EVT_CLOSE, self.close)
-       
+
         if wxObject.connectbutton.GetName().lower() != "connect":
             self.sev_add.Enable(False)
             self.server_add.Enable(False)
@@ -989,7 +992,7 @@ class Config_window(wx.Frame):
             self.log_fpath.SetForegroundColour((0,0,0))
             self.qu_timeout.SetLabel('Query Timeout')
             self.qu_timeout.SetForegroundColour((0,0,0))
-            self.sev_cert.SetLabel('Server Cert')
+            self.sev_cert.SetLabel('Server Certificate')
             self.sev_cert.SetForegroundColour((0,0,0))
             self.ch_path.SetLabel('Chrome Path')
             self.ch_path.SetForegroundColour((0,0,0))
@@ -1017,7 +1020,10 @@ class Config_window(wx.Frame):
                 data['logFile_Path'] = ''
 
             #---------------------------------------resetting the static texts
-            if (os.path.isfile(data['chrome_path'])==True or str(data['chrome_path']).strip()=='default') and os.path.isfile(data['server_cert'])==True and os.path.isfile(data['logFile_Path'])==True and (os.path.isfile(data['firefox_path'])==True or str(data['firefox_path']).strip()=='default'):
+            if ((os.path.isfile(data['chrome_path'])==True or str(data['chrome_path']).strip()=='default') and
+                (os.path.isfile(data['server_cert'])==True or str(data['server_cert']).strip()=='default') and
+                (os.path.isfile(data['firefox_path'])==True or str(data['firefox_path']).strip()=='default') and
+                os.path.isfile(data['logFile_Path'])==True):
                 if int(data['connection_timeout'])in range(1, 8):
                     self.error_msg.SetLabel("Connection Timeout must be greater than or equal to 8")
                     self.error_msg.SetForegroundColour((255,0,0))
@@ -1027,11 +1033,11 @@ class Config_window(wx.Frame):
             else:
                 self.error_msg.SetLabel("Marked fields '^' contain invalid path, Data not saved")
                 self.error_msg.SetForegroundColour((0,0,255))
-                if os.path.isfile(data['server_cert'])!=True:
-                    self.sev_cert.SetLabel('Server Cert^')
+                if os.path.isfile(data['server_cert'])!=True or str(data['server_cert']).strip()=='default':
+                    self.sev_cert.SetLabel('Server Certificate^')
                     self.sev_cert.SetForegroundColour((0,0,255))
                 else:
-                    self.sev_cert.SetLabel('Server Cert')
+                    self.sev_cert.SetLabel('Server Certificate')
                     self.sev_cert.SetForegroundColour((0,0,0))
 
                 if os.path.isfile(data['chrome_path'])==True or str(data['chrome_path']).strip()=='default':
@@ -1088,10 +1094,10 @@ class Config_window(wx.Frame):
                 self.qu_timeout.SetLabel('Query Timeout')
                 self.qu_timeout.SetForegroundColour((0,0,0))
             if data['server_cert']=='':
-                self.sev_cert.SetLabel('Server Cert*')
+                self.sev_cert.SetLabel('Server Certificate*')
                 self.sev_cert.SetForegroundColour((255,0,0))
             else:
-                self.sev_cert.SetLabel('Server Cert')
+                self.sev_cert.SetLabel('Server Certificate')
                 self.sev_cert.SetForegroundColour((0,0,0))
             if data['chrome_path']=='':
                 self.ch_path.SetLabel('Chrome Path*')
