@@ -10,6 +10,7 @@
 #-------------------------------------------------------------------------------
 import string
 import random
+import re
 import logger
 import generic_constants
 import core_utils
@@ -278,6 +279,7 @@ class StringOperation:
         result=generic_constants.TEST_RESULT_FALSE
         err_msg=None
         output=OUTPUT_CONSTANT
+        position=[]
         try:
             if not (actual_string is None or actual_string is ''):
                 if not (to_find is None or to_find is ''):
@@ -285,14 +287,19 @@ class StringOperation:
                     actual_string=coreutilsobj.get_UTF_8(actual_string)
                     actual_string=unidecode(actual_string)
                     to_find=coreutilsobj.get_UTF_8(to_find)
-                    output_val = actual_string.find(to_find)
-                    if(output_val == -1):
+                    #output_val = actual_string.find(to_find)
+                    for m in re.finditer(to_find,actual_string):
+                        position.append(m.start())
+                    output_val = len(position)
+                    if len(position) == 1: position=position[0]
+                    if(output_val == 0):
                         logger.print_on_console('The Original String is:',actual_string ,'and' , actual_string , 'does not Contain', to_find )
                     else:
                         log.info('Result : ')
                         log.info(output_val)
                         status=generic_constants.TEST_RESULT_PASS
                         result=generic_constants.TEST_RESULT_TRUE
+                        output=position
             else:
                 #log.error(INVALID_INPUT)
                 err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
@@ -347,7 +354,6 @@ class StringOperation:
 ##                logger.print_on_console(INVALID_INPUT)
         except Exception as e:
             log.error(e)
-
             logger.print_on_console(e)
         if err_msg!=None:
             logger.print_on_console(err_msg)
@@ -441,6 +447,7 @@ class StringOperation:
         result=generic_constants.TEST_RESULT_FALSE
         err_msg=None
         output=None
+        index=str(index)
         try:
             if not (actual_string is None or actual_string is ''):
                 coreutilsobj=core_utils.CoreUtils()
@@ -478,7 +485,6 @@ class StringOperation:
                 #logger.print_on_console(INVALID_INPUT)
         except Exception as e:
             log.error(e)
-
             logger.print_on_console(e)
         if err_msg!=None:
             logger.print_on_console(err_msg)
@@ -529,7 +535,6 @@ class StringOperation:
 ##                logger.print_on_console(INVALID_INPUT)
         except Exception as e:
             log.error(e)
-
             logger.print_on_console(e)
         if err_msg!=None:
             logger.print_on_console(err_msg)

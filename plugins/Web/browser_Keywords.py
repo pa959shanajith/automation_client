@@ -207,6 +207,28 @@ class BrowserKeywords():
             err_msg=self.__web_driver_exception(e)
         return status,result,output,err_msg
 
+
+    def openNewTab(self ,*args):
+        global local_bk
+        status=webconstants.TEST_RESULT_FAIL
+        result=webconstants.TEST_RESULT_FALSE
+        output=OUTPUT_CONSTANT
+        err_msg=None
+        try:
+            logger.print_on_console(local_bk.driver_obj)
+            local_bk.driver_obj.execute_script("window.open('');")
+            handles = local_bk.driver_obj.window_handles
+            local_bk.driver_obj.switch_to.window(handles[-1])
+            h=local_bk.driver_obj.current_window_handle
+            local_bk.all_handles.append(h)
+            local_bk.recent_handles.append(h)
+            status=webconstants.TEST_RESULT_PASS
+            result=webconstants.TEST_RESULT_TRUE
+        except Exception as e:
+            err_msg=self.__web_driver_exception(e)
+        return status,result,output,err_msg
+
+        
     def refresh(self,*args):
         global local_bk
         status=webconstants.TEST_RESULT_FAIL

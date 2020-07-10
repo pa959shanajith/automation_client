@@ -13,11 +13,13 @@ import threading
 import socket
 import datetime
 import core
+import readconfig
 
 log = logging.getLogger('benchmark.py')
 resArray = []
 string = ""
-host = [core.configvalues["server_ip"], "google.com"]
+configvalues = readconfig.readConfig().readJson()
+host = [configvalues["server_ip"], "google.com"]
 socketIO = None
 bench_thread = []
 threadNames = []
