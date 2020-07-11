@@ -865,10 +865,8 @@ class Controller():
             print('\n')
             tsplist = obj.read_step()
             for k in range(len(tsplist)):
-                if tsplist[k].name.lower() == 'openbrowser':
-                    if tsplist[k].apptype.lower()=='web':
-                        if not (IGNORE_THIS_STEP in tsplist[k].inputval[0].split(';')):
-                            tsplist[k].inputval = browser_type
+                if tsplist[k].name.lower() == 'openbrowser' and tsplist[k].apptype.lower()=='web' and (IGNORE_THIS_STEP not in tsplist[k].inputval[0].split(';')):
+                    tsplist[k].inputval = browser_type
         if flag:
             if runfrom_step > 0 and runfrom_step <= tsplist[len(tsplist)-1].stepnum:
                 self.conthread=mythread
@@ -1012,10 +1010,8 @@ class Controller():
                                         continue
                                     if not(aws_mode):
                                         for k in range(len(tsplist)):
-                                            if tsplist[k].name.lower() == 'openbrowser':
-                                                if tsplist[k].apptype.lower()=='web':
-                                                    if not (IGNORE_THIS_STEP in tsplist[k].inputval[0].split(';')):
-                                                            tsplist[k].inputval = [browser]
+                                            if tsplist[k].name.lower() == 'openbrowser' and tsplist[k].apptype.lower()=='web' and (IGNORE_THIS_STEP not in tsplist[k].inputval[0].split(';')):
+                                                tsplist[k].inputval = [browser]
                             if aws_mode:
                                 compile_status=False
                                 scen_id=scenario_id.split('"')
@@ -1038,8 +1034,6 @@ class Controller():
                                     logger.print_on_console(msg)
                                     log.info(msg)
                                     tsplist=[]
-
-
                                 sc_idx+=1
                                 execute_flag=False
                             if flag and execute_flag :
@@ -1145,7 +1139,6 @@ class Controller():
             if aws_mode and not terminate_flag:
                 tc_obj.make_zip(pytest_files)
                 execution_status,step_results=self.aws_obj.run_aws_android_tests()
-                # obj_reporting=con.reporting_obj
                 self.aws_report(aws_tsp,aws_scenario,step_results,suite_idx,execute_result_data,con.reporting_obj,json_data,socketIO)
                 if not(execution_status):
                     status=TERMINATE
@@ -1175,11 +1168,6 @@ class Controller():
         inpval=[]
         keyword_flag=True
         ignore_stat=False
-        #  path_file=os.environ['NINETEEN68_HOME']+os.sep+'output'
-        # os.chdir(path_file)
-        # with open("step_result.txt","w") as fp:
-        #     for line in step_results:
-        #         fp.write(str(line))
         path_file=os.environ['NINETEEN68_HOME']+os.sep+'output'
         os.chdir(path_file)
         f=open("step_result.txt","w")
@@ -1188,12 +1176,8 @@ class Controller():
         del step_results[-1]
         list_time=eval(list_time)
         format_time='%Y-%m-%d %H:%M:%S.%f'
-        # self.scenario_start_time=datetime.now()
-        # start_time_string=self.scenario_start_time.strftime(TIME_FORMAT)
-        # logger.print_on_console('Scenario Execution start time is : '+start_time_string,'\n')
         for i in step_results:
             self.scenario_start_time=datetime.strptime(list_time[idx_t], format_time)
-            # self.scenario_start_time=list_time[idx_t]
             status_percentage = {TEST_RESULT_PASS:0,TEST_RESULT_FAIL:0,TERMINATE:0,"total":0}
             pass_val=fail_val=0
             obj_reporting.report_string=[]
@@ -1233,9 +1217,6 @@ class Controller():
                     obj_reporting.generate_report_step(tsp,self.status,self,ellapsed_time,keyword_flag,result,ignore_stat,inpval)
                     continue
             self.scenario_end_time=datetime.strptime(list_time[idx_t+1], format_time)
-            # self.scenario_end_time=list_time[idx_t+1]
-            # end_time_string=self.scenario_end_time.strftime(TIME_FORMAT)
-            # logger.print_on_console('Scenario Execution end time is : '+end_time_string)
             self.scenario_ellapsed_time=self.scenario_end_time-self.scenario_start_time
             obj_reporting.build_overallstatus(self.scenario_start_time,self.scenario_end_time,self.scenario_ellapsed_time)
             status_percentage[TEST_RESULT_PASS]=pass_val
@@ -1249,16 +1230,16 @@ class Controller():
             sc_idx+=1
             idx_t+=1
 
-    def invoke_controller(self,action,mythread,debug_mode,runfrom_step,json_data,wxObject,socketIO,qc_soc,*args):
+    def invoke_controller(self,action,mythread,debug_mode,runfrom_step,json_data,root_obj,socketIO,qc_soc,*args):
         status = COMPLETED
         global terminate_flag,pause_flag,socket_object
         self.conthread=mythread
         self.clear_data()
+        wxObject = root_obj.cw
         socket_object = socketIO
         #Logic to make sure that logic of usage of existing driver is not applicable to execution
         if local_cont.web_dispatcher_obj != None:
             local_cont.web_dispatcher_obj.action=action
-        self.debug_choice=wxObject.choice
         if action==EXECUTE:
             if len(args)>0:
                 aws_mode=args[0]
@@ -1269,6 +1250,7 @@ class Controller():
             elif self.execution_mode == PARALLEL:
                 status = self.invoke_parralel_exe(mythread,json_data,socketIO,wxObject,self.configvalues,qc_soc,aws_mode)
         elif action==DEBUG:
+            self.debug_choice=wxObject.choice
             self.debug_mode=debug_mode
             self.wx_object=wxObject
             status=self.invoke_debug(mythread,runfrom_step,json_data)

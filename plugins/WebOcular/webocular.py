@@ -358,7 +358,7 @@ class Webocular():
             #traceback.format_exc()
             self.crawlStatus = False
 
-    def runCrawler(self,socketIO,mainwxobj,url,level,agent,proxy,searchData):
+    def runCrawler(self,socketIO,mainobj,url,level,agent,proxy,searchData):
         self.socketIO=socketIO
         log.debug("inside runCrawler method")
         level  = int(level)
@@ -408,7 +408,7 @@ class Webocular():
                 controller.terminate_flag = False
             if controller.disconnect_flag:
                 controller.disconnect_flag=False
-            mainwxobj.terminatebutton.Enable()
+            if mainobj.gui: mainobj.cw.terminatebutton.Enable()
             t = threading.Thread(target = self.crawl, args = (start_url, level,agent))
             t.start()
             t.join()
@@ -463,4 +463,4 @@ class Webocular():
 
         #finally reset the controller's terminate flag to False and Disable the terminate button
         controller.terminate_flag = False
-        mainwxobj.terminatebutton.Disable()
+        if mainobj.gui: mainobj.cw.terminatebutton.Disable()
