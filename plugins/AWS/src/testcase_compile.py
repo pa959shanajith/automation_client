@@ -60,9 +60,12 @@ class TestcaseCompile():
 import time
 import logging
 import os
+import pytz
 from generic_operations import GenericOperations
 from android_spinner_keywords import Spinner_Keywords
 from android_operations_keywords import MobileOpeartions
+import datetime as dt
+from pytz import timezone
 from testmobile_constants import *
 logging.basicConfig(filemode='a',
                             format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
@@ -75,6 +78,10 @@ def scenario(driver):
 \tgen_obj=GenericOperations()
 \tspinner_obj=Spinner_Keywords()
 \tres={}
+\tscenario_exe_time=""
+\ttimezone_req = pytz.timezone('Asia/Kolkata')
+\tsc_time = dt.datetime.now(timezone_req)
+\tscenario_exe_time= str(sc_time.replace(tzinfo=None))
 """
         f.write(code)
         launch_status=False
@@ -135,6 +142,7 @@ def scenario(driver):
             f.write("\n\tres['"+str(t.stepnum)+"'] = result")
         f.write("\n\tprint('result:')")
         f.write("\n\tprint(res)")
+        f.write("\n\treturn scenario_exe_time")
         f.close()
         if compile_status:
             dest_folder=AWS_assets+os.sep+bundle_name+os.sep+'tests'+os.sep+pytest_file
@@ -152,24 +160,43 @@ def scenario(driver):
 import time
 import logging
 import os
+import pytz
+import datetime as dt
+from pytz import timezone
 from android_operations_keywords import MobileOpeartions
 logging.basicConfig(filemode='a',format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',datefmt='%H:%M:%S',level=logging.INFO)
 log=logging.getLogger('test_scenario.py')\n"""
         f.write(code)
         call_scenarios="\n"
+        timez_calc="\n"
+        last_scenario_time="\n"
+        append_time="\n"
+        append_last_sctime=""
         s_counter=1
         for scenario in pytest_files:
             f.write("import "+scenario[:-3]+" as s"+str(s_counter)+"\n")
-            call_scenarios+="\ts"+str(s_counter)+".scenario(driver)\n"
+            call_scenarios+="\tt"+str(s_counter)+"="+"s"+str(s_counter)+".scenario(driver)\n"
+            append_time+="\ttime_list.append(t"+str(s_counter)+")\n"
             s_counter+=1
+        timez_calc="""\ttimezone_req=pytz.timezone('Asia/Kolkata')\n\tsc_time=dt.datetime.now(timezone_req)\n\tscenario_exe_time=str(sc_time.replace(tzinfo=None))\n"""
+        last_scenario_time="\tt"+str(s_counter)+"="+"scenario_exe_time\n"
+        append_last_sctime="\ttime_list.append(t"+str(s_counter)+")\n"
+        print_list="""\n\tprint(time_list)"""
         import platform
         if platform.system() == 'Darwin':
             code="""def test_scenario():\n\tmob_obj=MobileOpeartions()\n\tdriver=mob_obj.start_server()"""
         else:
             package_name, activity_name = self.get_package_activity()
             code="""def test_scenario():\n\tmob_obj=MobileOpeartions()\n\tdriver=mob_obj.start_server('"""+package_name+"""','"""+activity_name+"""')"""
+            list_time="""\n\ttime_list=[]"""
         f.write(code)
+        f.write(list_time)
         f.write(call_scenarios)
+        f.write(timez_calc)
+        f.write(last_scenario_time)
+        f.write(append_time)
+        f.write(append_last_sctime)
+        f.write(print_list)
         f.close()
         dest_folder=AWS_assets+os.sep+bundle_name+os.sep+'tests'+os.sep+pytest_file
         shutil.move(pytest_file, dest_folder)

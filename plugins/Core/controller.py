@@ -906,6 +906,10 @@ class Controller():
         con = Controller()
         obj = handler.Handler()
         status=COMPLETED
+        aws_tsp=[]
+        aws_scenario=[]
+        step_results=[]
+        scen_id=[]
         condition_check_flag = False
         testcase_empty_flag = False
         info_msg=''
@@ -1000,6 +1004,8 @@ class Controller():
                                     execute_flag=False
                                 else:
                                     tsplist = handler.local_handler.tspList
+                                    if aws_mode:
+                                        aws_tsp.append(tsplist)
                                     if len(tsplist)==0:
                                         continue
                                     if not(aws_mode):
@@ -1008,6 +1014,8 @@ class Controller():
                                                 tsplist[k].inputval = [browser]
                             if aws_mode:
                                 compile_status=False
+                                scen_id=scenario_id.split('"')
+                                aws_scenario=aws_scenario+scen_id
                                 scenario_name=json_data['suitedetails'][suite_idx-1]["scenarioNames"][sc_idx]
                                 if not terminate_flag:
                                     compile_status,pytest_file=tc_obj.compile_tc(tsplist,sc_idx+1,scenario_name)
@@ -1130,7 +1138,8 @@ class Controller():
                             report_json=con.reporting_obj.report_json[OVERALLSTATUS]
             if aws_mode and not terminate_flag:
                 tc_obj.make_zip(pytest_files)
-                execution_status=self.aws_obj.run_aws_android_tests()
+                execution_status,step_results=self.aws_obj.run_aws_android_tests()
+                self.aws_report(aws_tsp,aws_scenario,step_results,suite_idx,execute_result_data,con.reporting_obj,json_data,socketIO)
                 if not(execution_status):
                     status=TERMINATE
             log.info('---------------------------------------------------------------------')
@@ -1149,6 +1158,77 @@ class Controller():
             logger.print_on_console( '***Terminating the Execution***')
             print('=======================================================================================================')
         return status
+
+    #generating report of AWS in N68 by using AWS result(AWS device farm executed result present in test spec output.txt)
+    def aws_report(self,aws_tsp,aws_scenario,step_results,suite_idx,execute_result_data,obj_reporting,json_data,socketIO):
+        sc_idx=0
+        idx_t=0
+        list_time=[]
+        tc_aws=[]
+        inpval=[]
+        keyword_flag=True
+        ignore_stat=False
+        path_file=os.environ['NINETEEN68_HOME']+os.sep+'output'
+        os.chdir(path_file)
+        f=open("step_result.txt","w")
+        f.writelines(str(step_results))
+        list_time=step_results[-1]
+        del step_results[-1]
+        list_time=eval(list_time)
+        format_time='%Y-%m-%d %H:%M:%S.%f'
+        for i in step_results:
+            self.scenario_start_time=datetime.strptime(list_time[idx_t], format_time)
+            status_percentage = {TEST_RESULT_PASS:0,TEST_RESULT_FAIL:0,TERMINATE:0,"total":0}
+            pass_val=fail_val=0
+            obj_reporting.report_string=[]
+            obj_reporting.overallstatus_array=[]
+            obj_reporting.overallstatus=TEST_RESULT_PASS
+            obj_reporting.report_json[ROWS]=obj_reporting.report_string
+            obj_reporting.report_json[OVERALLSTATUS]=obj_reporting.overallstatus_array
+            tc_aws=aws_tsp[sc_idx]
+            os.chdir(self.cur_dir)
+            filename='Scenario'+str(sc_idx+1)+'.json'
+            for tsp in tc_aws:
+                if tsp.name=='LaunchApplication':
+                    inpval = tsp.inputval[0].split(';')
+                    result=['Pass',True,'9cc33d6fe25973868b30f4439f09901a',None]
+                    self.status=result[0]
+                    if result[0]=='Pass':
+                        pass_val+=1
+                        status_percentage["total"]+=1
+                    else:
+                        fail_val+=1
+                        status_percentage["total"]+=1
+                    ellapsed_time=''                                
+                    obj_reporting.generate_report_step(tsp,self.status,self,ellapsed_time,keyword_flag,result,ignore_stat,inpval)
+                    continue
+                else:
+                    self.status=i[str(tsp.stepnum)][0]
+                    if self.status=='Pass':
+                        pass_val+=1
+                        status_percentage["total"]+=1
+                    elif self.status=='Fail':
+                        fail_val+=1
+                        status_percentage["total"]+=1
+                        obj_reporting.overallstatus=self.status
+                    inpval = tsp.inputval[0].split(';')
+                    result=i[str(tsp.stepnum)]
+                    ellapsed_time=''
+                    obj_reporting.generate_report_step(tsp,self.status,self,ellapsed_time,keyword_flag,result,ignore_stat,inpval)
+                    continue
+            self.scenario_end_time=datetime.strptime(list_time[idx_t+1], format_time)
+            self.scenario_ellapsed_time=self.scenario_end_time-self.scenario_start_time
+            obj_reporting.build_overallstatus(self.scenario_start_time,self.scenario_end_time,self.scenario_ellapsed_time)
+            status_percentage[TEST_RESULT_PASS]=pass_val
+            status_percentage[TEST_RESULT_FAIL]=fail_val
+            status_percentage["s_index"]=suite_idx-1
+            status_percentage["index"]=sc_idx
+            obj_reporting.save_report_json(filename,json_data,status_percentage)
+            execute_result_data["scenarioId"]=aws_scenario[sc_idx]                  
+            execute_result_data["reportData"] = obj_reporting.report_json
+            socketIO.emit('result_executeTestSuite', execute_result_data)                  
+            sc_idx+=1
+            idx_t+=1
 
     def invoke_controller(self,action,mythread,debug_mode,runfrom_step,json_data,root_obj,socketIO,qc_soc,*args):
         status = COMPLETED

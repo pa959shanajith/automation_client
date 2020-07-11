@@ -38,72 +38,66 @@ class ScrapeWindow(wx.Frame):
         if (SYSTEM_OS != 'Darwin'):
             self.scrapeoptions = ["Full",'Textbox','Timepicker','Datepicker','Radio','Button','Switch','Checkbox','Spinner','Numberpicker','Seekbar','Text','Image','Layout','View','Element']
             self.classes = {
-                'textbox': ['android.widget.EditText'],
-                'timepicker': ['android.widget.TimePicker'],
-                'datepicker': ['android.widget.DatePicker'],
-                'radio': ['android.widget.RadioButton'],
-                'button': ['android.widget.Button','android.widget.ImageButton'],
-                'switch': ['android.widget.Switch'],
-                'checkbox': ['android.widget.CheckBox'],
-                'spinner': ['android.widget.Spinner'],
-                'numberpicker': ['android.widget.NumberPicker'],
-                'seekbar': ['android.widget.SeekBar'],
-                'listview': ['android.widget.ListView'],
-                'text': ['android.widget.TextView'],
-                'image': ['android.widget.ImageView'],
-                'layout': ['android.widget.LinearLayout','android.widget.RelativeLayout'],
-                'view':['android.view.View'],
-                'element': ['android.widget.ScrollView','android.view.ViewGroup','android.widget.FrameLayout','android.widget.LinearLayout','android.widget.RelativeLayout']
+                'textbox': ['_txtbox'],
+                'timepicker': ['_timepicker'],
+                'datepicker': ['_datepicker'],
+                'radio': ['_radiobtn'],
+                'button': ['_btn','_imagebtn'],
+                'switch': ['_switch'],
+                'checkbox': ['_chkbox','_chkdtxtview'],
+                'spinner': ['_spinner'],
+                'numberpicker': ['_numberpicker'],
+                'seekbar': ['_seekbar'],
+                'listview': ['_listview'],
+                'text': ['_txtview'],
+                'image': ['_img'],
+                'layout': ['_linearlayout','_relativelayout','_framelayout'],
+                'view':['_view'],
+                'element': ['_elmnt']
             }
         else:
             self.scrapeoptions = ["Full",'Textbox','Radio','Button','Switch','Checkbox','Picker','Slider','Link','Text','Image','Table','Cell','Key','Element']
             self.classes = {
-                'textbox': ['XCUIElementTypeTextField','XCUIElementTypeSearchField','XCUIElementTypeSecureTextField'],
-                'radio': ['XCUIElementTypeRadioButton'],
-                'button': ['XCUIElementTypeButton'],
-                'switch': ['XCUIElementTypeSwitch','XCUIElementTypeToggle'],
-                'checkbox': ['XCUIElementTypeCheckBox'],
-                'picker': ['XCUIElementTypePickerWheel'],
-                'slider': ['XCUIElementTypeSlider'],
-                'link': ['XCUIElementTypeLink'],
-                'text': ['XCUIElementTypeStaticText','XCUIElementTypeTextView'],
-                'image': ['XCUIElementTypeImage','XCUIElementTypeIcon'],
-                'table': ['XCUIElementTypeTable'],
-                'cell' : ['XCUIElementTypeCell'],
-                'key' : ['XCUIElementTypeKey'],
-                'element': ['XCUIElementTypeApplication','XCUIElementTypeWindow','XCUIElementTypeOther','XCUIElementTypeNavigationBar','XCUIElementTypeScrollView','XCUIElementTypeSheet','XCUIElementTypeAlert']
+                'textbox': ['_textfield','_searchfield','_securetextfield'],
+                'radio': ['_radio'],
+                'button': ['_button'],
+                'switch': ['_switch','_toggle'],
+                'checkbox': ['_checkbox'],
+                'picker': ['_picker'],
+                'slider': ['_slider'],
+                'link': ['_link'],
+                'text': ['_statictxt','_txtview'],
+                'image': ['_image','_icon'],
+                'table': ['_table'],
+                'cell' : ['_cell'],
+                'key' : ['_key'],
+                'element': ['_elmnt']
             }
         self.scrape_selected_option = ["full"]
         self.selected_choice = "Full"
         
         global obj
-        
+        self.min_y = 0
+        self.max_y = 0
+        self.x_Value = 0
         self.socketIO = socketIO
         apk_path=filePath.split(';')[0]
         serial=filePath.split(';')[1]
         if str(apk_path).endswith("apk"):
             status = obj.installApplication(apk_path, None, serial, None)
-            if android_scrapping.driver is not None:
-                size=android_scrapping.driver.get_window_size()
-                self.min_y=(size['height']/4)
-                self.max_y=(size['height']*0.75)
-                self.x_Value=(size['width']*0.50)
-            else:
-                self.print_error(DRIVER_ERROR)
         else:
             deviceName = filePath.split(';')[0]
             platform_version = filePath.split(';')[1]
             bundle_id = filePath.split(';')[2]
             Ip_Address = filePath.split(';')[3]
             status = obj.installApplication(deviceName, platform_version,bundle_id,Ip_Address)
-            if android_scrapping.driver is not None:
-                size=android_scrapping.driver.get_window_size()
-                self.min_y=(size['height']/4)
-                self.max_y=(size['height']*0.75)
-                self.x_Value=(size['width']*0.50)
-            else:
-                self.print_error(DRIVER_ERROR)
+
         if status!=None:
+            if android_scrapping.driver is not None:
+                size = android_scrapping.driver.get_window_size()
+                self.min_y = size['height']/4
+                self.max_y = size['height']*0.75
+                self.x_Value = size['width']*0.50
             self.panel = wx.Panel(self)
             self.scrapedropdown = wx.ComboBox(self.panel, value="Full",pos=(12, 28), size=(87.5, 28),choices=self.scrapeoptions, style = wx.CB_DROPDOWN)
             self.scrapedropdown.SetEditable(False)
@@ -123,7 +117,7 @@ class ScrapeWindow(wx.Frame):
             wx.Frame(self.panel, style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER)
             self.Show()
         else:
-            self.socketIO.emit('scrape','Fail')
+            self.socketIO.emit('scrape','fail')
             self.Close()
             self.parent.schedule.Enable()
 
@@ -192,7 +186,7 @@ class ScrapeWindow(wx.Frame):
                         self.socketIO.emit('scrape','Response Body exceeds max. Limit.')
                 else:
                     self.print_error('Error in scraping')
-                    self.socketIO.emit('scrape','Error in scraping')
+                    self.socketIO.emit('scrape','fail')
                 self.parent.schedule.Enable()
                 self.Close()
                 log.info('Fullscrape completed')
@@ -204,11 +198,13 @@ class ScrapeWindow(wx.Frame):
                         if i not in new:
                             new[i] = d[i]
                     for i in range(len(d['view'])):
-                        if(d['view'][i]['tag'] in self.classes[self.selected_choice.lower()]):
-                            new['view'].append(d['view'][i])
+                        for j in self.classes[self.selected_choice.lower()]:
+                            if(d['view'][i]['custname'].endswith(j)):
+                                new['view'].append(d['view'][i])
+                                break
                     if new["view"]==[]:
                         self.print_error('Selected type of objects not found while scraping')
-                        self.socketIO.emit('scrape','Selected type of objects not found')
+                        self.socketIO.emit('scrape','fail')
                     else:
                         if self.core_utilsobject.getdatasize(str(new),'mb') < 10:
                             self.socketIO.emit('scrape',new)
@@ -217,13 +213,13 @@ class ScrapeWindow(wx.Frame):
                             self.socketIO.emit('scrape','Response Body exceeds max. Limit.')
                 else:
                     self.print_error('Error in scraping')
-                    self.socketIO.emit('scrape','Error in scraping')
+                    self.socketIO.emit('scrape','fail')
                 self.parent.schedule.Enable()
                 self.Close()
                 log.info('Selective scrape completed')
         except Exception as e:
             self.print_error("Error occurred in FullScrape")
-            self.socketIO.emit('scrape','Error occurred in FullScrape')
+            self.socketIO.emit('scrape','fail')
             self.parent.schedule.Enable()
             self.Close()
             log.error(e, exc_info=True)
