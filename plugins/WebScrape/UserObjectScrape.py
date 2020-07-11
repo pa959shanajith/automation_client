@@ -12,7 +12,7 @@ import core_utils
 import logging
 import wx
 ##import logger
-log = logging.getLogger('clientwindow.py')
+log = logging.getLogger('userobjectscrape.py')
 update_data={}
 class UserObject:
     def __init__(self):

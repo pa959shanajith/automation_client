@@ -69,9 +69,14 @@ class CoreUtils():
         return data[0:-ord(data[-1])]
 
     def unwrap(self, hex_data, key, iv=b'0'*16):
-        data = codecs.decode(hex_data, 'hex')
-        aes = AES.new(key.encode('utf-8'), AES.MODE_CBC, iv)
-        return self.unpad(aes.decrypt(data).decode('utf-8'))
+        dec_data=None
+        try:
+            data = codecs.decode(hex_data, 'hex')
+            aes = AES.new(key.encode('utf-8'), AES.MODE_CBC, iv)
+            dec_data = self.unpad(aes.decrypt(data).decode('utf-8'))
+        except Exception as e:
+            log.error("Invalid input for Decryption")
+        return dec_data
 
     def wrap(self, data, key, iv=b'0'*16):
         aes = AES.new(key.encode('utf-8'), AES.MODE_CBC, iv)

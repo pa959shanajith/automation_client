@@ -71,9 +71,14 @@ class Dropdown_Keywords():
                             break
                         i = i + 1
                     try:
-                        ses.FindById(id).key = arr_k[int(input_val[0])]
+                        if ( len(input_val) > 1 ):
+                            inp = input_val[3]
+                        else:
+                            inp = input_val[0]
+                        ses.FindById(id).key = arr_k[int(inp)]
                         status = sap_constants.TEST_RESULT_PASS
                         result = sap_constants.TEST_RESULT_TRUE
+                        del inp, entries, id, ses
                     except Exception as e:
                         err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
                         log.error( err_msg )
@@ -89,6 +94,7 @@ class Dropdown_Keywords():
             err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
             log.error( err_msg )
             logger.print_on_console( "Error occured in getValueByIndex" )
+        del i, arr_k, arr_v, sap_id, input_val
         return status, result, value, err_msg
 
     def getValueByIndex(self, sap_id, input_val, *args):
@@ -176,6 +182,7 @@ class Dropdown_Keywords():
         result = sap_constants.TEST_RESULT_FALSE
         value = OUTPUT_CONSTANT
         err_msg = None
+        flag = False
         try:
             self.lk.setWindowToForeground(sap_id)
             id, ses = self.uk.getSapElement(sap_id)
@@ -193,9 +200,12 @@ class Dropdown_Keywords():
                                 ses.FindById(id).value = text
                                 status = sap_constants.TEST_RESULT_PASS
                                 result = sap_constants.TEST_RESULT_TRUE
+                                flag = True
                         except:
                             break
                         i = i + 1
+                    if ( flag == False ) :
+                        err_msg = sap_constants.INVALID_INPUT
                 else:
                     err_msg = sap_constants.ELEMENT_NOT_CHANGEABLE
             else:
@@ -215,6 +225,7 @@ class Dropdown_Keywords():
         result = sap_constants.TEST_RESULT_FALSE
         value = OUTPUT_CONSTANT
         err_msg = None
+        flag = False
         try:
             self.lk.setWindowToForeground(sap_id)
             id, ses = self.uk.getSapElement(sap_id)
@@ -232,9 +243,12 @@ class Dropdown_Keywords():
                                 ses.FindById(id).key = text
                                 status = sap_constants.TEST_RESULT_PASS
                                 result = sap_constants.TEST_RESULT_TRUE
+                                flag = True
                         except:
                             break
                         i = i + 1
+                    if ( flag == False ) :
+                        err_msg = sap_constants.INVALID_INPUT
                 else:
                     err_msg = sap_constants.ELEMENT_NOT_CHANGEABLE
             else:
