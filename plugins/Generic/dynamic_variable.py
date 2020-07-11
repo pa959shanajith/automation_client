@@ -23,6 +23,8 @@ class DynamicVariables:
 
     def __init__(self):
         self.dyn_obj=dynamic_variable_handler.DynamicVariables()
+        dynamic_variable_handler.local_dynamic.dynamic_variable_map['{newline}']='\n'
+        dynamic_variable_handler.local_dynamic.dynamic_variable_map['{tab}']='\t'
 
 
     def create_dynamic_variable(self,variable,value):
@@ -46,13 +48,11 @@ class DynamicVariables:
                         dynamic_variable_handler.local_dynamic.dynamic_variable_map[variable]=value
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
-##                        log.info('Variable created is '+str(variable)+'='+str(value))
                         log.info('Variable created is: ')
                         log.info(variable)
                         log.info('Value : ')
                         log.info(value)
                         logger.print_on_console('Variable created is ',str(variable),' = ',str(value))
-##                        logger.print_on_console('Variable created is '+str(variable)+'='+str(value))
                     else:
                         err_msg=ERROR_CODE_DICT['ERR_DYNVAR_ALREADY_EXISTS']
                         log.error(err_msg)
@@ -61,7 +61,6 @@ class DynamicVariables:
                 err_msg=INVALID_INPUT
                 log.error(err_msg)
                 logger.print_on_console(err_msg)
-
         except Exception as e:
             log.error(e)
             logger.print_on_console(e)

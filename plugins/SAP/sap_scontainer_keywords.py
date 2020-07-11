@@ -577,7 +577,7 @@ class SContainer_Keywords():
                 except Exception as e: log.info('Exception at rPrev:',e)
                 if(r1 == r2):
                     rHList.append(ch[i])
-                elif(r2 and r1!=r2):
+                elif( (r2 and r1!=r2) or (r1 and not(r2)) ):
                     if (r1 == rPrev):
                         rHList.append(ch[i])
                         tableObj.append(rHList)

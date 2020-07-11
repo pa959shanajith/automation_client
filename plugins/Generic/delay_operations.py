@@ -15,6 +15,7 @@ from constants import *
 import core_utils
 import dynamic_variable_handler
 import time
+import os
 import readconfig
 log = logging.getLogger('delay_operations.py')
 
@@ -54,10 +55,15 @@ class Delay_keywords:
         output=OUTPUT_CONSTANT
         err_msg=None
         try:
-            o = pause_display_operation.PauseAndDisplay()
-            o.execute(args[-2],args[-1])
-            status=TEST_RESULT_PASS
-            methodoutput=TEST_RESULT_TRUE
+            if os.environ["ice_mode"] == "gui":
+                o = pause_display_operation.PauseAndDisplay()
+                o.execute(args[-2],args[-1])
+                status=TEST_RESULT_PASS
+                methodoutput=TEST_RESULT_TRUE
+            else:
+                err_msg = "Pause Keyword is not applicable when ICE is running in command line mode"
+                log.error(err_msg)
+                logger.print_on_console(err_msg)
         except Exception as e:
             err_msg = "Error occurred for during pause"
             log.error(err_msg)
@@ -91,11 +97,6 @@ class Delay_keywords:
                         coreutilsobj=core_utils.CoreUtils()
                         y=coreutilsobj.get_UTF_8(y)
                         x=coreutilsobj.get_UTF_8(x)
-    ##                  if type(x)==unicode or type(x)==str:
-    ##                        x=str(x)
-    ##                        changes to fix issue:304-Generic : getData keyword:  Actual data  is not getting stored in dynamic variable instead "null" is stored.
-    ##                  changes done by jayashree.r
-    ##                  if y == 'None' or y == None:
                         if y == None:
                             y = 'null'
                         if not((x.startswith('{') and x.endswith('}')) or (x.startswith('|') and x.endswith('|'))):
@@ -109,12 +110,11 @@ class Delay_keywords:
                             if str(type(y))=="<class 'selenium.webdriver.remote.webelement.WebElement'>":
                                 y = "WebElement"
                             y=str(y)
-    ##                    display_input+=x+' = '+(y if type(y)==str else repr(y))+'\n'
-
                         display_input+=x+' = '+y+'\n'
                     if not (flag_invalid_syntax):
-                        o = pause_display_operation.PauseAndDisplay()
-                        o.display_value(display_input,args[-2],args[-1])
+                        if os.environ["ice_mode"] == "gui":
+                            o = pause_display_operation.PauseAndDisplay()
+                            o.display_value(display_input,args[-2],args[-1])
                         logger.print_on_console('Result is ',display_input)
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE

@@ -25,7 +25,7 @@ class readConfig():
     def readJson(self):
         global configvalues
         configvalues={"server_ip":"", "server_port":"", "ignore_certificate":"",
-        "chrome_path":"", "bit_64":"", "logFile_Path":"", "screenShot_Flag":"",
+        "chrome_path":"", "chrome_profile":"","bit_64":"", "logFile_Path":"", "screenShot_Flag":"",
         "queryTimeOut":"", "timeOut":"", "stepExecutionWait":"", "displayVariableTimeOut":"",
         "retrieveURL":"", "delay":"", "ignoreVisibilityCheck":"", "exception_flag":"",
         "server_cert":"", "enableSecurityCheck":"","browser_check":"","disable_server_cert":"","highlight_check":"","firefox_path":"",
@@ -39,6 +39,7 @@ class readConfig():
                 configvalues['server_port']=params['server_port']
                 configvalues['ignore_certificate']=params['ignore_certificate']
                 configvalues['chrome_path']=params['chrome_path']
+                configvalues['chrome_profile']=params['chrome_profile']
                 configvalues['firefox_path']=params['firefox_path']
                 configvalues['bit_64']=params['bit_64']
                 configvalues['logFile_Path']=params['logFile_Path']

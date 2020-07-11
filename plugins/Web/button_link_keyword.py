@@ -29,7 +29,7 @@ class ButtonLinkKeyword():
     def __init__(self):
         local_blk.log = logging.getLogger('button_link_keyword.py')
         local_blk.text_javascript = """function stext_content(f) {     var sfirstText = '';     var stextdisplay = '';     for (var z = 0; z < f.childNodes.length; z++) {         var scurNode = f.childNodes[z];         swhitespace = /^\s*$/;         if (scurNode.nodeName === '#text' && !(swhitespace.test(scurNode.nodeValue))) {             sfirstText = scurNode.nodeValue;             stextdisplay = stextdisplay + sfirstText;         }     }     return (stextdisplay); }; return stext_content(arguments[0])"""
-        self.copy_text=None
+        #self.copy_text=None
 
     def click(self,webelement,*args):
         local_blk.log.debug('Got the driver object from browser keyword class')
@@ -492,20 +492,22 @@ class ButtonLinkKeyword():
             local_blk.log.debug('using Robot class to perform keyboard operation')
             robot = Robot()
             time.sleep(1)
-            self.__set_clipboard_data(inputfile)
+            #Ignoring the copying to the clipboard(due to some issues to access to the open clipboard)
+            #self.__set_clipboard_data(inputfile)
             robot.sleep(1)
             robot.key_press(Keys.alt)
             robot.key_press(Keys.n)
-            robot.sleep(0.5)
+            robot.sleep(1)
             robot.key_release(Keys.n)
             robot.key_release(Keys.alt)
-            robot.sleep(0.5)
-            copy_text=r'{}'.format(self.copy_text[2])
-            robot.type_string(copy_text,0.005)
+            robot.sleep(1)
+            #copy_text=r'{}'.format(self.copy_text[2])
+            #robot.type_string(copy_text,0.005)
             #robot.paste()
-            robot.sleep(0.5)
+            robot.type_string(inputfile)
+            robot.sleep(1)
             robot.key_press(Keys.enter)
-            robot.sleep(0.5)
+            robot.sleep(1)
             robot.key_release(Keys.enter)
             robot.sleep(1)
             local_blk.log.debug('copied clipboard data pasted to the input using robot')
@@ -520,12 +522,12 @@ class ButtonLinkKeyword():
         status = False
         try:
             #robot = Robot()
-            SO = StringOperation()
+            #SO = StringOperation()
             local_blk.log.debug('Copying input file path to the clipboard')
             #robot.add_to_clipboard(inputfile.encode(encoding='utf8'))
-            SO.save_to_clip_board(inputfile.encode(encoding='utf8'))
+            #SO.save_to_clip_board(inputfile.encode(encoding='utf8'))
             #self.copy_text=robot.get_clipboard_data().decode('utf8')
-            self.copy_text=SO.get_from_clip_board()
+            #self.copy_text=SO.get_from_clip_board()
             local_blk.log.debug(' input file path Copied to  clipboard')
             status = True
         except Exception as e:
