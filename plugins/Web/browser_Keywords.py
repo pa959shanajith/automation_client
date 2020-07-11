@@ -954,6 +954,7 @@ class Singleton_DriverUtil():
         local_bk.log.debug(browser_num)
         logger.print_on_console( 'BROWSER NUM: ',str(browser_num))
         configvalues = readconfig.configvalues
+        headless_mode = str(configvalues['headless_mode'])=='Yes'
         if (browser_num == '1'):
             try:
                 chrome_path = configvalues['chrome_path']
@@ -961,15 +962,13 @@ class Singleton_DriverUtil():
                 exec_path = webconstants.CHROME_DRIVER_PATH
                 if  SYSTEM_OS == "Darwin":
                     exec_path = webconstants.drivers_path+"/chromedriver"
-                # choptions1 = webdriver.ChromeOptions()
-                # # --headless helps to run chrome without browser window
-                # choptions1.add_argument('--headless')
-                # driver = webdriver.Chrome(chrome_options=choptions1, executable_path=exec_path)
                 # flag1 = self.chrome_version(driver)
-                # driver = None
                 if core.chromeFlag:
                     choptions = webdriver.ChromeOptions()
-                    choptions.add_argument('start-maximized')
+                    if headless_mode:
+                        choptions.add_argument('--headless')
+                    else:
+                        choptions.add_argument('start-maximized')
                     if configvalues['extn_enabled'].lower()=='yes' and os.path.exists(webconstants.EXTENSION_PATH):
                         choptions.add_extension(webconstants.EXTENSION_PATH)
                     else:
@@ -980,11 +979,16 @@ class Singleton_DriverUtil():
                         choptions.add_argument("user-data-dir="+chrome_profile)
                     
                     driver = webdriver.Chrome(executable_path=exec_path,chrome_options=choptions)
+                    driver.navigate().refresh()
                     ##driver = webdriver.Chrome(desired_capabilities= choptions.to_capabilities(), executable_path = exec_path)
                     drivermap.append(driver)
                     driver.maximize_window()
-                    logger.print_on_console('Chrome browser started')
-                    local_bk.log.info('Chrome browser started')
+                    if headless_mode:
+                        logger.print_on_console('Headless Chrome browser started')
+                        local_bk.log.info('Headless Chrome browser started')
+                    else:    
+                        logger.print_on_console('Chrome browser started')
+                        local_bk.log.info('Chrome browser started') 
                 else:
                     logger.print_on_console('Chrome browser version not supported')
                     local_bk.log.info('Chrome browser version not supported')
@@ -998,6 +1002,10 @@ class Singleton_DriverUtil():
             try:
                 caps=webdriver.DesiredCapabilities.FIREFOX
                 caps['marionette'] = True
+                from selenium.webdriver.firefox.options import Options
+                firefox_options = Options()
+                if headless_mode:
+                    firefox_options.add_argument('--headless')
                 if SYSTEM_OS == "Darwin":
                     exec_path = webconstants.drivers_path+"/geckodriver"
                 else:
@@ -1006,11 +1014,13 @@ class Singleton_DriverUtil():
                     if str(configvalues['firefox_path']).lower()!="default":
                         from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
                         binary = FirefoxBinary(str(configvalues['firefox_path']))
-                        driver = webdriver.Firefox(capabilities=caps, firefox_binary=binary, executable_path=exec_path)
+                        driver = webdriver.Firefox(capabilities=caps, firefox_binary=binary, executable_path=exec_path,options=firefox_options)
+                        driver.navigate().refresh()
                     else:
-                        driver = webdriver.Firefox(capabilities=caps,executable_path=exec_path)
+                        driver = webdriver.Firefox(capabilities=caps,executable_path=exec_path,options=firefox_options)
+                        driver.navigate().refresh()
                     drivermap.append(driver)
-                    driver.maximize_window()
+                    if not headless_mode: driver.maximize_window()
                     logger.print_on_console('Firefox browser started using geckodriver')
                     local_bk.log.info('Firefox browser started using geckodriver ')
                 else:

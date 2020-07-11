@@ -491,20 +491,6 @@ class Config_window(wx.Frame):
             "Disp_var":[(235,222),(135, 25),(375,218), (70,-1)],
             "C_Timeout" :[(12,252),(120, 25),(135,248), (70,-1)],
             "Delay_Stringinput":[(235,252),(130, 25),(375,248), (70,-1)],
-            "Ignore_cert":[(12,308)],
-            "IE_arch":[(150,308)],
-            "Dis_s_cert":[(290,308)],
-            "Ex_flag":[(12,368)],
-            "Ignore_v_check":[(150,368)],
-            "En_secu_check":[(368,368)],
-            "S_flag":[(340,428)],
-            "Ret_url":[(12,428)],
-            "Brow_ch":[(115,428)],
-            "High_ch":[(225,428)],
-            "Iris_prediction":[(12,488)],
-            "hide_soft_key":[(180,488)],
-            "extn_enabled":[(320,488)],
-            "update_check":[(12,548)],
             "err_text":[(85,525),(350, 25)],
             "Save":[(100,550), (100, 28)],
             "Close":[(250,550), (100, 28)]
@@ -526,20 +512,6 @@ class Config_window(wx.Frame):
             "Disp_var":[(288,222),(140, 25),(448,218),(85,-1)],
             "C_Timeout" :[(12,252),(120, 25),(180,248), (80,-1)],
             "Delay_Stringinput":[(288,252),(140, 25),(448,248), (85,-1)],
-            "Ignore_cert":[(12,308)],
-            "IE_arch":[(170,308)],
-            "Dis_s_cert":[(344,308)],
-            "Ex_flag":[(12,368)],
-            "Ignore_v_check":[(146,368)],
-            "En_secu_check":[(334,368)],
-            "S_flag":[(396,428)],
-            "Ret_url":[(12,428)],
-            "Brow_ch":[(130,428)],
-            "High_ch":[(260,428)],
-            "Iris_prediction":[(12,488)],
-            "hide_soft_key":[(230,488)],
-            "extn_enabled":[(400,488)],
-            "update_check":[(12,548)],
             "err_text":[(85,525),(350, 25)],
             "Save":[(130,550),(100, 28)],
             "Close":[(370,550),(120, 28)]
@@ -760,7 +732,7 @@ class Config_window(wx.Frame):
             self.rbox2.SetSelection(0)
         self.rbox2.SetToolTip(wx.ToolTip("Checks if the Client machine is a 64-bit machine or 32-bit"))
     
-        self.rbox9 = wx.RadioBox(self.panel1, label = 'Disable Server Cert Check', pos=config_fields["Dis_s_cert"][0], choices = lblList,
+        self.rbox9 = wx.RadioBox(self.panel1, label = 'Disable Server Cert Check', choices = lblList,
             majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
         if isConfigJson!=False and isConfigJson['disable_server_cert'].title() == lblList[0]:
             self.rbox9.SetSelection(0)
@@ -856,13 +828,21 @@ class Config_window(wx.Frame):
             self.rbox14.SetSelection(1)
         self.rbox14.SetToolTip(wx.ToolTip("Checks for the availability of ICE updates"))
 
+        self.rbox15 = wx.RadioBox(self.panel1, label = "Headless Mode", choices = lblList,
+            majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
+        if isConfigJson != False and isConfigJson['headless_mode'].title() == lblList[0]:
+            self.rbox15.SetSelection(0)
+        else:
+            self.rbox15.SetSelection(1)    
+        self.rbox15.SetToolTip(wx.ToolTip("Enables or disables Headless execution mode for Browser"))
+
         #Adding GridSizer which will show the radio buttons into grid of 7 rows and 2 colums it can be changed based on the requirements 
-        self.gs=wx.GridSizer(7,2,5,5)
+        self.gs=wx.GridSizer(8,2,5,5)
         self.gs.AddMany([(self.rbox1,0,wx.EXPAND), (self.rbox2,0,wx.EXPAND), (self.rbox9,0,wx.EXPAND),
             (self.rbox5,0,wx.EXPAND), (self.rbox6,0,wx.EXPAND), (self.rbox3,0,wx.EXPAND),
             (self.rbox4,0,wx.EXPAND), (self.rbox8,0,wx.EXPAND), (self.rbox7,0,wx.EXPAND),
             (self.rbox10,0,wx.EXPAND), (self.rbox11,0,wx.EXPAND), (self.rbox12,0,wx.EXPAND),
-            (self.rbox13,0,wx.EXPAND), (self.rbox14,0,wx.EXPAND)])    
+            (self.rbox13,0,wx.EXPAND), (self.rbox14,0,wx.EXPAND), (self.rbox15,0,wx.EXPAND)])    
        
         #adding  GridSizer to bSizer which is a box sizer
         self.bSizer.Add(self.gs, 1, wx.EXPAND | wx.TOP, 5)
@@ -947,6 +927,7 @@ class Config_window(wx.Frame):
         conn_timeout = self.conn_timeout.GetValue()
         extn_enabled = self.rbox13.GetStringSelection()
         update_check = self.rbox14.GetStringSelection()
+        headless_mode = self.rbox15.GetStringSelection()
         delay_string_in = self.Delay_input.GetValue()
         #----------------creating data dictionary
         data['server_ip'] = server_add.strip()
@@ -976,6 +957,7 @@ class Config_window(wx.Frame):
         data['connection_timeout']= conn_timeout.strip()
         data['extn_enabled']= extn_enabled.strip()
         data['update_check']= update_check.strip()
+        data['headless_mode']=headless_mode.strip()
         data['delay_stringinput']=delay_string_in.strip()
         config_data=data
         if (data['server_ip']!='' and data['server_port']!='' and data['server_cert']!='' and
