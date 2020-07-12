@@ -148,10 +148,21 @@ class MobileDispatcher:
         'verifydate':date_keywords_object.verify_date
     }
 
-    def dispatcher(self,teststepproperty,input,reporting_obj):
+    def dispatcher(self,teststepproperty,input,reporting_obj, iris_flag):
         global apptypes,ip
         objectname = teststepproperty.objectname
         object_name_ios = objectname
+        # SOME IRIS FLAG FUNCTIONS
+        if (iris_flag):
+            import iris_mobile
+            iris_mobile_object = iris_mobile.iris_mobile_class()
+            self.mob_dict['pressiris'] = iris_mobile_object.Press
+            self.mob_dict['longpressiris'] = iris_mobile_object.LongPress
+            self.mob_dict['settextiris'] = iris_mobile_object.SetText
+            self.mob_dict['verifyexistsiris'] = iris_mobile_object.VerifyExists
+            self.mob_dict['verifytextiris'] = iris_mobile_object.VerifyText
+            self.mob_dict['cleartextiris'] = iris_mobile_object.ClearText
+            self.mob_dict['gettextiris'] = iris_mobile_object.GetText
         output = teststepproperty.outputval
         objectname = objectname.strip()
         keyword = teststepproperty.name.lower()
@@ -176,6 +187,9 @@ class MobileDispatcher:
                     else:
                         logger.print_on_console(INVALID_INPUT,": NULL object used in input")
                         result[3]=INVALID_INPUT+": NULL object used in input"
+                elif teststepproperty.cord != '' and teststepproperty.cord != None:
+                    #cord to change to img and operations to add here
+                    result = self.mob_dict[keyword](objectname , input[0], teststepproperty.cord, teststepproperty.original_device_width, teststepproperty.original_device_height)
                 elif keyword==WAIT_FOR_ELEMENT_EXISTS:
                     result=self.mob_dict[keyword](objectname,input)
                 else:

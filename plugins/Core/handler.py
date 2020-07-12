@@ -465,7 +465,7 @@ class Handler():
                 logger.print_on_console('Commented step '+str(step['stepNo']))
         return flag
 
-    def create_step(self,index,keyword,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo,i,remark,testcase_details,cord,extract_path=None):
+    def create_step(self,index,keyword,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo,i,remark,testcase_details,cord,original_device_height,original_device_width,extract_path=None):
         """
         def : create_step
         purpose : creates an object of each step
@@ -528,7 +528,7 @@ class Handler():
                             objectname = left_part+';'+xpath_string[1]+';'+right_part
                     except Exception as e:
                         local_handler.log.error(e)
-                tsp_step=TestStepProperty(keyword,index,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo,i,remark,testcase_details,cord)
+                tsp_step=TestStepProperty(keyword,index,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo,i,remark,testcase_details,cord,original_device_height,original_device_width)
         except Exception as e:
             logger.print_on_console(e)
             local_handler.log.error(e)
@@ -549,6 +549,13 @@ class Handler():
         stepnum=step['stepNo']
         url=step['url']
         custname=step['custname']
+
+        if 'original_device_height' in step and 'original_device_width' in step:
+            original_device_height = step['original_device_height']
+            original_device_width = step['original_device_width']
+        else:
+            original_device_height = None
+            original_device_width = None
         if('cord' in step):
             cord=step['cord']
         else:
@@ -565,7 +572,7 @@ class Handler():
         #check if the step is commented before adding to the tsplist
         if not (len(outputArray)>=1 and  '##' == outputArray[-1] ):
             local_handler.tspIndex2+=1
-            return self.create_step(local_handler.tspIndex2,keyword,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo,i,remark,testcase_details,cord,extract_path)
+            return self.create_step(local_handler.tspIndex2,keyword,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo,i,remark,testcase_details,cord, original_device_height, original_device_width,extract_path)
         return None
 
 
