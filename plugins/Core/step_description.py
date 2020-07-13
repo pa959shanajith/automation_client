@@ -1198,6 +1198,21 @@ class StepDescription:
         def verifycellvalue():
             return "Verify data from the cell number '" + input+ "' in the table '" + tsp.custname + "'"
 
+        #iris keywords for mobile
+        def pressiris():
+            return 'Press on '+ "'" +tsp.custname+ "'" +'.'
+        def longpressiris():
+            return 'Long press on '+ "'" +tsp.custname+ "'" +'.'
+        def settextiris():
+            return 'Enter text '+"'"+ input+"'"+ ' in ' + "'" + tsp.custname + "'"+ '.'
+        def verifyexistsiris():
+            return 'Verify '+ "'" + tsp.custname + "'" + '  exists '+'.'
+        def verifytextiris():
+            return 'Verify ' + "'"+input + "'"+' is the text in the '+ "'" + tsp.custname + "'"+ '.'
+        def cleartextiris():
+            return 'Clear the text for '+ "'" + tsp.custname + "'"+ '.'
+        def gettextiris():
+            return 'Get text From '+ "'" +tsp.custname + "'" + ' and save the text '+"'"+ output + "'"+' in ' +"'"+ tsp.outputval+"'"+ '.'
 
         return locals()[keyword]()
 
