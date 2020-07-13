@@ -401,7 +401,7 @@ class ClientWindow(wx.Frame):
         if scrape:
             try:
                 if (self.scrapewindow != None) and (bool(self.scrapewindow) != False):
-                    if  self.scrapewindow.cropandaddobj != None:
+                    if hasattr(self.scrapewindow, 'cropandaddobj') and self.scrapewindow.cropandaddobj != None:
                         self.scrapewindow.cropandaddobj.terminate_flag = True
                     self.scrapewindow.Destroy()
                     flag = True
