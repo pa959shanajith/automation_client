@@ -223,6 +223,7 @@ class DesktopDispatcher:
             self.desktop_dict['getcellvalueiris'] = iris_object.getcellvalueiris
             self.desktop_dict['verifyexistsiris'] = iris_object.verifyexistsiris
             self.desktop_dict['verifytextiris'] = iris_object.verifytextiris
+            self.desktop_dict['cleartextiris'] = iris_object.cleartextiris
         try:
             if ( objectname == desktop_constants.CUSTOM and teststepproperty.custom_flag ):
                 ele_type = input[0].lower()

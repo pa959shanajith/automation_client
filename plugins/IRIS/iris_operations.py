@@ -657,6 +657,66 @@ class IRISKeywords():
         del element, args, img, res, elem_coordinates, const_coordintes, elements, height, width # deleting variables
         return status, result, value, err_msg
 
+    def cleartextiris(self,element,*args):
+        """
+        Discription: Performs a clear text operation(keyboard-backspace) on the IRIS object, if VerifyExistIRIS is provided then uses that(IRIS object) as a parent reference, then finds the element to perform action.
+        Input: N/A
+        OutPut: Boolean Value
+        """
+        log.info('Inside cleartextiris and No. of arguments passed are : '+str(len(args)))
+        status = TEST_RESULT_FAIL
+        result = TEST_RESULT_FALSE
+        err_msg=None
+        value = OUTPUT_CONSTANT
+        img = None
+        res = None
+        elem_coordinates = None
+        const_coordintes = None
+        elements =[]
+        width = None
+        height = None
+        try:
+            if(len(args) == 3 and args[2]!='' and len(verifyexists)>0):
+                elem_coordinates = element['coordinates']
+                const_coordintes = args[2]['coordinates']
+                elements = [(const_coordintes[0],const_coordintes[1]),
+                        (const_coordintes[2],const_coordintes[3]),
+                        (elem_coordinates[0], elem_coordinates[1]),
+                        (elem_coordinates[2], elem_coordinates[3])]
+                img, res = find_relative_image(elements, verifyexists)
+                log.info( 'Relative image co-ordinates : ' + str(res) )
+                width = res[2] - res[0]
+                height = res[3] - res[1]
+                pyautogui.moveTo(res[0]+ int(width/2),res[1] + int(height/2))
+            else:
+                res = gotoobject(element)
+            if(len(res) > 0):
+                if SYSTEM_OS != 'Darwin':
+                    pythoncom.CoInitialize()
+                    pyautogui.click()
+                    robot = Robot()
+                    robot.ctrl_press('a')
+                    time.sleep(1)
+                    robot.key_press('backspace')
+                else:
+                    pyautogui.click()
+                    pyautogui.hotkey('ctrl','a')
+                    time.sleep(1)
+                    pyautogui.press('backspace')
+                status= TEST_RESULT_PASS
+                result = TEST_RESULT_TRUE
+            else:
+                err_msg = "Object not found"
+            if ( err_msg ):
+                log.info( err_msg )
+                logger.print_on_console( err_msg )
+        except Exception as e:
+            err_msg = "Error occurred in ClearTextIris, Err_Msg : " + str(e)
+            log.error( err_msg )
+            logger.print_on_console( "Error occurred in ClearTextIris" )
+        del element, args, img, res, elem_coordinates, const_coordintes, elements, height, width # deleting variables
+        return status, result, value, err_msg
+
     def setsecuretextiris(self,element,*args):
         """
         Discription: Performs a set secure text operation(inputs a AES encrypted text) on the IRIS object, if VerifyExistIRIS is provided then uses that(IRIS object) as a parent reference, then finds the element to perform action.

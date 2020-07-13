@@ -236,6 +236,7 @@ class Dispatcher:
             self.web_dict['getcellvalueiris'] = iris_object.getcellvalueiris
             self.web_dict['verifyexistsiris'] = iris_object.verifyexistsiris
             self.web_dict['verifytextiris'] = iris_object.verifytextiris
+            self.web_dict['cleartextiris'] = iris_object.cleartextiris
 
         def print_error(err_msg):
             err_msg=ERROR_CODE_DICT[err_msg]

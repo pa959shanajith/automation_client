@@ -438,6 +438,8 @@ class StepDescription:
             return 'Enter secure text '+"'"+ input+"'"+ ' in ' + "'" + tsp.custname + "'"+ '.'
         def settextiris():
             return 'Enter text '+"'"+ input+"'"+ ' in ' + "'" + tsp.custname + "'"+ '.'
+        def cleartextiris():
+            return 'Clear the text for '+ "'" + tsp.custname + "'"+ '.'
         def gettextiris():
             return 'Get text From '+ "'" +tsp.custname + "'" + ' and save the text '+"'"+ output + "'"+' in ' +"'"+ tsp.outputval+"'"+ '.'
         def getrowcountiris():
@@ -464,6 +466,8 @@ class StepDescription:
                 if(";" in tsp.outputval):
                     i = tsp.outputval.index(";")
                     tsp_outputval=tsp.outputval[:i]
+                else:
+                    tsp_outputval = tsp.outputval
                 if("," in output):
                     ni = output.index(',')
                     output =output[:ni]
@@ -746,6 +750,8 @@ class StepDescription:
             return 'Enter secure text '+"'"+ input+"'"+ ' in ' + "'" + tsp.custname + "'"+ '.'
         def settextiris():
             return 'Enter text '+"'"+ input+"'"+ ' in ' + "'" + tsp.custname + "'"+ '.'
+        def cleartextiris():
+            return 'Clear the text for '+ "'" + tsp.custname + "'"+ '.'
         def gettextiris():
             return 'Get text From '+ "'" +tsp.custname + "'" + ' and save the text '+"'"+ output + "'"+' in ' +"'"+ tsp_outputval+"'"+ '.'
         def getrowcountiris():
@@ -773,6 +779,8 @@ class StepDescription:
                 if(";" in tsp.outputval):
                     i = tsp.outputval.index(";")
                     tsp_outputval=tsp.outputval[:i]
+                else:
+                    tsp_outputval = tsp.outputval
                 if("," in output):
                     ni = output.index(',')
                     output =output[:ni]
@@ -988,6 +996,8 @@ class StepDescription:
             return 'Enter secure text '+"'"+ input+"'"+ ' in ' + "'" + tsp.custname + "'"+ '.'
         def settextiris():
             return 'Enter text '+"'"+ input+"'"+ ' in ' + "'" + tsp.custname + "'"+ '.'
+        def cleartextiris():
+            return 'Clear the text for '+ "'" + tsp.custname + "'"+ '.'
         def gettextiris():
             return 'Get text From '+ "'" +tsp.custname + "'" + ' and save the text '+"'"+ output + "'"+' in ' +"'"+ tsp_outputval+"'"+ '.'
         def getrowcountiris():
@@ -1474,6 +1484,8 @@ class StepDescription:
             return 'Enter secure text '+"'"+ input+"'"+ ' in ' + "'" + tsp.custname + "'"+ '.'
         def settextiris():
             return 'Enter text '+"'"+ input+"'"+ ' in ' + "'" + tsp.custname + "'"+ '.'
+        def cleartextiris():
+            return 'Clear the text for '+ "'" + tsp.custname + "'"+ '.'
         def gettextiris():
             return 'Get text From '+ "'" +tsp.custname + "'" + ' and save the text '+"'"+ output + "'"+' in ' +"'"+ tsp.outputval+"'"+ '.'
         def getrowcountiris():
@@ -1481,7 +1493,7 @@ class StepDescription:
         def getcolcountiris():
             return 'Get column Count of ' + "'" + tsp.custname + "'" + ' and save the count ' + "'"+output+"'" + ' in '+"'"+ tsp.outputval+"'"+'.'
         def getcellvalueiris():
-                return 'Get cell value of ' + "'" + tsp.custname +'['+inputL[0]+']['+inputL[1]+']'+"'" + ' in the table and save the value ' +"'"+output +"'"+ ' in '+"'"+tsp.outputval+"'"
+            return 'Get cell value of ' + "'" + tsp.custname +'['+inputL[0]+']['+inputL[1]+']'+"'" + ' in the table and save the value ' +"'"+output +"'"+ ' in '+"'"+tsp.outputval+"'"
         def verifyexistsiris():
             return 'Verify '+ "'" + tsp.custname + "'" + '  exists '+'.'
         def verifytextiris():
