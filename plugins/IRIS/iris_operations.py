@@ -29,7 +29,12 @@ TESSERACT_PATH = os.environ["NINETEEN68_HOME"] + '/Lib/Tesseract-OCR'
 TESSERACT_PATH_EXISTS = os.path.isdir(TESSERACT_PATH)
 
 def remove_duplicates(lines):
-    # remove duplicate lines (lines within 10 pixels of eachother)
+    """
+    Definition: Remove duplicate lines (lines within 10 pixels of eachother)
+    Input : lines
+    Output : sorted lines
+    Method Referenced in : hough_transform_p
+    """
     for x1, y1, x2, y2 in lines:
         for index, (x3, y3, x4, y4) in enumerate(lines):
             if y1 == y2 and y3 == y4:
@@ -40,30 +45,96 @@ def remove_duplicates(lines):
                 diff = 0
             if diff < 15 and diff is not 0:
                 del lines[index]
+        del index,diff #deleting variables
+    del x1,x2,y1,y2 #deleting variables
     return lines
 
 def sort_line_list(lines):
-    # sort lines into horizontal and vertical
+    """
+    Definition: Sort lines into horizontal and vertical
+    Input : lines
+    Output : sorted lines
+    Method Referenced in : hough_transform_p
+    """
     vertical = []
     for line in lines:
         if line[0] == line[2]:
             vertical.append(line)
     vertical.sort()
+    del line,lines #deleting variables
     return vertical
 
 def get_ocr(image):
-    image = cv2.resize(image,(0,0),fx=5,fy=5)
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    gray = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
-    # write the grayscale image to disk as a temporary file.
+    """
+    Definition: Converts image to text
+    Input : image
+    Output : text
+    Method Referenced in : data_in_cells, gettextiris, verifytextiris
+    """
+    """Step 1. Resize input image"""
+    rez_image = cv2.resize(image,(0,0),fx=5,fy=5)
+
+    """Step 2: Convert the resized image to greyscle"""
+    gray_img = cv2.cvtColor(rez_image, cv2.COLOR_BGR2GRAY)
+
+    """Step 3: Apply blur to smoothen images
+        Types of blurs:
+            1.Averaging :It simply takes the average of all the pixels under the kernel area and replaces the central element.
+                blur = cv.blur(img,(5,5))
+            2.Gaussian blurring : it is highly effective in removing Gaussian noise from an image.
+                blur = cv.GaussianBlur(img,(5,5),0)
+            3.Median Blurring : takes the median of all the pixels under the kernel area and the central element is replaced with this median value.
+                                highly effective against salt-and-pepper noise in an image.
+                median = cv.medianBlur(img,5)
+            4.Bilateral Filtering : highly effective in noise removal while keeping edges sharp
+                blur = cv.bilateralFilter(img,9,75,75)
+    """
+    filter_img = cv2.medianBlur(gray_img, 5)
+
+    """Step 4: Apply thresholding methods to remove edges
+    Types of thresholding:
+        1.Adaptive Thresholding: Used when image has different lighting conditions in different areas.
+                                 Adaptive Method - It decides how thresholding value is calculated.
+                                    cv2.ADAPTIVE_THRESH_MEAN_C : threshold value is the mean of neighbourhood area.
+                                    cv2.ADAPTIVE_THRESH_GAUSSIAN_C : threshold value is the weighted sum of neighbourhood values where weights are a gaussian window.
+            th2 = cv2.adaptiveThreshold(img,255,cv2.ADAPTIVE_THRESH_MEAN_C,\cv2.THRESH_BINARY,11,2)
+            th3 = cv2.adaptiveThreshold(img,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,\cv2.THRESH_BINARY,11,2)
+        2.Otsu's Binarization: it automatically calculates a threshold value from image histogram for a bimodal image.
+            th3 = cv2.threshold(blur,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+        3.Simple Thresholding :
+    Function: cv2.threshold(p1,p2,p3,p4)
+        Parameter 1:is the source image, which should be a grayscale image.
+        Parameter 2:the threshold value which is used to classify the pixel values.
+        Parameter 3:the maxVal which represents the value to be given if pixel value is more than (sometimes less than) the threshold value.
+        Parameter 4:OpenCV provides different styles of thresholding and it is decided by the fourth parameter of the function. Different types are:
+            cv2.THRESH_BINARY
+            cv2.THRESH_BINARY_INV
+            cv2.THRESH_TRUNC
+            cv2.THRESH_TOZERO
+            cv2.THRESH_TOZERO_INV
+            more info :https://www.learnopencv.com/opencv-threshold-python-cpp/
+    """
+    thresh_img = cv2.threshold(filter_img, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1] # Otsu's thresholding -inv
+    # thresh_img = cv2.threshold(filter_img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1] # Otsu's thresholding
+
+    """Step 5: Write the image created from mentioned steps, to disk as a temporary file."""
     filename = str(int(time.time()))+".png"
-    cv2.imwrite(filename, gray)
-    # load the image as a PIL/Pillow image, apply OCR, and then delete the temporary file
+    cv2.imwrite(filename, thresh_img)
+
+    """Step 6: Load the image as a PIL/Pillow image, apply OCR, and then delete the temporary file"""
     text = pytesseract.image_to_string(Image.open(filename))
     os.remove(filename)
+
+    del image, rez_image, gray_img, filter_img, thresh_img, filename #deleting variables
     return text
 
-def hough_transform_p(img,pos):
+def hough_transform_p(img, pos):
+    """
+    Def : Performs a hough transformation(hough transformation is a technique to find imperfect instances of objects within a certain class of shapes by a voting procedure). We use it to detect lines.
+    Input : Image, Position
+    Output : N/A, assigns sorted line pos to horizontal and vertical global variables
+    Method Referenced in : getrowcountiris, getcolcountiris
+    """
     global horizontal,vertical
     # open and process images
     img_copy = img.copy()
@@ -94,18 +165,32 @@ def hough_transform_p(img,pos):
             vertical = sort_line_list(lines)
         else:
             horizontal = sort_line_list(lines)
+    del img_copy, kernel, img, pos, gray, edges, lines, lines_t #deleting variables
 
 
 def data_in_cells(image,row,column):
+    """
+    Def : This function will return the data(text) from mentioned table image
+    Input : image,row,column
+    Output : text
+    Method Referenced in : getcellvalueiris
+    """
     text = None
     if(row<len(horizontal) and column<len(vertical)):
         img = image[horizontal[row-1][0]+2:horizontal[row][0]-2,vertical[column-1][0]+2:vertical[column][0]-2]
         text = get_ocr(img)
     else:
         logger.print_on_console("Invalid Input for row and column number")
+    del image, row, column #deleting variables
     return text
 
 def gotoobject(elem):
+    """
+    Def : Return a match of the scraped IRIS image. Compares the IRIS Image over the DOM and returns Image co-ordinates, if multiple matches are found then compares best possible match via the original IRIS image co-ordinates.
+    Input : IRIS element object
+    Output : point (matched image co-ordinates)
+    Method Referenced in : clickiris, doubleclickiris, rightclickiris, settextiris, cleartextiris, setsecuretextiris, gettextiris, verifyexistsiris
+    """
     mirror = get_byte_mirror(elem['cord'])
     img_rgb = base64.b64decode(mirror)
     fh = open("sample.png", "wb")
@@ -125,6 +210,8 @@ def gotoobject(elem):
     ind = np.unravel_index(np.argmax(res, axis=None), res.shape)
     pt = []
     total_points = []
+    dist = None
+    min_dist = None
     for pt in zip(*loc[::-1]):
         total_points.append(pt)
         cv2.rectangle(img_rgb, pt, (pt[0] + w, pt[1] + h), (0,0,255), 2)
@@ -155,10 +242,17 @@ def gotoobject(elem):
         os.remove('sample.png')
     if(os.path.isfile('test.png')):
         os.remove('test.png')
+    del elem, mirror, img_rgb, img_gray, fh, im, template, w, h, res, threshold, loc, ind, pt, total_points, dist, min_dist #deleting variables
     return point
 
 
-def find_relative_image(elements,const_new_coordinates):
+def find_relative_image(elements, const_new_coordinates):
+    """
+    Def : Finds the co-ordinates of the relative image
+    Input : elements, const_new_coordinates
+    Output : rel_image(the original image), co-ordinates(relative image co-ordinates)
+    Method Referenced in : clickiris, doubleclickiris, rightclickiris, settextiris, cleartextiris, setsecuretextiris, gettextiris, verifyexistsiris, getrowcountiris, getcolcountiris, getcellvalueiris, verifytextiris
+    """
     try:
         coordinates = []
         rel_image = ''
@@ -195,9 +289,16 @@ def find_relative_image(elements,const_new_coordinates):
     except Exception as e:
         log.error("Error occurred in finding relative image, Err_Msg : ",e)
         logger.print_on_console("Error occurred in finding relative image.")
-    return rel_image,coordinates
+    del elements, const_new_coordinates, a1, a2, a3, a4, dist, width, height, starty, endy, startx, endx, img #deleting variables
+    return rel_image, coordinates
 
 def check_duplicates(scrapedata, socketIO):
+    """
+    Def : This method is used to check for duplicate IRIS objects in IRIS scrape data
+    Input : scrapedata, socketIO
+    Output : N/A, emits socket data (json format)
+    Method Referenced in : webserver
+    """
     try:
         duplicates = []
         mirror = get_byte_mirror(scrapedata['mirror'])
@@ -232,13 +333,25 @@ def check_duplicates(scrapedata, socketIO):
             os.remove('sample.png')
         if(os.path.isfile('screen.png')):
             os.remove('screen.png')
+        del duplicates, mirror, img_rgb, img_gray, scrapedata, img, fh, template, w, h, res, threshold, loc, ind, p, pt, socketIO #deleting variables
     except Exception as e:
         log.error("Error while checking for duplicate objects, Err_Msg : ",e)
         logger.print_on_console("Error while checking for duplicate objects.")
 
 def scaleUpOrDown(arg,elem,template,img_rgb):
+    """
+    Def : This function resizes(scales up or down) the scraped image
+    Input : element['coordinates'], template, RGB image
+    Output : point, resized_width, resized_height
+    Method Referenced in : gotoobject
+    """
+    dist = None
+    min_dist = None
+    img_gray = None
+    point = ()
+    w = None
+    h = None
     try:
-        point = ()
         img_gray = cv2.cvtColor(img_rgb, cv2.COLOR_BGR2GRAY)
         w, h = template.shape[::-1]
         for scale in np.linspace(arg, 1.0, 20)[::-1]:
@@ -267,11 +380,19 @@ def scaleUpOrDown(arg,elem,template,img_rgb):
                     point = (ind[1],ind[0])
                 break
     except Exception as e:
-        log.error("Error while scaling image, Err_Msg : ",e)
+        log.error("Error while scaling image, Err_Msg : ", e)
         logger.print_on_console("Error while scaling image.")
-    return point,resized_width,resized_height
+    del arg, elem, template, img_rgb, img_gray, w, h, scale, resized, threshold, res, loc, ind, pt, total_points, min_dist, dist # deleting variables
+    return point, resized_width, resized_height
 
 def update_dataset(image_data):
+    """
+    Def : This method is to check and assign dataset values(button,textbox,etc) to the IRIS image
+    Input : image data
+    Output : boolean value
+    Method Referenced in : webserver
+    """
+    flag = False
     try:
         if(image_data['type'] != 'others'):
             mirror = get_byte_mirror(image_data['cord'])
@@ -279,20 +400,27 @@ def update_dataset(image_data):
             if (os.path.exists(SCREENSHOT_PATH + '/Dataset')):
                 with open(filename,'wb') as f:
                     f.write(base64.b64decode(mirror))
-                return True
+                flag = True
             else:
                 log.error( "Dataset folder not found." )
                 logger.print_on_console( "Dataset folder not found." )
-                return False
-        else:# When the selected type is others
-            return True
+            del mirror, filename # deleting variables
+        else:
+            """When the selected type is others"""
+            flag = True
     except Exception as e:
         log.error("Error occurred in update_dataset, Err_Msg : ",e)
         logger.print_on_console("Error while updating dataset.")
-        return False
+    del image_data # deleting variables
+    return flag
 
 def get_byte_mirror(element_cord):
-    """Input : element['cord']"""
+    """
+    Def : Returns image from the coded mirror image
+    Input : element['cord'](mirror of image)
+    Output : decoded image
+    Method Referenced in : gettextiris, getrowcountiris, getcolcountiris, getcellvalueiris, verifytextiris, gotoobject
+    """
     img = None
     byte_mirror = None
     try:
@@ -307,15 +435,28 @@ def get_byte_mirror(element_cord):
     except Exception as e:
         log.error("Error occurred in get_byte_mirror, Err_Msg : ", e)
         logger.print_on_console("Error occurred while fetching byte mirror")
+    del byte_mirror, b64
     return img
 
 class IRISKeywords():
     def clickiris(self,element,*args):
+        """
+        Discription: Performs a click operation on the IRIS object, if VerifyExistIRIS is provided then uses that(IRIS object) as a parent reference, then finds the element to perform action.
+        Input: N/A
+        OutPut: Boolean Value
+        """
         log.info('Inside clickiris and No. of arguments passed are : '+str(len(args)))
         status = TEST_RESULT_FAIL
         result = TEST_RESULT_FALSE
-        err_msg=None
+        err_msg = None
         value = OUTPUT_CONSTANT
+        img = None
+        res = None
+        elem_coordinates = None
+        const_coordintes = None
+        elements = []
+        width = None
+        height = None
         try:
             img = None
             if(len(args) == 3 and args[2]!='' and len(verifyexists)>0):
@@ -325,13 +466,15 @@ class IRISKeywords():
                         (const_coordintes[2],const_coordintes[3]),
                         (elem_coordinates[0], elem_coordinates[1]),
                         (elem_coordinates[2], elem_coordinates[3])]
-                img,res = find_relative_image(elements, verifyexists)
+                img, res = find_relative_image(elements, verifyexists)
+                log.info( 'Relative image co-ordinates : ' + str(res) )
                 width = res[2] - res[0]
                 height = res[3] - res[1]
                 pyautogui.moveTo(res[0]+ int(width/2),res[1] + int(height/2))
+                log.info( "Element co-ordinates after finding relative image are : " + str(res) )
             else:
                 res = gotoobject(element)
-            if(len(res)>0):
+            if( len(res) > 0 ):
                 if SYSTEM_OS != 'Darwin': pythoncom.CoInitialize()
                 log.info('Performing clickiris')
                 pyautogui.click()
@@ -339,20 +482,36 @@ class IRISKeywords():
                 status= TEST_RESULT_PASS
                 result = TEST_RESULT_TRUE
             else:
-                logger.print_on_console("Object not found")
+                err_msg = "Object not found"
+            if ( err_msg ):
+                log.info( err_msg )
+                logger.print_on_console( err_msg )
         except Exception as e:
-            log.error("Error occurred in clickiris, Err_Msg :",e)
+            err_msg = "Error occurred in clickiris, Err_Msg : " + str(e)
+            log.error(err_msg)
             logger.print_on_console("Error occurred in clickiris")
+        del element, args, img, res, elem_coordinates, const_coordintes, elements, height, width # deleting variables
         return status,result,value,err_msg
 
     def doubleclickiris(self,element,*args):
+        """
+        Discription: Performs a double-click operation on the IRIS object, if VerifyExistIRIS is provided then uses that(IRIS object) as a parent reference, then finds the element to perform action.
+        Input: N/A
+        OutPut: Boolean Value
+        """
         log.info('Inside doubleclickiris and No. of arguments passed are : '+str(len(args)))
         status = TEST_RESULT_FAIL
         result = TEST_RESULT_FALSE
         err_msg=None
         value = OUTPUT_CONSTANT
+        img = None
+        res = None
+        elem_coordinates = None
+        const_coordintes = None
+        elements =[]
+        width = None
+        height = None
         try:
-            img = None
             if(len(args) == 3 and args[2]!='' and len(verifyexists)>0):
                 elem_coordinates = element['coordinates']
                 const_coordintes = args[2]['coordinates']
@@ -360,17 +519,18 @@ class IRISKeywords():
                         (const_coordintes[2],const_coordintes[3]),
                         (elem_coordinates[0], elem_coordinates[1]),
                         (elem_coordinates[2], elem_coordinates[3])]
-                img,res = find_relative_image(elements, verifyexists)
+                img, res = find_relative_image(elements, verifyexists)
+                log.info( 'Relative image co-ordinates : ' + str(res) )
                 width = res[2] - res[0]
                 height = res[3] - res[1]
                 pyautogui.moveTo(res[0]+ int(width/2),res[1] + int(height/2))
             else:
+                res = gotoobject(element)
+            if(len(res)>0):
                 if SYSTEM_OS != 'Darwin': pythoncom.CoInitialize()
                 log.info('Performing doubleClick')
-                res = gotoobject(element)
-                log.info('doubleClick performed')
-            if(len(res)>0):
                 pyautogui.doubleClick()
+                log.info('doubleClick performed')
                 status= TEST_RESULT_PASS
                 result = TEST_RESULT_TRUE
             else:
@@ -378,16 +538,28 @@ class IRISKeywords():
         except Exception as e:
             log.error("Error occurred in doubleclickiris, Err_Msg :",e)
             logger.print_on_console("Error occurred in doubleclickiris")
+        del element, args, img, res, elem_coordinates, const_coordintes, elements, height, width # deleting variables
         return status,result,value,err_msg
 
     def rightclickiris(self,element,*args):
+        """
+        Discription: Performs a right-click operation on the IRIS object, if VerifyExistIRIS is provided then uses that(IRIS object) as a parent reference, then finds the element to perform action.
+        Input: N/A
+        OutPut: Boolean Value
+        """
         log.info('Inside rightclickiris and No. of arguments passed are : '+str(len(args)))
         status = TEST_RESULT_FAIL
         result = TEST_RESULT_FALSE
         err_msg=None
         value = OUTPUT_CONSTANT
+        img = None
+        res = None
+        elem_coordinates = None
+        const_coordintes = None
+        elements =[]
+        width = None
+        height = None
         try:
-            img = None
             if(len(args) == 3 and args[2]!='' and len(verifyexists)>0):
                 elem_coordinates = element['coordinates']
                 const_coordintes = args[2]['coordinates']
@@ -395,7 +567,8 @@ class IRISKeywords():
                         (const_coordintes[2],const_coordintes[3]),
                         (elem_coordinates[0], elem_coordinates[1]),
                         (elem_coordinates[2], elem_coordinates[3])]
-                img,res = find_relative_image(elements, verifyexists)
+                img, res = find_relative_image(elements, verifyexists)
+                log.info( 'Relative image co-ordinates : ' + str(res) )
                 width = res[2] - res[0]
                 height = res[3] - res[1]
                 pyautogui.moveTo(res[0]+ int(width/2),res[1] + int(height/2))
@@ -409,20 +582,36 @@ class IRISKeywords():
                 status= TEST_RESULT_PASS
                 result = TEST_RESULT_TRUE
             else:
-                logger.print_on_console("Object not found")
+                err_msg = "Object not found"
+            if ( err_msg ):
+                log.info( err_msg )
+                logger.print_on_console( err_msg )
         except Exception as e:
-            log.error("Error occurred in rightclickiris, Err_Msg :",e)
-            logger.print_on_console("Error occurred in rightclickiris")
-        return status,result,value,err_msg
+            err_msg = "Error occurred in rightclickiris, Err_Msg : " + str(e)
+            log.error( err_msg )
+            logger.print_on_console( "Error occurred in rightclickiris" )
+        del element, args, img, res, elem_coordinates, const_coordintes, elements, height, width # deleting variables
+        return status, result, value, err_msg
 
     def settextiris(self,element,*args):
+        """
+        Discription: Performs a set text operation(keyboard type) on the IRIS object, if VerifyExistIRIS is provided then uses that(IRIS object) as a parent reference, then finds the element to perform action.
+        Input: Input Text
+        OutPut: Boolean Value
+        """
         log.info('Inside settextiris and No. of arguments passed are : '+str(len(args)))
         status = TEST_RESULT_FAIL
         result = TEST_RESULT_FALSE
         err_msg=None
         value = OUTPUT_CONSTANT
+        img = None
+        res = None
+        elem_coordinates = None
+        const_coordintes = None
+        elements =[]
+        width = None
+        height = None
         try:
-            img = None
             if(len(args) == 3 and args[2]!='' and len(verifyexists)>0):
                 elem_coordinates = element['coordinates']
                 const_coordintes = args[2]['coordinates']
@@ -430,7 +619,8 @@ class IRISKeywords():
                         (const_coordintes[2],const_coordintes[3]),
                         (elem_coordinates[0], elem_coordinates[1]),
                         (elem_coordinates[2], elem_coordinates[3])]
-                img,res = find_relative_image(elements, verifyexists)
+                img, res = find_relative_image(elements, verifyexists)
+                log.info( 'Relative image co-ordinates : ' + str(res) )
                 width = res[2] - res[0]
                 height = res[3] - res[1]
                 pyautogui.moveTo(res[0]+ int(width/2),res[1] + int(height/2))
@@ -456,20 +646,36 @@ class IRISKeywords():
                 status= TEST_RESULT_PASS
                 result = TEST_RESULT_TRUE
             else:
-                logger.print_on_console("Object not found")
+                err_msg = "Object not found"
+            if ( err_msg ):
+                log.info( err_msg )
+                logger.print_on_console( err_msg )
         except Exception as e:
-            log.error("Error occurred in SetTextIris, Err_Msg : ",e)
-            logger.print_on_console("Error occurred in SetTextIris")
-        return status,result,value,err_msg
+            err_msg = "Error occurred in SetTextIris, Err_Msg : " + str(e)
+            log.error( err_msg )
+            logger.print_on_console( "Error occurred in SetTextIris" )
+        del element, args, img, res, elem_coordinates, const_coordintes, elements, height, width # deleting variables
+        return status, result, value, err_msg
 
     def setsecuretextiris(self,element,*args):
+        """
+        Discription: Performs a set secure text operation(inputs a AES encrypted text) on the IRIS object, if VerifyExistIRIS is provided then uses that(IRIS object) as a parent reference, then finds the element to perform action.
+        Input: Encrypted Input Text (AES)
+        OutPut: Boolean Value
+        """
         log.info('Inside setsecuretextiris and No. of arguments passed are : '+str(len(args)))
         status = TEST_RESULT_FAIL
         result = TEST_RESULT_FALSE
-        err_msg=None
+        err_msg = None
         value = OUTPUT_CONSTANT
+        img = None
+        res = None
+        elem_coordinates = None
+        const_coordintes = None
+        elements = []
+        width = None
+        height = None
         try:
-            img = None
             if(len(args) == 3 and args[2]!='' and len(verifyexists)>0):
                 elem_coordinates = element['coordinates']
                 const_coordintes = args[2]['coordinates']
@@ -477,13 +683,14 @@ class IRISKeywords():
                         (const_coordintes[2],const_coordintes[3]),
                         (elem_coordinates[0], elem_coordinates[1]),
                         (elem_coordinates[2], elem_coordinates[3])]
-                img,res = find_relative_image(elements, verifyexists)
+                img, res = find_relative_image(elements, verifyexists)
+                log.info( 'Relative image co-ordinates : ' + str(res) )
                 width = res[2] - res[0]
                 height = res[3] - res[1]
                 pyautogui.moveTo(res[0]+ int(width/2),res[1] + int(height/2))
             else:
                 res = gotoobject(element)
-            if(len(res)>0):
+            if( len(res) > 0 ):
                 encryption_obj = AESCipher()
                 input_val_temp = encryption_obj.decrypt( args[0][0] )
                 if SYSTEM_OS != 'Darwin':
@@ -505,27 +712,50 @@ class IRISKeywords():
                 status= TEST_RESULT_PASS
                 result = TEST_RESULT_TRUE
             else:
-                logger.print_on_console("Object not found")
+                err_msg = "Object not found"
+            if ( err_msg ):
+                log.info( err_msg )
+                logger.print_on_console( err_msg )
         except Exception as e:
-            log.error("Error occurred in SetTextIris, Err_Msg : ",e)
-            logger.print_on_console("Error occurred in SetSecureTextIris")
+            err_msg = "Error occurred in SetTextIris, Err_Msg : " + str(e)
+            log.error( err_msg )
+            logger.print_on_console( "Error occurred in SetSecureTextIris" )
+        del element, args, img, res, elem_coordinates, const_coordintes, elements, height, width # deleting variables
         return status,result,value,err_msg
 
     def gettextiris(self,element,*args):
+        """
+        Discription: Performs a get text operation(fetches text of the image) on the IRIS object, if VerifyExistIRIS is provided then uses that(IRIS object) as a parent reference, then finds the element to perform action.
+        Input: N/A - no input then performs a direct image to text operation(uses Tessaract - OCR).
+               'selective'|| 'selective;right' || 'selective;left' - giving this value as input will result in selection of text via mouse-drag. By default drags mouse from left to right, but second option(right/left) can be given to indicate mouse-drag starting direction.
+               'date' - giving this value will help in removing
+        OutPut: Text (of IRIS object)
+        """
         log.info('Inside gettextiris and No. of arguments passed are : '+str(len(args)))
         status = TEST_RESULT_FAIL
         result = TEST_RESULT_FALSE
-        err_msg=None
+        err_msg = None
         value = OUTPUT_CONSTANT
+        img = None
+        res = None
+        elem_coordinates = None
+        const_coordintes = None
+        elements = []
+        height = None
+        #-----------
+        image = None
+        text = ''
+        opt = None
         try:
             if(TESSERACT_PATH_EXISTS):
+                #---------------------------------------------------------------taking Tessaract path for respective OS
                 if SYSTEM_OS != 'Darwin':
                     pytesseract.tesseract_cmd = TESSERACT_PATH + '/tesseract'
                     os.environ["TESSDATA_PREFIX"] = TESSERACT_PATH + '/tessdata'
                 else:
                     pytesseract.tesseract_cmd = TESSERACT_PATH + '/bin/tesseract'
                     os.environ["TESSDATA_PREFIX"] = TESSERACT_PATH + '/share/tessdata'
-                img = None
+                #---------------------------------------------------------------taking Tessaract path for respective OS
                 if(len(args) == 3 and args[2]!='' and len(verifyexists)>0):
                     elem_coordinates = element['coordinates']
                     const_coordintes = args[2]['coordinates']
@@ -533,15 +763,16 @@ class IRISKeywords():
                             (const_coordintes[2],const_coordintes[3]),
                             (elem_coordinates[0], elem_coordinates[1]),
                             (elem_coordinates[2], elem_coordinates[3])]
-                    img,res = find_relative_image(elements, verifyexists)
+                    img, res = find_relative_image(elements, verifyexists)
+                    log.info( 'Relative image co-ordinates : '+str(res) )
                 else:
                     img = get_byte_mirror(element['cord'])
                 with open("cropped.png", "wb") as f:
                     f.write(base64.b64decode(img))
                 image = cv2.imread("cropped.png")
                 text = ''
-                if(len(args[0])==1 and args[0][0].lower().strip() == 'select'):
-                    if SYSTEM_OS != 'Darwin':
+                if(len(args[0]) >= 1 and args[0][0].lower().strip() == 'select'):
+                    if ( SYSTEM_OS != 'Darwin' ):
                         win32clipboard.OpenClipboard()
                         win32clipboard.EmptyClipboard()
                         win32clipboard.CloseClipboard()
@@ -558,8 +789,8 @@ class IRISKeywords():
                                 else:
                                     h1 = int(height/2)
                                     h2 = -int(height/2)
-                                del opt,height
-                                return h1,h2
+                                del opt, height # deleting variables
+                                return h1, h2
                             def getFromClipboard(flag):
                                 text = None
                                 robot = Robot()
@@ -569,8 +800,8 @@ class IRISKeywords():
                                 try:text = win32clipboard.GetClipboardData()
                                 except : flag = False
                                 win32clipboard.CloseClipboard()
-                                del robot
-                                return text,flag
+                                del robot # deleting variables
+                                return text, flag
                             def dragFunctionA(c1, c2, c3, c4, h, opt):
                                 log.debug('Entering dragFunctionA ')
                                 text = None
@@ -581,8 +812,8 @@ class IRISKeywords():
                                 text, flag = getFromClipboard(flag)
                                 if not(text and flag):
                                     text,flag = dragFunctionB( c1, c2, c3, c4, h, opt )
-                                del c1, c2, c3, c4, opt, h, h1, h2
-                                return text,flag
+                                del c1, c2, c3, c4, opt, h, h1, h2 # deleting variables
+                                return text, flag
                             def dragFunctionB(c1, c2, c3, c4, h, opt):
                                 log.debug('Entering dragFunctionB ,dragFunctionA did not work')
                                 text = None
@@ -593,7 +824,7 @@ class IRISKeywords():
                                 text, flag = getFromClipboard(flag)
                                 if not(text and flag):
                                     text,flag = dragFunctionC( c1, c2, c3, c4, h, opt )
-                                del c1, c2, c3, c4, opt, h, h1, h2
+                                del c1, c2, c3, c4, opt, h, h1, h2 # deleting variables
                                 return text, flag
                             def dragFunctionC(c1, c2, c3, c4, h, opt):
                                 log.debug('Entering dragFunctionC ,dragFunctionB did not work')
@@ -603,18 +834,18 @@ class IRISKeywords():
                                 pywinauto.mouse.press(button = 'left', coords=(c1, c2 + h1))
                                 pywinauto.mouse.release(button = 'left', coords=(c3, c4 + h2))
                                 text, flag = getFromClipboard(flag)
-                                del c1, c2, c3, c4, opt, h, h1, h2
+                                del c1, c2, c3, c4, opt, h, h1, h2 # deleting variables
                                 return text, flag
-                            if (opt=='left'):#L-R
+                            if ( opt =='left' ):#L-R
                                 text, flag = dragFunctionA(int(element['coordinates'][0]),int(element['coordinates'][1]),int(element['coordinates'][2]),int(element['coordinates'][3]) ,height ,opt)
-                            elif (opt=='right'): #R-L
+                            elif (opt == 'right' ): #R-L
                                 text, flag = dragFunctionA(int(element['coordinates'][2]),int(element['coordinates'][3]),int(element['coordinates'][0]),int(element['coordinates'][1]) ,height ,opt)
                             if not(text and flag):
                                 err_msg = "Unable to select the text"
                         else:
                             err_msg = "Error : Invalid option"
-                        del opt, height, args, image
-                elif(len(args[0])==1 and args[0][0].lower().strip() == 'date'):
+                        del opt, height, args, image # deleting variables
+                elif( len(args[0])==1 and args[0][0].lower().strip() == 'date' ):
                     img = Image.open('cropped.png')
                     imgr = img.resize((img.size[0] * 10, img.size[1] * 10), Image.ANTIALIAS)
                     imgr.save('scaled_cropped.png')
@@ -665,17 +896,29 @@ class IRISKeywords():
                 log.info( err_msg )
                 logger.print_on_console( err_msg )
         except Exception as e:
-            log.error("Error occurred in GetTextIris, Err_Msg : ",e)
-            logger.print_on_console("Error occurred in GetTextIris")
+            err_msg = "Error occurred in GetTextIris, Err_Msg : " + str(e)
+            log.error( err_msg )
+            logger.print_on_console( "Error occurred in GetTextIris" )
+        del element, args, img, res, elem_coordinates, const_coordintes, elements, height, image, text, opt # deleting variables
         return status,result,value,err_msg
 
     def getrowcountiris(self,element,*args):
+        """
+        Discription: This function returns total row count of the IRIS image(uses hough transform to get cells of the table)
+        Input: N/A
+        OutPut: Row count
+        """
         log.info('Inside getrowcountiris and No. of arguments passed are : '+str(len(args)))
         global horizontal,vertical
         status = TEST_RESULT_FAIL
         result = TEST_RESULT_FALSE
-        err_msg=None
+        err_msg = None
         value = OUTPUT_CONSTANT
+        img = None
+        res = None
+        elem_coordinates = None
+        const_coordintes = None
+        elements =[]
         try:
             img = None
             if(len(args) == 3 and args[2]!='' and len(verifyexists)>0):
@@ -685,7 +928,8 @@ class IRISKeywords():
                         (const_coordintes[2],const_coordintes[3]),
                         (elem_coordinates[0], elem_coordinates[1]),
                         (elem_coordinates[2], elem_coordinates[3])]
-                img,res = find_relative_image(elements, verifyexists)
+                img, res = find_relative_image(elements, verifyexists)
+                log.info( 'Relative image co-ordinates : '+str(res) )
             else:
                 img = get_byte_mirror(element['cord'])
             with open("cropped.png", "wb") as f:
@@ -710,17 +954,28 @@ class IRISKeywords():
         except Exception as e:
             log.error("Error occurred in GetRowCountIris, Err_Msg : ",e)
             logger.print_on_console("Error occurred in GetRowCountIris")
+        del element, args, img, res, elem_coordinates, const_coordintes, elements # deleting variables
         return status,result,value,err_msg
 
     def getcolcountiris(self,element,*args):
+        """
+        Discription: This function returns total column count of the IRIS image(uses hough transform to get cells of the table)
+        Input:N/A
+        OutPut: Column count
+        """
         log.info('Inside getcolcountiris and No. of arguments passed are : '+str(len(args)))
         global horizontal,vertical
         status = TEST_RESULT_FAIL
         result = TEST_RESULT_FALSE
-        err_msg=None
+        err_msg = None
         value = OUTPUT_CONSTANT
+        img = None
+        res = None
+        elem_coordinates = None
+        const_coordintes = None
+        elements = []
+        rotated = None
         try:
-            img = None
             if(len(args) == 3 and args[2]!='' and len(verifyexists)>0):
                 elem_coordinates = element['coordinates']
                 const_coordintes = args[2]['coordinates']
@@ -728,7 +983,8 @@ class IRISKeywords():
                         (const_coordintes[2],const_coordintes[3]),
                         (elem_coordinates[0], elem_coordinates[1]),
                         (elem_coordinates[2], elem_coordinates[3])]
-                img,res = find_relative_image(elements, verifyexists)
+                img, res = find_relative_image(elements, verifyexists)
+                log.info( 'Relative image co-ordinates : '+str(res) )
             else:
                 img = get_byte_mirror(element['cord'])
             with open("cropped.png", "wb") as f:
@@ -751,12 +1007,19 @@ class IRISKeywords():
             os.remove('cropped.png')
             os.remove('rotated.png')
         except Exception as e:
-            log.error("Error occurred in GetColCountIris, Err_Msg : ",e)
-            logger.print_on_console("Error occurred in GetColCountIris")
-        return status,result,value,err_msg
+            err_msg = "Error occurred in GetColCountIris, Err_Msg : " + str(e)
+            log.error( err_msg )
+            logger.print_on_console( "Error occurred in GetColCountIris" )
+        del element, args, img, res, elem_coordinates, const_coordintes, elements, rotated # deleting variables
+        return status, result, value, err_msg
 
     def getcellvalueiris(self,element,*args):
-        log.info('Inside getcellvalueiris and No. of arguments passed are : '+str(len(args)))
+        """
+        Discription: This function returns the cell text/value of the IRIS image(uses hough transform to get cells of the table)
+        Input: Row, Column
+        OutPut: Cell Text/Value
+        """
+        log.info( 'Inside getcellvalueiris and No. of arguments passed are : ' + str(len(args)) )
         global horizontal,vertical
         status = TEST_RESULT_FAIL
         result = TEST_RESULT_FALSE
@@ -764,6 +1027,11 @@ class IRISKeywords():
         value = OUTPUT_CONSTANT
         row = int(args[0][0])
         col = int(args[0][1])
+        img = None
+        res = None
+        elem_coordinates = None
+        const_coordintes = None
+        elements = []
         try:
             self.getrowcountiris(element)
             if( TESSERACT_PATH_EXISTS ):
@@ -777,7 +1045,8 @@ class IRISKeywords():
                             (const_coordintes[2],const_coordintes[3]),
                             (elem_coordinates[0], elem_coordinates[1]),
                             (elem_coordinates[2], elem_coordinates[3])]
-                    img,res = find_relative_image(elements, verifyexists)
+                    img, res = find_relative_image(elements, verifyexists)
+                    log.info( 'Relative image co-ordinates : '+str(res) )
                 else:
                     img = get_byte_mirror(element['cord'])
                 with open("cropped.png", "wb") as f:
@@ -790,18 +1059,35 @@ class IRISKeywords():
                     value = text
                 os.remove('cropped.png')
             else:
-                log.error("Tesseract module not found.")
+                err_msg = "Tesseract module not found"
+            if ( err_msg ):
+                log.info( err_msg )
+                logger.print_on_console( err_msg )
         except Exception as e:
-            log.error("Error occurred in GetCellValueIris, Err_Msg : ",e)
-            logger.print_on_console("Error occurred in GetCellValueIris")
+            err_msg = "Error occurred in GetCellValueIris, Err_Msg : " + str(e)
+            log.error( err_msg )
+            logger.print_on_console( "Error occurred in GetCellValueIris" )
+        del element, args, img, res, elem_coordinates, const_coordintes, elements, row, col # deleting variables
         return status,result,value,err_msg
 
     def verifyexistsiris(self,element,*args):
+        """
+        Discription: Verifies if image is present on DOM. This image will be set as a parent element , if scraped image is a 'const' type
+        Input: N/A
+        OutPut: Boolean Value
+        """
         log.info('Inside verifyexistsiris and No. of arguments passed are : '+str(len(args)))
         status = TEST_RESULT_FAIL
         result = TEST_RESULT_FALSE
-        err_msg=None
+        err_msg = None
         value = OUTPUT_CONSTANT
+        img = None
+        res = None
+        elem_coordinates = None
+        const_coordintes = None
+        elements = []
+        width = None
+        height = None
         try:
             global verifyexists
             if( len(args) == 3 and args[2] != '' and len(verifyexists) > 0 ):
@@ -811,37 +1097,53 @@ class IRISKeywords():
                         (const_coordintes[2],const_coordintes[3]),
                         (elem_coordinates[0], elem_coordinates[1]),
                         (elem_coordinates[2], elem_coordinates[3])]
-                img,res = find_relative_image(elements, verifyexists)
+                img, res = find_relative_image(elements, verifyexists)
+                log.info( 'Relative image co-ordinates : '+str(res) )
                 width = res[2] - res[0]
                 height = res[3] - res[1]
                 pyautogui.moveTo(res[0]+ int(width/2),res[1] + int(height/2))
             else:
                 res = gotoobject(element)
-            if(len(res)>0):
+            if(len(res) > 0):
                 status= TEST_RESULT_PASS
                 result = TEST_RESULT_TRUE
                 verifyexists = res
                 logger.print_on_console('Element exists.')
             else:
-                logger.print_on_console("Object not found.")
+                err_msg = "Object not found."
+            if ( err_msg ):
+                log.info( err_msg )
+                logger.print_on_console( err_msg )
         except Exception as e:
-            log.error("Error occurred in VerifyExistsIris, Err_Msg :",e)
-            logger.print_on_console("Error occurred in VerifyExistsIris")
-        return status,result,value,err_msg
+            err_msg = "Error occurred in VerifyExistsIris, Err_Msg : " + str(e)
+            log.error( err_msg )
+            logger.print_on_console( "Error occurred in VerifyExistsIris" )
+        del element, args, img, res, elem_coordinates, const_coordintes, elements, height, width # deleting variables
+        return status, result, value, err_msg
 
     def verifytextiris(self,element,*args):
+        """
+        Discription: Verifyies the input text with the text of the image.
+        Input: Input Text
+        Output: list of [input text,text]
+        """
         log.info('Inside verifytextiris and No. of arguments passed are : '+str(len(args)))
         status = TEST_RESULT_FAIL
         result = TEST_RESULT_FALSE
-        err_msg=None
+        err_msg = None
         value = [args[0][0],'null']
+        img = None
+        res = None
+        elem_coordinates = None
+        const_coordintes = None
+        elements = []
+        image = None
+        text = ''
+        verifytext = args[0][0]
         try:
-            verifytext = args[0][0]
-            text = ''
-            if(TESSERACT_PATH_EXISTS):
+            if( TESSERACT_PATH_EXISTS ):
                 pytesseract.tesseract_cmd = TESSERACT_PATH + '/tesseract'
                 os.environ["TESSDATA_PREFIX"] = TESSERACT_PATH + '/tessdata'
-                img = None
                 if(len(args) == 3 and args[2]!='' and len(verifyexists)>0):
                     elem_coordinates = element['coordinates']
                     const_coordintes = args[2]['coordinates']
@@ -849,7 +1151,8 @@ class IRISKeywords():
                             (const_coordintes[2],const_coordintes[3]),
                             (elem_coordinates[0], elem_coordinates[1]),
                             (elem_coordinates[2], elem_coordinates[3])]
-                    img,res = find_relative_image(elements, verifyexists)
+                    img, res = find_relative_image(elements, verifyexists)
+                    log.info( 'Relative image co-ordinates : '+str(res) )
                 else:
                     img = get_byte_mirror(element['cord'])
                 with open("cropped.png", "wb") as f:
@@ -860,13 +1163,19 @@ class IRISKeywords():
                     status= TEST_RESULT_PASS
                     result = TEST_RESULT_TRUE
                 else:
+                    err_msg = "Values do not match"
                     logger.print_on_console("Expected value is:", verifytext)
                     logger.print_on_console("Actual value is:", text)
                 value = [verifytext,text]
                 os.remove('cropped.png')
             else:
-                log.error("Tesseract module not found.")
+                err_msg = "Tesseract module not found."
+            if ( err_msg ):
+                log.info( err_msg )
+                logger.print_on_console( err_msg )
         except Exception as e:
-            log.error("Error occurred in VerifyTextIris, Err_Msg : ",e)
-            logger.print_on_console("Error occurred in VerifyTextIris")
-        return status,result,value,err_msg
+            err_msg = "Error occurred in VerifyTextIris, Err_Msg : " + str(e)
+            log.error( err_msg )
+            logger.print_on_console( "Error occurred in VerifyTextIris" )
+        del element, args, img, res, elem_coordinates, const_coordintes, elements, text, verifytext, image # deleting variables
+        return status, result, value, err_msg
