@@ -19,6 +19,7 @@ from selenium.common.exceptions import *
 import logging
 from constants import *
 import platform
+import readconfig
 
 
 log = logging.getLogger('textbox_operations_MW.py')
@@ -37,17 +38,11 @@ class TextboxKeywords:
         log.debug(user_input)
         return user_input
 
-    def __read_only(self):
-        err_msg=ERROR_CODE_DICT['ERR_ELEMENT_IS_READONLY']
-        logger.print_on_console(err_msg)
-        log.error(err_msg)
-        return err_msg
+    def print_error(self,e):
+        log.error(e)
+        logger.print_on_console(e)
+        return e
 
-    def __element_disabled(self):
-        err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
-        logger.print_on_console(err_msg)
-        log.error(err_msg)
-        return err_msg
 
     def __invalid_element_state(self,e):
         err_msg=ERROR_CODE_DICT['ERR_INVALID_ELEMENT_STATE_EXCEPTION']
@@ -102,17 +97,23 @@ class TextboxKeywords:
                                 webelement.clear()
                             log.debug('Setting the text')
                             browser_Keywords_MW.driver_obj.execute_script(SET_TEXT_SCRIPT,webelement,input)
+                            # configvalues = readconfig.configvalues
+                            # hide_soft_key = configvalues['hide_soft_key']
+                            # if browser_Keywords_MW.driver_obj.is_keyboard_shown() and (hide_soft_key == "Yes"):
+                            #     browser_Keywords_MW.driver_obj.hide_keyboard()
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
                         else:
-                            err_msg=self.__read_only()
+                            err_msg=self.print_error('Element is readonly.')
                 else:
-                    err_msg=self.__element_disabled()
+                    err_msg=self.print_error('The Element is Disabled.')
             except InvalidElementStateException as e:
                 err_msg=self.__invalid_element_state(e)
+                # err_msg=self.print_error('The current operation cannot be performed because of the object state.')
 
             except Exception as e:
                 err_msg=self.__web_driver_exception(e)
+                # err_msg=self.print_error('Error occurred in set text ')
 
         return status,methodoutput,output,err_msg
 
@@ -157,13 +158,15 @@ class TextboxKeywords:
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
                         else:
-                            err_msg=self.__read_only()
+                            err_msg=self.print_error('Element is readonly.')
                 else:
-                    err_msg=self.__element_disabled()
+                    err_msg=self.print_error('The Element is Disabled.')
             except InvalidElementStateException as e:
                 err_msg=self.__invalid_element_state(e)
+                # err_msg=self.print_error('The current operation cannot be performed because of the object state.')
             except Exception as e:
                 err_msg=self.__web_driver_exception(e)
+                # err_msg=self.print_error('Error occurred in send value')
         return status,methodoutput,output,err_msg
 
     def __get_text(self,webelement):
@@ -196,6 +199,7 @@ class TextboxKeywords:
                methodoutput=TEST_RESULT_TRUE
             except Exception as e:
                 err_msg=self.__web_driver_exception(e)
+                # err_msg=self.print_error('Error occurred in get text')
 
         logger.print_on_console(METHOD_OUTPUT+str(text))
         return status,methodoutput,text,err_msg
@@ -226,6 +230,7 @@ class TextboxKeywords:
 
             except Exception as e:
                 err_msg=self.__web_driver_exception(e)
+                # err_msg=self.print_error('Error occurred in verify text')
         return status,methodoutput,output,err_msg
 
     def clear_text(self,webelement,*args):
@@ -251,13 +256,15 @@ class TextboxKeywords:
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
                     else:
-                        err_msg=self.__read_only()
+                        err_msg=self.print_error('Element is readonly.')
                 else:
-                    err_msg=self.__element_disabled()
+                    err_msg=self.print_error('The Element is Disabled.')
             except InvalidElementStateException as e:
                 err_msg=self.__invalid_element_state(e)
+                # err_msg=self.print_error('The current operation cannot be performed because of the object state.')
             except Exception as e:
                 err_msg=self.__web_driver_exception(e)
+                # err_msg=self.print_error('Error occurred in clear text')
         return status,methodoutput,output,err_msg
 
     def gettextbox_length(self,webelement,*args):
@@ -276,6 +283,7 @@ class TextboxKeywords:
                     err_msg='Textbox length is '+str(length)
             except Exception as e:
                 err_msg=self.__web_driver_exception(e)
+                # err_msg=self.print_error('Error occurred in get textbox length')
         logger.print_on_console('Textbox length is '+str(length))
         log.info('Textbox length is '+str(length))
         return status,methodoutput,length,err_msg
@@ -314,6 +322,7 @@ class TextboxKeywords:
 
             except Exception as e:
                 err_msg=self.__web_driver_exception(e)
+                # err_msg=self.print_error('Error occurred in verify textbox length')
         return status,methodoutput,output,err_msg
 
     def setsecuretext(self,webelement,input,*args):
@@ -354,13 +363,69 @@ class TextboxKeywords:
                             else:
                                 err_msg=ERROR_CODE_DICT['ERR_INVALID_INPUT']
                         else:
-                            err_msg=self.__read_only()
+                            err_msg=self.print_error('Element is readonly.')
                 else:
-                    err_msg=self.__element_disabled()
+                    err_msg=self.print_error('The Element is Disabled.')
             except InvalidElementStateException as e:
                 err_msg=self.__invalid_element_state(e)
+                # err_msg=self.print_error('The current operation cannot be performed because of the object state.')
             except Exception as e:
                 err_msg=self.__web_driver_exception(e)
+                # err_msg=self.print_error('Error occurred in set secure text')
+        return status,methodoutput,output,err_msg
+
+
+
+    def sendSecureValue(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        visibilityFlag=True
+        output=OUTPUT_CONSTANT
+        err_msg=None
+        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        if webelement is not None:
+            try:
+                if webelement.is_enabled():
+                    log.debug(WEB_ELEMENT_ENABLED)
+                    utilobj=UtilWebKeywords()
+                    is_visble=utilobj.is_visible(webelement)
+                    if len(args)>0 and args[0] != '':
+                        visibilityFlag=args[0]
+                    input=input[0]
+                    logger.print_on_console(INPUT_IS+str(input))
+                    log.info(INPUT_IS)
+                    log.info(input)
+                    if input is not None:
+                        readonly_value=webelement.get_attribute("readonly")
+                        if not(readonly_value is not None and readonly_value.lower() =='true' or readonly_value is ''):
+                            encryption_obj = AESCipher()
+                            input_val = encryption_obj.decrypt(input)
+                            user_input=self.validate_input(webelement,input_val)
+                            if user_input is not None:
+                                input_val=user_input
+                            if not(visibilityFlag and is_visble):
+                                self.clear_text(webelement)
+                                log.debug('Sending the value via part 1')
+                                browser_Keywords_MW.driver_obj.execute_script(SET_TEXT_SCRIPT,webelement,input_val)
+                            else:
+                                webelement.clear()
+                                if(isinstance(browser_Keywords_MW.driver_obj,selenium.webdriver.Ie) and self.__check_IE_64bit_from_config):
+                                    for i in range (0,len(input_val)+1):
+                                        browser_Keywords_MW.driver_obj.execute_script(SET_TEXT_SCRIPT,webelement,input_val[0:i])
+                                else:
+                                    webelement.send_keys(input_val)
+                            status=TEST_RESULT_PASS
+                            methodoutput=TEST_RESULT_TRUE
+                        else:
+                            err_msg=self.print_error('Element is readonly.')
+                else:
+                    err_msg=self.print_error('The Element is Disabled.')
+            except InvalidElementStateException as e:
+                err_msg=self.__invalid_element_state(e)
+                # err_msg=self.print_error('The current operation cannot be performed because of the object state.')
+            except Exception as e:
+                err_msg=self.__web_driver_exception(e)
+                # err_msg=self.print_error('Error occurred in send secure value')
         return status,methodoutput,output,err_msg
 
 
