@@ -2617,25 +2617,28 @@ def check_browser():
             log.error(e,exc_info=True)
         #Checking browser for microsoft edge
         try:
-            from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
-            p = subprocess.Popen('MicrosoftWebDriver.exe --version', stdout=subprocess.PIPE, bufsize=1,cwd=DRIVERS_PATH,shell=True) 
-            a = p.stdout.readline()
-            a = a.decode('utf-8')[28:40]
-            driver = webdriver.Edge(executable_path=EDGE_DRIVER_PATH)
-            browser_ver = driver.capabilities['browserVersion']
-            browser_ver1 = browser_ver.encode('utf-8')
-            browser_ver = float(browser_ver1[:8])
-            try:
-                driver.close()
-                driver.quit()
-            except:
-                pass
-            for k,v in list(EDGE_VERSION.items()):
-                if a == k:
-                    if str(browser_ver) >= v[0] or str(browser_ver) <= v[1]:
-                        edgeFlag = True
-            if edgeFlag == False:
-                logger.print_on_console('WARNING!! : Edge Legacy version ',str(browser_ver),' is not supported.')
+            if('Windows-10' in platform.platform()):
+                from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+                p = subprocess.Popen('MicrosoftWebDriver.exe --version', stdout=subprocess.PIPE, bufsize=1,cwd=DRIVERS_PATH,shell=True) 
+                a = p.stdout.readline()
+                a = a.decode('utf-8')[28:40]
+                driver = webdriver.Edge(executable_path=EDGE_DRIVER_PATH)
+                browser_ver = driver.capabilities['browserVersion']
+                browser_ver1 = browser_ver.encode('utf-8')
+                browser_ver = float(browser_ver1[:8])
+                try:
+                    driver.close()
+                    driver.quit()
+                except:
+                    pass
+                for k,v in list(EDGE_VERSION.items()):
+                    if a == k:
+                        if str(browser_ver) >= v[0] or str(browser_ver) <= v[1]:
+                            edgeFlag = True
+                if edgeFlag == False:
+                    logger.print_on_console('WARNING!! : Edge Legacy version ',str(browser_ver),' is not supported.')
+            else:
+               logger.print_on_console("WARNING!! : Edge Legacy is supported only in Windows10 platform") 
         except Exception as e:
             logger.print_on_console("Error in checking Edge Legacy version")
             log.error("Error in checking Edge Legacy version")

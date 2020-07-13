@@ -1162,17 +1162,22 @@ class Singleton_DriverUtil():
 
         elif(browser_num == '7'):
             try:
-                caps = webdriver.DesiredCapabilities.EDGE.copy()
-                bit_64 = configvalues['bit_64']
-                if ((str(bit_64).lower()) == 'no'):
-                    edgepath = webconstants.EDGE_DRIVER_PATH
+                if('Windows-10' in platform.platform()):
+                    caps = webdriver.DesiredCapabilities.EDGE.copy()
+                    bit_64 = configvalues['bit_64']
+                    if ((str(bit_64).lower()) == 'no'):
+                        edgepath = webconstants.EDGE_DRIVER_PATH
+                    else:
+                        edgepath = webconstants.EDGE_DRIVER_PATH
+                    driver = webdriver.Edge(capabilities=caps,executable_path=edgepath)
+                    drivermap.append(driver)
+                    driver.maximize_window()
+                    logger.print_on_console('Edge Legacy browser started')
+                    local_bk.log.info('Edge Legacy browser started')
                 else:
-                    edgepath = webconstants.EDGE_DRIVER_PATH
-                driver = webdriver.Edge(capabilities=caps,executable_path=edgepath)
-                drivermap.append(driver)
-                driver.maximize_window()
-                logger.print_on_console('Edge Legacy browser started')
-                local_bk.log.info('Edge Legacy browser started')
+                    logger.print_on_console('Edge Legacy is supported only in Windows10 platform')
+                    local_bk.log.info('Edge Legacy is supported only in Windows10 platform')
+                    driver = None
             except Exception as e:
                 logger.print_on_console("Requested browser is not available")
                 local_bk.log.info('Requested browser is not available')
