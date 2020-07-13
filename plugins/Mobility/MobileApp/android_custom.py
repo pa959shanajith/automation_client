@@ -89,12 +89,15 @@ class custom():
                             "verifyhidden", "waitforelementexists"]
             }
             try:
-                if keyword in custom_dict[class_name]:
-                    return True
+                if class_name in custom_dict:
+                    if keyword in custom_dict[class_name]:
+                        return True
+                    else:
+                        return False
                 else:
-                    return False
+                    logger.print_on_console("Non-standard Element; "+keyword+" may not work!")
+                    return True
             except Exception as e:
-                self.print_error("Object name incorrect!!")
                 log.error(e,exc_info=True)
                 return False
         self.print_error(INVALID_INPUT)
@@ -104,14 +107,14 @@ class custom():
     def custom_element(self,input,*args):
         element = None
         driver_flag = False
-        object_name = input[0].lower()
+        object_name = input[0]
         visible_text = input[1]
         driver = android_scrapping.driver
         if SYSTEM_OS != 'Darwin':
             classes = {
-                'textbox': ['android.widget.EditText'], 'timepicker': ['android.widget.TimePicker'], 'datepicker': ['android.widget.DatePicker'], 'radio': ['android.widget.RadioButton'], 'button': ['android.widget.Button','android.widget.ImageButton'], 'switch': ['android.widget.Switch'], 'checkbox': ['android.widget.CheckBox'],
+                'textbox': ['android.widget.EditText'], 'timepicker': ['android.widget.TimePicker'], 'datepicker': ['android.widget.DatePicker'], 'radio': ['android.widget.RadioButton'], 'button': ['android.widget.Button','android.widget.ImageButton'], 'switch': ['android.widget.Switch'], 'checkbox': ['android.widget.CheckBox','android.widget.CheckedTextView'],
                 'spinner': ['android.widget.Spinner'], 'numberpicker': ['android.widget.NumberPicker'], 'seekbar': ['android.widget.SeekBar'], 'listview': ['android.widget.ListView'], 'text': ['android.widget.TextView'], 'image': ['android.widget.ImageView'],
-                'layout': ['android.widget.LinearLayout','android.widget.RelativeLayout'], 'view':['android.view.View'], 'element': ['android.widget.ScrollView','android.view.ViewGroup','android.widget.FrameLayout','android.widget.LinearLayout','android.widget.RelativeLayout']
+                'layout': ['android.widget.LinearLayout','android.widget.RelativeLayout','android.widget.FrameLayout'], 'view':['android.view.View'], 'element': ['android.widget.ScrollView','android.view.ViewGroup']
             }
         else:
             classes = {
@@ -134,13 +137,27 @@ class custom():
             else: driver_flag = True
             if driver_flag is True:
                 elem_count = 0
-                if len(visible_text) > 0:
-                   for item in classes[object_name]:
-                        xpath_str = "//"+item+"[starts-with(@text,'"+visible_text+"')]"
-                        element_list = element_list + driver.find_elements_by_xpath(xpath_str)
+                if object_name.lower() in classes:
+                    if len(visible_text) > 0:
+                        for item in classes[object_name.lower()]:
+                            xpath_str = "//"+item+"[starts-with(@text,'"+visible_text+"')]"
+                            element_list = element_list + driver.find_elements_by_xpath(xpath_str)
+                    else:
+                        for item in classes[object_name.lower()]:
+                            element_list = element_list + driver.find_elements_by_class_name(item)
                 else:
-                    for item in classes[object_name]:
-                        element_list = element_list + driver.find_elements_by_class_name(item)
+                    try:
+                        if object_name.startswith('android') or object_name.startswith('XCUIElement'):
+                            if len(visible_text) > 0:
+                                xpath_str = "//"+object_name+"[starts-with(@text,'"+visible_text+"')]"
+                                element_list = driver.find_elements_by_xpath(xpath_str)
+                            else:
+                                element_list = driver.find_elements_by_class_name(object_name)
+                        else:
+                            self.print_error('Invalid object name given!!')
+                    except Exception as e:
+                        self.print_error(str(e))
+                        element_list = []
                 if index < len(element_list):
                     log.info(CUSTOM_ELEMENT_FOUND)
                     logger.print_on_console(CUSTOM_ELEMENT_FOUND)

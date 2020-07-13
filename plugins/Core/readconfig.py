@@ -25,11 +25,11 @@ class readConfig():
     def readJson(self):
         global configvalues
         configvalues={"server_ip":"", "server_port":"", "ignore_certificate":"",
-        "chrome_path":"", "bit_64":"", "logFile_Path":"", "screenShot_Flag":"",
+        "chrome_path":"", "chrome_profile":"","bit_64":"", "logFile_Path":"", "screenShot_Flag":"",
         "queryTimeOut":"", "timeOut":"", "stepExecutionWait":"", "displayVariableTimeOut":"",
         "retrieveURL":"", "delay":"", "ignoreVisibilityCheck":"", "exception_flag":"",
         "server_cert":"", "enableSecurityCheck":"","browser_check":"","disable_server_cert":"","highlight_check":"","firefox_path":"",
-        "prediction_for_iris_objects":"","hide_soft_key":"","connection_timeout":"","extn_enabled":"","update_check":"","delay_stringinput":""}
+        "prediction_for_iris_objects":"","hide_soft_key":"","connection_timeout":"","extn_enabled":"","headless_mode":"","update_check":"","delay_stringinput":""}
         if os.path.isfile(self.config_path)==True:
             try:
                 conf = open(self.config_path, 'r')
@@ -39,6 +39,7 @@ class readConfig():
                 configvalues['server_port']=params['server_port']
                 configvalues['ignore_certificate']=params['ignore_certificate']
                 configvalues['chrome_path']=params['chrome_path']
+                configvalues['chrome_profile']=params['chrome_profile']
                 configvalues['firefox_path']=params['firefox_path']
                 configvalues['bit_64']=params['bit_64']
                 configvalues['logFile_Path']=params['logFile_Path']
@@ -61,6 +62,7 @@ class readConfig():
                 configvalues['connection_timeout'] = params['connection_timeout']
                 configvalues['extn_enabled'] = params['extn_enabled']
                 configvalues['update_check'] = params['update_check']
+                configvalues['headless_mode'] = params['headless_mode']
                 configvalues['delay_stringinput']=params['delay_stringinput']
             except Exception as e:
                 configvalues['errorflag']=e
