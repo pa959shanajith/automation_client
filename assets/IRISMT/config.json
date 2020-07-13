@@ -1,0 +1,18 @@
+{
+    "active_model": "Lib/Tesseract-OCR/tessdata/eng.traineddata",
+    "all_versions": [
+        "5.0.0"
+    ],
+    "checkpoint_dir": "assets/IRISMT/checkpoints",
+    "current_version": "5.0.0",
+    "iterations": "400",
+    "lang": "eng",
+    "langdata_dir": "Lib/Tesseract-OCR/langdata",
+    "logFile_Path": "assets/IRISMT/logs/TestautoV2.log",
+    "rollback_dir": "assets/IRISMT/model_backup.7z",
+    "tessdata_dir": "Lib/Tesseract-OCR/tessdata",
+    "trained_result": "Lib/Tesseract-OCR/tessdata/eng.traineddata",
+    "traineddata_dir": "Lib/Tesseract-OCR/tessdata/best/eng.traineddata",
+    "trainingfiles_dir": "assets/IRISMT/training_files",
+    "trainingtool_dir": "/Lib/Tesseract-OCR/training"
+}
