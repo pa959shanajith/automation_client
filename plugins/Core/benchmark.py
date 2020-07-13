@@ -231,7 +231,7 @@ def execute(name,schedTime):
             logger.print_on_console("Terminating Benchmark Execution")
             start(delta.seconds,name,schedTime)
             return 
-        socketIO.emit('benchmark_ping',{'cpuscore':b,"memoryscore":c,"networkscore":a,"percent_received":str(percent * 100) + '%',"hostip":socket.gethostbyname(socket.gethostname()),"hostname":os.environ['username'],"systemscore":result,"time":str(datetime.datetime.isoformat(datetime.datetime.now()))})
+        socketIO.emit('benchmark_ping',{'cpuscore':b,"memoryscore":c,"networkscore":a,"percent_received":str(percent * 100) + '%',"hostip":socket.gethostbyname(socket.gethostname()),"hostname":os.environ['username'],"systemscore":result,"time":str(datetime.datetime.now())})
         start(delta.seconds,name,schedTime)
         return
     except Exception as e:

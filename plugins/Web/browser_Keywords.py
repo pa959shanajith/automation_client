@@ -90,7 +90,7 @@ class BrowserKeywords():
                     #stale logic
                     try:
                         import win32com.client
-                        my_processes = ['chromedriver.exe','IEDriverServer.exe','IEDriverServer64.exe','CobraWinLDTP.exe','phantomjs.exe']
+                        my_processes = ['chromedriver.exe','msedgedriver.exe','MicrosoftWebDriver.exe','MicrosoftEdge.exe','IEDriverServer.exe','IEDriverServer64.exe','CobraWinLDTP.exe','phantomjs.exe']
                         wmi=win32com.client.GetObject('winmgmts:')
                         for p in wmi.InstancesOf('win32_process'):
                             if p.Name in my_processes:
@@ -138,6 +138,19 @@ class BrowserKeywords():
                         p = psutil.Process(local_bk.driver_obj.iedriver.process.pid)
                         pidie = p.children()[0]
                         pid = pidie.pid
+                        local_bk.pid_set.append(pid)
+                    elif(self.browser_num == '7'):
+                        if enableSecurityFlag:
+                            local_bk.driver_obj = obj.set_security_zones(
+                                self.browser_num, local_bk.driver_obj)
+                        p = psutil.Process(local_bk.driver_obj.edge_service.process.pid)
+                        pidedge = p.children()[0]
+                        pid = pidedge.pid
+                        local_bk.pid_set.append(pid)
+                    elif (self.browser_num == '8'):
+                        p = psutil.Process(local_bk.driver_obj.edge_service.process.pid)
+                        pidchromium = p.children()[0]
+                        pid = pidchromium.pid
                         local_bk.pid_set.append(pid)
                     hwndg = utilobject.bring_Window_Front(pid)
                 self.update_pid_set(enableSecurityFlag)
@@ -677,7 +690,7 @@ class BrowserKeywords():
         output=OUTPUT_CONSTANT
         err_msg=None
         try:
-            if local_bk.driver_obj != None and isinstance(local_bk.driver_obj,webdriver.Ie):
+            if local_bk.driver_obj != None and isinstance(local_bk.driver_obj,webdriver.Ie) or isinstance(local_bk.driver_obj,webdriver.Edge):
                 #get all the cookies
                 cookies=local_bk.driver_obj.get_cookies()
                 if len(cookies)>0:
@@ -783,7 +796,6 @@ class BrowserKeywords():
                     pidchrome = p.children()[0]
                     pid = pidchrome.pid
                     local_bk.pid_set.append(pid)
-
             elif(self.browser_num == '3'):
                 # Logic checks if security settings needs to be addressed
                 if enableSecurityFlag:
@@ -793,6 +805,21 @@ class BrowserKeywords():
                 p = psutil.Process(local_bk.driver_obj.iedriver.process.pid)
                 pidie = p.children()[0]
                 pid = pidie.pid
+                local_bk.pid_set.append(pid)
+            elif(self.browser_num == '7'):
+                if enableSecurityFlag:
+                    local_bk.driver_obj = obj.set_security_zones(
+                        self.browser_num, local_bk.driver_obj)
+                #Logic to get the pid of the edge window
+                p = psutil.Process(local_bk.driver_obj.edge_service.process.pid)
+                pidedge = p.children()[0]
+                pid = pidedge.pid
+                local_bk.pid_set.append(pid)
+            elif (self.browser_num == '8'):
+                #Logic to get the pid of the edge_chromium window
+                p = psutil.Process(local_bk.driver_obj.edge_service.process.pid)
+                pidchromium = p.children()[0]
+                pid = pidchromium.pid
                 local_bk.pid_set.append(pid)
             hwndg = utilobject.bring_Window_Front(pid)
 
@@ -892,57 +919,75 @@ class Singleton_DriverUtil():
 
     def chech_if_driver_exists_in_map(self,browserType):
         global local_bk, drivermap
+        if len(drivermap) == 0: return None
         d = None
         # drivermap.reverse()
         if browserType == '1':
-            if len(drivermap) > 0:
-                for i in drivermap:
-                    if isinstance(i,webdriver.Chrome ):
-                        try:
-                            if len (i.window_handles) > 0:
-                                d = i
-                        except Exception as e:
-                            d = 'stale'
-                            break
-
+            for i in drivermap:
+                if isinstance(i,webdriver.Chrome):
+                    try:
+                        if len (i.window_handles) > 0:
+                            d = i
+                    except Exception as e:
+                        d = 'stale'
+                        break
         elif browserType == '2':
-            if len(drivermap) > 0:
-                for i in drivermap:
-                    if isinstance(i,webdriver.Firefox ):
-                        try:
-                            if len (i.window_handles) > 0:
-                                d = i
-                        except Exception as e:
-                            d = 'stale'
-                            break
+            for i in drivermap:
+                if isinstance(i,webdriver.Firefox):
+                    try:
+                        if len (i.window_handles) > 0:
+                            d = i
+                    except Exception as e:
+                        d = 'stale'
+                        break
         elif browserType == '3':
-            if len(drivermap) > 0:
-                for i in drivermap:
-                    if isinstance(i,webdriver.Ie ):
-                        try:
-                            if len (i.window_handles) == 0:
-                                d = 'stale'
-                                break
-                            else:
-                                d = i
-                        except Exception as e:
+            for i in drivermap:
+                if isinstance(i,webdriver.Ie):
+                    try:
+                        if len (i.window_handles) == 0:
                             d = 'stale'
                             break
+                        else:
+                            d = i
+                    except Exception as e:
+                        d = 'stale'
+                        break
         elif browserType == '6':
-            if len(drivermap) > 0:
-                for i in drivermap:
-                    if isinstance(i, webdriver.Safari):
-                        try:
-                            if len(i.window_handles) == 0:
-                                d = 'stale'
-                                break
-                            else:
-                                d = i
-                        except Exception as e:
+            for i in drivermap:
+                if isinstance(i, webdriver.Safari):
+                    try:
+                        if len(i.window_handles) == 0:
                             d = 'stale'
                             break
-
-                                   ##        drivermap.reverse()
+                        else:
+                            d = i
+                    except Exception as e:
+                        d = 'stale'
+                        break
+        elif browserType == '7':
+            for i in drivermap:
+                if isinstance(i, webdriver.Edge) and i.name=='MicrosoftEdge':
+                    try:
+                        if len (i.window_handles) == 0:
+                            d = 'stale'
+                            break
+                        else:
+                            d = i
+                    except Exception as e:
+                        d = 'stale'
+                        break
+        elif browserType == '8':
+            for i in drivermap:
+                if isinstance(i, webdriver.Edge) and i.name=='msedge':
+                    try:
+                        if len (i.window_handles) == 0:
+                            d = 'stale'
+                            break
+                        else:
+                            d = i
+                    except Exception as e:
+                        d = 'stale'
+                        break
         return d
 
     def getBrowser(self,browser_num):
@@ -1015,10 +1060,9 @@ class Singleton_DriverUtil():
                         from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
                         binary = FirefoxBinary(str(configvalues['firefox_path']))
                         driver = webdriver.Firefox(capabilities=caps, firefox_binary=binary, executable_path=exec_path,options=firefox_options)
-                        driver.navigate().refresh()
                     else:
-                        driver = webdriver.Firefox(capabilities=caps,executable_path=exec_path,options=firefox_options)
-                        driver.navigate().refresh()
+                        driver = webdriver.Firefox(capabilities=caps, executable_path=exec_path,options=firefox_options)
+                    driver.navigate().refresh()
                     drivermap.append(driver)
                     if not headless_mode: driver.maximize_window()
                     logger.print_on_console('Firefox browser started using geckodriver')
@@ -1091,6 +1135,45 @@ class Singleton_DriverUtil():
                 logger.print_on_console('Safari browser started')
                 local_bk.log.info('Safari browser started')
 
+            except Exception as e:
+                logger.print_on_console("Requested browser is not available")
+                local_bk.log.info('Requested browser is not available')
+
+        elif(browser_num == '7'):
+            try:
+                if('Windows-10' in platform.platform()):
+                    caps = webdriver.DesiredCapabilities.EDGE.copy()
+                    bit_64 = configvalues['bit_64']
+                    if ((str(bit_64).lower()) == 'no'):
+                        edgepath = webconstants.EDGE_DRIVER_PATH
+                    else:
+                        edgepath = webconstants.EDGE_DRIVER_PATH
+                    driver = webdriver.Edge(capabilities=caps,executable_path=edgepath)
+                    drivermap.append(driver)
+                    driver.maximize_window()
+                    logger.print_on_console('Edge Legacy browser started')
+                    local_bk.log.info('Edge Legacy browser started')
+                else:
+                    logger.print_on_console('Edge Legacy is supported only in Windows10 platform')
+                    local_bk.log.info('Edge Legacy is supported only in Windows10 platform')
+                    driver = None
+            except Exception as e:
+                logger.print_on_console("Requested browser is not available")
+                local_bk.log.info('Requested browser is not available')
+
+        elif(browser_num == '8'):
+            try:
+                caps1 = webdriver.DesiredCapabilities.EDGE.copy()
+                bit_64 = configvalues['bit_64']
+                if ((str(bit_64).lower()) == 'no'):
+                    chromium_path = webconstants.EDGE_CHROMIUM_DRIVER_PATH
+                else:
+                    chromium_path = webconstants.EDGE_CHROMIUM_DRIVER_PATH
+                driver = webdriver.Edge(capabilities=caps1,executable_path=chromium_path)
+                drivermap.append(driver)
+                driver.maximize_window()
+                logger.print_on_console('Edge Chromium browser started')
+                local_bk.log.info('Edge Chromium browser started')
             except Exception as e:
                 logger.print_on_console("Requested browser is not available")
                 local_bk.log.info('Requested browser is not available')
