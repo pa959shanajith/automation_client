@@ -34,6 +34,11 @@ INVALID_INPUT='Input is Invalid'
 ##CHROME_DRIVER_PATH = 'chromedriver.exe'
 CHROME_DRIVER_PATH = drivers_path + "\\chromedriver.exe"
 
+#Edge path
+EDGE_DRIVER_PATH = drivers_path + "\\MicrosoftWebDriver.exe"
+
+EDGE_CHROMIUM_DRIVER_PATH = drivers_path + "\\msedgedriver.exe"
+
 IE_DRIVER_PATH_64 =  drivers_path +'\\IEDriverServer64.exe'
 
 IE_DRIVER_PATH_32 =   drivers_path +'\\IEDriverServer.exe'
@@ -169,4 +174,4 @@ NON_WEBELEMENT_KEYWORDS=['openbrowser','opennewbrowser','navigatetourl','getpage
 
 FOUND='found'
 
-BROWSER_NAME = {1: 'Chrome', 2: 'Firefox', 3: 'Internet Explorer'}
+BROWSER_NAME = {1: 'Chrome', 2: 'Firefox', 3: 'Internet Explorer', 7: 'Edge Legacy', 8: 'Edge Chromium'}

@@ -43,7 +43,11 @@ soc=None
 browsercheckFlag=False
 updatecheckFlag=False
 chromeFlag=False
+edgeFlag=False
+chromiumFlag=False
 firefoxFlag=False
+edgeFlag=False
+chromiumFlag=False
 desktopScrapeFlag=False
 sapScrapeFlag=False
 mobileScrapeFlag=False
@@ -71,10 +75,13 @@ LOGCONFIG_PATH = NINETEEN68_HOME + "/assets/logging.conf"
 DRIVERS_PATH = NINETEEN68_HOME + "/lib/Drivers"
 CHROME_DRIVER_PATH = DRIVERS_PATH + "/chromedriver"
 GECKODRIVER_PATH = DRIVERS_PATH + "/geckodriver"
+EDGE_DRIVER_PATH = DRIVERS_PATH + "/MicrosoftWebDriver"
+EDGE_CHROMIUM_DRIVER_PATH = DRIVERS_PATH + "/msedgedriver"
 if SYSTEM_OS == "Windows":
     CHROME_DRIVER_PATH += ".exe"
     GECKODRIVER_PATH += ".exe"
-
+    EDGE_DRIVER_PATH += ".exe"
+    EDGE_CHROMIUM_DRIVER_PATH += ".exe"
 
 class MainNamespace(BaseNamespace):
     def on_message(self, *args):
@@ -306,6 +313,10 @@ class MainNamespace(BaseNamespace):
                         browsername = '2'
                     elif str(task) == 'OPEN BROWSER SF':
                         browsername = '6'
+                    elif str(task) == 'OPEN BROWSER EDGE':
+                        browsername = '7'
+                    elif str(task) == 'OPEN BROWSER CHROMIUM':
+                        browsername = '8'
                 elif action == 'compare':
                     task = d['task']
                     data['view'] = d['viewString']
@@ -316,6 +327,10 @@ class MainNamespace(BaseNamespace):
                         browsername = '3'
                     elif str(task) == 'OPEN BROWSER FX':
                         browsername = '2'
+                    elif str(task) == 'OPEN BROWSER EDGE':
+                        browsername = '7'
+                    elif str(task) == 'OPEN BROWSER CHROMIUM':
+                        browsername = '8'                     
                 wx.PostEvent(cw.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, cw.GetId()))
         except Exception as e:
             err_msg='Error while Scraping Web application'
@@ -1322,12 +1337,13 @@ class Main():
                 cw.debugwindow = clientwindow.DebugWindow(parent = cw,id = -1, title="Debugger")
                 debugFlag = False
             else:
-                browsernumbers = ['1','2','3','6']
+                browsernumbers = ['1','2','3','6','7','8']
                 if browsername in browsernumbers:
                     logger.print_on_console('Browser name : '+str(browsername))
                     #con = controller.Controller()
                     core_utils.get_all_the_imports('Web')
                     core_utils.get_all_the_imports('WebScrape')
+                    sys.coinit_flags = 2
                     import Nineteen68_WebScrape
                     cw.scrapewindow = Nineteen68_WebScrape.ScrapeWindow(parent = cw,id = -1, title="SLK Nineteen68 - Web Scrapper",browser = browsername,socketIO = socketIO,action=action,data=data,irisFlag = irisFlag)
                     browsername = ''
@@ -1364,12 +1380,18 @@ def check_browser():
                     if params['FIREFOX_VERSION'] != "":
                         for k,v in list(params['FIREFOX_VERSION'].items()):
                             FIREFOX_BROWSER_VERSION[str(k)]=[int(str(v)[:2]),int(str(v)[3:])]
+                    if params['EDGE_VERSION'] != "":
+                        for k,v in list(params['EDGE_VERSION'].items()):
+                            EDGE_VERSION[str(k)]=[(str(v)[:8]),(str(v)[13:21])]
+                    if params['EDGE_CHROMIUM_VERSION'] != "":
+                        for k,v in list(params['EDGE_CHROMIUM_VERSION'].items()):
+                            EDGE_CHROMIUM_VERSION[str(k)]=[int(str(v)[:2]),int(str(v)[3:])]
                 else:
                     logger.print_on_console("Unable to locate ICE parameters")
             except Exception as e:
                 logger.print_on_console("Unable to locate ICE parameters")
                 log.error(e)
-            global chromeFlag,firefoxFlag
+            global chromeFlag,firefoxFlag,edgeFlag,chromiumFlag
             logger.print_on_console('Browser compatibility check started')
             from selenium import webdriver
             from selenium.webdriver import ChromeOptions
@@ -1437,7 +1459,63 @@ def check_browser():
             logger.print_on_console("Error in checking Firefox version")
             log.error("Error in checking Firefox version")
             log.error(e,exc_info=True)
-        if chromeFlag == True and firefoxFlag == True:
+        #Checking browser for microsoft edge
+        try:
+            if('Windows-10' in platform.platform()):
+                from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+                p = subprocess.Popen('MicrosoftWebDriver.exe --version', stdout=subprocess.PIPE, bufsize=1,cwd=DRIVERS_PATH,shell=True) 
+                a = p.stdout.readline()
+                a = a.decode('utf-8')[28:40]
+                driver = webdriver.Edge(executable_path=EDGE_DRIVER_PATH)
+                browser_ver = driver.capabilities['browserVersion']
+                browser_ver1 = browser_ver.encode('utf-8')
+                browser_ver = float(browser_ver1[:8])
+                try:
+                    driver.close()
+                    driver.quit()
+                except:
+                    pass
+                for k,v in list(EDGE_VERSION.items()):
+                    if a == k:
+                        if str(browser_ver) >= v[0] or str(browser_ver) <= v[1]:
+                            edgeFlag = True
+                if edgeFlag == False:
+                    logger.print_on_console('WARNING!! : Edge Legacy version ',str(browser_ver),' is not supported.')
+            else:
+               logger.print_on_console("WARNING!! : Edge Legacy is supported only in Windows10 platform") 
+        except Exception as e:
+            logger.print_on_console("Error in checking Edge Legacy version")
+            log.error("Error in checking Edge Legacy version")
+            log.error(e,exc_info=True)
+
+        #checking browser for microsoft edge(chromium based)
+        try:
+            from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+            p = subprocess.Popen('msedgedriver.exe --version', stdout=subprocess.PIPE, bufsize=1,cwd=DRIVERS_PATH,shell=True)
+            a = p.stdout.readline()
+            a = a.decode('utf-8')[13:17]
+            driver = webdriver.Edge(executable_path=EDGE_CHROMIUM_DRIVER_PATH)
+            browser_ver = driver.capabilities['browserVersion']
+            browser_ver1 = browser_ver.encode('utf-8')
+            browser_ver = int(browser_ver1[:2])
+            try:
+                driver.close()
+                driver.quit()
+            except:
+                pass
+            driver=None
+            for k,v in list(EDGE_CHROMIUM_VERSION.items()):
+                if a == k:
+                    if browser_ver >= v[0] and browser_ver <= v[1]:
+                        chromiumFlag=True
+            if chromiumFlag == False :
+                logger.print_on_console('WARNING!! : Edge Chromium version ',str(browser_ver),' is not supported.')
+        except Exception as e:
+            logger.print_on_console("Error in checking Edge Chromium version")
+            log.error("Error in checking Edge Chromium version")
+            log.error(e,exc_info=True)
+            
+        if chromeFlag == True and firefoxFlag == True and edgeFlag == True and chromiumFlag == True:
             logger.print_on_console('Current version of browsers are supported')
         browsercheckFlag = True
     except Exception as e:

@@ -105,7 +105,9 @@ class BrowserOperations():
             '1':webdriver.Chrome,
             '2':webdriver.Firefox,
             '3':webdriver.Ie,
-            '6':webdriver.Safari
+            '6':webdriver.Safari,
+            '7':webdriver.Edge,
+            '8':webdriver.Edge
         }
         if len(browser_Keywords.drivermap) > 0:
             for i in browser_Keywords.drivermap:
@@ -113,6 +115,12 @@ class BrowserOperations():
                     try:
                         if (browserType == '1') or (browserType == '2'):
                             if len (i.window_handles) > 0:
+                                d = i
+                        elif (browserType == '7'):
+                            if len (i.window_handles) > 0 and i.name=='MicrosoftEdge':
+                                d = i
+                        elif (browserType == '8'):
+                            if len (i.window_handles) > 0 and i.name=='msedge':
                                 d = i
                         else:
                             if len (i.window_handles) == 0:
