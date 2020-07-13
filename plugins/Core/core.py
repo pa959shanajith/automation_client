@@ -828,6 +828,9 @@ class ConnectionThread(threading.Thread):
             err_msg = str(e).replace("[engine.io waiting for connection] ",'').replace("[SSL: CERTIFICATE_VERIFY_FAILED] ",'')
             if "_ssl.c" in err_msg:
                 err_msg = err_msg[:err_msg.index("(_ssl")]
+                logger.print_on_console("Try changing Server Certificate Path to 'default'." +
+                    " If that also doesn't work, then disable server certificate check. But that" +
+                    " will result in an insecure HTTPS connection")
         except Exception as e:
             err_msg = "Error in server connection"
             log.error(e,exc_info=True)
