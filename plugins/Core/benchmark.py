@@ -94,7 +94,7 @@ def cpu():
             random.shuffle(arr)
             arr.reverse()
             arr = selectionSort(arr)
-            string = string + ''.join(str(e) for e in arr)			  
+            string = string + ''.join(str(e) for e in arr)
             binArr = []
             binArr = arr[:]
             convertToBinary(binArr)
@@ -159,20 +159,20 @@ def selectionSort(arr):
     return arr
 
 def dec2bin(dec):
-	return bin(math.ceil(dec))
+    return bin(math.ceil(dec))
 
 def convertToBinary(rr):
-	for i in range(len(rr)):
-		rr[i] = dec2bin(rr[i])
+    for i in range(len(rr)):
+        rr[i] = dec2bin(rr[i])
   
 def ping(host):
-	p = subprocess.Popen(["ping.exe",host], stdout = subprocess.PIPE, shell = True)
-	result = p.communicate()[0]
-	for row in str(result).split("\\r\\n"):
-		if 'Average' in row:
-			x = row.split("Average = ")[1].split("ms")[0]
-			return float(x)
-	return -1
+    p = subprocess.Popen(["ping.exe",host], stdout = subprocess.PIPE, shell = True)
+    result = p.communicate()[0]
+    for row in str(result).split("\\r\\n"):
+        if 'Average' in row:
+            x = row.split("Average = ")[1].split("ms")[0]
+            return float(x)
+    return -1
 
 def network():
     logger.print_on_console("Running network benchmark")
