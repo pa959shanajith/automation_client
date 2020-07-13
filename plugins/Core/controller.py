@@ -665,7 +665,7 @@ class Controller():
                     #MobileApp apptype module call
                     if self.mobile_app_dispatcher_obj==None:
                         self.__load_mobile_app()
-                    result = self.invokemobileappkeyword(teststepproperty,self.mobile_app_dispatcher_obj,inpval,args[0])
+                    result = self.invokemobileappkeyword(teststepproperty,self.mobile_app_dispatcher_obj,inpval,args[0], iris_flag)
                 elif teststepproperty.apptype.lower() == APPTYPE_WEBSERVICE:
                     #Webservice apptype module call
                     if self.webservice_dispatcher_obj == None:
@@ -828,8 +828,8 @@ class Controller():
         res = dispatcher_obj.dispatcher(teststepproperty,inputval,self.reporting_obj)
         return res
 
-    def invokemobileappkeyword(self,teststepproperty,dispatcher_obj,inputval,reporting_obj):
-        res = dispatcher_obj.dispatcher(teststepproperty,inputval,self.reporting_obj)
+    def invokemobileappkeyword(self,teststepproperty,dispatcher_obj,inputval,reporting_obj, iris_flag):
+        res = dispatcher_obj.dispatcher(teststepproperty,inputval,self.reporting_obj, iris_flag)
         return res
 
     def invokeDesktopkeyword(self,teststepproperty,dispatcher_obj,inputval,iris_flag):
