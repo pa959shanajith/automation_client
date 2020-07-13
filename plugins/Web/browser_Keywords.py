@@ -796,7 +796,6 @@ class BrowserKeywords():
                     pidchrome = p.children()[0]
                     pid = pidchrome.pid
                     local_bk.pid_set.append(pid)
-
             elif(self.browser_num == '3'):
                 # Logic checks if security settings needs to be addressed
                 if enableSecurityFlag:
@@ -807,17 +806,17 @@ class BrowserKeywords():
                 pidie = p.children()[0]
                 pid = pidie.pid
                 local_bk.pid_set.append(pid)
-
             elif(self.browser_num == '7'):
                 if enableSecurityFlag:
                     local_bk.driver_obj = obj.set_security_zones(
                         self.browser_num, local_bk.driver_obj)
+                #Logic to get the pid of the edge window
                 p = psutil.Process(local_bk.driver_obj.edge_service.process.pid)
                 pidedge = p.children()[0]
                 pid = pidedge.pid
                 local_bk.pid_set.append(pid)
-
             elif (self.browser_num == '8'):
+                #Logic to get the pid of the edge_chromium window
                 p = psutil.Process(local_bk.driver_obj.edge_service.process.pid)
                 pidchromium = p.children()[0]
                 pid = pidchromium.pid
@@ -920,83 +919,75 @@ class Singleton_DriverUtil():
 
     def chech_if_driver_exists_in_map(self,browserType):
         global local_bk, drivermap
+        if len(drivermap) == 0: return None
         d = None
         # drivermap.reverse()
         if browserType == '1':
-            if len(drivermap) > 0:
-                for i in drivermap:
-                    if isinstance(i,webdriver.Chrome ):
-                        try:
-                            if len (i.window_handles) > 0:
-                                d = i
-                        except Exception as e:
-                            d = 'stale'
-                            break
-
+            for i in drivermap:
+                if isinstance(i,webdriver.Chrome):
+                    try:
+                        if len (i.window_handles) > 0:
+                            d = i
+                    except Exception as e:
+                        d = 'stale'
+                        break
         elif browserType == '2':
-            if len(drivermap) > 0:
-                for i in drivermap:
-                    if isinstance(i,webdriver.Firefox ):
-                        try:
-                            if len (i.window_handles) > 0:
-                                d = i
-                        except Exception as e:
-                            d = 'stale'
-                            break
+            for i in drivermap:
+                if isinstance(i,webdriver.Firefox):
+                    try:
+                        if len (i.window_handles) > 0:
+                            d = i
+                    except Exception as e:
+                        d = 'stale'
+                        break
         elif browserType == '3':
-            if len(drivermap) > 0:
-                for i in drivermap:
-                    if isinstance(i,webdriver.Ie ):
-                        try:
-                            if len (i.window_handles) == 0:
-                                d = 'stale'
-                                break
-                            else:
-                                d = i
-                        except Exception as e:
+            for i in drivermap:
+                if isinstance(i,webdriver.Ie):
+                    try:
+                        if len (i.window_handles) == 0:
                             d = 'stale'
                             break
+                        else:
+                            d = i
+                    except Exception as e:
+                        d = 'stale'
+                        break
         elif browserType == '6':
-            if len(drivermap) > 0:
-                for i in drivermap:
-                    if isinstance(i, webdriver.Safari):
-                        try:
-                            if len(i.window_handles) == 0:
-                                d = 'stale'
-                                break
-                            else:
-                                d = i
-                        except Exception as e:
+            for i in drivermap:
+                if isinstance(i, webdriver.Safari):
+                    try:
+                        if len(i.window_handles) == 0:
                             d = 'stale'
                             break
+                        else:
+                            d = i
+                    except Exception as e:
+                        d = 'stale'
+                        break
         elif browserType == '7':
-            if len(drivermap) > 0:
-                for i in drivermap:
-                    if isinstance(i, webdriver.Edge) and i.name=='MicrosoftEdge':
-                        try:
-                            if len (i.window_handles) == 0:
-                                d = 'stale'
-                                break
-                            else:
-                                d = i
-                        except Exception as e:
+            for i in drivermap:
+                if isinstance(i, webdriver.Edge) and i.name=='MicrosoftEdge':
+                    try:
+                        if len (i.window_handles) == 0:
                             d = 'stale'
                             break
+                        else:
+                            d = i
+                    except Exception as e:
+                        d = 'stale'
+                        break
         elif browserType == '8':
-            if len(drivermap) > 0:
-                for i in drivermap:
-                    if isinstance(i, webdriver.Edge) and i.name=='msedge':
-                        try:
-                            if len (i.window_handles) == 0:
-                                d = 'stale'
-                                break
-                            else:
-                                d = i
-                        except Exception as e:
+            for i in drivermap:
+                if isinstance(i, webdriver.Edge) and i.name=='msedge':
+                    try:
+                        if len (i.window_handles) == 0:
                             d = 'stale'
                             break
-
-                                   ##        drivermap.reverse()
+                        else:
+                            d = i
+                    except Exception as e:
+                        d = 'stale'
+                        break
         return d
 
     def getBrowser(self,browser_num):
@@ -1069,10 +1060,9 @@ class Singleton_DriverUtil():
                         from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
                         binary = FirefoxBinary(str(configvalues['firefox_path']))
                         driver = webdriver.Firefox(capabilities=caps, firefox_binary=binary, executable_path=exec_path,options=firefox_options)
-                        driver.navigate().refresh()
                     else:
-                        driver = webdriver.Firefox(capabilities=caps,executable_path=exec_path,options=firefox_options)
-                        driver.navigate().refresh()
+                        driver = webdriver.Firefox(capabilities=caps, executable_path=exec_path,options=firefox_options)
+                    driver.navigate().refresh()
                     drivermap.append(driver)
                     if not headless_mode: driver.maximize_window()
                     logger.print_on_console('Firefox browser started using geckodriver')

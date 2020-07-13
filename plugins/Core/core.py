@@ -46,6 +46,8 @@ chromeFlag=False
 edgeFlag=False
 chromiumFlag=False
 firefoxFlag=False
+edgeFlag=False
+chromiumFlag=False
 desktopScrapeFlag=False
 sapScrapeFlag=False
 mobileScrapeFlag=False
@@ -1341,6 +1343,7 @@ class Main():
                     #con = controller.Controller()
                     core_utils.get_all_the_imports('Web')
                     core_utils.get_all_the_imports('WebScrape')
+                    sys.coinit_flags = 2
                     import Nineteen68_WebScrape
                     cw.scrapewindow = Nineteen68_WebScrape.ScrapeWindow(parent = cw,id = -1, title="SLK Nineteen68 - Web Scrapper",browser = browsername,socketIO = socketIO,action=action,data=data,irisFlag = irisFlag)
                     browsername = ''

@@ -35,8 +35,6 @@ CERTIFICATE_PATH = NINETEEN68_HOME + "/assets/CA_BUNDLE"
 LOGCONFIG_PATH = NINETEEN68_HOME + "/assets/logging.conf"
 DRIVERS_PATH = NINETEEN68_HOME + "/lib/Drivers"
 CHROME_DRIVER_PATH = DRIVERS_PATH + "/chromedriver"
-EDGE_DRIVER_PATH = DRIVERS_PATH + "/MicrosoftWebDriver"
-EDGE_CHROMIUM_DRIVER_PATH = DRIVERS_PATH + "/msedgedriver"
 GECKODRIVER_PATH = DRIVERS_PATH + "/geckodriver"
 if SYSTEM_OS == "Windows":
     CHROME_DRIVER_PATH += ".exe"
@@ -1494,6 +1492,7 @@ class DebugWindow(wx.Frame):
         logger.print_on_console(msg)
         controller.pause_flag=False
         root.testthread.resume(True)
+
 
 def check_update(flag):
     global update_obj
