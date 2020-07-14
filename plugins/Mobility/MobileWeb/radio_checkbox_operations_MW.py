@@ -27,11 +27,6 @@ class RadioCheckboxKeywords():
         self.status={'radio':'Selected',
                     'checkbox':'Checked'}
 
-    def __element_disabled(self):
-        err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
-        logger.print_on_console(err_msg)
-        log.error(err_msg)
-        return err_msg
 
     def __web_driver_exception(self,e):
         log.error(e)
@@ -39,6 +34,10 @@ class RadioCheckboxKeywords():
         err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         return err_msg
 
+    def print_error(self,e):
+        log.error(e)
+        logger.print_on_console(e)
+        return e
 
     def select_radiobutton(self,webelement,*args):
         status=TEST_RESULT_FAIL
@@ -55,15 +54,25 @@ class RadioCheckboxKeywords():
                     if len(args)>0:
                         visibilityFlag=args[0]
                     if not(visibilityFlag and is_visible):
+                        # performing js code
+                        log.debug('element is invisible, performing js code')
                         browser_Keywords_MW.driver_obj.execute_script(webconstants_MW.CLICK_RADIO_CHECKBOX,webelement)
+                        status = TEST_RESULT_PASS
+                        methodoutput = TEST_RESULT_TRUE
                     else:
-                        webelement.click()
-                    status=TEST_RESULT_PASS
-                    methodoutput=TEST_RESULT_TRUE
+                        if is_visible:
+                            # performing selenium code
+                            log.debug('element is visible, performing selenium code')
+                            webelement.click()
+                            status=TEST_RESULT_PASS
+                            methodoutput=TEST_RESULT_TRUE
+                        else:
+                            err_msg=self.print_error('The object is not displayed.')
                 else:
-                    err_msg=self.__element_disabled()
+                    err_msg=self.print_error('The Element is Disabled.')
             except Exception as e:
                 err_msg=self.__web_driver_exception(e)
+                # err_msg=self.print_error('Error occurred in select radio button')
 
         return status,methodoutput,output,err_msg
 
@@ -84,19 +93,27 @@ class RadioCheckboxKeywords():
                         if len(args)>0:
                             visibilityFlag=args[0]
                         if not(visibilityFlag and is_visble ):
+                            # performing js code
+                            log.debug('element is invisible, performing js code')
                             browser_Keywords_MW.driver_obj.execute_script(webconstants_MW.CLICK_RADIO_CHECKBOX,webelement)
+                            status = TEST_RESULT_PASS
+                            methodoutput = TEST_RESULT_TRUE
                         else:
-                            webelement.click()
-                        status=TEST_RESULT_PASS
-                        methodoutput=TEST_RESULT_TRUE
+                            if is_visble:
+                                # performing selenium code
+                                log.debug('element is visible, performing selenium code')
+                                webelement.click()
+                                status=TEST_RESULT_PASS
+                                methodoutput=TEST_RESULT_TRUE
+                            else:
+                                err_msg=self.print_error('The object is not displayed.')
                     else:
-                        err_msg=ERROR_CODE_DICT['ERR_OBJECTSELECTED']
-                        logger.print_on_console(err_msg)
-                        log.error(err_msg)
+                        err_msg=self.print_error('Checkbox already Selected')
                 else:
-                    err_msg=self.__element_disabled()
+                    err_msg=self.print_error('The Element is Disabled.')
             except Exception as e:
                 err_msg=self.__web_driver_exception(e)
+                # err_msg=self.print_error('Error occurred in select checkbox')
         return status,methodoutput,output,err_msg
 
 
@@ -116,19 +133,27 @@ class RadioCheckboxKeywords():
                         if len(args)>0:
                             visibilityFlag=args[0]
                         if not(visibilityFlag and is_visible ):
+                             # performing js code
+                            local_rco.log.debug('element is invisible, performing js code')
                             browser_Keywords_MW.driver_obj.execute_script(webconstants_MW.CLICK_RADIO_CHECKBOX,webelement)
+                            status = TEST_RESULT_PASS
+                            methodoutput = TEST_RESULT_TRUE
                         else:
-                            webelement.click()
-                        status=TEST_RESULT_PASS
-                        methodoutput=TEST_RESULT_TRUE
+                            if self.utilobj.is_visible(webelement):
+                                # performing selenium code
+                                log.debug('element is visible, performing selenium code')
+                                webelement.click()
+                                status=TEST_RESULT_PASS
+                                methodoutput=TEST_RESULT_TRUE
+                            else:
+                                err_msg=self.print_error('The object is not displayed.')
                     else:
-                        err_msg=ERROR_CODE_DICT['ERR_OBJECTUNSELECTED']
-                        logger.print_on_console(err_msg)
-                        log.error(err_msg)
+                        err_msg=self.print_error('Checkbox already Unselected')
                 else:
-                    err_msg=self.__element_disabled()
+                    err_msg=self.print_error('The Element is Disabled.')
             except Exception as e:
                 err_msg=self.__web_driver_exception(e)
+                # err_msg=self.print_error('Error occurred in unselect checkbox')
         return status,methodoutput,output,err_msg
 
     def get_status(self,webelement,input,*args):
@@ -154,6 +179,7 @@ class RadioCheckboxKeywords():
 
             except Exception as e:
                 err_msg=self.__web_driver_exception(e)
+                # err_msg=self.print_error('Error occurred in get status')
         return status,methodoutput,output,err_msg
 
     def __fetch_status(self,webelement,*args):
@@ -172,6 +198,7 @@ class RadioCheckboxKeywords():
                     status='Un'+self.status[input_type].lower()
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
+            # err_msg=self.print_error('Error occurred in fetch status ')
         return status
 
     def __fetch_status_array(self,webelement,input):
@@ -202,6 +229,7 @@ class RadioCheckboxKeywords():
 
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
+            # err_msg=self.print_error('Error occurred in fetch status array')
         log.debug(status_list)
         return status_list
 
@@ -228,6 +256,7 @@ class RadioCheckboxKeywords():
                   xpath_elements=xpath.split('/')
                   lastElement=xpath_elements[len(xpath_elements)-1]
                   childindex=lastElement[lastElement.find("[")+1:lastElement.find("]")]
+                  childindex = int(childindex)
                   if tag.lower()=='dropdown' or tag.lower()=='listbox' and tagName=='select':
                     multiSelect=cellChild.get_attribute('multiple')
                     if multiSelect!=None and multiSelect=='true' or multiSelect=='multiple':
@@ -270,12 +299,15 @@ class RadioCheckboxKeywords():
                                     else:
                                         counter+=counter
                   else:
-                            eleStatus=True
+                            #Nineteen68#1626: commented next line, as because of this, loop was not going into next iteration
+                            #eleStatus=True
+                            continue
 
                   if eleStatus==True:
                     actualElement=cellChild
                     break
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
+            # err_msg=self.print_error('Error occurred in get actual element')
 
         return actualElement
