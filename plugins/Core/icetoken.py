@@ -30,7 +30,7 @@ class ICEToken():
         self.token_folder=self.get_token_folder()
         self.token_file=self.token_folder+os.sep+"token.enc"
         if os.path.exists(self.token_file):
-            log.info("Token exists")
+            log.debug("Token exists")
             """ Decrypt the token with token key """
             token_key = "".join(['a','s','i','d','f','n','H','T','E','o','w','#','D','j',
                         'g','L','I','$','o','K','n','^','8','s','j','p','2','h','9','Y','&','d'])

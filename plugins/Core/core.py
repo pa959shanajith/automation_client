@@ -878,6 +878,9 @@ class TestThread(threading.Thread):
         global execution_flag, closeActiveConnection, connection_Timer
         batch_id = None
         try:
+            self.con = controller.Controller()
+            self.con.configvalues=configvalues
+            self.con.exception_flag=(str(configvalues["exception_flag"]).strip().lower()=="true")
             runfrom_step=1
             if self.action==EXECUTE: batch_id = self.json_data["batchId"]
             elif self.action==DEBUG:
@@ -897,9 +900,6 @@ class TestThread(threading.Thread):
                 self.cw.rbox.Disable()
                 self.cw.breakpoint.Disable()
                 self.cw.terminatebutton.Enable()
-            self.con = controller.Controller()
-            self.con.configvalues=configvalues
-            self.con.exception_flag=(str(configvalues["exception_flag"]).strip().lower()=="true")
             status = ''
             apptype = ''
             if(self.action == DEBUG):
@@ -907,9 +907,9 @@ class TestThread(threading.Thread):
             else:
                 execution_flag = True
                 if root.gui: benchmark.stop(True)
-                apptype =(self.json_data)['apptype']
-            if(apptype == "DesktopJava"): apptype = "oebs"
-            if(apptype.lower() not in plugins_list):
+                apptype = self.json_data['apptype']
+            if apptype == "DesktopJava": apptype = "oebs"
+            if apptype.lower() not in plugins_list:
                 logger.print_on_console('This app type is not part of the license.')
                 status=TERMINATE
             else:
@@ -919,16 +919,6 @@ class TestThread(threading.Thread):
 
             if status==TERMINATE:
                 logger.print_on_console('---------Termination Completed-------')
-            if self.main.gui:
-                if self.cw.choice=='RunfromStep':
-                    self.cw.breakpoint.Enable()
-                else:
-                    self.cw.breakpoint.Disable()
-                #Removed execute,debug button
-                self.cw.breakpoint.Clear()
-                self.cw.rbox.Enable()
-                # self.cw.breakpoint.Disable()
-                self.cw.cancelbutton.Enable()
             if self.action==DEBUG:
                 testcasename = handler.local_handler.testcasename
                 self.cw.killChildWindow(debug=True)
@@ -964,7 +954,13 @@ class TestThread(threading.Thread):
 
         self.main.testthread = None
         execution_flag = False
-        if self.main.gui: self.cw.schedule.Enable()
+        if self.main.gui:
+            if self.cw.choice=='RunfromStep': self.cw.breakpoint.Enable()
+            else: self.cw.breakpoint.Disable()
+            # self.cw.breakpoint.Clear()
+            self.cw.rbox.Enable()
+            self.cw.cancelbutton.Enable()
+            self.cw.schedule.Enable()
 
 
 class Main():
