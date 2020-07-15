@@ -1022,9 +1022,9 @@ class Singleton_DriverUtil():
                         choptions.binary_location=str(chrome_path)
                     if ((str(chrome_profile).lower()) != 'default'):
                         choptions.add_argument("user-data-dir="+chrome_profile)
-                    
+
                     driver = webdriver.Chrome(executable_path=exec_path,chrome_options=choptions)
-                    driver.navigate().refresh()
+                    # driver.navigate().refresh()
                     ##driver = webdriver.Chrome(desired_capabilities= choptions.to_capabilities(), executable_path = exec_path)
                     drivermap.append(driver)
                     driver.maximize_window()
@@ -1062,7 +1062,7 @@ class Singleton_DriverUtil():
                         driver = webdriver.Firefox(capabilities=caps, firefox_binary=binary, executable_path=exec_path,options=firefox_options)
                     else:
                         driver = webdriver.Firefox(capabilities=caps, executable_path=exec_path,options=firefox_options)
-                    driver.navigate().refresh()
+                    # driver.navigate().refresh()
                     drivermap.append(driver)
                     if not headless_mode: driver.maximize_window()
                     logger.print_on_console('Firefox browser started using geckodriver')
