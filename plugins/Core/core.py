@@ -1466,7 +1466,7 @@ def check_browser():
         try:
             if('Windows-10' in platform.platform()):
                 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
-                p = subprocess.Popen('MicrosoftWebDriver.exe --version', stdout=subprocess.PIPE, bufsize=1,cwd=DRIVERS_PATH,shell=True) 
+                p = subprocess.Popen(EDGE_DRIVER_PATH + ' --version', stdout=subprocess.PIPE, bufsize=1,cwd=DRIVERS_PATH,shell=True) 
                 a = p.stdout.readline()
                 a = a.decode('utf-8')[28:40]
                 driver = webdriver.Edge(executable_path=EDGE_DRIVER_PATH)
@@ -1494,7 +1494,7 @@ def check_browser():
         #checking browser for microsoft edge(chromium based)
         try:
             from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
-            p = subprocess.Popen('msedgedriver.exe --version', stdout=subprocess.PIPE, bufsize=1,cwd=DRIVERS_PATH,shell=True)
+            p = subprocess.Popen(EDGE_CHROMIUM_DRIVER_PATH + ' --version'', stdout=subprocess.PIPE, bufsize=1,cwd=DRIVERS_PATH,shell=True)
             a = p.stdout.readline()
             a = a.decode('utf-8')[13:17]
             driver = webdriver.Edge(executable_path=EDGE_CHROMIUM_DRIVER_PATH)
