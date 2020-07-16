@@ -904,7 +904,6 @@ class IRISKeywords():
                                 err_msg = "Unable to select the text"
                         else:
                             err_msg = "Error : Invalid option"
-                        del opt, height, args, image # deleting variables
                 elif( len(args[0])==1 and args[0][0].lower().strip() == 'date' ):
                     img = Image.open('cropped.png')
                     imgr = img.resize((img.size[0] * 10, img.size[1] * 10), Image.ANTIALIAS)

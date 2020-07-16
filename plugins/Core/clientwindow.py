@@ -297,12 +297,12 @@ class ClientWindow(wx.Frame):
     def onRadioBox(self,e):
         self.choice=self.rbox.GetStringSelection()
         logger.print_on_console(str(self.choice)+' is Selected')
+        self.debug_mode=False
         if self.choice == 'Normal':
             self.breakpoint.Clear()
             self.breakpoint.Disable()
             self.killChildWindow(debug=True)
-        self.debug_mode=False
-        if self.choice in ['Stepwise','RunfromStep']:
+        elif self.choice in ['Stepwise','RunfromStep']:
             self.debug_mode=True
             ##if self.debugwindow == None:
             ##    self.debugwindow = DebugWindow(parent = None,id = -1, title="Debugger")
