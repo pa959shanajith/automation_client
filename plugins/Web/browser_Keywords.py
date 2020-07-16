@@ -1163,12 +1163,14 @@ class Singleton_DriverUtil():
 
         elif(browser_num == '8'):
             try:
-                caps1 = webdriver.DesiredCapabilities.EDGE.copy()
-                bit_64 = configvalues['bit_64']
-                if ((str(bit_64).lower()) == 'no'):
-                    chromium_path = webconstants.EDGE_CHROMIUM_DRIVER_PATH
-                else:
-                    chromium_path = webconstants.EDGE_CHROMIUM_DRIVER_PATH
+                from selenium.webdriver.edge.options import Options
+                options = Options()
+                options.use_chromium = True
+                caps1 = options.to_capabilities()
+                chromium_path = webconstants.EDGE_CHROMIUM_DRIVER_PATH
+                if SYSTEM_OS == "Darwin":
+                    chromium_path = webconstants.drivers_path+"/msedgedriver"
+                    caps1['platform'] = 'MAC'
                 driver = webdriver.Edge(capabilities=caps1,executable_path=chromium_path)
                 drivermap.append(driver)
                 driver.maximize_window()
