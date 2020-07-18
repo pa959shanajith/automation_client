@@ -14,6 +14,10 @@ import csv
 import file_operations
 import excel_operations
 import xlwt
+from xlutils.copy import copy as xl_copy
+import openpyxl
+from openpyxl.utils import get_column_letter
+from xlrd import open_workbook
 import generic_constants
 import os
 import logger
@@ -358,12 +362,15 @@ class DatabaseOperation():
                 rows = cursor.fetchall()
                 columns = [column[0] for column in cursor.description]
                 ##logic for output col reading
+                if len(args)>1:
+                    inp_sheet=args[1]
+                else:
+                    inp_sheet=None
                 out_tuple = args
                 fields = out_tuple[0]
-                inp_sheet = None
                 path=None
                 ext = self.get_ext(fields)
-                if (ext == '.xls' or ext == '.xlsx'):
+                if (ext == '.xls'):
                     verify = os.path.isfile(fields)
                     try:
                         if(verify == False):
@@ -371,23 +378,36 @@ class DatabaseOperation():
                                 work_book = xlwt.Workbook(encoding="utf-8") #Changed code
                                 if(inp_sheet is None or inp_sheet == ''):
                                     inp_sheet = generic_constants.DATABASE_SHEET
-                                    work_sheet = work_book.add_sheet(inp_sheet)
-                                else:
-                                    work_sheet = work_book.add_sheet(inp_sheet)
-                                    log.debug('Input Sheet and file path while creating file :')
-                                    log.debug(inp_sheet)
-                                    log.debug(fields)
+                                    
+                                work_sheet = work_book.add_sheet(inp_sheet)
+                                index_sheet = work_book.sheet_index(inp_sheet)
+                                work_book.set_active_sheet(index_sheet)
+                                log.debug('Input Sheet and file path while creating file :')
+                                log.debug(inp_sheet)
+                                log.debug(fields)
                             except Exception as e:
                                 err_msg = ERROR_CODE_DICT["ERR_FILE_WRITE"]
                                 logger.print_on_console(err_msg)
                                 log.error(err_msg)
                                 log.error(e)
-                        if(inp_sheet is None or inp_sheet == ''):
-                            inp_sheet = generic_constants.DATABASE_SHEET
-                            log.debug('Input Sheet is :')
-                            log.debug(inp_sheet)
-                            work_book = xlwt.Workbook(encoding="utf-8")
-                            work_sheet = work_book.add_sheet(inp_sheet)
+                        else:
+                            try:
+                                rb = open_workbook(fields)
+                                work_book = xl_copy(rb)
+                                if(inp_sheet is None or inp_sheet == ''):
+                                    inp_sheet = generic_constants.DATABASE_SHEET
+                                    log.debug('Input Sheet is :')
+                                    log.debug(inp_sheet)
+                                    #work_book = xlwt.Workbook(encoding="utf-8")
+                                    #changed the above line , becoz it removes the existing sheets.
+                                work_sheet = work_book.add_sheet(inp_sheet)
+                                index_sheet = work_book.sheet_index(inp_sheet)
+                                work_book.set_active_sheet(index_sheet)
+                            except Exception as e:
+                                err_msg = ERROR_CODE_DICT["ERR_FILE_WRITE"]
+                                logger.print_on_console(err_msg)
+                                log.error(err_msg)
+                                log.error(e)
                         i=0
                         j=0
                         for x in columns:
@@ -415,6 +435,103 @@ class DatabaseOperation():
                                         work_sheet.write(k,l,y)
                                 l+=1
                             k+=1
+                        work_book.save(fields)
+                    except Exception as e:
+                        err_msg = ERROR_CODE_DICT["ERR_FILE_WRITE"]
+                        logger.print_on_console(err_msg)
+                        log.error(err_msg)
+                        log.error(e)
+                    status=generic_constants.TEST_RESULT_PASS
+                    result=generic_constants.TEST_RESULT_TRUE
+
+                elif(ext == '.xlsx'):
+                    verify = os.path.isfile(fields)
+                    try:
+                        if(verify == False):
+                            try:
+                                work_book = openpyxl.Workbook()
+                                index_sheet=0
+                                if(inp_sheet is None or inp_sheet == ''):
+                                    inp_sheet = generic_constants.DATABASE_SHEET
+                                    log.debug('Input Sheet is :')
+                                    log.debug(inp_sheet)
+                                    
+                                work_book.create_sheet(index=index_sheet, title=inp_sheet)
+                                log.debug('Input Sheet and file path while creating file :')
+                                log.debug(inp_sheet)
+                                log.debug(fields)
+                            except Exception as e:
+                                err_msg = ERROR_CODE_DICT["ERR_FILE_WRITE"]
+                                logger.print_on_console(err_msg)
+                                log.error(err_msg)
+                                log.error(e)
+                        else:
+                            try:
+                                work_book = openpyxl.load_workbook(fields)
+                                if(inp_sheet is None or inp_sheet == ''):
+                                    inp_sheet = generic_constants.DATABASE_SHEET
+                                    log.debug('Input Sheet is :')
+                                    log.debug(inp_sheet)
+                                
+                                sheet_names = work_book.sheetnames
+                                if len(sheet_names)>0:
+                                    try:
+                                        if inp_sheet in sheet_names:
+                                            index_sheet=sheet_names.index(inp_sheet)
+                                        else:
+                                            index_sheet = len(sheet_names)+1
+                                    
+                                        work_book.create_sheet(index=index_sheet, title=inp_sheet)
+                                    except:
+                                        index_sheet = len(sheet_names)+1
+                                        work_book.create_sheet(index=index_sheet, title=inp_sheet)
+
+                            except Exception as e:
+                                err_msg = ERROR_CODE_DICT["ERR_FILE_WRITE"]
+                                logger.print_on_console(err_msg)
+                                log.error(err_msg)
+                                log.error(e)
+                        i=1
+                        j=1
+                        work_sheet = work_book[inp_sheet]
+                        
+                        for x in columns:
+                            work_sheet.cell(row=i, column=j).value = x
+                            j=j+1
+                            max_col_width = 2.4
+                            adjusted_width = (len(x) + 2) * 1.2
+                            if adjusted_width > max_col_width:
+                                max_col_width=adjusted_width
+                            work_sheet.column_dimensions[get_column_letter(j)].width = max_col_width
+                        k=1
+                        for row in rows:
+                            l=1
+                            for y in row:
+                                try:
+                                    work_sheet.cell(row=k, column=l).value = y
+                                    
+                                except Exception as e:
+                                    if 'character' in str(e):
+                                        i = str(e).index('character')
+                                        err_new=str(e)[:i+len('character')]
+                                        if err_new==generic_constants.UNICODE_ERR:
+                                            newrow=[]
+                                            for ele in row:
+                                                if type(ele) == str:
+                                                     ele = ele.encode('utf-8')
+                                                     newrow.append(ele)
+                                                else:
+                                                    newrow.append(ele)
+                                        row = tuple(newrow)
+                                        work_sheet.cell(row=k, column=l).value = y
+                                l+=1
+                                max_col_width = 2.4
+                                adjusted_width = (len(y) + 2) * 1.2
+                                if adjusted_width > max_col_width:
+                                    max_col_width=adjusted_width
+                                work_sheet.column_dimensions[get_column_letter(l)].width = max_col_width
+                            k+=1
+                        work_book.active=index_sheet
                         work_book.save(fields)
                     except Exception as e:
                         err_msg = ERROR_CODE_DICT["ERR_FILE_WRITE"]
