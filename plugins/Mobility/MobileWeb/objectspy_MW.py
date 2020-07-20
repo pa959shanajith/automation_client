@@ -33,7 +33,7 @@ class Object_Mapper():
     def compare(self):
         find_ele=highlight_MW.Highlight()
         global currenthandle
-        with open(os.environ["NINETEEN68_HOME"] + '/output/domelements_scraped.json') as data_file:
+        with open(os.environ["AVO_ASSURE_HOME"] + '/output/domelements_scraped.json') as data_file:
             self.data = json.load(data_file)
             driver = browserops_MW.driver
             time.sleep(10)
@@ -77,7 +77,7 @@ class Object_Mapper():
         data['view'] = lst
         data['mirror'] = screen
 
-        with open(os.environ["NINETEEN68_HOME"] + '/output/domelements.json', 'w') as outfile:
+        with open(os.environ["AVO_ASSURE_HOME"] + '/output/domelements.json', 'w') as outfile:
             json.dump(data, outfile, indent=4, sort_keys=False)
         return data
 
@@ -89,11 +89,11 @@ class Object_Mapper():
         abc=input("enter ok to stop click and add ")
         if abc=='ok':
             b.stopclickandadd_MW()
-        with open(os.environ["NINETEEN68_HOME"] + '/output/domelements.json') as data_file:
+        with open(os.environ["AVO_ASSURE_HOME"] + '/output/domelements.json') as data_file:
             data = json.load(data_file)
             lst=self.data['view']
             for element  in data['view']:
                 lst.append(element)
             vie = {'view': lst}
-            with io.open(os.environ["NINETEEN68_HOME"] + '/output/domelements.json', 'w', encoding='utf-8') as f:
+            with io.open(os.environ["AVO_ASSURE_HOME"] + '/output/domelements.json', 'w', encoding='utf-8') as f:
                     f.write(json.dumps(vie, ensure_ascii=False))

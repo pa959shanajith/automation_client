@@ -1,6 +1,13 @@
 #ignore *.pyc files,*.exe, *.log , *.json, *.DS_Store files 
 *.pyc
+*.pyo
 *.exe
 *.log
 *.DS_Store
-*.json
+./*.json
+DLLs/*
+include/*
+Lib/*
+libs/*
+logs/*
+output/*

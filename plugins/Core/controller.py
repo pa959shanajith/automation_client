@@ -1164,7 +1164,7 @@ class Controller():
             print('=======================================================================================================')
         return status
 
-    #generating report of AWS in N68 by using AWS result(AWS device farm executed result present in test spec output.txt)
+    #generating report of AWS in Avo Assure by using AWS result(AWS device farm executed result present in test spec output.txt)
     def aws_report(self,aws_tsp,aws_scenario,step_results,suite_idx,execute_result_data,obj_reporting,json_data,socketIO):
         sc_idx=0
         idx_t=0
@@ -1173,7 +1173,7 @@ class Controller():
         inpval=[]
         keyword_flag=True
         ignore_stat=False
-        path_file=os.environ['NINETEEN68_HOME']+os.sep+'output'
+        path_file=os.environ['AVO_ASSURE_HOME']+os.sep+'output'
         os.chdir(path_file)
         f=open("step_result.txt","w")
         f.writelines(str(step_results))
@@ -1337,8 +1337,8 @@ def kill_process():
 
         try:
             # os.system("killall -9 Safari")
-                # This kills all instances of safari browser even if it is not opened by nineteen68.
-                # Issue when Nineteen68 is opened in Safari browser
+                # This kills all instances of safari browser even if it is not opened by Avo Assure.
+                # Issue when Avo Assure is opened in Safari browser
             os.system("killall -9 safaridriver")
             os.system("killall -9 node_appium")
             os.system("killall -9 xcodebuild")

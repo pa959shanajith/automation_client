@@ -43,11 +43,11 @@ INP_VAL_EXCEEDS = 'Given length should be greater than 0'
 
 DATE_FORMAT = '%d/%m/%Y'
 
-DATABASE_FILE_XLS ='//Ninteen68Database_verify.xls'
+DATABASE_FILE_XLS ='//AvoAssureDatabase_verify.xls'
 
-DATABASE_FILE_XLSX ='Ninteen68Database_verify.xlsx'
+DATABASE_FILE_XLSX ='AvoAssureDatabase_verify.xlsx'
 
-DATABASE_FILE_CSV ='//Ninteen68Database_verify.csv'
+DATABASE_FILE_CSV ='//AvoAssureDatabase_verify.csv'
 
 DATABASE_SHEET = 'Sheet0'
 
@@ -57,13 +57,13 @@ VBS_FILE_TYPE='.vbs'
 
 EXE_FILE_TYPE='.exe'
 
-TEST_RESULT_PASS = "Pass";
+TEST_RESULT_PASS = "Pass"
 
-TEST_RESULT_FAIL = "Fail";
+TEST_RESULT_FAIL = "Fail"
 
-TEST_RESULT_TRUE = "True";
+TEST_RESULT_TRUE = "True"
 
-TEST_RESULT_FALSE = "False";
+TEST_RESULT_FALSE = "False"
 
 INVALID_CHARS_PATH='*?"<>|'
 

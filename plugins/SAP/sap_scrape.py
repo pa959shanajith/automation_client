@@ -32,7 +32,7 @@ class ScrapeWindow(wx.Frame):
         wx.Frame.__init__(self, parent, title=title,
                    pos = (300, 150), size = (210, 150), style=wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER | wx.MAXIMIZE_BOX | wx.CLOSE_BOX) )
         self.SetBackgroundColour('#e6e7e8')
-        self.iconpath = os.environ["IMAGES_PATH"] + "/slk.ico"
+        self.iconpath = os.environ["IMAGES_PATH"] + "/avo.ico"
         self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
         self.core_utilsobject = core_utils.CoreUtils()
         self.parent = parent
@@ -102,7 +102,7 @@ class ScrapeWindow(wx.Frame):
             encoded_string = self.screenShot(wnd_title,wnd_id)
             data['mirror'] = encoded_string.decode('UTF-8').strip()
             data['view'] = d
-            # 10 is the limit of MB set as per Nineteen68 standards
+            # 10 is the limit of MB set as per Avo Assure standards
             if ( self.core_utilsobject.getdatasize(str(data),'mb') < 10 ):
                 self.socketIO.emit('scrape',data)
             else:
@@ -129,7 +129,7 @@ class ScrapeWindow(wx.Frame):
         encoded_string = self.screenShot(wnd_title,wnd_id)
         data['mirror'] = encoded_string.decode('UTF-8').strip()
         data['view'] = scraped_data
-        # 10 is the limit of MB set as per Nineteen68 standards
+        # 10 is the limit of MB set as per Avo Assure standards
         if ( self.core_utilsobject.getdatasize(str(data),'mb') < 10 ):
             self.socketIO.emit('scrape',data)
         else:

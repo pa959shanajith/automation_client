@@ -78,7 +78,7 @@ class BuildJson:
         jsonArray['view']= scrape_data
         jsonArray['mirror']='IMAGEEEEE'
 ##        jsonArray['mirror']=driver.get_screenshot_as_base64()
-        with open(os.environ["NINETEEN68_HOME"] + '/output/domelements_Android.json', 'w') as outfile:
+        with open(os.environ["AVO_ASSURE_HOME"] + '/output/domelements_Android.json', 'w') as outfile:
                 print ('Writing scrape data to domelements.json file')
                 log.info(jsonArray)
                 json.dump(jsonArray, outfile, indent=4, sort_keys=False)

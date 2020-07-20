@@ -147,8 +147,8 @@ def build_recursive_dir_tree(path):
 
 print("Building process initiated....")
 cwd = os.getcwd()
-plugins_path = normpath(cwd + "/Nineteen68/plugins/")
-unit_tests_path = normpath(cwd + "/Nineteen68/unit_tests/")
+plugins_path = normpath(cwd + "/AvoAssure/plugins/")
+unit_tests_path = normpath(cwd + "/AvoAssure/unit_tests/")
 if os.path.isdir(unit_tests_path):
     shutil.rmtree(unit_tests_path)
 os.chdir(plugins_path)

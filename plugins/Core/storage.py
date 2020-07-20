@@ -97,7 +97,7 @@ class SQLite(AbstractStorage):
     def __init__(self):
         self.db = None
         super(SQLite, self).__init__()
-        db_path = os.environ["NINETEEN68_HOME"]+os.sep+'assets'+os.sep+'packets.db'
+        db_path = os.environ["AVO_ASSURE_HOME"]+os.sep+'assets'+os.sep+'packets.db'
         #if os.path.isfile(db_path): os.rename(db_path, db_path[:-2]+str(int(time()*100000))+".db")
         if os.path.isfile(db_path): os.remove(db_path)  #####
         connection = sqlite3.connect(db_path, check_same_thread=False)

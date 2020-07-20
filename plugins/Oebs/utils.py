@@ -40,7 +40,7 @@ class Utils:
         self.aut_handle=None
 
     def save_json(self,scrape_data):
-        with open(os.environ["NINETEEN68_HOME"] + '/output/domelements.json', 'w') as outfile:
+        with open(os.environ["AVO_ASSURE_HOME"] + '/output/domelements.json', 'w') as outfile:
                 logger.print_on_console('Writing scrape data to domelements.json file')
                 log.info('Writing scrape data to domelements.json file')
                 json.dump(scrape_data, outfile, indent=4, sort_keys=False)

@@ -37,7 +37,7 @@ class ScrapeWindow(wx.Frame):
             wx.Frame.__init__(self, parent, title = title,
                        pos = (300, 150), size = (210, 180), style = wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER | wx.MAXIMIZE_BOX | wx.CLOSE_BOX) )
             self.SetBackgroundColour('#e6e7e8')
-            self.iconpath = os.environ["IMAGES_PATH"] + "/slk.ico"
+            self.iconpath = os.environ["IMAGES_PATH"] + "/avo.ico"
             self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
             global obj
             obj = desktop_launch_keywords.Launch_Keywords()
@@ -166,7 +166,7 @@ class ScrapeWindow(wx.Frame):
                             logger.print_on_console( 'Error occured while capturing Screenshot' )
                             log.error(e)
                     data['mirror'] = encoded_string.decode('UTF-8').strip()
-                    #10 is the limit of MB set as per Nineteen68 standards
+                    #10 is the limit of MB set as per Avo Assure standards
                     if self.core_utilsobject.getdatasize(str(data), 'mb') < 10:
                         self.socketIO.emit('scrape', data)
                     else:

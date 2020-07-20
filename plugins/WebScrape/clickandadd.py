@@ -120,7 +120,7 @@ class Clickandadd():
         try:
             log.info('Inside stopclickandadd method .....')
             driver = browserops.driver
-            maindir = os.environ["NINETEEN68_HOME"]
+            maindir = os.environ["AVO_ASSURE_HOME"]
             screen_shot_path = maindir + '/output/' + domconstants.SCREENSHOT_IMG
             log.info('Obtained driver from browserops.py class .....')
 
@@ -198,7 +198,7 @@ class Clickandadd():
             data['mirror'] = screen
 
             log.info('Creating a json object with key view with value as return data')
-            with open(os.environ["NINETEEN68_HOME"] + '/output/domelements.json', 'w') as outfile:
+            with open(os.environ["AVO_ASSURE_HOME"] + '/output/domelements.json', 'w') as outfile:
                 log.info('Opening domelements.json file to write view object')
                 json.dump(data, outfile, indent=4, sort_keys=False)
                 log.info('view is dumped into  domelements.json file ')

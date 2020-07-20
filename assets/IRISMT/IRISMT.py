@@ -16,13 +16,13 @@ date_obj = datetime.datetime.now()
 '''
     Home Directory and Zip file location are initialized here
 '''
-NINETEEN68_HOME = os.path.normpath(str(os.getcwd())) + '/'
-LOC_7z = NINETEEN68_HOME + "Lib/7zip/7z.exe"
+AVO_ASSURE_HOME = os.path.normpath(str(os.getcwd())) + '/'
+LOC_7z = AVO_ASSURE_HOME + "Lib/7zip/7z.exe"
 
 '''
     Config.json is accessed and stored in a variable to later access all the configuration values
 '''
-config_path = NINETEEN68_HOME + "assets/IRISMT/config.json"
+config_path = AVO_ASSURE_HOME + "assets/IRISMT/config.json"
 config_file = open(config_path, "r")
 configs = json.load(config_file)
 config_file.close()
@@ -31,7 +31,7 @@ config_file.close()
 '''
     Log location is configured here to save all the logs generated and make log directory if not exist
 '''
-log_loc = NINETEEN68_HOME + configs['logFile_Path'][:configs['logFile_Path'].rindex('/')]
+log_loc = AVO_ASSURE_HOME + configs['logFile_Path'][:configs['logFile_Path'].rindex('/')]
 if not ( os.path.isdir(str(log_loc)) and os.path.exists(str(log_loc)) ):
     os.mkdir(str(log_loc))
 
@@ -54,19 +54,19 @@ class IRISMT(wx.Frame):
             All the paths are stored in a dictionary after retrieving from config json file
         '''
         self.FONTS_DIR = None
-        self.TRAININGTOOL_DIR = NINETEEN68_HOME + configs["trainingtool_dir"]
+        self.TRAININGTOOL_DIR = AVO_ASSURE_HOME + configs["trainingtool_dir"]
         self.LANG = configs["lang"]
-        self.LANGDATA_DIR = NINETEEN68_HOME + configs["langdata_dir"]
-        self.TESSDATA_DIR = NINETEEN68_HOME + configs["tessdata_dir"]
-        self.TRAININGFILES_DIR = NINETEEN68_HOME + configs["trainingfiles_dir"]
-        self.TRAINEDDATA_DIR = NINETEEN68_HOME + configs["traineddata_dir"]
-        self.CHECKPOINT_DIR = NINETEEN68_HOME + configs["checkpoint_dir"]
+        self.LANGDATA_DIR = AVO_ASSURE_HOME + configs["langdata_dir"]
+        self.TESSDATA_DIR = AVO_ASSURE_HOME + configs["tessdata_dir"]
+        self.TRAININGFILES_DIR = AVO_ASSURE_HOME + configs["trainingfiles_dir"]
+        self.TRAINEDDATA_DIR = AVO_ASSURE_HOME + configs["traineddata_dir"]
+        self.CHECKPOINT_DIR = AVO_ASSURE_HOME + configs["checkpoint_dir"]
         self.ITERATIONS = configs["iterations"]
-        self.TRAINED_RESULT = NINETEEN68_HOME + configs["trained_result"]
+        self.TRAINED_RESULT = AVO_ASSURE_HOME + configs["trained_result"]
         self.all_versions = configs["all_versions"]
         self.current_version = configs["current_version"]
-        self.active_model = NINETEEN68_HOME + configs["active_model"]
-        self.rollback_dir = NINETEEN68_HOME + configs["rollback_dir"]
+        self.active_model = AVO_ASSURE_HOME + configs["active_model"]
+        self.rollback_dir = AVO_ASSURE_HOME + configs["rollback_dir"]
 
         log.debug("All value initialized")
 
@@ -451,10 +451,10 @@ class IRISMT(wx.Frame):
     def start_training(self, event):
         if self.current_version == "5.0.0":
             # if current version is 5.0.0, tesseract contains int model in the tessdata but we need float model so we fetchit from tessdata/best
-            self.TRAINEDDATA_DIR = NINETEEN68_HOME + configs["traineddata_dir"]
+            self.TRAINEDDATA_DIR = AVO_ASSURE_HOME + configs["traineddata_dir"]
         else:
             # all the other versions are built upon the float model so they are fetch from tessdata only
-            self.TRAINEDDATA_DIR = NINETEEN68_HOME + configs["trained_result"]
+            self.TRAINEDDATA_DIR = AVO_ASSURE_HOME + configs["trained_result"]
 
         if not os.path.exists(self.CHECKPOINT_DIR):
             log.debug("Creating Checkpoint folder")

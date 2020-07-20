@@ -1,4 +1,4 @@
-# Nineteen68 CI
+# Avo Assure CI
 
 ## SOFTWARES NEEDED
 * `WinBuild 32/64`

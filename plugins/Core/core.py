@@ -65,14 +65,14 @@ execution_flag = False
 closeActiveConnection = False
 connection_Timer = None
 core_utils_obj = core_utils.CoreUtils()
-NINETEEN68_HOME = os.environ["NINETEEN68_HOME"]
-IMAGES_PATH = NINETEEN68_HOME + "/assets/images/"
+AVO_ASSURE_HOME = os.environ["AVO_ASSURE_HOME"]
+IMAGES_PATH = AVO_ASSURE_HOME + "/assets/images/"
 os.environ["IMAGES_PATH"] = IMAGES_PATH
-ICE_CONST= NINETEEN68_HOME + "/assets/ice_const.json"
-CONFIG_PATH= NINETEEN68_HOME + "/assets/config.json"
-CERTIFICATE_PATH = NINETEEN68_HOME + "/assets/CA_BUNDLE"
-LOGCONFIG_PATH = NINETEEN68_HOME + "/assets/logging.conf"
-DRIVERS_PATH = NINETEEN68_HOME + "/lib/Drivers"
+ICE_CONST= AVO_ASSURE_HOME + "/assets/ice_const.json"
+CONFIG_PATH= AVO_ASSURE_HOME + "/assets/config.json"
+CERTIFICATE_PATH = AVO_ASSURE_HOME + "/assets/CA_BUNDLE"
+LOGCONFIG_PATH = AVO_ASSURE_HOME + "/assets/logging.conf"
+DRIVERS_PATH = AVO_ASSURE_HOME + "/lib/Drivers"
 CHROME_DRIVER_PATH = DRIVERS_PATH + "/chromedriver"
 GECKODRIVER_PATH = DRIVERS_PATH + "/geckodriver"
 EDGE_DRIVER_PATH = DRIVERS_PATH + "/MicrosoftWebDriver.exe"
@@ -91,7 +91,7 @@ class MainNamespace(BaseNamespace):
                 if allow_connect:
                     sch_mode = cw.schedule.GetValue() if root.gui else False
                     if sch_mode: socketIO.emit('toggle_schedule',sch_mode)
-                    msg = ("Schedule" if sch_mode else "Normal") + " Mode: Connection to the Nineteen68 Server established"
+                    msg = ("Schedule" if sch_mode else "Normal") + " Mode: Connection to the Avo Assure Server established"
                     logger.print_on_console(msg)
                     log.info(msg)
                     msg = "ICE Name: " + root.ice_token["icename"]
@@ -137,9 +137,9 @@ class MainNamespace(BaseNamespace):
                 enable_reregister = False
                 try:
                     global plugins_list
-                    ice_ndac_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
+                    ice_das_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
                         'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
-                    response = json.loads(core_utils_obj.unwrap(str(args[1]), ice_ndac_key))
+                    response = json.loads(core_utils_obj.unwrap(str(args[1]), ice_das_key))
                     if(response['id'] != root.icesession['ice_id'] or response['connect_time'] != root.icesession['connect_time']):
                         err_res="Invalid response received"
                         logger.print_on_console(err_res)
@@ -154,7 +154,7 @@ class MainNamespace(BaseNamespace):
                             if root.gui:
                                 cw.connectbutton.SetBitmapLabel(cw.disconnect_img)
                                 cw.connectbutton.SetName("disconnect")
-                                cw.connectbutton.SetToolTip(wx.ToolTip("Disconnect from Nineteen68 Server"))
+                                cw.connectbutton.SetToolTip(wx.ToolTip("Disconnect from Avo Assure Server"))
                             controller.disconnect_flag=False
                         else:
                             if 'err_msg' in response: err_res = response['err_msg']
@@ -174,18 +174,18 @@ class MainNamespace(BaseNamespace):
                     root.ice_token = None
                     root.token_obj.delete_token()
                     if root.gui:
-                        logger.print_on_console("ICE is not registered with Nineteen68. Click to Register")
+                        logger.print_on_console("ICE is not registered with Avo Assure. Click to Register")
                         cw.enable_register()
                     else:
-                        logger.print_on_console("ICE is not registered with Nineteen68. Try Again")
+                        logger.print_on_console("ICE is not registered with Avo Assure. Try Again")
                 if root.gui: cw.connectbutton.Enable()
 
             elif(str(args[0]) == 'fail'):
                 fail_msg = "Fail"
                 if len(args) > 1 and args[1]=="conn":
-                    fail_msg+="ed to connect to Nineteen68 Server"
+                    fail_msg+="ed to connect to Avo Assure Server"
                 if len(args) > 1 and args[1]=="disconn":
-                    fail_msg+="ed to disconnect from Nineteen68 Server"
+                    fail_msg+="ed to disconnect from Avo Assure Server"
                 logger.print_on_console(fail_msg)
                 log.info(fail_msg)
                 kill_conn = True
@@ -723,10 +723,10 @@ class MainNamespace(BaseNamespace):
         if not allow_connect: return
         log.info('Disconnect triggered')
         if (socketIO is not None) and (not socketIO.waiting_for_close):
-            ice_ndac_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
+            ice_das_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
                 'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
             root.icesession['connect_time'] = str(datetime.now())
-            socketIO._http_session.params['icesession'] = core_utils_obj.wrap(json.dumps(root.icesession), ice_ndac_key)
+            socketIO._http_session.params['icesession'] = core_utils_obj.wrap(json.dumps(root.icesession), ice_das_key)
             if root.gui:
                 if not bool(cw): return
                 cw.schedule.Disable()
@@ -736,7 +736,7 @@ class MainNamespace(BaseNamespace):
                 if root.gui: cw.enable_register()
                 return
             else:
-                msg = 'Connectivity issue with Nineteen68 Server. Attempting to restore connectivity...'
+                msg = 'Connectivity issue with Avo Assure Server. Attempting to restore connectivity...'
                 logger.print_on_console(msg)
                 log.error(msg)
         if root.ice_token:
@@ -791,9 +791,9 @@ class ConnectionThread(threading.Thread):
             'icetoken': root.ice_token,
             'data': random()*100000000000000
         }
-        ice_ndac_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
+        ice_das_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
             'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
-        icesession_enc = core_utils_obj.wrap(json.dumps(root.icesession), ice_ndac_key)
+        icesession_enc = core_utils_obj.wrap(json.dumps(root.icesession), ice_das_key)
         params={'username': username, 'icename': root.ice_token["icename"],
             'ice_action': self.ice_action, 'icesession': icesession_enc}
         args = {"cert": client_cert, "params": params}
@@ -1057,7 +1057,7 @@ class Main():
         global connection_Timer
         controller.terminate_flag = True
         controller.disconnect_flag = True
-        if self.socketthread: logger.print_on_console('Disconnected from Nineteen68 server')
+        if self.socketthread: logger.print_on_console('Disconnected from Avo Assure server')
         if (connection_Timer != None and connection_Timer.isAlive()):
             log.info("Connection Timeout timer Stopped")
             connection_Timer.cancel()
@@ -1070,15 +1070,15 @@ class Main():
         controller.kill_process()
         if SYSTEM_OS == "Windows":
             nul = subprocess.DEVNULL
-            subprocess.Popen("TASKKILL /F /IM nineteen68MFapi.exe", stdout=nul, stderr=nul)
+            subprocess.Popen("TASKKILL /F /IM AvoAssureMFapi.exe", stdout=nul, stderr=nul)
         sys.exit(0)
 
     def register(self, token, hold = False):
-        ice_ndac_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
+        ice_das_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
             'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
         emsg = "Error: Invalid Server address or Token . Please try again"
         try:
-            token_dec = core_utils_obj.unwrap(token,ice_ndac_key).split("@")
+            token_dec = core_utils_obj.unwrap(token,ice_das_key).split("@")
             token_info = {'token':token_dec[0],'icetype':token_dec[1] ,'icename':token_dec[2]}
             if self.gui and token_info["icetype"] != "normal":
                 emsg = "Token is provisioned for CI-CD ICE. Either use a token provisioned for Normal mode or register ICE in command line mode."
@@ -1118,9 +1118,9 @@ class Main():
                     if response == "fail":
                         err_res = "ICE registration failed."
                     else:
-                        ice_ndac_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
+                        ice_das_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
                             'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
-                        response = json.loads(core_utils_obj.unwrap(response, ice_ndac_key))
+                        response = json.loads(core_utils_obj.unwrap(response, ice_das_key))
                     if err_res or response['id'] != self.icesession['ice_id'] or response['connect_time'] != self.icesession['connect_time']:
                         if not err_res: err_res = "Invalid response received"
                         logger.print_on_console(err_res)
@@ -1145,8 +1145,8 @@ class Main():
                                 cw.EnableAll()
                                 cw.connectbutton.SetBitmapLabel(cw.connect_img)
                                 cw.connectbutton.SetName('connect')
-                                cw.connectbutton.SetToolTip(wx.ToolTip("Connect to Nineteen68 Server"))
-                            msg='ICE "'+data["icename"]+'" registered successfully with Nineteen68'
+                                cw.connectbutton.SetToolTip(wx.ToolTip("Connect to Avo Assure Server"))
+                            msg='ICE "'+data["icename"]+'" registered successfully with Avo Assure'
                             logger.print_on_console(msg)
                             log.info(msg)
                 except Exception as e:
@@ -1160,10 +1160,10 @@ class Main():
                     self.ice_token = None
                     self.token_obj.delete_token()
                     if self.gui:
-                        logger.print_on_console("ICE is not registered with Nineteen68. Click to Register")
+                        logger.print_on_console("ICE is not registered with Avo Assure. Click to Register")
                         cw.enable_register()
                     else:
-                        logger.print_on_console("ICE is not registered with Nineteen68. Try Again")
+                        logger.print_on_console("ICE is not registered with Avo Assure. Try Again")
                 if self.gui: cw.connectbutton.Enable()
                 else: self._wants_to_close = True
             elif mode == 'connect' or mode == "guestconnect":
@@ -1174,7 +1174,7 @@ class Main():
                 if status == False:
                     self.ice_action = "register"
                     self.ice_token = None
-                    msg = "ICE is not registered with Nineteen68."
+                    msg = "ICE is not registered with Avo Assure."
                     if self.gui:
                         msg += " Click to Register"
                         logger.print_on_console(msg)
@@ -1195,8 +1195,8 @@ class Main():
                 self.socketthread.start()
             else:
                 self.killSocket(True)
-                log.info('Disconnected from Nineteen68 server')
-                logger.print_on_console('Disconnected from Nineteen68 server')
+                log.info('Disconnected from Avo Assure server')
+                logger.print_on_console('Disconnected from Avo Assure server')
                 global connection_Timer
                 if (connection_Timer != None and connection_Timer.isAlive()):
                     log.info("Connection Timeout Timer Stopped")
@@ -1208,7 +1208,7 @@ class Main():
         except Exception as e:
             emsg="Forbidden request, Connection refused, please configure server ip and server port in "
             if self.gui: emsg += "Edit -> Configuration"
-            else: emsg += "configuration file located at NINETEEN68_HOME/assets/config.json"
+            else: emsg += "configuration file located at AVO_ASSURE_HOME/assets/config.json"
             emsg += ", and retry."
             if mode == "register":
                 self.ice_token=None
@@ -1257,7 +1257,7 @@ class Main():
 
     def verifyRegistration(self, verifyonly = False):
         global executionOnly
-        emsg = "Nineteen68 ICE is not registered."
+        emsg = "Avo Assure ICE is not registered."
         executionOnly = True
         try:
             self.token_obj = ICEToken()
@@ -1313,23 +1313,23 @@ class Main():
             if(irisFlag == True):
                 core_utils.get_all_the_imports('IRIS')
             if mobileScrapeFlag==True:
-                cw.scrapewindow = mobileScrapeObj.ScrapeWindow(parent = cw,id = -1, title="SLK Nineteen68 - Mobile Scrapper",filePath = browsername,socketIO = socketIO)
+                cw.scrapewindow = mobileScrapeObj.ScrapeWindow(parent = cw,id = -1, title="Avo Assure - Mobile Scrapper",filePath = browsername,socketIO = socketIO)
                 mobileScrapeFlag=False
             elif mobileWebScrapeFlag==True:
-                cw.scrapewindow = mobileWebScrapeObj.ScrapeWindow(parent = cw,id = -1, title="SLK Nineteen68 - Mobile Scrapper",browser = browsername,socketIO = socketIO)
+                cw.scrapewindow = mobileWebScrapeObj.ScrapeWindow(parent = cw,id = -1, title="Avo Assure - Mobile Scrapper",browser = browsername,socketIO = socketIO)
                 mobileWebScrapeFlag=False
             elif desktopScrapeFlag==True:
-                cw.scrapewindow = desktopScrapeObj.ScrapeWindow(parent = cw,id = -1, title="SLK Nineteen68 - Desktop Scrapper",filePath = browsername,socketIO = socketIO,irisFlag = irisFlag)
+                cw.scrapewindow = desktopScrapeObj.ScrapeWindow(parent = cw,id = -1, title="Avo Assure - Desktop Scrapper",filePath = browsername,socketIO = socketIO,irisFlag = irisFlag)
                 desktopScrapeFlag=False
                 browsername = ''
             elif sapScrapeFlag==True:
-                cw.scrapewindow = sapScrapeObj.ScrapeWindow(parent = cw,id = -1, title="SLK Nineteen68 - SAP Scrapper",filePath = browsername,socketIO = socketIO,irisFlag = irisFlag)
+                cw.scrapewindow = sapScrapeObj.ScrapeWindow(parent = cw,id = -1, title="Avo Assure - SAP Scrapper",filePath = browsername,socketIO = socketIO,irisFlag = irisFlag)
                 sapScrapeFlag=False
             elif oebsScrapeFlag==True:
-                cw.scrapewindow = oebsScrapeObj.ScrapeDispatcher(parent = cw,id = -1, title="SLK Nineteen68 - Oebs Scrapper",filePath = browsername,socketIO = socketIO,irisFlag = irisFlag)
+                cw.scrapewindow = oebsScrapeObj.ScrapeDispatcher(parent = cw,id = -1, title="Avo Assure - Oebs Scrapper",filePath = browsername,socketIO = socketIO,irisFlag = irisFlag)
                 oebsScrapeFlag=False
             elif pdfScrapeFlag==True:
-                cw.scrapewindow = pdfScrapeObj.ScrapeDispatcher(parent = cw,id = -1, title="SLK Nineteen68 - PDF Scrapper",filePath = browsername,socketIO = socketIO,irisFlag = irisFlag)
+                cw.scrapewindow = pdfScrapeObj.ScrapeDispatcher(parent = cw,id = -1, title="Avo Assure - PDF Scrapper",filePath = browsername,socketIO = socketIO,irisFlag = irisFlag)
                 pdfScrapeFlag=False
             elif debugFlag == True:
                 cw.debugwindow = clientwindow.DebugWindow(parent = cw,id = -1, title="Debugger")
@@ -1342,8 +1342,8 @@ class Main():
                     core_utils.get_all_the_imports('Web')
                     core_utils.get_all_the_imports('WebScrape')
                     sys.coinit_flags = 2
-                    import Nineteen68_WebScrape
-                    cw.scrapewindow = Nineteen68_WebScrape.ScrapeWindow(parent = cw,id = -1, title="SLK Nineteen68 - Web Scrapper",browser = browsername,socketIO = socketIO,action=action,data=data,irisFlag = irisFlag)
+                    import web_scrape
+                    cw.scrapewindow = web_scrape.ScrapeWindow(parent = cw,id = -1, title="Avo Assure - Web Scrapper",browser = browsername,socketIO = socketIO,action=action,data=data,irisFlag = irisFlag)
                     browsername = ''
                 else:
                     import pause_display_operation
@@ -1351,16 +1351,16 @@ class Main():
                     flag,inputvalue = o.getflagandinput()
                     if flag == 'pause':
                         #call pause logic
-                        cw.pausewindow = pause_display_operation.Pause(parent = None,id = -1, title="SLK Nineteen68 - Pause")
+                        cw.pausewindow = pause_display_operation.Pause(parent = None,id = -1, title="Avo Assure - Pause")
                     elif flag == 'display':
                         #call display logic
-                        cw.pausewindow = pause_display_operation.Display(parent = cw,id = -1, title="SLK Nineteen68 - Display Variable",input = inputvalue)
+                        cw.pausewindow = pause_display_operation.Display(parent = cw,id = -1, title="Avo Assure - Display Variable",input = inputvalue)
                     elif flag == 'debug':
                         #call debug logic
-                        cw.pausewindow = pause_display_operation.Debug(parent = cw,id = -1, title="SLK Nineteen68 - Debug Mode",input = inputvalue)
+                        cw.pausewindow = pause_display_operation.Debug(parent = cw,id = -1, title="Avo Assure - Debug Mode",input = inputvalue)
                     elif flag == 'error':
                         #call debug error logic
-                        cw.pausewindow = pause_display_operation.Error(parent = cw,id = -1, title="SLK Nineteen68 - Debug Mode",input = inputvalue)
+                        cw.pausewindow = pause_display_operation.Error(parent = cw,id = -1, title="Avo Assure - Debug Mode",input = inputvalue)
         except Exception as e:
             log.error(e,exc_info=True)
 

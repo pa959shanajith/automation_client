@@ -18,7 +18,7 @@ def test_cython(f):
         print(e)
 
 print("Cython test initiated....")
-cwd = os.getcwd() + os.sep + "Nineteen68" + os.sep
+cwd = os.getcwd() + os.sep + "AvoAssure" + os.sep
 print("\nCurrent working location: "+cwd)
 cython_error = open('../cython_error.txt','w+')
 for root, dirs, files in os.walk(cwd):

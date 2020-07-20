@@ -1,9 +1,9 @@
 ![Build Status](https://dev.azure.com/dimensionlabs/Nineteen68/_apis/build/status/Nineteen68?branchName=master)
 
-# Nineteen68 Version 2.0
+# Avo Assure Version 2.0
 
 ## Technologies Used
-* `Nineteen68 Executor`
+* `Avo Assure Executor`
     * Python 3.7.0 - Entire Core Development
     * Plugin Development 
 * `UX`
@@ -11,16 +11,14 @@
 * `Web Server and Backend`
     * Nodejs
     * ExpressJS
-    * Cassandra-driver
 * `Database`
-    * Cassandra v2.1
+    * Mongo v4.2.0
     * Redis v3.2.1
-    * Neo4j 3.4.1
 
 ### Core Development
 
 ### Package Changes for 32 bit support
-* All the packages used in 64 bit to support Nineteen68 have been installed in 32 bit setup.
+* All the packages used in 64 bit to support Avo Assure have been installed in 32 bit setup.
 
 * Following are the few packages that has been installed in 32 bit which are different in version used in 64 bit :
     * 64 bit packages

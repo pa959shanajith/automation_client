@@ -750,7 +750,6 @@ class BrowserKeywords():
                 #parent_handle=all_handles[0]
                 local_bk.recent_handles=[a for a in local_bk.recent_handles if a not in invalid_handles]
                 if len(local_bk.recent_handles)>0:
-                    ## Fix Nineteen68#1278
                     if local_bk.driver_obj.current_window_handle != local_bk.recent_handles[-1]:
                         local_bk.driver_obj.switch_to.window(local_bk.recent_handles[-1])
             except Exception as e:
