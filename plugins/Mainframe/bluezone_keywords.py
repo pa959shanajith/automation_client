@@ -357,7 +357,7 @@ class BluezoneKeywords:
                         output=jobno
                     else:
                         content = self.host.ReadScreen(buffer_var,8,21,25)
-                        log.debug('Job Number :',jobno)
+                        log.debug('Job Number :' + str(jobno))
                         jobno = content[1]
                         self.host.WaitReady(10,1000)
                         self.host.SendKeys(MAINFRAME_KEY_ENTER)
@@ -798,7 +798,7 @@ class BluezoneAPIKeywords:
                             jobno = dataTransmitter("gettext", 8, 1, 25)
                             dataTransmitter("sendvalue", MAINFRAME_KEY_ENTER)
                         jobno = jobno["ret"]
-                        log.debug('Job Number: ',jobno)
+                        log.debug('Job Number: ' + str(jobno))
                         return_value = 0
                         output = jobno
                     else:
