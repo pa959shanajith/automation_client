@@ -1446,7 +1446,7 @@ class MobileOpeartions():
 
 
 
-##    def start_server_nineteen68(self):
+##    def start_server_avo_assure(self):
 ##        path = 'D:/AWS/node_modules/node_modules/appium/build/lib/main.js'
 ##        nodePath = 'D:/AWS/node.exe'
 ##        proc = subprocess.Popen([nodePath, path], shell=False, stdin=None, stdout=None, stderr=None, close_fds=True)

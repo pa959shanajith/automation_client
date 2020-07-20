@@ -65,7 +65,7 @@ class BrowserKeywords():
         try:
 ##            maindir = os.getcwd()
 ##            os.chdir('..')
-            curdir = os.environ["NINETEEN68_HOME"]
+            curdir = os.environ["AVO_ASSURE_HOME"]
             if(SYSTEM_OS!='Darwin'):
                 path = curdir + '/plugins/Mobility/MobileApp/node_modules/appium/build/lib/main.js'
                 nodePath = curdir + "/Lib/Drivers/node.exe"
@@ -155,7 +155,7 @@ class BrowserKeywords():
             except Exception as e:
                 err_msg = 'ERROR OCURRED WHILE OPENING BROWSER'
                 if SYSTEM_OS == 'Darwin':
-                    curdir = os.environ["NINETEEN68_HOME"]
+                    curdir = os.environ["AVO_ASSURE_HOME"]
                     path_node_modules = curdir + '/plugins/Mobility/node_modules'
                     if not os.path.exists(path_node_modules):
                         logger.print_on_console(

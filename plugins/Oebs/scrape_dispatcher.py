@@ -32,7 +32,7 @@ class ScrapeDispatcher(wx.Frame):
         wx.Frame.__init__(self, parent, title=title,
                    pos=(300, 150),  size=(210, 180) ,style = wx.CAPTION|wx.CLIP_CHILDREN )
         self.SetBackgroundColour('#e6e7e8')
-        self.iconpath = os.environ["IMAGES_PATH"] + "/slk.ico"
+        self.iconpath = os.environ["IMAGES_PATH"] + "/avo.ico"
         self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
         global obj
         obj = utils.Utils()
@@ -129,7 +129,7 @@ class ScrapeDispatcher(wx.Frame):
             except Exception as e:
                 logger.print_on_console('Error occured while capturing Screenshot',e)
 
-            #10 is the limit of MB set as per Nineteen68 standards
+            #10 is the limit of MB set as per Avo Assure standards
             if self.core_utilsobject.getdatasize(str(d),'mb') < 10:
                 self.socketIO.emit('scrape',d)
             else:
@@ -164,7 +164,7 @@ class ScrapeDispatcher(wx.Frame):
         except Exception as e:
             logger.print_on_console('Error occured while capturing Screenshot ',e)
 
-        #10 is the limit of MB set as per Nineteen68 standards
+        #10 is the limit of MB set as per Avo Assure standards
         if self.core_utilsobject.getdatasize(str(d),'mb') < 10:
             self.socketIO.emit('scrape',d)
         else:

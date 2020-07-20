@@ -3,8 +3,8 @@ from pdfkitlib_override import pdfkit
 import logger
 import logging
 log = logging.getLogger('generatepdf_batch.py')
-template_path = os.environ["NINETEEN68_HOME"] + "/plugins/PdfReport/template.html"
-report_path = os.environ["NINETEEN68_HOME"] + "/plugins/PdfReport/report.json"
+template_path = os.environ["AVO_ASSURE_HOME"] + "/plugins/PdfReport/template.html"
+report_path = os.environ["AVO_ASSURE_HOME"] + "/plugins/PdfReport/report.json"
 
 class WatchThread(threading.Thread):
     def __init__(self, wxObj, source, target):
@@ -94,7 +94,7 @@ class GeneratePDFReportBatch(wx.Frame):
 
         global pdfkit_conf
         pdfkit_conf = conf
-        self.SetIcon(wx.Icon(os.environ["IMAGES_PATH"] + "/slk.ico", wx.BITMAP_TYPE_ICO))
+        self.SetIcon(wx.Icon(os.environ["IMAGES_PATH"] + "/avo.ico", wx.BITMAP_TYPE_ICO))
 
         self.watchThread = None
         self.started = False

@@ -152,7 +152,7 @@ class DeadcodeIdentifier():
 
 	def pmdCall(self,language,pathToFile):
 		if SYSTEM_OS=='Darwin':
-			os.chdir(os.environ['NINETEEN68_HOME']+'/lib/python2.7/site-packages/PMD/deadcode_identifier')
+			os.chdir(os.environ['AVO_ASSURE_HOME']+'/lib/python2.7/site-packages/PMD/deadcode_identifier')
 			subprocess.call(['java', '-classpath', './lib/*:.' ,'src.DD' ,str(language) , pathToFile],shell=False)
 		else:
 			os.chdir(r'./Lib/site-packages/PMD/deadcode_identifier')
@@ -168,7 +168,7 @@ class DeadcodeIdentifier():
 					flag = False
 				root = dataStructDeadCode.start()
 				os.remove('./ASTTree.txt')
-				os.chdir(os.environ["NINETEEN68_HOME"])
+				os.chdir(os.environ["AVO_ASSURE_HOME"])
 				if root:
 					logger.print_on_console(filename)
 					filePath = os.path.abspath(filename)

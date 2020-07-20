@@ -25,7 +25,7 @@ if SYSTEM_OS != 'Darwin':
 vertical = []
 horizontal = []
 verifyexists = []
-TESSERACT_PATH = os.environ["NINETEEN68_HOME"] + '/Lib/Tesseract-OCR'
+TESSERACT_PATH = os.environ["AVO_ASSURE_HOME"] + '/Lib/Tesseract-OCR'
 TESSERACT_PATH_EXISTS = os.path.isdir(TESSERACT_PATH)
 
 def remove_duplicates(lines):

@@ -44,7 +44,7 @@ class ICEToken():
 
     """ Registration window for token """
     def token_window(self,parent,images_path):
-        self.tokenwindow=Token_window(parent = parent, id = -1, title="Nineteen68 Registration",images_path=images_path)
+        self.tokenwindow=Token_window(parent = parent, id = -1, title="Avo Assure ICE Registration",images_path=images_path)
 
     """ Registration window for token """
     def kill_window(self):
@@ -72,9 +72,9 @@ class ICEToken():
     def get_token_folder(self):
         token_folder=None
         if sys.platform=="win32":
-            token_folder=os.getenv("LOCALAPPDATA")+os.sep+"Nineteen68"
+            token_folder=os.getenv("LOCALAPPDATA")+os.sep+"AvoAssure"
         elif sys.platform.lower()=="darwin":
-            token_folder=os.environ['HOME']+os.sep+".Local"+os.sep+"Nineteen68"
+            token_folder=os.environ['HOME']+os.sep+".Local"+os.sep+"AvoAssure"
         else:
             print(sys.platform+" platform yet to be supported")
         return token_folder
@@ -86,7 +86,7 @@ class Token_window(wx.Frame):
             wx.Frame.__init__(self, parent=None, title=title, pos=(300, 150), size=(210, 180), style = wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER  |wx.MAXIMIZE_BOX | wx.CLOSE_BOX))
             self.SetBackgroundColour('#e6e7e8')
             self.parent=parent
-            self.iconpath = images_path +"slk.ico"
+            self.iconpath = images_path +"avo.ico"
             self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
             self.SetIcon(self.wicon)
             self.panel = wx.Panel(self)

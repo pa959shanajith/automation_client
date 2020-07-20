@@ -23,7 +23,7 @@ import wx.lib.buttons as btn
 from PIL import ImageGrab
 import win32gui
 
-IMAGES_PATH = os.environ["NINETEEN68_HOME"] + "/assets/Images/"
+IMAGES_PATH = os.environ["AVO_ASSURE_HOME"] + "/assets/Images/"
 os.environ["IMAGES_PATH"] = IMAGES_PATH
 
 pageToFind = ''
@@ -60,8 +60,8 @@ class PDFViewer(sc.SizedFrame):
             super(PDFViewer, self).__init__(parent, **kwds)
             global eleList
             eleList = []
-            # Adding slk icon to window
-            self.iconpath = IMAGES_PATH+"slk.ico"
+            # Adding avo icon to window
+            self.iconpath = IMAGES_PATH+"avo.ico"
             self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
             self.SetIcon(self.wicon)
 

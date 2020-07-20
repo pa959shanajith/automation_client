@@ -25,8 +25,7 @@ class RadioCheckboxKeywords():
 
     def __init__(self):
         self.utilobj=utilweb_operations.UtilWebKeywords()
-        self.status={'radio':'Selected',
-                    'checkbox':'Checked'}
+        self.status = { 'radio': 'Selected', 'checkbox': 'Checked' }
         local_rco.log = logging.getLogger('radio_checkbox_operations.py')
 
     def __element_disabled(self):
@@ -244,16 +243,16 @@ class RadioCheckboxKeywords():
             cell=table_keywords_obj.javascriptExecutor(element,row_number-1,col_number-1)
             element_list=cell.find_elements_by_xpath('.//*')
             for member in element_list:
-                  js1='function getElementXPath(elt) {var path = "";for (; elt && elt.nodeType == 1; elt = elt.parentNode){idx = getElementIdx(elt);xname = elt.tagName;if (idx >= 1){xname += "[" + idx + "]";}path = "/" + xname + path;}return path;}function getElementIdx(elt){var count = 1;for (var sib = elt.previousSibling; sib ; sib = sib.previousSibling){if(sib.nodeType == 1 && sib.tagName == elt.tagName){count++;}}return count;}return getElementXPath(arguments[0]).toLowerCase();'
-                  xpath=browser_Keywords.local_bk.driver_obj.execute_script(js1,member)
-                  cellChild = browser_Keywords.local_bk.driver_obj.find_element_by_xpath(xpath)
-                  tagName = cellChild.tag_name
-                  tagType = cellChild.get_attribute('type')
-                  xpath_elements=xpath.split('/')
-                  lastElement=xpath_elements[len(xpath_elements)-1]
-                  childindex=lastElement[lastElement.find("[")+1:lastElement.find("]")]
-                  childindex = int(childindex)
-                  if (tag.lower()=='dropdown' or tag.lower()=='listbox') and tagName=='select':
+                js1='function getElementXPath(elt) {var path = "";for (; elt && elt.nodeType == 1; elt = elt.parentNode){idx = getElementIdx(elt);xname = elt.tagName;if (idx >= 1){xname += "[" + idx + "]";}path = "/" + xname + path;}return path;}function getElementIdx(elt){var count = 1;for (var sib = elt.previousSibling; sib ; sib = sib.previousSibling){if(sib.nodeType == 1 && sib.tagName == elt.tagName){count++;}}return count;}return getElementXPath(arguments[0]).toLowerCase();'
+                xpath=browser_Keywords.local_bk.driver_obj.execute_script(js1,member)
+                cellChild = browser_Keywords.local_bk.driver_obj.find_element_by_xpath(xpath)
+                tagName = cellChild.tag_name
+                tagType = cellChild.get_attribute('type')
+                xpath_elements=xpath.split('/')
+                lastElement=xpath_elements[len(xpath_elements)-1]
+                childindex=lastElement[lastElement.find("[")+1:lastElement.find("]")]
+                childindex = int(childindex)
+                if (tag.lower()=='dropdown' or tag.lower()=='listbox') and tagName=='select':
                     multiSelect=cellChild.get_attribute('multiple')
                     if multiSelect!=None and (multiSelect=='true' or multiSelect=='multiple'):
                           if index==childindex:
@@ -275,34 +274,32 @@ class RadioCheckboxKeywords():
                                 else:
                                     counter+=1
 
-                  elif tag.lower()=='checkbox' or tag.lower()=='radio':
+                elif tag.lower()=='checkbox' or tag.lower()=='radio':
                     if tagName=='input' and tagType=='radio':
                         if index==childindex:
-                                eleStatus =True
+                            eleStatus =True
                         else:
-                                if counter==index:
-                                    index =childindex
-                                    eleStatus =True
-                                else:
-                                    counter+=1
-                    elif tagName=='input' and tagType=='checkbox':
-                            if index==childindex:
-                                    eleStatus =True
+                            if counter==index:
+                                index =childindex
+                                eleStatus =True
                             else:
-                                    if counter==index:
-                                        index =childindex
-                                        eleStatus =True
-                                    else:
-                                        counter+=1
+                                counter+=1
+                    elif tagName=='input' and tagType=='checkbox':
+                        if index==childindex:
+                            eleStatus =True
+                        else:
+                            if counter==index:
+                                index =childindex
+                                eleStatus =True
+                            else:
+                                counter+=1
                   else:
-                            #Nineteen68#1626: commented next line, as because of this, loop was not going into next iteration
-                            #eleStatus=True
-                            continue
-
+                        # Commented next line, as because of this, loop was not going into next iteration
+                        # eleStatus=True
+                        continue
                   if eleStatus==True:
                     actualElement=cellChild
                     break
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
-
         return actualElement

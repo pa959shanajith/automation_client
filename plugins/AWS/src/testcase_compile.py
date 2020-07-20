@@ -209,7 +209,7 @@ log=logging.getLogger('test_scenario.py')\n"""
     def make_zip(self,pytest_files):
         """
         Purpose : Converting test_bundle folder  into .zip file
-        pytest_files : List of all the pytest file generated from Nineteen68 which is to be
+        pytest_files : List of all the pytest file generated from Avo Assure which is to be
                       sent to AWS
 
         By-default : Test_Bundle is the folder in which required tests and python wheel

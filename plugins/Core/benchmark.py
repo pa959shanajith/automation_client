@@ -31,6 +31,7 @@ def init(times,socket):
     socketIO = socket
     if len(threadNames) is not 0:
         stop(False)
+    times = []
     display_str = "Benchmark Execution Scheduled at "
     for i in range(len(times)):
         timeNow =  datetime.datetime.today()

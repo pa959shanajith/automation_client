@@ -249,7 +249,7 @@ class BodyGenarator():
                 serverCerificate_pass =obj.aes_decript(serverCerificate_pass)
                 trust_cert= obj.extract_jks(serverCertificate,serverCerificate_pass.encode('utf-8'))
                 if trust_cert:
-                    trust_cert_path = os.environ["NINETEEN68_HOME"]+'\\TRUSTSTORECERT.pem'
+                    trust_cert_path = os.environ["AVO_ASSURE_HOME"]+'\\TRUSTSTORECERT.pem'
                     resp = requests.get(wsdl, auth=HTTPBasicAuth(auth_uname, auth_pass),verify=trust_cert_path)
                     status_code = resp.status_code
             else:
@@ -260,7 +260,7 @@ class BodyGenarator():
                 serverCerificate_pass =obj.aes_decript(serverCerificate_pass)
                 trust_cert= obj.extract_jks(serverCertificate,serverCerificate_pass.encode('utf-8'))
                 if trust_cert:
-                    trust_cert_path = os.environ["NINETEEN68_HOME"]+'\\TRUSTSTORECERT.pem'
+                    trust_cert_path = os.environ["AVO_ASSURE_HOME"]+'\\TRUSTSTORECERT.pem'
                     resp = requests.get(wsdl, verify=trust_cert_path)
                     status_code = resp.status_code
             else:

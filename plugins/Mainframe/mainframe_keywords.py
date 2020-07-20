@@ -40,8 +40,8 @@ import logging
 log = logging.getLogger('mainframe_keywords.py')
 
 #added the below code for the bug:FHN#1982
-NINETEEN68_HOME = os.environ["NINETEEN68_HOME"]
-mainframe_api=NINETEEN68_HOME+"plugins/Mainframe/nineteen68MFapi.exe"
+AVO_ASSURE_HOME = os.environ["AVO_ASSURE_HOME"]
+mainframe_api=AVO_ASSURE_HOME+"plugins/Mainframe/AvoAssureMFapi.exe"
 class MainframeKeywords:
 
     def __init__(self):

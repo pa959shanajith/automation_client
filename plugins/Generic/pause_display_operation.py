@@ -29,7 +29,7 @@ class Pause(wx.Frame):
         self.SetBackgroundColour('#e6e7e8')
         self.panel = wx.Panel(self)
         self.sizer = wx.GridBagSizer(1, 2)
-        self.iconpath = os.environ["IMAGES_PATH"] + "/slk.ico"
+        self.iconpath = os.environ["IMAGES_PATH"] + "/avo.ico"
         self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
         self.SetIcon(self.wicon)
 
@@ -74,10 +74,10 @@ class Pause(wx.Frame):
 
 class Display(wx.Frame):
     def __init__(self, parent, id,title,input):
-        wx.Frame.__init__(self, parent, title="Nineteen68 - DisplayValue",   size=(400, 300),style=wx.STAY_ON_TOP|wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER |wx.MAXIMIZE_BOX|wx.CLOSE_BOX))
+        wx.Frame.__init__(self, parent, title="Avo Assure ICE - DisplayValue",   size=(400, 300),style=wx.STAY_ON_TOP|wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER |wx.MAXIMIZE_BOX|wx.CLOSE_BOX))
         self.SetBackgroundColour('#e6e7e8')
         self.panel = wx.Panel(self)
-        self.iconpath = os.environ["IMAGES_PATH"] + "/slk.ico"
+        self.iconpath = os.environ["IMAGES_PATH"] + "/avo.ico"
         self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
         self.SetIcon(self.wicon)
         self.t = wx.TextCtrl(self.panel, wx.ID_ANY,  size=(380, 200),  style = wx.TE_MULTILINE|wx.TE_READONLY)
@@ -173,7 +173,7 @@ class Debug(wx.Frame):
         self.SetBackgroundColour('#e6e7e8')
         self.panel = wx.Panel(self)
         self.sizer = wx.BoxSizer(wx.VERTICAL)
-        self.iconpath = os.environ["IMAGES_PATH"] + "/slk.ico"
+        self.iconpath = os.environ["IMAGES_PATH"] + "/avo.ico"
         self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
         self.SetIcon(self.wicon)
         label="Debug Paused!! Web Element '"+str(input[0]['custname'])+"' not found in step num"+str(input[0]['stepnum'])
@@ -225,7 +225,7 @@ class Error(wx.Frame):
         self.SetBackgroundColour('#e6e7e8')
         self.panel = wx.Panel(self)
         self.sizer = wx.BoxSizer(wx.VERTICAL)
-        self.iconpath = os.environ["IMAGES_PATH"] + "/slk.ico"
+        self.iconpath = os.environ["IMAGES_PATH"] + "/avo.ico"
         self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
         self.SetIcon(self.wicon)
         label="The newly added object is of "+str(input['newtype'])+" and existing object is of "+str(input['custtype'])

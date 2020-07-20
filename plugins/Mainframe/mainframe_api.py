@@ -509,7 +509,7 @@ if __name__ == '__main__':
     host = 'localhost'
     port = 10001
     DATA_EOF = "$r^mB@$"
-    print('Nineteen68 Mainframe API started...')
+    print('Avo Assure Mainframe API started...')
     fail_status = {"stat": -1, "emsg": "Something went wrong."}
     keyword_dict = None
     try:

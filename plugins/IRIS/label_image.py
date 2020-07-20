@@ -78,11 +78,11 @@ class LabelImage():
     def start(self,view):
         try:
             if SYSTEM_OS=='Darwin':
-                model_file = os.environ['NINETEEN68_HOME'] + '/lib/python2.7/site-packages/prediction/retrained_graph.pb'
-                label_file = os.environ['NINETEEN68_HOME'] + '/lib/python2.7/site-packages/prediction/retrained_labels.txt'
+                model_file = os.environ['AVO_ASSURE_HOME'] + '/lib/python2.7/site-packages/prediction/retrained_graph.pb'
+                label_file = os.environ['AVO_ASSURE_HOME'] + '/lib/python2.7/site-packages/prediction/retrained_labels.txt'
             else:
-                model_file = os.environ['NINETEEN68_HOME'] + '/Lib/site-packages/prediction/retrained_graph.pb'
-                label_file = os.environ['NINETEEN68_HOME'] + '/Lib/site-packages/prediction/retrained_labels.txt'
+                model_file = os.environ['AVO_ASSURE_HOME'] + '/Lib/site-packages/prediction/retrained_graph.pb'
+                label_file = os.environ['AVO_ASSURE_HOME'] + '/Lib/site-packages/prediction/retrained_labels.txt'
             input_height = 299
             input_width = 299
             input_mean = 0
@@ -99,7 +99,7 @@ class LabelImage():
             prediction_results = {}
 
             labels = load_labels(label_file)
-            file_name = os.environ['NINETEEN68_HOME'] + '/test.png'
+            file_name = os.environ['AVO_ASSURE_HOME'] + '/test.png'
 
             with tf.Session(graph=graph) as sess:
                 for obj in view:

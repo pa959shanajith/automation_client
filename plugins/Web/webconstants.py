@@ -1,9 +1,9 @@
 import os
 from constants import SYSTEM_OS
 
-drivers_path = os.path.join(os.environ["NINETEEN68_HOME"], "lib", "Drivers")
+drivers_path = os.path.join(os.environ["AVO_ASSURE_HOME"], "lib", "Drivers")
 
-assets_path = os.environ["NINETEEN68_HOME"] + os.sep + "assets"
+assets_path = os.environ["AVO_ASSURE_HOME"] + os.sep + "assets"
 
 GET_XPATH_JS="""function getElementXPath(elt) {var path = "";for (; elt && elt.nodeType == 1; elt = elt.parentNode){idx = getElementIdx(elt);xname = elt.tagName;if (idx >= 1){xname += "[" + idx + "]";}path = "/" + xname + path;}return path;}function getElementIdx(elt){var count = 1;for (var sib = elt.previousSibling; sib ; sib = sib.previousSibling){if(sib.nodeType == 1 && sib.tagName == elt.tagName){count++;}}return count;}return getElementXPath(arguments[0]).toLowerCase();"""
 
