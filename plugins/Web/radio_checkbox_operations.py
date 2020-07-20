@@ -293,11 +293,11 @@ class RadioCheckboxKeywords():
                                 eleStatus =True
                             else:
                                 counter+=1
-                  else:
-                        # Commented next line, as because of this, loop was not going into next iteration
-                        # eleStatus=True
-                        continue
-                  if eleStatus==True:
+                else:
+                    # Commented next line, as because of this, loop was not going into next iteration
+                    # eleStatus=True
+                    continue
+                if eleStatus==True:
                     actualElement=cellChild
                     break
         except Exception as e:
