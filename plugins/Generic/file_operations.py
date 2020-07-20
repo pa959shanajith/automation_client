@@ -1313,7 +1313,7 @@ class FileOperations:
         """
         def : cell_by_cell_compare
         purpose : compares the data of given sheets of 2 different excel files and write down the result in another result sheet.
-        param : input_path1<>sheet1;input_path2<>sheet2
+        param : input : input_path1<>sheet1;input_path2<>sheet2 output: input_path<>sheet(optional);desc(optional)
         return : bool
         """
         status=False
