@@ -493,8 +493,10 @@ class Controller():
             display_keyword_response=result_temp[2]
         if tsp.name.lower()=='verifyvalues':
             display_keyword_response=[result[1]]
-        if tsp.name.lower()=='verifytextiris':
+        elif tsp.name.lower()=='verifytextiris':
             display_keyword_response=result[1]
+        elif tsp.name.lower()=='find':
+            keyword_response=result[1]
 		#To Handle dynamic variables of DB keywords
         if tsp.name.lower() in DATABASE_KEYWORDS:
             if keyword_response != []:
@@ -567,6 +569,9 @@ class Controller():
                 logger.print_on_console('Result obtained is: ',result[2])
             elif result:
                 logger.print_on_console('Result obtained is: ',result[1])
+        if tsp.name.lower()=='find':
+            keyword_response=result[1]
+            result = result[:1] + (result[2],) + result[2:]
         if len(output)>0 and output[0] != '':
             self.dynamic_var_handler_obj.store_dynamic_value(output[0],keyword_response,tsp.name)
         if len(output)>1:

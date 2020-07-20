@@ -582,7 +582,7 @@ class Singleton_DriverUtil():
 ##                    driver_instance =self.driver('2')
 ##                    return driver_instance
 
-    def chech_if_driver_exists_in_map(self,browserType):
+    def check_if_driver_exists_in_map(self,browserType):
         d = None
 ##        drivermap.reverse()
         if browserType == '1':

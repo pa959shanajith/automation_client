@@ -273,7 +273,7 @@ class StringOperation:
         def : find
         purpose : to find if string conatins another string
         param  : string , string
-        return : boolean
+        return : integers or list of integers
         """
         status=generic_constants.TEST_RESULT_FAIL
         result=generic_constants.TEST_RESULT_FALSE
@@ -288,8 +288,8 @@ class StringOperation:
                     actual_string=unidecode(actual_string)
                     to_find=coreutilsobj.get_UTF_8(to_find)
                     #output_val = actual_string.find(to_find)
-                    for m in re.finditer(to_find,actual_string):
-                        position.append(m.start())
+                    for m in re.finditer("(?=("+to_find+"))",actual_string):
+                        position.append(m.start()+1)
                     output_val = len(position)
                     if len(position) == 1: position=position[0]
                     if(output_val == 0):

@@ -147,6 +147,7 @@ class ClientWindow(wx.Frame):
         self.rbox.Bind(wx.EVT_RADIOBOX,self.onRadioBox)
         self.breakpoint = wx.TextCtrl(self.panel, wx.ID_ANY, pos=(225, 595), size=(60,20), style = wx.TE_RICH)
         box.Add(self.breakpoint, 1, wx.ALL|wx.EXPAND, 5)
+        self.breakpoint.Bind(wx.EVT_CHAR, self.handle_keypress)
         self.breakpoint.Disable()
 
         self.cancelbutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap(IMAGES_PATH +"killStaleProcess.png", wx.BITMAP_TYPE_ANY), wx.Point(360, 555), wx.Size(50, 42))
@@ -173,6 +174,10 @@ class ClientWindow(wx.Frame):
         self.panel.SetSizer(self.sizer)
         self.Centre()
         self.Show()
+
+    """ Allows only integer values + directional keys """
+    def handle_keypress(self, event):
+        if chr(event.GetKeyCode()) in '0123456789\x08\x09ĺĽĻļĹĸŷŸŹźŻž\x7f': event.Skip()
 
     """
     Menu Items:
@@ -871,11 +876,9 @@ class Config_window(wx.Frame):
         wx.Frame(self.panel)
         self.Show()
 
-    #allows only integer and float values 
+    """ Allows only integer and float values + directional keys"""
     def handle_keypress(self, event):
-        keycode = event.GetKeyCode()
-        if chr(keycode) in ['0','1','2','3','4','5','6','7','8','9','.','\x08','ĺ','ļ','Ĺ','ĸ','\x7f']:
-            event.Skip()
+        if chr(event.GetKeyCode()) in '0123456789.\x08\x09ĺĽĻļĹĸŷŸŹźŻž\x7f': event.Skip()
 
     def toggle1_generic(self,evt):
         self.demo=evt.EventObject
