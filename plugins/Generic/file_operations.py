@@ -1208,8 +1208,12 @@ class FileOperations:
     def write_result_file(self,input_sheet,content):
 
         '''
-        Writing the compare results into the specified file, supporting xls and xlsx extension
+        def : write_result_file
+        purpose : Writing the compare results into the specified file, supporting xls and xlsx extension.
+        param : input_path<>sheet;desc(Description: Details status )
+        return : bool
         '''
+        
         status=False
         err_msg=None
         try:
@@ -1246,6 +1250,7 @@ class FileOperations:
                             work_sheet.col(int(column)).width = max_col_width
                     work_book.set_active_sheet(index_sheet)
                     work_book.save(input_path)
+                    del column,row,max_col_width,adjusted_width,value
                     status=True              
         
                 elif(file_ext=='.xlsx'):
@@ -1287,6 +1292,7 @@ class FileOperations:
                             sheet.column_dimensions[get_column_letter(int(column)+1)].width = max_col_width
                     wb.active=index_sheet
                     wb.save(input_path)
+                    del column,row,max_col_width,adjusted_width,value
                     status=True
             else:
                 err_msg=result3[3]
@@ -1299,18 +1305,21 @@ class FileOperations:
             err_msg='Writing to Excel Sheet Failed'
             log.error(e)
         log.info('Status is '+str(status))
+        del input_path,sheetname,result3,file_ext,rb,work_book,work_sheet,index_sheet,wb,sheet_names
         return status,err_msg
 
-    def compare_write_content(self,input1,*args):
+    def cell_by_cell_compare(self,input1,*args):
     
         """
-        def : compare_write_content
+        def : cell_by_cell_compare
         purpose : compares the data of given sheets of 2 different excel files and write down the result in another result sheet.
-        param : input_path1,input_path2,input_path3,Sheet1,Sheet2,Sheet3
+        param : input_path1<>sheet1;input_path2<>sheet2
         return : bool
         """
         status=False
         err_msg=None
+        methodoutput=TEST_RESULT_FALSE
+        output_res=OUTPUT_CONSTANT
         desc=None
         collect_content={}
         log.debug('Comparing content cell by cell of .xls files ')
@@ -1362,13 +1371,13 @@ class FileOperations:
                             if output_filed[1].lower()=='desc':
                                 collect_content[colnum].append(desc)
                             else:
-                                collect_content[colnum].append(status)
+                                collect_content[colnum].append(output)
                         else:
                             if output_filed[1].lower()=='desc':
                                 collect_content[colnum].append(desc)
                             else:
-                                collect_content[colnum].append(status)
-                        
+                                collect_content[colnum].append(output)
+                del rownum,colnum,desc,output,c1,c2      
                 status, err_msg=self.write_result_file(output_filed[0],collect_content)
             else:
                 err_msg=result1[3]
@@ -1376,6 +1385,7 @@ class FileOperations:
                     err_msg=result2[3]
             if err_msg==None:
                 status=True
+                methodoutput=TEST_RESULT_TRUE
             else:
                 status=False
 
@@ -1383,5 +1393,7 @@ class FileOperations:
             err_msg='Error occured in compare content of two files'
             log.error(e)
         log.info('Status is '+str(status))
-        return status,err_msg
+        del row_max,col_max,output_filed,result1,result2,collect_content
+        del input_path1,sheetname1,input_path2,sheetname2,book1,book2
+        return status,methodoutput,output_res,err_msg
 

@@ -147,7 +147,7 @@ class GenericKeywordDispatcher:
             'comparefiles': local_generic.generic_file.compare_files,	
             'beautify': local_generic.generic_file.beautify_file,	
             'compareinputs': local_generic.generic_file.compare_inputs,
-            'comparewriteexcelcontent': local_generic.generic_file.compare_write_content
+            'cellbycellcompare': local_generic.generic_file.cell_by_cell_compare
             }
 	#Call to fetch data in database keywords
     def fetch_data(self,input):
@@ -204,7 +204,7 @@ class GenericKeywordDispatcher:
                             var = str(output[0])[1:len(str(output[0]))-1]
                             output[0] = data[var][0]
                     message.extend(output)
-                if( keyword in ['comparefiles','beautify','compareinputs','comparewriteexcelcontent'] ):	
+                if( keyword in ['comparefiles','beautify','compareinputs','cellbycellcompare'] ):	
                     input = list(message)	
                     output = tsp.outputval	
                     result= self.generic_dict[keyword](input,output)	
