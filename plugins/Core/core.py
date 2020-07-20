@@ -75,12 +75,11 @@ LOGCONFIG_PATH = NINETEEN68_HOME + "/assets/logging.conf"
 DRIVERS_PATH = NINETEEN68_HOME + "/lib/Drivers"
 CHROME_DRIVER_PATH = DRIVERS_PATH + "/chromedriver"
 GECKODRIVER_PATH = DRIVERS_PATH + "/geckodriver"
-EDGE_DRIVER_PATH = DRIVERS_PATH + "/MicrosoftWebDriver"
+EDGE_DRIVER_PATH = DRIVERS_PATH + "/MicrosoftWebDriver.exe"
 EDGE_CHROMIUM_DRIVER_PATH = DRIVERS_PATH + "/msedgedriver"
 if SYSTEM_OS == "Windows":
     CHROME_DRIVER_PATH += ".exe"
     GECKODRIVER_PATH += ".exe"
-    EDGE_DRIVER_PATH += ".exe"
     EDGE_CHROMIUM_DRIVER_PATH += ".exe"
 
 class MainNamespace(BaseNamespace):
@@ -1518,7 +1517,7 @@ def check_browser():
             logger.print_on_console("Error in checking Edge Chromium version")
             log.error("Error in checking Edge Chromium version")
             log.error(e,exc_info=True)
-            
+
         if chromeFlag == True and firefoxFlag == True and edgeFlag == True and chromiumFlag == True:
             logger.print_on_console('Current version of browsers are supported')
         browsercheckFlag = True

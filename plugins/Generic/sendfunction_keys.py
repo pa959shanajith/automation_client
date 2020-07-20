@@ -20,8 +20,6 @@ import time
 from constants import *
 import logging
 import readconfig
-configvalues = readconfig.readConfig().readJson()
-delay_stringinput = float(configvalues['delay_stringinput'])
 log = logging.getLogger('sendfunction_keys.py')
 class SendFunctionKeys:
 
@@ -82,7 +80,8 @@ class SendFunctionKeys:
                 count=self.get_args(args)
                 if count == 'type':
                     log.debug('sending the keys in input')
-                    self.type(input,delay_stringinput)
+                    configvalues = readconfig.readConfig().readJson()
+                    self.type(input, float(configvalues['delay_stringinput']))
                 else:
                     if '+' in input:
                         keys_list=input.split('+')
@@ -122,11 +121,12 @@ class SendFunctionKeys:
             for key in keys_list:
                 self.release_key(key)
 
-    def type(self,input,delay_stringinput):
+    def type(self,input,delay_stringinput=None):
         try:
             if SYSTEM_OS == "Darwin":
                 pyautogui.typewrite(str(input))
             else:
+                if delay_stringinput is None: delay_stringinput = 0.005
                 robot=Robot()
                 robot.type_string(str(input),delay_stringinput)
         except Exception as e:

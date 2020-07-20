@@ -157,7 +157,7 @@ class PopupKeywords():
             local_pk.log.debug('Got the driver object from browser keyword class')
             local_pk.log.debug(driver)
             try:
-                text = driver.switch_to_alert().text
+                text = driver.switch_to.alert().text
                 local_pk.log.debug('Popup exists with text : %s', text)
                 return False
             except Exception as e:

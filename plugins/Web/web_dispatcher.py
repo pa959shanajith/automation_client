@@ -433,7 +433,7 @@ class Dispatcher:
                     elif keyword not in [OPEN_BROWSER,OPEN_NEW_BROWSER,CLOSE_BROWSER,GET_POPUP_TEXT,VERIFY_POPUP_TEXT]:
                         if configvalues['retrieveURL'].lower() == 'yes':
                             if result[0].lower() == 'fail':
-                                res,value=self.check_url_error_code()
+                                res,_=self.check_url_error_code()
                                 if res:
                                     result=TERMINATE
                     elif keyword==OPEN_BROWSER:
@@ -461,8 +461,8 @@ class Dispatcher:
             result[3]=err_msg
             result[2]=None
         except Exception as e:
-            local_Wd.log.error(e)
-##            logger.print_on_console('Exception at dispatcher')
+            local_Wd.log.error(e,exc_info=True)
+            # logger.print_on_console('Exception at dispatcher')
         if err_msg!=None:
             local_Wd.log.error(err_msg)
             logger.print_on_console(err_msg)
