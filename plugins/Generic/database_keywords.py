@@ -629,7 +629,7 @@ class DatabaseOperation():
                 self.cnxn = ibm_db_dbi.Connection(cnxn)
             elif dbtype == 6:
                 import cx_Oracle
-                path = os.path.normpath(os.environ["NINETEEN68_HOME"] + "/Lib/instantclient")
+                path = os.path.normpath(os.environ["AVO_ASSURE_HOME"] + "/Lib/instantclient")
                 os.environ["PATH"] += os.pathsep + path
                 host = str(ip)+":"+str(port)+"/"+dbName
                 self.cnxn = cx_Oracle.connect(userName, password, host, encoding="UTF-8")
@@ -670,7 +670,7 @@ class DatabaseOperation():
         try:
             wb = xlwt.Workbook()
             ws = wb.add_sheet(generic_constants.DATABASE_SHEET)
-            maindir = os.environ["NINETEEN68_HOME"]
+            maindir = os.environ["AVO_ASSURE_HOME"]
             path = maindir +'/plugins/Generic' + generic_constants.DATABASE_FILE_XLS
             wb.save(path)
         except Exception as e:
@@ -688,7 +688,7 @@ class DatabaseOperation():
         try:
             wb = xlwt.Workbook()
             ws = wb.add_sheet(generic_constants.DATABASE_SHEET)
-            maindir = os.environ["NINETEEN68_HOME"]
+            maindir = os.environ["AVO_ASSURE_HOME"]
             path = maindir +'/plugins/Generic' + generic_constants.DATABASE_FILE_XLSX
             wb.save(path)
         except Exception as e:
@@ -704,7 +704,7 @@ class DatabaseOperation():
         """
         path=None
         try:
-            maindir = os.environ["NINETEEN68_HOME"]
+            maindir = os.environ["AVO_ASSURE_HOME"]
             path = maindir +'/plugins/Generic' + generic_constants.DATABASE_FILE_CSV
             with open(path,'wb') as file:
                 pass

@@ -1,6 +1,6 @@
 #-------------------------------------------------------------------------------
 # Name:        pdfReportGenerator
-# Purpose:     Generate PDF report form Nineteen68 Reports JSON
+# Purpose:     Generate PDF report form Avo Assure Reports JSON
 #
 # Author:      ranjan.agrawal
 #
@@ -15,7 +15,7 @@ from generatepdf import GeneratePDFReport
 from generatepdf_batch import GeneratePDFReportBatch
 
 pdfkit_conf = None
-wkhtmltopdf_path = os.environ["NINETEEN68_HOME"] + "/Lib/wkhtmltox/bin/wkhtmltopdf.exe"
+wkhtmltopdf_path = os.environ["AVO_ASSURE_HOME"] + "/Lib/wkhtmltox/bin/wkhtmltopdf.exe"
 if os.path.exists(wkhtmltopdf_path):
     pdfkit_conf = pdfkit.configuration(wkhtmltopdf=wkhtmltopdf_path)
 else:

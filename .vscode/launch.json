@@ -1,0 +1,79 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Avo Assure ICE: GUI",
+            "type": "python",
+            "request": "launch",
+            "cwd": "${workspaceRoot}",
+            "program": "${workspaceRoot}/plugins/Core",
+            "console": "integratedTerminal",
+            "env": {
+                "PYTHONDONTWRITEBYTECODE": "1"
+            },
+            "args": [
+                "--AVO_ASSURE_HOME",
+                "${workspaceRoot}",
+            ],
+            "justMyCode": false
+        },
+        {
+            "name": "Avo Assure ICE: CLI - Register",
+            "type": "python",
+            "request": "launch",
+            "cwd": "${workspaceRoot}",
+            "program": "${workspaceRoot}/plugins/Core",
+            "console": "integratedTerminal",
+            "env": {
+                "PYTHONDONTWRITEBYTECODE": "1"
+            },
+            "args": [
+                "--AVO_ASSURE_HOME",
+                "${workspaceRoot}",
+                "--register",
+                "--token",
+                "${workspaceRoot}/cicd_icetoken.txt"
+            ],
+            "justMyCode": false
+        },
+        {
+            "name": "Avo Assure ICE: CLI - Connect",
+            "type": "python",
+            "request": "launch",
+            "cwd": "${workspaceRoot}",
+            "program": "${workspaceRoot}/plugins/Core",
+            "console": "integratedTerminal",
+            "env": {
+                "PYTHONDONTWRITEBYTECODE": "1"
+            },
+            "args": [
+                "--AVO_ASSURE_HOME",
+                "${workspaceRoot}",
+                "--connect"
+            ],
+            "justMyCode": false
+        },
+        {
+            "name": "Avo Assure ICE: CLI - Guest Connect",
+            "type": "python",
+            "request": "launch",
+            "cwd": "${workspaceRoot}",
+            "program": "${workspaceRoot}/plugins/Core",
+            "console": "integratedTerminal",
+            "env": {
+                "PYTHONDONTWRITEBYTECODE": "1"
+            },
+            "args": [
+                "--AVO_ASSURE_HOME",
+                "${workspaceRoot}",
+                "--connect",
+                "--token",
+                "${workspaceRoot}/cicd_icetoken.txt"
+            ],
+            "justMyCode": false
+       }
+    ]
+}

@@ -40,7 +40,7 @@ class Fullscrape():
             log.info(' Inside fullscrape method .....')
             log.info('scrape_option is: %s',scrape_option)
             hwndg = browserops.hwndg
-            maindir = os.environ["NINETEEN68_HOME"]
+            maindir = os.environ["AVO_ASSURE_HOME"]
             screen_shot_path = maindir + '/output/' + domconstants.SCREENSHOT_IMG
             log.info('Obtained browser handle and driver from browserops.py class .....')
             if SYSTEM_OS=='Windows':
@@ -162,7 +162,7 @@ class Fullscrape():
             data['view'] = tempne
             data['mirror'] = screen
             log.info('Creating a json object with key view with value as return data')
-            with open(os.environ["NINETEEN68_HOME"] + '/output/domelements.json', 'w') as outfile:
+            with open(os.environ["AVO_ASSURE_HOME"] + '/output/domelements.json', 'w') as outfile:
                 log.info('Opening domelements.json file to write view object')
                 json.dump(data, outfile, indent=4, sort_keys=False)
                 log.info('view is dumped into  domelements.json file ')

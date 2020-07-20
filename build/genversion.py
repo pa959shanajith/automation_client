@@ -95,7 +95,7 @@ BUILD = env("BUILD_ENV")
 if BUILD=="": BUILD="PROD"
 CBU = env("CBU")
 if CBU=="": CBU="RC"
-BRANCH = env("BRANCH")
+BRANCH = env("TARGET_BRANCH")
 MAJOR_VERSION = env("MAJOR_VERSION")
 MINOR_VERSION = get_minor_ver()
 PATCH_VERSION = get_patch_ver()

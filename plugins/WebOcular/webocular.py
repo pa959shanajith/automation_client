@@ -32,8 +32,8 @@ from axe_selenium_python import Axe
 from selenium.webdriver.firefox.options import Options
 
 SYSTEM_OS=platform.system()
-NINETEEN68_HOME = os.environ["NINETEEN68_HOME"]
-DRIVERS_PATH = NINETEEN68_HOME + "/Lib/Drivers"
+AVO_ASSURE_HOME = os.environ["AVO_ASSURE_HOME"]
+DRIVERS_PATH = AVO_ASSURE_HOME + "/Lib/Drivers"
 GECKODRIVER_PATH = DRIVERS_PATH + "/geckodriver"
 if SYSTEM_OS == "Windows":
     GECKODRIVER_PATH += ".exe"

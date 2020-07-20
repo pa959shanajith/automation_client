@@ -36,7 +36,7 @@ class ScrapeWindow(wx.Frame):
     def __init__(self, parent,id, title,filePath,socketIO):
         wx.Frame.__init__(self, parent, title=title, size=(190, 202), style=wx.DEFAULT_FRAME_STYLE & ~(wx.RESIZE_BORDER|wx.MAXIMIZE_BOX|wx.CLOSE_BOX))
         self.SetBackgroundColour('#e6e7e8')
-        self.iconpath = os.environ["IMAGES_PATH"] + "/slk.ico"
+        self.iconpath = os.environ["IMAGES_PATH"] + "/avo.ico"
         self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
         self.core_utilsobject = core_utils.CoreUtils()
         self.parent = parent
@@ -188,7 +188,7 @@ class ScrapeWindow(wx.Frame):
         try:
             if(self.selected_choice.lower()=="full"):
                 d = obj.scrape()
-                # 10 is the limit of MB set as per Nineteen68 standards
+                # 10 is the limit of MB set as per Avo Assure standards
                 if d is not None:
                     if self.core_utilsobject.getdatasize(str(d),'mb') < 10:
                         self.socketIO.emit('scrape',d)

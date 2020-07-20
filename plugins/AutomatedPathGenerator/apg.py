@@ -94,7 +94,7 @@ class AutomatedPathGenerator:
     '''This call will generate the AST Using PMD Parser and store it in ASTTree.txt'''
     def pmdCall(self, version, pathToFile, filename):
         if SYSTEM_OS=='Darwin':
-            os.chdir(os.environ['NINETEEN68_HOME'] + '/lib/python2.7/site-packages')
+            os.chdir(os.environ['AVO_ASSURE_HOME'] + '/lib/python2.7/site-packages')
             subprocess.call(['java','-classpath','./flowgraph_lib/*:.','PMD.DD',str(version),pathToFile,filename],shell=False)
         else:
             os.chdir(r'./Lib/site-packages')
@@ -119,7 +119,7 @@ class AutomatedPathGenerator:
                 # ASTTree 1st node(CompilationUnit) captured in root if no error is present
                 root = dataStruct.start(name)
                 os.remove('./ASTTree' + name + '.txt')
-                os.chdir(os.environ["NINETEEN68_HOME"])
+                os.chdir(os.environ["AVO_ASSURE_HOME"])
                 if root:
                     # ObjectExtract.main will generate the FlowChart Nodes, give the Classes and all Possible Methods
                     prev_classes.extend(self.Classes)
@@ -360,7 +360,7 @@ class AutomatedPathGenerator:
                  complexity_data={}
                  if SYSTEM_OS=='Darwin':
                     file = open('./Output.txt', 'w+')
-                    subprocess.call(['java','-classpath',os.environ['NINETEEN68_HOME']+'/lib/python2.7/site-packages/flowgraph_lib/Cyclomatic/*','net.sourceforge.pmd.PMD','-d',
+                    subprocess.call(['java','-classpath',os.environ['AVO_ASSURE_HOME']+'/lib/python2.7/site-packages/flowgraph_lib/Cyclomatic/*','net.sourceforge.pmd.PMD','-d',
                                     str(filepath),'-R','category/java/design.xml/CyclomaticComplexity','-f','text'],shell=False,stdout=file)
                     file.close()
                  else:

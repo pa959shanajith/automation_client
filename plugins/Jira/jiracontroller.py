@@ -14,6 +14,8 @@ import os
 import logger
 import logging
 log = logging.getLogger("jiracontroller.py")
+
+
 class JiraWindow():
     jira = None
     def __init__(self,x=0):
@@ -148,22 +150,3 @@ class JiraWindow():
             else:
                 socket.emit('auto_populate','Fail')
             logger.print_on_console('Exception in login and auto populating data')
-
-
-##obj = Nineteen68Jira()
-##jira = obj.__connectJIRA('http://10.44.10.54:8082','Rakesh', 'Rakesh@1234')
-##all_project=jira.projects()
-##            issue_dict = {'project': {'id': 10000},'summary': 'test connection and issue creation ','description': 'Nothing as of now','issuetype': {'name': 'Task'},'priority':{'name' : 'High'},'labels':['Development']}
-##            for project , issue , priority in zip(projects_list,issue_types,priority_list):
-##                data['projects'] = {'projectid': project.id , 'projectname':project.name , 'projectkey':project.key}
-##                data['issuetype'] = {'id': issue.id , 'name':issue.name }
-##                data['priority'] = {'id': priority.id , 'name':priority.name }
-
-##def endSession():
-##        try:
-##            jira.kill_session()
-##        except Exception as e:
-##            print 'Failed to end session'
-
-
-

@@ -59,14 +59,14 @@ class InstallAndLaunch():
     def start_server(self,platform_name=""):
         try:
             err_msg = None
-            curdir = os.environ["NINETEEN68_HOME"]
+            curdir = os.environ["AVO_ASSURE_HOME"]
             path_node_modules = curdir + '/plugins/Mobility/MobileApp/node_modules'
             if not os.path.exists(path_node_modules):
                 self.print_error('node_modules Directory not Found in /plugins/Mobility/MobileApp')
                 return False
             if (SYSTEM_OS != 'Darwin'):
                 path = curdir + '/plugins/Mobility/MobileApp/node_modules/appium/build/lib/main.js'
-                nodePath = os.environ["NINETEEN68_HOME"] + "/Lib/Drivers/node.exe"
+                nodePath = os.environ["AVO_ASSURE_HOME"] + "/Lib/Drivers/node.exe"
                 proc = subprocess.Popen([nodePath, path], shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)
                 start = time.time()
                 timeout = 120 #tentative; as it depends on the system performance.
@@ -115,7 +115,7 @@ class InstallAndLaunch():
                     self.desired_caps['deviceName'] = device_name
                     self.desired_caps['udid'] = udid
                     self.desired_caps['fullReset'] = False
-                    self.desired_caps['xcodeConfigFile'] = os.environ["NINETEEN68_HOME"]+ '/assets/appium.xcconfig'
+                    self.desired_caps['xcodeConfigFile'] = os.environ["AVO_ASSURE_HOME"]+ '/assets/appium.xcconfig'
                     self.desired_caps['showXcodeLog'] = True
                     # self.desired_caps['launchTimeout'] = 120000
                     self.desired_caps['noReset'] = True
@@ -191,7 +191,7 @@ class InstallAndLaunch():
             handler = Exact('/',parser,'')
             parser.setContentHandler(handler)
             
-            file_path_xml=os.environ["NINETEEN68_HOME"]+'/output/Elements.xml'
+            file_path_xml=os.environ["AVO_ASSURE_HOME"]+'/output/Elements.xml'
             page_source=page_source.encode('utf-8').strip()
             try:
                 with open(file_path_xml,'wb') as new_file:
@@ -370,7 +370,7 @@ class BuildJson:
             dimension = driver.get_window_size()
             jsonArray['mirrorwidth'] = dimension['width']
             jsonArray['mirrorheight'] = dimension['height']
-            file_path_json=os.environ["NINETEEN68_HOME"] + '/output/domelements_Android.json'
+            file_path_json=os.environ["AVO_ASSURE_HOME"] + '/output/domelements_Android.json'
             with open(file_path_json, 'w') as outfile:
                 logger.print_on_console('Writing scrape data to domelements.json file')
                 json.dump(jsonArray, outfile, indent=4, sort_keys=False)

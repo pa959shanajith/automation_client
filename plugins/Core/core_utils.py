@@ -123,7 +123,7 @@ class CoreUtils():
 
 
 def get_all_the_imports(plugin_path):
-        path= os.environ["NINETEEN68_HOME"] + '/plugins/'+plugin_path
+        path= os.environ["AVO_ASSURE_HOME"] + '/plugins/'+plugin_path
         sys.path.append(path)
         for root, dirs, files in os.walk(path):
             for d in dirs:

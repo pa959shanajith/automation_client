@@ -165,7 +165,7 @@ class Cropandadd():
                     self.data['mirror'] =  base64.b64encode(imageFile.read()).decode('UTF-8').strip()
                 os.remove('test_screenshot.png')
                 os.remove('resized_test_screenshot.png')
-                with open(os.environ["NINETEEN68_HOME"] + '/output/domelements_android.json', 'w') as outfile:
+                with open(os.environ["AVO_ASSURE_HOME"] + '/output/domelements_android.json', 'w') as outfile:
                     log.info('Opening domelements_Android.json file to write scraped objects')
                     logger.print_on_console("Writing scrape data to domelements_Android.json file")
                     json.dump(self.data, outfile, indent=4, sort_keys=False)

@@ -175,7 +175,7 @@ class fullscrape_MW():
             data['mirrorwidth'] = driver.execute_script("return window.innerWidth")
             data['mirrorheight'] = driver.execute_script("return window.innerHeight")
             log.info('Creating a json object with key vie with value as return data')
-            with open(os.environ["NINETEEN68_HOME"] + '/output/domelements.json', 'w') as outfile:
+            with open(os.environ["AVO_ASSURE_HOME"] + '/output/domelements.json', 'w') as outfile:
                 log.info('Opening domelements.json file to write vie object')
                 json.dump(data, outfile, indent=4, sort_keys=False)
                 log.info('vie is dumped into  domelements.json file ')

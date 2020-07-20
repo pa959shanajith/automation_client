@@ -206,7 +206,7 @@ class System_Keywords():
                 wmi_ref=self.getWmi(machine_name)
                 if wmi_ref is not None:
                     if machine_name[0] is None:
-                        path_outfile=os.environ["NINETEEN68_HOME"]+"/plugins/System/nineteen68_system.txt"
+                        path_outfile=os.environ["AVO_ASSURE_HOME"]+"/plugins/System/AvoAssure_system.txt"
                         process_id, process_status = wmi_ref.Win32_Process.Create(CommandLine="cmd /c "+command_toexecute+" > "+path_outfile)
                     else:
                         file_name=None
@@ -216,9 +216,9 @@ class System_Keywords():
                             path_attrib=path_outfile.split(':')
                             if(len(path_attrib)==2):
                                 if path_attrib[1].endswith('\\'):
-                                    file_name ="nineteen68_system.txt"
+                                    file_name ="AvoAssure_system.txt"
                                 else:
-                                    file_name="/nineteen68_system.txt"
+                                    file_name="/AvoAssure_system.txt"
 
                                 path_outfile = "//"+machine_name[0]+"/"+path_attrib[0]+"$"+path_attrib[1]+file_name
                             else:
@@ -231,7 +231,7 @@ class System_Keywords():
                     time.sleep(2)
                     status=system_constants.TEST_RESULT_PASS
                     result=system_constants.TEST_RESULT_TRUE
-                    log.debug("Executed command in remote/local machine and stored result in nineteen68_system.txt")
+                    log.debug("Executed command in remote/local machine and stored result in AvoAssure_system.txt")
                 else:
                     pass
             elif SYSTEM_OS.lower()=="darwin":
