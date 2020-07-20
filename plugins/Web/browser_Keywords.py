@@ -1027,7 +1027,7 @@ class Singleton_DriverUtil():
                     ##driver = webdriver.Chrome(desired_capabilities= choptions.to_capabilities(), executable_path = exec_path)
                     drivermap.append(driver)
                     driver.maximize_window()
-                    msg = ('Headless ' if headless_mode else '') 'Chrome browser started'
+                    msg = ('Headless ' if headless_mode else '') + 'Chrome browser started'
                     logger.print_on_console(msg)
                     local_bk.log.info(msg)
                 else:
@@ -1058,7 +1058,7 @@ class Singleton_DriverUtil():
                     # driver.navigate().refresh()
                     drivermap.append(driver)
                     driver.maximize_window()
-                    msg = ('Headless ' if headless_mode else '') 'Firefox browser started'
+                    msg = ('Headless ' if headless_mode else '') + 'Firefox browser started'
                     logger.print_on_console(msg)
                     local_bk.log.info(msg)
                 else:
