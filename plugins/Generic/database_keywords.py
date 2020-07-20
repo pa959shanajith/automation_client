@@ -413,6 +413,7 @@ class DatabaseOperation():
                         for x in columns:
                             work_sheet.write(i,j,x)
                             j=j+1
+                        del i,j,x,columns
                         k=1
                         for row in rows:
                             l=0
@@ -431,11 +432,13 @@ class DatabaseOperation():
                                                      newrow.append(ele)
                                                 else:
                                                     newrow.append(ele)
+                                            del ele
                                         row = tuple(newrow)
                                         work_sheet.write(k,l,y)
                                 l+=1
                             k+=1
                         work_book.save(fields)
+                        del k,l,row,rows,y
                     except Exception as e:
                         err_msg = ERROR_CODE_DICT["ERR_FILE_WRITE"]
                         logger.print_on_console(err_msg)
@@ -503,6 +506,7 @@ class DatabaseOperation():
                             if adjusted_width > max_col_width:
                                 max_col_width=adjusted_width
                             work_sheet.column_dimensions[get_column_letter(j)].width = max_col_width
+                        del x,columns,j,i,max_col_width,adjusted_width
                         k=1
                         for row in rows:
                             l=1
@@ -522,6 +526,7 @@ class DatabaseOperation():
                                                      newrow.append(ele)
                                                 else:
                                                     newrow.append(ele)
+                                            del ele
                                         row = tuple(newrow)
                                         work_sheet.cell(row=k, column=l).value = y
                                 l+=1
@@ -531,8 +536,10 @@ class DatabaseOperation():
                                     max_col_width=adjusted_width
                                 work_sheet.column_dimensions[get_column_letter(l)].width = max_col_width
                             k+=1
+                        del row,y,l,k,max_col_width,adjusted_width
                         work_book.active=index_sheet
                         work_book.save(fields)
+                        
                     except Exception as e:
                         err_msg = ERROR_CODE_DICT["ERR_FILE_WRITE"]
                         logger.print_on_console(err_msg)
@@ -561,9 +568,12 @@ class DatabaseOperation():
                                                  newrow.append(ele)
                                             else:
                                                 newrow.append(ele)
+                                        del ele
                                     row = tuple(newrow)
                                     writer.writerow(row)
+                                
                     csvfile.close()
+                    del row,columns
                     status=generic_constants.TEST_RESULT_PASS
                     result=generic_constants.TEST_RESULT_TRUE
                 else:
@@ -577,6 +587,8 @@ class DatabaseOperation():
             if cnxn is not None: cnxn.close()
         if err_msg!=None:
             logger.print_on_console(err_msg)
+        del inp_sheet,out_tuple,fields,work_book,work_sheet,index_sheet
+        del rb,sheet_names,path
         return status,result,verb,err_msg
 
     def secureExportData(self, ip , port , userName , password, dbName, query, dbtype,*args):
