@@ -239,8 +239,8 @@ class RadioCheckboxKeywords():
             col_number=input[1]
             row_number=int(row_number)
             col_number=int(col_number)
-            tag=input[2]
-            index=input[3]
+            tag=input[2].lower()
+            index=int(input[3])
             eleStatus=False
             counter = 1
             actualElement=None
