@@ -1,5 +1,5 @@
 {
-    "python.pythonPath": "D:\\AvoAssure_ICE\\AvoAssure\\python.exe",
+    "python.pythonPath": "${workspaceRoot}/python.exe",
     "python.linting.pylintEnabled": true,
     "python.linting.enabled": true
 }
