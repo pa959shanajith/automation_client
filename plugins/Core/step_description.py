@@ -64,6 +64,8 @@ class StepDescription:
             return "Compared the inputs '"+ inputval[0] + "' and '"+ inputval[1]+"'"
         def beautify():
             return "Beautified the "+inputval[1]+" input '"+ inputval[0]+"'"
+        def cellbycellcompare():
+            return "Compared cell by cell data between file "+inputval[2]+" and file '"+ inputval[0]+"'"
         def executescript():
             return "Perform execution of the script '"+ input+"'"
         def writetofile():
