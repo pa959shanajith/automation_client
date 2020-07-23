@@ -173,7 +173,7 @@ GET_POPUP_TEXT = 'getpopuptext'
 VERIFY_POPUP_TEXT = 'verifypopuptext'
 
 
-NON_WEBELEMENT_KEYWORDS=['openbrowser','opennewbrowser','navigatetourl','getpagetitle','verifypagetitle','getcurrenturl','verifycurrenturl','closebrowser',
+NON_WEBELEMENT_KEYWORDS=['openbrowser','opennewbrowser','opennewtab','navigatetourl','getpagetitle','verifypagetitle','getcurrenturl','verifycurrenturl','closebrowser',
 'switchtowindow','closesubwindows','waitforelementvisible','refresh','maximizebrowser','getcurrenturl','acceptpopup','dismisspopup',
 'getpopuptext','verifypopuptext','clearcache','navigatewithauthenticate']
 

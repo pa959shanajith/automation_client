@@ -602,16 +602,16 @@ class UtilWebKeywords:
                         local_uo.log.debug('It is a textbox')
                         #self.generic_sendfucntion_keys(input1.lower(),*args)
                         if(len(input)>1):
-                            self.generic_sendfucntion_keys(input[0].lower(),input[1])
+                            self.generic_sendfucntion_keys(input[0],input[1])
                         else:
-                            self.generic_sendfucntion_keys(input[0].lower(),*args)
+                            self.generic_sendfucntion_keys(input[0],*args)
                 else:
                     local_uo.log.debug('Calling Generic sendfunction keys')
                     #self.generic_sendfucntion_keys(input.lower(),*args)
                     if(len(input)>1):
-                        self.generic_sendfucntion_keys(input[0].lower(),input[1])
+                        self.generic_sendfucntion_keys(input[0],input[1])
                     else:
-                        self.generic_sendfucntion_keys(input[0].lower(),*args)
+                        self.generic_sendfucntion_keys(input[0],*args)
                 status=TEST_RESULT_PASS
                 methodoutput=TEST_RESULT_TRUE
         except Exception as e:
