@@ -82,10 +82,8 @@ class Highlight():
                 original_style_outline = webElement.value_of_css_property('outline')
                 log.info('Original style obtained')
 
-                # Apply Nineteen68 highlight style
-                apply_status = self.apply_style(webElement,str(
-                    original_style) + self.webscrapeutilsobj.NINETEEN68_WEBELEMENT_HIGHLIGHT_STYLE,
-                            3)
+                # Apply Avo Assure highlight style
+                apply_status = self.apply_style(webElement,str(original_style) + self.webscrapeutilsobj.AVO_ASSURE_WEBELEMENT_HIGHLIGHT_STYLE, 3)
                 log.info('Element highlighted')
 
                 # Decide which style attributes need to be reverted
@@ -97,7 +95,7 @@ class Highlight():
                 if original_style_outline is None:
                     extra_style = extra_style + "outline: none"
 
-                # Now remove the Nineteen68 highlight style and apply original style
+                # Now remove the Avo Assure highlight style and apply original style
                 remove_status = self.apply_style(webElement,str(original_style) + extra_style, 0)
                 if apply_status and remove_status:
                     log.info('element highlighted successfully')

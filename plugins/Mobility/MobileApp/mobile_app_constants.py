@@ -35,7 +35,7 @@ CUSTOM_ELEMENT_NOT_FOUND = 'Custom element not found'
 
 WAIT_FOR_ELEMENT_EXISTS = 'waitforelementexists'
 
-DRIVER_ERROR = 'Driver not active, please launch/install an app using Nineteen68 to proceed'
+DRIVER_ERROR = 'Driver not active, please launch/install an app using Avo Assure to proceed'
 
 NO_ANDROID_HOME = 'ANDROID_HOME not in system path'
 

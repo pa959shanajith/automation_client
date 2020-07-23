@@ -259,6 +259,7 @@ class SAPDispatcher:
                 self.sap_dict['getcellvalueiris'] = iris_object.getcellvalueiris
                 self.sap_dict['verifyexistsiris'] = iris_object.verifyexistsiris
                 self.sap_dict['verifytextiris'] = iris_object.verifytextiris
+                self.sap_dict['cleartextiris'] = iris_object.cleartextiris
 
             keyword = keyword.lower()
             if ( keyword in list(self.sap_dict.keys()) ):

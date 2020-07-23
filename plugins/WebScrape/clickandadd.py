@@ -120,7 +120,7 @@ class Clickandadd():
         try:
             log.info('Inside stopclickandadd method .....')
             driver = browserops.driver
-            maindir = os.environ["NINETEEN68_HOME"]
+            maindir = os.environ["AVO_ASSURE_HOME"]
             screen_shot_path = maindir + '/output/' + domconstants.SCREENSHOT_IMG
             log.info('Obtained driver from browserops.py class .....')
 
@@ -166,7 +166,7 @@ class Clickandadd():
             driver.switch_to.window(currenthandle)
             driver.switch_to_default_content()
 
-            if (isinstance(driver,webdriver.Firefox) or isinstance(driver,webdriver.Chrome)):
+            if (isinstance(driver,webdriver.Firefox) or isinstance(driver,webdriver.Chrome) or isinstance(driver,webdriver.Edge)):
                 screen = webscrape_utils_obj.fullpage_screenshot(driver, screen_shot_path )
             else:
                 screen = driver.get_screenshot_as_base64()
@@ -177,6 +177,10 @@ class Clickandadd():
                 scrapedin = 'IE'
             elif browserops.browser == 1:
                 scrapedin = 'CH'
+            elif browserops.browser == 7:
+                scrapedin = 'EDGE'
+            elif browserops.browser == 8:
+                scrapedin = 'EDGE CHROMIUM'
             data['scrapetype'] = 'cna'
             data['scrapedin'] = scrapedin
             #XPath encryption logic implemented
@@ -194,7 +198,7 @@ class Clickandadd():
             data['mirror'] = screen
 
             log.info('Creating a json object with key view with value as return data')
-            with open(os.environ["NINETEEN68_HOME"] + '/output/domelements.json', 'w') as outfile:
+            with open(os.environ["AVO_ASSURE_HOME"] + '/output/domelements.json', 'w') as outfile:
                 log.info('Opening domelements.json file to write view object')
                 json.dump(data, outfile, indent=4, sort_keys=False)
                 log.info('view is dumped into  domelements.json file ')

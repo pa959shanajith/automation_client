@@ -15,6 +15,7 @@ import xml.parsers.expat
 import configparser
 import uuid, json, os, psutil, subprocess, time, re
 from collections import OrderedDict
+import ctypes
 from constants import *
 from mobile_app_constants import *
 import logger, subprocess, socket, base64, platform, logging
@@ -58,14 +59,14 @@ class InstallAndLaunch():
     def start_server(self,platform_name=""):
         try:
             err_msg = None
-            curdir = os.environ["NINETEEN68_HOME"]
+            curdir = os.environ["AVO_ASSURE_HOME"]
             path_node_modules = curdir + '/plugins/Mobility/MobileApp/node_modules'
             if not os.path.exists(path_node_modules):
                 self.print_error('node_modules Directory not Found in /plugins/Mobility/MobileApp')
                 return False
             if (SYSTEM_OS != 'Darwin'):
                 path = curdir + '/plugins/Mobility/MobileApp/node_modules/appium/build/lib/main.js'
-                nodePath = os.environ["NINETEEN68_HOME"] + "/Lib/Drivers/node.exe"
+                nodePath = os.environ["AVO_ASSURE_HOME"] + "/Lib/Drivers/node.exe"
                 proc = subprocess.Popen([nodePath, path], shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)
                 start = time.time()
                 timeout = 120 #tentative; as it depends on the system performance.
@@ -114,7 +115,7 @@ class InstallAndLaunch():
                     self.desired_caps['deviceName'] = device_name
                     self.desired_caps['udid'] = udid
                     self.desired_caps['fullReset'] = False
-                    self.desired_caps['xcodeConfigFile'] = os.environ["NINETEEN68_HOME"]+ '/assets/appium.xcconfig'
+                    self.desired_caps['xcodeConfigFile'] = os.environ["AVO_ASSURE_HOME"]+ '/assets/appium.xcconfig'
                     self.desired_caps['showXcodeLog'] = True
                     # self.desired_caps['launchTimeout'] = 120000
                     self.desired_caps['noReset'] = True
@@ -190,7 +191,7 @@ class InstallAndLaunch():
             handler = Exact('/',parser,'')
             parser.setContentHandler(handler)
             
-            file_path_xml=os.environ["NINETEEN68_HOME"]+'/output/Elements.xml'
+            file_path_xml=os.environ["AVO_ASSURE_HOME"]+'/output/Elements.xml'
             page_source=page_source.encode('utf-8').strip()
             try:
                 with open(file_path_xml,'wb') as new_file:
@@ -208,8 +209,67 @@ class InstallAndLaunch():
             return finalJson
         else:
             return None
+            
+    '''
+        Definition: Saves the mobile screenshot, corrects the dimensions if wrong, resizes according to requirement
+                    returns the dimensions
+        Output: Screenshot/Device dimensions
+        Output Type: Tuple
+        Reference: iris_mobile.py, mobile_app_scrape.py
+    '''
+    def get_screenshot(self, resizeImg=False):
+        coords = None
+        user32 = ctypes.windll.user32
+        if driver is not None:
+            screen_shot = driver.get_screenshot_as_file("test_screenshot.png")
+            # mobile screenshot is saved as test_screenshot locally
+            if screen_shot:
+                from PIL import Image
+                screenshot_img = Image.open("test_screenshot.png")
+                # original_width = driver.get_window_size()['width']
+                # original_height = driver.get_window_size()['height']
+                result = subprocess.run("adb shell wm size", stdout=subprocess.PIPE)   # device dimensions are retrieved through adb command because driver.get_window_size is giving wrong dimensions for some device ex. HTC
+                device_dimensions = result.stdout.decode("utf-8").split(" ")[-1].split("x")
+                original_width = int(device_dimensions[0])
+                original_height = int(device_dimensions[1])
+                if screenshot_img.size[0] != original_width or screenshot_img.size[1] != original_height:
+                    '''
+                        screenshot saved can have wrong dimension from actual device dimension (happening in HTC) so 
+                        resizing it to correct device dimensions
+                    '''
+                    screenshot_img = screenshot_img.resize((int(original_width), int(original_height)), Image.ANTIALIAS)
+                    screenshot_img.save("test_screenshot.png")
+                if resizeImg:
+                    '''
+                        flag to check if resize for display monitor is required or not
+                    '''
+                    img_ratio = original_width/original_height 
+                    new_width = img_ratio * int(87.890625*user32.GetSystemMetrics(79)/100)
+                    new_height = new_width / img_ratio
+                    resized_screenshot_img = screenshot_img.resize((int(new_width), int(new_height)), Image.ANTIALIAS)
+                    resized_screenshot_img.save("resized_test_screenshot.png")
+                # os.remove("test_screenshot.png")
+                coords =  (original_width, original_height)
+                
+                del(screen_shot)
+                del(screenshot_img)
+                del(result)
+                del(device_dimensions)
+                del(img_ratio)
+                del(new_width)
+                del(new_height)
+                del(resized_screenshot_img)
+                
+        return coords
 
 
+    '''
+        --- def get_driver() ---
+        Definition: Returns the driver object
+        Reference: iris_mobile.py
+    '''
+    def get_driver(self):
+        return driver
 
 class BuildJson:
 
@@ -310,7 +370,7 @@ class BuildJson:
             dimension = driver.get_window_size()
             jsonArray['mirrorwidth'] = dimension['width']
             jsonArray['mirrorheight'] = dimension['height']
-            file_path_json=os.environ["NINETEEN68_HOME"] + '/output/domelements_Android.json'
+            file_path_json=os.environ["AVO_ASSURE_HOME"] + '/output/domelements_Android.json'
             with open(file_path_json, 'w') as outfile:
                 logger.print_on_console('Writing scrape data to domelements.json file')
                 json.dump(jsonArray, outfile, indent=4, sort_keys=False)

@@ -123,7 +123,7 @@ class Clickandadd():
             log.info('Inside stopclickandadd method .....')
             # driver = browserops.driver
             driver = browser_Keywords_MW.driver_obj
-            maindir = os.environ["NINETEEN68_HOME"]
+            maindir = os.environ["AVO_ASSURE_HOME"]
             screen_shot_path = maindir + '/output/' + domconstants_MW.SCREENSHOT_IMG
             log.info('Obtained driver from browserops.py class .....')
 
@@ -197,7 +197,7 @@ class Clickandadd():
             data['mirror'] = screen
 
             log.info('Creating a json object with key view with value as return data')
-            with open(os.environ["NINETEEN68_HOME"] + '/output/domelements.json', 'w') as outfile:
+            with open(os.environ["AVO_ASSURE_HOME"] + '/output/domelements.json', 'w') as outfile:
                 log.info('Opening domelements.json file to write view object')
                 json.dump(data, outfile, indent=4, sort_keys=False)
                 log.info('view is dumped into  domelements.json file ')
@@ -230,7 +230,7 @@ class Clickandadd():
 ##        scrapetype = {'scrapetype' : 'cna'}
 ##        data.append(screenshot)
 ##        data.append(scrapetype)
-##        with open(os.environ["NINETEEN68_HOME"] + '/output/domelements.json', 'w') as outfile:
+##        with open(os.environ["AVO_ASSURE_HOME"] + '/output/domelements.json', 'w') as outfile:
 ##                log.info('FILE: clickandadd_MW.py , DEF: stopclickandadd_MW() , MSG: Opening domelements.json file to write vie object')
 ##                json.dump(data, outfile, indent=4, sort_keys=False)
 ##                log.info('FILE: clickandadd_MW.py , DEF: stopclickandadd_MW() , MSG: vie is dumped into  domelements.json file ')

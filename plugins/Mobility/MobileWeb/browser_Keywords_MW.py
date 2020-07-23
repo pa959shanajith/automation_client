@@ -65,7 +65,7 @@ class BrowserKeywords():
         try:
 ##            maindir = os.getcwd()
 ##            os.chdir('..')
-            curdir = os.environ["NINETEEN68_HOME"]
+            curdir = os.environ["AVO_ASSURE_HOME"]
             if(SYSTEM_OS!='Darwin'):
                 path = curdir + '/plugins/Mobility/MobileApp/node_modules/appium/build/lib/main.js'
                 nodePath = curdir + "/Lib/Drivers/node.exe"
@@ -155,7 +155,7 @@ class BrowserKeywords():
             except Exception as e:
                 err_msg = 'ERROR OCURRED WHILE OPENING BROWSER'
                 if SYSTEM_OS == 'Darwin':
-                    curdir = os.environ["NINETEEN68_HOME"]
+                    curdir = os.environ["AVO_ASSURE_HOME"]
                     path_node_modules = curdir + '/plugins/Mobility/node_modules'
                     if not os.path.exists(path_node_modules):
                         logger.print_on_console(
@@ -582,7 +582,7 @@ class Singleton_DriverUtil():
 ##                    driver_instance =self.driver('2')
 ##                    return driver_instance
 
-    def chech_if_driver_exists_in_map(self,browserType):
+    def check_if_driver_exists_in_map(self,browserType):
         d = None
 ##        drivermap.reverse()
         if browserType == '1':

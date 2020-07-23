@@ -56,7 +56,7 @@ class Test():
     "keywordVal": "concatenate",
     "objectName": " ",
     "inputVal": [
-      "slk;software"
+      "avo;software"
     ],
     "appType": "Generic",
     "stepNo": 3,

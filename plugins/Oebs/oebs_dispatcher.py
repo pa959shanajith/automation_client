@@ -207,6 +207,7 @@ class OebsDispatcher:
                 dict['getcellvalueiris'] = iris_object.getcellvalueiris
                 dict['verifyexistsiris'] = iris_object.verifyexistsiris
                 dict['verifytextiris'] = iris_object.verifytextiris
+                dict['cleartextiris'] = iris_object.cleartextiris
 
             keyword=keyword.lower()
             if keyword in list(dict.keys()):

@@ -128,9 +128,9 @@ class Update_Rollback:
         if ( self.update_flag == True and self.check_flag == True ):
             update_msg = 'Update Available!!! Click on update'
         elif ( self.update_flag == False and self.check_flag == True ):
-            update_msg = 'You are running the latest version of Nineteen68'
+            update_msg = 'You are running the latest version of Avo Assure ICE'
         elif ( self.check_flag == False ):
-            update_msg = 'An Error has occoured while checking for new versions of Nineteen68, kindly contact Support Team'
+            update_msg = 'An Error has occoured while checking for new versions of Avo Assure ICE, kindly contact Support Team'
         return update_msg
 
     def run_updater(self):

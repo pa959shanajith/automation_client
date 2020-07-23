@@ -43,7 +43,11 @@ soc=None
 browsercheckFlag=False
 updatecheckFlag=False
 chromeFlag=False
+edgeFlag=False
+chromiumFlag=False
 firefoxFlag=False
+edgeFlag=False
+chromiumFlag=False
 desktopScrapeFlag=False
 sapScrapeFlag=False
 mobileScrapeFlag=False
@@ -61,20 +65,22 @@ execution_flag = False
 closeActiveConnection = False
 connection_Timer = None
 core_utils_obj = core_utils.CoreUtils()
-NINETEEN68_HOME = os.environ["NINETEEN68_HOME"]
-IMAGES_PATH = NINETEEN68_HOME + "/assets/images/"
+AVO_ASSURE_HOME = os.environ["AVO_ASSURE_HOME"]
+IMAGES_PATH = AVO_ASSURE_HOME + "/assets/images/"
 os.environ["IMAGES_PATH"] = IMAGES_PATH
-ICE_CONST= NINETEEN68_HOME + "/assets/ice_const.json"
-CONFIG_PATH= NINETEEN68_HOME + "/assets/config.json"
-CERTIFICATE_PATH = NINETEEN68_HOME + "/assets/CA_BUNDLE"
-LOGCONFIG_PATH = NINETEEN68_HOME + "/assets/logging.conf"
-DRIVERS_PATH = NINETEEN68_HOME + "/lib/Drivers"
+ICE_CONST= AVO_ASSURE_HOME + "/assets/ice_const.json"
+CONFIG_PATH= AVO_ASSURE_HOME + "/assets/config.json"
+CERTIFICATE_PATH = AVO_ASSURE_HOME + "/assets/CA_BUNDLE"
+LOGCONFIG_PATH = AVO_ASSURE_HOME + "/assets/logging.conf"
+DRIVERS_PATH = AVO_ASSURE_HOME + "/lib/Drivers"
 CHROME_DRIVER_PATH = DRIVERS_PATH + "/chromedriver"
 GECKODRIVER_PATH = DRIVERS_PATH + "/geckodriver"
+EDGE_DRIVER_PATH = DRIVERS_PATH + "/MicrosoftWebDriver.exe"
+EDGE_CHROMIUM_DRIVER_PATH = DRIVERS_PATH + "/msedgedriver"
 if SYSTEM_OS == "Windows":
     CHROME_DRIVER_PATH += ".exe"
     GECKODRIVER_PATH += ".exe"
-
+    EDGE_CHROMIUM_DRIVER_PATH += ".exe"
 
 class MainNamespace(BaseNamespace):
     def on_message(self, *args):
@@ -85,7 +91,7 @@ class MainNamespace(BaseNamespace):
                 if allow_connect:
                     sch_mode = cw.schedule.GetValue() if root.gui else False
                     if sch_mode: socketIO.emit('toggle_schedule',sch_mode)
-                    msg = ("Schedule" if sch_mode else "Normal") + " Mode: Connection to the Nineteen68 Server established"
+                    msg = ("Schedule" if sch_mode else "Normal") + " Mode: Connection to the Avo Assure Server established"
                     logger.print_on_console(msg)
                     log.info(msg)
                     msg = "ICE Name: " + root.ice_token["icename"]
@@ -131,9 +137,9 @@ class MainNamespace(BaseNamespace):
                 enable_reregister = False
                 try:
                     global plugins_list
-                    ice_ndac_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
+                    ice_das_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
                         'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
-                    response = json.loads(core_utils_obj.unwrap(str(args[1]), ice_ndac_key))
+                    response = json.loads(core_utils_obj.unwrap(str(args[1]), ice_das_key))
                     if(response['id'] != root.icesession['ice_id'] or response['connect_time'] != root.icesession['connect_time']):
                         err_res="Invalid response received"
                         logger.print_on_console(err_res)
@@ -148,7 +154,7 @@ class MainNamespace(BaseNamespace):
                             if root.gui:
                                 cw.connectbutton.SetBitmapLabel(cw.disconnect_img)
                                 cw.connectbutton.SetName("disconnect")
-                                cw.connectbutton.SetToolTip(wx.ToolTip("Disconnect from Nineteen68 Server"))
+                                cw.connectbutton.SetToolTip(wx.ToolTip("Disconnect from Avo Assure Server"))
                             controller.disconnect_flag=False
                         else:
                             if 'err_msg' in response: err_res = response['err_msg']
@@ -168,18 +174,18 @@ class MainNamespace(BaseNamespace):
                     root.ice_token = None
                     root.token_obj.delete_token()
                     if root.gui:
-                        logger.print_on_console("ICE is not registered with Nineteen68. Click to Register")
+                        logger.print_on_console("ICE is not registered with Avo Assure. Click to Register")
                         cw.enable_register()
                     else:
-                        logger.print_on_console("ICE is not registered with Nineteen68. Try Again")
+                        logger.print_on_console("ICE is not registered with Avo Assure. Try Again")
                 if root.gui: cw.connectbutton.Enable()
 
             elif(str(args[0]) == 'fail'):
                 fail_msg = "Fail"
                 if len(args) > 1 and args[1]=="conn":
-                    fail_msg+="ed to connect to Nineteen68 Server"
+                    fail_msg+="ed to connect to Avo Assure Server"
                 if len(args) > 1 and args[1]=="disconn":
-                    fail_msg+="ed to disconnect from Nineteen68 Server"
+                    fail_msg+="ed to disconnect from Avo Assure Server"
                 logger.print_on_console(fail_msg)
                 log.info(fail_msg)
                 kill_conn = True
@@ -306,6 +312,10 @@ class MainNamespace(BaseNamespace):
                         browsername = '2'
                     elif str(task) == 'OPEN BROWSER SF':
                         browsername = '6'
+                    elif str(task) == 'OPEN BROWSER EDGE':
+                        browsername = '7'
+                    elif str(task) == 'OPEN BROWSER CHROMIUM':
+                        browsername = '8'
                 elif action == 'compare':
                     task = d['task']
                     data['view'] = d['viewString']
@@ -316,6 +326,10 @@ class MainNamespace(BaseNamespace):
                         browsername = '3'
                     elif str(task) == 'OPEN BROWSER FX':
                         browsername = '2'
+                    elif str(task) == 'OPEN BROWSER EDGE':
+                        browsername = '7'
+                    elif str(task) == 'OPEN BROWSER CHROMIUM':
+                        browsername = '8'                     
                 wx.PostEvent(cw.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, cw.GetId()))
         except Exception as e:
             err_msg='Error while Scraping Web application'
@@ -709,10 +723,10 @@ class MainNamespace(BaseNamespace):
         if not allow_connect: return
         log.info('Disconnect triggered')
         if (socketIO is not None) and (not socketIO.waiting_for_close):
-            ice_ndac_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
+            ice_das_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
                 'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
             root.icesession['connect_time'] = str(datetime.now())
-            socketIO._http_session.params['icesession'] = core_utils_obj.wrap(json.dumps(root.icesession), ice_ndac_key)
+            socketIO._http_session.params['icesession'] = core_utils_obj.wrap(json.dumps(root.icesession), ice_das_key)
             if root.gui:
                 if not bool(cw): return
                 cw.schedule.Disable()
@@ -722,7 +736,7 @@ class MainNamespace(BaseNamespace):
                 if root.gui: cw.enable_register()
                 return
             else:
-                msg = 'Connectivity issue with Nineteen68 Server. Attempting to restore connectivity...'
+                msg = 'Connectivity issue with Avo Assure Server. Attempting to restore connectivity...'
                 logger.print_on_console(msg)
                 log.error(msg)
         if root.ice_token:
@@ -777,9 +791,9 @@ class ConnectionThread(threading.Thread):
             'icetoken': root.ice_token,
             'data': random()*100000000000000
         }
-        ice_ndac_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
+        ice_das_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
             'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
-        icesession_enc = core_utils_obj.wrap(json.dumps(root.icesession), ice_ndac_key)
+        icesession_enc = core_utils_obj.wrap(json.dumps(root.icesession), ice_das_key)
         params={'username': username, 'icename': root.ice_token["icename"],
             'ice_action': self.ice_action, 'icesession': icesession_enc}
         args = {"cert": client_cert, "params": params}
@@ -813,6 +827,9 @@ class ConnectionThread(threading.Thread):
             err_msg = str(e).replace("[engine.io waiting for connection] ",'').replace("[SSL: CERTIFICATE_VERIFY_FAILED] ",'')
             if "_ssl.c" in err_msg:
                 err_msg = err_msg[:err_msg.index("(_ssl")]
+                logger.print_on_console("Try changing Server Certificate Path to 'default'." +
+                    " If that also doesn't work, then disable server certificate check. But that" +
+                    " will result in an insecure HTTPS connection")
         except Exception as e:
             err_msg = "Error in server connection"
             log.error(e,exc_info=True)
@@ -860,6 +877,9 @@ class TestThread(threading.Thread):
         global execution_flag, closeActiveConnection, connection_Timer
         batch_id = None
         try:
+            self.con = controller.Controller()
+            self.con.configvalues=configvalues
+            self.con.exception_flag=(str(configvalues["exception_flag"]).strip().lower()=="true")
             runfrom_step=1
             if self.action==EXECUTE: batch_id = self.json_data["batchId"]
             elif self.action==DEBUG:
@@ -879,9 +899,6 @@ class TestThread(threading.Thread):
                 self.cw.rbox.Disable()
                 self.cw.breakpoint.Disable()
                 self.cw.terminatebutton.Enable()
-            self.con = controller.Controller()
-            self.con.configvalues=configvalues
-            self.con.exception_flag=(str(configvalues["exception_flag"]).strip().lower()=="true")
             status = ''
             apptype = ''
             if(self.action == DEBUG):
@@ -889,9 +906,9 @@ class TestThread(threading.Thread):
             else:
                 execution_flag = True
                 if root.gui: benchmark.stop(True)
-                apptype =(self.json_data)['apptype']
-            if(apptype == "DesktopJava"): apptype = "oebs"
-            if(apptype.lower() not in plugins_list):
+                apptype = self.json_data['apptype']
+            if apptype == "DesktopJava": apptype = "oebs"
+            if apptype.lower() not in plugins_list:
                 logger.print_on_console('This app type is not part of the license.')
                 status=TERMINATE
             else:
@@ -901,16 +918,6 @@ class TestThread(threading.Thread):
 
             if status==TERMINATE:
                 logger.print_on_console('---------Termination Completed-------')
-            if self.main.gui:
-                if self.cw.choice=='RunfromStep':
-                    self.cw.breakpoint.Enable()
-                else:
-                    self.cw.breakpoint.Disable()
-                #Removed execute,debug button
-                self.cw.breakpoint.Clear()
-                self.cw.rbox.Enable()
-                # self.cw.breakpoint.Disable()
-                self.cw.cancelbutton.Enable()
             if self.action==DEBUG:
                 testcasename = handler.local_handler.testcasename
                 self.cw.killChildWindow(debug=True)
@@ -946,7 +953,13 @@ class TestThread(threading.Thread):
 
         self.main.testthread = None
         execution_flag = False
-        if self.main.gui: self.cw.schedule.Enable()
+        if self.main.gui:
+            if self.cw.choice=='RunfromStep': self.cw.breakpoint.Enable()
+            else: self.cw.breakpoint.Disable()
+            # self.cw.breakpoint.Clear()
+            self.cw.rbox.Enable()
+            self.cw.cancelbutton.Enable()
+            self.cw.schedule.Enable()
 
 
 class Main():
@@ -1044,7 +1057,7 @@ class Main():
         global connection_Timer
         controller.terminate_flag = True
         controller.disconnect_flag = True
-        if self.socketthread: logger.print_on_console('Disconnected from Nineteen68 server')
+        if self.socketthread: logger.print_on_console('Disconnected from Avo Assure server')
         if (connection_Timer != None and connection_Timer.isAlive()):
             log.info("Connection Timeout timer Stopped")
             connection_Timer.cancel()
@@ -1057,15 +1070,15 @@ class Main():
         controller.kill_process()
         if SYSTEM_OS == "Windows":
             nul = subprocess.DEVNULL
-            subprocess.Popen("TASKKILL /F /IM nineteen68MFapi.exe", stdout=nul, stderr=nul)
+            subprocess.Popen("TASKKILL /F /IM AvoAssureMFapi.exe", stdout=nul, stderr=nul)
         sys.exit(0)
 
     def register(self, token, hold = False):
-        ice_ndac_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
+        ice_das_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
             'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
         emsg = "Error: Invalid Server address or Token . Please try again"
         try:
-            token_dec = core_utils_obj.unwrap(token,ice_ndac_key).split("@")
+            token_dec = core_utils_obj.unwrap(token,ice_das_key).split("@")
             token_info = {'token':token_dec[0],'icetype':token_dec[1] ,'icename':token_dec[2]}
             if self.gui and token_info["icetype"] != "normal":
                 emsg = "Token is provisioned for CI-CD ICE. Either use a token provisioned for Normal mode or register ICE in command line mode."
@@ -1105,9 +1118,9 @@ class Main():
                     if response == "fail":
                         err_res = "ICE registration failed."
                     else:
-                        ice_ndac_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
+                        ice_das_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
                             'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
-                        response = json.loads(core_utils_obj.unwrap(response, ice_ndac_key))
+                        response = json.loads(core_utils_obj.unwrap(response, ice_das_key))
                     if err_res or response['id'] != self.icesession['ice_id'] or response['connect_time'] != self.icesession['connect_time']:
                         if not err_res: err_res = "Invalid response received"
                         logger.print_on_console(err_res)
@@ -1132,8 +1145,8 @@ class Main():
                                 cw.EnableAll()
                                 cw.connectbutton.SetBitmapLabel(cw.connect_img)
                                 cw.connectbutton.SetName('connect')
-                                cw.connectbutton.SetToolTip(wx.ToolTip("Connect to Nineteen68 Server"))
-                            msg='ICE "'+data["icename"]+'" registered successfully with Nineteen68'
+                                cw.connectbutton.SetToolTip(wx.ToolTip("Connect to Avo Assure Server"))
+                            msg='ICE "'+data["icename"]+'" registered successfully with Avo Assure'
                             logger.print_on_console(msg)
                             log.info(msg)
                 except Exception as e:
@@ -1147,10 +1160,10 @@ class Main():
                     self.ice_token = None
                     self.token_obj.delete_token()
                     if self.gui:
-                        logger.print_on_console("ICE is not registered with Nineteen68. Click to Register")
+                        logger.print_on_console("ICE is not registered with Avo Assure. Click to Register")
                         cw.enable_register()
                     else:
-                        logger.print_on_console("ICE is not registered with Nineteen68. Try Again")
+                        logger.print_on_console("ICE is not registered with Avo Assure. Try Again")
                 if self.gui: cw.connectbutton.Enable()
                 else: self._wants_to_close = True
             elif mode == 'connect' or mode == "guestconnect":
@@ -1161,7 +1174,7 @@ class Main():
                 if status == False:
                     self.ice_action = "register"
                     self.ice_token = None
-                    msg = "ICE is not registered with Nineteen68."
+                    msg = "ICE is not registered with Avo Assure."
                     if self.gui:
                         msg += " Click to Register"
                         logger.print_on_console(msg)
@@ -1182,8 +1195,8 @@ class Main():
                 self.socketthread.start()
             else:
                 self.killSocket(True)
-                log.info('Disconnected from Nineteen68 server')
-                logger.print_on_console('Disconnected from Nineteen68 server')
+                log.info('Disconnected from Avo Assure server')
+                logger.print_on_console('Disconnected from Avo Assure server')
                 global connection_Timer
                 if (connection_Timer != None and connection_Timer.isAlive()):
                     log.info("Connection Timeout Timer Stopped")
@@ -1195,7 +1208,7 @@ class Main():
         except Exception as e:
             emsg="Forbidden request, Connection refused, please configure server ip and server port in "
             if self.gui: emsg += "Edit -> Configuration"
-            else: emsg += "configuration file located at NINETEEN68_HOME/assets/config.json"
+            else: emsg += "configuration file located at AVO_ASSURE_HOME/assets/config.json"
             emsg += ", and retry."
             if mode == "register":
                 self.ice_token=None
@@ -1244,7 +1257,7 @@ class Main():
 
     def verifyRegistration(self, verifyonly = False):
         global executionOnly
-        emsg = "Nineteen68 ICE is not registered."
+        emsg = "Avo Assure ICE is not registered."
         executionOnly = True
         try:
             self.token_obj = ICEToken()
@@ -1300,36 +1313,37 @@ class Main():
             if(irisFlag == True):
                 core_utils.get_all_the_imports('IRIS')
             if mobileScrapeFlag==True:
-                cw.scrapewindow = mobileScrapeObj.ScrapeWindow(parent = cw,id = -1, title="SLK Nineteen68 - Mobile Scrapper",filePath = browsername,socketIO = socketIO)
+                cw.scrapewindow = mobileScrapeObj.ScrapeWindow(parent = cw,id = -1, title="Avo Assure - Mobile Scrapper",filePath = browsername,socketIO = socketIO)
                 mobileScrapeFlag=False
             elif mobileWebScrapeFlag==True:
-                cw.scrapewindow = mobileWebScrapeObj.ScrapeWindow(parent = cw,id = -1, title="SLK Nineteen68 - Mobile Scrapper",browser = browsername,socketIO = socketIO)
+                cw.scrapewindow = mobileWebScrapeObj.ScrapeWindow(parent = cw,id = -1, title="Avo Assure - Mobile Scrapper",browser = browsername,socketIO = socketIO)
                 mobileWebScrapeFlag=False
             elif desktopScrapeFlag==True:
-                cw.scrapewindow = desktopScrapeObj.ScrapeWindow(parent = cw,id = -1, title="SLK Nineteen68 - Desktop Scrapper",filePath = browsername,socketIO = socketIO,irisFlag = irisFlag)
+                cw.scrapewindow = desktopScrapeObj.ScrapeWindow(parent = cw,id = -1, title="Avo Assure - Desktop Scrapper",filePath = browsername,socketIO = socketIO,irisFlag = irisFlag)
                 desktopScrapeFlag=False
                 browsername = ''
             elif sapScrapeFlag==True:
-                cw.scrapewindow = sapScrapeObj.ScrapeWindow(parent = cw,id = -1, title="SLK Nineteen68 - SAP Scrapper",filePath = browsername,socketIO = socketIO,irisFlag = irisFlag)
+                cw.scrapewindow = sapScrapeObj.ScrapeWindow(parent = cw,id = -1, title="Avo Assure - SAP Scrapper",filePath = browsername,socketIO = socketIO,irisFlag = irisFlag)
                 sapScrapeFlag=False
             elif oebsScrapeFlag==True:
-                cw.scrapewindow = oebsScrapeObj.ScrapeDispatcher(parent = cw,id = -1, title="SLK Nineteen68 - Oebs Scrapper",filePath = browsername,socketIO = socketIO,irisFlag = irisFlag)
+                cw.scrapewindow = oebsScrapeObj.ScrapeDispatcher(parent = cw,id = -1, title="Avo Assure - Oebs Scrapper",filePath = browsername,socketIO = socketIO,irisFlag = irisFlag)
                 oebsScrapeFlag=False
             elif pdfScrapeFlag==True:
-                cw.scrapewindow = pdfScrapeObj.ScrapeDispatcher(parent = cw,id = -1, title="SLK Nineteen68 - PDF Scrapper",filePath = browsername,socketIO = socketIO,irisFlag = irisFlag)
+                cw.scrapewindow = pdfScrapeObj.ScrapeDispatcher(parent = cw,id = -1, title="Avo Assure - PDF Scrapper",filePath = browsername,socketIO = socketIO,irisFlag = irisFlag)
                 pdfScrapeFlag=False
             elif debugFlag == True:
                 cw.debugwindow = clientwindow.DebugWindow(parent = cw,id = -1, title="Debugger")
                 debugFlag = False
             else:
-                browsernumbers = ['1','2','3','6']
+                browsernumbers = ['1','2','3','6','7','8']
                 if browsername in browsernumbers:
                     logger.print_on_console('Browser name : '+str(browsername))
                     #con = controller.Controller()
                     core_utils.get_all_the_imports('Web')
                     core_utils.get_all_the_imports('WebScrape')
-                    import Nineteen68_WebScrape
-                    cw.scrapewindow = Nineteen68_WebScrape.ScrapeWindow(parent = cw,id = -1, title="SLK Nineteen68 - Web Scrapper",browser = browsername,socketIO = socketIO,action=action,data=data,irisFlag = irisFlag)
+                    sys.coinit_flags = 2
+                    import web_scrape
+                    cw.scrapewindow = web_scrape.ScrapeWindow(parent = cw,id = -1, title="Avo Assure - Web Scrapper",browser = browsername,socketIO = socketIO,action=action,data=data,irisFlag = irisFlag)
                     browsername = ''
                 else:
                     import pause_display_operation
@@ -1337,16 +1351,16 @@ class Main():
                     flag,inputvalue = o.getflagandinput()
                     if flag == 'pause':
                         #call pause logic
-                        cw.pausewindow = pause_display_operation.Pause(parent = None,id = -1, title="SLK Nineteen68 - Pause")
+                        cw.pausewindow = pause_display_operation.Pause(parent = None,id = -1, title="Avo Assure - Pause")
                     elif flag == 'display':
                         #call display logic
-                        cw.pausewindow = pause_display_operation.Display(parent = cw,id = -1, title="SLK Nineteen68 - Display Variable",input = inputvalue)
+                        cw.pausewindow = pause_display_operation.Display(parent = cw,id = -1, title="Avo Assure - Display Variable",input = inputvalue)
                     elif flag == 'debug':
                         #call debug logic
-                        cw.pausewindow = pause_display_operation.Debug(parent = cw,id = -1, title="SLK Nineteen68 - Debug Mode",input = inputvalue)
+                        cw.pausewindow = pause_display_operation.Debug(parent = cw,id = -1, title="Avo Assure - Debug Mode",input = inputvalue)
                     elif flag == 'error':
                         #call debug error logic
-                        cw.pausewindow = pause_display_operation.Error(parent = cw,id = -1, title="SLK Nineteen68 - Debug Mode",input = inputvalue)
+                        cw.pausewindow = pause_display_operation.Error(parent = cw,id = -1, title="Avo Assure - Debug Mode",input = inputvalue)
         except Exception as e:
             log.error(e,exc_info=True)
 
@@ -1364,12 +1378,18 @@ def check_browser():
                     if params['FIREFOX_VERSION'] != "":
                         for k,v in list(params['FIREFOX_VERSION'].items()):
                             FIREFOX_BROWSER_VERSION[str(k)]=[int(str(v)[:2]),int(str(v)[3:])]
+                    if params['EDGE_VERSION'] != "":
+                        for k,v in list(params['EDGE_VERSION'].items()):
+                            EDGE_VERSION[str(k)]=[(str(v)[:8]),(str(v)[13:21])]
+                    if params['EDGE_CHROMIUM_VERSION'] != "":
+                        for k,v in list(params['EDGE_CHROMIUM_VERSION'].items()):
+                            EDGE_CHROMIUM_VERSION[str(k)]=[int(str(v)[:2]),int(str(v)[3:])]
                 else:
                     logger.print_on_console("Unable to locate ICE parameters")
             except Exception as e:
                 logger.print_on_console("Unable to locate ICE parameters")
                 log.error(e)
-            global chromeFlag,firefoxFlag
+            global chromeFlag,firefoxFlag,edgeFlag,chromiumFlag
             logger.print_on_console('Browser compatibility check started')
             from selenium import webdriver
             from selenium.webdriver import ChromeOptions
@@ -1437,7 +1457,68 @@ def check_browser():
             logger.print_on_console("Error in checking Firefox version")
             log.error("Error in checking Firefox version")
             log.error(e,exc_info=True)
-        if chromeFlag == True and firefoxFlag == True:
+        #Checking browser for microsoft edge
+        try:
+            if('Windows-10' in platform.platform()):
+                #from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+                p = subprocess.Popen(EDGE_DRIVER_PATH + ' --version', stdout=subprocess.PIPE, bufsize=1,cwd=DRIVERS_PATH,shell=True) 
+                a = p.stdout.readline()
+                a = a.decode('utf-8')[28:40]
+                driver = webdriver.Edge(executable_path=EDGE_DRIVER_PATH)
+                browser_ver = driver.capabilities['browserVersion']
+                browser_ver1 = browser_ver.encode('utf-8')
+                browser_ver = float(browser_ver1[:8])
+                try:
+                    driver.close()
+                    driver.quit()
+                except:
+                    pass
+                for k,v in list(EDGE_VERSION.items()):
+                    if a == k:
+                        if str(browser_ver) >= v[0] or str(browser_ver) <= v[1]:
+                            edgeFlag = True
+                if edgeFlag == False:
+                    logger.print_on_console('WARNING!! : Edge Legacy version ',str(browser_ver),' is not supported.')
+            else:
+               logger.print_on_console("WARNING!! : Edge Legacy is supported only in Windows10 platform") 
+        except Exception as e:
+            logger.print_on_console("Error in checking Edge Legacy version")
+            log.error("Error in checking Edge Legacy version")
+            log.error(e,exc_info=True)
+
+        #checking browser for microsoft edge(chromium based)
+        try:
+            from selenium.webdriver.edge.options import Options
+            options = Options()
+            options.use_chromium = True
+            caps =  options.to_capabilities()
+            p = subprocess.Popen(EDGE_CHROMIUM_DRIVER_PATH + ' --version', stdout=subprocess.PIPE, bufsize=1,cwd=DRIVERS_PATH,shell=True)
+            a = p.stdout.readline()
+            a = a.decode('utf-8')[13:17]
+            if SYSTEM_OS == 'Darwin': #MAC check for edge chromium
+                caps['platform'] = 'MAC'
+            driver = webdriver.Edge(capabilities=caps, executable_path=EDGE_CHROMIUM_DRIVER_PATH)
+            browser_ver = driver.capabilities['browserVersion']
+            browser_ver1 = browser_ver.encode('utf-8')
+            browser_ver = int(browser_ver1[:2])
+            try:
+                driver.close()
+                driver.quit()
+            except:
+                pass
+            driver=None
+            for k,v in list(EDGE_CHROMIUM_VERSION.items()):
+                if a == k:
+                    if browser_ver >= v[0] and browser_ver <= v[1]:
+                        chromiumFlag=True
+            if chromiumFlag == False :
+                logger.print_on_console('WARNING!! : Edge Chromium version ',str(browser_ver),' is not supported.')
+        except Exception as e:
+            logger.print_on_console("Error in checking Edge Chromium version")
+            log.error("Error in checking Edge Chromium version")
+            log.error(e,exc_info=True)
+
+        if chromeFlag == True and firefoxFlag == True and edgeFlag == True and chromiumFlag == True:
             logger.print_on_console('Current version of browsers are supported')
         browsercheckFlag = True
     except Exception as e:

@@ -29,7 +29,7 @@ class ScrapeWindow(wx.Frame):
         wx.Frame.__init__(self, parent, title=title,
                    pos=(300, 150),  size=(200, 150) ,style=wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER |wx.MAXIMIZE_BOX|wx.CLOSE_BOX) )
         self.SetBackgroundColour('#e6e7e8')
-        self.iconpath = os.environ["IMAGES_PATH"] + "/slk.ico"
+        self.iconpath = os.environ["IMAGES_PATH"] + "/avo.ico"
         self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
         self.SetIcon(self.wicon)
         obj = browser_Keywords_MW.BrowserKeywords()#browserops_MW.BrowserOperations()
@@ -97,7 +97,7 @@ class ScrapeWindow(wx.Frame):
             d = clickandadd_MWoj.stopclickandadd()
             logger.print_on_console('Scrapped data saved successfully in domelements.json file')
 
-            #10 is the limit of MB set as per Nineteen68 standards
+            #10 is the limit of MB set as per Avo Assure standards
             if self.core_utilsobject.getdatasize(str(d),'mb') < 10:
                 self.socketIO.emit('scrape',d)
             else:
@@ -131,7 +131,7 @@ class ScrapeWindow(wx.Frame):
         d = fullscrape_MWobj.Fullscrape()
 
 
-        #10 is the limit of MB set as per Nineteen68 standards
+        #10 is the limit of MB set as per Avo Assure standards
         if self.core_utilsobject.getdatasize(str(d),'mb') < 10:
             self.socketIO.emit('scrape',d)
         else:
@@ -153,7 +153,7 @@ class ScrapeWindow(wx.Frame):
             log.debug("Window Handle not found, switching to window",self.driver.window_handles[-1])
             self.driver.switch_to_window(self.driver.window_handles[-1])
         if self.driver.current_url in self.invalid_urls:
-            wx.MessageBox(self.invalid_url_msg, "SLK Nineteen68 - Web Scraper", wx.OK | wx.ICON_ERROR)
+            wx.MessageBox(self.invalid_url_msg, "Avo Assure - Web Scraper", wx.OK | wx.ICON_ERROR)
         else:
             self.scrape_type = "fullscrape"
             self.startbutton.Disable()
@@ -205,7 +205,7 @@ class ScrapeWindow(wx.Frame):
             logger.print_on_console("value is: ",self.scrape_selected_option[1])
         d = fullscrape_MWobj.fullscrape(self.scrape_selected_option,self.window_handle_number,visiblity_status)
 
-        '''Check the limit of data size as per Nineteen68 standards'''
+        '''Check the limit of data size as per Avo Assure standards'''
         # if self.core_utilsobject.getdatasize(str(d),'mb') < self.webscrape_utils_obj.SCRAPE_DATA_LIMIT:
         if self.core_utilsobject.getdatasize(str(d),'mb') < 30:
             if  isinstance(d,str):

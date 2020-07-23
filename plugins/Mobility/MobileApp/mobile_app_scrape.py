@@ -13,12 +13,17 @@ from constants import *
 import android_scrapping
 import wx
 from socketIO_client import SocketIO,BaseNamespace
-import os
+import os, time, sys
 import logger
 import logging
 log = logging.getLogger('mobile_app_scrape.py')
 obj=android_scrapping.InstallAndLaunch()
 import core_utils
+from threading import Thread
+# cropandaddobj = None
+img=None
+from queue import Queue
+import concurrent.futures
 
 class ScrapeWindow(wx.Frame):
 
@@ -29,9 +34,9 @@ class ScrapeWindow(wx.Frame):
 
 
     def __init__(self, parent,id, title,filePath,socketIO):
-        wx.Frame.__init__(self, parent, title=title, size=(190, 170), style=wx.DEFAULT_FRAME_STYLE & ~(wx.RESIZE_BORDER|wx.MAXIMIZE_BOX|wx.CLOSE_BOX))
+        wx.Frame.__init__(self, parent, title=title, size=(190, 202), style=wx.DEFAULT_FRAME_STYLE & ~(wx.RESIZE_BORDER|wx.MAXIMIZE_BOX|wx.CLOSE_BOX))
         self.SetBackgroundColour('#e6e7e8')
-        self.iconpath = os.environ["IMAGES_PATH"] + "/slk.ico"
+        self.iconpath = os.environ["IMAGES_PATH"] + "/avo.ico"
         self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
         self.core_utilsobject = core_utils.CoreUtils()
         self.parent = parent
@@ -111,6 +116,12 @@ class ScrapeWindow(wx.Frame):
             self.swipedownbutton.Bind(wx.EVT_BUTTON, self.swipedown)
             self.swipeupbutton = wx.Button(self.panel, label="Swipe Up",pos=(12,92), size=(150, 28))
             self.swipeupbutton.Bind(wx.EVT_BUTTON, self.swipeup)
+
+            import mobile_crop_and_add
+            self.cropandaddobj = mobile_crop_and_add.Cropandadd()
+            self.queue = Queue()
+            self.irisbutton = wx.ToggleButton(self.panel, label="Start IRIS", pos=(12, 124), size=(150, 28))
+            self.irisbutton.Bind(wx.EVT_TOGGLEBUTTON, self.iris)
             self.Centre()
             style = self.GetWindowStyle()
             self.SetWindowStyle( style|wx.STAY_ON_TOP )
@@ -177,7 +188,7 @@ class ScrapeWindow(wx.Frame):
         try:
             if(self.selected_choice.lower()=="full"):
                 d = obj.scrape()
-                # 10 is the limit of MB set as per Nineteen68 standards
+                # 10 is the limit of MB set as per Avo Assure standards
                 if d is not None:
                     if self.core_utilsobject.getdatasize(str(d),'mb') < 10:
                         self.socketIO.emit('scrape',d)
@@ -254,3 +265,53 @@ class ScrapeWindow(wx.Frame):
         except Exception as e:
             self.print_error("Error occurred in SwipeUp")
             log.error(e, exc_info=True)
+       
+
+    '''
+        --- def onIRISstart() ---
+        > Disable other buttons
+        > Gets the screenshot dimensions
+        > launches screenshot viewer
+        > starts another thread to perform cropandadd
+    '''
+    def onIRISstart(self, event):
+        logger.print_on_console("Performing IRIS")
+        self.scrapebutton.Disable()
+        self.scrapedropdown.Disable()             #disabling the rest of buttons
+        self.swipedownbutton.Disable()
+        self.swipeupbutton.Disable()
+        event.GetEventObject().SetLabel("Stop IRIS")                # changing the label "start iris" to "stop iris"
+        size = obj.get_screenshot(resizeImg=True)         # saves the screenshot and gets the size of that screenshot
+        time.sleep(1)
+        status = self.cropandaddobj.startcropandadd(self,size)
+
+    '''
+        --- def onIRISstop() ---
+        > Closes the cropandadd and screenshot viewer
+        > Stores the scraped elements
+        > Returns scraped elements to webserver
+    '''
+
+    def onIRISstop(self, event):
+        logger.print_on_console("Stopped IRIS")
+        self.Hide()                     # hides the scrapping window
+        self.scraped_data = None            # initializing scraped_data to None
+        data = self.cropandaddobj.stopcropandadd()
+        self.scraped_data = data
+        time.sleep(2)                
+        self.parent.schedule.Enable()
+        self.socketIO.emit('scrape',self.scraped_data)
+        self.Close()
+
+    '''
+        --- def iris() ---
+        > Gets called when start or stop iris button pressed
+        > Calls onIRISstart and onIRISstop depending upon status' value True or False
+    '''
+
+    def iris(self, event):
+        status = event.GetEventObject().GetValue()          # stores True/False to status keyword
+        if status:
+            self.onIRISstart(event)                 # perform start crop operation
+        else:
+            self.onIRISstop(event)                  # perform stop crop operation

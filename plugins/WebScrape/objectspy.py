@@ -108,7 +108,7 @@ class Object_Mapper():
                 comparedin = 'CH'
 
             log.info("taking fullpage screenshot")
-            maindir = os.environ["NINETEEN68_HOME"]
+            maindir = os.environ["AVO_ASSURE_HOME"]
             screen_shot_path = maindir + '/output/' + domconstants.SCREENSHOT_IMG
             if (isinstance(self.driver, webdriver.Firefox) or isinstance(self.driver, webdriver.Chrome)):
                 screen = self.webscrapeutilsobj.fullpage_screenshot(self.driver, screen_shot_path)
@@ -121,7 +121,7 @@ class Object_Mapper():
             self.data['changedobjectskeys'] = self.changedobjectskeys
             self.data['notfoundobjectskeys'] = self.notfoundobjectskeys
             log.info("writing data into domelements.json")
-            with open(os.environ["NINETEEN68_HOME"] + '/output/domelements.json', 'w') as outfile:
+            with open(os.environ["AVO_ASSURE_HOME"] + '/output/domelements.json', 'w') as outfile:
                 json.dump(self.data, outfile, indent=4, sort_keys=False)
             self.status  = domconstants.STATUS_SUCCESS
         except ValueError as e:

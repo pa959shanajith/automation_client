@@ -187,7 +187,7 @@ def socketIO_get_response(request, *args, **kw):
         raise ConnectionError('could not negotiate SSL (%s)' % e)
     status_code = response.status_code
     if 200 != status_code:
-        if status_code == 504 and "Nineteen68 Error" in response.text: raise ValueError("Nineteen68 Server Unavailable")
+        if status_code == 504 and "Avo Assure Error" in response.text: raise ValueError("Avo Assure Server Unavailable")
         raise ConnectionError('unexpected status code (%s %s)' % (
             status_code, response.text))
     return response

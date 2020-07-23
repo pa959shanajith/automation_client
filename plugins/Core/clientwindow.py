@@ -27,21 +27,21 @@ configvalues = None
 update_obj = None
 SERVER_LOC = None
 pdfgentool = None
-NINETEEN68_HOME = os.environ["NINETEEN68_HOME"]
-IMAGES_PATH = NINETEEN68_HOME + "/assets/images/"
+AVO_ASSURE_HOME = os.environ["AVO_ASSURE_HOME"]
+IMAGES_PATH = AVO_ASSURE_HOME + "/assets/images/"
 os.environ["IMAGES_PATH"] = IMAGES_PATH
-CONFIG_PATH= NINETEEN68_HOME + "/assets/config.json"
-CERTIFICATE_PATH = NINETEEN68_HOME + "/assets/CA_BUNDLE"
-LOGCONFIG_PATH = NINETEEN68_HOME + "/assets/logging.conf"
-DRIVERS_PATH = NINETEEN68_HOME + "/lib/Drivers"
+CONFIG_PATH= AVO_ASSURE_HOME + "/assets/config.json"
+CERTIFICATE_PATH = AVO_ASSURE_HOME + "/assets/CA_BUNDLE"
+LOGCONFIG_PATH = AVO_ASSURE_HOME + "/assets/logging.conf"
+DRIVERS_PATH = AVO_ASSURE_HOME + "/lib/Drivers"
 CHROME_DRIVER_PATH = DRIVERS_PATH + "/chromedriver"
 GECKODRIVER_PATH = DRIVERS_PATH + "/geckodriver"
 if SYSTEM_OS == "Windows":
     CHROME_DRIVER_PATH += ".exe"
     GECKODRIVER_PATH += ".exe"
-MANIFEST_LOC= NINETEEN68_HOME + '/assets/about_manifest.json'
-LOC_7Z = NINETEEN68_HOME + '/Lib/7zip/7z.exe'
-UPDATER_LOC = NINETEEN68_HOME + '/assets/Update.exe'
+MANIFEST_LOC= AVO_ASSURE_HOME + '/assets/about_manifest.json'
+LOC_7Z = AVO_ASSURE_HOME + '/Lib/7zip/7z.exe'
+UPDATER_LOC = AVO_ASSURE_HOME + '/assets/Update.exe'
 if (os.path.exists(UPDATER_LOC[:-3] + "py")): UPDATER_LOC = UPDATER_LOC[:-3] + "py"
 
 
@@ -72,7 +72,7 @@ class ClientWindow(wx.Frame):
         self.debug_mode=False
         self.choice='Normal'
         global wxObject
-        self.iconpath = IMAGES_PATH +"slk.ico"
+        self.iconpath = IMAGES_PATH +"avo.ico"
         self.connect_img=wx.Image(IMAGES_PATH +"connect.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
         self.disconnect_img=wx.Image(IMAGES_PATH +"disconnect.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
         self.register_img=wx.Image(IMAGES_PATH +"register.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
@@ -126,7 +126,7 @@ class ClientWindow(wx.Frame):
         self.Bind(wx.EVT_MENU, self.menuhandler)
         self.connectbutton = wx.BitmapButton(self.panel, bitmap=self.connect_img,pos=(10, 10), size=(100, 25), name='connect')
         self.connectbutton.Bind(wx.EVT_BUTTON, self.OnNodeConnect)
-        self.connectbutton.SetToolTip(wx.ToolTip("Connect to Nineteen68 Server"))
+        self.connectbutton.SetToolTip(wx.ToolTip("Connect to Avo Assure Server"))
         self.log = wx.TextCtrl(self.panel, wx.ID_ANY, pos=(12, 38), size=(760,500), style = wx.TE_MULTILINE|wx.TE_READONLY)
         font1 = wx.Font(10, wx.MODERN, wx.NORMAL, wx.NORMAL,  False, 'Consolas')
         self.log.SetForegroundColour((0,50,250))
@@ -147,6 +147,7 @@ class ClientWindow(wx.Frame):
         self.rbox.Bind(wx.EVT_RADIOBOX,self.onRadioBox)
         self.breakpoint = wx.TextCtrl(self.panel, wx.ID_ANY, pos=(225, 595), size=(60,20), style = wx.TE_RICH)
         box.Add(self.breakpoint, 1, wx.ALL|wx.EXPAND, 5)
+        self.breakpoint.Bind(wx.EVT_CHAR, self.handle_keypress)
         self.breakpoint.Disable()
 
         self.cancelbutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap(IMAGES_PATH +"killStaleProcess.png", wx.BITMAP_TYPE_ANY), wx.Point(360, 555), wx.Size(50, 42))
@@ -173,6 +174,10 @@ class ClientWindow(wx.Frame):
         self.panel.SetSizer(self.sizer)
         self.Centre()
         self.Show()
+
+    """ Allows only integer values + directional keys """
+    def handle_keypress(self, event):
+        if chr(event.GetKeyCode()) in '0123456789\x08\x09ĺĽĻļĹĸŷŸŹźŻž\x7f': event.Skip()
 
     """
     Menu Items:
@@ -206,7 +211,7 @@ class ClientWindow(wx.Frame):
                 msg = '--Edit Config selected--'
                 logger.print_on_console(msg)
                 log.info(msg)
-                Config_window(parent = None,id = -1, title="Nineteen68 Configuration")
+                Config_window(parent = None,id = -1, title="Avo Assure Configuration")
             except Exception as e:
                 msg = "Error while updating configuration"
                 logger.print_on_console(msg)
@@ -297,12 +302,12 @@ class ClientWindow(wx.Frame):
     def onRadioBox(self,e):
         self.choice=self.rbox.GetStringSelection()
         logger.print_on_console(str(self.choice)+' is Selected')
+        self.debug_mode=False
         if self.choice == 'Normal':
             self.breakpoint.Clear()
             self.breakpoint.Disable()
             self.killChildWindow(debug=True)
-        self.debug_mode=False
-        if self.choice in ['Stepwise','RunfromStep']:
+        elif self.choice in ['Stepwise','RunfromStep']:
             self.debug_mode=True
             ##if self.debugwindow == None:
             ##    self.debugwindow = DebugWindow(parent = None,id = -1, title="Debugger")
@@ -360,7 +365,7 @@ class ClientWindow(wx.Frame):
                 if self.connectbutton.GetName() != "register":
                     self.connectbutton.SetBitmapLabel(self.connect_img)
                     self.connectbutton.SetName('connect')
-                    self.connectbutton.SetToolTip(wx.ToolTip("Connect to Nineteen68 Server"))
+                    self.connectbutton.SetToolTip(wx.ToolTip("Connect to Avo Assure Server"))
                     self.connectbutton.Enable()
                 self.schedule.SetValue(False)
                 self.schedule.Disable()
@@ -376,7 +381,7 @@ class ClientWindow(wx.Frame):
     def enable_register(self):
         self.connectbutton.SetBitmapLabel(self.register_img)
         self.connectbutton.SetName("register")
-        self.connectbutton.SetToolTip(wx.ToolTip("Register ICE with Nineteen68 Server"))
+        self.connectbutton.SetToolTip(wx.ToolTip("Register ICE with Avo Assure Server"))
         self.connectbutton.Enable()
 
     def killChildWindow(self, debug=False, scrape=False, display=False, pdf=False,register=False):
@@ -401,6 +406,8 @@ class ClientWindow(wx.Frame):
         if scrape:
             try:
                 if (self.scrapewindow != None) and (bool(self.scrapewindow) != False):
+                    if hasattr(self.scrapewindow, 'cropandaddobj') and self.scrapewindow.cropandaddobj != None:
+                        self.scrapewindow.cropandaddobj.terminate_flag = True
                     self.scrapewindow.Destroy()
                     flag = True
                 self.scrapewindow = None
@@ -519,7 +526,7 @@ class Config_window(wx.Frame):
         wx.Frame.__init__(self, parent, title=title,
             pos=config_fields["Frame"][0], size=config_fields["Frame"][1],style = wx.CAPTION|wx.CLIP_CHILDREN)
 
-        self.iconpath = IMAGES_PATH +"slk.ico"
+        self.iconpath = IMAGES_PATH +"avo.ico"
         self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
         self.SetIcon(self.wicon)
         self.updated = False
@@ -573,7 +580,7 @@ class Config_window(wx.Frame):
         self.log_file_path_btn=wx.Button(self.panel, label="...",pos=config_fields["Log_path"][4], size=config_fields["Log_path"][5])
         self.log_file_path_btn.Bind(wx.EVT_BUTTON, self.fileBrowser_logfilepath)
         if (not isConfigJson) or (isConfigJson and isConfigJson['logFile_Path']=='./logs/TestautoV2.log'):
-            self.log_file_path.SetValue(os.path.normpath(NINETEEN68_HOME + '/logs/TestautoV2.log'))
+            self.log_file_path.SetValue(os.path.normpath(AVO_ASSURE_HOME + '/logs/TestautoV2.log'))
         else:
             self.log_file_path.SetValue(isConfigJson['logFile_Path'])
 
@@ -869,11 +876,9 @@ class Config_window(wx.Frame):
         wx.Frame(self.panel)
         self.Show()
 
-    #allows only integer and float values 
+    """ Allows only integer and float values + directional keys"""
     def handle_keypress(self, event):
-        keycode = event.GetKeyCode()
-        if chr(keycode) in ['0','1','2','3','4','5','6','7','8','9','.','\x08','ĺ','ļ','Ĺ','ĸ','\x7f']:
-            event.Skip()
+        if chr(event.GetKeyCode()) in '0123456789.\x08\x09ĺĽĻļĹĸŷŸŹźŻž\x7f': event.Skip()
 
     def toggle1_generic(self,evt):
         self.demo=evt.EventObject
@@ -1154,7 +1159,7 @@ class Config_window(wx.Frame):
 
     """This method open a file selector dialog , from where file path can be set """
     def fileBrowser_chpath(self,event):
-        dlg = wx.FileDialog(self, message="Choose a file ...",defaultDir=NINETEEN68_HOME,defaultFile="", wildcard="Chrome executable (*chrome.exe)|*chrome.exe|" \
+        dlg = wx.FileDialog(self, message="Choose a file ...",defaultDir=AVO_ASSURE_HOME,defaultFile="", wildcard="Chrome executable (*chrome.exe)|*chrome.exe|" \
             "All files (*.*)|*.*", style=wx.FD_SAVE)
         if dlg.ShowModal() == wx.ID_OK:
             path = dlg.GetPath()
@@ -1162,14 +1167,14 @@ class Config_window(wx.Frame):
         dlg.Destroy()
 
     def fileBrowser_chprofile(self,event):
-        dlg = wx.DirDialog(self, message="Choose a folder ...",defaultPath=NINETEEN68_HOME, style=wx.DD_DEFAULT_STYLE | wx.DD_NEW_DIR_BUTTON)
+        dlg = wx.DirDialog(self, message="Choose a folder ...",defaultPath=AVO_ASSURE_HOME, style=wx.DD_DEFAULT_STYLE | wx.DD_NEW_DIR_BUTTON)
         if dlg.ShowModal() == wx.ID_OK:
             path = dlg.GetPath()
             self.chrome_profile.SetValue(path)
         dlg.Destroy()
     """This method open a file selector dialog , from where file path can be set """
     def fileBrowser_ffpath(self,event):
-        dlg = wx.FileDialog(self, message="Choose a file ...",defaultDir=NINETEEN68_HOME,defaultFile="", wildcard="Firefox executable (*firefox.exe)|*firefox.exe|" \
+        dlg = wx.FileDialog(self, message="Choose a file ...",defaultDir=AVO_ASSURE_HOME,defaultFile="", wildcard="Firefox executable (*firefox.exe)|*firefox.exe|" \
             "All files (*.*)|*.*", style=wx.FD_SAVE)
         if dlg.ShowModal() == wx.ID_OK:
             path = dlg.GetPath()
@@ -1185,7 +1190,7 @@ class Config_window(wx.Frame):
         dlg.Destroy()
     """This method open a file selector dialog , from where file path can be set """
     def fileBrowser_servcert(self,event):
-        dlg = wx.FileDialog(self, message="Choose a file ...",defaultDir=NINETEEN68_HOME,defaultFile="", wildcard="Certificate file (*.crt)|*.crt|" \
+        dlg = wx.FileDialog(self, message="Choose a file ...",defaultDir=AVO_ASSURE_HOME,defaultFile="", wildcard="Certificate file (*.crt)|*.crt|" \
             "All files (*.*)|*.*", style=wx.FD_SAVE)
         if dlg.ShowModal() == wx.ID_OK:
             path = dlg.GetPath()
@@ -1239,7 +1244,7 @@ class About_window(wx.Frame):
             }
             wx.Frame.__init__(self, parent, title=title,pos=upload_fields["Frame"][0], size=upload_fields["Frame"][1], style = wx.CAPTION|wx.CLIP_CHILDREN)
             self.SetBackgroundColour('#e6e7e8')
-            self.iconpath = IMAGES_PATH +"slk.ico"
+            self.iconpath = IMAGES_PATH +"avo.ico"
             self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
             self.SetIcon(self.wicon)
             self.panel = wx.Panel(self)
@@ -1291,7 +1296,7 @@ class About_window(wx.Frame):
         return str1
 
     def get_Info_4(self):
-        return 'Copyright ?? -SLK Software Solutions \n'
+        return '© Avo Automation\n'
 
     def get_Info_5(self,data):
         str1=''
@@ -1344,7 +1349,7 @@ class Check_Update_window(wx.Frame):
             }
             wx.Frame.__init__(self, parent, title=title,pos=upload_fields["Frame"][0], size=upload_fields["Frame"][1], style = wx.CAPTION|wx.CLIP_CHILDREN)
             self.SetBackgroundColour('#e6e7e8')
-            self.iconpath = IMAGES_PATH +"slk.ico"
+            self.iconpath = IMAGES_PATH +"avo.ico"
             self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
             self.SetIcon(self.wicon)
             self.updated = False
@@ -1410,7 +1415,7 @@ class rollback_window(wx.Frame):
             }
             wx.Frame.__init__(self, parent, title=title,pos=upload_fields["Frame"][0], size=upload_fields["Frame"][1], style = wx.CAPTION|wx.CLIP_CHILDREN)
             self.SetBackgroundColour('#e6e7e8')
-            self.iconpath = IMAGES_PATH +"slk.ico"
+            self.iconpath = IMAGES_PATH +"avo.ico"
             self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
             self.SetIcon(self.wicon)
             self.panel = wx.Panel(self)
@@ -1421,13 +1426,13 @@ class rollback_window(wx.Frame):
             self.close_btn = wx.Button(self.panel, label="Close",pos=upload_fields["Close"][0], size=upload_fields["Close"][1])
             self.close_btn.Bind(wx.EVT_BUTTON, self.close)
             self.rollback_btn.Disable()
-            res = os.path.exists(os.path.normpath(NINETEEN68_HOME+'/assets/Nineteen68_backup.7z'))
+            res = os.path.exists(os.path.normpath(AVO_ASSURE_HOME+'/assets/AvoAssureICE_backup.7z'))
             self.rollback_obj = update_module.Update_Rollback()
             if ( res == False ):
-                self.disp_msg.AppendText( "Nineteen68 ICE backup not found, cannot rollback changes.")
+                self.disp_msg.AppendText( "Avo Assure ICE backup not found, cannot rollback changes.")
             else:
-                self.rollback_obj.update(None, None, None, NINETEEN68_HOME, LOC_7Z, UPDATER_LOC, 'ROLLBACK')
-                self.disp_msg.AppendText( "Click 'Rollback' to run previous version of Nineteen68.")
+                self.rollback_obj.update(None, None, None, AVO_ASSURE_HOME, LOC_7Z, UPDATER_LOC, 'ROLLBACK')
+                self.disp_msg.AppendText( "Click 'Rollback' to run previous version of Avo Assure ICE.")
                 self.rollback_btn.Enable()
             self.Centre()
             wx.Frame(self.panel)
@@ -1437,11 +1442,11 @@ class rollback_window(wx.Frame):
             logger.print_on_console('Error occured while trying to rollback.')
 
     def rollback(self,event):
-        """Rolls back Nineteen68"""
+        """Rolls back Avo Assure ICE"""
         try:
             self.close(event)
-            logger.print_on_console("--Rolling back to previous version of Nineteen68--")
-            log.info("--Rolling back to previous version of Nineteen68--")
+            logger.print_on_console("--Rolling back to previous version of Avo Assure ICE--")
+            log.info("--Rolling back to previous version of Avo Assure ICE--")
             self.rollback_obj.run_rollback()
         except Exception as e:
             log.error('Error occured in rollback : ' + str(e))
@@ -1461,7 +1466,7 @@ class DebugWindow(wx.Frame):
             style=wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER |wx.MAXIMIZE_BOX|wx.CLOSE_BOX) )
         self.SetBackgroundColour('#e6e7e8')
         ##style = wx.CAPTION|wx.CLIP_CHILDREN
-        self.iconpath = IMAGES_PATH +"slk.ico"
+        self.iconpath = IMAGES_PATH +"avo.ico"
         self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
         self.SetIcon(self.wicon)
         self.panel = wx.Panel(self)
@@ -1514,7 +1519,7 @@ def check_update(flag):
     def update_updater_module(data):
         global update_obj
         update_obj = update_module.Update_Rollback()
-        update_obj.update(data, MANIFEST_LOC, SERVER_LOC, NINETEEN68_HOME, LOC_7Z, UPDATER_LOC, 'UPDATE')
+        update_obj.update(data, MANIFEST_LOC, SERVER_LOC, AVO_ASSURE_HOME, LOC_7Z, UPDATER_LOC, 'UPDATE')
     #---------------------------------------updater
     data = get_server_manifest_data()
     update_updater_module(data)
@@ -1525,10 +1530,10 @@ def check_update(flag):
         logger.print_on_console("An update is available. Click on 'Help' menu option -> 'Check for Updates' sub-menu option -> 'Update' button")
         logger.print_on_console('The latest ICE version : ',l_ver)
         log.info(UPDATE_MSG)
-    elif ( UPDATE_MSG == 'You are running the latest version of Nineteen68' and flag == True ):
+    elif ( UPDATE_MSG == 'You are running the latest version of Avo Assure ICE' and flag == True ):
         logger.print_on_console( "No updates available" )
         log.info( "No updates available" )
-    elif ( UPDATE_MSG == 'An Error has occoured while checking for new versions of Nineteen68, kindly contact Support Team'):
+    elif ( UPDATE_MSG == 'An Error has occured while checking for new versions of Avo Assure ICE, kindly contact Support Team'):
         if not (os.path.exists(MANIFEST_LOC)):
             logger.print_on_console( "Client manifest unavaliable." )
             log.info( "Client manifest unavaliable." )

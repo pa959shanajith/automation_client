@@ -6,20 +6,20 @@ import logger
 import readconfig
 import platform
 import constants
-log = logging.getLogger('Nineteen68')
+log = logging.getLogger('Avo_Assure')
 
-parser = argparse.ArgumentParser(description="Nineteen68 ICE Platform")
-parser.add_argument('-n', '--NINETEEN68_HOME', required=True, type=str, help='A Required path to Nineteen68 root location')
-parser.add_argument('-v', '--version', action='version', version='Nineteen68 ICE 2.0', help='Show Nineteen68 ICE version information')
-parser.add_argument('--register', action='store_true', help='Register Nineteen68 ICE with Nineteen68 Web Application.')
+parser = argparse.ArgumentParser(description="Avo Assure ICE Platform")
+parser.add_argument('-n', '--AVO_ASSURE_HOME', required=True, type=str, help='A Required path to Avo Assure root location')
+parser.add_argument('-v', '--version', action='version', version='Avo Assure ICE 2.0', help='Show Avo Assure ICE version information')
+parser.add_argument('--register', action='store_true', help='Register Avo Assure ICE with Avo Assure Web Application.')
 reg_group = parser.add_argument_group("register")
-reg_group.add_argument('--host', type=str, help='Nineteen68 Web Application URL. Eg: https://example.com:8443. If no value is provided then value is read from configuration file.')
+reg_group.add_argument('--host', type=str, help='Avo Assure Web Application URL. Eg: https://example.com:8443. If no value is provided then value is read from configuration file.')
 reg_group.add_argument('--token', type=str, help='Registration token obtained during ICE Provisioning. Input can be file or text.')
-parser.add_argument('--connect', action='store_true', help='Establish a connection between Nineteen68 Web Application and ICE.')
+parser.add_argument('--connect', action='store_true', help='Establish a connection between Avo Assure Web Application and ICE.')
 args = parser.parse_args()
-if args.NINETEEN68_HOME and not os.path.exists(args.NINETEEN68_HOME+os.sep+'/plugins'):
-    parser.error("Invalid path provided for NINETEEN68_HOME")
-os.environ["NINETEEN68_HOME"] = args.NINETEEN68_HOME
+if args.AVO_ASSURE_HOME and not os.path.exists(args.AVO_ASSURE_HOME+os.sep+'/plugins'):
+    parser.error("Invalid path provided for AVO_ASSURE_HOME")
+os.environ["AVO_ASSURE_HOME"] = args.AVO_ASSURE_HOME
 if args.connect and args.register:
     parser.error("Register operation cannot be used with connect operation")
 if not (args.register or args.connect) and (args.host or args.token):
@@ -58,9 +58,9 @@ if sys.platform == 'win32':
 
 if __name__ == "__main__":
     try:
-        appName = "Nineteen68 ICE"
+        appName = "Avo Assure ICE"
         constants.SYSTEM_OS = platform.system()
-        path = os.environ["NINETEEN68_HOME"]+os.sep
+        path = os.environ["AVO_ASSURE_HOME"]+os.sep
         if not os.path.exists(path+"logs"): os.mkdir(path+"logs")
         if not os.path.exists(path+"output"): os.mkdir(path+"output")
         import core

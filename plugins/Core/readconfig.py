@@ -20,7 +20,7 @@ configvalues = None
 class readConfig():
 
     def __init__(self):
-        self.config_path = os.environ["NINETEEN68_HOME"] + '/assets/config.json'
+        self.config_path = os.environ["AVO_ASSURE_HOME"] + '/assets/config.json'
 
     def readJson(self):
         global configvalues

@@ -31,6 +31,7 @@ def init(times,socket):
     socketIO = socket
     if len(threadNames) is not 0:
         stop(False)
+    times = []
     display_str = "Benchmark Execution Scheduled at "
     for i in range(len(times)):
         timeNow =  datetime.datetime.today()
@@ -94,7 +95,7 @@ def cpu():
             random.shuffle(arr)
             arr.reverse()
             arr = selectionSort(arr)
-            string = string + ''.join(str(e) for e in arr)			  
+            string = string + ''.join(str(e) for e in arr)
             binArr = []
             binArr = arr[:]
             convertToBinary(binArr)
@@ -159,20 +160,20 @@ def selectionSort(arr):
     return arr
 
 def dec2bin(dec):
-	return bin(math.ceil(dec))
+    return bin(math.ceil(dec))
 
 def convertToBinary(rr):
-	for i in range(len(rr)):
-		rr[i] = dec2bin(rr[i])
+    for i in range(len(rr)):
+        rr[i] = dec2bin(rr[i])
   
 def ping(host):
-	p = subprocess.Popen(["ping.exe",host], stdout = subprocess.PIPE, shell = True)
-	result = p.communicate()[0]
-	for row in str(result).split("\\r\\n"):
-		if 'Average' in row:
-			x = row.split("Average = ")[1].split("ms")[0]
-			return float(x)
-	return -1
+    p = subprocess.Popen(["ping.exe",host], stdout = subprocess.PIPE, shell = True)
+    result = p.communicate()[0]
+    for row in str(result).split("\\r\\n"):
+        if 'Average' in row:
+            x = row.split("Average = ")[1].split("ms")[0]
+            return float(x)
+    return -1
 
 def network():
     logger.print_on_console("Running network benchmark")
@@ -231,7 +232,7 @@ def execute(name,schedTime):
             logger.print_on_console("Terminating Benchmark Execution")
             start(delta.seconds,name,schedTime)
             return 
-        socketIO.emit('benchmark_ping',{'cpuscore':b,"memoryscore":c,"networkscore":a,"percent_received":str(percent * 100) + '%',"hostip":socket.gethostbyname(socket.gethostname()),"hostname":os.environ['username'],"systemscore":result,"time":str(datetime.datetime.isoformat(datetime.datetime.now()))})
+        socketIO.emit('benchmark_ping',{'cpuscore':b,"memoryscore":c,"networkscore":a,"percent_received":str(percent * 100) + '%',"hostip":socket.gethostbyname(socket.gethostname()),"hostname":os.environ['username'],"systemscore":result,"time":str(datetime.datetime.now())})
         start(delta.seconds,name,schedTime)
         return
     except Exception as e:

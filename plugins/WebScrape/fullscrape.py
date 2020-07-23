@@ -40,7 +40,7 @@ class Fullscrape():
             log.info(' Inside fullscrape method .....')
             log.info('scrape_option is: %s',scrape_option)
             hwndg = browserops.hwndg
-            maindir = os.environ["NINETEEN68_HOME"]
+            maindir = os.environ["AVO_ASSURE_HOME"]
             screen_shot_path = maindir + '/output/' + domconstants.SCREENSHOT_IMG
             log.info('Obtained browser handle and driver from browserops.py class .....')
             if SYSTEM_OS=='Windows':
@@ -142,7 +142,7 @@ class Fullscrape():
             log.info('json operations dumps and loads are performed on the return data')
             scrape_time = time.clock() - start_time
             log.info("Time taken in fullscrape: %s seconds",str(scrape_time))
-            if (isinstance(driver,webdriver.Firefox) or isinstance(driver,webdriver.Chrome)):
+            if (isinstance(driver,webdriver.Firefox) or isinstance(driver,webdriver.Chrome) or isinstance(driver,webdriver.Edge)):
                 screen = webscrape_utils_obj.fullpage_screenshot(driver, screen_shot_path )
             else:
                 screen = driver.get_screenshot_as_base64()
@@ -153,12 +153,16 @@ class Fullscrape():
                 scrapedin =  'IE'
             elif browserops.browser == 1:
                 scrapedin =  'CH'
+            elif browserops.browser == 7:
+                scrapedin = 'EDGE'
+            elif browserops.browser == 8:
+                scrapedin = 'EDGE CHROMIUM'
             data['scrapetype'] = 'fs'
             data['scrapedin'] = scrapedin
             data['view'] = tempne
             data['mirror'] = screen
             log.info('Creating a json object with key view with value as return data')
-            with open(os.environ["NINETEEN68_HOME"] + '/output/domelements.json', 'w') as outfile:
+            with open(os.environ["AVO_ASSURE_HOME"] + '/output/domelements.json', 'w') as outfile:
                 log.info('Opening domelements.json file to write view object')
                 json.dump(data, outfile, indent=4, sort_keys=False)
                 log.info('view is dumped into  domelements.json file ')

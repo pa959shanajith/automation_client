@@ -24,8 +24,7 @@ class RadioCheckboxKeywords():
 
     def __init__(self):
         self.utilobj=UtilWebKeywords()
-        self.status={'radio':'Selected',
-                    'checkbox':'Checked'}
+        self.status = { 'radio': 'Selected', 'checkbox': 'Checked' }
 
 
     def __web_driver_exception(self,e):
@@ -299,9 +298,9 @@ class RadioCheckboxKeywords():
                                     else:
                                         counter+=counter
                   else:
-                            #Nineteen68#1626: commented next line, as because of this, loop was not going into next iteration
-                            #eleStatus=True
-                            continue
+                        # Commented next line, as because of this, loop was not going into next iteration
+                        # eleStatus=True
+                        continue
 
                   if eleStatus==True:
                     actualElement=cellChild

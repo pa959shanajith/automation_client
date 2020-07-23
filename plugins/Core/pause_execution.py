@@ -42,7 +42,7 @@ class AppFrame(wx.Frame):
 
 
 def execute(flag):
-    obj=AppFrame(None, title="SLK Nineteen68 - Pause")
+    obj=AppFrame(None, title="Avo Assure - Pause")
     if flag=='pause':
         app2.MainLoop()
     elif flag=='continue':

@@ -1,8 +1,9 @@
 import os
+from constants import SYSTEM_OS
 
-drivers_path = os.environ["NINETEEN68_HOME"] + "/Lib/Drivers"
+drivers_path = os.path.join(os.environ["AVO_ASSURE_HOME"], "lib", "Drivers")
 
-assets_path = os.environ["NINETEEN68_HOME"] + "/assets"
+assets_path = os.environ["AVO_ASSURE_HOME"] + os.sep + "assets"
 
 GET_XPATH_JS="""function getElementXPath(elt) {var path = "";for (; elt && elt.nodeType == 1; elt = elt.parentNode){idx = getElementIdx(elt);xname = elt.tagName;if (idx >= 1){xname += "[" + idx + "]";}path = "/" + xname + path;}return path;}function getElementIdx(elt){var count = 1;for (var sib = elt.previousSibling; sib ; sib = sib.previousSibling){if(sib.nodeType == 1 && sib.tagName == elt.tagName){count++;}}return count;}return getElementXPath(arguments[0]).toLowerCase();"""
 
@@ -13,9 +14,9 @@ GET_CELL_JS="""var temp = fun(arguments[0], arguments[2], arguments[1]); return 
 
 VERIFY_VISIBLE = 'NO'
 
-TEST_RESULT_PASS = "Pass";
+TEST_RESULT_PASS = "Pass"
 
-TEST_RESULT_FAIL = "Fail";
+TEST_RESULT_FAIL = "Fail"
 
 VALUE = 'value'
 
@@ -23,26 +24,35 @@ NAME = 'name'
 
 HREF = 'href'
 
-TEST_RESULT_TRUE = "True";
+TEST_RESULT_TRUE = "True"
 
-TEST_RESULT_FALSE = "False";
+TEST_RESULT_FALSE = "False"
 
 METHOD_INVALID='Invalid Keyword'
 
 INVALID_INPUT='Input is Invalid'
 
-##CHROME_DRIVER_PATH = 'chromedriver.exe'
-CHROME_DRIVER_PATH = drivers_path + "\\chromedriver.exe"
+CHROME_DRIVER_PATH = drivers_path + os.sep + "chromedriver"
 
-IE_DRIVER_PATH_64 =  drivers_path +'\\IEDriverServer64.exe'
+EDGE_DRIVER_PATH = drivers_path + os.sep + "MicrosoftWebDriver.exe"
 
-IE_DRIVER_PATH_32 =   drivers_path +'\\IEDriverServer.exe'
+EDGE_CHROMIUM_DRIVER_PATH = drivers_path + os.sep + "msedgedriver"
 
-PHANTOM_DRIVER_PATH =  drivers_path +'\\phantomjs.exe'
+IE_DRIVER_PATH_64 =  drivers_path + os.sep + 'IEDriverServer64.exe'
 
-GECKODRIVER_PATH =  drivers_path +'\\geckodriver.exe'
+IE_DRIVER_PATH_32 =   drivers_path + os.sep + 'IEDriverServer.exe'
 
-EXTENSION_PATH = assets_path + '\\extension.crx'
+PHANTOM_DRIVER_PATH =  drivers_path + os.sep + 'phantomjs.exe'
+
+GECKODRIVER_PATH =  drivers_path + os.sep + 'geckodriver'
+
+EXTENSION_PATH = assets_path + os.sep + 'extension.crx'
+
+if SYSTEM_OS == "Windows":
+    CHROME_DRIVER_PATH += ".exe"
+    GECKODRIVER_PATH += ".exe"
+    EDGE_CHROMIUM_DRIVER_PATH += ".exe"
+
 
 SET_TEXT_SCRIPT="""arguments[0].value=arguments[1]"""
 
@@ -169,4 +179,4 @@ NON_WEBELEMENT_KEYWORDS=['openbrowser','opennewbrowser','navigatetourl','getpage
 
 FOUND='found'
 
-BROWSER_NAME = {1: 'Chrome', 2: 'Firefox', 3: 'Internet Explorer'}
+BROWSER_NAME = {1: 'Chrome', 2: 'Firefox', 3: 'Internet Explorer', 7: 'Edge Legacy', 8: 'Edge Chromium'}

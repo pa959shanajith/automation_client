@@ -128,7 +128,7 @@ class Cropandadd():
             with open("out.png", "rb") as imageFile:
                 self.data['mirror'] = base64.b64encode(imageFile.read()).decode('UTF-8').strip()
             os.remove('out.png')
-            with open(os.environ["NINETEEN68_HOME"] + '/output/domelements.json', 'w') as outfile:
+            with open(os.environ["AVO_ASSURE_HOME"] + '/output/domelements.json', 'w') as outfile:
                 log.info('Opening domelements.json file to write scraped objects')
                 json.dump(self.data, outfile, indent=4, sort_keys=False)
                 log.info('crop and add is dumped into domelements.json file')

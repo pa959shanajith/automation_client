@@ -493,8 +493,10 @@ class Controller():
             display_keyword_response=result_temp[2]
         if tsp.name.lower()=='verifyvalues':
             display_keyword_response=[result[1]]
-        if tsp.name.lower()=='verifytextiris':
+        elif tsp.name.lower()=='verifytextiris':
             display_keyword_response=result[1]
+        elif tsp.name.lower()=='find':
+            keyword_response=result[1]
 		#To Handle dynamic variables of DB keywords
         if tsp.name.lower() in DATABASE_KEYWORDS:
             if keyword_response != []:
@@ -567,6 +569,9 @@ class Controller():
                 logger.print_on_console('Result obtained is: ',result[2])
             elif result:
                 logger.print_on_console('Result obtained is: ',result[1])
+        if tsp.name.lower()=='find':
+            keyword_response=result[1]
+            result = result[:1] + (result[2],) + result[2:]
         if len(output)>0 and output[0] != '':
             self.dynamic_var_handler_obj.store_dynamic_value(output[0],keyword_response,tsp.name)
         if len(output)>1:
@@ -665,7 +670,7 @@ class Controller():
                     #MobileApp apptype module call
                     if self.mobile_app_dispatcher_obj==None:
                         self.__load_mobile_app()
-                    result = self.invokemobileappkeyword(teststepproperty,self.mobile_app_dispatcher_obj,inpval,args[0])
+                    result = self.invokemobileappkeyword(teststepproperty,self.mobile_app_dispatcher_obj,inpval,args[0], iris_flag)
                 elif teststepproperty.apptype.lower() == APPTYPE_WEBSERVICE:
                     #Webservice apptype module call
                     if self.webservice_dispatcher_obj == None:
@@ -828,8 +833,8 @@ class Controller():
         res = dispatcher_obj.dispatcher(teststepproperty,inputval,self.reporting_obj)
         return res
 
-    def invokemobileappkeyword(self,teststepproperty,dispatcher_obj,inputval,reporting_obj):
-        res = dispatcher_obj.dispatcher(teststepproperty,inputval,self.reporting_obj)
+    def invokemobileappkeyword(self,teststepproperty,dispatcher_obj,inputval,reporting_obj, iris_flag):
+        res = dispatcher_obj.dispatcher(teststepproperty,inputval,self.reporting_obj, iris_flag)
         return res
 
     def invokeDesktopkeyword(self,teststepproperty,dispatcher_obj,inputval,iris_flag):
@@ -1159,7 +1164,7 @@ class Controller():
             print('=======================================================================================================')
         return status
 
-    #generating report of AWS in N68 by using AWS result(AWS device farm executed result present in test spec output.txt)
+    #generating report of AWS in Avo Assure by using AWS result(AWS device farm executed result present in test spec output.txt)
     def aws_report(self,aws_tsp,aws_scenario,step_results,suite_idx,execute_result_data,obj_reporting,json_data,socketIO):
         sc_idx=0
         idx_t=0
@@ -1168,7 +1173,7 @@ class Controller():
         inpval=[]
         keyword_flag=True
         ignore_stat=False
-        path_file=os.environ['NINETEEN68_HOME']+os.sep+'output'
+        path_file=os.environ['AVO_ASSURE_HOME']+os.sep+'output'
         os.chdir(path_file)
         f=open("step_result.txt","w")
         f.writelines(str(step_results))
@@ -1332,8 +1337,8 @@ def kill_process():
 
         try:
             # os.system("killall -9 Safari")
-                # This kills all instances of safari browser even if it is not opened by nineteen68.
-                # Issue when Nineteen68 is opened in Safari browser
+                # This kills all instances of safari browser even if it is not opened by Avo Assure.
+                # Issue when Avo Assure is opened in Safari browser
             os.system("killall -9 safaridriver")
             os.system("killall -9 node_appium")
             os.system("killall -9 xcodebuild")
@@ -1347,7 +1352,7 @@ def kill_process():
     else:
         try:
             import win32com.client
-            my_processes = ['chromedriver.exe','IEDriverServer.exe','IEDriverServer64.exe','CobraWinLDTP.exe','phantomjs.exe','geckodriver.exe']
+            my_processes = ['msedgedriver.exe','MicrosoftWebDriver.exe','MicrosoftEdge.exe','chromedriver.exe','IEDriverServer.exe','IEDriverServer64.exe','CobraWinLDTP.exe','phantomjs.exe','geckodriver.exe']
             wmi=win32com.client.GetObject('winmgmts:')
             for p in wmi.InstancesOf('win32_process'):
                 if p.Name in my_processes:

@@ -1,9 +1,9 @@
 #-------------------------------------------------------------------------------
 # Name:        Updater/Rollback Module
 # Purpose for update:     Does the following functions
-#                   1.Create a backup of Nineteen68 (plugins folder) and the about manifest
+#                   1.Create a backup of Avo Assure ICE (plugins folder) and the about manifest
 #                   2.Download files from End Point URL location to temp folder.
-#                   3.Unpack the files and replace them in Nineteen68 directory.
+#                   3.Unpack the files and replace them in AvoAssure directory.
 #                   4.Once all files have been replaced, delete the file from temp directory.
 #                   5.If minor changes then perform steps 1-3(while sequentially calling the zip files)
 #                   6.If major changes take the base package of the major version, then perform minor operations.
@@ -11,8 +11,8 @@
 #                   8.Close Client_updater module
 # Purpose for rollback:     Does the following functions
 #               1. Close ICE
-#               2. Delete Nineteen68 Folder and client manifest
-#               3. Unpack Nineteen68_backup.7z in ICE directory
+#               2. Delete Avo Assure ICE Folder and client manifest
+#               3. Unpack AvoAssureICE_backup.7z in ICE directory
 #               4. Delete the rollback
 #               5. Update in client manifest
 #               6. Restart ICE
@@ -95,7 +95,7 @@ class Message(wx.Frame):
         (keepGoing, skip) = self.progress.Update(taskPercent, update_msg)
 
     def ShowMessage(self):
-        dlg = wx.MessageBox("Nineteen68 updated successfully. Click 'OK' start ICE.", 'Info',
+        dlg = wx.MessageBox("Avo Assure ICE updated successfully. Click 'OK' start ICE.", 'Info',
             wx.OK | wx.ICON_INFORMATION)
         if (dlg == 4 ):
             self.Close()
@@ -130,34 +130,34 @@ class Updater:
         log.info( 'All class variables assigned.' )
 
     def create_backup(self):
-        """Purpose: To create a backup of Nineteen68 folder and about_manifest"""
-        """Input : 1.7-zip location 2.Nineteen68 folder location and about_manifest.json location 3.Rollbackfile location"""
-        """Functionality: 1.Checks is Update folder is present in ICE directory, if present checks if Nineteen68_backup.7z is present
-                          2.If Nineteen68_backup.7z is present, then delete this instance to create a new once(we do this so as not to keep appending new files to the existing 7zip file)
+        """Purpose: To create a backup of Avo Assure ICE folder and about_manifest"""
+        """Input : 1.7-zip location 2.Avo Assure ICE folder location and about_manifest.json location 3.Rollbackfile location"""
+        """Functionality: 1.Checks is Update folder is present in ICE directory, if present checks if AvoAssureICE_backup.7z is present
+                          2.If AvoAssureICE_backup.7z is present, then delete this instance to create a new once(we do this so as not to keep appending new files to the existing 7zip file)
                           3.If Update folder is not present then creates a new folder by the same name in ICE directory
-                          4.Adds Nineteen68(plugins) folder to Nineteen68_backup.7z
-                          5.Adds about_manifest.json to Nineteen68_backup.7z"""
+                          4.Adds Avo Assure (plugins) folder to AvoAssureICE_backup.7z
+                          5.Adds about_manifest.json to AvoAssureICE_backup.7z"""
         try:
             log.debug( 'Inside create_backup function' )
             #--------------------------------------------check if Update folder exists
-            if ( os.path.exists(self.extraction_loc + "\\assets\\Nineteen68_backup.7z") ):
-                log.debug( 'Nineteen68_backup.7z already exists, removing Nineteen68_backup.7z' )
-                os.remove(self.extraction_loc + "\\assets\\Nineteen68_backup.7z")
-                log.debug( 'Nineteen68_backup.7z removed succefully' )
+            if ( os.path.exists(self.extraction_loc + "\\assets\\AvoAssureICE_backup.7z") ):
+                log.debug( 'AvoAssureICE_backup.7z already exists, removing AvoAssureICE_backup.7z' )
+                os.remove(self.extraction_loc + "\\assets\\AvoAssureICE_backup.7z")
+                log.debug( 'AvoAssureICE_backup.7z removed succefully' )
                 time.sleep(1)
-            print ( '=>Creating new Nineteen68 backup instance' )
-            store_loc = self.extraction_loc+"\\assets\\Nineteen68_backup.7z"
-            source_nineteen68 = self.extraction_loc +'\\plugins'
+            print ( '=>Creating new Avo Assure ICE backup instance' )
+            store_loc = self.extraction_loc+"\\assets\\AvoAssureICE_backup.7z"
+            source_ice = self.extraction_loc +'\\plugins'
             source_client_manifest = self.extraction_loc +'\\assets\\about_manifest.json'
-            log.debug( 'Adding ' + source_nineteen68 + " to archive" )
-            archive_command = r'"{}" a "{}" "{}"'.format(self.loc_7z, store_loc, source_nineteen68)
+            log.debug( 'Adding ' + source_ice + " to archive" )
+            archive_command = r'"{}" a "{}" "{}"'.format(self.loc_7z, store_loc, source_ice)
             subprocess.call(archive_command, shell=True)
-            log.debug( 'Success : Added ' + source_nineteen68 + " to archive" )
+            log.debug( 'Success : Added ' + source_ice + " to archive" )
             log.debug( 'Adding '+source_client_manifest+ " to archive" )
             archive_command = r'"{}" a "{}" "{}"'.format(self.loc_7z, store_loc, source_client_manifest)
             subprocess.call(archive_command, shell=True)
             log.debug( 'Success : Added ' + source_client_manifest + " to archive" )
-            log.debug( 'Successfully created backup of Nineteen68' )
+            log.debug( 'Successfully created backup of Avo Assure ICE' )
         except Exception as e:
             print ( "Error occoured in create_backup : ", e )
             log.error( "Error occoured in create_backup : " + str(e) )
@@ -288,7 +288,7 @@ class Rollback():
     def __init__(self):
         """Initializing class variables"""
         self.ROLLBACK_LOC = None
-        self.NINETEEN68_LOC = None
+        self.AVOASSUREICE_LOC = None
         self.loc_7z = None
         pass
 
@@ -297,11 +297,11 @@ class Rollback():
         try:
             res = os.path.exists(self.ROLLBACK_LOC)
             if ( res == True ):
-                print( '=>Nineteen68_backup.7z exists, in location : ' + str(self.ROLLBACK_LOC) )
-                log.info( "Nineteen68_backup.7z exists, in location : " + str(self.ROLLBACK_LOC) )
+                print( '=>AvoAssureICE_backup.7z exists, in location : ' + str(self.ROLLBACK_LOC) )
+                log.info( "AvoAssureICE_backup.7z exists, in location : " + str(self.ROLLBACK_LOC) )
             elif ( res == False ):
-                print( '=>Nineteen68_backup.7z does not exist, in location : ' + str(self.ROLLBACK_LOC) )
-                log.info( "Nineteen68_backup.7z does not exist, in location : " + str(self.ROLLBACK_LOC) )
+                print( '=>AvoAssureICE_backup.7z does not exist, in location : ' + str(self.ROLLBACK_LOC) )
+                log.info( "AvoAssureICE_backup.7z does not exist, in location : " + str(self.ROLLBACK_LOC) )
         except Exception as e:
             print ( "=>Error occoured in backup_check : ", e )
             log.error( "Error occoured in backup_check : " + str(e) )
@@ -309,31 +309,31 @@ class Rollback():
             traceback.print_exc()
         return res
 
-    def assignment(self,NINETEEN68_LOC,loc_7z):
+    def assignment(self,AVOASSUREICE_LOC,loc_7z):
         """Assigning value to class variables"""
-        self.ROLLBACK_LOC = NINETEEN68_LOC+"\\assets\\Nineteen68_backup.7z"
+        self.ROLLBACK_LOC = AVOASSUREICE_LOC+"\\assets\\AvoAssureICE_backup.7z"
         log.info( '=>Rollback location : ' + str(self.ROLLBACK_LOC))
-        self.NINETEEN68_LOC = NINETEEN68_LOC
-        log.info( '=>Nineteen68 location : ' + str(self.NINETEEN68_LOC))
+        self.AVOASSUREICE_LOC = AVOASSUREICE_LOC
+        log.info( '=>Avo Assure ICE location : ' + str(self.AVOASSUREICE_LOC))
         self.loc_7z = loc_7z
         log.info( '=>7z location : ' + str(self.loc_7z))
 
     def delete_old_instance(self):
-        """Removing old Nineteen68 and client manifest"""
+        """Removing old Avo Assure ICE and client manifest"""
         try:
             log.debug( 'Inside delete_old_instance function' )
-            #-----------------------------------------deleting Nineteen68 folder and its contents
-            print( '=>Deleting : ',self.NINETEEN68_LOC+"\\plugins" )
-            log.info( 'Deleting : ' + str(self.NINETEEN68_LOC+"\\plugins") )
-            shutil.rmtree(self.NINETEEN68_LOC+"\\plugins", ignore_errors=False, onerror=None)
-            print( '=>Deleted : ',self.NINETEEN68_LOC+"\\plugins" )
-            log.info( 'Deleted : ' + str(self.NINETEEN68_LOC+"\\plugins") )
+            #-----------------------------------------deleting Avo Assure ICE folder and its contents
+            print( '=>Deleting : ',self.AVOASSUREICE_LOC+"\\plugins" )
+            log.info( 'Deleting : ' + str(self.AVOASSUREICE_LOC+"\\plugins") )
+            shutil.rmtree(self.AVOASSUREICE_LOC+"\\plugins", ignore_errors=False, onerror=None)
+            print( '=>Deleted : ',self.AVOASSUREICE_LOC+"\\plugins" )
+            log.info( 'Deleted : ' + str(self.AVOASSUREICE_LOC+"\\plugins") )
             #-------------------------------------------deleting client manifest
-            print( '=>Deleting : ',self.NINETEEN68_LOC+"\\assets\\about_manifest.json" )
-            log.info( 'Deleting : ' + str(self.NINETEEN68_LOC+"\\assets\\about_manifest.json") )
-            os.remove(self.NINETEEN68_LOC+"\\assets\\about_manifest.json")
-            print( '=>Deleted : ',self.NINETEEN68_LOC+"\\assets\\about_manifest.json" )
-            log.info( 'Deleted : ' + str(self.NINETEEN68_LOC+"\\assets\\about_manifest.json") )
+            print( '=>Deleting : ',self.AVOASSUREICE_LOC+"\\assets\\about_manifest.json" )
+            log.info( 'Deleting : ' + str(self.AVOASSUREICE_LOC+"\\assets\\about_manifest.json") )
+            os.remove(self.AVOASSUREICE_LOC+"\\assets\\about_manifest.json")
+            print( '=>Deleted : ',self.AVOASSUREICE_LOC+"\\assets\\about_manifest.json" )
+            log.info( 'Deleted : ' + str(self.AVOASSUREICE_LOC+"\\assets\\about_manifest.json") )
         except Exception as e:
             print ( "=>Error occoured in delete_old_instance : ", e )
             log.error( "Error occoured in delete_old_instance : " + str(e) )
@@ -344,10 +344,10 @@ class Rollback():
         """get to portable 7z and open the cmd #2.EXTRACT TO DESTINATION"""
         try:
             log.debug( 'Inside rollback_changes function' )
-            extract_command = r'"{}" x "{}" -o"{}" -y'.format( self.loc_7z, self.ROLLBACK_LOC, self.NINETEEN68_LOC )
+            extract_command = r'"{}" x "{}" -o"{}" -y'.format( self.loc_7z, self.ROLLBACK_LOC, self.AVOASSUREICE_LOC )
             subprocess.call(extract_command, shell = True )
-            print( '=>Completed extraction of package at :', self.NINETEEN68_LOC )
-            log.info( 'Completed extraction of package at : ' + str(self.NINETEEN68_LOC) )
+            print( '=>Completed extraction of package at :', self.AVOASSUREICE_LOC )
+            log.info( 'Completed extraction of package at : ' + str(self.AVOASSUREICE_LOC) )
         except Exception as e:
             print( '=>Extraction could not complete \n' )
             print ( "=>Error occoured in rollback_changes : ", e )
@@ -356,10 +356,10 @@ class Rollback():
             traceback.print_exc()
 
     def delete_rollback(self):
-        """Removing old Nineteen68 and client manifest"""
+        """Removing old Avo Assure ICE and client manifest"""
         try:
             log.debug( 'Inside delete_rollback function' )
-            #--------------------------------------deleting Nineteen68_backup.7z
+            #--------------------------------------deleting AvoAssureICE_backup.7z
             print( '=>Deleting : ',self.ROLLBACK_LOC )
             log.info( 'Deleting : ' + str(self.ROLLBACK_LOC) )
             os.remove(self.ROLLBACK_LOC)
@@ -376,7 +376,7 @@ class Rollback():
         """Modify the client manifest"""
         try:
             log.debug( 'Inside modify_client_manifest function' )
-            path= str(self.NINETEEN68_LOC + "/about_manifest.json")
+            path= str(self.AVOASSUREICE_LOC + "/about_manifest.json")
             with open(path) as json_file:
                 json_decoded = json.load(json_file)
             json_decoded['rollback'] = 'True'
@@ -384,7 +384,7 @@ class Rollback():
             with open(path, 'w') as json_file:
                 json.dump(json_decoded, json_file)
             #---------------------------------------------move about_manifest to assets.
-            shutil.move(self.NINETEEN68_LOC+"\\about_manifest.json", self.NINETEEN68_LOC+"\\assets\\about_manifest.json")
+            shutil.move(self.AVOASSUREICE_LOC+"\\about_manifest.json", self.AVOASSUREICE_LOC+"\\assets\\about_manifest.json")
         except Exception as e:
             print ( "=>Error occoured in modify_client_manifest : ", e )
             log.error( "Error occoured in modify_client_manifest : " + str(e) )
@@ -399,10 +399,10 @@ class common_functions:
         """Killing ICE via window title"""
         try:
             log.debug( 'Inside close_ICE function')
-            hwnd = win32gui.FindWindow(None, 'Nineteen68 ICE')
+            hwnd = win32gui.FindWindow(None, 'Avo Assure ICE')
             win32gui.PostMessage(hwnd, win32con.WM_CLOSE, 0, 0)
             time.sleep(5)
-            os.system('taskkill /F /FI "WINDOWTITLE eq Nineteen68 ICE"')
+            os.system('taskkill /F /FI "WINDOWTITLE eq Avo Assure ICE"')
             print ( '=>closed ICE' )
             log.info( 'ICE was closed' )
         except Exception as e:
@@ -411,11 +411,11 @@ class common_functions:
             import traceback
             traceback.print_exc()
 
-    def restartICE(self,NINETEEN68_LOC):
+    def restartICE(self,AVOASSUREICE_LOC):
         """Method to restart ICE"""
         try:
             log.debug( 'Inside restartICE function' )
-            loc = NINETEEN68_LOC[:NINETEEN68_LOC.rindex('\\')] +"\\run.bat"
+            loc = AVOASSUREICE_LOC[:AVOASSUREICE_LOC.rindex('\\')] +"\\run.bat"
             subprocess.Popen(loc,cwd=os.path.dirname(loc), creationflags=subprocess.CREATE_NEW_CONSOLE)
             log.debug( 'Restarted ICE.' )
         except Exception as e:
@@ -459,7 +459,7 @@ def main():
             obj.assignment(json.loads(sys.argv[2].replace("'",'\"')[1:-1]), json.loads(sys.argv[3].replace("'", '\"')[1:-1]), sys.argv[4], sys.argv[5], sys.argv[6])#---------------------------------->2.Assign Values
             comm_obj.percentageIncri(msg,25,"Updating...")
             comm_obj.percentageIncri(msg,30,"Creating backup.")
-            obj.create_backup()#---------------------------------->3.Create backup 'Nineteen68_backup' into Rollback folder
+            obj.create_backup()#---------------------------------->3.Create backup 'AvoAssureICE_backup' into Rollback folder
             comm_obj.percentageIncri(msg,35,"Backup created.")
             comm_obj.percentageIncri(msg,40,"Updating...")
             comm_obj.percentageIncri(msg,45,"Verifying latest files.")
@@ -471,7 +471,7 @@ def main():
             comm_obj.percentageIncri(msg,70,"Latest files retrieved.")
             comm_obj.percentageIncri(msg,75,"Updating...")
             comm_obj.percentageIncri(msg,80,"Downloading and extracting files")
-            obj.download_files(end_point_list)#---------------------------------->6.From the endpoint url list a.download the file, b.extract file into Nineteen68 and c.delete the downloaded  7z file
+            obj.download_files(end_point_list)#---------------------------------->6.From the endpoint url list a.download the file, b.extract file into Avo Assure ICE and c.delete the downloaded  7z file
             comm_obj.percentageIncri(msg,85,"Files Downloaded and extracted")
             comm_obj.percentageIncri(msg,90,"Updating...")
             comm_obj.percentageIncri(msg,95,"Successfully Updated!")
@@ -499,15 +499,15 @@ def main():
             comm_obj.percentageIncri(msg,35,"Rolling back changes...")
             if ( res == True ):
                 comm_obj.percentageIncri(msg,40,"Deleting old instance...")
-                obj.delete_old_instance()#---------------------------------->2.Delete old instance of Nineteen68 and about_manifest.json
+                obj.delete_old_instance()#---------------------------------->2.Delete old instance of Avo Assure ICE and about_manifest.json
                 comm_obj.percentageIncri(msg,45,"Old instance deleted.")
                 comm_obj.percentageIncri(msg,50,"Rolling back changes...")
                 comm_obj.percentageIncri(msg,55,"Extracting files...")
-                obj.rollback_changes()#---------------------------------->3.Rollback contents of Nineteen68_backup.7z
+                obj.rollback_changes()#---------------------------------->3.Rollback contents of AvoAssureICE_backup.7z
                 comm_obj.percentageIncri(msg,60,"Files extracted.")
                 comm_obj.percentageIncri(msg,65,"Rolling back changes...")
                 comm_obj.percentageIncri(msg,70,"Deleting rollback instance...")
-                obj.delete_rollback()#---------------------------------->4.Delete Nineteen68_backup.7z
+                obj.delete_rollback()#---------------------------------->4.Delete AvoAssureICE_backup.7z
                 comm_obj.percentageIncri(msg,75,"Rollback instance deleted.")
                 comm_obj.percentageIncri(msg,80,"Rolling back changes...")
                 comm_obj.percentageIncri(msg,85,"Modifying client manifest...")

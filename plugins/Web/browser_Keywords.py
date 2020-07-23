@@ -85,12 +85,12 @@ class BrowserKeywords():
                 enableSecurityFlag = True
             #Logic to make sure that logic of usage of existing driver is not applicable to execution
             if  browser_num[-1] != EXECUTE:
-                d = obj.chech_if_driver_exists_in_map(self.browser_num)
+                d = obj.check_if_driver_exists_in_map(self.browser_num)
                 if d == 'stale':
                     #stale logic
                     try:
                         import win32com.client
-                        my_processes = ['chromedriver.exe','IEDriverServer.exe','IEDriverServer64.exe','CobraWinLDTP.exe','phantomjs.exe']
+                        my_processes = ['chromedriver.exe','msedgedriver.exe','MicrosoftWebDriver.exe','MicrosoftEdge.exe','IEDriverServer.exe','IEDriverServer64.exe','CobraWinLDTP.exe','phantomjs.exe']
                         wmi=win32com.client.GetObject('winmgmts:')
                         for p in wmi.InstancesOf('win32_process'):
                             if p.Name in my_processes:
@@ -138,6 +138,19 @@ class BrowserKeywords():
                         p = psutil.Process(local_bk.driver_obj.iedriver.process.pid)
                         pidie = p.children()[0]
                         pid = pidie.pid
+                        local_bk.pid_set.append(pid)
+                    elif(self.browser_num == '7'):
+                        if enableSecurityFlag:
+                            local_bk.driver_obj = obj.set_security_zones(
+                                self.browser_num, local_bk.driver_obj)
+                        p = psutil.Process(local_bk.driver_obj.edge_service.process.pid)
+                        pidedge = p.children()[0]
+                        pid = pidedge.pid
+                        local_bk.pid_set.append(pid)
+                    elif (self.browser_num == '8'):
+                        p = psutil.Process(local_bk.driver_obj.edge_service.process.pid)
+                        pidchromium = p.children()[0]
+                        pid = pidchromium.pid
                         local_bk.pid_set.append(pid)
                     hwndg = utilobject.bring_Window_Front(pid)
                 self.update_pid_set(enableSecurityFlag)
@@ -207,7 +220,6 @@ class BrowserKeywords():
             err_msg=self.__web_driver_exception(e)
         return status,result,output,err_msg
 
-
     def openNewTab(self ,*args):
         global local_bk
         status=webconstants.TEST_RESULT_FAIL
@@ -215,7 +227,6 @@ class BrowserKeywords():
         output=OUTPUT_CONSTANT
         err_msg=None
         try:
-            logger.print_on_console(local_bk.driver_obj)
             local_bk.driver_obj.execute_script("window.open('');")
             handles = local_bk.driver_obj.window_handles
             local_bk.driver_obj.switch_to.window(handles[-1])
@@ -228,7 +239,6 @@ class BrowserKeywords():
             err_msg=self.__web_driver_exception(e)
         return status,result,output,err_msg
 
-        
     def refresh(self,*args):
         global local_bk
         status=webconstants.TEST_RESULT_FAIL
@@ -262,8 +272,12 @@ class BrowserKeywords():
                 #ignore certificate implementation
                 try:
                     ignore_certificate = readconfig.configvalues['ignore_certificate']
-                    if ((ignore_certificate.lower() == 'yes') and ((local_bk.driver_obj.title !=None) and ('Certificate' in local_bk.driver_obj.title))):
-                        local_bk.driver_obj.execute_script("""document.getElementById('overridelink').click();""")
+                    tab_title = local_bk.driver_obj.title
+                    if ((ignore_certificate.lower() == 'yes') and (tab_title is not None)):
+                        if 'Certificate' in tab_title:
+                            local_bk.driver_obj.execute_script("""document.getElementById('overridelink').click();""")
+                        elif 'Privacy error' in tab_title:
+                            local_bk.driver_obj.execute_script("""document.getElementById('details-button').click();document.getElementById('proceed-link').click();""")
                 except Exception as k:
                     logger.print_on_console('Exception while ignoring the certificate')
                 logger.print_on_console('Navigated to URL')
@@ -677,7 +691,7 @@ class BrowserKeywords():
         output=OUTPUT_CONSTANT
         err_msg=None
         try:
-            if local_bk.driver_obj != None and isinstance(local_bk.driver_obj,webdriver.Ie):
+            if local_bk.driver_obj != None and isinstance(local_bk.driver_obj,webdriver.Ie) or isinstance(local_bk.driver_obj,webdriver.Edge):
                 #get all the cookies
                 cookies=local_bk.driver_obj.get_cookies()
                 if len(cookies)>0:
@@ -736,7 +750,6 @@ class BrowserKeywords():
                 #parent_handle=all_handles[0]
                 local_bk.recent_handles=[a for a in local_bk.recent_handles if a not in invalid_handles]
                 if len(local_bk.recent_handles)>0:
-                    ## Fix Nineteen68#1278
                     if local_bk.driver_obj.current_window_handle != local_bk.recent_handles[-1]:
                         local_bk.driver_obj.switch_to.window(local_bk.recent_handles[-1])
             except Exception as e:
@@ -783,7 +796,6 @@ class BrowserKeywords():
                     pidchrome = p.children()[0]
                     pid = pidchrome.pid
                     local_bk.pid_set.append(pid)
-
             elif(self.browser_num == '3'):
                 # Logic checks if security settings needs to be addressed
                 if enableSecurityFlag:
@@ -793,6 +805,21 @@ class BrowserKeywords():
                 p = psutil.Process(local_bk.driver_obj.iedriver.process.pid)
                 pidie = p.children()[0]
                 pid = pidie.pid
+                local_bk.pid_set.append(pid)
+            elif(self.browser_num == '7'):
+                if enableSecurityFlag:
+                    local_bk.driver_obj = obj.set_security_zones(
+                        self.browser_num, local_bk.driver_obj)
+                #Logic to get the pid of the edge window
+                p = psutil.Process(local_bk.driver_obj.edge_service.process.pid)
+                pidedge = p.children()[0]
+                pid = pidedge.pid
+                local_bk.pid_set.append(pid)
+            elif (self.browser_num == '8'):
+                #Logic to get the pid of the edge_chromium window
+                p = psutil.Process(local_bk.driver_obj.edge_service.process.pid)
+                pidchromium = p.children()[0]
+                pid = pidchromium.pid
                 local_bk.pid_set.append(pid)
             hwndg = utilobject.bring_Window_Front(pid)
 
@@ -831,7 +858,7 @@ class BrowserKeywords():
                     if from_window>-1:
                         local_bk.driver_obj.switch_to.window(window_handles[to_window-1])
                         self.update_recent_handle(window_handles[to_window-1])
-                        logger.print_on_console('Switched to window handle'+str(local_bk.driver_obj.current_window_handle))
+                        local_bk.log.info('Switched to window handle '+str(local_bk.driver_obj.current_window_handle))
                         logger.print_on_console('Control switched from window ' + str(from_window)
     							+ " to window " + str(to_window))
                         status=TEST_RESULT_PASS
@@ -890,59 +917,77 @@ class BrowserKeywords():
 
 class Singleton_DriverUtil():
 
-    def chech_if_driver_exists_in_map(self,browserType):
+    def check_if_driver_exists_in_map(self,browserType):
         global local_bk, drivermap
+        if len(drivermap) == 0: return None
         d = None
         # drivermap.reverse()
         if browserType == '1':
-            if len(drivermap) > 0:
-                for i in drivermap:
-                    if isinstance(i,webdriver.Chrome ):
-                        try:
-                            if len (i.window_handles) > 0:
-                                d = i
-                        except Exception as e:
-                            d = 'stale'
-                            break
-
+            for i in drivermap:
+                if isinstance(i,webdriver.Chrome):
+                    try:
+                        if len (i.window_handles) > 0:
+                            d = i
+                    except Exception as e:
+                        d = 'stale'
+                        break
         elif browserType == '2':
-            if len(drivermap) > 0:
-                for i in drivermap:
-                    if isinstance(i,webdriver.Firefox ):
-                        try:
-                            if len (i.window_handles) > 0:
-                                d = i
-                        except Exception as e:
-                            d = 'stale'
-                            break
+            for i in drivermap:
+                if isinstance(i,webdriver.Firefox):
+                    try:
+                        if len (i.window_handles) > 0:
+                            d = i
+                    except Exception as e:
+                        d = 'stale'
+                        break
         elif browserType == '3':
-            if len(drivermap) > 0:
-                for i in drivermap:
-                    if isinstance(i,webdriver.Ie ):
-                        try:
-                            if len (i.window_handles) == 0:
-                                d = 'stale'
-                                break
-                            else:
-                                d = i
-                        except Exception as e:
+            for i in drivermap:
+                if isinstance(i,webdriver.Ie):
+                    try:
+                        if len (i.window_handles) == 0:
                             d = 'stale'
                             break
+                        else:
+                            d = i
+                    except Exception as e:
+                        d = 'stale'
+                        break
         elif browserType == '6':
-            if len(drivermap) > 0:
-                for i in drivermap:
-                    if isinstance(i, webdriver.Safari):
-                        try:
-                            if len(i.window_handles) == 0:
-                                d = 'stale'
-                                break
-                            else:
-                                d = i
-                        except Exception as e:
+            for i in drivermap:
+                if isinstance(i, webdriver.Safari):
+                    try:
+                        if len(i.window_handles) == 0:
                             d = 'stale'
                             break
-
-                                   ##        drivermap.reverse()
+                        else:
+                            d = i
+                    except Exception as e:
+                        d = 'stale'
+                        break
+        elif browserType == '7':
+            for i in drivermap:
+                if isinstance(i, webdriver.Edge) and i.name=='MicrosoftEdge':
+                    try:
+                        if len (i.window_handles) == 0:
+                            d = 'stale'
+                            break
+                        else:
+                            d = i
+                    except Exception as e:
+                        d = 'stale'
+                        break
+        elif browserType == '8':
+            for i in drivermap:
+                if isinstance(i, webdriver.Edge) and i.name=='msedge':
+                    try:
+                        if len (i.window_handles) == 0:
+                            d = 'stale'
+                            break
+                        else:
+                            d = i
+                    except Exception as e:
+                        d = 'stale'
+                        break
         return d
 
     def getBrowser(self,browser_num):
@@ -960,8 +1005,6 @@ class Singleton_DriverUtil():
                 chrome_path = configvalues['chrome_path']
                 chrome_profile=configvalues["chrome_profile"]
                 exec_path = webconstants.CHROME_DRIVER_PATH
-                if  SYSTEM_OS == "Darwin":
-                    exec_path = webconstants.drivers_path+"/chromedriver"
                 # flag1 = self.chrome_version(driver)
                 if core.chromeFlag:
                     choptions = webdriver.ChromeOptions()
@@ -977,18 +1020,15 @@ class Singleton_DriverUtil():
                         choptions.binary_location=str(chrome_path)
                     if ((str(chrome_profile).lower()) != 'default'):
                         choptions.add_argument("user-data-dir="+chrome_profile)
-                    
+
                     driver = webdriver.Chrome(executable_path=exec_path,chrome_options=choptions)
-                    driver.navigate().refresh()
+                    # driver.navigate().refresh()
                     ##driver = webdriver.Chrome(desired_capabilities= choptions.to_capabilities(), executable_path = exec_path)
                     drivermap.append(driver)
                     driver.maximize_window()
-                    if headless_mode:
-                        logger.print_on_console('Headless Chrome browser started')
-                        local_bk.log.info('Headless Chrome browser started')
-                    else:    
-                        logger.print_on_console('Chrome browser started')
-                        local_bk.log.info('Chrome browser started') 
+                    msg = ('Headless ' if headless_mode else '') + 'Chrome browser started'
+                    logger.print_on_console(msg)
+                    local_bk.log.info(msg)
                 else:
                     logger.print_on_console('Chrome browser version not supported')
                     local_bk.log.info('Chrome browser version not supported')
@@ -1006,23 +1046,20 @@ class Singleton_DriverUtil():
                 firefox_options = Options()
                 if headless_mode:
                     firefox_options.add_argument('--headless')
-                if SYSTEM_OS == "Darwin":
-                    exec_path = webconstants.drivers_path+"/geckodriver"
-                else:
-                    exec_path = webconstants.GECKODRIVER_PATH
+                exec_path = webconstants.GECKODRIVER_PATH
                 if(core.firefoxFlag == True):
                     if str(configvalues['firefox_path']).lower()!="default":
                         from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
                         binary = FirefoxBinary(str(configvalues['firefox_path']))
                         driver = webdriver.Firefox(capabilities=caps, firefox_binary=binary, executable_path=exec_path,options=firefox_options)
-                        driver.navigate().refresh()
                     else:
-                        driver = webdriver.Firefox(capabilities=caps,executable_path=exec_path,options=firefox_options)
-                        driver.navigate().refresh()
+                        driver = webdriver.Firefox(capabilities=caps, executable_path=exec_path,options=firefox_options)
+                    # driver.navigate().refresh()
                     drivermap.append(driver)
-                    if not headless_mode: driver.maximize_window()
-                    logger.print_on_console('Firefox browser started using geckodriver')
-                    local_bk.log.info('Firefox browser started using geckodriver ')
+                    driver.maximize_window()
+                    msg = ('Headless ' if headless_mode else '') + 'Firefox browser started'
+                    logger.print_on_console(msg)
+                    local_bk.log.info(msg)
                 else:
                     driver = None
                     logger.print_on_console("Firefox browser version not supported")
@@ -1094,6 +1131,46 @@ class Singleton_DriverUtil():
             except Exception as e:
                 logger.print_on_console("Requested browser is not available")
                 local_bk.log.info('Requested browser is not available')
+
+        elif(browser_num == '7'):
+            try:
+                if('Windows-10' in platform.platform()):
+                    caps = webdriver.DesiredCapabilities.EDGE.copy()
+                    bit_64 = configvalues['bit_64']
+                    if ((str(bit_64).lower()) == 'no'):
+                        edgepath = webconstants.EDGE_DRIVER_PATH
+                    else:
+                        edgepath = webconstants.EDGE_DRIVER_PATH
+                    driver = webdriver.Edge(capabilities=caps,executable_path=edgepath)
+                    drivermap.append(driver)
+                    driver.maximize_window()
+                    logger.print_on_console('Edge Legacy browser started')
+                    local_bk.log.info('Edge Legacy browser started')
+                else:
+                    logger.print_on_console('Edge Legacy is supported only in Windows10 platform')
+                    local_bk.log.info('Edge Legacy is supported only in Windows10 platform')
+                    driver = None
+            except Exception as e:
+                logger.print_on_console("Requested browser is not available")
+                local_bk.log.info('Requested browser is not available')
+
+        elif(browser_num == '8'):
+            try:
+                from selenium.webdriver.edge.options import Options
+                options = Options()
+                options.use_chromium = True
+                caps1 = options.to_capabilities()
+                chromium_path = webconstants.EDGE_CHROMIUM_DRIVER_PATH
+                if SYSTEM_OS == "Darwin":
+                    caps1['platform'] = 'MAC'
+                driver = webdriver.Edge(capabilities=caps1,executable_path=chromium_path)
+                drivermap.append(driver)
+                driver.maximize_window()
+                logger.print_on_console('Edge Chromium browser started')
+                local_bk.log.info('Edge Chromium browser started')
+            except Exception as e:
+                logger.print_on_console("Requested browser is not available")
+                local_bk.log.info('Requested browser is not available')
         return driver
 
     def fetch_security_zones(self):
@@ -1123,72 +1200,76 @@ class Singleton_DriverUtil():
                                     , fetch_security_zonesexc)
 
     def set_security_zones(self, browsernumber, driverobj):
-            try:
-                global local_bk
-                # fetch the zones settings from registry
-                zonevalues = list(self.fetch_security_zones())
+        try:
+            global local_bk
+            # fetch the zones settings from registry
+            zonevalues = list(self.fetch_security_zones())
+            flag = False
+            # checks if zone values are on the same lines
+            if '3' in zonevalues and '0' in zonevalues:
                 flag = False
-                # checks if zone values are on the same lines
-                if '3' in zonevalues and '0' in zonevalues:
-                    flag = False
+            else:
+                flag = True
+            # checks if flag is false, performs action if condition is true.
+            if not flag:
+                sendfunctionkeys_obj = SF()
+                sendfunctionkeys_obj.press_multiple_keys(['alt', 'x'], 1)
+                time.sleep(0.5)
+                sendfunctionkeys_obj.execute_key('o', 1)
+                time.sleep(0.5)
+                sendfunctionkeys_obj.press_multiple_keys(['ctrl', 'tab'], 1)
+                time.sleep(0.5)
+                if zonevalues[0] == '3':
+                    sendfunctionkeys_obj.execute_key('leftarrow', 1)
+                    time.sleep(0.5)
+                    sendfunctionkeys_obj.press_multiple_keys(['alt', 'p'], 1)
+                    time.sleep(0.5)
+                    sendfunctionkeys_obj.press_multiple_keys(['alt', 'a'], 1)
                 else:
-                    flag = True
-                # checks if flag is false, performs action if condition is true.
-                if not flag:
-                    sendfunctionkeys_obj = SF()
-                    sendfunctionkeys_obj.press_multiple_keys(['alt', 'x'], 1)
+                    sendfunctionkeys_obj.execute_key('leftarrow', 1)
+                time.sleep(0.5)
+                if zonevalues[1] == '3':
+                    sendfunctionkeys_obj.execute_key('rightarrow', 1)
                     time.sleep(0.5)
-                    sendfunctionkeys_obj.execute_key('o', 1)
+                    sendfunctionkeys_obj.press_multiple_keys(['alt', 'p'], 1)
                     time.sleep(0.5)
-                    sendfunctionkeys_obj.press_multiple_keys(['ctrl', 'tab'], 1)
+                    sendfunctionkeys_obj.press_multiple_keys(['alt', 'a'], 1)
+                else:
+                    sendfunctionkeys_obj.execute_key('rightarrow', 1)
+                time.sleep(0.5)
+                if zonevalues[2] == '3':
+                    sendfunctionkeys_obj.execute_key('rightarrow', 1)
                     time.sleep(0.5)
-                    if zonevalues[0] == '3':
-                        sendfunctionkeys_obj.execute_key('leftarrow', 1)
-                        time.sleep(0.5)
-                        sendfunctionkeys_obj.press_multiple_keys(['alt', 'p'], 1)
-                        time.sleep(0.5)
-                        sendfunctionkeys_obj.press_multiple_keys(['alt', 'a'], 1)
-                    else:
-                        sendfunctionkeys_obj.execute_key('leftarrow', 1)
+                    sendfunctionkeys_obj.press_multiple_keys(['alt', 'p'], 1)
                     time.sleep(0.5)
-                    if zonevalues[1] == '3':
-                        sendfunctionkeys_obj.execute_key('rightarrow', 1)
-                        time.sleep(0.5)
-                        sendfunctionkeys_obj.press_multiple_keys(['alt', 'p'], 1)
-                        time.sleep(0.5)
-                        sendfunctionkeys_obj.press_multiple_keys(['alt', 'a'], 1)
-                    else:
-                        sendfunctionkeys_obj.execute_key('rightarrow', 1)
+                    sendfunctionkeys_obj.press_multiple_keys(['alt', 'a'], 1)
+                else:
+                    sendfunctionkeys_obj.execute_key('rightarrow', 1)
+                time.sleep(0.5)
+                if zonevalues[3] == '3':
+                    sendfunctionkeys_obj.execute_key('rightarrow', 1)
                     time.sleep(0.5)
-                    if zonevalues[2] == '3':
-                        sendfunctionkeys_obj.execute_key('rightarrow', 1)
-                        time.sleep(0.5)
-                        sendfunctionkeys_obj.press_multiple_keys(['alt', 'p'], 1)
-                        time.sleep(0.5)
-                        sendfunctionkeys_obj.press_multiple_keys(['alt', 'a'], 1)
-                    else:
-                        sendfunctionkeys_obj.execute_key('rightarrow', 1)
+                    sendfunctionkeys_obj.press_multiple_keys(['alt', 'p'], 1)
                     time.sleep(0.5)
-                    if zonevalues[3] == '3':
-                        sendfunctionkeys_obj.execute_key('rightarrow', 1)
-                        time.sleep(0.5)
-                        sendfunctionkeys_obj.press_multiple_keys(['alt', 'p'], 1)
-                        time.sleep(0.5)
-                        sendfunctionkeys_obj.press_multiple_keys(['alt', 'a'], 1)
-                        time.sleep(0.5)
-                    sendfunctionkeys_obj.execute_key('enter', 1)
+                    sendfunctionkeys_obj.press_multiple_keys(['alt', 'a'], 1)
                     time.sleep(0.5)
-                    try:
-                        driverobj.quit()
-                        logger.print_on_console('Security zones modified, Browser closed.')
-                        local_bk.driver_obj = self.getBrowser(browsernumber)
-                    except Exception as internalexcsecuset:
-                        logger.print_on_console('error setting '
-                                                + 'Browsers Security.', internalexcsecuset)
-                return local_bk.driver_obj
-            except Exception as set_security_zonesexc:
-                logger.print_on_console('error in setting updated zones data.'
-                                        , set_security_zonesexc)
+                sendfunctionkeys_obj.execute_key('enter', 1)
+                time.sleep(0.5)
+                try:
+                    driverobj.quit()
+                    logger.print_on_console('Security zones modified, Browser closed.')
+                    local_bk.driver_obj = self.getBrowser(browsernumber)
+                except Exception as internalexcsecuset:
+                    err_msg = 'Error while setting Browsers Security'
+                    logger.print_on_console(err_msg)
+                    local_bk.log.error(err_msg)
+                    local_bk.log.error(internalexcsecuset)
+            return local_bk.driver_obj
+        except Exception as set_security_zonesexc:
+            err_msg = 'Error while updating security zones data'
+            logger.print_on_console(err_msg)
+            local_bk.log.error(err_msg)
+            local_bk.log.error(set_security_zonesexc)
 
     def chrome_version(self,driver):
         browser_ver = driver.capabilities['version']
