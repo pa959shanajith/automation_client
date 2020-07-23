@@ -31,7 +31,6 @@ def init(times,socket):
     socketIO = socket
     if len(threadNames) is not 0:
         stop(False)
-    times = []
     display_str = "Benchmark Execution Scheduled at "
     for i in range(len(times)):
         timeNow =  datetime.datetime.today()
@@ -39,7 +38,9 @@ def init(times,socket):
         schedTime = datetime.datetime.strptime(times[i],"%H:%M")
         delta = schedTime - timeNow
         start(delta.seconds + 1,"bench_thread"+str(i),schedTime)
+    if len(times) == 0: display_str = "Benchmark Execution Disabled"
     logger.print_on_console(display_str)
+    log.info(display_str)
 
 
 def start(t,name,schedTime):

@@ -547,6 +547,8 @@ class Controller():
                             logger.print_on_console('Result obtained is: ',result[2])
                         elif result:
                             logger.print_on_console('Result obtained is: ',result[1])
+                    elif tsp.name.lower() == "find":
+                        logger.print_on_console('Result obtained is: ',result[2])
                 else:
                     if tsp.apptype.lower()=='system':
                         if result[2]!=OUTPUT_CONSTANT :
