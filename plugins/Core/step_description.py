@@ -64,6 +64,12 @@ class StepDescription:
             return "Compared the inputs '"+ inputval[0] + "' and '"+ inputval[1]+"'"
         def beautify():
             return "Beautified the "+inputval[1]+" input '"+ inputval[0]+"'"
+        def getxmlblockdata():
+            return "Get the xml block data of file '" + inputval[0] + "'and save the result in '"+ tsp.outputval+"'"
+        def selectivexmlfilecompare():
+            return "Selectively compare xml block data between file '" + inputval[2] + "' and file '"+ inputval[0]+"'and save the result in '"+ tsp.outputval+"'"
+        def compxmlfilewithxmlblock():
+            return "Compare xml file '" + inputval[0] + "' with the xml block amd save the result in '"+ tsp.outputval+"'"
         def cellbycellcompare():
             return "Compared cell by cell data between file "+inputval[2]+" and file '"+ inputval[0]+"'"
         def executescript():

@@ -556,7 +556,7 @@ class Controller():
                         elif result:
                             logger.print_on_console('Result obtained is: ',result[1])
                     else:
-                        if (tsp.apptype.lower()!='desktop') : logger.print_on_console('Result obtained is ',",".join([str(display_keyword_response[local_cont.i])
+                        if (tsp.apptype.lower()!='desktop' and tsp.name.lower() != 'getxmlblockdata') : logger.print_on_console('Result obtained is ',",".join([str(display_keyword_response[local_cont.i])
                         if not isinstance(display_keyword_response[local_cont.i],str) else display_keyword_response[local_cont.i] for local_cont.i in range(len(display_keyword_response))]))
             else:
                 logger.print_on_console('Result obtained exceeds max. Limit, please use writeToFile keyword.')
@@ -1206,7 +1206,7 @@ class Controller():
                     else:
                         fail_val+=1
                         status_percentage["total"]+=1
-                    ellapsed_time=''                                
+                    ellapsed_time=''
                     obj_reporting.generate_report_step(tsp,self.status,self,ellapsed_time,keyword_flag,result,ignore_stat,inpval)
                     continue
                 else:
@@ -1231,9 +1231,9 @@ class Controller():
             status_percentage["s_index"]=suite_idx-1
             status_percentage["index"]=sc_idx
             obj_reporting.save_report_json(filename,json_data,status_percentage)
-            execute_result_data["scenarioId"]=aws_scenario[sc_idx]                  
+            execute_result_data["scenarioId"]=aws_scenario[sc_idx]
             execute_result_data["reportData"] = obj_reporting.report_json
-            socketIO.emit('result_executeTestSuite', execute_result_data)                  
+            socketIO.emit('result_executeTestSuite', execute_result_data)
             sc_idx+=1
             idx_t+=1
 

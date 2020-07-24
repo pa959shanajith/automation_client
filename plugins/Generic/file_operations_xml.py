@@ -1,6 +1,6 @@
 #-------------------------------------------------------------------------------
 # Name:        file_operations_xml
-# Purpose:     comparison between two xml data, in respective menthods
+# Purpose:     comparison between two xml data, in respective functions
 #
 # Author:      anas.ahmed
 #
@@ -14,13 +14,13 @@ from constants import *
 import json
 import difflib
 from xmldiff import main, formatting
+import xml.dom.minidom
 from lxml import etree
 import tempfile
 import os
 import string
 import random
 import logging
-
 log = logging.getLogger('file_operations_xml.py')
 
 class FileOperationsXml:
@@ -29,9 +29,9 @@ class FileOperationsXml:
 #------------------------------------------keywords---------------------------------------------
     def getXmlBlockData(self,input_val,*args):
         """
-        This function will get all xml blocks of data, from provided xml file.
+        Purpose: This function will get all xml blocks of data, from provided xml file.
         Input: <file-path>;<block xpath>
-        output: list of blocks
+        Output: list of blocks
         """
         status = TEST_RESULT_FAIL
         result = TEST_RESULT_FALSE
@@ -76,7 +76,9 @@ class FileOperationsXml:
                         if( flg ):
                             status = TEST_RESULT_PASS
                             result = TEST_RESULT_TRUE
+                            logger.print_on_console( "Blocks found with given block xpath : " +str(len(elementList)) )
                             value = elementList
+
                     del ele,elm,searchList
                 else:
                     err_msg = generic_constants.FILE_NOT_EXISTS
@@ -94,9 +96,9 @@ class FileOperationsXml:
 
     def selectiveXmlFileCompare(self,input_val,*args):
         """
-        This function will selectively compare the block of data between two xml files
+        Purpose: This function will selectively compare the block of data between two xml files
         Input: <file-path1>;<file-path2>;<block xpath>
-        output: differed text
+        Output: differed text
         """
         status = TEST_RESULT_FAIL
         result = TEST_RESULT_FALSE
@@ -126,13 +128,15 @@ class FileOperationsXml:
                                 del el
                             with open(tempFile,'w') as f:
                                 for v in elementList:
-                                    f.write(v)
-                            del elm,path,tempFile,searchList,elementList
-                        fp1 = self.createTempFile()
-                        fp2 = self.createTempFile()
-                        writeSelectiveData(path1,fp1,searchList)
-                        writeSelectiveData(path2,fp2,searchList)
-                        output_res = self.compare_texts(fp1,fp2)
+                                    f.write(self.beautify_xml_file(v))
+                            del elm, path, searchList, elementList
+                        fp1 = self.createTempFile() #create temp file 1
+                        fp2 = self.createTempFile() #create temp file 2
+                        writeSelectiveData(path1,fp1,searchList) #write the blocks (matched xml block data by block xml path) to temp file 1
+                        writeSelectiveData(path2,fp2,searchList) #write the blocks (matched xml block data by block xml path) to temp file 2
+                        output_res = self.compare_xmls(fp1,fp2) # compare the two temp files
+                        self.deleteTempFile(fp1) #delete temp file 1
+                        self.deleteTempFile(fp2) #delete temp file 2
                         if ( output_res ):
                             flg = True
                             num_diff,ch_lines = self.get_diff_count_xml(output_res)
@@ -166,8 +170,6 @@ class FileOperationsXml:
                 log.error(err_msg)
                 logger.print_on_console(err_msg)
         except Exception as e:
-            import traceback
-            traceback.print_exc()
             err_msg = ("Exception occurred in selectiveXmlFileCompare while comparing two files, ERROR : " + str(e))
             log.error( err_msg )
             logger.print_on_console( "Error occured in selectiveXmlFileCompare" )
@@ -175,9 +177,9 @@ class FileOperationsXml:
 
     def compXmlFileWithXmlBlock(self,input_val,*args):
         """
-        This function will compare data from getXmlBlockData with all blocks of data from mentioned file.
+        Purpose: This function will compare data from getXmlBlockData with all blocks of data from mentioned file.
         Input: <file-path>;<blockData from getXmlBlockData>;<block xpath>
-        output: differed text
+        Output: differed text
         """
         status = TEST_RESULT_FAIL
         result = TEST_RESULT_FALSE
@@ -208,13 +210,27 @@ class FileOperationsXml:
                         elementList.append( el )
                         del el
                     # compare block of data to each block of data in file to be compared
+                    logger.print_on_console( "Blocks found with given block xpath : " + str(len(elementList)) )
+                    fg1 = True
+                    fg2 = True
+                    try : xml.dom.minidom.parseString(self.beautify_xml_file(blockData))
+                    except : fg1 = False
                     for eL in elementList:
-                        output_res.extend( self.compare_texts( blockData, eL ) )
+                        try : xml.dom.minidom.parseString(self.beautify_xml_file(eL))
+                        except : fg2 = False
+                    for eL in elementList:
+                        if ( fg1 and fg2 ):
+                            out = self.compare_xmls( self.beautify_xml_file( blockData ), self.beautify_xml_file( eL ) )
+                        else :
+                            out = self.compare_texts( self.beautify_xml_file( blockData ), self.beautify_xml_file( eL ) )
+                        output_res.extend( out )
                     if( output_res ):
                         num_diff,ch_lines = self.get_diff_count( output_res )
                         output_res = '\n'.join(output_res)
                     if ( len(output_res) > 0 ):
                         flg = True
+                        if( num_diff ):
+                            logger.print_on_console("The number of differences in compare_file are: ",num_diff)
                         if ( output_res and output_path ):
                             try:
                                 #output_res = '\n'.join(output_res)
@@ -229,7 +245,7 @@ class FileOperationsXml:
                                 log.error( err_msg )
                                 logger.print_on_console( "Error occured while writing to output file in Compare File" )
                         if( flg ):
-                            log.info("Comparision of texts completed")
+                            log.info( "Comparision of texts completed" )
                             value = output_res
                             status = TEST_RESULT_PASS
                             result = TEST_RESULT_TRUE
@@ -242,19 +258,18 @@ class FileOperationsXml:
                 log.error(err_msg)
                 logger.print_on_console(err_msg)
         except Exception as e:
-            import traceback
-            traceback.print_exc()
             err_msg = ("Exception occurred in compXmlFileWithXmlBlock, ERROR : " + str(e))
             log.error( err_msg )
             logger.print_on_console( "Error occured in compXmlFileWithXmlBlock" )
+        del elementList, blockVal, blockData, output_path, output_res, input_val #deleting variables
         return status, result, value ,err_msg
 
     def compare_inputs(self,input_val,*args):
         """
         def : compare_inputs
-        purpose : compares two text inputs
-        param : inputtext-1,inputtext-2
-        return : differed text, bool
+        Purpose :  compares two text inputs
+        Input : inputtext-1,inputtext-2
+        Output : differed text, bool
         """
         status = TEST_RESULT_FAIL
         result = TEST_RESULT_FALSE
@@ -318,9 +333,9 @@ class FileOperationsXml:
     def beautify_file(self, input_val, *args):
         """
         def : beautify_file
-        purpose : beautifies/pretifies a file/string of type json or xml
-        param : inputpath,file type
-        return : beautified text, bool
+        Purpose : beautifies/pretifies a file/string of type json or xml
+        Input : inputpath,file type
+        Output : beautified text, bool
         """
         status = TEST_RESULT_FAIL
         result = TEST_RESULT_FALSE
@@ -374,9 +389,9 @@ class FileOperationsXml:
     def compare_files(self,input_val,*args):
         """
         def : compare_file
-        purpose : compares two files
-        param : inputPath-1,inputPath-2
-        return : differed text, bool
+        Purpose : compares two files
+        Input : inputPath-1,inputPath-2
+        Output : differed text, bool
         """
         status = TEST_RESULT_FAIL
         result = TEST_RESULT_FALSE
@@ -450,8 +465,6 @@ class FileOperationsXml:
                 log.error(err_msg)
                 logger.print_on_console(err_msg)
         except Exception as e:
-            import traceback
-            traceback.print_exc()
             err_msg = ("Exception occurred in compare_files while comparing two files"+str(e))
             log.error( err_msg )
             logger.print_on_console( "Error occured in Compare Files" )
@@ -519,15 +532,13 @@ class FileOperationsXml:
         try:
             text1_lines = text1.splitlines()
             text2_lines = text2.splitlines()
-            if(text1_lines==text2_lines):
+            if( text1_lines == text2_lines ):
                 logger.print_on_console( "Inputs are same" )
                 log.info( "Inputs are same" )
-                out = list(difflib.Differ().compare(text1_lines, text2_lines))
-            else:
-                out = list(difflib.Differ().compare(text1_lines, text2_lines))
+            out = list(difflib.Differ().compare(text1_lines, text2_lines))
         except Exception as e:
             logger.print_on_console("Exception occurred in compare_texts while comparing two texts")
-            log.error("Exception occurred in compare_texts while comparing two texts"+str(e))
+            log.error("Exception occurred in compare_texts while comparing two texts, ERR_MSG:" + str(e))
         return out
 
     def compare_xmls(self, xml_input1, xml_input2):
@@ -539,17 +550,21 @@ class FileOperationsXml:
         """
         out = None
         try:
-            text1_lines = xml_input1.splitlines()
-            text2_lines = xml_input2.splitlines()
-            if(text1_lines==text2_lines):
-                logger.print_on_console( "Inputs are same" )
-                log.info( "Inputs are same" )
-                out = main.diff_files(xml_input1, xml_input2,diff_options={'fast_match': False},formatter=formatting.XMLFormatter(normalize=formatting.WS_BOTH)).split("\n")
-            else:
-                out = main.diff_files(xml_input1, xml_input2,diff_options={'fast_match': False},formatter=formatting.XMLFormatter(normalize=formatting.WS_BOTH)).split("\n")
+            #check if xml is a file path'
+            if ( os.path.isfile(xml_input1) and os.path.isfile(xml_input1) ) :
+                log.info('Comparison between xml files')
+                out = main.diff_files(xml_input1, xml_input2, diff_options={'fast_match': False},formatter=formatting.XMLFormatter(normalize=formatting.WS_BOTH)).split("\n")
+            elif( not(os.path.isfile(xml_input1)) and not(os.path.isfile(xml_input2)) ):
+                log.info('Comparison between xml text data')
+                text1_lines = xml_input1.splitlines()
+                text2_lines = xml_input2.splitlines()
+                if ( text1_lines == text2_lines ):
+                    log.info('Inputs are same')
+                    logger.print_on_console( 'Inputs are same' )
+                out = main.diff_texts(xml_input1, xml_input2, diff_options={'fast_match': False},formatter=formatting.XMLFormatter(normalize=formatting.WS_BOTH)).split("\n")
         except Exception as e:
-            logger.print_on_console("Exception occurred in compare_xmls while comparing two texts")
-            log.error("Exception occurred in compare_xmls while comparing two texts"+str(e))
+            logger.print_on_console( "Exception occurred in compare_xmls while comparing two xml data" )
+            log.error( "Exception occurred in compare_xmls while comparing two xml data, ERR_MSG:" + str(e) )
         return out
 
     def get_diff_count(self,output_response):
@@ -660,7 +675,8 @@ class FileOperationsXml:
         except:
             res =element.xpath(search)
         if (res == None):
-            print('Entered xpath is incorrect : ',search)
+            log.info('Entered element xpath is incorrect : '+ str(search))
+            logger.print_on_console('Entered element xpath is incorrect : '+ str(search))
         return res
 
     def treeElemToString(self,element):
