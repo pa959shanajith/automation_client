@@ -164,8 +164,6 @@ GET_INNER_TABLE='getinnertable'
 
 OPEN_BROWSER='openbrowser'
 
-OPEN_NEW_BROWSER='opennewbrowser'
-
 CLOSE_BROWSER='closebrowser'
 
 GET_POPUP_TEXT = 'getpopuptext'
@@ -173,7 +171,7 @@ GET_POPUP_TEXT = 'getpopuptext'
 VERIFY_POPUP_TEXT = 'verifypopuptext'
 
 
-NON_WEBELEMENT_KEYWORDS=['openbrowser','opennewbrowser','opennewtab','navigatetourl','getpagetitle','verifypagetitle','getcurrenturl','verifycurrenturl','closebrowser',
+NON_WEBELEMENT_KEYWORDS=['openbrowser','opennewtab','navigatetourl','getpagetitle','verifypagetitle','getcurrenturl','verifycurrenturl','closebrowser',
 'switchtowindow','closesubwindows','waitforelementvisible','refresh','maximizebrowser','getcurrenturl','acceptpopup','dismisspopup',
 'getpopuptext','verifypopuptext','clearcache','navigatewithauthenticate']
 
