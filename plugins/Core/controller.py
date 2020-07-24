@@ -35,7 +35,7 @@ local_cont = threading.local()
 #Terminate Flag
 terminate_flag=False
 pause_flag=False
-iris_flag = False
+iris_flag = True
 iris_constant_step = -1
 socket_object = None
 count = 0

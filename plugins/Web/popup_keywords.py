@@ -70,7 +70,7 @@ class PopupKeywords():
             methodoutput = webconstants.TEST_RESULT_TRUE
         except Exception as e:
             logger.print_on_console(EXCEPTION_OCCURED,e)
-            local_pk.log.error(EXCEPTION_OCCURED)
+            local_pk.log.error(e)
             err_msg = "EXCEPTION OCCURED"
         local_pk.log.info(RETURN_RESULT)
         return status,methodoutput,output, err_msg
@@ -157,7 +157,7 @@ class PopupKeywords():
             local_pk.log.debug('Got the driver object from browser keyword class')
             local_pk.log.debug(driver)
             try:
-                text = driver.switch_to.alert().text
+                text = driver.switch_to.alert.text
                 local_pk.log.debug('Popup exists with text : %s', text)
                 return False
             except Exception as e:
