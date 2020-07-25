@@ -24,10 +24,6 @@ log = logging.getLogger('element_operations_MW.py')
 
 class ElementKeywords:
 
-    def print_error(self,e):
-        log.error(e)
-        logger.print_on_console(e)
-        return e
 
     def __getelement_text(self,webelement):
         text=''
@@ -95,14 +91,13 @@ class ElementKeywords:
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
                     else:
-                        err_msg=self.print_error('Element is not displayed')
-                        log.info(ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED'])
+                        err_msg = 'Element is not displayed'
             except Exception as e:
-                log.error(e)
-
-                logger.print_on_console(e)
                 err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
-                # err_msg=self.print_error('Element is not displayed')
+                log.error(e)
+            if err_msg is not None:
+                logger.print_on_console(err_msg)
+                log.error(err_msg)
         log.info(RETURN_RESULT)
         return status,methodoutput,text,err_msg
 
@@ -141,14 +136,13 @@ class ElementKeywords:
                         log.info('Actual:')
                         log.info(text)
                 else:
-                    err_msg=self.print_error('Invalid input, Please provide the valid input')
-                    # logger.print_on_console(INVALID_INPUT)
+                    err_msg=INVALID_INPUT
             except Exception as e:
-                log.error(e)
-
-                logger.print_on_console(e)
                 err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
-                # err_msg=self.print_error('Error occurred with browser')
+                log.error(e)
+            if err_msg is not None:
+                logger.print_on_console(err_msg)
+                log.error(err_msg)
         #return status and methodoutput
         log.info(RETURN_RESULT)
         return status,methodoutput,output,err_msg
@@ -170,13 +164,13 @@ class ElementKeywords:
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
                 else:
-                    err_msg=self.print_error('The Element is Disabled.')
+                    err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
             except Exception as e:
-                log.error(e)
-
-                logger.print_on_console(e)
                 err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
-                # err_msg=self.print_error('Error occurred with browser')
+                log.error(e)
+            if err_msg is not None:
+                logger.print_on_console(err_msg)
+                log.error(err_msg)
         #return status and methodoutput
         log.info(RETURN_RESULT)
         return status,methodoutput,output,err_msg
@@ -208,8 +202,6 @@ class ElementKeywords:
                             obj.mouse_move(int(location.get('x')+9),int(location.get('y')+obj.rect[1]+6))
                         else:
                             err_msg='Element to be dragged should be on top'
-                            log.error=err_msg
-                            logger.print_on_console(err_msg)
                     import time
                     time.sleep(0.5)
                     obj.mouse_press(LEFT_BUTTON)
@@ -217,12 +209,13 @@ class ElementKeywords:
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
                 else:
-                    err_msg=self.print_error('The Element is Disabled.')
+                    err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
             except Exception as e:
-                log.error(e)
-                logger.print_on_console(e)
                 err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
-                # err_msg=self.print_error('Error occurred with browser')
+                log.error(e)
+            if err_msg is not None:
+                logger.print_on_console(err_msg)
+                log.error(err_msg)
         #return status and methodoutput
         log.info(RETURN_RESULT)
         return status,methodoutput,output,err_msg
@@ -255,20 +248,20 @@ class ElementKeywords:
                         if len(obj.rect)>1:
                             obj.slide(int(location.get('x')+9),int(location.get('y')+obj.rect[1]+6), "slow")
                         else:
-                            err_msg=self.print_error('Element to be dragged should be on top')
+                            err_msg='Element to be dragged should be on top'
                     time.sleep(0.5)
                     obj.mouse_release(LEFT_BUTTON)
                     log.info(STATUS_METHODOUTPUT_UPDATE)
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
                 else:
-                    err_msg=self.print_error('The Element is Disabled.')
+                    err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
             except Exception as e:
-                log.error(e)
-
-                logger.print_on_console(e)
                 err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
-                # err_msg=self.print_error('Error occurred with browser')
+                log.error(e)
+            if err_msg is not None:
+                logger.print_on_console(err_msg)
+                log.error(err_msg)
         #return status and methodoutput
         log.info(RETURN_RESULT)
         return status,methodoutput,output,err_msg
@@ -289,17 +282,16 @@ class ElementKeywords:
                    methodoutput=TEST_RESULT_TRUE
                else:
                     tool_tip=None
-                    # err_msg = 'No tool tip text found'
-                    err_msg=self.print_error('No tool tip text found')
+                    err_msg = 'No tool tip text found'
                log.info('Tool tip text is : ')
                log.info(tool_tip)
                logger.print_on_console('Tool tip text: '+str(tool_tip))
             except Exception as e:
-                log.error(e)
-
-                logger.print_on_console(e)
                 err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
-                # err_msg=self.print_error('Error occurred with browser')
+                log.error(e)
+            if err_msg is not None:
+                logger.print_on_console(err_msg)
+                log.error(err_msg)
         #return status and methodoutput
         log.info(RETURN_RESULT)
         return status,methodoutput,tool_tip,err_msg
@@ -333,13 +325,13 @@ class ElementKeywords:
                         log.info('Actual:')
                         log.info(tool_tip)
                 else:
-                    err_msg=self.print_error('Invalid input, Please provide the valid input')
+                    err_msg=INVALID_INPUT
             except Exception as e:
-                log.error(e)
-
-                logger.print_on_console(e)
                 err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
-                # err_msg=self.print_error('Error occurred with browser')
+                log.error(e)
+            if err_msg is not None:
+                logger.print_on_console(err_msg)
+                log.error(err_msg)
         #return status and methodoutput
         log.info(RETURN_RESULT)
         return status,methodoutput,output,err_msg
@@ -369,15 +361,14 @@ class ElementKeywords:
         except TimeoutException as e:
             logger.print_on_console('Delay timeout exceeded')
             log.error(e)
-
             logger.print_on_console(e)
             err_msg='Delay timeout exceeded'
         except Exception as e:
-            log.error(e)
-
-            logger.print_on_console(e)
             err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
-            # err_msg=self.print_error('Error occurred with browser')
+            log.error(e)
+        if err_msg is not None:
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
         return status,methodoutput,output,err_msg
 
 

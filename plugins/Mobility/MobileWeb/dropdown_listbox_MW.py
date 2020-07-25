@@ -12,8 +12,8 @@
 from selenium.webdriver.support.ui import Select
 import  browser_Keywords_MW
 import webconstants_MW
-# from utilweb_operations_MW import UtilWebKeywords
-import utilweb_operations_MW
+from utilweb_operations_MW import UtilWebKeywords
+# import utilweb_operations_MW
 import logger
 import core_utils
 import radio_checkbox_operations_MW
@@ -25,16 +25,9 @@ class DropdownKeywords():
 
     def __init__(self):
         self.radioKeywordsObj=radio_checkbox_operations_MW.RadioCheckboxKeywords()
-        self.util = utilweb_operations_MW.UtilWebKeywords()
+        # self.util = utilweb_operations_MW.UtilWebKeywords()
         log = logging.getLogger('dropdown_listbox.py')
-
-    def __check_visibility_from_config(self):
-        return readconfig.configvalues['ignoreVisibilityCheck'].strip().lower() == "yes"
     
-    def print_error(self,e):
-        log.error(e,exc_info=True)
-        logger.print_on_console(e)
-        return e
 
     def selectValueByIndex(self,webelement,input,*args):
         """
@@ -53,11 +46,15 @@ class DropdownKeywords():
         try:
             if webelement is not None:
                 log.info('Recieved web element from the web dispatcher')
+                utilobj=UtilWebKeywords()
+                is_visble=utilobj.is_visible(webelement)
+                if len(args)>0 and args[0] != '':
+                    visibilityFlag=args[0]
                 if webelement.tag_name=='table':
                         webelement=self.radioKeywordsObj.getActualElement(webelement,input)
                         index = input[4]
                 if ((webelement.is_enabled())):
-                    if not (self.util.is_visible(webelement)) and self.__check_visibility_from_config():
+                    if not(visibilityFlag=='yes' and is_visble):
                         # performing js code
                         log.debug('element is invisible, performing js code')
                         if (input is not None) :
@@ -86,18 +83,12 @@ class DropdownKeywords():
                                             result=webconstants_MW.TEST_RESULT_TRUE
                                             log.info(STATUS_METHODOUTPUT_UPDATE)
                                 else:
-                                    # logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                    # log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                    # err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                                    err_msg=self.print_error(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                    err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                             else:
-                                # logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                # log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                # err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                                err_msg=self.print_error(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
 
                     else:
-                        if (self.util.is_visible(webelement)):
+                        if is_visble:
                             # performing selenium code
                             log.debug('element is visible, performing selenium code')
                             if (input is not None):
@@ -129,32 +120,24 @@ class DropdownKeywords():
                                                 result = webconstants_MW.TEST_RESULT_TRUE
                                                 log.info(STATUS_METHODOUTPUT_UPDATE)
                                     else:
-                                        # logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                        # log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                        # err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                                        err_msg=self.print_error(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                        err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                                 else:
-                                    # logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                    # log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                    # err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                                    err_msg=self.print_error(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                    err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                         else:
-                            # err_msg = 'Element is not displayed'
-                            # logger.print_on_console('Element is not displayed')
-                            # log.info(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
-                            err_msg=self.print_error('Element is not displayed')
-                            err_msg=self.print_error(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
+                            err_msg = 'Element is not displayed'
+                            log.info(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
 
                 else:
-                    # err_msg = ERROR_CODE_DICT['ERR_OBJECT_DISABLED']
-                    # log.info(err_msg)
-                    err_msg=self.print_error(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
+                    err_msg = ERROR_CODE_DICT['ERR_OBJECT_DISABLED']
+                    log.info(err_msg)
 
         except Exception as e:
+            err_msg=e
             log.error(e)
-            logger.print_on_console(e)
-            err_msg=self.print_error(e)
         log.info(RETURN_RESULT)
+        if err_msg is not None:
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
 
         return status,result,verb,err_msg
                
@@ -175,8 +158,12 @@ class DropdownKeywords():
         if webelement is not None:
             # log.info('Recieved web element from the web dispatcher')
             ##if ((webelement.is_enabled())):
+            utilobj=UtilWebKeywords()
+            is_visble=utilobj.is_visible(webelement)
+            if len(args)>0 and args[0] != '':
+                visibilityFlag=args[0]
             log.info('Recieved web element from the web dispatcher')
-            if not (self.util.is_visible(webelement)) and self.__check_visibility_from_config():
+            if not(visibilityFlag=='yes' and is_visble):
                 # performing js code
                 log.debug('element is invisible, performing js code')
                 try:
@@ -193,7 +180,7 @@ class DropdownKeywords():
                     log.error(e)
                     logger.print_on_console(e)
             else:
-                if self.util.is_visible(webelement):
+                if is_visble:
                     # performing selenium code
                     log.debug('element is visible, performing selenium code')
                     log.debug(ERROR_CODE_DICT['MSG_OBJECT_DISPLAYED'])
@@ -210,17 +197,19 @@ class DropdownKeywords():
                             logger.print_on_console('Result obtained is: ',output)
                             log.info(STATUS_METHODOUTPUT_UPDATE)
                     except Exception as e:
+                        err_msg=e
                         log.error(e)
-                        logger.print_on_console(e)
                     log.info(RETURN_RESULT)
                 else:
                     logger.print_on_console('Element is not displayed')
-                    log.info(ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED'])
                     err_msg = ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED']
             ##else:
                 ##err_msg = 'Element is not enabled '
                 ##logger.print_on_console(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
                 ##local_ddl.log.info(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
+        if err_msg is not None:
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
         return status,result,output,err_msg
 
     """
@@ -247,11 +236,15 @@ class DropdownKeywords():
         verb = OUTPUT_CONSTANT
         err_msg=None
         if webelement is not None:
+            utilobj=UtilWebKeywords()
+            is_visble=utilobj.is_visible(webelement)
+            if len(args)>0 and args[0] != '':
+                visibilityFlag=args[0]
             if webelement.tag_name=='table':
                     if len(input)==5:
                         webelement=self.radioKeywordsObj.getActualElement(webelement,input)
             if ((webelement.is_enabled())):
-                if not (self.util.is_visible(webelement)) and self.__check_visibility_from_config():
+                if not(visibilityFlag=='yes' and is_visble):
                     #performing js code
                     log.debug('element is invisible, performing js code')
                     try:
@@ -287,18 +280,12 @@ class DropdownKeywords():
                                                 inp_val = data_list[index_val]
                                                 flag = True
                                             else:
-                                                # logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                                # log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                                # err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                                                err_msg=self.print_error(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                                         else:
                                             inp_val = data_list[0]
                                             flag = True
                                     else:
-                                        # logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                        # log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                        # err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                                        err_msg=self.print_error(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                        err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                                     if(flag):
                                         sValue = self.getText(webelement,inp_val)
                                         if sValue is not None:
@@ -311,26 +298,15 @@ class DropdownKeywords():
                                             log.info(STATUS_METHODOUTPUT_UPDATE)
 
                                     else:
-                                        # logger.print_on_console(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
-                                        # log.info(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
-                                        # err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
-                                        err_msg=self.print_error(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
+                                        err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
                                 else:
-                                    # logger.print_on_console(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
-                                    # log.info(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
-                                    # err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
-                                    err_msg=self.print_error(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
+                                    err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
                             else:
-                                # logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                # log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                # err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                                err_msg=self.print_error(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                         else:
-                            # logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                            # log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                            # err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                            err_msg=self.print_error(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                            err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                     except Exception as e:
+                        err_msg=e
                         log.error(e)
                         from selenium.common.exceptions import NoSuchElementException
                         if type(e) == NoSuchElementException:
@@ -338,7 +314,7 @@ class DropdownKeywords():
 
                         logger.print_on_console(e)
                 else:
-                    if (self.util.is_visible(webelement)):
+                    if is_visble:
                         # performing selenium code
                         log.debug('element is visible, performing selenium code')
                         try:
@@ -374,18 +350,12 @@ class DropdownKeywords():
                                                     inp_val = data_list[index_val]
                                                     flag = True
                                                 else:
-                                                    # logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                                    # log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                                    # err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                                                    err_msg=self.print_error(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                                    err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                                             else:
                                                 inp_val = data_list[0]
                                                 flag = True
                                         else:
-                                            # logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                            # log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                            # err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                                            err_msg=self.print_error(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                            err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                                         if (flag):
                                             import platform
                                             if SYSTEM_OS == 'Darwin':
@@ -400,40 +370,28 @@ class DropdownKeywords():
                                             result = webconstants_MW.TEST_RESULT_TRUE
                                             log.info(STATUS_METHODOUTPUT_UPDATE)
                                         else:
-                                            # logger.print_on_console(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
-                                            # log.info(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
-                                            # err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
-                                            err_msg=self.print_error(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
+                                            err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
                                     else:
-                                        # logger.print_on_console(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
-                                        # log.info(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
-                                        # err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
-                                        err_msg=self.print_error(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
+                                        err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
                                 else:
-                                    # logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                    # log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                    # err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                                    err_msg=self.print_error(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                    err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                             else:
-                                # logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                # log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                # err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                                err_msg=self.print_error(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                         except Exception as e:
+                            err_msg=e
                             log.error(e)
                             from selenium.common.exceptions import NoSuchElementException
                             if type(e) == NoSuchElementException:
                                 err_msg = str(e)
                             logger.print_on_console(e)
                     else:
-                        logger.print_on_console('Element is not displayed')
-                        log.info(ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED'])
                         err_msg = ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED']
             else:
-                # err_msg = 'Element is not enabled '
-                # logger.print_on_console(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
-                # log.info(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
-                err_msg=self.print_error(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
+                err_msg = 'Element is not enabled '
+                logger.print_on_console(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
+        if err_msg is not None:
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
         return status,result,verb,err_msg
 
             
@@ -453,6 +411,7 @@ class DropdownKeywords():
             js="""var temp = fun(arguments[0], arguments[2], arguments[1]); return temp; function fun(table, x, y) {     var m = [],         row, cell, xx, tx, ty, xxx, yyy,sVal;     for (yyy = 0; yyy < table.rows.length; yyy++) {         row = table.rows[yyy];         for (xxx = 0; xxx < row.cells.length; xxx++) {             cell = row.cells[xxx];             xx = xxx;			             for (; m[yyy] && m[yyy][xx]; ++xx) {}             for (tx = xx; tx < xx + cell.colSpan; ++tx) {                 for (ty = yyy; ty < yyy + cell.rowSpan; ++ty) {                     if (!m[ty]) m[ty] = [];                     m[ty][tx] = true;                 }             }			             if (xx <= x && x < xx + cell.colSpan && yyy <= y && y < yyy + cell.rowSpan)              if(cell.children[0].type=='select-one'){                 sVal=cell.children[0]; 				return sVal; 		} 		else{               return cell; 		}         }     }     return null; };"""
             remoteWebElement=browser_Keywords_MW.driver_obj.execute_script(js,webElement,row_num,col_num)
         except Exception as e:
+            logger.print_on_console(EXCEPTION_OCCURED)
             log.error(e)
         return remoteWebElement
 
@@ -470,9 +429,13 @@ class DropdownKeywords():
         err_msg=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
+            utilobj=UtilWebKeywords()
+            is_visble=utilobj.is_visible(webelement)
+            if len(args)>0 and args[0] != '':
+                visibilityFlag=args[0]
             if ((webelement.is_enabled())):
                 log.info('Recieved web element from the web dispatcher')
-                if not (self.util.is_visible(webelement)) and self.__check_visibility_from_config():
+                if not(visibilityFlag=='yes' and is_visble):
                     # performing js code
                     log.debug('element is invisible, performing js code')
                     try:
@@ -496,20 +459,14 @@ class DropdownKeywords():
                                 result=webconstants_MW.TEST_RESULT_TRUE
                                 log.info(STATUS_METHODOUTPUT_UPDATE)
                             else:
-                                logger.print_on_console(ERROR_CODE_DICT['ERR_INPUT_MISS_MATCH'])
-                                log.info(ERROR_CODE_DICT['ERR_INPUT_MISS_MATCH'])
                                 err_msg = ERROR_CODE_DICT['ERR_INPUT_MISS_MATCH']
                         else:
-                            # logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                            # log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                            # err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                            err_msg=self.print_error(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                            err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                     except Exception as e:
+                        err_msg=e
                         log.error(e)
-
-                        logger.print_on_console(e)
                 else:
-                    if (self.util.is_visible(webelement)):
+                    if is_visble:
                         # performing selenium code
                         log.debug('element is visible, performing selenium code')
                         try:
@@ -524,26 +481,22 @@ class DropdownKeywords():
                                     result=webconstants_MW.TEST_RESULT_TRUE
                                     log.info(STATUS_METHODOUTPUT_UPDATE)
                                 else:
-                                    logger.print_on_console(ERROR_CODE_DICT['ERR_INPUT_MISS_MATCH'])
-                                    log.info(ERROR_CODE_DICT['ERR_INPUT_MISS_MATCH'])
                                     err_msg = ERROR_CODE_DICT['ERR_INPUT_MISS_MATCH']
                             else:
-                                # logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                # log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                # err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                                err_msg=self.print_error(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                         except Exception as e:
+                            err_msg=e
                             log.error(e)
-                            logger.print_on_console(e)
                     else:
                         logger.print_on_console('Element is not displayed')
-                        log.info(ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED'])
                         err_msg = ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED']
             else:
-                # err_msg = 'Element is not enabled '
-                # logger.print_on_console(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
-                # log.info(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
-                err_msg=self.print_error(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
+                err_msg = 'Element is not enabled '
+                log.info(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
+
+        if err_msg is not None:
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
         return status,result,verb,err_msg
             
 
@@ -561,9 +514,13 @@ class DropdownKeywords():
         err_msg=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
+            utilobj=UtilWebKeywords()
+            is_visble=utilobj.is_visible(webelement)
+            if len(args)>0 and args[0] != '':
+                visibilityFlag=args[0]
             if ((webelement.is_enabled())):
                 log.info('Recieved web element from the web dispatcher')
-                if not (self.util.is_visible(webelement)) and self.__check_visibility_from_config():
+                if not(visibilityFlag=='yes' and is_visble):
                     try:
                         # performing js code
                         log.debug('element is invisible, performing js code')
@@ -583,15 +540,12 @@ class DropdownKeywords():
                                 log.info('Count mismatched')
                                 err_msg = 'Count mismatched'
                         else:
-                            # logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                            # log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                            # err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                            err_msg=self.print_error(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                            err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                     except Exception as e:
+                        err_msg=e
                         log.error(e)
-                        logger.print_on_console(e)
                 else:
-                    if self.util.is_visible(webelement):
+                    if is_visble:
                         # performing selenium code
                         log.debug('element is visible, performing selenium code')
                         log.info(ERROR_CODE_DICT['MSG_OBJECT_DISPLAYED'])
@@ -618,23 +572,18 @@ class DropdownKeywords():
                                     log.info(ACTUAL)
                                     log.info(iListSize)
                             else:
-                                # logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                # log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                # err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                                err_msg=self.print_error(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                         except Exception as e:
+                            err_msg=e
                             log.error(e)
-                            logger.print_on_console(e)
                     else:
                         logger.print_on_console('Element is not displayed')
-                        # log.info(ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED'])
-                        # err_msg = ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED']
-                        err_msg=self.print_error(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                        err_msg = ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED']
             else:
-                # err_msg = 'Element is not enabled '
-                # logger.print_on_console(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
-                # log.info(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
-                err_msg=self.print_error(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
+                err_msg = ERROR_CODE_DICT['ERR_OBJECT_DISABLED']
+        if err_msg is not None:
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
         return status,result,verb,err_msg
             
 
@@ -648,103 +597,100 @@ class DropdownKeywords():
         """
         status=webconstants_MW.TEST_RESULT_FAIL
         result=webconstants_MW.TEST_RESULT_FALSE
+        visibilityFlag=True
         output = None
         err_msg=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
-            log.info('Recieved web element from the web dispatcher')
-            ##if ((webelement.is_enabled())):
-            if not (self.util.is_visible(webelement)) and self.__check_visibility_from_config():
-                try:
-                    # performing js code
-                    log.debug('element is invisible, performing js code')
-                    if input is not None:
-                        alloptions = []
-                        if browser_Keywords_MW.driver_obj is not None and isinstance(browser_Keywords_MW.driver_obj,
-                                                                                  webdriver.Ie):
-                            count = browser_Keywords_MW.driver_obj.execute_script(
-                                """return arguments[0].childElementCount""", webelement)
-                            for i in range(count):
-                                alloptions.append(browser_Keywords_MW.driver_obj.execute_script(
-                                    """return arguments[0].options[arguments[1]].text""", webelement, i))
-                        else:
-                            optionlist = browser_Keywords_MW.driver_obj.execute_script(
-                                """return arguments[0].options""", webelement)
-                            for element in optionlist:
-                                alloptions.append(
-                                    browser_Keywords_MW.driver_obj.execute_script("""return arguments[0].text""",
-                                                                               element))
-                        if len(input)!=0 and input[0] == "1":
-                            for i in range(len(alloptions)):
-                                alloptions[i] = alloptions[i].strip()
-                        output = alloptions
-                        if len(output) != 0:
-                            status = webconstants_MW.TEST_RESULT_PASS
-                            result = webconstants_MW.TEST_RESULT_TRUE
-                            logger.print_on_console(output)
-                            log.info(STATUS_METHODOUTPUT_UPDATE)
-                        else:
-                            # err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
-                            # logger.print_on_console(err_msg)
-                            # log.error(err_msg)
-                            err_msg=self.print_error(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
-                    else:
-                        err_msg = 'Provided input not present in element'
-                        logger.print_on_console(err_msg)
-                        log.error(err_msg)
-                except Exception as e:
-                    log.error(e)
-                    logger.print_on_console(e)
-            else:
-                try:
-                    if input is not None:
-                        log.info('Input is not none')
-                        if self.util.is_visible(webelement):
-                            # performing selenium code
-                            log.debug('element is visible, performing selenium code')
-                            log.info(ERROR_CODE_DICT['MSG_OBJECT_DISPLAYED'])
-                            select = Select(webelement)
-                            option_len = select.options
-                            opt_len = len(option_len)
-                            inp_val_len = len(input)
-                            log.info('inp_val_len')
-                            log.info(inp_val_len)
-                            temp = []
-                            flag = True
-                            for x in range(0,opt_len):
-                                internal_val = select.options[x].text
-                                if len(input)!=0 and input[0] == "1":
-                                    internal_val= select.options[x].text.strip()
-                                temp.append(internal_val)
-                            log.info('temp value')
-                            log.info(temp)
-                            output=temp
-                            if(len(temp) != 0 ):
-                                status=webconstants_MW.TEST_RESULT_PASS
-                                result=webconstants_MW.TEST_RESULT_TRUE
+            utilobj=UtilWebKeywords()
+            is_visble=utilobj.is_visible(webelement)
+            if len(args)>0 and args[0] != '':
+                visibilityFlag=args[0]
+            if ((webelement.is_enabled())):
+                log.info('Recieved web element from the web dispatcher')
+                ##if ((webelement.is_enabled())):
+                if not(visibilityFlag=='yes' and is_visble):
+                    try:
+                        # performing js code
+                        log.debug('element is invisible, performing js code')
+                        if input is not None:
+                            alloptions = []
+                            if browser_Keywords_MW.driver_obj is not None and isinstance(browser_Keywords_MW.driver_obj,
+                                                                                    webdriver.Ie):
+                                count = browser_Keywords_MW.driver_obj.execute_script(
+                                    """return arguments[0].childElementCount""", webelement)
+                                for i in range(count):
+                                    alloptions.append(browser_Keywords_MW.driver_obj.execute_script(
+                                        """return arguments[0].options[arguments[1]].text""", webelement, i))
+                            else:
+                                optionlist = browser_Keywords_MW.driver_obj.execute_script(
+                                    """return arguments[0].options""", webelement)
+                                for element in optionlist:
+                                    alloptions.append(
+                                        browser_Keywords_MW.driver_obj.execute_script("""return arguments[0].text""",
+                                                                                element))
+                            if len(input)!=0 and input[0] == "1":
+                                for i in range(len(alloptions)):
+                                    alloptions[i] = alloptions[i].strip()
+                            output = alloptions
+                            if len(output) != 0:
+                                status = webconstants_MW.TEST_RESULT_PASS
+                                result = webconstants_MW.TEST_RESULT_TRUE
                                 logger.print_on_console(output)
                                 log.info(STATUS_METHODOUTPUT_UPDATE)
                             else:
-                                # err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
-                                # logger.print_on_console(err_msg)
-                                # log.error(err_msg)
-                                err_msg=self.print_error(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
+                                err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
                         else:
-                            err_msg = ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED']
-                            logger.print_on_console(err_msg)
-                            log.error(err_msg)
+                            err_msg = 'Provided input not present in element'
+                    except Exception as e:
+                        err_msg=e
+                        log.error(e)
+                else:
+                    try:
+                        if input is not None:
+                            log.info('Input is not none')
+                            if is_visble:
+                                # performing selenium code
+                                log.debug('element is visible, performing selenium code')
+                                log.info(ERROR_CODE_DICT['MSG_OBJECT_DISPLAYED'])
+                                select = Select(webelement)
+                                option_len = select.options
+                                opt_len = len(option_len)
+                                inp_val_len = len(input)
+                                log.info('inp_val_len')
+                                log.info(inp_val_len)
+                                temp = []
+                                flag = True
+                                for x in range(0,opt_len):
+                                    internal_val = select.options[x].text
+                                    if len(input)!=0 and input[0] == "1":
+                                        internal_val= select.options[x].text.strip()
+                                    temp.append(internal_val)
+                                log.info('temp value')
+                                log.info(temp)
+                                output=temp
+                                if(len(temp) != 0 ):
+                                    status=webconstants_MW.TEST_RESULT_PASS
+                                    result=webconstants_MW.TEST_RESULT_TRUE
+                                    logger.print_on_console(output)
+                                    log.info(STATUS_METHODOUTPUT_UPDATE)
+                                else:
+                                    err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
+                            else:
+                                err_msg = ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED']
 
-                    else:
-                        err_msg='Provided input not present in element'
-                        logger.print_on_console(err_msg)
-                        log.error(err_msg)
-                except Exception as e:
-                    log.error(e)
-                    logger.print_on_console(e)
-            ##else:
-                ##err_msg = 'Element is not enabled '
-                ##logger.print_on_console(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
-                ##local_ddl.log.info(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
+                        else:
+                            err_msg='Provided input not present in element'
+                    except Exception as e:
+                        err_msg=e
+                        log.error(e)
+                ##else:
+                    ##err_msg = 'Element is not enabled '
+                    ##logger.print_on_console(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
+                    ##local_ddl.log.info(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
+        if err_msg is not None:
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
         return status,result,output,err_msg
 
     def verifyAllValues(self,webelement,input,*args):
@@ -762,9 +708,13 @@ class DropdownKeywords():
         err_msg=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
+            utilobj=UtilWebKeywords()
+            is_visble=utilobj.is_visible(webelement)
+            if len(args)>0 and args[0] != '':
+                visibilityFlag=args[0]
             if ((webelement.is_enabled())):
                 log.info('Recieved web element from the web dispatcher')
-                if not (self.util.is_visible(webelement)) and self.__check_visibility_from_config():
+                if not(visibilityFlag=='yes' and is_visble):
                     try:
                         # performing js code
                         log.debug('element is invisible, performing js code')
@@ -798,29 +748,21 @@ class DropdownKeywords():
                                 result = webconstants_MW.TEST_RESULT_TRUE
                                 log.info(STATUS_METHODOUTPUT_UPDATE)
                             else:
-                                # err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
-                                # logger.print_on_console(err_msg)
-                                # log.error(err_msg)
-                                err_msg=self.print_error(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
+                                err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
                         elif input[0]=='':
-                        #    logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                        #    log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                        #    err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                           err_msg=self.print_error(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                           err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
 
                         else:
                             err_msg='Provided input not present in element'
-                            logger.print_on_console(err_msg)
-                            log.error(err_msg)
 
                     except Exception as e:
+                        err_msg=e
                         log.error(e)
-                        logger.print_on_console(e)
                 else:
                     try:
                         if input is not None and input[0] != '':
                             log.info('Input is not none')
-                            if self.util.is_visible(webelement):
+                            if is_visble:
                                 # performing selenium code
                                 log.debug('element is visible, performing selenium code')
                                 log.info(ERROR_CODE_DICT['MSG_OBJECT_DISPLAYED'])
@@ -852,34 +794,23 @@ class DropdownKeywords():
                                     result=webconstants_MW.TEST_RESULT_TRUE
                                     log.info(STATUS_METHODOUTPUT_UPDATE)
                                 else:
-                                    # err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
-                                    # logger.print_on_console(err_msg)
-                                    # log.error(err_msg)
-                                    err_msg=self.print_error(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
-
+                                    err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
                             else:
                                 err_msg = ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED']
-                                logger.print_on_console(err_msg)
-                                log.error(err_msg)
                         elif input[0]=='':
-                        #    logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                        #    log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                        #    err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                           err_msg=self.print_error(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                           err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
 
                         else:
                             err_msg='Provided input not present in element'
-                            logger.print_on_console(err_msg)
-                            log.error(err_msg)
 
                     except Exception as e:
+                        err_msg=e
                         log.error(e)
-                        logger.print_on_console(e)
             else:
-                # err_msg = 'Element is not enabled '
-                # logger.print_on_console(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
-                # log.info(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
-                err_msg=self.print_error(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
+                err_msg = ERROR_CODE_DICT['ERR_OBJECT_DISABLED']
+        if err_msg is not None:
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
         return status,result,verb,err_msg
         
 
@@ -897,9 +828,13 @@ class DropdownKeywords():
         err_msg=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
+            utilobj=UtilWebKeywords()
+            is_visble=utilobj.is_visible(webelement)
+            if len(args)>0 and args[0] != '':
+                visibilityFlag=args[0]
             if ((webelement.is_enabled())):
                 log.info('Recieved web element from the web dispatcher')
-                if not (self.util.is_visible(webelement)) and self.__check_visibility_from_config():
+                if not(visibilityFlag=='yes' and is_visble):
                     try:
                         # performing js code
                         log.debug('element is invisible, performing js code')
@@ -928,17 +863,14 @@ class DropdownKeywords():
                                     result = webconstants_MW.TEST_RESULT_TRUE
                                     log.info(STATUS_METHODOUTPUT_UPDATE)
                         else:
-                            # logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                            # log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                            # err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                            err_msg=self.print_error(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                            err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                     except Exception as e:
+                        err_msg=e
                         log.error(e)
-                        logger.print_on_console(e)
                 else:
                     try:
                         if input is not None and len(input) != 0:
-                                if (self.util.is_visible(webelement)):
+                                if is_visble:
                                     # performing selenium code
                                     log.debug('element is visible, performing selenium code')
                                     log.info(ERROR_CODE_DICT['MSG_OBJECT_ENABLED'])
@@ -968,34 +900,25 @@ class DropdownKeywords():
                                                 select.select_by_index(inputindex)
                                             else:
                                                 flag = True
-                                                # logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                                # log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                                # err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                                                err_msg=self.print_error(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                                                 break
                                     if (not flag):
                                         status = webconstants_MW.TEST_RESULT_PASS
                                         result = webconstants_MW.TEST_RESULT_TRUE
                                         log.info(STATUS_METHODOUTPUT_UPDATE)
                                 else:
-                                    # err_msg = 'Element is disabled'
-                                    # logger.print_on_console('Element is disabled ')
-                                    # log.info(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
-                                    err_msg=self.print_error(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
-                                    log.info(ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED'])
+                                    err_msg = 'Element is disabled'
+                                    log.info(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
                         else:
-                            # logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                            # log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                            # err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                            err_msg=self.print_error(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                            err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                     except Exception as e:
                         log.error(e)
                         logger.print_on_console(e)
             else:
-                # err_msg = 'Element is not enabled '
-                # logger.print_on_console(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
-                # log.info(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
-                err_msg=self.print_error(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
+                err_msg = ERROR_CODE_DICT['ERR_OBJECT_DISABLED']
+        if err_msg is not None:
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
         return status,result,verb,err_msg
         
 
@@ -1013,9 +936,13 @@ class DropdownKeywords():
         err_msg=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
+            utilobj=UtilWebKeywords()
+            is_visble=utilobj.is_visible(webelement)
+            if len(args)>0 and args[0] != '':
+                visibilityFlag=args[0]
             ##if ((webelement.is_enabled())):
             log.info('Recieved web element from the web dispatcher')
-            if not (self.util.is_visible(webelement)) and self.__check_visibility_from_config():
+            if not(visibilityFlag=='yes' and is_visble):
                 try:
                     # performing js code
                     log.debug('element is invisible, performing js code')
@@ -1023,10 +950,8 @@ class DropdownKeywords():
                         if ((webelement.is_enabled())):
                             webelement=self.radioKeywordsObj.getActualElement(webelement,input)
                         else:
-                            # err_msg = 'Element is not enabled '
-                            # logger.print_on_console(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
-                            # log.info(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
-                            err_msg=self.print_error(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
+                            err_msg = 'Element is not enabled '
+                            logger.print_on_console(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
                     selectedvalues = []
                     if browser_Keywords_MW.driver_obj is not None and isinstance(browser_Keywords_MW.driver_obj,webdriver.Ie):
                         count = browser_Keywords_MW.driver_obj.execute_script("""return arguments[0].childElementCount""", webelement)
@@ -1063,11 +988,9 @@ class DropdownKeywords():
                         if ((webelement.is_enabled())):
                             webelement = self.radioKeywordsObj.getActualElement(webelement, input)
                         else:
-                            # err_msg = 'Element is not enabled '
-                            # logger.print_on_console(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
-                            # log.info(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
-                            err_msg=self.print_error(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
-                    if self.util.is_visible(webelement):
+                            err_msg = 'Element is not enabled '
+                            logger.print_on_console(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
+                    if is_visble:
                         # performing selenium code
                         log.debug('element is visible, performing selenium code')
                         log.info(ERROR_CODE_DICT['MSG_OBJECT_DISPLAYED'])
@@ -1093,15 +1016,17 @@ class DropdownKeywords():
                         log.info(STATUS_METHODOUTPUT_UPDATE)
                     else:
                         logger.print_on_console('Element is not displayed')
-                        log.info(ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED'])
                         err_msg = ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED']
                 except Exception as e:
+                    err_msg=e
                     log.error(e)
-                    logger.print_on_console(e)
             ##else:
                 ##err_msg = 'Element is not enabled '
                 ##logger.print_on_console(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
                 ##local_ddl.log.info(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
+        if err_msg is not None:
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
         return status, result, output ,err_msg
         
 
@@ -1114,9 +1039,13 @@ class DropdownKeywords():
         err_msg=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
+            utilobj=UtilWebKeywords()
+            is_visble=utilobj.is_visible(webelement)
+            if len(args)>0 and args[0] != '':
+                visibilityFlag=args[0]
             if ((webelement.is_enabled())):
                 log.info('Recieved web element from the web dispatcher')
-                if not (self.util.is_visible(webelement)) and self.__check_visibility_from_config():
+                if not(visibilityFlag=='yes' and is_visble):
                     try:
                         # performing js code
                         log.debug('element is invisible, performing js code')
@@ -1142,20 +1071,14 @@ class DropdownKeywords():
                                 result=webconstants_MW.TEST_RESULT_TRUE
                                 log.info(STATUS_METHODOUTPUT_UPDATE)
                             else:
-                                # logger.print_on_console(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
-                                # log.info(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
-                                # err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
-                                err_msg=self.print_error(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
+                                err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
                         else:
-                            # logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                            # log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                            # err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                            err_msg=self.print_error(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                            err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                     except Exception as e:
+                        err_msg=e
                         log.error(e)
-                        logger.print_on_console(e)
                 else:
-                    if (self.util.is_visible(webelement)):
+                    if is_visble:
                         # performing selenium code
                         log.debug('element is visible, performing selenium code')
                         log.info(ERROR_CODE_DICT['MSG_OBJECT_ENABLED'])
@@ -1183,10 +1106,7 @@ class DropdownKeywords():
                                         result = webconstants_MW.TEST_RESULT_TRUE
                                         log.info(STATUS_METHODOUTPUT_UPDATE)
                                     else:
-                                        # logger.print_on_console(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
-                                        # log.info(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
-                                        # err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
-                                        err_msg=self.print_error(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
+                                        err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
                                 else:
                                     counter = 0
                                     options = []
@@ -1204,28 +1124,22 @@ class DropdownKeywords():
                                         result = webconstants_MW.TEST_RESULT_TRUE
                                         log.info(STATUS_METHODOUTPUT_UPDATE)
                                     else:
-                                        # logger.print_on_console(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
-                                        # log.info(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
-                                        # err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
-                                        err_msg=self.print_error(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
+                                        err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
                             else:
-                                # logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                # log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                # err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                                err_msg=self.print_error(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
 
                         except Exception as e:
+                            err_msg=e
                             log.error(e)
-                            logger.print_on_console(e)
                     else:
                         err_msg = 'Element is not displayed'
-                        logger.print_on_console('Element is not displayed')
                         log.info(ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED'])
             else:
-                # err_msg = 'Element is not enabled '
-                # logger.print_on_console(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
-                # log.info(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
-                err_msg=self.print_error(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
+                err_msg = 'Element is not enabled '
+                logger.print_on_console(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
+        if err_msg is not None:
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
         return status,result,verb,err_msg
         
 
@@ -1237,9 +1151,13 @@ class DropdownKeywords():
         err_msg=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
+            utilobj=UtilWebKeywords()
+            is_visble=utilobj.is_visible(webelement)
+            if len(args)>0 and args[0] != '':
+                visibilityFlag=args[0]
             ##if ((webelement.is_enabled())):
             log.info('Recieved web element from the web dispatcher')
-            if not (self.util.is_visible(webelement)) and self.__check_visibility_from_config():
+            if not(visibilityFlag=='yes' and is_visble):
                 try:
                     # performing js code
                     log.debug('element is invisible, performing js code')
@@ -1271,17 +1189,14 @@ class DropdownKeywords():
                             result = webconstants_MW.TEST_RESULT_TRUE
                             log.info(STATUS_METHODOUTPUT_UPDATE)
                     else:
-                        # logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                        # log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                        # err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                        err_msg=self.print_error(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                        err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                 except Exception as e:
+                    err_msg=e
                     log.error(e)
-                    logger.print_on_console(e)
             else:
                 try:
                     if input is not None and len(input) != 0:
-                        if self.util.is_visible(webelement):
+                        if is_visble:
                             # performing selenium code
                             log.debug('element is visible, performing selenium code')
                             log.info(ERROR_CODE_DICT['MSG_OBJECT_DISPLAYED'])
@@ -1302,10 +1217,7 @@ class DropdownKeywords():
                                     temp.append(value)
                                 else:
                                     flag = True
-                                    # logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                    # log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                    # err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                                    err_msg=self.print_error(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                    err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                                     break
                             if(not flag):
                                 output = ';'.join(temp)
@@ -1316,20 +1228,19 @@ class DropdownKeywords():
                                 log.info(STATUS_METHODOUTPUT_UPDATE)
                         else:
                             logger.print_on_console('Element is not displayed')
-                            log.info(ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED'])
                             err_msg = ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED']
                     else:
-                        # logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                        # log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                        # err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                        err_msg=self.print_error(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                        err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                 except Exception as e:
+                    err_msg=e
                     log.error(e)
-                    logger.print_on_console(e)
             ##else:
                 ##err_msg = 'Element is not enabled '
                 ##logger.print_on_console(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
                 ##local_ddl.log.info(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
+        if err_msg is not None:
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
         return status,result,output,err_msg
         
 
@@ -1341,9 +1252,13 @@ class DropdownKeywords():
         err_msg=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
+            utilobj=UtilWebKeywords()
+            is_visble=utilobj.is_visible(webelement)
+            if len(args)>0 and args[0] != '':
+                visibilityFlag=args[0]
             if ((webelement.is_enabled())):
                 log.info('Recieved web element from the web dispatcher')
-                if not (self.util.is_visible(webelement)) and self.__check_visibility_from_config():
+                if not(visibilityFlag=='yes' and is_visble):
                     try:
                         # performing js code
                         log.debug('element is invisible, performing js code')
@@ -1354,10 +1269,10 @@ class DropdownKeywords():
                         result = webconstants_MW.TEST_RESULT_TRUE
                         log.info(STATUS_METHODOUTPUT_UPDATE)
                     except Exception as e:
+                        err_msg=e
                         log.error(e)
-                        logger.print_on_console(e)
                 else:
-                    if (self.util.is_visible(webelement)):
+                    if is_visble:
                         # performing selenium code
                         log.debug('element is visible, performing selenium code')
                         log.info(ERROR_CODE_DICT['MSG_OBJECT_ENABLED'])
@@ -1397,17 +1312,18 @@ class DropdownKeywords():
                                     result=webconstants_MW.TEST_RESULT_TRUE
                                     log.info(STATUS_METHODOUTPUT_UPDATE)
                         except Exception as e:
+                            err_msg=e
                             log.error(e)
                             logger.print_on_console(e)
                     else:
                         logger.print_on_console('Element is not displayed')
-                        log.info(ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED'])
                         err_msg = ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED']
             else:
-                # err_msg = 'Element is not enabled '
-                # logger.print_on_console(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
-                # log.info(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
-                err_msg=self.print_error(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
+                err_msg = 'Element is not enabled '
+                logger.print_on_console(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
+        if err_msg is not None:
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
         return status,result,verb,err_msg
             
 
@@ -1419,9 +1335,13 @@ class DropdownKeywords():
         err_msg=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
+            utilobj=UtilWebKeywords()
+            is_visble=utilobj.is_visible(webelement)
+            if len(args)>0 and args[0] != '':
+                visibilityFlag=args[0]
             ##if ((webelement.is_enabled())):
             log.info('Recieved web element from the web dispatcher')
-            if not (self.util.is_visible(webelement)) and self.__check_visibility_from_config():
+            if not(visibilityFlag=='yes' and is_visble):
                 try:
                     # performing js code
                     log.debug('element is invisible, performing js code')
@@ -1436,20 +1356,14 @@ class DropdownKeywords():
                                 logger.print_on_console('Result obtained is: ',output)
                                 log.info(STATUS_METHODOUTPUT_UPDATE)
                         else:
-                            # logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                            # log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                            # err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                            err_msg=self.print_error(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                            err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                     else:
-                        # logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                        # log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                        # err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                        err_msg=self.print_error(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                        err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                 except Exception as e:
+                    err_msg=e
                     log.error(e)
-                    logger.print_on_console(e)
             else:
-                if self.util.is_visible(webelement):
+                if is_visble:
                     # performing selenium code
                     log.debug('element is visible, performing selenium code')
                     log.info(ERROR_CODE_DICT['MSG_OBJECT_DISPLAYED'])
@@ -1471,31 +1385,24 @@ class DropdownKeywords():
                                             logger.print_on_console('Result obtained is: ',output)
                                             log.info(STATUS_METHODOUTPUT_UPDATE)
                                 else:
-                                    # logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                    # log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                    # err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                                    err_msg=self.print_error(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                    err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                             else:
-                                # logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                # log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                # err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                                err_msg=self.print_error(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                         else:
-                            # logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                            # log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                            # err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                            err_msg=self.print_error(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                            err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                     except Exception as e:
+                        err_msg=e
                         log.error(e)
-                        logger.print_on_console(e)
                 else:
-                    logger.print_on_console('Element is not displayed')
                     log.info(ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED'])
                     err_msg = ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED']
             ##else:
                 ##err_msg = 'Element is not enabled '
                 ##logger.print_on_console(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
                 ##local_ddl.log.info(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
+        if err_msg is not None:
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
         return status,result,output,err_msg
             
 
@@ -1507,9 +1414,13 @@ class DropdownKeywords():
         err_msg=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
+            utilobj=UtilWebKeywords()
+            is_visble=utilobj.is_visible(webelement)
+            if len(args)>0 and args[0] != '':
+                visibilityFlag=args[0]
             if ((webelement.is_enabled())):
                 log.info('Recieved web element from the web dispatcher')
-                if not (self.util.is_visible(webelement)) and self.__check_visibility_from_config():
+                if not(visibilityFlag=='yes' and is_visble):
                     try:
                         # performing js code
                         log.debug('element is invisible, performing js code')
@@ -1536,23 +1447,17 @@ class DropdownKeywords():
                                 result = webconstants_MW.TEST_RESULT_TRUE
                                 log.info(STATUS_METHODOUTPUT_UPDATE)
                             else:
-                                # logger.print_on_console(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
-                                # log.info(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
-                                # err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
-                                err_msg=self.print_error(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
+                                err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
                         else:
-                            # logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                            # log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                            # err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                            err_msg=self.print_error(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                            err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                     except Exception as e:
+                        err_msg=e
                         log.error(e)
-                        logger.print_on_console(e)
                 else:
                     try:
                         if input is not None:
                             log.debug('Input is not none')
-                            if self.util.is_visible(webelement):
+                            if is_visble:
                                 # performing selenium code
                                 log.debug('element is visible, performing selenium code')
                                 log.info(ERROR_CODE_DICT['MSG_OBJECT_DISPLAYED'])
@@ -1583,22 +1488,19 @@ class DropdownKeywords():
                                 else:
                                     logger.print_on_console('Inputs does not match')
                             else:
-                                logger.print_on_console('Element is not displayed')
                                 log.info(ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED'])
                                 err_msg = ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED']
                         else:
-                            # logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                            # log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                            # err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                            err_msg=self.print_error(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                            err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                     except Exception as e:
+                        err_msg=e
                         log.error(e)
-                        logger.print_on_console(e)
             else:
-                # err_msg = 'Element is not enabled '
-                # logger.print_on_console(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
-                # log.info(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
-                err_msg=self.print_error(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
+                err_msg = 'Element is not enabled '
+                logger.print_on_console(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
+        if err_msg is not None:
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
         return status,result,verb,err_msg
         
 
@@ -1616,9 +1518,13 @@ class DropdownKeywords():
         err_msg=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
+            utilobj=UtilWebKeywords()
+            is_visble=utilobj.is_visible(webelement)
+            if len(args)>0 and args[0] != '':
+                visibilityFlag=args[0]
             if ((webelement.is_enabled())):
                 log.info('Recieved web element from the web dispatcher')
-                if not (self.util.is_visible(webelement)) and self.__check_visibility_from_config():
+                if not(visibilityFlag=='yes' and is_visble):
                     try:
                         # performing js code
                         log.debug('element is invisible, performing js code')
@@ -1645,19 +1551,12 @@ class DropdownKeywords():
                                 result = webconstants_MW.TEST_RESULT_TRUE
                                 log.info(STATUS_METHODOUTPUT_UPDATE)
                             else:
-                                # err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
-                                # logger.print_on_console(err_msg)
-                                # log.error(err_msg)
-                                err_msg=self.print_error(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
+                                err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
                         else:
-                            # logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                            # log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                            # err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                            err_msg=self.print_error(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                            err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                     except Exception as e:
+                        err_msg=e
                         log.error(e)
-
-                        logger.print_on_console(e)
                 else:
                     try:
                         # performing selenium code
@@ -1689,24 +1588,18 @@ class DropdownKeywords():
                                 result = webconstants_MW.TEST_RESULT_TRUE
                                 log.info(STATUS_METHODOUTPUT_UPDATE)
                             else:
-                                # err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
-                                # logger.print_on_console(err_msg)
-                                # log.error(err_msg)
-                                err_msg=self.print_error(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
+                                err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
                         else:
-                            # logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                            # log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                            # err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                            err_msg=self.print_error(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                            err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                     except Exception as e:
+                        err_msg=e
                         log.error(e)
-
-                        logger.print_on_console(e)
             else:
-                # err_msg = 'Element is not enabled '
-                # logger.print_on_console(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
-                # log.info(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
-                err_msg=self.print_error(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
+                err_msg = 'Element is not enabled '
+                logger.print_on_console(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
+        if err_msg is not None:
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
         return status,result,verb,err_msg
         
 
@@ -1719,10 +1612,14 @@ class DropdownKeywords():
         err_msg=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
+            utilobj=UtilWebKeywords()
+            is_visble=utilobj.is_visible(webelement)
+            if len(args)>0 and args[0] != '':
+                visibilityFlag=args[0]
             if ((webelement.is_enabled())):
                 log.info('Recieved web element from the web dispatcher')
                 log.debug(webelement)
-                if not (self.util.is_visible(webelement)) and self.__check_visibility_from_config():
+                if not(visibilityFlag=='yes' and is_visble):
                     try:
                         # performing js code
                         log.debug('element is invisible, performing js code')
@@ -1733,10 +1630,10 @@ class DropdownKeywords():
                         result = webconstants_MW.TEST_RESULT_TRUE
                         log.info(STATUS_METHODOUTPUT_UPDATE)
                     except Exception as e:
+                        err_msg=e
                         log.error(e)
-                        logger.print_on_console(e)
                 else:
-                    if (self.util.is_visible(webelement)):
+                    if is_visble:
                         # performing selenium code
                         log.debug('element is visible, performing selenium code')
                         log.info(ERROR_CODE_DICT['MSG_OBJECT_ENABLED'])
@@ -1758,18 +1655,16 @@ class DropdownKeywords():
                                 result=webconstants_MW.TEST_RESULT_TRUE
                                 log.info(STATUS_METHODOUTPUT_UPDATE)
                         except Exception as e:
+                            err_msg=e
                             log.error(e)
-                            logger.print_on_console(e)
                     else:
-                        # err_msg = 'Element is not displayed'
-                        logger.print_on_console('Element is not displayed')
-                        # log.info(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
-                        err_msg=self.print_error(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
+                        err_msg = 'Element is not displayed'
             else:
-                # err_msg = 'Element is not enabled '
-                # logger.print_on_console(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
-                # log.info(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
-                err_msg=self.print_error(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
+                err_msg = 'Element is not enabled '
+                logger.print_on_console(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
+        if err_msg is not None:
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
         return status,result,verb,err_msg
             
 
@@ -1814,23 +1709,14 @@ class DropdownKeywords():
                                                 result=webconstants_MW.TEST_RESULT_TRUE
                                                 log.info('Values Match')
                                             else:
-                                                # logger.print_on_console(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
-                                                # log.info(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
-                                                # err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
-                                                err_msg=self.print_error(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
+                                                err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
                                         else:
-                                            # logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                            # log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                            # err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                                            err_msg=self.print_error(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                            err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                             else:
-                                # logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                # log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                # err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                                err_msg=self.print_error(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                     except Exception as e:
+                        err_msg=e
                         log.error(e)
-                        logger.print_on_console(e)
             elif (len(input) == 1):
                 if(webelement.is_enabled()):
                     if input[0] != '':
@@ -1853,31 +1739,19 @@ class DropdownKeywords():
                                     result=webconstants_MW.TEST_RESULT_TRUE
                                     log.info('Values Match')
                                 else:
-                                    # logger.print_on_console(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
-                                    # log.info(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
-                                    # err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
-                                    err_msg=self.print_error(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
+                                    err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
                             else:
-                                # logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                # log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                # err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                                err_msg=self.print_error(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                         except Exception as e:
+                            err_msg=e
                             log.error(e)
-                            logger.print_on_console(e)
                     else:
-                        # logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                        # log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                        # err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                        err_msg=self.print_error(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                        err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                 else:
-                    # err_msg = ERROR_CODE_DICT['ERR_OBJECT_DISABLED']
-                    # logger.print_on_console(err_msg)
-                    # log.info(err_msg)
-                    err_msg=self.print_error(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
+                    err_msg = ERROR_CODE_DICT['ERR_OBJECT_DISABLED']
             else:
-                # logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                # log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                # err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                err_msg=self.print_error(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+        if err_msg is not None:
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
         return status,result,verb,err_msg

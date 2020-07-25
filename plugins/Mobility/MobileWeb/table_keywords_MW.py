@@ -26,10 +26,6 @@ import logging
 log = logging.getLogger('table_keywords_MW.py')
 class TableOperationKeywords():
 
-        def print_error(self,e):
-            log.error(e)
-            logger.print_on_console(e)
-            return e
 
 #   returns the row count of table if the table found with the given xpath
         def getRowCount(self,webElement,*args):
@@ -54,13 +50,16 @@ class TableOperationKeywords():
                             methodoutput=TEST_RESULT_TRUE
                             logger.print_on_console('Row count is  : ',row_count)
                     else:
-                        err_msg=self.print_error('Element not found')
+                        err_msg='Element not found'
                 except Exception as e:
                      log.error(e)
                      logger.print_on_console(e)
                      err_msg=e
             else:
-                err_msg=self.print_error('The element is Hidden.')
+                err_msg = ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
+            if err_msg is not None:
+                logger.print_on_console(err_msg)
+                log.error(err_msg)
             return status,methodoutput,row_count,err_msg
 
 #   returns the no of coloumns of the table if the table found with the given xpath
@@ -87,12 +86,13 @@ class TableOperationKeywords():
                             log.info('Column count is : ',coloumn_count)
                             logger.print_on_console('Column count is : ',coloumn_count)
                 except Exception as e:
-                    log.error(e)
-                    logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
                     err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
-                    # err_msg=self.print_error('The element is Hidden.')
+                    log.error(e)
             else:
-                err_msg=self.print_error('The element is Hidden.')
+                err_msg = ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
+            if err_msg is not None:
+                logger.print_on_console(err_msg)
+                log.error(err_msg)
             return status,methodoutput,coloumn_count,err_msg
 
 #   returns the cell value of cell with ',' seperated values, if the table found with the given xpath
@@ -117,8 +117,6 @@ class TableOperationKeywords():
                         if row_num-1>row_count or col_num-1>col_count:
                             log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                             err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                            logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                            err_msg=self.print_error('Input error: please provide the valid input.')
                         else:
                             remoteWebElement=self.javascriptExecutor(webElement,row_num-1,col_num-1)
                             cellVal=self.getChildNodes(remoteWebElement)
@@ -128,13 +126,15 @@ class TableOperationKeywords():
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
                     else:
-                        err_msg=self.print_error('Input error: please provide the valid input.')
+                        err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                 else:
-                    err_msg=self.print_error('The element is Hidden.')
+                    err_msg = ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
             except Exception as e:
-                log.error(e)
-                logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
                 err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                log.error(e)
+            if err_msg is not None:
+                logger.print_on_console(err_msg)
+                log.error(err_msg)
             return status,methodoutput,cellVal,err_msg
 
 #   verifies the cell value with the given text input, if the table found with the given xpath
@@ -158,7 +158,7 @@ class TableOperationKeywords():
                         row_count=self.getRowCountJs(webElement)
                         col_count=self.getColoumnCountJs(webElement)
                         if row_num>row_count or col_num>col_count:
-                            err_msg=self.print_error('Input error: please provide the valid input.')
+                            err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                         else:
                             actual_rowNum=row_num-1
                             actual_colNum=col_num-1
@@ -172,18 +172,20 @@ class TableOperationKeywords():
                                 status=TEST_RESULT_PASS
                                 methodoutput=TEST_RESULT_TRUE
                             else:
-                                err_msg=self.print_error('Values does not match')
+                                err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
                                 logger.print_on_console('Actual value is : ',cellVal)
                                 logger.print_on_console('Expected value is : ',expected_value)
 
                     else:
-                        err_msg=self.print_error('Input error: please provide the valid input.')
+                        err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                 else:
-                    err_msg=self.print_error('The element is Hidden.')
+                    err_msg = ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
             except Exception as e:
-                log.error(e)
-                logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
                 err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                log.error(e)
+            if err_msg is not None:
+                logger.print_on_console(err_msg)
+                log.error(err_msg)
             return status,methodoutput,output_res,err_msg
 
 #   returns the  tooltip text  of given cell, if the table found with the given xpath
@@ -206,7 +208,8 @@ class TableOperationKeywords():
                         row_count=self.getRowCountJs(webElement)
                         col_count=self.getColoumnCountJs(webElement)
                         if row_number>row_count or col_number>col_count:
-                            err_msg=self.print_error('Input error: please provide the valid input.')
+                            log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                            err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                         else:
                             log.debug('perfoming java script on element')
                             contents = self.getTooltip(webElement, row_number,
@@ -218,14 +221,15 @@ class TableOperationKeywords():
                                 log.info('Got the result : %s',cellVal)
                                 logger.print_on_console('Got the result : ',cellVal)
                     else:
-                        err_msg=self.print_error('Input error: please provide the valid input.')
-
+                        err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                 except Exception as e:
-                    log.error(e)
-                    logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
                     err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                    log.error(e)
             else:
-                err_msg=self.print_error('The element is Hidden.')
+                err_msg = ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
+            if err_msg is not None:
+                logger.print_on_console(err_msg)
+                log.error(err_msg)
             return status,methodoutput,tooltip,err_msg
 
         def verifyCellToolTip(self,webElement,input_val,*args):
@@ -246,7 +250,8 @@ class TableOperationKeywords():
                         row_count=self.getRowCountJs(webElement)
                         col_count=self.getColoumnCountJs(webElement)
                         if row_number>row_count or col_number>col_count:
-                            err_msg=self.print_error('Input error: please provide the valid input.')
+                            log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                            err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                         else:
                             log.debug('perfoming java script on element')
                             contents = self.getTooltip(webElement, row_number,
@@ -263,18 +268,21 @@ class TableOperationKeywords():
                                 status=TEST_RESULT_PASS
                                 methodoutput=TEST_RESULT_TRUE
                             else:
-                                err_msg=self.print_error('Values does not match')
+                                log.info(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
+                                err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
                                 logger.print_on_console('Actual value is : ',str(verifytooltip))
                                 logger.print_on_console('Expected value is : ',str(expected_value))
                     else:
-                        err_msg=self.print_error('Input error: please provide the valid input.')
+                        err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
 
                 except Exception as e:
-                    log.error(e)
-                    logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
                     err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                    log.error(e)
             else:
-                err_msg=self.print_error('The element is Hidden.')
+                err_msg = ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
+            if err_msg is not None:
+                logger.print_on_console(err_msg)
+                log.error(err_msg)
             return status,methodoutput,verifytooltip,err_msg
 
 #   lclicks on the given cell, if the table found with the given xpath
@@ -339,9 +347,8 @@ class TableOperationKeywords():
                                                 log.info('click action performed successfully')
                                                 logger.print_on_console('click action performed successfully')
                             except Exception as e:
-                                log.error(e)
-                                logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
                                 err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                                log.error(e)
                         elif len(input_arr)>2:
                             log.info('click on an element inside a cell')
                             logger.print_on_console('click on an element inside a cell')
@@ -492,19 +499,22 @@ class TableOperationKeywords():
                                                     methodoutput=TEST_RESULT_TRUE
                                                     break
                                         except Exception as e:
-                                             log.error(e)
-                                             logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
                                              err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                                             log.error(e)
 
                     except Exception as e:
-                       log.error(e)
-                       logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
                        err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                       log.error(e)
                 else:
-                    err_msg=self.print_error('The element is Hidden.')
+                    err_msg = ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
+                if err_msg is not None:
+                    logger.print_on_console(err_msg)
+                    log.error(err_msg)
                 return status,methodoutput,output_val,err_msg
             else:
-                err_msg=self.print_error('Input error: please provide the valid input.')
+                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                logger.print_on_console(err_msg)
+                log.error(err_msg)
 
 
 
@@ -532,13 +542,15 @@ class TableOperationKeywords():
                         log.info('Got the result : %s',row_number)
                         logger.print_on_console('Got the result : ',row_number)
                     except Exception as e:
-                        log.error(e)
-                        logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
                         err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                        log.error(e)
                 else:
-                    err_msg=self.print_error('The element is Hidden.')
+                    err_msg = ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
             else:
                 err_msg = ERROR_CODE_DICT['MSG_ELEMENT_NOT_FOUND']
+            if err_msg is not None:
+                logger.print_on_console(err_msg)
+                log.error(err_msg)
             return status,methodoutput,row_number,err_msg
 
         def getColNumByText(self,webElement,text,*args):
@@ -566,12 +578,14 @@ class TableOperationKeywords():
                         logger.print_on_console('Got the result : ',col_number)
                     except Exception as e:
                         log.error(e)
-                        logger.print_on_console(e)
                         err_msg=e
                 else:
-                    err_msg=self.print_error('The element is Hidden.')
+                    err_msg = ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
             else:
                 err_msg = ERROR_CODE_DICT['MSG_ELEMENT_NOT_FOUND']
+            if err_msg is not None:
+                logger.print_on_console(err_msg)
+                log.error(err_msg)
             return status,methodoutput,col_number,err_msg
 
 
@@ -669,9 +683,11 @@ class TableOperationKeywords():
 ##                        script = """var ele = arguments[0]; var temp = fun(ele); console.log(temp); return temp;  function fun(tableEle) {     eleCollection = tableEle.getElementsByTagName('table');     if (eleCollection.length > 0) {         console.log(eleCollection.length);         return eleCollection[0];     }     return "null";     console.log("No Inner Table") };"""
 ##                        web_element = browser_Keywords_MW.driver_obj.execute_script(script)
                 except Exception as e:
-                    log.error(e)
-                    logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
                     err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                    log.error(e)
+                if err_msg is not None:
+                    logger.print_on_console(err_msg)
+                    log.error(err_msg)
             return status,methodoutput,web_element,err_msg
 
         def selectByAbsoluteValue(self,webelement,input,*args):
@@ -716,17 +732,18 @@ class TableOperationKeywords():
                                                     result=webconstants_MW.TEST_RESULT_TRUE
                                                     log.info('Values Match')
                                                 else:
-                                                    err_msg=self.print_error('Values does not match')
+                                                    err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
                                             else:
-                                                err_msg=self.print_error('Input error: please provide the valid input.')
+                                                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                                 except Exception as e:
-                                    log.error(e)
-                                    logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
                                     err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                                    log.error(e)
                             except Exception as e:
-                                log.error(e)
-                                logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
                                 err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                                log.error(e)
+            if err_msg is not None:
+                logger.print_on_console(err_msg)
+                log.error(err_msg)
             return status,result,verb,err_msg
 
 

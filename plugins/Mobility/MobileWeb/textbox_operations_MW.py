@@ -38,27 +38,6 @@ class TextboxKeywords:
         log.debug(user_input)
         return user_input
 
-    def print_error(self,e):
-        log.error(e)
-        logger.print_on_console(e)
-        return e
-
-
-    def __invalid_element_state(self,e):
-        err_msg=ERROR_CODE_DICT['ERR_INVALID_ELEMENT_STATE_EXCEPTION']
-        log.error(e)
-        logger.print_on_console(err_msg)
-        return err_msg
-
-    def __web_driver_exception(self,e):
-        logger.print_on_console(e)
-        import traceback
-        traceback.print_exc()
-        err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
-        return err_msg
-
-
-
     def set_text(self,webelement,input,*args):
         """
         def : set_text
@@ -104,17 +83,18 @@ class TextboxKeywords:
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
                         else:
-                            err_msg=self.print_error('Element is readonly.')
+                            err_msg=ERROR_CODE_DICT['ERR_ELEMENT_IS_READONLY']
                 else:
-                    err_msg=self.print_error('The Element is Disabled.')
+                    err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
             except InvalidElementStateException as e:
-                err_msg=self.__invalid_element_state(e)
-                # err_msg=self.print_error('The current operation cannot be performed because of the object state.')
-
+                err_msg=ERROR_CODE_DICT['ERR_INVALID_ELEMENT_STATE_EXCEPTION']
+                log.error(e)
             except Exception as e:
-                err_msg=self.__web_driver_exception(e)
-                # err_msg=self.print_error('Error occurred in set text ')
-
+                err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                log.error(e)
+            if err_msg is not None:
+                logger.print_on_console(err_msg)
+                log.error(err_msg)
         return status,methodoutput,output,err_msg
 
     def send_value(self,webelement,input,*args):
@@ -158,15 +138,17 @@ class TextboxKeywords:
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
                         else:
-                            err_msg=self.print_error('Element is readonly.')
+                            err_msg=ERROR_CODE_DICT['ERR_ELEMENT_IS_READONLY']
                 else:
-                    err_msg=self.print_error('The Element is Disabled.')
+                    err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
             except InvalidElementStateException as e:
-                err_msg=self.__invalid_element_state(e)
-                # err_msg=self.print_error('The current operation cannot be performed because of the object state.')
+                err_msg=ERROR_CODE_DICT['ERR_INVALID_ELEMENT_STATE_EXCEPTION']
             except Exception as e:
-                err_msg=self.__web_driver_exception(e)
-                # err_msg=self.print_error('Error occurred in send value')
+                err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                log.error(e)
+            if err_msg is not None:
+                logger.print_on_console(err_msg)
+                log.error(err_msg)
         return status,methodoutput,output,err_msg
 
     def __get_text(self,webelement):
@@ -198,8 +180,11 @@ class TextboxKeywords:
                status=TEST_RESULT_PASS
                methodoutput=TEST_RESULT_TRUE
             except Exception as e:
-                err_msg=self.__web_driver_exception(e)
-                # err_msg=self.print_error('Error occurred in get text')
+                err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                log.error(e)
+            if err_msg is not None:
+                logger.print_on_console(err_msg)
+                log.error(err_msg)
 
         logger.print_on_console(METHOD_OUTPUT+str(text))
         return status,methodoutput,text,err_msg
@@ -229,8 +214,11 @@ class TextboxKeywords:
                 log.info(text)
 
             except Exception as e:
-                err_msg=self.__web_driver_exception(e)
-                # err_msg=self.print_error('Error occurred in verify text')
+                err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                log.error(e)
+            if err_msg is not None:
+                logger.print_on_console(err_msg)
+                log.error(err_msg)
         return status,methodoutput,output,err_msg
 
     def clear_text(self,webelement,*args):
@@ -256,15 +244,17 @@ class TextboxKeywords:
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
                     else:
-                        err_msg=self.print_error('Element is readonly.')
+                        err_msg=ERROR_CODE_DICT['ERR_ELEMENT_IS_READONLY']
                 else:
-                    err_msg=self.print_error('The Element is Disabled.')
+                    err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
             except InvalidElementStateException as e:
-                err_msg=self.__invalid_element_state(e)
-                # err_msg=self.print_error('The current operation cannot be performed because of the object state.')
+                err_msg=ERROR_CODE_DICT['ERR_INVALID_ELEMENT_STATE_EXCEPTION']
             except Exception as e:
-                err_msg=self.__web_driver_exception(e)
-                # err_msg=self.print_error('Error occurred in clear text')
+                err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                log.error(e)
+            if err_msg is not None:
+                logger.print_on_console(err_msg)
+                log.error(err_msg)
         return status,methodoutput,output,err_msg
 
     def gettextbox_length(self,webelement,*args):
@@ -282,8 +272,11 @@ class TextboxKeywords:
                 else:
                     err_msg='Textbox length is '+str(length)
             except Exception as e:
-                err_msg=self.__web_driver_exception(e)
-                # err_msg=self.print_error('Error occurred in get textbox length')
+                err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                log.error(e)
+            if err_msg is not None:
+                logger.print_on_console(err_msg)
+                log.error(err_msg)
         logger.print_on_console('Textbox length is '+str(length))
         log.info('Textbox length is '+str(length))
         return status,methodoutput,length,err_msg
@@ -321,8 +314,11 @@ class TextboxKeywords:
                     err_msg='Textbox length is None or empty'
 
             except Exception as e:
-                err_msg=self.__web_driver_exception(e)
-                # err_msg=self.print_error('Error occurred in verify textbox length')
+                err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                log.error(e)
+            if err_msg is not None:
+                logger.print_on_console(err_msg)
+                log.error(err_msg)    
         return status,methodoutput,output,err_msg
 
     def setsecuretext(self,webelement,input,*args):
@@ -363,15 +359,17 @@ class TextboxKeywords:
                             else:
                                 err_msg=ERROR_CODE_DICT['ERR_INVALID_INPUT']
                         else:
-                            err_msg=self.print_error('Element is readonly.')
+                            err_msg=ERROR_CODE_DICT['ERR_ELEMENT_IS_READONLY']
                 else:
-                    err_msg=self.print_error('The Element is Disabled.')
+                    err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
             except InvalidElementStateException as e:
-                err_msg=self.__invalid_element_state(e)
-                # err_msg=self.print_error('The current operation cannot be performed because of the object state.')
+                err_msg=ERROR_CODE_DICT['ERR_INVALID_ELEMENT_STATE_EXCEPTION']
             except Exception as e:
-                err_msg=self.__web_driver_exception(e)
-                # err_msg=self.print_error('Error occurred in set secure text')
+                err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                log.error(e)
+            if err_msg is not None:
+                logger.print_on_console(err_msg)
+                log.error(err_msg)
         return status,methodoutput,output,err_msg
 
 
@@ -417,15 +415,17 @@ class TextboxKeywords:
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
                         else:
-                            err_msg=self.print_error('Element is readonly.')
+                            err_msg=ERROR_CODE_DICT['ERR_ELEMENT_IS_READONLY']
                 else:
-                    err_msg=self.print_error('The Element is Disabled.')
+                    err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
             except InvalidElementStateException as e:
-                err_msg=self.__invalid_element_state(e)
-                # err_msg=self.print_error('The current operation cannot be performed because of the object state.')
+                err_msg=ERROR_CODE_DICT['ERR_INVALID_ELEMENT_STATE_EXCEPTION']
             except Exception as e:
-                err_msg=self.__web_driver_exception(e)
-                # err_msg=self.print_error('Error occurred in send secure value')
+                err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                log.error(e)
+            if err_msg is not None:
+                logger.print_on_console(err_msg)
+                log.error(err_msg)
         return status,methodoutput,output,err_msg
 
 
