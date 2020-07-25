@@ -793,7 +793,7 @@ class Config_window(wx.Frame):
             self.rbox7.SetSelection(0)
         else:
             self.rbox7.SetSelection(1)
-        self.rbox7.SetToolTip(wx.ToolTip("Provides an option for the IE browser to set all the security zones to the same level while executing the openBrowser/openNewBrowser keywords. It is applicable only when automating Web Applications in IE browser"))
+        self.rbox7.SetToolTip(wx.ToolTip("Provides an option for the IE browser to set all the security zones to the same level while executing the openBrowser keywords. It is applicable only when automating Web Applications in IE browser"))
 
         self.rbox10 = wx.RadioBox(self.panel1, label = 'Highlight Check', choices = lblList,
             majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
