@@ -39,6 +39,7 @@ cw = None
 browsername = None
 qcdata = None
 qcObject = None
+qtestObject = None
 soc=None
 browsercheckFlag=False
 updatecheckFlag=False
@@ -565,6 +566,30 @@ class MainNamespace(BaseNamespace):
             try: socketIO.emit('qcresponse','Error:Qc Operations')
             except: pass
 
+    def on_qtestlogin(self, *args):
+        global qtestObject
+        err_msg = None
+        try:
+            if(qtestObject == None):
+                core_utils.get_all_the_imports('QTest')
+                import QTestController
+                qtestObject = QTestController.QcWindow()
+
+            qcdata = args[0]
+            response = qtestObject.qc_dict[qcdata.pop('qcaction')](qcdata)
+            socketIO.emit('qcresponse', response)
+        except KeyError:
+            err_msg = 'Invalid qTest operation'
+        except Exception as e:
+            err_msg = 'Error in qTest operations'
+            log.error(e, exc_info=True)
+        if err_msg is not None:
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
+            try: socketIO.emit('qcresponse','Error:Qtest Operations')
+            except: pass
+
+
     def on_render_screenshot(self,*args):
         try:
             global socketIO
@@ -912,7 +937,7 @@ class TestThread(threading.Thread):
                 logger.print_on_console('This app type is not part of the license.')
                 status=TERMINATE
             else:
-                status = self.con.invoke_controller(self.action,self,self.debug_mode,runfrom_step,self.json_data,self.main,socketIO,qcObject,self.aws_mode)
+                status = self.con.invoke_controller(self.action,self,self.debug_mode,runfrom_step,self.json_data,self.main,socketIO,qcObject,qtestObject,self.aws_mode)
 
             logger.print_on_console('Execution status '+status)
 
