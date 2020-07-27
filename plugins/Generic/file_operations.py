@@ -27,10 +27,8 @@ import xml.dom.minidom
 import json	
 import difflib	
 from xmldiff import main, formatting
-
+import readconfig
 import logging
-
-
 log = logging.getLogger('file_operations.py')
 
 
@@ -671,10 +669,8 @@ class FileOperations:
 
         """
         try:
-            ##url_save=None
-            ##import browser_Keywords
-            ##url_save=browser_Keywords.url_save
-            ##print url_save
+            configvalues = readconfig.readConfig().readJson()
+            delay_stringinput = float(configvalues['delay_stringinput'])
             import time
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
@@ -710,7 +706,7 @@ class FileOperations:
                 time.sleep(1)
 
                 #Enter the folder path
-                obj.type(folder_path)
+                obj.type(folder_path,delay_stringinput)
                 time.sleep(1)
                 #Press 'Enter' key
                 obj.execute_key('enter',1)
@@ -722,7 +718,7 @@ class FileOperations:
                 obj.press_multiple_keys(['alt','n'],1)
                 time.sleep(1)
                 #Enter the file name
-                obj.type(file_path)
+                obj.type(file_path,delay_stringinput)
                 time.sleep(1)
                 #Press 'Enter' key
                 obj.execute_key('enter',1)
