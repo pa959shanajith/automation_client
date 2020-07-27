@@ -117,7 +117,10 @@ class BrowserKeywords():
                 self.start_server()
                 obj = Singleton_DriverUtil()
                 # Logic to make sure that logic of usage of existing driver is not applicable to execution
-
+                if driver_obj is not None:
+                    result = webconstants_MW.TEST_RESULT_TRUE
+                    status = webconstants_MW.TEST_RESULT_PASS
+                    return status, result, output, err_msg
                 input_list = inputs
                 device_id = input_list[0]
                 time.sleep(5)
