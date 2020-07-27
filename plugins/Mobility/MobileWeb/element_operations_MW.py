@@ -55,7 +55,6 @@ class ElementKeywords:
             log.error(e)
             logger.print_on_console(e)
         return text
-        # return str(webelement.get_attribute('title'))
 
 
     def get_element_text(self,webelement,*args):

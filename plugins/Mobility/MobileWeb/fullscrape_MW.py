@@ -9,7 +9,7 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 
-# import browserops_MW
+
 from constants import SYSTEM_OS
 if SYSTEM_OS=='Windows':
     import win32gui
@@ -21,11 +21,9 @@ import os
 import time
 import browser_Keywords_MW
 # from selenium import webdriver
-log = logging.getLogger('fullscrape_MWD.py')
+log = logging.getLogger('fullscrape_MW.py')
 currenthandle = ''
 status = domconstants_MW.STATUS_FAIL
-# import browserops_MW
-# browserops_obj=browserops_MW.BrowserOperations()
 from core_utils import CoreUtils
 import logger
 from webscrape_utils_MW import WebScrape_Utils
@@ -35,7 +33,6 @@ class Fullscrape():
         global currenthandle
         start_time = time.clock()
         data = {}
-        # driver = browserops.driver
         driver = browser_Keywords_MW.driver_obj
         webscrape_utils_obj = WebScrape_Utils()
         try:
@@ -149,14 +146,6 @@ class Fullscrape():
             # else:
             screen = driver.get_screenshot_as_base64()
             scrapedin = 'CH'
-            # scrapedin = 'CH'
-            # if browserops.browser == 2:
-            #     scrapedin = 'FX'
-            # elif browserops.browser == 3:
-            #     scrapedin =  'IE'
-            # el
-            # if browserops_MW.browser == 1:
-            #     scrapedin =  'CH'
             data['scrapetype'] = 'fs'
             data['scrapedin'] = scrapedin
             data['view'] = tempne

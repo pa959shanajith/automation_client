@@ -185,7 +185,7 @@ class ButtonLinkKeyword():
                     log.info(buttonname)
                     status = webconstants_MW.TEST_RESULT_PASS
                     methodoutput = webconstants_MW.TEST_RESULT_TRUE
-                logger.print_on_console('Button name: 'str(buttonname))
+                logger.print_on_console('Button name: '+str(buttonname))
                 #Remove the leading and trailing spaces
                 input = inputs[0]
                 input = input.strip()

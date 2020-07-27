@@ -10,6 +10,7 @@
 #-------------------------------------------------------------------------------
 
 from selenium.webdriver.support.ui import Select
+from selenium import webdriver
 import  browser_Keywords_MW
 import webconstants_MW
 from utilweb_operations_MW import UtilWebKeywords
@@ -589,7 +590,6 @@ class DropdownKeywords():
 
     def getAllValues(self,webelement,input,*args):
         """
-        author : arpitha.b.v
         def :getAllValues
         purpose: to get All values present in the dropdown.
         param: webelement,list

@@ -268,26 +268,26 @@ class Dispatcher:
                     else:
                         if objectname=="@Object":
                             webelement = input[0]
-                            og.info(WEB_ELEMENT_FOUND_FROM_GetInnerTable)
+                            log.info(WEB_ELEMENT_FOUND_FROM_GetInnerTable)
                             logger.print_on_console(WEB_ELEMENT_FOUND_FROM_GetInnerTable)
                         elif teststepproperty.cord != None and teststepproperty.cord != "":
                             obj_props = teststepproperty.objectname.split(';')
                             coord = [obj_props[2],obj_props[3],obj_props[4],obj_props[5]]
                             webelement = {'cord': teststepproperty.cord, 'coordinates':coord}
                         else:
-                            import UserObjectScrape_MW
-                            webscrape=UserObjectScrape_MW.UserObject()
-                            obj1=UserObjectScrape_MW.update_data.copy()
-                            for k,v in obj1.items():
-                                if teststepproperty.custname in v:
-                                    objectname=v[teststepproperty.custname]
-                                    UserObjectScrape_MW.update_data[str(teststepproperty.stepnum)]=v
+                            # import UserObjectScrape_MW
+                            # webscrape=UserObjectScrape_MW.UserObject()
+                            # obj1=UserObjectScrape_MW.update_data.copy()
+                            # for k,v in obj1.items():
+                            #     if teststepproperty.custname in v:
+                            #         objectname=v[teststepproperty.custname]
+                            #         UserObjectScrape_MW.update_data[str(teststepproperty.stepnum)]=v
                             webelement = self.getwebelement(driver,objectname,teststepproperty.stepnum,teststepproperty.custname)
-                            if(obj_flag!=False):
-                                import UserObjectScrape_MW
-                                webscrape=UserObjectScrape_MW.UserObject()
-                                # obj=core_utils.CoreUtils()
-                                webscrape.update_scrape_object(url,objectname,obj_flag,teststepproperty.stepnum,teststepproperty.custname)
+                            # if(obj_flag!=False):
+                            #     import UserObjectScrape_MW
+                            #     webscrape=UserObjectScrape_MW.UserObject()
+                            #     # obj=core_utils.CoreUtils()
+                                # webscrape.update_scrape_object(url,objectname,obj_flag,teststepproperty.stepnum,teststepproperty.custname)
                             if webelement != None:
                                 if isinstance(webelement,list):
                                     webelement = webelement[0]
@@ -330,13 +330,8 @@ class Dispatcher:
 
 
         try:
-            window_ops_list=['click','press','doubleclick','rightclick','uploadfile','acceptpopup','dismisspopup','selectradiobutton','selectcheckbox','unselectcheckbox','cellclick','clickelement','drag','drop','settext','sendvalue','cleartext','setsecuretext','sendsecurevalue','selectvaluebyindex','selectvaluebytext','selectallvalues','selectmultiplevaluesbyindexes','selectmultiplevaluesbytext','verifyvaluesexists','deselectall','setfocus','mousehover','tab','sendfunctionkeys','rightclick','mouseclick','openbrowser','navigatetourl','opennewbrowser','refresh','closebrowser','closesubwindows','switchtowindow','clearcache','navigatewithauthenticate']
+            # window_ops_list=['click','press','doubleclick','rightclick','uploadfile','acceptpopup','dismisspopup','selectradiobutton','selectcheckbox','unselectcheckbox','cellclick','clickelement','drag','drop','settext','sendvalue','cleartext','setsecuretext','sendsecurevalue','selectvaluebyindex','selectvaluebytext','selectallvalues','selectmultiplevaluesbyindexes','selectmultiplevaluesbytext','verifyvaluesexists','deselectall','setfocus','mousehover','tab','sendfunctionkeys','rightclick','mouseclick','openbrowser','navigatetourl','opennewbrowser','refresh','closebrowser','closesubwindows','switchtowindow','clearcache','navigatewithauthenticate']
             if browser_Keywords_MW.driver_obj is not None:
-                # browser_info=browser_Keywords_MW.driver_obj.capabilities
-                # reporting_obj.browser_type=browser_info.get('browserName')
-                # reporting_obj.browser_version=browser_info.get('version')
-                # if(reporting_obj.browser_version == '' or reporting_obj.browser_version == None):
-                #     reporting_obj.browser_version= browser_info['browserVersion']
                 browser_info=browser_Keywords_MW.driver_obj.capabilities
                 reporting_obj.browser_version=browser_Keywords_MW.driver_obj.execute_script("""x = navigator.userAgent.indexOf("Chrome");y = navigator.userAgent;z = y.substring(x + 7);ver = z.slice(0, 4);return ver;""")
                 reporting_obj.browser_type=browser_info.get('browserName')
@@ -402,7 +397,7 @@ class Dispatcher:
                     if keyword == GET_INNER_TABLE and (output != '' and output.startswith('{') and output.endswith('}')):
                         webelement_map[output]=result[2]
 
-                    elif keyword not in [OPEN_BROWSER,OPEN_NEW_BROWSER,CLOSE_BROWSER,GET_POPUP_TEXT,VERIFY_POPUP_TEXT]:
+                    elif keyword not in [OPEN_BROWSER,OPEN_NEW_BROWSER,CLOSE_BROWSER]:
                         if configvalues['retrieveURL'].lower() == 'yes':
                             if result[0].lower() == 'fail':
                                 res,value=self.check_url_error_code()

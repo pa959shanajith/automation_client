@@ -22,9 +22,6 @@ import logger
 import pythoncom
 import threading
 import core_utils
-import tempfile
-import os
-import shutil
 log = logging.getLogger( 'outlook.py' )
 
 ## This class will have the methods to automate Outlook Application
@@ -43,30 +40,6 @@ class OutlookKeywords:
             self.subjectFlag = False
             self.Msg = ''
 
-        def removeGenCache(self):
-            log.info("Attempting to delete gen_py folder")
-            path_gen_py=tempfile.gettempdir()+os.sep+'gen_py'
-            valid = os.path.exists(path_gen_py)
-            if valid:
-                log.info("gen_py folder found")
-                shutil.rmtree(path_gen_py)
-            else:
-                log.info("gen_py folder not found")
-
-        def checkOutlook(self):
-            for i in range(1,3):
-                log.info("Retrying to get OutlookComObj attempt : " + str(i))
-                if ( self.outlook == None):
-                    log.info("Checking with OutlookComObj type 2(EnsureDispatch)")
-                    self.removeGenCache()
-                    self.outlook = self.getOutlookComObj(2)
-                    if ( self.outlook == None):
-                        log.info("Checking with OutlookComObj type 1(Dispatch)")
-                        self.removeGenCache()
-                        self.outlook = self.getOutlookComObj(1)
-                if self.outlook:
-                    log.info("outlookObj found , Success!")
-                    break
 
         def getOutlookComObj(self, optflag):
             import pythoncom
@@ -83,14 +56,13 @@ class OutlookKeywords:
                     outlookObj = EnsureDispatch('Outlook.Application').GetNamespace('MAPI')
                 except Exception as e:
                     log.error( e )
-                    log.debug( e )
+                    logger.print_on_console(e)
             elif ( optflag == 3 ):
                 try:
                     outlookObj = Dispatch("Outlook.Application")
                 except Exception as e:
                     log.error( e )
                     logger.print_on_console(e)
-            log.info("outlookObj returned is : " + str(outlookObj) )
             return outlookObj
 
 #To support seperate accounts and  subFolders this method is implemented , Input should be the folder path in properties of outlook folder
@@ -111,8 +83,6 @@ class OutlookKeywords:
                 
                 accountname = folders[0]
                 self.outlook = self.getOutlookComObj(2)
-                if ( self.outlook == None ):
-                    self.checkOutlook()
                 #get the message stores in outlook
                 stores = self.outlook.Folders
                 if ( accountname != '' ):

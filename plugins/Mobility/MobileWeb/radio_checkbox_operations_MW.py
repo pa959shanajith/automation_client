@@ -128,7 +128,7 @@ class RadioCheckboxKeywords():
                             visibilityFlag=args[0]
                         if not(visibilityFlag and is_visible ):
                              # performing js code
-                            local_rco.log.debug('element is invisible, performing js code')
+                            log.debug('element is invisible, performing js code')
                             browser_Keywords_MW.driver_obj.execute_script(webconstants_MW.CLICK_RADIO_CHECKBOX,webelement)
                             status = TEST_RESULT_PASS
                             methodoutput = TEST_RESULT_TRUE
@@ -176,10 +176,8 @@ class RadioCheckboxKeywords():
 
             except Exception as e:
                 err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
-                log.error(e)
-            if err_msg is not None:
-                logger.print_on_console(err_msg)
                 log.error(err_msg)
+                log.error(e)
         return status,methodoutput,output,err_msg
 
     def __fetch_status(self,webelement,*args):

@@ -181,10 +181,8 @@ class TextboxKeywords:
                methodoutput=TEST_RESULT_TRUE
             except Exception as e:
                 err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
-                log.error(e)
-            if err_msg is not None:
-                logger.print_on_console(err_msg)
                 log.error(err_msg)
+                log.error(e)
 
         logger.print_on_console(METHOD_OUTPUT+str(text))
         return status,methodoutput,text,err_msg
@@ -215,10 +213,8 @@ class TextboxKeywords:
 
             except Exception as e:
                 err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
-                log.error(e)
-            if err_msg is not None:
-                logger.print_on_console(err_msg)
                 log.error(err_msg)
+                log.error(e)
         return status,methodoutput,output,err_msg
 
     def clear_text(self,webelement,*args):

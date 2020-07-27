@@ -2,24 +2,21 @@ import wx
 import sys
 import os
 from selenium import webdriver
-import browser_Keywords_MW#browserops_MW
+import browser_Keywords_MW
 import clickandadd_MW
 import fullscrape_MW
-import fullscrape_MWD
 from constants import SYSTEM_OS
 from socketIO_client import SocketIO,BaseNamespace
 from selenium.common.exceptions import NoSuchWindowException
 import time
-# from webscrape_utils_MW import WebScrape_Utils  #me
+# from webscrape_utils_MW import WebScrape_Utils  
 import objectspy_MW
 import core_utils
 import platform
 import logger
 
-#browserobj = browserops_MW.BrowserOperations()
 clickandadd_MWoj = clickandadd_MW.Clickandadd()
 fullscrape_MWobj = fullscrape_MW.Fullscrape()
-# fullscrape_MWDobj = fullscrape_MWD.Fullscrape()
 visiblity_status=False
 
 class ScrapeWindow(wx.Frame):
@@ -32,10 +29,10 @@ class ScrapeWindow(wx.Frame):
         self.iconpath = os.environ["IMAGES_PATH"] + "/avo.ico"
         self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
         self.SetIcon(self.wicon)
-        obj = browser_Keywords_MW.BrowserKeywords()#browserops_MW.BrowserOperations()
+        obj = browser_Keywords_MW.BrowserKeywords()
         self.socketIO = socketIO
-        self.scrapeoptions = ["Full",'Button','Checkbox','Radiobutton','Dropdown','ListBox','Image','Link','TextBox','Table','Element','Other tag','Select A Section using XPath'] #me
-        self.scrape_selected_option = ["full"] #me
+        self.scrapeoptions = ["Full",'Button','Checkbox','Radiobutton','Dropdown','ListBox','Image','Link','TextBox','Table','Element','Other tag','Select A Section using XPath']
+        self.scrape_selected_option = ["full"] 
         self.window_handle_number = 0
         status = obj.openBrowser(None,browser.split(';'))
         self.panel = wx.Panel(self)
@@ -45,8 +42,8 @@ class ScrapeWindow(wx.Frame):
         self.invalid_urls = ["about:blank","data:,",""]
         self.invalid_url_msg = "There is no URL in the browser selected or the URL is empty/blank. Please load the webpage and then start performing the desired action."
         self.parent = parent
-        self.driver = browser_Keywords_MW.driver_obj#browserops_MW.driver
-        # self.webscrape_utils_obj = WebScrape_Utils() #me
+        self.driver = browser_Keywords_MW.driver_obj
+        # self.webscrape_utils_obj = WebScrape_Utils() 
         #if SYSTEM_OS== "Darwin":
         self.vsizer = wx.BoxSizer(wx.VERTICAL)
         self.startbutton = wx.ToggleButton(self.panel, label="Start clickandadd",pos=(12,8 ), size=(175, 28))
@@ -54,7 +51,6 @@ class ScrapeWindow(wx.Frame):
         # self.fullscrape_MWbutton = wx.Button(self.panel, label="Full Scrape",pos=(12,48 ), size=(175, 28)) #previously present
         # self.fullscrape_MWbutton.Bind(wx.EVT_BUTTON, self.fullscrape_MW)   # need to implement OnExtract() #previously present
 
-        #me start
         self.fullscrapedropdown_MW = wx.ComboBox(self.panel, value="Full", pos=(12,48 ),size=(87.5, 25), choices=self.scrapeoptions, style = wx.CB_DROPDOWN)
         self.fullscrapedropdown_MW.SetEditable(False)
         self.fullscrapedropdown_MW.SetToolTip(wx.ToolTip("full objects will be scraped"))
@@ -62,7 +58,6 @@ class ScrapeWindow(wx.Frame):
 
         self.fullscrapebutton_MW = wx.Button(self.panel, label="Scrape",pos=(101,48 ), size=(86, 25))
         self.fullscrapebutton_MW.Bind(wx.EVT_BUTTON, self.fullscrape)
-        #me end
 
 ##            self.fullscrape_MWbutton.SetToolTip(wx.ToolTip("To perform fullscrape_MW Scraping"))
         #if SYSTEM_OS != "Darwin":
@@ -79,7 +74,7 @@ class ScrapeWindow(wx.Frame):
     #----------------------------------------------------------------------
     def OnExit(self, event):
         self.Close()
-        driver = browser_Keywords_MW.driver_obj#browserops_MW.driver
+        driver = browser_Keywords_MW.driver_obj
         driver.close()
 
     #----------------------------------------------------------------------
@@ -125,26 +120,26 @@ class ScrapeWindow(wx.Frame):
             self.Close()
 
 
-    #----------------------------------------------------------------------
-    def fullscrape_MW(self,event):
-        logger.print_on_console('Performing full scrape')
-        d = fullscrape_MWobj.Fullscrape()
+    # #----------------------------------------------------------------------
+    # def fullscrape_MW(self,event):
+    #     logger.print_on_console('Performing full scrape')
+    #     d = fullscrape_MWobj.Fullscrape()
 
 
-        #10 is the limit of MB set as per Avo Assure standards
-        if self.core_utilsobject.getdatasize(str(d),'mb') < 10:
-            self.socketIO.emit('scrape',d)
-        else:
-            logger.print_on_console('Scraped data exceeds max. Limit.')
-            self.socketIO.emit('scrape','Response Body exceeds max. Limit.')
-        self.parent.schedule.Enable()
-        self.Close()
-        if d != 'FAIL':
-            logger.print_on_console('Full scrape  completed')
-        else:
-            logger.print_on_console('Full scrape not Done')
+    #     #10 is the limit of MB set as per Avo Assure standards
+    #     if self.core_utilsobject.getdatasize(str(d),'mb') < 10:
+    #         self.socketIO.emit('scrape',d)
+    #     else:
+    #         logger.print_on_console('Scraped data exceeds max. Limit.')
+    #         self.socketIO.emit('scrape','Response Body exceeds max. Limit.')
+    #     self.parent.schedule.Enable()
+    #     self.Close()
+    #     if d != 'FAIL':
+    #         logger.print_on_console('Full scrape  completed')
+    #     else:
+    #         logger.print_on_console('Full scrape not Done')
 
-    #me
+
     def fullscrape(self,event):
         try:
             if not(self.driver.current_window_handle):
