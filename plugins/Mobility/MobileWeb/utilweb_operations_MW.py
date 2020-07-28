@@ -476,7 +476,7 @@ class UtilWebKeywords:
                     self.generic_sendfucntion_keys(input.lower(),*args)
                 status=TEST_RESULT_PASS
                 methodoutput=TEST_RESULT_TRUE
-        except Exception as e:f
+        except Exception as e:
             err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
             log.error(e)
         return status,methodoutput,output,err_msg

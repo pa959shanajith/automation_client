@@ -142,8 +142,9 @@ class Dispatcher:
 
 
         'openbrowser':browser_object.openBrowser,
+        # 'opennewtab':browser_object.openNewTab,
         'navigatetourl':browser_object.navigateToURL,
-        'opennewbrowser':browser_object.openNewBrowser,
+        # 'opennewbrowser':browser_object.openNewBrowser,
         'getpagetitle':browser_object.getPageTitle,
         'getcurrenturl':browser_object.getCurrentURL,
         'maximizebrowser':browser_object.maximizeBrowser,
