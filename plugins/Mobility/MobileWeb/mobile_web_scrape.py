@@ -14,6 +14,8 @@ import objectspy_MW
 import core_utils
 import platform
 import logger
+import logging
+log = logging.getLogger('mobile_web_scrape.py')
 
 clickandadd_MWoj = clickandadd_MW.Clickandadd()
 fullscrape_MWobj = fullscrape_MW.Fullscrape()
@@ -145,7 +147,7 @@ class ScrapeWindow(wx.Frame):
             if not(self.driver.current_window_handle):
                 self.driver.switch_to_window(self.driver.window_handles[-1])
         except NoSuchWindowException as e:
-            log.debug("Window Handle not found, switching to window",self.driver.window_handles[-1])
+            log.debug("Window Handle not found, switching to window " + str(self.driver.window_handles[-1]))
             self.driver.switch_to_window(self.driver.window_handles[-1])
         if self.driver.current_url in self.invalid_urls:
             wx.MessageBox(self.invalid_url_msg, "Avo Assure - Web Scraper", wx.OK | wx.ICON_ERROR)

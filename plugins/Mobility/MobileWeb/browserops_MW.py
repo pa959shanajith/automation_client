@@ -9,8 +9,6 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 
-
-
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
@@ -21,6 +19,8 @@ import subprocess
 import re
 import platform
 from constants import SYSTEM_OS
+if SYSTEM_OS != 'Darwin':
+    import psutil
 import domconstants_MW
 import logger
 import logging
@@ -169,8 +169,6 @@ class BrowserOperations():
     def stop_server(self):
         try:
             if SYSTEM_OS != 'Darwin':
-                import psutil
-                import os
                 processes = psutil.net_connections()
                 for line in processes:
                     p = line.laddr
@@ -178,40 +176,34 @@ class BrowserOperations():
                         os.system("TASKKILL /F /PID " + str(line.pid))
                         logger.print_on_console('Server stopped')
             else:
-                import os
                 os.system("killall -9 node")
         except Exception as e:
             log.error(e,exc_info=True)
             logger.print_on_console('Exception in stopping server')
 
     def closeandroidBrowser(self  , *args):
-         mobile_server_utilities.cleardata()
-         status=webconstants_MW.TEST_RESULT_FAIL
-         result=webconstants_MW.TEST_RESULT_FALSE
-         value=''
-         try:
-
+        mobile_server_utilities.cleardata()
+        status=webconstants_MW.TEST_RESULT_FAIL
+        result=webconstants_MW.TEST_RESULT_FALSE
+        value=''
+        try:
             if( driver!= None):
-
                 driver.close()
-
                 logger.log('chrome browser closed')
                 status=webconstants_MW.TEST_RESULT_PASS
                 result=webconstants_MW.TEST_RESULT_TRUE
             else:
                 mobile_key_objects.custom_msg.append("ERR_WEB_DRIVER_EXCEPTION")
-         except Exception as e:
+        except Exception as e:
             log.error(e,exc_info=True)
             mobile_key_objects.custom_msg.append("ERR_WEB_DRIVER")
-
-         mobile_key_objects.keyword_output.append(str(status))
-         mobile_key_objects.keyword_output.append(str(value))
+        mobile_key_objects.keyword_output.append(str(status))
+        mobile_key_objects.keyword_output.append(str(value))
 
     def openBrowser(self,inputs):
         global driver
         try:
            if SYSTEM_OS == "Darwin":
-
                self.stop_server()
                self.start_server()
                input_list = inputs.split(';')
@@ -236,8 +228,6 @@ class BrowserOperations():
                    'FILE: browserops_MW.py , DEF: openSafariBrowser() , MSG:  Safari browser opened successfully')
                status = domconstants_MW.STATUS_SUCCESS
            else:
-                import psutil
-                import os
                 processes = psutil.net_connections()
                 for line in processes:
                     p = line.laddr
