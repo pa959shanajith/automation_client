@@ -54,6 +54,7 @@ class WSkeywords:
         self.baseReqBody=''
         self.baseResHeader = None
         self.baseResBody=None
+        self.req_params = None
         self.modifiedTemplate = ''
         self.content_type=''
         # Certificate elements
@@ -296,6 +297,41 @@ class WSkeywords:
         log.info(RETURN_RESULT)
         return status,methodoutput,output,err_msg
 
+    def setParam(self,paramValue):
+        """
+        def : setParam
+        purpose : sets the parameters provided in parameters
+        param : parameters of the webservice to set
+        return : Returns True if it sets the url else False
+        """
+        status = ws_constants.TEST_RESULT_FAIL
+        methodoutput = ws_constants.TEST_RESULT_FALSE
+        err_msg=None
+        output=OUTPUT_CONSTANT
+        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        try:
+            paramValue=str(paramValue)
+            if paramValue != None and paramValue.strip() != '':
+                 paramValue=paramValue.strip()
+                 self.req_params = paramValue
+                 log.info('Input param value has been set to base Request Params ')
+                 log.debug(STATUS_METHODOUTPUT_UPDATE)
+##                 output=self.baseReqBody
+                 status = ws_constants.TEST_RESULT_PASS
+                 methodoutput = ws_constants.TEST_RESULT_TRUE
+                 logger.print_on_console('Request Parameters has been set to :',self.req_params)
+            else:
+                err_msg = ws_constants.ERR_SET_PARAMS
+        except Exception as e:
+            log.error(e)
+            logger.de
+            err_msg=ws_constants.ERR_MSG1+'setParams'
+        if err_msg!=None:
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
+        log.info(RETURN_RESULT)
+        return status,methodoutput,output,err_msg
+
     def setWholeBody(self,body):
         """
         def : setWholeBody
@@ -400,7 +436,7 @@ class WSkeywords:
                         req_body=json.dumps(self.baseReqBody)
                 else:
                     req_body=self.baseReqBody
-                response = requests.post(self.baseEndPointURL, data = req_body, headers=self.baseReqHeader, cookies=self.req_cookies, proxies=self.proxies, cert=self.client_cert, verify=self.server_cert, auth=self.req_auth)
+                response = requests.post(self.baseEndPointURL, data = req_body, headers=self.baseReqHeader, cookies=self.req_cookies, proxies=self.proxies, cert=self.client_cert, verify=self.server_cert, auth=self.req_auth, params=self.req_params)
 
                 if response != None and response != False:
                     self.clearCertFiles()
@@ -427,11 +463,11 @@ class WSkeywords:
         log.debug(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if not (self.baseEndPointURL is '' or self.baseOperation is '' or self.baseReqHeader is ''):
-                req=self.baseEndPointURL+'/'+self.baseOperation+'?'+self.baseReqHeader
+                req=self.baseEndPointURL+'/'+self.baseOperation
             elif not (self.baseEndPointURL is ''):
                 req=self.baseEndPointURL
             self.get_cookies()
-            response=requests.get(req, cookies=self.req_cookies, proxies=self.proxies, verify=self.server_cert)
+            response=requests.get(req, headers=self.baseReqHeader, cookies=self.req_cookies, proxies=self.proxies, cert=self.client_cert, verify=self.server_cert, auth=self.req_auth, params=self.req_params)
             logger.print_on_console('Response: ',response)
             log.info(response)
             status,methodoutput,output=self.__saveResults(response)
@@ -593,7 +629,7 @@ class WSkeywords:
             if len(args) == 1:
                 key=args[0]
                 if key!= None and key != '':
-            
+
                     log.debug(STATUS_METHODOUTPUT_UPDATE)
                     status = ws_constants.TEST_RESULT_PASS
                     methodoutput = ws_constants.TEST_RESULT_TRUE
@@ -603,7 +639,7 @@ class WSkeywords:
                         output = 'null'
                         logger.print_on_console('Please provide valid Input - Invalid Header Key ='+key)
                 else:
-                
+
                     log.debug(STATUS_METHODOUTPUT_UPDATE)
                     if self.baseResHeader != None:
                         status = ws_constants.TEST_RESULT_PASS
@@ -650,7 +686,7 @@ class WSkeywords:
         err_msg=None
         output=None
         try:
-            if len(args) == 1:                    
+            if len(args) == 1:
                 log.debug(STATUS_METHODOUTPUT_UPDATE)
                 try:
                     flag=0
@@ -660,7 +696,7 @@ class WSkeywords:
                         if 'soap:Envelope' in self.baseResBody:
                             from lxml import etree as et
                             root = et.fromstring(self.baseResBody)
-                            
+
                             respBody = str(et.tostring(root,pretty_print=True))
                             if respBody.find(args[0])==-1:
                                 status = ws_constants.TEST_RESULT_FAIL
@@ -680,7 +716,7 @@ class WSkeywords:
                     if args[0] !='' and args[1]!='' and args[0] !=None and args[1]!=None:
                         start=response_body.find(args[0])+len(args[0])
                         end=response_body.find(args[1])
-                        response_body=response_body[start:end]                       
+                        response_body=response_body[start:end]
                         log.debug(STATUS_METHODOUTPUT_UPDATE)
                         status = ws_constants.TEST_RESULT_PASS
                         methodoutput = ws_constants.TEST_RESULT_TRUE
@@ -733,6 +769,8 @@ class WSkeywords:
                                 extract_status = self.extract_pem(client_cert,keystore_pass)
                             elif file_ext.lower() == '.pkcs12':
                                 extract_status = self.extract_pkcs12(client_cert,keystore_pass)
+                            elif file_ext.lower() == '.pfx':
+                                extract_status = self.extract_pfx(client_cert,keystore_pass)
                             else:
                                 err_msg = 'Invalid Input'
                                 logger.print_on_console('Invalid Input')
@@ -864,7 +902,7 @@ class WSkeywords:
                 file.close()
 
             try:
-                
+
                 with open("PRIVATECERT.pem",'w') as file_pem:
                     file_pem.write(crypto.dump_certificate(crypto.FILETYPE_PEM, p12.get_certificate()).decode("utf8"))
                     file_pem.close()
@@ -884,12 +922,39 @@ class WSkeywords:
             except Exception as e:
                 log.error(e)
                 logger.print_on_console(str(e))
-            
+
         except Exception as e:
             log.error(e)
             logger.print_on_console(str(e))
         return extract_status
 
+    def extract_pfx(self,client_cert,keystore_pass):
+        import chilkat
+        extract_status = False
+        try:
+            cert = chilkat.CkCert()
+            pfxFile=client_cert
+            pfxPass=keystore_pass
+            success = cert.LoadPfxFile(pfxFile,pfxPass)
+            privatekey=cert.ExportPrivateKey()
+            # Fetch Private KEY and Private CERT from .pfx file
+            # cert.getPrivateKeyPem()
+            # cert.exportCertPem();
+            if privatekey.keyType() == 'rsa':
+                RSAPath = "RSAPRIVATEKEY.pem"
+                success = privatekey.SavePkcs8PemFile(RSAPath)
+                self.client_key_path = RSAPath
+            else:
+                PKeyPath = "PRIVATEKEY.pem"
+                psuccess = privatekey.SavePemFile(PKeyPath)
+                self.client_key_path = PKeyPath
+            PCERTPath="PRIVATECERT.pem"
+            extract_status = cert.ExportCertPemFile(PCERTPath)
+            self.client_cert_path  = PCERTPath
+        except Exception as e:
+            log.error(e)
+            logger.print_on_console(str(e))
+        return extract_status
 
     def cert_formatter(self,certdata_bytes,certtype):
         pemfile = ""
@@ -910,7 +975,7 @@ class WSkeywords:
         new_path= new_path[1:]
         result=None
         element_to_change=new_path[len(new_path)-1]
-        if element_to_change.startswith('ns',0,2):
+        if element_to_change.startswith('ns',0,2) or element_to_change.startswith('set',0,3):
             element_to_change=element_to_change.split(":")[1]
         self.actual_parser(element_to_change,value,template,index,attribute_name,flag)
         result=etree.tostring(template)
@@ -1064,7 +1129,7 @@ class WSkeywords:
         output=OUTPUT_CONSTANT
         log.debug(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
-            if(not(url==''and username=='' and password=='') and 
+            if(not(url==''and username=='' and password=='') and
                 not (url==None and username==None and password==None)):
                 service=url.strip().split(":")
                 proxie=str(service[0])+"://"+str(username.strip())+":"+str(self.aes_decript(password.strip()))+"@"+str(service[1].strip().strip("//"))+":"+str(service[-1])+"/"

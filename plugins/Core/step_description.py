@@ -287,6 +287,12 @@ class StepDescription:
             return 'Basic authentication for the Webservice with username '+"'"+inputval[0]+"'"+" and password "+"'"+inputval[1]+"'"+"."
         def getservercertificate():
             return 'Fetch the Server certificate and save it in '+ "'"+inputval[1] +"'"+ '.'
+        def setparam():
+            return 'Set the parameters '+ "'"+input +"'"+ ' that needs to be sent in the request.'
+        def executerequest():
+            return 'Execute the request.'
+        #return locals()[key](keyword)
+
         def executerequest():
             return 'Execute the request.'
         #return locals()[key](keyword)

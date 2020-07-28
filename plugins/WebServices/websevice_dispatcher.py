@@ -37,7 +37,8 @@ class Dispatcher:
                   'setheadertemplate':self.webservice.setHeaderTemplate,
                   'setproxies':self.webservice.setProxies,
                   # Authentication methods
-                  'setbasicauth': self.webservice.setBasicAuth
+                  'setbasicauth': self.webservice.setBasicAuth,
+                  'setparam':self.webservice.setParam
                 }
             if keyword in ws_dict.keys():
                 if keyword in ['settagvalue','settagattribute']:
