@@ -55,6 +55,8 @@ class TestThread(threading.Thread):
 class BrowserKeywords():
     def __init__(self):
         self.browser_num=''
+        self.all_handles=[]
+        self.recent_handles=[]
 
 
     def start_server(self):
@@ -114,8 +116,6 @@ class BrowserKeywords():
         err_msg = None
         try:
             if SYSTEM_OS== 'Darwin':
-                self.start_server()
-                obj = Singleton_DriverUtil()
                 # Logic to make sure that logic of usage of existing driver is not applicable to execution
                 if driver_obj is not None:
                     result = webconstants_MW.TEST_RESULT_TRUE
@@ -123,27 +123,28 @@ class BrowserKeywords():
                     return status, result, output, err_msg
                 input_list = inputs
                 device_id = input_list[0]
-                time.sleep(5)
-                desired_caps = {}
-                desired_caps['platformName'] = 'iOS'
-                desired_caps['platformVersion'] = input_list[1]
-                desired_caps['deviceName'] = input_list[0]
-                desired_caps['udid'] = input_list[2]
-                desired_caps['autoWebview'] = True
-                desired_caps['startIWDP'] = True
-                desired_caps['automationName'] = 'XCUITest'
-                desired_caps['browserName'] = 'Safari'
-                ##            desired_caps['appium-version'] = '1.4.0'
-
-                desired_caps['newCommandTimeout'] = '36000'
-                driver = webdriver.Remote('http://localhost:4723/wd/hub', desired_caps)
-                log.info('FILE: browserops_MW.py , DEF: openSafariBrowser() , MSG:  Navigating to blank page')
-                driver.get(domconstants_MW.BLANK_PAGE)
-                driver_obj = driver
-                log.info(
-                    'FILE: browserops_MW.py , DEF: openSafariBrowser() , MSG:  Safari browser opened successfully')
-                result = webconstants_MW.TEST_RESULT_TRUE
-                status = webconstants_MW.TEST_RESULT_PASS
+                if device_id != '':
+                    self.start_server()
+                    obj = Singleton_DriverUtil()
+                    time.sleep(5)
+                    desired_caps = {}
+                    desired_caps['platformName'] = 'iOS'
+                    desired_caps['platformVersion'] = input_list[1]
+                    desired_caps['deviceName'] = input_list[0]
+                    desired_caps['udid'] = input_list[2]
+                    desired_caps['autoWebview'] = True
+                    desired_caps['startIWDP'] = True
+                    desired_caps['automationName'] = 'XCUITest'
+                    desired_caps['browserName'] = 'Safari'
+                    desired_caps['newCommandTimeout'] = '36000'
+                    driver = webdriver.Remote('http://0.0.0.0:4723/wd/hub', desired_caps)
+                    log.info('FILE: browserops_MW.py , DEF: openSafariBrowser() , MSG:  Navigating to blank page')
+                    driver.get(domconstants_MW.BLANK_PAGE)
+                    driver_obj = driver
+                    log.info(
+                        'FILE: browserops_MW.py , DEF: openSafariBrowser() , MSG:  Safari browser opened successfully')
+                    result = webconstants_MW.TEST_RESULT_TRUE
+                    status = webconstants_MW.TEST_RESULT_PASS
             else:
                 if driver_obj is not None:
                     result = webconstants_MW.TEST_RESULT_TRUE
@@ -179,8 +180,30 @@ class BrowserKeywords():
                     driver.get(domconstants_MW.BLANK_PAGE)
                     driver_obj = driver
                     log.info('FILE: browserops_MW.py , DEF: openChromeBrowser() , MSG:  Chrome browser opened successfully')
-                    result = webconstants_MW.TEST_RESULT_TRUE
-                    status = webconstants_MW.TEST_RESULT_PASS
+                    parent_handle =  None
+                try:
+                    parent_handle = driver_obj.current_window_handle
+                except Exception as nosuchWindowExc:
+                    log.error(nosuchWindowExc)
+                    log.warn("A window or tab was closed manually from the browser!")
+                if parent_handle is not None:
+                    self.update_recent_handle(parent_handle)
+                    self.all_handles.append(parent_handle)
+                elif len(self.all_handles) > 0:
+                    driver_handles = driver_obj.window_handles
+                    switch_to_handle = None
+                    for handle in self.all_handles:
+                        if handle in driver_handles:
+                            switch_to_handle = handle
+                            break
+                    if switch_to_handle is not None:
+                        log.info("driver will now switch to the first window/tab")
+                        driver_obj.switch_to.window(switch_to_handle)
+                    else:
+                        log.info("driver will now switch to any available window/tab")
+                        driver_obj.switch_to.window(driver_handles[0])
+                result = webconstants_MW.TEST_RESULT_TRUE
+                status = webconstants_MW.TEST_RESULT_PASS
         except Exception as e:
             err_msg = 'ERROR OCURRED WHILE OPENING BROWSER'
             if SYSTEM_OS == 'Darwin':
@@ -195,27 +218,26 @@ class BrowserKeywords():
             log.error(err_msg)
         return status, result, output, err_msg
 
-    def openNewBrowser(self,*args):
-        global driver_obj,webdriver_list
+
+    def openNewTab(self ,*args):
+        #opennewtab
+        global driver_obj
         status=webconstants_MW.TEST_RESULT_FAIL
         result=webconstants_MW.TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
         try:
-            driver = Singleton_DriverUtil()
-            driver_obj=driver.getBrowser(self.browser_num)
-            webdriver_list.append(driver_obj)
-            parent_handle = driver_obj.current_window_handle
-            logger.print_on_console('Opened new browser')
-            log.info('Opened new browser')
+            driver_obj.execute_script("window.open('');")
+            handles = driver_obj.window_handles
+            driver_obj.switch_to.window(handles[-1])
+            h=driver_obj.current_window_handle
+            self.all_handles.append(h)
+            self.recent_handles.append(h)
             status=webconstants_MW.TEST_RESULT_PASS
             result=webconstants_MW.TEST_RESULT_TRUE
         except Exception as e:
             err_msg='ERROR OCURRED WHILE OPENING BROWSER'
             log.error(e)
-        if err_msg is not None:
-            logger.print_on_console(err_msg)
-            log.error(err_msg)
         return status,result,output,err_msg
 
     def refresh(self,*args):
@@ -239,6 +261,9 @@ class BrowserKeywords():
             log.error(err_msg)
         return status,result,output,err_msg
 
+    def update_recent_handle(self,h): 
+        if len(self.recent_handles)==0 or self.recent_handles[-1]!=h:
+            self.recent_handles.append(h)
 
     def navigateToURL(self ,webelement, url , *args):
         global driver_obj
