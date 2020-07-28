@@ -9,8 +9,8 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 import logger
-class StepDescription:
 
+class StepDescription:
 
     def generic(self,keyword,tsp,inputval,input,output,con,reporting_obj):
         if str(keyword) in ["typecast","split","displayvariablevalue"]:
@@ -39,7 +39,6 @@ class StepDescription:
             return "Add "+inputval[0] +" months to date '"+inputval[1]+ "' and save the date '"+output+"' in '"+tsp.outputval+ "'"
         def changedateformat():
             return "Change the format of the date '"+ inputval[0] + "' to format '"+ inputval[1]+ "' and save the date  '" + output + "' in "+"'"+tsp.outputval+"'"
-
 
         #File operations
         def createfile():
@@ -195,8 +194,6 @@ class StepDescription:
             return "Compare the contents of file '"+ str(inputval[0])+ "' and '"+ str(inputval[1])+ "'"
         def copyvalue():
             return "Copy value to variable '"+str(inputval[0])+ "' from variable '"+str(inputval[1])+ "'"
-        def getcontent():
-           return "Get content from the file '" +input+ "' and save it in '"+ tsp.outputval + "'"
         def getindexcount():
             if '@' in output:
                 row,col=output.split('@')
@@ -217,8 +214,6 @@ class StepDescription:
             return "Press '"+ input +"' Key"
         def stop():
             return "Stop the Execution"
-        def verifycontent():
-            return "Verify '"+ inputval[1]+ "' is present in the file '" + inputval[0] + "'"
 
         #Generic-XML
         def getblockcount():
@@ -245,7 +240,6 @@ class StepDescription:
             return "Execute SQL Query '"+ inputval[5]+"' and save resultset in '" + tsp.outputval + "'"
         def secureverifydata():
             return "Verify SQL Query '"+ inputval[5]+ "' and result is same as '"+ inputval[7] + ","+ inputval[8] + "'"
-
 
         #Excel Keywords
         def clearcell():
@@ -299,11 +293,6 @@ class StepDescription:
             return 'Set the parameters '+ "'"+input +"'"+ ' that needs to be sent in the request.'
         def executerequest():
             return 'Execute the request.'
-        #return locals()[key](keyword)
-
-        def executerequest():
-            return 'Execute the request.'
-        #return locals()[key](keyword)
         return locals()[keyword]()
 
     def oebs(self,keyword,tsp,inputval,input,output,con,reporting_obj):
@@ -518,7 +507,6 @@ class StepDescription:
         def doubleclickstatusbar():
             return 'Double Clicked the Statusbar' + '.'
 
-
         #Textbox keywords
         def gettext():
             return 'Get text From '+ "'" +tsp.custname + "'" + ' and save the text '+"'"+ output + "'"+' in ' +"'"+ tsp_outputval+"'"+ '.'
@@ -596,8 +584,8 @@ class StepDescription:
             return 'Verify cell value of element in row number ' +"'"+ input[0] +"'"+' and column number '+"'"+input[1] +"'"+' against the input value '+"'"+input[2]+"'"+' present in ' +"'" + tsp.custname + "'"+'.'
         def verifytextexists():
             return 'Verify text '+ "'"+input+"'"+' exists in table '+"'"+ tsp.custname +"'"+"and  save the result as "+"'"+ output +"'"+ ' in '+"'"+ tsp_outputval+"'"+'.'
-        def getselected():
-            return 'Get Selected value of '+ "'" + tsp.custname + "'"+ ' and save value ' +"'"+ output +"'"+ ' in '+"'"+ tsp_outputval + "'"+'.'
+        # def getselected():
+        #     return 'Get Selected value of '+ "'" + tsp.custname + "'"+ ' and save value ' +"'"+ output +"'"+ ' in '+"'"+ tsp_outputval + "'"+'.'
         def selectrow():
             return 'Select the row '+"'" + input+"'" +' in '+"'" + tsp.custname + "'"+'.'
         def unselectrow():
@@ -1294,12 +1282,8 @@ class StepDescription:
             return 'Enter secure text ' +"'"+input+"'"+ ' in the  ' + "'" + tsp.custname + "'"
         def sendsecurevalue():
             return 'Enter secure value ' +"'"+input+"'"+ ' in the  ' + "'" + tsp.custname + "'"
-
         def iossendkey():
             return 'Press '+"'"+input+"'"+" Key"
-
-
-
 
         #Image keywords
         def verifywebimages():
@@ -1339,8 +1323,6 @@ class StepDescription:
             return 'Select all values in the ' +"'" + tsp.custname + "'"
         def verifycount():
             return 'Verify ' +"'"+ input +"'"+ ' is the list count of the ' +"'" + tsp.custname + "'"
-        def verifyselectedvalue():
-            return 'Verify value ' +"'"+ input +"'"+ ' is selected in the ' +"'" + tsp.custname + "'"
         def selectvaluebyindex():
             if tsp.custname=="@Custom":
                 return 'Select value '+"'" +input+"'" +' with visible text '+"'" +visible_text+"'" +' of the type '+"'" +ele_type+"'" +' with the index '+"'" +cust_index+"'" +' present in '+ "'" + tsp.custname + "'"
@@ -1481,8 +1463,8 @@ class StepDescription:
             return 'Get the cell tooltip from the '+ "'" + tsp.custname +'['+inputval[0]+']['+inputval[1]+']'+ "'"+ ' and save the tool tip text ' +"'"+output+"'"+' in ' +"'"+tsp.outputval+"'"
         def verifycelltooltip():
             return 'Verify cell tooltip value '+"'"+input+"'"+' is present in the '+ "'"+ tsp.custname +'['+inputval[0]+']['+inputval[1]+']'+ "' table."
-        def cellclick():
-            return 'Click on ' + "'" + tsp.custname + "'"
+        # def cellclick():
+        #     return 'Click on ' + "'" + tsp.custname + "'"
         def getrowcount():
             return 'Get row count of the ' + "'" + tsp.custname + "'" + ' and save the count ' +"'"+output+"'"+' in '+"'"+tsp.outputval+"'"
         def getcolumncount():
@@ -1660,7 +1642,6 @@ class StepDescription:
         def getosinfo():
             machine_name = get_machine_name(input)
             return "Get OS Information from '"+machine_name+"' and save the info '"+output+"' in '"+tsp.outputval+"'"
-            pass
 
         def getallprocess():
             machine_name = get_machine_name(input)
@@ -1681,10 +1662,5 @@ class StepDescription:
         logger.print_on_console(keyword)
 
         return locals()[keyword]()
-
-
-
-
-
 #==========================================================================================================#
 #End of System Keyword Reporting starts
