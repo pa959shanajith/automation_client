@@ -64,7 +64,7 @@ class Controller():
         self.cur_dir= os.getcwd()
         self.previous_step=''
         self.verify_dict={'web':VERIFY_EXISTS,
-        'oebs':VERIFY_VISIBLE,'sap':VERIFY_EXISTS,'desktop':VERIFY_EXISTS}
+        'oebs':VERIFY_VISIBLE,'sap':VERIFY_EXISTS,'desktop':VERIFY_EXISTS,'mobileweb':VERIFY_EXISTS}
         self.dynamic_var_handler_obj=dynamic_variable_handler.DynamicVariables()
         self.status=TEST_RESULT_FAIL
         self.scenario_start_time=''
@@ -1359,6 +1359,15 @@ def kill_process():
             for p in wmi.InstancesOf('win32_process'):
                 if p.Name in my_processes:
                     os.system("TASKKILL /F /T /IM " + p.Name )
+        except Exception as e:
+            log.error(e)
+
+        try:
+            import browser_Keywords_MW
+            del browser_Keywords_MW.drivermap[:]
+            if hasattr(browser_Keywords_MW, 'driver_obj'):
+                if (browser_Keywords_MW.driver_obj):
+                    browser_Keywords_MW.driver_obj = None
         except Exception as e:
             log.error(e)
 

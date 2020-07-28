@@ -37,3 +37,5 @@ STATUS_FAIL = 'FAIL'
 FRAME = 'frame'
 
 IFRAME = 'iframe'
+
+SCREENSHOT_IMG = 'image.png'
