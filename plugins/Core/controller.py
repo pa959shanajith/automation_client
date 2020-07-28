@@ -905,11 +905,12 @@ class Controller():
         obj.clear_dyn_variables()
         return status
 
-    def invoke_execution(self,mythread,json_data,socketIO,wxObject,configvalues,qcObject,aws_mode):
+    def invoke_execution(self,mythread,json_data,socketIO,wxObject,configvalues,qcObject,qtestObject,aws_mode):
         global terminate_flag,count,status_percentage
         qc_url=''
         qc_password=''
         qc_username=''
+        qc_type=''
         con = Controller()
         obj = handler.Handler()
         status=COMPLETED
@@ -980,7 +981,7 @@ class Controller():
                                 logger.print_on_console( '***Scenario ' ,str(sc_idx + 1) ,' execution started***')
                                 print('=======================================================================================================')
                                 log.info('***Scenario '  + str(sc_idx + 1)+ ' execution started***')
-                            if(len(scenario)==2 and len(scenario['qcdetails'])==10):
+                            if('qctype' not in qc_creds and len(scenario)==2 and len(scenario['qcdetails'])==10):
                                 qc_username=qc_creds['qcusername']
                                 qc_password=qc_creds['qcpassword']
                                 qc_url=qc_creds['qcurl']
@@ -990,7 +991,18 @@ class Controller():
                                 qc_folder=qc_sceanrio_data['qcfolderpath']
                                 qc_tsList=qc_sceanrio_data['qctestset']
                                 qc_testrunname=qc_sceanrio_data['qctestcase']
-
+                            if('qctype' in qc_creds and qc_creds['qctype'] != ''):
+                                qc_username=qc_creds['qcusername']
+                                qc_password=qc_creds['qcpassword']
+                                qc_url=qc_creds['qcurl']
+                                qc_type=qc_creds['qctype']
+                                qc_stepsup=qc_creds['qteststeps']
+                                qc_sceanrio_data=scenario['qcdetails']
+                                qc_project=qc_sceanrio_data['qtestproject']
+                                qc_projectid=qc_sceanrio_data['qtestprojectid']
+                                qc_suite=qc_sceanrio_data['qtestsuite']
+                                qc_suiteid=qc_sceanrio_data['qtestsuiteid']
+                                
                             #Iterating through each test case in the scenario
                             for testcase in [eval(scenario[scenario_id])]:
                                 #check for temrinate flag before parsing tsp list
@@ -1055,6 +1067,7 @@ class Controller():
                                     print('=======================================================================================================')
                                     logger.print_on_console( '***Scenario' ,str(sc_idx + 1) ,' execution completed***')
                                     print('=======================================================================================================')
+                                    tsplistLen = len(tsplist)
                                     del con.tsp_list
                                     del tsplist
                             if execute_flag:
@@ -1076,7 +1089,7 @@ class Controller():
                                 sc_idx += 1
                                 #logic for condition check
                                 report_json=con.reporting_obj.report_json[OVERALLSTATUS]
-                                if len(scenario['qcdetails'])==10 and (qc_url!='' and qc_password!='' and  qc_username!=''):
+                                if qc_type!="qTest" and len(scenario['qcdetails'])==10 and (qc_url!='' and qc_password!='' and  qc_username!=''):
                                     qc_status_over=report_json[0]
                                     qc_update_status=qc_status_over['overallstatus']
                                     if(str(qc_update_status).lower()=='pass'):
@@ -1105,6 +1118,45 @@ class Controller():
                                             logger.print_on_console('****Failed to Update QCDetails****')
                                     except Exception as e:
                                         logger.print_on_console('Error in Updating Qc details')
+                                if (qc_type=="qTest" and qc_url!='' and qc_password!='' and  qc_username!=''):
+                                    qc_status_over=report_json[0]
+                                    try:
+                                        qc_status = {}
+                                        qc_status['qcaction']='qcupdate'
+                                        qc_status['qc_project']=qc_project
+                                        qc_status['qc_projectid']=qc_projectid
+                                        qc_status['qc_suite']=qc_suite
+                                        qc_status['qc_suiteid']=qc_suiteid
+                                        qc_status['user']=qc_username
+                                        qc_status['qc_status_over'] = qc_status_over
+                                        qc_status['qc_stepsup']=qc_stepsup
+                                        qc_status['steps']=[]
+                                        for i in con.reporting_obj.report_json['rows']:
+                                            if 'Keyword' in i and i['Keyword'] == 'TestCase Name':
+                                                pass
+                                            elif 'Step' in i and i['Step'] == 'Terminated': 
+                                                pass
+                                            else:
+                                                if(i['status'].lower()=='pass'):
+                                                    qc_status['steps'].append(601)
+                                                elif(i['status'].lower()=='fail'):
+                                                    qc_status['steps'].append(602)
+                                                elif(i['status'].lower()=='terminate'):
+                                                    qc_status['steps'].append(603)
+                                                else:
+                                                    tsplistLen -= 1
+                                        logger.print_on_console('****Updating qTest Details****')
+                                        if qtestObject is not None:
+                                            status = qtestObject.update_qtest_run_details(qc_status,tsplistLen)
+                                            if status:
+                                                logger.print_on_console('****Updated qTest Details****')
+                                            else:
+                                               logger.print_on_console('****Failed to Update qTest Details****')
+                                        else:
+                                            logger.print_on_console('****Failed to Update qTest Details****')
+                                    except Exception as e:
+                                        log.error('Error in Updating qTest details '+str(e))
+                                        logger.print_on_console('Error in Updating qTest details')
 
                                 #Check is made to fix issue #401
                                 if len(report_json)>0:
@@ -1237,7 +1289,7 @@ class Controller():
             sc_idx+=1
             idx_t+=1
 
-    def invoke_controller(self,action,mythread,debug_mode,runfrom_step,json_data,root_obj,socketIO,qc_soc,*args):
+    def invoke_controller(self,action,mythread,debug_mode,runfrom_step,json_data,root_obj,socketIO,qc_soc,qtest_soc,*args):
         status = COMPLETED
         global terminate_flag,pause_flag,socket_object
         self.conthread=mythread
@@ -1253,9 +1305,9 @@ class Controller():
             self.execution_mode = json_data['exec_mode'].lower()
             kill_process()
             if self.execution_mode == SERIAL:
-                status=self.invoke_execution(mythread,json_data,socketIO,wxObject,self.configvalues,qc_soc,aws_mode)
+                status=self.invoke_execution(mythread,json_data,socketIO,wxObject,self.configvalues,qc_soc,qtest_soc,aws_mode)
             elif self.execution_mode == PARALLEL:
-                status = self.invoke_parralel_exe(mythread,json_data,socketIO,wxObject,self.configvalues,qc_soc,aws_mode)
+                status = self.invoke_parralel_exe(mythread,json_data,socketIO,wxObject,self.configvalues,qc_soc,qtest_soc,aws_mode)
         elif action==DEBUG:
             self.debug_choice=wxObject.choice
             self.debug_mode=debug_mode
@@ -1265,7 +1317,7 @@ class Controller():
             status=COMPLETED
         return status
 
-    def invoke_parralel_exe(self,mythread,json_data,socketIO,wxObject,configvalues,qc_soc,aws_mode):
+    def invoke_parralel_exe(self,mythread,json_data,socketIO,wxObject,configvalues,qc_soc,qtest_soc,aws_mode):
         try:
             import copy
             browsers_data = json_data['suitedetails'][0]['browserType']
@@ -1275,7 +1327,7 @@ class Controller():
                 jsondata_dict[i] = copy.deepcopy(json_data)
                 for j in range(len(jsondata_dict[i]['suitedetails'])):
                     jsondata_dict[i]['suitedetails'][j]['browserType'] = [browsers_data[i]]
-                th[i] = threading.Thread(target = self.invoke_execution, args = (mythread,jsondata_dict[i],socketIO,wxObject,configvalues,qc_soc,aws_mode))
+                th[i] = threading.Thread(target = self.invoke_execution, args = (mythread,jsondata_dict[i],socketIO,wxObject,configvalues,qc_soc,qtest_soc,aws_mode))
                 th[i].start()
             for i in th:
                 th[i].join()

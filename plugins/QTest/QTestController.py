@@ -1,0 +1,236 @@
+#-------------------------------------------------------------------------------
+# Name:        QcTestLab.py
+# Purpose:
+#
+# Author:      chethan.singh
+#
+# Created:     10/05/2017
+# Copyright:   (c) chethan.singh 2017
+# Licence:     <your licence>
+#-------------------------------------------------------------------------------
+
+import json
+import os
+from requests.auth import HTTPBasicAuth
+import requests
+import logger
+import logging
+import xmltodict
+import base64
+import datetime
+log = logging.getLogger("Qccontroller.py")
+
+class QcWindow():
+    cookies = None
+    headers = None
+    _headers = None
+    Qc_Url = None
+    access_token = None
+    token_type = None
+    project_dict = None
+    release_dict = None
+
+    def __init__(self):
+        self.qc_dict = {
+            'domain': self.login,
+            'project': self.get_projects,
+            'folder': self.list_test_set_folder,
+            'suitedetails': self.get_suite_details
+        }
+
+    def login(self,filePath):
+        res = "invalidcredentials"
+        try:
+            user_name=filePath["qcUsername"]
+            pass_word=filePath["qcPassword"]
+            self.Qc_Url=filePath["qcURL"]
+            self.headers = {'cache-control': "no-cache"}
+            login_url = self.Qc_Url + '/oauth/token'
+            myobj = {'grant_type': 'password', 'username': user_name, 'password':pass_word}
+            splitUrl = bytes(self.Qc_Url.split("//")[1].split(".")[0]+':','ascii')
+            encSt = base64.b64encode(splitUrl)
+            headersVal = {'Authorization':'Basic %s'% encSt.decode('ascii')}
+            resp = requests.post(login_url,  headers=headersVal, data = myobj, verify=False)
+            if resp.status_code == 200:
+                response = json.loads(resp.text)
+                self.access_token = response['access_token']
+                self.token_type = response['token_type']
+               
+                domain_dict={}
+                key="domain"
+                domain_dict.setdefault(key, [])
+                domain_dict['login_status']=True
+                self._headers = {
+                    'accept': 'application/json',
+                    'Authorization' : self.token_type+" "+self.access_token
+                }
+                DomainURL = self.Qc_Url + '/api/v3/projects'
+                _resp = requests.get(DomainURL, headers=self._headers,verify=False)   
+                JsonObject = _resp.json()
+                res = [{'id':i['id'],'name':i['name']} for i in JsonObject]
+                self.project_dict = {}
+                for item in JsonObject:
+                    self.project_dict[item['name']] = item['id']
+        except Exception as e:
+            err_msg='Error while Login in qTest'
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
+            log.error(e, exc_info=True)
+        # res = [{'id':1,'name':'Sample'}]
+        return res
+        
+    def get_projects(self,filePath):
+        res = {"project": []}
+        try:
+            project_name = filePath["domain"]
+            releases = []
+            releaseURL = self.Qc_Url + '/api/v3/projects/'+str(self.project_dict[project_name])+'/releases?includeClosed=true'
+            resp = requests.get(releaseURL, headers=self._headers,verify=False)
+            JsonObject = resp.json()
+            # JsonObject.append({'links': [{'rel': 'test-cycles', 'href': 'dummy.dummy'}], 'name': 'rel1'})
+            self.release_dict = {}
+            for item in JsonObject:
+                if 'links' in item:
+                    self.release_dict[item['name']] = [i['href'] for i in item['links'] if i['rel']=='test-cycles']
+                else:
+                    self.release_dict[item['name']] = [self.Qc_Url + "/api/v3/projects/"+str(self.project_dict[project_name])+"/test-cycles?parentType=release&parentId="+str(item['id'])]
+            if len(JsonObject) >0:
+                releases = list(self.release_dict.keys())
+                res["project"] = releases
+            else:
+                err_msg = 'Selected qTest project has no releases'
+                log.error(err_msg)
+                logger.print_on_console(err_msg)
+        except Exception as eproject:
+            err_msg = 'Error while fetching releases from qTest'
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
+            log.error(eproject, exc_info=True)
+        # res["project"] = ['Rel1']
+        return res
+
+    def get_suite_details(self, filePath):
+        res = []
+        try:
+            suitedata = filePath['suiteData']
+            # suiteid = filePath["suiteId"]
+            # projectid = filePath["projectId"]
+            for i in suitedata:
+                suiteid = i['qtestsuiteid']
+                projectid = i['qtestprojectid']
+                # maptype = i['maptype']
+                # if(maptype == 'testsuite'):
+                #     URL = self.Qc_Url + '/api/v3/projects/' + str(projectid) + '/test-suites/' + str(suiteid)
+                # elif(maptype == 'testrun'):
+                URL = self.Qc_Url + '/api/v3/projects/' + str(projectid) + '/test-runs/' + str(suiteid)
+                response = requests.get(URL,  headers=self._headers, verify=False)
+                resp = response.json()
+                if 'name' in resp:
+                    i['qtestsuite'] = resp['name']
+                    # i['qtestsuite'] = 'dummo'+str(suiteid)
+                    res.append(i)
+        except:
+            pass
+        return res
+
+    def list_test_set_folder(self,filePath):
+        ##The final list which contains the testsets and testset under the specified path
+        res = []
+        try:
+            testsetpath = str(filePath["foldername"])
+            almDomain = filePath["domain"]
+            log.info("project id: "+str(almDomain))
+            almProject = filePath["project"]
+            folderUrl = self.release_dict[almProject][0] + '&expand=descendants'
+            # folderUrl = "https://apitryout.qtestnet.com/api/v3/projects"
+            response = requests.get(folderUrl, headers=self._headers,verify=False)
+            JsonObject = response.json()
+            # JsonObject = []
+            for cycle in JsonObject:
+                newObj = {}
+                newObj["cycle"]=cycle['name']
+                newObj['testsuites'] = []
+                # newObj["testsuites"]=[{'name':i['name'],'id':i['id']} for i in cycle['test-suites']]
+                for i in cycle['test-suites']:
+                    gettestrunAPI = self.Qc_Url + "/api/v3/projects/"+str(almDomain)+"/test-runs?parentId="+str(i['id'])+"&parentType=test-suite"
+                    log.info("get run url: "+gettestrunAPI)
+                    res1 = requests.get(gettestrunAPI,  headers=self._headers,verify=False)
+                    resp1 = res1.json()
+                    log.info("res1: "+str(resp1))
+                    if 'items' in resp1:
+                        testruns = [{'id':j['id'],'name':j['name']} for j in resp1['items']]
+                    else:
+                        testruns = [{'id':j['id'],'name':j['name']} for j in resp1]
+                    log.info("testruns: "+str(testruns))
+                    newObj['testsuites'].append({'id':i['id'],'name':i['name'],'testruns':testruns})
+                # newObj[cycle['name']] = [{'name':i['name'],'id':i['id']} for i in cycle['test-suites']]
+                res.append(newObj)
+            # res = [{"testfolder": folder_list, "TestSet": tests_list}]
+            # res.append({"cycle": "abc", "testsuites": [{"name":"abcd","id":7},{"name":"abcde","id":73}]})
+        except Exception as e:
+            err_msg = 'Error while fetching testsuites from qTest'
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
+            log.error(e, exc_info=True)
+        # res = [{'cycle':'Cyc 1','testsuites':[{'id':1,'name':'Suite 1','testruns':[{'id':1,'name':'Run1'}]}]}]
+        log.info("res all: "+str(res))
+        return res
+
+    def update_qtest_run_details(self,data, tsplistLen):
+        status = False
+        stepLength = None
+        try:
+            updateRequest = {}
+            updateRequest['submittedBy'] = data['user']
+            if data['qc_status_over']['overallstatus'].lower() == "pass":
+                updateRequest['status']={"id":601}
+            elif data['qc_status_over']['overallstatus'].lower() == "fail":
+                updateRequest['status']={"id":602}
+            elif data['qc_status_over']['overallstatus'].lower() == "terminate":
+                updateRequest['status']={"id":603}
+            # Converting time format
+            # From: YYYY-MM-DD hh:mm:ss.ffffff
+            # To: YYYY-MM-DDThh:mm:ss.fffZ
+            updateRequest['exe_start_date']=data['qc_status_over']['StartTime'][:10]+"T"+data['qc_status_over']['StartTime'][11:23]+"Z"
+            updateRequest['exe_end_date']=data['qc_status_over']['EndTime'][:10]+"T"+data['qc_status_over']['EndTime'][11:23]+"Z"
+            getstepsAPI = self.Qc_Url + "/api/v3/projects/"+str(data['qc_projectid'])+"/test-runs/"+str(data['qc_suiteid'])+"?expand=testcase.teststep"
+            log.info("getstepreq: "+str(getstepsAPI))
+            res2 = requests.get(getstepsAPI,  headers=self._headers,verify=False)
+            resp2 = res2.json()
+            log.info("resp2: "+str(resp2))
+            
+            if data['qc_stepsup']:
+                updateRequest['test_step_logs'] = []
+                # if(len(resp2['test_case']['test_steps'])>len(data['steps'])):
+                stepLength = len(data['steps'])
+                # else:
+                    # stepLength = len(resp2['test_case']['test_steps'])
+                for j in range(tsplistLen):
+                    try:
+                        stepStatus = data['steps'][j]
+                        if stepStatus != 603:
+                            stepId = resp2['test_case']['test_steps'][j]['id']
+                            updateRequest['test_step_logs'].append({"test_step_id":stepId,"status":{"id":stepStatus}})
+                        else:
+                            stepId = [resp2['test_case']['test_steps'][k]['id'] for k in range(j,len(resp2['test_case']['test_steps']))]
+                            updateRequest['test_step_logs'].extend([{"test_step_id":step,"status":{"id":stepStatus}} for step in stepId])
+                            break
+                    except Exception:
+                        stepStatus = 603
+                        stepId = [resp2['test_case']['test_steps'][k]['id'] for k in range(j,tsplistLen)]
+                        updateRequest['test_step_logs'].extend([{"test_step_id":step,"status":{"id":stepStatus}} for step in stepId])
+                        break
+
+            updatetestlog = self.Qc_Url + "/api/v3/projects/"+str(data['qc_projectid'])+"/test-runs/"+str(data['qc_suiteid'])+"/test-logs"
+            log.info("updateRequest: "+str(updateRequest))
+            log.info("updatetestlog: "+str(updatetestlog))
+            res3 = requests.post(updatetestlog, headers = self._headers, json=updateRequest,verify=False) 
+            log.info("res3: "+str(res3))
+            status = (res3.status_code == 201)
+            log.info("status "+str(status))
+        except Exception as e:
+            err_msg = 'Error while updating data in qTest'
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
+            log.error(e, exc_info=True)
+        return status
