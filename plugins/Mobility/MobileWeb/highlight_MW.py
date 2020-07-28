@@ -8,11 +8,10 @@
 # Copyright:   (c) wasimakram.sutar 2016
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
-import Exceptions_MW
 import domconstants_MW
 import clickandadd_MW
 import time
-import browserops_MW
+import browser_Keywords_MW
 import fullscrape_MW
 import logger
 import objectspy_MW
@@ -30,9 +29,9 @@ class Highlight():
         try:
             action=''
             log.info('Inside highlight method .....')
-            driver = browserops_MW.driver
+            driver = browser_Keywords_MW.driver_obj
             currentdriverhandle = clickandadd_MW.currenthandle
-            log.info(' Obtained browser handle and driver from browserops_MW.py class ......')
+            log.info(' Obtained browser handle and driver from browser_Keywords_MW.py class ......')
             if currentdriverhandle is  '' or currentdriverhandle is  None:
                 currentdriverhandle = fullscrape_MW.currenthandle
             if currentdriverhandle is  '' or currentdriverhandle is  None:
@@ -285,7 +284,7 @@ class Highlight():
             status = domconstants_MW.STATUS_SUCCESS
         except Exception as e:
             log.error(e,exc_info=True)
-            Exceptions_MW.error(e)
+            log.error(e)
             status= domconstants_MW.STATUS_FAIL
         log.info('Highlight method execution done ')
         return status

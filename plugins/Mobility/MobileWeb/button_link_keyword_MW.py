@@ -13,6 +13,7 @@
 import logger
 import webconstants_MW
 import time
+import core_utils
 from selenium import webdriver
 from constants import *
 if SYSTEM_OS!='Darwin':
@@ -25,8 +26,11 @@ import logging
 ##driver = None
 log = logging.getLogger('button_link_keyword_MW.py')
 class ButtonLinkKeyword():
-##    def __init__(self):
+    def __init__(self):
 ##        driver = webdriver.Ie(executable_path = 'D:\Drivers\iedriverserver64')
+       log = logging.getLogger('button_link_keyword.py')
+    #    text_javascript = """function stext_content(f) {     var sfirstText = '';     var stextdisplay = '';     for (var z = 0; z < f.childNodes.length; z++) {         var scurNode = f.childNodes[z];         swhitespace = /^\s*$/;         if (scurNode.nodeName === '#text' && !(swhitespace.test(scurNode.nodeValue))) {             sfirstText = scurNode.nodeValue;             stextdisplay = stextdisplay + sfirstText;         }     }     return (stextdisplay); }; return stext_content(arguments[0])"""
+       self.copy_text=None
 
     def click(self,webelement,*args):
         log.debug('Got the driver object from browser keyword class')
@@ -81,14 +85,13 @@ class ButtonLinkKeyword():
                             status = webconstants_MW.TEST_RESULT_PASS
                             methodoutput = webconstants_MW.TEST_RESULT_TRUE
                 else:
-                    log.info(WEB_ELEMENT_DISABLED)
                     err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
         except Exception as e:
-            log.error(e)
-
-            logger.print_on_console(e)
             err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
-        log.info(RETURN_RESULT)
+            log.error(e)
+        if err_msg is not None:
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
         return status,methodoutput,output,err_msg
 
     def get_button_name(self,webelement,inputs,*args):
@@ -118,8 +121,6 @@ class ButtonLinkKeyword():
                     buttonname = webelement.get_attribute(webconstants_MW.VALUE)
                     log.info('Button name fetched from the AUT using value attribute')
                     log.info(buttonname)
-
-##                    logger.print_on_console('Button name : ' , buttonname)
                     status = webconstants_MW.TEST_RESULT_PASS
                     methodoutput = webconstants_MW.TEST_RESULT_TRUE
                     output = buttonname
@@ -139,15 +140,13 @@ class ButtonLinkKeyword():
                     buttonname = webelement.get_attribute(webconstants_MW.ALT)
                     log.info('Button name fetched from the AUT using name attribute')
                     log.info(buttonname)
-##                    logger.print_on_console('Button name : ' , buttonname)
                     status = webconstants_MW.TEST_RESULT_PASS
                     methodoutput = webconstants_MW.TEST_RESULT_TRUE
                     output = buttonname
         except Exception as e:
-            log.error(e)
-            logger.print_on_console(e)
             err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
-        #return status and methodoutput
+            log.error(err_msg)
+            log.error(e)
         return status,methodoutput,output,err_msg
 
 
@@ -166,37 +165,30 @@ class ButtonLinkKeyword():
                 log.debug('Going to fetch the button name')
                 buttonname = webelement.text
                 log.info('Button name fetched from the AUT using selenium')
-##                logger.print_on_console('Button name : ' , buttonname)
-
                 if buttonname == None or len(buttonname) == 0:
                     log.debug('Button name not recieved using selenium text method, Getting value attribute')
                     #if text is empty search for the value attribute
                     buttonname = webelement.get_attribute(webconstants_MW.VALUE)
                     log.info('Button name fetched from the AUT using value attribute')
                     log.info(buttonname)
-##                    logger.print_on_console('Button name : ' , buttonname)
-                if buttonname == None or len(buttonname) == 0:
+                elif buttonname == None or len(buttonname) == 0:
                     log.debug('Button name not recieved using selenium text method/ value attribute, Getting name attribute')
                     #if value is empty search for the name attribute
                     buttonname = webelement.get_attribute(webconstants_MW.NAME)
                     log.info('Button name fetched from the AUT using name attribute')
                     log.info(buttonname)
-##                    logger.print_on_console('Button name : ' , buttonname)
-                if buttonname == None or len(buttonname) == 0:
+                elif buttonname == None or len(buttonname) == 0:
                     log.debug('Button name not recieved using selenium text method/ value attribute, Getting name attribute')
                     #if value is empty search for the name attribute
                     buttonname = webelement.get_attribute(webconstants_MW.ALT)
                     log.info('Button name fetched from the AUT using name attribute')
                     log.info(buttonname)
-##                    logger.print_on_console('Button name : ' , buttonname)
                     status = webconstants_MW.TEST_RESULT_PASS
                     methodoutput = webconstants_MW.TEST_RESULT_TRUE
-                    ##output = buttonname
-
+                logger.print_on_console('Button name: '+str(buttonname))
                 #Remove the leading and trailing spaces
                 input = inputs[0]
                 input = input.strip()
-##                logger.print_on_console('Input text : ' , input)
                 #Check for the input
                 if input != None and len(input) != 0:
                     log.info('Input is valid, Continue..')
@@ -208,27 +200,22 @@ class ButtonLinkKeyword():
                         methodoutput = webconstants_MW.TEST_RESULT_TRUE
                     else:
                         err_msg='Button name mismatched'
-                        log.info('Button name does not matched with the input, set the status to Fail')
                         logger.print_on_console(err_msg)
+                        log.error(err_msg)
                         logger.print_on_console(EXPECTED,input)
                         log.info(EXPECTED)
                         log.info(input)
                         logger.print_on_console(ACTUAL,buttonname)
                         log.info(ACTUAL)
                         log.info(buttonname)
-
                 else:
-                    log.error(INVALID_INPUT)
                     err_msg=INVALID_INPUT
-                    logger.print_on_console(INVALID_INPUT)
-
         except Exception as e:
-            log.error(e)
-
-            logger.print_on_console(e)
             err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
-        #return status and methodoutput
-        log.info(RETURN_RESULT)
+            log.error(e)
+        if err_msg is not None:
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
         return status,methodoutput,output,err_msg
 
     def get_link_text(self,webelement,input,*args):
@@ -243,30 +230,30 @@ class ButtonLinkKeyword():
                 log.info('Recieved web element from the web dispatcher')
                 log.debug(webelement)
                 log.debug('Getting href attribute')
-                text = webelement.get_attribute(webconstants_MW.HREF)
-                if text != None:
-                    log.info('Web element is a valid link and it has href attribute')
+                linktext = browser_Keywords_MW.driver_obj.execute_script(webconstants_MW.TEXT_JAVASCRIPT,webelement)
+                coreutilsobj=core_utils.CoreUtils()
+                linktext=coreutilsobj.get_UTF_8(linktext)
+                linktext = linktext.replace('\n','')
+                linktext = linktext.strip()
+                if linktext == None or linktext == '':
+                    linktext = webelement.get_attribute(webconstants_MW.HREF)
+                elif linktext == None or linktext == '':
                     linktext = webelement.text
-                    if linktext == None:
-                        linktext = ''
+                logger.print_on_console('Link text: ' )
+                logger.print_on_console(linktext)
+                if linktext != None and linktext !='':
                     log.info('Link text: ' +linktext)
                     log.info(STATUS_METHODOUTPUT_UPDATE)
                     status = webconstants_MW.TEST_RESULT_PASS
                     methodoutput = webconstants_MW.TEST_RESULT_TRUE
                 else:
-                    log.error('Web element is not a link')
-                    logger.print_on_console('Web element is not a link')
-##            else:
-##                logger.print_on_console('Element not found')
-##            print 'Keyword result: ',status
-
+                    err_msg='There is no link text for the given element'
         except Exception as e:
-            log.error(e)
-
-            logger.print_on_console(e)
             err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
-        #return status and methodoutput
-        log.info(RETURN_RESULT)
+            log.error(e)
+        if err_msg is not None:
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
         return status,methodoutput,linktext,err_msg
 
     def verify_link_text(self,webelement,inputs,*args):
@@ -280,17 +267,26 @@ class ButtonLinkKeyword():
             if webelement != None:
                 input = inputs[0]
                 input = input.strip()
+                coreutilsobj=core_utils.CoreUtils()
+                input=coreutilsobj.get_UTF_8(input)
                 if input != None and len(input) != 0:
                     log.debug('Input is valid, Continue..')
                     log.debug('Getting href attribute')
-                    text = webelement.get_attribute(webconstants_MW.HREF)
-                    if text != None:
+                    linktext = browser_Keywords_MW.driver_obj.execute_script(webconstants_MW.TEXT_JAVASCRIPT,webelement)
+                    linktext=coreutilsobj.get_UTF_8(linktext)
+                    linktext = linktext.replace('\n','')
+                    linktext = linktext.strip()
+                    if linktext == None or linktext == '':
+                        linktext = webelement.get_attribute(webconstants_MW.HREF)
+                        log.info('Link text: ' +linktext)
+                    if linktext == None or linktext == '':
                         log.info('Web element is a valid link and it has href attribute')
                         linktext = webelement.text
                         log.info('Link text: ' +linktext)
+                    if linktext != None and linktext !='':
                         if linktext == input:
                             err_msg='Link Text matched'
-                            logger.print_on_console('Link Text matched')
+                            logger.print_on_console(err_msg)
                             log.info(err_msg)
                             log.info(STATUS_METHODOUTPUT_UPDATE)
                             status = webconstants_MW.TEST_RESULT_PASS
@@ -305,21 +301,16 @@ class ButtonLinkKeyword():
                             logger.print_on_console(ACTUAL,linktext)
                             log.info(ACTUAL)
                             log.info(linktext)
-
-
+                    else:
+                        err_msg='There is no link text for the given element'
                 else:
-                    log.error(INVALID_INPUT)
                     err_msg=INVALID_INPUT
-                    logger.print_on_console(INVALID_INPUT)
-
         except Exception as e:
-            log.error(e)
-
-            logger.print_on_console(e)
             err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
-
-        #return status and methodoutput
-        log.info(RETURN_RESULT)
+            log.error(e)
+        if err_msg is not None:
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
         return status,methodoutput,output,err_msg
 
     #Below keyword specifically written for to support mnt CBU
@@ -344,16 +335,13 @@ class ButtonLinkKeyword():
                     status = webconstants_MW.TEST_RESULT_PASS
                     methodoutput = webconstants_MW.TEST_RESULT_TRUE
                 else:
-                    log.info(WEB_ELEMENT_DISABLED)
-                    err_msg = WEB_ELEMENT_DISABLED
-                    logger.print_on_console(WEB_ELEMENT_DISABLED)
+                    err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
         except Exception as e:
-            log.error(e)
-
-            logger.print_on_console(e)
             err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
-        #return status and methodoutput
-        log.info(RETURN_RESULT)
+            log.error(e)
+        if err_msg is not None:
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
         return status,methodoutput,output,err_msg
 
     def double_click(self,webelement,input,*args):
@@ -375,17 +363,13 @@ class ButtonLinkKeyword():
                     status = webconstants_MW.TEST_RESULT_PASS
                     methodoutput = webconstants_MW.TEST_RESULT_TRUE
                 else:
-                    log.info(WEB_ELEMENT_DISABLED)
-                    err_msg = WEB_ELEMENT_DISABLED
-                    logger.print_on_console(WEB_ELEMENT_DISABLED)
+                    err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
         except Exception as e:
-            log.error(e)
-            logger.print_on_console(e)
-            import traceback
-            traceback.print_exc()
             err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
-        #return status and methodoutput
-        log.info(RETURN_RESULT)
+            log.error(e)
+        if err_msg is not None:
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
         return status,methodoutput,output,err_msg
 
     def right_click(self,webelement,input,*args):
@@ -407,15 +391,13 @@ class ButtonLinkKeyword():
                     status = webconstants_MW.TEST_RESULT_PASS
                     methodoutput = webconstants_MW.TEST_RESULT_TRUE
                 else:
-                    log.info(WEB_ELEMENT_DISABLED)
-                    err_msg = WEB_ELEMENT_DISABLED
-                    logger.print_on_console(WEB_ELEMENT_DISABLED)
+                    err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
         except Exception as e:
-            log.error(e)
-
-            logger.print_on_console(e)
             err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
-        #return status and methodoutput
+            log.error(e)
+        if err_msg is not None:
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
         log.info(RETURN_RESULT)
         return status,methodoutput,output,err_msg
 
@@ -452,16 +434,13 @@ class ButtonLinkKeyword():
                             status = webconstants_MW.TEST_RESULT_PASS
                             methodoutput = webconstants_MW.TEST_RESULT_TRUE
                 else:
-                    log.info(WEB_ELEMENT_DISABLED)
-                    err_msg = WEB_ELEMENT_DISABLED
-                    logger.print_on_console(WEB_ELEMENT_DISABLED)
+                    err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
         except Exception as e:
-            log.error(e)
-
-            logger.print_on_console(e)
             err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
-        #return status and methodoutput
-        log.info(RETURN_RESULT)
+            log.error(e)
+        if err_msg is not None:
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
         return status,methodoutput,output,err_msg
 
     def __upload_operation(self,inputfile):
@@ -487,8 +466,7 @@ class ButtonLinkKeyword():
             log.debug('copied clipboard data pasted to the input using robot')
             status = True
         except Exception as e:
-            logger.print_on_console(EXCEPTION_OCCURED,e)
-            log.error(EXCEPTION_OCCURED)
+            logger.print_on_console(EXCEPTION_OCCURED)
             log.error(e)
         return status
 
@@ -501,10 +479,10 @@ class ButtonLinkKeyword():
             log.debug(' input file path Copied to  clipboard')
             status = True
         except Exception as e:
-            logger.print_on_console(EXCEPTION_OCCURED,e)
-            log.error(EXCEPTION_OCCURED)
+            logger.print_on_console(EXCEPTION_OCCURED)
             log.error(e)
         return status
+
     def __click_for_file_upload(self,driver,webelement):
         status = False
         try:
@@ -522,71 +500,9 @@ class ButtonLinkKeyword():
                 log.info('Click operation performed using selenium click')
                 status = True
         except Exception as e:
-            logger.print_on_console(EXCEPTION_OCCURED,e)
-            log.error(EXCEPTION_OCCURED)
+            logger.print_on_console(EXCEPTION_OCCURED)
             log.error(e)
         return status
-
-
-##if __name__ == '__main__':
-####    driver = webdriver.Chrome(executable_path = 'D:\Drivers\chromedriver')
-##    driver = webdriver.Ie(executable_path = 'D:\Drivers\iedriverserver64')
-##    driver.get('https://converge/ManageUsers.aspx')
-##    driver.get('https://www.google.co.in/?gfe_rd=cr&ei=y3ghWLqjAs-L8QfMjYGwDA&gws_rd=ssl')
-##    driver.get('https://www.irctc.co.in/eticketing/loginHome.jsf')
-##
-##    print 'Browser opened and navigaed to url'
-##
-####    element = driver.find_element_by_id('ctl00_MainContent_btnSearch')
-##    element = driver.find_element_by_id('loginbutton')
-##
-##    print 'element obtained'
-##
-##
-####    element = driver.find_element_by_name('btnI')
-##    obj = ButtonLinkKeyword()
-##    logger.print_on_console('ButtonLinkKeyword object created')
-##
-##    obj.click(element)
-##    print ' ***click exected ***\n\n'
-##    time.sleep(5)
-##
-##    obj.verify_button_name('Login',element)
-##
-##    print ' ***verify_button_name exected ***\n\n'
-##
-##    linkelement = driver.find_element_by_xpath('//*[@id="loginFormId"]/div[1]/div[4]/div/ul/li[1]/a')
-##
-##    status,methodoutput,linktext = obj.get_link_text(linkelement)
-##    print 'Status: ',status
-##    print 'Method Result: ',methodoutput
-##    print 'Link text: ',linktext
-##
-##    print ' ***get_link_text exected ***\n\n'
-##
-##    status,methodoutput = obj.verify_link_text('Forgot Password',linkelement)
-##
-##    print 'Status: ',status
-##    print 'Method Result: ',methodoutput
-##
-##    print ' ***verify_link_text exected ***\n\n'
-##
-####    obj.double_click(element)
-####    print ' ***double_click exected ***\n\n'
-##
-##    driver.get('http://cgi-lib.berkeley.edu/ex/fup.html')
-##
-##    upele = driver.find_element_by_name('upfile')
-##
-##    folder = 'D:\M'
-##    filename = 'test.txt'
-##    obj.upload_file(upele,folder,filename)
-##    print ' ***upload_file exected ***\n\n'
-##
-##
-##    clele = driver.find_element_by_xpath('/html/body/form/input[3]')
-####    obj.click(clele)
-##
 
 
 

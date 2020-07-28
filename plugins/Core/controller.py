@@ -35,7 +35,7 @@ local_cont = threading.local()
 #Terminate Flag
 terminate_flag=False
 pause_flag=False
-iris_flag = False
+iris_flag = True
 iris_constant_step = -1
 socket_object = None
 count = 0
@@ -64,7 +64,7 @@ class Controller():
         self.cur_dir= os.getcwd()
         self.previous_step=''
         self.verify_dict={'web':VERIFY_EXISTS,
-        'oebs':VERIFY_VISIBLE,'sap':VERIFY_EXISTS,'desktop':VERIFY_EXISTS}
+        'oebs':VERIFY_VISIBLE,'sap':VERIFY_EXISTS,'desktop':VERIFY_EXISTS,'mobileweb':VERIFY_EXISTS}
         self.dynamic_var_handler_obj=dynamic_variable_handler.DynamicVariables()
         self.status=TEST_RESULT_FAIL
         self.scenario_start_time=''
@@ -556,7 +556,7 @@ class Controller():
                         elif result:
                             logger.print_on_console('Result obtained is: ',result[1])
                     else:
-                        if (tsp.apptype.lower()!='desktop') : logger.print_on_console('Result obtained is ',",".join([str(display_keyword_response[local_cont.i])
+                        if (tsp.apptype.lower()!='desktop' and tsp.name.lower() != 'getxmlblockdata') : logger.print_on_console('Result obtained is ',",".join([str(display_keyword_response[local_cont.i])
                         if not isinstance(display_keyword_response[local_cont.i],str) else display_keyword_response[local_cont.i] for local_cont.i in range(len(display_keyword_response))]))
             else:
                 logger.print_on_console('Result obtained exceeds max. Limit, please use writeToFile keyword.')
@@ -1258,7 +1258,7 @@ class Controller():
                     else:
                         fail_val+=1
                         status_percentage["total"]+=1
-                    ellapsed_time=''                                
+                    ellapsed_time=''
                     obj_reporting.generate_report_step(tsp,self.status,self,ellapsed_time,keyword_flag,result,ignore_stat,inpval)
                     continue
                 else:
@@ -1283,9 +1283,9 @@ class Controller():
             status_percentage["s_index"]=suite_idx-1
             status_percentage["index"]=sc_idx
             obj_reporting.save_report_json(filename,json_data,status_percentage)
-            execute_result_data["scenarioId"]=aws_scenario[sc_idx]                  
+            execute_result_data["scenarioId"]=aws_scenario[sc_idx]
             execute_result_data["reportData"] = obj_reporting.report_json
-            socketIO.emit('result_executeTestSuite', execute_result_data)                  
+            socketIO.emit('result_executeTestSuite', execute_result_data)
             sc_idx+=1
             idx_t+=1
 
@@ -1411,6 +1411,15 @@ def kill_process():
             for p in wmi.InstancesOf('win32_process'):
                 if p.Name in my_processes:
                     os.system("TASKKILL /F /T /IM " + p.Name )
+        except Exception as e:
+            log.error(e)
+
+        try:
+            import browser_Keywords_MW
+            del browser_Keywords_MW.drivermap[:]
+            if hasattr(browser_Keywords_MW, 'driver_obj'):
+                if (browser_Keywords_MW.driver_obj):
+                    browser_Keywords_MW.driver_obj = None
         except Exception as e:
             log.error(e)
 
