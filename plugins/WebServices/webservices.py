@@ -257,14 +257,16 @@ class WSkeywords:
         try:
             header=str(header)
             if header != None and header.strip() != '':
-                header = str(header).replace('\n','').replace("'",'').strip()
-                log.debug('Removed new line and single quote from the input header')
                 if header.find("##")!=-1:
+                    header = str(header).replace('\n','').replace("'",'').strip()
+                    log.debug('Removed new line and single quote from the input header')
                     header=header.split('##')
                     log.debug('Header is split with ##')
                 else:
-                    header=header.split()
-                    log.debug('Header is split with spaces')
+                    header = str(header).replace("'",'').strip()
+                    log.debug('Removed single quote from the input header')
+                    header=header.split('\n')
+                    log.debug('Header is split with newlines')
                 header_dict={}
                 if self.baseReqHeader is not None and isinstance(self.baseReqHeader,dict):
                     header_dict=self.baseReqHeader
@@ -628,8 +630,7 @@ class WSkeywords:
         try:
             if len(args) == 1:
                 key=args[0]
-                if key!= None and key != '':
-
+                if key!= None and key.strip() != '':
                     log.debug(STATUS_METHODOUTPUT_UPDATE)
                     status = ws_constants.TEST_RESULT_PASS
                     methodoutput = ws_constants.TEST_RESULT_TRUE
@@ -649,7 +650,7 @@ class WSkeywords:
                 output = []
                 for i in range(0,len(args)):
                     key = args[i]
-                    if key!= None and key != '':
+                    if key!= None and key.strip() != '':
 
                         log.debug(STATUS_METHODOUTPUT_UPDATE)
                         status = ws_constants.TEST_RESULT_PASS

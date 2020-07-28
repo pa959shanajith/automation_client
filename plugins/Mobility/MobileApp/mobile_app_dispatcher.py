@@ -226,11 +226,11 @@ class MobileDispatcher:
         xpath = None
         id = None
         if objectname.strip() != '':
+            identifiers = objectname.split(';')
             if SYSTEM_OS=='Darwin':
-                xpath = objectname.replace("/AppiumAUT[1]/", "/")
-                log.debug(objectname)
+                xpath = identifiers[0].replace("/AppiumAUT[1]/", "/")
+                log.debug(identifiers)
             else:
-                identifiers = objectname.split(';')
                 if identifiers[0]!='': id = identifiers[0]
                 xpath = identifiers[1]
                 log.debug('Identifiers are ')

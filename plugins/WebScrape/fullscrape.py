@@ -133,7 +133,7 @@ class Fullscrape():
             # XPath Encryption logic implemented
             for a in tempne:
                 a['url']= obj.scrape_wrap(a['url'])
-                xpath_string=a['xpath'].split(';')
+                xpath_string=a['xpath'].split(';') + ["null",a['tag']]
                 left_part=obj.scrape_wrap(';'.join(xpath_string[:2]))
                 right_part=obj.scrape_wrap(';'.join(xpath_string[3:]))
                 a['xpath'] = left_part+';'+xpath_string[2]+';'+right_part
