@@ -40,6 +40,7 @@ class OutlookKeywords:
             self.subjectFlag = False
             self.Msg = ''
 
+
         def getOutlookComObj(self, optflag):
             import pythoncom
             pythoncom.CoInitialize()
@@ -62,7 +63,6 @@ class OutlookKeywords:
                 except Exception as e:
                     log.error( e )
                     logger.print_on_console(e)
-
             return outlookObj
 
 #To support seperate accounts and  subFolders this method is implemented , Input should be the folder path in properties of outlook folder

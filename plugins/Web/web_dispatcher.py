@@ -156,7 +156,6 @@ class Dispatcher:
 
             'openbrowser':local_Wd.browser_object.openBrowser,
             'navigatetourl':local_Wd.browser_object.navigateToURL,
-            'opennewbrowser':local_Wd.browser_object.openNewBrowser,
             'getpagetitle':local_Wd.browser_object.getPageTitle,
             'getcurrenturl':local_Wd.browser_object.getCurrentURL,
             'maximizebrowser':local_Wd.browser_object.maximizeBrowser,
@@ -359,7 +358,7 @@ class Dispatcher:
 
 
         try:
-            window_ops_list=['click','press','doubleclick','rightclick','uploadfile','acceptpopup','dismisspopup','selectradiobutton','selectcheckbox','unselectcheckbox','cellclick','clickelement','drag','drop','settext','sendvalue','cleartext','setsecuretext','sendsecurevalue','selectvaluebyindex','selectvaluebytext','selectallvalues','selectmultiplevaluesbyindexes','selectmultiplevaluesbytext','verifyvaluesexists','deselectall','setfocus','mousehover','tab','sendfunctionkeys','rightclick','mouseclick','openbrowser','navigatetourl','opennewbrowser','refresh','closebrowser','closesubwindows','switchtowindow','clearcache','navigatewithauthenticate']
+            window_ops_list=['click','press','doubleclick','rightclick','uploadfile','acceptpopup','dismisspopup','selectradiobutton','selectcheckbox','unselectcheckbox','cellclick','clickelement','drag','drop','settext','sendvalue','cleartext','setsecuretext','sendsecurevalue','selectvaluebyindex','selectvaluebytext','selectallvalues','selectmultiplevaluesbyindexes','selectmultiplevaluesbytext','verifyvaluesexists','deselectall','setfocus','mousehover','tab','sendfunctionkeys','rightclick','mouseclick','openbrowser','navigatetourl','refresh','closebrowser','closesubwindows','switchtowindow','clearcache','navigatewithauthenticate']
             if browser_Keywords.local_bk.driver_obj is not None:
                 browser_info=browser_Keywords.local_bk.driver_obj.capabilities
                 reporting_obj.browser_type=browser_info.get('browserName')
@@ -430,7 +429,7 @@ class Dispatcher:
 
                     if keyword == GET_INNER_TABLE and (output != '' and output.startswith('{') and output.endswith('}')):
                         local_Wd.webelement_map[output]=result[2]
-                    elif keyword not in [OPEN_BROWSER,OPEN_NEW_BROWSER,CLOSE_BROWSER,GET_POPUP_TEXT,VERIFY_POPUP_TEXT]:
+                    elif keyword not in [OPEN_BROWSER,CLOSE_BROWSER,GET_POPUP_TEXT,VERIFY_POPUP_TEXT]:
                         if configvalues['retrieveURL'].lower() == 'yes':
                             if result[0].lower() == 'fail':
                                 res,_=self.check_url_error_code()

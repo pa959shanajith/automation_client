@@ -13,7 +13,7 @@
 import json
 import time
 import os
-import browserops_MW
+import browser_Keywords_MW
 import clickandadd_MW
 import highlight_MW
 import io
@@ -35,10 +35,9 @@ class Object_Mapper():
         global currenthandle
         with open(os.environ["AVO_ASSURE_HOME"] + '/output/domelements_scraped.json') as data_file:
             self.data = json.load(data_file)
-            driver = browserops_MW.driver
-            time.sleep(10)
-            hwndg = browserops_MW.hwndg
-            log.info( 'Obtained browser handle and driver from browserops_MW.py class .....')
+            driver = browser_Keywords_MW.driver_obj
+            # time.sleep(10)
+            log.info( 'Obtained browser handle and driver from browser_Keywords_MW.py class .....')
 
             log.info( 'Minimizing the foreground window i.e tool and assuming AUT on top .....')
             javascript_hasfocus = """return(document.hasFocus());"""
@@ -56,7 +55,7 @@ class Object_Mapper():
 
 
     def update(self):
-        driver = browserops_MW.driver
+        driver = browser_Keywords_MW.driver_obj
         data = {}
         lst =[]
         cobject = {'changedobject' : highlight_MW.changedobject}
@@ -65,13 +64,13 @@ class Object_Mapper():
         lst.append(cobject)
         lst.append(ncobject)
         lst.append(nfobject)
-        comparedin  =''
-        if browserops_MW.browser == 2:
-            comparedin =  'FX'
-        elif browserops_MW.browser == 3:
-            comparedin = 'IE'
-        elif browserops_MW.browser == 1:
-            comparedin =  'CH'
+        comparedin  ='CH'
+        # if browserops_MW.browser == 2:
+        #     comparedin =  'FX'
+        # elif browserops_MW.browser == 3:
+        #     comparedin = 'IE'
+        # elif browserops_MW.browser == 1:
+        #     comparedin =  'CH'
         screen = driver.get_screenshot_as_base64()
         data['comparedin'] = comparedin
         data['view'] = lst
