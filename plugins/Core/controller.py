@@ -25,7 +25,6 @@ import os,sys
 import logger
 import json
 from constants import *
-import pause_execution
 import dynamic_variable_handler
 import reporting
 import core_utils
