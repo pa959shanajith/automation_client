@@ -100,11 +100,7 @@ class UtilWebKeywords:
         except Exception as e:
             log.error(e)
 
-    def __web_driver_exception(self,e):
-        log.error(e)
-        logger.print_on_console(e)
-        err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
-        return err_msg
+
 
     def is_visible(self,webelement):
         flag=False
@@ -113,7 +109,8 @@ class UtilWebKeywords:
             script="""var isVisible = (function() {     function inside(schild, sparent) {         while (schild) {             if (schild === sparent) return true;             schild = schild.parentNode;         }         return false;     };     return function(selem) {         if (document.hidden || selem.offsetWidth == 0 || selem.offsetHeight == 0 || selem.style.visibility == 'hidden' || selem.style.display == 'none' || selem.style.opacity === 0) return false;         var srect = selem.getBoundingClientRect();         if (window.getComputedStyle || selem.currentStyle) {             var sel = selem,                 scomp = null;             while (sel) {                 if (sel === document) {                     break;                 } else if (!sel.parentNode) return false;                 scomp = window.getComputedStyle ? window.getComputedStyle(sel, null) : sel.currentStyle;                 if (scomp && (scomp.visibility == 'hidden' || scomp.display == 'none' || (typeof scomp.opacity !== 'undefined' && !(scomp.opacity > 0)))) return false;                 sel = sel.parentNode;             }         }         return true;     } })(); var s = arguments[0]; return isVisible(s);"""
             flag= browser_Keywords_MW.driver_obj.execute_script(script,webelement)
         except Exception as e:
-            self.__web_driver_exception(e)
+            logger.print_on_console("ERR_WEB_DRIVER_EXCEPTION")
+            log.error(e)
         log.debug('Visibility is '+str(flag))
         return flag
 
@@ -142,10 +139,12 @@ class UtilWebKeywords:
                     methodoutput=TEST_RESULT_TRUE
                 else:
                     err_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
-                    logger.print_on_console(err_msg)
-                    log.error(err_msg)
         except Exception as e:
-            err_msg=self.__web_driver_exception(e)
+            err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+            log.error(e)
+        if err_msg is not None:
+            logger.print_on_console(err_msg)
+            log.error(err_msg)       
         return status,methodoutput,output,err_msg
 
 
@@ -164,7 +163,9 @@ class UtilWebKeywords:
                 status=TEST_RESULT_PASS
                 methodoutput=TEST_RESULT_TRUE
         except Exception as e:
-           err_msg=self.__web_driver_exception(e)
+            err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+            logger.print_on_console(e)
+            log.error(e)
         return status,methodoutput,output,err_msg
 
     def verify_doesnot_exists(self,webelement,*args):
@@ -199,10 +200,12 @@ class UtilWebKeywords:
                     log.info(info_msg)
                 else:
                     err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
-                    logger.print_on_console(err_msg)
-                    log.error(err_msg)
         except Exception as e:
-            err_msg=self.__web_driver_exception(e)
+            err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+            log.error(e)
+        if err_msg is not None:
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
         return status,methodoutput,output,err_msg
 
     def verify_disabled(self,webelement,*args):
@@ -223,10 +226,12 @@ class UtilWebKeywords:
                     log.info(info_msg)
                 else:
                     err_msg=ERROR_CODE_DICT['MSG_OBJECT_ENABLED']
-                    logger.print_on_console(err_msg)
-                    log.error(err_msg)
         except Exception as e:
-            err_msg=self.__web_driver_exception(e)
+            err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+            log.error(e)
+        if err_msg is not None:
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
         return status,methodoutput,output,err_msg
 
     def verify_hidden(self,webelement,*args):
@@ -246,10 +251,12 @@ class UtilWebKeywords:
                     methodoutput=TEST_RESULT_TRUE
                 else:
                     err_msg=ERROR_CODE_DICT['ERR_OBJECT_VISIBLE']
-                    logger.print_on_console(err_msg)
-                    log.error(err_msg)
         except Exception as e:
-            err_msg=self.__web_driver_exception(e)
+            err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+            log.error(e)
+        if err_msg is not None:
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
         return status,methodoutput,output,err_msg
 
     def verify_readonly(self,webelement,*args):
@@ -271,10 +278,12 @@ class UtilWebKeywords:
                     methodoutput=TEST_RESULT_TRUE
                 else:
                     err_msg=ERROR_CODE_DICT['ERR_ELEMENT_IS_NOT_READONLY']
-                    logger.print_on_console(err_msg)
-                    log.error(err_msg)
         except Exception as e:
-            err_msg=self.__web_driver_exception(e)
+            err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+            log.error(e)
+        if err_msg is not None:
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
         return status,methodoutput,output,err_msg
 
 
@@ -308,7 +317,8 @@ class UtilWebKeywords:
                 else:
                     browser_Keywords_MW.driver_obj.execute_script(HIGHLIGHT_SCRIPT,webelement,original_style)
         except Exception as e:
-            err_msg=self.__web_driver_exception(e)
+            err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+            log.error(e)
 
 
     def __setfocus(self,webelement):
@@ -333,7 +343,8 @@ class UtilWebKeywords:
                     logger.print_on_console(info_msg)
                     methodoutput=TEST_RESULT_TRUE
         except Exception as e:
-            err_msg=self.__web_driver_exception(e)
+            err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+            log.error(e)
         return status,methodoutput,output,err_msg
 
 
@@ -360,7 +371,8 @@ class UtilWebKeywords:
                 status=TEST_RESULT_PASS
                 methodoutput=TEST_RESULT_TRUE
         except Exception as e:
-            err_msg=self.__web_driver_exception(e)
+            err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+            log.error(e)
         return status,methodoutput,output,err_msg
 
 
@@ -464,8 +476,9 @@ class UtilWebKeywords:
                     self.generic_sendfucntion_keys(input.lower(),*args)
                 status=TEST_RESULT_PASS
                 methodoutput=TEST_RESULT_TRUE
-        except Exception as e:
-            err_msg=self.__web_driver_exception(e)
+        except Exception as e:f
+            err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+            log.error(e)
         return status,methodoutput,output,err_msg
 
     def rightclick(self,webelement,*args):
@@ -485,7 +498,8 @@ class UtilWebKeywords:
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
         except Exception as e:
-            err_msg=self.__web_driver_exception(e)
+            err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+            log.error(e)
         return status,methodoutput,output,err_msg
 
     def switch_to_window(self,webelement,input,*args):
@@ -529,7 +543,7 @@ class UtilWebKeywords:
             methodoutput=TEST_RESULT_TRUE
         except Exception as e:
             etype=type(e)
-            err_msg=self.__web_driver_exception(e)
+            err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
             log.info('Inside Exception block')
             try:
                 if isinstance(etype,NoSuchWindowException):
@@ -544,11 +558,13 @@ class UtilWebKeywords:
                         methodoutput=TEST_RESULT_TRUE
                     else:
                         err_msg='No handles found'
-                        logger.print_on_console(err_msg)
-                        log.error(err_msg)
             except Exception as e:
                 etype=type(e)
-                err_msg=self.__web_driver_exception(e)
+                err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                log.error(e)
+        if err_msg is not None:
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
         return status,methodoutput,output,err_msg
 
     def mouse_click(self,webelement,input,*args):
@@ -599,7 +615,8 @@ class UtilWebKeywords:
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
         except Exception as e:
-            err_msg=self.__web_driver_exception(e)
+            err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+            log.error(e)
         return status,methodoutput,output,err_msg
 
     def verify_web_images(self,webelement,input,*args):
@@ -655,11 +672,12 @@ class UtilWebKeywords:
                             err_msg=ERROR_CODE_DICT['ERR_IMAGE_COMPARE_FAIL']
             else:
                 err_msg=ERROR_CODE_DICT['ERR_NO_IMAGE_SOURCE']
-            if err_msg != None:
-                logger.print_on_console(err_msg)
-                log.error(err_msg)
         except Exception as e:
-            err_msg=self.__web_driver_exception(e)
+            err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+            log.error(e)
+        if err_msg is not None:
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
         return status,methodoutput,output,err_msg
 
     def image_similarity_percentage(self,webelement,input,*args):
@@ -713,13 +731,12 @@ class UtilWebKeywords:
                         logger.print_on_console('Result is ',output)
             else:
                 err_msg=ERROR_CODE_DICT['ERR_NO_IMAGE_SOURCE']
-            if err_msg != None:
-                logger.print_on_console(err_msg)
-                log.error(err_msg)
         except Exception as e:
-            log.error(e)
-            logger.print_on_console(e)
             err_msg=INPUT_ERROR
+            log.error(e)
+        if err_msg is not None:
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
         return status,methodoutput,output,err_msg
 
     def __get_window_handles(self):

@@ -12,6 +12,7 @@ import os
 import date_ops_keywords
 import string_ops_keywords
 import file_operations
+import file_operations_xml
 import folder_operations
 import logger
 import generic_constants
@@ -38,6 +39,7 @@ class GenericKeywordDispatcher:
         local_generic.generic_date = date_ops_keywords.DateOperation()
         local_generic.generic_string =string_ops_keywords.StringOperation()
         local_generic.generic_file=file_operations.FileOperations()
+        local_generic.generic_file_xml=file_operations_xml.FileOperationsXml()
         local_generic.genric_folder=folder_operations.FolderOperations()
         local_generic.generic_excel=excel_operations.ExcelFile()
         local_generic.generic_word=word_operations.WordFile()
@@ -144,9 +146,12 @@ class GenericKeywordDispatcher:
             'readxml': local_generic.generic_word.readxml,
             'readpdf': local_generic.generic_word.readPdf,
             'getkeyvalue': local_generic.json_oper.get_key_value,
-            'comparefiles': local_generic.generic_file.compare_files,	
-            'beautify': local_generic.generic_file.beautify_file,	
-            'compareinputs': local_generic.generic_file.compare_inputs,
+            'comparefiles': local_generic.generic_file_xml.compare_files,
+            'beautify': local_generic.generic_file_xml.beautify_file,
+            'compareinputs': local_generic.generic_file_xml.compare_inputs,
+            'getxmlblockdata' :local_generic.generic_file_xml.getXmlBlockData,
+            'selectivexmlfilecompare' : local_generic.generic_file_xml.selectiveXmlFileCompare,
+            'compxmlfilewithxmlblock' : local_generic.generic_file_xml.compXmlFileWithXmlBlock,
             'cellbycellcompare': local_generic.generic_file.cell_by_cell_compare
             }
 	#Call to fetch data in database keywords
@@ -204,10 +209,10 @@ class GenericKeywordDispatcher:
                             var = str(output[0])[1:len(str(output[0]))-1]
                             output[0] = data[var][0]
                     message.extend(output)
-                if( keyword in ['comparefiles','beautify','compareinputs','cellbycellcompare'] ):	
-                    input = list(message)	
-                    output = tsp.outputval	
-                    result= self.generic_dict[keyword](input,output)	
+                if( keyword in ['comparefiles','beautify','compareinputs','getxmlblockdata','selectivexmlfilecompare','compxmlfilewithxmlblock','cellbycellcompare'] ):
+                    input = list(message)
+                    output = tsp.outputval
+                    result= self.generic_dict[keyword](input,output)
                 else:
                     result= self.generic_dict[keyword](*message)
             else:
