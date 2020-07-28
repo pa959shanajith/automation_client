@@ -327,7 +327,7 @@ class BuildJson:
                         counter=counter+1
 
                 if SYSTEM_OS!='Darwin':
-                    xpath = resource_id[i] + ';' + XpathList[i]
+                    xpath = resource_id[i] + ';' + XpathList[i] + ';' + class_name[i]
                     ele_bounds=re.findall('\d+',rectangle[i])
                     width_=(int(ele_bounds[2])-int(ele_bounds[0])) if len(ele_bounds)==4 else ""
                     height_=int(ele_bounds[3])-int(ele_bounds[1]) if len(ele_bounds)==4 else ""
@@ -338,7 +338,7 @@ class BuildJson:
                         'id': resource_id[i], 'custname': text,
                         'reference': str(uuid.uuid4()),'enabled':enabled[i],'left':left,'top':top,'width':width_,'height':height_})
                 elif SYSTEM_OS=='Darwin':
-                    xpath =  XpathList[i]
+                    xpath = XpathList[i] + ';' + class_name[i]
                     ScrapeList.append({'xpath': xpath, 'tag': class_name[i],
                        'text': text,
                        'custname': text,
