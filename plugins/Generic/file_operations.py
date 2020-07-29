@@ -1053,6 +1053,7 @@ class FileOperations:
                 del rownum, colnum, desc, out, c1, c2 #deleting variables
                 if( output_feild ):
                     if( os.path.exists(output_feild) or os.path.exists(os.path.dirname(output_feild)) ):
+                        logger.print_on_console( "Writing the output of cellByCellCompare to file : " + str(output_feild) )
                         flg, err_msg = self.write_result_file(output_feild, collect_content, 'CellByCellCompare_Result')
                     else:
                         status_excel_create_file = False
@@ -1062,6 +1063,7 @@ class FileOperations:
                         else:
                             err_msg = 'Warning! : Invalid file extension. Output file format should be either ".xls" or ".xlxs".'
                         if (status_excel_create_file):
+                            logger.print_on_console( "Writing the output of cellByCellCompare to file : " + str(output_feild) )
                             flg, err_msg = self.write_result_file(output_feild, collect_content, 'CellByCellCompare_Result')
                     if ( flg ):
                         status = TEST_RESULT_PASS

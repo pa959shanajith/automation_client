@@ -64,6 +64,7 @@ class FileOperationsXml:
                         if ( elementList and output_path ):
                             try:
                                 if( os.path.exists(output_path) or os.path.exists(os.path.dirname(output_path)) ):
+                                    logger.print_on_console( "Writing the output of getXmlBlockData to file : " + str(output_path) )
                                     with open(output_path,'w') as f:
                                         for v in elementList:
                                             f.write(v)
@@ -71,9 +72,9 @@ class FileOperationsXml:
                                     err_msg = generic_constants.FILE_NOT_EXISTS
                                     flg = False
                             except Exception as e:
-                                err_msg = ("Exception occurred while writing to output file in compare_file : " + str(ex))
+                                err_msg = ("Exception occurred while writing to output file in getXmlBlockData : " + str(ex))
                                 log.error( err_msg )
-                                logger.print_on_console( "Error occured while writing to output file in Compare File" )
+                                logger.print_on_console( "Error occured while writing to output file in getXmlBlockData" )
                         if( flg ):
                             status = TEST_RESULT_PASS
                             result = TEST_RESULT_TRUE
@@ -98,7 +99,7 @@ class FileOperationsXml:
     def selectiveXmlFileCompare(self,input_val,*args):
         """
         Purpose: This function will selectively compare the block of data between two xml files
-        Input: <file-path1>;<file-path2>;<block xpath>
+        Input: <file-path1>;<file-path2>;<all/selective - output result (optional)>;<block xpath>
         Output: differed text
         """
         status = TEST_RESULT_FAIL
@@ -106,6 +107,7 @@ class FileOperationsXml:
         err_msg = None
         value = OUTPUT_CONSTANT
         output_path = None
+        res_opt = 'all'
         try:
             if ( args[0] ) :
                 out_path = self.DV.get_dynamic_value(args[0].split(";")[0])
@@ -113,7 +115,8 @@ class FileOperationsXml:
             if (len(input_val)>=3):
                 path1 = input_val[0]
                 path2 = input_val[1]
-                blockVal = ';'.join(input_val[2:])
+                if ((input_val[2]) != '') : res_opt = input_val[2].lower().strip()
+                blockVal = ';'.join(input_val[3:])
                 if ( os.path.isfile(path1) and os.path.isfile(path2) ):
                     if ( blockVal ):
                         searchList= self.searchPatternBuild(blockVal)
@@ -141,20 +144,32 @@ class FileOperationsXml:
                             flg = True
                             num_diff,ch_lines = self.get_diff_count_xml(output_res)
                             try:
-                                output_res = '\n'.join(output_res)
-                                if(num_diff):
-                                    logger.print_on_console("The number of differences in compare_file are : ", num_diff)
-                                if(output_path):
-                                    if( os.path.exists(output_path) or os.path.exists(os.path.dirname(output_path)) ):
-                                        with open(output_path,'w') as f:
-                                            f.write(output_res)
-                                    else:
-                                        err_msg = generic_constants.FILE_NOT_EXISTS
-                                        flg = False
+                                #-----------------------------------------------------------------selective output
+                                if ( res_opt == 'selective' or res_opt == 'all') :
+                                    log.info("Result to be displayed is : " + str(res_opt))
+                                    logger.print_on_console("Result to be displayed is : " + str(res_opt))
+                                    if (res_opt == 'selective') : output_res = ch_lines
+                                    output_res = '\n'.join(output_res)
+                                    if(num_diff):
+                                        logger.print_on_console("The number of differences in selectiveXmlFileCompare are : ", num_diff)
+                                    elif(int(num_diff) == 0):
+                                        logger.print_on_console("No Difference between files in selectiveXmlFileCompare" )
+                                    if(output_path):
+                                        if( os.path.isfile(output_path) or os.path.exists(os.path.dirname(output_path)) ):
+                                            logger.print_on_console( "Writing the output of selectiveXmlFileCompare to : " + str(output_path) )
+                                            with open(output_path,'w') as f:
+                                                f.write(output_res)
+                                        else:
+                                            err_msg = generic_constants.FILE_NOT_EXISTS
+                                            flg = False
+                                else:
+                                    err_msg = INVALID_INPUT
+                                    flg = False
+                                #-----------------------------------------------------------------selective output
                             except Exception as e:
-                                err_msg = ("Exception occurred while writing to output file in compare_file : " + str(ex))
+                                err_msg = ("Exception occurred while writing to output file in selectiveXmlFileCompare : " + str(ex))
                                 log.error( err_msg )
-                                logger.print_on_console( "Error occured while writing to output file in Compare File" )
+                                logger.print_on_console( "Error occured while writing to output file in selectiveXmlFileCompare" )
                         if( flg ):
                             log.info( "Comparision of files completed" )
                             value = output_res
@@ -178,14 +193,14 @@ class FileOperationsXml:
     def compXmlFileWithXmlBlock(self,input_val,*args):
         """
         Purpose: This function will compare data from getXmlBlockData with all blocks of data from mentioned file.
-        Input: <file-path>;<blockData from getXmlBlockData>;<block xpath>
+        Input: <file-path>;<blockData from getXmlBlockData>;<all/selective - output result (optional)>;<block xpath>
         Output: differed text
         """
         status = TEST_RESULT_FAIL
         result = TEST_RESULT_FALSE
         err_msg = None
         value = OUTPUT_CONSTANT
-
+        res_opt = 'all'
         elementList = []
         blockVal = None
         blockData = None
@@ -195,8 +210,9 @@ class FileOperationsXml:
             if ( args[0] ) :
                 out_path = self.DV.get_dynamic_value(args[0].split(";")[0])
                 if ( out_path ): output_path = out_path
-            if ( len(input_val) >= 3 ):
-                blockVal = ';'.join(input_val[2:])
+            if ( len(input_val) >= 4 ):
+                blockVal = ';'.join(input_val[3:])
+                if ((input_val[2]) != '') : res_opt = input_val[2].lower().strip()
                 blockData = input_val[1]
                 path = input_val[0]
                 if os.path.isfile( path ):
@@ -223,31 +239,41 @@ class FileOperationsXml:
                         else :
                             out = self.compare_texts( self.beautify_xml_file( blockData ), self.beautify_xml_file( eL ) )
                         output_res.extend( out )
-                    if( output_res ):
-                        num_diff,ch_lines = self.get_diff_count( output_res )
-                        output_res = '\n'.join(output_res)
-                    if ( len(output_res) > 0 ):
+                    if ( output_res and len(output_res) > 0 ):
                         flg = True
-                        if( num_diff ):
-                            logger.print_on_console("The number of differences in compare_file are: ",num_diff)
-                        if ( output_res and output_path ):
-                            try:
-                                #output_res = '\n'.join(output_res)
-                                if( os.path.exists(output_path) or os.path.exists(os.path.dirname(output_path)) ):
-                                    with open(output_path,'w') as f:
+                        num_diff,ch_lines = self.get_diff_count_xml(output_res)
+                        #num_diff,ch_lines = self.get_diff_count( output_res )
+                        try:
+                            #-----------------------------------------------------------------selective output
+                            if ( res_opt == 'selective' or res_opt == 'all') :
+                                log.info("Result to be displayed is : " + str(res_opt))
+                                logger.print_on_console("Result to be displayed is : " + str(res_opt))
+                                if (res_opt == 'selective') : output_res = ch_lines
+                                output_res = '\n'.join(output_res)
+                                if(num_diff):
+                                    logger.print_on_console("The number of differences in compXmlFileWithXmlBlock are : ", num_diff)
+                                elif(int(num_diff) == 0):
+                                    logger.print_on_console("No Difference between files in compXmlFileWithXmlBlock" )
+                                if(output_path):
+                                    if( os.path.isfile(output_path) or os.path.exists(os.path.dirname(output_path)) ):
+                                        logger.print_on_console( "Writing the output of compXmlFileWithXmlBlock to : " + str(output_path) )
+                                        with open(output_path,'w') as f:
                                             f.write(output_res)
-                                else:
-                                    err_msg = generic_constants.FILE_NOT_EXISTS
-                                    flg = False
-                            except Exception as e:
-                                err_msg = ("Exception occurred while writing to output file in compare_file : " + str(ex))
-                                log.error( err_msg )
-                                logger.print_on_console( "Error occured while writing to output file in Compare File" )
-                        if( flg ):
-                            log.info( "Comparision of texts completed" )
-                            value = output_res
-                            status = TEST_RESULT_PASS
-                            result = TEST_RESULT_TRUE
+                                    else:
+                                        err_msg = generic_constants.FILE_NOT_EXISTS
+                                        flg = False
+                            else:
+                                err_msg = INVALID_INPUT
+                                flg = False
+                        except Exception as e:
+                            err_msg = ("Exception occurred while writing to output file in compXmlFileWithXmlBlock : " + str(ex))
+                            log.error( err_msg )
+                            logger.print_on_console( "Error occured while writing to output file in compXmlFileWithXmlBlock" )
+                    if( flg ):
+                        log.info( "Comparision of texts completed" )
+                        value = output_res
+                        status = TEST_RESULT_PASS
+                        result = TEST_RESULT_TRUE
                     del ele,elm,searchList
                 else:
                     err_msg = generic_constants.FILE_NOT_EXISTS
@@ -267,7 +293,7 @@ class FileOperationsXml:
         """
         def : compare_inputs
         Purpose :  compares two text inputs
-        Input : inputtext-1,inputtext-2
+        Input : inputtext-1,inputtext-2,<all/selective - output result (optional)>
         Output : differed text, bool
         """
         status = TEST_RESULT_FAIL
@@ -293,7 +319,9 @@ class FileOperationsXml:
                         try:
                             num_diff,ch_lines = self.get_diff_count(output_res)
                             if(num_diff):
-                                logger.print_on_console("The number of differences in compare_inputs are: ",num_diff)
+                                logger.print_on_console("The number of differences in compareInputs are: ",num_diff)
+                            elif(int(num_diff) == 0):
+                                    logger.print_on_console("No Difference between inputs in compareInputs")
                             if ( res_opt == 'selective' or res_opt == 'all') :
                                 log.info("Result to be displayed is : " + str(res_opt))
                                 logger.print_on_console("Result to be displayed is : " + str(res_opt))
@@ -301,15 +329,16 @@ class FileOperationsXml:
                             output_res = '\n'.join(output_res)
                             if(output_path):
                                 if(os.path.isfile(output_path) or os.path.exists(os.path.dirname(output_path))):
+                                    logger.print_on_console( "Writing the output of compareInputs to file: " + str(output_path) )
                                     with open(output_path,'w') as f:
                                         f.write(output_res)
                                 else:
                                     err_msg='Wrong file path entered'
                                     flg = False
                         except Exception as ex:
-                            err_msg = ("Exception occurred while writing to output file in compare_inputs : "+str(ex))
+                            err_msg = ("Exception occurred while writing to output file in compareInputs : "+str(ex))
                             log.error( err_msg )
-                            logger.print_on_console( "Error occured while writing to output file in Compare Inputs" )
+                            logger.print_on_console( "Error occured while writing to output file in compareInputs" )
                         if(flg):
                             log.info("Comparision of texts completed")
                             value = output_res
@@ -359,6 +388,7 @@ class FileOperationsXml:
                     try:
                         if(output_path):
                             if(os.path.isfile(output_path) or os.path.exists(os.path.dirname(output_path))):
+                                logger.print_on_console( "Writing the output of beautify to file: " + str(output_path) )
                                 with open(output_path,'w') as f:
                                     f.write(beautified_output)
                             else:
@@ -367,7 +397,7 @@ class FileOperationsXml:
                     except Exception as ex:
                         err_msg = ("Exception occurred while writing to output file in beautify_file : "+str(ex))
                         log.error( err_msg )
-                        logger.print_on_console( "Error occured while writing to output file in Beautify File" )
+                        logger.print_on_console( "Error occured while writing to output file in Beautify" )
                     if(flg):
                         value = beautified_output
                         status=TEST_RESULT_PASS
@@ -387,7 +417,7 @@ class FileOperationsXml:
         """
         def : compare_file
         Purpose : compares two files
-        Input : inputPath-1,inputPath-2
+        Input : inputPath-1,inputPath-2,<all/selective - output result (optional)>
         Output : differed text, bool
         """
         status = TEST_RESULT_FAIL
@@ -435,17 +465,20 @@ class FileOperationsXml:
                                 output_res = '\n'.join(output_res)
                                 if(num_diff):
                                     logger.print_on_console("The number of differences in compare_file are: ",num_diff)
+                                elif(int(num_diff) == 0):
+                                    logger.print_on_console("No Difference between inputs in compareFile")
                                 if(output_path):
                                     if(os.path.exists(output_path) or os.path.exists(os.path.dirname(output_path))):
+                                        logger.print_on_console( "Writing the output of compareFiles to file : " + str(output_path) )
                                         with open(output_path,'w') as f:
                                             f.write(output_res)
                                     else:
                                         err_msg = generic_constants.FILE_NOT_EXISTS
                                         flg = False
                             except Exception as ex:
-                                err_msg = ("Exception occurred while writing to output file in compare_file : "+str(ex))
+                                err_msg = ("Exception occurred while writing to output file in compareFile : "+str(ex))
                                 log.error( err_msg )
-                                logger.print_on_console( "Error occured while writing to output file in Compare File" )
+                                logger.print_on_console( "Error occured while writing to output file in compareFile" )
                             if(flg):
                                 log.info("Comparision of files completed")
                                 value = output_res
