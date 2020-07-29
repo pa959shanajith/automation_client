@@ -9,6 +9,7 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 from selenium import webdriver
+from collections import OrderedDict
 import domconstants_MW
 import logger
 import webconstants_MW
@@ -31,6 +32,7 @@ if SYSTEM_OS!='Darwin':
     import win32api
 import readconfig
 import browserops_MW
+import core_utils
 #New Thread to navigate to given url for the keyword 'naviagteWithAut'
 class TestThread(threading.Thread):
     """Test Worker Thread Class."""
@@ -57,6 +59,7 @@ class BrowserKeywords():
         self.browser_num=''
         self.all_handles=[]
         self.recent_handles=[]
+        # parent_handle=None
 
 
     def start_server(self):
@@ -220,7 +223,6 @@ class BrowserKeywords():
 
 
     def openNewTab(self ,*args):
-        #opennewtab
         global driver_obj
         status=webconstants_MW.TEST_RESULT_FAIL
         result=webconstants_MW.TEST_RESULT_FALSE
@@ -236,7 +238,7 @@ class BrowserKeywords():
             status=webconstants_MW.TEST_RESULT_PASS
             result=webconstants_MW.TEST_RESULT_TRUE
         except Exception as e:
-            err_msg='ERROR OCURRED WHILE OPENING BROWSER'
+            err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
             log.error(e)
         return status,result,output,err_msg
 
@@ -254,11 +256,9 @@ class BrowserKeywords():
                 status=webconstants_MW.TEST_RESULT_PASS
                 result=webconstants_MW.TEST_RESULT_TRUE
         except Exception as e:
-            err_msg='ERROR OCURRED WHILE OPENING BROWSER'
+            err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
             log.error(e)
-        if err_msg is not None:
             logger.print_on_console(err_msg)
-            log.error(err_msg)
         return status,result,output,err_msg
 
     def update_recent_handle(self,h): 
@@ -285,7 +285,7 @@ class BrowserKeywords():
             else:
                 logger.print_on_console(webconstants_MW.INVALID_INPUT)
         except Exception as e:
-            err_msg='ERROR OCURRED WHILE OPENING BROWSER'
+            err_msg='ERROR OCURRED WHILE NAVIGATING TO URL'
             log.error(e)
         if err_msg is not None:
             logger.print_on_console(err_msg)
@@ -305,11 +305,9 @@ class BrowserKeywords():
             obj.execute_key('tab',1)
             obj.execute_key('enter',1)
         except Exception as e:
-            err_msg='ERROR OCURRED WHILE OPENING BROWSER'
-            log.error(e)
-        if err_msg is not None:
+            err_msg='ERROR OCURRED IN TYPE FUNCTION '
             logger.print_on_console(err_msg)
-            log.error(err_msg)
+            log.error(e)
         return
 
 
@@ -345,7 +343,7 @@ class BrowserKeywords():
                 log.error(webconstants_MW.INVALID_INPUT)
                 err_msg = webconstants_MW.INVALID_INPUT
         except Exception as e:
-            err_msg='ERROR OCURRED WHILE OPENING BROWSER'
+            err_msg='error occured in navigate with authenticate'
             log.error(e)
         if err_msg is not None:
             logger.print_on_console(err_msg)
@@ -371,11 +369,9 @@ class BrowserKeywords():
                 status=webconstants_MW.TEST_RESULT_PASS
                 result=webconstants_MW.TEST_RESULT_TRUE
             else:
-                logger.print_on_console('Driver object is null')
-                log.error('Driver object is null')
                 err_msg = 'Driver object is null'
         except Exception as e:
-            err_msg='ERROR OCURRED WHILE OPENING BROWSER'
+            err_msg='error occured in get page title'
             log.error(e)
         if err_msg is not None:
             logger.print_on_console(err_msg)
@@ -394,29 +390,45 @@ class BrowserKeywords():
                 if (page_title is ''):
                     page_title= driver_obj.current_url
                 page_title.strip()
-                if(page_title == input_val[0]):
+                coreutilsobj=core_utils.CoreUtils()
+                userinput=coreutilsobj.get_UTF_8(input_val[0])
+                if(page_title == userinput):
                     logger.print_on_console('Page title matched')
                     log.info('Page title matched')
                     status=webconstants_MW.TEST_RESULT_PASS
                     result=webconstants_MW.TEST_RESULT_TRUE
                 else:
                     logger.print_on_console('Page title mismatched')
-                    logger.print_on_console(EXPECTED,input_val[0])
+                    logger.print_on_console(EXPECTED,userinput)
                     log.info(EXPECTED)
-                    log.info(input_val[0])
+                    log.info(userinput)
                     logger.print_on_console(ACTUAL,page_title)
                     log.info(ACTUAL)
                     log.info(page_title)
             else:
-                log.error('Driver object is null')
-                logger.print_on_console('Driver object is null')
                 err_msg = 'Driver object is null'
         except Exception as e:
-            err_msg='ERROR OCURRED WHILE OPENING BROWSER'
+            err_msg='error occured in verify page title'
             log.error(e)
         if err_msg is not None:
             logger.print_on_console(err_msg)
             log.error(err_msg)
+        return status,result,output,err_msg
+
+    def navigate_back(self, webelement, url, *args):
+        """performs a navigate_back back operation"""
+        status=webconstants_MW.TEST_RESULT_FAIL
+        result=webconstants_MW.TEST_RESULT_FALSE
+        output=OUTPUT_CONSTANT
+        err_msg=None
+        try:
+            driver_obj.execute_script("window.history.go(-1)")
+            status=webconstants_MW.TEST_RESULT_PASS
+            result=webconstants_MW.TEST_RESULT_TRUE
+        except Exception as e:
+            err_msg='error  occured in navigate back'
+            logger.print_on_console(err_msg)
+            log.error(e)
         return status,result,output,err_msg
 
 
@@ -435,11 +447,9 @@ class BrowserKeywords():
                 status=webconstants_MW.TEST_RESULT_PASS
                 result=webconstants_MW.TEST_RESULT_TRUE
             else:
-                logger.print_on_console('Driver object is null')
-                log.error('Driver object is null')
                 err_msg = 'Driver object is null'
         except Exception as e:
-            err_msg='ERROR OCURRED WHILE OPENING BROWSER'
+            err_msg='error occured in get current url'
             log.error(e)
         if err_msg is not None:
             logger.print_on_console(err_msg)
@@ -472,11 +482,9 @@ class BrowserKeywords():
                     log.info(ACTUAL)
                     log.info(url)
             else:
-                log.error(webconstants_MW.INVALID_INPUT)
-                logger.print_on_console(webconstants_MW.INVALID_INPUT)
                 err_msg = webconstants_MW.INVALID_INPUT
         except Exception as e:
-            err_msg='ERROR OCURRED WHILE OPENING BROWSER'
+            err_msg='error occured in verify current url'
             log.error(e)
         if err_msg is not None:
             logger.print_on_console(err_msg)
@@ -498,10 +506,8 @@ class BrowserKeywords():
                 os.system("killall -9 node_appium")
         except Exception as e:
             err_msg="Exception in stopping server"
-            log.error(e)
-        if err_msg is not None:
             logger.print_on_console(err_msg)
-            log.error(err_msg)
+            log.error(e)
 
     def closeBrowser(self,*args):
         status=webconstants_MW.TEST_RESULT_FAIL
@@ -541,7 +547,7 @@ class BrowserKeywords():
                 result=webconstants_MW.TEST_RESULT_TRUE
 
         except Exception as e:
-            err_msg='ERROR OCURRED WHILE OPENING BROWSER'
+            err_msg='exception in closing the browser'
             log.error(e)
         if err_msg is not None:
             logger.print_on_console(err_msg)
@@ -549,70 +555,55 @@ class BrowserKeywords():
         return status,result,output,err_msg
 
 
-    def maximizeBrowser(self,*args):
-        status=webconstants_MW.TEST_RESULT_FAIL
-        result=webconstants_MW.TEST_RESULT_FALSE
-        output=OUTPUT_CONSTANT
-        err_msg=None
-        try:
-            global driver_obj
-            if(driver_obj!= None):
-                driver_obj.maximize_window()
-                logger.print_on_console('browser maximized')
-                log.info('browser maximized')
-                status=webconstants_MW.TEST_RESULT_PASS
-                result=webconstants_MW.TEST_RESULT_TRUE
-            else:
-                logger.print_on_console('Driver object is null')
-                log.error('Driver object is null')
-                err_msg = 'Driver object is null'
-        except Exception as e:
-            err_msg='ERROR OCURRED WHILE OPENING BROWSER'
-            log.error(e)
-        if err_msg is not None:
-            logger.print_on_console(err_msg)
-            log.error(err_msg)
-        return status,result,output,err_msg
+
 
     def closeSubWindows(self,*args):
+            # closeSubWindows
         status=webconstants_MW.TEST_RESULT_FAIL
         result=webconstants_MW.TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
         try:
-            global driver_obj
-            winHandles = driver_obj.window_handles
-            winHandles = driver_obj.window_handles
-            if len(winHandles) > 1:
-                for x in winHandles:
-                    if(not(parent_handle == x)):
+            if (len(args) > 1):
+                inp = args[1]
+                inp = str(inp[0])
+            if len(self.all_handles) > 1:
+                if(inp == 'ALL'):
+                    while self.all_handles[-1]!=parent_handle:
                         try:
-                            driver_obj.switch_to.window(parent_handle)
-                            driver_obj.switch_to.window(x)
+                            driver_obj.switch_to.window(self.all_handles[-1])
                             driver_obj.close()
-                            logger.print_on_console('Sub windows closed')
-                            log.info('Sub windows closed')
+                            self.all_handles=self.all_handles[0:-1]
+                            logger.print_on_console('Sub window closed')
+                            log.info('Sub window closed')
                         except Exception as e:
-                            err_msg='ERROR OCURRED WHILE OPENING BROWSER'
-                            log.error(e)
-                after_close = driver_obj.window_handles
-                after_close = driver_obj.window_handles
-                if(len(after_close) == 1):
+                            err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                else:
+                    try:
+                        driver_obj.switch_to.window(self.all_handles[-1])
+                        driver_obj.close()
+                        self.all_handles=self.all_handles[0:-1]
+                        logger.print_on_console('Sub window closed')
+                        log.info('Sub windows closed')
+                    except Exception as e:
+                        err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+
+                if(len(self.all_handles) >= 1):
                     driver_obj.switch_to.window(parent_handle)
+                    self.update_recent_handle(parent_handle)
                     status=webconstants_MW.TEST_RESULT_PASS
                     result=webconstants_MW.TEST_RESULT_TRUE
             else:
-                logger.print_on_console('No sub windows to close')
-                log.info('No sub windows to close')
+                err_msg = 'No sub windows to close'
 
         except Exception as e:
-            err_msg='ERROR OCURRED WHILE OPENING BROWSER'
-            log.error(e)
+            err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
             driver_obj.switch_to.window(parent_handle)
         if err_msg is not None:
             logger.print_on_console(err_msg)
             log.error(err_msg)
         return status,result,output,err_msg
+        
 
     def clear_cache(self,*args):
         status=webconstants_MW.TEST_RESULT_FAIL
@@ -628,7 +619,7 @@ class BrowserKeywords():
                     cookies_list=[]
                     for x in cookies:
                         cookies_list.append(x['name'])
-                    logger.print_on_console('Cookies are ',cookies_list)
+                    logger.print_on_console('Cookies are ',str(cookies_list))
                     log.info('Cookies are: ')
                     log.info(cookies_list)
                     #delete_all_cookies()
@@ -637,21 +628,130 @@ class BrowserKeywords():
                     result=webconstants_MW.TEST_RESULT_TRUE
 
                 else:
-                    logger.print_on_console('No Cookies found')
-                    log.error('No Cookies found')
                     err_msg = 'No Cookies found'
             else:
-                logger.print_on_console("This feature is available only for Internet Explorer.")
-                log.error("This feature is available only for Internet Explorer.")
                 err_msg = "This feature is available only for Internet Explorer."
         except Exception as e:
-            err_msg='ERROR OCURRED WHILE OPENING BROWSER'
+            err_msg='exception in clear cache'
             log.error(e)
         if err_msg is not None:
             logger.print_on_console(err_msg)
             log.error(err_msg)
         return status,result,output,err_msg
 
+    def switch_to_window(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        output=OUTPUT_CONSTANT
+        err_msg=None
+        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        try:
+            input=input[0]
+            try:
+                to_window=int(input)
+            except Exception as e:
+                to_window = -1
+            if not(input is None or input is '' or to_window <0):
+                logger.print_on_console(INPUT_IS+input)
+                log.info('Switching to the window ')
+                log.info(to_window)
+                self.update_window_handles()
+                window_handles=self.__get_window_handles()
+                ## Issue #190 Driver control won't switch back to parent window
+                if to_window>len(window_handles):
+                    err_msg='Window '+input+' not found'
+                    logger.print_on_console(err_msg)
+                    log.error(err_msg)
+                else:
+                    log.info('The available window handles are ')
+                    log.info(window_handles)
+                    cur_handle=driver_obj.current_window_handle
+                    from_window=-1
+                    if cur_handle in window_handles:
+                        from_window=window_handles.index(cur_handle)+1
+                        log.info('Switching from the window')
+                        log.info(from_window)
+                    if from_window>-1:
+                        driver_obj.switch_to.window(window_handles[to_window-1])
+                        self.update_recent_handle(window_handles[to_window-1])
+                        log.info('Switched to window handle '+str(driver_obj.current_window_handle))
+                        logger.print_on_console('Control switched from window ' + str(from_window)
+    							+ " to window " + str(to_window))
+                        status=TEST_RESULT_PASS
+                        methodoutput=TEST_RESULT_TRUE
+                    else:
+                        err_msg='Current window handle not found'
+            elif (input is None or input is ''):
+                window_handles=self.__get_window_handles()
+                log.info('Current window handles are ')
+                log.info(window_handles)
+                log.debug(len(window_handles))
+                if len(window_handles)>0:
+                    total_handles=len(window_handles)
+                    driver_obj.switch_to.window(window_handles[total_handles-1])
+                    ## Issue #190 Driver control won't switch back to parent window
+                    self.update_recent_handle(window_handles[total_handles-1])
+                    logger.print_on_console('Control switched to latest window')
+                    status=TEST_RESULT_PASS
+                    methodoutput=TEST_RESULT_TRUE
+            else:
+                err_msg=INVALID_INPUT
+        except Exception as e:
+            log.error(e)
+            log.info('Inside Exception block')
+            try:
+                if isinstance(e,NoSuchWindowException):
+                    window_handles=self.__get_window_handles()
+                    log.info('Current window handles are ')
+                    log.info(window_handles)
+                    log.debug(len(window_handles))
+                    if len(window_handles)>0:
+                        total_handles=len(window_handles)
+                        driver_obj.switch_to.window(window_handles[total_handles-1])
+                        ## Issue #190 Driver control won't switch back to parent window
+                        self.update_recent_handle(window_handles[total_handles-1])
+                        status=TEST_RESULT_PASS
+                        methodoutput=TEST_RESULT_TRUE
+                    else:
+                        err_msg='No handles found'
+            except Exception as e:
+                err_msg='exception in switch to window'
+        if err_msg is not None:
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
+        return status,methodoutput,output,err_msg
+
+    def __get_window_handles(self):
+        window_handles=driver_obj.window_handles
+        logger.print_on_console('Window handles size '+str(len(window_handles)))
+        return window_handles
+
+    def update_window_handles(self):
+    	## Issue #190 Driver control won't switch back to parent window
+        if driver_obj is not None:
+            try:
+                winHandles=list(driver_obj.window_handles)
+                new_handles=[]
+                invalid_handles=[]
+                self.all_handles=list(OrderedDict.fromkeys(self.all_handles))
+                for h in self.all_handles:
+                    if h in winHandles:
+                        new_handles.append(h)
+                        winHandles.remove(h)
+                    else:
+                        invalid_handles.append(h)
+                del self.all_handles[:]
+                if len(winHandles)>0:
+                    self.all_handles=new_handles+winHandles
+                else:
+                    self.all_handles=new_handles
+                #parent_handle=all_handles[0]
+                self.recent_handles=[a for a in self.recent_handles if a not in invalid_handles]
+                if len(self.recent_handles)>0:
+                    if driver_obj.current_window_handle != self.recent_handles[-1]:
+                        driver_obj.switch_to.window(self.recent_handles[-1])
+            except Exception as e:
+                log.error(e)
 
 class Singleton_DriverUtil():
 ##    def check_available_driver(self,browser_num):

@@ -134,10 +134,17 @@ class Dispatcher:
         'tab':util_object.tab,
         'actionkey':action_keyowrds_object.action_key,
         'rightclick':util_object.rightclick,
+        'iossendkey': util_object.iossendkey,
         'mouseclick':util_object.mouse_click,
         'verifywebimages':util_object.verify_web_images,
         'imagesimilaritypercentage':util_object.image_similarity_percentage,
         'waitforelementvisible':element_object.waitforelement_visible,
+        'getelementtagvalue': util_object.get_element_tag_value,
+
+           
+        # Added getAttributeValue and verifyAttribute keywords
+        'getattributevalue': util_object.get_attribute_value,
+        'verifyattribute': util_object.verify_attribute,
 
 
 
@@ -147,17 +154,17 @@ class Dispatcher:
         # 'opennewbrowser':browser_object.openNewBrowser,
         'getpagetitle':browser_object.getPageTitle,
         'getcurrenturl':browser_object.getCurrentURL,
-        'maximizebrowser':browser_object.maximizeBrowser,
         'refresh':browser_object.refresh,
         'verifycurrenturl':browser_object.verifyCurrentURL,
         'closebrowser':browser_object.closeBrowser,
         'closesubwindows':browser_object.closeSubWindows,
-        'switchtowindow':util_object.switch_to_window,
+        'switchtowindow':browser_object.switch_to_window,
         'verifytextexists':statict_text_object.verify_text_exists,
         'verifypagetitle':browser_object.verify_page_title,
         'clearcache':browser_object.clear_cache,
+        'navigateback':browser_object.navigate_back,
         'navigatewithauthenticate':browser_object.navigate_with_authenticate,
-        'iossendkey': util_object.iossendkey
+        
     }
 
     def __init__(self):
@@ -398,7 +405,7 @@ class Dispatcher:
                     if keyword == GET_INNER_TABLE and (output != '' and output.startswith('{') and output.endswith('}')):
                         webelement_map[output]=result[2]
 
-                    elif keyword not in [OPEN_BROWSER,OPEN_NEW_BROWSER,CLOSE_BROWSER]:
+                    elif keyword not in [OPEN_BROWSER,CLOSE_BROWSER]:
                         if configvalues['retrieveURL'].lower() == 'yes':
                             if result[0].lower() == 'fail':
                                 res,value=self.check_url_error_code()
