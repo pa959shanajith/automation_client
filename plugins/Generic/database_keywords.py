@@ -34,6 +34,10 @@ log = logging.getLogger('database_keywords.py')
 
 
 class DatabaseOperation():
+
+    def __init__(self):
+        self.DV = dynamic_variable_handler.DynamicVariables()
+
     def processException(self, e):
         etype = type(e)
         ae = None
@@ -363,15 +367,24 @@ class DatabaseOperation():
                 rows = cursor.fetchall()
                 columns = [column[0] for column in cursor.description]
                 ##logic for output col reading
-                self.DV = dynamic_variable_handler.DynamicVariables()
-                
-                if len(args)>1:
-                    inp_sheet = self.DV.get_dynamic_value(args[1])
+                if (args[0].startswith("{")):
+                    inp_path = self.DV.get_dynamic_value(args[0])
+                    if inp_path!=None:
+                        if len(inp_path.split(';'))>1:
+                            fields=inp_path.split(";")[0]
+                            inp_sheet=inp_path.split(";")[1]
+                        else:
+                            fields=inp_path.split(";")[0]
+                            inp_sheet=None
+                    else:
+                        fields = None
+                        inp_sheet=None
                 else:
-                    inp_sheet=None
-                out_tuple = args
-                fields = out_tuple[0]
-                path=None
+                    if len(args)>1:
+                        fields = args[0]
+                        inp_sheet=args[1]
+                    else:
+                        fields=args[0]
                 ext = self.get_ext(fields)
                 if (ext == '.xls'):
                     verify = os.path.isfile(fields)
