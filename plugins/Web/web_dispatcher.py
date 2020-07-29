@@ -572,7 +572,7 @@ class Dispatcher:
                                             logger.print_on_console('Webelement found by OI5')
                                             local_Wd.log.debug('Webelement found by OI5')
                                     if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
-                                        if(len(identifiers)==12):
+                                        if(len(identifiers)>=12):
                                             tempwebElement = driver.find_elements_by_css_selector(identifiers[11])
                                             if (len(tempwebElement) == 1):
                                                 logger.print_on_console('Webelement found by OI6')
@@ -588,7 +588,7 @@ class Dispatcher:
                                                 logger.print_on_console('Webelement found by OI5')
                                                 local_Wd.log.debug('Webelement found by OI5')
                                             if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
-                                                if(len(identifiers)==12):
+                                                if(len(identifiers)>=12):
                                                     tempwebElement = driver.find_elements_by_css_selector(identifiers[11])
                                                     if (len(tempwebElement) == 1):
                                                         logger.print_on_console('Webelement found by OI6')
@@ -599,7 +599,7 @@ class Dispatcher:
                                     except Exception as webEx:
                                         try:
                                             if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
-                                                if(len(identifiers)==12):
+                                                if(len(identifiers)>=12):
                                                     tempwebElement = driver.find_elements_by_css_selector(identifiers[11])
                                                     if (len(tempwebElement) == 1):
                                                         logger.print_on_console('Webelement found by OI6')
@@ -673,22 +673,23 @@ class Dispatcher:
                 o.debug_object(inputs,self.wxObject,self.thread,driver)
                 attributes=driver.execute_script("return JSON.parse(window.localStorage.attributes)")
                 new_ele_type=driver.execute_script("return window.localStorage.element").lower()
-                typemap={'btn': 'button',
-                        'chkbox': 'checkbox',
-                        'elmnt': 'elmnt',
-                        'img': 'img',
-                        'lst': 'list',
-                        'radiobtn': 'radiobutton',
-                        'select': 'select',
-                        'tbl': 'table',
-                        'txtbox': 'input',
-                        'lnk':'a'
-                }
-                if (typemap[identifiers[4]]!=new_ele_type):
+                tagname = identifiers[4].split("[")[0]
+                # typemap={'btn': 'button',
+                #         'chkbox': 'checkbox',
+                #         'elmnt': 'elmnt',
+                #         'img': 'img',
+                #         'lst': 'list',
+                #         'radiobtn': 'radiobutton',
+                #         'select': 'select',
+                #         'tbl': 'table',
+                #         'txtbox': 'input',
+                #         'lnk':'a'
+                # }
+                if (tagname!=new_ele_type):
                     flag=False
                 if(flag==False):
                     o = pause_display_operation.PauseAndDisplay()
-                    inputs1={'custtype':typemap[identifiers[4]],'newtype':new_ele_type}
+                    inputs1={'custtype':tagname,'newtype':new_ele_type}
                     o.debug_error(inputs1,self.wxObject,self.thread)
                 ele='//*'
                 a=[]

@@ -41,6 +41,8 @@ ERR_MSG1='Error occurred in '
 
 ERR_SET_WHOLE_BODY='Invalid input : Whole Body is invalid or missing.'
 
+ERR_SET_PARAMS='Invalid input : Whole Body is invalid or missing.'
+
 ERR_SET_TAG_VALUE='Request body is empty'
 
 ERR_AUTH_COMPONENT_MISSING = 'Invalid Input: Authentication component missing'

@@ -14,7 +14,6 @@ import logger
 import browser_Keywords_MW
 from webconstants_MW import *
 from constants import *
-import Exceptions_MW
 sourcetext= ''
 import logging
 log = logging.getLogger('static_text_keywords_MW.py')
@@ -38,7 +37,7 @@ class StaticTextKeywords:
                         cond_flag = False
                         break
         except Exception as e:
-            Exceptions_MW.error(e)
+            log.error(e)
             cond_flag = False
         return cond_flag
 

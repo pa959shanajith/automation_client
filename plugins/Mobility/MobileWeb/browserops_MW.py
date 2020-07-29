@@ -9,8 +9,6 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 
-
-
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
@@ -21,11 +19,12 @@ import subprocess
 import re
 import platform
 from constants import SYSTEM_OS
+if SYSTEM_OS != 'Darwin':
+    import psutil
 import domconstants_MW
 import logger
 import logging
 log = logging.getLogger('browserops_MW.py')
-import Exceptions_MW
 import mobile_server_utilities
 import webconstants_MW
 import mobile_key_objects
@@ -50,21 +49,45 @@ class BrowserOperations():
 
     def start_server(self):
         try:
-##            maindir = os.getcwd()
-##            os.chdir('..')
+            err_msg = None
             curdir = os.environ["AVO_ASSURE_HOME"]
             if (SYSTEM_OS != 'Darwin'):
                 path = curdir + '/plugins/Mobility/MobileApp/node_modules/appium/build/lib/main.js'
-                nodePath = curdir + "/Lib/Drivers/node.exe"
+                nodePath = os.environ["AVO_ASSURE_HOME"] + "/Lib/Drivers/node.exe"
                 proc = subprocess.Popen([nodePath, path], shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)
+                start = time.time()
+                timeout = 120 #tentative; as it depends on the system performance.
+                server_flag = False
+                while(True):
+                    if int(time.time()-start) >= timeout:
+                        err_msg = 'Timeout starting the Appium server'
+                        break
+                    processes = psutil.net_connections()
+                    for line in processes:
+                        p = line.laddr
+                        if p[1] == 4723:
+                            time.sleep(2)
+                            server_flag = True
+                            break
+                    if server_flag: break
+                    time.sleep(5)
+                if err_msg is None:
+                    logger.print_on_console('Server started')
+                    return True
             else:
-                path = curdir + '/plugins/Mobility/node_modules/appium/build/lib/main.js'
-                proc = subprocess.Popen(path, shell=False, stdin=None, stdout=None, stderr=None, close_fds=True)
-            time.sleep(15)
-            logger.print_on_console('Server started')
+                path = curdir + '/plugins/Mobility/MobileApp/node_modules/appium/build/lib/main.js'
+                nodePath = curdir + '/plugins/Mobility/MobileApp/node_modules/node_appium'
+                proc = subprocess.Popen([nodePath, path], shell=False, stdin=None, stdout=None, stderr=None, close_fds=True)
+                time.sleep(25) # psutil.net_connections() doesn't work on Mac, insearch of alternatives
+                logger.print_on_console('Server started')
+                return True
         except Exception as e:
-            log.error(e,exc_info=True)
-            logger.print_on_console('Exception in starting server')
+            err_msg = 'Error while starting server'
+            log.error(e)
+        if err_msg is not None:
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
+        return False
 
     def get_device_list(self,input_val,*args):
 
@@ -146,8 +169,6 @@ class BrowserOperations():
     def stop_server(self):
         try:
             if SYSTEM_OS != 'Darwin':
-                import psutil
-                import os
                 processes = psutil.net_connections()
                 for line in processes:
                     p = line.laddr
@@ -155,40 +176,34 @@ class BrowserOperations():
                         os.system("TASKKILL /F /PID " + str(line.pid))
                         logger.print_on_console('Server stopped')
             else:
-                import os
                 os.system("killall -9 node")
         except Exception as e:
             log.error(e,exc_info=True)
             logger.print_on_console('Exception in stopping server')
 
     def closeandroidBrowser(self  , *args):
-         mobile_server_utilities.cleardata()
-         status=webconstants_MW.TEST_RESULT_FAIL
-         result=webconstants_MW.TEST_RESULT_FALSE
-         value=''
-         try:
-
+        mobile_server_utilities.cleardata()
+        status=webconstants_MW.TEST_RESULT_FAIL
+        result=webconstants_MW.TEST_RESULT_FALSE
+        value=''
+        try:
             if( driver!= None):
-
                 driver.close()
-
                 logger.log('chrome browser closed')
                 status=webconstants_MW.TEST_RESULT_PASS
                 result=webconstants_MW.TEST_RESULT_TRUE
             else:
                 mobile_key_objects.custom_msg.append("ERR_WEB_DRIVER_EXCEPTION")
-         except Exception as e:
+        except Exception as e:
             log.error(e,exc_info=True)
             mobile_key_objects.custom_msg.append("ERR_WEB_DRIVER")
-
-         mobile_key_objects.keyword_output.append(str(status))
-         mobile_key_objects.keyword_output.append(str(value))
+        mobile_key_objects.keyword_output.append(str(status))
+        mobile_key_objects.keyword_output.append(str(value))
 
     def openBrowser(self,inputs):
         global driver
         try:
            if SYSTEM_OS == "Darwin":
-
                self.stop_server()
                self.start_server()
                input_list = inputs.split(';')
@@ -213,8 +228,6 @@ class BrowserOperations():
                    'FILE: browserops_MW.py , DEF: openSafariBrowser() , MSG:  Safari browser opened successfully')
                status = domconstants_MW.STATUS_SUCCESS
            else:
-                import psutil
-                import os
                 processes = psutil.net_connections()
                 for line in processes:
                     p = line.laddr
@@ -227,32 +240,33 @@ class BrowserOperations():
                     device_name=self.wifi_connect()
                 if device_name != '':
                     self.start_server()
-                    time.sleep(5)
                     desired_caps = {}
                     desired_caps['platformName'] = 'Android'
                     desired_caps['platformVersion'] =input_list[1]
                     desired_caps['deviceName'] = device_name
                     desired_caps['udid'] = device_name
+                    desired_caps['skipUnlock'] = True
+                    desired_caps['automationName'] = 'UiAutomator2'
                     desired_caps['browserName'] = 'Chrome'
                     desired_caps['clearSystemFiles']=True
-                    desired_caps['newCommandTimeout'] = '36000'
-                    device_version= subprocess.check_output(["adb","-s",device_name, "shell", "getprop ro.build.version.release"])
-                    device_version=str(device_version)[2:-1]
-                    device_version_data =device_version.split('\\r')
-                    version = device_version_data[-2]
-                    if (version[0] == '\\n'):
-                        version = version[1:]
-                    if str(input_list[1]) == str(version):
-                        driver= webdriver.Remote('http://localhost:4723/wd/hub', desired_caps)
-                        logger.log('FILE: browserops_MW.py , DEF: openChromeBrowser() , MSG:  Navigating to blank page')
-                        driver.get(domconstants_MW.BLANK_PAGE)
-                        logger.log('FILE: browserops_MW.py , DEF: openChromeBrowser() , MSG:  Chrome browser opened successfully')
-                        status = domconstants_MW.STATUS_SUCCESS
-                    else:
-                        logger.log('Invalid Input')
-                        mobile_key_objects.custom_msg.append("Invalid Input")
-                        status = domconstants_MW.STATUS_FAIL
-                        logger.print_on_console("Invalid Input")
+                    desired_caps['newCommandTimeout'] = 0
+                    # device_version= subprocess.check_output(["adb","-s",device_name, "shell", "getprop ro.build.version.release"])
+                    # device_version=str(device_version)[2:-1]
+                    # device_version_data =device_version.split('\\r')
+                    # version = device_version_data[-2]
+                    # if (version[0] == '\\n'):
+                    #     version = version[1:]
+                    # if str(input_list[1]) == str(version):
+                    driver= webdriver.Remote('http://localhost:4723/wd/hub', desired_caps)
+                    logger.log('FILE: browserops_MW.py , DEF: openChromeBrowser() , MSG:  Navigating to blank page')
+                    driver.get(domconstants_MW.BLANK_PAGE)
+                    logger.log('FILE: browserops_MW.py , DEF: openChromeBrowser() , MSG:  Chrome browser opened successfully')
+                    status = domconstants_MW.STATUS_SUCCESS
+                    # else:
+                    #     logger.log('Invalid Input')
+                    #     mobile_key_objects.custom_msg.append("Invalid Input")
+                    #     status = domconstants_MW.STATUS_FAIL
+                    #     logger.print_on_console("Invalid Input")
                 else:
                     status = domconstants_MW.STATUS_FAIL
 
@@ -262,10 +276,9 @@ class BrowserOperations():
             status = domconstants_MW.STATUS_FAIL
             if SYSTEM_OS == 'Darwin':
                 curdir = os.environ["AVO_ASSURE_HOME"]
-                path_node_modules = curdir + '/plugins/Mobility/node_modules'
+                path_node_modules = curdir + '/plugins/Mobility/MobileApp/node_modules'
                 if not os.path.exists(path_node_modules):
-                    logger.print_on_console("node_modules Directory not Found in /plugins/Mobility/")
+                    logger.print_on_console("node_modules Directory not Found in /plugins/Mobility/MobileApp/")
             logger.print_on_console("ERROR OCURRED WHILE OPENING BROWSER")
             log.error(e,exc_info=True)
-            ##Exceptions_MW.error(e)
         return status

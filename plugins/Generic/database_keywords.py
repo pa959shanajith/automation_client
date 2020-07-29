@@ -375,11 +375,15 @@ class DatabaseOperation():
                     try:
                         if(verify == False):
                             try:
+                                #creating the New file.
                                 work_book = xlwt.Workbook(encoding="utf-8") #Changed code
                                 if(inp_sheet is None or inp_sheet == ''):
                                     inp_sheet = generic_constants.DATABASE_SHEET
+                                try:
+                                    work_sheet = work_book.add_sheet(inp_sheet)
+                                except:
+                                    work_sheet = work_book.get_sheet(inp_sheet)
                                     
-                                work_sheet = work_book.add_sheet(inp_sheet)
                                 index_sheet = work_book.sheet_index(inp_sheet)
                                 work_book.set_active_sheet(index_sheet)
                                 log.debug('Input Sheet and file path while creating file :')
@@ -392,6 +396,7 @@ class DatabaseOperation():
                                 log.error(e)
                         else:
                             try:
+                                #opening and copy the exisiting file.
                                 rb = open_workbook(fields)
                                 work_book = xl_copy(rb)
                                 if(inp_sheet is None or inp_sheet == ''):
@@ -400,7 +405,11 @@ class DatabaseOperation():
                                     log.debug(inp_sheet)
                                     #work_book = xlwt.Workbook(encoding="utf-8")
                                     #changed the above line , becoz it removes the existing sheets.
-                                work_sheet = work_book.add_sheet(inp_sheet)
+                                try:
+                                    work_sheet = work_book.add_sheet(inp_sheet)
+                                except:
+                                    work_sheet = work_book.get_sheet(inp_sheet)
+                                    
                                 index_sheet = work_book.sheet_index(inp_sheet)
                                 work_book.set_active_sheet(index_sheet)
                             except Exception as e:
@@ -438,7 +447,11 @@ class DatabaseOperation():
                                 l+=1
                             k+=1
                         work_book.save(fields)
-                        del k,l,row,rows,y
+                        try:
+                            del k,l,row,rows,y
+                            del work_book,work_sheet,index_sheet,rb
+                        except Exception as e :
+                            log.error('some error : {}'.format(e))
                     except Exception as e:
                         err_msg = ERROR_CODE_DICT["ERR_FILE_WRITE"]
                         logger.print_on_console(err_msg)
@@ -452,14 +465,21 @@ class DatabaseOperation():
                     try:
                         if(verify == False):
                             try:
+                                #Creating the New File.
                                 work_book = openpyxl.Workbook()
-                                index_sheet=0
+                                
                                 if(inp_sheet is None or inp_sheet == ''):
                                     inp_sheet = generic_constants.DATABASE_SHEET
                                     log.debug('Input Sheet is :')
                                     log.debug(inp_sheet)
-                                    
-                                work_book.create_sheet(index=index_sheet, title=inp_sheet)
+                                    #adding the New Sheet.
+                                sheet_names = work_book.sheetnames
+                                if len(sheet_names)>0:
+                                    if inp_sheet in sheet_names:
+                                        index_sheet=sheet_names.index(inp_sheet)
+                                    else:
+                                        index_sheet = 0
+                                        work_book.create_sheet(index=index_sheet, title=inp_sheet)
                                 log.debug('Input Sheet and file path while creating file :')
                                 log.debug(inp_sheet)
                                 log.debug(fields)
@@ -470,6 +490,7 @@ class DatabaseOperation():
                                 log.error(e)
                         else:
                             try:
+                                #Opening the Exisiting File.
                                 work_book = openpyxl.load_workbook(fields)
                                 if(inp_sheet is None or inp_sheet == ''):
                                     inp_sheet = generic_constants.DATABASE_SHEET
@@ -478,15 +499,10 @@ class DatabaseOperation():
                                 
                                 sheet_names = work_book.sheetnames
                                 if len(sheet_names)>0:
-                                    try:
-                                        if inp_sheet in sheet_names:
-                                            index_sheet=sheet_names.index(inp_sheet)
-                                        else:
-                                            index_sheet = len(sheet_names)+1
-                                    
-                                        work_book.create_sheet(index=index_sheet, title=inp_sheet)
-                                    except:
-                                        index_sheet = len(sheet_names)+1
+                                    if inp_sheet in sheet_names:
+                                        index_sheet=sheet_names.index(inp_sheet)
+                                    else:
+                                        index_sheet = 0
                                         work_book.create_sheet(index=index_sheet, title=inp_sheet)
 
                             except Exception as e:
@@ -506,8 +522,11 @@ class DatabaseOperation():
                             if adjusted_width > max_col_width:
                                 max_col_width=adjusted_width
                             work_sheet.column_dimensions[get_column_letter(j)].width = max_col_width
-                        del x,columns,j,i,max_col_width,adjusted_width
-                        k=1
+                        try:
+                            del x,columns,j,i,max_col_width,adjusted_width
+                        except Exception as e :
+                            log.error('some error : {}'.format(e))
+                        k=2
                         for row in rows:
                             l=1
                             for y in row:
@@ -536,10 +555,14 @@ class DatabaseOperation():
                                     max_col_width=adjusted_width
                                 work_sheet.column_dimensions[get_column_letter(l)].width = max_col_width
                             k+=1
-                        del row,y,l,k,max_col_width,adjusted_width
+                        
                         work_book.active=index_sheet
                         work_book.save(fields)
-                        
+                        try:
+                            del row,y,l,k,max_col_width,adjusted_width
+                            del work_book,work_sheet,index_sheet
+                        except Exception as e :
+                            log.error('some error : {}'.format(e))
                     except Exception as e:
                         err_msg = ERROR_CODE_DICT["ERR_FILE_WRITE"]
                         logger.print_on_console(err_msg)
@@ -571,7 +594,6 @@ class DatabaseOperation():
                                         del ele
                                     row = tuple(newrow)
                                     writer.writerow(row)
-                                
                     csvfile.close()
                     del row,columns
                     status=generic_constants.TEST_RESULT_PASS
@@ -587,8 +609,6 @@ class DatabaseOperation():
             if cnxn is not None: cnxn.close()
         if err_msg!=None:
             logger.print_on_console(err_msg)
-        del inp_sheet,out_tuple,fields,work_book,work_sheet,index_sheet
-        del rb,sheet_names,path
         return status,result,verb,err_msg
 
     def secureExportData(self, ip , port , userName , password, dbName, query, dbtype,*args):
@@ -606,7 +626,7 @@ class DatabaseOperation():
             encryption_obj = AESCipher()
             decrypted_password = encryption_obj.decrypt(password)
             out_col = args
-            status,result,verb,err_msg=self.exportData(ip,port,userName,decrypted_password,dbName, query, dbtype, out_col[0])
+            status,result,verb,err_msg=self.exportData(ip,port,userName,decrypted_password,dbName, query, dbtype, out_col)
         except Exception as e:
             err_msg = self.processException(e)
         return status,result,verb,err_msg

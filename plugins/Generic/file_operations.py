@@ -23,14 +23,13 @@ from file_comparison_operations import TextFile,PdfFile,XML,JSON
 import excel_operations
 import core_utils
 import urllib.request, urllib.error, urllib.parse
-import xml.dom.minidom	
-import json	
-import difflib	
+import xml.dom.minidom
+import json
+import difflib
 from xmldiff import main, formatting
-
+import readconfig
+from xlrd import open_workbook
 import logging
-
-
 log = logging.getLogger('file_operations.py')
 
 
@@ -671,10 +670,8 @@ class FileOperations:
 
         """
         try:
-            ##url_save=None
-            ##import browser_Keywords
-            ##url_save=browser_Keywords.url_save
-            ##print url_save
+            configvalues = readconfig.readConfig().readJson()
+            delay_stringinput = float(configvalues['delay_stringinput'])
             import time
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
@@ -710,7 +707,7 @@ class FileOperations:
                 time.sleep(1)
 
                 #Enter the folder path
-                obj.type(folder_path)
+                obj.type(folder_path,delay_stringinput)
                 time.sleep(1)
                 #Press 'Enter' key
                 obj.execute_key('enter',1)
@@ -722,7 +719,7 @@ class FileOperations:
                 obj.press_multiple_keys(['alt','n'],1)
                 time.sleep(1)
                 #Enter the file name
-                obj.type(file_path)
+                obj.type(file_path,delay_stringinput)
                 time.sleep(1)
                 #Press 'Enter' key
                 obj.execute_key('enter',1)
@@ -765,7 +762,7 @@ class FileOperations:
 
             file_ext1,status1=self.__get_ext(input_path1)
             file_ext2,status2=self.__get_ext(input_path2)
-            
+
             if status1 == True and status2==True and file_ext1==file_ext2:
                 log.debug('verifying whether the files exists')
                 result1=self.verify_file_exists(input_path1,'')
@@ -806,7 +803,7 @@ class FileOperations:
                 except Exception as e:
                     if err_msg==None:
                         err_msg="Failed to load the JSON"
-                    log.error(e)  
+                    log.error(e)
         except Exception as e:
             err_msg=generic_constants.ERR_MSG1+'Comapring content of'+generic_constants.ERR_MSG2
             log.error(e)
@@ -865,475 +862,149 @@ class FileOperations:
         "\\u0178": "\x9F", # LATIN CAPITAL LETTER Y WITH DIAERESIS
     }
 
-    	#--------------------------------------------------------------------------------File compare	
-    def file_get_contents(self,input):	
-        if os.path.isfile(input):	
-            logger.print_on_console(input, 'This file has been found. ')	
-            with file(input) as f:	
-                s = f.read()	
-            return s	
-        else:	
-            logger.print_on_console(input, 'This file has not been found. Enter correct path. ')	
-            return input	
-
-    def beautify_xml_file(self,input):	
-        pretty_xml_as_string = ''	
-        flag = False	
-        try:	
-            if os.path.isfile(input):	
-                dom = xml.dom.minidom.parse(input)	
-            else:	
-                dom = xml.dom.minidom.parseString(input)	
-            xml_string = dom.toprettyxml()	
-            pretty_xml_as_string = xml_string.replace('<?xml version="1.0" ?>\n','',1)	
-            pretty_xml_as_string = os.linesep.join([s for s in pretty_xml_as_string.splitlines() if s.strip()])	
-            flag = True	
-        except Exception as e:	
-            logger.print_on_console('Invalid xml input ')	
-            log.error(e)	
-        if not (flag):	
-            logger.print_on_console('Unable to beautify')	
-            # self.file_get_contents(input)	
-        return pretty_xml_as_string	
-
-    def beautify_json_file(self,input):	
-        pretty_json_as_string = ''	
-        flag = False	
-        try:	
-            if os.path.isfile(input):	
-                with open(input, 'r') as handle:	
-                    parsed = json.load(handle)	
-            else:	
-                parsed = json.loads(input)	
-            pretty_json_as_string = json.dumps(parsed, indent=4)	
-            flag = True	
-        except Exception as e:	
-            logger.print_on_console('Invalid json input ')	
-            log.error(e)	
-        if not (flag):	
-            logger.print_on_console('Unable to beautify')	
-            # self.file_get_contents(input)	
-        return pretty_json_as_string	
-
-    def beautify_file(self, input_val, *args):	
-        """	
-        def : beautify_file	
-        purpose : beautifies/pretifies a file/string of type json or xml	
-        param : inputpath,file type	
-        return : beautified text, bool	
-        """	
-        status = TEST_RESULT_FAIL	
-        result = TEST_RESULT_FALSE	
-        err_msg = None	
-        value = OUTPUT_CONSTANT	
-        beautified_output = None	
-        output_path = None
-        try:	
-            if ( len(input_val) == 2):	
-                iv1 = input_val[0]	
-                iv2 = input_val[1]
-                if ( args[0] ) : 	
-                    out_path = args[0].split(";")[0]		
-                    if(not out_path.startswith("{")):	
-                        output_path = out_path	
-                if (str(iv2).lower() == 'json'):	
-                    beautified_output = self.beautify_json_file(iv1)	
-                elif (str(iv2).lower() == 'xml'):	
-                    beautified_output = self.beautify_xml_file(iv1)	
-                else:	
-                    err_msg = 'File format not supported'	
-                if(beautified_output):	
-                    flg = True	
-                    try:	
-                        if(output_path):	
-                            if(os.path.isfile(output_path) or os.path.exists(os.path.dirname(output_path))):	
-                                with open(output_path,'w') as f:	
-                                    f.write(beautified_output)	
-                            else:	
-                                flg = False	
-                                err_msg='Wrong file path entered'	
-                    except Exception as ex:	
-                        err_msg = ("Exception occurred while writing to output file in beautify_file : "+str(ex))	
-                        log.error( err_msg )	
-                        logger.print_on_console( "Error occured while writing to output file in Beautify File" )	
-                    if(flg):	
-                        value = beautified_output	
-                        status=TEST_RESULT_PASS	
-                        result=TEST_RESULT_TRUE	
-            else:	
-                err_msg = 'Invalid number of inputs'	
-            if ( err_msg != None ):	
-                log.error(err_msg)	
-                logger.print_on_console(err_msg)	
-        except Exception as e:	
-            err_msg = ("Exception occurred in beautify_file : "+str(e))	
-            log.error( err_msg )	
-            logger.print_on_console( "Error occured in Beautify File" )	
-        return status, result, value ,err_msg	
-
-    def compare_inputs(self,input_val,*args):	
-        """	
-        def : compare_inputs	
-        purpose : compares two text inputs	
-        param : inputtext-1,inputtext-2	
-        return : differed text, bool	
-        """	
-        status = TEST_RESULT_FAIL	
-        result = TEST_RESULT_FALSE	
-        err_msg = None	
-        value = OUTPUT_CONSTANT	
-        beautified_output = None	
-        res_opt = 'all'		
-        output_path = None	
-        try:	
-            if ( len(input_val) == 2 or len(input_val) == 3):	
-                inputtext1 = input_val[0]	
-                inputtext2 = input_val[1]	
-                if (len(inputtext1)!=0 and len(inputtext2)!=0):	
-                    log.info("Comparing texts...")	
-                    if ( args[0] ) : 	
-                        out_path = args[0].split(";")[0]		
-                        if(not out_path.startswith("{")):	
-                            output_path = out_path	
-                    if ( len(input_val) == 3 and (input_val[2] != None or input_val[2] != '' )) : res_opt = input_val[2].strip().lower()	
-                    output_res = self.compare_texts(inputtext1,inputtext2)	
-                    if ( output_res ):	
-                        flg = True	
-                        try:	
-                            num_diff,ch_lines = self.get_diff_count(output_res)	
-                            if(num_diff):	
-                                logger.print_on_console("The number of differences in compare_inputs are: ",num_diff)	
-                            if ( res_opt == 'selective' or res_opt == 'all') :		
-                                log.info("Result to be displayed is : " + str(res_opt))		
-                                logger.print_on_console("Result to be displayed is : " + str(res_opt))		
-                                if (res_opt == 'selective') : output_res = ch_lines	
-                            output_res = '\n'.join(output_res)	
-                            if(output_path):	
-                                if(os.path.isfile(output_path) or os.path.exists(os.path.dirname(output_path))):	
-                                    with open(output_path,'w') as f:	
-                                        f.write(output_res)	
-                                else:	
-                                    err_msg='Wrong file path entered'	
-                                    flg = False	
-                        except Exception as ex:	
-                            err_msg = ("Exception occurred while writing to output file in compare_inputs : "+str(ex))	
-                            log.error( err_msg )	
-                            logger.print_on_console( "Error occured while writing to output file in Compare Inputs" )	
-                        if(flg):	
-                            log.info("Comparision of texts completed")	
-                            value = output_res	
-                            status = TEST_RESULT_PASS	
-                            result = TEST_RESULT_TRUE	
-                else:	
-                    err_msg = 'Empty inputs'	
-            else:	
-                err_msg = 'Invalid number of inputs'	
-            if ( err_msg != None ):	
-                log.error(err_msg)	
-                logger.print_on_console(err_msg)	
-        except Exception as e:	
-            err_msg = ("Exception occurred in compare_inputs while comparing inputs"+str(e))	
-            log.error( err_msg )	
-            logger.print_on_console( "Error occured in Compare Inputs" )	
-        return status, result, value ,err_msg	
-
-    def compare_texts(self,text1,text2):	
-        """	
-        def : compare_texts	
-        purpose : compares both texts line by line	
-        param : text1,text2	
-        return : list of differences in texts	
-        """	
-        out = None	
-        try:	
-            text1_lines = text1.splitlines()	
-            text2_lines = text2.splitlines()	
-            if(text1_lines==text2_lines):	
-                logger.print_on_console( "Inputs are same" )	
-                log.info( "Inputs are same" )	
-                out = list(difflib.Differ().compare(text1_lines, text2_lines))	
-            else:	
-                out = list(difflib.Differ().compare(text1_lines, text2_lines))	
-        except Exception as e:	
-            logger.print_on_console("Exception occurred in compare_texts while comparing two texts")	
-            log.error("Exception occurred in compare_texts while comparing two texts"+str(e))	
-        return out	
-
-    def compare_xmls(self, xml_input1, xml_input2):	
-        """	
-        def : compare_xmls	
-        purpose : compares two xml files	
-        param : inputPath-1,inputPath-2	
-        return : differed xml	
-        """	
-        out = None	
-        try:	
-            text1_lines = xml_input1.splitlines()	
-            text2_lines = xml_input2.splitlines()	
-            if(text1_lines==text2_lines):	
-                logger.print_on_console( "Inputs are same" )	
-                log.info( "Inputs are same" )	
-                out = main.diff_files(xml_input1, xml_input2,diff_options={'fast_match': True},formatter=formatting.XMLFormatter(normalize=formatting.WS_BOTH)).split("\n")	
-            else:	
-                out = main.diff_files(xml_input1, xml_input2,diff_options={'fast_match': True},formatter=formatting.XMLFormatter(normalize=formatting.WS_BOTH)).split("\n")	
-        except Exception as e:	
-            logger.print_on_console("Exception occurred in compare_xmls while comparing two texts")	
-            log.error("Exception occurred in compare_xmls while comparing two texts"+str(e))	
-        return out	
-
-    def compare_files(self,input_val,*args):	
-        """	
-        def : compare_file	
-        purpose : compares two files	
-        param : inputPath-1,inputPath-2	
-        return : differed text, bool	
-        """	
-        status = TEST_RESULT_FAIL	
-        result = TEST_RESULT_FALSE	
-        err_msg = None	
-        value = OUTPUT_CONSTANT	
-        res_opt = 'all'		
-        output_path = None	
-        try:	
-            if ( len(input_val) == 2 or len(input_val) == 3):	
-                filePathA = input_val[0]	
-                filePathB = input_val[1]	
-                if ( args[0] ) : 	
-                    out_path = args[0].split(";")[0]		
-                    if(not out_path.startswith("{")):	
-                        output_path = out_path		
-                if ( len(input_val) == 3 and (input_val[2] != None or input_val[2] != '' )) : res_opt = input_val[2].strip().lower()	
-                if ( os.path.isfile(filePathA) and os.path.isfile(filePathB) ):	
-                    if( os.path.getsize(filePathA)>0 and os.path.getsize(filePathB)>0):	
-                        fileNameA, fileExtensionA = os.path.splitext(filePathA)	
-                        fileNameB, fileExtensionB = os.path.splitext(filePathB)	
-                        log.info("Comparing files...")	
-                        with open(filePathA) as fa, open(filePathB) as fb:	
-                            file1_lines=fa.read()	
-                            file2_lines=fb.read()	
-                        if(fileExtensionA == '.xml' and fileExtensionB == '.xml'):	
-                            output_res = self.compare_xmls(filePathA,filePathB)	
-                            if(output_res):	
-                                num_diff,ch_lines = self.get_diff_count_xml(output_res)	
-                        else:	
-                            output_res = self.compare_texts(file1_lines,file2_lines)	
-                            if(output_res):	
-                                num_diff,ch_lines = self.get_diff_count(output_res)		
-                                	
-                        if ( output_res ):	
-                            flg = True	
-                            try:	
-                                if ( res_opt == 'selective' or res_opt == 'all') :		
-                                    log.info("Result to be displayed is : " + str(res_opt))		
-                                    logger.print_on_console("Result to be displayed is : " + str(res_opt))		
-                                    if (res_opt == 'selective') : output_res = ch_lines	
-                                output_res = '\n'.join(output_res)	
-                                if(num_diff):	
-                                    logger.print_on_console("The number of differences in compare_file are: ",num_diff)	
-                                if(output_path):	
-                                    if(os.path.exists(output_path) or os.path.exists(os.path.dirname(output_path))):	
-                                        with open(output_path,'w') as f:	
-                                            f.write(output_res)	
-                                    else:	
-                                        err_msg='Wrong file path entered'	
-                                        flg = False	
-                            except Exception as ex:	
-                                err_msg = ("Exception occurred while writing to output file in compare_file : "+str(ex))	
-                                log.error( err_msg )	
-                                logger.print_on_console( "Error occured while writing to output file in Compare File" )	
-                            if(flg):	
-                                log.info("Comparision of files completed")	
-                                value = output_res	
-                                status = TEST_RESULT_PASS	
-                                result = TEST_RESULT_TRUE	
-                    else:	
-                        err_msg = 'One or more files are empty'	
-                else:	
-                    err_msg = 'Invalid file paths'	
-            else:	
-                err_msg = 'Invalid number of inputs'	
-            if ( err_msg != None ):	
-                log.error(err_msg)	
-                logger.print_on_console(err_msg)	
-        except Exception as e:	
-            err_msg = ("Exception occurred in compare_files while comparing two files"+str(e))	
-            log.error( err_msg )	
-            logger.print_on_console( "Error occured in Compare Files" )	
-        return status, result, value ,err_msg	
-
-    def get_diff_count(self,output_response):	
-        """	
-        def : get_diff_count	
-        purpose : counts number of differences between inputs	
-        param : difference of inputs	
-        return : count of differences	
-        """	
-        num_que = 0	
-        num_diff = 0	
-        prev_sign = ''	
-        ch_lines = []	
-        for line in output_response:	
-            if(prev_sign=='+' and (not line.startswith('?')) and num_que==1):	
-                num_diff-=1	
-                num_que=0	
-            elif(line.startswith(('-','+'))):	
-                num_diff+=1	
-                ch_lines.append(line)	
-                prev_sign=line[0]	
-            elif(line.startswith('?')):	
-                ch_lines.append(line)	
-                if(prev_sign=='-'):	
-                    num_que+=1	
-                elif(prev_sign=='+'):	
-                    num_diff-=1	
-                    num_que=0  	
-                prev_sign='?'                  	
-        return num_diff,ch_lines	
-
-    def get_diff_count_xml(self,output_response):	
-        """	
-        def : get_diff_count_xml	
-        purpose : counts number of differences between xml inputs	
-        param : difference of inputs	
-        return : count of differences	
-        """	
-        ch_lines = []	
-        num_diff = int(str(output_response).count("diff:"))-int(str(output_response).count("/diff:"))
-        for line in output_response:	
-            if(line.find("diff:") != -1):	
-                ch_lines.append(line)	
-        return num_diff,ch_lines	
-#--------------------------------------------------------------------------------File compare
-
-    def write_result_file(self,input_sheet,content):
-
-        '''
+    def write_result_file(self,outputFilePath,content,sheetname):
+        """
         def : write_result_file
         purpose : Writing the compare results into the specified file, supporting xls and xlsx extension.
-        param : input_path<>sheet;desc(Description: Details status )
+        param : outputFilePath;content;sheetname
         return : bool
-        '''
-        
-        status=False
-        err_msg=None
+        """
+        status = False
+        err_msg = None
+        result3 = None
+        index_sheet = None
         try:
-            input_path, sheetname = input_sheet.split("<>")
-            result3=self.verify_file_exists(input_path,'')
+            result3=os.path.isfile(outputFilePath)
+            file_ext,status1=self.__get_ext(outputFilePath)
 
-            if result3[1]==TEST_RESULT_TRUE:
-                file_ext,status1=self.__get_ext(input_path)
-
-                if (file_ext=='.xls'):
-                    rb = open_workbook(input_path)
+            if ( file_ext == '.xls' ):
+                #checking the file exists and open the exists file.
+                if result3==True:
+                    rb = open_workbook(outputFilePath)
                     work_book = xl_copy(rb)
-                    if(sheetname is None or sheetname == ''):
-                        sheetname = generic_constants.DATABASE_SHEET
-                        log.debug('Input Sheet is :')
-                        log.debug(sheetname)
-                        
-                    work_sheet = work_book.add_sheet(sheetname)
-                    index_sheet = work_book.sheet_index(sheetname)
-                   
-                    log.debug('Input Sheet and file path while creating file :')
-                    log.debug(sheetname)
-                    log.debug(input_path)  
-                    for column in content.keys():
-                        row = 0
-                        max_col_width=2962
-                        for value in content[column]:
-                            work_sheet.write(row,int(column),value)
-                            row+=1
-                            #add the adjusting width to expand the column.
-                            adjusted_width = len(value)*367
-                            if (len(value)*367) > max_col_width:
-                                max_col_width=(len(value)*367)
-                            work_sheet.col(int(column)).width = max_col_width
-                    work_book.set_active_sheet(index_sheet)
-                    work_book.save(input_path)
-                    del column,row,max_col_width,adjusted_width,value
-                    status=True              
-        
-                elif(file_ext=='.xlsx'):
-                    wb = openpyxl.load_workbook(input_path)
-                    if(sheetname is None or sheetname == ''):
-                        sheetname = generic_constants.DATABASE_SHEET
-                        sheet_names = wb.sheetnames
-                        log.debug('Input Sheet is :')
-                        log.debug(sheetname)
-                        index_sheet=0
-                        wb.create_sheet(index=index_sheet, title=sheetname)
-                    else:
-                        sheet_names = wb.sheetnames
-                        if len(sheet_names)>0:
-                            try:
-                                if sheetname in sheet_names:
-                                    index_sheet=sheet_names.index(sheetname)
-                                else:
-                                    index_sheet = len(sheet_names)+1
-                                    wb.create_sheet(index=index_sheet, title=sheetname)
-                            except:
-                                index_sheet = len(sheet_names)+1
-                                wb.create_sheet(index=index_sheet, title=sheetname)
-                            sheet_names = wb.sheetnames
-
-                    log.debug('Input Sheet and file path while creating file :')
-                    log.debug(sheetname)
-                    log.debug(input_path)
-                    sheet = wb[sheetname]
-                    for column in content.keys():
-                        row=1
-                        max_col_width = 2.4
-                        for value in content[column]:
-                            sheet.cell(row=row, column=int(column)+1).value = value
-                            row+=1
-                            adjusted_width = (len(value) + 2) * 1.2
-                            if adjusted_width > max_col_width:
-                                max_col_width=adjusted_width
-                            sheet.column_dimensions[get_column_letter(int(column)+1)].width = max_col_width
-                    wb.active=index_sheet
-                    wb.save(input_path)
-                    del column,row,max_col_width,adjusted_width,value
-                    status=True
-            else:
-                err_msg=result3[3]
-                if err_msg==None:
-                    status=True
                 else:
-                    status=False
+                    #creating the new file, while given file fails.
+                    work_book = xlwt.Workbook(encoding="utf-8")
+
+                log.debug('Input Sheet is :')
+                log.debug(sheetname)
+                try:
+                    #adding the new sheet.
+                    work_sheet = work_book.add_sheet(sheetname)
+
+                except:
+                    #geeting the existing sheet
+                    work_sheet = work_book.get_sheet(sheetname)
+
+                index_sheet = work_book.sheet_index(sheetname)
+
+                log.debug('Input Sheet and file path while creating file :')
+                log.debug(sheetname)
+                log.debug(outputFilePath)
+                for column in content.keys():
+                    row = 0
+                    max_col_width=2962
+                    for value in content[column]:
+                        work_sheet.write(row,int(column),value)
+                        row+=1
+                        #add the adjusting width to expand the column.
+                        adjusted_width = len(value)*367
+                        if (len(value)*367) > max_col_width:
+                            max_col_width=(len(value)*367)
+                        work_sheet.col(int(column)).width = max_col_width
+                work_book.set_active_sheet(index_sheet)
+                log.info("WorkSheet Saving : {}".format(outputFilePath))
+                work_book.save(outputFilePath)
+                del column,row,max_col_width,adjusted_width,value,work_book,work_sheet
+                status=True
+
+            elif( file_ext == '.xlsx' ):
+                if result3==True:
+                    #checking the file and open the existing file.
+                    wb = openpyxl.load_workbook(outputFilePath)
+                else:
+                    #creating the new file.
+                    wb = openpyxl.Workbook()
+
+                log.debug(sheetname)
+                sheet_names = wb.sheetnames
+                if len(sheet_names)>0:
+                    if sheetname in sheet_names:
+                        index_sheet=sheet_names.index(sheetname)
+                    else:
+                        index_sheet = 0
+                        #adding the New sheet.
+                        wb.create_sheet(index=index_sheet, title=sheetname)
+
+                log.debug('Input Sheet and file path while creating file :')
+                log.debug(sheetname)
+                log.debug(input_file)
+                #reading the existing sheet
+                sheet = wb[sheetname]
+                for column in content.keys():
+                    row=1
+                    max_col_width = 2.4
+                    for value in content[column]:
+                        sheet.cell(row=row, column=int(column)+1).value = value
+                        row+=1
+                        adjusted_width = (len(value) + 2) * 1.2
+                        if adjusted_width > max_col_width:
+                            max_col_width=adjusted_width
+                        sheet.column_dimensions[get_column_letter(int(column)+1)].width = max_col_width
+                wb.active=index_sheet
+                log.info("WorkBook Saving: {}".format(outputFilePath))
+                wb.save(outputFilePath)
+                del column,row,max_col_width,adjusted_width,value,sheet_names,wb
+                status=True
 
         except Exception as e:
             err_msg='Writing to Excel Sheet Failed'
             log.error(e)
-        log.info('Status is '+str(status))
-        del input_path,sheetname,result3,file_ext,rb,work_book,work_sheet,index_sheet,wb,sheet_names
-        return status,err_msg
+        log.info('Status of write_result_file is ' + str(status) )
+        del outputFilePath,sheetname,result3,index_sheet
+        return status, err_msg
 
-    def cell_by_cell_compare(self,input1,*args):
-    
+    def cell_by_cell_compare(self,input_val,*args):
         """
         def : cell_by_cell_compare
         purpose : compares the data of given sheets of 2 different excel files and write down the result in another result sheet.
-        param : input : input_path1<>sheet1;input_path2<>sheet2 output: input_path<>sheet(optional);desc(optional)
-        return : bool
+        param : input : <input_path1>;<sheet1(optional)>;<input_path2>;<sheet2(optional)>;<selective(optional- will print diff b/w mismatched text of each cell in provided output excel file )> output: output_path(optional)
+        return : bool/ if output file mentioned then prints cell by cell to that file
         """
-        status=False
-        err_msg=None
-        methodoutput=TEST_RESULT_FALSE
-        output_res=OUTPUT_CONSTANT
-        desc=None
+        status = TEST_RESULT_FAIL
+        result = TEST_RESULT_FALSE
+        err_msg = None
+        output = OUTPUT_CONSTANT
+        flg = False
+        desc = None
         collect_content={}
+        opt = False
+        input_path1 = None
+        sheetname1 = None
+        input_path2 = None
+        sheetname2 = None
+        output_feild = None
         log.debug('Comparing content cell by cell of .xls files ')
         try:
-            input_path1, sheetname1 = input1[0].split("<>")
-            input_path2, sheetname2 = input1[1].split("<>")
+            input_path1 = input_val[0]
+            sheetname1 = input_val[1]
+            input_path2 = input_val[2]
+            sheetname2 = input_val[3]
+            if ( len(input_val) == 5 and input_val[4].strip().lower() == 'selective'):
+                opt = True
 
-            output_filed=args[0].split(';')
-            
+            if ( args[0] ) :
+                out_path = args[0].split(";")[0]
+                if(not out_path.startswith("{")):
+                    output_feild = out_path
+
             book1 = open_workbook(input_path1)
             book2 = open_workbook(input_path2)
-            sheet1 = book1.sheet_by_name(sheetname1)
-            sheet2 = book2.sheet_by_name(sheetname2)
-            
+            if (sheetname1.strip() != ''):sheet1 = book1.sheet_by_name(sheetname1)
+            else : sheet1 = book1.sheet_by_index(0)
+            if (sheetname2.strip() != ''):sheet2 = book2.sheet_by_name(sheetname2)
+            else : sheet2 = book2.sheet_by_index(0)
+
             log.debug('verifying whether the files exists')
             result1=self.verify_file_exists(input_path1,'')
             result2=self.verify_file_exists(input_path2,'')
@@ -1354,46 +1025,61 @@ class FileOperations:
                             c2=None
                         if (c1!=None and c2!=None) and (c1!='' and c2!=''):
                             if c1 != c2:
-                                output='Not Matched'
+                                out='Not Matched'
                                 desc="Not Matched, Cell Values {} and {}".format(c1,c2)
                             else:
-                                output="Matched"
+                                out="Matched"
                                 desc="Matched"
                         elif (c1==None or c1=='') and (c2== '' or c2==None):
-                            output=''
+                            out=''
                             desc=''
                         else:
-                            output= 'Not Matched'
+                            out= 'Not Matched'
                             desc="Not Matched, Cell Values {} and {}".format(c1,c2)
 
                         if colnum not in collect_content.keys():
                             collect_content[colnum]=[]
-                            if output_filed[1].lower()=='desc':
+                            if( opt == True ):
                                 collect_content[colnum].append(desc)
                             else:
-                                collect_content[colnum].append(output)
+                                collect_content[colnum].append(out)
                         else:
-                            if output_filed[1].lower()=='desc':
+                            if( opt == True ):
                                 collect_content[colnum].append(desc)
                             else:
-                                collect_content[colnum].append(output)
-                del rownum,colnum,desc,output,c1,c2      
-                status, err_msg=self.write_result_file(output_filed[0],collect_content)
+                                collect_content[colnum].append(out)
+                del rownum, colnum, desc, out, c1, c2 #deleting variables
+                if( output_feild ):
+                    if( os.path.exists(output_feild) or os.path.exists(os.path.dirname(output_feild)) ):
+                        flg, err_msg = self.write_result_file(output_feild, collect_content, 'CellByCellCompare_Result')
+                    else:
+                        status_excel_create_file = False
+                        file_extension,status_get_ext = self.__get_ext(output_feild)
+                        if status_get_ext and file_extension is not None and file_extension in generic_constants.EXCEL_TYPES:
+                            status_excel_create_file,e_msg = self.dict[file_extension + '_create_file'](output_feild,'CellByCellCompare_Result')
+                        else:
+                            err_msg = 'Warning! : Invalid file extension. Output file format should be either ".xls" or ".xlxs".'
+                        if (status_excel_create_file):
+                            flg, err_msg = self.write_result_file(output_feild, collect_content, 'CellByCellCompare_Result')
+                    if ( flg ):
+                        status = TEST_RESULT_PASS
+                        result = TEST_RESULT_TRUE
+                else:
+                    logger.print_on_console("Output file not provided")
+                    if (collect_content) :
+                        output = collect_content
+                        status = TEST_RESULT_PASS
+                        result = TEST_RESULT_TRUE
+                    else :
+                        err_msg = "Content is empty"
             else:
-                err_msg=result1[3]
-                if err_msg==None:
-                    err_msg=result2[3]
-            if err_msg==None:
-                status=True
-                methodoutput=TEST_RESULT_TRUE
-            else:
-                status=False
-
+                err_msg = 'Error : Validity of file path 1 is : ' + str(result1[1]) + 'and validity of file path 2 is : ' + str(result2[1]) + '. Please make sure file paths entered are correct'
+            if ( err_msg ):
+                log.error(err_msg)
+                logger.print_on_console(err_msg)
         except Exception as e:
-            err_msg='Error occured in compare content of two files'
-            log.error(e)
-        log.info('Status is '+str(status))
-        del row_max,col_max,output_filed,result1,result2,collect_content
-        del input_path1,sheetname1,input_path2,sheetname2,book1,book2
-        return status,methodoutput,output_res,err_msg
-
+            err_msg = 'Error occured in compare content of two files ERR_MSG: ' + str(e)
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
+        del input_path1, sheetname1, input_path2, sheetname2, book1, book2, row_max, col_max, output_feild, result1, result2, collect_content #deleting variables
+        return status, result, output, err_msg
