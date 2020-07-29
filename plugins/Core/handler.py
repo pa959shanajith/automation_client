@@ -514,20 +514,21 @@ class Handler():
                 tsp_step=jumpTo.JumpTo(index,keyword,inputval,outputval,stepnum,testscript_name,False,apptype,additionalinfo,i,remark,testcase_details)
 
             #block which creates the step of instances of (Keywords)
-            #Implementation of Decryption of Xpath and url
-            #Currenlty implemented only for WEB and MobileWeb apptype
-            if(apptype.lower() == constants.APPTYPE_WEB or apptype.lower() == constants.APPTYPE_MOBILE ):
-                try:
-                    if len(url.strip())!=0:
-                        url=self.utils_obj.scrape_unwrap(url)
-                    if(objectname.strip() != '' and not(objectname.startswith('@'))):
-                        xpath_string=objectname.split(';')
-                        left_part=self.utils_obj.scrape_unwrap(xpath_string[0])
-                        right_part=self.utils_obj.scrape_unwrap(xpath_string[2])
-                        objectname = left_part+';'+xpath_string[1]+';'+right_part
-                except Exception as e:
-                    local_handler.log.error(e)
-            tsp_step=TestStepProperty(keyword,index,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo,i,remark,testcase_details,cord,original_device_height,original_device_width)
+            else:
+                #Implementation of Decryption of Xpath and url
+                #Currenlty implemented only for WEB and MobileWeb apptype
+                if(apptype.lower() == constants.APPTYPE_WEB or apptype.lower() == constants.APPTYPE_MOBILE ):
+                    try:
+                        if len(url.strip())!=0:
+                            url=self.utils_obj.scrape_unwrap(url)
+                        if(objectname.strip() != '' and not(objectname.startswith('@'))):
+                            xpath_string=objectname.split(';')
+                            left_part=self.utils_obj.scrape_unwrap(xpath_string[0])
+                            right_part=self.utils_obj.scrape_unwrap(xpath_string[2])
+                            objectname = left_part+';'+xpath_string[1]+';'+right_part
+                    except Exception as e:
+                        local_handler.log.error(e)
+                tsp_step=TestStepProperty(keyword,index,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo,i,remark,testcase_details,cord,original_device_height,original_device_width)
         except Exception as e:
             logger.print_on_console(e)
             local_handler.log.error(e)
