@@ -23,6 +23,7 @@ import os
 import logger
 from encryption_utility import AESCipher
 import logging
+import dynamic_variable_handler
 try:
     import pyodbc
 except:
@@ -362,8 +363,10 @@ class DatabaseOperation():
                 rows = cursor.fetchall()
                 columns = [column[0] for column in cursor.description]
                 ##logic for output col reading
+                self.DV = dynamic_variable_handler.DynamicVariables()
+                
                 if len(args)>1:
-                    inp_sheet=args[1]
+                    inp_sheet = self.DV.get_dynamic_value(args[1])
                 else:
                     inp_sheet=None
                 out_tuple = args
