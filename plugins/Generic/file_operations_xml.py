@@ -20,11 +20,13 @@ import tempfile
 import os
 import string
 import random
+import dynamic_variable_handler
 import logging
 log = logging.getLogger('file_operations_xml.py')
 
 class FileOperationsXml:
     def __init__(self):
+        self.DV = dynamic_variable_handler.DynamicVariables()
         pass
 #------------------------------------------keywords---------------------------------------------
     def getXmlBlockData(self,input_val,*args):
@@ -43,9 +45,8 @@ class FileOperationsXml:
         output_path = None
         try:
             if ( args[0] ) :
-                out_path = args[0].split(";")[0]
-                if(not out_path.startswith("{")):
-                    output_path = out_path
+                out_path = self.DV.get_dynamic_value(args[0].split(";")[0])
+                if ( out_path ): output_path = out_path
             if ( len(input_val) >= 2 ):
                 blockVal = ';'.join(input_val[1:])
                 path = input_val[0]
@@ -107,9 +108,8 @@ class FileOperationsXml:
         output_path = None
         try:
             if ( args[0] ) :
-                out_path = args[0].split(";")[0]
-                if(not out_path.startswith("{")):
-                    output_path = out_path
+                out_path = self.DV.get_dynamic_value(args[0].split(";")[0])
+                if ( out_path ): output_path = out_path
             if (len(input_val)>=3):
                 path1 = input_val[0]
                 path2 = input_val[1]
@@ -193,9 +193,8 @@ class FileOperationsXml:
         output_res = []
         try:
             if ( args[0] ) :
-                out_path = args[0].split(";")[0]
-                if(not out_path.startswith("{")):
-                    output_path = out_path
+                out_path = self.DV.get_dynamic_value(args[0].split(";")[0])
+                if ( out_path ): output_path = out_path
             if ( len(input_val) >= 3 ):
                 blockVal = ';'.join(input_val[2:])
                 blockData = input_val[1]
@@ -285,9 +284,8 @@ class FileOperationsXml:
                 if (len(inputtext1)!=0 and len(inputtext2)!=0):
                     log.info("Comparing texts...")
                     if ( args[0] ) :
-                        out_path = args[0].split(";")[0]
-                        if(not out_path.startswith("{")):
-                            output_path = out_path
+                        out_path = self.DV.get_dynamic_value(args[0].split(";")[0])
+                        if ( out_path ): output_path = out_path
                     if ( len(input_val) == 3 and (input_val[2] != None or input_val[2] != '' )) : res_opt = input_val[2].strip().lower()
                     output_res = self.compare_texts(inputtext1,inputtext2)
                     if ( output_res ):
@@ -348,9 +346,8 @@ class FileOperationsXml:
                 iv1 = input_val[0]
                 iv2 = input_val[1]
                 if ( args[0] ) :
-                    out_path = args[0].split(";")[0]
-                    if(not out_path.startswith("{")):
-                        output_path = out_path
+                    out_path = self.DV.get_dynamic_value(args[0].split(";")[0])
+                    if ( out_path ): output_path = out_path
                 if (str(iv2).lower() == 'json'):
                     beautified_output = self.beautify_json_file(iv1)
                 elif (str(iv2).lower() == 'xml'):
@@ -404,9 +401,8 @@ class FileOperationsXml:
                 filePathA = input_val[0]
                 filePathB = input_val[1]
                 if ( args[0] ) :
-                    out_path = args[0].split(";")[0]
-                    if(not out_path.startswith("{")):
-                        output_path = out_path
+                    out_path = self.DV.get_dynamic_value(args[0].split(";")[0])
+                    if ( out_path ): output_path = out_path
                 if ( len(input_val) == 3 and (input_val[2] != None or input_val[2] != '' )) : res_opt = input_val[2].strip().lower()
                 if ( os.path.isfile(filePathA) and os.path.isfile(filePathB) ):
                     if( os.path.getsize(filePathA)>0 and os.path.getsize(filePathB)>0):
