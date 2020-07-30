@@ -934,6 +934,10 @@ class Config_window(wx.Frame):
         update_check = self.rbox14.GetStringSelection()
         headless_mode = self.rbox15.GetStringSelection()
         delay_string_in = self.Delay_input.GetValue()
+        if extn_enabled == 'Yes' and headless_mode == 'Yes':
+            self.error_msg.SetLabel("Extension Enable must be disabled when in Headless Mode")
+            self.error_msg.SetForegroundColour((255,0,0))
+            return
         #----------------creating data dictionary
         data['server_ip'] = server_add.strip()
         data['server_port'] = server_port.strip()
