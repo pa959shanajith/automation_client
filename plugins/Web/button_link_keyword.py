@@ -90,15 +90,16 @@ class ButtonLinkKeyword():
                         try:
                             local_blk.log.debug('Going to perform click operation')
                             time.sleep(0.5)
-                            webelement.click()
-                            local_blk.log.info('Click operation performed using selenium click')
+                            clickinfo = browser_Keywords.local_bk.driver_obj.execute_script(webconstants.CLICK_JAVASCRIPT,webelement)
+                            local_blk.log.info('Click operation performed using javascript click')
                             local_blk.log.info(STATUS_METHODOUTPUT_UPDATE)
                             status = webconstants.TEST_RESULT_PASS
                             methodoutput = webconstants.TEST_RESULT_TRUE
                         except Exception as e:
-                            local_blk.log.error('selenium click  error occured, Trying to click using Javascript')
-                            clickinfo = browser_Keywords.local_bk.driver_obj.execute_script(webconstants.CLICK_JAVASCRIPT,webelement)
-                            local_blk.log.info('Click operation performed using javascript click')
+                            # local_blk.log.info('Click operation performed using javascript click')
+                            # local_blk.log.error('selenium click  error occured, Trying to click using Javascript')
+                            webelement.click()
+                            local_blk.log.info('Click operation performed using selenium click')
                             local_blk.log.debug('click operation info: ')
                             local_blk.log.debug(clickinfo)
                             local_blk.log.info(STATUS_METHODOUTPUT_UPDATE)
