@@ -23,6 +23,8 @@ from constants import *
 import core_utils
 import threading
 from string_ops_keywords import *
+from utilweb_operations import *
+import pyautogui
 local_blk = threading.local()
 ##text_javascript = """function stext_content(f) {     var sfirstText = '';     var stextdisplay = '';     for (var z = 0; z < f.childNodes.length; z++) {         var scurNode = f.childNodes[z];         swhitespace = /^\s*$/;         if (scurNode.nodeName === '#text' && !(swhitespace.test(scurNode.nodeValue))) {             sfirstText = scurNode.nodeValue;             stextdisplay = stextdisplay + sfirstText;         }     }     return (stextdisplay); }; return stext_content(arguments[0])"""
 class ButtonLinkKeyword():
@@ -493,24 +495,44 @@ class ButtonLinkKeyword():
             local_blk.log.debug('using Robot class to perform keyboard operation')
             robot = Robot()
             time.sleep(1)
-            #Ignoring the copying to the clipboard(due to some issues to access to the open clipboard)
             #self.__set_clipboard_data(inputfile)
             robot.sleep(1)
-            robot.key_press(Keys.alt)
+            #robot.key_press(Keys.alt)
+            '''
+
             robot.key_press(Keys.n)
             robot.sleep(1)
             robot.key_release(Keys.n)
             robot.key_release(Keys.alt)
             robot.sleep(1)
+            '''
+            pyautogui.PAUSE = 1
+            pyautogui.keyDown('alt')
+            pyautogui.keyDown('n')
+            pyautogui.PAUSE = 1
+            pyautogui.keyUp('alt')
+            pyautogui.keyUp('n')
+            pyautogui.PAUSE = 1
+
+            
             #copy_text=r'{}'.format(self.copy_text[2])
-            #robot.type_string(copy_text,0.005)
+            #print (copy_text)
+            #robot.type_string(inputfile)
+            pyautogui.typewrite(inputfile, interval=0.25)
+            pyautogui.PAUSE = 1
+            pyautogui.keyDown('enter')
+            pyautogui.PAUSE = 1
+            pyautogui.keyUp('enter')
+            pyautogui.PAUSE = 1
+            #pyautogui.press('enter')
             #robot.paste()
-            robot.type_string(inputfile)
-            robot.sleep(1)
+            '''
+            robot.sleep(0.5)
             robot.key_press(Keys.enter)
-            robot.sleep(1)
+            robot.sleep(0.5)
             robot.key_release(Keys.enter)
             robot.sleep(1)
+            '''
             local_blk.log.debug('copied clipboard data pasted to the input using robot')
             status = True
         except Exception as e:
@@ -540,22 +562,47 @@ class ButtonLinkKeyword():
         status = False
         try:
             if isinstance(browser_Keywords.local_bk.driver_obj,webdriver.Ie):
-                local_blk.log.debug('Going to perform click operation')
-                clickinfo = browser_Keywords.local_bk.driver_obj.execute_script(webconstants.CLICK_JAVASCRIPT,webelement)
-                local_blk.log.info('Click operation performed using javascript click')
-                local_blk.log.debug('click operation info: ')
-                local_blk.log.debug(clickinfo)
+                try:
+                    logger.print_on_console("new setting apply")
+                    UW=UtilWebKeywords()
+                    browser_Keywords.local_bk.driver_obj.execute_script(webconstants.FOUCS_ELE,webelement)
+                    UW.mouse_hover(webelement,(1,))
+                    pyautogui.PAUSE = 1
+                    pyautogui.keyDown('enter')
+                    #pyautogui.press('enter')
+                    pyautogui.PAUSE = 1
+                    pyautogui.keyUp('enter')
+
+                    logger.print_on_console("end new setting apply")
+                except:
+                    local_blk.log.debug('Going to perform click operation')
+                    clickinfo = browser_Keywords.local_bk.driver_obj.execute_script(webconstants.CLICK_JAVASCRIPT,webelement)
+                    local_blk.log.info('Click operation performed using javascript click')
+                    local_blk.log.debug('click operation info: ')
+                    local_blk.log.debug(clickinfo)
                 local_blk.log.info(STATUS_METHODOUTPUT_UPDATE)
                 status = True
             else:
-                local_blk.log.debug('Going to perform click operation')
-                #webelement.click()
-                self.click(webelement)
-                local_blk.log.info('Click operation performed using selenium click')
+                try:
+                    logger.print_on_console("new setting apply")
+                    UW=UtilWebKeywords()
+                    browser_Keywords.local_bk.driver_obj.execute_script(webconstants.FOUCS_ELE,webelement)
+                    UW.mouse_hover(webelement,(1,))
+                    pyautogui.PAUSE = 1
+                    pyautogui.keyDown('enter')
+                    #pyautogui.press('enter')
+                    pyautogui.PAUSE = 1
+                    pyautogui.keyUp('enter')
+
+                    logger.print_on_console("end new setting apply")
+                except:
+                    local_blk.log.debug('Going to perform click operation')
+                    webelement.click()
+                    #self.click(webelement)
+                    local_blk.log.info('Click operation performed using selenium click')
                 status = True
         except Exception as e:
             logger.print_on_console(EXCEPTION_OCCURED,e)
             local_blk.log.error(EXCEPTION_OCCURED)
             local_blk.log.error(e)
         return status
-

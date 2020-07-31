@@ -23,6 +23,7 @@ if SYSTEM_OS!='Darwin':
     import pyrobot_MW
 import table_keywords_MW
 import time
+import readconfig
 import urllib.request, urllib.parse, urllib.error, io
 import logging
 
@@ -131,7 +132,7 @@ class UtilWebKeywords:
                 self.highlight(webelement)
                 res=self.is_visible(webelement)
                 log.info('The visible status is '+str(res))
-               ## logger.print_on_console('The visible status is '+str(res))
+                logger.print_on_console('The visible status is '+str(res))
                 if res:
                     logger.print_on_console(ERROR_CODE_DICT['ERR_OBJECT_VISIBLE'])
                     log.info(ERROR_CODE_DICT['ERR_OBJECT_VISIBLE'])
@@ -157,14 +158,16 @@ class UtilWebKeywords:
         try:
             if webelement is not None:
                 #call to highlight the webelement
-                self.highlight(webelement)
+                if readconfig.configvalues['highlight_check'].strip().lower()=="yes":
+                    self.highlight(webelement)
+                # self.highlight(webelement)
                 logger.print_on_console(ERROR_CODE_DICT['MSG_ELEMENT_EXISTS'])
                 log.info(ERROR_CODE_DICT['MSG_ELEMENT_EXISTS'])
                 status=TEST_RESULT_PASS
                 methodoutput=TEST_RESULT_TRUE
         except Exception as e:
             err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
-            logger.print_on_console(e)
+            logger.print_on_console(err_msg)
             log.error(e)
         return status,methodoutput,output,err_msg
 
@@ -174,11 +177,16 @@ class UtilWebKeywords:
         output=OUTPUT_CONSTANT
         err_msg=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
-        if webelement is None:
-            logger.print_on_console(ERROR_CODE_DICT['ERR_ELEMENT_NOT_EXISTS'])
-            log.info(ERROR_CODE_DICT['MSG_ELEMENT_EXISTS'])
+        if webelement is None or webelement == '':
+            message=ERROR_CODE_DICT['ERR_ELEMENT_NOT_EXISTS']
+            logger.print_on_console(message)
+            log.info(message)
             status=TEST_RESULT_PASS
             methodoutput=TEST_RESULT_TRUE
+        else:
+            err_msg=ERROR_CODE_DICT['MSG_ELEMENT_EXISTS']
+            log.info(err_msg)
+            logger.print_on_console(err_msg)
         return status,methodoutput,output,err_msg
 
 
@@ -192,11 +200,19 @@ class UtilWebKeywords:
             if webelement is not None:
                 #call to highlight the webelement
                 self.highlight(webelement)
-                if webelement.is_enabled():
+                if readconfig.configvalues['ignoreVisibilityCheck'].strip().lower()=="no":
+                    res=self.is_visible(webelement)
+                else:
+                    res=True
+                if webelement.is_enabled() and not(res):
+                    info_msg=ERROR_CODE_DICT['The object is Hidden']
+                    logger.print_on_console(err_msg)
+                    log.info(info_msg)
+                elif webelement.is_enabled() and res:
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
                     info_msg=ERROR_CODE_DICT['MSG_OBJECT_ENABLED']
-                    #logger.print_on_console(err_msg)
+                    logger.print_on_console(err_msg)
                     log.info(info_msg)
                 else:
                     err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
@@ -218,7 +234,13 @@ class UtilWebKeywords:
             if webelement is not None:
                 #call to highlight the webelement
                 self.highlight(webelement)
-                if not(webelement.is_enabled()):
+                flag=False
+                unselectable_val=webelement.get_attribute('unselectable')
+                log.info('unselectable_val ',unselectable_val)
+                if (unselectable_val!=None and unselectable_val.lower()=='on'):
+                    flag=True
+                log.info('Disabled flag value ',str(flag))
+                if not(webelement.is_enabled()) or flag:
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
                     info_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
@@ -251,6 +273,8 @@ class UtilWebKeywords:
                     methodoutput=TEST_RESULT_TRUE
                 else:
                     err_msg=ERROR_CODE_DICT['ERR_OBJECT_VISIBLE']
+                    logger.print_on_console(err_msg)
+                    log.error(err_msg)
         except Exception as e:
             err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
             log.error(e)
@@ -317,7 +341,7 @@ class UtilWebKeywords:
                 else:
                     browser_Keywords_MW.driver_obj.execute_script(HIGHLIGHT_SCRIPT,webelement,original_style)
         except Exception as e:
-            err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+            logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
             log.error(e)
 
 
@@ -502,70 +526,6 @@ class UtilWebKeywords:
             log.error(e)
         return status,methodoutput,output,err_msg
 
-    def switch_to_window(self,webelement,input,*args):
-        status=TEST_RESULT_FAIL
-        methodoutput=TEST_RESULT_FALSE
-        output=OUTPUT_CONSTANT
-        err_msg=None
-        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
-        try:
-            input=input[0]
-            logger.print_on_console(INPUT_IS+input)
-            input=float(str(input))
-            if not(input is None or int(input) <0):
-                to_window=int(input)
-                log.info('Switching to the window ')
-                log.info(to_window)
-                window_handles=self.__get_window_handles()
-                log.info('The available window handles are ')
-                log.info(window_handles)
-                cur_handle=browser_Keywords_MW.driver_obj.current_window_handle
-                from_window=-1
-                if cur_handle in window_handles:
-                    from_window=window_handles.index(cur_handle)+1
-                    log.info('Switching from the window')
-                    log.info(from_window)
-                if from_window>-1:
-                    browser_Keywords_MW.driver_obj.switch_to.window(window_handles[to_window-1])
-                    logger.print_on_console('Switched to window handle'+browser_Keywords_MW.driver_obj.current_window_handle)
-                    logger.print_on_console('Control switched from window ' + str(from_window)
-							+ " to window " + str(to_window))
-                else:
-                    err_msg='Current window handle not found'
-                    logger.print_on_console(err_msg)
-                    log.error(err_msg)
-
-            else:
-                logger.print_on_console(INVALID_INPUT)
-                err_msg=INVALID_INPUT
-                log.error(INVALID_INPUT)
-            status=TEST_RESULT_PASS
-            methodoutput=TEST_RESULT_TRUE
-        except Exception as e:
-            etype=type(e)
-            err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
-            log.info('Inside Exception block')
-            try:
-                if isinstance(etype,NoSuchWindowException):
-                    window_handles=self.__get_window_handles()
-                    log.info('Current window handles are ')
-                    log.info(window_handles)
-                    log.debug(len(window_handles))
-                    if len(window_handles)>0:
-                        total_handles=len(window_handles)
-                        browser_Keywords_MW.driver_obj.switch_to.window(window_handles[total_handles-1])
-                        status=TEST_RESULT_PASS
-                        methodoutput=TEST_RESULT_TRUE
-                    else:
-                        err_msg='No handles found'
-            except Exception as e:
-                etype=type(e)
-                err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
-                log.error(e)
-        if err_msg is not None:
-            logger.print_on_console(err_msg)
-            log.error(err_msg)
-        return status,methodoutput,output,err_msg
 
     def mouse_click(self,webelement,input,*args):
         status=TEST_RESULT_FAIL
@@ -739,11 +699,116 @@ class UtilWebKeywords:
             log.error(err_msg)
         return status,methodoutput,output,err_msg
 
-    def __get_window_handles(self):
-        window_handles=browser_Keywords_MW.driver_obj.window_handles
-        window_handles=browser_Keywords_MW.driver_obj.window_handles
-        logger.print_on_console('Window handles size '+str(len(window_handles)))
-        return window_handles
+    
+    def get_element_tag_value(self,webelement,*args):
+        # get_element_tag_value
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output=None
+        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        if webelement is not None:
+            try:
+                if webelement.is_enabled():
+                    log.info(ERROR_CODE_DICT['MSG_OBJECT_ENABLED'])
+                    output = str(webelement.tag_name)
+                    log.info(STATUS_METHODOUTPUT_UPDATE)
+                    logger.print_on_console('Result: ',output)
+                    status=TEST_RESULT_PASS
+                    methodoutput=TEST_RESULT_TRUE
+                else:
+                    err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
+            except Exception as e:
+                err_msg="exception occur in get element tag value"
+                log.error(e)
+            if err_msg is not None:
+                logger.print_on_console(err_msg)
+                log.error(err_msg)
+        log.info(RETURN_RESULT)
+        return status,methodoutput,output,err_msg
+
+    def get_attribute_value(self,webelement,input,*args):
+        # get_attribute_value
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output=None
+        attr_name=input[0]
+        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        try:
+            if webelement != None and webelement !='':
+                log.info(INPUT_IS)
+                log.info(input)
+                if len(input)<2 and attr_name:
+                    if attr_name != 'required':
+                        output = webelement.get_attribute(attr_name)
+                    else:
+                        output = browser_Keywords_MW.driver_obj.execute_script("return arguments[0].getAttribute('required')",webelement)
+                    if output != None and output !='':
+                        logger.print_on_console('Output: ',output)
+                        status = TEST_RESULT_PASS
+                        methodoutput = TEST_RESULT_TRUE
+                    else:
+                        err_msg = 'Attribute does not exists'
+                else:
+                    err_msg = 'Failed to fetch the attribute value/Number of inputs exceeded'
+        except Exception as e:
+            err_msg = 'Error occured while fetching attribute value'
+            log.error(e)
+        if err_msg is not None:
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
+        return status,methodoutput,output,err_msg
+
+    def verify_attribute(self,webelement,input,*args):
+        # verify_attribute
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output=OUTPUT_CONSTANT
+        attr_name=input[0]
+        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        try:
+            if webelement != None and webelement !='':
+                log.info(INPUT_IS)
+                log.info(input)
+                if len(input)<3 and attr_name:
+                    if attr_name != 'required':
+                        output = webelement.get_attribute(attr_name)
+                    else:
+                        output = browser_Keywords_MW.driver_obj.execute_script("return arguments[0].getAttribute('required')",webelement)
+                    if output != None and output !='':
+                        log.info(output)
+                        if len(input)>1:
+                            result = input[1]
+                            if output == result:
+                                log.info('Attribute values matched')
+                                logger.print_on_console('Attribute values matched')
+                                status = TEST_RESULT_PASS
+                                methodoutput = TEST_RESULT_TRUE
+                            else:
+                                err_msg = 'Attribute values does not match'
+                        else:
+                            log.info('Attribute exists')
+                            logger.print_on_console('Attribute exists')
+                            status = TEST_RESULT_PASS
+                            methodoutput = TEST_RESULT_TRUE
+                    else:
+                        err_msg = 'Attribute does not exixts'
+                else:
+                    err_msg = 'Input is empty/Number of inputs exceeded'
+        except NoSuchAttributeException as ex:
+            err_msg = 'Attribute does not exixts'
+            log.error(ex)
+        except Exception as e:
+            err_msg = 'Error occured while verifying attribute'
+            log.error(e)
+        if err_msg is not None:
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
+        return status,methodoutput,output,err_msg
+
+
 
 
 
