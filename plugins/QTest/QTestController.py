@@ -76,7 +76,6 @@ class QcWindow():
             log.error(err_msg)
             logger.print_on_console(err_msg)
             log.error(e, exc_info=True)
-        # res = [{'id':1,'name':'Sample'}]
         return res
         
     def get_projects(self,filePath):
@@ -106,7 +105,6 @@ class QcWindow():
             log.error(err_msg)
             logger.print_on_console(err_msg)
             log.error(eproject, exc_info=True)
-        # res["project"] = ['Rel1']
         return res
 
     def get_suite_details(self, filePath):
@@ -134,15 +132,12 @@ class QcWindow():
         return res
 
     def list_test_set_folder(self,filePath):
-        ##The final list which contains the testsets and testset under the specified path
         res = []
         try:
             testsetpath = str(filePath["foldername"])
             almDomain = filePath["domain"]
-            log.info("project id: "+str(almDomain))
             almProject = filePath["project"]
             folderUrl = self.release_dict[almProject][0] + '&expand=descendants'
-            # folderUrl = "https://apitryout.qtestnet.com/api/v3/projects"
             response = requests.get(folderUrl, headers=self._headers,verify=False)
             JsonObject = response.json()
             # JsonObject = []
@@ -153,27 +148,20 @@ class QcWindow():
                 # newObj["testsuites"]=[{'name':i['name'],'id':i['id']} for i in cycle['test-suites']]
                 for i in cycle['test-suites']:
                     gettestrunAPI = self.Qc_Url + "/api/v3/projects/"+str(almDomain)+"/test-runs?parentId="+str(i['id'])+"&parentType=test-suite"
-                    log.info("get run url: "+gettestrunAPI)
                     res1 = requests.get(gettestrunAPI,  headers=self._headers,verify=False)
                     resp1 = res1.json()
-                    log.info("res1: "+str(resp1))
                     if 'items' in resp1:
                         testruns = [{'id':j['id'],'name':j['name']} for j in resp1['items']]
                     else:
                         testruns = [{'id':j['id'],'name':j['name']} for j in resp1]
-                    log.info("testruns: "+str(testruns))
                     newObj['testsuites'].append({'id':i['id'],'name':i['name'],'testruns':testruns})
                 # newObj[cycle['name']] = [{'name':i['name'],'id':i['id']} for i in cycle['test-suites']]
                 res.append(newObj)
-            # res = [{"testfolder": folder_list, "TestSet": tests_list}]
-            # res.append({"cycle": "abc", "testsuites": [{"name":"abcd","id":7},{"name":"abcde","id":73}]})
         except Exception as e:
             err_msg = 'Error while fetching testsuites from qTest'
             log.error(err_msg)
             logger.print_on_console(err_msg)
             log.error(e, exc_info=True)
-        # res = [{'cycle':'Cyc 1','testsuites':[{'id':1,'name':'Suite 1','testruns':[{'id':1,'name':'Run1'}]}]}]
-        log.info("res all: "+str(res))
         return res
 
     def update_qtest_run_details(self,data, tsplistLen):
@@ -194,10 +182,8 @@ class QcWindow():
             updateRequest['exe_start_date']=data['qc_status_over']['StartTime'][:10]+"T"+data['qc_status_over']['StartTime'][11:23]+"Z"
             updateRequest['exe_end_date']=data['qc_status_over']['EndTime'][:10]+"T"+data['qc_status_over']['EndTime'][11:23]+"Z"
             getstepsAPI = self.Qc_Url + "/api/v3/projects/"+str(data['qc_projectid'])+"/test-runs/"+str(data['qc_suiteid'])+"?expand=testcase.teststep"
-            log.info("getstepreq: "+str(getstepsAPI))
             res2 = requests.get(getstepsAPI,  headers=self._headers,verify=False)
             resp2 = res2.json()
-            log.info("resp2: "+str(resp2))
             
             if data['qc_stepsup']:
                 updateRequest['test_step_logs'] = []
@@ -222,12 +208,8 @@ class QcWindow():
                         break
 
             updatetestlog = self.Qc_Url + "/api/v3/projects/"+str(data['qc_projectid'])+"/test-runs/"+str(data['qc_suiteid'])+"/test-logs"
-            log.info("updateRequest: "+str(updateRequest))
-            log.info("updatetestlog: "+str(updatetestlog))
             res3 = requests.post(updatetestlog, headers = self._headers, json=updateRequest,verify=False) 
-            log.info("res3: "+str(res3))
             status = (res3.status_code == 201)
-            log.info("status "+str(status))
         except Exception as e:
             err_msg = 'Error while updating data in qTest'
             log.error(err_msg)
