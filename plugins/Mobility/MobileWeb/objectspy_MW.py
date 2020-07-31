@@ -119,7 +119,7 @@ class Object_Mapper():
 
             log.info("taking fullpage screenshot")
             maindir = os.environ["AVO_ASSURE_HOME"]
-            screen_shot_path = maindir + '/output/' + domconstants.SCREENSHOT_IMG
+            screen_shot_path = maindir + '/output/' + domconstants_MW.SCREENSHOT_IMG
             if (isinstance(self.driver, webdriver.Firefox) or isinstance(self.driver, webdriver.Chrome)):
                 screen = self.webscrapeutilsobj.fullpage_screenshot(self.driver, screen_shot_path)
             else:

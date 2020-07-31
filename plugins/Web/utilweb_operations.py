@@ -536,7 +536,7 @@ class UtilWebKeywords:
                         if webelement.is_displayed():
                             location=webelement.location
                         else:
-                        location=obj.get_element_location(webelement)
+                            location=obj.get_element_location(webelement)
                         obj.enumwindows()
                         rect=obj.rect
                         robot=pyrobot.Robot()
