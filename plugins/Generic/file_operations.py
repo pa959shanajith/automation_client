@@ -29,6 +29,7 @@ import difflib
 from xmldiff import main, formatting
 import readconfig
 from xlrd import open_workbook
+import dynamic_variable_handler
 import logging
 log = logging.getLogger('file_operations.py')
 
@@ -45,6 +46,7 @@ class FileOperations:
         self.xls_obj=excel_operations.ExcelXLS()
         self.xlsx_obj=excel_operations.ExcelXLSX()
         self.csv_obj=excel_operations.ExcelCSV()
+        self.DV = dynamic_variable_handler.DynamicVariables()
 
         """Mapping of keywords to its respective methods"""
         self.dict={'.txt_write_to_file':self.txt.write_to_file,
@@ -994,9 +996,9 @@ class FileOperations:
                 opt = True
 
             if ( args[0] ) :
-                out_path = args[0].split(";")[0]
-                if(not out_path.startswith("{")):
-                    output_feild = out_path
+                out_path = self.DV.get_dynamic_value(args[0].split(";")[0])
+                if ( out_path ): output_feild = out_path
+
 
             book1 = open_workbook(input_path1)
             book2 = open_workbook(input_path2)
@@ -1051,6 +1053,7 @@ class FileOperations:
                 del rownum, colnum, desc, out, c1, c2 #deleting variables
                 if( output_feild ):
                     if( os.path.exists(output_feild) or os.path.exists(os.path.dirname(output_feild)) ):
+                        logger.print_on_console( "Writing the output of cellByCellCompare to file : " + str(output_feild) )
                         flg, err_msg = self.write_result_file(output_feild, collect_content, 'CellByCellCompare_Result')
                     else:
                         status_excel_create_file = False
@@ -1060,6 +1063,7 @@ class FileOperations:
                         else:
                             err_msg = 'Warning! : Invalid file extension. Output file format should be either ".xls" or ".xlxs".'
                         if (status_excel_create_file):
+                            logger.print_on_console( "Writing the output of cellByCellCompare to file : " + str(output_feild) )
                             flg, err_msg = self.write_result_file(output_feild, collect_content, 'CellByCellCompare_Result')
                     if ( flg ):
                         status = TEST_RESULT_PASS

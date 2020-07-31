@@ -97,8 +97,8 @@ def get_ocr(image):
                                  Adaptive Method - It decides how thresholding value is calculated.
                                     cv2.ADAPTIVE_THRESH_MEAN_C : threshold value is the mean of neighbourhood area.
                                     cv2.ADAPTIVE_THRESH_GAUSSIAN_C : threshold value is the weighted sum of neighbourhood values where weights are a gaussian window.
-            th2 = cv2.adaptiveThreshold(img,255,cv2.ADAPTIVE_THRESH_MEAN_C,\cv2.THRESH_BINARY,11,2)
-            th3 = cv2.adaptiveThreshold(img,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,\cv2.THRESH_BINARY,11,2)
+            th2 = cv2.adaptiveThreshold(img,255,cv2.ADAPTIVE_THRESH_MEAN_C \ cv2.THRESH_BINARY,11,2)
+            th3 = cv2.adaptiveThreshold(img,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C \ cv2.THRESH_BINARY,11,2)
         2.Otsu's Binarization: it automatically calculates a threshold value from image histogram for a bimodal image.
             th3 = cv2.threshold(blur,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
         3.Simple Thresholding :
@@ -826,129 +826,133 @@ class IRISKeywords():
                     img, res = find_relative_image(elements, verifyexists)
                     log.info( 'Relative image co-ordinates : '+str(res) )
                 else:
-                    img = get_byte_mirror(element['cord'])
-                with open("cropped.png", "wb") as f:
-                    f.write(base64.b64decode(img))
-                image = cv2.imread("cropped.png")
-                text = ''
-                if(len(args[0]) >= 1 and args[0][0].lower().strip() == 'select'):
-                    if ( SYSTEM_OS != 'Darwin' ):
-                        win32clipboard.OpenClipboard()
-                        win32clipboard.EmptyClipboard()
-                        win32clipboard.CloseClipboard()
-                        height = int(element['coordinates'][3]) - int(element['coordinates'][1])
-                        opt = None
-                        if (len(args[0])==2 and args[0][1].lower().strip()=='left'):opt='left'
-                        elif ((len(args[0])==2 and args[0][1].lower().strip()=='right') or len(args[0])==1):opt='right'
-                        if (opt):
-                            def heightDiff(height,opt):
-                                h1 = h2 = None
-                                if (opt == 'right'):
-                                    h1 = -int(height/2)
-                                    h2 = int(height/2)
-                                else:
-                                    h1 = int(height/2)
-                                    h2 = -int(height/2)
-                                del opt, height # deleting variables
-                                return h1, h2
-                            def getFromClipboard(flag):
-                                text = None
-                                robot = Robot()
-                                robot.ctrl_press('c')
-                                time.sleep(1)
-                                win32clipboard.OpenClipboard()
-                                try:text = win32clipboard.GetClipboardData()
-                                except : flag = False
-                                win32clipboard.CloseClipboard()
-                                del robot # deleting variables
-                                return text, flag
-                            def dragFunctionA(c1, c2, c3, c4, h, opt):
-                                log.debug('Entering dragFunctionA ')
-                                text = None
-                                flag = True
-                                h1, h2 = heightDiff(h, opt)
-                                pyautogui.moveTo( c1, c2 + h1 )
-                                pyautogui.dragTo( c3, c4 + h2 , button = 'left')
-                                text, flag = getFromClipboard(flag)
+                    res = gotoobject(element)
+                    if(res): img = get_byte_mirror(element['cord'])
+                if (res and img):
+                    with open("cropped.png", "wb") as f:
+                        f.write(base64.b64decode(img))
+                    image = cv2.imread("cropped.png")
+                    text = ''
+                    if(len(args[0]) >= 1 and args[0][0].lower().strip() == 'select'):
+                        if ( SYSTEM_OS != 'Darwin' ):
+                            win32clipboard.OpenClipboard()
+                            win32clipboard.EmptyClipboard()
+                            win32clipboard.CloseClipboard()
+                            height = int(element['coordinates'][3]) - int(element['coordinates'][1])
+                            opt = None
+                            if (len(args[0])==2 and args[0][1].lower().strip()=='left'):opt='left'
+                            elif ((len(args[0])==2 and args[0][1].lower().strip()=='right') or len(args[0])==1):opt='right'
+                            if (opt):
+                                def heightDiff(height,opt):
+                                    h1 = h2 = None
+                                    if (opt == 'right'):
+                                        h1 = -int(height/2)
+                                        h2 = int(height/2)
+                                    else:
+                                        h1 = int(height/2)
+                                        h2 = -int(height/2)
+                                    del opt, height # deleting variables
+                                    return h1, h2
+                                def getFromClipboard(flag):
+                                    text = None
+                                    robot = Robot()
+                                    robot.ctrl_press('c')
+                                    time.sleep(1)
+                                    win32clipboard.OpenClipboard()
+                                    try:text = win32clipboard.GetClipboardData()
+                                    except : flag = False
+                                    win32clipboard.CloseClipboard()
+                                    del robot # deleting variables
+                                    return text, flag
+                                def dragFunctionA(c1, c2, c3, c4, h, opt):
+                                    log.debug('Entering dragFunctionA ')
+                                    text = None
+                                    flag = True
+                                    h1, h2 = heightDiff(h, opt)
+                                    pyautogui.moveTo( c1, c2 + h1 )
+                                    pyautogui.dragTo( c3, c4 + h2 , button = 'left')
+                                    text, flag = getFromClipboard(flag)
+                                    if not(text and flag):
+                                        text,flag = dragFunctionB( c1, c2, c3, c4, h, opt )
+                                    del c1, c2, c3, c4, opt, h, h1, h2 # deleting variables
+                                    return text, flag
+                                def dragFunctionB(c1, c2, c3, c4, h, opt):
+                                    log.debug('Entering dragFunctionB ,dragFunctionA did not work')
+                                    text = None
+                                    flag = True
+                                    h1, h2 = heightDiff(h, opt)
+                                    pyautogui.moveTo( c1, c2 + h1 )
+                                    pyautogui.drag( c3, c4 + h2 , button = 'left')
+                                    text, flag = getFromClipboard(flag)
+                                    if not(text and flag):
+                                        text,flag = dragFunctionC( c1, c2, c3, c4, h, opt )
+                                    del c1, c2, c3, c4, opt, h, h1, h2 # deleting variables
+                                    return text, flag
+                                def dragFunctionC(c1, c2, c3, c4, h, opt):
+                                    log.debug('Entering dragFunctionC ,dragFunctionB did not work')
+                                    text = None
+                                    flag = True
+                                    h1, h2 = heightDiff(h, opt)
+                                    pywinauto.mouse.press(button = 'left', coords=(c1, c2 + h1))
+                                    pywinauto.mouse.release(button = 'left', coords=(c3, c4 + h2))
+                                    text, flag = getFromClipboard(flag)
+                                    del c1, c2, c3, c4, opt, h, h1, h2 # deleting variables
+                                    return text, flag
+                                if ( opt =='left' ):#L-R
+                                    text, flag = dragFunctionA(int(element['coordinates'][0]),int(element['coordinates'][1]),int(element['coordinates'][2]),int(element['coordinates'][3]) ,height ,opt)
+                                elif (opt == 'right' ): #R-L
+                                    text, flag = dragFunctionA(int(element['coordinates'][2]),int(element['coordinates'][3]),int(element['coordinates'][0]),int(element['coordinates'][1]) ,height ,opt)
                                 if not(text and flag):
-                                    text,flag = dragFunctionB( c1, c2, c3, c4, h, opt )
-                                del c1, c2, c3, c4, opt, h, h1, h2 # deleting variables
-                                return text, flag
-                            def dragFunctionB(c1, c2, c3, c4, h, opt):
-                                log.debug('Entering dragFunctionB ,dragFunctionA did not work')
-                                text = None
-                                flag = True
-                                h1, h2 = heightDiff(h, opt)
-                                pyautogui.moveTo( c1, c2 + h1 )
-                                pyautogui.drag( c3, c4 + h2 , button = 'left')
-                                text, flag = getFromClipboard(flag)
-                                if not(text and flag):
-                                    text,flag = dragFunctionC( c1, c2, c3, c4, h, opt )
-                                del c1, c2, c3, c4, opt, h, h1, h2 # deleting variables
-                                return text, flag
-                            def dragFunctionC(c1, c2, c3, c4, h, opt):
-                                log.debug('Entering dragFunctionC ,dragFunctionB did not work')
-                                text = None
-                                flag = True
-                                h1, h2 = heightDiff(h, opt)
-                                pywinauto.mouse.press(button = 'left', coords=(c1, c2 + h1))
-                                pywinauto.mouse.release(button = 'left', coords=(c3, c4 + h2))
-                                text, flag = getFromClipboard(flag)
-                                del c1, c2, c3, c4, opt, h, h1, h2 # deleting variables
-                                return text, flag
-                            if ( opt =='left' ):#L-R
-                                text, flag = dragFunctionA(int(element['coordinates'][0]),int(element['coordinates'][1]),int(element['coordinates'][2]),int(element['coordinates'][3]) ,height ,opt)
-                            elif (opt == 'right' ): #R-L
-                                text, flag = dragFunctionA(int(element['coordinates'][2]),int(element['coordinates'][3]),int(element['coordinates'][0]),int(element['coordinates'][1]) ,height ,opt)
-                            if not(text and flag):
-                                err_msg = "Unable to select the text"
-                        else:
-                            err_msg = "Error : Invalid option"
-                elif( len(args[0])==1 and args[0][0].lower().strip() == 'date' ):
-                    img = Image.open('cropped.png')
-                    imgr = img.resize((img.size[0] * 10, img.size[1] * 10), Image.ANTIALIAS)
-                    imgr.save('scaled_cropped.png')
-                    '''
-                    image = cv2.imread('scaled_cropped.png')
-                    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-                    avg = np.mean(gray)
-                    gray = cv2.threshold(gray, 0.7*avg, 255, cv2.THRESH_BINARY_INV)[1]
-                    '''
-                    filename = 'scaled_cropped.png'
-                    img = cv2.imread(filename,0)
-                    Z = img.reshape((-1,))
+                                    err_msg = "Unable to select the text"
+                            else:
+                                err_msg = "Error : Invalid option"
+                    elif( len(args[0])==1 and args[0][0].lower().strip() == 'date' ):
+                        img = Image.open('cropped.png')
+                        imgr = img.resize((img.size[0] * 10, img.size[1] * 10), Image.ANTIALIAS)
+                        imgr.save('scaled_cropped.png')
+                        '''
+                        image = cv2.imread('scaled_cropped.png')
+                        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+                        avg = np.mean(gray)
+                        gray = cv2.threshold(gray, 0.7*avg, 255, cv2.THRESH_BINARY_INV)[1]
+                        '''
+                        filename = 'scaled_cropped.png'
+                        img = cv2.imread(filename,0)
+                        Z = img.reshape((-1,))
 
-                    # convert to np.float32
-                    Z = np.float32(Z)
+                        # convert to np.float32
+                        Z = np.float32(Z)
 
-                    # define criteria, number of clusters(K) and apply kmeans()
-                    criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 10, 1.0)
-                    K = 2
-                    ret,label,center=cv2.kmeans(Z,K,None,criteria,10,cv2.KMEANS_RANDOM_CENTERS)
-                    lbllist = np.unique(label)
+                        # define criteria, number of clusters(K) and apply kmeans()
+                        criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 10, 1.0)
+                        K = 2
+                        ret,label,center=cv2.kmeans(Z,K,None,criteria,10,cv2.KMEANS_RANDOM_CENTERS)
+                        lbllist = np.unique(label)
 
-                    # Now convert back into uint8, and make original image
-                    center = np.uint8(center)
-                    res = center[label.flatten()]
-                    res2 = res.reshape((img.shape))
-                    a=int(center[0][0]/2+center[1][0]/2)
-                    if((center[0]>center[1] and center[0][0]>center[1][0]) or (center[0]<center[1] and center[0][0]<center[1][0])):
-                        a=255 - a
-                        res2 = cv2.bitwise_not(res2)
-                    img,gray = cv2.threshold(res2,a,255,cv2.THRESH_BINARY)
-                    cv2.imwrite('demo_cropped.png', gray)
-                    text = pytesseract.image_to_string(Image.open('demo_cropped.png'))
-                    if(os.path.isfile('scaled_cropped.png')):
-                        os.remove('scaled_cropped.png')
-                    if(os.path.isfile('demo_cropped.png')):
-                        os.remove('demo_cropped.png')
+                        # Now convert back into uint8, and make original image
+                        center = np.uint8(center)
+                        res = center[label.flatten()]
+                        res2 = res.reshape((img.shape))
+                        a=int(center[0][0]/2+center[1][0]/2)
+                        if((center[0]>center[1] and center[0][0]>center[1][0]) or (center[0]<center[1] and center[0][0]<center[1][0])):
+                            a=255 - a
+                            res2 = cv2.bitwise_not(res2)
+                        img,gray = cv2.threshold(res2,a,255,cv2.THRESH_BINARY)
+                        cv2.imwrite('demo_cropped.png', gray)
+                        text = pytesseract.image_to_string(Image.open('demo_cropped.png'))
+                        if(os.path.isfile('scaled_cropped.png')):
+                            os.remove('scaled_cropped.png')
+                        if(os.path.isfile('demo_cropped.png')):
+                            os.remove('demo_cropped.png')
+                    else:
+                        text = get_ocr(image)
+                    if not( err_msg ):
+                        status= TEST_RESULT_PASS
+                        result = TEST_RESULT_TRUE
+                        value = text
+                    os.remove('cropped.png')
                 else:
-                    text = get_ocr(image)
-                if not( err_msg ):
-                    status= TEST_RESULT_PASS
-                    result = TEST_RESULT_TRUE
-                    value = text
-                os.remove('cropped.png')
+                   err_msg = "Element not found on screen."
             else:
                 err_msg = "Tesseract module not found."
             if ( err_msg ):
@@ -959,7 +963,7 @@ class IRISKeywords():
             log.error( err_msg )
             logger.print_on_console( "Error occurred in GetTextIris" )
         del element, args, img, res, elem_coordinates, const_coordintes, elements, height, image, text, opt # deleting variables
-        return status,result,value,err_msg
+        return status, result, value, err_msg
 
     def getrowcountiris(self,element,*args):
         """
@@ -990,26 +994,30 @@ class IRISKeywords():
                 img, res = find_relative_image(elements, verifyexists)
                 log.info( 'Relative image co-ordinates : '+str(res) )
             else:
-                img = get_byte_mirror(element['cord'])
-            with open("cropped.png", "wb") as f:
-                f.write(base64.b64decode(img))
-            img = cv2.imread("cropped.png")
-            hough_transform_p(img,1)
-            # rotated = imutils.rotate_bound(img, 270)
-            rotated = np.rot90(img,1)
-            cv2.imwrite("rotated.png", rotated)
-            time.sleep(1)
-            img = cv2.imread("rotated.png")
-            hough_transform_p(img,2)
-            status  = TEST_RESULT_PASS
-            result = TEST_RESULT_TRUE
-            if(len(horizontal)>0):
-                value = len(horizontal)-1
+                res = gotoobject(element)
+                if(res): img = get_byte_mirror(element['cord'])
+            if( res and img ):
+                with open("cropped.png", "wb") as f:
+                    f.write(base64.b64decode(img))
+                img = cv2.imread("cropped.png")
+                hough_transform_p(img,1)
+                # rotated = imutils.rotate_bound(img, 270)
+                rotated = np.rot90(img,1)
+                cv2.imwrite("rotated.png", rotated)
+                time.sleep(1)
+                img = cv2.imread("rotated.png")
+                hough_transform_p(img,2)
+                status  = TEST_RESULT_PASS
+                result = TEST_RESULT_TRUE
+                if(len(horizontal)>0):
+                    value = len(horizontal)-1
+                else:
+                    value = 0
+                    logger.print_on_console('Unable to detect rows')
+                os.remove('cropped.png')
+                os.remove('rotated.png')
             else:
-                value = 0
-                logger.print_on_console('Unable to detect rows')
-            os.remove('cropped.png')
-            os.remove('rotated.png')
+                err_msg = "Element not found on screen."
         except Exception as e:
             log.error("Error occurred in GetRowCountIris, Err_Msg : ",e)
             logger.print_on_console("Error occurred in GetRowCountIris")
@@ -1045,26 +1053,30 @@ class IRISKeywords():
                 img, res = find_relative_image(elements, verifyexists)
                 log.info( 'Relative image co-ordinates : '+str(res) )
             else:
-                img = get_byte_mirror(element['cord'])
-            with open("cropped.png", "wb") as f:
-                f.write(base64.b64decode(img))
-            img = cv2.imread("cropped.png")
-            hough_transform_p(img,1)
-            # rotated = imutils.rotate_bound(img, 270)
-            rotated = np.rot90(img,1)
-            cv2.imwrite("rotated.png", rotated)
-            time.sleep(1)
-            img = cv2.imread("rotated.png")
-            hough_transform_p(img,2)
-            status  = TEST_RESULT_PASS
-            result = TEST_RESULT_TRUE
-            if(len(vertical)>0):
-                value = len(vertical)-1
+                res = gotoobject(element)
+                if(res): img = get_byte_mirror(element['cord'])
+            if( res and img ):
+                with open("cropped.png", "wb") as f:
+                    f.write(base64.b64decode(img))
+                img = cv2.imread("cropped.png")
+                hough_transform_p(img,1)
+                # rotated = imutils.rotate_bound(img, 270)
+                rotated = np.rot90(img,1)
+                cv2.imwrite("rotated.png", rotated)
+                time.sleep(1)
+                img = cv2.imread("rotated.png")
+                hough_transform_p(img,2)
+                status  = TEST_RESULT_PASS
+                result = TEST_RESULT_TRUE
+                if(len(vertical)>0):
+                    value = len(vertical)-1
+                else:
+                    value = 0
+                    logger.print_on_console('Unable to detect columns')
+                os.remove('cropped.png')
+                os.remove('rotated.png')
             else:
-                value = 0
-                logger.print_on_console('Unable to detect columns')
-            os.remove('cropped.png')
-            os.remove('rotated.png')
+                err_msg = "Element not found on screen."
         except Exception as e:
             err_msg = "Error occurred in GetColCountIris, Err_Msg : " + str(e)
             log.error( err_msg )
@@ -1107,16 +1119,20 @@ class IRISKeywords():
                     img, res = find_relative_image(elements, verifyexists)
                     log.info( 'Relative image co-ordinates : '+str(res) )
                 else:
-                    img = get_byte_mirror(element['cord'])
-                with open("cropped.png", "wb") as f:
-                    f.write(base64.b64decode(img))
-                img = cv2.imread("cropped.png")
-                text = data_in_cells(img,row,col)
-                if(text != None):
-                    status  = TEST_RESULT_PASS
-                    result = TEST_RESULT_TRUE
-                    value = text
-                os.remove('cropped.png')
+                    res = gotoobject(element)
+                    if(res): img = get_byte_mirror(element['cord'])
+                if( res and img ):
+                    with open("cropped.png", "wb") as f:
+                        f.write(base64.b64decode(img))
+                    img = cv2.imread("cropped.png")
+                    text = data_in_cells(img,row,col)
+                    if(text != None):
+                        status  = TEST_RESULT_PASS
+                        result = TEST_RESULT_TRUE
+                        value = text
+                    os.remove('cropped.png')
+                else:
+                    err_msg = "Element not found on screen."
             else:
                 err_msg = "Tesseract module not found"
             if ( err_msg ):
@@ -1163,7 +1179,7 @@ class IRISKeywords():
                 pyautogui.moveTo(res[0]+ int(width/2),res[1] + int(height/2))
             else:
                 res = gotoobject(element)
-            if(len(res) > 0):
+            if( len(res) > 0 ):
                 status= TEST_RESULT_PASS
                 result = TEST_RESULT_TRUE
                 verifyexists = res
@@ -1213,20 +1229,24 @@ class IRISKeywords():
                     img, res = find_relative_image(elements, verifyexists)
                     log.info( 'Relative image co-ordinates : '+str(res) )
                 else:
-                    img = get_byte_mirror(element['cord'])
-                with open("cropped.png", "wb") as f:
-                    f.write(base64.b64decode(img))
-                image = cv2.imread("cropped.png")
-                text = get_ocr(image)
-                if(verifytext == text):
-                    status= TEST_RESULT_PASS
-                    result = TEST_RESULT_TRUE
+                    res = gotoobject(element)
+                    if(res): img = get_byte_mirror(element['cord'])
+                if( res and img ):
+                    with open("cropped.png", "wb") as f:
+                        f.write(base64.b64decode(img))
+                    image = cv2.imread("cropped.png")
+                    text = get_ocr(image)
+                    if(verifytext == text):
+                        status= TEST_RESULT_PASS
+                        result = TEST_RESULT_TRUE
+                    else:
+                        err_msg = "Values do not match"
+                        logger.print_on_console("Expected value is:", verifytext)
+                        logger.print_on_console("Actual value is:", text)
+                    value = [verifytext,text]
+                    os.remove('cropped.png')
                 else:
-                    err_msg = "Values do not match"
-                    logger.print_on_console("Expected value is:", verifytext)
-                    logger.print_on_console("Actual value is:", text)
-                value = [verifytext,text]
-                os.remove('cropped.png')
+                    err_msg = "Element not found on screen."
             else:
                 err_msg = "Tesseract module not found."
             if ( err_msg ):
