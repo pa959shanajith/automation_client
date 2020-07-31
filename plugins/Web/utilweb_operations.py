@@ -532,6 +532,10 @@ class UtilWebKeywords:
                         methodoutput=TEST_RESULT_TRUE
                     else:
                         obj=Utils()
+                        #Scroll happens only if webelement is not displayed on screen.
+                        if webelement.is_displayed():
+                            location=webelement.location
+                        else:
                         location=obj.get_element_location(webelement)
                         obj.enumwindows()
                         rect=obj.rect

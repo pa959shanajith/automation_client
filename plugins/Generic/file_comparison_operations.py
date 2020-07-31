@@ -458,9 +458,12 @@ class XML:
                 tree = ET.XML(content)
             except:
                 tree = ET.XML(content.encode('UTF-8'))
-            rough_string = ElementTree.tostring(tree,'utf-8')
-            reparsed = minidom.parseString(rough_string)
-            val=reparsed.toprettyxml(indent="\t")
+            if 'Envelope' in tree.tag and tree.tag.split('}')[1] == 'Envelope':
+                val=content
+            else:
+                rough_string = ElementTree.tostring(tree,'utf-8')
+                reparsed = minidom.parseString(rough_string)
+                val=reparsed.toprettyxml(indent="\t")
             with open(input_path, 'w') as file:
                 #val=val.encode('utf-8')
                 file.write(val)

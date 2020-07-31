@@ -188,7 +188,10 @@ class ElementKeywords:
                     obj=Utils()
                     local_eo.log.debug('Utils object created to call the get_element_location method')
                      #find the location of the element w.r.t viewport
-                    location=obj.get_element_location(webelement)
+                    if webelement.is_displayed():
+                        location=webelement.location
+                    else:
+                        location=obj.get_element_location(webelement)
                     local_eo.log.info('location is :')
                     local_eo.log.info(location)
                     from selenium import webdriver
@@ -234,7 +237,10 @@ class ElementKeywords:
                     obj=Utils()
                     local_eo.log.debug('Utils object created to call the get_element_location method')
                      #find the location of the element w.r.t viewport
-                    location=obj.get_element_location(webelement)
+                    if webelement.is_displayed():
+                        location=webelement.location
+                    else:
+                        location=obj.get_element_location(webelement)
                     local_eo.log.info('location is :')
                     local_eo.log.info(location)
                     import time
