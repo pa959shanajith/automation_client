@@ -146,7 +146,6 @@ GET_INNER_TABLE='getinnertable'
 
 OPEN_BROWSER='openbrowser'
 
-OPEN_NEW_BROWSER='opennewbrowser'
 
 CLOSE_BROWSER='closebrowser'
 

@@ -53,28 +53,34 @@ class CustomKeyword:
 
     def switch_to_iframe(self,url,window_handle):
         try:
-            input_url=url.replace("f", "-frame");
-            input_url=url.replace("i", "-iframe");
-            curr_window_handle=browser_Keywords.local_bk.driver_obj.current_window_handle
-            if window_handle !='':
-                curr_window_handle=window_handle
-            logger.print_on_console('Url is '+url)
-            indiframes = url.split('/')
-            browser_Keywords.local_bk.driver_obj.switch_to.window(curr_window_handle)
-            #0i/1f
-            for i in indiframes:
-                if i is not '':
-                    frame_iframe = 'frame'
-                    j = i.rstrip(i[-1:])
-                    if i[-1:] == 'i':
-                        frame_iframe = 'iframe'
-                    logger.print_on_console('It is '+frame_iframe)
-                    if j=='':
-                        continue
-                    browser_Keywords.local_bk.driver_obj.switch_to.frame(browser_Keywords.local_bk.driver_obj.find_elements_by_tag_name(frame_iframe)[int(j)])
-            log_msg='Control switched to frame/iframe '+input_url
-            logger.print_on_console(log_msg)
-            local_ck.log.info(log_msg)
+            if url.find('frame') != -1 or url.find('iframe') != -1:
+                browser_Keywords.local_bk.driver_obj.switch_to.frame(browser_Keywords.local_bk.driver_obj.find_elements_by_xpath(url)[0])
+                log_msg='Control switched to frame/iframe '
+                logger.print_on_console(log_msg)
+                local_ck.log.info(log_msg)
+            else:
+                input_url=url.replace("f", "-frame");
+                input_url=url.replace("i", "-iframe");
+                curr_window_handle=browser_Keywords.local_bk.driver_obj.current_window_handle
+                if window_handle !='':
+                    curr_window_handle=window_handle
+                logger.print_on_console('Url is '+url)
+                indiframes = url.split('/')
+                browser_Keywords.local_bk.driver_obj.switch_to.window(curr_window_handle)
+                #0i/1f
+                for i in indiframes:
+                    if i is not '':
+                        frame_iframe = 'frame'
+                        j = i.rstrip(i[-1:])
+                        if i[-1:] == 'i':
+                            frame_iframe = 'iframe'
+                        logger.print_on_console('It is '+frame_iframe)
+                        if j=='':
+                            continue
+                        browser_Keywords.local_bk.driver_obj.switch_to.frame(browser_Keywords.local_bk.driver_obj.find_elements_by_tag_name(frame_iframe)[int(j)])
+                log_msg='Control switched to frame/iframe '+input_url
+                logger.print_on_console(log_msg)
+                local_ck.log.info(log_msg)
         except WebDriverException as e:
             err_msg='Control failed to switched to frame/iframe '+input_url
             local_ck.log.error(err_msg)

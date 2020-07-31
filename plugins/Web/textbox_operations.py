@@ -144,11 +144,19 @@ class TextboxKeywords:
                             if user_input is not None:
                                 input=user_input
                             if not(isvisble) and self.__check_visibility_from_config():
-                                self.clear_text(webelement)
+                                try:
+                                    self.clear_text(webelement)
+                                except Exception as e:
+                                    local_to.log.error('Exception in clearing text')
+                                    pass
                                 local_to.log.debug('Sending the value via part 1')
                                 browser_Keywords.local_bk.driver_obj.execute_script(SET_TEXT_SCRIPT,webelement,input)
                             else:
-                                webelement.clear()
+                                try:
+                                    webelement.clear()
+                                except Exception as e:
+                                    local_to.log.error('Exception in clearing text')
+                                    pass
                                 if(isinstance(browser_Keywords.local_bk.driver_obj,selenium.webdriver.Ie) and self.__check_IE_64bit_from_config):
                                     for i in range (0,len(input)+1):
                                         browser_Keywords.local_bk.driver_obj.execute_script(SET_TEXT_SCRIPT,webelement,input[0:i])

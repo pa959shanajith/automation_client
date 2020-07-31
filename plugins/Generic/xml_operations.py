@@ -28,12 +28,13 @@ class XMLOperations():
         #checking for xml file.
         try:
             if os.path.exists(input_string):
-            
+
                 filename,file_ext = os.path.splitext(input_string)
-                
+
                 if file_ext.find('.xml')!=-1:
-                    tree = ET.parse(input_string)
-                    input_string = ElementTree.tostring(tree.getroot()).decode('utf8')
+                    input_string=open(input_string, "r").read()
+                    # tree = ET.parse(input_string)
+                    # input_string = ElementTree.tostring(tree.getroot()).decode('utf8')
                     log.info("Result : XML file to string")
                 elif file_ext.find('.json')!=-1:
                     with open(input_string) as file_open:
@@ -42,15 +43,15 @@ class XMLOperations():
                 else:
                     log.debug("Please Pass the XML/JSON file with proper extension")
                     logger.print_on_console("Please Pass the XML/JSON file with proper extension")
-                    
+
             elif isinstance(input_string,str):
-                
+
                 log.info("Passed input is a string")
                 logger.print_on_console("Passed input is a string")
             else:
                 log.debug("Unable to find the specified path")
                 logger.print_on_console("Unable to find the specified path")
-                
+
         except Exception as e:
             log.debug(e)
             return input_string
@@ -73,8 +74,8 @@ class XMLOperations():
                 keys.update(val)
          else:
             keys[key]=value
-            
-            
+
+
       print ("Keys {}".format(keys))
       return keys
 
@@ -95,7 +96,7 @@ class XMLOperations():
         exception_json=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
-            
+
             input_string=self.check_xml_json_file(input_string)
             encoded_inp_string=input_string
             json_obj=None
@@ -212,7 +213,7 @@ class XMLOperations():
         log.info(RETURN_RESULT)
         return status,methodoutput,block_count,err_msg
 
-    def get_tag_value(self,input_string,block_number,input_tag,child_tag,*args):
+    def get_tag_value(self,input_string,input_tag,block_number,child_tag,*args):
         """
         def : get_tag_value
         purpose : get_tag_value is used to get the Tag Value of the specified tag in the given XML
@@ -240,65 +241,65 @@ class XMLOperations():
             #this condition checks if the XML type received is SOAP type
             #if true then "items" are added using looping
             #else the regular flow continues
-            if 'Envelope' in root.tag and root.tag.split('}')[1] == 'Envelope':
-                for elem in root.iter():
-                    if elem.tag.find('}')!=-1:
-                        tag = elem.tag.split('}')[1]
-                    else:
-                        tag = elem.tag
-                    if tag == input_tag:
-                        items.append(elem)
-            else:
-##                items = root.getiterator(str(input_tag))
-                items = list(root.getiterator(input_tag))
-            log.debug(items)
-            log.debug('Getting children node from the root')
-            if len(items) > 0:
-                log.debug('There are children in the root node, get the total number of children')
-                block_count = len(items)
-                block_number = int(block_number)
-                block = items[block_number-1].getchildren()
-##                log.info('Block number: ' + str(block_number))
-                log.info('Block number: ')
-                log.info(block_number)
-                if len(block)==0:
-                    block=[items[0]]
-                list_tag=[]
-                for child in block:
-                    log.info('Iterating child in the block')
-                    # added condition in 'or' for SOAP types
-##                    if child.tag == str(child_tag) or ('}' in child.tag
-##                                and child.tag.split('}')[1] == str(child_tag)):
-                    if child.tag == child_tag or ('}' in child.tag
-                        and child.tag.split('}')[1] == child_tag):
-                        log.info('Child matched with the input child tag')
-                        if len(args)>0:
-                            attribute=args[0]
-                            attribute_dict=child.attrib
-                            if attribute in attribute_dict:
-                                tagvalue=attribute_dict[attribute]
-                                logger.print_on_console('Tag Attribute : ',attribute, ' Tag Value : ',tagvalue)
-                                log.info('Got the child attribute value and stored in tagvalue')
-                                log.info(STATUS_METHODOUTPUT_UPDATE)
-                                status = TEST_RESULT_PASS
-                                methodoutput = TEST_RESULT_TRUE
-                            else:
-                                logger.print_on_console('Invalid attribute key')
-                                log.info('Invalid attribute key')
+            # if 'Envelope' in root.tag and root.tag.split('}')[1] == 'Envelope':
+            #     for elem in root.iter():
+            #         tag = elem.tag.split('}')[1]
+            #         if tag == input_tag:
+            #             items.append(elem)
+            val=''
+            j = JSONOperations()
+            status,methodoutput,val,err_msg=j.parsexmltodict(input_string,input_tag,block_number,child_tag,args)
+#             else:
+# ##                items = root.getiterator(str(input_tag))
+#                 items = list(root.getiterator(input_tag))
+#             log.debug(items)
+#             log.debug('Getting children node from the root')
+#             if len(items) > 0:
+#                 log.debug('There are children in the root node, get the total number of children')
+#                 block_count = len(items)
+#                 block_number = int(block_number)
+#                 block = items[block_number-1].getchildren()
+# ##                log.info('Block number: ' + str(block_number))
+#                 log.info('Block number: ')
+#                 log.info(block_number)
+#                 if len(block)==0:
+#                     block=[items[0]]
+#                 list_tag=[]
+#                 for child in block:
+#                     log.info('Iterating child in the block')
+#                     # added condition in 'or' for SOAP types
+# ##                    if child.tag == str(child_tag) or ('}' in child.tag
+# ##                                and child.tag.split('}')[1] == str(child_tag)):
+#                     if child.tag == child_tag or ('}' in child.tag
+#                         and child.tag.split('}')[1] == child_tag):
+#                         log.info('Child matched with the input child tag')
+#                         if len(args)>0:
+#                             attribute=args[0]
+#                             attribute_dict=child.attrib
+#                             if attribute in attribute_dict:
+#                                 tagvalue=attribute_dict[attribute]
+#                                 logger.print_on_console('Tag Attribute : ',attribute, ' Tag Value : ',tagvalue)
+#                                 log.info('Got the child attribute value and stored in tagvalue')
+#                                 log.info(STATUS_METHODOUTPUT_UPDATE)
+#                                 status = TEST_RESULT_PASS
+#                                 methodoutput = TEST_RESULT_TRUE
+#                             else:
+#                                 logger.print_on_console('Invalid attribute key')
+#                                 log.info('Invalid attribute key')
 
 
-                        else:
-                            tagvalue =  child.text
-                            logger.print_on_console('Tag : ',input_tag, ' Tag Value : ',tagvalue)
-                            log.info('Got the child text value and stored in tagvalue')
-                            log.info(STATUS_METHODOUTPUT_UPDATE)
-                            status = TEST_RESULT_PASS
-                            methodoutput = TEST_RESULT_TRUE
-                        list_tag.append(tagvalue)
-                    else:
-                        invalidinput = True
-                if status == TEST_RESULT_FAIL:
-                    err_msg=INVALID_INPUT + ' Please check the input tag'
+#                         else:
+#                             tagvalue =  child.text
+#                             logger.print_on_console('Tag : ',input_tag, ' Tag Value : ',tagvalue)
+#                             log.info('Got the child text value and stored in tagvalue')
+#                             log.info(STATUS_METHODOUTPUT_UPDATE)
+#                             status = TEST_RESULT_PASS
+#                             methodoutput = TEST_RESULT_TRUE
+#                         list_tag.append(tagvalue)
+#                     else:
+#                         invalidinput = True
+#                 if status == TEST_RESULT_FAIL:
+#                     err_msg=INVALID_INPUT + ' Please check the input tag'
         except Exception as e:
             log.error(e)
             if isinstance(e,ValueError):
@@ -311,10 +312,12 @@ class XMLOperations():
             log.error(err_msg)
             logger.print_on_console(err_msg)
         log.info(RETURN_RESULT)
-        if len(list_tag) <=1:
-            tagvalue=list_tag[0]
-        else:
-            tagvalue=list_tag
+        # if len(list_tag) <=1:
+        #     tagvalue=list_tag[0]
+        # else:
+        #     tagvalue=list_tag
+        if isinstance(val,str):
+            tagvalue=val
         return status,methodoutput,tagvalue,err_msg
 
     def get_block_value(self,input_string,block_number,input_tag):
@@ -409,7 +412,7 @@ class XMLOperations():
                     log.info('Block number: ',block_number)
                     block = blocks[block_number-1].getchildren()
                     log.info('Iterating child in the block')
-                    for child in block:   
+                    for child in block:
                         if '}' in child.tag:
                             if child.text != None:
                                 log.info('Child text :',child.text)
@@ -523,7 +526,7 @@ class JSONOperations():
         err_msg=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
-        
+
             xml_class=XMLOperations()
             input_string=xml_class.check_xml_json_file(input_string)
             encoded_inp_string=input_string
@@ -579,4 +582,65 @@ class JSONOperations():
             err_msg=EXCEPTION_OCCURED
             log.error(e)
 ##        key_value=key_value.encode('utf-8')
+        return status,methodoutput,key_value,err_msg
+
+    def parsexmltodict(self,input_string,block_key_name,block_count,key_name,args):
+        status = TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FALSE
+        err_msg=None
+        import xmltodict
+        input_json=xmltodict.parse(input_string)
+        #logger.print_on_console(input_json)
+        block=block_key_name.split('.')
+        number=block_count.split(',')
+        nested=input_json
+        key_value=None
+        for i in range(0,len(block)):
+            if(block[i] in nested and isinstance(nested,dict)):
+                nested=nested[block[i]]
+            elif(isinstance(nested,list)):
+                if int(number[i])-1 != -1:
+                    nested=nested[int(number[i])-1]
+                else:
+                    nested=nested[0]
+
+        try:
+            if isinstance(nested,list) and int(number[i]) != None and int(number[i])!='':
+                if int(number[i])-1 != -1 :
+                    if key_name in nested[int(number[i])-1]:
+                        key_value = nested[int(number[i])-1][key_name];
+                        #logger.print_on_console('Tag : ',key_name, ' Value : ',key_value)
+                        status = TEST_RESULT_PASS
+                        methodoutput = TEST_RESULT_TRUE
+                    else:
+                        log.debug('Invalid key given')
+                        err_msg= ERR_XML
+                else:
+                    log.debug('Index out of range')
+                    err_msg= ERR_XML
+            elif isinstance(nested,dict):
+                if key_name in nested:
+                    key_value = nested[key_name]
+                    #logger.print_on_console('Tag : ',key_name, ' Value : ',key_value)
+                    status = TEST_RESULT_PASS
+                    methodoutput = TEST_RESULT_TRUE
+                else:
+                    log.debug('Invalid key given')
+                    err_msg= ERR_XML
+            else:
+                    key_value = nested[0][key_name];
+                    #logger.print_on_console('Tag : ',key_name, ' Value : ',key_value)
+                    status = TEST_RESULT_PASS
+                    methodoutput = TEST_RESULT_TRUE
+            if len(args)>0:
+                attr='@'+args[0]
+                key_value=key_value[int(number[i])-1][attr]
+                logger.print_on_console('Tag Attribute : ',key_name, ' Attribute Value : ',key_value)
+            else:
+                logger.print_on_console('Tag : ',key_name, ' Value : ',key_value)
+        except Exception as e:
+            err_msg=ERR_XML
+            logger.print_on_console(err_msg)
+            log.error(e)
+
         return status,methodoutput,key_value,err_msg
