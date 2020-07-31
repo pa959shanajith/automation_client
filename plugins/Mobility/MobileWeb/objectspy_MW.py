@@ -24,75 +24,125 @@ if SYSTEM_OS!="Darwin":
     import win32con
 import logger
 import logging
+from selenium import webdriver
+from core_utils import CoreUtils
+log = logging.getLogger(__name__)
+from webscrape_utils_MW import WebScrape_Utils
+import domconstants_MW
 
-log = logging.getLogger('objectspy.py')
+# log = logging.getLogger('objectspy.py')
 currenthandle=''
 
 class Object_Mapper():
+    coreutilsobj = CoreUtils()
+    webscrapeutilsobj = WebScrape_Utils()
 
-    def compare(self):
-        find_ele=highlight_MW.Highlight()
-        global currenthandle
-        with open(os.environ["AVO_ASSURE_HOME"] + '/output/domelements_scraped.json') as data_file:
-            self.data = json.load(data_file)
-            driver = browser_Keywords_MW.driver_obj
-            # time.sleep(10)
-            log.info( 'Obtained browser handle and driver from browser_Keywords_MW.py class .....')
+    def __init__(self):
+        self.driver = browser_Keywords_MW.driver_obj
+        self.currenthandle = None
+        self.changedobjects = []
+        self.changedobjectskeys = []
 
-            log.info( 'Minimizing the foreground window i.e tool and assuming AUT on top .....')
+        self.notchangedobjects = []
+
+        self.notfoundobjects = []
+        self.notfoundobjectskeys = []
+        self.viewdata= []
+        self.data ={}
+        self.status = domconstants_MW.STATUS_FAIL
+
+    def perform_compare(self,elementsdata):
+        try:
+            log.info('Inside perform_compare method')
             javascript_hasfocus = """return(document.hasFocus());"""
-
-            for eachdriverhand in driver.window_handles:
-                log.info( 'Iterating through the number of windows open by the driver')
-                driver.switch_to.window(eachdriverhand)
-                log.info( 'Switching to each handle and checking weather it has focus ')
+            for eachdriverhand in self.driver.window_handles:
+                log.info('Iterating through the number of windows open by the driver')
+                self.driver.switch_to.window(eachdriverhand)
+                log.info('Switching to each handle and checking weather it has focus ')
                 time.sleep(3)
-                if (driver.execute_script(javascript_hasfocus)):
-                        log.info( 'Got the window which has the focus')
-                        currenthandle = eachdriverhand
-            for element  in self.data['view']:
-                    updated_ele=find_ele.highlight('OBJECTMAPPER'+','+element['xpath']+','+element['url'],element,currenthandle)
+                if (self.driver.execute_script(javascript_hasfocus)):
+                    log.info('Got the window which has the focus')
+                    self.currenthandle = eachdriverhand
+            log.info("Comparing %d objects",len(elementsdata['view']))
+            if  not "scrapedurl" in elementsdata.keys():
+                raise Exception("Invalid url, Unable to navigate to the website")
+            count = 0
+            for element in elementsdata['view']:
+                # XPath and URL decryption logic implemented
+                xpath_string = element['xpath'].split(';')
+                if not xpath_string[0]:
+                    raise ValueError('xpath of the object is empty')
+                left_part = self.coreutilsobj.scrape_unwrap(xpath_string[0])
+                right_part = self.coreutilsobj.scrape_unwrap(xpath_string[2])
+                decryptedxpath = left_part + ';' + xpath_string[1] + ';' + right_part
+                decryptedelementurl = self.coreutilsobj.scrape_unwrap(element['url'])
+                identifiers = decryptedxpath.split(';')
 
+                # Locate the webelement
+                if self.webscrapeutilsobj.is_iframe_frame_url(decryptedelementurl):
+                    self.webscrapeutilsobj.switchtoframe_webscrape(self.driver, self.currenthandle, decryptedelementurl)
+                webElement = self.webscrapeutilsobj.locate_webelement(self.driver, identifiers)
+                if webElement is not None:
+                    new_properties = self.driver.execute_script(self.webscrapeutilsobj.javascript_get_object_properties,webElement[0],decryptedelementurl)[0]
+                    if new_properties['xpath'] != decryptedxpath:
+                        # print "new: ",new_properties['xpath']
+                        # log.debug("changed object found")
+                        # Xpath Encryption logic implemented
+                        new_properties['url'] = self.coreutilsobj.scrape_wrap(new_properties['url'])
+                        xpath_string = new_properties['xpath'].split(';')
+                        left_part = self.coreutilsobj.scrape_wrap(';'.join(xpath_string[:2]))
+                        right_part = self.coreutilsobj.scrape_wrap(';'.join(xpath_string[3:]))
+                        new_properties['xpath'] = left_part + ';' + xpath_string[2] + ';' + right_part
+                        self.changedobjects.append(new_properties)
+                        self.changedobjectskeys.append(count)
+                    else:
+                        log.debug("not changed object found")
+                        self.notchangedobjects.append(element)
+                else:
+                    log.debug("object not found")
+                    self.notfoundobjectskeys.append(count)
+                    self.notfoundobjects.append(element)
+                count = count + 1
+                log.debug("processed object: %d",count)
+            log.info("all %s elements are processed, changedobject: %d, notchangedobject: %d, notfoundobject: %d",
+                     len(elementsdata['view']),len(self.changedobjects),len(self.notchangedobjects), len(self.notfoundobjects))
+            self.viewdata.append({'changedobject' : self.changedobjects })
+            self.viewdata.append({'notchangedobject': self.notchangedobjects})
+            self.viewdata.append({'notfoundobject': self.notfoundobjects})
+            comparedin = 'CH'
+            # if browserops.browser == '2':
+            #     comparedin = 'FX'
+            # elif browserops.browser == '3':
+            #     comparedin = 'IE'
+            # elif browserops.browser == '1':
+                # comparedin = 'CH'
 
-    def update(self):
-        driver = browser_Keywords_MW.driver_obj
-        data = {}
-        lst =[]
-        cobject = {'changedobject' : highlight_MW.changedobject}
-        ncobject = {'notchangedobject': highlight_MW.notchangedobject}
-        nfobject = {'notfoundobject' : highlight_MW.notfoundobject}
-        lst.append(cobject)
-        lst.append(ncobject)
-        lst.append(nfobject)
-        comparedin  ='CH'
-        # if browserops_MW.browser == 2:
-        #     comparedin =  'FX'
-        # elif browserops_MW.browser == 3:
-        #     comparedin = 'IE'
-        # elif browserops_MW.browser == 1:
-        #     comparedin =  'CH'
-        screen = driver.get_screenshot_as_base64()
-        data['comparedin'] = comparedin
-        data['view'] = lst
-        data['mirror'] = screen
+            log.info("taking fullpage screenshot")
+            maindir = os.environ["AVO_ASSURE_HOME"]
+            screen_shot_path = maindir + '/output/' + domconstants.SCREENSHOT_IMG
+            if (isinstance(self.driver, webdriver.Firefox) or isinstance(self.driver, webdriver.Chrome)):
+                screen = self.webscrapeutilsobj.fullpage_screenshot(self.driver, screen_shot_path)
+            else:
+                screen = self.driver.get_screenshot_as_base64()
+            self.data['comparedin'] = comparedin
+            self.data['view'] = self.viewdata
+            self.data['mirror'] = screen
+            self.data['scrapedurl'] = self.driver.current_url
+            self.data['changedobjectskeys'] = self.changedobjectskeys
+            self.data['notfoundobjectskeys'] = self.notfoundobjectskeys
+            log.info("writing data into domelements.json")
+            with open(os.environ["AVO_ASSURE_HOME"] + '/output/domelements.json', 'w') as outfile:
+                json.dump(self.data, outfile, indent=4, sort_keys=False)
+            self.status  = domconstants_MW.STATUS_SUCCESS
+        except ValueError as e:
+            self.status = "EMPTY_OBJECT"
+            logger.print_on_console("Unmapped object(s) found")
+            log.error(e)
+        except Exception as e:
+            logger.print_on_console("Error while comparing objects")
+            log.error(e)
 
-        with open(os.environ["AVO_ASSURE_HOME"] + '/output/domelements.json', 'w') as outfile:
-            json.dump(data, outfile, indent=4, sort_keys=False)
-        return data
+        self.data['action'] = 'compare'
+        self.data['status'] = self.status
+        return self.data
 
-
-
-    def clickandadd_MW(self):
-        b=clickandadd_MW.clickandadd_MW()
-        b.startclickandadd_MW()
-        abc=input("enter ok to stop click and add ")
-        if abc=='ok':
-            b.stopclickandadd_MW()
-        with open(os.environ["AVO_ASSURE_HOME"] + '/output/domelements.json') as data_file:
-            data = json.load(data_file)
-            lst=self.data['view']
-            for element  in data['view']:
-                lst.append(element)
-            vie = {'view': lst}
-            with io.open(os.environ["AVO_ASSURE_HOME"] + '/output/domelements.json', 'w', encoding='utf-8') as f:
-                    f.write(json.dumps(vie, ensure_ascii=False))
