@@ -71,6 +71,7 @@ class OutlookKeywords:
         def getOutlookComObj(self, optflag):
             import pythoncom
             pythoncom.CoInitialize()
+            outlookObj = None
             if ( optflag == 1 ):
                 try:
                     outlookObj = Dispatch('Outlook.Application').GetNamespace('MAPI')
