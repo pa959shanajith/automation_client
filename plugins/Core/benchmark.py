@@ -147,7 +147,10 @@ def memory():
         print("Memory Performance",result)
         return result
     except Exception as e:
-        logger.print_on_console("Error in Benchmark Execution")
+        msg = "Error in Benchmark Execution"
+        logger.print_on_console(msg)
+        log.error(msg)
+        log.error(e, exc_info=True)
         return -99
 
 def selectionSort(arr):
@@ -238,8 +241,10 @@ def execute(name,schedTime):
         return
     except Exception as e:
         delete_memory_test_file()
-        logger.print_on_console("Error in Benchmark Execution, terminating.")
-        log.error(e)
+        msg = "Error in Benchmark Execution, Terminating the benchmark"
+        logger.print_on_console(msg)
+        log.error(msg)
+        log.error(e, exc_info=True)
         start(delta.seconds,name,schedTime)
         return
 
