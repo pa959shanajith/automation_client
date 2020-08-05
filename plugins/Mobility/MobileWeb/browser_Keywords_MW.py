@@ -31,7 +31,7 @@ if SYSTEM_OS!='Darwin':
     import win32gui
     import win32api
 import readconfig
-import browserops_MW
+import device_keywords_MW
 import core_utils
 #New Thread to navigate to given url for the keyword 'naviagteWithAut'
 class TestThread(threading.Thread):
@@ -141,11 +141,11 @@ class BrowserKeywords():
                     desired_caps['browserName'] = 'Safari'
                     desired_caps['newCommandTimeout'] = '36000'
                     driver = webdriver.Remote('http://0.0.0.0:4723/wd/hub', desired_caps)
-                    log.info('FILE: browserops_MW.py , DEF: openSafariBrowser() , MSG:  Navigating to blank page')
+                    log.info('FILE: browser_keywords_MW.py , DEF: openSafariBrowser() , MSG:  Navigating to blank page')
                     driver.get(domconstants_MW.BLANK_PAGE)
                     driver_obj = driver
                     log.info(
-                        'FILE: browserops_MW.py , DEF: openSafariBrowser() , MSG:  Safari browser opened successfully')
+                        'FILE: browser_keywords_MW.py , DEF: openSafariBrowser() , MSG:  Safari browser opened successfully')
                     result = webconstants_MW.TEST_RESULT_TRUE
                     status = webconstants_MW.TEST_RESULT_PASS
             else:
@@ -153,11 +153,11 @@ class BrowserKeywords():
                     result = webconstants_MW.TEST_RESULT_TRUE
                     status = webconstants_MW.TEST_RESULT_PASS
                     return status, result, output, err_msg
-                browserops_object = browserops_MW.BrowserOperations()
+                device_object = device_keywords_MW.Device_Keywords()
                 input_list = inputs
                 device_id = input_list[0]
                 if device_id == 'wifi':
-                    device_id=browserops_object.wifi_connect()
+                    device_id=device_object.wifi_connect()
                 if device_id != '':
                     self.start_server()
                     obj = Singleton_DriverUtil()
@@ -179,10 +179,10 @@ class BrowserKeywords():
                     desired_caps['enablePerformanceLogging'] = True
                     desired_caps['chromedriverExecutable'] =  os.environ["AVO_ASSURE_HOME"] + "/Lib/Drivers/chromedriver_mobile.exe"
                     driver= webdriver.Remote('http://localhost:4723/wd/hub', desired_caps)
-                    log.info('FILE: browserops_MW.py , DEF: openChromeBrowser() , MSG:  Navigating to blank page')
+                    log.info('FILE: browser_keywords_MW.py , DEF: openChromeBrowser() , MSG:  Navigating to blank page')
                     driver.get(domconstants_MW.BLANK_PAGE)
                     driver_obj = driver
-                    log.info('FILE: browserops_MW.py , DEF: openChromeBrowser() , MSG:  Chrome browser opened successfully')
+                    log.info('FILE: browser_keywords_MW.py , DEF: openChromeBrowser() , MSG:  Chrome browser opened successfully')
                     parent_handle =  None
                 try:
                     parent_handle = driver_obj.current_window_handle
@@ -491,24 +491,6 @@ class BrowserKeywords():
             log.error(err_msg)
         return status,result,output,err_msg
 
-    def stop_server(self):
-        try:
-            if SYSTEM_OS!= 'Darwin':
-                import psutil
-                import os
-                processes = psutil.net_connections()
-                for line in processes:
-                    p =  line.laddr
-                    if p[1] == 4723:
-                        os.system("TASKKILL /F /PID " + str(line.pid))
-            else:
-                import os
-                os.system("killall -9 node_appium")
-        except Exception as e:
-            err_msg="Exception in stopping server"
-            logger.print_on_console(err_msg)
-            log.error(e)
-
     def closeBrowser(self,*args):
         status=webconstants_MW.TEST_RESULT_FAIL
         result=webconstants_MW.TEST_RESULT_FALSE
@@ -542,7 +524,6 @@ class BrowserKeywords():
             else:
                 driver_obj.close()
                 driver_obj = None
-                self.stop_server()
                 status=webconstants_MW.TEST_RESULT_PASS
                 result=webconstants_MW.TEST_RESULT_TRUE
 
