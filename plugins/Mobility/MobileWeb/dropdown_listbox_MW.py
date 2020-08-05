@@ -77,7 +77,7 @@ class DropdownKeywords():
                                         if(input_val == i):
                                             sValue =  browser_Keywords_MW.driver_obj.execute_script("""return arguments[0].options[arguments[1]].text""", webelement,input_val)
                                             browser_Keywords_MW.driver_obj.execute_script("""arguments[0].focus()""",webelement)
-                                            from pyrobot import Robot
+                                            from pyrobot_MW import Robot
                                             robot = Robot()
                                             robot.type_string(str(sValue).strip())
                                             status=webconstants_MW.TEST_RESULT_PASS
@@ -291,7 +291,7 @@ class DropdownKeywords():
                                         sValue = self.getText(webelement,inp_val)
                                         if sValue is not None:
                                             browser_Keywords_MW.driver_obj.execute_script("""arguments[0].focus()""",webelement)
-                                            from pyrobot import Robot
+                                            from pyrobot_MW import Robot
                                             robot = Robot()
                                             robot.type_string(str(sValue).strip())
                                             status = webconstants_MW.TEST_RESULT_PASS
