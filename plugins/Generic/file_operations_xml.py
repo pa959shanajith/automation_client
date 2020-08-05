@@ -43,6 +43,9 @@ class FileOperationsXml:
         elementList = []
         blockVal = None
         output_path = None
+
+        elm = None
+        searchList = []
         try:
             if ( args[0] ) :
                 if(str(args[0].split(";")[0]).startswith("{") and str(args[0].split(";")[0]).endswith("}")):
@@ -54,38 +57,44 @@ class FileOperationsXml:
                 blockVal = ';'.join(input_val[1:])
                 path = input_val[0]
                 if os.path.isfile(path):
-                    searchList= self.searchPatternBuild(blockVal)
-                    elm = etree.parse(path)
-                    for i in range(0,len(searchList)):
-                        elm = self.getTreeElemByXpath(elm,searchList[i])
-                    for ele in elm:
-                        el = self.treeElemToString(ele)
-                        elementList.append(el)
-                        del el
-                    if ( len(elementList) > 0 ):
-                        flg = True
-                        if ( elementList and output_path ):
-                            try:
-                                if( os.path.exists(output_path) or os.path.exists(os.path.dirname(output_path)) ):
-                                    logger.print_on_console( "Writing the output of getXmlBlockData to file : " + str(output_path) )
-                                    with open(output_path,'w') as f:
-                                        for v in elementList:
-                                            f.write(v)
-                                else:
-                                    err_msg = generic_constants.FILE_NOT_EXISTS
-                                    flg = False
-                            except Exception as e:
-                                err_msg = ("Exception occurred while writing to output file in getXmlBlockData : " + str(ex))
-                                log.error( err_msg )
-                                logger.print_on_console( "Error occured while writing to output file in getXmlBlockData" )
-                        if( flg ):
-                            status = TEST_RESULT_PASS
-                            result = TEST_RESULT_TRUE
-                            logger.print_on_console( "Blocks found with given block xpath : " +str(len(elementList)) )
-                            value = elementList
+                    try:elm = etree.parse(path)
+                    except Exception as e:log.error(e)
+                    if ( elm ):
+                        searchList = self.searchPatternBuild(blockVal)
+                        if( searchList ):
+                            for i in range(0,len(searchList)):
+                                elm = self.getTreeElemByXpath(elm,searchList[i])
+                            for ele in elm:
+                                el = self.treeElemToString(ele)
+                                elementList.append(el)
+                                del el
+                            if ( len(elementList) > 0 ):
+                                flg = True
+                                if ( elementList and output_path ):
+                                    try:
+                                        if( os.path.exists(output_path) or os.path.exists(os.path.dirname(output_path)) ):
+                                            logger.print_on_console( "Writing the output of getXmlBlockData to file : " + str(output_path) )
+                                            with open(output_path,'w') as f:
+                                                for v in elementList:
+                                                    f.write(v)
+                                        else:
+                                            err_msg = generic_constants.FILE_NOT_EXISTS
+                                            flg = False
+                                    except Exception as e:
+                                        err_msg = ("Exception occurred while writing to output file in getXmlBlockData : " + str(e))
+                                        log.error( err_msg )
+                                        flg = False
+                                if( flg ):
+                                    status = TEST_RESULT_PASS
+                                    result = TEST_RESULT_TRUE
+                                    logger.print_on_console( "Blocks found with given block xpath : " +str(len(elementList)) )
+                                    value = elementList
+                            else:
+                                err_msg = 'Invalid block : XML data not found'
+                        else:
+                            err_msg = 'Invalid block : incorrect input block data'
                     else:
-                        err_msg = 'Invalid block : XML data not found'
-                    del elm,searchList
+                        err_msg = 'Invalid XML data'
                 else:
                     err_msg = generic_constants.FILE_NOT_EXISTS
             else:
@@ -97,7 +106,7 @@ class FileOperationsXml:
             err_msg = ("Exception occurred in getXmlBlockData, ERROR : " + str(e))
             log.error( err_msg )
             logger.print_on_console( "Error occured in getXmlBlockData" )
-        del blockVal,input_val,elementList,path
+        del blockVal,input_val,elementList,path,elm,searchList
         return status, result, value ,err_msg
 
     def selectiveXmlFileCompare(self,input_val,*args):
@@ -127,69 +136,79 @@ class FileOperationsXml:
                 if ( os.path.isfile(path1) and os.path.isfile(path2) ):
                     if ( blockVal ):
                         searchList= self.searchPatternBuild(blockVal)
-                        def writeSelectiveData(path,tempFile,searchList):
-                            flag = True
-                            elm = etree.parse(path)
-                            elementList = []
-                            for i in range(0,len(searchList)):
-                                elm = self.getTreeElemByXpath(elm,searchList[i])
-                            for ele in elm:
-                                el = self.treeElemToString(ele)
-                                elementList.append(el)
-                                del el
-                            with open(tempFile,'w') as f:
-                                for v in elementList:
-                                    f.write(self.beautify_xml_file(v))
-                            if ( not elementList ):
-                                flag = False
-                                log.debug( 'Element list not found for file : ' + str(path) )
-                            del elm, path, searchList, elementList
-                            return flag
-                        fp1 = self.createTempFile() #create temp file 1
-                        fp2 = self.createTempFile() #create temp file 2
-                        flg1 = writeSelectiveData(path1,fp1,searchList) #write the blocks (matched xml block data by block xml path) to temp file 1
-                        flg2 = writeSelectiveData(path2,fp2,searchList) #write the blocks (matched xml block data by block xml path) to temp file 2
-                        output_res = self.compare_xmls(fp1,fp2) # compare the two temp files
-                        self.deleteTempFile(fp1) #delete temp file 1
-                        self.deleteTempFile(fp2) #delete temp file 2
-                        if ( output_res and flg1 and flg2):
-                            flg = True
-                            num_diff,ch_lines = self.get_diff_count_xml(output_res)
-                            try:
-                                #-----------------------------------------------------------------selective output
-                                if ( res_opt == 'selective' or res_opt == 'all') :
-                                    log.info("Result to be displayed is : " + str(res_opt))
-                                    logger.print_on_console("Result to be displayed is : " + str(res_opt))
-                                    if (res_opt == 'selective') : output_res = ch_lines
-                                    output_res = '\n'.join(output_res)
-                                    if(num_diff):
-                                        logger.print_on_console("The number of differences in selectiveXmlFileCompare are : ", num_diff)
-                                    elif(int(num_diff) == 0):
-                                        logger.print_on_console("No Difference between files in selectiveXmlFileCompare" )
-                                    if(output_path):
-                                        if( os.path.isfile(output_path) or os.path.exists(os.path.dirname(output_path)) ):
-                                            logger.print_on_console( "Writing the output of selectiveXmlFileCompare to : " + str(output_path) )
-                                            with open(output_path,'w') as f:
-                                                f.write(output_res)
-                                        else:
-                                            err_msg = generic_constants.FILE_NOT_EXISTS
-                                            flg = False
+                        if ( searchList ):
+                            def writeSelectiveData(path,tempFile,searchList):
+                                flag = True
+                                elm = None
+                                try:elm = etree.parse(path)
+                                except Exception as e:log.error(e)
+                                elementList = []
+                                if (elm):
+                                    for i in range(0,len(searchList)):
+                                        elm = self.getTreeElemByXpath(elm,searchList[i])
+                                    for ele in elm:
+                                        el = self.treeElemToString(ele)
+                                        elementList.append(el)
+                                        del el
+                                    with open(tempFile,'w') as f:
+                                        for v in elementList:
+                                            f.write(self.beautify_xml_file(v))
+                                    if ( not elementList ):
+                                        flag = False
+                                        log.debug( 'Element list not found for file : ' + str(path) )
+                                        logger.print_on_console('Invalid block : XML data not found')
                                 else:
-                                    err_msg = INVALID_INPUT
+                                    flag = False
+                                    log.debug( 'Invalid XML file : ' + str(path) )
+                                del elm, path, searchList, elementList
+                                return flag
+                            fp1 = self.createTempFile() #create temp file 1
+                            fp2 = self.createTempFile() #create temp file 2
+                            flg1 = writeSelectiveData(path1,fp1,searchList) #write the blocks (matched xml block data by block xml path) to temp file 1
+                            flg2 = writeSelectiveData(path2,fp2,searchList) #write the blocks (matched xml block data by block xml path) to temp file 2
+                            output_res = self.compare_xmls(fp1,fp2) # compare the two temp files
+                            self.deleteTempFile(fp1) #delete temp file 1
+                            self.deleteTempFile(fp2) #delete temp file 2
+                            if ( output_res and flg1 and flg2):
+                                flg = True
+                                num_diff,ch_lines = self.get_diff_count_xml(output_res)
+                                try:
+                                    #-----------------------------------------------------------------selective output
+                                    if ( res_opt == 'selective' or res_opt == 'all') :
+                                        log.info("Result to be displayed is : " + str(res_opt))
+                                        logger.print_on_console("Result to be displayed is : " + str(res_opt))
+                                        if (res_opt == 'selective') : output_res = ch_lines
+                                        output_res = '\n'.join(output_res)
+                                        if(num_diff):
+                                            logger.print_on_console("The number of differences in selectiveXmlFileCompare are : ", num_diff)
+                                        elif(int(num_diff) == 0):
+                                            logger.print_on_console("No Difference between files in selectiveXmlFileCompare" )
+                                        if(output_path):
+                                            if( os.path.isfile(output_path) or os.path.exists(os.path.dirname(output_path)) ):
+                                                logger.print_on_console( "Writing the output of selectiveXmlFileCompare to : " + str(output_path) )
+                                                with open(output_path,'w') as f:
+                                                    f.write(output_res)
+                                            else:
+                                                err_msg = generic_constants.FILE_NOT_EXISTS
+                                                flg = False
+                                    else:
+                                        err_msg = INVALID_INPUT
+                                        flg = False
+                                    #-----------------------------------------------------------------selective output
+                                except Exception as e:
+                                    err_msg = ("Exception occurred while writing to output file in selectiveXmlFileCompare : " + str(e))
+                                    log.debug( err_msg )
                                     flg = False
-                                #-----------------------------------------------------------------selective output
-                            except Exception as e:
-                                err_msg = ("Exception occurred while writing to output file in selectiveXmlFileCompare : " + str(ex))
-                                log.error( err_msg )
-                                logger.print_on_console( "Error occured while writing to output file in selectiveXmlFileCompare" )
+                            else:
+                                err_msg = 'Invalid XML data'
+                                flg = False
+                            if( flg ):
+                                log.info( "Comparision of files completed" )
+                                value = output_res
+                                status = TEST_RESULT_PASS
+                                result = TEST_RESULT_TRUE
                         else:
-                            err_msg = 'Invalid block : XML data not found'
-                            flg = False
-                        if( flg ):
-                            log.info( "Comparision of files completed" )
-                            value = output_res
-                            status = TEST_RESULT_PASS
-                            result = TEST_RESULT_TRUE
+                            err_msg = 'Invalid block : incorrect input block data'
                     else:
                         err_msg = generic_constants.INVALID_INPUT
                 else:
@@ -221,81 +240,90 @@ class FileOperationsXml:
         blockData = None
         output_path = None
         output_res = []
+
+        elm = None
+        searchList = []
         try:
-            if ( args[0] ) :
+            if( args[0] ) :
                 if(str(args[0].split(";")[0]).startswith("{") and str(args[0].split(";")[0]).endswith("}")):
                     out_path = self.DV.get_dynamic_value(args[0].split(";")[0])
                     if ( out_path ): output_path = out_path
                 else:
                     output_path = args[0].split(";")[0]
-            if ( len(input_val) >= 4 ):
+            if( len(input_val) >= 4 ):
                 blockVal = ';'.join(input_val[3:])
                 if ((input_val[2]) != '') : res_opt = input_val[2].lower().strip()
                 blockData = input_val[1]
                 path = input_val[0]
-                if os.path.isfile( path ):
-                    searchList= self.searchPatternBuild( blockVal )
-                    elm = etree.parse( path )
-                    for i in range( 0, len(searchList) ):
-                        elm = self.getTreeElemByXpath( elm, searchList[i] )
-                    for ele in elm:
-                        el = self.treeElemToString( ele )
-                        elementList.append( el )
-                        del el
-                    # compare block of data to each block of data in file to be compared
-                    logger.print_on_console( "Blocks found with given block xpath : " + str(len(elementList)) )
-                    fg1 = True
-                    fg2 = True
-                    try : xml.dom.minidom.parseString(self.beautify_xml_file(blockData))
-                    except : fg1 = False
-                    for eL in elementList:
-                        try : xml.dom.minidom.parseString(self.beautify_xml_file(eL))
-                        except : fg2 = False
-                    for eL in elementList:
-                        if ( fg1 and fg2 ):
-                            out = self.compare_xmls( self.beautify_xml_file( blockData ), self.beautify_xml_file( eL ) )
-                        else :
-                            out = self.compare_texts( self.beautify_xml_file( blockData ), self.beautify_xml_file( eL ) )
-                        output_res.extend( out )
-                    if ( output_res and len(output_res) > 0 ):
-                        flg = True
-                        num_diff,ch_lines = self.get_diff_count_xml(output_res)
-                        #num_diff,ch_lines = self.get_diff_count( output_res )
-                        try:
-                            #-----------------------------------------------------------------selective output
-                            if ( res_opt == 'selective' or res_opt == 'all') :
-                                log.info("Result to be displayed is : " + str(res_opt))
-                                logger.print_on_console("Result to be displayed is : " + str(res_opt))
-                                if (res_opt == 'selective') : output_res = ch_lines
-                                output_res = '\n'.join(output_res)
-                                if(num_diff):
-                                    logger.print_on_console("The number of differences in compXmlFileWithXmlBlock are : ", num_diff)
-                                elif(int(num_diff) == 0):
-                                    logger.print_on_console("No Difference between files in compXmlFileWithXmlBlock" )
-                                if(output_path):
-                                    if( os.path.isfile(output_path) or os.path.exists(os.path.dirname(output_path)) ):
-                                        logger.print_on_console( "Writing the output of compXmlFileWithXmlBlock to : " + str(output_path) )
-                                        with open(output_path,'w') as f:
-                                            f.write(output_res)
+                if( os.path.isfile( path ) ):
+                    try: elm = etree.parse( path )
+                    except Exception as e:log.error(e)
+                    if( elm ):
+                        searchList= self.searchPatternBuild( blockVal )
+                        if( searchList ):
+                            for i in range( 0, len(searchList) ):
+                                elm = self.getTreeElemByXpath( elm, searchList[i] )
+                            for ele in elm:
+                                el = self.treeElemToString( ele )
+                                elementList.append( el )
+                                del el
+                            # compare block of data to each block of data in file to be compared
+                            logger.print_on_console( "Blocks found with given block xpath : " + str(len(elementList)) )
+                            fg1 = True
+                            fg2 = True
+                            try : xml.dom.minidom.parseString(self.beautify_xml_file(blockData))
+                            except : fg1 = False
+                            for eL in elementList:
+                                try : xml.dom.minidom.parseString(self.beautify_xml_file(eL))
+                                except : fg2 = False
+                            for eL in elementList:
+                                if ( fg1 and fg2 ):
+                                    out = self.compare_xmls( self.beautify_xml_file( blockData ), self.beautify_xml_file( eL ) )
+                                else :
+                                    out = self.compare_texts( self.beautify_xml_file( blockData ), self.beautify_xml_file( eL ) )
+                                output_res.extend( out )
+                            if ( output_res and len(output_res) > 0 ):
+                                flg = True
+                                num_diff,ch_lines = self.get_diff_count_xml(output_res)
+                                #num_diff,ch_lines = self.get_diff_count( output_res )
+                                try:
+                                    #-----------------------------------------------------------------selective output
+                                    if ( res_opt == 'selective' or res_opt == 'all') :
+                                        log.info("Result to be displayed is : " + str(res_opt))
+                                        logger.print_on_console("Result to be displayed is : " + str(res_opt))
+                                        if (res_opt == 'selective') : output_res = ch_lines
+                                        output_res = '\n'.join(output_res)
+                                        if(num_diff):
+                                            logger.print_on_console("The number of differences in compXmlFileWithXmlBlock are : ", num_diff)
+                                        elif(int(num_diff) == 0):
+                                            logger.print_on_console("No Difference between files in compXmlFileWithXmlBlock" )
+                                        if( output_path ):
+                                            if( os.path.isfile(output_path) or os.path.exists(os.path.dirname(output_path)) ):
+                                                logger.print_on_console( "Writing the output of compXmlFileWithXmlBlock to : " + str(output_path) )
+                                                with open(output_path,'w') as f:
+                                                    f.write(output_res)
+                                            else:
+                                                err_msg = generic_constants.FILE_NOT_EXISTS
+                                                flg = False
                                     else:
-                                        err_msg = generic_constants.FILE_NOT_EXISTS
+                                        err_msg = INVALID_INPUT
                                         flg = False
+                                except Exception as e:
+                                    err_msg = "Exception occurred while writing to output file in compXmlFileWithXmlBlock : " + str(e)
+                                    log.debug( err_msg )
+                                    flg = False
                             else:
-                                err_msg = INVALID_INPUT
+                                err_msg = 'Invalid block : XML data not found'
                                 flg = False
-                        except Exception as e:
-                            err_msg = ("Exception occurred while writing to output file in compXmlFileWithXmlBlock : " + str(ex))
-                            log.error( err_msg )
-                            logger.print_on_console( "Error occured while writing to output file in compXmlFileWithXmlBlock" )
+                            if( flg ):
+                                log.info( "Comparision of texts completed" )
+                                value = output_res
+                                status = TEST_RESULT_PASS
+                                result = TEST_RESULT_TRUE
+                        else:
+                            err_msg = 'Invalid block : incorrect input block data'
                     else:
-                        err_msg = 'Invalid block : XML data not found'
-                        flg = False
-                    if( flg ):
-                        log.info( "Comparision of texts completed" )
-                        value = output_res
-                        status = TEST_RESULT_PASS
-                        result = TEST_RESULT_TRUE
-                    del ele,elm,searchList
+                        err_msg = 'Invalid XML data'
                 else:
                     err_msg = generic_constants.FILE_NOT_EXISTS
             else:
@@ -307,7 +335,7 @@ class FileOperationsXml:
             err_msg = ("Exception occurred in compXmlFileWithXmlBlock, ERROR : " + str(e))
             log.error( err_msg )
             logger.print_on_console( "Error occured in compXmlFileWithXmlBlock" )
-        del elementList, blockVal, blockData, output_path, output_res, input_val #deleting variables
+        del elementList, blockVal, blockData, output_path, output_res, input_val, elm, searchList #deleting variables
         return status, result, value ,err_msg
 
     def compare_inputs(self,input_val,*args):
@@ -361,8 +389,8 @@ class FileOperationsXml:
                                     flg = False
                         except Exception as ex:
                             err_msg = ("Exception occurred while writing to output file in compareInputs : "+str(ex))
-                            log.error( err_msg )
-                            logger.print_on_console( "Error occured while writing to output file in compareInputs" )
+                            log.debug( err_msg )
+                            flg = False
                         if(flg):
                             log.info("Comparision of texts completed")
                             value = output_res
@@ -423,8 +451,8 @@ class FileOperationsXml:
                                 err_msg='Wrong file path entered'
                     except Exception as ex:
                         err_msg = ("Exception occurred while writing to output file in beautify_file : "+str(ex))
-                        log.error( err_msg )
-                        logger.print_on_console( "Error occured while writing to output file in Beautify" )
+                        log.debug( err_msg )
+                        flg = False
                     if(flg):
                         value = beautified_output
                         status=TEST_RESULT_PASS
@@ -507,8 +535,8 @@ class FileOperationsXml:
                                         flg = False
                             except Exception as ex:
                                 err_msg = ("Exception occurred while writing to output file in compareFile : "+str(ex))
-                                log.error( err_msg )
-                                logger.print_on_console( "Error occured while writing to output file in compareFile" )
+                                log.debug( err_msg )
+                                flg = False
                             if(flg):
                                 log.info("Comparision of files completed")
                                 value = output_res
@@ -766,24 +794,27 @@ class FileOperationsXml:
             Eg: Input : '<m d="ClassCd" i="CLASS - CD" v="8017A"/>'
                 Output : .//m[@d="ClassCd" and @i="CLASS - CD" and @v="8017A"]
         """
-        tempList = searchInput.split(';')
         finalList = []
-        for t in tempList:
-            st = None
-            t = t[1:len(t) - 1]
-            if ( t[len(t)-1] == '/' ):t = t[:len(t)-1]
-            t = self.igSplit(t)
-            st = ".//" + t[0]
-            if(len(t)>1):
-                st = st + '[' +'@'+t[1]
-                if (len(t) == 2):
-                    st = st + ']'
-                else:
-                    for i in range(2,len(t)):
-                        st  = st + ' and ' + '@' +t[i]
-                    st = st + ']'
-            finalList.append(st)
-        del tempList,t,st,i,searchInput
+        try:
+            tempList = searchInput.split(';')
+            for t in tempList:
+                st = None
+                t = t[1:len(t) - 1]
+                if ( t[len(t)-1] == '/' ):t = t[:len(t)-1]
+                t = self.igSplit(t)
+                st = ".//" + t[0]
+                if(len(t)>1):
+                    st = st + '[' +'@'+t[1]
+                    if (len(t) == 2):
+                        st = st + ']'
+                    else:
+                        for i in range(2,len(t)):
+                            st  = st + ' and ' + '@' +t[i]
+                        st = st + ']'
+                finalList.append(st)
+            del tempList,t,st,i,searchInput
+        except Exception as e:
+            log.debug('Error occoured in searchPatternBuild : ' + str(e))
         return finalList
     #-----------------------------------------------block data operations end
     def createTempFile(self):
