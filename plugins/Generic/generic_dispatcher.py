@@ -212,6 +212,28 @@ class GenericKeywordDispatcher:
                 if( keyword in ['comparefiles','beautify','compareinputs','getxmlblockdata','selectivexmlfilecompare','compxmlfilewithxmlblock','cellbycellcompare'] ):
                     input = list(message)
                     output = tsp.outputval
+                    #split output for static variable
+                    if (str(output[0]).startswith("|")):
+                        if ';' in output:
+                            output = output.split(';')
+                        else:
+                            opList=[]
+                            opList.append(output)
+                            output = opList
+                    if str(output[0]).startswith("|") and str(output[0]).endswith("|"):
+                        import handler
+                        import controller
+                        con = controller.Controller()
+                        for test in handler.local_handler.tspList:
+                            if((test.name).lower() == "getparam"):
+                                teststep = test
+                                break
+                        rawinput = teststep.inputval
+                        inpval,ignore_stat=con.split_input(rawinput,tsp.name)
+                        data = teststep.invokegetparam(inpval)
+                        var = str(output[0])[1:len(str(output[0]))-1]
+                        output[0] = data[var][0]
+                        output=';'.join(output)
                     result= self.generic_dict[keyword](input,output)
                 else:
                     result= self.generic_dict[keyword](*message)

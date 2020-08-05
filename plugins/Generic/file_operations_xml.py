@@ -45,8 +45,11 @@ class FileOperationsXml:
         output_path = None
         try:
             if ( args[0] ) :
-                out_path = self.DV.get_dynamic_value(args[0].split(";")[0])
-                if ( out_path ): output_path = out_path
+                if(str(args[0].split(";")[0]).startswith("{") and str(args[0].split(";")[0]).endswith("}")):
+                    out_path = self.DV.get_dynamic_value(args[0].split(";")[0])
+                    if ( out_path ): output_path = out_path
+                else:
+                    output_path = args[0].split(";")[0]
             if ( len(input_val) >= 2 ):
                 blockVal = ';'.join(input_val[1:])
                 path = input_val[0]
@@ -80,8 +83,9 @@ class FileOperationsXml:
                             result = TEST_RESULT_TRUE
                             logger.print_on_console( "Blocks found with given block xpath : " +str(len(elementList)) )
                             value = elementList
-
-                    del ele,elm,searchList
+                    else:
+                        err_msg = 'Invalid block : XML data not found'
+                    del elm,searchList
                 else:
                     err_msg = generic_constants.FILE_NOT_EXISTS
             else:
@@ -110,9 +114,12 @@ class FileOperationsXml:
         res_opt = 'all'
         try:
             if ( args[0] ) :
-                out_path = self.DV.get_dynamic_value(args[0].split(";")[0])
-                if ( out_path ): output_path = out_path
-            if (len(input_val)>=3):
+                if(str(args[0].split(";")[0]).startswith("{") and str(args[0].split(";")[0]).endswith("}")):
+                    out_path = self.DV.get_dynamic_value(args[0].split(";")[0])
+                    if ( out_path ): output_path = out_path
+                else:
+                    output_path = args[0].split(";")[0]
+            if (len(input_val)>=4):
                 path1 = input_val[0]
                 path2 = input_val[1]
                 if ((input_val[2]) != '') : res_opt = input_val[2].lower().strip()
@@ -121,6 +128,7 @@ class FileOperationsXml:
                     if ( blockVal ):
                         searchList= self.searchPatternBuild(blockVal)
                         def writeSelectiveData(path,tempFile,searchList):
+                            flag = True
                             elm = etree.parse(path)
                             elementList = []
                             for i in range(0,len(searchList)):
@@ -132,15 +140,19 @@ class FileOperationsXml:
                             with open(tempFile,'w') as f:
                                 for v in elementList:
                                     f.write(self.beautify_xml_file(v))
+                            if ( not elementList ):
+                                flag = False
+                                log.debug( 'Element list not found for file : ' + str(path) )
                             del elm, path, searchList, elementList
+                            return flag
                         fp1 = self.createTempFile() #create temp file 1
                         fp2 = self.createTempFile() #create temp file 2
-                        writeSelectiveData(path1,fp1,searchList) #write the blocks (matched xml block data by block xml path) to temp file 1
-                        writeSelectiveData(path2,fp2,searchList) #write the blocks (matched xml block data by block xml path) to temp file 2
+                        flg1 = writeSelectiveData(path1,fp1,searchList) #write the blocks (matched xml block data by block xml path) to temp file 1
+                        flg2 = writeSelectiveData(path2,fp2,searchList) #write the blocks (matched xml block data by block xml path) to temp file 2
                         output_res = self.compare_xmls(fp1,fp2) # compare the two temp files
                         self.deleteTempFile(fp1) #delete temp file 1
                         self.deleteTempFile(fp2) #delete temp file 2
-                        if ( output_res ):
+                        if ( output_res and flg1 and flg2):
                             flg = True
                             num_diff,ch_lines = self.get_diff_count_xml(output_res)
                             try:
@@ -170,6 +182,9 @@ class FileOperationsXml:
                                 err_msg = ("Exception occurred while writing to output file in selectiveXmlFileCompare : " + str(ex))
                                 log.error( err_msg )
                                 logger.print_on_console( "Error occured while writing to output file in selectiveXmlFileCompare" )
+                        else:
+                            err_msg = 'Invalid block : XML data not found'
+                            flg = False
                         if( flg ):
                             log.info( "Comparision of files completed" )
                             value = output_res
@@ -208,8 +223,11 @@ class FileOperationsXml:
         output_res = []
         try:
             if ( args[0] ) :
-                out_path = self.DV.get_dynamic_value(args[0].split(";")[0])
-                if ( out_path ): output_path = out_path
+                if(str(args[0].split(";")[0]).startswith("{") and str(args[0].split(";")[0]).endswith("}")):
+                    out_path = self.DV.get_dynamic_value(args[0].split(";")[0])
+                    if ( out_path ): output_path = out_path
+                else:
+                    output_path = args[0].split(";")[0]
             if ( len(input_val) >= 4 ):
                 blockVal = ';'.join(input_val[3:])
                 if ((input_val[2]) != '') : res_opt = input_val[2].lower().strip()
@@ -269,6 +287,9 @@ class FileOperationsXml:
                             err_msg = ("Exception occurred while writing to output file in compXmlFileWithXmlBlock : " + str(ex))
                             log.error( err_msg )
                             logger.print_on_console( "Error occured while writing to output file in compXmlFileWithXmlBlock" )
+                    else:
+                        err_msg = 'Invalid block : XML data not found'
+                        flg = False
                     if( flg ):
                         log.info( "Comparision of texts completed" )
                         value = output_res
@@ -310,8 +331,11 @@ class FileOperationsXml:
                 if (len(inputtext1)!=0 and len(inputtext2)!=0):
                     log.info("Comparing texts...")
                     if ( args[0] ) :
-                        out_path = self.DV.get_dynamic_value(args[0].split(";")[0])
-                        if ( out_path ): output_path = out_path
+                        if(str(args[0].split(";")[0]).startswith("{") and str(args[0].split(";")[0]).endswith("}")):
+                            out_path = self.DV.get_dynamic_value(args[0].split(";")[0])
+                            if ( out_path ): output_path = out_path
+                        else:
+                            output_path = args[0].split(";")[0]
                     if ( len(input_val) == 3 and (input_val[2] != None or input_val[2] != '' )) : res_opt = input_val[2].strip().lower()
                     output_res = self.compare_texts(inputtext1,inputtext2)
                     if ( output_res ):
@@ -375,8 +399,11 @@ class FileOperationsXml:
                 iv1 = input_val[0]
                 iv2 = input_val[1]
                 if ( args[0] ) :
-                    out_path = self.DV.get_dynamic_value(args[0].split(";")[0])
-                    if ( out_path ): output_path = out_path
+                    if(str(args[0].split(";")[0]).startswith("{") and str(args[0].split(";")[0]).endswith("}")):
+                        out_path = self.DV.get_dynamic_value(args[0].split(";")[0])
+                        if ( out_path ): output_path = out_path
+                    else:
+                        output_path = args[0].split(";")[0]
                 if (str(iv2).lower() == 'json'):
                     beautified_output = self.beautify_json_file(iv1)
                 elif (str(iv2).lower() == 'xml'):
@@ -431,8 +458,11 @@ class FileOperationsXml:
                 filePathA = input_val[0]
                 filePathB = input_val[1]
                 if ( args[0] ) :
-                    out_path = self.DV.get_dynamic_value(args[0].split(";")[0])
-                    if ( out_path ): output_path = out_path
+                    if(str(args[0].split(";")[0]).startswith("{") and str(args[0].split(";")[0]).endswith("}")):
+                        out_path = self.DV.get_dynamic_value(args[0].split(";")[0])
+                        if ( out_path ): output_path = out_path
+                    else:
+                        output_path = args[0].split(";")[0]
                 if ( len(input_val) == 3 and (input_val[2] != None or input_val[2] != '' )) : res_opt = input_val[2].strip().lower()
                 if ( os.path.isfile(filePathA) and os.path.isfile(filePathB) ):
                     if( os.path.getsize(filePathA)>0 and os.path.getsize(filePathB)>0):
