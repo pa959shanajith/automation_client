@@ -507,7 +507,10 @@ class StringOperation:
                     if(data_length_int > 0):
                         data_type=data_type.lower()
                         if (data_type == 'char'):
-                            output = ''.join(random.choice(string.ascii_lowercase + string.ascii_uppercase) for i in range(data_length_int))
+                            while True:
+                                output = ''.join(random.choice(string.digits) for i in range(data_length_int))
+                                if data_length_int==1: break
+                                elif data_length_int>1 and output[0]!='0': break
 ##                            logger.print_on_console('Result : ',output)
                             log.info('Result : ')
                             log.info(output)
