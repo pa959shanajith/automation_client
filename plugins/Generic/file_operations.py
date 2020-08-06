@@ -749,7 +749,7 @@ class FileOperations:
 
     def json_compare_content(self,input_path1,input_path2,*args):
         """
-        def : verify_Json_content
+        def : json_compare_content
         purpose : calls the respective method to compare the content of 2 Json
         param : input_path1,input_path2
         return : bool
@@ -760,10 +760,19 @@ class FileOperations:
         methodoutput=TEST_RESULT_FALSE
         err_msg=None
         output_res=OUTPUT_CONSTANT
+        status1=False
+        status2=False
+        file_ext1=None
+        file_ext2=None
         try:
-
-            file_ext1,status1=self.__get_ext(input_path1)
-            file_ext2,status2=self.__get_ext(input_path2)
+            try:
+                if (os.path.exists(input_path1) and os.path.exists(input_path2)):
+                    file_ext1,status1=self.__get_ext(input_path1)
+                    file_ext2,status2=self.__get_ext(input_path2)
+                else:
+                    log.info("Provided inputs as a string")
+            except Exception as e:
+                log.debug("Files not provided {}".format(e))
 
             if status1 == True and status2==True and file_ext1==file_ext2:
                 log.debug('verifying whether the files exists')
@@ -793,8 +802,12 @@ class FileOperations:
             else:
                 err_msg=ERROR_CODE_DICT['ERR_FILE_EXT_MISMATCH']
                 try:
-                    json.loads(input_path1)
-                    json.loads(input_path2)
+                    try:
+                        json.loads(input_path1)
+                        json.loads(input_path2)
+                    except Exception as e:
+                        logger.print_on_console("Input error: Invalid json")
+                        log.error(e)
                     params=[input_path1,input_path2]
                     res,err_msg=self.dict['.json_compare_content'](*params)
                     if res:
@@ -811,7 +824,7 @@ class FileOperations:
             log.error(e)
         if err_msg!=None:
             log.error(err_msg)
-            logger.print_on_console(err_msg)
+            #logger.print_on_console(err_msg)
         return status,methodoutput,output_res,err_msg
 
     def __split(self,*args):
@@ -940,7 +953,7 @@ class FileOperations:
 
                 log.debug('Input Sheet and file path while creating file :')
                 log.debug(sheetname)
-                log.debug(input_file)
+                log.debug(outputFilePath)
                 #reading the existing sheet
                 sheet = wb[sheetname]
                 for column in content.keys():
@@ -956,14 +969,20 @@ class FileOperations:
                 wb.active=index_sheet
                 log.info("WorkBook Saving: {}".format(outputFilePath))
                 wb.save(outputFilePath)
-                del column,row,max_col_width,adjusted_width,value,sheet_names,wb
+                try:
+                    del column,row,max_col_width,adjusted_width,value,sheet_names,wb
+                except Exception as e :
+                    log.error('some error : {}'.format(e))
                 status=True
 
         except Exception as e:
             err_msg='Writing to Excel Sheet Failed'
             log.error(e)
         log.info('Status of write_result_file is ' + str(status) )
-        del outputFilePath,sheetname,result3,index_sheet
+        try:
+            del outputFilePath,sheetname,result3,index_sheet
+        except Exception as e :
+            log.error('some error : {}'.format(e))
         return status, err_msg
 
     def cell_by_cell_compare(self,input_val,*args):
@@ -986,98 +1005,160 @@ class FileOperations:
         input_path2 = None
         sheetname2 = None
         output_feild = None
+        sheet_exist=[]
         log.debug('Comparing content cell by cell of .xls files ')
         try:
-            input_path1 = input_val[0]
-            sheetname1 = input_val[1]
-            input_path2 = input_val[2]
-            sheetname2 = input_val[3]
-            if ( len(input_val) == 5 and input_val[4].strip().lower() == 'selective'):
-                opt = True
+            if (len(input_val)==5):
+                input_path1 = input_val[0]
+                sheetname1 = input_val[1]
+                input_path2 = input_val[2]
+                sheetname2 = input_val[3]
+                if ( len(input_val) == 5 and input_val[4].strip().lower() == 'selective'):
+                    logger.print_on_console("Selective Option Set to True")
+                    opt = True
+                    log.info("Selective option set True")
 
-            if ( args[0] ) :
-                out_path = self.DV.get_dynamic_value(args[0].split(";")[0])
-                if ( out_path ): output_feild = out_path
-
-
-            book1 = open_workbook(input_path1)
-            book2 = open_workbook(input_path2)
-            if (sheetname1.strip() != ''):sheet1 = book1.sheet_by_name(sheetname1)
-            else : sheet1 = book1.sheet_by_index(0)
-            if (sheetname2.strip() != ''):sheet2 = book2.sheet_by_name(sheetname2)
-            else : sheet2 = book2.sheet_by_index(0)
-
-            log.debug('verifying whether the files exists')
-            result1=self.verify_file_exists(input_path1,'')
-            result2=self.verify_file_exists(input_path2,'')
-            log.info("taking the maxium row and column")
-            row_max=max(sheet1.nrows,sheet2.nrows)
-            col_max=max(sheet1.ncols,sheet2.ncols)
-
-            if result1[1] == TEST_RESULT_TRUE and result2[1]==TEST_RESULT_TRUE:
-                for rownum in range(int(row_max)):
-                    for colnum in range(int(col_max)):
-                        try:
-                            c1=str(sheet1.cell(rownum, colnum).value)
-                        except:
-                            c1=None
-                        try:
-                            c2=str(sheet2.cell(rownum, colnum).value)
-                        except:
-                            c2=None
-                        if (c1!=None and c2!=None) and (c1!='' and c2!=''):
-                            if c1 != c2:
-                                out='Not Matched'
-                                desc="Not Matched, Cell Values {} and {}".format(c1,c2)
-                            else:
-                                out="Matched"
-                                desc="Matched"
-                        elif (c1==None or c1=='') and (c2== '' or c2==None):
-                            out=''
-                            desc=''
-                        else:
-                            out= 'Not Matched'
-                            desc="Not Matched, Cell Values {} and {}".format(c1,c2)
-
-                        if colnum not in collect_content.keys():
-                            collect_content[colnum]=[]
-                            if( opt == True ):
-                                collect_content[colnum].append(desc)
-                            else:
-                                collect_content[colnum].append(out)
-                        else:
-                            if( opt == True ):
-                                collect_content[colnum].append(desc)
-                            else:
-                                collect_content[colnum].append(out)
-                del rownum, colnum, desc, out, c1, c2 #deleting variables
-                if( output_feild ):
-                    if( os.path.exists(output_feild) or os.path.exists(os.path.dirname(output_feild)) ):
-                        logger.print_on_console( "Writing the output of cellByCellCompare to file : " + str(output_feild) )
-                        flg, err_msg = self.write_result_file(output_feild, collect_content, 'CellByCellCompare_Result')
-                    else:
-                        status_excel_create_file = False
-                        file_extension,status_get_ext = self.__get_ext(output_feild)
-                        if status_get_ext and file_extension is not None and file_extension in generic_constants.EXCEL_TYPES:
-                            status_excel_create_file,e_msg = self.dict[file_extension + '_create_file'](output_feild,'CellByCellCompare_Result')
-                        else:
-                            err_msg = 'Warning! : Invalid file extension. Output file format should be either ".xls" or ".xlxs".'
-                        if (status_excel_create_file):
-                            logger.print_on_console( "Writing the output of cellByCellCompare to file : " + str(output_feild) )
-                            flg, err_msg = self.write_result_file(output_feild, collect_content, 'CellByCellCompare_Result')
-                    if ( flg ):
-                        status = TEST_RESULT_PASS
-                        result = TEST_RESULT_TRUE
+                if(str(args[0].split(";")[0]).startswith("{") and str(args[0].split(";")[0]).endswith("}")):
+                    out_path = self.DV.get_dynamic_value(args[0].split(";")[0])
+                    
+                    if ( out_path ): 
+                        output_feild = out_path
+                        log.info("Choosen the dynamic file path")
+                        #logger.print_on_console("Choosen the dynamic file path")
                 else:
-                    logger.print_on_console("Output file not provided")
-                    if (collect_content) :
-                        output = collect_content
-                        status = TEST_RESULT_PASS
-                        result = TEST_RESULT_TRUE
-                    else :
-                        err_msg = "Content is empty"
+                    output_feild = args[0].split(";")[0]
+                    log.info("Choosen the direct file path")
+                    #logger.print_on_console("Choosen the direct file path")
+
+
+                book1 = open_workbook(input_path1)
+                book2 = open_workbook(input_path2)
+                try:
+                    if (sheetname1.strip() != ''):sheet1 = book1.sheet_by_name(sheetname1)
+                    else : 
+                        sheet1 = book1.sheet_by_index(0)
+                except Exception as e:
+                    sheet_exist.append(str(e))
+                try:
+                    if (sheetname2.strip() != ''):sheet2 = book2.sheet_by_name(sheetname2)
+                    else : 
+                        sheet2 = book2.sheet_by_index(0)
+                except Exception as e:
+                    #logger.print_on_console("Sheet Doesn't Exist: {}".format(str(e)))
+                    sheet_exist.append(str(e))
+
+                log.debug('verifying whether the files exists')
+                result1=self.verify_file_exists(input_path1,'')
+                result2=self.verify_file_exists(input_path2,'')
+
+                if result1[1] == TEST_RESULT_TRUE and result2[1]==TEST_RESULT_TRUE and len(sheet_exist)==0:
+                    log.info("taking the maxium row and column")
+                    row_max=max(sheet1.nrows,sheet2.nrows)
+                    col_max=max(sheet1.ncols,sheet2.ncols)
+                    for rownum in range(int(row_max)):
+                        for colnum in range(int(col_max)):
+                            try:
+                                c1=str(sheet1.cell(rownum, colnum).value)
+                            except:
+                                c1=None
+                            try:
+                                c2=str(sheet2.cell(rownum, colnum).value)
+                            except:
+                                c2=None
+                            if (c1!=None and c2!=None) and (c1!='' and c2!=''):
+                                if c1 != c2:
+                                    out='Not Matched'
+                                    desc="Not Matched, Cell Values {} and {}".format(c1,c2)
+                                else:
+                                    out="Matched"
+                                    desc="Matched"
+                            elif (c1==None or c1=='') and (c2== '' or c2==None):
+                                out=''
+                                desc=''
+                            else:
+                                out= 'Not Matched'
+                                desc="Not Matched, Cell Values {} and {}".format(c1,c2)
+
+                            if colnum not in collect_content.keys():
+                                collect_content[colnum]=[]
+                                if( opt == True ):
+                                    collect_content[colnum].append(desc)
+                                else:
+                                    collect_content[colnum].append(out)
+                            else:
+                                if( opt == True ):
+                                    collect_content[colnum].append(desc)
+                                else:
+                                    collect_content[colnum].append(out)
+                    try:
+                        del rownum, colnum, desc, out, c1, c2 #deleting variables
+                    except Exception as e :
+                        log.error('some error : {}'.format(e))
+                    if( output_feild ):
+                        
+                        if( os.path.exists(output_feild) or os.path.exists(os.path.dirname(output_feild)) ):
+
+                            logger.print_on_console( "Writing the output of cellByCellCompare to file ")
+                            flg, err_msg = self.write_result_file(output_feild, collect_content, 'CellByCellCompare_Result')
+                        else:
+                            status_excel_create_file = False
+                            file_extension,status_get_ext = self.__get_ext(output_feild)
+                            if status_get_ext and file_extension is not None and file_extension in generic_constants.EXCEL_TYPES:
+                                logger.print_on_console("File Does not exists, creating the file in specified path {}".format(output_feild))
+                                status_excel_create_file,e_msg = self.dict[file_extension + '_create_file'](output_feild,'CellByCellCompare_Result')
+                            else:
+                                err_msg = 'Warning! : Invalid file extension. Output file format should be either ".xls" or ".xlxs".'
+                            if (status_excel_create_file):
+                                logger.print_on_console( "Writing the output of cellByCellCompare to file : " + str(output_feild) )
+                                flg, err_msg = self.write_result_file(output_feild, collect_content, 'CellByCellCompare_Result')
+                        if ( flg ):
+                            if opt==True:
+                                comp_flg=True
+                                if len(collect_content)!=0:
+                                    for each_key in collect_content.keys():
+                                        for each_match in collect_content[each_key]:
+                                            if each_match.find("Not Matched")!=-1:
+                                                comp_flg=False
+                                    if comp_flg!=False:
+                                        logger.print_on_console("Input files are same")
+                                    else:
+                                        logger.print_on_console("Input files are not same")
+                                    status = TEST_RESULT_PASS
+                                    result = TEST_RESULT_TRUE
+                                else:
+                                    logger.print_on_console("Input files are same")
+
+                            else:
+                                if len(collect_content)!=0:
+                                    status = TEST_RESULT_PASS
+                                    result = TEST_RESULT_TRUE
+                    else:
+                        log.debug("Output file not provided")
+                        if (collect_content) :
+                            if opt==True:
+                                comp_flg=True
+                                if len(collect_content)!=0:
+                                    for each_key in collect_content.keys():
+                                        for each_match in collect_content[each_key]:
+                                            if each_match.find("Not Matched")!=-1:
+                                                comp_flg=False
+                                    if comp_flg!=False:
+                                        logger.print_on_console("Input files are same")
+                                    else:
+                                        logger.print_on_console("Input files are not same")
+                            output = collect_content
+                            status = TEST_RESULT_PASS
+                            result = TEST_RESULT_TRUE
+                        else :
+                            err_msg = "Content is empty"
+                else:
+                    if sheet_exist!=None:
+                        err_msg="Provided sheet doesn't exist: {}".format(', '.join(sheet_exist))
+                    else:
+                        err_msg = 'Error : Validity of file path 1 is : ' + str(result1[1]) + 'and validity of file path 2 is : ' + str(result2[1]) + '. Please make sure file paths entered are correct'
             else:
-                err_msg = 'Error : Validity of file path 1 is : ' + str(result1[1]) + 'and validity of file path 2 is : ' + str(result2[1]) + '. Please make sure file paths entered are correct'
+                err_msg="Invalid Inputs, Please provide the proper inputs"
+
             if ( err_msg ):
                 log.error(err_msg)
                 logger.print_on_console(err_msg)
@@ -1085,5 +1166,8 @@ class FileOperations:
             err_msg = 'Error occured in compare content of two files ERR_MSG: ' + str(e)
             log.error(err_msg)
             logger.print_on_console(err_msg)
-        del input_path1, sheetname1, input_path2, sheetname2, book1, book2, row_max, col_max, output_feild, result1, result2, collect_content #deleting variables
+        try:
+            del input_path1, sheetname1, input_path2, sheetname2, book1, book2, row_max, col_max, output_feild, result1, result2, collect_content, sheet_exist,each_key,each_match,comp_flg#deleting variables
+        except Exception as e :
+            log.error('some error : {}'.format(e))
         return status, result, output, err_msg
