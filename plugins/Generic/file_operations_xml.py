@@ -70,11 +70,13 @@ class FileOperationsXml:
                                 del el
                             if ( len(elementList) > 0 ):
                                 flg = True
+                                optFlg = True
                                 if ( elementList and output_path ):
                                     try:
                                         if( os.path.exists(output_path) or os.path.exists(os.path.dirname(output_path)) ):
                                             log.debug( "Writing the output of getXmlBlockData to file : " + str(output_path) )
                                             logger.print_on_console( "Writing the output of getXmlBlockData to file.")
+                                            optFlg = False
                                             with open(output_path,'w') as f:
                                                 for v in elementList:
                                                     f.write(v)
@@ -89,7 +91,8 @@ class FileOperationsXml:
                                     status = TEST_RESULT_PASS
                                     result = TEST_RESULT_TRUE
                                     logger.print_on_console( "Blocks found with given block xpath : " + str(len(elementList)) )
-                                    value = elementList
+                                    if( optFlg ):
+                                        value = elementList
                             else:
                                 err_msg = 'Invalid block : XML data not found'
                         else:
@@ -157,7 +160,7 @@ class FileOperationsXml:
                                     if ( not elementList ):
                                         flag = False
                                         log.debug( 'Element list not found for file : ' + str(path) )
-                                        logger.print_on_console('Invalid block : XML data not found')
+                                        #logger.print_on_console('Invalid block : XML data not found')
                                 else:
                                     flag = False
                                     log.debug( 'Invalid XML file : ' + str(path) )
@@ -172,6 +175,7 @@ class FileOperationsXml:
                             self.deleteTempFile(fp2) #delete temp file 2
                             if ( output_res and flg1 and flg2):
                                 flg = True
+                                optFlg = True
                                 num_diff,ch_lines = self.get_diff_count_xml(output_res)
                                 try:
                                     #-----------------------------------------------------------------selective output
@@ -188,6 +192,7 @@ class FileOperationsXml:
                                             if( os.path.isfile(output_path) or os.path.exists(os.path.dirname(output_path)) ):
                                                 log.debug( "Writing the output of selectiveXmlFileCompare to file : " + str(output_path) )
                                                 logger.print_on_console( "Writing the output of selectiveXmlFileCompare to file.")
+                                                optFlg = False
                                                 with open(output_path,'w') as f:
                                                     f.write(output_res)
                                             else:
@@ -205,10 +210,11 @@ class FileOperationsXml:
                                 err_msg = 'Invalid XML data'
                                 flg = False
                             if( flg ):
-                                log.info( "Comparision of files completed" )
-                                value = output_res
                                 status = TEST_RESULT_PASS
                                 result = TEST_RESULT_TRUE
+                                log.info( "Comparision of files completed" )
+                                if( optFlg ):
+                                    value = output_res
                         else:
                             err_msg = 'Invalid block : incorrect input block data'
                     else:
@@ -286,6 +292,7 @@ class FileOperationsXml:
                                 output_res.extend( out )
                             if ( output_res and len(output_res) > 0 ):
                                 flg = True
+                                optFlg = True
                                 num_diff,ch_lines = self.get_diff_count_xml(output_res)
                                 #num_diff,ch_lines = self.get_diff_count( output_res )
                                 try:
@@ -303,6 +310,7 @@ class FileOperationsXml:
                                             if( os.path.isfile(output_path) or os.path.exists(os.path.dirname(output_path)) ):
                                                 log.debug( "Writing the output of compXmlFileWithXmlBlock to file : " + str(output_path) )
                                                 logger.print_on_console( "Writing the output of compXmlFileWithXmlBlock to file.")
+                                                optFlg = False
                                                 with open(output_path,'w') as f:
                                                     f.write(output_res)
                                             else:
@@ -319,10 +327,11 @@ class FileOperationsXml:
                                 err_msg = 'Invalid block : XML data not found'
                                 flg = False
                             if( flg ):
-                                log.info( "Comparision of texts completed" )
-                                value = output_res
                                 status = TEST_RESULT_PASS
                                 result = TEST_RESULT_TRUE
+                                log.info( "Comparision of texts completed" )
+                                if( optFlg ):
+                                    value = output_res
                         else:
                             err_msg = 'Invalid block : incorrect input block data'
                     else:
@@ -371,6 +380,7 @@ class FileOperationsXml:
                     output_res = self.compare_texts(inputtext1,inputtext2)
                     if ( output_res ):
                         flg = True
+                        optFlg = True
                         try:
                             num_diff,ch_lines = self.get_diff_count(output_res)
                             if(num_diff):
@@ -386,6 +396,7 @@ class FileOperationsXml:
                                 if(os.path.isfile(output_path) or os.path.exists(os.path.dirname(output_path))):
                                     log.debug( "Writing the output of compareInputs to file : " + str(output_path) )
                                     logger.print_on_console( "Writing the output of compareInputs to file.")
+                                    optFlg = False
                                     with open(output_path,'w') as f:
                                         f.write(output_res)
                                 else:
@@ -395,11 +406,12 @@ class FileOperationsXml:
                             err_msg = ("Exception occurred while writing to output file in compareInputs : " + str(ex))
                             log.debug( err_msg )
                             flg = False
-                        if(flg):
-                            log.info("Comparision of texts completed")
-                            value = output_res
+                        if( flg ):
                             status = TEST_RESULT_PASS
                             result = TEST_RESULT_TRUE
+                            log.info("Comparision of texts completed")
+                            if( optFlg ):
+                                value = output_res
                 else:
                     err_msg = 'Empty inputs'
             else:
@@ -444,11 +456,13 @@ class FileOperationsXml:
                     err_msg = 'File format not supported'
                 if(beautified_output):
                     flg = True
+                    optFlg = True
                     try:
                         if(output_path):
                             if(os.path.isfile(output_path) or os.path.exists(os.path.dirname(output_path))):
                                 log.debug( "Writing the output of beautify to file: " + str(output_path) )
                                 logger.print_on_console( "Writing the output of beautify to file.")
+                                optFlg = False
                                 with open(output_path,'w') as f:
                                     f.write(beautified_output)
                             else:
@@ -459,9 +473,11 @@ class FileOperationsXml:
                         log.debug( err_msg )
                         flg = False
                     if(flg):
-                        value = beautified_output
                         status=TEST_RESULT_PASS
                         result=TEST_RESULT_TRUE
+                        log.info('Input text/file is beautified')
+                        if( optFlg ):
+                            value = beautified_output
             else:
                 err_msg = 'Invalid number of inputs'
             if ( err_msg != None ):
@@ -520,6 +536,7 @@ class FileOperationsXml:
 
                         if ( output_res ):
                             flg = True
+                            optFlg = True
                             try:
                                 if ( res_opt == 'selective' or res_opt == 'all') :
                                     log.info("Result to be displayed is : " + str(res_opt))
@@ -534,6 +551,7 @@ class FileOperationsXml:
                                     if(os.path.exists(output_path) or os.path.exists(os.path.dirname(output_path))):
                                         log.debug( "Writing the output of compareFiles to file : " + str(output_path) )
                                         logger.print_on_console( "Writing the output of compareFiles to file.")
+                                        optFlg = False
                                         with open(output_path,'w') as f:
                                             f.write(output_res)
                                     else:
@@ -544,10 +562,11 @@ class FileOperationsXml:
                                 log.debug( err_msg )
                                 flg = False
                             if(flg):
-                                log.info("Comparision of files completed")
-                                value = output_res
                                 status = TEST_RESULT_PASS
                                 result = TEST_RESULT_TRUE
+                                log.info("Comparision of files completed")
+                                if( optFlg ):
+                                    value = output_res
                     else:
                         err_msg = 'One or more files are empty'
                 else:
