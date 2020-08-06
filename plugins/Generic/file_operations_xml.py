@@ -73,7 +73,8 @@ class FileOperationsXml:
                                 if ( elementList and output_path ):
                                     try:
                                         if( os.path.exists(output_path) or os.path.exists(os.path.dirname(output_path)) ):
-                                            logger.print_on_console( "Writing the output of getXmlBlockData to file : " + str(output_path) )
+                                            log.debug( "Writing the output of getXmlBlockData to file : " + str(output_path) )
+                                            logger.print_on_console( "Writing the output of getXmlBlockData to file.")
                                             with open(output_path,'w') as f:
                                                 for v in elementList:
                                                     f.write(v)
@@ -87,7 +88,7 @@ class FileOperationsXml:
                                 if( flg ):
                                     status = TEST_RESULT_PASS
                                     result = TEST_RESULT_TRUE
-                                    logger.print_on_console( "Blocks found with given block xpath : " +str(len(elementList)) )
+                                    logger.print_on_console( "Blocks found with given block xpath : " + str(len(elementList)) )
                                     value = elementList
                             else:
                                 err_msg = 'Invalid block : XML data not found'
@@ -185,7 +186,8 @@ class FileOperationsXml:
                                             logger.print_on_console("No Difference between files in selectiveXmlFileCompare" )
                                         if(output_path):
                                             if( os.path.isfile(output_path) or os.path.exists(os.path.dirname(output_path)) ):
-                                                logger.print_on_console( "Writing the output of selectiveXmlFileCompare to : " + str(output_path) )
+                                                log.debug( "Writing the output of selectiveXmlFileCompare to file : " + str(output_path) )
+                                                logger.print_on_console( "Writing the output of selectiveXmlFileCompare to file.")
                                                 with open(output_path,'w') as f:
                                                     f.write(output_res)
                                             else:
@@ -299,7 +301,8 @@ class FileOperationsXml:
                                             logger.print_on_console("No Difference between files in compXmlFileWithXmlBlock" )
                                         if( output_path ):
                                             if( os.path.isfile(output_path) or os.path.exists(os.path.dirname(output_path)) ):
-                                                logger.print_on_console( "Writing the output of compXmlFileWithXmlBlock to : " + str(output_path) )
+                                                log.debug( "Writing the output of compXmlFileWithXmlBlock to file : " + str(output_path) )
+                                                logger.print_on_console( "Writing the output of compXmlFileWithXmlBlock to file.")
                                                 with open(output_path,'w') as f:
                                                     f.write(output_res)
                                             else:
@@ -381,14 +384,15 @@ class FileOperationsXml:
                             output_res = '\n'.join(output_res)
                             if(output_path):
                                 if(os.path.isfile(output_path) or os.path.exists(os.path.dirname(output_path))):
-                                    logger.print_on_console( "Writing the output of compareInputs to file: " + str(output_path) )
+                                    log.debug( "Writing the output of compareInputs to file : " + str(output_path) )
+                                    logger.print_on_console( "Writing the output of compareInputs to file.")
                                     with open(output_path,'w') as f:
                                         f.write(output_res)
                                 else:
                                     err_msg='Wrong file path entered'
                                     flg = False
                         except Exception as ex:
-                            err_msg = ("Exception occurred while writing to output file in compareInputs : "+str(ex))
+                            err_msg = ("Exception occurred while writing to output file in compareInputs : " + str(ex))
                             log.debug( err_msg )
                             flg = False
                         if(flg):
@@ -404,7 +408,7 @@ class FileOperationsXml:
                 log.error(err_msg)
                 logger.print_on_console(err_msg)
         except Exception as e:
-            err_msg = ("Exception occurred in compare_inputs while comparing inputs"+str(e))
+            err_msg = ("Exception occurred in compare_inputs while comparing inputs " + str(e))
             log.error( err_msg )
             logger.print_on_console( "Error occured in Compare Inputs" )
         return status, result, value ,err_msg
@@ -443,14 +447,15 @@ class FileOperationsXml:
                     try:
                         if(output_path):
                             if(os.path.isfile(output_path) or os.path.exists(os.path.dirname(output_path))):
-                                logger.print_on_console( "Writing the output of beautify to file: " + str(output_path) )
+                                log.debug( "Writing the output of beautify to file: " + str(output_path) )
+                                logger.print_on_console( "Writing the output of beautify to file.")
                                 with open(output_path,'w') as f:
                                     f.write(beautified_output)
                             else:
                                 flg = False
                                 err_msg='Wrong file path entered'
                     except Exception as ex:
-                        err_msg = ("Exception occurred while writing to output file in beautify_file : "+str(ex))
+                        err_msg = ("Exception occurred while writing to output file in beautify_file : " + str(ex))
                         log.debug( err_msg )
                         flg = False
                     if(flg):
@@ -463,7 +468,7 @@ class FileOperationsXml:
                 log.error(err_msg)
                 logger.print_on_console(err_msg)
         except Exception as e:
-            err_msg = ("Exception occurred in beautify_file : "+str(e))
+            err_msg = ("Exception occurred in beautify_file : " + str(e))
             log.error( err_msg )
             logger.print_on_console( "Error occured in Beautify File" )
         return status, result, value ,err_msg
@@ -527,14 +532,15 @@ class FileOperationsXml:
                                     logger.print_on_console("No Difference between inputs in compareFile")
                                 if(output_path):
                                     if(os.path.exists(output_path) or os.path.exists(os.path.dirname(output_path))):
-                                        logger.print_on_console( "Writing the output of compareFiles to file : " + str(output_path) )
+                                        log.debug( "Writing the output of compareFiles to file : " + str(output_path) )
+                                        logger.print_on_console( "Writing the output of compareFiles to file.")
                                         with open(output_path,'w') as f:
                                             f.write(output_res)
                                     else:
                                         err_msg = generic_constants.FILE_NOT_EXISTS
                                         flg = False
                             except Exception as ex:
-                                err_msg = ("Exception occurred while writing to output file in compareFile : "+str(ex))
+                                err_msg = ("Exception occurred while writing to output file in compareFile : " + str(ex))
                                 log.debug( err_msg )
                                 flg = False
                             if(flg):
@@ -555,7 +561,7 @@ class FileOperationsXml:
             err_msg = ("Exception occurred in compare_files while comparing two files"+str(e))
             log.error( err_msg )
             logger.print_on_console( "Error occured in Compare Files" )
-        return status, result, value ,err_msg
+        return status, result, value, err_msg
 #------------------------------------------keywords end---------------------------------------------
 
 #------------------------------------------keyword-operations-----------------------------------
