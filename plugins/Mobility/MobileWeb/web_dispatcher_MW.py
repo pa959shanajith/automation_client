@@ -19,6 +19,7 @@ import element_operations_MW
 import textbox_operations_MW
 import dropdown_listbox_MW
 import static_text_keywords_MW
+import device_keywords_MW
 import mob_screenshot_web
 import logger
 from webconstants_MW import *
@@ -49,6 +50,7 @@ class Dispatcher:
     action_keyowrds_object=action_keyowrds_web.Action_Key_App()
     statict_text_object = static_text_keywords_MW.StaticTextKeywords()
     custom_object=custom_keyword_MW.CustomKeyword()
+    device_keywords_object = device_keywords_MW.Device_Keywords()
     webelement_map=OrderedDict()
 
     MW_dict={
@@ -67,6 +69,8 @@ class Dispatcher:
         'dismisspopup':popup_object.dismiss_popup,
         'getpopuptext':popup_object.get_popup_text,
         'verifypopuptext':popup_object.verify_popup_text,
+        'getdevices' : device_keywords_object.get_device_list,
+        'invokedevice' : device_keywords_object.invoke_device,
 
 
         'getstatus': radio_checkbox_object.get_status,
@@ -130,10 +134,8 @@ class Dispatcher:
         'verifyhidden':util_object.verify_hidden,
         'verifyreadonly':util_object.verify_readonly,
         'setfocus':util_object.setfocus,
-        'mousehover':util_object.mouse_hover,
         'tab':util_object.tab,
         'actionkey':action_keyowrds_object.action_key,
-        'rightclick':util_object.rightclick,
         'iossendkey': util_object.iossendkey,
         'mouseclick':util_object.mouse_click,
         'verifywebimages':util_object.verify_web_images,
