@@ -17,7 +17,7 @@ import core_utils
 from selenium import webdriver
 from constants import *
 if SYSTEM_OS!='Darwin':
-    from pyrobot import Robot,Keys
+    from pyrobot_MW import Robot,Keys
 import browser_Keywords_MW
 import logging
 
