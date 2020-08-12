@@ -148,6 +148,7 @@ class Handler():
             data_param_path_temp = str(data_param_path)
             extract_path.append(data_param_path_temp)
         #Iterating through json array
+        appType=None
         for json_data in new_obj:
             #if json_data.has_key('template'):
                 #ws_template=json_data['template']
