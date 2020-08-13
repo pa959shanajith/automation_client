@@ -215,14 +215,14 @@ class GenericKeywordDispatcher:
                     if (str(output)==''):
                         output=output
                     #split output for static variable
-                    if (str(output[0]).startswith("|")):
+                    elif (str(output[0]).startswith("|")):
                         if ';' in output:
                             output = output.split(';')
                         else:
                             opList=[]
                             opList.append(output)
                             output = opList
-                    if str(output[0]).startswith("|") and str(output[0]).endswith("|"):
+                    elif str(output[0]).startswith("|") and str(output[0]).endswith("|"):
                         import handler
                         import controller
                         con = controller.Controller()
