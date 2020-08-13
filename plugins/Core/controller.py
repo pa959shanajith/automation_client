@@ -1353,8 +1353,6 @@ def kill_process():
     import os,shutil
     if SYSTEM_OS == 'Darwin':
         try:
-            # import browserops_MW
-            # browserops_MW.driver.quit()
             import browser_Keywords_MW
             browser_Keywords_MW.driver_obj.quit()
         except ImportError: pass
@@ -1362,13 +1360,6 @@ def kill_process():
             logger.print_on_console('Error in stopping scraping driver as driver is already closed')
             log.error(e)
 
-        try:
-            import browser_Keywords_MW
-            browser_Keywords_MW.driver_obj.quit()
-        except ImportError: pass
-        except Exception as e:
-            logger.print_on_console('Error in stopping browser driver as driver is already closed')
-            log.error(e)
 
         try:
             import install_and_launch
