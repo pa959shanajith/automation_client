@@ -212,6 +212,8 @@ class GenericKeywordDispatcher:
                 if( keyword in ['comparefiles','beautify','compareinputs','getxmlblockdata','selectivexmlfilecompare','compxmlfilewithxmlblock','cellbycellcompare'] ):
                     input = list(message)
                     output = tsp.outputval
+                    if (str(output)==''):
+                        output=output
                     #split output for static variable
                     if (str(output[0]).startswith("|")):
                         if ';' in output:

@@ -747,7 +747,7 @@ class FileOperations:
             logger.print_on_console(err_msg)
         return status,methodoutput,output_res,err_msg
 
-    def json_compare_content(self,input_path1,input_path2,*args):
+    def json_compare_content(self,input_path1,input_path2):
         """
         def : json_compare_content
         purpose : calls the respective method to compare the content of 2 Json
@@ -1126,7 +1126,7 @@ class FileOperations:
                                     status = TEST_RESULT_PASS
                                     result = TEST_RESULT_TRUE
                                 else:
-                                    logger.print_on_console("Input files are same")
+                                    logger.print_on_console("Input files are empty")
 
                             else:
                                 if len(collect_content)!=0:
@@ -1146,9 +1146,12 @@ class FileOperations:
                                         logger.print_on_console("Input files are same")
                                     else:
                                         logger.print_on_console("Input files are not same")
+
+                                    status = TEST_RESULT_PASS
+                                    result = TEST_RESULT_TRUE
+                                else:
+                                    logger.print_on_console("Input files are empty")
                             output = collect_content
-                            status = TEST_RESULT_PASS
-                            result = TEST_RESULT_TRUE
                         else :
                             err_msg = "Content is empty"
                 else:
