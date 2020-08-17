@@ -16,7 +16,7 @@ import sys
 import logging
 from constants import SYSTEM_OS
 if SYSTEM_OS!='Darwin':
-    from pyrobot import Robot
+    from pyrobot_MW import Robot
     import win32gui
     import win32process
     import win32con

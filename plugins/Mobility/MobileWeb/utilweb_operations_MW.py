@@ -18,7 +18,7 @@ from utils_web_MW import Utils
 from webconstants_MW import *
 from constants import *
 if SYSTEM_OS!='Darwin':
-    from pyrobot import Robot
+    from pyrobot_MW import Robot
     import win32gui
     import pyrobot_MW
 import table_keywords_MW
@@ -372,36 +372,6 @@ class UtilWebKeywords:
         return status,methodoutput,output,err_msg
 
 
-
-    def mouse_hover(self,webelement,*args):
-        status=TEST_RESULT_FAIL
-        methodoutput=TEST_RESULT_FALSE
-        output=OUTPUT_CONSTANT
-        err_msg=None
-        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
-        try:
-            if webelement is not None:
-                obj=Utils()
-                 #find the location of the element w.r.t viewport
-                location=obj.get_element_location(webelement)
-                logger.print_on_console('location is '+str(location))
-                if isinstance(browser_Keywords_MW.driver_obj,webdriver.Firefox):
-                    yoffset=browser_Keywords_MW.driver_obj.execute_script(MOUSE_HOVER_FF)
-                    logger.print_on_console('y offset is '+str(yoffset))
-                    obj.mouse_move(int(location.get('x')+9),int(location.get('y')+yoffset))
-                else:
-                    obj.enumwindows()
-                    obj.mouse_move(int(location.get('x')+9),int(location.get('y')+obj.rect[1]+6))
-                status=TEST_RESULT_PASS
-                methodoutput=TEST_RESULT_TRUE
-        except Exception as e:
-            err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
-            log.error(e)
-        return status,methodoutput,output,err_msg
-
-
-
-
     def tab(self,webelement,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
@@ -505,26 +475,6 @@ class UtilWebKeywords:
             log.error(e)
         return status,methodoutput,output,err_msg
 
-    def rightclick(self,webelement,*args):
-        status=TEST_RESULT_FAIL
-        methodoutput=TEST_RESULT_FALSE
-        output=OUTPUT_CONSTANT
-        err_msg=None
-        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
-        try:
-            if webelement is not None:
-                if webelement.is_enabled():
-                    log.debug(WEB_ELEMENT_ENABLED)
-                    from selenium.webdriver.common.action_chains import ActionChains
-                    action_obj=ActionChains(browser_Keywords_MW.driver_obj)
-                    action_obj.context_click(webelement).perform()
-                    log.debug('Performed Right click')
-                    status=TEST_RESULT_PASS
-                    methodoutput=TEST_RESULT_TRUE
-        except Exception as e:
-            err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
-            log.error(e)
-        return status,methodoutput,output,err_msg
 
 
     def mouse_click(self,webelement,input,*args):

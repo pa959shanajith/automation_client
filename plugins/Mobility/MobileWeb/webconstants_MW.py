@@ -149,10 +149,22 @@ OPEN_BROWSER='openbrowser'
 
 CLOSE_BROWSER='closebrowser'
 
+ELEMENT_NOT_DISPALYED = "Element not displayed"
+
+ELEMENT_IS_DISPALYED = 'Element is displayed'
+
+CLASS_NAME = 'android.widget.TextView'
+
+INVALID_KEYWORD = 'Invalid keyword'
+
+ELEMENT_FOUND=True
+
+WAIT_FOR_ELEMENT_EXISTS='waitforelementexists'
+
 
 NON_WEBELEMENT_KEYWORDS=['openbrowser','opennewbrowser','navigatetourl','getpagetitle','verifypagetitle','getcurrenturl','verifycurrenturl','closebrowser',
 'switchtowindow','closesubwindows','verifytextexists','waitforelementvisible','actionkey','refresh','maximizebrowser','getcurrenturl','acceptpopup','dismisspopup',
-'getpopuptext','verifypopuptext','clearcache','navigatewithauthenticate']
+'getpopuptext','verifypopuptext','clearcache','navigatewithauthenticate','getdevices','invokedevice','waitforelementexists']
 
 FOUND='found'
 

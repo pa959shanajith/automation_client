@@ -736,7 +736,7 @@ class MainNamespace(BaseNamespace):
             msg = 'Connection termination request triggered remotely by ' + args[0]
             logger.print_on_console(msg)
             log.info(msg)
-            if (len(args) > 1 and args[1 == "dereg"]):
+            if (len(args) > 1 and args[1] == "dereg"):
                 msg = 'ICE "'+root.ice_token["icename"]+'" is Deregistered.'
                 logger.print_on_console(msg)
                 log.info(msg)
@@ -1367,8 +1367,9 @@ class Main():
                 debugFlag = False
             else:
                 browsernumbers = ['1','2','3','6','7','8']
+                browser_names = {'1': 'Chrome', '2': 'Firefox', '3': 'Internet Explorer', '6': 'Safari', '7': 'Edge Legacy', '8': 'Edge Chromium'}
                 if browsername in browsernumbers:
-                    logger.print_on_console('Browser name : '+str(browsername))
+                    logger.print_on_console('Browser Name : '+browser_names[browsername])
                     #con = controller.Controller()
                     core_utils.get_all_the_imports('Web')
                     core_utils.get_all_the_imports('WebScrape')
