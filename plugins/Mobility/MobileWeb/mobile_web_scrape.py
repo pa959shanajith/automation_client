@@ -79,7 +79,7 @@ class ScrapeWindow(wx.Frame):
                         browser_Keywords_MW.driver_obj.get(data['scrapedurl'])
                     except:
                         log.error("scrapedurl is Empty")
-                    self.comparebutton = wx.ToggleButton(self.panel, label="Compare",pos=(12,68 ), size=(175, 28))
+                    self.comparebutton = wx.ToggleButton(self.panel, label="Start Compare",pos=(12,38 ), size=(175, 28))
                     self.comparebutton.Bind(wx.EVT_TOGGLEBUTTON, self.compare)   # need to implement OnExtract()
                 self.Centre()
                 style = self.GetWindowStyle()
@@ -126,19 +126,6 @@ class ScrapeWindow(wx.Frame):
             event.GetEventObject().SetLabel("Start clickandadd_MW")
             logger.print_on_console('Click and add scrape  completed')
 
-    # def compare(self,event):
-    #     state = event.GetEventObject().GetValue()
-    #     if state == True:
-    #         self.fullscrape_MWbutton.Disable()
-    #         self.startbutton.Disable()
-    #         obj = objectspy_MW.Object_Mapper()
-    #         obj.compare()
-    #         event.GetEventObject().SetLabel("Update")
-    #     else:
-    #         obj = objectspy_MW.Object_Mapper()
-    #         d = obj.update()
-    #         self.socketIO.send(d)
-    #         self.Close()
 
     def compare(self,event):
         state = event.GetEventObject().GetValue()
