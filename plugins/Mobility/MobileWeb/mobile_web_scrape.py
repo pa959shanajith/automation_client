@@ -9,7 +9,7 @@ from constants import SYSTEM_OS
 from socketIO_client import SocketIO,BaseNamespace
 from selenium.common.exceptions import NoSuchWindowException
 import time
-# from webscrape_utils_MW import WebScrape_Utils  
+from webscrape_utils_MW import WebScrape_Utils  
 import objectspy_MW
 import core_utils
 import platform
@@ -24,7 +24,7 @@ visiblity_status=False
 class ScrapeWindow(wx.Frame):
 
     #----------------------------------------------------------------------
-    def __init__(self, parent,id, title,browser,socketIO):
+    def __init__(self, parent,id, title,browser,socketIO,action,data):
         wx.Frame.__init__(self, parent, title=title,
                    pos=(300, 150),  size=(200, 150) ,style=wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER |wx.MAXIMIZE_BOX|wx.CLOSE_BOX) )
         self.SetBackgroundColour('#e6e7e8')
@@ -37,39 +37,58 @@ class ScrapeWindow(wx.Frame):
         self.scrape_selected_option = ["full"] 
         self.window_handle_number = 0
         status = obj.openBrowser(None,browser.split(';'))
-        self.panel = wx.Panel(self)
-        self.core_utilsobject = core_utils.CoreUtils()
+        # self.panel = wx.Panel(self)
         self.scrape_type = None
+        self.action = action
+        self.data = data
         # self.irisFlag = irisFlag
         self.invalid_urls = ["about:blank","data:,",""]
         self.invalid_url_msg = "There is no URL in the browser selected or the URL is empty/blank. Please load the webpage and then start performing the desired action."
         self.parent = parent
         self.driver = browser_Keywords_MW.driver_obj
-        # self.webscrape_utils_obj = WebScrape_Utils() 
-        #if SYSTEM_OS== "Darwin":
-        self.vsizer = wx.BoxSizer(wx.VERTICAL)
-        self.startbutton = wx.ToggleButton(self.panel, label="Start clickandadd",pos=(12,8 ), size=(175, 28))
-        self.startbutton.Bind(wx.EVT_TOGGLEBUTTON, self.clickandadd_MW)   # need to implement OnExtract()
-        # self.fullscrape_MWbutton = wx.Button(self.panel, label="Full Scrape",pos=(12,48 ), size=(175, 28)) #previously present
-        # self.fullscrape_MWbutton.Bind(wx.EVT_BUTTON, self.fullscrape_MW)   # need to implement OnExtract() #previously present
+        if status[1] == False:
+            self.socketIO.emit('scrape',status)
+            if self.driver is not None: self.driver.close()
+            self.parent.schedule.Enable()
+            self.Close()
+        else:
+            try:
+                self.panel = wx.Panel(self)
+                self.core_utilsobject = core_utils.CoreUtils()
+                self.webscrape_utils_obj = WebScrape_Utils()
+                if (self.action == 'scrape'): 
+                    #if SYSTEM_OS== "Darwin":
+                    self.vsizer = wx.BoxSizer(wx.VERTICAL)
+                    self.startbutton = wx.ToggleButton(self.panel, label="Start clickandadd",pos=(12,8 ), size=(175, 28))
+                    self.startbutton.Bind(wx.EVT_TOGGLEBUTTON, self.clickandadd_MW)   # need to implement OnExtract()
+                    # self.fullscrape_MWbutton = wx.Button(self.panel, label="Full Scrape",pos=(12,48 ), size=(175, 28)) #previously present
+                    # self.fullscrape_MWbutton.Bind(wx.EVT_BUTTON, self.fullscrape_MW)   # need to implement OnExtract() #previously present
 
-        self.fullscrapedropdown_MW = wx.ComboBox(self.panel, value="Full", pos=(12,48 ),size=(87.5, 25), choices=self.scrapeoptions, style = wx.CB_DROPDOWN)
-        self.fullscrapedropdown_MW.SetEditable(False)
-        self.fullscrapedropdown_MW.SetToolTip(wx.ToolTip("full objects will be scraped"))
-        self.fullscrapedropdown_MW.Bind(wx.EVT_COMBOBOX,self.OnFullscrapeChoice)
+                    self.fullscrapedropdown_MW = wx.ComboBox(self.panel, value="Full", pos=(12,48 ),size=(87.5, 25), choices=self.scrapeoptions, style = wx.CB_DROPDOWN)
+                    self.fullscrapedropdown_MW.SetEditable(False)
+                    self.fullscrapedropdown_MW.SetToolTip(wx.ToolTip("full objects will be scraped"))
+                    self.fullscrapedropdown_MW.Bind(wx.EVT_COMBOBOX,self.OnFullscrapeChoice)
 
-        self.fullscrapebutton_MW = wx.Button(self.panel, label="Scrape",pos=(101,48 ), size=(86, 25))
-        self.fullscrapebutton_MW.Bind(wx.EVT_BUTTON, self.fullscrape)
+                    self.fullscrapebutton_MW = wx.Button(self.panel, label="Scrape",pos=(101,48 ), size=(86, 25))
+                    self.fullscrapebutton_MW.Bind(wx.EVT_BUTTON, self.fullscrape)
 
-##            self.fullscrape_MWbutton.SetToolTip(wx.ToolTip("To perform fullscrape_MW Scraping"))
-        #if SYSTEM_OS != "Darwin":
-        # self.comparebutton = wx.ToggleButton(self.panel, label="Compare",pos=(12,68 ), size=(175, 28))
-        # self.comparebutton.Bind(wx.EVT_TOGGLEBUTTON, self.compare)   # need to implement OnExtract()
-        self.Centre()
-        style = self.GetWindowStyle()
-        self.SetWindowStyle( style|wx.STAY_ON_TOP )
-        wx.Frame(self.panel, style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER)
-        self.Show()
+            ##            self.fullscrape_MWbutton.SetToolTip(wx.ToolTip("To perform fullscrape_MW Scraping"))
+                    #if SYSTEM_OS != "Darwin":
+                elif(self.action == 'compare'):
+                    try:
+                        browser_Keywords_MW.driver_obj.get(data['scrapedurl'])
+                    except:
+                        log.error("scrapedurl is Empty")
+                    self.comparebutton = wx.ToggleButton(self.panel, label="Compare",pos=(12,68 ), size=(175, 28))
+                    self.comparebutton.Bind(wx.EVT_TOGGLEBUTTON, self.compare)   # need to implement OnExtract()
+                self.Centre()
+                style = self.GetWindowStyle()
+                self.SetWindowStyle( style|wx.STAY_ON_TOP )
+                wx.Frame(self.panel, style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER)
+                self.Show()
+            except Exception as e:
+                log.error(e)
+                self.parent.schedule.Enable()
 
 
 
@@ -107,18 +126,38 @@ class ScrapeWindow(wx.Frame):
             event.GetEventObject().SetLabel("Start clickandadd_MW")
             logger.print_on_console('Click and add scrape  completed')
 
+    # def compare(self,event):
+    #     state = event.GetEventObject().GetValue()
+    #     if state == True:
+    #         self.fullscrape_MWbutton.Disable()
+    #         self.startbutton.Disable()
+    #         obj = objectspy_MW.Object_Mapper()
+    #         obj.compare()
+    #         event.GetEventObject().SetLabel("Update")
+    #     else:
+    #         obj = objectspy_MW.Object_Mapper()
+    #         d = obj.update()
+    #         self.socketIO.send(d)
+    #         self.Close()
+
     def compare(self,event):
         state = event.GetEventObject().GetValue()
         if state == True:
-            self.fullscrape_MWbutton.Disable()
-            self.startbutton.Disable()
             obj = objectspy_MW.Object_Mapper()
-            obj.compare()
-            event.GetEventObject().SetLabel("Update")
-        else:
-            obj = objectspy_MW.Object_Mapper()
-            d = obj.update()
-            self.socketIO.send(d)
+            event.GetEventObject().SetLabel("Comparing...")
+            self.comparebutton.Disable()
+            d = obj.perform_compare(self.data)
+            if self.core_utilsobject.getdatasize(str(d),'mb') < self.webscrape_utils_obj.SCRAPE_DATA_LIMIT:
+                if  isinstance(d,str):
+                    if d.lower() == 'fail':
+                        self.socketIO.emit('scrape',d)
+                else:
+                    self.socketIO.emit('scrape',d)
+                    logger.print_on_console('Compare completed')
+            else:
+                logger.print_on_console('data exceeds max. Limit.')
+                self.socketIO.emit('scrape','Response Body exceeds max. Limit.')
+            self.parent.schedule.Enable()
             self.Close()
 
 
@@ -203,8 +242,8 @@ class ScrapeWindow(wx.Frame):
         d = fullscrape_MWobj.fullscrape(self.scrape_selected_option,self.window_handle_number,visiblity_status)
 
         '''Check the limit of data size as per Avo Assure standards'''
-        # if self.core_utilsobject.getdatasize(str(d),'mb') < self.webscrape_utils_obj.SCRAPE_DATA_LIMIT:
-        if self.core_utilsobject.getdatasize(str(d),'mb') < 30:
+        if self.core_utilsobject.getdatasize(str(d),'mb') < self.webscrape_utils_obj.SCRAPE_DATA_LIMIT:
+        # if self.core_utilsobject.getdatasize(str(d),'mb') < 30:
             if  isinstance(d,str):
                 if d.lower() == 'fail':
                     self.socketIO.emit('scrape',d)
