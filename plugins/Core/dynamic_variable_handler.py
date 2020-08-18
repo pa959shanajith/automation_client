@@ -20,6 +20,7 @@ import logging
 import ast
 import threading
 import json
+import controller
 local_dynamic = threading.local()
 
 class DynamicVariables:
@@ -43,7 +44,7 @@ class DynamicVariables:
             if dbvalue!=None and temp_dbvalue[0]=='{'+variable[0]+'}':
                   #Dynamic variable is sent to DB keyword 'fetch_data' to get the cell value present in given row and col of DB
                 dbvalue[-1]=inp_value
-                dyn_value=con_obj.generic_dispatcher_obj.fetch_data(dbvalue)
+                dyn_value=controller.local_cont.generic_dispatcher_obj.fetch_data(dbvalue)
                 res=True
         return res,dyn_value
 

@@ -288,12 +288,11 @@ class StringOperation:
                     actual_string=unidecode(actual_string)
                     to_find=coreutilsobj.get_UTF_8(to_find)
                     #output_val = actual_string.find(to_find)
-                    for m in re.finditer("(?=("+to_find+"))",actual_string):
-                        position.append(m.start()+1)
+                    position = [i+1 for i in range(len(actual_string)) if actual_string.startswith(to_find, i)]
                     output_val = len(position)
                     if len(position) == 1: position=position[0]
                     if(output_val == 0):
-                        logger.print_on_console('The Original String is:',actual_string ,'and' , actual_string , 'does not Contain', to_find )
+                        logger.print_on_console('The Original String is:',actual_string ,' and ' , actual_string , ' does not Contain ', to_find )
                     else:
                         log.info('Result : ')
                         log.info(output_val)
@@ -515,7 +514,10 @@ class StringOperation:
                             status=generic_constants.TEST_RESULT_PASS
                             result=generic_constants.TEST_RESULT_TRUE
                         elif (data_type == 'num'):
-                            output = ''.join(random.choice(string.digits) for i in range(data_length_int))
+                            while True:
+                                output = ''.join(random.choice(string.digits) for i in range(data_length_int))
+                                if data_length_int==1: break
+                                elif data_length_int>1 and output[0]!='0': break
 ##                            logger.print_on_console('Result : ',output)
                             log.info('Result : ')
                             log.info(output)

@@ -498,7 +498,7 @@ class Config_window(wx.Frame):
             "Disp_var":[(235,222),(135, 25),(375,218), (70,-1)],
             "C_Timeout" :[(12,252),(120, 25),(135,248), (70,-1)],
             "Delay_Stringinput":[(235,252),(130, 25),(375,248), (70,-1)],
-            "err_text":[(85,525),(350, 25)],
+            "err_text":[(50,525),(350, 25)],
             "Save":[(100,550), (100, 28)],
             "Close":[(250,550), (100, 28)]
             }
@@ -856,7 +856,7 @@ class Config_window(wx.Frame):
         #now setting that boxsizer to our panel1
         self.panel1.SetSizer(self.bSizer)
 
-        self.error_msg=wx.StaticText(self.panel, label="", pos=config_fields["err_text"][0],size=config_fields["err_text"][1], style=0, name="")
+        self.error_msg=wx.StaticText(self.panel, label="", pos=config_fields["err_text"][0],size=config_fields["err_text"][1], style=wx.ALIGN_CENTRE, name="")
         self.save_btn=wx.Button(self.panel, label="Save",pos=config_fields["Save"][0], size=config_fields["Save"][1])
         self.save_btn.Bind(wx.EVT_BUTTON, self.config_check)
         self.close_btn=wx.Button(self.panel, label="Close",pos=config_fields["Close"][0], size=config_fields["Close"][1])
@@ -935,7 +935,7 @@ class Config_window(wx.Frame):
         headless_mode = self.rbox15.GetStringSelection()
         delay_string_in = self.Delay_input.GetValue()
         if extn_enabled == 'Yes' and headless_mode == 'Yes':
-            self.error_msg.SetLabel("Extension Enable must be disabled when in Headless Mode")
+            self.error_msg.SetLabel("Extension Enable must be disabled when Headless Mode is enabled")
             self.error_msg.SetForegroundColour((255,0,0))
             return
         #----------------creating data dictionary
