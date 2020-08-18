@@ -1368,9 +1368,6 @@ class Main():
                 cw.scrapewindow = mobileScrapeObj.ScrapeWindow(parent = cw,id = -1, title="Avo Assure - Mobile Scrapper",filePath = browsername,socketIO = socketIO)
                 mobileScrapeFlag=False
             elif mobileWebScrapeFlag==True:
-                core_utils.get_all_the_imports('Mobility/MobileWeb')
-                import mobile_web_scrape
-                mobileWebScrapeObj=mobile_web_scrape
                 cw.scrapewindow = mobileWebScrapeObj.ScrapeWindow(parent = cw,id = -1, title="Avo Assure - Mobile Scrapper",browser = browsername,socketIO = socketIO,action=action,data=data)
                 mobileWebScrapeFlag=False
             elif desktopScrapeFlag==True:
