@@ -213,9 +213,10 @@ class MainNamespace(BaseNamespace):
                 res = light.perform_highlight(args[0],args[1])
                 logger.print_on_console('Highlight result: '+str(res))
             if appType==APPTYPE_MOBILE.lower():
+                core_utils.get_all_the_imports('Mobility/MobileWeb')
                 import highlight_MW
                 light =highlight_MW.Highlight()
-                res = light.highlight(args,None,None)
+                res = light.perform_highlight(args[0],args[1])
                 logger.print_on_console('Highlight result: '+str(res))
             if appType==APPTYPE_DESKTOP_JAVA.lower():
                 if(not args[0].startswith('iris')):
@@ -422,17 +423,37 @@ class MainNamespace(BaseNamespace):
         try:
             if check_execution_lic("scrape"): return None
             elif bool(cw.scrapewindow): return None
-            global mobileWebScrapeObj,mobileWebScrapeFlag
+            global mobileWebScrapeObj,mobileWebScrapeFlag,action,data
             #con = controller.Controller()
             global browsername
+            compare_flag=False
             browsername = args[0]+";"+args[1]
+            args = list(args)
+            d = args[2]
+            data = {}
+            action = d['action']
             if SYSTEM_OS=='Darwin':
                 core_utils.get_all_the_imports('Mobility/MobileWeb')
             else:
                 core_utils.get_all_the_imports('Mobility')
-            import mobile_web_scrape
-            mobileWebScrapeObj=mobile_web_scrape
-            mobileWebScrapeFlag=True
+            if action == 'userobject':
+                core_utils.get_all_the_imports('Mobility/MobileWeb')
+                import UserObjectScrape_MW
+                webscrape=UserObjectScrape_MW.UserObject()
+                webscrape.get_user_object(d,socketIO)
+            elif action == 'compare':
+                compare_flag=True
+                mobileWebScrapeFlag=True
+                # task = d['task']
+                data['view'] = d['viewString']
+                data['scrapedurl'] = d['scrapedurl']
+            else:
+                if action == 'scrape':
+                    # task = d['task']
+                    core_utils.get_all_the_imports('Mobility/MobileWeb')
+                    import mobile_web_scrape
+                    mobileWebScrapeObj=mobile_web_scrape
+                    mobileWebScrapeFlag=True
             wx.PostEvent(cw.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, cw.GetId()))
         except Exception as e:
             err_msg='Error while Scraping Mobile application'
@@ -1347,7 +1368,7 @@ class Main():
                 cw.scrapewindow = mobileScrapeObj.ScrapeWindow(parent = cw,id = -1, title="Avo Assure - Mobile Scrapper",filePath = browsername,socketIO = socketIO)
                 mobileScrapeFlag=False
             elif mobileWebScrapeFlag==True:
-                cw.scrapewindow = mobileWebScrapeObj.ScrapeWindow(parent = cw,id = -1, title="Avo Assure - Mobile Scrapper",browser = browsername,socketIO = socketIO)
+                cw.scrapewindow = mobileWebScrapeObj.ScrapeWindow(parent = cw,id = -1, title="Avo Assure - Mobile Scrapper",browser = browsername,socketIO = socketIO,action=action,data=data)
                 mobileWebScrapeFlag=False
             elif desktopScrapeFlag==True:
                 cw.scrapewindow = desktopScrapeObj.ScrapeWindow(parent = cw,id = -1, title="Avo Assure - Desktop Scrapper",filePath = browsername,socketIO = socketIO,irisFlag = irisFlag)
