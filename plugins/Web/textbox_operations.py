@@ -31,7 +31,7 @@ class TextboxKeywords:
         local_to.log.debug('Validating user input for max_length attribute')
         user_input=None
         max_len=self.__gettexbox_length(webelement)
-        if not(max_len is None or max_len is '' or max_len is 'null'):
+        if not(max_len is None or max_len is '' or max_len == 'null'):
             max_len=int(float(max_len))
             if len(input) > max_len:
                 user_input=input[0:max_len]
