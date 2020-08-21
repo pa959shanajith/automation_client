@@ -537,57 +537,53 @@ class UtilWebKeywords:
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             from PIL import Image
-            img_src = webelement.get_attribute("src")
-            file1 = io.StringIO(urllib.request.urlopen(img_src).read())
-            file2=input[0]
-            log.info(INPUT_IS)
-            log.info(file2)
-            if file1 != None and file2 != None and  file2 != '' and os.path.exists(file2) :
-                log.debug('comparing the images')
-                if self.verify_image_obj != None: #Meaning user has advanced image processing plugin
-                    #print 'Entered advanced'
-                    if self.verify_image_obj.imagecomparison(file1,file2):
-                        info_msg=ERROR_CODE_DICT['MSG_IMAGE_COMPARE_PASS']
-                        log.info(info_msg)
-                        logger.print_on_console(info_msg)
-                        methodoutput=TEST_RESULT_TRUE
-                        status=TEST_RESULT_PASS
-                    else:
-                		#using MSE
-                        from PIL import Image
-                        import numpy as np
-
-                        img1 = Image.open(file1)
-                        img2 = Image.open(file2)
-                        width1, height1 = img1.size
-                        width2, height2 = img2.size
-                        size=(min(width1,width2,1024),min(height1,height2,800))
-                        img1 = img1.convert('RGB')
-                        img2 = img2.convert('RGB')
-                        img1 = img1.resize(size)
-                        img2 = img2.resize(size)
-                        imageA = np.asarray(img1)
-                        imageB = np.asarray(img2)
-                        err = np.sum((imageA.astype("float") - imageB.astype("float"))**2)
-                        #print 'err: ',err
-                        err /= float(size[0]*size[1]*3*255*255);
-                        #print 'err %: ',err*100,'%'
-                        if(err<0.0005):
+            if webelement!=None and webelement !='':
+                img_src = webelement.get_attribute("src")
+                file1 = io.BytesIO(urllib.request.urlopen(img_src).read())
+                file2=input[0]
+                log.info(INPUT_IS)
+                log.info(file2)
+                if file1 != None and file2 != None and  file2 != '' and os.path.exists(file2) :
+                    log.debug('comparing the images')
+                    if self.verify_image_obj != None: #Meaning user has advanced image processing plugin
+                        if self.verify_image_obj.imagecomparison(file1,file2):
                             info_msg=ERROR_CODE_DICT['MSG_IMAGE_COMPARE_PASS']
                             log.info(info_msg)
                             logger.print_on_console(info_msg)
                             methodoutput=TEST_RESULT_TRUE
                             status=TEST_RESULT_PASS
-                        else:
-                            err_msg=ERROR_CODE_DICT['ERR_IMAGE_COMPARE_FAIL']
+                    else:
+                            from PIL import Image
+                            import numpy as np
+                            size=(128,128)
+                            img1 = Image.open(file1)
+                            img2 = Image.open(file2)
+                            img1 = img1.convert('RGB')
+                            img2 = img2.convert('RGB')
+                            img1 = img1.resize(size)
+                            img2 = img2.resize(size)
+                            imageA = np.asarray(img1)
+                            imageB = np.asarray(img2)
+                            err = np.sum((imageA.astype("float") - imageB.astype("float"))**2)
+                            err /= float(imageA.shape[0] * imageA.shape[1])
+                            if(err<1000):
+                                info_msg=ERROR_CODE_DICT['MSG_IMAGE_COMPARE_PASS']
+                                log.info(info_msg)
+                                logger.print_on_console(info_msg)
+                                methodoutput=TEST_RESULT_TRUE
+                                status=TEST_RESULT_PASS
+                            else:
+                                err_msg=ERROR_CODE_DICT['ERR_IMAGE_COMPARE_FAIL']
+                else:
+                    err_msg=ERROR_CODE_DICT['ERR_NO_IMAGE_SOURCE']
             else:
-                err_msg=ERROR_CODE_DICT['ERR_NO_IMAGE_SOURCE']
+                err_msg='Web element not found'
+            if err_msg != None:
+                logger.print_on_console(err_msg)
+                log.error(err_msg)
         except Exception as e:
             err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
             log.error(e)
-        if err_msg is not None:
-            logger.print_on_console(err_msg)
-            log.error(err_msg)
         return status,methodoutput,output,err_msg
 
     def image_similarity_percentage(self,webelement,input,*args):
@@ -598,55 +594,53 @@ class UtilWebKeywords:
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             from PIL import Image
-            img_src = webelement.get_attribute("src")
-            file1 = io.StringIO(urllib.request.urlopen(img_src).read())
-            file2=input[0]
-            log.info(INPUT_IS)
-            log.info(file2)
-            if file1 != None and file2 != None and  file2 != '' and os.path.exists(file2) :
-                log.debug('comparing the images')
-                if self.verify_image_obj != None: #Meaning user has advanced image processing plugin
-                    #print 'Entered advanced'
-                    if self.verify_image_obj.imagecomparison(file1,file2):
-                        info_msg=ERROR_CODE_DICT['MSG_IMAGE_COMPARE_PASS']
-                        log.info(info_msg)
-                        logger.print_on_console(info_msg)
-                        methodoutput=TEST_RESULT_TRUE
-                        status=TEST_RESULT_PASS
+            if webelement!=None and webelement !='':
+                img_src = webelement.get_attribute("src")
+                file1 = io.BytesIO(urllib.request.urlopen(img_src).read())
+                file2=input[0]
+                log.info(INPUT_IS)
+                log.info(file2)
+                if file1 != None and file2 != None and  file2 != '' and os.path.exists(file2) :
+                    log.debug('comparing the images')
+                    if self.verify_image_obj != None: #Meaning user has advanced image processing plugin
+                        if self.verify_image_obj.imagecomparison(file1,file2):
+                            info_msg=ERROR_CODE_DICT['MSG_IMAGE_COMPARE_PASS']
+                            log.info(info_msg)
+                            logger.print_on_console(info_msg)
+                            methodoutput=TEST_RESULT_TRUE
+                            status=TEST_RESULT_PASS
                     else:
-                		#using MSE
-                        from PIL import Image
-                        import numpy as np
-
-                        img1 = Image.open(file1)
-                        img2 = Image.open(file2)
-                        width1, height1 = img1.size
-                        width2, height2 = img2.size
-                        size=(min(width1,width2,1024),min(height1,height2,800))
-                        img1 = img1.convert('RGB')
-                        img2 = img2.convert('RGB')
-                        img1 = img1.resize(size)
-                        img2 = img2.resize(size)
-                        imageA = np.asarray(img1)
-                        imageB = np.asarray(img2)
-                        err = np.sum((imageA.astype("float") - imageB.astype("float"))**2)
-                        #print 'err: ',err
-                        err /= float(size[0]*size[1]*3*255*255);
-                        #print 'err %: ',err*100,'%'
-                        output = str((1-err)*100)
-                        logger.print_on_console("Image similarity percentage is: "+str((1-err)*100)+"%")
-                        methodoutput=TEST_RESULT_TRUE
-                        status=TEST_RESULT_PASS
-                        log.info('Result is ',output)
-                        logger.print_on_console('Result is ',output)
-            else:
-                err_msg=ERROR_CODE_DICT['ERR_NO_IMAGE_SOURCE']
+                            from PIL import Image
+                            import numpy as np
+                            size=(128,128)
+                            img1 = Image.open(file1)
+                            img2 = Image.open(file2)
+                            img1 = img1.convert('RGB')
+                            img2 = img2.convert('RGB')
+                            img1 = img1.resize(size)
+                            img2 = img2.resize(size)
+                            imageA = np.asarray(img1)
+                            imageB = np.asarray(img2)
+                            err = np.sum((imageA.astype("float") - imageB.astype("float"))**2)
+                            err /= float(imageA.shape[0] * imageA.shape[1])
+                            #print 'err: ',err
+                            err /= float(size[0]*size[1]*3*255*255)
+                            #print 'err %: ',err*100,'%'
+                            output = str((1-err)*100)
+                            logger.print_on_console("Image similarity percentage is: "+str((1-err)*100)+"%")
+                            methodoutput=TEST_RESULT_TRUE
+                            status=TEST_RESULT_PASS
+                            log.info('Result is ',output)
+                            logger.print_on_console('Result is ',output)
+                else:
+                    err_msg=ERROR_CODE_DICT['ERR_NO_IMAGE_SOURCE']
+                if err_msg != None:
+                    logger.print_on_console(err_msg)
+                    log.error(err_msg)
         except Exception as e:
-            err_msg=INPUT_ERROR
             log.error(e)
-        if err_msg is not None:
-            logger.print_on_console(err_msg)
-            log.error(err_msg)
+            logger.print_on_console(e)
+            err_msg=INPUT_ERROR
         return status,methodoutput,output,err_msg
 
     

@@ -24,6 +24,7 @@ import mob_screenshot_web
 import logger
 from webconstants_MW import *
 import custom_keyword_MW
+import screenshot_keywords
 from collections import OrderedDict
 from constants import *
 import action_keyowrds_web
@@ -375,8 +376,8 @@ class Dispatcher:
                     if(keyword.lower() == "sendfunctionkeys"):
                         input.extend(actual_input)
                     ## Issue #190 Driver control won't switch back to parent window
-                    # if self.popup_object.check_if_no_popup_exists():
-                    #     self.browser_object.validate_current_window_handle()
+                    if self.popup_object.check_if_no_popup_exists():
+                        self.browser_object.validate_current_window_handle()
                     if objectname=="@Object":
                         ##webelement = input[0]
                         input =input[1:]
@@ -399,15 +400,15 @@ class Dispatcher:
                     #     if self.popup_object.check_if_no_popup_exists():
                     #         self.browser_object.update_window_handles()
                     driver=browser_Keywords_MW.driver_obj
-                    # if self.popup_object.check_if_no_popup_exists() and (keyword not in [GET_POPUP_TEXT,VERIFY_POPUP_TEXT]):
-                    #     driver.switch_to.default_content()
+                    if self.popup_object.check_if_no_popup_exists() and (keyword not in [GET_POPUP_TEXT,VERIFY_POPUP_TEXT]):
+                        driver.switch_to.default_content()
                     if flag and webelement==None and teststepproperty.custname!='@Browser':
                         result=list(result)
                         result[3]=WEB_ELEMENT_NOT_FOUND
                     if keyword == GET_INNER_TABLE and (output != '' and output.startswith('{') and output.endswith('}')):
                         webelement_map[output]=result[2]
 
-                    elif keyword not in [OPEN_BROWSER,CLOSE_BROWSER]:
+                    elif keyword not in [OPEN_BROWSER,CLOSE_BROWSER,GET_POPUP_TEXT,VERIFY_POPUP_TEXT]:
                         if configvalues['retrieveURL'].lower() == 'yes':
                             if result[0].lower() == 'fail':
                                 res,value=self.check_url_error_code()

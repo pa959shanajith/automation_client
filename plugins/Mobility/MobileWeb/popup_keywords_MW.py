@@ -16,6 +16,7 @@ import webconstants_MW
 from selenium import webdriver
 import browser_Keywords_MW
 import logging
+import core_utils
 from constants import *
 from selenium.common.exceptions import NoAlertPresentException
 
@@ -67,7 +68,7 @@ class PopupKeywords():
             methodoutput = webconstants_MW.TEST_RESULT_TRUE
         except Exception as e:
             logger.print_on_console(EXCEPTION_OCCURED,e)
-            log.error(EXCEPTION_OCCURED)
+            log.error(e)
             err_msg = "EXCEPTION OCCURED"
         log.info(RETURN_RESULT)
         return status,methodoutput,output, err_msg
@@ -117,7 +118,11 @@ class PopupKeywords():
             log.info('Switched to Alert and retrieved the text')
             logger.print_on_console('Alert text : ' , text)
             log.info('Alert text= '+ str( text))
+            # input = inputs[0]
+            # input = input.strip()
             input = inputs[0]
+            coreutilsobj=core_utils.CoreUtils()
+            input=coreutilsobj.get_UTF_8(input)
             input = input.strip()
             logger.print_on_console('Input text : ' , input)
             log.info('Input text= '+ str( input))
@@ -149,7 +154,7 @@ class PopupKeywords():
             log.debug('Got the driver object from browser keyword class')
             log.debug(driver)
             try:
-                text = driver.switch_to_alert().text
+                text = driver.switch_to.alert.text
                 log.debug('Popup exists with text : %s', text)
                 return False
             except Exception as e:

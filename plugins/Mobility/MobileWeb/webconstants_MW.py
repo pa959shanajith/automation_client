@@ -161,6 +161,10 @@ ELEMENT_FOUND=True
 
 WAIT_FOR_ELEMENT_EXISTS='waitforelementexists'
 
+GET_POPUP_TEXT = 'getpopuptext'
+
+VERIFY_POPUP_TEXT = 'verifypopuptext'
+
 
 NON_WEBELEMENT_KEYWORDS=['openbrowser','opennewbrowser','navigatetourl','getpagetitle','verifypagetitle','getcurrenturl','verifycurrenturl','closebrowser',
 'switchtowindow','closesubwindows','verifytextexists','waitforelementvisible','actionkey','refresh','maximizebrowser','getcurrenturl','acceptpopup','dismisspopup',

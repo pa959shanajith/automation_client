@@ -261,6 +261,22 @@ class BrowserKeywords():
             logger.print_on_console(err_msg)
         return status,result,output,err_msg
 
+    def validate_current_window_handle(self):
+    	## Issue #190 Driver control won't switch back to parent window
+        if driver_obj is not None:
+            try:
+                winHandles=driver_obj.window_handles
+                curHandle=driver_obj.current_window_handle
+            except Exception as e:
+                log.error(e)
+                rev_recent_handles=list(recent_handles)
+                rev_recent_handles.reverse()
+                for h in rev_recent_handles:
+                    try:
+                        driver_obj.switch_to.window(h)
+                    except Exception as e:
+                        log.error(e)
+
     def update_recent_handle(self,h): 
         if len(self.recent_handles)==0 or self.recent_handles[-1]!=h:
             self.recent_handles.append(h)

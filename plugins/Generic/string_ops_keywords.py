@@ -514,7 +514,10 @@ class StringOperation:
                             status=generic_constants.TEST_RESULT_PASS
                             result=generic_constants.TEST_RESULT_TRUE
                         elif (data_type == 'num'):
-                            output = ''.join(random.choice(string.digits) for i in range(data_length_int))
+                            while True:
+                                output = ''.join(random.choice(string.digits) for i in range(data_length_int))
+                                if data_length_int==1: break
+                                elif data_length_int>1 and output[0]!='0': break
 ##                            logger.print_on_console('Result : ',output)
                             log.info('Result : ')
                             log.info(output)
