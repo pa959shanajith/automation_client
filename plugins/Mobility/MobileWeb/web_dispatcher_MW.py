@@ -178,7 +178,7 @@ class Dispatcher:
         objectname = teststepproperty.objectname
         output = teststepproperty.outputval
         objectname = objectname.strip()
-        url=teststepproperty.url.strip()
+        url = teststepproperty.url.strip() if(hasattr(teststepproperty, 'url')) else ""
         keyword = teststepproperty.name.lower()
         driver = browser_Keywords_MW.driver_obj
         webelement = None
