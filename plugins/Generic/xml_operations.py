@@ -103,6 +103,7 @@ class XMLOperations():
             if isinstance(input_string,str):
                 encoded_inp_string=input_string.encode('utf-8')
             try:
+                if (type(encoded_inp_string)==bytes):encoded_inp_string = encoded_inp_string.decode('utf8')
                 json_obj=json.loads(encoded_inp_string)
                 print ("Checking the JSON : {}".format(json_obj))
                 if len(args)>0:
