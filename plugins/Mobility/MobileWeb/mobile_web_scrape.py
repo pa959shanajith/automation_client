@@ -221,9 +221,9 @@ class ScrapeWindow(wx.Frame):
         scrape_selected_option must be having one more entry as the value of tagname/xpath'''
         global visiblity_status
         if self.scrape_selected_option[0]  == self.scrapeoptions[-1]:
-            self.scrape_selected_option.append(self.fullscrapedropdown.GetValue())
+            self.scrape_selected_option.append(self.fullscrapedropdown_MW.GetValue())
         elif self.scrape_selected_option[0] == self.scrapeoptions[-2]:
-            self.scrape_selected_option.append(self.fullscrapedropdown.GetValue().lower())
+            self.scrape_selected_option.append(self.fullscrapedropdown_MW.GetValue().lower())
         if len(self.scrape_selected_option) > 1:
             logger.print_on_console("value is: ",self.scrape_selected_option[1])
         d = fullscrape_MWobj.fullscrape(self.scrape_selected_option,self.window_handle_number,visiblity_status)
