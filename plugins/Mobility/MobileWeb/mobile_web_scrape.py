@@ -148,26 +148,6 @@ class ScrapeWindow(wx.Frame):
             self.Close()
 
 
-    # #----------------------------------------------------------------------
-    # def fullscrape_MW(self,event):
-    #     logger.print_on_console('Performing full scrape')
-    #     d = fullscrape_MWobj.Fullscrape()
-
-
-    #     #10 is the limit of MB set as per Avo Assure standards
-    #     if self.core_utilsobject.getdatasize(str(d),'mb') < 10:
-    #         self.socketIO.emit('scrape',d)
-    #     else:
-    #         logger.print_on_console('Scraped data exceeds max. Limit.')
-    #         self.socketIO.emit('scrape','Response Body exceeds max. Limit.')
-    #     self.parent.schedule.Enable()
-    #     self.Close()
-    #     if d != 'FAIL':
-    #         logger.print_on_console('Full scrape  completed')
-    #     else:
-    #         logger.print_on_console('Full scrape not Done')
-
-
     def fullscrape(self,event):
         try:
             if not(self.driver.current_window_handle):
