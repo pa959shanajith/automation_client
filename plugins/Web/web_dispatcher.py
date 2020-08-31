@@ -449,11 +449,9 @@ class Dispatcher:
                     if configvalues['screenShot_Flag'].lower() == 'fail':
                         if result[0].lower() == 'fail':
                             file_path = screen_shot_obj.captureScreenshot()
-                            driver.save_screenshot(file_path[2])
                             result.append(file_path[2])
                     elif configvalues['screenShot_Flag'].lower() == 'all':
                         file_path = screen_shot_obj.captureScreenshot()
-                        driver.save_screenshot(file_path[2])
                         result.append(file_path[2])
         except TypeError as e:
             local_Wd.log.error(e,exc_info=True)
