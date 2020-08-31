@@ -66,7 +66,13 @@ class RadioCheckboxKeywords():
                         status = TEST_RESULT_PASS
                         methodoutput = TEST_RESULT_TRUE
                     else:
-                        if self.utilobj.is_visible(webelement):
+                        if self.__check_visibility_from_config():
+                            # performing js code
+                            local_rco.log.debug('element is visible, performing js code')
+                            browser_Keywords.local_bk.driver_obj.execute_script(webconstants.CLICK_RADIO_CHECKBOX,webelement)
+                            status = TEST_RESULT_PASS
+                            methodoutput = TEST_RESULT_TRUE
+                        elif self.utilobj.is_visible(webelement):
                             # performing selenium code
                             local_rco.log.debug('element is visible, performing selenium code')
                             webelement.click()
@@ -99,7 +105,13 @@ class RadioCheckboxKeywords():
                             status = TEST_RESULT_PASS
                             methodoutput = TEST_RESULT_TRUE
                         else:
-                            if self.utilobj.is_visible(webelement):
+                            if self.__check_visibility_from_config():
+                                # performing js code
+                                local_rco.log.debug('element is visible, performing js code')
+                                browser_Keywords.local_bk.driver_obj.execute_script(webconstants.CLICK_RADIO_CHECKBOX,webelement)
+                                status = TEST_RESULT_PASS
+                                methodoutput = TEST_RESULT_TRUE
+                            elif self.utilobj.is_visible(webelement):
                                 # performing selenium code
                                 local_rco.log.debug('element is visible, performing selenium code')
                                 webelement.click()
