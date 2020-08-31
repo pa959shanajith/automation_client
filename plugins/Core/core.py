@@ -206,38 +206,43 @@ class MainNamespace(BaseNamespace):
         try:
             appType=args[2]
             appType=appType.lower()
-            if appType==APPTYPE_WEB:
-                core_utils.get_all_the_imports('WebScrape')
-                import highlight
-                light =highlight.Highlight()
-                res = light.perform_highlight(args[0],args[1])
-                logger.print_on_console('Highlight result: '+str(res))
-            if appType==APPTYPE_MOBILE.lower():
-                core_utils.get_all_the_imports('Mobility/MobileWeb')
-                import highlight_MW
-                light =highlight_MW.Highlight()
-                res = light.perform_highlight(args[0],args[1])
-                logger.print_on_console('Highlight result: '+str(res))
-            if appType==APPTYPE_DESKTOP_JAVA.lower():
-                if(not args[0].startswith('iris')):
-                    #con =controller.Controller()
-                    core_utils.get_all_the_imports('Oebs')
-                    import utils
-                    light =utils.Utils()
-                    res = light.highlight(args[0],args[1])
+            headless_mode = str(configvalues['headless_mode'])=='Yes' 
+            if headless_mode:
+                logger.print_on_console('Object cannot be highlighted in headless mode')
+                log.error('Object cannot be highlighted in headless mode')
+            else:
+                if appType==APPTYPE_WEB:
+                    core_utils.get_all_the_imports('WebScrape')
+                    import highlight
+                    light =highlight.Highlight()
+                    res = light.perform_highlight(args[0],args[1])
                     logger.print_on_console('Highlight result: '+str(res))
-            elif appType==APPTYPE_DESKTOP.lower():
-                #con =controller.Controller()
-                core_utils.get_all_the_imports('Desktop')
-                import desktop_highlight
-                highlightObj=desktop_highlight.highLight()
-                highlightObj.highLiht_element(args[0],args[1])
-            elif appType==APPTYPE_SAP.lower():
-                #con =controller.Controller()
-                core_utils.get_all_the_imports('SAP')
-                import sap_highlight
-                highlightObj=sap_highlight.highLight()
-                highlightObj.highlight_element(args[0])
+                if appType==APPTYPE_MOBILE.lower():
+                    core_utils.get_all_the_imports('Mobility/MobileWeb')
+                    import highlight_MW
+                    light =highlight_MW.Highlight()
+                    res = light.perform_highlight(args[0],args[1])
+                    logger.print_on_console('Highlight result: '+str(res))
+                if appType==APPTYPE_DESKTOP_JAVA.lower():
+                    if(not args[0].startswith('iris')):
+                        #con =controller.Controller()
+                        core_utils.get_all_the_imports('Oebs')
+                        import utils
+                        light =utils.Utils()
+                        res = light.highlight(args[0],args[1])
+                        logger.print_on_console('Highlight result: '+str(res))
+                elif appType==APPTYPE_DESKTOP.lower():
+                    #con =controller.Controller()
+                    core_utils.get_all_the_imports('Desktop')
+                    import desktop_highlight
+                    highlightObj=desktop_highlight.highLight()
+                    highlightObj.highLiht_element(args[0],args[1])
+                elif appType==APPTYPE_SAP.lower():
+                    #con =controller.Controller()
+                    core_utils.get_all_the_imports('SAP')
+                    import sap_highlight
+                    highlightObj=sap_highlight.highLight()
+                    highlightObj.highlight_element(args[0])
         except Exception as e:
             err_msg='Error while Highlighting'
             log.error(err_msg)

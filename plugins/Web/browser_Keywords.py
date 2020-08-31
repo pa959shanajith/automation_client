@@ -1008,10 +1008,9 @@ class Singleton_DriverUtil():
                 # flag1 = self.chrome_version(driver)
                 if core.chromeFlag:
                     choptions = webdriver.ChromeOptions()
-                    if headless_mode:
-                        choptions.add_argument('--headless')
-                    else:
-                        choptions.add_argument('start-maximized')
+                    choptions.add_argument('start-maximized')
+                    if headless_mode: choptions.add_argument('--headless')
+                       
                     if configvalues['extn_enabled'].lower()=='yes' and os.path.exists(webconstants.EXTENSION_PATH):
                         choptions.add_extension(webconstants.EXTENSION_PATH)
                     else:

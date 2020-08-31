@@ -927,6 +927,10 @@ class Controller():
         self.action=EXECUTE
         log.info( 'No  of Suites : '+str(len(suiteId_list)))
         logger.print_on_console('No  of Suites : ',str(len(suiteId_list)))
+        headless_mode = str(configvalues['headless_mode'])=='Yes' 
+        if headless_mode:
+            log.info('Execution in headless mode')
+            logger.print_on_console('Execution in headless mode')
         suite_idx=1
         tc_obj=None
         self.aws_obj=None
