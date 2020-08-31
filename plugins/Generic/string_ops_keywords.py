@@ -590,6 +590,7 @@ class StringOperation:
             if SYSTEM_OS == "Windows":
                 win32clipboard.OpenClipboard()
                 output = win32clipboard.GetClipboardData()
+                output = output.replace('\x00','') if output else None
                 win32clipboard.CloseClipboard()
                 status=generic_constants.TEST_RESULT_PASS
             elif SYSTEM_OS == "Darwin":
