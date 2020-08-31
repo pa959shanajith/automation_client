@@ -158,12 +158,8 @@ class TextboxKeywords:
                                     local_to.log.error('Exception in clearing text')
                                     pass
                                 if(isinstance(browser_Keywords.local_bk.driver_obj,selenium.webdriver.Ie) and self.__check_IE_64bit_from_config):
-                                    input=input+" "
                                     for i in range (0,len(input)+1):
                                         browser_Keywords.local_bk.driver_obj.execute_script(SET_TEXT_SCRIPT,webelement,input[0:i])
-                                    from sendfunction_keys import SendFunctionKeys
-                                    obj=SendFunctionKeys()
-                                    obj.sendfunction_keys("backspace",*args)
                                 else:
                                     webelement.send_keys(input)
                             status=TEST_RESULT_PASS
