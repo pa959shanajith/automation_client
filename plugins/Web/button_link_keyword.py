@@ -92,7 +92,18 @@ class ButtonLinkKeyword():
                         try:
                             local_blk.log.debug('Going to perform click operation')
                             time.sleep(0.5)
-                            clickinfo = browser_Keywords.local_bk.driver_obj.execute_script(webconstants.CLICK_JAVASCRIPT,webelement)
+                            local_blk.log.debug(webelement)
+                            if len(args)>0:
+                                coords=args[0][0][0].split(',')
+                                x_coord = coords[0]
+                                y_coord = coords[1]
+                                action = webdriver.common.action_chains.ActionChains(browser_Keywords.local_bk.driver_obj)
+                                print(x_coord,y_coord)
+                                action.move_to_element_with_offset(webelement, int(x_coord), int(y_coord)).click().perform()
+                                # Js="""function clickon(x,y){var ev=document.createEvent("MouseEvent");var el=document.elementFromPoint(x,y);ev.initMouseEvent("click",true,true,window,null,x,y,0,0,false,false,false,false,0,null);el.dispatchEvent(ev);} arguments[0].clickon(arguments[1],arguments[2])"""
+                                # browser_Keywords.local_bk.driver_obj.execute_script(Js,webelement,x_coord,y_coord)
+                            else:
+                                clickinfo = browser_Keywords.local_bk.driver_obj.execute_script(webconstants.CLICK_JAVASCRIPT,webelement)
                             local_blk.log.info('Click operation performed using javascript click')
                             local_blk.log.info(STATUS_METHODOUTPUT_UPDATE)
                             status = webconstants.TEST_RESULT_PASS
