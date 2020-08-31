@@ -217,7 +217,7 @@ class Dispatcher:
 
                     }
         custom_dict_element={'element':['getobjectcount','getobject','clickelement','doubleclick','rightclick','getelementtext','verifyelementtext','drag', 'drop','gettooltiptext','verifytooltiptext','verifyexists', 'verifydoesnotexists', 'verifyhidden','verifyvisible', 'switchtotab','switchtowindow','setfocus','sendfunctionkeys',
-                                        'tab','waitforelementvisible','mousehover','savefile','press','verifyenabled','verifydisabled','verifyreadonly','getattributevalue','verifyattribute','getrowcount','getcolumncount','getcellvalue','verifycellvalue','getcelltooltip','verifycelltooltip','cellclick','getrownumbytext','getcolnumbytext','getinnertable','selectbyabsolutevalue']}
+            'tab','waitforelementvisible','mousehover','press','verifyenabled','verifydisabled','verifyreadonly','getattributevalue','verifyattribute','getrowcount','getcolumncount','getcellvalue','verifycellvalue','getcelltooltip','verifycelltooltip','cellclick','getrownumbytext','getcolnumbytext','getinnertable','selectbyabsolutevalue']}
 
         result=[TEST_RESULT_FAIL,TEST_RESULT_FALSE,OUTPUT_CONSTANT,err_msg]
 
