@@ -794,7 +794,96 @@ class TableOperationKeywords():
                                 err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
             return status,result,verb,err_msg
 
+        def set_text(self,webelement,input,*args):
+            """
+            def : set_text
+            purpose : sets the text on the given webelemnt
+            param : webelement,input(text to be set)
+            return : bool
 
+            """
+            status=TEST_RESULT_FAIL
+            methodoutput=TEST_RESULT_FALSE
+            output=OUTPUT_CONSTANT
+            err_msg=None
+            local_tk.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+            visibleFlag=True
+            if visibleFlag==True:
+                try:
+                    if webelement.is_enabled():
+                        local_tk.log.debug(WEB_ELEMENT_ENABLED)
+                        row_num=int(input[0])
+                        col_num=int(input[1])
+                        inp_list=[]
+                        inp_list.append(input[2])
+                        coreutilsobj=core_utils.CoreUtils()
+                        # input=coreutilsobj.get_UTF_8(input)
+                        # logger.print_on_console(INPUT_IS+input)
+                        # local_tk.log.info(INPUT_IS)
+                        local_tk.log.info(input)
+                        row_count=self.getRowCountJs(webelement)
+                        col_count=self.getColoumnCountJs(webelement)
+                        if row_num-1>row_count or col_num-1>col_count:
+                            local_tk.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                            err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                            logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                        else:
+                            cell=self.javascriptExecutor(webelement,row_num-1,col_num-1)
+                            txt_box=cell.find_elements_by_tag_name('input')
+                            if len(txt_box)>0:
+                                import textbox_operations
+                                textboxobj = textbox_operations.TextboxKeywords()
+                                textboxobj.set_text(txt_box[0],inp_list)
+                                status=TEST_RESULT_PASS
+                                methodoutput=TEST_RESULT_TRUE
+                except Exception as e:
+                    local_tk.log.error(e)
+                    logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
+                    err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+
+            return status,methodoutput,output,err_msg
+
+        def send_value(self,webelement,input,*args):
+            status=TEST_RESULT_FAIL
+            methodoutput=TEST_RESULT_FALSE
+            output=OUTPUT_CONSTANT
+            err_msg=None
+            local_tk.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+            visibleFlag=True
+            if visibleFlag==True:
+                try:
+                    if webelement.is_enabled():
+                        local_tk.log.debug(WEB_ELEMENT_ENABLED)
+                        row_num=int(input[0])
+                        col_num=int(input[1])
+                        inp_list=[]
+                        inp_list.append(input[2])
+                        coreutilsobj=core_utils.CoreUtils()
+                        # input=coreutilsobj.get_UTF_8(input)
+                        # logger.print_on_console(INPUT_IS+input)
+                        # local_tk.log.info(INPUT_IS)
+                        local_tk.log.info(input)
+                        row_count=self.getRowCountJs(webelement)
+                        col_count=self.getColoumnCountJs(webelement)
+                        if row_num-1>row_count or col_num-1>col_count:
+                            local_tk.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                            err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                            logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                        else:
+                            cell=self.javascriptExecutor(webelement,row_num-1,col_num-1)
+                            txt_box=cell.find_elements_by_tag_name('input')
+                            if len(txt_box)>0:
+                                import textbox_operations
+                                textboxobj = textbox_operations.TextboxKeywords()
+                                textboxobj.send_value(txt_box[0],inp_list)
+                                status=TEST_RESULT_PASS
+                                methodoutput=TEST_RESULT_TRUE
+                except Exception as e:
+                    local_tk.log.error(e)
+                    logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
+                    err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+
+            return status,methodoutput,output,err_msg 
 
 
 ##if __name__ == '__main__':
