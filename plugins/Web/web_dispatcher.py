@@ -85,6 +85,8 @@ class Dispatcher:
             'getrownumbytext' : local_Wd.table_object.getRowNumByText,
             'getcolnumbytext' : local_Wd.table_object.getColNumByText,
             'getinnertable' : local_Wd.table_object.getInnerTable,
+            'settext' : local_Wd.table_object.set_text,
+            'sendvalue' : local_Wd.table_object.send_value,
             #author : arpitha.b.v
             #added mapping of 'getCellToolTip' and 'verifyCellToolTip' to table object
             'getcelltooltip' : local_Wd.table_object.getCellToolTip,
