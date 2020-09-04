@@ -206,13 +206,13 @@ class UtilWebKeywords:
                     res=True
                 if webelement.is_enabled() and not(res):
                     info_msg=ERROR_CODE_DICT['The object is Hidden']
-                    logger.print_on_console(err_msg)
+                    logger.print_on_console(info_msg)
                     log.info(info_msg)
                 elif webelement.is_enabled() and res:
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
                     info_msg=ERROR_CODE_DICT['MSG_OBJECT_ENABLED']
-                    logger.print_on_console(err_msg)
+                    logger.print_on_console(info_msg)
                     log.info(info_msg)
                 else:
                     err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
@@ -273,7 +273,6 @@ class UtilWebKeywords:
                     methodoutput=TEST_RESULT_TRUE
                 else:
                     err_msg=ERROR_CODE_DICT['ERR_OBJECT_VISIBLE']
-                    logger.print_on_console(err_msg)
                     log.error(err_msg)
         except Exception as e:
             err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
