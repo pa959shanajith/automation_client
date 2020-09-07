@@ -59,7 +59,7 @@ class ScrapeWindow(wx.Frame):
                 if (self.action == 'scrape'): 
                     #if SYSTEM_OS== "Darwin":
                     self.vsizer = wx.BoxSizer(wx.VERTICAL)
-                    self.startbutton = wx.ToggleButton(self.panel, label="Start clickandadd",pos=(12,8 ), size=(175, 28))
+                    self.startbutton = wx.ToggleButton(self.panel, label="Start clickandadd",pos=(12,18 ), size=(165, 25))
                     self.startbutton.Bind(wx.EVT_TOGGLEBUTTON, self.clickandadd_MW)   # need to implement OnExtract()
                     # self.fullscrape_MWbutton = wx.Button(self.panel, label="Full Scrape",pos=(12,48 ), size=(175, 28)) #previously present
                     # self.fullscrape_MWbutton.Bind(wx.EVT_BUTTON, self.fullscrape_MW)   # need to implement OnExtract() #previously present
@@ -69,8 +69,11 @@ class ScrapeWindow(wx.Frame):
                     self.fullscrapedropdown_MW.SetToolTip(wx.ToolTip("full objects will be scraped"))
                     self.fullscrapedropdown_MW.Bind(wx.EVT_COMBOBOX,self.OnFullscrapeChoice)
 
-                    self.fullscrapebutton_MW = wx.Button(self.panel, label="Scrape",pos=(101,48 ), size=(86, 25))
+                    self.fullscrapebutton_MW = wx.Button(self.panel, label="Scrape",pos=(101,48 ), size=(75, 25))
                     self.fullscrapebutton_MW.Bind(wx.EVT_BUTTON, self.fullscrape)
+
+                    self.visibilityCheck = wx.CheckBox(self.panel, label="Visibility",pos=(12,78), size=(175, 25))
+                    self.visibilityCheck.Bind(wx.EVT_CHECKBOX, self.visibility)
 
             ##            self.fullscrape_MWbutton.SetToolTip(wx.ToolTip("To perform fullscrape_MW Scraping"))
                     #if SYSTEM_OS != "Darwin":
@@ -224,4 +227,8 @@ class ScrapeWindow(wx.Frame):
         self.Close()
         visiblity_status =False
 
-
+    def visibility(self,event):
+        global visiblity_status
+        visiblity_state = event.GetEventObject()
+        log.info(visiblity_state.GetLabel(),' is clicked',visiblity_state.GetValue())
+        visiblity_status= visiblity_state.GetValue()
