@@ -805,14 +805,15 @@ class TableOperationKeywords():
                 try:
                     if webelement.is_enabled():
                         local_tk.log.debug(WEB_ELEMENT_ENABLED)
-                        row_num=int(input[0])
-                        col_num=int(input[1])
-                        obj_type=input[2].lower()
-                        index_val=int(input[3])-1
-                        inp_list=[]
-                        inp_list.append(input[4])
-                        coreutilsobj=core_utils.CoreUtils()
-                        local_tk.log.info(input)
+                        if len(input)==5:
+                            row_num=int(input[0])
+                            col_num=int(input[1])
+                            obj_type=input[2].lower()
+                            index_val=int(input[3])-1
+                            inp_list=[]
+                            inp_list.append(input[4])
+                            coreutilsobj=core_utils.CoreUtils()
+                            local_tk.log.info(input)
                         row_count=self.getRowCountJs(webelement)
                         col_count=self.getColoumnCountJs(webelement)
                         if obj_type== "textbox":
@@ -851,14 +852,15 @@ class TableOperationKeywords():
                 try:
                     if webelement.is_enabled():
                         local_tk.log.debug(WEB_ELEMENT_ENABLED)
-                        row_num=int(input[0])
-                        col_num=int(input[1])
-                        obj_type = input[2].lower()
-                        index_val=int(input[3])-1
-                        inp_list=[]
-                        inp_list.append(input[4])
-                        coreutilsobj=core_utils.CoreUtils()
-                        local_tk.log.info(input)
+                        if len(input)==5:
+                            row_num=int(input[0])
+                            col_num=int(input[1])
+                            obj_type = input[2].lower()
+                            index_val=int(input[3])-1
+                            inp_list=[]
+                            inp_list.append(input[4])
+                            coreutilsobj=core_utils.CoreUtils()
+                            local_tk.log.info(input)
                         row_count=self.getRowCountJs(webelement)
                         col_count=self.getColoumnCountJs(webelement)
                         if obj_type == "textbox":
@@ -897,14 +899,15 @@ class TableOperationKeywords():
                 try:
                     if webelement.is_enabled():
                         local_tk.log.debug(WEB_ELEMENT_ENABLED)
-                        row_num=int(input[0])
-                        col_num=int(input[1])
-                        obj_type=input[2].lower()
-                        index_val=int(input[3])-1
-                        inp_list=[]
-                        inp_list.append(input[4])
-                        coreutilsobj=core_utils.CoreUtils()
-                        local_tk.log.info(input)
+                        if len(input)==5:
+                            row_num=int(input[0])
+                            col_num=int(input[1])
+                            obj_type=input[2].lower()
+                            index_val=int(input[3])-1
+                            inp_list=[]
+                            inp_list.append(input[4])
+                            coreutilsobj=core_utils.CoreUtils()
+                            local_tk.log.info(input)
                         row_count=self.getRowCountJs(webelement)
                         col_count=self.getColoumnCountJs(webelement)
                         if obj_type== "textbox":
@@ -943,14 +946,15 @@ class TableOperationKeywords():
                 try:
                     if webelement.is_enabled():
                         local_tk.log.debug(WEB_ELEMENT_ENABLED)
-                        row_num=int(input[0])
-                        col_num=int(input[1])
-                        obj_type = input[2].lower()
-                        index_val=int(input[3])-1
-                        inp_list=[]
-                        inp_list.append(input[4])
-                        coreutilsobj=core_utils.CoreUtils()
-                        local_tk.log.info(input)
+                        if len(input)==5:
+                            row_num=int(input[0])
+                            col_num=int(input[1])
+                            obj_type = input[2].lower()
+                            index_val=int(input[3])-1
+                            inp_list=[]
+                            inp_list.append(input[4])
+                            coreutilsobj=core_utils.CoreUtils()
+                            local_tk.log.info(input)
                         row_count=self.getRowCountJs(webelement)
                         col_count=self.getColoumnCountJs(webelement)
                         if obj_type == "textbox":
@@ -989,10 +993,11 @@ class TableOperationKeywords():
                 try:
                     if webelement.is_enabled():
                         local_tk.log.debug(WEB_ELEMENT_ENABLED)
-                        row_num=int(input[0])
-                        col_num=int(input[1])
-                        obj_type = input[2].lower()
-                        index_val=int(input[3])-1
+                        if len(input)==4:
+                            row_num=int(input[0])
+                            col_num=int(input[1])
+                            obj_type = input[2].lower()
+                            index_val=int(input[3])-1
                         row_count=self.getRowCountJs(webelement)
                         col_count=self.getColoumnCountJs(webelement)
                         if obj_type == "textbox":
@@ -1025,16 +1030,18 @@ class TableOperationKeywords():
             methodoutput=TEST_RESULT_FALSE
             output=OUTPUT_CONSTANT
             err_msg=None
+            text=None
             local_tk.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
             visibleFlag=True
             if visibleFlag==True:
                 try:
                     if webelement.is_enabled():
                         local_tk.log.debug(WEB_ELEMENT_ENABLED)
-                        row_num=int(input[0])
-                        col_num=int(input[1])
-                        obj_type=input[2].lower()
-                        index_val=int(input[3])-1
+                        if len(input)==4:
+                            row_num=int(input[0])
+                            col_num=int(input[1])
+                            obj_type=input[2].lower()
+                            index_val=int(input[3])-1
                         row_count=self.getRowCountJs(webelement)
                         col_count=self.getColoumnCountJs(webelement)
                         if obj_type== "textbox":
@@ -1049,8 +1056,8 @@ class TableOperationKeywords():
                                     import textbox_operations
                                     textboxobj = textbox_operations.TextboxKeywords()
                                     status,methodoutput,text,err_msg = textboxobj.get_text(txt_box[index_val])
-                                    status=TEST_RESULT_PASS
-                                    methodoutput=TEST_RESULT_TRUE
+                                    # status=TEST_RESULT_PASS
+                                    # methodoutput=TEST_RESULT_TRUE
                         else:
                             err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                             local_tk.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
@@ -1067,16 +1074,18 @@ class TableOperationKeywords():
             methodoutput=TEST_RESULT_FALSE
             output=OUTPUT_CONSTANT
             err_msg=None
+            length=None
             local_tk.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
             visibleFlag=True
             if visibleFlag==True:
                 try:
                     if webelement.is_enabled():
                         local_tk.log.debug(WEB_ELEMENT_ENABLED)
-                        row_num=int(input[0])
-                        col_num=int(input[1])
-                        obj_type = input[2].lower()
-                        index_val=int(input[3])-1
+                        if len(input)==4:
+                            row_num=int(input[0])
+                            col_num=int(input[1])
+                            obj_type = input[2].lower()
+                            index_val=int(input[3])-1
                         row_count=self.getRowCountJs(webelement)
                         col_count=self.getColoumnCountJs(webelement)
                         if obj_type == "textbox":
@@ -1091,8 +1100,8 @@ class TableOperationKeywords():
                                     import textbox_operations
                                     textboxobj = textbox_operations.TextboxKeywords()
                                     status,methodoutput,length,err_msg = textboxobj.gettextbox_length(txt_box[index_val])
-                                    status=TEST_RESULT_PASS
-                                    methodoutput=TEST_RESULT_TRUE
+                                    # status=TEST_RESULT_PASS
+                                    # methodoutput=TEST_RESULT_TRUE
                         else:
                             err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                             local_tk.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
