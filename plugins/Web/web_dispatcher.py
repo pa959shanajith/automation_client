@@ -84,18 +84,7 @@ class Dispatcher:
             'cellclick' : local_Wd.table_object.cellClick,
             'getrownumbytext' : local_Wd.table_object.getRowNumByText,
             'getcolnumbytext' : local_Wd.table_object.getColNumByText,
-            'getinnertable' : local_Wd.table_object.getInnerTable,
-
-            #author : sathwik.p
-            #added settext, sendvalue, setsecuretext, sendsecurevalue, cleartext,gettext,gettextboxlength keywords
-            'settext' : local_Wd.table_object.set_text,
-            'sendvalue' : local_Wd.table_object.send_value,
-            'setsecuretext' : local_Wd.table_object.setsecuretext,
-            'sendsecurevalue' : local_Wd.table_object.sendSecureValue,
-            'cleartext' : local_Wd.table_object.clear_text,
-            'gettext' : local_Wd.table_object.get_text,
-            'gettextboxlength' : local_Wd.table_object.gettextbox_length,
-            
+            'getinnertable' : local_Wd.table_object.getInnerTable,            
             #author : arpitha.b.v
             #added mapping of 'getCellToolTip' and 'verifyCellToolTip' to table object
             'getcelltooltip' : local_Wd.table_object.getCellToolTip,

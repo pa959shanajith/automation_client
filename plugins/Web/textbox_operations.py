@@ -21,11 +21,13 @@ from constants import *
 import core_utils
 import readconfig
 import threading
+import table_keywords
 local_to = threading.local()
 
 class TextboxKeywords:
     def __init__(self):
         local_to.log = logging.getLogger('textbox_operations.py')
+        self.txtobj = table_keywords.TableOperationKeywords()
 
     def validate_input(self,webelement,input):
         local_to.log.debug('Validating user input for max_length attribute')
@@ -84,6 +86,29 @@ class TextboxKeywords:
         if webelement is not None:
             try:
                 if webelement.is_enabled():
+                    if webelement.tag_name == 'table':
+                        if len(input)==5:
+                            row_num=int(input[0])
+                            col_num=int(input[1])
+                            obj_type=input[2].lower()
+                            index_val=int(input[3])-1
+                            inp_list=[]
+                            inp_list.append(input[4])
+                            coreutilsobj=core_utils.CoreUtils()
+                            local_to.log.info(input)
+                        row_count=self.txtobj.getRowCountJs(webelement)
+                        col_count=self.txtobj.getColoumnCountJs(webelement)
+                        if obj_type== "textbox":
+                            if row_num-1>row_count or col_num-1>col_count:
+                                local_to.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                                logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                            else:
+                                cell=self.txtobj.javascriptExecutor(webelement,row_num-1,col_num-1)
+                                txt_box=cell.find_elements_by_tag_name('input')
+                                if len(txt_box)>0:
+                                    webelement = txt_box[index_val]
+                                    input = inp_list
                     local_to.log.debug(WEB_ELEMENT_ENABLED)
                     utilobj=UtilWebKeywords()
                     is_visble=utilobj.is_visible(webelement)
@@ -128,6 +153,29 @@ class TextboxKeywords:
         if webelement is not None:
             try:
                 if webelement.is_enabled():
+                    if webelement.tag_name == 'table':
+                        if len(input)==5:
+                            row_num=int(input[0])
+                            col_num=int(input[1])
+                            obj_type=input[2].lower()
+                            index_val=int(input[3])-1
+                            inp_list=[]
+                            inp_list.append(input[4])
+                            coreutilsobj=core_utils.CoreUtils()
+                            local_to.log.info(input)
+                        row_count=self.txtobj.getRowCountJs(webelement)
+                        col_count=self.txtobj.getColoumnCountJs(webelement)
+                        if obj_type== "textbox":
+                            if row_num-1>row_count or col_num-1>col_count:
+                                local_to.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                                logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                            else:
+                                cell=self.txtobj.javascriptExecutor(webelement,row_num-1,col_num-1)
+                                txt_box=cell.find_elements_by_tag_name('input')
+                                if len(txt_box)>0:
+                                    webelement = txt_box[index_val]
+                                    input = inp_list
                     local_to.log.debug(WEB_ELEMENT_ENABLED)
                     utilobj=UtilWebKeywords()
                     isvisble=utilobj.is_visible(webelement)
@@ -206,7 +254,7 @@ class TextboxKeywords:
         return webelement.get_attribute('maxlength')
 
 
-    def get_text(self,webelement,*args):
+    def get_text(self,webelement,input,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         text=None
@@ -214,6 +262,24 @@ class TextboxKeywords:
         local_to.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
             try:
+               if webelement.tag_name == 'table':
+                    if len(input)==4:
+                        row_num=int(input[0])
+                        col_num=int(input[1])
+                        obj_type=input[2].lower()
+                        index_val=int(input[3])-1
+                    row_count=self.txtobj.getRowCountJs(webelement)
+                    col_count=self.txtobj.getColoumnCountJs(webelement)
+                    if obj_type== "textbox":
+                        if row_num-1>row_count or col_num-1>col_count:
+                            local_to.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                            err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                            logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                        else:
+                            cell=self.txtobj.javascriptExecutor(webelement,row_num-1,col_num-1)
+                            txt_box=cell.find_elements_by_tag_name('input')
+                            if len(txt_box)>0:
+                                webelement = txt_box[index_val]
                text=self.__get_text(webelement)
                status=TEST_RESULT_PASS
                methodoutput=TEST_RESULT_TRUE
@@ -252,7 +318,7 @@ class TextboxKeywords:
                 err_msg=self.__web_driver_exception(e)
         return status,methodoutput,output,err_msg
 
-    def clear_text(self,webelement,*args):
+    def clear_text(self,webelement,input,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -261,6 +327,24 @@ class TextboxKeywords:
         if webelement is not None:
             try:
                 if webelement.is_enabled():
+                    if webelement.tag_name == 'table':
+                        if len(input)==4:
+                            row_num=int(input[0])
+                            col_num=int(input[1])
+                            obj_type=input[2].lower()
+                            index_val=int(input[3])-1
+                        row_count=self.txtobj.getRowCountJs(webelement)
+                        col_count=self.txtobj.getColoumnCountJs(webelement)
+                        if obj_type== "textbox":
+                            if row_num-1>row_count or col_num-1>col_count:
+                                local_to.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                                logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                            else:
+                                cell=self.txtobj.javascriptExecutor(webelement,row_num-1,col_num-1)
+                                txt_box=cell.find_elements_by_tag_name('input')
+                                if len(txt_box)>0:
+                                    webelement = txt_box[index_val]
                     local_to.log.debug(WEB_ELEMENT_ENABLED)
                     readonly_value=webelement.get_attribute("readonly")
                     if not(readonly_value is not None and readonly_value.lower() =='true' or readonly_value is ''):
@@ -283,7 +367,7 @@ class TextboxKeywords:
                 err_msg=self.__web_driver_exception(e)
         return status,methodoutput,output,err_msg
 
-    def gettextbox_length(self,webelement,*args):
+    def gettextbox_length(self,webelement,input,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         length=None
@@ -291,6 +375,24 @@ class TextboxKeywords:
         local_to.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
             try:
+                if webelement.tag_name == 'table':
+                    if len(input)==4:
+                        row_num=int(input[0])
+                        col_num=int(input[1])
+                        obj_type=input[2].lower()
+                        index_val=int(input[3])-1
+                    row_count=self.txtobj.getRowCountJs(webelement)
+                    col_count=self.txtobj.getColoumnCountJs(webelement)
+                    if obj_type== "textbox":
+                        if row_num-1>row_count or col_num-1>col_count:
+                            local_to.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                            err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                            logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                        else:
+                            cell=self.txtobj.javascriptExecutor(webelement,row_num-1,col_num-1)
+                            txt_box=cell.find_elements_by_tag_name('input')
+                            if len(txt_box)>0:
+                                webelement = txt_box[index_val]
                 length = self.__gettexbox_length(webelement)
                 if length is not None:
                     status=TEST_RESULT_PASS
@@ -348,6 +450,29 @@ class TextboxKeywords:
         if webelement is not None:
             try:
                 if webelement.is_enabled():
+                    if webelement.tag_name == 'table':
+                        if len(input)==5:
+                            row_num=int(input[0])
+                            col_num=int(input[1])
+                            obj_type=input[2].lower()
+                            index_val=int(input[3])-1
+                            inp_list=[]
+                            inp_list.append(input[4])
+                            coreutilsobj=core_utils.CoreUtils()
+                            local_to.log.info(input)
+                        row_count=self.txtobj.getRowCountJs(webelement)
+                        col_count=self.txtobj.getColoumnCountJs(webelement)
+                        if obj_type== "textbox":
+                            if row_num-1>row_count or col_num-1>col_count:
+                                local_to.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                                logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                            else:
+                                cell=self.txtobj.javascriptExecutor(webelement,row_num-1,col_num-1)
+                                txt_box=cell.find_elements_by_tag_name('input')
+                                if len(txt_box)>0:
+                                    webelement = txt_box[index_val]
+                                    input = inp_list
                     local_to.log.debug(WEB_ELEMENT_ENABLED)
                     utilobj=UtilWebKeywords()
                     is_visble=utilobj.is_visible(webelement)
@@ -394,6 +519,29 @@ class TextboxKeywords:
         if webelement is not None:
             try:
                 if webelement.is_enabled():
+                    if webelement.tag_name == 'table':
+                        if len(input)==5:
+                            row_num=int(input[0])
+                            col_num=int(input[1])
+                            obj_type=input[2].lower()
+                            index_val=int(input[3])-1
+                            inp_list=[]
+                            inp_list.append(input[4])
+                            coreutilsobj=core_utils.CoreUtils()
+                            local_to.log.info(input)
+                        row_count=self.txtobj.getRowCountJs(webelement)
+                        col_count=self.txtobj.getColoumnCountJs(webelement)
+                        if obj_type== "textbox":
+                            if row_num-1>row_count or col_num-1>col_count:
+                                local_to.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                                logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                            else:
+                                cell=self.txtobj.javascriptExecutor(webelement,row_num-1,col_num-1)
+                                txt_box=cell.find_elements_by_tag_name('input')
+                                if len(txt_box)>0:
+                                    webelement = txt_box[index_val]
+                                    input = inp_list
                     local_to.log.debug(WEB_ELEMENT_ENABLED)
                     utilobj=UtilWebKeywords()
                     isvisble=utilobj.is_visible(webelement)
