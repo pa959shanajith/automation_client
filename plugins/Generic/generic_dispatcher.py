@@ -210,7 +210,7 @@ class GenericKeywordDispatcher:
                             var = str(output[0])[1:len(str(output[0]))-1]
                             output[0] = data[var][0]
                     message.extend(output)
-                if( keyword in ['comparefiles','beautify','compareinputs','getxmlblockdata','selectivexmlfilecompare','compxmlfilewithxmlblock','cellbycellcompare'] ):
+                if( keyword in ['comparefiles','beautify','compareinputs','getxmlblockdata','selectivexmlfilecompare','compxmlfilewithxmlblock','cellbycellcompare','findfilepath'] ):
                     input = list(message)
                     output = tsp.outputval
                     if (str(output)==''):
