@@ -152,7 +152,8 @@ class GenericKeywordDispatcher:
             'getxmlblockdata' :local_generic.generic_file_xml.getXmlBlockData,
             'selectivexmlfilecompare' : local_generic.generic_file_xml.selectiveXmlFileCompare,
             'compxmlfilewithxmlblock' : local_generic.generic_file_xml.compXmlFileWithXmlBlock,
-            'cellbycellcompare': local_generic.generic_file.cell_by_cell_compare
+            'cellbycellcompare': local_generic.generic_file.cell_by_cell_compare,
+            'findfilepath': local_generic.generic_file.find_file_path
             }
 	#Call to fetch data in database keywords
     def fetch_data(self,input):

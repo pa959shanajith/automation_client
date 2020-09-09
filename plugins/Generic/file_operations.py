@@ -1174,3 +1174,37 @@ class FileOperations:
         except Exception as e :
             log.error('some error : {}'.format(e))
         return status, result, output, err_msg
+
+    def find_file_path(self,input,*args):
+        """
+        def : find_file_path
+        purpose : Fetch the loaction of the input file
+        param : filename, folderpath
+        return : Location of the input file
+
+        """
+        try:
+            status=TEST_RESULT_FAIL
+            methodoutput=TEST_RESULT_FALSE
+            err_msg=None
+            output_res=OUTPUT_CONSTANT
+            log.debug('reading the inputs')
+            filename=input[0]
+            folderpath=input[1]
+            output=[]
+            for root, dirs, files in os.walk(folderpath):
+                if filename in files:
+                    output.append(root.replace("\\","/")+'/'+filename)
+            if(output==[]):
+                log.info('File does not exist inside '+folderpath)
+                logger.print_on_console('File does not exist inside '+folderpath)
+            else: 
+                log.info('File location is fetched')
+                logger.print_on_console('File location is fetched')
+                status = TEST_RESULT_PASS
+                methodoutput = TEST_RESULT_TRUE
+        except Exception as e:
+            err_msg = 'Error occured in fetching file location'
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
+        return status,methodoutput,output,err_msg
