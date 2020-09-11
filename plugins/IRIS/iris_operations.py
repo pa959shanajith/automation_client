@@ -859,7 +859,9 @@ class IRISKeywords():
                                     robot.ctrl_press('c')
                                     time.sleep(1)
                                     win32clipboard.OpenClipboard()
-                                    try:text = win32clipboard.GetClipboardData()
+                                    try:
+                                        text = win32clipboard.GetClipboardData()
+                                        text = text.replace('\x00','') if text else None
                                     except : flag = False
                                     win32clipboard.CloseClipboard()
                                     del robot # deleting variables
