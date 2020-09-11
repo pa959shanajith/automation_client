@@ -239,8 +239,8 @@ class ButtonLinkKeyword():
                     linktext = webelement.get_attribute(webconstants_MW.HREF)
                 elif linktext == None or linktext == '':
                     linktext = webelement.text
-                logger.print_on_console('Link text: ' )
-                logger.print_on_console(linktext)
+                logger.print_on_console('Link text: ' , linktext)
+                # logger.print_on_console(linktext)
                 if linktext != None and linktext !='':
                     log.info('Link text: ' +linktext)
                     log.info(STATUS_METHODOUTPUT_UPDATE)
@@ -285,9 +285,9 @@ class ButtonLinkKeyword():
                         log.info('Link text: ' +linktext)
                     if linktext != None and linktext !='':
                         if linktext == input:
-                            err_msg='Link Text matched'
-                            logger.print_on_console(err_msg)
-                            log.info(err_msg)
+                            info_msg='Link Text matched'
+                            logger.print_on_console(info_msg)
+                            log.info(info_msg)
                             log.info(STATUS_METHODOUTPUT_UPDATE)
                             status = webconstants_MW.TEST_RESULT_PASS
                             methodoutput = webconstants_MW.TEST_RESULT_TRUE
@@ -336,6 +336,8 @@ class ButtonLinkKeyword():
                     methodoutput = webconstants_MW.TEST_RESULT_TRUE
                 else:
                     err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
+            else:
+                err_msg="element is hidden"
         except Exception as e:
             err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
             log.error(e)
