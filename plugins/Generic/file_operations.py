@@ -1181,6 +1181,42 @@ class FileOperations:
         purpose : Fetch the loaction of the input file
         param : filename, folderpath
         return : Location of the input file
+        """
+        try:
+            status=TEST_RESULT_FAIL
+            methodoutput=TEST_RESULT_FALSE
+            err_msg=None
+            output_res=OUTPUT_CONSTANT
+            log.debug('reading the inputs')
+            output=[]
+            if(len(input)==2):
+                filename=input[0]
+                folderpath=input[1]
+                for root, dirs, files in os.walk(folderpath):
+                    if filename in files:
+                        output.append(root.replace("\\","/")+'/'+filename)
+                if(output==[]):
+                    log.info('File does not exist inside '+folderpath)
+                    logger.print_on_console('File does not exist inside '+folderpath)
+                else: 
+                    log.info('File location is fetched')
+                    logger.print_on_console('File location is fetched')
+                    status = TEST_RESULT_PASS
+                    methodoutput = TEST_RESULT_TRUE
+            else:
+                err_msg="Invalid number of inputs"
+        except Exception as e:
+            err_msg = 'Error occured in fetching file location'
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
+        return status,methodoutput,output,err_msg
+
+    def selective_cell_compare(self,input,*args):
+        """
+        def : selective_cell_compare
+        purpose : selective cell comparison between excel and csv files
+        param : CSV/Excel file path1, sheetname (optional), selected cell range, CSV/Excel file path2, sheetname (optional), selected cell range
+        return : bool/ if output file mentioned then prints cell by cell to that file
 
         """
         try:
@@ -1189,22 +1225,65 @@ class FileOperations:
             err_msg=None
             output_res=OUTPUT_CONSTANT
             log.debug('reading the inputs')
-            filename=input[0]
-            folderpath=input[1]
-            output=[]
-            for root, dirs, files in os.walk(folderpath):
-                if filename in files:
-                    output.append(root.replace("\\","/")+'/'+filename)
-            if(output==[]):
-                log.info('File does not exist inside '+folderpath)
-                logger.print_on_console('File does not exist inside '+folderpath)
-            else: 
-                log.info('File location is fetched')
-                logger.print_on_console('File location is fetched')
-                status = TEST_RESULT_PASS
-                methodoutput = TEST_RESULT_TRUE
+            filepath1=input[0]
+            sheetname1=input[1]
+            range1=input[2].split(':')
+            filepath2=input[3]
+            sheetname2=input[4]
+            range2=input[5].split(':')
+            res1=[]
+            output_feild = None
+            if(len(input)==6): # Indicates both files are excel
+                book1 = openpyxl.load_workbook(filepath1)
+                book2 = openpyxl.load_workbook(filepath2)
+                #verify whether file exists or not
+                result1=self.verify_file_exists(filepath1,'')
+                result2=self.verify_file_exists(filepath2,'')
+
+                sheet1=book1.get_sheet_by_name(sheetname1)
+                sheet2=book2.get_sheet_by_name(sheetname2)
+
+                cell1=list(sheet1[range1[0]:range1[1]])
+                cell2=list(sheet2[range2[0]:range2[1]])
+                for eachcell in cell1:
+                    for eachcell2 in cell2:
+                        for i in range(len(eachcell2)):
+                            if (eachcell[i].value==eachcell2[i].value):
+                                output='Matched'
+                                res1+=[output]
+                            else:
+                                output='Not Matched'
+                                res1+=[output]
+                        del cell2[0]
+                        break
+                if(str(args[0].split(";")[0]).startswith("{") and str(args[0].split(";")[0]).endswith("}")):
+                    out_path = self.DV.get_dynamic_value(args[0].split(";")[0])
+                    if(out_path): 
+                        output_feild = out_path
+                else:
+                    output_feild = args[0].split(";")[0]
+                if(output_feild):     
+                    if( os.path.exists(output_feild) or os.path.exists(os.path.dirname(output_feild)) ):
+                        logger.print_on_console( "Writing the output of cellByCellCompare to file ")
+                        flg, err_msg = self.write_result_file(output_feild, res1, 'selectiveCellCompare')
+                    else:
+                        status_excel_create_file = False
+                        file_extension,status_get_ext = self.__get_ext(output_feild)
+                        if status_get_ext and file_extension is not None and file_extension in generic_constants.EXCEL_TYPES:
+                            logger.print_on_console("File Does not exists, creating the file in specified path {}".format(output_feild))
+                            status_excel_create_file,e_msg = self.dict[file_extension + '_create_file'](output_feild,'CellByCellCompare_Result')
+                        else:
+                            err_msg = 'Warning! : Invalid file extension. Output file format should be either ".xls" or ".xlxs".'
+                        if (status_excel_create_file):
+                            logger.print_on_console( "Writing the output of cellByCellCompare to file : " + str(output_feild) )
+                            flg, err_msg = self.write_result_file(output_feild, res1, 'CellByCellCompare_Result')
+                if(res1!=[]):
+                    log.info('Compared cells between the mentioned files')
+                    logger.print_on_console('Compared cells between the mentioned files')
+                    status = TEST_RESULT_PASS
+                    methodoutput = TEST_RESULT_TRUE
         except Exception as e:
-            err_msg = 'Error occured in fetching file location'
+            err_msg = 'Error occured in comparing selected cells between files'
             log.error(err_msg)
             logger.print_on_console(err_msg)
         return status,methodoutput,output,err_msg

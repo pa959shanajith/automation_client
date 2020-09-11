@@ -73,6 +73,8 @@ class StepDescription:
             return "Compared cell by cell data between file "+inputval[2]+" and file '"+ inputval[0]+"'"
         def findfilepath():
             return "Fetches the location of the file '" + inputval[0] + "'"
+        def selectivecellcompare():
+            return "Compared selected cells between file "+inputval[0]+" and file '"+ inputval[4]+"'"
         def executescript():
             return "Perform execution of the script '"+ input+"'"
         def writetofile():
