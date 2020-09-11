@@ -177,6 +177,7 @@ class OutlookKeywords:
                 self.senderEmail = input[0]
                 self.subject = input[2]
                 self.toMail = input[1].strip()
+                self.indexval = int(input[3])
                 #clearing all the variables before fetching the values
                 Subject = ''
                 ToMailID = ''
@@ -196,7 +197,10 @@ class OutlookKeywords:
                 folders = inbox.Folders
                 #-------------fetching sorted mails and storing in list variable mails
                 mails = self.messageSegregator(all_inbox, self.toMail, self.senderEmail, self.subject)
-                msg = mails[0] # as it is the latest msg object by date/time.
+                if self.indexval == '':
+                    msg = mails[0] # as it is the latest msg object by date/time.
+                else:
+                    msg = mails[self.indexval]
                 #----------------------------------------------------------------------
                 if ( msg.SenderEmailType == 'EX' ):
                     try:
@@ -424,13 +428,46 @@ class OutlookKeywords:
                     try:
                         #all_inbox_msgs.Item(1).RecievedTime>all_inbox_msgs.Item(all_inbox_msgs.Count).RecieveTime
                         for message in all_inbox_msgs:
-                            if ( message.Class == 43 and message.SenderName.strip() == From_add.strip() and message.Subject.strip() == sub.strip() ):
-                                ToMail = message.To
-                                tomailsList = ToMail.split(';')
-                                for to in tomailsList:
-                                    if ( str(to).strip() == To_add.strip() ):
-                                        mSegList.append(message)
-                                        break
+                            if (To_add != '' and (From_add !="" and sub !="" )):
+                                if ( message.Class == 43 and message.SenderName.strip() == From_add.strip() and message.Subject.strip() == sub.strip()):
+                                    ToMail = message.To
+                                    tomailsList = ToMail.split(';')
+                                    for to in tomailsList:
+                                        if ( str(to).strip() == To_add.strip() ):
+                                            mSegList.append(message)
+                                            break
+                            elif (To_add == '' and (From_add !="" and sub !="" )):
+                                if ( message.Class == 43 and message.SenderName.strip() == From_add.strip() and message.Subject.strip() == sub.strip()):
+                                    ToMail = message.To
+                                    tomailsList = ToMail.split(';')
+                                    for to in tomailsList:
+                                        if ( str(to).strip() == ToMail.strip() ):
+                                            mSegList.append(message)
+                                            break
+                            elif (To_add != '' and (From_add !="" or sub !="" )):
+                                if ( message.Class == 43 and (message.To.strip() == To_add.strip() and (message.SenderName.strip() == From_add.strip() or message.Subject.strip() == sub.strip()))):
+                                    ToMail = message.To
+                                    tomailsList = ToMail.split(';')
+                                    for to in tomailsList:
+                                        if ( str(to).strip() == To_add.strip() ):
+                                            mSegList.append(message)
+                                            break
+                            elif (To_add != '' and (From_add =="" and sub =="" )):
+                                if ( message.Class == 43 and message.To.strip() == To_add.strip()):
+                                    ToMail = message.To
+                                    tomailsList = ToMail.split(';')
+                                    for to in tomailsList:
+                                        if ( str(to).strip() == To_add.strip() ):
+                                            mSegList.append(message)
+                                            break
+                            else:
+                                if ( message.Class == 43 and (message.SenderName.strip() == From_add.strip() or message.Subject.strip() == sub.strip())):
+                                    ToMail = message.To
+                                    tomailsList = ToMail.split(';')
+                                    for to in tomailsList:
+                                        if ( str(to).strip() == ToMail.strip() ):
+                                            mSegList.append(message)
+                                            break
                     except Exception as e:
                         log.error( 'Error at mail segregator : ' + str(e) )
                         logger.print_on_console( 'Error at mail segregator : ' + str(e) )
@@ -456,7 +493,11 @@ class OutlookKeywords:
                     return sortedList
 
                 mailSegList=mailSegregator(all_inbox_msgs, To_add, From_add, sub)
+                log.debug(len(mailSegList))
+                logger.print_on_console("number of emails that matched the input is:",len(mailSegList))
                 segregatedList=timeSegregator(mailSegList)
+                # log.debug(len(segregatedList))
+                # logger.print_on_console("number of emails that matched the input is:",len(mailSegList))
             except Exception as e:
                 logger.print_on_console( 'Error at mail segregator' )
                 log.error( desktop_constants.ERROR_MSG + ' : ' + str(e) )
