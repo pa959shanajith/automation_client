@@ -69,7 +69,7 @@ class ScrapeWindow(wx.Frame):
                     self.fullscrapedropdown_MW.SetToolTip(wx.ToolTip("full objects will be scraped"))
                     self.fullscrapedropdown_MW.Bind(wx.EVT_COMBOBOX,self.OnFullscrapeChoice)
 
-                    self.fullscrapebutton_MW = wx.Button(self.panel, label="Scrape",pos=(101,48 ), size=(75, 25))
+                    self.fullscrapebutton_MW = wx.Button(self.panel, label="Scrape",pos=(101,47 ), size=(75, 25))
                     self.fullscrapebutton_MW.Bind(wx.EVT_BUTTON, self.fullscrape)
 
                     self.visibilityCheck = wx.CheckBox(self.panel, label="Visibility",pos=(12,78), size=(175, 25))
@@ -198,6 +198,12 @@ class ScrapeWindow(wx.Frame):
             self.fullscrapedropdown_MW.SetToolTip(wx.ToolTip(self.fullscrapedropdown_MW.GetValue() + " objects will be scraped"))
             self.scrape_selected_option[0] = selected_choice.lower()
 
+    def visibility(self,event):
+        global visiblity_status
+        visiblity_state = event.GetEventObject()
+        log.info(visiblity_state.GetLabel(),' is clicked',visiblity_state.GetValue())
+        visiblity_status= visiblity_state.GetValue()
+
     def perform_fullscrape(self):
 
         '''if any of the last two options are selected then
@@ -227,8 +233,4 @@ class ScrapeWindow(wx.Frame):
         self.Close()
         visiblity_status =False
 
-    def visibility(self,event):
-        global visiblity_status
-        visiblity_state = event.GetEventObject()
-        log.info(visiblity_state.GetLabel(),' is clicked',visiblity_state.GetValue())
-        visiblity_status= visiblity_state.GetValue()
+

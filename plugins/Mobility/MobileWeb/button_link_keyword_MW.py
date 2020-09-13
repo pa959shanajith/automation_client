@@ -114,7 +114,7 @@ class ButtonLinkKeyword():
                     logger.print_on_console('Button name : ' , buttonname)
                     status = webconstants_MW.TEST_RESULT_PASS
                     methodoutput = webconstants_MW.TEST_RESULT_TRUE
-
+                    output = buttonname
                 if buttonname == None or len(buttonname) == 0:
                     log.debug('Button name not recieved using selenium text method, Getting value attribute')
                     #if text is empty search for the value attribute
@@ -143,6 +143,9 @@ class ButtonLinkKeyword():
                     status = webconstants_MW.TEST_RESULT_PASS
                     methodoutput = webconstants_MW.TEST_RESULT_TRUE
                     output = buttonname
+                if buttonname == None or len(buttonname) == 0:
+                    status = webconstants_MW.TEST_RESULT_FAIL
+                    methodoutput = webconstants_MW.TEST_RESULT_FALSE
         except Exception as e:
             err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
             log.error(err_msg)
