@@ -98,7 +98,7 @@ class ButtonLinkKeyword():
                                 x_coord = coords[0]
                                 y_coord = coords[1]
                                 action = webdriver.common.action_chains.ActionChains(browser_Keywords.local_bk.driver_obj)
-                                print_on_console("Clicking on coordinates ",x_coord,y_coord)
+                                logger.print_on_console("Clicking on coordinates "+x_coord+", "+y_coord)
                                 action.move_to_element_with_offset(webelement, int(x_coord), int(y_coord)).click().perform()
                                 # Js="""function clickon(x,y){var ev=document.createEvent("MouseEvent");var el=document.elementFromPoint(x,y);ev.initMouseEvent("click",true,true,window,null,x,y,0,0,false,false,false,false,0,null);el.dispatchEvent(ev);} arguments[0].clickon(arguments[1],arguments[2])"""
                                 # browser_Keywords.local_bk.driver_obj.execute_script(Js,webelement,x_coord,y_coord)
