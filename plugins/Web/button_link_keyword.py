@@ -539,9 +539,7 @@ class ButtonLinkKeyword():
             pyautogui.keyUp('a')
             pyautogui.PAUSE = 1
             pyautogui.typewrite(inputfile, interval=0.25)
-            #pyautogui.PAUSE = 1
             pyautogui.keyDown('enter')
-            #pyautogui.press('enter')
             pyautogui.PAUSE = 1
             pyautogui.keyUp('enter')
             pyautogui.PAUSE = 1
