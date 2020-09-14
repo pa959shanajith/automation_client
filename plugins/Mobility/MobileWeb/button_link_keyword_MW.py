@@ -162,57 +162,61 @@ class ButtonLinkKeyword():
         #verify_button_name keyword implementation
         try:
             if webelement != None:
-                log.info('Recieved web element from the web dispatcher')
-                log.debug(webelement)
-                #fetch the text (button name) using selenium webelement.text
-                log.debug('Going to fetch the button name')
-                buttonname = webelement.text
-                log.info('Button name fetched from the AUT using selenium')
-                if buttonname == None or len(buttonname) == 0:
-                    log.debug('Button name not recieved using selenium text method, Getting value attribute')
-                    #if text is empty search for the value attribute
-                    buttonname = webelement.get_attribute(webconstants_MW.VALUE)
-                    log.info('Button name fetched from the AUT using value attribute')
-                    log.info(buttonname)
-                elif buttonname == None or len(buttonname) == 0:
-                    log.debug('Button name not recieved using selenium text method/ value attribute, Getting name attribute')
-                    #if value is empty search for the name attribute
-                    buttonname = webelement.get_attribute(webconstants_MW.NAME)
-                    log.info('Button name fetched from the AUT using name attribute')
-                    log.info(buttonname)
-                elif buttonname == None or len(buttonname) == 0:
-                    log.debug('Button name not recieved using selenium text method/ value attribute, Getting name attribute')
-                    #if value is empty search for the name attribute
-                    buttonname = webelement.get_attribute(webconstants_MW.ALT)
-                    log.info('Button name fetched from the AUT using name attribute')
-                    log.info(buttonname)
-                    status = webconstants_MW.TEST_RESULT_PASS
-                    methodoutput = webconstants_MW.TEST_RESULT_TRUE
-                logger.print_on_console('Button name: '+str(buttonname))
-                #Remove the leading and trailing spaces
-                input = inputs[0]
-                input = input.strip()
-                #Check for the input
-                if input != None and len(input) != 0:
-                    log.info('Input is valid, Continue..')
-                    if buttonname == input:
-                        log.info('Button name matched with the input, set the status to Pass')
-                        logger.print_on_console('Button name  matched')
-                        log.info(STATUS_METHODOUTPUT_UPDATE)
+                visibility=webelement.is_displayed()
+                if visibility:
+                    log.info('Recieved web element from the web dispatcher')
+                    log.debug(webelement)
+                    #fetch the text (button name) using selenium webelement.text
+                    log.debug('Going to fetch the button name')
+                    buttonname = webelement.text
+                    log.info('Button name fetched from the AUT using selenium')
+                    if buttonname == None or len(buttonname) == 0:
+                        log.debug('Button name not recieved using selenium text method, Getting value attribute')
+                        #if text is empty search for the value attribute
+                        buttonname = webelement.get_attribute(webconstants_MW.VALUE)
+                        log.info('Button name fetched from the AUT using value attribute')
+                        log.info(buttonname)
+                    elif buttonname == None or len(buttonname) == 0:
+                        log.debug('Button name not recieved using selenium text method/ value attribute, Getting name attribute')
+                        #if value is empty search for the name attribute
+                        buttonname = webelement.get_attribute(webconstants_MW.NAME)
+                        log.info('Button name fetched from the AUT using name attribute')
+                        log.info(buttonname)
+                    elif buttonname == None or len(buttonname) == 0:
+                        log.debug('Button name not recieved using selenium text method/ value attribute, Getting name attribute')
+                        #if value is empty search for the name attribute
+                        buttonname = webelement.get_attribute(webconstants_MW.ALT)
+                        log.info('Button name fetched from the AUT using name attribute')
+                        log.info(buttonname)
                         status = webconstants_MW.TEST_RESULT_PASS
                         methodoutput = webconstants_MW.TEST_RESULT_TRUE
+                    logger.print_on_console('Button name: '+str(buttonname))
+                    #Remove the leading and trailing spaces
+                    input = inputs[0]
+                    input = input.strip()
+                    #Check for the input
+                    if input != None and len(input) != 0:
+                        log.info('Input is valid, Continue..')
+                        if buttonname == input:
+                            log.info('Button name matched with the input, set the status to Pass')
+                            logger.print_on_console('Button name  matched')
+                            log.info(STATUS_METHODOUTPUT_UPDATE)
+                            status = webconstants_MW.TEST_RESULT_PASS
+                            methodoutput = webconstants_MW.TEST_RESULT_TRUE
+                        else:
+                            err_msg='Button name mismatched'
+                            logger.print_on_console(err_msg)
+                            log.error(err_msg)
+                            logger.print_on_console(EXPECTED,input)
+                            log.info(EXPECTED)
+                            log.info(input)
+                            logger.print_on_console(ACTUAL,buttonname)
+                            log.info(ACTUAL)
+                            log.info(buttonname)
                     else:
-                        err_msg='Button name mismatched'
-                        logger.print_on_console(err_msg)
-                        log.error(err_msg)
-                        logger.print_on_console(EXPECTED,input)
-                        log.info(EXPECTED)
-                        log.info(input)
-                        logger.print_on_console(ACTUAL,buttonname)
-                        log.info(ACTUAL)
-                        log.info(buttonname)
+                        err_msg=INVALID_INPUT
                 else:
-                    err_msg=INVALID_INPUT
+                    err_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
         except Exception as e:
             err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
             log.error(e)
@@ -326,21 +330,23 @@ class ButtonLinkKeyword():
        #press keyword implementation
         try:
             if webelement != None:
-                log.info('Recieved web element from the web dispatcher')
-                log.debug(webelement)
-                log.debug('Check for the element enable')
-                if webelement.is_enabled():
-                    log.debug(WEB_ELEMENT_ENABLED)
-                    log.debug('Going to perform click operation')
-                    webelement.click()
-                    log.info('press operation performed using selenium click')
-                    log.info(STATUS_METHODOUTPUT_UPDATE)
-                    status = webconstants_MW.TEST_RESULT_PASS
-                    methodoutput = webconstants_MW.TEST_RESULT_TRUE
+                visibility=webelement.is_displayed()
+                if visibility:
+                    log.info('Recieved web element from the web dispatcher')
+                    log.debug(webelement)
+                    log.debug('Check for the element enable')
+                    if webelement.is_enabled():
+                        log.debug(WEB_ELEMENT_ENABLED)
+                        log.debug('Going to perform click operation')
+                        webelement.click()
+                        log.info('press operation performed using selenium click')
+                        log.info(STATUS_METHODOUTPUT_UPDATE)
+                        status = webconstants_MW.TEST_RESULT_PASS
+                        methodoutput = webconstants_MW.TEST_RESULT_TRUE
+                    else:
+                        err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
                 else:
-                    err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
-            else:
-                err_msg="element is hidden"
+                    err_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
         except Exception as e:
             err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
             log.error(e)
