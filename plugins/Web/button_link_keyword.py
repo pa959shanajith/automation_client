@@ -531,20 +531,20 @@ class ButtonLinkKeyword():
             #robot.type_string(inputfile)
             pyautogui.typewrite(inputfile, interval=0.25)
             pyautogui.PAUSE = 1
+            #pyautogui.PAUSE = 1
+            pyautogui.keyDown('ctrl')
+            pyautogui.keyDown('a')
+            pyautogui.PAUSE = 1
+            pyautogui.keyUp('ctrl')
+            pyautogui.keyUp('a')
+            pyautogui.PAUSE = 1
+            pyautogui.typewrite(inputfile, interval=0.25)
+            #pyautogui.PAUSE = 1
             pyautogui.keyDown('enter')
+            #pyautogui.press('enter')
             pyautogui.PAUSE = 1
             pyautogui.keyUp('enter')
             pyautogui.PAUSE = 1
-            #pyautogui.press('enter')
-            #robot.paste()
-            '''
-            robot.sleep(0.5)
-            robot.key_press(Keys.enter)
-            robot.sleep(0.5)
-            robot.key_release(Keys.enter)
-            robot.sleep(1)
-            '''
-            local_blk.log.debug('copied clipboard data pasted to the input using robot')
             status = True
         except Exception as e:
             logger.print_on_console(EXCEPTION_OCCURED,e)
