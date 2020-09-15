@@ -174,10 +174,13 @@ class OutlookKeywords:
                 method_output = desktop_constants.TEST_RESULT_FALSE
                 result = OUTPUT_CONSTANT
                 error_msg = None
+                index_flag = False
                 self.senderEmail = input[0]
                 self.subject = input[2]
                 self.toMail = input[1].strip()
-                self.indexval = int(input[3])
+                if input[3]!="":
+                    self.indexval = int(input[3])-1
+                    index_flag = True
                 #clearing all the variables before fetching the values
                 Subject = ''
                 ToMailID = ''
@@ -196,44 +199,47 @@ class OutlookKeywords:
                 all_inbox = inbox.Items
                 folders = inbox.Folders
                 #-------------fetching sorted mails and storing in list variable mails
-                mails = self.messageSegregator(all_inbox, self.toMail, self.senderEmail, self.subject)
-                if self.indexval == '':
-                    msg = mails[0] # as it is the latest msg object by date/time.
-                else:
-                    msg = mails[self.indexval]
-                #----------------------------------------------------------------------
-                if ( msg.SenderEmailType == 'EX' ):
+                if (self.senderEmail!="" or self.subject!="" or self.toMail!=""):
+                    mails = self.messageSegregator(all_inbox, self.toMail, self.senderEmail, self.subject)
+                    if index_flag:
+                        msg = mails[self.indexval] # as it is the latest msg object by date/time.
+                    else:
+                        msg = mails[0]
+                    #----------------------------------------------------------------------
+                    if ( msg.SenderEmailType == 'EX' ):
+                        try:
+                            FromMailId = msg.Sender.PropertyAccessor.GetProperty(outlook_constants.PR_SMTP_ADDRESS)
+                        except:
+                            pass
+                    else:
+                        FromMailId = msg.SenderEmailAddress
+                    for recipient in  msg.Recipients:
+                        if ( recipient.Type == 1 ):
+                            ToMailID += recipient.PropertyAccessor.GetProperty(outlook_constants.PR_SMTP_ADDRESS) + ';'
+                    ToMailID = ToMailID[: - 1]
+                    if ( msg.Attachments.Count > 0 ):
+                        AttachmentStatus = outlook_constants.ATTACH_STATUS_YES
                     try:
-                        FromMailId = msg.Sender.PropertyAccessor.GetProperty(outlook_constants.PR_SMTP_ADDRESS)
-                    except:
-                        pass
-                else:
-                    FromMailId = msg.SenderEmailAddress
-                for recipient in  msg.Recipients:
-                    if ( recipient.Type == 1 ):
-                        ToMailID += recipient.PropertyAccessor.GetProperty(outlook_constants.PR_SMTP_ADDRESS) + ';'
-                ToMailID = ToMailID[: - 1]
-                if ( msg.Attachments.Count > 0 ):
-                    AttachmentStatus = outlook_constants.ATTACH_STATUS_YES
-                try:
-                        msg.Display()
-                        Flag = True
-                        key = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(5)) #creating a random key of length '5'
-                        self.GetEmailList.append({'Subject' : msg.Subject, 'ToMailID' : ToMailID, 'FromMailId' : FromMailId, 'AttachmentStatus' : AttachmentStatus, 'Body' : msg.Body, 'Flag' : Flag, 'Key' : key, 'Content' : msg})
-                        result = key
-                        status = desktop_constants.TEST_RESULT_PASS
-                        method_output = desktop_constants.TEST_RESULT_TRUE
-                except Exception as e:# done to handle popups and dialog boxes
-                    f = e[2]
-                    if ( str(f[2]) == "Outlook can't do this because a dialog box is open. Please close it and try again." ):
-                        logger.print_on_console(str(f[2]))
-                        error_msg = str(f[2])
+                            msg.Display()
+                            Flag = True
+                            key = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(5)) #creating a random key of length '5'
+                            self.GetEmailList.append({'Subject' : msg.Subject, 'ToMailID' : ToMailID, 'FromMailId' : FromMailId, 'AttachmentStatus' : AttachmentStatus, 'Body' : msg.Body, 'Flag' : Flag, 'Key' : key, 'Content' : msg})
+                            result = key
+                            status = desktop_constants.TEST_RESULT_PASS
+                            method_output = desktop_constants.TEST_RESULT_TRUE
+                    except Exception as e:# done to handle popups and dialog boxes
+                        f = e[2]
+                        if ( str(f[2]) == "Outlook can't do this because a dialog box is open. Please close it and try again." ):
+                            logger.print_on_console(str(f[2]))
+                            error_msg = str(f[2])
 
-                if ( Flag != True ):
-                    if ( error_msg ):
-                        error_msg = 'Error: No such mail found'
-                        log.info( error_msg )
-                        logger.print_on_console( error_msg )
+                    if ( Flag != True ):
+                        if ( error_msg ):
+                            error_msg = 'Error: No such mail found'
+                            log.info( error_msg )
+                            logger.print_on_console( error_msg )
+                else:
+                    logger.print_on_console( 'Please provide at least one input parameter' )
             except Exception as e:
                 logger.print_on_console( 'Error: No such mail found' )
                 error_msg = desktop_constants.ERROR_MSG + ' : ' + str(e)
@@ -494,10 +500,10 @@ class OutlookKeywords:
 
                 mailSegList=mailSegregator(all_inbox_msgs, To_add, From_add, sub)
                 log.debug(len(mailSegList))
-                logger.print_on_console("number of emails that matched the input is:",len(mailSegList))
-                segregatedList=timeSegregator(mailSegList)
-                # log.debug(len(segregatedList))
                 # logger.print_on_console("number of emails that matched the input is:",len(mailSegList))
+                segregatedList=timeSegregator(mailSegList)
+                log.debug(len(segregatedList))
+                logger.print_on_console("number of emails that matched the input is:",len(mailSegList))
             except Exception as e:
                 logger.print_on_console( 'Error at mail segregator' )
                 log.error( desktop_constants.ERROR_MSG + ' : ' + str(e) )
