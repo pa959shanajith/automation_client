@@ -94,7 +94,21 @@ class DropdownKeywords():
                                 err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
 
                     else:
-                        if (self.util.is_visible(webelement)):
+                        if (self.util.is_visible(webelement) and self.__check_visibility_from_config()):
+                            # performing selenium code
+                            local_ddl.log.debug('element is visible, performing selenium code')
+                            list_size = browser_Keywords.local_bk.driver_obj.execute_script("""return arguments[0].length""",webelement)
+                            index = input[0]
+                            if (int(index) < list_size):
+                                browser_Keywords.local_bk.driver_obj.execute_script("""arguments[0].selectedIndex=arguments[1]""",webelement,index)
+                                status = webconstants.TEST_RESULT_PASS
+                                result = webconstants.TEST_RESULT_TRUE
+                                local_ddl.log.info(STATUS_METHODOUTPUT_UPDATE)
+                            else:
+                                logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                local_ddl.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                        elif (self.util.is_visible(webelement)):
                             # performing selenium code
                             local_ddl.log.debug('element is visible, performing selenium code')
                             if (input is not None):
