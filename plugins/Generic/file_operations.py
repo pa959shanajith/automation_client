@@ -1231,7 +1231,7 @@ class FileOperations:
             filepath2=input[3]
             sheetname2=input[4]
             range2=input[5].split(':')
-            res1=[]
+            res1={}
             output_feild = None
             if(len(input)==6): # Indicates both files are excel
                 book1 = openpyxl.load_workbook(filepath1)
@@ -1248,12 +1248,21 @@ class FileOperations:
                 for eachcell in cell1:
                     for eachcell2 in cell2:
                         for i in range(len(eachcell2)):
-                            if (eachcell[i].value==eachcell2[i].value):
-                                output='Matched'
-                                res1+=[output]
+                            if i not in res1.keys():
+                                res1[i]=[]
+                                if (eachcell[i].value==eachcell2[i].value):
+                                    output='Matched'
+                                    res1[i].append(output)
+                                else:
+                                    output='Not Matched'
+                                    res1[i].append(output)
                             else:
-                                output='Not Matched'
-                                res1+=[output]
+                                if (eachcell[i].value==eachcell2[i].value):
+                                    output='Matched'
+                                    res1[i].append(output)
+                                else:
+                                    output='Not Matched'
+                                    res1[i].append(output)
                         del cell2[0]
                         break
                 if(str(args[0].split(";")[0]).startswith("{") and str(args[0].split(";")[0]).endswith("}")):
@@ -1286,4 +1295,4 @@ class FileOperations:
             err_msg = 'Error occured in comparing selected cells between files'
             log.error(err_msg)
             logger.print_on_console(err_msg)
-        return status,methodoutput,output,err_msg
+        return status,methodoutput,res1,err_msg
