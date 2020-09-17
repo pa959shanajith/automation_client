@@ -119,7 +119,7 @@ class FileOperationsPDF:
                                         logger.print_on_console("The number of pages with differences in comparePDFs are: ",len(output_res))
                                     else:
                                         logger.print_on_console("No Difference between inputs in comparePDFs")
-                                    if output_path:
+                                    if output_path and not isinstance(output_path,dict):
                                         if(os.path.exists(output_path) or os.path.exists(os.path.dirname(output_path))):
                                             log.debug( "Writing the output of compareFiles to file : " + str(output_path) )
                                             logger.print_on_console( "Writing the output of compareFiles to file.")
@@ -321,24 +321,24 @@ class FileOperationsPDF:
                         fileNameA, fileExtensionA = os.path.splitext(filePathA)
                         fileNameB, fileExtensionB = os.path.splitext(filePathB)
                         if fileExtensionA.lower() == ".pdf" and fileExtensionB.lower() == ".png":   
-                            result = self.get_thresholded_similar_images(filePathA,filePathB)
-                            if result is not None:
+                            output_res = self.get_thresholded_similar_images(filePathA,filePathB)
+                            if output_res is not None:
                                 flg = True
                                 optFlg = True
                                 try:  
-                                    if result['total_count'] > 0:      
-                                        logger.print_on_console("Total number of image occurances are: ",result['total_count'])
+                                    if output_res['total_count'] > 0:      
+                                        logger.print_on_console("Total number of image occurances are: ",output_res['total_count'])
                                     else:
                                         logger.print_on_console("No image occurances in PDF")
-                                    if output_path:
+                                    if output_path and not isinstance(output_path,dict):
                                         if(os.path.exists(output_path) or os.path.exists(os.path.dirname(output_path))):
-                                            log.debug( "Writing the output of PDFimageCompare to file : " + str(result) )
+                                            log.debug( "Writing the output of PDFimageCompare to file : " + str(output_res) )
                                             logger.print_on_console( "Writing the output of PDFimageCompare to file.")
                                             optFlg = False
                                             with open(output_path,'w') as f:
-                                                f.write(str(result))
+                                                f.write(str(output_res))
                                             with open("sample1.json", "w") as outfile: 
-                                                outfile.write(str(result)) 
+                                                outfile.write(str(output_res)) 
                                         else:
                                             err_msg = generic_constants.FILE_NOT_EXISTS
                                             flg = False
@@ -351,7 +351,7 @@ class FileOperationsPDF:
                                     result = constants.TEST_RESULT_TRUE
                                     log.info("Comparision of files completed")
                                     if( optFlg ):
-                                        value = result
+                                        value = output_res
                             else:
                                 err_msg = generic_constants.TEMPLATE_ERR
                         else:
