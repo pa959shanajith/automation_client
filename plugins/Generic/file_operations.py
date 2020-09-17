@@ -19,7 +19,7 @@ from openpyxl.utils import get_column_letter
 import generic_constants
 from constants import *
 import folder_operations
-from file_comparison_operations import TextFile,PdfFile,XML,JSON
+from file_comparison_operations import TextFile,XML,JSON
 import excel_operations
 import core_utils
 import urllib.request, urllib.error, urllib.parse
@@ -39,7 +39,6 @@ class FileOperations:
     """The instantiation operation __init__ creates an empty object of the class FileOperations when it is instantiated"""
     def __init__(self):
         self.txt=TextFile()
-        self.pdf=PdfFile()
         self.xml=XML()
         self.json=JSON()
         self.folder=folder_operations.FolderOperations()
@@ -58,12 +57,10 @@ class FileOperations:
               '.xls_verify_content':self.xls_obj.verify_content_xls,
               '.xlsx_verify_content':self.xlsx_obj.verify_content_xlsx,
               '.txt_verify_content':self.txt.verify_content,
-              '.pdf_verify_content':self.pdf.verify_content,
 
               '.txt_compare_content':self.txt.compare_content,
               '.xls_compare_content':self.xls_obj.compare_content_xls,
               '.xlsx_compare_content':self.xlsx_obj.compare_content_xlsx,
-              '.pdf_compare_content':self.pdf.compare_content,
               '.csv_compare_content':self.csv_obj.compare_content_csv,
               '.json_compare_content':self.json.compare_content,
 
@@ -73,7 +70,6 @@ class FileOperations:
               '.xml_clear_content':self.xml.clear_content,
 
               '.txt_get_content':self.txt.get_content,
-              '.pdf_get_content':self.pdf.get_content,
 
               '.txt_replace_content':self.txt.replace_content,
               '.xls_replace_content':self.xls_obj.replace_content_xls,
