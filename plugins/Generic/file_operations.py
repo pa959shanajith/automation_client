@@ -1290,8 +1290,6 @@ class FileOperations:
                     for key, value in res1.items():
                         result.writerow(value)
                     outFile.close()
-                    os.remove(file1)
-                    os.remove(file2)
                 else:
                     status_excel_create_file = False
                     file_extension,status_get_ext = self.__get_ext(output_feild)
@@ -1307,8 +1305,8 @@ class FileOperations:
                         for key, value in res1.items():
                             result.writerow(value)
                         outFile.close()
-                        os.remove(file1)
-                        os.remove(file2)
+                os.remove(file1)
+                os.remove(file2)
             else:# Indicates both files are excel
                 book1 = openpyxl.load_workbook(filepath1)
                 book2 = openpyxl.load_workbook(filepath2)
