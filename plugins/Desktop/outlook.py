@@ -175,12 +175,25 @@ class OutlookKeywords:
                 result = OUTPUT_CONSTANT
                 error_msg = None
                 index_flag = False
-                self.senderEmail = input[0]
-                self.subject = input[2]
-                self.toMail = input[1].strip()
-                if input[3]!="":
-                    self.indexval = int(input[3])-1
-                    index_flag = True
+                if len(input)==1:
+                    self.senderEmail = input[0]
+                    self.subject = ''
+                    self.toMail = ''
+                if len(input)==2:
+                    self.senderEmail = input[0]
+                    self.toMail = input[1].strip()
+                    self.subject = ''
+                if len(input)==3:
+                    self.senderEmail = input[0]
+                    self.subject = input[2]
+                    self.toMail = input[1].strip()
+                if len(input)==4:
+                    self.senderEmail = input[0]
+                    self.subject = input[2]
+                    self.toMail = input[1].strip()
+                    if input[3]!='' and int(input[3])>=1:
+                        self.indexval = int(input[3])-1
+                        index_flag = True
                 #clearing all the variables before fetching the values
                 Subject = ''
                 ToMailID = ''

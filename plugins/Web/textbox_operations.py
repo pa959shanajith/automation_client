@@ -355,7 +355,7 @@ class TextboxKeywords:
                             index_val=int(input[3])-1
                         row_count=self.txtobj.getRowCountJs(webelement)
                         col_count=self.txtobj.getColoumnCountJs(webelement)
-                        if obj_type== "textbox":
+                        if obj_type== "textbox" and index_val!=-1:
                             if row_num-1>row_count or col_num-1>col_count:
                                 local_to.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                                 err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
@@ -403,7 +403,7 @@ class TextboxKeywords:
                         index_val=int(input[3])-1
                     row_count=self.txtobj.getRowCountJs(webelement)
                     col_count=self.txtobj.getColoumnCountJs(webelement)
-                    if obj_type== "textbox":
+                    if obj_type== "textbox" and index_val!=-1:
                         if row_num-1>row_count or col_num-1>col_count:
                             local_to.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                             err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
@@ -413,12 +413,27 @@ class TextboxKeywords:
                             txt_box=cell.find_elements_by_tag_name('input')
                             if len(txt_box)>0:
                                 webelement = txt_box[index_val]
-                length = self.__gettexbox_length(webelement)
-                if length is not None:
-                    status=TEST_RESULT_PASS
-                    methodoutput=TEST_RESULT_TRUE
+                                length = self.__gettexbox_length(webelement)
+                                if length is not None:
+                                    status=TEST_RESULT_PASS
+                                    methodoutput=TEST_RESULT_TRUE
+                                else:
+                                    err_msg='Textbox length is '+str(length)
+                            else:
+                                local_to.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                                logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                    else:
+                        local_to.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                        err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                        logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])           
                 else:
-                    err_msg='Textbox length is '+str(length)
+                    length = self.__gettexbox_length(webelement)
+                    if length is not None:
+                        status=TEST_RESULT_PASS
+                        methodoutput=TEST_RESULT_TRUE
+                    else:
+                        err_msg='Textbox length is '+str(length)
             except Exception as e:
                 err_msg=self.__web_driver_exception(e)
         logger.print_on_console('Textbox length is '+str(length))
@@ -482,7 +497,7 @@ class TextboxKeywords:
                             local_to.log.info(input)
                         row_count=self.txtobj.getRowCountJs(webelement)
                         col_count=self.txtobj.getColoumnCountJs(webelement)
-                        if obj_type== "textbox":
+                        if obj_type== "textbox" and index_val!=-1:
                             if row_num-1>row_count or col_num-1>col_count:
                                 local_to.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                                 err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
@@ -524,6 +539,9 @@ class TextboxKeywords:
                             err_msg=self.__read_only()
                 else:
                     err_msg=self.__element_disabled()
+            except UnboundLocalError as e:
+                local_to.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
             except InvalidElementStateException as e:
                 err_msg=self.__invalid_element_state(e)
             except Exception as e:
@@ -551,7 +569,7 @@ class TextboxKeywords:
                             local_to.log.info(input)
                         row_count=self.txtobj.getRowCountJs(webelement)
                         col_count=self.txtobj.getColoumnCountJs(webelement)
-                        if obj_type== "textbox":
+                        if obj_type== "textbox" and index_val!=-1:
                             if row_num-1>row_count or col_num-1>col_count:
                                 local_to.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                                 err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
@@ -596,6 +614,9 @@ class TextboxKeywords:
                             err_msg=self.__read_only()
                 else:
                     err_msg=self.__element_disabled()
+            except UnboundLocalError as e:
+                local_to.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
             except InvalidElementStateException as e:
                 err_msg=self.__invalid_element_state(e)
             except Exception as e:
