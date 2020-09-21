@@ -115,14 +115,16 @@ class FileOperationsPDF:
                                 try:
                                     log.info("Result to be displayed is : " + str(res_opt))
                                     logger.print_on_console("Result to be displayed is : " + str(res_opt))            
-                                    if len(output_res):
+                                    if "error" in output_res and output_res['error']:
+                                        logger.print_on_console("Pages empty or generator not supported in comparePDFs")
+                                    elif len(output_res):
                                         logger.print_on_console("The number of pages with differences in comparePDFs are: ",len(output_res))
                                     else:
                                         logger.print_on_console("No Difference between inputs in comparePDFs")
                                     if output_path and not isinstance(output_path,dict):
                                         if(os.path.exists(output_path) or os.path.exists(os.path.dirname(output_path))):
-                                            log.debug( "Writing the output of compareFiles to file : " + str(output_path) )
-                                            logger.print_on_console( "Writing the output of compareFiles to file.")
+                                            log.debug( "Writing the output of comparePDFs to file : " + str(output_path) )
+                                            logger.print_on_console( "Writing the output of comparePDFs to file.")
                                             optFlg = False
                                             with open(output_path,'w') as f:
                                                 f.write(str(output_res))
@@ -154,9 +156,9 @@ class FileOperationsPDF:
                 log.error(err_msg)
                 logger.print_on_console(err_msg)
         except Exception as e:
-            err_msg = ("Exception occurred in compare_files while comparing two files"+str(e))
+            err_msg = ("Exception occurred in comparePDFs while comparing two files"+str(e))
             log.error( err_msg )
-            logger.print_on_console( "Error occured in Compare Files" )
+            logger.print_on_console( "Error occured in comparePDFs" )
         return status, result, value, err_msg
 
     def compare_pagewise(self,pdfReader1,pdfReader2,opt,doc1,doc2):
@@ -164,6 +166,12 @@ class FileOperationsPDF:
         for i in range(pdfReader1.numPages):
             result[i + 1] = {}
             result[i+1]['images'] = {}
+            test_str1 = pdfReader1.getPage(i).extractText().replace('\n',"")
+            total_char1 = len(test_str1)
+            if total_char1 == 0:
+                result['error'] = True
+                result[i + 1]["error"] = "Page empty or generator not supported"
+                continue
             if pdfReader2.numPages <= i:
                 result[i + 1]["deletions"] = pdfReader1.getPage(i).extractText().replace('\n',"")
                 result[i + 1]["images"] = self.compare_images(doc1,None,i,i,opt)
@@ -171,8 +179,6 @@ class FileOperationsPDF:
             result[i + 1]["images"] = self.compare_images(doc1,doc2,i,i,opt)
             test_str2 = pdfReader2.getPage(i).extractText().replace('\n',"")
             total_char2 = len(test_str2)
-            test_str1 = pdfReader1.getPage(i).extractText().replace('\n',"")
-            total_char1 = len(test_str1)
             test_str1_copy = test_str1
             result[i + 1]['deletions'] = test_str1
             result[i + 1]['additions'] = test_str2
@@ -190,8 +196,15 @@ class FileOperationsPDF:
             result[i + 1]["matchedDest"] = matched_count/total_char2*100
         if pdfReader1.numPages < pdfReader2.numPages:
             for i in range(pdfReader1.numPages,pdfReader2.numPages):
+                result[i + 1] = {}
+                test_str2 = pdfReader2.getPage(i).extractText().replace('\n',"")
+                total_char2 = len(test_str2)
+                if total_char2 == 0:
+                    result['error'] = True
+                    result[i + 1] = "Page empty or generator not supported"
+                    continue
                 result[i + 1]["images"] = self.compare_images(None,doc2,i,i,opt)
-                result[i + 1]["additions"] = pdfReader2.getPage(i)
+                result[i + 1]["additions"] = test_str2
 
         return result
 
@@ -213,6 +226,11 @@ class FileOperationsPDF:
                 total_char2 = len(test_str2)
                 test_str1 = pdfReader1.getPage(i).extractText().replace('\n',"")
                 total_char1 = len(test_str1)
+                if total_char1 == 0:
+                    lastMathc = -99
+                    result['error'] = True
+                    result[i + 1]["error"] = "Page empty or generator not supported"
+                    break
                 test_str1_copy = test_str1
                 matched_count = 0
                 deletions = test_str1
@@ -225,7 +243,7 @@ class FileOperationsPDF:
                     matches.append(matched)
                     deletions = deletions.replace(matched, "")
                     additions = additions.replace(matched, "")
-                if i not in sim or sim[i] < matched_count/total_char1*100:
+                if total_char1 != 0 and (i not in sim or sim[i] < matched_count/total_char1*100):
                     if matched_count/total_char1*100 > 20:
                         sim[i] =  matched_count/total_char1*100
                         result[i + 1]["matchedSource"] = matched_count/total_char1*100
@@ -250,16 +268,21 @@ class FileOperationsPDF:
                 result[i + 1]["additions"] = "None"
                 result[i + 1]["images"] = self.compare_images(doc1,None,i,j,opt)
             
-        j = pdfReader1.numPages + 1
-        while i < pdfReader2.numPages and pageMatched[i] != 1:
-            result[j]["matchedSource"] = -1
-            result[j]["images"] = self.compare_images(None,doc2,i,i,opt)
-            result[j]["matchedDest"] = -1
-            result[j]["pageMatch"] = j+1
+        j = pdfReader1.numPages
+        while j < pdfReader2.numPages and (j not in pageMatched or pageMatched[i] != 1):
+            if  len(pdfReader2.getPage(i).extractText().replace('\n',"") == 0):
+                result['error'] = True
+                result[j + 1] = "Page empty or generator not supported"
+                continue
+            result[j + 1] = {}
+            result[j + 1]["matchedSource"] = -1
+            result[j + 1]["images"] = self.compare_images(None,doc2,i,i,opt)
+            result[j + 1]["matchedDest"] = -1
+            result[j + 1]["pageMatch"] = j+1
             if opt == "all":
-                result[j]["matches"] = "None"
-            result[j]["deletions"] = "None"
-            result[j]["additions"] = pdfReader2.getPage(i).extractText().replace('\n',"")
+                result[j + 1]["matches"] = "None"
+            result[j + 1]["deletions"] = "None"
+            result[j + 1]["additions"] = pdfReader2.getPage(i).extractText().replace('\n',"")
             j += 1
 
         return result
@@ -278,9 +301,7 @@ class FileOperationsPDF:
             result["deletions"] = len(doc1.getPageImageList(index1))
             return result
         for (img1,img2) in itertools.zip_longest(doc1.getPageImageList(index1),doc2.getPageImageList(index2)):
-            if index1 == 5 and index2 == 6:
-                print("yoli")
-            if img1 and img2 and img1 == img2:
+            if img1 and img2 and self.subtract_and_check_if_identical(img1,img2):
                 if opt == "all":
                     result['matches'] += 1
             elif img1 is None:
@@ -290,6 +311,13 @@ class FileOperationsPDF:
             else:
                 result['addition'] += 1
                 result['deletion'] += 1
+        return result
+
+    def subtract_and_check_if_identical(self,img1,img2):
+        img1 = self.pix2np(img1)
+        img2 = self.pix2np(img2)
+        difference = cv2.subtract(a, b)    
+        result = not np.any(difference) 
         return result
 
     def locate_image(self,input_val,args):
