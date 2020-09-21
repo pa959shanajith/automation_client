@@ -98,7 +98,7 @@ class TextboxKeywords:
                             local_to.log.info(input)
                         row_count=self.txtobj.getRowCountJs(webelement)
                         col_count=self.txtobj.getColoumnCountJs(webelement)
-                        if obj_type== "textbox" and index_val>=1:
+                        if obj_type== "textbox" and index_val>=0:
                             if row_num-1>row_count or col_num-1>col_count:
                                 local_to.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                                 err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
@@ -169,7 +169,7 @@ class TextboxKeywords:
                             local_to.log.info(input)
                         row_count=self.txtobj.getRowCountJs(webelement)
                         col_count=self.txtobj.getColoumnCountJs(webelement)
-                        if obj_type== "textbox" and index_val>=1:
+                        if obj_type== "textbox" and index_val>=0:
                             if row_num-1>row_count or col_num-1>col_count:
                                 local_to.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                                 err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
@@ -278,7 +278,7 @@ class TextboxKeywords:
                         index_val=int(input[3])-1
                     row_count=self.txtobj.getRowCountJs(webelement)
                     col_count=self.txtobj.getColoumnCountJs(webelement)
-                    if obj_type== "textbox" and index_val>=1:
+                    if obj_type== "textbox" and index_val>=0:
                         if row_num-1>row_count or col_num-1>col_count:
                             local_to.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                             err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
@@ -355,7 +355,7 @@ class TextboxKeywords:
                             index_val=int(input[3])-1
                         row_count=self.txtobj.getRowCountJs(webelement)
                         col_count=self.txtobj.getColoumnCountJs(webelement)
-                        if obj_type== "textbox" and index_val>=1:
+                        if obj_type== "textbox" and index_val>=0:
                             if row_num-1>row_count or col_num-1>col_count:
                                 local_to.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                                 err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
@@ -403,7 +403,7 @@ class TextboxKeywords:
                         index_val=int(input[3])-1
                     row_count=self.txtobj.getRowCountJs(webelement)
                     col_count=self.txtobj.getColoumnCountJs(webelement)
-                    if obj_type== "textbox" and index_val>=1:
+                    if obj_type== "textbox" and index_val>=0:
                         if row_num-1>row_count or col_num-1>col_count:
                             local_to.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                             err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
@@ -497,7 +497,7 @@ class TextboxKeywords:
                             local_to.log.info(input)
                         row_count=self.txtobj.getRowCountJs(webelement)
                         col_count=self.txtobj.getColoumnCountJs(webelement)
-                        if obj_type== "textbox" and index_val>=1:
+                        if obj_type== "textbox" and index_val>=0:
                             if row_num-1>row_count or col_num-1>col_count:
                                 local_to.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                                 err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
@@ -569,7 +569,7 @@ class TextboxKeywords:
                             local_to.log.info(input)
                         row_count=self.txtobj.getRowCountJs(webelement)
                         col_count=self.txtobj.getColoumnCountJs(webelement)
-                        if obj_type== "textbox" and index_val>=1:
+                        if obj_type== "textbox" and index_val>=0:
                             if row_num-1>row_count or col_num-1>col_count:
                                 local_to.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                                 err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
