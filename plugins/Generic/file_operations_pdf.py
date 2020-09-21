@@ -301,22 +301,30 @@ class FileOperationsPDF:
             result["deletions"] = len(doc1.getPageImageList(index1))
             return result
         for (img1,img2) in itertools.zip_longest(doc1.getPageImageList(index1),doc2.getPageImageList(index2)):
-            if img1 and img2 and self.subtract_and_check_if_identical(img1,img2):
-                if opt == "all":
-                    result['matches'] += 1
+            if img1 and img2:
+                xref1 = img1[0]
+                xref2 = img2[0]
+                pix1 = fitz.Pixmap(doc1, xref1)
+                pix2 = fitz.Pixmap(doc2, xref2)
+                if self.subtract_and_check_if_identical(pix1,pix2):
+                    if opt == "all":
+                        result['matches'] += 1
+                else:
+                    result['addition'] += 1
+                    result['deletion'] += 1
             elif img1 is None:
                 result['addition'] += 1
             elif img2 is None:
                 result['deletion'] += 1
-            else:
-                result['addition'] += 1
-                result['deletion'] += 1
+                
         return result
 
     def subtract_and_check_if_identical(self,img1,img2):
         img1 = self.pix2np(img1)
         img2 = self.pix2np(img2)
-        difference = cv2.subtract(a, b)    
+        if img1.shape != img2.shape:
+            return False
+        difference = cv2.subtract(img1, img2)    
         result = not np.any(difference) 
         return result
 
