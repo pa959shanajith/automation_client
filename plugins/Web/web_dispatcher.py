@@ -520,9 +520,7 @@ class Dispatcher:
                 if ' ' in identifier.strip():
                     identifier = '.'+identifier.replace(' ','.')
                     type = 'css_selector'
-                    webElement=getattr(driver,self.identifier_dict[type])(identifier)
-                else :
-                    webElement=getattr(driver,self.identifier_dict[type])(identifier)
+                webElement=getattr(driver,self.identifier_dict[type])(identifier)
                 if len(webElement) >= index:
                     webElement = [webElement[index]]
             else:
