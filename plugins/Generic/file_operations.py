@@ -48,7 +48,7 @@ class FileOperations:
         self.xls_obj=excel_operations.ExcelXLS()
         self.xlsx_obj=excel_operations.ExcelXLSX()
         self.csv_obj=excel_operations.ExcelCSV()
-        self.convert_string_to_int=excel_operations.ExcelFile()
+        self.convert=excel_operations.ExcelFile()
         self.DV = dynamic_variable_handler.DynamicVariables()
 
         """Mapping of keywords to its respective methods"""
@@ -894,6 +894,7 @@ class FileOperations:
         try:
             result3=os.path.isfile(outputFilePath)
             file_ext,status1=self.__get_ext(outputFilePath)
+            import csv
 
             if ( file_ext == '.xls' ):
                 #checking the file exists and open the exists file.
@@ -987,6 +988,7 @@ class FileOperations:
                 for key, value in content.items():
                     result.writerow(value)
                 outFile.close()
+                status=True
         except Exception as e:
             err_msg='Writing to Excel Sheet Failed'
             log.error(e)
@@ -1254,15 +1256,15 @@ class FileOperations:
                 col12 = " ".join(re.findall("[a-zA-Z]+", range1[1]))
                 row11=int(" ".join(re.findall(r'[0-9]+', range1[0])))
                 row12=int(" ".join(re.findall(r'[0-9]+', range1[1])))
-                column11=self.convert_string_to_int(col11)
-                column12=self.convert_string_to_int(col12)
+                column11=self.convert.convertStringToInt(col11)
+                column12=self.convert.convertStringToInt(col12)
 
                 col21 = " ".join(re.findall("[a-zA-Z]+", range2[0]))
                 col22 = " ".join(re.findall("[a-zA-Z]+", range2[1]))
                 row21=int(" ".join(re.findall(r'[0-9]+', range2[0])))
                 row22=int(" ".join(re.findall(r'[0-9]+', range2[1])))
-                column21=self.convert_string_to_int(col21)
-                column22=self.convert_string_to_int(col22)
+                column21=self.convert.convertStringToInt(col21)
+                column22=self.convert.convertStringToInt(col22)
 
                 i,j,x=0,0,0
                 output1,output2={},{}
@@ -1295,7 +1297,7 @@ class FileOperations:
                     aa+=1
                     x+=1
 
-            elif(extension1 in  generic_constants.FILE_TYPES and extension2 in generic_constants.FILE_TYPES):# Indicates both files are excel
+            elif(extension1 in  generic_constants.EXCEL_TYPES and extension2 in generic_constants.EXCEL_TYPES):# Indicates both files are excel
                 book1 = openpyxl.load_workbook(filepath1)
                 book2 = openpyxl.load_workbook(filepath2)
                 #verify whether file exists or not
@@ -1346,8 +1348,8 @@ class FileOperations:
                 col12 = " ".join(re.findall("[a-zA-Z]+", range1[1]))
                 row11=int(" ".join(re.findall(r'[0-9]+', range1[0])))
                 row12=int(" ".join(re.findall(r'[0-9]+', range1[1])))
-                column11=self.convert_string_to_int(col11)
-                column12=self.convert_string_to_int(col12)
+                column11=self.convert.convertStringToInt(col11)
+                column12=self.convert.convertStringToInt(col12)
                 output1,output2={},{}
                 i,x,j=0,0,0
                 if(file1):
