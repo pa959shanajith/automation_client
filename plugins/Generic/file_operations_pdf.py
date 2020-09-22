@@ -118,7 +118,7 @@ class FileOperationsPDF:
                                     if "error" in output_res and output_res['error']:
                                         logger.print_on_console("Pages empty or generator not supported in comparePDFs")
                                     elif len(output_res):
-                                        logger.print_on_console("The number of pages with differences in comparePDFs are: ",len(output_res))
+                                        logger.print_on_console("The number of pages with differences in comparePDFs are: ",self.get_number_diff_pages(output_res))
                                     else:
                                         logger.print_on_console("No Difference between inputs in comparePDFs")
                                     if output_path and not isinstance(output_path,dict):
@@ -126,11 +126,9 @@ class FileOperationsPDF:
                                             log.debug( "Writing the output of comparePDFs to file : " + str(output_path) )
                                             logger.print_on_console( "Writing the output of comparePDFs to file.")
                                             optFlg = False
+                                            formatted_output = json.dumps(output_res, indent = 4)
                                             with open(output_path,'w') as f:
-                                                f.write(str(output_res))
-                                            json_object = json.dumps(output_res, indent = 4) 
-                                            with open("sample2.json", "w") as outfile: 
-                                                outfile.write(json_object) 
+                                                f.write(str(formatted_output))
                                         else:
                                             err_msg = generic_constants.FILE_NOT_EXISTS
                                             flg = False
@@ -205,8 +203,16 @@ class FileOperationsPDF:
                     continue
                 result[i + 1]["images"] = self.compare_images(None,doc2,i,i,opt)
                 result[i + 1]["additions"] = test_str2
+                result[i + 1]["deletions"] = "None"
+
 
         return result
+    def get_number_diff_pages(self,comparison_result):
+        difference_found = 0
+        for page in comparison_result:
+            if len(comparison_result[page]['deletions']) > 0 or len(comparison_result[page]['additions']) > 0:
+                difference_found += 1 
+        return difference_found
 
     def compare_complete(self,pdfReader1,pdfReader2,opt,doc1,doc2):
         sim = {}
@@ -309,9 +315,11 @@ class FileOperationsPDF:
                 if self.subtract_and_check_if_identical(pix1,pix2):
                     if opt == "all":
                         result['matches'] += 1
+                        continue
                 else:
                     result['addition'] += 1
                     result['deletion'] += 1
+                    continue
             elif img1 is None:
                 result['addition'] += 1
             elif img2 is None:
@@ -371,10 +379,9 @@ class FileOperationsPDF:
                                             log.debug( "Writing the output of PDFimageCompare to file : " + str(output_res) )
                                             logger.print_on_console( "Writing the output of PDFimageCompare to file.")
                                             optFlg = False
+                                            formatted_output = json.dumps(output_res, indent = 4)
                                             with open(output_path,'w') as f:
-                                                f.write(str(output_res))
-                                            with open("sample1.json", "w") as outfile: 
-                                                outfile.write(str(output_res)) 
+                                                f.write(str(formatted_output))
                                         else:
                                             err_msg = generic_constants.FILE_NOT_EXISTS
                                             flg = False
@@ -493,7 +500,7 @@ class FileOperationsPDF:
                 y = 1
                 if found[1] > c2:
                     y = 2
-            results["location"].append({x,y})
+            results["location"].append(str(x) + "," + str(y))
         (startX, startY) = (int(maxLoc[0] * r), int(maxLoc[1] * r))
         (endX, endY) = (int((maxLoc[0] + tW) * r), int((maxLoc[1] + tH) * r))
         # draw a bounding box around the detected result and display the image
