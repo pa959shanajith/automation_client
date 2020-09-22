@@ -126,9 +126,9 @@ class FileOperationsPDF:
                                             log.debug( "Writing the output of comparePDFs to file : " + str(output_path) )
                                             logger.print_on_console( "Writing the output of comparePDFs to file.")
                                             optFlg = False
-                                            formatted_output = json.dumps(output_res, indent = 4)
+                                            output_res = json.dumps(output_res, indent = 4)
                                             with open(output_path,'w') as f:
-                                                f.write(str(formatted_output))
+                                                f.write(str(output_res))
                                         else:
                                             err_msg = generic_constants.FILE_NOT_EXISTS
                                             flg = False
@@ -141,7 +141,7 @@ class FileOperationsPDF:
                                     result = constants.TEST_RESULT_TRUE
                                     log.info("Comparision of files completed")
                                     if( optFlg ):
-                                        value = output_res
+                                        value = json.dumps(output_res, indent = 4)
                         else:
                             err_msg = generic_constants.INVALID_FILE_FORMAT
                     else:
@@ -379,9 +379,9 @@ class FileOperationsPDF:
                                             log.debug( "Writing the output of PDFimageCompare to file : " + str(output_res) )
                                             logger.print_on_console( "Writing the output of PDFimageCompare to file.")
                                             optFlg = False
-                                            formatted_output = json.dumps(output_res, indent = 4)
+                                            output_res = json.dumps(output_res, indent = 4)
                                             with open(output_path,'w') as f:
-                                                f.write(str(formatted_output))
+                                                f.write(str(output_res))
                                         else:
                                             err_msg = generic_constants.FILE_NOT_EXISTS
                                             flg = False
@@ -394,7 +394,7 @@ class FileOperationsPDF:
                                     result = constants.TEST_RESULT_TRUE
                                     log.info("Comparision of files completed")
                                     if( optFlg ):
-                                        value = output_res
+                                        value = json.dumps(output_res, indent = 4)
                             else:
                                 err_msg = generic_constants.TEMPLATE_ERR
                         else:
