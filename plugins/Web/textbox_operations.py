@@ -94,10 +94,10 @@ class TextboxKeywords:
                             index_val=int(input[3])-1
                             inp_list=[]
                             inp_list.append(input[4])
-                            coreutilsobj=core_utils.CoreUtils()
                             local_to.log.info(input)
                         row_count=self.txtobj.getRowCountJs(webelement)
                         col_count=self.txtobj.getColoumnCountJs(webelement)
+                        input = inp_list
                         if obj_type== "textbox" and index_val>=0:
                             if row_num-1>row_count or col_num-1>col_count:
                                 local_to.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
@@ -108,7 +108,6 @@ class TextboxKeywords:
                                 txt_box=cell.find_elements_by_tag_name('input')
                                 if len(txt_box)>0:
                                     webelement = txt_box[index_val]
-                                    input = inp_list
                     local_to.log.debug(WEB_ELEMENT_ENABLED)
                     utilobj=UtilWebKeywords()
                     is_visble=utilobj.is_visible(webelement)
@@ -165,10 +164,10 @@ class TextboxKeywords:
                             index_val=int(input[3])-1
                             inp_list=[]
                             inp_list.append(input[4])
-                            coreutilsobj=core_utils.CoreUtils()
                             local_to.log.info(input)
                         row_count=self.txtobj.getRowCountJs(webelement)
                         col_count=self.txtobj.getColoumnCountJs(webelement)
+                        input = inp_list
                         if obj_type== "textbox" and index_val>=0:
                             if row_num-1>row_count or col_num-1>col_count:
                                 local_to.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
@@ -179,7 +178,6 @@ class TextboxKeywords:
                                 txt_box=cell.find_elements_by_tag_name('input')
                                 if len(txt_box)>0:
                                     webelement = txt_box[index_val]
-                                    input = inp_list
                     local_to.log.debug(WEB_ELEMENT_ENABLED)
                     utilobj=UtilWebKeywords()
                     isvisble=utilobj.is_visible(webelement)
@@ -493,10 +491,10 @@ class TextboxKeywords:
                             index_val=int(input[3])-1
                             inp_list=[]
                             inp_list.append(input[4])
-                            coreutilsobj=core_utils.CoreUtils()
                             local_to.log.info(input)
                         row_count=self.txtobj.getRowCountJs(webelement)
                         col_count=self.txtobj.getColoumnCountJs(webelement)
+                        input = inp_list
                         if obj_type== "textbox" and index_val>=0:
                             if row_num-1>row_count or col_num-1>col_count:
                                 local_to.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
@@ -507,7 +505,6 @@ class TextboxKeywords:
                                 txt_box=cell.find_elements_by_tag_name('input')
                                 if len(txt_box)>0:
                                     webelement = txt_box[index_val]
-                                    input = inp_list
                     local_to.log.debug(WEB_ELEMENT_ENABLED)
                     utilobj=UtilWebKeywords()
                     is_visble=utilobj.is_visible(webelement)
@@ -565,10 +562,10 @@ class TextboxKeywords:
                             index_val=int(input[3])-1
                             inp_list=[]
                             inp_list.append(input[4])
-                            coreutilsobj=core_utils.CoreUtils()
                             local_to.log.info(input)
                         row_count=self.txtobj.getRowCountJs(webelement)
                         col_count=self.txtobj.getColoumnCountJs(webelement)
+                        input = inp_list
                         if obj_type== "textbox" and index_val>=0:
                             if row_num-1>row_count or col_num-1>col_count:
                                 local_to.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
@@ -579,7 +576,6 @@ class TextboxKeywords:
                                 txt_box=cell.find_elements_by_tag_name('input')
                                 if len(txt_box)>0:
                                     webelement = txt_box[index_val]
-                                    input = inp_list
                     local_to.log.debug(WEB_ELEMENT_ENABLED)
                     utilobj=UtilWebKeywords()
                     isvisble=utilobj.is_visible(webelement)
