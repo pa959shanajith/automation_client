@@ -31,6 +31,8 @@ import readconfig
 from xlrd import open_workbook
 import dynamic_variable_handler
 import logging
+from itertools import islice
+import re
 log = logging.getLogger('file_operations.py')
 
 
@@ -46,6 +48,7 @@ class FileOperations:
         self.xls_obj=excel_operations.ExcelXLS()
         self.xlsx_obj=excel_operations.ExcelXLSX()
         self.csv_obj=excel_operations.ExcelCSV()
+        self.convert_string_to_int=excel_operations.ExcelFile()
         self.DV = dynamic_variable_handler.DynamicVariables()
 
         """Mapping of keywords to its respective methods"""
@@ -975,6 +978,15 @@ class FileOperations:
                     log.error('some error : {}'.format(e))
                 status=True
 
+            elif( file_ext == '.csv'):
+                if result3==True:
+                    outFile = open(outputFilePath, 'w', newline='')
+                else:
+                    outFile = open(outputFilePath, 'a', newline='')
+                result=csv.writer(outFile)
+                for key, value in content.items():
+                    result.writerow(value)
+                outFile.close()
         except Exception as e:
             err_msg='Writing to Excel Sheet Failed'
             log.error(e)
@@ -1226,88 +1238,64 @@ class FileOperations:
             output_res=OUTPUT_CONSTANT
             log.debug('reading the inputs')
             filepath1=input[0]
-            sheetname1=input[1]
-            range1=input[2].split(':')
             filepath2=input[3]
+            sheetname1=input[1]
             sheetname2=input[4]
+            range1=input[2].split(':')
             range2=input[5].split(':')
             res1={}
             output_feild = None
-            if(sheetname1=='' and sheetname2==''):
-                from openpyxl import Workbook
-                import csv
-                csvToExcel1='csvToExcel1.xlsx'
-                csvToExcel2='csvToExcel2.xlsx'
-                file1=os.path.dirname(filepath1)+'\\'+csvToExcel1
-                file2=os.path.dirname(filepath2)+'\\'+csvToExcel2
-                with open(filepath1, 'r') as f:
-                    wb = Workbook()
-                    ws = wb.active
-                    for row in csv.reader(f):
-                        ws.append(row)
-                wb.save(file1)
-                with open(filepath2, 'r') as f:
-                    wb = Workbook()
-                    ws = wb.active
-                    for row in csv.reader(f):
-                        ws.append(row)
-                wb.save(file2)
-                book1 = openpyxl.load_workbook(file1)
-                book2 = openpyxl.load_workbook(file2)
-                #verify whether file exists or not
-                result1=self.verify_file_exists(filepath1,'')
-                result2=self.verify_file_exists(filepath2,'')
+            extension1=os.path.splitext(filepath1)[1]
+            extension2=os.path.splitext(filepath2)[1]
+            import csv
 
-                sheet1=book1.get_sheet_by_name(book1.sheetnames[0])
-                sheet2=book2.get_sheet_by_name(book2.sheetnames[0])
+            if(extension1=='.csv' and extension2=='.csv'):#both files are csv
+                col11 = " ".join(re.findall("[a-zA-Z]+", range1[0]))
+                col12 = " ".join(re.findall("[a-zA-Z]+", range1[1]))
+                row11=int(" ".join(re.findall(r'[0-9]+', range1[0])))
+                row12=int(" ".join(re.findall(r'[0-9]+', range1[1])))
+                column11=self.convert_string_to_int(col11)
+                column12=self.convert_string_to_int(col12)
 
-                cell1=list(sheet1[range1[0]:range1[1]])
-                cell2=list(sheet2[range2[0]:range2[1]])
-                x=0
-                for eachcell in cell1:
-                    for eachcell2 in cell2:
-                        res1[x]=[]
-                        for i in range(len(eachcell2)):
-                            if (eachcell[i].value==eachcell2[i].value):
-                                output='Matched'
-                                res1[x].append(output)
-                            else:
-                                output='Not Matched'
-                                res1[x].append(output)
-                        del cell2[0]
-                        x+=1
-                        break
-                if(str(args[0].split(";")[0]).startswith("{") and str(args[0].split(";")[0]).endswith("}")):
-                    out_path = self.DV.get_dynamic_value(args[0].split(";")[0])
-                    if(out_path): 
-                        output_feild = out_path
-                    else:
-                        output_feild = args[0].split(";")[0]
-                if( os.path.exists(output_feild) or os.path.exists(os.path.dirname(output_feild)) ):
-                    logger.print_on_console( "Writing the output of selectiveCellCompare to file ")
-                    outFile = open(output_feild, 'w', newline='')
-                    result=csv.writer(outFile)
-                    for key, value in res1.items():
-                        result.writerow(value)
-                    outFile.close()
-                else:
-                    status_excel_create_file = False
-                    file_extension,status_get_ext = self.__get_ext(output_feild)
-                    if status_get_ext and file_extension is not None and file_extension in generic_constants.FILE_TYPES:
-                        logger.print_on_console("File Does not exists, creating the file in specified path {}".format(output_feild))
-                        status_excel_create_file,e_msg = self.dict[file_extension + '_create_file'](output_feild,'selectiveCellCompare_Result')
-                    else:
-                        err_msg = 'Warning! : Invalid file extension.'
-                    if (status_excel_create_file):
-                        logger.print_on_console( "Writing the output of selectiveCellCompare to file : " + str(output_feild) )
-                        outFile = open(output_feild, 'w', newline='')
-                        result=csv.writer(outFile)
-                        for key, value in res1.items():
-                            result.writerow(value)
-                        outFile.close()
-                os.remove(file1)
-                os.remove(file2)
-            else:# Indicates both files are excel
+                col21 = " ".join(re.findall("[a-zA-Z]+", range2[0]))
+                col22 = " ".join(re.findall("[a-zA-Z]+", range2[1]))
+                row21=int(" ".join(re.findall(r'[0-9]+', range2[0])))
+                row22=int(" ".join(re.findall(r'[0-9]+', range2[1])))
+                column21=self.convert_string_to_int(col21)
+                column22=self.convert_string_to_int(col22)
+
+                i,j,x=0,0,0
+                output1,output2={},{}
+                with open(filepath1,'r') as f1:
+                    reader1=csv.reader(f1)
+                    for row in islice(reader1,min(row11,row12)-1,max(row11,row12)): #row length
+                        output1[i]=[]
+                        for column in islice(row,min(column11,column12)-1,max(column11,column12)): #column length
+                            output1[i].append(column)
+                        i+=1
+
+                with open(filepath2,'r') as f2:
+                    reader2=csv.reader(f2)
+                    for row in islice(reader2,min(row21,row22)-1,max(row21,row22)): #row length
+                        output2[j]=[]
+                        for column in islice(row,min(column21,column22)-1,max(column21,column22)): #column length
+                            output2[j].append(column)
+                        j+=1
+
+                for aa in range(len(output1)):
+                    res1[x]=[]
+                    for bb in range(len(output2[0])):
+                        if (output1[aa][bb]==output2[aa][bb]):
+                            output='Matched'
+                            res1[x].append(output)
+                        else:
+                            output='Not Matched'
+                            res1[x].append(output)
+                        bb+=1
+                    aa+=1
+                    x+=1
+
+            elif(extension1 in  generic_constants.FILE_TYPES and extension2 in generic_constants.FILE_TYPES):# Indicates both files are excel
                 book1 = openpyxl.load_workbook(filepath1)
                 book2 = openpyxl.load_workbook(filepath2)
                 #verify whether file exists or not
@@ -1339,27 +1327,86 @@ class FileOperations:
                                     res1[i].append(output)
                         del cell2[0]
                         break
-                if(str(args[0].split(";")[0]).startswith("{") and str(args[0].split(";")[0]).endswith("}")):
-                    out_path = self.DV.get_dynamic_value(args[0].split(";")[0])
-                    if(out_path): 
-                        output_feild = out_path
-                else:
-                    output_feild = args[0].split(";")[0]
-                if(output_feild):     
-                    if( os.path.exists(output_feild) or os.path.exists(os.path.dirname(output_feild)) ):
-                        logger.print_on_console( "Writing the output of selectiveCellCompare to file ")
-                        flg, err_msg = self.write_result_file(output_feild, res1, 'selectiveCellCompare')
-                    else:
-                        status_excel_create_file = False
-                        file_extension,status_get_ext = self.__get_ext(output_feild)
-                        if status_get_ext and file_extension is not None and file_extension in generic_constants.EXCEL_TYPES:
-                            logger.print_on_console("File Does not exists, creating the file in specified path {}".format(output_feild))
-                            status_excel_create_file,e_msg = self.dict[file_extension + '_create_file'](output_feild,'selectiveCellCompare_Result')
+
+            else:#one excel and one csv
+                if(extension1=='.csv'):
+                    file1=filepath1
+                    file2=filepath2
+                    range1=range1
+                    range2=range2
+                    book1 = openpyxl.load_workbook(file2)
+                elif(extension2=='.csv'):
+                    file1=filepath2
+                    file2=filepath1
+                    range1=range2
+                    range2=range1
+                    book1 = openpyxl.load_workbook(file2)
+
+                col11 = " ".join(re.findall("[a-zA-Z]+", range1[0]))
+                col12 = " ".join(re.findall("[a-zA-Z]+", range1[1]))
+                row11=int(" ".join(re.findall(r'[0-9]+', range1[0])))
+                row12=int(" ".join(re.findall(r'[0-9]+', range1[1])))
+                column11=self.convert_string_to_int(col11)
+                column12=self.convert_string_to_int(col12)
+                output1,output2={},{}
+                i,x,j=0,0,0
+                if(file1):
+                    with open(file1,'r') as f1:
+                        reader1=csv.reader(f1)
+                        for row in islice(reader1,min(row11,row12)-1,max(row11,row12)): #row length
+                            output1[i]=[]
+                            for column in islice(row,min(column11,column12)-1,max(column11,column12)): #column length
+                                output1[i].append(column)
+                            i+=1
+                
+                #verify whether file exists or not
+                result1=self.verify_file_exists(file1,'')
+                result2=self.verify_file_exists(file2,'')
+
+                sheet1=book1.get_sheet_by_name(book1.sheetnames[0])
+
+                cell1=list(sheet1[range2[0]:range1[1]])
+
+                for eachcell in cell1:
+                    output2[x]=[]
+                    for i in range(len(eachcell)):
+                        output2[x].append(eachcell[i].value)
+                    x+=1
+
+                for aa in range(len(output1)):
+                    res1[j]=[]
+                    for bb in range(len(output2[0])):
+                        if (output1[aa][bb]==output2[aa][bb]):
+                            output='Matched'
+                            res1[j].append(output)
                         else:
-                            err_msg = 'Warning! : Invalid file extension. Output file format should be either ".xls" or ".xlxs".'
-                        if (status_excel_create_file):
-                            logger.print_on_console( "Writing the output of selectiveCellCompare to file : " + str(output_feild) )
-                            flg, err_msg = self.write_result_file(output_feild, res1, 'selectiveCellCompare_Result')
+                            output='Not Matched'
+                            res1[j].append(output)
+                        bb+=1
+                    aa+=1
+                    j+=1
+
+            if(str(args[0].split(";")[0]).startswith("{") and str(args[0].split(";")[0]).endswith("}")):
+                out_path = self.DV.get_dynamic_value(args[0].split(";")[0])
+                if(out_path): 
+                    output_feild = out_path
+            else:
+                output_feild = args[0].split(";")[0]
+            if(output_feild):
+                if( os.path.exists(output_feild) or os.path.exists(os.path.dirname(output_feild)) ):
+                    logger.print_on_console( "Writing the output of selectiveCellCompare to file ")
+                    flg, err_msg = self.write_result_file(output_feild, res1, 'selectiveCellCompare')
+                else:
+                    status_excel_create_file = False
+                    file_extension,status_get_ext = self.__get_ext(output_feild)
+                    if status_get_ext and file_extension is not None and file_extension in generic_constants.FILE_TYPES:
+                        logger.print_on_console("File Does not exists, creating the file in specified path {}".format(output_feild))
+                        status_excel_create_file,e_msg = self.dict[file_extension + '_create_file'](output_feild,'selectiveCellCompare_Result')
+                    else:
+                        err_msg = 'Warning! : Invalid file extension.'
+                    if (status_excel_create_file):
+                        logger.print_on_console( "Writing the output of selectiveCellCompare to file : " + str(output_feild) )
+                        flg, err_msg = self.write_result_file(output_feild, res1, 'selectiveCellCompare')
             if(res1!=[]):
                 log.info('Compared cells between the mentioned files')
                 logger.print_on_console('Compared cells between the mentioned files')
