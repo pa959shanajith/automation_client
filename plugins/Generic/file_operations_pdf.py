@@ -26,6 +26,7 @@ import cv2
 import numpy as np
 import imutils
 import fitz
+import re
 log = logging.getLogger('file_operations_xml.py')
 
 class FileOperationsPDF:
@@ -171,46 +172,69 @@ class FileOperationsPDF:
                 result[i + 1]["error"] = "Page empty or generator not supported"
                 continue
             if pdfReader2.numPages <= i:
-                result[i + 1]["deletions"] = pdfReader1.getPage(i).extractText().replace('\n',"")
+                result[i + 1]["comparison_result"] = "---" + pdfReader1.getPage(i).extractText().replace('\n',"") + "---"
                 result[i + 1]["images"] = self.compare_images(doc1,None,i,i,opt)
                 continue
             result[i + 1]["images"] = self.compare_images(doc1,doc2,i,i,opt)
             test_str2 = pdfReader2.getPage(i).extractText().replace('\n',"")
             total_char2 = len(test_str2)
             test_str1_copy = test_str1
-            result[i + 1]['deletions'] = test_str1
-            result[i + 1]['additions'] = test_str2
             matches = difflib.SequenceMatcher(None, test_str1, test_str2).get_matching_blocks()
             result[i + 1]["matches"] = []
+            match_arr = []
             matched_count = 0
             for match in matches:
                 matched = test_str1_copy[match.a:match.a + match.size]
                 matched_count = len(matched) + matched_count
-                if opt == "all":
+                match_arr.append(matched)
+                if opt == "all" or True:
                     result[i + 1]['matches'].append(matched)
-                result[i + 1]['deletions'] = result[i + 1]["deletions"].replace(matched, "")
-                result[i + 1]['additions'] = result[i + 1]["additions"].replace(matched, "")
+            result[i + 1]["comparison_result"] = self.get_formatted_comparison_result(test_str1,test_str2,match_arr)
             result[i + 1]["matchedSource"] = matched_count/total_char1*100
             result[i + 1]["matchedDest"] = matched_count/total_char2*100
+
         if pdfReader1.numPages < pdfReader2.numPages:
             for i in range(pdfReader1.numPages,pdfReader2.numPages):
                 result[i + 1] = {}
-                test_str2 = pdfReader2.getPage(i).extractText().replace('\n',"")
+                test_str2 = " +++ " + pdfReader2.getPage(i).extractText().replace('\n',"") + " +++ "
                 total_char2 = len(test_str2)
                 if total_char2 == 0:
                     result['error'] = True
                     result[i + 1] = "Page empty or generator not supported"
                     continue
+                result[i + 1]["comparison_result"] = " +++ " + test_str2 + " +++ "
                 result[i + 1]["images"] = self.compare_images(None,doc2,i,i,opt)
-                result[i + 1]["additions"] = test_str2
-                result[i + 1]["deletions"] = "None"
-
-
         return result
+
+    def get_formatted_comparison_result(self,pageA,pageB,match_arr):
+        pattern = '--cEND-- (.*?) --cSTART--'
+        end = " --cEND-- "
+        start = " --cSTART-- "
+        for cmn_str in match_arr:
+            if cmn_str != '' and cmn_str != ' ' and len(cmn_str) > 1:
+                comman_match = start + cmn_str + end
+                pageA = pageA.replace(cmn_str, comman_match)
+                pageB = pageB.replace(cmn_str, comman_match)
+        add = re.findall(pattern,pageB)
+        dele = re.findall(pattern,pageA)
+        for deletion in dele:
+            pageA = pageA.replace(end + deletion + start,"---" + deletion + " --- ")
+        pageA = pageA.replace(start , "")
+        pageA = pageA.replace(end , "")
+        for addition in add:
+            if addition == "":
+                continue
+            find_str = addition + start
+            index = pageB.find(find_str)
+            prev_matches = re.findall('--cSTART-- (.*?) --cEND--',pageB[:index])
+            add_index = pageA.find(prev_matches[len(prev_matches) - 1]) + len(prev_matches[len(prev_matches) - 1])
+            pageA = pageA[:add_index] + " +++ " + addition + " +++ " + pageA[add_index:]
+        return pageA
+
     def get_number_diff_pages(self,comparison_result):
         difference_found = 0
         for page in comparison_result:
-            if len(comparison_result[page]['deletions']) > 0 or len(comparison_result[page]['additions']) > 0:
+            if comparison_result[page]['comparison_result'].find("+++") != -1 or comparison_result[page]['comparison_result'].find("---") != -1:
                 difference_found += 1 
         return difference_found
 
@@ -239,16 +263,12 @@ class FileOperationsPDF:
                     break
                 test_str1_copy = test_str1
                 matched_count = 0
-                deletions = test_str1
-                additions = test_str2
                 matches = [] 
                 match_page = difflib.SequenceMatcher(None, test_str1, test_str2).get_matching_blocks()
                 for match in match_page:
                     matched = test_str1_copy[match.a:match.a + match.size]
                     matched_count = len(matched) + matched_count
                     matches.append(matched)
-                    deletions = deletions.replace(matched, "")
-                    additions = additions.replace(matched, "")
                 if total_char1 != 0 and (i not in sim or sim[i] < matched_count/total_char1*100):
                     if matched_count/total_char1*100 > 20:
                         sim[i] =  matched_count/total_char1*100
@@ -261,8 +281,7 @@ class FileOperationsPDF:
                         pageMatched[j] = 1
                         if opt == "all":
                             result[i + 1]["matches"] = matches
-                        result[i + 1]["deletions"] = deletions
-                        result[i + 1]["additions"] = additions
+                        result[i + 1]["comparison_result"] = self.get_formatted_comparison_result(test_str1,test_str2,matches)
                 j += 1
             if lastMathc is -1:
                 result[i + 1]["matchedSource"] = -1
@@ -270,8 +289,7 @@ class FileOperationsPDF:
                 result[i + 1]["pageMatch"] = -1
                 if opt == "all":
                     result[i + 1]["matches"] = "None"
-                result[i + 1]["deletions"] = test_str1
-                result[i + 1]["additions"] = "None"
+                result[i + 1]["comparison_result"] = " --- " + test_str1 + " --- "
                 result[i + 1]["images"] = self.compare_images(doc1,None,i,j,opt)
             
         j = pdfReader1.numPages
@@ -287,8 +305,7 @@ class FileOperationsPDF:
             result[j + 1]["pageMatch"] = j+1
             if opt == "all":
                 result[j + 1]["matches"] = "None"
-            result[j + 1]["deletions"] = "None"
-            result[j + 1]["additions"] = pdfReader2.getPage(i).extractText().replace('\n',"")
+            result[j + 1]["comparison_result"] = " +++ " + pdfReader2.getPage(i).extractText().replace('\n',"") + " +++ "
             j += 1
 
         return result
@@ -301,10 +318,10 @@ class FileOperationsPDF:
         result['addition'] = 0
         i = 1
         if doc1 is None:
-            result["additions"] = len(doc2.getPageImageList(index2))
+            result["addition"] = len(doc2.getPageImageList(index2))
             return result
         if doc2 is None:
-            result["deletions"] = len(doc1.getPageImageList(index1))
+            result["deletion"] = len(doc1.getPageImageList(index1))
             return result
         for (img1,img2) in itertools.zip_longest(doc1.getPageImageList(index1),doc2.getPageImageList(index2)):
             if img1 and img2:
