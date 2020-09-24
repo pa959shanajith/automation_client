@@ -981,7 +981,12 @@ class FileOperations:
 
             elif( file_ext == '.csv'):
                 if result3==True:
-                    outFile = open(outputFilePath, 'w', newline='')
+                    with open(outputFilePath, 'r') as csvfile:
+                        csv_dict = [row for row in csv.DictReader(csvfile)]
+                    if len(csv_dict) == 0:
+                        outFile = open(outputFilePath, 'w', newline='')
+                    else:
+                        outFile = open(outputFilePath, 'w+', newline='')
                 else:
                     outFile = open(outputFilePath, 'a', newline='')
                 result=csv.writer(outFile)
@@ -1239,6 +1244,8 @@ class FileOperations:
             err_msg=None
             output_res=OUTPUT_CONSTANT
             log.debug('reading the inputs')
+            flag1=False
+            flag2=False
             filepath1=input[0]
             filepath2=input[3]
             sheetname1=input[1]
@@ -1284,18 +1291,28 @@ class FileOperations:
                             output2[j].append(column)
                         j+=1
 
+                i=list(output2.keys())[0]
                 for aa in range(len(output1)):
                     res1[x]=[]
-                    for bb in range(len(output2[0])):
+                    for bb in range(len(output2[i])):
                         if (output1[aa][bb]==output2[aa][bb]):
                             output='Matched'
                             res1[x].append(output)
                         else:
                             output='Not Matched'
                             res1[x].append(output)
-                        bb+=1
-                    aa+=1
                     x+=1
+                
+                if (len(output1)<len(output2)):                    
+                    for i in range(len(output1)):
+                        output2.pop(i)
+                    xx=list(output2.keys())[0]
+                    for k in range(len(output2)):
+                        res1[x]=[]
+                        for j in range(len(output2[xx])):
+                            output='Not Matched'
+                            res1[x].append(output)
+                        x+=1
 
             elif(extension1 in  generic_constants.EXCEL_TYPES and extension2 in generic_constants.EXCEL_TYPES):# Indicates both files are excel
                 book1 = openpyxl.load_workbook(filepath1)
@@ -1375,9 +1392,10 @@ class FileOperations:
                         output2[x].append(eachcell[i].value)
                     x+=1
 
+                i=list(output2.keys())[0]
                 for aa in range(len(output1)):
                     res1[j]=[]
-                    for bb in range(len(output2[0])):
+                    for bb in range(len(output2[i])):
                         if (output1[aa][bb]==output2[aa][bb]):
                             output='Matched'
                             res1[j].append(output)
@@ -1388,6 +1406,17 @@ class FileOperations:
                     aa+=1
                     j+=1
 
+                if (len(output1)<len(output2)):                    
+                    for i in range(len(output1)):
+                        output2.pop(i)
+                    xx=list(output2.keys())[0]
+                    for k in range(len(output2)):
+                        res1[j]=[]
+                        for m in range(len(output2[xx])):
+                            output='Not Matched'
+                            res1[j].append(output)
+                        j+=1
+
             if(str(args[0].split(";")[0]).startswith("{") and str(args[0].split(";")[0]).endswith("}")):
                 out_path = self.DV.get_dynamic_value(args[0].split(";")[0])
                 if(out_path): 
@@ -1395,21 +1424,39 @@ class FileOperations:
             else:
                 output_feild = args[0].split(";")[0]
             if(output_feild):
-                if( os.path.exists(output_feild) or os.path.exists(os.path.dirname(output_feild)) ):
+                file_extension,status_get_ext = self.__get_ext(output_feild)
+                sheet='selectiveCellCompare'
+                if(os.path.exists(output_feild)):# or os.path.exists(os.path.dirname(output_feild)) ):
                     logger.print_on_console( "Writing the output of selectiveCellCompare to file ")
-                    flg, err_msg = self.write_result_file(output_feild, res1, 'selectiveCellCompare')
+                    msg='Output file has old entries! Erasing the old data to store incoming result.'
+                    if(file_extension=='.xlsx'):
+                        clear_xlsx = openpyxl.load_workbook(output_feild)
+                        if(sheet in clear_xlsx.sheetnames):
+                            logger.print_on_console(msg)
+                            self.xlsx_obj.clear_content_xlsx(os.path.dirname(output_feild),os.path.basename(output_feild),sheet)
+                    elif(file_extension=='.xls'):
+                        clear_xls = open_workbook(output_feild)
+                        if(sheet in clear_xls.sheet_names()):
+                            logger.print_on_console(msg)
+                            self.xls_obj.clear_content_xls(os.path.dirname(output_feild),os.path.basename(output_feild),sheet)
+                    flag1, err_msg = self.write_result_file(output_feild, res1, sheet)
                 else:
-                    status_excel_create_file = False
-                    file_extension,status_get_ext = self.__get_ext(output_feild)
-                    if status_get_ext and file_extension is not None and file_extension in generic_constants.FILE_TYPES:
+                    if status_get_ext and file_extension is not None and file_extension in generic_constants.SELECTIVE_CELL_FILE_TYPES:
                         logger.print_on_console("File Does not exists, creating the file in specified path {}".format(output_feild))
-                        status_excel_create_file,e_msg = self.dict[file_extension + '_create_file'](output_feild,'selectiveCellCompare_Result')
+                        flag2, err_msg = self.write_result_file(output_feild, res1, sheet)
                     else:
-                        err_msg = 'Warning! : Invalid file extension.'
-                    if (status_excel_create_file):
-                        logger.print_on_console( "Writing the output of selectiveCellCompare to file : " + str(output_feild) )
-                        flg, err_msg = self.write_result_file(output_feild, res1, 'selectiveCellCompare')
-            if(res1!=[]):
+                        err_msg = 'Warning! : Invalid file extension(Supports only .xlsx, .xls, .txt, .csv).'
+                    if (flag2==False):
+                        log.error(err_msg)
+                        logger.print_on_console(err_msg)
+                if(flag1==False):
+                    log.error(err_msg)
+                    logger.print_on_console(err_msg)
+            else:
+                err_msg='Output field is empty'
+                log.error(err_msg)
+                logger.print_on_console(err_msg)
+            if(flag1 or flag2):
                 log.info('Compared cells between the mentioned files')
                 logger.print_on_console('Compared cells between the mentioned files')
                 status = TEST_RESULT_PASS
