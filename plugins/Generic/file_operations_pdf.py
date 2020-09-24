@@ -27,6 +27,7 @@ import numpy as np
 import imutils
 import fitz
 import re
+import copy
 log = logging.getLogger('file_operations_xml.py')
 
 class FileOperationsPDF:
@@ -103,9 +104,11 @@ class FileOperationsPDF:
                             doc1 = fitz.open(filePathA)
                             doc2 = fitz.open(filePathB)
                             if type_opt == 'pagewise':
-                                output_res = self.compare_pagewise(pdfReader1,pdfReader2,res_opt,doc1,doc2)
+                                output_res_dict = self.compare_pagewise(pdfReader1,pdfReader2,res_opt,doc1,doc2)
+                                output_res = self.convert_output_to_list(output_res_dict)
                             if type_opt == 'complete': 
-                                output_res = self.compare_complete(pdfReader1,pdfReader2,res_opt,doc1,doc2)
+                                output_res_dict = self.compare_complete(pdfReader1,pdfReader2,res_opt,doc1,doc2)
+                                output_res = self.convert_output_to_list(output_res_dict)
                             pdf1.close()
                             pdf2.close()
                             doc1.close()
@@ -116,10 +119,10 @@ class FileOperationsPDF:
                                 try:
                                     log.info("Result to be displayed is : " + str(res_opt))
                                     logger.print_on_console("Result to be displayed is : " + str(res_opt))            
-                                    if "error" in output_res and output_res['error']:
+                                    if "error" in output_res_dict and output_res_dict['error']:
                                         logger.print_on_console("Pages empty or generator not supported in comparePDFs")
                                     elif len(output_res):
-                                        logger.print_on_console("The number of pages with differences in comparePDFs are: ",self.get_number_diff_pages(output_res))
+                                        logger.print_on_console("The number of pages with differences in comparePDFs are: ",self.get_number_diff_pages(output_res_dict))
                                     else:
                                         logger.print_on_console("No Difference between inputs in comparePDFs")
                                     if output_path and not isinstance(output_path,dict):
@@ -127,9 +130,8 @@ class FileOperationsPDF:
                                             log.debug( "Writing the output of comparePDFs to file : " + str(output_path) )
                                             logger.print_on_console( "Writing the output of comparePDFs to file.")
                                             optFlg = False
-                                            output_res = json.dumps(output_res, indent = 4)
                                             with open(output_path,'w') as f:
-                                                f.write(str(output_res))
+                                                f.write('\n'.join(str(output_res)))
                                         else:
                                             err_msg = generic_constants.FILE_NOT_EXISTS
                                             flg = False
@@ -142,7 +144,7 @@ class FileOperationsPDF:
                                     result = constants.TEST_RESULT_TRUE
                                     log.info("Comparision of files completed")
                                     if( optFlg ):
-                                        value = json.dumps(output_res, indent = 4)
+                                        value = output_res
                         else:
                             err_msg = generic_constants.INVALID_FILE_FORMAT
                     else:
@@ -187,9 +189,7 @@ class FileOperationsPDF:
                 matched = test_str1_copy[match.a:match.a + match.size]
                 matched_count = len(matched) + matched_count
                 match_arr.append(matched)
-                if opt == "all" or True:
-                    result[i + 1]['matches'].append(matched)
-            result[i + 1]["comparison_result"] = self.get_formatted_comparison_result(test_str1,test_str2,match_arr)
+            result[i + 1]["comparison_result"] = self.get_formatted_comparison_result(test_str1,test_str2,match_arr,opt)
             result[i + 1]["matchedSource"] = matched_count/total_char1*100
             result[i + 1]["matchedDest"] = matched_count/total_char2*100
 
@@ -206,7 +206,7 @@ class FileOperationsPDF:
                 result[i + 1]["images"] = self.compare_images(None,doc2,i,i,opt)
         return result
 
-    def get_formatted_comparison_result(self,pageA,pageB,match_arr):
+    def get_formatted_comparison_result(self,pageA,pageB,match_arr,opt):
         pattern = '--cEND-- (.*?) --cSTART--'
         end = " --cEND-- "
         start = " --cSTART-- "
@@ -229,6 +229,9 @@ class FileOperationsPDF:
             prev_matches = re.findall('--cSTART-- (.*?) --cEND--',pageB[:index])
             add_index = pageA.find(prev_matches[len(prev_matches) - 1]) + len(prev_matches[len(prev_matches) - 1])
             pageA = pageA[:add_index] + " +++ " + addition + " +++ " + pageA[add_index:]
+        if opt == 'selective':
+            for cmn_str in match_arr:
+                pageA = pageA.replace(cmn_str,"")
         return pageA
 
     def get_number_diff_pages(self,comparison_result):
@@ -237,6 +240,26 @@ class FileOperationsPDF:
             if comparison_result[page]['comparison_result'].find("+++") != -1 or comparison_result[page]['comparison_result'].find("---") != -1:
                 difference_found += 1 
         return difference_found
+
+    def convert_output_to_list(self,dictionary):
+        result = []
+        for page in dictionary:
+            temp_page = []
+            current_page = dictionary[page]
+            temp_page.append(page)
+            if "error" in current_page:
+                temp_page.append(current_page["error"])
+                result.append(temp_page)
+                continue
+            temp_page.append(current_page["comparison_result"])
+            temp_page.append(current_page["images"])
+            if "pageMatch" in  current_page:
+                temp_page.append(current_page["pageMatch"])
+            if "mathces" in current_page:
+                temp_page.append(current_page["matches"])
+            result.append(temp_page)
+        return result
+            
 
     def compare_complete(self,pdfReader1,pdfReader2,opt,doc1,doc2):
         sim = {}
@@ -279,16 +302,12 @@ class FileOperationsPDF:
                         pageMatched[lastMathc] = -1
                         lastMathc = j
                         pageMatched[j] = 1
-                        if opt == "all":
-                            result[i + 1]["matches"] = matches
-                        result[i + 1]["comparison_result"] = self.get_formatted_comparison_result(test_str1,test_str2,matches)
+                        result[i + 1]["comparison_result"] = self.get_formatted_comparison_result(test_str1,test_str2,matches,opt)
                 j += 1
             if lastMathc is -1:
                 result[i + 1]["matchedSource"] = -1
                 result[i + 1]["matchedDest"] = -1
                 result[i + 1]["pageMatch"] = -1
-                if opt == "all":
-                    result[i + 1]["matches"] = "None"
                 result[i + 1]["comparison_result"] = " --- " + test_str1 + " --- "
                 result[i + 1]["images"] = self.compare_images(doc1,None,i,j,opt)
             
@@ -303,25 +322,19 @@ class FileOperationsPDF:
             result[j + 1]["images"] = self.compare_images(None,doc2,i,i,opt)
             result[j + 1]["matchedDest"] = -1
             result[j + 1]["pageMatch"] = j+1
-            if opt == "all":
-                result[j + 1]["matches"] = "None"
             result[j + 1]["comparison_result"] = " +++ " + pdfReader2.getPage(i).extractText().replace('\n',"") + " +++ "
             j += 1
 
         return result
 
     def compare_images(self,doc1,doc2,index1,index2,opt):
-        result = {}
-        if opt == "all":
-            result['matches'] = 0
-        result['deletion'] = 0
-        result['addition'] = 0
+        result = [0,0,0]
         i = 1
         if doc1 is None:
-            result["addition"] = len(doc2.getPageImageList(index2))
+            result[0] = len(doc2.getPageImageList(index2))
             return result
         if doc2 is None:
-            result["deletion"] = len(doc1.getPageImageList(index1))
+            result[1] = len(doc1.getPageImageList(index1))
             return result
         for (img1,img2) in itertools.zip_longest(doc1.getPageImageList(index1),doc2.getPageImageList(index2)):
             if img1 and img2:
@@ -331,16 +344,16 @@ class FileOperationsPDF:
                 pix2 = fitz.Pixmap(doc2, xref2)
                 if self.subtract_and_check_if_identical(pix1,pix2):
                     if opt == "all":
-                        result['matches'] += 1
+                        result[2] += 1
                         continue
                 else:
-                    result['addition'] += 1
-                    result['deletion'] += 1
+                    result[0] += 1
+                    result[1] += 1
                     continue
             elif img1 is None:
-                result['addition'] += 1
+                result[0] += 1
             elif img2 is None:
-                result['deletion'] += 1
+                result[1] += 1
                 
         return result
 
@@ -382,13 +395,13 @@ class FileOperationsPDF:
                         fileNameA, fileExtensionA = os.path.splitext(filePathA)
                         fileNameB, fileExtensionB = os.path.splitext(filePathB)
                         if fileExtensionA.lower() == ".pdf" and fileExtensionB.lower() == ".png":   
-                            output_res = self.get_thresholded_similar_images(filePathA,filePathB)
+                            output_res,total_found = self.get_thresholded_similar_images(filePathA,filePathB)
                             if output_res is not None:
                                 flg = True
                                 optFlg = True
                                 try:  
-                                    if output_res['total_count'] > 0:      
-                                        logger.print_on_console("Total number of image occurances are: ",output_res['total_count'])
+                                    if total_found > 0:      
+                                        logger.print_on_console("Total number of image occurances are: ",total_found)
                                     else:
                                         logger.print_on_console("No image occurances in PDF")
                                     if output_path and not isinstance(output_path,dict):
@@ -396,7 +409,6 @@ class FileOperationsPDF:
                                             log.debug( "Writing the output of PDFimageCompare to file : " + str(output_res) )
                                             logger.print_on_console( "Writing the output of PDFimageCompare to file.")
                                             optFlg = False
-                                            output_res = json.dumps(output_res, indent = 4)
                                             with open(output_path,'w') as f:
                                                 f.write(str(output_res))
                                         else:
@@ -411,7 +423,7 @@ class FileOperationsPDF:
                                     result = constants.TEST_RESULT_TRUE
                                     log.info("Comparision of files completed")
                                     if( optFlg ):
-                                        value = json.dumps(output_res, indent = 4)
+                                        value = output_res
                             else:
                                 err_msg = generic_constants.TEMPLATE_ERR
                         else:
@@ -452,26 +464,41 @@ class FileOperationsPDF:
             output_res[i + 1] ,output_res["abs_max"] = self.compare(image,template,output_res['abs_max'])
         if output_res["abs_max"] < 0.3:
             return None
+        output = []
+        log_output = []
+        total_found = 0
         for image in output_res:
             if not isinstance(image,int):
                 continue
             if output_res[image]['max_corr'] > output_res['abs_max'] - 0.02 and output_res[image]['max_corr'] <= output_res['abs_max']:
                 #cv2.imwrite("result"+str(image)+".png",output_res[image]["image"])
-                output_res['total_count'] += output_res[image]['count'] 
+                page = [] 
+                page.append(image)
+                page.append(output_res[image]['count'])
+                total_found += output_res[image]['count']
+                page.append(output_res[image]['location'])
+                
             else:
-                output_res[image]['count'] = 0
-                output_res[image]['location'] = None
-
-        return output_res         
+                page = [] 
+                page.append(image)
+                page.append(0)
+                page.append([])
+            output.append(page)
+            page_copy = copy.deepcopy(page)
+            page_copy.append(output_res[image]["correlations"])
+            log_output.append(page_copy)
+        return output,total_found            
 
     def compare(self,image,template,abs_max):
         template = cv2.Canny(template, 50, 200)
+        location_dict = {(1,1):"bottom-left",(1,2):"bottom-center",(1,3):"bottom-right",(2,1):"middle-left",(2,2):"middle-center",(2,3):"middle-right",(3,1):"top-left",(3,2):"top-center",(3,1):"top-right"}
         (tH, tW) = template.shape[:2]
         gray = image
         found = None
         results = {}
         count = 0
         max_val = 0
+        correlations = []
         location = []
         # loop over the scales of the image
         for scale in np.linspace(0.2, 1.0, 20)[::-1]:
@@ -491,12 +518,15 @@ class FileOperationsPDF:
             if found is None or maxVal > found[0]:
                 count = 1
                 location = []
+                correlations = []
+                correlations.append(round(max_val*100,2))
                 location.append(maxLoc)
                 found = (maxVal, maxLoc, r)
                 xx = cv2.minMaxLoc(result)
                 max_val = maxVal
             elif maxVal == found[0]:
                 count += 1
+                correlations.append(round(max_val*100,2))
                 location.append(maxLoc)
             if maxVal > abs_max:
                 abs_max = maxVal
@@ -506,24 +536,25 @@ class FileOperationsPDF:
         dimensions = image.shape
         r1,r2,r3 = dimensions[0]/3,dimensions[0]/1.5 - 10,dimensions[0]
         c1,c2,c3 = dimensions[1]/3,dimensions[1]/1.5 - 10,dimensions[1]
-        x,y = 0,3
+        x,y = 1,3
         results['location'] = []
         for found in location:
             if found[0] > r1:
                 x = 2
                 if found[0] > r2:
-                    x = 2
+                    x = 3
             if found[1] > c1:
-                y = 1
+                y = 2
                 if found[1] > c2:
-                    y = 2
-            results["location"].append(str(x) + "," + str(y))
+                    y = 1
+            results["location"].append(location_dict[x,y])
         (startX, startY) = (int(maxLoc[0] * r), int(maxLoc[1] * r))
         (endX, endY) = (int((maxLoc[0] + tW) * r), int((maxLoc[1] + tH) * r))
         # draw a bounding box around the detected result and display the image
         cv2.rectangle(image, (startX, startY), (endX, endY), (0, 0, 255), 2)
         #results["image"] = image
         results["max_corr"] = max_val
+        results['correlations'] = correlations
         results['count'] = count
         return results,abs_max
 
