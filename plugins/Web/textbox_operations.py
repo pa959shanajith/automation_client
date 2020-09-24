@@ -315,23 +315,71 @@ class TextboxKeywords:
         local_to.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
             try:
-               text=self.__get_text(webelement)
-               local_to.log.debug('Text is '+text)
-               input=input[0]
-               coreutilsobj=core_utils.CoreUtils()
-               input=coreutilsobj.get_UTF_8(input)
-               if text==input:
-                status=TEST_RESULT_PASS
-                methodoutput=TEST_RESULT_TRUE
-               else:
-                err_msg='Text mismatched'
-                logger.print_on_console(err_msg)
-                logger.print_on_console(EXPECTED,input)
-                local_to.log.info(EXPECTED)
-                local_to.log.info(input)
-                logger.print_on_console(ACTUAL,text)
-                local_to.log.info(ACTUAL)
-                local_to.log.info(text)
+                if webelement.tag_name == 'table':
+                    if len(input)==5:
+                        row_num=int(input[0])
+                        col_num=int(input[1])
+                        obj_type=input[2].lower()
+                        index_val=int(input[3])-1
+                        inp_list=[]
+                        inp_list.append(input[4])
+                        local_to.log.info(input)
+                    row_count=self.txtobj.getRowCountJs(webelement)
+                    col_count=self.txtobj.getColoumnCountJs(webelement)
+                    input = inp_list
+                    if obj_type== "textbox" and index_val>=0:
+                        if row_num-1>row_count or col_num-1>col_count:
+                            local_to.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                            err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                            logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                        else:
+                            cell=self.txtobj.javascriptExecutor(webelement,row_num-1,col_num-1)
+                            txt_box=cell.find_elements_by_tag_name('input')
+                            if len(txt_box)>0:
+                                webelement = txt_box[index_val]
+                                text=self.__get_text(webelement)
+                                local_to.log.debug('Text is '+text)
+                                input=input[0]
+                                coreutilsobj=core_utils.CoreUtils()
+                                input=coreutilsobj.get_UTF_8(input)
+                                if text==input:
+                                    status=TEST_RESULT_PASS
+                                    methodoutput=TEST_RESULT_TRUE
+                                else:
+                                    err_msg='Text mismatched'
+                                    logger.print_on_console(err_msg)
+                                    logger.print_on_console(EXPECTED,input)
+                                    local_to.log.info(EXPECTED)
+                                    local_to.log.info(input)
+                                    logger.print_on_console(ACTUAL,text)
+                                    local_to.log.info(ACTUAL)
+                                    local_to.log.info(text)
+                            else:
+                                local_to.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                                logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                    else:
+                        local_to.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                        err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                        logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                else:
+                    text=self.__get_text(webelement)
+                    local_to.log.debug('Text is '+text)
+                    input=input[0]
+                    coreutilsobj=core_utils.CoreUtils()
+                    input=coreutilsobj.get_UTF_8(input)
+                    if text==input:
+                        status=TEST_RESULT_PASS
+                        methodoutput=TEST_RESULT_TRUE
+                    else:
+                        err_msg='Text mismatched'
+                        logger.print_on_console(err_msg)
+                        logger.print_on_console(EXPECTED,input)
+                        local_to.log.info(EXPECTED)
+                        local_to.log.info(input)
+                        logger.print_on_console(ACTUAL,text)
+                        local_to.log.info(ACTUAL)
+                        local_to.log.info(text)
             except Exception as e:
                 err_msg=self.__web_driver_exception(e)
         return status,methodoutput,output,err_msg
@@ -446,29 +494,82 @@ class TextboxKeywords:
         local_to.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
             try:
-                length = self.__gettexbox_length(webelement)
-                input=input[0]
-                logger.print_on_console(INPUT_IS+str(input))
-                local_to.log.info(INPUT_IS)
-                local_to.log.info(input)
-
-                if length != None and length != '':
-                    if '.' in input:
-                        input=input[0:input.find('.')]
-                    if length==input:
-                        status=TEST_RESULT_PASS
-                        methodoutput=TEST_RESULT_TRUE
-                    else:
-                        err_msg='Textbox length mismatched'
-                        logger.print_on_console(err_msg)
-                        logger.print_on_console(EXPECTED,input)
-                        local_to.log.info(EXPECTED)
+                if webelement.tag_name == 'table':
+                    if len(input)==5:
+                        row_num=int(input[0])
+                        col_num=int(input[1])
+                        obj_type=input[2].lower()
+                        index_val=int(input[3])-1
+                        inp_list=[]
+                        inp_list.append(input[4])
                         local_to.log.info(input)
-                        logger.print_on_console(ACTUAL,length)
-                        local_to.log.info(ACTUAL)
-                        local_to.log.info(length)
+                    row_count=self.txtobj.getRowCountJs(webelement)
+                    col_count=self.txtobj.getColoumnCountJs(webelement)
+                    input = inp_list
+                    if obj_type== "textbox" and index_val>=0:
+                        if row_num-1>row_count or col_num-1>col_count:
+                            local_to.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                            err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                            logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                        else:
+                            cell=self.txtobj.javascriptExecutor(webelement,row_num-1,col_num-1)
+                            txt_box=cell.find_elements_by_tag_name('input')
+                            if len(txt_box)>0:
+                                webelement = txt_box[index_val]
+                                length = self.__gettexbox_length(webelement)
+                                input=input[0]
+                                logger.print_on_console(INPUT_IS+str(input))
+                                local_to.log.info(INPUT_IS)
+                                local_to.log.info(input)
+                                if length != None and length != '':
+                                    if '.' in input:
+                                        input=input[0:input.find('.')]
+                                    if length==input:
+                                        status=TEST_RESULT_PASS
+                                        methodoutput=TEST_RESULT_TRUE
+                                    else:
+                                        err_msg='Textbox length mismatched'
+                                        logger.print_on_console(err_msg)
+                                        logger.print_on_console(EXPECTED,input)
+                                        local_to.log.info(EXPECTED)
+                                        local_to.log.info(input)
+                                        logger.print_on_console(ACTUAL,length)
+                                        local_to.log.info(ACTUAL)
+                                        local_to.log.info(length)
+                                else:
+                                    err_msg='Textbox length is None or empty'
+                            else:
+                                local_to.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                                logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                    else:
+                        local_to.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                        err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                        logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                 else:
-                    err_msg='Textbox length is None or empty'
+                    length = self.__gettexbox_length(webelement)
+                    input=input[0]
+                    logger.print_on_console(INPUT_IS+str(input))
+                    local_to.log.info(INPUT_IS)
+                    local_to.log.info(input)
+
+                    if length != None and length != '':
+                        if '.' in input:
+                            input=input[0:input.find('.')]
+                        if length==input:
+                            status=TEST_RESULT_PASS
+                            methodoutput=TEST_RESULT_TRUE
+                        else:
+                            err_msg='Textbox length mismatched'
+                            logger.print_on_console(err_msg)
+                            logger.print_on_console(EXPECTED,input)
+                            local_to.log.info(EXPECTED)
+                            local_to.log.info(input)
+                            logger.print_on_console(ACTUAL,length)
+                            local_to.log.info(ACTUAL)
+                            local_to.log.info(length)
+                    else:
+                        err_msg='Textbox length is None or empty'
 
             except Exception as e:
                 err_msg=self.__web_driver_exception(e)
