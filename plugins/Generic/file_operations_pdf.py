@@ -1,8 +1,8 @@
 #-------------------------------------------------------------------------------
-# Name:        file_operations_xml
+# Name:        file_operations_pdf
 # Purpose:     comparison between two xml data, in respective functions
 #
-# Author:      anas.ahmed
+# Author:      divyansh.singh
 #
 # Created:     11-09-2020
 # Copyright:   (c) divyansh.singh 2020
@@ -174,7 +174,7 @@ class FileOperationsPDF:
                 result[i + 1]["error"] = "Page empty or generator not supported"
                 continue
             if pdfReader2.numPages <= i:
-                result[i + 1]["comparison_result"] = "---" + pdfReader1.getPage(i).extractText().replace('\n',"") + "---"
+                result[i + 1]["comparison_result"] = "||---" + pdfReader1.getPage(i).extractText().replace('\n',"") + "---||"
                 result[i + 1]["images"] = self.compare_images(doc1,None,i,i,opt)
                 continue
             result[i + 1]["images"] = self.compare_images(doc1,doc2,i,i,opt)
@@ -202,14 +202,14 @@ class FileOperationsPDF:
                     result['error'] = True
                     result[i + 1] = "Page empty or generator not supported"
                     continue
-                result[i + 1]["comparison_result"] = " +++ " + test_str2 + " +++ "
+                result[i + 1]["comparison_result"] = "||+++" + test_str2 + "+++||"
                 result[i + 1]["images"] = self.compare_images(None,doc2,i,i,opt)
         return result
 
     def get_formatted_comparison_result(self,pageA,pageB,match_arr,opt):
-        pattern = '--cEND-- (.*?) --cSTART--'
-        end = " --cEND-- "
-        start = " --cSTART-- "
+        pattern = '--cEND--(.*?)--cSTART--'
+        end = "--cEND--"
+        start = "--cSTART--"
         for cmn_str in match_arr:
             if cmn_str != '' and cmn_str != ' ' and len(cmn_str) > 1:
                 comman_match = start + cmn_str + end
@@ -218,7 +218,7 @@ class FileOperationsPDF:
         add = re.findall(pattern,pageB)
         dele = re.findall(pattern,pageA)
         for deletion in dele:
-            pageA = pageA.replace(end + deletion + start,"---" + deletion + " --- ")
+            pageA = pageA.replace(end + deletion + start," ||---" + deletion + " ---|| ")
         pageA = pageA.replace(start , "")
         pageA = pageA.replace(end , "")
         for addition in add:
@@ -226,12 +226,15 @@ class FileOperationsPDF:
                 continue
             find_str = addition + start
             index = pageB.find(find_str)
-            prev_matches = re.findall('--cSTART-- (.*?) --cEND--',pageB[:index])
+            prev_matches = re.findall('--cSTART--(.*?)--cEND--',pageB[:index])
             add_index = pageA.find(prev_matches[len(prev_matches) - 1]) + len(prev_matches[len(prev_matches) - 1])
-            pageA = pageA[:add_index] + " +++ " + addition + " +++ " + pageA[add_index:]
+            pageA = pageA[:add_index] + " ||+++ " + addition + " +++|| " + pageA[add_index:]
         if opt == 'selective':
             for cmn_str in match_arr:
-                pageA = pageA.replace(cmn_str,"")
+                if cmn_str != "" and cmn_str != " ":
+                    pageA = pageA.replace(cmn_str,"")
+        pageA = pageA.replace("--cSAR--" , "")
+        pageA = pageA.replace("--cEND--" , "")           
         return pageA
 
     def get_number_diff_pages(self,comparison_result):
@@ -308,7 +311,7 @@ class FileOperationsPDF:
                 result[i + 1]["matchedSource"] = -1
                 result[i + 1]["matchedDest"] = -1
                 result[i + 1]["pageMatch"] = -1
-                result[i + 1]["comparison_result"] = " --- " + test_str1 + " --- "
+                result[i + 1]["comparison_result"] = "||---" + test_str1 + "---||"
                 result[i + 1]["images"] = self.compare_images(doc1,None,i,j,opt)
             
         j = pdfReader1.numPages
@@ -322,7 +325,7 @@ class FileOperationsPDF:
             result[j + 1]["images"] = self.compare_images(None,doc2,i,i,opt)
             result[j + 1]["matchedDest"] = -1
             result[j + 1]["pageMatch"] = j+1
-            result[j + 1]["comparison_result"] = " +++ " + pdfReader2.getPage(i).extractText().replace('\n',"") + " +++ "
+            result[j + 1]["comparison_result"] = "||+++" + pdfReader2.getPage(i).extractText().replace('\n',"") + "+++||"
             j += 1
 
         return result
