@@ -28,7 +28,7 @@ import imutils
 import fitz
 import re
 import copy
-log = logging.getLogger('file_operations_xml.py')
+log = logging.getLogger('file_operations_pdf.py')
 
 class FileOperationsPDF:
     def __init__(self):
@@ -70,6 +70,7 @@ class FileOperationsPDF:
         value = constants.OUTPUT_CONSTANT
         res_opt = 'all'
         type_opt = 'pagewise'
+        input_valid = False
         output_path = None
         try:
             if len(input_val) == 2 or len(input_val) == 3 or len(input_val) == 4:
@@ -87,11 +88,15 @@ class FileOperationsPDF:
                             if ( out_path ): output_path = out_path
                     else:
                         output_path = args.split(";")[0]
-                if len(input_val) >= 3 and (input_val[2] != None or input_val[2] != '' ): 
-                    res_opt = input_val[2].strip().lower()
-                if len(input_val) == 4 and (input_val[3] != None or input_val[3] != '' ): 
-                    type_opt = input_val[3].strip().lower()
-                if os.path.isfile(filePathA) and os.path.isfile(filePathB):
+                if len(input_val) >= 3 and input_val[2] != None  and (input_val[2] == 'selective' or input_val[2] == "all" or input_val[2] == ""): 
+                    if input_val[2] != "":
+                        res_opt = input_val[2].strip().lower()
+                    input_valid = True
+                if len(input_val) == 4 and input_val[3] != None and (input_val[3] == 'pagewise' or input_val[3] == "complete" or input_val[3] == ""): 
+                    if input_val[3] != "":
+                        type_opt = input_val[3].strip().lower()
+                    input_valid = True
+                if os.path.isfile(filePathA) and os.path.isfile(filePathB) and input_valid:
                     if os.path.getsize(filePathA)>0 and os.path.getsize(filePathB)>0:
                         fileNameA, fileExtensionA = os.path.splitext(filePathA)
                         fileNameB, fileExtensionB = os.path.splitext(filePathB)
@@ -150,7 +155,10 @@ class FileOperationsPDF:
                     else:
                         err_msg = 'One or more files are empty'
                 else:
-                    err_msg = generic_constants.FILE_NOT_EXISTS
+                    if not input_valid:
+                        err_msg = "Invalid optional inputs"
+                    else:
+                        err_msg = generic_constants.FILE_NOT_EXISTS
             else:
                 err_msg = 'Invalid number of inputs'
             if ( err_msg != None ):
@@ -207,9 +215,9 @@ class FileOperationsPDF:
         return result
 
     def get_formatted_comparison_result(self,pageA,pageB,match_arr,opt):
-        pattern = '--cEND--(.*?)--cSTART--'
-        end = "--cEND--"
-        start = "--cSTART--"
+        pattern = '--cEND-- (.*?) --cSTART--'
+        end = "--cEND-- "
+        start = " --cSTART--"
         for cmn_str in match_arr:
             if cmn_str != '' and cmn_str != ' ' and len(cmn_str) > 1:
                 comman_match = start + cmn_str + end
@@ -219,11 +227,15 @@ class FileOperationsPDF:
         dele = re.findall(pattern,pageA)
         for deletion in dele:
             pageA = pageA.replace(end + deletion + start," ||---" + deletion + " ---|| ")
-        pageA = pageA.replace(start , "")
-        pageA = pageA.replace(end , "")
+        # pageA = pageA.replace(start , "")
+        # pageA = pageA.replace(end , "")
         for addition in add:
             if addition == "":
                 continue
+            if end in addition:
+                addition = addition.replace(end,"")
+            elif start in addition:
+                addition = addition.replace(start,"")
             find_str = addition + start
             index = pageB.find(find_str)
             prev_matches = re.findall('--cSTART--(.*?)--cEND--',pageB[:index])
@@ -233,8 +245,8 @@ class FileOperationsPDF:
             for cmn_str in match_arr:
                 if cmn_str != "" and cmn_str != " ":
                     pageA = pageA.replace(cmn_str,"")
-        pageA = pageA.replace("--cSAR--" , "")
-        pageA = pageA.replace("--cEND--" , "")           
+        pageA = pageA.replace(start , "")
+        pageA = pageA.replace(end, "")           
         return pageA
 
     def get_number_diff_pages(self,comparison_result):
@@ -247,6 +259,8 @@ class FileOperationsPDF:
     def convert_output_to_list(self,dictionary):
         result = []
         for page in dictionary:
+            if page == "error":
+                continue
             temp_page = []
             current_page = dictionary[page]
             temp_page.append(page)
@@ -316,7 +330,7 @@ class FileOperationsPDF:
             
         j = pdfReader1.numPages
         while j < pdfReader2.numPages and (j not in pageMatched or pageMatched[i] != 1):
-            if  len(pdfReader2.getPage(i).extractText().replace('\n',"") == 0):
+            if  len(pdfReader2.getPage(i).extractText().replace('\n',"")) == 0:
                 result['error'] = True
                 result[j + 1] = "Page empty or generator not supported"
                 continue
@@ -490,6 +504,7 @@ class FileOperationsPDF:
             page_copy = copy.deepcopy(page)
             page_copy.append(output_res[image]["correlations"])
             log_output.append(page_copy)
+            log.info(log_output)
         return output,total_found            
 
     def compare(self,image,template,abs_max):
@@ -537,20 +552,20 @@ class FileOperationsPDF:
         # of the bounding box based on the resized ratio
         (_, maxLoc, r) = found
         dimensions = image.shape
-        r1,r2,r3 = dimensions[0]/3,dimensions[0]/1.5 - 10,dimensions[0]
-        c1,c2,c3 = dimensions[1]/3,dimensions[1]/1.5 - 10,dimensions[1]
+        r1,r2 = dimensions[0]/3-50,dimensions[0]/1.5 - 50
+        c1,c2 = dimensions[1]/3-50,dimensions[1]/1.5 - 50
         x,y = 1,3
         results['location'] = []
         for found in location:
-            if found[0] > r1:
+            if (found[0]+50)/dimensions[0] > 1/3:
                 x = 2
-                if found[0] > r2:
+                if (found[0]+50)/dimensions[0] >2/3:
                     x = 3
-            if found[1] > c1:
+            if found[1]/dimensions[1] > 1/3:
                 y = 2
-                if found[1] > c2:
-                    y = 1
-            results["location"].append(location_dict[x,y])
+                if found[1]/dimensions[1] >2/3:
+                    y = 1 
+            results["location"].append(location_dict[y,x])
         (startX, startY) = (int(maxLoc[0] * r), int(maxLoc[1] * r))
         (endX, endY) = (int((maxLoc[0] + tW) * r), int((maxLoc[1] + tH) * r))
         # draw a bounding box around the detected result and display the image
