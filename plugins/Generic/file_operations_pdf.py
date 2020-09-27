@@ -70,7 +70,8 @@ class FileOperationsPDF:
         value = constants.OUTPUT_CONSTANT
         res_opt = 'all'
         type_opt = 'pagewise'
-        input_valid = False
+        select_input = False
+        type_input = False
         output_path = None
         try:
             if len(input_val) == 2 or len(input_val) == 3 or len(input_val) == 4:
@@ -88,15 +89,19 @@ class FileOperationsPDF:
                             if ( out_path ): output_path = out_path
                     else:
                         output_path = args.split(";")[0]
+                if len(input_val) == 2:
+                    select_input = True
+                    type_input = True
                 if len(input_val) >= 3 and input_val[2] != None  and (input_val[2] == 'selective' or input_val[2] == "all" or input_val[2] == ""): 
                     if input_val[2] != "":
                         res_opt = input_val[2].strip().lower()
-                    input_valid = True
+                    select_input = True
                 if len(input_val) == 4 and input_val[3] != None and (input_val[3] == 'pagewise' or input_val[3] == "complete" or input_val[3] == ""): 
                     if input_val[3] != "":
                         type_opt = input_val[3].strip().lower()
-                    input_valid = True
-                if os.path.isfile(filePathA) and os.path.isfile(filePathB) and input_valid:
+                    type_input = True 
+                
+                if os.path.isfile(filePathA) and os.path.isfile(filePathB) and select_input and type_input:
                     if os.path.getsize(filePathA)>0 and os.path.getsize(filePathB)>0:
                         fileNameA, fileExtensionA = os.path.splitext(filePathA)
                         fileNameB, fileExtensionB = os.path.splitext(filePathB)
@@ -155,8 +160,10 @@ class FileOperationsPDF:
                     else:
                         err_msg = 'One or more files are empty'
                 else:
-                    if not input_valid:
-                        err_msg = "Invalid optional inputs"
+                    if not select_input:
+                        err_msg = "Invalid third input"
+                    elif not type_input:
+                        err_msg = "Invalid fourth input"
                     else:
                         err_msg = generic_constants.FILE_NOT_EXISTS
             else:
