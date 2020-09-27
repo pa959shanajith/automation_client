@@ -511,7 +511,7 @@ class FileOperationsPDF:
             page_copy = copy.deepcopy(page)
             page_copy.append(output_res[image]["correlations"])
             log_output.append(page_copy)
-            log.info(log_output)
+        log.info("Result of findImageInPDF"+ str(log_output))
         return output,total_found            
 
     def compare(self,image,template,abs_max):
