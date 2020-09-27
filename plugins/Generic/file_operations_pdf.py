@@ -179,7 +179,7 @@ class FileOperationsPDF:
             total_char1 = len(test_str1)
             if total_char1 == 0:
                 result['error'] = True
-                result[i + 1]["error"] = "Page empty or generator not supported"
+                result[i + 1]["error"] = "Page empty or unsupported text"
                 continue
             if pdfReader2.numPages <= i:
                 result[i + 1]["comparison_result"] = "||---" + pdfReader1.getPage(i).extractText().replace('\n',"") + "---||"
@@ -208,7 +208,7 @@ class FileOperationsPDF:
                 total_char2 = len(test_str2)
                 if total_char2 == 0:
                     result['error'] = True
-                    result[i + 1] = "Page empty or generator not supported"
+                    result[i + 1] = "Page empty or unsupported text"
                     continue
                 result[i + 1]["comparison_result"] = "||+++" + test_str2 + "+++||"
                 result[i + 1]["images"] = self.compare_images(None,doc2,i,i,opt)
@@ -299,7 +299,7 @@ class FileOperationsPDF:
                 if total_char1 == 0:
                     lastMathc = -99
                     result['error'] = True
-                    result[i + 1]["error"] = "Page empty or generator not supported"
+                    result[i + 1]["error"] = "Page empty or unsupported text"
                     break
                 test_str1_copy = test_str1
                 matched_count = 0
@@ -332,7 +332,7 @@ class FileOperationsPDF:
         while j < pdfReader2.numPages and (j not in pageMatched or pageMatched[i] != 1):
             if  len(pdfReader2.getPage(i).extractText().replace('\n',"")) == 0:
                 result['error'] = True
-                result[j + 1] = "Page empty or generator not supported"
+                result[j + 1] = "Page empty or unsupported text"
                 continue
             result[j + 1] = {}
             result[j + 1]["matchedSource"] = -1
