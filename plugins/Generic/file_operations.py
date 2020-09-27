@@ -986,6 +986,7 @@ class FileOperations:
                     if len(csv_dict) == 0:
                         outFile = open(outputFilePath, 'w', newline='')
                     else:
+						logger.print_on_console('Output file has old entries! Erasing the old data to store incoming result.')
                         outFile = open(outputFilePath, 'w+', newline='')
                 else:
                     outFile = open(outputFilePath, 'a', newline='')
@@ -994,8 +995,18 @@ class FileOperations:
                     result.writerow(value)
                 outFile.close()
                 status=True
+            elif(file_ext == '.txt'):
+                if result3==True:
+                    out = open(outputFilePath, "w")   
+                else:
+                    logger.print_on_console('Output file has old entries! Erasing the old data to store incoming result.')
+                    out = open(outputFilePath, "w+")
+                for key,value in content.items():
+                    out.write(",".join(value)+'\n')
+                out.close() 
+                status=True   
         except Exception as e:
-            err_msg='Writing to Excel Sheet Failed'
+            err_msg='Writing to output file Failed'
             log.error(e)
         log.info('Status of write_result_file is ' + str(status) )
         try:
@@ -1292,17 +1303,21 @@ class FileOperations:
                         j+=1
 
                 i=list(output2.keys())[0]
+                count=0
                 for aa in range(len(output1)):
                     res1[x]=[]
                     for bb in range(len(output2[i])):
                         if (output1[aa][bb]==output2[aa][bb]):
-                            output='Matched'
+                            output='True'
                             res1[x].append(output)
                         else:
-                            output='Not Matched'
+                            output='False'
                             res1[x].append(output)
+                    count+=1
                     x+=1
-                
+                    if(count>=len(output2)):
+                        break
+             
                 if (len(output1)<len(output2)):                    
                     for i in range(len(output1)):
                         output2.pop(i)
@@ -1310,7 +1325,17 @@ class FileOperations:
                     for k in range(len(output2)):
                         res1[x]=[]
                         for j in range(len(output2[xx])):
-                            output='Not Matched'
+                            output='False'
+                            res1[x].append(output)
+                        x+=1
+                elif(len(output1)>len(output2)):
+                    for i in range(len(output2)):
+                        output1.pop(i)
+                    xx=list(output1.keys())[0]
+                    for k in range(len(output1)):
+                        res1[x]=[]
+                        for j in range(len(output1[xx])):
+                            output='False'
                             res1[x].append(output)
                         x+=1
 
@@ -1332,17 +1357,17 @@ class FileOperations:
                             if i not in res1.keys():
                                 res1[i]=[]
                                 if (eachcell[i].value==eachcell2[i].value):
-                                    output='Matched'
+                                    output='True'
                                     res1[i].append(output)
                                 else:
-                                    output='Not Matched'
+                                    output='False'
                                     res1[i].append(output)
                             else:
                                 if (eachcell[i].value==eachcell2[i].value):
-                                    output='Matched'
+                                    output='True'
                                     res1[i].append(output)
                                 else:
-                                    output='Not Matched'
+                                    output='False'
                                     res1[i].append(output)
                         del cell2[0]
                         break
@@ -1354,12 +1379,14 @@ class FileOperations:
                     range1=range1
                     range2=range2
                     book1 = openpyxl.load_workbook(file2)
+                    sheetname1=input[4]
                 elif(extension2=='.csv'):
                     file1=filepath2
                     file2=filepath1
                     range1=range2
                     range2=range1
                     book1 = openpyxl.load_workbook(file2)
+                    sheetname1=input[2]
 
                 col11 = " ".join(re.findall("[a-zA-Z]+", range1[0]))
                 col12 = " ".join(re.findall("[a-zA-Z]+", range1[1]))
@@ -1382,9 +1409,9 @@ class FileOperations:
                 result1=self.verify_file_exists(file1,'')
                 result2=self.verify_file_exists(file2,'')
 
-                sheet1=book1.get_sheet_by_name(book1.sheetnames[0])
+                sheet1=book1.get_sheet_by_name(sheetname1)
 
-                cell1=list(sheet1[range2[0]:range1[1]])
+                cell1=list(sheet1[range2[0]:range2[1]])
 
                 for eachcell in cell1:
                     output2[x]=[]
@@ -1393,18 +1420,21 @@ class FileOperations:
                     x+=1
 
                 i=list(output2.keys())[0]
+                count=0
                 for aa in range(len(output1)):
                     res1[j]=[]
                     for bb in range(len(output2[i])):
                         if (output1[aa][bb]==output2[aa][bb]):
-                            output='Matched'
+                            output='True'
                             res1[j].append(output)
                         else:
-                            output='Not Matched'
+                            output='False'
                             res1[j].append(output)
-                        bb+=1
                     aa+=1
                     j+=1
+                    count+=1
+                    if(count>=len(output2)):
+                        break
 
                 if (len(output1)<len(output2)):                    
                     for i in range(len(output1)):
@@ -1413,7 +1443,17 @@ class FileOperations:
                     for k in range(len(output2)):
                         res1[j]=[]
                         for m in range(len(output2[xx])):
-                            output='Not Matched'
+                            output='False'
+                            res1[j].append(output)
+                        j+=1
+                elif(len(output1)>len(output2)):
+                    for i in range(len(output2)):
+                        output1.pop(i)
+                    xx=list(output1.keys())[0]
+                    for k in range(len(output1)):
+                        res1[j]=[]
+                        for m in range(len(output1[xx])):
+                            output='False'
                             res1[j].append(output)
                         j+=1
 
@@ -1426,7 +1466,7 @@ class FileOperations:
             if(output_feild):
                 file_extension,status_get_ext = self.__get_ext(output_feild)
                 sheet='selectiveCellCompare'
-                if(os.path.exists(output_feild)):# or os.path.exists(os.path.dirname(output_feild)) ):
+                if(os.path.exists(output_feild)):
                     logger.print_on_console( "Writing the output of selectiveCellCompare to file ")
                     msg='Output file has old entries! Erasing the old data to store incoming result.'
                     if(file_extension=='.xlsx'):
@@ -1440,6 +1480,9 @@ class FileOperations:
                             logger.print_on_console(msg)
                             self.xls_obj.clear_content_xls(os.path.dirname(output_feild),os.path.basename(output_feild),sheet)
                     flag1, err_msg = self.write_result_file(output_feild, res1, sheet)
+                    if(flag1==False):
+                        log.error(err_msg)
+                        logger.print_on_console(err_msg)
                 else:
                     if status_get_ext and file_extension is not None and file_extension in generic_constants.SELECTIVE_CELL_FILE_TYPES:
                         logger.print_on_console("File Does not exists, creating the file in specified path {}".format(output_feild))
@@ -1448,10 +1491,7 @@ class FileOperations:
                         err_msg = 'Warning! : Invalid file extension(Supports only .xlsx, .xls, .txt, .csv).'
                     if (flag2==False):
                         log.error(err_msg)
-                        logger.print_on_console(err_msg)
-                if(flag1==False):
-                    log.error(err_msg)
-                    logger.print_on_console(err_msg)
+                        logger.print_on_console(err_msg)       
             else:
                 err_msg='Output field is empty'
                 log.error(err_msg)
@@ -1461,8 +1501,7 @@ class FileOperations:
                 logger.print_on_console('Compared cells between the mentioned files')
                 status = TEST_RESULT_PASS
                 methodoutput = TEST_RESULT_TRUE
-        except Exception as e:
-            err_msg = 'Error occured in comparing selected cells between files'
+        except Exception as err_msg:
             log.error(err_msg)
             logger.print_on_console(err_msg)
         return status,methodoutput,res1,err_msg
