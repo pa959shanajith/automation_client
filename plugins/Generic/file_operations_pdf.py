@@ -184,15 +184,16 @@ class FileOperationsPDF:
             result[i+1]['images'] = {}
             test_str1 = pdfReader1.getPage(i).extractText().replace('\n',"")
             total_char1 = len(test_str1)
-            if total_char1 == 0:
+            if total_char1 == 0 or test_str1 == " ":
                 result['error'] = True
                 result[i + 1]["error"] = "Page empty or unsupported text"
+                result[i + 1]["images"] = self.compare_images(doc1,doc2,i,i)
                 continue
             if pdfReader2.numPages <= i:
                 result[i + 1]["comparison_result"] = "||---" + pdfReader1.getPage(i).extractText().replace('\n',"") + "---||"
-                result[i + 1]["images"] = self.compare_images(doc1,None,i,i,opt)
+                result[i + 1]["images"] = self.compare_images(doc1,None,i,i)
                 continue
-            result[i + 1]["images"] = self.compare_images(doc1,doc2,i,i,opt)
+            result[i + 1]["images"] = self.compare_images(doc1,doc2,i,i)
             test_str2 = pdfReader2.getPage(i).extractText().replace('\n',"")
             total_char2 = len(test_str2)
             test_str1_copy = test_str1
@@ -211,14 +212,16 @@ class FileOperationsPDF:
         if pdfReader1.numPages < pdfReader2.numPages:
             for i in range(pdfReader1.numPages,pdfReader2.numPages):
                 result[i + 1] = {}
-                test_str2 = " +++ " + pdfReader2.getPage(i).extractText().replace('\n',"") + " +++ "
+                test_str2 = pdfReader2.getPage(i).extractText().replace('\n',"") 
                 total_char2 = len(test_str2)
-                if total_char2 == 0:
+                if total_char2 == 0 or test_str2 == " ":
                     result['error'] = True
-                    result[i + 1] = "Page empty or unsupported text"
+                    result[i + 1]['error'] = "Page empty or unsupported text"
+                    result[i + 1]["images"] = self.compare_images(None,doc2,i,i)
                     continue
+                test_str2 = " +++ " + pdfReader2.getPage(i).extractText().replace('\n',"") + " +++ "
                 result[i + 1]["comparison_result"] = "||+++" + test_str2 + "+++||"
-                result[i + 1]["images"] = self.compare_images(None,doc2,i,i,opt)
+                result[i + 1]["images"] = self.compare_images(None,doc2,i,i)
         return result
 
     def get_formatted_comparison_result(self,pageA,pageB,match_arr,opt):
@@ -274,6 +277,8 @@ class FileOperationsPDF:
             if "error" in current_page:
                 temp_page.append(current_page["error"])
                 result.append(temp_page)
+                if "images" in current_page:
+                    temp_page.append(current_page["images"])
                 continue
             temp_page.append(current_page["comparison_result"])
             temp_page.append(current_page["images"])
@@ -284,7 +289,6 @@ class FileOperationsPDF:
             result.append(temp_page)
         return result
             
-
     def compare_complete(self,pdfReader1,pdfReader2,opt,doc1,doc2):
         sim = {}
         result = {}
@@ -303,10 +307,11 @@ class FileOperationsPDF:
                 total_char2 = len(test_str2)
                 test_str1 = pdfReader1.getPage(i).extractText().replace('\n',"")
                 total_char1 = len(test_str1)
-                if total_char1 == 0:
+                if total_char1 == 0 or test_str1 == " ":
                     lastMathc = -99
                     result['error'] = True
                     result[i + 1]["error"] = "Page empty or unsupported text"
+                    result[i + 1]["images"] = [-1,-1,-1]
                     break
                 test_str1_copy = test_str1
                 matched_count = 0
@@ -322,7 +327,7 @@ class FileOperationsPDF:
                         result[i + 1]["matchedSource"] = matched_count/total_char1*100
                         result[i + 1]["matchedDest"] = matched_count/total_char2*100
                         result[i + 1]["pageMatch"] = j + 1
-                        result[i + 1]['images'] = self.compare_images(doc1,doc2,i,j,opt)
+                        result[i + 1]['images'] = self.compare_images(doc1,doc2,i,j)
                         pageMatched[lastMathc] = -1
                         lastMathc = j
                         pageMatched[j] = 1
@@ -333,25 +338,35 @@ class FileOperationsPDF:
                 result[i + 1]["matchedDest"] = -1
                 result[i + 1]["pageMatch"] = -1
                 result[i + 1]["comparison_result"] = "||---" + test_str1 + "---||"
-                result[i + 1]["images"] = self.compare_images(doc1,None,i,j,opt)
+                result[i + 1]["images"] = self.compare_images(doc1,None,i,j)
             
-        j = pdfReader1.numPages
-        while j < pdfReader2.numPages and (j not in pageMatched or pageMatched[i] != 1):
-            if  len(pdfReader2.getPage(i).extractText().replace('\n',"")) == 0:
-                result['error'] = True
-                result[j + 1] = "Page empty or unsupported text"
+        j = 0
+        i = pdfReader1.numPages + 1
+        while j < pdfReader2.numPages:
+            if j in pageMatched and pageMatched[j] == 1:
+                j += 1
                 continue
-            result[j + 1] = {}
-            result[j + 1]["matchedSource"] = -1
-            result[j + 1]["images"] = self.compare_images(None,doc2,i,i,opt)
-            result[j + 1]["matchedDest"] = -1
-            result[j + 1]["pageMatch"] = j+1
-            result[j + 1]["comparison_result"] = "||+++" + pdfReader2.getPage(i).extractText().replace('\n',"") + "+++||"
+            test_str2 = pdfReader2.getPage(j).extractText().replace('\n',"")
+            result[i] = {}
+            if  len(test_str2) == 0 or test_str2 == " ":
+                result['error'] = True
+                result[i]['error'] = "Page empty or unsupported text"
+                result[i]["images"] = [-1,-1,-1]
+                result[i]["pageMatch"] = -1
+                j += 1
+                i += 1
+                continue
+            result[i]["matchedSource"] = -1
+            result[i]["images"] = self.compare_images(None,doc2,j,j)
+            result[i]["matchedDest"] = -1
+            result[i]["pageMatch"] = j+1
+            result[i]["comparison_result"] = "||+++" + test_str2 + "+++||"
             j += 1
+            i += 1
 
         return result
 
-    def compare_images(self,doc1,doc2,index1,index2,opt):
+    def compare_images(self,doc1,doc2,index1,index2):
         result = [0,0,0]
         i = 1
         if doc1 is None:
@@ -367,9 +382,8 @@ class FileOperationsPDF:
                 pix1 = fitz.Pixmap(doc1, xref1)
                 pix2 = fitz.Pixmap(doc2, xref2)
                 if self.subtract_and_check_if_identical(pix1,pix2):
-                    if opt == "all":
-                        result[2] += 1
-                        continue
+                    result[2] += 1
+                    continue
                 else:
                     result[0] += 1
                     result[1] += 1
