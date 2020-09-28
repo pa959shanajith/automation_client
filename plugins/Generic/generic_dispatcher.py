@@ -188,9 +188,10 @@ class GenericKeywordDispatcher:
                     if ';' in tsp.outputval:
                         output=tsp.outputval.split(';')
                     #Changes for defect #983 - to resolve values of static and dynamic variables in output for this particular keyword
-                    if(keyword == "exportdata" and len(output)>1):
-                        i = (tsp.outputval).index(';')
-                        tsp.outputval = tsp.outputval[i+1:]
+                    if(keyword == "exportdata" or keyword=="secureexportdata") and (len(output)>1):
+                        if tsp.outputval.find(';')!=-1:
+                            i = (tsp.outputval).index(';')
+                            tsp.outputval = tsp.outputval[i+1:]
                         if str(output[0]).startswith("{") and str(output[0]).endswith("}"):
                             import dynamic_variable_handler
                             import controller
