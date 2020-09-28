@@ -555,7 +555,8 @@ class Controller():
                         elif result:
                             logger.print_on_console('Result obtained is: ',result[1])
                     else:
-                        if (tsp.apptype.lower()!='desktop' and tsp.name.lower() != 'getxmlblockdata') : logger.print_on_console('Result obtained is ',",".join([str(display_keyword_response[local_cont.i])
+                        keyword_lower = tsp.name.lower()
+                        if (tsp.apptype.lower()!='desktop' and keyword_lower != 'getxmlblockdata' and keyword_lower != 'findimageinpdf' and keyword_lower != 'comparepdfs') : logger.print_on_console('Result obtained is ',",".join([str(display_keyword_response[local_cont.i])
                         if not isinstance(display_keyword_response[local_cont.i],str) else display_keyword_response[local_cont.i] for local_cont.i in range(len(display_keyword_response))]))
             else:
                 logger.print_on_console('Result obtained exceeds max. Limit, please use writeToFile keyword.')
