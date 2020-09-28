@@ -1415,15 +1415,26 @@ class FileOperations:
                     file2=filepath2
                     range1=range1
                     range2=range2
-                    book1 = openpyxl.load_workbook(file2)
                     sheetname1=input[4]
+                    if(extension2=='.xlsx'):
+                        book1 = openpyxl.load_workbook(file2)
+                        sheet1=book1.get_sheet_by_name(sheetname1)
+                    elif(extension2=='.xls'):
+                        book1 = open_workbook(file2)
+                        sheet1 = book1.sheet_by_name(sheetname1)
+
                 elif(extension2=='.csv'):
                     file1=filepath2
                     file2=filepath1
                     range1=range2
                     range2=range1
-                    book1 = openpyxl.load_workbook(file2)
                     sheetname1=input[1]
+                    if(extension1=='.xlsx'):
+                        book1 = openpyxl.load_workbook(file2)
+                        sheet1=book1.get_sheet_by_name(sheetname1)
+                    elif(extension1=='.xls'):
+                        book1 = open_workbook(file2)
+                        sheet1 = book1.sheet_by_name(sheetname1)
 
                 col11 = " ".join(re.findall("[a-zA-Z]+", range1[0]))
                 col12 = " ".join(re.findall("[a-zA-Z]+", range1[1]))
@@ -1446,15 +1457,25 @@ class FileOperations:
                 result1=self.verify_file_exists(file1,'')
                 result2=self.verify_file_exists(file2,'')
 
-                sheet1=book1.get_sheet_by_name(sheetname1)
+                # sheet1=book1.get_sheet_by_name(sheetname1)
+                if(extension1=='.xlsx' or extension2=='.xlsx'):
+                    cell1=list(sheet1[range2[0]:range2[1]])
 
-                cell1=list(sheet1[range2[0]:range2[1]])
-
-                for eachcell in cell1:
-                    output2[x]=[]
-                    for i in range(len(eachcell)):
-                        output2[x].append(eachcell[i].value)
-                    x+=1
+                    for eachcell in cell1:
+                        output2[x]=[]
+                        for i in range(len(eachcell)):
+                            output2[x].append(eachcell[i].value)
+                        x+=1
+                elif(extension1=='.xls' or extension2=='.xls'):
+                    for row in range(row11-1, row12):
+                        output2[x]=[]
+                        for col in range(column11-1,column12):
+                            cell = sheet1.cell(row,col)
+                            cell_value = cell.value
+                            if cell.ctype in (2,3) and int(cell_value) == cell_value:
+                                cell_value = int(cell_value)
+                            output2[x].append(str(cell_value))
+                        x+=1
 
                 i=list(output2.keys())[0]
                 count=0
