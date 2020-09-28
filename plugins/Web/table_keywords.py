@@ -42,7 +42,7 @@ class TableOperationKeywords():
             local_tk.log.debug('got the driver instance from browser keyword')
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
-            row_count=None
+            row_count=0
             visibleFlag=True
             err_msg=None
             if visibleFlag==True:
@@ -52,7 +52,7 @@ class TableOperationKeywords():
                         if webElement.get_attribute('role') == 'grid':
                             body = True
                             right = True
-                            if len(args)==2:
+                            if (args[0] != ['']):
                                 input_val = args[0]
                                 if (input_val[0].lower() != 'body') : body = False
                                 if (input_val[1].lower() != 'right') : right = False
@@ -99,7 +99,7 @@ class TableOperationKeywords():
             logger.print_on_console('Executing keyword : getColoumnCount')
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
-            coloumn_count=None
+            coloumn_count=0
             err_msg=None
             local_tk.driver=browser_Keywords.local_bk.driver_obj
             local_tk.log.debug('got the driver instance from browser keyword')
@@ -111,7 +111,7 @@ class TableOperationKeywords():
                         if webElement.get_attribute('role') == 'grid':
                             body = True
                             right = True
-                            if len(args)==2:
+                            if (args[0] != ['']):
                                 input_val = args[0]
                                 if (input_val[0].lower() != 'body') : body = False
                                 if (input_val[1].lower() != 'right') : right = False
@@ -132,8 +132,9 @@ class TableOperationKeywords():
                                         cells = i.find_elements_by_xpath(".//div[@role='gridcell']")
                                     else:
                                         cells = i.find_elements_by_xpath(".//div[@role='columnheader']")
+                                    if coloumn_count == len(cells):
+                                        break
                                     coloumn_count = len(cells)
-                                    break
                                 except:pass
                             if(coloumn_count>=0):
                                 status=TEST_RESULT_PASS
