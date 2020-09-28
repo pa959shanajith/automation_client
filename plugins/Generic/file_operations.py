@@ -989,6 +989,7 @@ class FileOperations:
                         logger.print_on_console('Output file has old entries! Erasing the old data to store incoming result.')
                         outFile = open(outputFilePath, 'w+', newline='')
                 else:
+                    logger.print_on_console("File Does not exists, creating the file in specified path {}".format(outputFilePath))
                     outFile = open(outputFilePath, 'a', newline='')
                 result=csv.writer(outFile)
                 for key, value in content.items():
@@ -998,8 +999,9 @@ class FileOperations:
             elif(file_ext == '.txt'):
                 if result3==True:
                     out = open(outputFilePath, "w")
-                else:
                     logger.print_on_console('Output file has old entries! Erasing the old data to store incoming result.')
+                else:
+                    logger.print_on_console("File Does not exists, creating the file in specified path {}".format(outputFilePath))
                     out = open(outputFilePath, "w+")
                 for key,value in content.items():
                     out.write(",".join(value)+'\n')
