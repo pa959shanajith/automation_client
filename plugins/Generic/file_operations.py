@@ -986,7 +986,7 @@ class FileOperations:
                     if len(csv_dict) == 0:
                         outFile = open(outputFilePath, 'w', newline='')
                     else:
-						logger.print_on_console('Output file has old entries! Erasing the old data to store incoming result.')
+                        logger.print_on_console('Output file has old entries! Erasing the old data to store incoming result.')
                         outFile = open(outputFilePath, 'w+', newline='')
                 else:
                     outFile = open(outputFilePath, 'a', newline='')
@@ -997,7 +997,7 @@ class FileOperations:
                 status=True
             elif(file_ext == '.txt'):
                 if result3==True:
-                    out = open(outputFilePath, "w")   
+                    out = open(outputFilePath, "w")
                 else:
                     logger.print_on_console('Output file has old entries! Erasing the old data to store incoming result.')
                     out = open(outputFilePath, "w+")
@@ -1245,11 +1245,12 @@ class FileOperations:
         """
         def : selective_cell_compare
         purpose : selective cell comparison between excel and csv files
-        param : CSV/Excel file path1, sheetname (optional), selected cell range, CSV/Excel file path2, sheetname (optional), selected cell range
+        param : CSV/Excel file path1, sheetname (optional), selected cell range, CSV/Excel file path2, sheetname (optional), selected cell range,case(optional)
         return : bool/ if output file mentioned then prints cell by cell to that file
 
         """
         try:
+            import csv
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
             err_msg=None
@@ -1267,7 +1268,10 @@ class FileOperations:
             output_feild = None
             extension1=os.path.splitext(filepath1)[1]
             extension2=os.path.splitext(filepath2)[1]
-            import csv
+            if(len(input)>6):
+                case=input[6]
+            else:
+                case=''
 
             if(extension1=='.csv' and extension2=='.csv'):#both files are csv
                 col11 = " ".join(re.findall("[a-zA-Z]+", range1[0]))
@@ -1307,12 +1311,20 @@ class FileOperations:
                 for aa in range(len(output1)):
                     res1[x]=[]
                     for bb in range(len(output2[i])):
-                        if (output1[aa][bb]==output2[aa][bb]):
-                            output='True'
-                            res1[x].append(output)
+                        if(case!=''):
+                            if (output1[aa][bb].lower()==output2[aa][bb].lower()):
+                                output='True'
+                                res1[x].append(output)
+                            else:
+                                output='False'
+                                res1[x].append(output)
                         else:
-                            output='False'
-                            res1[x].append(output)
+                            if (output1[aa][bb]==output2[aa][bb]):
+                                output='True'
+                                res1[x].append(output)
+                            else:
+                                output='False'
+                                res1[x].append(output)
                     count+=1
                     x+=1
                     if(count>=len(output2)):
@@ -1351,26 +1363,49 @@ class FileOperations:
 
                 cell1=list(sheet1[range1[0]:range1[1]])
                 cell2=list(sheet2[range2[0]:range2[1]])
-                for eachcell in cell1:
-                    for eachcell2 in cell2:
-                        for i in range(len(eachcell2)):
-                            if i not in res1.keys():
-                                res1[i]=[]
-                                if (eachcell[i].value==eachcell2[i].value):
-                                    output='True'
-                                    res1[i].append(output)
-                                else:
-                                    output='False'
-                                    res1[i].append(output)
+                
+                x,i=0,0
+                for aa in range(len(cell1)):
+                    res1[x]=[]
+                    for bb in range(len(cell2[i])):
+                        if(case!=''):
+                            if (cell1[aa][bb].lower()==cell2[aa][bb].lower()):
+                                output='True'
+                                res1[x].append(output)
                             else:
-                                if (eachcell[i].value==eachcell2[i].value):
-                                    output='True'
-                                    res1[i].append(output)
-                                else:
-                                    output='False'
-                                    res1[i].append(output)
-                        del cell2[0]
+                                output='False'
+                                res1[x].append(output)
+                        else:
+                            if (cell1[aa][bb]==cell2[aa][bb]):
+                                output='True'
+                                res1[x].append(output)
+                            else:
+                                output='False'
+                                res1[x].append(output)
+                    x+=1
+                    i+=1
+                    if(i>=len(cell2)):
                         break
+
+                if (len(cell1)<len(cell2)):                    
+                    for i in range(len(cell1)):
+                        del cell2[0]
+                    for k in range(len(cell2)):
+                        res1[x]=[]
+                        for m in range(len(cell2[0])):
+                            output='False'
+                            res1[x].append(output)
+                        x+=1
+                elif(len(cell1)>len(cell2)):
+                    for i in range(len(cell2)):
+                        del cell1[0]
+                    for k in range(len(cell1)):
+                        res1[x]=[]
+                        for m in range(len(cell1[0])):
+                            output='False'
+                            res1[x].append(output)
+                        x+=1
+                    
 
             else:#one excel and one csv
                 if(extension1=='.csv'):
@@ -1386,7 +1421,7 @@ class FileOperations:
                     range1=range2
                     range2=range1
                     book1 = openpyxl.load_workbook(file2)
-                    sheetname1=input[2]
+                    sheetname1=input[1]
 
                 col11 = " ".join(re.findall("[a-zA-Z]+", range1[0]))
                 col12 = " ".join(re.findall("[a-zA-Z]+", range1[1]))
@@ -1424,12 +1459,20 @@ class FileOperations:
                 for aa in range(len(output1)):
                     res1[j]=[]
                     for bb in range(len(output2[i])):
-                        if (output1[aa][bb]==output2[aa][bb]):
-                            output='True'
-                            res1[j].append(output)
+                        if(case!=''):
+                            if (str(output1[aa][bb]).lower()==str(output2[aa][bb]).lower()):
+                                output='True'
+                                res1[j].append(output)
+                            else:
+                                output='False'
+                                res1[j].append(output)
                         else:
-                            output='False'
-                            res1[j].append(output)
+                            if (str(output1[aa][bb])==str(output2[aa][bb])):
+                                output='True'
+                                res1[j].append(output)
+                            else:
+                                output='False'
+                                res1[j].append(output)
                     aa+=1
                     j+=1
                     count+=1
@@ -1466,41 +1509,82 @@ class FileOperations:
             if(output_feild):
                 file_extension,status_get_ext = self.__get_ext(output_feild)
                 sheet='selectiveCellCompare'
-                if(os.path.exists(output_feild)):
-                    logger.print_on_console( "Writing the output of selectiveCellCompare to file ")
-                    msg='Output file has old entries! Erasing the old data to store incoming result.'
+                result=os.path.isfile(output_feild)
+                
+                logger.print_on_console( "Writing the output of selectiveCellCompare to file ")
+                msg='Output file has old entries! Erasing old data to store incoming result.'
+                if status_get_ext and file_extension is not None and file_extension in generic_constants.SELECTIVE_CELL_FILE_TYPES:
+                    # logger.print_on_console("File Does not exists, creating the file in specified path {}".format(output_feild))
+                    
                     if(file_extension=='.xlsx'):
-                        clear_xlsx = openpyxl.load_workbook(output_feild)
-                        if(sheet in clear_xlsx.sheetnames):
+                        if result==True:
+                            wb=openpyxl.load_workbook(output_feild)
+                        else:
+                            logger.print_on_console("File Does not exists, creating the file in specified path {}".format(output_feild))
+                            wb=openpyxl.Workbook()
+                        
+                        if(sheet in wb.sheetnames):
                             logger.print_on_console(msg)
                             self.xlsx_obj.clear_content_xlsx(os.path.dirname(output_feild),os.path.basename(output_feild),sheet)
+                        else:
+                            wb.create_sheet(index=0, title=sheet)
+
+                        row,col=1,1
+                        getSheet=wb[sheet]
+                        for key, value in res1.items():
+                            for i in range(len(res1[key])):
+                                getSheet.cell(row, col , value[i])
+                                col += 1
+                            col = 1
+                            row+=1
+                        wb.save(output_feild)
+                        wb.close()
+                        flag1=True
+                
                     elif(file_extension=='.xls'):
-                        clear_xls = open_workbook(output_feild)
-                        if(sheet in clear_xls.sheet_names()):
-                            logger.print_on_console(msg)
-                            self.xls_obj.clear_content_xls(os.path.dirname(output_feild),os.path.basename(output_feild),sheet)
-                    flag1, err_msg = self.write_result_file(output_feild, res1, sheet)
+                        if result==True:
+                            rb = open_workbook(output_feild)
+                            wb = xl_copy(rb)
+                            getSheet = wb.get_sheet(sheet)
+                        else:
+                            logger.print_on_console("File Does not exists, creating the file in specified path {}".format(output_feild))
+                            wb = xlwt.Workbook(encoding="utf-8")
+                        try:
+                            if(getSheet):
+                                logger.print_on_console(msg)
+                                self.xls_obj.clear_content_xls(os.path.dirname(output_feild),os.path.basename(output_feild),sheet)
+                        except:
+                            getSheet = wb.add_sheet(sheet)
+                                
+                        row,col=0,0
+                        for key, value in res1.items():
+                            for i in range(len(res1[key])):
+                                getSheet.write(row, col , value[i])
+                                col += 1
+                            col = 0
+                            row+=1
+                        wb.save(output_feild)
+                        flag1=True
+                        
+                    #for csv and txt    
+                    if(file_extension=='.csv' or file_extension=='.txt'):
+                        flag1, err_msg = self.write_result_file(output_feild, res1, sheet)
+
                     if(flag1==False):
                         log.error(err_msg)
                         logger.print_on_console(err_msg)
+            
+                    if(flag1 or flag2):
+                        log.info('Compared cells between the mentioned files')
+                        logger.print_on_console('Compared cells between the mentioned files')
+                        status = TEST_RESULT_PASS
+                        methodoutput = TEST_RESULT_TRUE
                 else:
-                    if status_get_ext and file_extension is not None and file_extension in generic_constants.SELECTIVE_CELL_FILE_TYPES:
-                        logger.print_on_console("File Does not exists, creating the file in specified path {}".format(output_feild))
-                        flag2, err_msg = self.write_result_file(output_feild, res1, sheet)
-                    else:
-                        err_msg = 'Warning! : Invalid file extension(Supports only .xlsx, .xls, .txt, .csv).'
-                    if (flag2==False):
-                        log.error(err_msg)
-                        logger.print_on_console(err_msg)       
+                    err_msg = 'Warning! : Invalid file extension(Supports only .xlsx, .xls, .txt, .csv).'
             else:
                 err_msg='Output field is empty'
                 log.error(err_msg)
                 logger.print_on_console(err_msg)
-            if(flag1 or flag2):
-                log.info('Compared cells between the mentioned files')
-                logger.print_on_console('Compared cells between the mentioned files')
-                status = TEST_RESULT_PASS
-                methodoutput = TEST_RESULT_TRUE
         except Exception as err_msg:
             log.error(err_msg)
             logger.print_on_console(err_msg)
