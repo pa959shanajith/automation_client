@@ -537,7 +537,7 @@ class FileOperationsPDF:
 
     def compare(self,image,template,abs_max):
         template = cv2.Canny(template, 50, 200)
-        location_dict = {(1,1):"bottom-left",(1,2):"bottom-center",(1,3):"bottom-right",(2,1):"middle-left",(2,2):"middle-center",(2,3):"middle-right",(3,1):"top-left",(3,2):"top-center",(3,1):"top-right"}
+        location_dict = {(1,1):"bottom-left",(1,2):"bottom-center",(1,3):"bottom-right",(2,1):"middle-left",(2,2):"middle-center",(2,3):"middle-right",(3,1):"top-left",(3,2):"top-center",(3,3):"top-right"}
         (tH, tW) = template.shape[:2]
         gray = image
         found = None
@@ -585,9 +585,9 @@ class FileOperationsPDF:
         x,y = 1,3
         results['location'] = []
         for found in location:
-            if (found[0]+50)/dimensions[0] > 1/3:
+            if (found[0]+150)/dimensions[0] > 1/3:
                 x = 2
-                if (found[0]+50)/dimensions[0] >2/3:
+                if (found[0]+150)/dimensions[0] >2/3:
                     x = 3
             if found[1]/dimensions[1] > 1/3:
                 y = 2
