@@ -1369,14 +1369,14 @@ class FileOperations:
                     res1[x]=[]
                     for bb in range(len(cell2[i])):
                         if(case!=''):
-                            if (cell1[aa][bb].lower()==cell2[aa][bb].lower()):
+                            if (str(cell1[aa][bb].value).lower()==str(cell2[aa][bb].value).lower()):
                                 output='True'
                                 res1[x].append(output)
                             else:
                                 output='False'
                                 res1[x].append(output)
                         else:
-                            if (cell1[aa][bb]==cell2[aa][bb]):
+                            if (str(cell1[aa][bb].value)==str(cell2[aa][bb].value)):
                                 output='True'
                                 res1[x].append(output)
                             else:
