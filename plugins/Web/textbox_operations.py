@@ -53,6 +53,31 @@ class TextboxKeywords:
         local_to.log.error(err_msg)
         return err_msg
 
+    def _invalid_input(self):
+        err_msg=ERROR_CODE_DICT['ERR_INVALID_INPUT']
+        local_to.log.info(err_msg)
+        logger.print_on_console(err_msg)
+        return err_msg
+    
+    def _invalid_index(self):
+        err_msg=("list index out of range")
+        local_to.log.info(err_msg)
+        logger.print_on_console(err_msg)
+        return err_msg
+
+    def _index_zero(self):
+        err_msg = (" index starts from 1")
+        local_to.log.info(err_msg)
+        logger.print_on_console(err_msg)
+        return err_msg
+
+    def __unbound_local_error(self,e):
+        err_msg=ERROR_CODE_DICT['ERR_INVALID_INPUT']
+        local_to.log.error(e)
+        local_to.log.info(err_msg)
+        logger.print_on_console(err_msg)
+        return err_msg
+
     def __invalid_element_state(self,e):
         err_msg=ERROR_CODE_DICT['ERR_INVALID_ELEMENT_STATE_EXCEPTION']
         local_to.log.error(e)
@@ -82,6 +107,7 @@ class TextboxKeywords:
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
+        check_flag=True
         local_to.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
             try:
@@ -98,47 +124,59 @@ class TextboxKeywords:
                         row_count=self.txtobj.getRowCountJs(webelement)
                         col_count=self.txtobj.getColoumnCountJs(webelement)
                         input = inp_list
-                        if obj_type== "textbox" and index_val>=0:
-                            if row_num-1>row_count or col_num-1>col_count:
-                                local_to.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                                logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                        if obj_type=="textbox" and index_val>=0:
+                            if row_num>row_count or col_num>col_count:
+                                check_flag=False
+                                err_msg=self._invalid_input()
                             else:
                                 cell=self.txtobj.javascriptExecutor(webelement,row_num-1,col_num-1)
                                 txt_box=cell.find_elements_by_tag_name('input')
                                 if len(txt_box)>0:
-                                    webelement = txt_box[index_val]
-                    local_to.log.debug(WEB_ELEMENT_ENABLED)
-                    utilobj=UtilWebKeywords()
-                    is_visble=utilobj.is_visible(webelement)
-                    input=input[0]
-                    coreutilsobj=core_utils.CoreUtils()
-                    input=coreutilsobj.get_UTF_8(input)
-                    logger.print_on_console(INPUT_IS+input)
-                    local_to.log.info(INPUT_IS)
-                    local_to.log.info(input)
-                    if input is not None:
-                        readonly_value=webelement.get_attribute("readonly")
-                        if not(readonly_value is not None and readonly_value.lower() =='true' or readonly_value is ''):
-                            user_input=self.validate_input(webelement,input)
-                            if user_input is not None:
-                                input=user_input
-                            if not(is_visble) and self.__check_visibility_from_config():
-                                self.clear_text(webelement)
-                            else:
-                                webelement.clear()
-                            local_to.log.debug('Setting the text')
-                            browser_Keywords.local_bk.driver_obj.execute_script(SET_TEXT_SCRIPT,webelement,input)
-                            status=TEST_RESULT_PASS
-                            methodoutput=TEST_RESULT_TRUE
+                                    if index_val >= len(txt_box):
+                                        check_flag= False
+                                        err_msg=self._invalid_index()
+                                    else:
+                                        webelement = txt_box[index_val]
+                                else:
+                                    check_flag=False
+                                    err_msg=self._invalid_input()
+                        elif obj_type!= "textbox":
+                            check_flag=False
+                            err_msg=self._invalid_input()
                         else:
-                            err_msg=self.__read_only()
+                            check_flag=False
+                            err_msg=self._index_zero()
+                    if check_flag==True:
+                        local_to.log.debug(WEB_ELEMENT_ENABLED)
+                        utilobj=UtilWebKeywords()
+                        is_visble=utilobj.is_visible(webelement)
+                        input=input[0]
+                        coreutilsobj=core_utils.CoreUtils()
+                        input=coreutilsobj.get_UTF_8(input)
+                        logger.print_on_console(INPUT_IS+input)
+                        local_to.log.info(INPUT_IS)
+                        local_to.log.info(input)
+                        if input is not None:
+                            readonly_value=webelement.get_attribute("readonly")
+                            if not(readonly_value is not None and readonly_value.lower() =='true' or readonly_value is ''):
+                                user_input=self.validate_input(webelement,input)
+                                if user_input is not None:
+                                    input=user_input
+                                if not(is_visble) and self.__check_visibility_from_config():
+                                    self.clear_text(webelement)
+                                else:
+                                    webelement.clear()
+                                local_to.log.debug('Setting the text')
+                                browser_Keywords.local_bk.driver_obj.execute_script(SET_TEXT_SCRIPT,webelement,input)
+                                status=TEST_RESULT_PASS
+                                methodoutput=TEST_RESULT_TRUE
+                            else:
+                                err_msg=self.__read_only()
                 else:
                     err_msg=self.__element_disabled()
             except UnboundLocalError as e:
-                local_to.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                err_msg=self.__unbound_local_error(e)
+
             except InvalidElementStateException as e:
                 err_msg=self.__invalid_element_state(e)
 
@@ -152,6 +190,7 @@ class TextboxKeywords:
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
+        check_flag=True
         local_to.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
             try:
@@ -168,64 +207,75 @@ class TextboxKeywords:
                         row_count=self.txtobj.getRowCountJs(webelement)
                         col_count=self.txtobj.getColoumnCountJs(webelement)
                         input = inp_list
-                        if obj_type== "textbox" and index_val>=0:
-                            if row_num-1>row_count or col_num-1>col_count:
-                                local_to.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                                logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                        if obj_type=="textbox" and index_val>=0:
+                            if row_num>row_count or col_num>col_count:
+                                check_flag=False
+                                err_msg=self._invalid_input()
                             else:
                                 cell=self.txtobj.javascriptExecutor(webelement,row_num-1,col_num-1)
                                 txt_box=cell.find_elements_by_tag_name('input')
                                 if len(txt_box)>0:
-                                    webelement = txt_box[index_val]
-                    local_to.log.debug(WEB_ELEMENT_ENABLED)
-                    utilobj=UtilWebKeywords()
-                    isvisble=utilobj.is_visible(webelement)
-                    input=input[0]
-                    coreutilsobj=core_utils.CoreUtils()
-                    input=coreutilsobj.get_UTF_8(input)
-                    logger.print_on_console(INPUT_IS+input)
-                    local_to.log.info(INPUT_IS)
-                    local_to.log.info(input)
-                    if input is not None:
-                        readonly_value=webelement.get_attribute("readonly")
-                        if not(readonly_value is not None and readonly_value.lower() =='true' or readonly_value is ''):
-                            user_input=self.validate_input(webelement,input)
-                            if user_input is not None:
-                                input=user_input
-                            if not(isvisble) and self.__check_visibility_from_config():
-                                try:
-                                    self.clear_text(webelement)
-                                except Exception as e:
-                                    local_to.log.error('Exception in clearing text')
-                                    pass
-                                local_to.log.debug('Sending the value via part 1')
-                                browser_Keywords.local_bk.driver_obj.execute_script(SET_TEXT_SCRIPT,webelement,input)
-                            else:
-                                try:
-                                    webelement.clear()
-                                except Exception as e:
-                                    local_to.log.error('Exception in clearing text')
-                                    pass
-                                if(isinstance(browser_Keywords.local_bk.driver_obj,selenium.webdriver.Ie) and self.__check_IE_64bit_from_config):
-                                    input=input+" "
-                                    for i in range (0,len(input)+1):
-                                        browser_Keywords.local_bk.driver_obj.execute_script(SET_TEXT_SCRIPT,webelement,input[0:i])
-                                    from sendfunction_keys import SendFunctionKeys
-                                    obj=SendFunctionKeys()
-                                    obj.sendfunction_keys("backspace",*args)
+                                    if index_val >= len(txt_box):
+                                        check_flag=False
+                                        err_msg=self._invalid_index()
+                                    else:
+                                        webelement = txt_box[index_val]
                                 else:
-                                    webelement.send_keys(input)
-                            status=TEST_RESULT_PASS
-                            methodoutput=TEST_RESULT_TRUE
+                                    check_flag=False
+                                    err_msg=self._invalid_input()
+                        elif obj_type!= "textbox":
+                            check_flag=False
+                            err_msg=self._invalid_input()
                         else:
-                            err_msg=self.__read_only()
+                            check_flag=False
+                            err_msg=self._index_zero()
+                    if check_flag==True:
+                        local_to.log.debug(WEB_ELEMENT_ENABLED)
+                        utilobj=UtilWebKeywords()
+                        isvisble=utilobj.is_visible(webelement)
+                        input=input[0]
+                        coreutilsobj=core_utils.CoreUtils()
+                        input=coreutilsobj.get_UTF_8(input)
+                        logger.print_on_console(INPUT_IS+input)
+                        local_to.log.info(INPUT_IS)
+                        local_to.log.info(input)
+                        if input is not None:
+                            readonly_value=webelement.get_attribute("readonly")
+                            if not(readonly_value is not None and readonly_value.lower() =='true' or readonly_value is ''):
+                                user_input=self.validate_input(webelement,input)
+                                if user_input is not None:
+                                    input=user_input
+                                if not(isvisble) and self.__check_visibility_from_config():
+                                    try:
+                                        self.clear_text(webelement)
+                                    except Exception as e:
+                                        local_to.log.error('Exception in clearing text')
+                                        pass
+                                    local_to.log.debug('Sending the value via part 1')
+                                    browser_Keywords.local_bk.driver_obj.execute_script(SET_TEXT_SCRIPT,webelement,input)
+                                else:
+                                    try:
+                                        webelement.clear()
+                                    except Exception as e:
+                                        local_to.log.error('Exception in clearing text')
+                                        pass
+                                    if(isinstance(browser_Keywords.local_bk.driver_obj,selenium.webdriver.Ie) and self.__check_IE_64bit_from_config):
+                                        input=input+" "
+                                        for i in range (0,len(input)+1):
+                                            browser_Keywords.local_bk.driver_obj.execute_script(SET_TEXT_SCRIPT,webelement,input[0:i])
+                                        from sendfunction_keys import SendFunctionKeys
+                                        obj=SendFunctionKeys()
+                                        obj.sendfunction_keys("backspace",*args)
+                                    else:
+                                        webelement.send_keys(input)
+                                status=TEST_RESULT_PASS
+                                methodoutput=TEST_RESULT_TRUE
+                            else:
+                                err_msg=self.__read_only()
                 else:
                     err_msg=self.__element_disabled()
             except UnboundLocalError as e:
-                local_to.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                err_msg=self.__unbound_local_error(e)
             except InvalidElementStateException as e:
                 err_msg=self.__invalid_element_state(e)
             except Exception as e:
@@ -265,6 +315,7 @@ class TextboxKeywords:
         methodoutput=TEST_RESULT_FALSE
         text=None
         err_msg=None
+        check_flag=True
         local_to.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
             try:
@@ -276,31 +327,34 @@ class TextboxKeywords:
                         index_val=int(input[3])-1
                     row_count=self.txtobj.getRowCountJs(webelement)
                     col_count=self.txtobj.getColoumnCountJs(webelement)
-                    if obj_type== "textbox" and index_val>=0:
-                        if row_num-1>row_count or col_num-1>col_count:
-                            local_to.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                            err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                            logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                    if obj_type=="textbox" and index_val>=0:
+                        if row_num>row_count or col_num>col_count:
+                            check_flag=False
+                            err_msg=self._invalid_input()
                         else:
                             cell=self.txtobj.javascriptExecutor(webelement,row_num-1,col_num-1)
                             txt_box=cell.find_elements_by_tag_name('input')
                             if len(txt_box)>0:
-                                webelement = txt_box[index_val]
-                                text=self.__get_text(webelement)
-                                status=TEST_RESULT_PASS
-                                methodoutput=TEST_RESULT_TRUE
+                                if index_val >= len(txt_box):
+                                    check_flag=False
+                                    err_msg=self._invalid_index()
+                                else:
+                                    webelement = txt_box[index_val]
                             else:
-                                local_to.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                                logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                check_flag=False
+                                err_msg=self._invalid_input()
+                    elif obj_type!= "textbox":
+                        check_flag=False
+                        err_msg=self._invalid_input()
                     else:
-                        local_to.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                        err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                        logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                else:
+                        check_flag=False
+                        err_msg=self._index_zero()
+                if check_flag==True:
                     text=self.__get_text(webelement)
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
+            except UnboundLocalError as e:
+                err_msg=self.__unbound_local_error(e)
             except Exception as e:
                 err_msg=self.__web_driver_exception(e)
         logger.print_on_console(METHOD_OUTPUT)
@@ -312,6 +366,7 @@ class TextboxKeywords:
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
+        check_flag=True
         local_to.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
             try:
@@ -327,42 +382,29 @@ class TextboxKeywords:
                     row_count=self.txtobj.getRowCountJs(webelement)
                     col_count=self.txtobj.getColoumnCountJs(webelement)
                     input = inp_list
-                    if obj_type== "textbox" and index_val>=0:
-                        if row_num-1>row_count or col_num-1>col_count:
-                            local_to.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                            err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                            logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                    if obj_type=="textbox" and index_val>=0:
+                        if row_num>row_count or col_num>col_count:
+                            check_flag=False
+                            err_msg=self._invalid_input()
                         else:
                             cell=self.txtobj.javascriptExecutor(webelement,row_num-1,col_num-1)
                             txt_box=cell.find_elements_by_tag_name('input')
                             if len(txt_box)>0:
-                                webelement = txt_box[index_val]
-                                text=self.__get_text(webelement)
-                                local_to.log.debug('Text is '+text)
-                                input=input[0]
-                                coreutilsobj=core_utils.CoreUtils()
-                                input=coreutilsobj.get_UTF_8(input)
-                                if text==input:
-                                    status=TEST_RESULT_PASS
-                                    methodoutput=TEST_RESULT_TRUE
+                                if index_val >= len(txt_box):
+                                    check_flag=False
+                                    err_msg=self._invalid_index()
                                 else:
-                                    err_msg='Text mismatched'
-                                    logger.print_on_console(err_msg)
-                                    logger.print_on_console(EXPECTED,input)
-                                    local_to.log.info(EXPECTED)
-                                    local_to.log.info(input)
-                                    logger.print_on_console(ACTUAL,text)
-                                    local_to.log.info(ACTUAL)
-                                    local_to.log.info(text)
+                                    webelement = txt_box[index_val]
                             else:
-                                local_to.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                                logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                check_flag=False
+                                err_msg=self._invalid_input()
+                    elif obj_type!= "textbox":
+                        check_flag=False
+                        err_msg=self._invalid_input()
                     else:
-                        local_to.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                        err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                        logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                else:
+                        check_flag=False
+                        err_msg=self._index_zero()
+                if check_flag==True:
                     text=self.__get_text(webelement)
                     local_to.log.debug('Text is '+text)
                     input=input[0]
@@ -380,6 +422,8 @@ class TextboxKeywords:
                         logger.print_on_console(ACTUAL,text)
                         local_to.log.info(ACTUAL)
                         local_to.log.info(text)
+            except UnboundLocalError as e:
+                err_msg=self.__unbound_local_error(e)
             except Exception as e:
                 err_msg=self.__web_driver_exception(e)
         return status,methodoutput,output,err_msg
@@ -389,6 +433,7 @@ class TextboxKeywords:
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
+        check_flag=True
         local_to.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
             try:
@@ -401,32 +446,47 @@ class TextboxKeywords:
                             index_val=int(input[3])-1
                         row_count=self.txtobj.getRowCountJs(webelement)
                         col_count=self.txtobj.getColoumnCountJs(webelement)
-                        if obj_type== "textbox" and index_val>=0:
-                            if row_num-1>row_count or col_num-1>col_count:
-                                local_to.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                                logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                        if obj_type=="textbox" and index_val>=0:
+                            if row_num>row_count or col_num>col_count:
+                                check_flag=False
+                                err_msg=self._invalid_input()
                             else:
                                 cell=self.txtobj.javascriptExecutor(webelement,row_num-1,col_num-1)
                                 txt_box=cell.find_elements_by_tag_name('input')
                                 if len(txt_box)>0:
-                                    webelement = txt_box[index_val]
-                    local_to.log.debug(WEB_ELEMENT_ENABLED)
-                    readonly_value=webelement.get_attribute("readonly")
-                    if not(readonly_value is not None and readonly_value.lower() =='true' or readonly_value is ''):
-                        obj=UtilWebKeywords()
-                        if obj.is_visible(webelement):
-                            webelement.clear()
-                            from selenium.webdriver.common.keys import Keys
-                            webelement.send_keys(Keys.BACK_SPACE)
+                                    if index_val >= len(txt_box):
+                                        check_flag=False
+                                        err_msg=self._invalid_index()
+                                    else:
+                                        webelement = txt_box[index_val]
+                                else:
+                                    check_flag=False
+                                    err_msg=self._invalid_input()
+                        elif obj_type!= "textbox":
+                            check_flag=False
+                            err_msg=self._invalid_input()
                         else:
-                            self.__clear_text(webelement)
-                        status=TEST_RESULT_PASS
-                        methodoutput=TEST_RESULT_TRUE
-                    else:
-                        err_msg=self.__read_only()
+                            check_flag=False
+                            err_msg=self._index_zero()
+                    if check_flag==True:
+                        local_to.log.debug(WEB_ELEMENT_ENABLED)
+                        readonly_value=webelement.get_attribute("readonly")
+                        if not(readonly_value is not None and readonly_value.lower() =='true' or readonly_value is ''):
+                            obj=UtilWebKeywords()
+                            if obj.is_visible(webelement):
+                                webelement.clear()
+                                from selenium.webdriver.common.keys import Keys
+                                webelement.send_keys(Keys.BACK_SPACE)
+                            else:
+                                self.__clear_text(webelement)
+                            status=TEST_RESULT_PASS
+                            methodoutput=TEST_RESULT_TRUE
+                        else:
+                            err_msg=self.__read_only()
                 else:
                     err_msg=self.__element_disabled()
+            except UnboundLocalError as e:
+                err_msg=self.__unbound_local_error(e)
             except InvalidElementStateException as e:
                 err_msg=self.__invalid_element_state(e)
             except Exception as e:
@@ -438,6 +498,7 @@ class TextboxKeywords:
         methodoutput=TEST_RESULT_FALSE
         length=None
         err_msg=None
+        check_flag=True
         local_to.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
             try:
@@ -449,37 +510,37 @@ class TextboxKeywords:
                         index_val=int(input[3])-1
                     row_count=self.txtobj.getRowCountJs(webelement)
                     col_count=self.txtobj.getColoumnCountJs(webelement)
-                    if obj_type== "textbox" and index_val>=0:
-                        if row_num-1>row_count or col_num-1>col_count:
-                            local_to.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                            err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                            logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                    if obj_type=="textbox" and index_val>=0:
+                        if row_num>row_count or col_num>col_count:
+                            check_flag=False
+                            err_msg=self._invalid_input()
                         else:
                             cell=self.txtobj.javascriptExecutor(webelement,row_num-1,col_num-1)
                             txt_box=cell.find_elements_by_tag_name('input')
                             if len(txt_box)>0:
-                                webelement = txt_box[index_val]
-                                length = self.__gettexbox_length(webelement)
-                                if length is not None:
-                                    status=TEST_RESULT_PASS
-                                    methodoutput=TEST_RESULT_TRUE
+                                if index_val >= len(txt_box):
+                                    check_flag=False
+                                    err_msg=self._invalid_index()
                                 else:
-                                    err_msg='Textbox length is '+str(length)
+                                    webelement = txt_box[index_val]
                             else:
-                                local_to.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                                logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                check_flag=False
+                                err_msg=self._invalid_input()
+                    elif obj_type!= "textbox":
+                        check_flag=False
+                        err_msg=self._invalid_input()
                     else:
-                        local_to.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                        err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                        logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])           
-                else:
+                        check_flag=False
+                        err_msg=self._index_zero()             
+                if check_flag==True:
                     length = self.__gettexbox_length(webelement)
                     if length is not None:
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
                     else:
                         err_msg='Textbox length is '+str(length)
+            except UnboundLocalError as e:
+                err_msg=self.__unbound_local_error(e)
             except Exception as e:
                 err_msg=self.__web_driver_exception(e)
         logger.print_on_console('Textbox length is '+str(length))
@@ -491,6 +552,7 @@ class TextboxKeywords:
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
+        check_flag=True
         local_to.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
             try:
@@ -506,47 +568,29 @@ class TextboxKeywords:
                     row_count=self.txtobj.getRowCountJs(webelement)
                     col_count=self.txtobj.getColoumnCountJs(webelement)
                     input = inp_list
-                    if obj_type== "textbox" and index_val>=0:
-                        if row_num-1>row_count or col_num-1>col_count:
-                            local_to.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                            err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                            logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                    if obj_type=="textbox" and index_val>=0:
+                        if row_num>row_count or col_num>col_count:
+                            check_flag=False
+                            err_msg=self._invalid_input()
                         else:
                             cell=self.txtobj.javascriptExecutor(webelement,row_num-1,col_num-1)
                             txt_box=cell.find_elements_by_tag_name('input')
                             if len(txt_box)>0:
-                                webelement = txt_box[index_val]
-                                length = self.__gettexbox_length(webelement)
-                                input=input[0]
-                                logger.print_on_console(INPUT_IS+str(input))
-                                local_to.log.info(INPUT_IS)
-                                local_to.log.info(input)
-                                if length != None and length != '':
-                                    if '.' in input:
-                                        input=input[0:input.find('.')]
-                                    if length==input:
-                                        status=TEST_RESULT_PASS
-                                        methodoutput=TEST_RESULT_TRUE
-                                    else:
-                                        err_msg='Textbox length mismatched'
-                                        logger.print_on_console(err_msg)
-                                        logger.print_on_console(EXPECTED,input)
-                                        local_to.log.info(EXPECTED)
-                                        local_to.log.info(input)
-                                        logger.print_on_console(ACTUAL,length)
-                                        local_to.log.info(ACTUAL)
-                                        local_to.log.info(length)
+                                if index_val >= len(txt_box):
+                                    check_flag=False
+                                    err_msg=self._invalid_index()
                                 else:
-                                    err_msg='Textbox length is None or empty'
+                                    webelement = txt_box[index_val]
                             else:
-                                local_to.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                                logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                check_flag=False
+                                err_msg=self._invalid_input()
+                    elif obj_type!= "textbox":
+                        check_flag=False
+                        err_msg=self._invalid_input()
                     else:
-                        local_to.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                        err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                        logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                else:
+                        check_flag=False
+                        err_msg=self._index_zero()            
+                if check_flag==True:
                     length = self.__gettexbox_length(webelement)
                     input=input[0]
                     logger.print_on_console(INPUT_IS+str(input))
@@ -570,7 +614,8 @@ class TextboxKeywords:
                             local_to.log.info(length)
                     else:
                         err_msg='Textbox length is None or empty'
-
+            except UnboundLocalError as e:
+                err_msg=self.__unbound_local_error(e)
             except Exception as e:
                 err_msg=self.__web_driver_exception(e)
         return status,methodoutput,output,err_msg
@@ -580,6 +625,7 @@ class TextboxKeywords:
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
+        check_flag=True
         local_to.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
             try:
@@ -596,50 +642,62 @@ class TextboxKeywords:
                         row_count=self.txtobj.getRowCountJs(webelement)
                         col_count=self.txtobj.getColoumnCountJs(webelement)
                         input = inp_list
-                        if obj_type== "textbox" and index_val>=0:
-                            if row_num-1>row_count or col_num-1>col_count:
-                                local_to.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                                logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                        if obj_type=="textbox" and index_val>=0:
+                            if row_num>row_count or col_num>col_count:
+                                check_flag=False
+                                err_msg=self._invalid_input()
                             else:
                                 cell=self.txtobj.javascriptExecutor(webelement,row_num-1,col_num-1)
                                 txt_box=cell.find_elements_by_tag_name('input')
                                 if len(txt_box)>0:
-                                    webelement = txt_box[index_val]
-                    local_to.log.debug(WEB_ELEMENT_ENABLED)
-                    utilobj=UtilWebKeywords()
-                    is_visble=utilobj.is_visible(webelement)
-                    input=input[0]
-                    coreutilsobj=core_utils.CoreUtils()
-                    input=coreutilsobj.get_UTF_8(input)
-                    logger.print_on_console(INPUT_IS+input)
-                    local_to.log.info(INPUT_IS)
-                    local_to.log.info(input)
-                    if input is not None:
-                        readonly_value=webelement.get_attribute("readonly")
-                        if not(readonly_value is not None and readonly_value.lower() =='true' or readonly_value is ''):
-                            if not(is_visble) and self.__check_visibility_from_config():
-                                self.clear_text(webelement)
-                            else:
-                                webelement.clear()
-                            encryption_obj = AESCipher()
-                            input_val = encryption_obj.decrypt(input)
-                            if input_val is not None:
-                                user_input=self.validate_input(webelement,input_val)
-                                if user_input is not None:
-                                    input_val=user_input
-                                browser_Keywords.local_bk.driver_obj.execute_script(SET_TEXT_SCRIPT,webelement,input_val)
-                                status=TEST_RESULT_PASS
-                                methodoutput=TEST_RESULT_TRUE
-                            else:
-                                err_msg=ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                                    if index_val >= len(txt_box):
+                                        check_flag=False
+                                        err_msg=self._invalid_index()
+                                    else:
+                                        webelement = txt_box[index_val]
+                                else:
+                                    check_flag=False
+                                    err_msg=self._invalid_input()
+                        elif obj_type!="textbox":
+                            check_flag=False
+                            err_msg=self._invalid_input()
                         else:
-                            err_msg=self.__read_only()
+                            check_flag=False
+                            err_msg=self._index_zero()
+                    if check_flag==True:
+                        local_to.log.debug(WEB_ELEMENT_ENABLED)
+                        utilobj=UtilWebKeywords()
+                        is_visble=utilobj.is_visible(webelement)
+                        input=input[0]
+                        coreutilsobj=core_utils.CoreUtils()
+                        input=coreutilsobj.get_UTF_8(input)
+                        logger.print_on_console(INPUT_IS+input)
+                        local_to.log.info(INPUT_IS)
+                        local_to.log.info(input)
+                        if input is not None:
+                            readonly_value=webelement.get_attribute("readonly")
+                            if not(readonly_value is not None and readonly_value.lower() =='true' or readonly_value is ''):
+                                if not(is_visble) and self.__check_visibility_from_config():
+                                    self.clear_text(webelement)
+                                else:
+                                    webelement.clear()
+                                encryption_obj = AESCipher()
+                                input_val = encryption_obj.decrypt(input)
+                                if input_val is not None:
+                                    user_input=self.validate_input(webelement,input_val)
+                                    if user_input is not None:
+                                        input_val=user_input
+                                    browser_Keywords.local_bk.driver_obj.execute_script(SET_TEXT_SCRIPT,webelement,input_val)
+                                    status=TEST_RESULT_PASS
+                                    methodoutput=TEST_RESULT_TRUE
+                                else:
+                                    err_msg=ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                            else:
+                                err_msg=self.__read_only()
                 else:
                     err_msg=self.__element_disabled()
             except UnboundLocalError as e:
-                local_to.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                err_msg=self.__unbound_local_error(e)
             except InvalidElementStateException as e:
                 err_msg=self.__invalid_element_state(e)
             except Exception as e:
@@ -651,6 +709,7 @@ class TextboxKeywords:
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
+        check_flag=True
         local_to.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
             try:
@@ -667,53 +726,65 @@ class TextboxKeywords:
                         row_count=self.txtobj.getRowCountJs(webelement)
                         col_count=self.txtobj.getColoumnCountJs(webelement)
                         input = inp_list
-                        if obj_type== "textbox" and index_val>=0:
-                            if row_num-1>row_count or col_num-1>col_count:
-                                local_to.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                                logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                        if obj_type=="textbox" and index_val>=0:
+                            if row_num>row_count or col_num>col_count:
+                                check_flag=False
+                                err_msg=self._invalid_input()
                             else:
                                 cell=self.txtobj.javascriptExecutor(webelement,row_num-1,col_num-1)
                                 txt_box=cell.find_elements_by_tag_name('input')
                                 if len(txt_box)>0:
-                                    webelement = txt_box[index_val]
-                    local_to.log.debug(WEB_ELEMENT_ENABLED)
-                    utilobj=UtilWebKeywords()
-                    isvisble=utilobj.is_visible(webelement)
-                    input=input[0]
-                    coreutilsobj=core_utils.CoreUtils()
-                    input=coreutilsobj.get_UTF_8(input)
-                    logger.print_on_console(INPUT_IS,input)
-                    local_to.log.info(INPUT_IS)
-                    local_to.log.info(input)
-                    if input is not None:
-                        readonly_value=webelement.get_attribute("readonly")
-                        if not(readonly_value is not None and readonly_value.lower() =='true' or readonly_value is ''):
-                            encryption_obj = AESCipher()
-                            input_val = encryption_obj.decrypt(input)
-                            user_input=self.validate_input(webelement,input_val)
-                            if user_input is not None:
-                                input_val=user_input
-                            if not(isvisble) and self.__check_visibility_from_config():
-                                self.clear_text(webelement)
-                                local_to.log.debug('Sending the value via part 1')
-                                browser_Keywords.local_bk.driver_obj.execute_script(SET_TEXT_SCRIPT,webelement,input_val)
-                            else:
-                                webelement.clear()
-                                if(isinstance(browser_Keywords.local_bk.driver_obj,selenium.webdriver.Ie) and self.__check_IE_64bit_from_config):
-                                    for i in range (0,len(input_val)+1):
-                                        browser_Keywords.local_bk.driver_obj.execute_script(SET_TEXT_SCRIPT,webelement,input_val[0:i])
+                                    if index_val >= len(txt_box):
+                                        check_flag=False
+                                        err_msg=self._invalid_index()
+                                    else:
+                                        webelement = txt_box[index_val]
                                 else:
-                                    webelement.send_keys(input_val)
-                            status=TEST_RESULT_PASS
-                            methodoutput=TEST_RESULT_TRUE
+                                    check_flag=False
+                                    err_msg=self._invalid_input()
+                        elif obj_type!="textbox":
+                            check_flag=False
+                            err_msg=self._invalid_input()
                         else:
-                            err_msg=self.__read_only()
+                            check_flag=False
+                            err_msg=self._index_zero()
+                    if check_flag==True:
+                        local_to.log.debug(WEB_ELEMENT_ENABLED)
+                        utilobj=UtilWebKeywords()
+                        isvisble=utilobj.is_visible(webelement)
+                        input=input[0]
+                        coreutilsobj=core_utils.CoreUtils()
+                        input=coreutilsobj.get_UTF_8(input)
+                        logger.print_on_console(INPUT_IS,input)
+                        local_to.log.info(INPUT_IS)
+                        local_to.log.info(input)
+                        if input is not None:
+                            readonly_value=webelement.get_attribute("readonly")
+                            if not(readonly_value is not None and readonly_value.lower() =='true' or readonly_value is ''):
+                                encryption_obj = AESCipher()
+                                input_val = encryption_obj.decrypt(input)
+                                user_input=self.validate_input(webelement,input_val)
+                                if user_input is not None:
+                                    input_val=user_input
+                                if not(isvisble) and self.__check_visibility_from_config():
+                                    self.clear_text(webelement)
+                                    local_to.log.debug('Sending the value via part 1')
+                                    browser_Keywords.local_bk.driver_obj.execute_script(SET_TEXT_SCRIPT,webelement,input_val)
+                                else:
+                                    webelement.clear()
+                                    if(isinstance(browser_Keywords.local_bk.driver_obj,selenium.webdriver.Ie) and self.__check_IE_64bit_from_config):
+                                        for i in range (0,len(input_val)+1):
+                                            browser_Keywords.local_bk.driver_obj.execute_script(SET_TEXT_SCRIPT,webelement,input_val[0:i])
+                                    else:
+                                        webelement.send_keys(input_val)
+                                status=TEST_RESULT_PASS
+                                methodoutput=TEST_RESULT_TRUE
+                            else:
+                                err_msg=self.__read_only()
                 else:
                     err_msg=self.__element_disabled()
             except UnboundLocalError as e:
-                local_to.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                err_msg=self.__unbound_local_error(e)
             except InvalidElementStateException as e:
                 err_msg=self.__invalid_element_state(e)
             except Exception as e:
