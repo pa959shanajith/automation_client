@@ -631,16 +631,10 @@ class IRISKeywords():
                     pythoncom.CoInitialize()
                     pyautogui.click()
                     robot = Robot()
-                    robot.ctrl_press('a')
-                    time.sleep(1)
-                    robot.key_press('backspace')
                     time.sleep(1)
                     robot.type_string(args[0][0], delay=0.2)
                 else:
                     pyautogui.click()
-                    pyautogui.hotkey('ctrl','a')
-                    time.sleep(1)
-                    pyautogui.press('backspace')
                     time.sleep(1)
                     pyautogui.typewrite(args[0][0]) ## Pending
                 status= TEST_RESULT_PASS
@@ -660,7 +654,10 @@ class IRISKeywords():
     def cleartextiris(self,element,*args):
         """
         Discription: Performs a clear text operation(keyboard-backspace) on the IRIS object, if VerifyExistIRIS is provided then uses that(IRIS object) as a parent reference, then finds the element to perform action.
-        Input: N/A
+        Input: Options: a. N/A or 0 - Clearing text by default method: Click element + "Ctrl+A" + Backspace
+                        b. 1 - 'Clearing text by method : Double click element + Backspace'
+                        c. 2 - 'Clearing text by method : Click element + Home + "Shift+End" + Backspace'
+                        d. 3 - 'Clearing text by method : Click element + End + "Shift+Home" + Backspace'
         OutPut: Boolean Value
         """
         log.info('Inside cleartextiris and No. of arguments passed are : '+str(len(args)))
@@ -675,6 +672,7 @@ class IRISKeywords():
         elements =[]
         width = None
         height = None
+        flag = False
         try:
             if(len(args) == 3 and args[2]!='' and len(verifyexists)>0):
                 elem_coordinates = element['coordinates']
@@ -691,20 +689,45 @@ class IRISKeywords():
             else:
                 res = gotoobject(element)
             if(len(res) > 0):
-                if SYSTEM_OS != 'Darwin':
-                    pythoncom.CoInitialize()
-                    pyautogui.click()
-                    robot = Robot()
-                    robot.ctrl_press('a')
-                    time.sleep(1)
-                    robot.key_press('backspace')
-                else:
+                pythoncom.CoInitialize()
+                if (args[0][0] == None or args[0][0] == '' or args[0][0] == str(0)):
+                    log.debug( 'Clearing text by default method: Click element + "Ctrl+A" + Backspace' )
                     pyautogui.click()
                     pyautogui.hotkey('ctrl','a')
-                    time.sleep(1)
+                    time.sleep(0.25)
                     pyautogui.press('backspace')
-                status= TEST_RESULT_PASS
-                result = TEST_RESULT_TRUE
+                    flag = True
+                elif(args[0][0] == str(1) ):
+                    log.debug( 'Clearing text by method : Double click element + Backspace' )
+                    pyautogui.doubleClick()
+                    time.sleep(0.25)
+                    pyautogui.press('backspace')
+                    flag = True
+                elif(args[0][0] == str(2) ):
+                    log.debug( 'Clearing text by method : Click element + Home + "Shift+End" + Backspace' )
+                    pyautogui.click()
+                    pyautogui.press('home')
+                    time.sleep(0.25)
+                    pyautogui.hotkey('shift','end')
+                    time.sleep(0.25)
+                    pyautogui.press('backspace')
+                    flag = True
+                elif(args[0][0] == str(3) ):
+                    log.debug( 'Clearing text by method : Click element + End + "Shift+Home" + Backspace' )
+                    pyautogui.click()
+                    pyautogui.press('end')
+                    time.sleep(0.25)
+                    pyautogui.hotkey('shift','home')
+                    time.sleep(0.25)
+                    pyautogui.press('backspace')
+                    flag = True
+                else:
+                    flag = False
+                    err_msg = 'Invalid option'
+                    log.error('Available Options : N/A or 0 - Clearing text by default method: Click element + "Ctrl+A" + Backspace, 1 - Clearing text by method : Double click element + Backspace, 2 - Clearing text by method : Click element + Home + "Shift+End" + Backspace, 3 - Clearing text by method : Click element + End + "Shift+Home" + Backspace')
+                if (flag):
+                    status= TEST_RESULT_PASS
+                    result = TEST_RESULT_TRUE
             else:
                 err_msg = "Object not found"
             if ( err_msg ):
