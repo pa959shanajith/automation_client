@@ -367,6 +367,11 @@ class DatabaseOperation():
                 rows = cursor.fetchall()
                 columns = [column[0] for column in cursor.description]
                 ##logic for output col reading
+                if type(args) is tuple:
+                    if str(args).startswith("(("):
+                        args=args[0]
+                    else:
+                        args=args
                 if (args[0].startswith("{")):
                     inp_path = self.DV.get_dynamic_value(args[0])
                     if inp_path!=None:

@@ -490,7 +490,8 @@ class WSkeywords:
              s=Session()
              if not (self.baseEndPointURL is '' or self.baseReqBody is '' or self.baseOperation is ''):
                 reqUrl=self.baseEndPointURL+'/'+self.baseOperation
-                req = requests.Request(method=self.baseMethod, url=reqUrl, data=self.baseReqBody)
+                self.get_cookies()
+                req = requests.Request(method=self.baseMethod, url=reqUrl, data=self.baseReqBody,cookies=self.req_cookies,proxies=self.proxies, cert=self.client_cert, verify=self.server_cert, auth=self.req_auth, params=self.req_params)
                 prep=req.prepare()
                 response=s.send(prep)
                 status,methodoutput,output=self.__saveResults(response)
@@ -515,7 +516,8 @@ class WSkeywords:
             s=Session()
             if not (self.baseEndPointURL is '' or self.baseOperation is ''):
                 reqUrl=self.baseEndPointURL+'/'+self.baseOperation
-                req = requests.Request(method=self.baseMethod, url=reqUrl)
+                self.get_cookies()
+                req = requests.Request(method=self.baseMethod, url=reqUrl,cookies=self.req_cookies,proxies=self.proxies, cert=self.client_cert, verify=self.server_cert, auth=self.req_auth, params=self.req_params)
                 prep=req.prepare()
                 response=s.send(prep)
                 status,methodoutput,output=self.__saveResults(response)
