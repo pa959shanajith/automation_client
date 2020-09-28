@@ -135,13 +135,13 @@ class FileOperationsPDF:
                                         logger.print_on_console("The number of pages with differences in comparePDFs are: ",self.get_number_diff_pages(output_res_dict))
                                     else:
                                         logger.print_on_console("No Difference between inputs in comparePDFs")
-                                    if output_path and not isinstance(output_path,dict):
+                                    if output_path and not isinstance(output_path,list):
                                         if(os.path.exists(output_path) or os.path.exists(os.path.dirname(output_path))):
                                             log.debug( "Writing the output of comparePDFs to file : " + str(output_path) )
                                             logger.print_on_console( "Writing the output of comparePDFs to file.")
                                             optFlg = False
                                             with open(output_path,'w') as f:
-                                                f.write('\n'.join(str(output_res)))
+                                                f.write(str(output_res))
                                         else:
                                             err_msg = generic_constants.FILE_NOT_EXISTS
                                             flg = False
@@ -196,6 +196,10 @@ class FileOperationsPDF:
             result[i + 1]["images"] = self.compare_images(doc1,doc2,i,i)
             test_str2 = pdfReader2.getPage(i).extractText().replace('\n',"")
             total_char2 = len(test_str2)
+            if total_char2 == 0 or len(test_str2.strip()) == 0:
+                result[i + 1]["comparison_result"] = "||---" + pdfReader1.getPage(i).extractText().replace('\n',"") + "---||"
+                result[i + 1]["images"] = self.compare_images(doc1,None,i,i)
+                continue
             test_str1_copy = test_str1
             matches = difflib.SequenceMatcher(None, test_str1, test_str2).get_matching_blocks()
             result[i + 1]["matches"] = []
@@ -219,7 +223,6 @@ class FileOperationsPDF:
                     result[i + 1]['error'] = "Page empty or unsupported text"
                     result[i + 1]["images"] = self.compare_images(None,doc2,i,i)
                     continue
-                test_str2 = " +++ " + pdfReader2.getPage(i).extractText().replace('\n',"") + " +++ "
                 result[i + 1]["comparison_result"] = "||+++" + test_str2 + "+++||"
                 result[i + 1]["images"] = self.compare_images(None,doc2,i,i)
         return result
@@ -242,14 +245,18 @@ class FileOperationsPDF:
         for addition in add:
             if addition == "":
                 continue
-            if end in addition:
-                addition = addition.replace(end,"")
-            elif start in addition:
-                addition = addition.replace(start,"")
             find_str = addition + start
             index = pageB.find(find_str)
-            prev_matches = re.findall('--cSTART--(.*?)--cEND--',pageB[:index])
-            add_index = pageA.find(prev_matches[len(prev_matches) - 1]) + len(prev_matches[len(prev_matches) - 1])
+            prev_matches = re.findall('--cSTART--(.*?)--cEND--',pageB[:index + len(find_str)])
+            post_matches = re.findall('--cSTART--(.*?)--cEND--',pageB[index + len(find_str):])
+            pageB = pageB[:index + len(find_str)].replace(addition,"") + pageB[index+len(find_str):]
+            try:
+                for i in re.finditer(prev_matches[len(prev_matches) -1],pageA):
+                    if not post_matches or (post_matches and i.start() < pageA.find(post_matches[0])):
+                        add_index = i.start()  + len(prev_matches[len(prev_matches) - 1])
+            except Exception as e:
+                log.info("Un accepted regex caharchter")
+                add_index = pageA.find(prev_matches[len(prev_matches) - 1]) + len(prev_matches[len(prev_matches) - 1])
             pageA = pageA[:add_index] + " ||+++ " + addition + " +++|| " + pageA[add_index:]
         if opt == 'selective':
             for cmn_str in match_arr:
@@ -442,7 +449,7 @@ class FileOperationsPDF:
                                         logger.print_on_console("Total number of image occurances are: ",total_found)
                                     else:
                                         logger.print_on_console("No image occurances in PDF")
-                                    if output_path and not isinstance(output_path,dict):
+                                    if output_path and not isinstance(output_path,list):
                                         if(os.path.exists(output_path) or os.path.exists(os.path.dirname(output_path))):
                                             log.debug( "Writing the output of PDFimageCompare to file : " + str(output_res) )
                                             logger.print_on_console( "Writing the output of PDFimageCompare to file.")
