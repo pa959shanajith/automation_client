@@ -1526,10 +1526,10 @@ class FileOperations:
                         if(sheet in wb.sheetnames):
                             logger.print_on_console(msg)
                             self.xlsx_obj.clear_content_xlsx(os.path.dirname(output_feild),os.path.basename(output_feild),sheet)
+                            wb=openpyxl.load_workbook(output_feild)
                         else:
                             wb.create_sheet(index=0, title=sheet)
 
-                        wb=openpyxl.load_workbook(output_feild)
                         row,col=1,1
                         getSheet=wb[sheet]
                         for key, value in res1.items():
@@ -1559,7 +1559,7 @@ class FileOperations:
                                 getSheet = wb.get_sheet(sheet)
                         except:
                             getSheet = wb.add_sheet(sheet)
-							
+        
                         row,col=0,0
                         for key, value in res1.items():
                             for i in range(len(res1[key])):
