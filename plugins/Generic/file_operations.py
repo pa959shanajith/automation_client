@@ -1516,8 +1516,6 @@ class FileOperations:
                 logger.print_on_console( "Writing the output of selectiveCellCompare to file ")
                 msg='Output file has old entries! Erasing old data to store incoming result.'
                 if status_get_ext and file_extension is not None and file_extension in generic_constants.SELECTIVE_CELL_FILE_TYPES:
-                    # logger.print_on_console("File Does not exists, creating the file in specified path {}".format(output_feild))
-                    
                     if(file_extension=='.xlsx'):
                         if result==True:
                             wb=openpyxl.load_workbook(output_feild)
@@ -1531,6 +1529,7 @@ class FileOperations:
                         else:
                             wb.create_sheet(index=0, title=sheet)
 
+                        wb=openpyxl.load_workbook(output_feild)
                         row,col=1,1
                         getSheet=wb[sheet]
                         for key, value in res1.items():
@@ -1555,9 +1554,12 @@ class FileOperations:
                             if(getSheet):
                                 logger.print_on_console(msg)
                                 self.xls_obj.clear_content_xls(os.path.dirname(output_feild),os.path.basename(output_feild),sheet)
+                                rb = open_workbook(output_feild)
+                                wb = xl_copy(rb)
+                                getSheet = wb.get_sheet(sheet)
                         except:
                             getSheet = wb.add_sheet(sheet)
-                                
+							
                         row,col=0,0
                         for key, value in res1.items():
                             for i in range(len(res1[key])):
