@@ -17,6 +17,10 @@ from constants import *
 import logger
 import json
 from  selenium.webdriver.common import action_chains
+if SYSTEM_OS=='Windows':
+    from ctypes import *
+else:
+    from pynput.mouse import Controller
 import time
 from selenium.webdriver.support.ui import Select
 import browser_Keywords
@@ -45,13 +49,37 @@ class TableOperationKeywords():
                 try:
                     local_tk.log.debug('checking for element')
                     if webElement!=None:
-                        local_tk.log.debug('performing java script on element')
-                        js='var targetTable = arguments[0]; var rowCount = targetTable.rows; return rowCount.length;'
-                        row_count = browser_Keywords.local_bk.driver_obj.execute_script(js,webElement)
-                        if(row_count>=0):
-                            status=TEST_RESULT_PASS
-                            methodoutput=TEST_RESULT_TRUE
-                            logger.print_on_console('Row count is  : ',str(row_count))
+                        if webElement.get_attribute('role') == 'grid':
+                            body = True
+                            right = True
+                            if len(args)==2:
+                                input_val = args[0]
+                                if (input_val[0].lower() != 'body') : body = False
+                                if (input_val[1].lower() != 'right') : right = False
+                            if body:
+                                if right:
+                                    container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-center-cols-container')]")
+                                else:
+                                    container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-pinned-left-cols-container')]")
+                            else:
+                                if right:
+                                    container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-header-viewport')]")
+                                else:
+                                    container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-pinned-left-header')]")
+                            rows = container.find_elements_by_xpath(".//div[@role='row']")
+                            row_count = len(rows)
+                            if(row_count>=0):
+                                status=TEST_RESULT_PASS
+                                methodoutput=TEST_RESULT_TRUE
+                                logger.print_on_console('Row count is  : ',str(row_count))
+                        else:
+                            local_tk.log.debug('performing java script on element')
+                            js='var targetTable = arguments[0]; var rowCount = targetTable.rows; return rowCount.length;'
+                            row_count = browser_Keywords.local_bk.driver_obj.execute_script(js,webElement)
+                            if(row_count>=0):
+                                status=TEST_RESULT_PASS
+                                methodoutput=TEST_RESULT_TRUE
+                                logger.print_on_console('Row count is  : ',str(row_count))
                     else:
                         err_msg='Element not found'
                         local_tk.log.error('Element not found')
@@ -80,14 +108,46 @@ class TableOperationKeywords():
                 try:
                     local_tk.log.debug('checking for element')
                     if webElement!=None:
-                        local_tk.log.debug('performing java script on element')
-                        js='var targetTable = arguments[0]; var columnCount = 0; var rows = targetTable.rows; if(rows.length > 0) { 	for (var i = 0; i < rows.length; i++) { 		var cells = rows[i].cells; 		var tempColumnCount = 0; 		for (var j = 0; j < cells.length; j++) { 			tempColumnCount += cells[j].colSpan; 		} 		if (tempColumnCount > columnCount) { 			columnCount = tempColumnCount; 		} 	} } return columnCount;'
-                        coloumn_count = browser_Keywords.local_bk.driver_obj.execute_script(js,webElement)
-                        if(coloumn_count>=0):
-                            status=TEST_RESULT_PASS
-                            methodoutput=TEST_RESULT_TRUE
-##                            local_tk.log.info('Column count is : ',coloumn_count)
-                            logger.print_on_console('Column count is : ',str(coloumn_count))
+                        if webElement.get_attribute('role') == 'grid':
+                            body = True
+                            right = True
+                            if len(args)==2:
+                                input_val = args[0]
+                                if (input_val[0].lower() != 'body') : body = False
+                                if (input_val[1].lower() != 'right') : right = False
+                            if body:
+                                if right:
+                                    container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-center-cols-container')]")
+                                else:
+                                    container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-pinned-left-cols-container')]")
+                            else:
+                                if right:
+                                    container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-header-viewport')]")
+                                else:
+                                    container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-pinned-left-header')]")
+                            rows = container.find_elements_by_xpath(".//div[@role='row']")
+                            for i in rows:
+                                try:
+                                    if body:
+                                        cells = i.find_elements_by_xpath(".//div[@role='gridcell']")
+                                    else:
+                                        cells = i.find_elements_by_xpath(".//div[@role='columnheader']")
+                                    coloumn_count = len(cells)
+                                    break
+                                except:pass
+                            if(coloumn_count>=0):
+                                status=TEST_RESULT_PASS
+                                methodoutput=TEST_RESULT_TRUE
+                                logger.print_on_console('Column count is : ',str(coloumn_count))
+                        else:
+                            local_tk.log.debug('performing java script on element')
+                            js='var targetTable = arguments[0]; var columnCount = 0; var rows = targetTable.rows; if(rows.length > 0) { 	for (var i = 0; i < rows.length; i++) { 		var cells = rows[i].cells; 		var tempColumnCount = 0; 		for (var j = 0; j < cells.length; j++) { 			tempColumnCount += cells[j].colSpan; 		} 		if (tempColumnCount > columnCount) { 			columnCount = tempColumnCount; 		} 	} } return columnCount;'
+                            coloumn_count = browser_Keywords.local_bk.driver_obj.execute_script(js,webElement)
+                            if(coloumn_count>=0):
+                                status=TEST_RESULT_PASS
+                                methodoutput=TEST_RESULT_TRUE
+                                # local_tk.log.info('Column count is : ',coloumn_count)
+                                logger.print_on_console('Column count is : ',str(coloumn_count))
                 except Exception as e:
                     local_tk.log.error(e)
                     logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
@@ -112,22 +172,61 @@ class TableOperationKeywords():
                 if visibleFlag==True:
                     local_tk.log.debug('reading the inputs')
                     if(len(input_val) > 1):
-                        row_num=int(input_val[0])
-                        col_num=int(input_val[1])
-                        row_count=self.getRowCountJs(webElement)
-                        col_count=self.getColoumnCountJs(webElement)
-                        if row_num-1>row_count or col_num-1>col_count:
-                            local_tk.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                            err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                            logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                        if webElement.get_attribute('role') == 'grid':
+                            body = True
+                            right = True
+                            if len(input_val)==4:
+                                if (input_val[2].lower() != 'body') : body = False
+                                if (input_val[3].lower() != 'right') : right = False
+                            row_number=int(input_val[0]) - 1
+                            col_number=int(input_val[1]) - 1
+                            if body:
+                                if right:
+                                    container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-center-cols-container')]")
+                                else:
+                                    container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-pinned-left-cols-container')]")
+                            else:
+                                if right:
+                                    container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-header-viewport')]")
+                                else:
+                                    container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-pinned-left-header')]")
+                            rows = container.find_elements_by_xpath(".//div[@role='row']")
+                            row_count = len(rows)
+                            if(row_count>=row_number):
+                                try:
+                                    if body:
+                                        cells = rows[row_number].find_elements_by_xpath(".//div[@role='gridcell']")
+                                    else:
+                                        cells = rows[row_number].find_elements_by_xpath(".//div[@role='columnheader']")
+                                    coloumn_count = len(cells)
+                                    if (coloumn_count>=col_number):
+                                        try:
+                                            cellVal = self.getChildNodes(cells[col_number])
+                                            cellVal=cellVal.strip()
+                                            local_tk.log.info('Got the result : %s',str(cellVal))
+                                            logger.print_on_console('Cell value is : ',str(cellVal))
+                                            status=TEST_RESULT_PASS
+                                            methodoutput=TEST_RESULT_TRUE
+                                        except:pass
+                                except:pass
+
                         else:
-                            remoteWebElement=self.javascriptExecutor(webElement,row_num-1,col_num-1)
-                            cellVal=self.getChildNodes(remoteWebElement)
-                            cellVal=cellVal.strip()
-                            local_tk.log.info('Got the result : %s',str(cellVal))
-                            logger.print_on_console('Cell value is : ',str(cellVal))
-                            status=TEST_RESULT_PASS
-                            methodoutput=TEST_RESULT_TRUE
+                            row_num=int(input_val[0])
+                            col_num=int(input_val[1])
+                            row_count=self.getRowCountJs(webElement)
+                            col_count=self.getColoumnCountJs(webElement)
+                            if row_num-1>row_count or col_num-1>col_count:
+                                local_tk.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                                logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                            else:
+                                remoteWebElement=self.javascriptExecutor(webElement,row_num-1,col_num-1)
+                                cellVal=self.getChildNodes(remoteWebElement)
+                                cellVal=cellVal.strip()
+                                local_tk.log.info('Got the result : %s',str(cellVal))
+                                logger.print_on_console('Cell value is : ',str(cellVal))
+                                status=TEST_RESULT_PASS
+                                methodoutput=TEST_RESULT_TRUE
                     else:
                         local_tk.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                         err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
@@ -157,32 +256,81 @@ class TableOperationKeywords():
                 if visibleFlag==True:
                     local_tk.log.debug('reading the inputs')
                     if(len(input_val) > 1):
-                        row_num=int(input_val[0])
-                        col_num=int(input_val[1])
-                        row_count=self.getRowCountJs(webElement)
-                        col_count=self.getColoumnCountJs(webElement)
-                        if row_num>row_count or col_num>col_count:
-                            local_tk.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                            err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                            logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                        else:
-                            remoteWebElement=self.javascriptExecutor(webElement,row_num-1,col_num-1)
-                            cellVal=self.getChildNodes(remoteWebElement)
-                            cellVal=cellVal.strip()
-                            expected_value=input_val[2].strip()
-                            coreutilsobj=core_utils.CoreUtils()
-                            expected_value=coreutilsobj.get_UTF_8(expected_value)
-                            if(cellVal == expected_value):
-                                local_tk.log.info('Got the result : %s', 'PASS')
-                                logger.print_on_console('Got the result : ','PASS')
-                                status=TEST_RESULT_PASS
-                                methodoutput=TEST_RESULT_TRUE
+                        if webElement.get_attribute('role') == 'grid':
+                            body = True
+                            right = True
+                            if len(input_val)==5:
+                                if (input_val[3].lower() != 'body') : body = False
+                                if (input_val[4].lower() != 'right') : right = False
+                            row_number=int(input_val[0]) - 1
+                            col_number=int(input_val[1]) - 1
+                            if body:
+                                if right:
+                                    container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-center-cols-container')]")
+                                else:
+                                    container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-pinned-left-cols-container')]")
                             else:
-                                local_tk.log.info(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
-                                err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
-                                logger.print_on_console(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
-                                logger.print_on_console('Actual value is : ',str(cellVal))
-                                logger.print_on_console('Expected value is : ',str(expected_value))
+                                if right:
+                                    container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-header-viewport')]")
+                                else:
+                                    container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-pinned-left-header')]")
+                            rows = container.find_elements_by_xpath(".//div[@role='row']")
+                            row_count = len(rows)
+                            if(row_count>=row_number):
+                                try:
+                                    if body:
+                                        cells = rows[row_number].find_elements_by_xpath(".//div[@role='gridcell']")
+                                    else:
+                                        cells = rows[row_number].find_elements_by_xpath(".//div[@role='columnheader']")
+                                    coloumn_count = len(cells)
+                                    if (coloumn_count>=col_number):
+                                        try:
+                                            cellVal = self.getChildNodes(cells[col_number])
+                                            cellVal=cellVal.strip()
+                                            expected_value=input_val[2].strip()
+                                            coreutilsobj=core_utils.CoreUtils()
+                                            expected_value=coreutilsobj.get_UTF_8(expected_value)
+                                            if(cellVal == expected_value):
+                                                local_tk.log.info('Got the result : %s', 'PASS')
+                                                logger.print_on_console('Got the result : ','PASS')
+                                                status=TEST_RESULT_PASS
+                                                methodoutput=TEST_RESULT_TRUE
+                                            else:
+                                                local_tk.log.info(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
+                                                err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
+                                                logger.print_on_console(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
+                                                logger.print_on_console('Actual value is : ',str(cellVal))
+                                                logger.print_on_console('Expected value is : ',str(expected_value))
+                                        except:pass
+                                except:pass
+
+                        else:
+                            row_num=int(input_val[0])
+                            col_num=int(input_val[1])
+                            row_count=self.getRowCountJs(webElement)
+                            col_count=self.getColoumnCountJs(webElement)
+                            if row_num>row_count or col_num>col_count:
+                                local_tk.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                                logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                            else:
+                                remoteWebElement=self.javascriptExecutor(webElement,row_num-1,col_num-1)
+                                cellVal=self.getChildNodes(remoteWebElement)
+                                cellVal=cellVal.strip()
+                                expected_value=input_val[2].strip()
+                                coreutilsobj=core_utils.CoreUtils()
+                                expected_value=coreutilsobj.get_UTF_8(expected_value)
+                                if(cellVal == expected_value):
+                                    local_tk.log.info('Got the result : %s', 'PASS')
+                                    logger.print_on_console('Got the result : ','PASS')
+                                    status=TEST_RESULT_PASS
+                                    methodoutput=TEST_RESULT_TRUE
+                                else:
+                                    local_tk.log.info(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
+                                    err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
+                                    logger.print_on_console(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
+                                    logger.print_on_console('Actual value is : ',str(cellVal))
+                                    logger.print_on_console('Expected value is : ',str(expected_value))
 
                     else:
                         local_tk.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
@@ -258,6 +406,8 @@ class TableOperationKeywords():
             param  : webelement,list
             return : bool
             """
+
+
         def verifyCellToolTip(self,webElement,input_val,*args):
             logger.print_on_console('Executing keyword : verifyCellToolTip')
             status=TEST_RESULT_FAIL
@@ -332,7 +482,39 @@ class TableOperationKeywords():
                 visibleFlag=True
                 if visibleFlag==True:
                     try:
-                        if len(input_arr)==2:
+                        if webElement.get_attribute('role') == 'grid':
+                            body = True
+                            right = True
+                            if len(input_arr)==4:
+                                if (input_arr[2].lower() != 'body') : body = False
+                                if (input_arr[3].lower() != 'right') : right = False
+                            if body:
+                                if right:
+                                    container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-center-cols-container')]")
+                                else:
+                                    container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-pinned-left-cols-container')]")
+                            else:
+                                if right:
+                                    container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-header-viewport')]")
+                                else:
+                                    container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-pinned-left-header')]")
+                            rows = container.find_elements_by_xpath(".//div[@role='row']")
+                            row_count = len(rows)
+                            if(row_count>=row_number):
+                                try:
+                                    if body:
+                                        cells = rows[row_number].find_elements_by_xpath(".//div[@role='gridcell']")
+                                    else:
+                                        cells = rows[row_number].find_elements_by_xpath(".//div[@role='columnheader']")
+                                    coloumn_count = len(cells)
+                                    if (coloumn_count>=col_number):
+                                        try:
+                                            cells[col_number].click()
+                                            status=TEST_RESULT_PASS
+                                            methodoutput=TEST_RESULT_TRUE
+                                        except:pass
+                                except:pass
+                        elif len(input_arr)==2:
                             local_tk.log.info('normal cell click')
                             #logger.print_on_console('normal cell click inside the cell')
                             cell=self.javascriptExecutor(webElement,row_number,col_number)
@@ -552,24 +734,25 @@ class TableOperationKeywords():
                     local_tk.log.info(ERROR_CODE_DICT['ERR_HIDDEN_OBJECT'])
                     err_msg = ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
                     logger.print_on_console(ERROR_CODE_DICT['ERR_HIDDEN_OBJECT'])
-                return status,methodoutput,output_val,err_msg
+                # return status,methodoutput,output_val,err_msg
             else:
                 local_tk.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                 err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                 logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+            return status,methodoutput,output_val,err_msg
 ##
 ##            return status,methodoutput,output_val,err_msg
 
 
 
-        def getRowNumByText(self,webElement,text,*args):
+        def getRowNumByText(self,webElement,input_val,*args):
             logger.print_on_console('Executing keyword : getRowNumByText')
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
             row_number=None
             err_msg=None
             local_tk.log.debug('reading the inputs')
-            text=text[0].strip()
+            text=input_val[0].strip()
             coreutilsobj=core_utils.CoreUtils()
             text=coreutilsobj.get_UTF_8(text)
             local_tk.driver=browser_Keywords.local_bk.driver_obj
@@ -578,11 +761,45 @@ class TableOperationKeywords():
             if (webElement is not None):
                 if visibleFlag==True:
                     try:
-                        js='var temp = fun(arguments[0], arguments[1]); return temp; function fun(table, str) {     var m = [],         row, cell, xx, tx, ty, xxx, yyy, child;     for (yyy = 0; yyy < table.rows.length; yyy++) {         row = table.rows[yyy];         for (xxx = 0; xxx < row.cells.length; xxx++) {             cell = row.cells[xxx];             xx = xxx;             for (; m[yyy] && m[yyy][xx]; ++xx) {}             for (tx = xx; tx < xx + cell.colSpan; ++tx) {                 for (ty = yyy; ty < yyy + cell.rowSpan; ++ty) {                     if (!m[ty]) m[ty] = [];                     m[ty][tx] = true;                 }             }             if (cell.innerText.indexOf(str)>= 0) return yyy + cell.rowSpan;             else if (cell.children.length > 0) {                 for (var i = 0; i < cell.children.length; i++) {                     child = cell.children[i];                     if (child.value == str) return yyy + cell.rowSpan; 					else{ 					var a=child.value; 					if(a){ 					var b=a; 					if(b.indexOf(str)>=0)return yyy + cell.rowSpan; 					}	 				}			 					                 }             }         }     }     return null; };'
-                        row_number=browser_Keywords.local_bk.driver_obj.execute_script(js,webElement,text)
-                        if row_number:
-                            status=TEST_RESULT_PASS
-                            methodoutput=TEST_RESULT_TRUE
+                        if webElement.get_attribute('role') == 'grid':
+                            body = True
+                            right = True
+                            if len(input_val)==3:
+                                if (input_val[1].lower() != 'body') : body = False
+                                if (input_val[2].lower() != 'right') : right = False
+                            if body:
+                                if right:
+                                    container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-center-cols-container')]")
+                                else:
+                                    container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-pinned-left-cols-container')]")
+                            else:
+                                if right:
+                                    container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-header-viewport')]")
+                                else:
+                                    container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-pinned-left-header')]")
+                            rows = container.find_elements_by_xpath(".//div[@role='row']")
+                            for i in range(len(rows)):
+                                if body:
+                                    cells = rows[i].find_elements_by_xpath(".//div[@role='gridcell']")
+                                else:
+                                    cells = rows[i].find_elements_by_xpath(".//div[@role='columnheader']")
+                                for j in range(len(cells)):
+                                    cellVal = self.getChildNodes(cells[j])
+                                    cellVal=cellVal.strip()
+                                    if text in cellVal:
+                                        row_number = i+1
+                                        break
+                                if row_number:
+                                    break
+                            if row_number:
+                                status=TEST_RESULT_PASS
+                                methodoutput=TEST_RESULT_TRUE
+                        else:
+                            js='var temp = fun(arguments[0], arguments[1]); return temp; function fun(table, str) {     var m = [],         row, cell, xx, tx, ty, xxx, yyy, child;     for (yyy = 0; yyy < table.rows.length; yyy++) {         row = table.rows[yyy];         for (xxx = 0; xxx < row.cells.length; xxx++) {             cell = row.cells[xxx];             xx = xxx;             for (; m[yyy] && m[yyy][xx]; ++xx) {}             for (tx = xx; tx < xx + cell.colSpan; ++tx) {                 for (ty = yyy; ty < yyy + cell.rowSpan; ++ty) {                     if (!m[ty]) m[ty] = [];                     m[ty][tx] = true;                 }             }             if (cell.innerText.indexOf(str)>= 0) return yyy + cell.rowSpan;             else if (cell.children.length > 0) {                 for (var i = 0; i < cell.children.length; i++) {                     child = cell.children[i];                     if (child.value == str) return yyy + cell.rowSpan; 					else{ 					var a=child.value; 					if(a){ 					var b=a; 					if(b.indexOf(str)>=0)return yyy + cell.rowSpan; 					}	 				}			 					                 }             }         }     }     return null; };'
+                            row_number=browser_Keywords.local_bk.driver_obj.execute_script(js,webElement,text)
+                            if row_number:
+                                status=TEST_RESULT_PASS
+                                methodoutput=TEST_RESULT_TRUE
                         local_tk.log.info('Got the result : %s',str(row_number))
                         logger.print_on_console('Got the result : ',str(row_number))
                     except Exception as e:
@@ -597,7 +814,7 @@ class TableOperationKeywords():
                 err_msg = ERROR_CODE_DICT['MSG_ELEMENT_NOT_FOUND']
             return status,methodoutput,row_number,err_msg
 
-        def getColNumByText(self,webElement,text,*args):
+        def getColNumByText(self,webElement,input_val,*args):
             logger.print_on_console('Executing keyword : getColNumByText')
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
@@ -607,16 +824,51 @@ class TableOperationKeywords():
             local_tk.log.debug('got the driver instance from browser keyword')
             visibleFlag=True
             local_tk.log.debug('reading the inputs')
-            text=text[0].strip()
+            text=input_val[0].strip()
             coreutilsobj=core_utils.CoreUtils()
             text=coreutilsobj.get_UTF_8(text)
             if (webElement is not None):
                 if visibleFlag==True:
                     try:
-                        js='var temp = fun(arguments[0], arguments[1]); return temp; function fun(table, str) {     var m = [],         row, cell, xx, tx, ty, xxx, yyy, child;     for (yyy = 0; yyy < table.rows.length; yyy++) {         row = table.rows[yyy];         for (xxx = 0; xxx < row.cells.length; xxx++) {             cell = row.cells[xxx];             xx = xxx;             for (; m[yyy] && m[yyy][xx]; ++xx) {}             for (tx = xx; tx < xx + cell.colSpan; ++tx) {                 for (ty = yyy; ty < yyy + cell.rowSpan; ++ty) {                     if (!m[ty]) m[ty] = [];                     m[ty][tx] = true;                 }             }             if (cell.innerText.indexOf(str)>= 0) return xx + cell.colSpan;             else if (cell.children.length > 0) {                 for (var i = 0; i < cell.children.length; i++) {                     child = cell.children[i];                     if (child.value == str) return xx + cell.colSpan; 					else{ 					var a=child.value; 					if(a){ 					var b=a; 					if(b.indexOf(str)>=0)return xx + cell.colSpan; 					}	 				}			 					                 }             }         }     }     return null; };'
-                        col_number=local_tk.driver.execute_script(js,webElement,text)
-                        status=TEST_RESULT_PASS
-                        methodoutput=TEST_RESULT_TRUE
+                        if webElement.get_attribute('role') == 'grid':
+                            body = True
+                            right = True
+                            if len(input_val)==3:
+                                if (input_val[1].lower() != 'body') : body = False
+                                if (input_val[2].lower() != 'right') : right = False
+                            if body:
+                                if right:
+                                    container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-center-cols-container')]")
+                                else:
+                                    container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-pinned-left-cols-container')]")
+                            else:
+                                if right:
+                                    container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-header-viewport')]")
+                                else:
+                                    container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-pinned-left-header')]")
+                            rows = container.find_elements_by_xpath(".//div[@role='row']")
+                            for i in range(len(rows)):
+                                if body:
+                                    cells = rows[i].find_elements_by_xpath(".//div[@role='gridcell']")
+                                else:
+                                    cells = rows[i].find_elements_by_xpath(".//div[@role='columnheader']")
+                                for j in range(len(cells)):
+                                    cellVal = self.getChildNodes(cells[j])
+                                    cellVal=cellVal.strip()
+                                    if text in cellVal:
+                                        col_number = j+1
+                                        break
+                                if col_number:
+                                    break
+                            if col_number:
+                                status=TEST_RESULT_PASS
+                                methodoutput=TEST_RESULT_TRUE
+                        else:
+                            js='var temp = fun(arguments[0], arguments[1]); return temp; function fun(table, str) {     var m = [],         row, cell, xx, tx, ty, xxx, yyy, child;     for (yyy = 0; yyy < table.rows.length; yyy++) {         row = table.rows[yyy];         for (xxx = 0; xxx < row.cells.length; xxx++) {             cell = row.cells[xxx];             xx = xxx;             for (; m[yyy] && m[yyy][xx]; ++xx) {}             for (tx = xx; tx < xx + cell.colSpan; ++tx) {                 for (ty = yyy; ty < yyy + cell.rowSpan; ++ty) {                     if (!m[ty]) m[ty] = [];                     m[ty][tx] = true;                 }             }             if (cell.innerText.indexOf(str)>= 0) return xx + cell.colSpan;             else if (cell.children.length > 0) {                 for (var i = 0; i < cell.children.length; i++) {                     child = cell.children[i];                     if (child.value == str) return xx + cell.colSpan; 					else{ 					var a=child.value; 					if(a){ 					var b=a; 					if(b.indexOf(str)>=0)return xx + cell.colSpan; 					}	 				}			 					                 }             }         }     }     return null; };'
+                            col_number=local_tk.driver.execute_script(js,webElement,text)
+                            if col_number:
+                                status=TEST_RESULT_PASS
+                                methodoutput=TEST_RESULT_TRUE
                         local_tk.log.info('Got the result : %s',str(col_number))
                         logger.print_on_console('Got the result : ',str(col_number))
                     except Exception as e:
@@ -720,9 +972,9 @@ class TableOperationKeywords():
                         else:
                             web_element = None
                             err_msg = 'Table element not found'
-##                    elif(len(input_val == 0)):
-##                        script = """var ele = arguments[0]; var temp = fun(ele); console.log(temp); return temp;  function fun(tableEle) {     eleCollection = tableEle.getElementsByTagName('table');     if (eleCollection.length > 0) {         console.log(eleCollection.length);         return eleCollection[0];     }     return "null";     console.log("No Inner Table") };"""
-##                        web_element = browser_Keywords.driver_obj.execute_script(script)
+                    ##elif(len(input_val == 0)):
+                    ##    script = """var ele = arguments[0]; var temp = fun(ele); console.log(temp); return temp;  function fun(tableEle) {     eleCollection = tableEle.getElementsByTagName('table');     if (eleCollection.length > 0) {         console.log(eleCollection.length);         return eleCollection[0];     }     return "null";     console.log("No Inner Table") };"""
+                    ##    web_element = browser_Keywords.driver_obj.execute_script(script)
                 except Exception as e:
                     local_tk.log.error(e)
                     logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
@@ -794,6 +1046,146 @@ class TableOperationKeywords():
                                 err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
             return status,result,verb,err_msg
 
+
+
+        def verticalScroll(self,webElement,input,*args):
+            logger.print_on_console('Executing keyword : verticalScroll')
+            local_tk.driver=browser_Keywords.local_bk.driver_obj
+            local_tk.log.debug('got the driver instance from browser keyword')
+            status=TEST_RESULT_FAIL
+            methodoutput=TEST_RESULT_FALSE
+            output_val=OUTPUT_CONSTANT
+            visibleFlag=True
+            err_msg=None
+            if visibleFlag==True:
+                try:
+                    local_tk.log.debug('checking for element')
+                    if webElement!=None:
+                        if webElement.get_attribute('role') == 'grid':
+                            container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-body-viewport')]//div[@class='ag-center-cols-container']")
+                            loc = container.location
+                            if loc.get('y') < 0:
+                                loc = container.location_once_scrolled_into_view
+                            local_tk.log.debug("Mouse hover at location:"+str(int(loc.get('x')) + 100)+","+str(int(loc.get('y') + 150)))
+                            direction = input[0]
+                            times = int(input[1])
+                            if SYSTEM_OS == "Windows":
+                                user32 = windll.user32
+                                user32.SetCursorPos(int(loc.get('x')) + 100, int(loc.get('y') + 150))
+                                time.sleep(1)
+                                if direction.lower() == 'up':
+                                    for i in range(times):
+                                        user32.mouse_event(0x0800, None, None, 400, None)
+                                elif direction.lower() == 'down':
+                                    for i in range(times):
+                                        user32.mouse_event(0x0800, None, None, -400, None)
+                                else:
+                                    err_msg='Direction given is incorrect'
+                                    local_tk.log.error('Direction given is incorrect')
+                                    logger.print_on_console('Direction given is incorrect')
+                            else:
+                                if direction.lower() == 'down':
+                                    times = (times * (-4))
+                                    mouse = Controller()
+                                    mouse.position = (int(loc.get('x')) + 100, int(loc.get('y') + 150))
+                                    time.sleep(1)
+                                    mouse.scroll(0, times)
+                                    del mouse
+                                elif direction.lower() == 'up':
+                                    times = (times * 4)
+                                    mouse = Controller()
+                                    mouse.position = (int(loc.get('x')) + 100, int(loc.get('y') + 150))
+                                    time.sleep(1)
+                                    mouse.scroll(0, times)
+                                    del mouse
+
+                            status=TEST_RESULT_PASS
+                            methodoutput=TEST_RESULT_TRUE
+                    else:
+                        err_msg='Element not found'
+                        local_tk.log.error('Element not found')
+                        logger.print_on_console('Element not found')
+                except Exception as e:
+                    local_tk.log.error(e, exc_info = True)
+                    logger.print_on_console(e)
+                    err_msg = ERROR_CODE_DICT['MSG_ELEMENT_NOT_FOUND']
+            else:
+                local_tk.log.info(ERROR_CODE_DICT['ERR_HIDDEN_OBJECT'])
+                err_msg = ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
+                logger.print_on_console(ERROR_CODE_DICT['ERR_HIDDEN_OBJECT'])
+            return status,methodoutput,output_val,err_msg
+
+
+        def horizontalScroll(self,webElement,input,*args):
+            logger.print_on_console('Executing keyword : horizontalScroll')
+            local_tk.driver=browser_Keywords.local_bk.driver_obj
+            local_tk.log.debug('got the driver instance from browser keyword')
+            status=TEST_RESULT_FAIL
+            methodoutput=TEST_RESULT_FALSE
+            output_val=OUTPUT_CONSTANT
+            visibleFlag=True
+            err_msg=None
+            if visibleFlag==True:
+                try:
+                    local_tk.log.debug('checking for element')
+                    if webElement!=None:
+                        if webElement.get_attribute('role') == 'grid':
+                            container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-body-viewport')]//div[@class='ag-center-cols-container']")
+                            loc = container.location
+                            if loc.get('y') < 0:
+                                loc = container.location_once_scrolled_into_view
+                            local_tk.log.debug("Mouse hover at location:"+str(int(loc.get('x')) + 100)+","+str(int(loc.get('y') + 150)))
+                            direction = input[0]
+                            times = int(input[1])
+                            if SYSTEM_OS == "Windows":
+                                user32 = windll.user32
+                                user32.SetCursorPos(int(loc.get('x')) + 100, int(loc.get('y') + 150))#self.robot.set_mouse_pos(int(loc.get('x')) + 100, int(loc.get('y') + 150))
+                                time.sleep(1)
+                                if direction.lower() == 'right':
+                                    for i in range(times):
+                                        user32.mouse_event(0x01000, None, None, 400, None)
+                                elif direction.lower() == 'left':
+                                    for i in range(times):
+                                        user32.mouse_event(0x01000, None, None, -400, None)
+                                else:
+                                    err_msg='Direction given is incorrect'
+                                    local_tk.log.error('Direction given is incorrect')
+                                    logger.print_on_console('Direction given is incorrect')
+                            else:
+                                if direction.lower() == 'left':
+                                    times = (times * (-4))
+                                    mouse = Controller()
+                                    mouse.position = (int(loc.get('x')) + 100, int(loc.get('y') + 150))
+                                    time.sleep(1)
+                                    mouse.scroll(times,0)
+                                    del mouse
+                                elif direction.lower() == 'right':
+                                    times = (times * 4)
+                                    mouse = Controller()
+                                    mouse.position = (int(loc.get('x')) + 100, int(loc.get('y') + 150))
+                                    time.sleep(1)
+                                    mouse.scroll(times,0)
+                                    del mouse
+                                else:
+                                    err_msg='Direction given is incorrect'
+                                    local_tk.log.error('Direction given is incorrect')
+                                    logger.print_on_console('Direction given is incorrect')
+
+                            status=TEST_RESULT_PASS
+                            methodoutput=TEST_RESULT_TRUE
+                    else:
+                        err_msg='Element not found'
+                        local_tk.log.error('Element not found')
+                        logger.print_on_console('Element not found')
+                except Exception as e:
+                    local_tk.log.error(e,exc_info=True)
+                    logger.print_on_console(e)
+                    err_msg = ERROR_CODE_DICT['MSG_ELEMENT_NOT_FOUND']
+            else:
+                local_tk.log.info(ERROR_CODE_DICT['ERR_HIDDEN_OBJECT'])
+                err_msg = ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
+                logger.print_on_console(ERROR_CODE_DICT['ERR_HIDDEN_OBJECT'])
+            return status,methodoutput,output_val,err_msg
 
 
 

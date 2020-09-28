@@ -34,7 +34,7 @@ class ScrapeWindow(wx.Frame):
         self.socketIO = socketIO
         self.action = action
         self.data = data
-        self.scrapeoptions = ["Full",'Button','Checkbox','Radiobutton','Dropdown','ListBox','Image','Link','TextBox','Table','Element','Other tag','Select A Section using XPath']
+        self.scrapeoptions = ["Full",'Button','Checkbox','Radiobutton','Dropdown','Grid','ListBox','Image','Link','TextBox','Table','Element','Other tag','Select A Section using XPath']
         self.scrape_selected_option = ["full"]
         self.window_handle_number = 0
         self.window_selected = False

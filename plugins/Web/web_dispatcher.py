@@ -85,6 +85,10 @@ class Dispatcher:
             'getrownumbytext' : local_Wd.table_object.getRowNumByText,
             'getcolnumbytext' : local_Wd.table_object.getColNumByText,
             'getinnertable' : local_Wd.table_object.getInnerTable,
+            # grid keywords
+            'horizontalscroll' : local_Wd.table_object.horizontalScroll,
+            'verticalscroll' : local_Wd.table_object.verticalScroll,
+
             #author : arpitha.b.v
             #added mapping of 'getCellToolTip' and 'verifyCellToolTip' to table object
             'getcelltooltip' : local_Wd.table_object.getCellToolTip,

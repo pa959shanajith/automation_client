@@ -1480,6 +1480,13 @@ class StepDescription:
             return 'Get row number of ' + "'" + tsp.custname + "'" + ' by text '+"'"+input +"'"+' and save the row number ' +"'"+output +"'"+ ' in '+"'"+tsp.outputval+"'"
         def getcellvalue():
             return 'Get cell value of ' + "'" + tsp.custname +'['+inputval[0]+']['+inputval[1]+']'+"'" + ' in the table and save the value ' +"'"+output +"'"+ ' in '+"'"+tsp.outputval+"'"
+        
+        #grid keywords
+        def horizontalscroll():
+            return 'Horizontal scroll has been performed'
+        def verticalscroll():
+            return 'Vertical scroll has been performed'
+        
         #custom keyword
         def getobjectcount():
             return 'Get Object count of the type '+"'" +ele_type+"'" +' and save the count '+"'" +output+"'" +' in '+"'"+tsp.outputval+"'"
