@@ -87,6 +87,8 @@ class GenericKeywordDispatcher:
             'renamefile':local_generic.generic_file.rename_file,
             'deletefile':local_generic.generic_file.delete_file,
             'verifyfileexists':local_generic.generic_file.verify_file_exists,
+            'copyfilefolder':local_generic.generic_file.copyFileFolder,
+            'movefilefolder':local_generic.generic_file.moveFileFolder,
             'createfolder':local_generic.genric_folder.create_folder,
             'renamefolder':local_generic.genric_folder.rename_folder,
             'deletefolder':local_generic.genric_folder.delete_folder,
