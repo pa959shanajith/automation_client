@@ -1046,7 +1046,7 @@ class TableOperationKeywords():
                                 logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
                                 err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
             return status,result,verb,err_msg
-
+ 
 
 
         def verticalScroll(self,webElement,input,*args):

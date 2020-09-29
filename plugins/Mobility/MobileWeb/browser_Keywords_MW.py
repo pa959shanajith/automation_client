@@ -93,14 +93,14 @@ class BrowserKeywords():
                     if server_flag: break
                     time.sleep(5)
                 if err_msg is None:
-                    logger.print_on_console('Server started')
+                    logger.print_on_console('Browser session started')
                     return True
             else:
                 path = curdir + '/plugins/Mobility/MobileApp/node_modules/appium/build/lib/main.js'
                 nodePath = curdir + '/plugins/Mobility/MobileApp/node_modules/node_appium'
                 proc = subprocess.Popen([nodePath, path], shell=False, stdin=None, stdout=None, stderr=None, close_fds=True)
                 time.sleep(25) # psutil.net_connections() doesn't work on Mac, insearch of alternatives
-                logger.print_on_console('Server started')
+                logger.print_on_console('Browser session started')
                 return True
         except Exception as e:
             err_msg = 'Error while starting server'

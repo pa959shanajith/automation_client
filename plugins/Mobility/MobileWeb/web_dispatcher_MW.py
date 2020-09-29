@@ -125,6 +125,7 @@ class Dispatcher:
         'verifyvaluesexists':dropdown_list_object.verifyValuesExists,
         'deselectall':dropdown_list_object.deselectAll,
         'selectbyabsolutevalue':dropdown_list_object.selectByAbsoluteValue,
+        'getallvalues':dropdown_list_object.getAllValues,
 
 
         'verifyvisible':util_object.verify_visible,
