@@ -116,6 +116,12 @@ class StepDescription:
 ##            }
             return  "Cleard all the content of the file '"
 
+        #File-Folder operations
+        def copyfilefolder():
+            return "The file/folder has been copied"
+        def movefilefolder():
+            return "The file/folder has been moved"
+
         #Folder operations
         def createfolder():
             return "Create a folder: '"+ inputval[1] + "' in the path: '" + inputval[0]+"'"
