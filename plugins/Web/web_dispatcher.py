@@ -92,7 +92,7 @@ class Dispatcher:
             'cellclick' : local_Wd.table_object.cellClick,
             'getrownumbytext' : local_Wd.table_object.getRowNumByText,
             'getcolnumbytext' : local_Wd.table_object.getColNumByText,
-            'getinnertable' : local_Wd.table_object.getInnerTable,
+            'getinnertable' : local_Wd.table_object.getInnerTable,            
             #author : arpitha.b.v
             #added mapping of 'getCellToolTip' and 'verifyCellToolTip' to table object
             'getcelltooltip' : local_Wd.table_object.getCellToolTip,
