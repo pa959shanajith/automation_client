@@ -199,23 +199,27 @@ class UtilWebKeywords:
         try:
             if webelement is not None:
                 #call to highlight the webelement
-                self.highlight(webelement)
-                if readconfig.configvalues['ignoreVisibilityCheck'].strip().lower()=="no":
-                    res=self.is_visible(webelement)
+                visibility=webelement.is_displayed()
+                if visibility:
+                    self.highlight(webelement)
+                    if readconfig.configvalues['ignoreVisibilityCheck'].strip().lower()=="no":
+                        res=self.is_visible(webelement)
+                    else:
+                        res=True
+                    if webelement.is_enabled() and not(res):
+                        info_msg=ERROR_CODE_DICT['The object is Hidden']
+                        logger.print_on_console(info_msg)
+                        log.info(info_msg)
+                    elif webelement.is_enabled() and res:
+                        status=TEST_RESULT_PASS
+                        methodoutput=TEST_RESULT_TRUE
+                        info_msg=ERROR_CODE_DICT['MSG_OBJECT_ENABLED']
+                        logger.print_on_console(info_msg)
+                        log.info(info_msg)
+                    else:
+                        err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
                 else:
-                    res=True
-                if webelement.is_enabled() and not(res):
-                    info_msg=ERROR_CODE_DICT['The object is Hidden']
-                    logger.print_on_console(err_msg)
-                    log.info(info_msg)
-                elif webelement.is_enabled() and res:
-                    status=TEST_RESULT_PASS
-                    methodoutput=TEST_RESULT_TRUE
-                    info_msg=ERROR_CODE_DICT['MSG_OBJECT_ENABLED']
-                    logger.print_on_console(err_msg)
-                    log.info(info_msg)
-                else:
-                    err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
+                    err_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
         except Exception as e:
             err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
             log.error(e)
@@ -273,7 +277,6 @@ class UtilWebKeywords:
                     methodoutput=TEST_RESULT_TRUE
                 else:
                     err_msg=ERROR_CODE_DICT['ERR_OBJECT_VISIBLE']
-                    logger.print_on_console(err_msg)
                     log.error(err_msg)
         except Exception as e:
             err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']

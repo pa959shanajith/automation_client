@@ -537,7 +537,6 @@ class DropdownKeywords():
                                 result = webconstants_MW.TEST_RESULT_TRUE
                                 log.info(STATUS_METHODOUTPUT_UPDATE)
                             else:
-                                logger.print_on_console('Count mismatched')
                                 log.info('Count mismatched')
                                 err_msg = 'Count mismatched'
                         else:
@@ -563,7 +562,6 @@ class DropdownKeywords():
                                     result=webconstants_MW.TEST_RESULT_TRUE
                                     log.info(STATUS_METHODOUTPUT_UPDATE)
                                 else:
-                                    logger.print_on_console('Count mismatched')
                                     log.info('Count mismatched')
                                     err_msg = 'Count mismatched'
                                     logger.print_on_console(EXPECTED,input_val)

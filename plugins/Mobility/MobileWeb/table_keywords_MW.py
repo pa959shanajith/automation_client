@@ -101,7 +101,7 @@ class TableOperationKeywords():
             cellVal=None
             err_msg=None
             driver=browser_Keywords_MW.driver_obj
-            logger.print_on_console('got the driver instance from browser keyword')
+            logger.debug('got the driver instance from browser keyword')
             visibleFlag=True
             try:
                 if visibleFlag==True:
