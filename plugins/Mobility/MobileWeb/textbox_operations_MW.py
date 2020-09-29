@@ -266,14 +266,14 @@ class TextboxKeywords:
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
                 else:
-                    err_msg='Textbox length is '+str(length)
+                    err_msg='Textbox does not have length'
             except Exception as e:
                 err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
                 log.error(e)
             if err_msg is not None:
                 logger.print_on_console(err_msg)
                 log.error(err_msg)
-        logger.print_on_console('Textbox length is '+str(length))
+        # logger.print_on_console('Textbox length is '+str(length))
         log.info('Textbox length is '+str(length))
         return status,methodoutput,length,err_msg
 
@@ -352,8 +352,8 @@ class TextboxKeywords:
                                 browser_Keywords_MW.driver_obj.execute_script(SET_TEXT_SCRIPT,webelement,input_val)
                                 status=TEST_RESULT_PASS
                                 methodoutput=TEST_RESULT_TRUE
-                            else:
-                                err_msg=ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                            # else:
+                            #     err_msg=ERROR_CODE_DICT['ERR_INVALID_INPUT']
                         else:
                             err_msg=ERROR_CODE_DICT['ERR_ELEMENT_IS_READONLY']
                 else:
