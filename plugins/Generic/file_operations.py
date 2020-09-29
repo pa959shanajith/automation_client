@@ -323,18 +323,12 @@ class FileOperations:
                     else: err_msg = 'IOError : ' + str(e)
             else:
                 err_msg = generic_constants.INVALID_INPUT
-
-            if ( err_msg ):
-                log.error( err_msg )
-                logger.print_on_console( err_msg )
         except ValueError:
             err_msg = 'Invalid option, Please provide 1 or 0'
-            log.error( err_msg )
-            logger.print_on_console( err_msg )
         except Exception as e:
-            import traceback
-            traceback.print_exc()
-            err_msg = 'Error occurred in copyFileFolder, ERR_MSG : ' + str(e)
+            err_msg = 'Error occurred in copyFileFolder'
+            log.error(e)
+        if err_msg:
             log.error( err_msg )
             logger.print_on_console( err_msg )
         del source_path, destination_path, opt #deleting variables
@@ -444,20 +438,14 @@ class FileOperations:
                     else: err_msg = 'IOError : ' + str(e)
             else:
                 err_msg = generic_constants.INVALID_INPUT
-
-            if ( err_msg ):
-                log.error( err_msg )
-                logger.print_on_console( err_msg )
         except ValueError:
             err_msg = 'Invalid option, Please provide 1 or 0'
-            log.error( err_msg )
-            logger.print_on_console( err_msg )
         except Exception as e:
-            import traceback
-            traceback.print_exc()
-            err_msg = 'Error occurred in moveFileFolder, ERR_MSG : ' + str(e)
-            log.error( err_msg )
+            err_msg = 'Error occurred in moveFileFolder'
+            log.error(e)
+        if err_msg:
             logger.print_on_console( err_msg )
+            log.error(err_msg)
         del source_path, destination_path, opt #deleting variables
         return status, result, output_res, err_msg
 
