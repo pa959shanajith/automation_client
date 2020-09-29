@@ -1353,7 +1353,7 @@ class FileOperations:
                             res1[x].append(output)
                         x+=1
 
-            elif(extension1 in  generic_constants.EXCEL_TYPES and extension2 in generic_constants.EXCEL_TYPES):# Indicates both files are excel
+            elif(extension1=='.xlsx' and extension2=='.xlsx'):# Indicates both files are excel(.xlsx)
                 book1 = openpyxl.load_workbook(filepath1)
                 book2 = openpyxl.load_workbook(filepath2)
                 #verify whether file exists or not
@@ -1408,6 +1408,195 @@ class FileOperations:
                             res1[x].append(output)
                         x+=1
                     
+            elif(extension1=='.xls' and extension2=='.xls'):
+                book1 = open_workbook(filepath1)
+                book2 = open_workbook(filepath2)
+                sheet1 = book1.sheet_by_name(sheetname1)    
+                sheet2 = book2.sheet_by_name(sheetname2)
+
+                #verify whether file exists or not
+                result1=self.verify_file_exists(filepath1,'')
+                result2=self.verify_file_exists(filepath2,'')
+
+                col11 = " ".join(re.findall("[a-zA-Z]+", range1[0]))
+                col12 = " ".join(re.findall("[a-zA-Z]+", range1[1]))
+                row11=int(" ".join(re.findall(r'[0-9]+', range1[0])))
+                row12=int(" ".join(re.findall(r'[0-9]+', range1[1])))
+                column11=self.convert.convertStringToInt(col11)
+                column12=self.convert.convertStringToInt(col12)
+
+                col21 = " ".join(re.findall("[a-zA-Z]+", range2[0]))
+                col22 = " ".join(re.findall("[a-zA-Z]+", range2[1]))
+                row21=int(" ".join(re.findall(r'[0-9]+', range2[0])))
+                row22=int(" ".join(re.findall(r'[0-9]+', range2[1])))
+                column21=self.convert.convertStringToInt(col21)
+                column22=self.convert.convertStringToInt(col22)
+
+                output1,output2={},{}
+                x,j,z=0,0,0
+                for row in range(row11-1, row12):
+                        output1[x]=[]
+                        for col in range(column11-1,column12):
+                            cell = sheet1.cell(row,col)
+                            cell_value = cell.value
+                            if cell.ctype in (2,3) and int(cell_value) == cell_value:
+                                cell_value = int(cell_value)
+                            output1[x].append(str(cell_value))
+                        x+=1
+
+                for row in range(row21-1, row22):
+                        output2[z]=[]
+                        for col in range(column21-1,column22):
+                            cell = sheet2.cell(row,col)
+                            cell_value = cell.value
+                            if cell.ctype in (2,3) and int(cell_value) == cell_value:
+                                cell_value = int(cell_value)
+                            output2[z].append(str(cell_value))
+                        z+=1
+
+                i=list(output2.keys())[0]
+                count=0
+                for aa in range(len(output1)):
+                    res1[j]=[]
+                    for bb in range(len(output2[i])):
+                        if(case!=''):
+                            if (str(output1[aa][bb]).lower()==str(output2[aa][bb]).lower()):
+                                output='True'
+                                res1[j].append(output)
+                            else:
+                                output='False'
+                                res1[j].append(output)
+                        else:
+                            if (str(output1[aa][bb])==str(output2[aa][bb])):
+                                output='True'
+                                res1[j].append(output)
+                            else:
+                                output='False'
+                                res1[j].append(output)
+                    aa+=1
+                    j+=1
+                    count+=1
+                    if(count>=len(output2)):
+                        break
+
+                if (len(output1)<len(output2)):                    
+                    for i in range(len(output1)):
+                        output2.pop(i)
+                    xx=list(output2.keys())[0]
+                    for k in range(len(output2)):
+                        res1[j]=[]
+                        for m in range(len(output2[xx])):
+                            output='False'
+                            res1[j].append(output)
+                        j+=1
+                elif(len(output1)>len(output2)):
+                    for i in range(len(output2)):
+                        output1.pop(i)
+                    xx=list(output1.keys())[0]
+                    for k in range(len(output1)):
+                        res1[j]=[]
+                        for m in range(len(output1[xx])):
+                            output='False'
+                            res1[j].append(output)
+                        j+=1
+
+            elif((extension1=='.xls' and extension2=='.xlsx')or(extension1=='.xlsx' and extension2=='.xls')):
+                #verify whether file exists or not
+                result1=self.verify_file_exists(filepath1,'')
+                result2=self.verify_file_exists(filepath2,'')
+                output1,output2={},{}
+                x,y,j=0,0,0
+
+                if(extension1=='.xlsx'):
+                    col11 = " ".join(re.findall("[a-zA-Z]+", range2[0]))
+                    col12 = " ".join(re.findall("[a-zA-Z]+", range2[1]))
+                    row11=int(" ".join(re.findall(r'[0-9]+', range2[0])))
+                    row12=int(" ".join(re.findall(r'[0-9]+', range2[1])))
+                    column11=self.convert.convertStringToInt(col11)
+                    column12=self.convert.convertStringToInt(col12)
+
+                    book1 = openpyxl.load_workbook(filepath1)
+                    sheet1=book1.get_sheet_by_name(sheetname1)
+                    book2 = open_workbook(filepath2)
+                    sheet2 = book2.sheet_by_name(sheetname2)
+                    cell1=list(sheet1[range1[0]:range1[1]])
+
+                elif(extension2=='.xlsx'):
+                    col11 = " ".join(re.findall("[a-zA-Z]+", range1[0]))
+                    col12 = " ".join(re.findall("[a-zA-Z]+", range1[1]))
+                    row11=int(" ".join(re.findall(r'[0-9]+', range1[0])))
+                    row12=int(" ".join(re.findall(r'[0-9]+', range1[1])))
+                    column11=self.convert.convertStringToInt(col11)
+                    column12=self.convert.convertStringToInt(col12)
+
+                    book1 = openpyxl.load_workbook(filepath2)
+                    sheet1=book1.get_sheet_by_name(sheetname2)
+                    book2 = open_workbook(filepath1)
+                    sheet2 = book2.sheet_by_name(sheetname1)
+                    cell1=list(sheet1[range2[0]:range2[1]])
+
+                for eachcell in cell1:
+                    output1[x]=[]
+                    for i in range(len(eachcell)):
+                        output1[x].append(eachcell[i].value)
+                    x+=1
+
+                for row in range(row11-1, row12):
+                    output2[y]=[]
+                    for col in range(column11-1,column12):
+                        cell = sheet2.cell(row,col)
+                        cell_value = cell.value
+                        if cell.ctype in (2,3) and int(cell_value) == cell_value:
+                            cell_value = int(cell_value)
+                        output2[y].append(str(cell_value))
+                    y+=1
+
+                i=list(output2.keys())[0]
+                count=0
+                for aa in range(len(output1)):
+                    res1[j]=[]
+                    for bb in range(len(output2[i])):
+                        if(case!=''):
+                            if (str(output1[aa][bb]).lower()==str(output2[aa][bb]).lower()):
+                                output='True'
+                                res1[j].append(output)
+                            else:
+                                output='False'
+                                res1[j].append(output)
+                        else:
+                            if (str(output1[aa][bb])==str(output2[aa][bb])):
+                                output='True'
+                                res1[j].append(output)
+                            else:
+                                output='False'
+                                res1[j].append(output)
+                    aa+=1
+                    j+=1
+                    count+=1
+                    if(count>=len(output2)):
+                        break
+
+                if (len(output1)<len(output2)):                    
+                    for i in range(len(output1)):
+                        output2.pop(i)
+                    xx=list(output2.keys())[0]
+                    for k in range(len(output2)):
+                        res1[j]=[]
+                        for m in range(len(output2[xx])):
+                            output='False'
+                            res1[j].append(output)
+                        j+=1
+                elif(len(output1)>len(output2)):
+                    for i in range(len(output2)):
+                        output1.pop(i)
+                    xx=list(output1.keys())[0]
+                    for k in range(len(output1)):
+                        res1[j]=[]
+                        for m in range(len(output1[xx])):
+                            output='False'
+                            res1[j].append(output)
+                        j+=1
+
 
             else:#one excel and one csv
                 if(extension1=='.csv'):
@@ -1477,6 +1666,7 @@ class FileOperations:
                             output2[x].append(str(cell_value))
                         x+=1
 
+
                 i=list(output2.keys())[0]
                 count=0
                 for aa in range(len(output1)):
@@ -1536,7 +1726,7 @@ class FileOperations:
                 
                 logger.print_on_console( "Writing the output of selectiveCellCompare to file ")
                 msg='Output file has old entries! Erasing old data to store incoming result.'
-                if status_get_ext and file_extension is not None and file_extension in generic_constants.SELECTIVE_CELL_FILE_TYPES:
+                if status_get_ext and file_extension is not None and file_extension in generic_constants.SELECTIVE_CELL_FILE_TYPES:                    
                     if(file_extension=='.xlsx'):
                         if result==True:
                             wb=openpyxl.load_workbook(output_feild)
