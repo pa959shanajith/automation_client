@@ -92,15 +92,11 @@ class Dispatcher:
             'cellclick' : local_Wd.table_object.cellClick,
             'getrownumbytext' : local_Wd.table_object.getRowNumByText,
             'getcolnumbytext' : local_Wd.table_object.getColNumByText,
-<<<<<<< HEAD
             'getinnertable' : local_Wd.table_object.getInnerTable,
             # grid keywords
             'horizontalscroll' : local_Wd.table_object.horizontalScroll,
             'verticalscroll' : local_Wd.table_object.verticalScroll,
 
-=======
-            'getinnertable' : local_Wd.table_object.getInnerTable,            
->>>>>>> 04d26d35cc96d60a9c0e259242798f2e23f10443
             #author : arpitha.b.v
             #added mapping of 'getCellToolTip' and 'verifyCellToolTip' to table object
             'getcelltooltip' : local_Wd.table_object.getCellToolTip,
