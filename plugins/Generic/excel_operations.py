@@ -46,6 +46,7 @@ class ExcelFile:
         self.sheetname=None
         self.xls_obj=ExcelXLS()
         self.xlsx_obj=ExcelXLSX()
+        self.csv_obj=ExcelCSV()
 
         self.dict={
         'delete_row_.xls':self.xls_obj.delete_row_xls,
@@ -62,7 +63,15 @@ class ExcelFile:
         'get_rowcount_.xlsx':self.xlsx_obj.get_rowcount_xlsx,
         'get_colcount_.xlsx':self.xlsx_obj.get_colcount_xlsx,
 
+        'delete_row_.csv':self.csv_obj.delete_row_csv,
+        'read_cell_.csv':self.csv_obj.read_cell_csv,
+        'write_cell_.csv':self.csv_obj.write_cell_csv,
+        'clear_cell_.csv':self.csv_obj.clear_cell_csv,
+        'get_rowcount_.csv':self.csv_obj.get_rowcount_csv,
+        'get_colcount_.csv':self.csv_obj.get_colcount_csv,
+
         }
+
 
     def open_and_save_file(self,input_path):
         #win32 part opening and closing of file to claculate and save values of the formula
@@ -72,7 +81,6 @@ class ExcelFile:
         excel.DisplayAlerts = False
         excel_file = excel.Workbooks.Open(input_path)
         excel_file.Close(True)
-
 
 
     def __get_ext(self,input_path):
@@ -94,10 +102,11 @@ class ExcelFile:
         except Exception as e:
             log.error(e)
             err_msg=generic_constants.INVALID_FILE_FORMAT
-##            logger.print_on_console(err_msg)
+            ##logger.print_on_console(err_msg)
         return '',False,err_msg
 
-    def set_excel_path(self,input_path,sheetname):
+
+    def set_excel_path(self,input_path,*args):
         """
         def : set_excel_path
         purpose : sets the given excel file path and sheet name for excel operations
@@ -109,17 +118,39 @@ class ExcelFile:
         methodoutput=TEST_RESULT_FALSE
         output = OUTPUT_CONSTANT
         err_msg = None
-        logger.print_on_console(generic_constants.INPUT_IS+input_path+' '+sheetname)
-        if input_path != None and sheetname != None and input_path != '' and sheetname != '':
+        sheetname = args[0] if args else None
+        logger.print_on_console(generic_constants.INPUT_IS+input_path+' '+(sheetname or ''))
+        if input_path != None  and input_path != '':
             if os.path.isfile(input_path):
                 file_ext,res,err_msg=self.__get_ext(input_path)
-                if file_ext in generic_constants.EXCEL_TYPES:
+                if file_ext in generic_constants.EXCEL_TYPES and sheetname != None  and sheetname != '':
                     log.info('File type is :'+str(file_ext))
                     logger.print_on_console('File type is :'+str(file_ext))
                     self.excel_path=input_path
-                    self.sheetname=sheetname
+                    try:
+                        if file_ext.endswith('x'):
+                            wb=openpyxl.load_workbook(self.excel_path,data_only=True)
+                            sheet=wb.get_sheet_by_name(sheetname)
+                            del wb,sheet
+                        else:
+                            wb = open_workbook(self.excel_path)
+                            sheet = wb.sheet_by_name(sheetname)
+                            del wb,sheet
+                        self.sheetname=sheetname
+                        status=TEST_RESULT_PASS
+                        methodoutput=TEST_RESULT_TRUE
+                    except KeyError:
+                        err_msg="Worksheet "+sheetname+" does not exist."
+                        self.excel_path=None
+                        self.sheetname=None
+                elif file_ext == '.csv':
+                    log.info('File type is :'+str(file_ext))
+                    logger.print_on_console('File type is :'+str(file_ext))
+                    self.excel_path=input_path
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
+                else:
+                    err_msg="Error: Please check your inputs"
             else:
                 err_msg=ERROR_CODE_DICT['ERR_FILE_NOT_FOUND_EXCEPTION']
         else:
@@ -145,10 +176,10 @@ class ExcelFile:
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         try:
-            if self.excel_path != None and self.sheetname != None:
+            if self.excel_path != None:
                 file_ext,res,err_msg=self.__get_ext(self.excel_path)
                 if res:
-                    info_msg=generic_constants.INPUT_IS+self.excel_path+' '+self.sheetname+' and the row is '+str(row)
+                    info_msg=generic_constants.INPUT_IS+self.excel_path+' '+(self.sheetname or '')+' and the row is '+str(row)
                     logger.print_on_console(info_msg)
                     log.info(info_msg)
                     myfile = open(self.excel_path, "a+") # or "a+", whatever you need
@@ -186,10 +217,10 @@ class ExcelFile:
         output=None
         err_msg = None
         try:
-            if self.excel_path != None and self.sheetname != None:
+            if self.excel_path != None:
                 file_ext,res,err_msg=self.__get_ext(self.excel_path)
                 if res:
-                    info_msg=generic_constants.INPUT_IS+self.excel_path+' '+self.sheetname
+                    info_msg=generic_constants.INPUT_IS+self.excel_path+' '+(self.sheetname or '')
                     logger.print_on_console(info_msg)
                     log.info(info_msg)
                     info_msg='Row is '+str(row)+' and col is '+str(col)
@@ -253,10 +284,10 @@ class ExcelFile:
         value=coreutilsobj.get_UTF_8(value)
 
         try:
-            if self.excel_path != None and self.sheetname != None:
+            if self.excel_path != None:
                 file_ext,res,err_msg=self.__get_ext(self.excel_path)
                 if res:
-                    info_msg=generic_constants.INPUT_IS+self.excel_path+' '+self.sheetname
+                    info_msg=generic_constants.INPUT_IS+self.excel_path+' '+(self.sheetname or '')
                     log.info(info_msg)
                     #983(Sakshi) - str required when value is an int because of the error - cannot concatenate string and int.
                     if(isinstance(value,int)):
@@ -265,7 +296,7 @@ class ExcelFile:
                         #872 removed str from value to support unicode (Himanshu)
                         info_msg='Row is '+str(row)+' col is '+str(col)+' and Value: '+value
                     log.info(info_msg)
-##                    logger.print_on_console(info_msg)
+                    ##logger.print_on_console(info_msg)
                     try:
                         row=int(row)
                         col=int(col)
@@ -308,10 +339,10 @@ class ExcelFile:
         output = OUTPUT_CONSTANT
         err_msg = None
         try:
-            if self.excel_path != None and self.sheetname != None:
+            if self.excel_path != None:
                 file_ext,res,err_msg=self.__get_ext(self.excel_path)
                 if res:
-                    info_msg=generic_constants.INPUT_IS+self.excel_path+' '+self.sheetname
+                    info_msg=generic_constants.INPUT_IS+self.excel_path+' '+(self.sheetname or '')
                     logger.print_on_console(info_msg)
                     log.info(info_msg)
                     info_msg='Row is '+str(row)+' and col is '+str(col)
@@ -359,10 +390,10 @@ class ExcelFile:
         row_count=None
         err_msg = None
         try:
-            if self.excel_path != None and self.sheetname != None:
+            if self.excel_path != None:
                 file_ext,res,err_msg=self.__get_ext(self.excel_path)
                 if res:
-                    info_msg=generic_constants.INPUT_IS+self.excel_path+' '+self.sheetname
+                    info_msg=generic_constants.INPUT_IS+self.excel_path+' '+(self.sheetname or '')
                     logger.print_on_console(info_msg)
                     log.info(info_msg)
                     res,row_count,err_msg=self.dict['get_rowcount_'+file_ext](self.excel_path,self.sheetname,*args)
@@ -381,7 +412,6 @@ class ExcelFile:
         return status,methodoutput,row_count,err_msg
 
 
-
     def get_colcount(self,*args):
         """
         def : get_colcount
@@ -396,10 +426,10 @@ class ExcelFile:
         col_count=None
         err_msg = None
         try:
-            if self.excel_path != None and self.sheetname != None:
+            if self.excel_path != None:
                 file_ext,res,err_msg=self.__get_ext(self.excel_path)
                 if res:
-                    info_msg=generic_constants.INPUT_IS+self.excel_path+' '+self.sheetname
+                    info_msg=generic_constants.INPUT_IS+self.excel_path+' '+(self.sheetname or '')
                     logger.print_on_console(info_msg)
                     log.info(info_msg)
                     res,col_count,err_msg=self.dict['get_colcount_'+file_ext](self.excel_path,self.sheetname,*args)
@@ -417,6 +447,7 @@ class ExcelFile:
             logger.print_on_console(err_msg)
         return status,methodoutput,col_count,err_msg
 
+
     def clear_excel_path(self,*args):
         """
         def : clear_excel_path
@@ -429,9 +460,9 @@ class ExcelFile:
         methodoutput=TEST_RESULT_FALSE
         output = OUTPUT_CONSTANT
         err_msg = None
-        if self.excel_path != None and self.excel_path != '' and self.sheetname != None and self.sheetname != '':
-            self.excel_path=''
-            self.sheetname=''
+        if self.excel_path != None and self.excel_path != '':
+            self.excel_path=None
+            self.sheetname=None
             status=TEST_RESULT_PASS
             methodoutput=TEST_RESULT_TRUE
         else:
@@ -439,6 +470,7 @@ class ExcelFile:
             log.error(err_msg)
             logger.print_on_console(err_msg)
         return status,methodoutput,output,err_msg
+
 
     def convertStringToInt(self,col):
         num=0
@@ -472,7 +504,7 @@ class ExcelXLS:
         return : list
 
         """
-##        book = open_workbook(inputpath,formatting_info=True)
+        ##book = open_workbook(inputpath,formatting_info=True)
         book = open_workbook(inputpath)
         sheet=book.sheet_by_name(sheetname)
         last_row=-1
@@ -483,7 +515,6 @@ class ExcelXLS:
             last_col=len(row)-1
 
         return book,sheet,last_row,last_col,sheet.nrows
-
 
 
     def __write_to_cell_xls(self,input_path,book,sheetname,row,col,value,*args):
@@ -521,11 +552,11 @@ class ExcelXLS:
                         flag=True
                     	#Evaluating formula
                         value=xlwt.ExcelFormula.Formula(value)
-##                        value='='+value
+                        ##value='='+value
                         s.write(int(row),int(col),value)
                     else:
                         flag=True
-##                        value=str(value)
+                        ##value=str(value)
                         s.write(int(row),int(col),value)
                     workbook.save(input_path)
                     status= True
@@ -535,7 +566,7 @@ class ExcelXLS:
             else:
                 flag=True
                 status= True
-##                value=str(value)
+                ##value=str(value)
                 s.write(int(row),int(col),value)
 
 
@@ -551,6 +582,7 @@ class ExcelXLS:
         if flag and status:
             self.excel_obj.open_and_save_file(input_path)
         return status,err_msg
+
 
     def get_linenumber_xls(self,input_path,sheetname,content):
         """
@@ -582,8 +614,9 @@ class ExcelXLS:
            err_msg='Error getting line number in .xls'
            log.error(e)
            logger.print_on_console(err_msg)
-##        log.info('Status is '+str(status))
+        ##log.info('Status is '+str(status))
         return status,line_number,err_msg
+
 
     def replace_content_xls(self,input_path,sheetname,existingcontent,replacecontent,*args):
         """
@@ -621,6 +654,7 @@ class ExcelXLS:
            log.error(e)
         log.info('Status is '+str(status))
         return status,err_msg
+
 
     def delete_row_xls(self,row,excel_path,sheetname):
         """
@@ -674,6 +708,7 @@ class ExcelXLS:
         log.info('Status is '+str(status))
         return status,err_msg
 
+
     def compare_content_xls(self,input_path1,sheetname1,input_path2,sheetname2,*args):
         """
         def : compare_content_xls
@@ -687,14 +722,14 @@ class ExcelXLS:
         x = False
         log.debug('Comparing content of .xls files')
         try:
-##            import pandas as pd
-##            file1=pd.ExcelFile(input_path1)
-##            data1=file1.parse(sheetname1)
-##            log.debug('File content1'+str(data1))
-##            file2=pd.ExcelFile(input_path2)
-##            data2=file2.parse(sheetname2)
-##            log.debug('File content2'+str(data2))
-##            status= (str(data1)==str(data2))
+            ##import pandas as pd
+            ##file1=pd.ExcelFile(input_path1)
+            ##data1=file1.parse(sheetname1)
+            ##log.debug('File content1'+str(data1))
+            ##file2=pd.ExcelFile(input_path2)
+            ##data2=file2.parse(sheetname2)
+            ##log.debug('File content2'+str(data2))
+            ##status= (str(data1)==str(data2))
             from itertools import zip_longest
             book1 = open_workbook(input_path1)
             book2 = open_workbook(input_path2)
@@ -728,6 +763,7 @@ class ExcelXLS:
         log.info('Status is '+str(status))
         return status,err_msg
 
+
     def verify_content_xls(self,input_path,sheetname,content,*args):
         """
         def : verify_content_xls
@@ -743,6 +779,7 @@ class ExcelXLS:
         if res and line_number != None:
             status=True
         return status,err_msg
+
 
     def delete_sheet_xls(self,inputpath,sheetname):
         """
@@ -760,6 +797,7 @@ class ExcelXLS:
         sheet.Delete()
         excel_file.Close(True)
 
+
     def create_sheet_xls(self,inputpath,sheetname):
         """
         def : create_sheet_xls
@@ -773,6 +811,7 @@ class ExcelXLS:
         xlw_ref=copy(xl_ref)
         xlw_ref.add_sheet(sheetname)
         xlw_ref.save(inputpath)
+
 
     def clear_content_xls(self,inputpath,filename,sheetname):
         """
@@ -809,6 +848,7 @@ class ExcelXLS:
             log.error(e)
         return status,err_msg
 
+
     def read_cell_xls(self,row,col,excel_path,sheetname,*args):
         """
         def : read_cell_xls
@@ -844,7 +884,6 @@ class ExcelXLS:
         if err_msg!=None:
             log.error(err_msg)
         return status,value,err_msg
-
 
 
     def clear_cell_xls(self,row,col,excel_path,sheetname):
@@ -896,6 +935,7 @@ class ExcelXLS:
             status,err_msg=self.__write_to_cell_xls(excel_path,workook_info[0],sheetname,row,col,value,*args)
         return status,err_msg
 
+
     def get_rowcount_xls(self,excel_path,sheetname,*args):
         """
         def : get_rowcount_xls
@@ -918,6 +958,7 @@ class ExcelXLS:
             log.error(e)
             logger.print_on_console(err_msg)
         return status,row_count,err_msg
+
 
     def get_colcount_xls(self,excel_path,sheetname,*args):
         """
@@ -942,6 +983,7 @@ class ExcelXLS:
             logger.print_on_console(err_msg)
         return status,col_count,err_msg
 
+
     def write_to_file_xls(self,input_path,sheetname,content,*args):
         """
         def : write_to_file_xls
@@ -963,19 +1005,19 @@ class ExcelXLS:
             col=workbook_info[3]
             len_args=len(args)
             ##print row,col
-##            if len(args)>0 and args[0].lower() == 'newline'  :
-##                col=0
-##                if workbook_info[3] != -1:
-##                    row=row+1
-##                    col=workbook_info[3]
-##                else:
-##                    row=0
-##            elif workbook_info[3]==-1:
-##                row=col=0
-##            else:
-##                col+=1
-##            #writes to the cell in given row,col
-##            status,err_msg=self.__write_to_cell_xls(input_path,workbook_info[0],sheetname,row,col,content,args)
+            ##if len(args)>0 and args[0].lower() == 'newline'  :
+                ##col=0
+                ##if workbook_info[3] != -1:
+                    ##row=row+1
+                    ##col=workbook_info[3]
+                ##else:
+                    ##row=0
+            ##elif workbook_info[3]==-1:
+                ##row=col=0
+            ##else:
+                ##col+=1
+            ###writes to the cell in given row,col
+            ##status,err_msg=self.__write_to_cell_xls(input_path,workbook_info[0],sheetname,row,col,content,args)
             if row==-1 and col==-1:
                 row=0
                 col=0
@@ -1013,6 +1055,7 @@ class ExcelXLS:
             logger.print_on_console(err_msg)
         return status,err_msg
 
+
     def create_file_xls(self,excel_path,sheet_name,*args):
         """
         def : create_file_xls
@@ -1033,6 +1076,8 @@ class ExcelXLS:
             err_msg='Error occurred creating .xls file '
             logger.print_on_console(err_msg)
         return status,err_msg
+
+
 
 class ExcelXLSX:
 
@@ -1063,6 +1108,7 @@ class ExcelXLSX:
             '[$-14009]d\ mmmm\ yyyy;@':'%d %B %Y',
             'mmm/yyyy':'%b-%Y',
             }
+
 
     def __load_workbook_xlsx(self,inputpath,sheetname):
         """
@@ -1116,7 +1162,7 @@ class ExcelXLSX:
                     value='='+value
                 else:
                     flag=True
-##                    value=str(value)
+                    ##value=str(value)
                 cell.value=value
                 status=True
             else:
@@ -1137,11 +1183,13 @@ class ExcelXLSX:
             self.excel_obj.open_and_save_file(input_path)
         return status,err_msg
 
+
     def __get_formatted_date(self,val,fmt):
         from datetime import datetime
         if fmt in list(self.date_formats.keys()):
             return val.strftime(self.date_formats[fmt])
         return None
+
 
     def get_linenumber_xlsx(self,input_path,sheetname,content):
         """
@@ -1173,6 +1221,7 @@ class ExcelXLSX:
            logger.print_on_console(err_msg)
         return status,line_number,err_msg
 
+
     def replace_content_xlsx(self,input_path,sheetname,existingcontent,replacecontent,*args):
         """
         def : replace_content_xlsx
@@ -1200,8 +1249,6 @@ class ExcelXLSX:
         return status
 
 
-
-
     def delete_row_xlsx(self,row,excel_path,sheetname):
         """
         def : delete_row_xlsx
@@ -1213,8 +1260,6 @@ class ExcelXLSX:
         #same functionality as compare_content_xlsx
         obj=ExcelXLS()
         return obj.delete_row_xls(row,excel_path,sheetname)
-
-
 
 
     def compare_content_xlsx(self,input_path1,sheetname1,input_path2,sheetname2,*args):
@@ -1232,10 +1277,6 @@ class ExcelXLSX:
         return status
 
 
-
-
-
-
     def verify_content_xlsx(self,input_path,sheetname,content,*args):
         """
         def : verify_content_xlsx
@@ -1250,7 +1291,6 @@ class ExcelXLSX:
         if res and line_number != None:
             status=True
         return status,err_msg
-
 
 
     def clear_content_xlsx(self,inputpath,filename,sheetname):
@@ -1287,7 +1327,6 @@ class ExcelXLSX:
             log.error(e)
             logger.print_on_console(err_msg)
         return status,err_msg
-
 
 
     def read_cell_xlsx(self,row,col,excel_path,sheetname,*args):
@@ -1330,6 +1369,7 @@ class ExcelXLSX:
             logger.print_on_console(err_msg)
         return status,value,err_msg
 
+
     def clear_cell_xlsx(self,row,col,excel_path,sheetname):
         """
         def : clear_cell_xls
@@ -1352,8 +1392,6 @@ class ExcelXLSX:
             err_msg='Error occurred in clearing cell of .xlsx file'
         workbook.save(excel_path)
         return status,err_msg
-
-
 
 
     def write_cell_xlsx(self,row,col,value,excel_path,sheetname,*args):
@@ -1384,7 +1422,6 @@ class ExcelXLSX:
         return status,err_msg
 
 
-
     def get_rowcount_xlsx(self,excel_path,sheetname,*args):
         """
         def : get_rowcount_xlsx
@@ -1409,7 +1446,6 @@ class ExcelXLSX:
         return status,row_count,err_msg
 
 
-
     def get_colcount_xlsx(self,excel_path,sheetname,*args):
         """
         def : get_colcount_xls
@@ -1432,6 +1468,7 @@ class ExcelXLSX:
             log.error(e)
             logger.print_on_console(err_msg)
         return status,col_count,err_msg
+
 
     def write_to_file_xlsx(self,input_path,sheetname,content,*args):
         """
@@ -1482,6 +1519,7 @@ class ExcelXLSX:
             logger.print_on_console(err_msg)
         return status,err_msg
 
+
     def create_file_xlsx(self,excel_path,sheet_name,*args):
         """
         def : create_file_xlsx
@@ -1505,7 +1543,136 @@ class ExcelXLSX:
             logger.print_on_console(err_msg)
         return status,err_msg
 
+
+
 class ExcelCSV:
+
+    def __init__(self):
+
+
+        self.excel_obj=''
+
+        self.cell_type={'string' : 'General',
+        'formula': 'f',
+        'number': '0.00',
+        'date':'n',
+        'boolean': 'b',
+        'null':'n',
+        'inline': 'inlineStr',
+        'error': 'e',
+        'formula_cache': 'str'}
+
+        self.date_formats={'[$-14009]dd\ mmmm\ yyyy;@':'%d %B %Y',
+            'mm-dd-yy':'%d-%m-%Y',
+            '[$-14009]d\.m\.yy;@':'%d.%m.%y',
+            'dd\/mm\/yyyy':'%d/%m/%y',
+            '[$-F800]dddd\,\ mmmm\ dd\,\ yyyy':'%d %B %Y',
+            '[$-14009]dd/mm/yyyy;@':'%d-%m-%Y',
+            '[$-14009]dd/mm/yy;@':'%d-%m-%y',
+            '[$-14009]d/m/yy;@':'%d-%m-%y',
+            '[$-14009]yyyy/mm/dd;@':'%Y-%m-%d',
+            '[$-14009]d\ mmmm\ yyyy;@':'%d %B %Y',
+            'mmm/yyyy':'%b-%Y',
+            }
+
+
+    def __get_formatted_date(self,val,fmt):
+        from datetime import datetime
+        if fmt in list(self.date_formats.keys()):
+            return val.strftime(self.date_formats[fmt])
+        return None
+
+
+    def get_linenumber_csv(self,input_path,sheetname,content):
+        """
+        def : get_linenumber_xlsx
+        purpose : get the line number where content is present in given .xlsx file
+        param  : input_path,sheetname,content
+        return : Returns line number (list)
+
+        """
+        status=False
+        line_number=None
+        err_msg=None
+        logger.print_on_console(generic_constants.INPUT_IS+input_path+' '+sheetname)
+        try:
+            book = load_workbook(input_path,data_only=True)
+            sheet = book.get_sheet_by_name(sheetname)
+            i=0
+            value=[]
+            for row in sheet.iter_rows():
+                i+=1
+                for cell in row:
+                    if  cell.internal_value is not None and content == cell.internal_value:
+                        value.append(i)
+                        status=True
+            line_number=value
+        except Exception as e:
+           err_msg='Error getting line number in .xlsx'
+           log.error(e)
+           logger.print_on_console(err_msg)
+        return status,line_number,err_msg
+
+
+    def replace_content_csv(self,input_path,sheetname,existingcontent,replacecontent,*args):
+        """
+        def : replace_content_xlsx
+        purpose : replace the 'existingcontent' by 'replacecontent' in given sheet of
+                  given .xlsx file
+        param : input_path,sheetname,existingcontent,replacecontent
+        return : bool
+
+        """
+        logger.print_on_console(generic_constants.INPUT_IS+input_path+' '+sheetname)
+        status=False
+        try:
+            book = load_workbook(input_path,data_only=True)
+            sheet = book.get_sheet_by_name(sheetname)
+            for row in sheet.iter_rows():
+                for cell in row:
+                    if existingcontent ==  str(cell.value):
+                        cell.value=replacecontent
+                        status=True
+            book.save(input_path)
+
+        except Exception as e:
+           log.error(e)
+           logger.print_on_console(e)
+        return status
+
+
+    def delete_row_csv(self,row,excel_path,sheetname):
+        """
+        def : delete_row_xlsx
+        purpose : calls delete_row_xls to delete a row in given .xlsx file
+        param : row
+        return : bool
+
+        """
+        status=False
+        err_msg=None
+        log.debug(generic_constants.INPUT_IS+excel_path)
+        sheet = []
+        try:
+            with open(excel_path) as f:
+                reader = csv.reader(f)
+                for _row in reader:
+                    sheet.append(_row)
+                row_count = len(sheet)
+                col_count = len(sheet[0]) if row_count>0 else 0
+                if row<=row_count:
+                    del sheet[row-1]
+                else:
+                    err_msg=ERROR_CODE_DICT["ERR_ROW_DOESN'T_EXIST"]
+            with open(excel_path, 'w', newline='') as f:
+                writer = csv.writer(f)
+                writer.writerows(sheet)
+            del sheet
+            status=True
+        except Exception as e:
+            err_msg='Error occurred in clearing cell of .csv file'
+        return status,err_msg
+
 
     def compare_content_csv(self,input_path1,input_path2,*args): # To compare the content for verifying data for csv files
         """
@@ -1558,6 +1725,295 @@ class ExcelCSV:
 
         log.info('Status is '+str(status))
         return status,err_msg
+
+
+    def verify_content_csv(self,input_path,sheetname,content,*args):
+        """
+        def : verify_content_xlsx
+        purpose : verify whether the 'existingcontent' is present in given sheet of
+                  given .xlsx file
+        param : input_path,sheetname,content
+        return : bool
+
+        """
+        status=False
+        res,line_number,err_msg=self.get_linenumber_xlsx(input_path,sheetname,content)
+        if res and line_number != None:
+            status=True
+        return status,err_msg
+
+
+    def clear_content_csv(self,inputpath,filename,sheetname):
+        """
+        def : clear_content_xlsx
+        purpose : removes the given sheet from the given .xlsx file
+        param : input_path,sheetname
+        return : bool
+
+        """
+        status=False
+        err_msg=None
+        info_msg=generic_constants.INPUT_IS+inputpath+' filename: '+filename+' Sheetname: '+sheetname
+        logger.print_on_console(info_msg)
+        log.info(info_msg)
+        inputpath=inputpath+'/'+filename
+        try:
+            import random,string
+            dummy_sheet_name =''.join([random.choice(string.ascii_letters + string.digits) for n in range(10)])
+            book=load_workbook(inputpath)
+            sheet=book.get_sheet_by_name(sheetname)
+            book.create_sheet(dummy_sheet_name)
+            book.remove(sheet)
+            book.active=len(book.sheetnames)-1
+            book.save(inputpath)
+            book.create_sheet(sheetname)
+            book.save(inputpath)
+            sheet=book.get_sheet_by_name(dummy_sheet_name)
+            book.remove(sheet)
+            book.save(inputpath)
+            status=True
+        except Exception as e:
+            err_msg='Error occured in clearing the content of excel sheet'
+            log.error(e)
+            logger.print_on_console(err_msg)
+        return status,err_msg
+
+
+    def read_cell_csv(self,row,col,excel_path,sheetname,*args):
+        """
+        def : read_cell_csv
+        purpose : reads the cell value in the given row and column of .csv file
+        param : input_path,sheetname
+        return : cell value
+
+        """
+        status=False
+        value=None
+        err_msg=None
+        sheet = []
+        try:
+            log.debug('Writing to the file'+generic_constants.INPUT_IS+excel_path)
+            with open(excel_path) as f:
+                reader = csv.reader(f, delimiter=',')
+                for _row in reader:
+                    sheet.append(_row)
+                row_count = len(sheet)
+                col_count = len(sheet[0]) if row_count>0 else 0
+                if row<=row_count:
+                    if col<=col_count:
+                        value = (sheet[row-1][col-1])
+                        status=True
+                    else:
+                        err_msg=ERROR_CODE_DICT["ERR_COL_DOESN'T_EXIST"]
+                else:
+                    err_msg=ERROR_CODE_DICT["ERR_ROW_DOESN'T_EXIST"]
+            del sheet
+        except Exception as e:
+            err_msg='Error occured in read cell of .csv file'
+            log.error(e)
+        if err_msg!=None:
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
+        return status,value,err_msg
+
+
+    def clear_cell_csv(self,row,col,excel_path,sheetname):
+        """
+        def : clear_cell_csv
+        purpose : clears the given cell of .csv file set by the user
+        param : row,col
+        return : bool
+
+        """
+        status=False
+        err_msg=None
+        log.debug(generic_constants.INPUT_IS+excel_path)
+        sheet = []
+        try:
+            with open(excel_path) as f:
+                reader = csv.reader(f)
+                for _row in reader:
+                    sheet.append(_row)
+                row_count = len(sheet)
+                col_count = len(sheet[0]) if row_count>0 else 0
+                if row<=row_count:
+                    if col<=col_count:
+                        sheet[row-1][col-1] = ''
+                    else:
+                        err_msg=ERROR_CODE_DICT["ERR_COL_DOESN'T_EXIST"]
+                else:
+                    err_msg=ERROR_CODE_DICT["ERR_ROW_DOESN'T_EXIST"]
+            with open(excel_path, 'w', newline='') as f:
+                writer = csv.writer(f)
+                writer.writerows(sheet)
+            del sheet
+            status=True
+        except Exception as e:
+            err_msg='Error occurred in clearing cell of .csv file'
+        return status,err_msg
+
+
+    def write_cell_csv(self,row,col,value,excel_path,sheetname,*args):
+        """
+        def : write_cell_csv
+        purpose : calls the private methods to write given value to the cell of given
+                row or col of .csv file
+        param : row,col,value
+        return : bool
+
+        """
+        status=False
+        err_msg=None
+        sheet = []
+        try:
+            with open(excel_path) as f:
+                reader = csv.reader(f)
+                for _row in reader:
+                    sheet.append(_row)
+                row_count = len(sheet)
+                col_count = len(sheet[0]) if row_count>0 else 0
+                if row<=row_count:
+                    if col<=col_count:
+                        sheet[row-1][col-1] = value
+                    else:
+                        err_msg=ERROR_CODE_DICT["ERR_COL_DOESN'T_EXIST"]
+                else:
+                    err_msg=ERROR_CODE_DICT["ERR_ROW_DOESN'T_EXIST"]
+            with open(excel_path, 'w', newline='') as f:
+                writer = csv.writer(f)
+                # for row in sheet:
+                writer.writerows(sheet)
+            del sheet
+            status=True
+        except Exception as e:
+            err_msg = 'Error writing to excel cell of .csv file'
+            log.error(e)
+            logger.print_on_console(err_msg)
+        return status,err_msg
+
+
+    def get_rowcount_csv(self,excel_path,sheetname,*args):
+        """
+        def : get_rowcount_csv
+        purpose : get the number of rows of .csv excel file set by the user
+        param : None
+        return : Returns row count(int)
+
+        """
+        status=False
+        row_count=None
+        err_msg=None
+        try:
+            log.debug('Fetching row count of '+generic_constants.INPUT_IS+excel_path)
+            with open(excel_path) as f:
+                row_count = sum(1 for row in f)
+            status=True
+        except Exception as e:
+            err_msg='Error getting the row count of .csv file'
+            log.error(e)
+            logger.print_on_console(err_msg)
+        return status,row_count,err_msg
+
+
+    def get_colcount_csv(self,excel_path,sheetname,*args):
+        """
+        def : get_colcount_csv
+        purpose : get the number of columns of .csv excel file set by the user
+        param : None
+        return : Returns row count(int)
+
+        """
+        status=False
+        col_count=None
+        err_msg=None
+        try:
+            log.debug('Fetching col count of '+generic_constants.INPUT_IS+excel_path)
+            with open(excel_path) as f:
+                col_count = sum(1 for col in f.readline().split(','))
+            status=True
+        except Exception as e:
+            err_msg='Error getting the col count of .csv file'
+            log.error(e)
+            logger.print_on_console(err_msg)
+        return status,col_count,err_msg
+
+
+    def write_to_file_csv(self,input_path,sheetname,content,*args):
+        """
+        def : write_to_file_xlsx
+        purpose : writes the given content to the given .xlsx file
+        param : inputpath,sheetname,content,('newline'-optional param)
+        return : bool
+
+        """
+
+        status=False
+        err_msg=None
+        coreutilsobj=core_utils.CoreUtils()
+        sheetname=coreutilsobj.get_UTF_8(sheetname)
+        log.debug(generic_constants.INPUT_IS+input_path+' '+sheetname)
+        try:
+            #loads the xlsx workbook
+
+            workbook_info=self.__load_workbook_xlsx(input_path,sheetname)
+            row=workbook_info[2]
+            col=workbook_info[3]
+
+            len_args=len(args)
+            ##print row,col
+            ##print args,'dfvgbjnml,',row,col
+            ##status,err_msg=self.__write_to_cell_xlsx(input_path,workbook_info[0],sheetname,row,col,content)
+            if len(args)>0 and args[len_args-1].lower() == 'newline':
+                if row == 1 and col == 1:
+                    status,err_msg=self.__write_to_cell_xlsx(input_path,workbook_info[0],sheetname,row,col,content)
+                else:
+                    row=row+1
+                    col=1
+                    status,err_msg=self.__write_to_cell_xlsx(input_path,workbook_info[0],sheetname,row,col,content)
+                for i in range(0,(len_args-1)):
+                    row=row+1
+                    col=1
+                    ##print row,col
+                    status,err_msg=self.__write_to_cell_xlsx(input_path,workbook_info[0],sheetname,row,col,args[i])
+            else:
+                status,err_msg=self.__write_to_cell_xlsx(input_path,workbook_info[0],sheetname,row,col,content)
+                for i in range(0,(len_args)):
+                    col=col+1
+                    ##print row,col
+                    status,err_msg=self.__write_to_cell_xlsx(input_path,workbook_info[0],sheetname,row,col,args[i])
+        except Exception as e:
+            log.error(e)
+            err_msg='Error occurred writing to .xlsx file '
+            logger.print_on_console(err_msg)
+        return status,err_msg
+
+
+    def create_file_csv(self,excel_path,sheet_name,*args):
+        """
+        def : create_file_csv
+        purpose : creates an csv file using provided path
+        param : excel_path,sheet_name
+        return : bool
+
+        """
+        status=False
+        err_msg=None
+        try:
+            # from openpyxl import Workbook
+            # wb = Workbook()
+            # ws = wb.active
+            # ws.title = sheet_name
+            # wb.save(excel_path)
+            with open(excel_path, 'w') as f:
+                pass
+            status = True
+        except Exception as e:
+            log.error(e)
+            err_msg='Error occurred creating .csv file '
+            logger.print_on_console(err_msg)
+        return status,err_msg
+
+
 
 class object_creator:
     def excel_object(self):
