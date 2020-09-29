@@ -152,7 +152,9 @@ class GenericKeywordDispatcher:
             'getxmlblockdata' :local_generic.generic_file_xml.getXmlBlockData,
             'selectivexmlfilecompare' : local_generic.generic_file_xml.selectiveXmlFileCompare,
             'compxmlfilewithxmlblock' : local_generic.generic_file_xml.compXmlFileWithXmlBlock,
-            'cellbycellcompare': local_generic.generic_file.cell_by_cell_compare
+            'cellbycellcompare': local_generic.generic_file.cell_by_cell_compare,
+            'findfilepath': local_generic.generic_file.find_file_path,
+            'selectivecellcompare': local_generic.generic_file.selective_cell_compare
             }
 	#Call to fetch data in database keywords
     def fetch_data(self,input):
@@ -210,7 +212,7 @@ class GenericKeywordDispatcher:
                             var = str(output[0])[1:len(str(output[0]))-1]
                             output[0] = data[var][0]
                     message.extend(output)
-                if( keyword in ['comparefiles','beautify','compareinputs','getxmlblockdata','selectivexmlfilecompare','compxmlfilewithxmlblock','cellbycellcompare'] ):
+                if( keyword in ['comparefiles','beautify','compareinputs','getxmlblockdata','selectivexmlfilecompare','compxmlfilewithxmlblock','cellbycellcompare','findfilepath','selectivecellcompare'] ):
                     input = list(message)
                     output = tsp.outputval
                     if (str(output)==''):
