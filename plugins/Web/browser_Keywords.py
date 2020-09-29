@@ -671,8 +671,8 @@ class BrowserKeywords():
                         err_msg=self.__web_driver_exception(e)
 
                 if(len(local_bk.all_handles) >= 1):
-                    local_bk.driver_obj.switch_to.window(local_bk.parent_handle)
-                    self.update_recent_handle(local_bk.parent_handle)
+                    local_bk.driver_obj.switch_to.window(local_bk.all_handles[-1])
+                    self.update_recent_handle(local_bk.all_handles[-1])
                     status=webconstants.TEST_RESULT_PASS
                     result=webconstants.TEST_RESULT_TRUE
             else:
@@ -682,7 +682,7 @@ class BrowserKeywords():
 
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
-            local_bk.driver_obj.switch_to.window(local_bk.parent_handle)
+            local_bk.driver_obj.switch_to.window(local_bk.all_handles[-1])
         return status,result,output,err_msg
 
     def clear_cache(self,*args):
@@ -1009,6 +1009,7 @@ class Singleton_DriverUtil():
                 if core.chromeFlag:
                     choptions = webdriver.ChromeOptions()
                     choptions.add_argument('start-maximized')
+                    choptions.add_experimental_option('useAutomationExtension', False)
                     if headless_mode: choptions.add_argument('--headless')
                        
                     if configvalues['extn_enabled'].lower()=='yes' and os.path.exists(webconstants.EXTENSION_PATH):
