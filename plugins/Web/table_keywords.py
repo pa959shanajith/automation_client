@@ -795,22 +795,3 @@ class TableOperationKeywords():
             return status,result,verb,err_msg
 
 
-
-##if __name__ == '__main__':
-##
-##        driver = webdriver.Chrome( executable_path='chromedriver.exe')
-##        res=raw_input('click ok after navigating')
-##        time.sleep(5)
-##        a=TableOperationKeywords()
-##        element = driver.find_element_by_xpath('/html/body/form/div[3]/table/tbody/tr[3]/td[2]/div[1]/div[4]/div[1]/div[2]/table')
-##        print type(element)
-##        print element
-##        nested_table=element.find_elements_by_tag_name('table')
-##        for table in nested_table:
-##            print a.getCellValue(nested_table[0],1,1,driver,True)
-##
-##
-##        res,rownum=a.getCellValue(True,element[0],1,3,driver)
-####        res=a.verifyCellValue(True,element[0],1,3,rownum,driver)
-##
-##        print 'End of main's
