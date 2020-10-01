@@ -415,6 +415,12 @@ class Scrape:
             elif ( Subtype and Subtype == 'Toolbar'):
                 custname = elem.__getattr__("Name") + "_toolbar"
                 tag = "toolbar"
+            elif ( Subtype and Subtype == 'Picture'):
+                custname = elem.__getattr__("Name") + "_picture"
+                tag = "picture"
+            elif ( Subtype and Subtype == 'TextEdit'):
+                custname = elem.__getattr__("Name") + "_textbox"
+                tag = "text"
 
             else:
                 """
