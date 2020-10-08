@@ -16,6 +16,7 @@ from button_link_keyword import ButtonLinkKeyword
 import browser_Keywords
 from webconstants import *
 import readconfig
+import time
 
 import logging
 from constants import *
@@ -209,7 +210,6 @@ class ElementKeywords:
                             err_msg='Element to be dragged should be on top'
                             local_eo.log.error=err_msg
                             logger.print_on_console(err_msg)
-                    import time
                     time.sleep(0.5)
                     obj.mouse_press(LEFT_BUTTON)
                     local_eo.log.info(STATUS_METHODOUTPUT_UPDATE)
@@ -247,7 +247,6 @@ class ElementKeywords:
                     size=webelement.size
                     local_eo.log.info('location is :')
                     local_eo.log.info(location)
-                    import time
                     if(args[0][0]!=''):
                         time1=float(args[0][0])
                         time.sleep(time1)
