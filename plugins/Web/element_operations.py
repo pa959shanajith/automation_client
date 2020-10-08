@@ -190,10 +190,9 @@ class ElementKeywords:
                      #find the location of the element w.r.t viewport
                     if webelement.is_displayed():
                         location=webelement.location
-                        size=webelement.size
                     else:
                         location=obj.get_element_location(webelement)
-                        size=webelement.size
+                    size=webelement.size
                     local_eo.log.info('location is :')
                     local_eo.log.info(location)
                     from selenium import webdriver
@@ -243,10 +242,9 @@ class ElementKeywords:
                      #find the location of the element w.r.t viewport
                     if webelement.is_displayed():
                         location=webelement.location
-                        size=webelement.size
                     else:
                         location=obj.get_element_location(webelement)
-                        size=webelement.size
+                    size=webelement.size
                     local_eo.log.info('location is :')
                     local_eo.log.info(location)
                     import time
