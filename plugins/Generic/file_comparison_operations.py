@@ -11,157 +11,22 @@
 
 import logger
 import generic_constants
-import logging
 import constants
-import core_utils
-import os
 import json
-
-log = logging.getLogger('file_comparison_operations.py')
-
-class PdfFile:
-
-    def verify_content(self,input_path,pagenumber,content):
-        """
-        def : verify_content
-        purpose : verifies whether the content is given pagenumber of pdf file
-        param : input_path,pagenumber,content
-        return : bool
-
-        """
-        status=False
-        err_msg=None
-        try:
-            log.debug('Verifying content of pdf file')
-            pdf_content=self.get_content(input_path,pagenumber,content,'_internal_verify_content')
-            log.debug('pdf_content is '+str(pdf_content))
-            if content in pdf_content.replace('\n',''):
-                status=True
-            else:
-                err_msg=generic_constants.CONTENT_NOT_PRESENT
-        except IOError:
-            err_msg=constants.ERROR_CODE_DICT['ERR_FILE_NOT_ACESSIBLE']
-        except Exception as e:
-            err_msg=generic_constants.ERR_MSG1+'verifying PDF content'+generic_constants.ERR_MSG2
-            log.error(e)
-        log.info('Status is '+str(status))
-        if err_msg!=None:
-            logger.print_on_console(err_msg)
-        return status,err_msg
-
-    def compare_content(self,input_path1,input_path2):
-        """
-        def : compare_content
-        purpose : compares all pages of given 2 pdf files
-        param : input_path1,input_path2
-        return : bool
-
-        """
-        status=False
-        err_msg=None
-        log.debug('Comparing content of pdf files: '+str(input_path1)+','+str(input_path2))
-        try:
-            import filecmp
-            status=filecmp.cmp(input_path1,input_path2)
-            if not(status):
-                err_msg=generic_constants.CONTENT_NOT_SAME
-        except IOError:
-            err_msg=constants.ERROR_CODE_DICT['ERR_FILE_NOT_ACESSIBLE']
-        except Exception as e:
-            err_msg=generic_constants.ERR_MSG1+'Comparing PDF content'+generic_constants.ERR_MSG2
-            log.error(e)
-        log.info('Status is '+str(status))
-        if err_msg!=None:
-            logger.print_on_console(err_msg)
-        return status,err_msg
-
-
-    def get_content(self,input_path,pagenumber,*args):
-        """
-        def : get_content
-        purpose : return the content present in given pagnumber of pdf file
-        param : input_path1,input_path2
-        return : bool
-
-        """
-        status=False
-        content=None
-        err_msg=None
-        from PyPDF2 import PdfFileReader, PdfFileWriter
-        import fitz
-        try:
-             log.debug('Get the content of pdf file: '+str(input_path)+','+str(pagenumber))
-             doc=fitz.open(input_path)
-             pagenumber=int(pagenumber)-1
-             if pagenumber<doc.pageCount:
-                page = doc[pagenumber]
-                content=page.getText()
-##                content=content.encode('utf-8')
-                if len(args)>1 and args[1]=='_internal_verify_content':
-                    return content
-                if len(args) >= 2 and not (args[0] is None and args[1] is None):
-                    start=args[0].strip()
-                    end=args[1].strip()
-                    startIndex=0
-                    endIndex=len(content)
-                    log.info('Start string: '+str(start)+' End string: '+str(end))
-                    if not start is '':
-                        startIndex=content.find(start)+len(start)
-                    if not end is '':
-                        endIndex=content.find(end)
-                    content=content[startIndex:endIndex]
-                    log.info('Content between Start and End string is ')
-##                    logger.print_on_console('Content between Start and End string is ')
-                elif len(args)==1:
-                    with open(args[0],'w') as file:
-                        file.write(content)
-                        file.close()
-                log.info(content)
-                status=True
-##        try:
-##             log.debug('Get the content of pdf file: '+str(input_path)+','+str(pagenumber))
-##             reader=PdfFileReader(open(input_path,'rb'))
-##             pagenumber=int(pagenumber)-1
-##             if pagenumber<reader.getNumPages():
-##                page=reader.getPage(pagenumber)
-##                content=page.extractText()
-##                if len(args)>1 and args[1]=='_internal_verify_content':
-##                    return content
-##                if len(args) >= 2 and not (args[0] is None and args[1] is None):
-##                    start=args[0].strip()
-##                    end=args[1].strip()
-##                    startIndex=0
-##                    endIndex=len(content)
-##                    log.info('Start string: '+str(start)+' End string: '+str(end))
-##                    if not start is '':
-##                        startIndex=content.find(start)+len(start)
-##                    if not end is '':
-##                        endIndex=content.find(end)
-##                    content=content[startIndex:endIndex]
-##                    log.info('Content between Start and End string is ')
-##                elif len(args)==1:
-##                    with open(args[0],'w') as file:
-##                        file.write(content)
-##                        file.close()
-##                log.info(content)
-##                status=True
-             else:
-                err_msg=generic_constants.INVALID_INPUT
-                log.error(err_msg)
-
-        except ValueError as e:
-            err_msg=generic_constants.INVALID_INPUT
-            log.error(e)
-        except IOError as e:
-            err_msg=constants.ERROR_CODE_DICT['ERR_FILE_NOT_ACESSIBLE']
-            log.error(e)
-        except Exception as e:
-            err_msg=generic_constants.ERR_MSG1+'Fetching PDF content'+generic_constants.ERR_MSG2
-            log.error(e)
-        log.info('Status is '+str(status))
-        if err_msg!=None:
-            logger.print_on_console(err_msg)
-        return status,content,err_msg
+import difflib
+import tempfile
+import os
+import string
+import random
+import dynamic_variable_handler
+import logging
+import fitz
+import cv2
+import imutils
+import numpy as np
+import PyPDF2
+import difflib
+log = logging.getLogger('file_operations_pdf.py')
 
 
 
