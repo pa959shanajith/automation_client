@@ -86,10 +86,12 @@ class MobileOpeartions():
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
                     else:
-                        err_msg=ERROR_CODE_DICT['ERR_ERR_WEB_ELEMENT_DISABLED']
+                        err_msg=ERROR_CODE_DICT['ERR_WEB_ELEMENT_DISABLED']
 
                 else:
                     err_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
+            else:
+                err_msg=ERROR_CODE_DICT['ERR_ELEMENT_NOT_EXISTS']
             if err_msg:
                 log.error(err_msg)
 
@@ -138,9 +140,11 @@ class MobileOpeartions():
                                 status=TEST_RESULT_PASS
                                 methodoutput=TEST_RESULT_TRUE
                     else:
-                        err_msg=ERROR_CODE_DICT['ERR_ERR_WEB_ELEMENT_DISABLED']
+                        err_msg=ERROR_CODE_DICT['ERR_WEB_ELEMENT_DISABLED']
                 else:
                     err_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
+            else:
+                err_msg=ERROR_CODE_DICT['ERR_ELEMENT_NOT_EXISTS']
             if err_msg:
                 log.error(err_msg)
         except Exception as e:
@@ -172,6 +176,8 @@ class MobileOpeartions():
                         err_msg=ERROR_CODE_DICT['ERR_WEB_ELEMENT_DISABLED']
                 else:
                     err_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
+            else:
+                err_msg=ERROR_CODE_DICT['ERR_ELEMENT_NOT_EXISTS']
             if err_msg:
                 log.error(err_msg)
         except Exception as e:
@@ -200,6 +206,8 @@ class MobileOpeartions():
                         err_msg=ERROR_CODE_DICT['ERR_WEB_ELEMENT_DISABLED']
                 else:
                     err_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
+            else:
+                err_msg=ERROR_CODE_DICT['ERR_ELEMENT_NOT_EXISTS']
             if err_msg:
                 log.error(err_msg)
         except Exception as e:
@@ -229,6 +237,8 @@ class MobileOpeartions():
                         err_msg=ERROR_CODE_DICT['ERR_WEB_ELEMENT_DISABLED']
                 else:
                     err_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
+            else:
+                err_msg=ERROR_CODE_DICT['ERR_ELEMENT_NOT_EXISTS']
             if err_msg:
                 log.error(err_msg)
         except Exception as e:
@@ -259,6 +269,8 @@ class MobileOpeartions():
                         err_msg=ERROR_CODE_DICT['ERR_WEB_ELEMENT_DISABLED']
                 else:
                     err_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
+            else:
+                err_msg=ERROR_CODE_DICT['ERR_ELEMENT_NOT_EXISTS']
             if err_msg:
                 log.error(err_msg)
         except Exception as e:
@@ -278,6 +290,8 @@ class MobileOpeartions():
                 log.info('The output is '+str(output))
                 status=TEST_RESULT_PASS
                 result=TEST_RESULT_TRUE
+            else:
+                err_msg=ERROR_CODE_DICT['ERR_ELEMENT_NOT_EXISTS']
         except Exception as e:
                 log.error(e)
         return status,result,output,err_msg
@@ -376,6 +390,8 @@ class MobileOpeartions():
 
                 else:
                     err_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
+            else:
+                err_msg=ERROR_CODE_DICT['ERR_ELEMENT_NOT_EXISTS']
             if err_msg:
                 log.error(err_msg)
         except Exception as e:
@@ -415,6 +431,8 @@ class MobileOpeartions():
                         err_msg=ERROR_CODE_DICT['ERR_WEB_ELEMENT_DISABLED']
                 else:
                     err_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
+            else:
+                err_msg=ERROR_CODE_DICT['ERR_ELEMENT_NOT_EXISTS']
             if err_msg:
                 log.error(err_msg)
         except Exception as e:
@@ -442,6 +460,8 @@ class MobileOpeartions():
                         err_msg=ERROR_CODE_DICT['ERR_WEB_ELEMENT_DISABLED']
                 else:
                     err_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
+            else:
+                err_msg=ERROR_CODE_DICT['ERR_ELEMENT_NOT_EXISTS']
             if err_msg:
                 log.error(err_msg)
         except Exception as e:
@@ -469,6 +489,8 @@ class MobileOpeartions():
                         err_msg=WEB_ELEMENT_ENABLED
                 else:
                     err_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
+            else:
+                err_msg=ERROR_CODE_DICT['ERR_ELEMENT_NOT_EXISTS']
             if err_msg:
                 log.error(err_msg)
         except Exception as e:
@@ -491,6 +513,8 @@ class MobileOpeartions():
                 else:
                     err_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
                     log.error(err_msg)
+            else:
+                err_msg=ERROR_CODE_DICT['ERR_ELEMENT_NOT_EXISTS']
         except Exception as e:
             log.error(e)
         return status,methodoutput,output,err_msg
@@ -511,6 +535,8 @@ class MobileOpeartions():
                 else:
                     err_msg=ELEMENT_VISIBLE
                     log.error(err_msg)
+            else:
+                err_msg=ERROR_CODE_DICT['ERR_ELEMENT_NOT_EXISTS']
         except Exception as e:
             log.error(e)
         return status,methodoutput,output,err_msg
@@ -690,6 +716,8 @@ class MobileOpeartions():
                         err_msg=ERROR_CODE_DICT['ERR_WEB_ELEMENT_DISABLED']
                 else:
                     err_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
+            else:
+                err_msg=ERROR_CODE_DICT['ERR_ELEMENT_NOT_EXISTS']
             if err_msg:
                 log.error(err_msg)
         except Exception as e:
@@ -717,6 +745,8 @@ class MobileOpeartions():
                         err_msg=ERROR_CODE_DICT['ERR_WEB_ELEMENT_DISABLED']
                 else:
                     err_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
+            else:
+                err_msg=ERROR_CODE_DICT['ERR_ELEMENT_NOT_EXISTS']
             if err_msg:
                 log.error(err_msg)
         except Exception as e:
@@ -751,6 +781,8 @@ class MobileOpeartions():
                         err_msg=ERROR_CODE_DICT['ERR_WEB_ELEMENT_DISABLED']
                 else:
                     err_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
+            else:
+                err_msg=ERROR_CODE_DICT['ERR_ELEMENT_NOT_EXISTS']
             if err_msg:
                 log.error(err_msg)
         except Exception as e:
@@ -780,6 +812,8 @@ class MobileOpeartions():
                         err_msg=ERROR_CODE_DICT['ERR_WEB_ELEMENT_DISABLED']
                 else:
                     err_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
+            else:
+                err_msg=ERROR_CODE_DICT['ERR_ELEMENT_NOT_EXISTS']
             if err_msg:
                 log.error(err_msg)
         except Exception as e:
@@ -827,6 +861,8 @@ class MobileOpeartions():
                         err_msg=ERROR_CODE_DICT['ERR_WEB_ELEMENT_DISABLED']
                 else:
                     err_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
+            else:
+                err_msg=ERROR_CODE_DICT['ERR_ELEMENT_NOT_EXISTS']
             if err_msg:
                 log.error(err_msg)
         except Exception as e:
@@ -856,6 +892,8 @@ class MobileOpeartions():
                         err_msg=ERROR_CODE_DICT['ERR_WEB_ELEMENT_DISABLED']
                 else:
                     err_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
+            else:
+                err_msg=ERROR_CODE_DICT['ERR_ELEMENT_NOT_EXISTS']
             if err_msg:
                 log.error(err_msg)
         except Exception as e:
@@ -885,6 +923,8 @@ class MobileOpeartions():
                         err_msg=ERROR_CODE_DICT['ERR_WEB_ELEMENT_DISABLED']
                 else:
                     err_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
+            else:
+                err_msg=ERROR_CODE_DICT['ERR_ELEMENT_NOT_EXISTS']
             if err_msg:
                 log.error(err_msg)
         except Exception as e:
@@ -927,6 +967,8 @@ class MobileOpeartions():
                         err_msg=ERROR_CODE_DICT['ERR_WEB_ELEMENT_DISABLED']
                 else:
                     err_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
+            else:
+                err_msg=ERROR_CODE_DICT['ERR_ELEMENT_NOT_EXISTS']
             if err_msg:
                 log.error(err_msg)
         except Exception as e:

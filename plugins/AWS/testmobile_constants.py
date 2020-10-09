@@ -31,10 +31,10 @@ ELEMENT_VISIBLE= 'Element is Visible'
 
 ERROR_CODE_DICT ={
                     'ERR_INVALID_INPUT':'Input error: please provide the valid input.',
-                    'ERR_HIDDEN_OBJECT':'The element is Hidden.',
-                    'ERR_DISABLED_OBJECT':'The Element is Disabled.',
+                    'ERR_HIDDEN_OBJECT':'Element is Hidden.',
+                    # 'ERR_DISABLED_OBJECT':'The Element is Disabled.',
                     'ERR_ELEMENT_NOT_EXISTS':'Element does not exists.',
-                    'ERR_WEB_ELEMENT_DISABLED':'Web Element is disabled, hence cannot perform operation'
+                    'ERR_WEB_ELEMENT_DISABLED':'Element is disabled'
                 }
 
 OUTPUT_CONSTANT = """9cc33d6fe25973868b30f4439f09901a"""
