@@ -71,6 +71,10 @@ class StepDescription:
             return "Compare xml file '" + inputval[0] + "' with the xml block amd save the result in '"+ tsp.outputval+"'"
         def cellbycellcompare():
             return "Compared cell by cell data between file "+inputval[2]+" and file '"+ inputval[0]+"'"
+        def findfilepath():
+            return "Fetches the location of the file '" + inputval[0] + "'"
+        def selectivecellcompare():
+            return "Compared selected cells between file "+inputval[0]+" and file '"+ inputval[4]+"'"
         def executescript():
             return "Perform execution of the script '"+ input+"'"
         def writetofile():
@@ -111,6 +115,12 @@ class StepDescription:
 ##                testDesicriptionDirectory.put("clearFileContent", "ClearFileContent failed - File type is Invalid ");
 ##            }
             return  "Cleard all the content of the file '"
+
+        #File-Folder operations
+        def copyfilefolder():
+            return "The file/folder has been copied"
+        def movefilefolder():
+            return "The file/folder has been moved"
 
         #Folder operations
         def createfolder():
@@ -1480,6 +1490,13 @@ class StepDescription:
             return 'Get row number of ' + "'" + tsp.custname + "'" + ' by text '+"'"+input +"'"+' and save the row number ' +"'"+output +"'"+ ' in '+"'"+tsp.outputval+"'"
         def getcellvalue():
             return 'Get cell value of ' + "'" + tsp.custname +'['+inputval[0]+']['+inputval[1]+']'+"'" + ' in the table and save the value ' +"'"+output +"'"+ ' in '+"'"+tsp.outputval+"'"
+        
+        #grid keywords
+        def horizontalscroll():
+            return 'Horizontal scroll has been performed'
+        def verticalscroll():
+            return 'Vertical scroll has been performed'
+        
         #custom keyword
         def getobjectcount():
             return 'Get Object count of the type '+"'" +ele_type+"'" +' and save the count '+"'" +output+"'" +' in '+"'"+tsp.outputval+"'"

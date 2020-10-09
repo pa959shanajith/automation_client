@@ -29,8 +29,12 @@ import difflib
 from xmldiff import main, formatting
 import readconfig
 from xlrd import open_workbook
+import shutil
+import pathlib
 import dynamic_variable_handler
 import logging
+from itertools import islice
+import re
 log = logging.getLogger('file_operations.py')
 
 
@@ -45,6 +49,7 @@ class FileOperations:
         self.xls_obj=excel_operations.ExcelXLS()
         self.xlsx_obj=excel_operations.ExcelXLSX()
         self.csv_obj=excel_operations.ExcelCSV()
+        self.convert=excel_operations.ExcelFile()
         self.DV = dynamic_variable_handler.DynamicVariables()
 
         """Mapping of keywords to its respective methods"""
@@ -211,6 +216,234 @@ class FileOperations:
             log.error(err_msg)
             logger.print_on_console(err_msg)
         return status,methodoutput,output_res,err_msg
+
+    def copyFileFolder(self, source_path, destination_path, opt = 0):
+        """
+        def: copyFileFolder
+        purpose: Copy from input path 1, to input path 2, optional(0(default)- overwrite/1- overwrite )
+        param: <path of source file/folder>,<path of destination(directory path only)>,bool
+        return: bool
+        """
+        status = TEST_RESULT_FAIL
+        result = TEST_RESULT_FALSE
+        err_msg = None
+        output_res = OUTPUT_CONSTANT
+        try:
+            if( source_path and destination_path ):
+                try:
+                    if( os.path.splitext(source_path)[1] and not os.path.splitext(destination_path)[1] ):
+                        #file ops
+                        if ( os.path.isfile(source_path) ):
+                            if( os.path.isdir(destination_path) ):# #destination should be a folder only
+                                destination_path = destination_path + '/' + os.path.basename(source_path)
+                                if ( shutil.disk_usage(os.path.dirname(destination_path)).free / 1048576 > os.path.getsize(source_path) / 1048576):
+                                    if( int(opt) == 0 ):
+                                        #dont-overwrite
+                                        if ( not os.path.isfile(destination_path) ): #already exists
+                                            logger.print_on_console( "Copying the file to destination. Please wait..." )
+                                            shutil.copyfile(source_path,destination_path)
+                                            log.debug( 'File successfully copied from ' + str(source_path) + ' to ' + str(destination_path) )
+                                            status=TEST_RESULT_PASS
+                                            result=TEST_RESULT_TRUE
+                                        else:
+                                            err_msg = 'File already exists in the directory'
+                                    elif( int(opt) == 1 ):
+                                        #overwrite
+                                        logger.print_on_console( "Copying the file to destination. Please wait..." )
+                                        shutil.copyfile(source_path,destination_path)
+                                        log.debug( 'File successfully copied from ' + str(source_path) + ' to ' + str(destination_path) )
+                                        status=TEST_RESULT_PASS
+                                        result=TEST_RESULT_TRUE
+                                    else:
+                                        err_msg = 'Invalid option, Please provide 1 or 0'
+                                else:
+                                    log.error('Available space on destination directory : ' + str(shutil.disk_usage(os.path.dirname(destination_path)).free / 1048576) + 'MB and file size of source path : ' + str(os.path.getsize(source_path) / 1048576) + 'MB')
+                                    err_msg = 'Destination directory does not have sufficient storage space'
+                            else:
+                                err_msg = 'Destination directory does not exist, Please provide a valid destination directory'
+                        else:
+                            err_msg = 'Source file does not exist, Please provide a valid source file'
+                    elif( not os.path.splitext(source_path)[1] and not os.path.splitext(destination_path)[1] ):
+                        #folder ops
+                        if( os.path.isdir(source_path) ):
+                            if (os.path.isdir(destination_path)):
+                                destination_path = destination_path + '/' + os.path.basename(source_path)
+                                if ( shutil.disk_usage(os.path.dirname(destination_path)).free / 1000000 > os.path.getsize(source_path)):
+                                    if( int(opt) == 0 ):
+                                        #dont - overwrite
+                                        if( not os.path.isdir(destination_path + '/' + os.path.basename(source_path)) ):
+                                            logger.print_on_console( "Copying the directory to destination. Please wait..." )
+                                            shutil.copytree(source_path, destination_path)
+                                            log.debug( 'Folder successfully copied to ' + str(source_path) + ' from ' + str(destination_path) )
+                                            status=TEST_RESULT_PASS
+                                            result=TEST_RESULT_TRUE
+                                        else:
+                                            err_msg = 'Folder already exists in the directory'
+                                    elif( int(opt) == 1 ):
+                                        #overwrite
+                                            logger.print_on_console( "Copying the directory to destination. Please wait..." )
+                                            shutil.copytree(source_path, destination_path)
+                                            log.debug( 'Folder successfully copied to ' + str(source_path) + ' from ' + str(destination_path) )
+                                            status=TEST_RESULT_PASS
+                                            result=TEST_RESULT_TRUE
+                                    else:
+                                        err_msg = 'Invalid option, Please provide 1 or 0'
+                                else:
+                                    log.error('Available space on destination directory : ' + str(shutil.disk_usage(os.path.dirname(destination_path)).free / 1000000) + 'MB and folder size of source path : ' + str(os.path.getsize(source_path)) + 'MB')
+                                    err_msg = 'Destination directory does not have sufficient storage space'
+                            else:
+                                err_msg = 'Destination directory does not exist, Please provide a valid destination directory'
+                        else:
+                            err_msg = 'Source directory does not exist, Please provide a valid source directory'
+                    else:
+                        err_msg = generic_constants.INVALID_INPUT
+                except FileExistsError as e:
+                    print(e)
+                    err_msg = 'Source and destination represents the same folder.'
+                except NotADirectoryError:
+                    err_msg = 'Invalid directory'
+                except IsADirectoryError:
+                    err_msg = 'Path is a directory'
+                except shutil.SameFileError:
+                    err_msg = 'Source and destination represents the same file.'
+                except PermissionError:
+                    err_msg = 'Permission denied. Check: 1.If file has valid permission 2.Source path should not end with "\\"'
+                except FileNotFoundError as e:
+                    if ( ']' in str(e) ): err_msg = str(e)[str(e).index(']')+2:]
+                    else: err_msg = 'FileNotFoundError : ' + str(e)
+                except IOError as e:
+                    if ('[Errno 28] No space left on device' in str(e)):
+                        err_msg = 'No space left on device'
+                        if( os.path.isdir( destination_path ) ): shutil.rmtree( destination_path )
+                        elif( os.path.isfile( destination_path ) ): os.remove( destination_path )
+                    else: err_msg = 'IOError : ' + str(e)
+            else:
+                err_msg = generic_constants.INVALID_INPUT
+        except ValueError:
+            err_msg = 'Invalid option, Please provide 1 or 0'
+        except Exception as e:
+            err_msg = 'Error occurred in copyFileFolder'
+            log.error(e)
+        if err_msg:
+            log.error( err_msg )
+            logger.print_on_console( err_msg )
+        del source_path, destination_path, opt #deleting variables
+        return status, result, output_res, err_msg
+
+    def moveFileFolder(self, source_path, destination_path, opt = 0):
+        """
+        def: moveFileFolder
+        purpose: Copy from input path 1, to input path 2, optional(0(default)- overwrite/1- overwrite )
+        param: <path of source file>,<path of destination(full file path)>,,bool
+        return: bool
+        """
+        status = TEST_RESULT_FAIL
+        result = TEST_RESULT_FALSE
+        err_msg = None
+        output_res = OUTPUT_CONSTANT
+        try:
+            if( source_path and destination_path ):
+                try:
+                    if( os.path.splitext(source_path)[1] and not os.path.splitext(destination_path)[1] ):
+                        #file ops
+                        if ( os.path.isfile(source_path) ):
+                            if( os.path.isdir(destination_path) ):# #destination should be a folder only
+                                if( int(opt) == 0 ):
+                                    if ( not os.path.isfile(destination_path + '/' + os.path.basename(source_path)) ):
+                                        logger.print_on_console( "Moving the file to destination. Please wait..." )
+                                        shutil.move(source_path,destination_path)
+                                        if ( os.path.isfile(source_path) ):#delete the file if still present in path(shutil only copies if location is on another disk)
+                                            pathlib.Path(source_path).unlink()
+                                        log.debug('File successfully moved from ' + str(source_path) + ' to ' + str(destination_path))
+                                        status=TEST_RESULT_PASS
+                                        result=TEST_RESULT_TRUE
+                                    else:
+                                        err_msg = 'File already exists in the directory'
+                                elif( int(opt) == 1 ):
+                                    #----- if file exists then overwrite
+                                    overwrite_fn = destination_path + '/' + os.path.basename(source_path)
+                                    if os.path.isfile(overwrite_fn):
+                                        log.info( 'File already exists in destination path, performing overwrite by deletion' )
+                                        os.remove(overwrite_fn)
+                                    #----- if file exists then overwrite
+                                    logger.print_on_console( "Moving the file to destination. Please wait..." )
+                                    shutil.move(source_path,destination_path)
+                                    if (os.path.isfile(source_path)):#delete the file if still present in path(shutil only copies if location is on another disk)
+                                        pathlib.Path(source_path).unlink()
+                                    log.debug('File successfully moved from ' + str(source_path) + ' to ' + str(destination_path))
+                                    status=TEST_RESULT_PASS
+                                    result=TEST_RESULT_TRUE
+                                else:
+                                    err_msg = 'Invalid option, Please provide 1 or 0'
+                            else:
+                                err_msg = 'Destination directory does not exist, Please provide a valid destination directory'
+                        else:
+                            err_msg = 'Source file does not exist, Please provide a valid source file'
+                    elif( not os.path.splitext(source_path)[1] and not os.path.splitext(destination_path)[1] ):
+                        #folder ops
+                        if( os.path.isdir(source_path) ):
+                            if (os.path.isdir(destination_path)):
+                                if( int(opt) == 0 ):
+                                    if ( not os.path.isdir(destination_path + '/' + os.path.basename(source_path)) ):
+                                        logger.print_on_console( "Moving the folder to destination. Please wait..." )
+                                        shutil.move(source_path,destination_path)
+                                        if (os.path.isdir(source_path)):#delete the folder if still present in path(shutil only copies if location is on another disk)
+                                            shutil.rmtree(source_path)
+                                        log.debug('Folder successfully moved to ' + str(source_path) + ' from ' + str(source_path))
+                                        status=TEST_RESULT_PASS
+                                        result=TEST_RESULT_TRUE
+                                    else:
+                                        err_msg = 'Folder already exists in the directory'
+                                elif( int(opt) == 1 ):
+                                    if ( os.path.isdir(destination_path + '/' + os.path.basename(source_path)) ):
+                                        shutil.rmtree( destination_path + '/' + os.path.basename(source_path) )
+                                    logger.print_on_console( "Moving the folder to destination. Please wait..." )
+                                    shutil.move(source_path,destination_path)
+                                    if (os.path.isdir(source_path)):#delete the folder if still present in path(shutil only copies if location is on another disk)
+                                        shutil.rmtree(source_path)
+                                    log.debug('Folder successfully moved to ' + str(source_path) + ' from ' + str(source_path))
+                                    status=TEST_RESULT_PASS
+                                    result=TEST_RESULT_TRUE
+                                else:
+                                    err_msg = 'Invalid option, Please provide 1 or 0'
+                            else:
+                                err_msg = 'Destination directory does not exist, Please provide a valid destination directory'
+                        else:
+                            err_msg = 'Source directory does not exist, Please provide a valid source directory'
+                    else:
+                        err_msg = generic_constants.INVALID_INPUT
+                except FileExistsError as e:
+                    print(e)
+                    err_msg = 'Source and destination represents the same folder.'
+                except NotADirectoryError:
+                    err_msg = 'Invalid directory'
+                except IsADirectoryError:
+                    err_msg = 'Path is a directory'
+                except shutil.SameFileError:
+                    err_msg = 'Source and destination represents the same file.'
+                except PermissionError:
+                    err_msg = 'Permission denied.'
+                except FileNotFoundError as e:
+                    if ( ']' in str(e) ): err_msg = str(e)[str(e).index(']')+2:]
+                    else: err_msg = 'FileNotFoundError : ' + str(e)
+                except IOError as e:
+                    if ('[Errno 28] No space left on device' in str(e)):
+                        err_msg = 'No space left on device'
+                        if( os.path.isdir( destination_path ) ): shutil.rmtree( destination_path )
+                        elif( os.path.isfile( destination_path ) ): os.remove( destination_path )
+                    else: err_msg = 'IOError : ' + str(e)
+            else:
+                err_msg = generic_constants.INVALID_INPUT
+        except ValueError:
+            err_msg = 'Invalid option, Please provide 1 or 0'
+        except Exception as e:
+            err_msg = 'Error occurred in moveFileFolder'
+            log.error(e)
+        if err_msg:
+            logger.print_on_console( err_msg )
+            log.error(err_msg)
+        del source_path, destination_path, opt #deleting variables
+        return status, result, output_res, err_msg
 
     def delete_file(self,inputpath,file_name):
         """
@@ -887,6 +1120,7 @@ class FileOperations:
         try:
             result3=os.path.isfile(outputFilePath)
             file_ext,status1=self.__get_ext(outputFilePath)
+            import csv
 
             if ( file_ext == '.xls' ):
                 #checking the file exists and open the exists file.
@@ -971,8 +1205,36 @@ class FileOperations:
                     log.error('some error : {}'.format(e))
                 status=True
 
+            elif( file_ext == '.csv'):
+                if result3==True:
+                    with open(outputFilePath, 'r') as csvfile:
+                        csv_dict = [row for row in csv.DictReader(csvfile)]
+                    if len(csv_dict) == 0:
+                        outFile = open(outputFilePath, 'w', newline='')
+                    else:
+                        logger.print_on_console('Output file has old entries! Erasing the old data to store incoming result.')
+                        outFile = open(outputFilePath, 'w+', newline='')
+                else:
+                    logger.print_on_console("File Does not exists, creating the file in specified path {}".format(outputFilePath))
+                    outFile = open(outputFilePath, 'a', newline='')
+                result=csv.writer(outFile)
+                for key, value in content.items():
+                    result.writerow(value)
+                outFile.close()
+                status=True
+            elif(file_ext == '.txt'):
+                if result3==True:
+                    out = open(outputFilePath, "w")
+                    logger.print_on_console('Output file has old entries! Erasing the old data to store incoming result.')
+                else:
+                    logger.print_on_console("File Does not exists, creating the file in specified path {}".format(outputFilePath))
+                    out = open(outputFilePath, "w+")
+                for key,value in content.items():
+                    out.write(",".join(value)+'\n')
+                out.close()
+                status=True
         except Exception as e:
-            err_msg='Writing to Excel Sheet Failed'
+            err_msg='Writing to output file Failed'
             log.error(e)
         log.info('Status of write_result_file is ' + str(status) )
         try:
@@ -1016,8 +1278,8 @@ class FileOperations:
 
                 if(str(args[0].split(";")[0]).startswith("{") and str(args[0].split(";")[0]).endswith("}")):
                     out_path = self.DV.get_dynamic_value(args[0].split(";")[0])
-                    
-                    if ( out_path ): 
+
+                    if ( out_path ):
                         output_feild = out_path
                         log.info("Choosen the dynamic file path")
                         #logger.print_on_console("Choosen the dynamic file path")
@@ -1031,13 +1293,13 @@ class FileOperations:
                 book2 = open_workbook(input_path2)
                 try:
                     if (sheetname1.strip() != ''):sheet1 = book1.sheet_by_name(sheetname1)
-                    else : 
+                    else :
                         sheet1 = book1.sheet_by_index(0)
                 except Exception as e:
                     sheet_exist.append(str(e))
                 try:
                     if (sheetname2.strip() != ''):sheet2 = book2.sheet_by_name(sheetname2)
-                    else : 
+                    else :
                         sheet2 = book2.sheet_by_index(0)
                 except Exception as e:
                     #logger.print_on_console("Sheet Doesn't Exist: {}".format(str(e)))
@@ -1091,7 +1353,7 @@ class FileOperations:
                     except Exception as e :
                         log.error('some error : {}'.format(e))
                     if( output_feild ):
-                        
+
                         if( os.path.exists(output_feild) or os.path.exists(os.path.dirname(output_feild)) ):
 
                             logger.print_on_console( "Writing the output of cellByCellCompare to file ")
@@ -1170,3 +1432,601 @@ class FileOperations:
         except Exception as e :
             log.error('some error : {}'.format(e))
         return status, result, output, err_msg
+
+    def find_file_path(self,input,*args):
+        """
+        def : find_file_path
+        purpose : Fetch the loaction of the input file
+        param : filename, folderpath
+        return : Location of the input file
+        """
+        try:
+            status=TEST_RESULT_FAIL
+            methodoutput=TEST_RESULT_FALSE
+            err_msg=None
+            output_res=OUTPUT_CONSTANT
+            log.debug('reading the inputs')
+            output=[]
+            if(len(input)==2):
+                filename=input[0]
+                folderpath=input[1]
+                for root, dirs, files in os.walk(folderpath):
+                    if filename in files:
+                        output.append(root.replace("\\","/")+'/'+filename)
+                if(output==[]):
+                    log.info('File does not exist inside '+folderpath)
+                    logger.print_on_console('File does not exist inside '+folderpath)
+                else:
+                    log.info('File location is fetched')
+                    logger.print_on_console('File location is fetched')
+                    status = TEST_RESULT_PASS
+                    methodoutput = TEST_RESULT_TRUE
+            else:
+                err_msg="Invalid number of inputs"
+        except Exception as e:
+            err_msg = 'Error occured in fetching file location'
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
+        return status,methodoutput,output,err_msg
+
+    def selective_cell_compare(self,input,*args):
+        """
+        def : selective_cell_compare
+        purpose : selective cell comparison between excel and csv files
+        param : CSV/Excel file path1, sheetname (optional), selected cell range, CSV/Excel file path2, sheetname (optional), selected cell range,case(optional)
+        return : bool/ if output file mentioned then prints cell by cell to that file
+
+        """
+        try:
+            import csv
+            status=TEST_RESULT_FAIL
+            methodoutput=TEST_RESULT_FALSE
+            err_msg=None
+            output_res=OUTPUT_CONSTANT
+            log.debug('reading the inputs')
+            flag1=False
+            flag2=False
+            filepath1=input[0]
+            filepath2=input[3]
+            sheetname1=input[1]
+            sheetname2=input[4]
+            range1=input[2].split(':')
+            range2=input[5].split(':')
+            res1={}
+            output_feild = None
+            extension1=os.path.splitext(filepath1)[1]
+            extension2=os.path.splitext(filepath2)[1]
+            if(len(input)>6):
+                case=input[6]
+            else:
+                case=''
+
+            if(extension1=='.csv' and extension2=='.csv'):#both files are csv
+                col11 = " ".join(re.findall("[a-zA-Z]+", range1[0]))
+                col12 = " ".join(re.findall("[a-zA-Z]+", range1[1]))
+                row11=int(" ".join(re.findall(r'[0-9]+', range1[0])))
+                row12=int(" ".join(re.findall(r'[0-9]+', range1[1])))
+                column11=self.convert.convertStringToInt(col11)
+                column12=self.convert.convertStringToInt(col12)
+
+                col21 = " ".join(re.findall("[a-zA-Z]+", range2[0]))
+                col22 = " ".join(re.findall("[a-zA-Z]+", range2[1]))
+                row21=int(" ".join(re.findall(r'[0-9]+', range2[0])))
+                row22=int(" ".join(re.findall(r'[0-9]+', range2[1])))
+                column21=self.convert.convertStringToInt(col21)
+                column22=self.convert.convertStringToInt(col22)
+
+                i,j,x=0,0,0
+                output1,output2={},{}
+                with open(filepath1,'r') as f1:
+                    reader1=csv.reader(f1)
+                    for row in islice(reader1,min(row11,row12)-1,max(row11,row12)): #row length
+                        output1[i]=[]
+                        for column in islice(row,min(column11,column12)-1,max(column11,column12)): #column length
+                            output1[i].append(column)
+                        i+=1
+
+                with open(filepath2,'r') as f2:
+                    reader2=csv.reader(f2)
+                    for row in islice(reader2,min(row21,row22)-1,max(row21,row22)): #row length
+                        output2[j]=[]
+                        for column in islice(row,min(column21,column22)-1,max(column21,column22)): #column length
+                            output2[j].append(column)
+                        j+=1
+
+                i=list(output2.keys())[0]
+                count=0
+                for aa in range(len(output1)):
+                    res1[x]=[]
+                    for bb in range(len(output2[i])):
+                        if(case!=''):
+                            if (output1[aa][bb].lower()==output2[aa][bb].lower()):
+                                output='True'
+                                res1[x].append(output)
+                            else:
+                                output='False'
+                                res1[x].append(output)
+                        else:
+                            if (output1[aa][bb]==output2[aa][bb]):
+                                output='True'
+                                res1[x].append(output)
+                            else:
+                                output='False'
+                                res1[x].append(output)
+                    count+=1
+                    x+=1
+                    if(count>=len(output2)):
+                        break
+
+                if (len(output1)<len(output2)):
+                    for i in range(len(output1)):
+                        output2.pop(i)
+                    xx=list(output2.keys())[0]
+                    for k in range(len(output2)):
+                        res1[x]=[]
+                        for j in range(len(output2[xx])):
+                            output='False'
+                            res1[x].append(output)
+                        x+=1
+                elif(len(output1)>len(output2)):
+                    for i in range(len(output2)):
+                        output1.pop(i)
+                    xx=list(output1.keys())[0]
+                    for k in range(len(output1)):
+                        res1[x]=[]
+                        for j in range(len(output1[xx])):
+                            output='False'
+                            res1[x].append(output)
+                        x+=1
+
+            elif(extension1=='.xlsx' and extension2=='.xlsx'):# Indicates both files are excel(.xlsx)
+                book1 = openpyxl.load_workbook(filepath1)
+                book2 = openpyxl.load_workbook(filepath2)
+                #verify whether file exists or not
+                result1=self.verify_file_exists(filepath1,'')
+                result2=self.verify_file_exists(filepath2,'')
+
+                sheet1=book1.get_sheet_by_name(sheetname1)
+                sheet2=book2.get_sheet_by_name(sheetname2)
+
+                cell1=list(sheet1[range1[0]:range1[1]])
+                cell2=list(sheet2[range2[0]:range2[1]])
+
+                x,i=0,0
+                for aa in range(len(cell1)):
+                    res1[x]=[]
+                    for bb in range(len(cell2[i])):
+                        if(case!=''):
+                            if (str(cell1[aa][bb].value).lower()==str(cell2[aa][bb].value).lower()):
+                                output='True'
+                                res1[x].append(output)
+                            else:
+                                output='False'
+                                res1[x].append(output)
+                        else:
+                            if (str(cell1[aa][bb].value)==str(cell2[aa][bb].value)):
+                                output='True'
+                                res1[x].append(output)
+                            else:
+                                output='False'
+                                res1[x].append(output)
+                    x+=1
+                    i+=1
+                    if(i>=len(cell2)):
+                        break
+
+                if (len(cell1)<len(cell2)):
+                    for i in range(len(cell1)):
+                        del cell2[0]
+                    for k in range(len(cell2)):
+                        res1[x]=[]
+                        for m in range(len(cell2[0])):
+                            output='False'
+                            res1[x].append(output)
+                        x+=1
+                elif(len(cell1)>len(cell2)):
+                    for i in range(len(cell2)):
+                        del cell1[0]
+                    for k in range(len(cell1)):
+                        res1[x]=[]
+                        for m in range(len(cell1[0])):
+                            output='False'
+                            res1[x].append(output)
+                        x+=1
+
+            elif(extension1=='.xls' and extension2=='.xls'):
+                book1 = open_workbook(filepath1)
+                book2 = open_workbook(filepath2)
+                sheet1 = book1.sheet_by_name(sheetname1)
+                sheet2 = book2.sheet_by_name(sheetname2)
+
+                #verify whether file exists or not
+                result1=self.verify_file_exists(filepath1,'')
+                result2=self.verify_file_exists(filepath2,'')
+
+                col11 = " ".join(re.findall("[a-zA-Z]+", range1[0]))
+                col12 = " ".join(re.findall("[a-zA-Z]+", range1[1]))
+                row11=int(" ".join(re.findall(r'[0-9]+', range1[0])))
+                row12=int(" ".join(re.findall(r'[0-9]+', range1[1])))
+                column11=self.convert.convertStringToInt(col11)
+                column12=self.convert.convertStringToInt(col12)
+
+                col21 = " ".join(re.findall("[a-zA-Z]+", range2[0]))
+                col22 = " ".join(re.findall("[a-zA-Z]+", range2[1]))
+                row21=int(" ".join(re.findall(r'[0-9]+', range2[0])))
+                row22=int(" ".join(re.findall(r'[0-9]+', range2[1])))
+                column21=self.convert.convertStringToInt(col21)
+                column22=self.convert.convertStringToInt(col22)
+
+                output1,output2={},{}
+                x,j,z=0,0,0
+                for row in range(row11-1, row12):
+                        output1[x]=[]
+                        for col in range(column11-1,column12):
+                            cell = sheet1.cell(row,col)
+                            cell_value = cell.value
+                            if cell.ctype in (2,3) and int(cell_value) == cell_value:
+                                cell_value = int(cell_value)
+                            output1[x].append(str(cell_value))
+                        x+=1
+
+                for row in range(row21-1, row22):
+                        output2[z]=[]
+                        for col in range(column21-1,column22):
+                            cell = sheet2.cell(row,col)
+                            cell_value = cell.value
+                            if cell.ctype in (2,3) and int(cell_value) == cell_value:
+                                cell_value = int(cell_value)
+                            output2[z].append(str(cell_value))
+                        z+=1
+
+                i=list(output2.keys())[0]
+                count=0
+                for aa in range(len(output1)):
+                    res1[j]=[]
+                    for bb in range(len(output2[i])):
+                        if(case!=''):
+                            if (str(output1[aa][bb]).lower()==str(output2[aa][bb]).lower()):
+                                output='True'
+                                res1[j].append(output)
+                            else:
+                                output='False'
+                                res1[j].append(output)
+                        else:
+                            if (str(output1[aa][bb])==str(output2[aa][bb])):
+                                output='True'
+                                res1[j].append(output)
+                            else:
+                                output='False'
+                                res1[j].append(output)
+                    aa+=1
+                    j+=1
+                    count+=1
+                    if(count>=len(output2)):
+                        break
+
+                if (len(output1)<len(output2)):
+                    for i in range(len(output1)):
+                        output2.pop(i)
+                    xx=list(output2.keys())[0]
+                    for k in range(len(output2)):
+                        res1[j]=[]
+                        for m in range(len(output2[xx])):
+                            output='False'
+                            res1[j].append(output)
+                        j+=1
+                elif(len(output1)>len(output2)):
+                    for i in range(len(output2)):
+                        output1.pop(i)
+                    xx=list(output1.keys())[0]
+                    for k in range(len(output1)):
+                        res1[j]=[]
+                        for m in range(len(output1[xx])):
+                            output='False'
+                            res1[j].append(output)
+                        j+=1
+
+            elif((extension1=='.xls' and extension2=='.xlsx')or(extension1=='.xlsx' and extension2=='.xls')):
+                #verify whether file exists or not
+                result1=self.verify_file_exists(filepath1,'')
+                result2=self.verify_file_exists(filepath2,'')
+                output1,output2={},{}
+                x,y,j=0,0,0
+
+                if(extension1=='.xlsx'):
+                    col11 = " ".join(re.findall("[a-zA-Z]+", range2[0]))
+                    col12 = " ".join(re.findall("[a-zA-Z]+", range2[1]))
+                    row11=int(" ".join(re.findall(r'[0-9]+', range2[0])))
+                    row12=int(" ".join(re.findall(r'[0-9]+', range2[1])))
+                    column11=self.convert.convertStringToInt(col11)
+                    column12=self.convert.convertStringToInt(col12)
+
+                    book1 = openpyxl.load_workbook(filepath1)
+                    sheet1=book1.get_sheet_by_name(sheetname1)
+                    book2 = open_workbook(filepath2)
+                    sheet2 = book2.sheet_by_name(sheetname2)
+                    cell1=list(sheet1[range1[0]:range1[1]])
+
+                elif(extension2=='.xlsx'):
+                    col11 = " ".join(re.findall("[a-zA-Z]+", range1[0]))
+                    col12 = " ".join(re.findall("[a-zA-Z]+", range1[1]))
+                    row11=int(" ".join(re.findall(r'[0-9]+', range1[0])))
+                    row12=int(" ".join(re.findall(r'[0-9]+', range1[1])))
+                    column11=self.convert.convertStringToInt(col11)
+                    column12=self.convert.convertStringToInt(col12)
+
+                    book1 = openpyxl.load_workbook(filepath2)
+                    sheet1=book1.get_sheet_by_name(sheetname2)
+                    book2 = open_workbook(filepath1)
+                    sheet2 = book2.sheet_by_name(sheetname1)
+                    cell1=list(sheet1[range2[0]:range2[1]])
+
+                for eachcell in cell1:
+                    output1[x]=[]
+                    for i in range(len(eachcell)):
+                        output1[x].append(eachcell[i].value)
+                    x+=1
+
+                for row in range(row11-1, row12):
+                    output2[y]=[]
+                    for col in range(column11-1,column12):
+                        cell = sheet2.cell(row,col)
+                        cell_value = cell.value
+                        if cell.ctype in (2,3) and int(cell_value) == cell_value:
+                            cell_value = int(cell_value)
+                        output2[y].append(str(cell_value))
+                    y+=1
+
+                i=list(output2.keys())[0]
+                count=0
+                for aa in range(len(output1)):
+                    res1[j]=[]
+                    for bb in range(len(output2[i])):
+                        if(case!=''):
+                            if (str(output1[aa][bb]).lower()==str(output2[aa][bb]).lower()):
+                                output='True'
+                                res1[j].append(output)
+                            else:
+                                output='False'
+                                res1[j].append(output)
+                        else:
+                            if (str(output1[aa][bb])==str(output2[aa][bb])):
+                                output='True'
+                                res1[j].append(output)
+                            else:
+                                output='False'
+                                res1[j].append(output)
+                    aa+=1
+                    j+=1
+                    count+=1
+                    if(count>=len(output2)):
+                        break
+
+                if (len(output1)<len(output2)):
+                    for i in range(len(output1)):
+                        output2.pop(i)
+                    xx=list(output2.keys())[0]
+                    for k in range(len(output2)):
+                        res1[j]=[]
+                        for m in range(len(output2[xx])):
+                            output='False'
+                            res1[j].append(output)
+                        j+=1
+                elif(len(output1)>len(output2)):
+                    for i in range(len(output2)):
+                        output1.pop(i)
+                    xx=list(output1.keys())[0]
+                    for k in range(len(output1)):
+                        res1[j]=[]
+                        for m in range(len(output1[xx])):
+                            output='False'
+                            res1[j].append(output)
+                        j+=1
+
+
+            else:#one excel and one csv
+                if(extension1=='.csv'):
+                    file1=filepath1
+                    file2=filepath2
+                    range1=range1
+                    range2=range2
+                    sheetname1=input[4]
+                    if(extension2=='.xlsx'):
+                        book1 = openpyxl.load_workbook(file2)
+                        sheet1=book1.get_sheet_by_name(sheetname1)
+                    elif(extension2=='.xls'):
+                        book1 = open_workbook(file2)
+                        sheet1 = book1.sheet_by_name(sheetname1)
+
+                elif(extension2=='.csv'):
+                    file1=filepath2
+                    file2=filepath1
+                    range1=range2
+                    range2=range1
+                    sheetname1=input[1]
+                    if(extension1=='.xlsx'):
+                        book1 = openpyxl.load_workbook(file2)
+                        sheet1=book1.get_sheet_by_name(sheetname1)
+                    elif(extension1=='.xls'):
+                        book1 = open_workbook(file2)
+                        sheet1 = book1.sheet_by_name(sheetname1)
+
+                col11 = " ".join(re.findall("[a-zA-Z]+", range1[0]))
+                col12 = " ".join(re.findall("[a-zA-Z]+", range1[1]))
+                row11=int(" ".join(re.findall(r'[0-9]+', range1[0])))
+                row12=int(" ".join(re.findall(r'[0-9]+', range1[1])))
+                column11=self.convert.convertStringToInt(col11)
+                column12=self.convert.convertStringToInt(col12)
+                output1,output2={},{}
+                i,x,j=0,0,0
+                if(file1):
+                    with open(file1,'r') as f1:
+                        reader1=csv.reader(f1)
+                        for row in islice(reader1,min(row11,row12)-1,max(row11,row12)): #row length
+                            output1[i]=[]
+                            for column in islice(row,min(column11,column12)-1,max(column11,column12)): #column length
+                                output1[i].append(column)
+                            i+=1
+
+                #verify whether file exists or not
+                result1=self.verify_file_exists(file1,'')
+                result2=self.verify_file_exists(file2,'')
+
+                # sheet1=book1.get_sheet_by_name(sheetname1)
+                if(extension1=='.xlsx' or extension2=='.xlsx'):
+                    cell1=list(sheet1[range2[0]:range2[1]])
+
+                    for eachcell in cell1:
+                        output2[x]=[]
+                        for i in range(len(eachcell)):
+                            output2[x].append(eachcell[i].value)
+                        x+=1
+                elif(extension1=='.xls' or extension2=='.xls'):
+                    for row in range(row11-1, row12):
+                        output2[x]=[]
+                        for col in range(column11-1,column12):
+                            cell = sheet1.cell(row,col)
+                            cell_value = cell.value
+                            if cell.ctype in (2,3) and int(cell_value) == cell_value:
+                                cell_value = int(cell_value)
+                            output2[x].append(str(cell_value))
+                        x+=1
+
+
+                i=list(output2.keys())[0]
+                count=0
+                for aa in range(len(output1)):
+                    res1[j]=[]
+                    for bb in range(len(output2[i])):
+                        if(case!=''):
+                            if (str(output1[aa][bb]).lower()==str(output2[aa][bb]).lower()):
+                                output='True'
+                                res1[j].append(output)
+                            else:
+                                output='False'
+                                res1[j].append(output)
+                        else:
+                            if (str(output1[aa][bb])==str(output2[aa][bb])):
+                                output='True'
+                                res1[j].append(output)
+                            else:
+                                output='False'
+                                res1[j].append(output)
+                    aa+=1
+                    j+=1
+                    count+=1
+                    if(count>=len(output2)):
+                        break
+
+                if (len(output1)<len(output2)):
+                    for i in range(len(output1)):
+                        output2.pop(i)
+                    xx=list(output2.keys())[0]
+                    for k in range(len(output2)):
+                        res1[j]=[]
+                        for m in range(len(output2[xx])):
+                            output='False'
+                            res1[j].append(output)
+                        j+=1
+                elif(len(output1)>len(output2)):
+                    for i in range(len(output2)):
+                        output1.pop(i)
+                    xx=list(output1.keys())[0]
+                    for k in range(len(output1)):
+                        res1[j]=[]
+                        for m in range(len(output1[xx])):
+                            output='False'
+                            res1[j].append(output)
+                        j+=1
+
+            if(str(args[0].split(";")[0]).startswith("{") and str(args[0].split(";")[0]).endswith("}")):
+                out_path = self.DV.get_dynamic_value(args[0].split(";")[0])
+                if(out_path):
+                    output_feild = out_path
+            else:
+                output_feild = args[0].split(";")[0]
+            if(output_feild):
+                file_extension,status_get_ext = self.__get_ext(output_feild)
+                sheet='selectiveCellCompare'
+                result=os.path.isfile(output_feild)
+
+                logger.print_on_console( "Writing the output of selectiveCellCompare to file ")
+                msg='Output file has old entries! Erasing old data to store incoming result.'
+                if status_get_ext and file_extension is not None and file_extension in generic_constants.SELECTIVE_CELL_FILE_TYPES:
+                    if(file_extension=='.xlsx'):
+                        if result==True:
+                            wb=openpyxl.load_workbook(output_feild)
+                        else:
+                            logger.print_on_console("File Does not exists, creating the file in specified path {}".format(output_feild))
+                            wb=openpyxl.Workbook()
+
+                        if(sheet in wb.sheetnames):
+                            logger.print_on_console(msg)
+                            self.xlsx_obj.clear_content_xlsx(os.path.dirname(output_feild),os.path.basename(output_feild),sheet)
+                            wb=openpyxl.load_workbook(output_feild)
+                        else:
+                            wb.create_sheet(index=0, title=sheet)
+
+                        row,col=1,1
+                        getSheet=wb[sheet]
+                        for key, value in res1.items():
+                            for i in range(len(res1[key])):
+                                getSheet.cell(row, col , value[i])
+                                col += 1
+                            col = 1
+                            row+=1
+                        wb.save(output_feild)
+                        wb.close()
+                        flag1=True
+
+                    elif(file_extension=='.xls'):
+                        if result==True:
+                            rb = open_workbook(output_feild)
+                            wb = xl_copy(rb)
+                            getSheet = wb.get_sheet(sheet)
+                        else:
+                            logger.print_on_console("File Does not exists, creating the file in specified path {}".format(output_feild))
+                            wb = xlwt.Workbook(encoding="utf-8")
+                        try:
+                            if(getSheet):
+                                logger.print_on_console(msg)
+                                self.xls_obj.clear_content_xls(os.path.dirname(output_feild),os.path.basename(output_feild),sheet)
+                                rb = open_workbook(output_feild)
+                                wb = xl_copy(rb)
+                                getSheet = wb.get_sheet(sheet)
+                        except:
+                            getSheet = wb.add_sheet(sheet)
+
+                        row,col=0,0
+                        for key, value in res1.items():
+                            for i in range(len(res1[key])):
+                                getSheet.write(row, col , value[i])
+                                col += 1
+                            col = 0
+                            row+=1
+                        wb.save(output_feild)
+                        flag1=True
+
+                    #for csv and txt
+                    if(file_extension=='.csv' or file_extension=='.txt'):
+                        flag1, err_msg = self.write_result_file(output_feild, res1, sheet)
+
+                    if(flag1==False):
+                        log.error(err_msg)
+                        logger.print_on_console(err_msg)
+
+                    if(flag1 or flag2):
+                        log.info('Compared cells between the mentioned files')
+                        logger.print_on_console('Compared cells between the mentioned files')
+                        status = TEST_RESULT_PASS
+                        methodoutput = TEST_RESULT_TRUE
+                else:
+                    err_msg = 'Warning! : Invalid file extension(Supports only .xlsx, .xls, .txt, .csv).'
+            else:
+                err_msg='Output field is empty'
+                log.error(err_msg)
+                logger.print_on_console(err_msg)
+        except Exception as err_msg:
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
+        return status,methodoutput,res1,err_msg

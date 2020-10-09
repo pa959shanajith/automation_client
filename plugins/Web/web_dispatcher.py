@@ -53,6 +53,14 @@ class Dispatcher:
         local_Wd.custom_object=custom_keyword.CustomKeyword()
         local_Wd.webelement_map=OrderedDict()
         local_Wd.log = logging.getLogger('web_dispatcher.py')
+        self.identifier_dict={
+            'rxpath': 'find_elements_by_xpath',
+            'id': 'find_elements_by_id',
+            'xpath': 'find_elements_by_xpath',
+            'name':'find_elements_by_name',
+            'classname':'find_elements_by_class_name',
+            'css_selector': 'find_elements_by_css_selector'
+        }
         self.web_dict={
             'getobjectcount':local_Wd.custom_object.get_object_count,
             'getobject':local_Wd.custom_object.get_object,
@@ -85,6 +93,12 @@ class Dispatcher:
             'getrownumbytext' : local_Wd.table_object.getRowNumByText,
             'getcolnumbytext' : local_Wd.table_object.getColNumByText,
             'getinnertable' : local_Wd.table_object.getInnerTable,
+            # grid keywords
+            'horizontalscroll' : local_Wd.table_object.horizontalScroll,
+            'verticalscroll' : local_Wd.table_object.verticalScroll,
+
+
+            'getinnertable' : local_Wd.table_object.getInnerTable,            
             #author : arpitha.b.v
             #added mapping of 'getCellToolTip' and 'verifyCellToolTip' to table object
             'getcelltooltip' : local_Wd.table_object.getCellToolTip,
@@ -500,6 +514,32 @@ class Dispatcher:
                 local_Wd.log.error(e)
         return status,value
 
+    def element_locator(self,driver,type,identifier,id_num):
+        if identifier=='null': return None
+        webElement = None
+        try:
+            index = 0
+            if type == "classname" :
+                if '[' and ']' in identifier:
+                    index = int(identifier.split('[')[1].split(']')[0])
+                    identifier = identifier.split('[')[0]
+                if ' ' in identifier.strip():
+                    identifier = '.'+identifier.replace(' ','.')
+                    type = 'css_selector'
+                webElement=getattr(driver,self.identifier_dict[type])(identifier)
+                if len(webElement) >= index:
+                    webElement = [webElement[index]]
+            else:
+                webElement=getattr(driver,self.identifier_dict[type])(identifier)
+            if len(webElement) == 1:
+                webElement=webElement[0]
+                logger.print_on_console('Webelement found by OI '+id_num)
+                local_Wd.log.info('Webelement found by OI '+id_num)
+            else: webElement = None
+        except Exception as e:
+            local_Wd.log.error(e,exc_info=True)
+        return webElement
+
 
     def getwebelement(self,driver,objectname,stepnum,custname):
 ##        objectname = str(objectname)
@@ -511,104 +551,27 @@ class Dispatcher:
             local_Wd.log.debug('Identifiers are ')
             local_Wd.log.debug(identifiers)
             if len(identifiers)>=3:
-                try:
-                    #find by rxpath
-                    tempwebElement = driver.find_elements_by_xpath(identifiers[0])
-                    if (len(tempwebElement) == 1):
-                        logger.print_on_console('Webelement found by OI1')
-                        local_Wd.log.debug('Webelement found by OI1')
-                    if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
-                        tempwebElement = driver.find_elements_by_id(identifiers[1])
-                        if (len(tempwebElement) == 1):
-                            logger.print_on_console('Webelement found by OI2')
-                            local_Wd.log.debug('Webelement found by OI2')
-                        if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
-                            tempwebElement = driver.find_elements_by_xpath(identifiers[2])
-                            if (len(tempwebElement) == 1):
-                                logger.print_on_console('Webelement found by OI3')
-                                local_Wd.log.debug('Webelement found by OI3')
-                            if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
-                                tempwebElement = None
-##                    local_Wd.log.debug('Webelement found by relative xpath')
-                    webElement = tempwebElement
-
-                except Exception as webEx:
-                    try:
-                        #find by id
-                        tempwebElement = driver.find_elements_by_id(identifiers[1])
-                        if (len(tempwebElement) == 1):
-                            logger.print_on_console('Webelement found by OI2')
-                            local_Wd.log.debug('Webelement found by OI2')
-                        if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
-                            tempwebElement = driver.find_elements_by_xpath(identifiers[2])
-                            if (len(tempwebElement) == 1):
-                                logger.print_on_console('Webelement found by OI3')
-                                local_Wd.log.debug('Webelement found by OI3')
-                            if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
-                                tempwebElement = None
-##                        local_Wd.log.debug('Webelement found by Id')
-                        webElement = tempwebElement
-                    except Exception as webEx:
-                        #find by absolute Xpath
-                        try:
-                            tempwebElement = driver.find_elements_by_xpath(identifiers[2])
-                            if (len(tempwebElement) == 1):
-                                logger.print_on_console('Webelement found by OI3')
-                                local_Wd.log.debug('Webelement found by OI3')
-                            if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
-                                tempwebElement = None
-                            webElement = tempwebElement
-##                            local_Wd.log.debug('Webelement found by absolute Xpath')
-                        except Exception as webEx:
-                            try:
-                                if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
-                                    tempwebElement = driver.find_elements_by_name(identifiers[3])
-                                    if (len(tempwebElement) == 1):
-                                        logger.print_on_console('Webelement found by OI4')
-                                        local_Wd.log.debug('Webelement found by OI4')
-                                    if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
-                                        tempwebElement = driver.find_elements_by_class_name(identifiers[5])
-                                        if (len(tempwebElement) == 1):
-                                            logger.print_on_console('Webelement found by OI5')
-                                            local_Wd.log.debug('Webelement found by OI5')
-                                    if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
-                                        if(len(identifiers)>=12):
-                                            tempwebElement = driver.find_elements_by_css_selector(identifiers[11])
-                                            if (len(tempwebElement) == 1):
-                                                logger.print_on_console('Webelement found by OI6')
-                                                local_Wd.log.debug('Webelement found by OI6')
-                                            else:
-                                                tempwebElement = None
-                                webElement = tempwebElement
-                            except Exception as webEx:
-                                    try:
-                                        if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
-                                            tempwebElement = driver.find_elements_by_class_name(identifiers[5])
-                                            if (len(tempwebElement) == 1):
-                                                logger.print_on_console('Webelement found by OI5')
-                                                local_Wd.log.debug('Webelement found by OI5')
-                                            if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
-                                                if(len(identifiers)>=12):
-                                                    tempwebElement = driver.find_elements_by_css_selector(identifiers[11])
-                                                    if (len(tempwebElement) == 1):
-                                                        logger.print_on_console('Webelement found by OI6')
-                                                        local_Wd.log.debug('Webelement found by OI6')
-                                                    else:
-                                                        tempwebElement = None
-                                        webElement = tempwebElement
-                                    except Exception as webEx:
-                                        try:
-                                            if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
-                                                if(len(identifiers)>=12):
-                                                    tempwebElement = driver.find_elements_by_css_selector(identifiers[11])
-                                                    if (len(tempwebElement) == 1):
-                                                        logger.print_on_console('Webelement found by OI6')
-                                                        local_Wd.log.debug('Webelement found by OI6')
-                                                    else:
-                                                        tempwebElement = None
-                                            webElement = tempwebElement
-                                        except Exception as webEx:
-                                            err_msg=WEB_ELEMENT_NOT_FOUND
+                #find by classname
+                webElement=self.element_locator(driver,'classname',identifiers[5],'5')
+                if not(webElement):
+                    #find by id
+                    webElement=self.element_locator(driver,'id',identifiers[1],'2')
+                    if not(webElement):
+                        #find by Relative xpath
+                        webElement=self.element_locator(driver,'rxpath',identifiers[0],'1')
+                        if not(webElement):
+                            #find by absolute xpath
+                            webElement=self.element_locator(driver,'xpath',identifiers[2],'3')
+                            if not(webElement):
+                                #find by name
+                                webElement=self.element_locator(driver,'name',identifiers[3],'4')
+                                if not(webElement):
+                                    #find by css selector
+                                    if len(identifiers) > 11:
+                                        webElement=self.element_locator(driver,'css_selector',identifiers[11],'6')
+                                    if not(webElement):
+                                        webElement=None
+                                        local_Wd.log.info("Weblement not found with Primary identifers")
             #enhance object reconition changes
             if(webElement == None):
                 try:
@@ -624,18 +587,23 @@ class Dispatcher:
                         if tagname in identifiers[4]:
                             arrofsimilartags.append(a[i])
                     elementname='null'
+                    elementxpath='null'
                     for i in range (len(arrofsimilartags)):
+                        local_Wd.log.debug("Elements found with similar tag names in the given boundary")
                         xpath =arrofsimilartags[i].get('xpath').split(';')
                         name=xpath[3]
+                        textvalue=xpath[7]
+                        #Matching with name attribute, on success , find the element by it's name
                         if name == identifiers[3]:
                             elementname= name
-                    if (elementname!='null'):
-                            tempwebElement = driver.find_elements_by_name(elementname)
-                            if (len(tempwebElement) == 1):
-                                logger.print_on_console('Webelement found by OI7')
-                                local_Wd.log.debug('Webelement found by OI7')
-                            if ((len(tempwebElement) > 1) or (len(tempwebElement) == 0)):
-                                webElement=None
+                        #Matching with textcontent, on success , find the element by it's xpath
+                        elif textvalue==identifiers[10]:
+                            elementxpath=xpath
+                    if (elementname!='null') or elementxpath!='null':
+                        webElement = self.element_locator(driver,'name',elementname,'7')
+                        if not(webElement):
+                            webElement = self.element_locator(driver,'xpath',elementxpath[2],'8')
+                        else: local_Wd.log.info("Weblement not found with Advanced object recognition - 1")
                     if(webElement==None):
                         script2="""var aTags = document.getElementsByTagName(arguments[2]); var arr = arguments[0]; var searchText = arguments[1]; var found = ''; var stextvalue = ''; var stagname = 0; for (var i = 0; i < arr.length; i++) {     for (var j = 0; j < aTags.length; j++) {         stextvalue = stext_content(aTags[j]);         stextvalue = (String(stextvalue));         var sname = aTags[j].name;         sname = (String(sname));         var splaceholder = aTags[j].placeholder;         splaceholder = (String(splaceholder));         var stagname = aTags[j].tagName.toLowerCase();         if (stextvalue == '' || stextvalue == 'null' || stextvalue == 'undefined' || stextvalue == '0') {             if (sname != '' && sname != 'undefined') {                 snames = document.getElementsByName(sname);                 if (snames.length > 1) {                     for (var k = 0; k < snames.length; k++) {                         if (aTags[j] == snames[k]) {                             stextvalue = sname + k;                         }                     }                 } else {                     stextvalue = sname;                 }             } else if (splaceholder != '' && splaceholder != 'undefined') {                 stextvalue = splaceholder;             } else { 				stextvalue = stagname + '_NONAME' + (j+1);             }         }         if (arr[i].text == stextvalue) {             if (stextvalue == searchText) {                 found = aTags[j];                 break;             }         }     }      if (found != '') {         break;     } }  function stext_content(f) {     var sfirstText = '';     var stextdisplay = '';     for (var z = 0; z < f.childNodes.length; z++) {         var scurNode = f.childNodes[z];         swhitespace = /^\s*$/;         if (scurNode.nodeName === '#text' && !(swhitespace.test(scurNode.nodeValue))) {             sfirstText = scurNode.nodeValue;             stextdisplay = stextdisplay + sfirstText;         }     }     return (stextdisplay); }; return found;"""
                         tagname=identifiers[4].split('[')[0]

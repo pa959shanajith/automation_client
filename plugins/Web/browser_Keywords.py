@@ -671,8 +671,8 @@ class BrowserKeywords():
                         err_msg=self.__web_driver_exception(e)
 
                 if(len(local_bk.all_handles) >= 1):
-                    local_bk.driver_obj.switch_to.window(local_bk.parent_handle)
-                    self.update_recent_handle(local_bk.parent_handle)
+                    local_bk.driver_obj.switch_to.window(local_bk.all_handles[-1])
+                    self.update_recent_handle(local_bk.all_handles[-1])
                     status=webconstants.TEST_RESULT_PASS
                     result=webconstants.TEST_RESULT_TRUE
             else:
@@ -682,7 +682,7 @@ class BrowserKeywords():
 
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
-            local_bk.driver_obj.switch_to.window(local_bk.parent_handle)
+            local_bk.driver_obj.switch_to.window(local_bk.all_handles[-1])
         return status,result,output,err_msg
 
     def clear_cache(self,*args):
@@ -690,26 +690,35 @@ class BrowserKeywords():
         result=webconstants.TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
+        configvalue=readconfig.configvalues
         try:
             if local_bk.driver_obj != None and isinstance(local_bk.driver_obj,webdriver.Ie) or isinstance(local_bk.driver_obj,webdriver.Edge):
-                #get all the cookies
-                cookies=local_bk.driver_obj.get_cookies()
-                if len(cookies)>0:
-                    cookies_list=[]
-                    for x in cookies:
-                        cookies_list.append(x['name'])
-                    logger.print_on_console('Cookies are ',str(cookies_list))
-                    local_bk.log.info('Cookies are: ')
-                    local_bk.log.info(cookies_list)
-                    #delete_all_cookies()
-                    local_bk.driver_obj.delete_all_cookies()
-                    status=webconstants.TEST_RESULT_PASS
-                    result=webconstants.TEST_RESULT_TRUE
-
+                if((str(configvalue['bit_64']).lower())=='yes' and isinstance(local_bk.driver_obj,webdriver.Ie)):
+                    import subprocess
+                    command = ['RunDll32.exe', 'InetCpl.cpl,ClearMyTracksByProcess', '2']
+                    proc = subprocess.run(command)
+                    if(proc.returncode==0):
+                        status = webconstants.TEST_RESULT_PASS
+                        result = webconstants.TEST_RESULT_TRUE
                 else:
-                    logger.print_on_console('No Cookies found')
-                    local_bk.log.error('No Cookies found')
-                    err_msg = 'No Cookies found'
+                    #get all the cookies
+                    cookies=local_bk.driver_obj.get_cookies()
+                    if len(cookies)>0:
+                        cookies_list=[]
+                        for x in cookies:
+                            cookies_list.append(x['name'])
+                        logger.print_on_console('Cookies are ',str(cookies_list))
+                        local_bk.log.info('Cookies are: ')
+                        local_bk.log.info(cookies_list)
+                        #delete_all_cookies()
+                        local_bk.driver_obj.delete_all_cookies()
+                        status=webconstants.TEST_RESULT_PASS
+                        result=webconstants.TEST_RESULT_TRUE
+
+                    else:
+                        logger.print_on_console('No Cookies found')
+                        local_bk.log.error('No Cookies found')
+                        err_msg = 'No Cookies found'
             #clear cache for chrome driver.
             elif local_bk.driver_obj != None and isinstance(local_bk.driver_obj,webdriver.Chrome):
                     local_bk.driver_obj.get('chrome://settings/clearBrowserData')
@@ -720,7 +729,8 @@ class BrowserKeywords():
                     status=webconstants.TEST_RESULT_PASS
                     result=webconstants.TEST_RESULT_TRUE
             else:
-                err_msg = "This feature is not available."
+                drv={ '2': 'Firefox', '3': 'Internet Explorer', '6': 'Safari', '7': 'Edge Legacy', '8': 'Edge Chromium'}
+                err_msg = "This function is not available for "+drv[self.browser_num]+'.'
                 logger.print_on_console(err_msg)
                 local_bk.log.error(err_msg)
         except Exception as e:
@@ -1009,6 +1019,7 @@ class Singleton_DriverUtil():
                 if core.chromeFlag:
                     choptions = webdriver.ChromeOptions()
                     choptions.add_argument('start-maximized')
+                    choptions.add_experimental_option('useAutomationExtension', False)
                     if headless_mode: choptions.add_argument('--headless')
                        
                     if configvalues['extn_enabled'].lower()=='yes' and os.path.exists(webconstants.EXTENSION_PATH):

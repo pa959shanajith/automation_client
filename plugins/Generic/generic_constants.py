@@ -33,6 +33,8 @@ FILE_TYPES=['.txt','.xls','.xlsx','.pdf','.xml','.csv','.json']
 
 EXCEL_TYPES=['.xls','.xlsx']
 
+SELECTIVE_CELL_FILE_TYPES=['.xls','.xlsx','.csv','.txt']
+
 INVALID_FILE_FORMAT='Invalid file format'
 
 NOT_SUPPORTED='Excel files are not supported'

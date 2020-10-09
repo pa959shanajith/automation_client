@@ -121,7 +121,7 @@ class ClientWindow(wx.Frame):
         self.rollbackItem = wx.MenuItem(self.helpMenu, 162, text="Rollback", kind=wx.ITEM_NORMAL)
         self.helpMenu.Append(self.rollbackItem)
         self.rollbackItem.Enable(False)
-        self.menubar.Append(self.helpMenu, '&Help')
+        #self.menubar.Append(self.helpMenu, '&Help')
 
         self.Bind(wx.EVT_MENU, self.menuhandler)
         self.connectbutton = wx.BitmapButton(self.panel, bitmap=self.connect_img,pos=(10, 10), size=(100, 25), name='connect')
@@ -532,7 +532,7 @@ class Config_window(wx.Frame):
         self.updated = False
         self.panel = wx.Panel(self)
 
-        #This is the panel which will have scrolling panel and which will contain the radiobuttons 
+        #This is the panel which will have scrolling panel and which will contain the radiobuttons
         self.panel1 = wx.lib.scrolledpanel.ScrolledPanel(self.panel,-1,size=(440,195), pos=(8,315))
         self.panel1.SetupScrolling()
 
@@ -666,7 +666,7 @@ class Config_window(wx.Frame):
         else:
             self.conn_timeout.SetValue("0")
 
-        self.config_param=wx.StaticText(self.panel,label="Config Parameters",pos=(10,290),size=(100,30), style=0, name="")    
+        self.config_param=wx.StaticText(self.panel,label="Config Parameters",pos=(10,290),size=(100,30), style=0, name="")
         font = wx.Font(9, wx.DEFAULT, wx.NORMAL, wx.NORMAL)
         #font.SetUnderlined(True)
         self.config_param.SetFont(font)
@@ -686,12 +686,12 @@ class Config_window(wx.Frame):
         self.dispVarTimeOut.SetToolTip(wx.ToolTip("displayVariable popup duration[in seconds]"))
         self.sev_cert.SetToolTip(wx.ToolTip("Server certificate file path or default"))
         self.connection_timeout.SetToolTip(wx.ToolTip("Timeout from server [in hours 0 or >8]"))
-        
+
         ## Binding placeholders and restricting textareas to just numeric characters
         self.disp_var_timeout.Bind(wx.EVT_SET_FOCUS,self.toggle1_generic)
         self.disp_var_timeout.Bind(wx.EVT_KILL_FOCUS,self.toggle2_generic)
         self.disp_var_timeout.Bind(wx.EVT_CHAR, self.handle_keypress)
-        
+
         self.query_timeout.Bind(wx.EVT_SET_FOCUS,self.toggle1_generic)
         self.query_timeout.Bind(wx.EVT_KILL_FOCUS,self.toggle2_generic)
         self.query_timeout.Bind(wx.EVT_CHAR, self.handle_keypress)
@@ -699,15 +699,15 @@ class Config_window(wx.Frame):
         self.time_out.Bind(wx.EVT_SET_FOCUS,self.toggle1_generic)
         self.time_out.Bind(wx.EVT_KILL_FOCUS,self.toggle2_generic)
         self.time_out.Bind(wx.EVT_CHAR, self.handle_keypress)
-        
+
         self.delay.Bind(wx.EVT_SET_FOCUS,self.toggle1_generic)
         self.delay.Bind(wx.EVT_KILL_FOCUS,self.toggle2_generic)
         self.delay.Bind(wx.EVT_CHAR, self.handle_keypress)
-        
+
         self.Delay_input.Bind(wx.EVT_SET_FOCUS,self.toggle1_generic)
         self.Delay_input.Bind(wx.EVT_KILL_FOCUS,self.toggle2_generic)
         self.Delay_input.Bind(wx.EVT_CHAR, self.handle_keypress)
-        
+
         self.step_exe_wait.Bind(wx.EVT_SET_FOCUS,self.toggle1_generic)
         self.step_exe_wait.Bind(wx.EVT_KILL_FOCUS,self.toggle2_generic)
         self.step_exe_wait.Bind(wx.EVT_CHAR, self.handle_keypress)
@@ -738,7 +738,7 @@ class Config_window(wx.Frame):
         else:
             self.rbox2.SetSelection(0)
         self.rbox2.SetToolTip(wx.ToolTip("Checks if the Client machine is a 64-bit machine or 32-bit"))
-    
+
         self.rbox9 = wx.RadioBox(self.panel1, label = 'Disable Server Cert Check', choices = lblList,
             majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
         if isConfigJson!=False and isConfigJson['disable_server_cert'].title() == lblList[0]:
@@ -840,17 +840,17 @@ class Config_window(wx.Frame):
         if isConfigJson != False and isConfigJson['headless_mode'].title() == lblList[0]:
             self.rbox15.SetSelection(0)
         else:
-            self.rbox15.SetSelection(1)    
+            self.rbox15.SetSelection(1)
         self.rbox15.SetToolTip(wx.ToolTip("Enables or disables Headless execution mode for Browser"))
 
-        #Adding GridSizer which will show the radio buttons into grid of 7 rows and 2 colums it can be changed based on the requirements 
+        #Adding GridSizer which will show the radio buttons into grid of 7 rows and 2 colums it can be changed based on the requirements
         self.gs=wx.GridSizer(8,2,5,5)
         self.gs.AddMany([(self.rbox1,0,wx.EXPAND), (self.rbox2,0,wx.EXPAND), (self.rbox9,0,wx.EXPAND),
             (self.rbox5,0,wx.EXPAND), (self.rbox6,0,wx.EXPAND), (self.rbox3,0,wx.EXPAND),
             (self.rbox4,0,wx.EXPAND), (self.rbox8,0,wx.EXPAND), (self.rbox7,0,wx.EXPAND),
             (self.rbox10,0,wx.EXPAND), (self.rbox11,0,wx.EXPAND), (self.rbox12,0,wx.EXPAND),
-            (self.rbox13,0,wx.EXPAND), (self.rbox14,0,wx.EXPAND), (self.rbox15,0,wx.EXPAND)])    
-       
+            (self.rbox13,0,wx.EXPAND), (self.rbox14,0,wx.EXPAND), (self.rbox15,0,wx.EXPAND)])
+
         #adding  GridSizer to bSizer which is a box sizer
         self.bSizer.Add(self.gs, 1, wx.EXPAND | wx.TOP, 5)
         #now setting that boxsizer to our panel1
