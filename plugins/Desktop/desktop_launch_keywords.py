@@ -353,6 +353,7 @@ class Launch_Keywords():
                         var = 1
                         while var == 1:
                             title_matched_windows = self.getProcessWindows(windowname)
+                            print("no of window handles",len(title_matched_windows))
                             log.debug(len(title_matched_windows))
                             if ( win_handle_flag == True ):
                                 if ( win_handle_index <= title_matched_windows ):
