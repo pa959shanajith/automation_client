@@ -19,7 +19,7 @@ from openpyxl.utils import get_column_letter
 import generic_constants
 from constants import *
 import folder_operations
-from file_comparison_operations import TextFile,PdfFile,XML,JSON
+from file_comparison_operations import TextFile,XML,JSON
 import excel_operations
 import core_utils
 import urllib.request, urllib.error, urllib.parse
@@ -29,6 +29,8 @@ import difflib
 from xmldiff import main, formatting
 import readconfig
 from xlrd import open_workbook
+import shutil
+import pathlib
 import dynamic_variable_handler
 import logging
 from itertools import islice
@@ -41,7 +43,6 @@ class FileOperations:
     """The instantiation operation __init__ creates an empty object of the class FileOperations when it is instantiated"""
     def __init__(self):
         self.txt=TextFile()
-        self.pdf=PdfFile()
         self.xml=XML()
         self.json=JSON()
         self.folder=folder_operations.FolderOperations()
@@ -61,12 +62,10 @@ class FileOperations:
               '.xls_verify_content':self.xls_obj.verify_content_xls,
               '.xlsx_verify_content':self.xlsx_obj.verify_content_xlsx,
               '.txt_verify_content':self.txt.verify_content,
-              '.pdf_verify_content':self.pdf.verify_content,
 
               '.txt_compare_content':self.txt.compare_content,
               '.xls_compare_content':self.xls_obj.compare_content_xls,
               '.xlsx_compare_content':self.xlsx_obj.compare_content_xlsx,
-              '.pdf_compare_content':self.pdf.compare_content,
               '.csv_compare_content':self.csv_obj.compare_content_csv,
               '.json_compare_content':self.json.compare_content,
 
@@ -76,7 +75,6 @@ class FileOperations:
               '.xml_clear_content':self.xml.clear_content,
 
               '.txt_get_content':self.txt.get_content,
-              '.pdf_get_content':self.pdf.get_content,
 
               '.txt_replace_content':self.txt.replace_content,
               '.xls_replace_content':self.xls_obj.replace_content_xls,
@@ -218,6 +216,234 @@ class FileOperations:
             log.error(err_msg)
             logger.print_on_console(err_msg)
         return status,methodoutput,output_res,err_msg
+
+    def copyFileFolder(self, source_path, destination_path, opt = 0):
+        """
+        def: copyFileFolder
+        purpose: Copy from input path 1, to input path 2, optional(0(default)- overwrite/1- overwrite )
+        param: <path of source file/folder>,<path of destination(directory path only)>,bool
+        return: bool
+        """
+        status = TEST_RESULT_FAIL
+        result = TEST_RESULT_FALSE
+        err_msg = None
+        output_res = OUTPUT_CONSTANT
+        try:
+            if( source_path and destination_path ):
+                try:
+                    if( os.path.splitext(source_path)[1] and not os.path.splitext(destination_path)[1] ):
+                        #file ops
+                        if ( os.path.isfile(source_path) ):
+                            if( os.path.isdir(destination_path) ):# #destination should be a folder only
+                                destination_path = destination_path + '/' + os.path.basename(source_path)
+                                if ( shutil.disk_usage(os.path.dirname(destination_path)).free / 1048576 > os.path.getsize(source_path) / 1048576):
+                                    if( int(opt) == 0 ):
+                                        #dont-overwrite
+                                        if ( not os.path.isfile(destination_path) ): #already exists
+                                            logger.print_on_console( "Copying the file to destination. Please wait..." )
+                                            shutil.copyfile(source_path,destination_path)
+                                            log.debug( 'File successfully copied from ' + str(source_path) + ' to ' + str(destination_path) )
+                                            status=TEST_RESULT_PASS
+                                            result=TEST_RESULT_TRUE
+                                        else:
+                                            err_msg = 'File already exists in the directory'
+                                    elif( int(opt) == 1 ):
+                                        #overwrite
+                                        logger.print_on_console( "Copying the file to destination. Please wait..." )
+                                        shutil.copyfile(source_path,destination_path)
+                                        log.debug( 'File successfully copied from ' + str(source_path) + ' to ' + str(destination_path) )
+                                        status=TEST_RESULT_PASS
+                                        result=TEST_RESULT_TRUE
+                                    else:
+                                        err_msg = 'Invalid option, Please provide 1 or 0'
+                                else:
+                                    log.error('Available space on destination directory : ' + str(shutil.disk_usage(os.path.dirname(destination_path)).free / 1048576) + 'MB and file size of source path : ' + str(os.path.getsize(source_path) / 1048576) + 'MB')
+                                    err_msg = 'Destination directory does not have sufficient storage space'
+                            else:
+                                err_msg = 'Destination directory does not exist, Please provide a valid destination directory'
+                        else:
+                            err_msg = 'Source file does not exist, Please provide a valid source file'
+                    elif( not os.path.splitext(source_path)[1] and not os.path.splitext(destination_path)[1] ):
+                        #folder ops
+                        if( os.path.isdir(source_path) ):
+                            if (os.path.isdir(destination_path)):
+                                destination_path = destination_path + '/' + os.path.basename(source_path)
+                                if ( shutil.disk_usage(os.path.dirname(destination_path)).free / 1000000 > os.path.getsize(source_path)):
+                                    if( int(opt) == 0 ):
+                                        #dont - overwrite
+                                        if( not os.path.isdir(destination_path + '/' + os.path.basename(source_path)) ):
+                                            logger.print_on_console( "Copying the directory to destination. Please wait..." )
+                                            shutil.copytree(source_path, destination_path)
+                                            log.debug( 'Folder successfully copied to ' + str(source_path) + ' from ' + str(destination_path) )
+                                            status=TEST_RESULT_PASS
+                                            result=TEST_RESULT_TRUE
+                                        else:
+                                            err_msg = 'Folder already exists in the directory'
+                                    elif( int(opt) == 1 ):
+                                        #overwrite
+                                            logger.print_on_console( "Copying the directory to destination. Please wait..." )
+                                            shutil.copytree(source_path, destination_path)
+                                            log.debug( 'Folder successfully copied to ' + str(source_path) + ' from ' + str(destination_path) )
+                                            status=TEST_RESULT_PASS
+                                            result=TEST_RESULT_TRUE
+                                    else:
+                                        err_msg = 'Invalid option, Please provide 1 or 0'
+                                else:
+                                    log.error('Available space on destination directory : ' + str(shutil.disk_usage(os.path.dirname(destination_path)).free / 1000000) + 'MB and folder size of source path : ' + str(os.path.getsize(source_path)) + 'MB')
+                                    err_msg = 'Destination directory does not have sufficient storage space'
+                            else:
+                                err_msg = 'Destination directory does not exist, Please provide a valid destination directory'
+                        else:
+                            err_msg = 'Source directory does not exist, Please provide a valid source directory'
+                    else:
+                        err_msg = generic_constants.INVALID_INPUT
+                except FileExistsError as e:
+                    print(e)
+                    err_msg = 'Source and destination represents the same folder.'
+                except NotADirectoryError:
+                    err_msg = 'Invalid directory'
+                except IsADirectoryError:
+                    err_msg = 'Path is a directory'
+                except shutil.SameFileError:
+                    err_msg = 'Source and destination represents the same file.'
+                except PermissionError:
+                    err_msg = 'Permission denied. Check: 1.If file has valid permission 2.Source path should not end with "\\"'
+                except FileNotFoundError as e:
+                    if ( ']' in str(e) ): err_msg = str(e)[str(e).index(']')+2:]
+                    else: err_msg = 'FileNotFoundError : ' + str(e)
+                except IOError as e:
+                    if ('[Errno 28] No space left on device' in str(e)):
+                        err_msg = 'No space left on device'
+                        if( os.path.isdir( destination_path ) ): shutil.rmtree( destination_path )
+                        elif( os.path.isfile( destination_path ) ): os.remove( destination_path )
+                    else: err_msg = 'IOError : ' + str(e)
+            else:
+                err_msg = generic_constants.INVALID_INPUT
+        except ValueError:
+            err_msg = 'Invalid option, Please provide 1 or 0'
+        except Exception as e:
+            err_msg = 'Error occurred in copyFileFolder'
+            log.error(e)
+        if err_msg:
+            log.error( err_msg )
+            logger.print_on_console( err_msg )
+        del source_path, destination_path, opt #deleting variables
+        return status, result, output_res, err_msg
+
+    def moveFileFolder(self, source_path, destination_path, opt = 0):
+        """
+        def: moveFileFolder
+        purpose: Copy from input path 1, to input path 2, optional(0(default)- overwrite/1- overwrite )
+        param: <path of source file>,<path of destination(full file path)>,,bool
+        return: bool
+        """
+        status = TEST_RESULT_FAIL
+        result = TEST_RESULT_FALSE
+        err_msg = None
+        output_res = OUTPUT_CONSTANT
+        try:
+            if( source_path and destination_path ):
+                try:
+                    if( os.path.splitext(source_path)[1] and not os.path.splitext(destination_path)[1] ):
+                        #file ops
+                        if ( os.path.isfile(source_path) ):
+                            if( os.path.isdir(destination_path) ):# #destination should be a folder only
+                                if( int(opt) == 0 ):
+                                    if ( not os.path.isfile(destination_path + '/' + os.path.basename(source_path)) ):
+                                        logger.print_on_console( "Moving the file to destination. Please wait..." )
+                                        shutil.move(source_path,destination_path)
+                                        if ( os.path.isfile(source_path) ):#delete the file if still present in path(shutil only copies if location is on another disk)
+                                            pathlib.Path(source_path).unlink()
+                                        log.debug('File successfully moved from ' + str(source_path) + ' to ' + str(destination_path))
+                                        status=TEST_RESULT_PASS
+                                        result=TEST_RESULT_TRUE
+                                    else:
+                                        err_msg = 'File already exists in the directory'
+                                elif( int(opt) == 1 ):
+                                    #----- if file exists then overwrite
+                                    overwrite_fn = destination_path + '/' + os.path.basename(source_path)
+                                    if os.path.isfile(overwrite_fn):
+                                        log.info( 'File already exists in destination path, performing overwrite by deletion' )
+                                        os.remove(overwrite_fn)
+                                    #----- if file exists then overwrite
+                                    logger.print_on_console( "Moving the file to destination. Please wait..." )
+                                    shutil.move(source_path,destination_path)
+                                    if (os.path.isfile(source_path)):#delete the file if still present in path(shutil only copies if location is on another disk)
+                                        pathlib.Path(source_path).unlink()
+                                    log.debug('File successfully moved from ' + str(source_path) + ' to ' + str(destination_path))
+                                    status=TEST_RESULT_PASS
+                                    result=TEST_RESULT_TRUE
+                                else:
+                                    err_msg = 'Invalid option, Please provide 1 or 0'
+                            else:
+                                err_msg = 'Destination directory does not exist, Please provide a valid destination directory'
+                        else:
+                            err_msg = 'Source file does not exist, Please provide a valid source file'
+                    elif( not os.path.splitext(source_path)[1] and not os.path.splitext(destination_path)[1] ):
+                        #folder ops
+                        if( os.path.isdir(source_path) ):
+                            if (os.path.isdir(destination_path)):
+                                if( int(opt) == 0 ):
+                                    if ( not os.path.isdir(destination_path + '/' + os.path.basename(source_path)) ):
+                                        logger.print_on_console( "Moving the folder to destination. Please wait..." )
+                                        shutil.move(source_path,destination_path)
+                                        if (os.path.isdir(source_path)):#delete the folder if still present in path(shutil only copies if location is on another disk)
+                                            shutil.rmtree(source_path)
+                                        log.debug('Folder successfully moved to ' + str(source_path) + ' from ' + str(source_path))
+                                        status=TEST_RESULT_PASS
+                                        result=TEST_RESULT_TRUE
+                                    else:
+                                        err_msg = 'Folder already exists in the directory'
+                                elif( int(opt) == 1 ):
+                                    if ( os.path.isdir(destination_path + '/' + os.path.basename(source_path)) ):
+                                        shutil.rmtree( destination_path + '/' + os.path.basename(source_path) )
+                                    logger.print_on_console( "Moving the folder to destination. Please wait..." )
+                                    shutil.move(source_path,destination_path)
+                                    if (os.path.isdir(source_path)):#delete the folder if still present in path(shutil only copies if location is on another disk)
+                                        shutil.rmtree(source_path)
+                                    log.debug('Folder successfully moved to ' + str(source_path) + ' from ' + str(source_path))
+                                    status=TEST_RESULT_PASS
+                                    result=TEST_RESULT_TRUE
+                                else:
+                                    err_msg = 'Invalid option, Please provide 1 or 0'
+                            else:
+                                err_msg = 'Destination directory does not exist, Please provide a valid destination directory'
+                        else:
+                            err_msg = 'Source directory does not exist, Please provide a valid source directory'
+                    else:
+                        err_msg = generic_constants.INVALID_INPUT
+                except FileExistsError as e:
+                    print(e)
+                    err_msg = 'Source and destination represents the same folder.'
+                except NotADirectoryError:
+                    err_msg = 'Invalid directory'
+                except IsADirectoryError:
+                    err_msg = 'Path is a directory'
+                except shutil.SameFileError:
+                    err_msg = 'Source and destination represents the same file.'
+                except PermissionError:
+                    err_msg = 'Permission denied.'
+                except FileNotFoundError as e:
+                    if ( ']' in str(e) ): err_msg = str(e)[str(e).index(']')+2:]
+                    else: err_msg = 'FileNotFoundError : ' + str(e)
+                except IOError as e:
+                    if ('[Errno 28] No space left on device' in str(e)):
+                        err_msg = 'No space left on device'
+                        if( os.path.isdir( destination_path ) ): shutil.rmtree( destination_path )
+                        elif( os.path.isfile( destination_path ) ): os.remove( destination_path )
+                    else: err_msg = 'IOError : ' + str(e)
+            else:
+                err_msg = generic_constants.INVALID_INPUT
+        except ValueError:
+            err_msg = 'Invalid option, Please provide 1 or 0'
+        except Exception as e:
+            err_msg = 'Error occurred in moveFileFolder'
+            log.error(e)
+        if err_msg:
+            logger.print_on_console( err_msg )
+            log.error(err_msg)
+        del source_path, destination_path, opt #deleting variables
+        return status, result, output_res, err_msg
 
     def delete_file(self,inputpath,file_name):
         """
@@ -1005,8 +1231,8 @@ class FileOperations:
                     out = open(outputFilePath, "w+")
                 for key,value in content.items():
                     out.write(",".join(value)+'\n')
-                out.close() 
-                status=True   
+                out.close()
+                status=True
         except Exception as e:
             err_msg='Writing to output file Failed'
             log.error(e)
@@ -1052,8 +1278,8 @@ class FileOperations:
 
                 if(str(args[0].split(";")[0]).startswith("{") and str(args[0].split(";")[0]).endswith("}")):
                     out_path = self.DV.get_dynamic_value(args[0].split(";")[0])
-                    
-                    if ( out_path ): 
+
+                    if ( out_path ):
                         output_feild = out_path
                         log.info("Choosen the dynamic file path")
                         #logger.print_on_console("Choosen the dynamic file path")
@@ -1067,13 +1293,13 @@ class FileOperations:
                 book2 = open_workbook(input_path2)
                 try:
                     if (sheetname1.strip() != ''):sheet1 = book1.sheet_by_name(sheetname1)
-                    else : 
+                    else :
                         sheet1 = book1.sheet_by_index(0)
                 except Exception as e:
                     sheet_exist.append(str(e))
                 try:
                     if (sheetname2.strip() != ''):sheet2 = book2.sheet_by_name(sheetname2)
-                    else : 
+                    else :
                         sheet2 = book2.sheet_by_index(0)
                 except Exception as e:
                     #logger.print_on_console("Sheet Doesn't Exist: {}".format(str(e)))
@@ -1127,7 +1353,7 @@ class FileOperations:
                     except Exception as e :
                         log.error('some error : {}'.format(e))
                     if( output_feild ):
-                        
+
                         if( os.path.exists(output_feild) or os.path.exists(os.path.dirname(output_feild)) ):
 
                             logger.print_on_console( "Writing the output of cellByCellCompare to file ")
@@ -1230,7 +1456,7 @@ class FileOperations:
                 if(output==[]):
                     log.info('File does not exist inside '+folderpath)
                     logger.print_on_console('File does not exist inside '+folderpath)
-                else: 
+                else:
                     log.info('File location is fetched')
                     logger.print_on_console('File location is fetched')
                     status = TEST_RESULT_PASS
@@ -1331,8 +1557,8 @@ class FileOperations:
                     x+=1
                     if(count>=len(output2)):
                         break
-             
-                if (len(output1)<len(output2)):                    
+
+                if (len(output1)<len(output2)):
                     for i in range(len(output1)):
                         output2.pop(i)
                     xx=list(output2.keys())[0]
@@ -1365,7 +1591,7 @@ class FileOperations:
 
                 cell1=list(sheet1[range1[0]:range1[1]])
                 cell2=list(sheet2[range2[0]:range2[1]])
-                
+
                 x,i=0,0
                 for aa in range(len(cell1)):
                     res1[x]=[]
@@ -1389,7 +1615,7 @@ class FileOperations:
                     if(i>=len(cell2)):
                         break
 
-                if (len(cell1)<len(cell2)):                    
+                if (len(cell1)<len(cell2)):
                     for i in range(len(cell1)):
                         del cell2[0]
                     for k in range(len(cell2)):
@@ -1407,11 +1633,11 @@ class FileOperations:
                             output='False'
                             res1[x].append(output)
                         x+=1
-                    
+
             elif(extension1=='.xls' and extension2=='.xls'):
                 book1 = open_workbook(filepath1)
                 book2 = open_workbook(filepath2)
-                sheet1 = book1.sheet_by_name(sheetname1)    
+                sheet1 = book1.sheet_by_name(sheetname1)
                 sheet2 = book2.sheet_by_name(sheetname2)
 
                 #verify whether file exists or not
@@ -1479,7 +1705,7 @@ class FileOperations:
                     if(count>=len(output2)):
                         break
 
-                if (len(output1)<len(output2)):                    
+                if (len(output1)<len(output2)):
                     for i in range(len(output1)):
                         output2.pop(i)
                     xx=list(output2.keys())[0]
@@ -1576,7 +1802,7 @@ class FileOperations:
                     if(count>=len(output2)):
                         break
 
-                if (len(output1)<len(output2)):                    
+                if (len(output1)<len(output2)):
                     for i in range(len(output1)):
                         output2.pop(i)
                     xx=list(output2.keys())[0]
@@ -1641,7 +1867,7 @@ class FileOperations:
                             for column in islice(row,min(column11,column12)-1,max(column11,column12)): #column length
                                 output1[i].append(column)
                             i+=1
-                
+
                 #verify whether file exists or not
                 result1=self.verify_file_exists(file1,'')
                 result2=self.verify_file_exists(file2,'')
@@ -1692,7 +1918,7 @@ class FileOperations:
                     if(count>=len(output2)):
                         break
 
-                if (len(output1)<len(output2)):                    
+                if (len(output1)<len(output2)):
                     for i in range(len(output1)):
                         output2.pop(i)
                     xx=list(output2.keys())[0]
@@ -1715,7 +1941,7 @@ class FileOperations:
 
             if(str(args[0].split(";")[0]).startswith("{") and str(args[0].split(";")[0]).endswith("}")):
                 out_path = self.DV.get_dynamic_value(args[0].split(";")[0])
-                if(out_path): 
+                if(out_path):
                     output_feild = out_path
             else:
                 output_feild = args[0].split(";")[0]
@@ -1723,17 +1949,17 @@ class FileOperations:
                 file_extension,status_get_ext = self.__get_ext(output_feild)
                 sheet='selectiveCellCompare'
                 result=os.path.isfile(output_feild)
-                
+
                 logger.print_on_console( "Writing the output of selectiveCellCompare to file ")
                 msg='Output file has old entries! Erasing old data to store incoming result.'
-                if status_get_ext and file_extension is not None and file_extension in generic_constants.SELECTIVE_CELL_FILE_TYPES:                    
+                if status_get_ext and file_extension is not None and file_extension in generic_constants.SELECTIVE_CELL_FILE_TYPES:
                     if(file_extension=='.xlsx'):
                         if result==True:
                             wb=openpyxl.load_workbook(output_feild)
                         else:
                             logger.print_on_console("File Does not exists, creating the file in specified path {}".format(output_feild))
                             wb=openpyxl.Workbook()
-                        
+
                         if(sheet in wb.sheetnames):
                             logger.print_on_console(msg)
                             self.xlsx_obj.clear_content_xlsx(os.path.dirname(output_feild),os.path.basename(output_feild),sheet)
@@ -1752,7 +1978,7 @@ class FileOperations:
                         wb.save(output_feild)
                         wb.close()
                         flag1=True
-                
+
                     elif(file_extension=='.xls'):
                         if result==True:
                             rb = open_workbook(output_feild)
@@ -1770,7 +1996,7 @@ class FileOperations:
                                 getSheet = wb.get_sheet(sheet)
                         except:
                             getSheet = wb.add_sheet(sheet)
-        
+
                         row,col=0,0
                         for key, value in res1.items():
                             for i in range(len(res1[key])):
@@ -1780,15 +2006,15 @@ class FileOperations:
                             row+=1
                         wb.save(output_feild)
                         flag1=True
-                        
-                    #for csv and txt    
+
+                    #for csv and txt
                     if(file_extension=='.csv' or file_extension=='.txt'):
                         flag1, err_msg = self.write_result_file(output_feild, res1, sheet)
 
                     if(flag1==False):
                         log.error(err_msg)
                         logger.print_on_console(err_msg)
-            
+
                     if(flag1 or flag2):
                         log.info('Compared cells between the mentioned files')
                         logger.print_on_console('Compared cells between the mentioned files')

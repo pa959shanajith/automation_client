@@ -16,6 +16,7 @@ from button_link_keyword import ButtonLinkKeyword
 import browser_Keywords
 from webconstants import *
 import readconfig
+import time
 
 import logging
 from constants import *
@@ -192,6 +193,7 @@ class ElementKeywords:
                         location=webelement.location
                     else:
                         location=obj.get_element_location(webelement)
+                    size=webelement.size
                     local_eo.log.info('location is :')
                     local_eo.log.info(location)
                     from selenium import webdriver
@@ -201,12 +203,13 @@ class ElementKeywords:
                     else:
                         obj.enumwindows()
                         if len(obj.rect)>1:
-                            obj.mouse_move(int(location.get('x')+9),int(location.get('y')+obj.rect[1]+6))
+                            height=int(size.get('height')/2)
+                            width=int(size.get('width')/2)
+                            obj.mouse_move(int(location.get('x')+width),int(location.get('y')+obj.rect[1]+height))
                         else:
                             err_msg='Element to be dragged should be on top'
                             local_eo.log.error=err_msg
                             logger.print_on_console(err_msg)
-                    import time
                     time.sleep(0.5)
                     obj.mouse_press(LEFT_BUTTON)
                     local_eo.log.info(STATUS_METHODOUTPUT_UPDATE)
@@ -241,23 +244,33 @@ class ElementKeywords:
                         location=webelement.location
                     else:
                         location=obj.get_element_location(webelement)
+                    size=webelement.size
                     local_eo.log.info('location is :')
                     local_eo.log.info(location)
-                    import time
-                    time.sleep(0.5)
+                    if(args[0][0]!=''):
+                        time1=float(args[0][0])
+                        time.sleep(time1)
+                    else:
+                        time.sleep(0.5)
                     from selenium import webdriver
                     if isinstance(browser_Keywords.local_bk.driver_obj,webdriver.Firefox):
                         yoffset=browser_Keywords.local_bk.driver_obj.execute_script(MOUSE_HOVER_FF)
-                        obj.slide(int(location.get('x')+9),int(location.get('y')+yoffset), 0);
+                        obj.slide(int(location.get('x')+9),int(location.get('y')+yoffset), 0)
                     else:
                         obj.enumwindows()
                         if len(obj.rect)>1:
-                            obj.slide(int(location.get('x')+9),int(location.get('y')+obj.rect[1]+6), "slow")
+                            height=int(size.get('height')/2)
+                            width=int(size.get('width')/2)
+                            obj.slide(int(location.get('x')+width),int(location.get('y')+obj.rect[1]+height), "slow")
                         else:
                             err_msg='Element to be dragged should be on top'
                             local_eo.log.error=err_msg
                             logger.print_on_console(err_msg)
-                    time.sleep(0.5)
+                    if(args[0][0]!=''):
+                        time1=float(args[0][0])
+                        time.sleep(time1)
+                    else:
+                        time.sleep(0.5)
                     obj.mouse_release(LEFT_BUTTON)
                     local_eo.log.info(STATUS_METHODOUTPUT_UPDATE)
                     status=TEST_RESULT_PASS
