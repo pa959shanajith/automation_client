@@ -391,7 +391,6 @@ class Launch_Keywords():
                                     status = desktop_constants.TEST_RESULT_PASS
                                     result = desktop_constants.TEST_RESULT_TRUE
                                     break
-
                 else:
                     self.multiInstance = title_matched_windows[0]
                     term = TERMINATE
