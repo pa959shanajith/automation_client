@@ -588,7 +588,7 @@ class JSONOperations():
 ##        key_value=key_value.encode('utf-8')
         return status,methodoutput,key_value,err_msg
 
-    def parsexmltodict(self,input_string,block_count,block_key_name,key_name,args):
+    def parsexmltodict(self,input_string,block_key_name,block_count,key_name,args):
         status = TEST_RESULT_FAIL
         methodoutput = TEST_RESULT_FALSE
         err_msg=None
