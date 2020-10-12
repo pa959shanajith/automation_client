@@ -217,7 +217,7 @@ class XMLOperations():
         log.info(RETURN_RESULT)
         return status,methodoutput,block_count,err_msg
 
-    def get_tag_value(self,input_string,input_tag,block_number,child_tag,*args):
+    def get_tag_value(self,input_string,block_number,input_tag,child_tag,*args):
         """
         def : get_tag_value
         purpose : get_tag_value is used to get the Tag Value of the specified tag in the given XML
@@ -588,7 +588,7 @@ class JSONOperations():
 ##        key_value=key_value.encode('utf-8')
         return status,methodoutput,key_value,err_msg
 
-    def parsexmltodict(self,input_string,block_key_name,block_count,key_name,args):
+    def parsexmltodict(self,input_string,block_count,block_key_name,key_name,args):
         status = TEST_RESULT_FAIL
         methodoutput = TEST_RESULT_FALSE
         err_msg=None
