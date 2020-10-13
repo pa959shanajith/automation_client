@@ -12,6 +12,7 @@ import os
 import date_ops_keywords
 import string_ops_keywords
 import file_operations
+import file_operations_pdf
 import file_operations_xml
 import folder_operations
 import logger
@@ -39,6 +40,7 @@ class GenericKeywordDispatcher:
         local_generic.generic_date = date_ops_keywords.DateOperation()
         local_generic.generic_string =string_ops_keywords.StringOperation()
         local_generic.generic_file=file_operations.FileOperations()
+        local_generic.generic_file_pdf=file_operations_pdf.FileOperationsPDF()
         local_generic.generic_file_xml=file_operations_xml.FileOperationsXml()
         local_generic.genric_folder=folder_operations.FolderOperations()
         local_generic.generic_excel=excel_operations.ExcelFile()
@@ -94,6 +96,8 @@ class GenericKeywordDispatcher:
             'deletefolder':local_generic.genric_folder.delete_folder,
             'verifyfolderexists':local_generic.genric_folder.verify_folder_exists,
             'comparecontent':local_generic.generic_file.compare_content,
+            'comparepdfs':local_generic.generic_file_pdf.compare_content,
+            'findimageinpdf':local_generic.generic_file_pdf.locate_image,
             'comparejsoncontent':local_generic.generic_file.json_compare_content,
             'replacecontent':local_generic.generic_file.replace_content,
             'verifycontent':local_generic.generic_file.verify_content,
@@ -214,7 +218,7 @@ class GenericKeywordDispatcher:
                             var = str(output[0])[1:len(str(output[0]))-1]
                             output[0] = data[var][0]
                     message.extend(output)
-                if( keyword in ['comparefiles','beautify','compareinputs','getxmlblockdata','selectivexmlfilecompare','compxmlfilewithxmlblock','cellbycellcompare','findfilepath','selectivecellcompare'] ):
+                if( keyword in ['comparefiles',"comparepdfs","findimageinpdf",'beautify','compareinputs','getxmlblockdata','selectivexmlfilecompare','compxmlfilewithxmlblock','cellbycellcompare','findfilepath','selectivecellcompare'] ):
                     input = list(message)
                     output = tsp.outputval
                     if (str(output)==''):
