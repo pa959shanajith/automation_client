@@ -97,8 +97,6 @@ class Dispatcher:
             'horizontalscroll' : local_Wd.table_object.horizontalScroll,
             'verticalscroll' : local_Wd.table_object.verticalScroll,
 
-
-            'getinnertable' : local_Wd.table_object.getInnerTable,            
             #author : arpitha.b.v
             #added mapping of 'getCellToolTip' and 'verifyCellToolTip' to table object
             'getcelltooltip' : local_Wd.table_object.getCellToolTip,
