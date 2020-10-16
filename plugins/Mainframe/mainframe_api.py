@@ -37,11 +37,13 @@ class EHLLAPI():
         status = -1
         try:
             status = hllapi(fnum,data,length,pos)
+            print('Status in hll_api : ',status)
         except Exception as e:
-            print(e)
+            print('Error in hll_api : ',e)
         return status
 
     def launch(self,file_path):
+        print("---------------------launch-----------------------------")
         global emulator
         status = {"stat": -1, "emsg": "Something Went Wrong"}
         try:
@@ -52,19 +54,23 @@ class EHLLAPI():
             status["emsg"] = "Error while launching " + subprocess.os.path.basename(file_path)
             import traceback
             traceback.print_exc()
+        print('Status of launch : ',status)
         return status
 
     def kill(self):
+        print("---------------------kill-----------------------------")
         status = {"emsg": "Something Went Wrong"}
         if emulator is not None:
             try:
                 status["stat"] = subprocess.call("TASKKILL /F /T /PID " + str(emulator.pid))
             except:
                 status["emsg"] = "Error while closing " + subprocess.os.path.basename(file_path)
+        print('Status of kill : ',status)
         return status
         #subprocess.sys.exit()
 
     def querySessions(self):
+        print("---------------------querySessions-----------------------------")
         status = {"stat": -1, "emsg": "Something Went Wrong"}
         function_number = c_int(10)
         data_string = c_char_p(" "*16)
@@ -76,9 +82,11 @@ class EHLLAPI():
         elif status["stat"] == 9:
             status["emsg"] = "A system error was encountered."
         status["res"] = data_string.value
+        print('Status of querySessions : ',status)
         return status
 
     def connectPresentationSpace(self,presentation_space):
+        print("---------------------connectPresentationSpace-----------------------------")
         status = {"stat": -1, "emsg": "Something Went Wrong"}
         function_number = c_int(1)
         data_string = c_char_p(str(presentation_space))
@@ -91,9 +99,11 @@ class EHLLAPI():
             status["emsg"] = "A system error was encountered."
         elif status["stat"] == 11:
             status["emsg"] = "This resource is unavailable. The host presentation space is already being used by another system function."
+        print('Status of connectPresentationSpace : ',status)
         return status
 
     def disconnectPresentationSpace(self):
+        print("---------------------disconnectPresentationSpace-----------------------------")
         status = {"stat": -1, "emsg": "Something Went Wrong"}
         function_number = c_int(2)
         data_string = c_char_p()
@@ -104,9 +114,11 @@ class EHLLAPI():
             status["emsg"] = "Client is not connected to a host session."
         elif status["stat"] == 9:
             status["emsg"] = "A system error was encountered."
+        print('Status of disconnectPresentationSpace : ',status)
         return status
 
     def getPresentationSpaceSize(self,presentation_space):
+        print("---------------------getPresentationSpaceSize-----------------------------")
         status = {"stat": -1, "emsg": "Something Went Wrong"}
         opts=[[24,80], [32,80], [43,80], [27,132]]
         function_number = c_int(99)
@@ -134,9 +146,11 @@ class EHLLAPI():
                     status["res"] = opts[1]
                 else:
                     status["res"] = opts[2]
+        print('Status of getPresentationSpaceSize : ',status)
         return status
 
     def wait(self):
+        print("---------------------wait-----------------------------")
         status = {"stat": -1, "emsg": "Something Went Wrong"}
         function_number = c_int(4)
         data_string = c_char_p()
@@ -151,9 +165,11 @@ class EHLLAPI():
             status["emsg"] = "Sending keystrokes are still disabled."
         elif status["stat"] == 9:
             status["emsg"] = "A system error was encountered."
+        print('Status of wait : ',status)
         return status
 
     def sendValue(self,key):
+        print("---------------------sendValue-----------------------------")
         status = {"stat": -1, "emsg": "Something Went Wrong"}
         function_number = c_int(3)
         data_string = c_char_p(key)
@@ -168,9 +184,11 @@ class EHLLAPI():
             status["emsg"] = "The host session was busy. sendValue failed."
         elif status["stat"] == 9:
             status["emsg"] = "A system error was encountered."
+        print('Status of sendValue : ',status)
         return status
 
     def copyPresentationSpace(self):
+        print("---------------------copyPresentationSpace-----------------------------")
         status = {"stat": -1, "emsg": "Something Went Wrong"}
         function_number = c_int(5)
         data_string = c_char_p(" "*1920)
@@ -182,9 +200,11 @@ class EHLLAPI():
         elif status["stat"] == 9:
             status["emsg"] = "A system error was encountered."
         status["res"] = data_string.value.decode('latin-1')
+        print('Status of copyPresentationSpace : ',status)
         return status
 
     def searchPresentationSpace(self,searchStr):
+        print("---------------------searchPresentationSpace-----------------------------")
         status = {"stat": -1, "emsg": "Something Went Wrong"}
         function_number = c_int(6)
         data_string = c_char_p(searchStr)
@@ -197,9 +217,11 @@ class EHLLAPI():
             status["emsg"] = "Invalid Input provided."
         elif status["stat"] == 9:
             status["emsg"] = "A system error was encountered."
+        print('Status of searchPresentationSpace : ',status)
         return status
 
     def setCursor(self,position):
+        print("---------------------setCursor-----------------------------")
         status = {"stat": -1, "emsg": "Something Went Wrong"}
         function_number = c_int(40)
         data_string = c_char_p()
@@ -214,9 +236,11 @@ class EHLLAPI():
             status["emsg"] = "Invalid position provided."
         elif status["stat"] == 9:
             status["emsg"] = "A system error was encountered."
+        print('Status of setCursor : ',status)
         return status
 
     def getCursor(self):
+        print("---------------------getCursor-----------------------------")
         status = {"stat": -1, "emsg": "Something Went Wrong"}
         function_number = c_int(7)
         data_string = c_char_p()
@@ -228,9 +252,11 @@ class EHLLAPI():
         elif status["stat"] == 9:
             status["emsg"] = "A system error was encountered."
         status["res"] = length.value
+        print('Status of getCursor : ',status)
         return status
 
     def setText(self,text,position):
+        print("---------------------setText-----------------------------")
         status = {"stat": -1, "emsg": "Something Went Wrong"}
         text = text.encode('ascii', 'ignore')
         function_number = c_int(15)
@@ -248,9 +274,11 @@ class EHLLAPI():
             status["emsg"] = "Invalid position provided."
         elif status["stat"] == 9:
             status["emsg"] = "A system error was encountered."
+        print('Status of setText : ',status)
         return status
 
     def getText(self,size,position):
+        print("---------------------getText-----------------------------")
         status = {"stat": -1, "emsg": "Something Went Wrong"}
         function_number = c_int(8)
         data_string = c_char_p(" "*size)
@@ -264,6 +292,7 @@ class EHLLAPI():
         elif status["stat"] == 9 or status["stat"] == 7:
             status["emsg"] = "A system error was encountered."
         status["res"] = data_string.value.decode('latin-1')
+        print('Status of getText : ',status)
         return status
 
     def waitForText(self):
