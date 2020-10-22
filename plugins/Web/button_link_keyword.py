@@ -97,24 +97,28 @@ class ButtonLinkKeyword():
                                 coords=args[0][0].split(',')
                                 x_coord = coords[0]
                                 y_coord = coords[1]
-                                action = webdriver.common.action_chains.ActionChains(browser_Keywords.local_bk.driver_obj)
-                                logger.print_on_console("Clicking on coordinates "+x_coord+", "+y_coord)
-                                action.move_to_element_with_offset(webelement, int(x_coord), int(y_coord)).click().perform()
+                                if(len(coords)==2):
+                                    action = webdriver.common.action_chains.ActionChains(browser_Keywords.local_bk.driver_obj)
+                                    logger.print_on_console("Clicking on coordinates "+x_coord+", "+y_coord)
+                                    action.move_to_element_with_offset(webelement, int(x_coord), int(y_coord)).click().perform()
+                                    status = webconstants.TEST_RESULT_PASS
+                                    methodoutput = webconstants.TEST_RESULT_TRUE
+                                else:
+                                    err_msg = 'Invalid number of coordinates given!'
+                                    logger.print_on_console(err_msg)
                                 # Js="""function clickon(x,y){var ev=document.createEvent("MouseEvent");var el=document.elementFromPoint(x,y);ev.initMouseEvent("click",true,true,window,null,x,y,0,0,false,false,false,false,0,null);el.dispatchEvent(ev);} arguments[0].clickon(arguments[1],arguments[2])"""
                                 # browser_Keywords.local_bk.driver_obj.execute_script(Js,webelement,x_coord,y_coord)
                             else:
                                 clickinfo = browser_Keywords.local_bk.driver_obj.execute_script(webconstants.CLICK_JAVASCRIPT,webelement)
-                            local_blk.log.info('Click operation performed using javascript click')
-                            local_blk.log.info(STATUS_METHODOUTPUT_UPDATE)
-                            status = webconstants.TEST_RESULT_PASS
-                            methodoutput = webconstants.TEST_RESULT_TRUE
+                                local_blk.log.info('Click operation performed using javascript click')
+                                local_blk.log.info(STATUS_METHODOUTPUT_UPDATE)
+                                status = webconstants.TEST_RESULT_PASS
+                                methodoutput = webconstants.TEST_RESULT_TRUE
                         except Exception as e:
                             # local_blk.log.info('Click operation performed using javascript click')
                             # local_blk.log.error('selenium click  error occured, Trying to click using Javascript')
                             webelement.click()
                             local_blk.log.info('Click operation performed using selenium click')
-                            local_blk.log.debug('click operation info: ')
-                            local_blk.log.debug(clickinfo)
                             local_blk.log.info(STATUS_METHODOUTPUT_UPDATE)
                             status = webconstants.TEST_RESULT_PASS
                             methodoutput = webconstants.TEST_RESULT_TRUE
@@ -123,7 +127,6 @@ class ButtonLinkKeyword():
                     err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
         except Exception as e:
             local_blk.log.error(e)
-
             logger.print_on_console(e)
             err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         local_blk.log.info(RETURN_RESULT)
