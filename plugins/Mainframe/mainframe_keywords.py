@@ -215,8 +215,11 @@ class MainframeKeywords:
                     print("Extra Emulator code")
                 elif self.emulator_type == MAINFRAME_BLUEZONE:
                     result,output,err_msg = self.bluezone_object.login(self.region,self.userID,self.password)
-                elif self.emulator_type in [MAINFRAME_PCOMM, MAINFRAME_RUMBA, MAINFRAME_HOD]:
+                elif self.emulator_type in [MAINFRAME_PCOMM, MAINFRAME_RUMBA]:
                     result,output,err_msg = self.ehllapi_object.login(self.region,self.userID,self.password)
+                elif self.emulator_type == MAINFRAME_HOD:
+                    err_msg = 'Keyword not supported for Host On-Demand'
+                    logger.print_on_console(err_msg)
                 if result:
                     status = TEST_RESULT_PASS
                     methodoutput = TEST_RESULT_TRUE
@@ -269,8 +272,11 @@ class MainframeKeywords:
                     print("Extra Emulator code")
                 elif self.emulator_type == MAINFRAME_BLUEZONE:
                     result,output,err_msg = self.bluezone_object.login(self.region,self.userID,password)
-                elif self.emulator_type in [MAINFRAME_PCOMM, MAINFRAME_RUMBA, MAINFRAME_HOD]:
+                elif self.emulator_type in [MAINFRAME_PCOMM, MAINFRAME_RUMBA]:
                     result,output,err_msg = self.ehllapi_object.login(self.region,self.userID,password)
+                elif self.emulator_type == MAINFRAME_HOD:
+                    err_msg = 'Keyword not supported for Host On-Demand'
+                    logger.print_on_console(err_msg)
                 if result:
                     status = TEST_RESULT_PASS
                     methodoutput = TEST_RESULT_TRUE
@@ -325,8 +331,11 @@ class MainframeKeywords:
                     print("Extra Emulator code")
                 elif self.emulator_type == MAINFRAME_BLUEZONE:
                     result,output,err_msg = self.bluezone_object.logoff(self.option)
-                elif self.emulator_type in [MAINFRAME_PCOMM, MAINFRAME_RUMBA, MAINFRAME_HOD]:
+                elif self.emulator_type in [MAINFRAME_PCOMM, MAINFRAME_RUMBA]:
                     result,output,err_msg = self.ehllapi_object.logoff(self.option)
+                elif self.emulator_type == MAINFRAME_HOD:
+                    err_msg = 'Keyword not supported for Host On-Demand'
+                    logger.print_on_console(err_msg)
                 if result:
                     status = TEST_RESULT_PASS
                     methodoutput = TEST_RESULT_TRUE
@@ -745,8 +754,11 @@ class MainframeKeywords:
                     print("Extra Emulator code")
                 elif self.emulator_type == MAINFRAME_BLUEZONE:
                     result,output,err_msg = self.bluezone_object.submit_job(self.job_path,self.member_name)
-                elif self.emulator_type in [MAINFRAME_PCOMM, MAINFRAME_RUMBA, MAINFRAME_HOD]:
+                elif self.emulator_type in [MAINFRAME_PCOMM, MAINFRAME_RUMBA]:
                     result,output,err_msg = self.ehllapi_object.submit_job(self.job_path,self.member_name)
+                elif self.emulator_type == MAINFRAME_HOD:
+                    err_msg = 'Keyword not supported for Host On-Demand'
+                    logger.print_on_console(err_msg)
                 if result:
                     status = TEST_RESULT_PASS
                     methodoutput = TEST_RESULT_TRUE
@@ -792,8 +804,11 @@ class MainframeKeywords:
                     print("Extra Emulator code")
                 elif self.emulator_type == MAINFRAME_BLUEZONE:
                     result,output,err_msg = self.bluezone_object.job_status(self.job_no)
-                elif self.emulator_type in [MAINFRAME_PCOMM, MAINFRAME_RUMBA, MAINFRAME_HOD]:
+                elif self.emulator_type in [MAINFRAME_PCOMM, MAINFRAME_RUMBA]:
                     result,output,err_msg = self.ehllapi_object.job_status(self.job_no)
+                elif self.emulator_type == MAINFRAME_HOD:
+                    err_msg = 'Keyword not supported for Host On-Demand'
+                    logger.print_on_console(err_msg)
                 if result:
                     status = TEST_RESULT_PASS
                     methodoutput = TEST_RESULT_TRUE
