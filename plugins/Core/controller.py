@@ -31,13 +31,12 @@ import core_utils
 local_cont = threading.local()
 #index for iterating the teststepproperty for executor
 ##i = 0
-#Terminate Flag
 terminate_flag=False
+manual_terminate_flag=False
 pause_flag=False
 iris_flag = True
 iris_constant_step = -1
 socket_object = None
-count = 0
 # test_case_number = 0
 log = logging.getLogger("controller.py")
 status_percentage = {TEST_RESULT_PASS:0,TEST_RESULT_FAIL:0,TERMINATE:0,"total":0}
@@ -280,8 +279,8 @@ class Controller():
             log.info('Input: '+str(i + 1)+ '= '+repr(inpval[i]))
 
     def clear_data(self):
-        global terminate_flag,pause_flag,iris_constant_step
-        terminate_flag=pause_flag=False
+        global terminate_flag,manual_terminate_flag,pause_flag,iris_constant_step
+        terminate_flag=manual_terminate_flag=pause_flag=False
         iris_constant_step = -1
 
     def resume_execution(self):
@@ -908,7 +907,7 @@ class Controller():
         return status
 
     def invoke_execution(self,mythread,json_data,socketIO,wxObject,configvalues,qcObject,qtestObject,aws_mode):
-        global terminate_flag,count,status_percentage
+        global terminate_flag,status_percentage
         qc_url=''
         qc_password=''
         qc_username=''
@@ -922,6 +921,7 @@ class Controller():
         scen_id=[]
         condition_check_flag = False
         testcase_empty_flag = False
+        count = 0
         info_msg=''
         # t = test.Test()
         # suites_list,flag = t.gettsplist()
@@ -947,7 +947,6 @@ class Controller():
         #Iterate through the suites-list
         for suite,suite_id,suite_id_data in zip(suite_details,suiteId_list,suite_data):
             #EXECUTION GOES HERE
-            status = False
             flag=True
             if terminate_flag:
                 status=TERMINATE
@@ -1081,13 +1080,15 @@ class Controller():
                                 logger.print_on_console( '***Saving report of Scenario' ,str(sc_idx  + 1 ),'***')
                                 log.info( '***Saving report of Scenario' +str(sc_idx + 1)+'***')
                                 os.chdir(self.cur_dir)
-                                filename='Scenario'+str(sc_idx + 1)+'.json'
+                                filename='Scenario'+str(count + 1)+'.json'
+                                count+=1
                                 #check if user has manually terminated during execution, then check if the teststep data and overallstatus is [] if so poputale default values in teststep data and overallstatus
-                                if terminate_flag ==True and execute_flag==True:
-                                    if con.reporting_obj.report_json['rows']==[] and con.reporting_obj.report_json['overallstatus']==[]:
+                                if terminate_flag:
+                                    if con.reporting_obj.report_json[ROWS]==[] and con.reporting_obj.report_json[OVERALLSTATUS]==[]:
                                         con.reporting_obj.add_to_reporting_obj()
                                 status_percentage["s_index"]=suite_idx-1
                                 status_percentage["index"]=sc_idx
+                                con.reporting_obj.user_termination=manual_terminate_flag
                                 con.reporting_obj.save_report_json(filename,json_data,status_percentage)
                                 execute_result_data["reportData"] = con.reporting_obj.report_json
                                 socketIO.emit('result_executeTestSuite', execute_result_data)
@@ -1115,8 +1116,8 @@ class Controller():
                                         qc_status['qc_update_status'] = qc_update_status
                                         logger.print_on_console('****Updating QCDetails****')
                                         if qcObject is not None:
-                                            status = qcObject.update_qc_details(qc_status)
-                                            if status:
+                                            qc_status_updated = qcObject.update_qc_details(qc_status)
+                                            if qc_status_updated:
                                                 logger.print_on_console('****Updated QCDetails****')
                                             else:
                                                logger.print_on_console('****Failed to Update QCDetails****')
@@ -1153,8 +1154,8 @@ class Controller():
                                                     tsplistLen -= 1
                                         logger.print_on_console('****Updating qTest Details****')
                                         if qtestObject is not None:
-                                            status = qtestObject.update_qtest_run_details(qc_status,tsplistLen)
-                                            if status:
+                                            qc_status_updated = qtestObject.update_qtest_run_details(qc_status,tsplistLen)
+                                            if qc_status_updated:
                                                 logger.print_on_console('****Updated qTest Details****')
                                             else:
                                                logger.print_on_console('****Failed to Update qTest Details****')
@@ -1166,7 +1167,7 @@ class Controller():
 
                                 #Check is made to fix issue #401
                                 if len(report_json)>0:
-                                    overall_status=report_json[0]['overallstatus']
+                                    overall_status=report_json[0][OVERALLSTATUS]
                                     if(condition_check_value==1):
                                         if(overall_status==TEST_RESULT_PASS):
                                             continue
@@ -1177,10 +1178,11 @@ class Controller():
                                 logger.print_on_console( '***Saving report of Scenario' ,str(sc_idx + 1),'***')
                                 log.info( '***Saving report of Scenario' +str(sc_idx + 1)+'***')
                                 os.chdir(self.cur_dir)
-                                filename='Scenario'+str(count  + 1)+'.json'
+                                filename='Scenario'+str(count + 1)+'.json'
                                 count+=1
                                 status_percentage["s_index"]=suite_idx-1
                                 status_percentage["index"]=sc_idx
+                                con.reporting_obj.user_termination=manual_terminate_flag
                                 con.reporting_obj.save_report_json_conditioncheck_testcase_empty(filename,info_msg,json_data,status_percentage)
                                 execute_result_data["reportData"] = con.reporting_obj.report_json_condition_check_testcase_empty
                                 socketIO.emit('result_executeTestSuite', execute_result_data)
@@ -1190,10 +1192,11 @@ class Controller():
                             logger.print_on_console( '***Saving report of Scenario' ,str(sc_idx + 1),'***')
                             log.info( '***Saving report of Scenario' +str(sc_idx + 1)+'***')
                             os.chdir(self.cur_dir)
-                            filename='Scenario'+str(count  + 1)+'.json'
+                            filename='Scenario'+str(count + 1)+'.json'
                             count+=1
                             status_percentage["s_index"]=suite_idx-1
                             status_percentage["index"]=sc_idx
+                            con.reporting_obj.user_termination=manual_terminate_flag
                             con.reporting_obj.save_report_json_conditioncheck(filename,json_data,status_percentage)
                             execute_result_data["reportData"] = con.reporting_obj.report_json_condition_check
                             socketIO.emit('result_executeTestSuite', execute_result_data)
@@ -1288,6 +1291,7 @@ class Controller():
             status_percentage[TEST_RESULT_FAIL]=fail_val
             status_percentage["s_index"]=suite_idx-1
             status_percentage["index"]=sc_idx
+            obj_reporting.user_termination=manual_terminate_flag
             obj_reporting.save_report_json(filename,json_data,status_percentage)
             execute_result_data["scenarioId"]=aws_scenario[sc_idx]
             execute_result_data["reportData"] = obj_reporting.report_json
@@ -1297,7 +1301,7 @@ class Controller():
 
     def invoke_controller(self,action,mythread,debug_mode,runfrom_step,json_data,root_obj,socketIO,qc_soc,qtest_soc,*args):
         status = COMPLETED
-        global terminate_flag,pause_flag,socket_object
+        global socket_object
         self.conthread=mythread
         self.clear_data()
         wxObject = root_obj.cw
