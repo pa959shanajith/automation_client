@@ -772,6 +772,7 @@ class TableOperationKeywords():
             methodoutput=TEST_RESULT_FALSE
             row_number=None
             err_msg=None
+            container=None
             local_tk.log.debug('reading the inputs')
             text=input_val[0].strip()
             coreutilsobj=core_utils.CoreUtils()
@@ -829,8 +830,18 @@ class TableOperationKeywords():
                         logger.print_on_console('Got the result : ',str(row_number))
                     except Exception as e:
                         local_tk.log.error(e)
-                        logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
-                        err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                        if container==None:
+                            js='var temp = fun(arguments[0], arguments[1]); return temp; function fun(table, str) {     var m = [],         row, cell, xx, tx, ty, xxx, yyy, child;     for (yyy = 0; yyy < table.rows.length; yyy++) {         row = table.rows[yyy];         for (xxx = 0; xxx < row.cells.length; xxx++) {             cell = row.cells[xxx];             xx = xxx;             for (; m[yyy] && m[yyy][xx]; ++xx) {}             for (tx = xx; tx < xx + cell.colSpan; ++tx) {                 for (ty = yyy; ty < yyy + cell.rowSpan; ++ty) {                     if (!m[ty]) m[ty] = [];                     m[ty][tx] = true;                 }             }             if (cell.innerText.indexOf(str)>= 0) return yyy + cell.rowSpan;             else if (cell.children.length > 0) {                 for (var i = 0; i < cell.children.length; i++) {                     child = cell.children[i];                     if (child.value == str) return yyy + cell.rowSpan; 					else{ 					var a=child.value; 					if(a){ 					var b=a; 					if(b.indexOf(str)>=0)return yyy + cell.rowSpan; 					}	 				}			 					                 }             }         }     }     return null; };'
+                            row_number=browser_Keywords.local_bk.driver_obj.execute_script(js,webElement,text)
+                            if row_number:
+                                status=TEST_RESULT_PASS
+                                methodoutput=TEST_RESULT_TRUE
+                            local_tk.log.info('Got the result : %s',str(row_number))
+                            logger.print_on_console('Got the result : ',str(row_number))
+                        else:
+
+                            logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
+                            err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
                 else:
                     local_tk.log.info(ERROR_CODE_DICT['ERR_HIDDEN_OBJECT'])
                     err_msg = ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
@@ -845,6 +856,7 @@ class TableOperationKeywords():
             methodoutput=TEST_RESULT_FALSE
             col_number=None
             err_msg = None
+            container = None
             local_tk.driver=browser_Keywords.local_bk.driver_obj
             local_tk.log.debug('got the driver instance from browser keyword')
             visibleFlag=True
@@ -903,7 +915,18 @@ class TableOperationKeywords():
                     except Exception as e:
                         local_tk.log.error(e)
                         logger.print_on_console(e)
-                        err_msg=e
+                        if container==None:
+                            js='var temp = fun(arguments[0], arguments[1]); return temp; function fun(table, str) {     var m = [],         row, cell, xx, tx, ty, xxx, yyy, child;     for (yyy = 0; yyy < table.rows.length; yyy++) {         row = table.rows[yyy];         for (xxx = 0; xxx < row.cells.length; xxx++) {             cell = row.cells[xxx];             xx = xxx;             for (; m[yyy] && m[yyy][xx]; ++xx) {}             for (tx = xx; tx < xx + cell.colSpan; ++tx) {                 for (ty = yyy; ty < yyy + cell.rowSpan; ++ty) {                     if (!m[ty]) m[ty] = [];                     m[ty][tx] = true;                 }             }             if (cell.innerText.indexOf(str)>= 0 && cell.innerText.length === str.length) return xx + cell.colSpan;             else if (cell.children.length > 0) {                 for (var i = 0; i < cell.children.length; i++) {                     child = cell.children[i];   var sap=child.value;  var check_match=sap;                if (str === check_match) return xx + cell.colSpan; 							 					                 }             }         }     }     return null; };'
+                            col_number=local_tk.driver.execute_script(js,webElement,text)
+                            if col_number:
+                                status=TEST_RESULT_PASS
+                                methodoutput=TEST_RESULT_TRUE
+                            local_tk.log.info('Got the result : %s',str(col_number))
+                            logger.print_on_console('Got the result : ',str(col_number))
+                        else:
+
+
+                            err_msg=e
                 else:
                     local_tk.log.info(ERROR_CODE_DICT['ERR_HIDDEN_OBJECT'])
                     err_msg = ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
