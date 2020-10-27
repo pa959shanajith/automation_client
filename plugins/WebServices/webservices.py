@@ -487,18 +487,17 @@ class WSkeywords:
         err_msg=None
         log.debug(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
-             s=Session()
-             if not (self.baseEndPointURL is '' or self.baseReqBody is '' or self.baseOperation is ''):
-                reqUrl=self.baseEndPointURL+'/'+self.baseOperation
-                self.get_cookies()
-                req = requests.Request(method=self.baseMethod, url=reqUrl, data=self.baseReqBody,cookies=self.req_cookies,proxies=self.proxies, cert=self.client_cert, verify=self.server_cert, auth=self.req_auth, params=self.req_params)
-                prep=req.prepare()
-                response=s.send(prep)
-                status,methodoutput,output=self.__saveResults(response)
-             else:
+            if not (self.baseEndPointURL is '' or self.baseOperation is '' or self.baseReqHeader is ''):
+                req=self.baseEndPointURL+'/'+self.baseOperation
+            elif not (self.baseEndPointURL is ''):
+                req=self.baseEndPointURL
+            else:
                 err_msg=ws_constants.METHOD_INVALID_INPUT
                 log.error(err_msg)
                 logger.print_on_console(ws_constants.METHOD_INVALID_INPUT)
+            self.get_cookies()
+            response=requests.put(req, headers=self.baseReqHeader, cookies=self.req_cookies, proxies=self.proxies, cert=self.client_cert, verify=self.server_cert, auth=self.req_auth, params=self.req_params)
+            status,methodoutput,output=self.__saveResults(response)
         except Exception as e:
             err_msg=str(e)
             log.error(e)
@@ -513,18 +512,17 @@ class WSkeywords:
         output=None
         err_msg=None
         try:
-            s=Session()
-            if not (self.baseEndPointURL is '' or self.baseOperation is ''):
-                reqUrl=self.baseEndPointURL+'/'+self.baseOperation
-                self.get_cookies()
-                req = requests.Request(method=self.baseMethod, url=reqUrl,cookies=self.req_cookies,proxies=self.proxies, cert=self.client_cert, verify=self.server_cert, auth=self.req_auth, params=self.req_params)
-                prep=req.prepare()
-                response=s.send(prep)
-                status,methodoutput,output=self.__saveResults(response)
+            if not (self.baseEndPointURL is '' or self.baseOperation is '' or self.baseReqHeader is ''):
+                req=self.baseEndPointURL+'/'+self.baseOperation
+            elif not (self.baseEndPointURL is ''):
+                req=self.baseEndPointURL
             else:
                 err_msg=ws_constants.METHOD_INVALID_INPUT
                 log.error(err_msg)
                 logger.print_on_console(ws_constants.METHOD_INVALID_INPUT)
+            self.get_cookies()
+            response=requests.delete(req, headers=self.baseReqHeader, cookies=self.req_cookies, proxies=self.proxies, cert=self.client_cert, verify=self.server_cert, auth=self.req_auth, params=self.req_params)
+            status,methodoutput,output=self.__saveResults(response)
         except Exception as e:
             err_msg=str(e)
             log.error(e)
