@@ -39,6 +39,7 @@ class ButtonLinkKeyword():
         status = webconstants.TEST_RESULT_FAIL
         methodoutput = webconstants.TEST_RESULT_FALSE
         err_msg=None
+        clickinfo=None
         output=OUTPUT_CONSTANT
         local_blk.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         #click keyword implementation
