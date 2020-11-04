@@ -821,7 +821,7 @@ class MainNamespace(BaseNamespace):
 class ConnectionThread(threading.Thread):
     """Test Worker Thread Class."""
     daemon = True
-
+    name = "socketIO_connection"
     def __init__(self, ice_action):
         """Init Worker Thread Class."""
         super(ConnectionThread, self).__init__()
@@ -903,6 +903,7 @@ class TestThread(threading.Thread):
     def __init__(self, main, action, json_data, aws_mode):
         """Init Worker Thread Class."""
         super(TestThread, self).__init__()
+        self.name = "test_thread"
         self.main = main
         self.cw = main.cw
         #flag to pause thread

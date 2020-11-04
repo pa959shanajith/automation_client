@@ -584,7 +584,6 @@ class Controller():
         global socket_object,iris_constant_step,status_percentage
         configvalues = self.configvalues
         try:
-            import time
             time.sleep(float(configvalues['stepExecutionWait']))
         except Exception as e:
             log.error('stepExecutionWait should be a integer, please change it in config.json')
@@ -1204,6 +1203,7 @@ class Controller():
                             sc_idx += 1
                             #logic for condition check
                             report_json=con.reporting_obj.report_json[OVERALLSTATUS]
+                        time.sleep(1)
             if aws_mode and not terminate_flag:
                 tc_obj.make_zip(pytest_files)
                 execution_status,step_results=self.aws_obj.run_aws_android_tests()
@@ -1216,7 +1216,7 @@ class Controller():
             #clearing dynamic variables at the end of execution to support dynamic variable at the scenario level
             obj.clear_dyn_variables()
             logger.print_on_console('***SUITE ', str(suite_idx) ,' EXECUTION COMPLETED***')
-            log.info('-----------------------------------------------')
+            log.info('---------------------------------------------------------------------')
             print('=======================================================================================================')
             suite_idx += 1
         del con
@@ -1337,7 +1337,8 @@ class Controller():
                 jsondata_dict[i] = copy.deepcopy(json_data)
                 for j in range(len(jsondata_dict[i]['suitedetails'])):
                     jsondata_dict[i]['suitedetails'][j]['browserType'] = [browsers_data[i]]
-                th[i] = threading.Thread(target = self.invoke_execution, args = (mythread,jsondata_dict[i],socketIO,wxObject,configvalues,qc_soc,qtest_soc,aws_mode))
+                thread_name = "test_thread_browser" + str(browsers_data[i])
+                th[i] = threading.Thread(target = self.invoke_execution, name = thread_name, args = (mythread,jsondata_dict[i],socketIO,wxObject,configvalues,qc_soc,qtest_soc,aws_mode))
                 th[i].start()
             for i in th:
                 th[i].join()
