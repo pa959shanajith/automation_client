@@ -288,9 +288,6 @@ class QcWindow():
                 xx=(x[1] + " " + x[0] + "]")[1:]
                 xx=xx.lstrip('0123456789')
                 tsn.append(xx)
-            # for bb in tsn:
-            #     bb.lstrip('0123456789')
-            # testc_id = ''
             entity_len = int(y["Entities"]["@TotalResults"])
             if (entity_len == 1): y["Entities"]["Entity"] = [y["Entities"]["Entity"]]
             if (entity_len > 0):
