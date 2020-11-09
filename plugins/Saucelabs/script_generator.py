@@ -241,7 +241,7 @@ def getWebElement(identifier):
             'press'  : element_obj.press,
             'doubleClick' : element_obj.doubleClick,
             'rightClick' : element_obj.rightClick,
-            'uploadFile'  : element_obj.uploadFile,
+            # 'uploadFile'  : element_obj.uploadFile,
 
             
             'verifyButtonName' : button_link_obj.verifyButtonName,
@@ -448,7 +448,6 @@ def getWebElement(identifier):
             # 'compxmlfilewithxmlblock' : generic_file_xml.compXmlFileWithXmlBlock,
             # 'cellbycellcompare': generic_file.cell_by_cell_compare
             }
-        
 
     def complie_TC(self,tsp,scenario_name,browser,index,execute_result_data,socketIO):
         try:
@@ -550,7 +549,11 @@ def getWebElement(identifier):
                     space+='\t'
                     if i.custname=='@Generic':
                         if flag != False:
-                            self.generic_keys[i.name](space,input_value)
+                            if i.name in self.generic_keys:
+                                self.generic_keys[i.name](space,input_value)
+                            else:
+                                logger.print_on_console(i.name+" keyword is not supported in saucelabs execution.")
+                                return False
                     elif i.custname=='@Browser':
                         if(i.name=="openBrowser"):
                             self.browsers['platform']=self.platform
@@ -560,15 +563,19 @@ def getWebElement(identifier):
                         else:
                             self.web_keys[i.name](space,input_value)
                     else:
-                        xpath=i.objectname.split(';')[0]
-                        if(i.name=="waitForElementVisible"):
-                            i.inputval=xpath
-                        self.f.write(space+"webelement=getWebElement("+repr(i.objectname)+")")
-                        self.f.write(space+"if webelement!=None:")
-                        space=space+"\t"
-                        webelement="webelement"
-                        self.web_keys[i.name](space,webelement,input_value)
-                        space=space[:-1]
+                        if i.name in self.web_keys:
+                            xpath=i.objectname.split(';')[0]
+                            if(i.name=="waitForElementVisible"):
+                                i.inputval=xpath
+                            self.f.write(space+"webelement=getWebElement("+repr(i.objectname)+")")
+                            self.f.write(space+"if webelement!=None:")
+                            space=space+"\t"
+                            webelement="webelement"
+                            self.web_keys[i.name](space,webelement,input_value)
+                            space=space[:-1]
+                        else:
+                            logger.print_on_console(i.name+" keyword is not supported in saucelabs execution.")
+                            return False
                     space=space[:-1]
                     self.f.write(space+"except Exception as e:")
                     self.f.write(space+"\toutput='False'")
