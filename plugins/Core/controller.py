@@ -907,7 +907,7 @@ class Controller():
         obj.clear_dyn_variables()
         return status
 
-    def invoke_execution(self,mythread,json_data,socketIO,wxObject,configvalues,qcObject,qtestObject,aws_mode):
+    def invoke_execution(self,mythread,json_data,socketIO,wxObject,configvalues,qcObject,qtestObject,zephyrObject,aws_mode):
         global terminate_flag,count,status_percentage
         qc_url=''
         qc_password=''
@@ -997,7 +997,7 @@ class Controller():
                                 qc_folder=qc_sceanrio_data['qcfolderpath']
                                 qc_tsList=qc_sceanrio_data['qctestset']
                                 qc_testrunname=qc_sceanrio_data['qctestcase']
-                            if('qctype' in qc_creds and qc_creds['qctype'] != ''):
+                            if('qctype' in qc_creds and qc_creds['qctype'] == 'qTest'):
                                 qc_username=qc_creds['qcusername']
                                 qc_password=qc_creds['qcpassword']
                                 qc_url=qc_creds['qcurl']
@@ -1008,6 +1008,18 @@ class Controller():
                                 qc_projectid=qc_sceanrio_data['qtestprojectid']
                                 qc_suite=qc_sceanrio_data['qtestsuite']
                                 qc_suiteid=qc_sceanrio_data['qtestsuiteid']
+                            if('qctype' in qc_creds and qc_creds['qctype'] == 'Zephyr'):
+                                qc_username=qc_creds['qcusername']
+                                qc_password=qc_creds['qcpassword']
+                                qc_url=qc_creds['qcurl']
+                                qc_type=qc_creds['qctype']
+                                qc_sceanrio_data=scenario['qcdetails']
+                                qc_cycleid=qc_sceanrio_data['cycleid']
+                                qc_projectid=qc_sceanrio_data['projectid']
+                                qc_versionid=qc_sceanrio_data['versionid']
+                                qc_testid=qc_sceanrio_data['testid']  
+                                qc_testname=qc_sceanrio_data['testname']   
+                                qc_issueid=qc_sceanrio_data['issueid']                       
                                 
                             #Iterating through each test case in the scenario
                             for testcase in [eval(scenario[scenario_id])]:
@@ -1095,7 +1107,7 @@ class Controller():
                                 sc_idx += 1
                                 #logic for condition check
                                 report_json=con.reporting_obj.report_json[OVERALLSTATUS]
-                                if qc_type!="qTest" and len(scenario['qcdetails'])==10 and (qc_url!='' and qc_password!='' and  qc_username!=''):
+                                if qc_type!="qTest" and qc_type!="Zephyr" and len(scenario['qcdetails'])==10 and (qc_url!='' and qc_password!='' and  qc_username!=''):
                                     qc_status_over=report_json[0]
                                     qc_update_status=qc_status_over['overallstatus']
                                     if(str(qc_update_status).lower()=='pass'):
@@ -1163,6 +1175,38 @@ class Controller():
                                     except Exception as e:
                                         log.error('Error in Updating qTest details '+str(e))
                                         logger.print_on_console('Error in Updating qTest details')
+
+                                if (qc_type=="Zephyr" and qc_url!='' and qc_password!='' and  qc_username!=''):
+                                    qc_status_over=report_json[0]
+                                    try:
+                                        qc_status = {}
+                                        qc_status['qcaction']='qcupdate'
+                                        qc_status['cycleId']=qc_cycleid
+                                        qc_status['testId']=qc_testid
+                                        qc_status['issueId']=qc_issueid
+                                        qc_status['projectId']=qc_projectid
+                                        qc_status['versionId']=qc_versionid
+                                        qc_update_status=qc_status_over['overallstatus']
+                                        qc_status['status']={}
+                                        if(qc_update_status.lower()=='pass'):
+                                            qc_status['status']['id']='1'
+                                        elif(qc_update_status.lower()=='fail'):
+                                            qc_status['status']['id']='2'
+                                        elif(qc_update_status.lower()=='terminate'):
+                                            qc_status['status']['id']='5'
+                                        logger.print_on_console('****Updating Zephyr Details****')
+                                        if zephyrObject is not None:
+                                            status = zephyrObject.update_zephyr_test_details(qc_status)
+                                            if status:
+                                                logger.print_on_console('****Updated Zephyr Details****')
+                                            else:
+                                               logger.print_on_console('****Failed to Update Zephyr Details****')
+                                        else:
+                                            logger.print_on_console('****Failed to Update Zephyr Details****')
+                                    except Exception as e:
+                                        log.error('Error in Updating Zephyr details '+str(e))
+                                        logger.print_on_console('Error in Updating Zephyr details')
+
 
                                 #Check is made to fix issue #401
                                 if len(report_json)>0:
@@ -1295,7 +1339,7 @@ class Controller():
             sc_idx+=1
             idx_t+=1
 
-    def invoke_controller(self,action,mythread,debug_mode,runfrom_step,json_data,root_obj,socketIO,qc_soc,qtest_soc,*args):
+    def invoke_controller(self,action,mythread,debug_mode,runfrom_step,json_data,root_obj,socketIO,qc_soc,qtest_soc,zephyr_soc,*args):
         status = COMPLETED
         global terminate_flag,pause_flag,socket_object
         self.conthread=mythread
@@ -1311,9 +1355,9 @@ class Controller():
             self.execution_mode = json_data['exec_mode'].lower()
             kill_process()
             if self.execution_mode == SERIAL:
-                status=self.invoke_execution(mythread,json_data,socketIO,wxObject,self.configvalues,qc_soc,qtest_soc,aws_mode)
+                status=self.invoke_execution(mythread,json_data,socketIO,wxObject,self.configvalues,qc_soc,qtest_soc,zephyr_soc,aws_mode)
             elif self.execution_mode == PARALLEL:
-                status = self.invoke_parralel_exe(mythread,json_data,socketIO,wxObject,self.configvalues,qc_soc,qtest_soc,aws_mode)
+                status = self.invoke_parralel_exe(mythread,json_data,socketIO,wxObject,self.configvalues,qc_soc,qtest_soc,zephyr_soc,aws_mode)
         elif action==DEBUG:
             self.debug_choice=wxObject.choice
             self.debug_mode=debug_mode
@@ -1323,7 +1367,7 @@ class Controller():
             status=COMPLETED
         return status
 
-    def invoke_parralel_exe(self,mythread,json_data,socketIO,wxObject,configvalues,qc_soc,qtest_soc,aws_mode):
+    def invoke_parralel_exe(self,mythread,json_data,socketIO,wxObject,configvalues,qc_soc,qtest_soc,zephyr_soc,aws_mode):
         try:
             import copy
             browsers_data = json_data['suitedetails'][0]['browserType']
@@ -1333,7 +1377,7 @@ class Controller():
                 jsondata_dict[i] = copy.deepcopy(json_data)
                 for j in range(len(jsondata_dict[i]['suitedetails'])):
                     jsondata_dict[i]['suitedetails'][j]['browserType'] = [browsers_data[i]]
-                th[i] = threading.Thread(target = self.invoke_execution, args = (mythread,jsondata_dict[i],socketIO,wxObject,configvalues,qc_soc,qtest_soc,aws_mode))
+                th[i] = threading.Thread(target = self.invoke_execution, args = (mythread,jsondata_dict[i],socketIO,wxObject,configvalues,qc_soc,qtest_soc,zephyr_soc,aws_mode))
                 th[i].start()
             for i in th:
                 th[i].join()
