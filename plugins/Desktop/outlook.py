@@ -238,8 +238,27 @@ class OutlookKeywords:
                             if ( recipient.Type == 1 ):
                                 ToMailID += recipient.PropertyAccessor.GetProperty(outlook_constants.PR_SMTP_ADDRESS) + ';'
                         ToMailID = ToMailID[: - 1]
-                        if ( msg.Attachments.Count > 0 ):
-                            AttachmentStatus = outlook_constants.ATTACH_STATUS_YES
+                        # if ( msg.Attachments.Count > 0 ):
+                        #     AttachmentStatus = outlook_constants.ATTACH_STATUS_YES
+                        # while True:
+                        attachments_item = msg.Attachments
+                        nbrOfAttachmentInMessage = attachments_item.Count
+                        x = 1
+                        # no=0
+                        # yes=0
+                        while x <= nbrOfAttachmentInMessage:
+                            attachment_item = attachments_item.Item(x)
+                            fn = attachment_item.FileName
+                            filename = fn.split('.')
+                            if filename[-1] in ['png']:  #['png','jpg']
+                                AttachmentStatus = outlook_constants.ATTACH_STATUS_NO
+                                break #(no=no+1)
+                            else:
+                                AttachmentStatus = outlook_constants.ATTACH_STATUS_YES
+                                break #(yes=yes+1)
+                            x+=1
+                        # if yes>1:
+                        #     AttachmentStatus = outlook_constants.ATTACH_STATUS_YES
                         try:
                                 msg.Display()
                                 Flag = True
