@@ -38,6 +38,7 @@ root = None
 cw = None
 browsername = None
 qcdata = None
+zephyrdata = None
 qcObject = None
 qtestObject = None
 zephyrObject = None
@@ -629,10 +630,10 @@ class MainNamespace(BaseNamespace):
             if(zephyrObject == None):
                 core_utils.get_all_the_imports('Zephyr')
                 import ZephyrController
-                zephyrObject = ZephyrController.QcWindow()
+                zephyrObject = ZephyrController.ZephyrWindow()
 
-            qcdata = args[0]
-            response = zephyrObject.qc_dict[qcdata.pop('qcaction')](qcdata)
+            zephyrdata = args[0]
+            response = zephyrObject.zephyr_dict[zephyrdata.pop('zephyraction')](zephyrdata)
             socketIO.emit('qcresponse', response)
         except KeyError:
             err_msg = 'Invalid Zephyr operation'

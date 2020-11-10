@@ -1,11 +1,11 @@
 #-------------------------------------------------------------------------------
-# Name:        QcTestLab.py
+# Name:        ZephyrController.py
 # Purpose:
 #
-# Author:      chethan.singh
+# Author:      keerthana.pai
 #
-# Created:     10/05/2017
-# Copyright:   (c) chethan.singh 2017
+# Created:     10/11/2020
+# Copyright:   (c) keerthana.pai 2020
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 
@@ -21,9 +21,9 @@ import datetime
 import jwt
 import time
 import hashlib
-log = logging.getLogger("Qccontroller.py")
+log = logging.getLogger("ZephyrController.py")
 
-class QcWindow():
+class ZephyrWindow():
     base_url = "https://prod-play.zephyr4jiracloud.com/connect"
     _headers = None
     account_id = None
@@ -37,7 +37,7 @@ class QcWindow():
     canonical_path = None
 
     def __init__(self):
-        self.qc_dict = {
+        self.zephyr_dict = {
             'domain': self.login,
             'project': self.get_projects
         }
@@ -46,12 +46,10 @@ class QcWindow():
         res = "invalidcredentials"
         try:
             exp = time.time() + 3600
-            self.account_id = filePath["qcURL"]
-            self.access_key = filePath["qcUsername"]
-            self.secret_key = filePath["qcPassword"]
-            self.jira_url = filePath["qcJiraUrl"]
-            self.jira_username = filePath["qcJiraUserName"]
-            self.jira_access_token = filePath["qcJiraAccToken"]
+            self.account_id = filePath["zephyrAccNo"]
+            self.access_key = filePath["zephyrAcKey"]
+            self.secret_key = filePath["zephyrSecKey"]
+            execFlag = filePath["execFlag"]
             self.payload = {
                 'sub': self.account_id,
                 'iss': self.access_key,
@@ -70,31 +68,38 @@ class QcWindow():
             }
             respon = requests.get(self.base_url+self.relative_path, headers=self._headers,verify=False)
 
-            login_url = "/rest/api/3/project/search"
-            tokengen = self.jira_username + ":" + self.jira_access_token
-            # from requests.auth import HTTPBasicAuth
-            # auth=HTTPBasicAuth('c5017', 'Welcome#20')
-            encSt = base64.b64encode(bytes(tokengen, 'utf-8'))
-            headersVal = {'Authorization':'Basic %s'% encSt.decode('ascii')}
-            #checking account id
-            acc_id_url = self.jira_url+"/rest/api/3/myself"
-            acc_id_resp = requests.get(acc_id_url, headers=headersVal,verify=False)
-            if acc_id_resp.status_code == 200:
-                res_str = acc_id_resp.json()
-                if not (res_str["accountId"] == self.account_id):
-                    return res            
-            resp = requests.get(self.jira_url+login_url, headers=headersVal, verify=False)
-            JsonObject = None
-            if resp.status_code == 200 and respon.status_code == 200:
-                # response = json.loads(resp.text)
-                JsonObject = resp.json()
-                if len(JsonObject["values"]) == 0:
-                    return res
-                res = [{'id':i['id'],'name':i['name']} for i in JsonObject["values"]]
-            self.project_dict = {}
-            if JsonObject != None:
-                for item in JsonObject["values"]:
-                    self.project_dict[item['name']] = item['id']
+            if execFlag == "0":
+                self.jira_url = filePath["zephyrJiraUrl"]
+                self.jira_username = filePath["zephyrJiraUserName"]
+                self.jira_access_token = filePath["zephyrJiraAccToken"]
+                login_url = "/rest/api/3/project/search"
+                tokengen = self.jira_username + ":" + self.jira_access_token
+                # from requests.auth import HTTPBasicAuth
+                # auth=HTTPBasicAuth('c5017', 'Welcome#20')
+                encSt = base64.b64encode(bytes(tokengen, 'utf-8'))
+                headersVal = {'Authorization':'Basic %s'% encSt.decode('ascii')}
+                #checking account id
+                acc_id_url = self.jira_url+"/rest/api/3/myself"
+                acc_id_resp = requests.get(acc_id_url, headers=headersVal,verify=False)
+                if acc_id_resp.status_code == 200:
+                    res_str = acc_id_resp.json()
+                    if not (res_str["accountId"] == self.account_id):
+                        return res            
+                resp = requests.get(self.jira_url+login_url, headers=headersVal, verify=False)
+                JsonObject = None
+                if resp.status_code == 200 and respon.status_code == 200:
+                    # response = json.loads(resp.text)
+                    JsonObject = resp.json()
+                    if len(JsonObject["values"]) == 0:
+                        return res
+                    res = [{'id':i['id'],'name':i['name']} for i in JsonObject["values"]]
+                self.project_dict = {}
+                if JsonObject != None:
+                    for item in JsonObject["values"]:
+                        self.project_dict[item['name']] = item['id']
+            elif execFlag == "1" and respon.status_code == 200:
+                res = []
+                return res
         except Exception as e:
             err_msg='Error while Login in qTest'
             log.error(err_msg)

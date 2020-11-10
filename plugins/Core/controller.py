@@ -912,7 +912,10 @@ class Controller():
         qc_url=''
         qc_password=''
         qc_username=''
-        qc_type=''
+        zephyr_accNo=''
+        zephyr_secKey=''
+        zephyr_acKey=''        
+        integration_type=''
         con = Controller()
         obj = handler.Handler()
         status=COMPLETED
@@ -987,7 +990,7 @@ class Controller():
                                 logger.print_on_console( '***Scenario ' ,str(sc_idx + 1) ,' execution started***')
                                 print('=======================================================================================================')
                                 log.info('***Scenario '  + str(sc_idx + 1)+ ' execution started***')
-                            if('qctype' not in qc_creds and len(scenario)==2 and len(scenario['qcdetails'])==10):
+                            if('integrationType' not in qc_creds and len(scenario)==2 and len(scenario['qcdetails'])==10):
                                 qc_username=qc_creds['qcusername']
                                 qc_password=qc_creds['qcpassword']
                                 qc_url=qc_creds['qcurl']
@@ -997,29 +1000,28 @@ class Controller():
                                 qc_folder=qc_sceanrio_data['qcfolderpath']
                                 qc_tsList=qc_sceanrio_data['qctestset']
                                 qc_testrunname=qc_sceanrio_data['qctestcase']
-                            if('qctype' in qc_creds and qc_creds['qctype'] == 'qTest'):
+                            if('integrationType' in qc_creds and qc_creds['integrationType'] == 'qTest'):
                                 qc_username=qc_creds['qcusername']
                                 qc_password=qc_creds['qcpassword']
                                 qc_url=qc_creds['qcurl']
-                                qc_type=qc_creds['qctype']
+                                integration_type=qc_creds['integrationType']
                                 qc_stepsup=qc_creds['qteststeps']
                                 qc_sceanrio_data=scenario['qcdetails']
                                 qc_project=qc_sceanrio_data['qtestproject']
                                 qc_projectid=qc_sceanrio_data['qtestprojectid']
                                 qc_suite=qc_sceanrio_data['qtestsuite']
                                 qc_suiteid=qc_sceanrio_data['qtestsuiteid']
-                            if('qctype' in qc_creds and qc_creds['qctype'] == 'Zephyr'):
-                                qc_username=qc_creds['qcusername']
-                                qc_password=qc_creds['qcpassword']
-                                qc_url=qc_creds['qcurl']
-                                qc_type=qc_creds['qctype']
-                                qc_sceanrio_data=scenario['qcdetails']
-                                qc_cycleid=qc_sceanrio_data['cycleid']
-                                qc_projectid=qc_sceanrio_data['projectid']
-                                qc_versionid=qc_sceanrio_data['versionid']
-                                qc_testid=qc_sceanrio_data['testid']  
-                                qc_testname=qc_sceanrio_data['testname']   
-                                qc_issueid=qc_sceanrio_data['issueid']                       
+                            if('integrationType' in qc_creds and qc_creds['integrationType'] == 'Zephyr'):
+                                zephyr_acKey=qc_creds['qcusername']
+                                zephyr_secKey=qc_creds['qcpassword']
+                                zephyr_accNo=qc_creds['qcurl']
+                                integration_type=qc_creds['integrationType']
+                                zephyr_sceanrio_data=scenario['qcdetails']
+                                zephyr_cycleid=zephyr_sceanrio_data['cycleid']
+                                zephyr_projectid=zephyr_sceanrio_data['projectid']
+                                zephy_versionid=zephyr_sceanrio_data['versionid']
+                                zephy_testid=zephyr_sceanrio_data['testid']  
+                                zephy_issueid=zephyr_sceanrio_data['issueid']                       
                                 
                             #Iterating through each test case in the scenario
                             for testcase in [eval(scenario[scenario_id])]:
@@ -1107,7 +1109,7 @@ class Controller():
                                 sc_idx += 1
                                 #logic for condition check
                                 report_json=con.reporting_obj.report_json[OVERALLSTATUS]
-                                if qc_type!="qTest" and qc_type!="Zephyr" and len(scenario['qcdetails'])==10 and (qc_url!='' and qc_password!='' and  qc_username!=''):
+                                if integration_type!="qTest" and integration_type!="Zephyr" and len(scenario['qcdetails'])==10 and (qc_url!='' and qc_password!='' and  qc_username!=''):
                                     qc_status_over=report_json[0]
                                     qc_update_status=qc_status_over['overallstatus']
                                     if(str(qc_update_status).lower()=='pass'):
@@ -1136,7 +1138,7 @@ class Controller():
                                             logger.print_on_console('****Failed to Update QCDetails****')
                                     except Exception as e:
                                         logger.print_on_console('Error in Updating Qc details')
-                                if (qc_type=="qTest" and qc_url!='' and qc_password!='' and  qc_username!=''):
+                                if (integration_type=="qTest" and qc_url!='' and qc_password!='' and  qc_username!=''):
                                     qc_status_over=report_json[0]
                                     try:
                                         qc_status = {}
@@ -1176,27 +1178,27 @@ class Controller():
                                         log.error('Error in Updating qTest details '+str(e))
                                         logger.print_on_console('Error in Updating qTest details')
 
-                                if (qc_type=="Zephyr" and qc_url!='' and qc_password!='' and  qc_username!=''):
-                                    qc_status_over=report_json[0]
+                                if (integration_type=="Zephyr" and zephyr_accNo!='' and zephyr_secKey!='' and  zephyr_acKey!=''):
+                                    zephyr_status_over=report_json[0]
                                     try:
-                                        qc_status = {}
-                                        qc_status['qcaction']='qcupdate'
-                                        qc_status['cycleId']=qc_cycleid
-                                        qc_status['testId']=qc_testid
-                                        qc_status['issueId']=qc_issueid
-                                        qc_status['projectId']=qc_projectid
-                                        qc_status['versionId']=qc_versionid
-                                        qc_update_status=qc_status_over['overallstatus']
-                                        qc_status['status']={}
-                                        if(qc_update_status.lower()=='pass'):
-                                            qc_status['status']['id']='1'
-                                        elif(qc_update_status.lower()=='fail'):
-                                            qc_status['status']['id']='2'
-                                        elif(qc_update_status.lower()=='terminate'):
-                                            qc_status['status']['id']='5'
+                                        zephyr_status = {}
+                                        zephyr_status['zephyraction']='zephyrupdate'
+                                        zephyr_status['cycleId']=zephyr_cycleid
+                                        zephyr_status['testId']=zephy_testid
+                                        zephyr_status['issueId']=zephy_issueid
+                                        zephyr_status['projectId']=zephyr_projectid
+                                        zephyr_status['versionId']=zephy_versionid
+                                        zephyr_update_status=zephyr_status_over['overallstatus']
+                                        zephyr_status['status']={}
+                                        if(zephyr_update_status.lower()=='pass'):
+                                            zephyr_status['status']['id']='1'
+                                        elif(zephyr_update_status.lower()=='fail'):
+                                            zephyr_status['status']['id']='2'
+                                        elif(zephyr_update_status.lower()=='terminate'):
+                                            zephyr_status['status']['id']='5'
                                         logger.print_on_console('****Updating Zephyr Details****')
                                         if zephyrObject is not None:
-                                            status = zephyrObject.update_zephyr_test_details(qc_status)
+                                            status = zephyrObject.update_zephyr_test_details(zephyr_status)
                                             if status:
                                                 logger.print_on_console('****Updated Zephyr Details****')
                                             else:
