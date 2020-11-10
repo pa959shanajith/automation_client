@@ -348,6 +348,12 @@ SCENARIO_NAME='scenarioName'
 
 RELEASE_NAME='releaseName'
 
+TERMINATED_BY='terminatedBy'
+
+USER_TERMINATED='user'
+
+PROGRAM_TERMINATED='program'
+
 #Logger constants
 
 KEYWORD_EXECUTION_STARTED = 'Keyword  execution started'

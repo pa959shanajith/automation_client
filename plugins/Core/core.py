@@ -821,7 +821,7 @@ class MainNamespace(BaseNamespace):
 class ConnectionThread(threading.Thread):
     """Test Worker Thread Class."""
     daemon = True
-
+    name = "socketIO_connection"
     def __init__(self, ice_action):
         """Init Worker Thread Class."""
         super(ConnectionThread, self).__init__()
@@ -903,6 +903,7 @@ class TestThread(threading.Thread):
     def __init__(self, main, action, json_data, aws_mode):
         """Init Worker Thread Class."""
         super(TestThread, self).__init__()
+        self.name = "test_thread"
         self.main = main
         self.cw = main.cw
         #flag to pause thread
@@ -993,7 +994,9 @@ class TestThread(threading.Thread):
                 else:
                     socketIO.emit('result_debugTestCaseWS',status)
             elif self.action==EXECUTE:
-                socketIO.emit('result_executeTestSuite', {"status":status, "batchId": batch_id})
+                result = {"status":status, "batchId": batch_id}
+                if controller.manual_terminate_flag: result["userTerminated"] = True
+                socketIO.emit('result_executeTestSuite', result)
         except Exception as e:
             log.error(e, exc_info=True)
             status=TERMINATE
@@ -1002,10 +1005,12 @@ class TestThread(threading.Thread):
                     self.cw.killChildWindow(debug=True)
                     socketIO.emit('result_debugTestCase',status)
                 elif self.action==EXECUTE:
-                    socketIO.emit('result_executeTestSuite', {"status":status, "batchId": batch_id})
+                    result = {"status":status, "batchId": batch_id}
+                    if controller.manual_terminate_flag: result["userTerminated"] = True
+                    socketIO.emit('result_executeTestSuite', result)
         if closeActiveConnection:
             closeActiveConnection = False
-            connection_Timer = threading.Timer(300, root.closeConnection)
+            connection_Timer = threading.Timer(300, self.main.closeConnection)
             connection_Timer.start()
 
         self.main.testthread = None
@@ -1113,6 +1118,7 @@ class Main():
     def close(self, *args):
         global connection_Timer
         controller.terminate_flag = True
+        controller.manual_terminate_flag = True
         controller.disconnect_flag = True
         if self.socketthread: logger.print_on_console('Disconnected from Avo Assure server')
         if (connection_Timer != None and connection_Timer.isAlive()):
