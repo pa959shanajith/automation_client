@@ -35,6 +35,7 @@ import dynamic_variable_handler
 import logging
 from itertools import islice
 import re
+import win32com.client
 log = logging.getLogger('file_operations.py')
 
 
@@ -217,11 +218,104 @@ class FileOperations:
             logger.print_on_console(err_msg)
         return status,methodoutput,output_res,err_msg
 
-    def copyFileFolder(self, source_path, destination_path, opt = 0):
+    def saveFileAs(self,source_path,destination_path,opt,extension):
+        import csv
+        status = TEST_RESULT_FAIL
+        result = TEST_RESULT_FALSE
+        err_msg = None
+        try:
+            file1 = os.path.basename(source_path)
+            if(not extension.startswith('.')): extension = '.'+extension    
+            file2 = os.path.dirname(destination_path)+'\\'+file1.split('.')[0]+extension               
+            res = os.path.isfile(file2)
+            filename = os.path.basename(file2)
+            input_ext = os.path.splitext(source_path)[1]
+            ext_list=['.txt','.csv','.xlsx','.xls','doc','.docx','.pdf']
+            if(extension in ext_list):
+                if(not res or opt=='1'): 
+                    if(input_ext=='.txt' and extension=='.csv'):
+                        with open(source_path, 'r') as in_file:
+                            stripped = (line.strip() for line in in_file)
+                            lines = (line.split(",") for line in stripped if line)
+                            with open(file2, 'w',newline='') as out_file:
+                                writer = csv.writer(out_file)
+                                writer.writerows(lines)
+                    
+                    elif(input_ext=='.csv' and extension=='.txt'):
+                        with open(file2, "w") as my_output_file:
+                            with open(source_path, "r") as my_input_file:
+                                [ my_output_file.write(",".join(row)+'\n') for row in csv.reader(my_input_file)]
+                            my_output_file.close()
+
+                    elif(input_ext=='.xlsx' and extension=='.csv'):
+                        wb = openpyxl.load_workbook(source_path)
+                        sh = wb.get_active_sheet()
+                        with open(file2, 'w', newline="") as f:
+                            c = csv.writer(f)
+                            for r in sh.rows:
+                                c.writerow([cell.value for cell in r])
+
+                    elif(input_ext=='.xls' and extension=='.csv'):
+                        with open_workbook(source_path) as wb:
+                            sheet = wb.sheet_by_index(0)
+                            with open(file2, 'w', newline="") as f:
+                                c = csv.writer(f)
+                                for r in range(sheet.nrows):
+                                    c.writerow(sheet.row_values(r))
+
+                    elif(input_ext=='.csv' and (extension=='.xlsx' or extension=='.xls')):
+                        workbook = openpyxl.Workbook()
+                        worksheet = workbook.create_sheet(index=0, title='Sheet1')
+                        with open(source_path, 'rt', encoding='utf8') as f:
+                            reader = csv.reader(f)
+                            for r, row in enumerate(reader):
+                                for c, col in enumerate(row):
+                                    worksheet.cell(r+1, c+1, col)
+                        workbook.save(os.path.join(os.path.dirname(file2), filename))
+                        workbook.close()
+
+                    elif((input_ext=='.xlsx' and extension=='.xls') or (input_ext=='.xls' and extension=='.xlsx')):
+                        excel = win32com.client.gencache.EnsureDispatch('Excel.Application')
+                        wb = excel.Workbooks.Open(source_path)
+                        if(extension=='.xls'):
+                            wb.SaveAs(file2, FileFormat = 56)
+                        else:
+                            wb.SaveAs(file2, FileFormat = 51)
+                        wb.Close()
+                        excel.Application.Quit()
+
+                    elif(((input_ext=='.doc' or input_ext=='.docx') and (extension=='.pdf' or extension=='.doc' or extension=='.docx')) or (input_ext=='.pdf' and (extension=='.doc' or extension=='.docx')) ):
+                        word = win32com.client.Dispatch('Word.Application')
+                        doc = word.Documents.Open(source_path)
+                        if(extension=='.docx'):
+                            doc.SaveAs(file2, FileFormat = 16)
+                        elif(extension=='.doc'):
+                            doc.SaveAs(file2, FileFormat = 0)
+                        else:
+                            doc.SaveAs(file2, FileFormat = 17)
+                        doc.Close()
+                        word.Quit()
+                        
+                    else:
+                        err_msg = 'File conversion support is not given for ' + str(source_path) + ' to ' + str(file2)
+                else:
+                    err_msg = 'File already exists in the destination path'
+                if(not err_msg):
+                    log.debug('File successfully converted from ' + str(source_path) + ' to ' + str(file2) ) 
+                    logger.print_on_console('File successfully converted from ' + str(source_path) + ' to ' + str(file2) )                                          
+                    status=TEST_RESULT_PASS
+                    result=TEST_RESULT_TRUE
+            else:
+                err_msg = 'Supported extensions for conversions are '+ str(ext_list)
+        except Exception as e:
+            err_msg = 'Error occurred while file conversion in copyFileFolder'
+        return status, result, err_msg
+            
+    def copyFileFolder(self, source_path, destination_path, opt = 0, extension = 'null'):
         """
         def: copyFileFolder
-        purpose: Copy from input path 1, to input path 2, optional(0(default)- overwrite/1- overwrite )
-        param: <path of source file/folder>,<path of destination(directory path only)>,bool
+        purpose: Copy from input path 1, to input path 2, optional(0(default)-don't overwrite/1- overwrite), extension(optional)
+        param: <path of source file/folder>,<path of destination(directory path only)>,bool,extension(to convert file to other formats)
         return: bool
         """
         status = TEST_RESULT_FAIL
@@ -229,6 +323,7 @@ class FileOperations:
         err_msg = None
         output_res = OUTPUT_CONSTANT
         try:
+            if(extension=='' or extension==' '): extension='null'
             if( source_path and destination_path ):
                 try:
                     if( os.path.splitext(source_path)[1] and not os.path.splitext(destination_path)[1] ):
@@ -241,19 +336,25 @@ class FileOperations:
                                         #dont-overwrite
                                         if ( not os.path.isfile(destination_path) ): #already exists
                                             logger.print_on_console( "Copying the file to destination. Please wait..." )
-                                            shutil.copyfile(source_path,destination_path)
-                                            log.debug( 'File successfully copied from ' + str(source_path) + ' to ' + str(destination_path) )
-                                            status=TEST_RESULT_PASS
-                                            result=TEST_RESULT_TRUE
+                                            if( extension!= 'null'):
+                                                status,result,err_msg=self.saveFileAs(source_path,destination_path,opt,extension)
+                                            else:
+                                                shutil.copyfile(source_path,destination_path)
+                                                log.debug( 'File successfully copied from ' + str(source_path) + ' to ' + str(destination_path) )                                             
+                                                status=TEST_RESULT_PASS
+                                                result=TEST_RESULT_TRUE
                                         else:
                                             err_msg = 'File already exists in the directory'
                                     elif( int(opt) == 1 ):
                                         #overwrite
                                         logger.print_on_console( "Copying the file to destination. Please wait..." )
-                                        shutil.copyfile(source_path,destination_path)
-                                        log.debug( 'File successfully copied from ' + str(source_path) + ' to ' + str(destination_path) )
-                                        status=TEST_RESULT_PASS
-                                        result=TEST_RESULT_TRUE
+                                        if( extension!= 'null'):
+                                            status,result,err_msg=self.saveFileAs(source_path,destination_path,opt,extension)
+                                        else:
+                                            shutil.copyfile(source_path,destination_path)
+                                            log.debug( 'File successfully copied from ' + str(source_path) + ' to ' + str(destination_path) )
+                                            status=TEST_RESULT_PASS
+                                            result=TEST_RESULT_TRUE
                                     else:
                                         err_msg = 'Invalid option, Please provide 1 or 0'
                                 else:
