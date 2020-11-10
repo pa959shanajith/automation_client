@@ -37,6 +37,7 @@ pause_flag=False
 iris_flag = True
 iris_constant_step = -1
 socket_object = None
+saucelabs_count = 0
 # test_case_number = 0
 log = logging.getLogger("controller.py")
 status_percentage = {TEST_RESULT_PASS:0,TEST_RESULT_FAIL:0,TERMINATE:0,"total":0}
@@ -159,6 +160,7 @@ class Controller():
             # core_utils.get_all_the_imports('ImageProcessing')
             core_utils.get_all_the_imports('WebScrape')
             core_utils.get_all_the_imports('Web')
+            core_utils.get_all_the_imports('Saucelabs')
             if iris_flag:
                 core_utils.get_all_the_imports('IRIS')
             import web_dispatcher
@@ -906,7 +908,7 @@ class Controller():
         return status
 
     def invoke_execution(self,mythread,json_data,socketIO,wxObject,configvalues,qcObject,qtestObject,aws_mode):
-        global terminate_flag,status_percentage
+        global terminate_flag,status_percentage,saucelabs_count
         qc_url=''
         qc_password=''
         qc_username=''
@@ -1058,6 +1060,15 @@ class Controller():
                                     log.info(msg)
                                     tsplist=[]
                                 sc_idx+=1
+                                execute_flag=False
+                            execution_env = json_data['exec_env'].lower()
+                            if execution_env == 'saucelabs':
+                                self.__load_web()
+                                import script_generator
+                                scenario_name=json_data['suitedetails'][suite_idx-1]["scenarioNames"][sc_idx]
+                                saucelabs_obj=script_generator.SauceLabs_Operations(scenario_name,str(saucelabs_count))
+                                status=saucelabs_obj.complie_TC(tsplist,scenario_name,browser,str(saucelabs_count),execute_result_data,socketIO)
+                                saucelabs_count += 1
                                 execute_flag=False
                             if flag and execute_flag :
                                 #check for temrinate flag before execution
