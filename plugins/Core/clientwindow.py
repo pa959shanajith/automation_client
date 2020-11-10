@@ -334,6 +334,7 @@ class ClientWindow(wx.Frame):
         logger.print_on_console(msg)
         log.info(msg)
         controller.terminate_flag=True
+        controller.manual_terminate_flag=True
         #Calling AWS stop job on terminate (if present)
         try:
             root.testthread.con.aws_obj.stop_job()

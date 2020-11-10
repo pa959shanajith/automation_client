@@ -17,7 +17,7 @@
         background-color: #dfd0fa;
     }
     .h2Header h3{
-      //border: 2px solid;
+      /*border: 2px solid;*/
       position: relative;
       text-align: center;
       left: -110px;
@@ -119,7 +119,7 @@
     .reportsDetails th:nth-child(7),.rDExpectedRes{width: 9%; word-break: break-word; text-align:left}
     .reportsDetails th:nth-child(8),.rDActualRes{width: 9%; word-break: break-word; text-align:left}
     .reportsDetails th:nth-child(9),.rDstatus{width: 5%; word-break: break-word; text-align:left}
-	.reportsDetails th:nth-child(10),.rjira{width: 9%; word-break: break-word; text-align:left}
+    .reportsDetails th:nth-child(10),.rjira{width: 9%; word-break: break-word; text-align:left}
     .maintabCont{float: left; width: 100%; border: 1px solid #dcdcdc; height: 49%;}
     .tabCont{display: table-cell; border-bottom: 1px solid #ececec; border-right: 1px solid #ececec;word-wrap:break-word}
     .reportsDetail{line-height: 2; text-align: center; height: calc(100% - 35px); overflow: auto;font-size: 14px;}
@@ -185,29 +185,29 @@
         <label>Browser Version</label><span>: {{browserVersion}}</span>
     </div>
     <div id="rightSummaryFunc" class="rightSummaryFunc">
-		<div class="reportStatus">
-			<div class="reportStatusBlk">
-            	<span class="progresslabel">Pass</span>
-            	<div class="progress customprogress">
-            		<span class="progress-bar progress-bar-success" style="width: {{pass}}%" role="progressbar"></span>
-            	</div>
-            	<span class="progresspercentage">{{pass}} %</span>
-			</div>
-        	<div class="reportStatusBlk">
-        		<span class="progresslabel">Fail</span>
-            	<div class="progress customprogress">
-            		<span class="progress-bar progress-bar-danger" style="width: {{fail}}%" role="progressbar"></span>
-            	</div>
-            	<span class="progresspercentage">{{fail}} %</span>
-			</div>
-        	<div class="reportStatusBlk">
-        		<span class="progresslabel">Terminated</span>
-            	<div class="progress customprogress">
-            		<span class="progress-bar progress-bar-warning" style="width: {{terminate}}%" role="progressbar"></span>
-           		</div>
-            	<span class="progresspercentage">{{terminate}} %</span>
-        	</div>
-    	</div>
+        <div class="reportStatus">
+            <div class="reportStatusBlk">
+                <span class="progresslabel">Pass</span>
+                <div class="progress customprogress">
+                    <span class="progress-bar progress-bar-success" style="width: {{pass}}%" role="progressbar"></span>
+                </div>
+                <span class="progresspercentage">{{pass}} %</span>
+            </div>
+            <div class="reportStatusBlk">
+                <span class="progresslabel">Fail</span>
+                <div class="progress customprogress">
+                    <span class="progress-bar progress-bar-danger" style="width: {{fail}}%" role="progressbar"></span>
+                </div>
+                <span class="progresspercentage">{{fail}} %</span>
+            </div>
+            <div class="reportStatusBlk">
+                <span class="progresslabel">Terminated</span>
+                <div class="progress customprogress">
+                    <span class="progress-bar progress-bar-warning" style="width: {{terminate}}%" role="progressbar"></span>
+                   </div>
+                <span class="progresspercentage">{{terminate}} %</span>
+            </div>
+        </div>
     </div>
     <div style="">
         <table cellpadding="3" cellspacing="0" class="midContainer" id="staustable">
@@ -242,7 +242,7 @@
                <tr><th>Sl No.</th>
                 <th>Test Step No.</th>
                 <th style="display:none">Test Step Description</th>
-				<th>Expected Result</th><th>Actual Result</th>
+                <th>Expected Result</th><th>Actual Result</th>
                 <th>Status</th>
                 <th>Elapsed Time</th>
                 {{#ifnotEquals commentsLength 0}}
@@ -251,109 +251,87 @@
                 <!-- {{#ifnotEquals remarksLength 0}}
                 <th>Remarks</th> 
                 {{/ifnotEquals}} -->
-				<th>Jira Defect ID</th></tr>
+                <th>Jira Defect ID</th></tr>
             </thead>
-            <tbody class="reportsDetail" >
+            <tbody class="reportsDetail">
                 {{#each rows}}
-                 {{#ifnotEquals hidestep "true"}}
+                {{#ifnotEquals hidestep "true"}}
                 <tr id="report-slno{{id}}" style="width: 100%;" class="reportdetailsrow">
                     <td class="rDid tabCont">{{id}}</td>
                     {{#ifnotEquals Step undefined}}
-                        <td class="rDstep tabCont">{{Step}}</td>
+                    <td class="rDstep tabCont">{{Step}}</td>
                     {{/ifnotEquals}}
                     {{#ifEquals Step undefined}}
-                      <td class="rDstep tabCont">{{StepDescription}}</td>
+                    <td class="rDstep tabCont">{{StepDescription}}</td>
                     {{/ifEquals}}
                     <td style="display:none" class="rDstepDes tabCont" style="padding-left: 10px;">{{StepDescription}}</td>
-					 <!-- If Hide Test Details is False -->
-                     {{#ifnotEquals hidestep "true"}}
-                     {{#ifEquals testcase_details.testcaseDetails undefined}}
-					 {{#ifnotEquals Keyword "TestCase Name"}}
-                      <td class="rDExpectedRes tabCont {{getClass StepDescription}}">{{StepDescription}}</td>
-					  {{/ifnotEquals}}
-					  {{#ifEquals Keyword "TestCase Name"}}
-                        <td class="rDExpectedRes tabCont" style="padding-left: 10px;"></td>
+                    <!-- If Hide Test Details is False -->
+                    {{#ifnotEquals hidestep "true"}}
+                    {{#ifEquals testcase_details.testcaseDetails undefined}}
+                    {{#ifnotEquals Keyword "TestCase Name"}}
+                    <td class="rDExpectedRes tabCont {{getClass StepDescription}}"></td>
+                    {{/ifnotEquals}}
+                    {{#ifEquals Keyword "TestCase Name"}}
+                    <td class="rDExpectedRes tabCont"></td>
                     {{/ifEquals}}
-                     {{/ifEquals}}
+                    {{/ifEquals}}
                     {{#ifEquals testcase_details.testcaseDetails ""}}
-                        <td class="rDExpectedRes tabCont" style="padding-left: 10px;">{{StepDescription}}</td>
+                    <td class="rDExpectedRes tabCont" style="padding-left: 10px;">{{StepDescription}}</td>
                     {{/ifEquals}}
-                    <!--{{#ifnotEquals testcase_details.testcaseDetails ""}}
-                       {{#ifnotEquals testcase_details undefined}}
-                        <td class="rDExpectedRes tabCont" style="padding-left: 10px;">{{StepDescription}}<br/> Expected Result is: {{testcase_details.testcaseDetails}}</td>
-                       {{/ifnotEquals}}
-                    {{/ifnotEquals}} -->
-
-
-                     {{#ifEquals status undefined}}
-                      <td class="rDActualRes tabCont"></td>
-                     {{/ifEquals}}
-                      {{#ifEquals status ""}}
-                      <td class="rDActualRes tabCont"></td>
-                     {{/ifEquals}}
+                    {{#ifnotEquals testcase_details.testcaseDetails ""}}
+                    {{#ifnotEquals testcase_details undefined}}
+                    <td class="rDExpectedRes tabCont" style="padding-left: 10px;">{{testcase_details.testcaseDetails}}</td>
+                    {{/ifnotEquals}}
+                    {{/ifnotEquals}}
+                    {{#ifEquals status undefined}}
+                    <td class="rDActualRes tabCont"></td>
+                    {{/ifEquals}}
+                    {{#ifEquals status ""}}
+                    <td class="rDActualRes tabCont"></td>
+                    {{/ifEquals}}
 
                     {{#ifEquals status "Pass"}}
-                        {{#ifEquals testcase_details.actualResult_pass ""}}
-                          <td class="rDActualRes tabCont" style="padding-left: 10px;">As Expected</td>
-                        {{/ifEquals}}
-                        {{#ifnotEquals testcase_details.actualResult_pass ""}}
-                           <td class="rDActualRes tabCont" style="padding-left: 10px;">{{testcase_details.actualResult_pass}}<a style="color: {{getColor status}};text-decoration:none" href="{{validateImageID screenshot_path slno}}">{{status}}</a></td>
-                        {{/ifnotEquals}}
+                    {{#ifEquals testcase_details.actualResult_pass ""}}
+                    <td class="rDActualRes tabCont" style="padding-left: 10px;">As Expected</td>
+                    {{/ifEquals}}
+                    {{#ifnotEquals testcase_details.actualResult_pass ""}}
+                    <td class="rDActualRes tabCont" style="padding-left: 10px;">{{testcase_details.actualResult_pass}}</td>
+                    {{/ifnotEquals}}
                     {{/ifEquals}}
 
                     {{#ifEquals status "Fail"}}
-                        {{#ifEquals testcase_details.actualResult_fail ""}}
-                            <td class="rDActualRes tabCont" style="padding-left: 10px;"><a style="color: {{getColor status}};text-decoration:none" href="{{validateImageID screenshot_path id}}">{{status}}</a></td>
-                        {{/ifEquals}}
-                        {{#ifnotEquals testcase_details.actualResult_fail ""}}
-                           <td class="rDActualRes tabCont" style="padding-left: 10px;">{{testcase_details.actualResult_fail}}<a style="color: {{getColor status}};text-decoration:none" href="{{validateImageID screenshot_path id}}">{{status}}</a></td>
-                        {{/ifnotEquals}}
+                    {{#ifEquals testcase_details.actualResult_fail ""}}
+                    <td class="rDActualRes tabCont" style="padding-left: 10px;">
+                        <a style="color: {{getColor status}};text-decoration:none" href="{{validateImageID screenshot_path id}}">{{status}}</a>
+                    </td>
                     {{/ifEquals}}
-                       
-                       <!-- If Hide Test Details is False -->
-
-                     {{#ifEquals status "Terminate"}}
-                        {{#ifEquals testcase_details.actualResult_fail ""}}
-                            <td class="rDActualRes tabCont" style="padding-left: 10px;">{{status}}</td>
-                        {{/ifEquals}}
-                        {{#ifnotEquals testcase_details.actualResult_fail ""}}
-                           <td class="rDActualRes tabCont" style="padding-left: 10px;">{{testcase_details.actualResult_fail}}</td>
-                        {{/ifnotEquals}}
+                    {{#ifnotEquals testcase_details.actualResult_fail ""}}
+                    <td class="rDActualRes tabCont" style="padding-left: 10px;">{{testcase_details.actualResult_fail}}</td>
+                    {{/ifnotEquals}}
                     {{/ifEquals}}
-					{{/ifnotEquals}}
 
-                    <td class="rDstatus tabCont" style=" padding-left: 10px; color: {{getColor status}}">
-                        <a style="color:inherit;text-decoration:none" href="{{validateImageID screenshot_path id}}">{{status}}</a></td>
+                    {{#ifEquals status "Terminate"}}
+                    <td class="rDActualRes tabCont {{getClass StepDescription}}">{{StepDescription}}</td>
+                    {{/ifEquals}}
+                    {{/ifnotEquals}}
+                    <!-- If Hide Test Details is False -->
+
+                    <td class="rDstatus tabCont" style="padding-left: 10px; color: {{getColor status}}">
+                        <a style="color:inherit;text-decoration:none" href="{{validateImageID screenshot_path id}}">{{status}}</a>
+                    </td>
                     <td class="rDellaps tabCont">{{EllapsedTime}}</td>
                     {{#ifnotEquals ../commentsLength 0}}
                     <td class="rDcomments tabCont" style="padding-left: 10px;">{{Comments}}</td>
                     {{/ifnotEquals}}
                     <!-- {{#ifnotEquals  ../remarksLength 0}}
                     <td class="rDremarks tabCont" style="padding-left: 10px;">{{Remark}}</td>
-                     {{/ifnotEquals}} -->
-                   
+                    {{/ifnotEquals}} -->
                     <td class="rjira tabCont" style="padding-left: 10px;">{{jira_defect_id}}</td>
-
-                     {{!-- <td class="rDExpectedRes tabCont" style="padding-left: 10px;">{{testcase_details.expectedResult_fail}}</td>
-                     <td class="rDActualRes tabCont" style="padding-left: 10px;">{{testcase_details.actualResult_fail}}</td> --}}
-                    {{!-- <td class="rDcomments tabCont" style="padding-left: 10px;">{{Comments}}</td> --}}
                 </tr>
-                  {{/ifnotEquals}}
+                {{/ifnotEquals}}
                 {{/each}}
             </tbody>
         </table>
-        <!--<div class="reportsDetail">
-            {{#each rows}}
-            <div style="width: 100%; display: table;" class="reportdetailsrow">
-                <div class="rDid tabCont">{{slno}}</div>
-                <div class="rDstep tabCont">{{Step}}</div>
-                <div class="rDstepDes tabCont" style="padding-left: 10px;">{{StepDescription}}</div>
-                <div class="rDstatus tabCont" style="padding-left: 10px; color: {{getColor status}}">{{status}}</div>
-                <div class="rDellaps tabCont">{{EllapsedTime}}</div>
-                <div class="rDcomments tabCont" style="padding-left: 10px;">{{Comments}}</div>
-            </div>
-            {{/each}}
-        </div>-->
         {{#each rows}}
         <div class="screenshot-container" style="display:{{validateImagePath screenshot_path}}">
             {{#ifEquals ../overallstatus.0.browserType "MobileApp"}}
@@ -368,14 +346,14 @@
     </div>
 </div>
 </script>
-	<script src="lib/jspdf.min.js"></script>
-	<script src="lib/jquery.min.js" type="text/javascript" charset="utf-8"></script>
-	<script src="./lib/handlebar.js" type="text/javascript" charset="utf-8"></script>
+    <script src="lib/jspdf.min.js"></script>
+    <script src="lib/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="./lib/handlebar.js" type="text/javascript" charset="utf-8"></script>
 </head>
 <body>
 <div id = "maincontainer1"></div>
 </body>
 <footer>
-	<script src="app.js" type="text/javascript" charset="utf-8"></script>
+    <script src="app.js" type="text/javascript" charset="utf-8"></script>
 </footer>
 </html>
