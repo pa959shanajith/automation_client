@@ -449,8 +449,8 @@ class Reporting:
                     report_json[OVERALLSTATUS][0]["pass"]="0"
                     report_json[OVERALLSTATUS][0]["fail"]="0"
                     report_json[OVERALLSTATUS][0]["terminate"]="0"
-            if len(report_json["rows"]) != 0:
-                for i in report_json["rows"]:
+            if len(report_json[ROWS]) != 0:
+                for i in report_json[ROWS]:
                     if i[COMMENTS]:
                         report_json[COMMENTS_LENGTH].append(i[COMMENTS])
             with open(filename, 'w') as outfile:

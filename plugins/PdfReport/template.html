@@ -268,25 +268,22 @@
                     <!-- If Hide Test Details is False -->
                     {{#ifnotEquals hidestep "true"}}
                     {{#ifEquals testcase_details.testcaseDetails undefined}}
-                    {{#ifnotEquals Keyword "TestCase Name"}}
-                    <td class="rDExpectedRes tabCont {{getClass StepDescription}}"></td>
-                    {{/ifnotEquals}}
                     {{#ifEquals Keyword "TestCase Name"}}
                     <td class="rDExpectedRes tabCont"></td>
                     {{/ifEquals}}
                     {{/ifEquals}}
                     {{#ifEquals testcase_details.testcaseDetails ""}}
                     <td class="rDExpectedRes tabCont" style="padding-left: 10px;">{{StepDescription}}</td>
-                    {{/ifEquals}}
-                    {{#ifnotEquals testcase_details.testcaseDetails ""}}
-                    {{#ifnotEquals testcase_details undefined}}
+                    {{/ifEquals}}{{#ifEquals testcase_details.testcaseDetails undefined}}{{#ifnotEquals Keyword "TestCase Name"}}
+                    <td class="rDExpectedRes tabCont" style="padding-left: 10px;">{{StepDescription}}</td>
+                    {{/ifnotEquals}}{{/ifEquals}}
+                    {{#ifnotEquals testcase_details.testcaseDetails ""}}{{#ifnotEquals testcase_details.testcaseDetails undefined}}
                     <td class="rDExpectedRes tabCont" style="padding-left: 10px;">{{testcase_details.testcaseDetails}}</td>
-                    {{/ifnotEquals}}
-                    {{/ifnotEquals}}
+                    {{/ifnotEquals}}{{/ifnotEquals}}
+
                     {{#ifEquals status undefined}}
                     <td class="rDActualRes tabCont"></td>
-                    {{/ifEquals}}
-                    {{#ifEquals status ""}}
+                    {{/ifEquals}}{{#ifEquals status ""}}
                     <td class="rDActualRes tabCont"></td>
                     {{/ifEquals}}
 
@@ -294,9 +291,12 @@
                     {{#ifEquals testcase_details.actualResult_pass ""}}
                     <td class="rDActualRes tabCont" style="padding-left: 10px;">As Expected</td>
                     {{/ifEquals}}
-                    {{#ifnotEquals testcase_details.actualResult_pass ""}}
+                    {{#ifEquals testcase_details.actualResult_pass undefined}}
+                    <td class="rDActualRes tabCont" style="padding-left: 10px;">As Expected</td>
+                    {{/ifEquals}}
+                    {{#ifnotEquals testcase_details.actualResult_pass ""}}{{#ifnotEquals testcase_details.actualResult_pass undefined}}
                     <td class="rDActualRes tabCont" style="padding-left: 10px;">{{testcase_details.actualResult_pass}}</td>
-                    {{/ifnotEquals}}
+                    {{/ifnotEquals}}{{/ifnotEquals}}
                     {{/ifEquals}}
 
                     {{#ifEquals status "Fail"}}
@@ -305,9 +305,14 @@
                         <a style="color: {{getColor status}};text-decoration:none" href="{{validateImageID screenshot_path id}}">{{status}}</a>
                     </td>
                     {{/ifEquals}}
-                    {{#ifnotEquals testcase_details.actualResult_fail ""}}
+                    {{#ifEquals testcase_details.actualResult_fail undefined}}
+                    <td class="rDActualRes tabCont" style="padding-left: 10px;">
+                        <a style="color: {{getColor status}};text-decoration:none" href="{{validateImageID screenshot_path id}}">{{status}}</a>
+                    </td>
+                    {{/ifEquals}}
+                    {{#ifnotEquals testcase_details.actualResult_fail ""}}{{#ifnotEquals testcase_details.actualResult_fail undefined}}
                     <td class="rDActualRes tabCont" style="padding-left: 10px;">{{testcase_details.actualResult_fail}}</td>
-                    {{/ifnotEquals}}
+                    {{/ifnotEquals}}{{/ifnotEquals}}
                     {{/ifEquals}}
 
                     {{#ifEquals status "Terminate"}}

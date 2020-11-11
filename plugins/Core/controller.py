@@ -217,7 +217,7 @@ class Controller():
             self.system_dispatcher_obj.action=self.action
         except Exception as e:
             logger.print_on_console('Error loading System plugin')
-            log.error(e)
+            log.error(e,exc_info=True)
 
 
     def __load_aws(self):
