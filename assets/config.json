@@ -3,6 +3,7 @@
     "browser_check": "Yes",
     "chrome_path": "default",
     "chrome_profile": "default",
+    "clear_cache": "No",
     "connection_timeout": "0",
     "delay": "0.3",
     "delay_stringinput": "1",
