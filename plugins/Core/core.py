@@ -65,6 +65,7 @@ configvalues = {}
 execution_flag = False
 closeActiveConnection = False
 connection_Timer = None
+status_ping_thread = None
 core_utils_obj = core_utils.CoreUtils()
 AVO_ASSURE_HOME = os.environ["AVO_ASSURE_HOME"]
 IMAGES_PATH = AVO_ASSURE_HOME + "/assets/images/"
@@ -870,7 +871,7 @@ class ConnectionThread(threading.Thread):
             root.ice_token = None
             if root.gui: cw.enable_register()
             return False
-        global socketIO, allow_connect
+        global socketIO, allow_connect,execution_flags
         allow_connect = False
         err_msg=None
         server_port = int(configvalues['server_port'])
@@ -879,6 +880,7 @@ class ConnectionThread(threading.Thread):
             kw_args = self.get_ice_session()
             socketIO = SocketIO(server_IP, server_port, MainNamespace, **kw_args)
             root.socketIO = socketIO
+            set_ICE_status(False)
             socketIO.wait()
         except ValueError as e:
             err_msg = str(e).replace("[engine.io waiting for connection] ",'').replace("[SSL: CERTIFICATE_VERIFY_FAILED] ",'')
@@ -962,6 +964,8 @@ class TestThread(threading.Thread):
                 apptype = (self.json_data)[0]['apptype']
             else:
                 execution_flag = True
+                #set ICE status as busy
+                set_ICE_status(True)
                 if root.gui: benchmark.stop(True)
                 apptype = self.json_data['apptype']
             if apptype == "DesktopJava": apptype = "oebs"
@@ -1010,6 +1014,8 @@ class TestThread(threading.Thread):
 
         self.main.testthread = None
         execution_flag = False
+        #set ICE status as available
+        set_ICE_status(True)
         if self.main.gui:
             if self.cw.choice=='RunfromStep': self.cw.breakpoint.Enable()
             else: self.cw.breakpoint.Disable()
@@ -1291,6 +1297,9 @@ class Main():
                 socketIO = None
                 self.socketthread.join()
                 log.info('Connection Closed')
+            stop_ping_thread()
+            log.info('Cancelling Ping Thread')
+
         except Exception as e:
             log.error("Error while closing connection")
             log.error(e,exc_info=True)
@@ -1597,3 +1606,31 @@ def check_execution_lic(event):
         logger.print_on_console(msg)
         socketIO.emit(event,'ExecutionOnlyAllowed')
     return executionOnly
+
+def set_ICE_status(one_time_ping = False):
+    """
+    def : set_ICE_status
+    purpose : communicates ICE status (availble/busy)
+    param : status (bool)
+    return : Timer
+
+    """   
+    global socketIO,root,execution_flag,cw
+    print("Sending status")
+    ICE_name = root.ice_token["icename"]
+    if not one_time_ping and socketIO is not None:
+        status_ping_thread = threading.Timer(60, set_ICE_status,[])
+        status_ping_thread.setName("Status Ping")
+        status_ping_thread.start()     
+    log.info('Ping Server')
+    #Add ICE identification and stauts, which is busy by default
+    result = {"hostip":socket.gethostbyname(socket.gethostname()),"hostname":os.environ['username'],"time":str(datetime.now()),"icename":ICE_name,"connnected":True}
+    result['status'] = execution_flag
+    result['mode'] = cw.schedule.GetValue()
+    if socketIO is not None:
+        socketIO.emit('ICE_status_change',result)
+    
+def stop_ping_thread():
+    global status_ping_thread
+    if status_ping_thread is not None:
+        status_ping_thread.cancel()
