@@ -1376,7 +1376,7 @@ class Controller():
         
     def seperate_log(self, cur_thread, id):
         try:
-            browser_name = {'1':'Chrome', '2':'IE', '3':'FireFox', '7':'EdgeLegacy', '8':'EdgeChromium'}
+            browser_name = {'1':'Chrome', '2':'FireFox', '3':'IE', '6': 'Safari', '7':'EdgeLegacy', '8':'EdgeChromium'}
             log_filepath = os.environ['AVO_ASSURE_HOME'] + '/logs/ParallelExec_' + str(browser_name[id]) + '.log'
             file1 = open(log_filepath, 'a+')
             threadName = cur_thread.name #Get name of each thread
