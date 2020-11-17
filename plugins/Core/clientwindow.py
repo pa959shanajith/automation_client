@@ -336,6 +336,7 @@ class ClientWindow(wx.Frame):
         logger.print_on_console(msg)
         log.info(msg)
         controller.terminate_flag=True
+        controller.manual_terminate_flag=True
         #Calling AWS stop job on terminate (if present)
         try:
             root.testthread.con.aws_obj.stop_job()
@@ -568,6 +569,11 @@ class Config_window(wx.Frame):
             self.chrome_profile.SetValue(isConfigJson['chrome_profile'])
         else:
             self.chrome_profile.SetValue('default')
+
+        if isConfigJson['clear_cache'] == 'Yes':
+            self.chrome_profile.SetValue('default')
+            self.chrome_profile.SetEditable(False)
+            self.chrome_profile.SetBackgroundColour((211,211,211))
 
         self.ff_path=wx.StaticText(self.panel, label="Firefox Path", pos=config_fields["Ffox_path"][0],size=config_fields["Ffox_path"][1], style=0, name="")
         self.firefox_path=wx.TextCtrl(self.panel, pos=config_fields["Ffox_path"][2], size=config_fields["Ffox_path"][3])
@@ -846,13 +852,23 @@ class Config_window(wx.Frame):
             self.rbox15.SetSelection(1)
         self.rbox15.SetToolTip(wx.ToolTip("Enables or disables Headless execution mode for Browser"))
 
+        #adding the radio button for clear cache:
+        self.rbox16 = wx.RadioBox(self.panel1, label = "Clear Cache", choices = lblList,
+            majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
+        if isConfigJson != False and isConfigJson['clear_cache'].title() == lblList[0]:
+            self.rbox16.SetSelection(0)
+        else:
+            self.rbox16.SetSelection(1)
+        self.rbox16.SetToolTip(wx.ToolTip("Enables or disables Clear Cache"))
+        self.rbox16.Bind(wx.EVT_RADIOBOX, self.OnClearCache)
+
         #Adding GridSizer which will show the radio buttons into grid of 7 rows and 2 colums it can be changed based on the requirements
         self.gs=wx.GridSizer(8,2,5,5)
         self.gs.AddMany([(self.rbox1,0,wx.EXPAND), (self.rbox2,0,wx.EXPAND), (self.rbox9,0,wx.EXPAND),
             (self.rbox5,0,wx.EXPAND), (self.rbox6,0,wx.EXPAND), (self.rbox3,0,wx.EXPAND),
             (self.rbox4,0,wx.EXPAND), (self.rbox8,0,wx.EXPAND), (self.rbox7,0,wx.EXPAND),
             (self.rbox10,0,wx.EXPAND), (self.rbox11,0,wx.EXPAND), (self.rbox12,0,wx.EXPAND),
-            (self.rbox13,0,wx.EXPAND), (self.rbox14,0,wx.EXPAND), (self.rbox15,0,wx.EXPAND)])
+            (self.rbox13,0,wx.EXPAND), (self.rbox14,0,wx.EXPAND), (self.rbox15,0,wx.EXPAND),(self.rbox16,0,wx.EXPAND)])
 
         #adding  GridSizer to bSizer which is a box sizer
         self.bSizer.Add(self.gs, 1, wx.EXPAND | wx.TOP, 5)
@@ -902,6 +918,17 @@ class Config_window(wx.Frame):
             self.demo.SetForegroundColour('#848484')
         evt.Skip()
 
+    def OnClearCache(self,event):
+        if self.rbox16.GetStringSelection()=='Yes':
+            self.chrome_profile.SetValue('default')
+            self.chrome_profile.SetEditable(False)
+            self.chrome_profile_btn.Disable()
+            self.chrome_profile.SetBackgroundColour((211,211,211))
+        else:
+            self.chrome_profile.SetEditable(False)
+            self.chrome_profile.SetBackgroundColour((255,255,255))
+            self.chrome_profile_btn.Enable()
+
     """This method verifies and checks if correct data is present,then creates a dictionary and sends this dictionary to jsonCreater()"""
     def config_check(self,event):
         data = {}
@@ -937,6 +964,7 @@ class Config_window(wx.Frame):
         update_check = self.rbox14.GetStringSelection()
         headless_mode = self.rbox15.GetStringSelection()
         delay_string_in = self.Delay_input.GetValue()
+        clear_cache = self.rbox16.GetStringSelection()
         if extn_enabled == 'Yes' and headless_mode == 'Yes':
             self.error_msg.SetLabel("Extension Enable must be disabled when Headless Mode is enabled")
             self.error_msg.SetForegroundColour((255,0,0))
@@ -971,6 +999,7 @@ class Config_window(wx.Frame):
         data['update_check']= update_check.strip()
         data['headless_mode']=headless_mode.strip()
         data['delay_stringinput']=delay_string_in.strip()
+        data['clear_cache']=clear_cache.strip()
         config_data=data
         if (data['server_ip']!='' and data['server_port']!='' and data['server_cert']!='' and
             data['chrome_path']!='' and data['queryTimeOut'] not in ['','sec'] and data['logFile_Path']!='' and

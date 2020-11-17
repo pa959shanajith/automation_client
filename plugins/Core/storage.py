@@ -100,9 +100,8 @@ class SQLite(AbstractStorage):
         db_path = os.environ["AVO_ASSURE_HOME"]+os.sep+'assets'+os.sep+'packets.db'
         #if os.path.isfile(db_path): os.rename(db_path, db_path[:-2]+str(int(time()*100000))+".db")
         if os.path.isfile(db_path): os.remove(db_path)  #####
-        connection = sqlite3.connect(db_path, check_same_thread=False)
-        connection.isolation_level = None
-        self.db = connection.cursor()
+        self.conn = sqlite3.connect(db_path, check_same_thread=False)
+        self.db = self.conn.cursor()
         Timer(5, self.compact_db).start()
         self.db.execute("CREATE TABLE IF NOT EXISTS packets (packetid integer, subpacketid text, packet text)")
         last_pcktid = self.db.execute("SELECT packetid from packets").fetchall()[-1:]
@@ -111,7 +110,7 @@ class SQLite(AbstractStorage):
     def __del__(self):
         if bool(self.db):
             self.compact_db()
-            self.db.connection.close()
+            self.conn.close()
 
     @property
     def has_packet(self):
@@ -133,6 +132,7 @@ class SQLite(AbstractStorage):
         try:
             sqlite_lock.acquire(True)
             self.db.execute("INSERT INTO packets VALUES (?,?,?)", (packetid, subid, json.dumps(packet)))
+            self.conn.commit()
         finally: sqlite_lock.release()
 
     def get_packet(self, packetid, subid = None):
@@ -155,12 +155,14 @@ class SQLite(AbstractStorage):
         try:
             sqlite_lock.acquire(True)
             self.db.execute("DELETE FROM packets WHERE packetid=?",(packetid,))
+            self.conn.commit()
         finally: sqlite_lock.release()
 
     def clear(self):
         try:
             sqlite_lock.acquire(True)
             self.db.execute("DELETE FROM packets")
+            self.conn.commit()
             self.db.execute("SELECT name FROM sqlite_master where name = packets")
             self.compact_db()
         finally: sqlite_lock.release()
@@ -169,4 +171,5 @@ class SQLite(AbstractStorage):
         try:
             sqlite_lock.acquire(True)
             self.db.execute("VACUUM")
+            self.conn.commit()
         finally: sqlite_lock.release()

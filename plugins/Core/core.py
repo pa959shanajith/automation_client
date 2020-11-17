@@ -15,6 +15,7 @@ from random import random
 import core_utils
 import logger
 import threading
+from os.path import normpath
 from constants import *
 import controller
 import readconfig
@@ -34,6 +35,7 @@ except ImportError:
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 log = logging.getLogger('core.py')
+opl = os.sep
 root = None
 cw = None
 browsername = None
@@ -68,17 +70,17 @@ connection_Timer = None
 status_ping_thread = None
 core_utils_obj = core_utils.CoreUtils()
 AVO_ASSURE_HOME = os.environ["AVO_ASSURE_HOME"]
-IMAGES_PATH = AVO_ASSURE_HOME + "/assets/images/"
+IMAGES_PATH = normpath(AVO_ASSURE_HOME + "/assets/images") + opl
 os.environ["IMAGES_PATH"] = IMAGES_PATH
-ICE_CONST= AVO_ASSURE_HOME + "/assets/ice_const.json"
-CONFIG_PATH= AVO_ASSURE_HOME + "/assets/config.json"
-CERTIFICATE_PATH = AVO_ASSURE_HOME + "/assets/CA_BUNDLE"
-LOGCONFIG_PATH = AVO_ASSURE_HOME + "/assets/logging.conf"
-DRIVERS_PATH = AVO_ASSURE_HOME + "/lib/Drivers"
-CHROME_DRIVER_PATH = DRIVERS_PATH + "/chromedriver"
-GECKODRIVER_PATH = DRIVERS_PATH + "/geckodriver"
-EDGE_DRIVER_PATH = DRIVERS_PATH + "/MicrosoftWebDriver.exe"
-EDGE_CHROMIUM_DRIVER_PATH = DRIVERS_PATH + "/msedgedriver"
+ICE_CONST = normpath(AVO_ASSURE_HOME + "/assets/ice_const.json")
+CONFIG_PATH = normpath(AVO_ASSURE_HOME + "/assets/config.json")
+CERTIFICATE_PATH = normpath(AVO_ASSURE_HOME + "/assets/CA_BUNDLE")
+LOGCONFIG_PATH = normpath(AVO_ASSURE_HOME + "/assets/logging.conf")
+DRIVERS_PATH = normpath(AVO_ASSURE_HOME + "/lib/Drivers")
+CHROME_DRIVER_PATH = DRIVERS_PATH + opl + "chromedriver"
+GECKODRIVER_PATH = DRIVERS_PATH + opl + "geckodriver"
+EDGE_DRIVER_PATH = DRIVERS_PATH + opl + "MicrosoftWebDriver.exe"
+EDGE_CHROMIUM_DRIVER_PATH = DRIVERS_PATH + opl + "msedgedriver"
 if SYSTEM_OS == "Windows":
     CHROME_DRIVER_PATH += ".exe"
     GECKODRIVER_PATH += ".exe"
@@ -704,7 +706,7 @@ class MainNamespace(BaseNamespace):
         else:
             spath=spath["default"]
         if len(spath) != 0 and os.path.exists(spath):
-            constants.SCREENSHOT_PATH=os.path.normpath(spath)+os.sep
+            constants.SCREENSHOT_PATH=os.path.normpath(spath)+opl
         else:
             constants.SCREENSHOT_PATH="Disabled"
             logger.print_on_console("Screenshot capturing disabled since user does not have sufficient privileges for screenshot folder\n")
@@ -822,7 +824,7 @@ class MainNamespace(BaseNamespace):
 class ConnectionThread(threading.Thread):
     """Test Worker Thread Class."""
     daemon = True
-
+    name = "socketIO_connection"
     def __init__(self, ice_action):
         """Init Worker Thread Class."""
         super(ConnectionThread, self).__init__()
@@ -834,8 +836,8 @@ class ConnectionThread(threading.Thread):
             server_cert = False
         elif server_cert != "default":
             if os.path.exists(server_cert) == False:
-                server_cert = CERTIFICATE_PATH +'/server.crt'
-        client_cert = (CERTIFICATE_PATH + '/client.crt', CERTIFICATE_PATH + '/client.key')
+                server_cert = CERTIFICATE_PATH + opl +'server.crt'
+        client_cert = (CERTIFICATE_PATH + opl + 'client.crt', CERTIFICATE_PATH + opl + 'client.key')
         key='USERNAME'
         if key not in os.environ:
             key='USER'
@@ -873,7 +875,8 @@ class ConnectionThread(threading.Thread):
             return False
         global socketIO, allow_connect,execution_flags
         allow_connect = False
-        err_msg=None
+        err = None
+        err_msg = "Error in Server Connection"
         server_port = int(configvalues['server_port'])
         server_IP = 'https://' + configvalues['server_ip']
         try:
@@ -883,18 +886,24 @@ class ConnectionThread(threading.Thread):
             set_ICE_status(False)
             socketIO.wait()
         except ValueError as e:
-            err_msg = str(e).replace("[engine.io waiting for connection] ",'').replace("[SSL: CERTIFICATE_VERIFY_FAILED] ",'')
-            if "_ssl.c" in err_msg:
-                err_msg = err_msg[:err_msg.index("(_ssl")]
-                logger.print_on_console("Try changing Server Certificate Path to 'default'." +
-                    " If that also doesn't work, then disable server certificate check. But that" +
-                    " will result in an insecure HTTPS connection")
-        except Exception as e:
-            err_msg = "Error in server connection"
-            log.error(e,exc_info=True)
-        if (err_msg):
+            err = e
+            err_msg = "Error occured while connecting to server due to TLS certificate error."
+            error = str(e).replace("[engine.io waiting for connection] ",'').replace("[SSL: CERTIFICATE_VERIFY_FAILED] ",'')
+            if "_ssl.c" in error:
+                err = error[:error.index("(_ssl")]
+            elif 'SSLCertVerificationError' in error:
+                err = error.split('SSLCertVerificationError')[1][2:-3]
             logger.print_on_console(err_msg)
+            logger.print_on_console(err)
+            logger.print_on_console("Try changing Server Certificate Path to 'default'." +
+                " If that also doesn't work, then disable server certificate check. But that" +
+                " will result in an insecure HTTPS connection")
+        except Exception as e:
+            err = e
+            logger.print_on_console(err_msg)
+        if err:
             log.error(err_msg)
+            log.error(err,exc_info=True)
             if root.gui: cw.connectbutton.Enable()
 
 
@@ -905,6 +914,7 @@ class TestThread(threading.Thread):
     def __init__(self, main, action, json_data, aws_mode):
         """Init Worker Thread Class."""
         super(TestThread, self).__init__()
+        self.name = "test_thread"
         self.main = main
         self.cw = main.cw
         #flag to pause thread
@@ -997,7 +1007,9 @@ class TestThread(threading.Thread):
                 else:
                     socketIO.emit('result_debugTestCaseWS',status)
             elif self.action==EXECUTE:
-                socketIO.emit('result_executeTestSuite', {"status":status, "batchId": batch_id})
+                result = {"status":status, "batchId": batch_id}
+                if controller.manual_terminate_flag: result["userTerminated"] = True
+                socketIO.emit('result_executeTestSuite', result)
         except Exception as e:
             log.error(e, exc_info=True)
             status=TERMINATE
@@ -1006,10 +1018,12 @@ class TestThread(threading.Thread):
                     self.cw.killChildWindow(debug=True)
                     socketIO.emit('result_debugTestCase',status)
                 elif self.action==EXECUTE:
-                    socketIO.emit('result_executeTestSuite', {"status":status, "batchId": batch_id})
+                    result = {"status":status, "batchId": batch_id}
+                    if controller.manual_terminate_flag: result["userTerminated"] = True
+                    socketIO.emit('result_executeTestSuite', result)
         if closeActiveConnection:
             closeActiveConnection = False
-            connection_Timer = threading.Timer(300, root.closeConnection)
+            connection_Timer = threading.Timer(300, self.main.closeConnection)
             connection_Timer.start()
 
         self.main.testthread = None
@@ -1119,6 +1133,7 @@ class Main():
     def close(self, *args):
         global connection_Timer
         controller.terminate_flag = True
+        controller.manual_terminate_flag = True
         controller.disconnect_flag = True
         if self.socketthread: logger.print_on_console('Disconnected from Avo Assure server')
         if (connection_Timer != None and connection_Timer.isAlive()):
@@ -1139,6 +1154,7 @@ class Main():
     def register(self, token, hold = False):
         ice_das_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
             'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
+        err = False
         emsg = "Error: Invalid Server address or Token . Please try again"
         try:
             token_dec = core_utils_obj.unwrap(token,ice_das_key).split("@")
@@ -1155,10 +1171,22 @@ class Main():
             if len(url) == 1: url.append("443")
             configvalues['server_port']=url[1]
             if not hold: self.connection("register")
+        except requests.exceptions.SSLError as e:
+            error = str(e)
+            if 'SSLCertVerificationError' in error:
+                err = error.split('SSLCertVerificationError')[1][2:-3]
+                emsg = "Error occured while connecting to server due to TLS certificate error."
+                logger.print_on_console(emsg)
+                logger.print_on_console(err)
+                logger.print_on_console("Try changing Server Certificate Path to 'default'." +
+                    " If that also doesn't work, then disable server certificate check. But that" +
+                    " will result in an insecure HTTPS connection")
         except Exception as e:
+            err = e
             logger.print_on_console(emsg)
+        if err:
             log.error(emsg)
-            log.error(e)
+            log.error(err)
             if self.gui: self.cw.enable_register()
             else: self._wants_to_close = True
 
@@ -1274,7 +1302,7 @@ class Main():
             else: emsg += "configuration file located at AVO_ASSURE_HOME/assets/config.json"
             emsg += ", and retry."
             if mode == "register":
-                self.ice_token=None
+                self.ice_token = None
                 emsg = "Connection refused: Invalid Server URL."
                 if self.gui:
                     emsg += " Click on Connect to retry Registration" 
@@ -1460,7 +1488,7 @@ def check_browser():
             logger.print_on_console('Browser compatibility check started')
             from selenium import webdriver
             from selenium.webdriver import ChromeOptions
-            p = subprocess.Popen(CHROME_DRIVER_PATH + ' --version', stdout=subprocess.PIPE, bufsize=1, shell=True)
+            p = subprocess.Popen('"' + CHROME_DRIVER_PATH + '" --version', stdout=subprocess.PIPE, bufsize=1, shell=True)
             a = p.stdout.readline()
             a = a.decode('utf-8')[13:17]
             choptions1 = webdriver.ChromeOptions()
@@ -1485,15 +1513,15 @@ def check_browser():
             for k,v in list(CHROME_DRIVER_VERSION.items()):
                 if a == k:
                     if browser_ver >= v[0] and browser_ver <= v[1]:
-                        chromeFlag=True
-            if chromeFlag == False :
+                        chromeFlag = True
+            if chromeFlag == False:
                 logger.print_on_console('WARNING!! : Chrome version ',str(browser_ver),' is not supported.')
         except Exception as e:
             logger.print_on_console("Error in checking chrome version")
             log.error("Error in checking chrome version")
             log.error(e,exc_info=True)
         try:
-            p = subprocess.Popen(GECKODRIVER_PATH + ' --version', stdout=subprocess.PIPE, bufsize=1, shell=True)
+            p = subprocess.Popen('"' + GECKODRIVER_PATH + '" --version', stdout=subprocess.PIPE, bufsize=1, shell=True)
             a = p.stdout.readline()
             a = a.decode('utf-8')[12:16]
             caps=webdriver.DesiredCapabilities.FIREFOX
@@ -1528,7 +1556,7 @@ def check_browser():
         try:
             if('Windows-10' in platform.platform()):
                 #from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
-                p = subprocess.Popen(EDGE_DRIVER_PATH + ' --version', stdout=subprocess.PIPE, bufsize=1,cwd=DRIVERS_PATH,shell=True) 
+                p = subprocess.Popen('"' + EDGE_DRIVER_PATH + '" --version', stdout=subprocess.PIPE, bufsize=1,cwd=DRIVERS_PATH,shell=True) 
                 a = p.stdout.readline()
                 a = a.decode('utf-8')[28:40]
                 driver = webdriver.Edge(executable_path=EDGE_DRIVER_PATH)
@@ -1559,7 +1587,7 @@ def check_browser():
             options = Options()
             options.use_chromium = True
             caps =  options.to_capabilities()
-            p = subprocess.Popen(EDGE_CHROMIUM_DRIVER_PATH + ' --version', stdout=subprocess.PIPE, bufsize=1,cwd=DRIVERS_PATH,shell=True)
+            p = subprocess.Popen('"' + EDGE_CHROMIUM_DRIVER_PATH + '" --version', stdout=subprocess.PIPE, bufsize=1,cwd=DRIVERS_PATH,shell=True)
             a = p.stdout.readline()
             a = a.decode('utf-8')[13:17]
             if SYSTEM_OS == 'Darwin': #MAC check for edge chromium
