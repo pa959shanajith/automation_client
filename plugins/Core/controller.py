@@ -28,6 +28,7 @@ from constants import *
 import dynamic_variable_handler
 import reporting
 import core_utils
+from logging.handlers import TimedRotatingFileHandler
 local_cont = threading.local()
 #index for iterating the teststepproperty for executor
 ##i = 0
@@ -1381,16 +1382,16 @@ class Controller():
             file1 = open(log_filepath, 'a+')
             threadName = cur_thread.name #Get name of each thread
             log_handler = logging.FileHandler(log_filepath)
+            log_handler = TimedRotatingFileHandler(log_filepath, 'midnight', 1, 5, None, False, False)
             formatter = logging.Formatter("%(asctime)s %(levelname)s %(name)s.%(funcName)s:%(lineno)d %(message)s")
             log_handler.setFormatter(formatter)
-            
             log_filter = ThreadLogFilter(threadName)
             log_handler.addFilter(log_filter)
 
             log = logging.getLogger()
             log.addHandler(log_handler)
 
-            file1.close()
+            file1.close()    
         except Exception as e:
             log.error(e)
     
