@@ -1221,8 +1221,8 @@ class Controller():
                                             zephyr_status['status']['id']='5'
                                         logger.print_on_console('****Updating Zephyr Details****')
                                         if zephyrObject is not None:
-                                            status = zephyrObject.update_zephyr_test_details(zephyr_status)
-                                            if status:
+                                            zephry_update_status = zephyrObject.update_zephyr_test_details(zephyr_status)
+                                            if zephry_update_status:
                                                 logger.print_on_console('****Updated Zephyr Details****')
                                             else:
                                                logger.print_on_console('****Failed to Update Zephyr Details****')
@@ -1424,20 +1424,17 @@ class Controller():
     def seperate_log(self, cur_thread, id):
         try:
             browser_name = {'1':'Chrome', '2':'FireFox', '3':'IE', '6': 'Safari', '7':'EdgeLegacy', '8':'EdgeChromium'}
-            log_filepath = os.environ['AVO_ASSURE_HOME'] + '/logs/ParallelExec_' + str(browser_name[id]) + '.log'
+            log_filepath = os.path.normpath(os.path.dirname(configvalues["logFile_Path"]) + os.sep + 'TestautoV2_Parallel_' + str(browser_name[id]) + '.log').replace("\\","\\\\")
             file1 = open(log_filepath, 'a+')
+            file1.close()
             threadName = cur_thread.name #Get name of each thread
-            log_handler = logging.FileHandler(log_filepath)
             log_handler = TimedRotatingFileHandler(log_filepath, 'midnight', 1, 5, None, False, False)
             formatter = logging.Formatter("%(asctime)s %(levelname)s %(name)s.%(funcName)s:%(lineno)d %(message)s")
             log_handler.setFormatter(formatter)
             log_filter = ThreadLogFilter(threadName)
             log_handler.addFilter(log_filter)
-
             log = logging.getLogger()
             log.addHandler(log_handler)
-
-            file1.close()    
         except Exception as e:
             log.error(e)
     

@@ -196,8 +196,7 @@ class MainNamespace(BaseNamespace):
                 kill_conn = True
 
             elif(str(args[0]) == 'decline'):
-                if len(args) > 1 and args[1]=="conn":
-                    fail_msg="Please accept terms and conditions before connecting to Avo Assure Server"
+                fail_msg="Please accept Avo Assure terms and conditions before connecting to Avo Assure Server"
                 logger.print_on_console(fail_msg)
                 log.info(fail_msg)
                 kill_conn = True
