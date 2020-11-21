@@ -200,6 +200,7 @@ class MainNamespace(BaseNamespace):
                 logger.print_on_console(fail_msg)
                 log.info(fail_msg)
                 kill_conn = True
+                if root.gui: cw.connectbutton.Enable()
 
         except Exception as e:
             err_msg='Error while Connecting to Server'
