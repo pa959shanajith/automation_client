@@ -1087,7 +1087,7 @@ class Controller():
                                     tsplist=[]
                                 sc_idx+=1
                                 execute_flag=False
-                            execution_env = json_data['exec_env'].lower()
+                            execution_env = json_data.get('exec_env', 'default').lower()
                             if execution_env == 'saucelabs':
                                 self.__load_web()
                                 import script_generator
