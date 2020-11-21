@@ -28,6 +28,7 @@ from constants import *
 import dynamic_variable_handler
 import reporting
 import core_utils
+from logging.handlers import TimedRotatingFileHandler
 local_cont = threading.local()
 #index for iterating the teststepproperty for executor
 ##i = 0
@@ -42,6 +43,17 @@ saucelabs_count = 0
 log = logging.getLogger("controller.py")
 status_percentage = {TEST_RESULT_PASS:0,TEST_RESULT_FAIL:0,TERMINATE:0,"total":0}
 
+class ThreadLogFilter(logging.Filter):
+    """
+    This filter only show log entries for specified thread name
+    """
+
+    def __init__(self, thread_name, *args, **kwargs):
+        logging.Filter.__init__(self, *args, **kwargs)
+        self.thread_name = thread_name
+
+    def filter(self, record):
+        return record.threadName == self.thread_name
 class Controller():
     mobile_web_dispatcher_obj = None
     oebs_dispatcher_obj = None
@@ -217,7 +229,7 @@ class Controller():
             self.system_dispatcher_obj.action=self.action
         except Exception as e:
             logger.print_on_console('Error loading System plugin')
-            log.error(e)
+            log.error(e,exc_info=True)
 
 
     def __load_aws(self):
@@ -1396,6 +1408,7 @@ class Controller():
                     jsondata_dict[i]['suitedetails'][j]['browserType'] = [browsers_data[i]]
                 thread_name = "test_thread_browser" + str(browsers_data[i])
                 th[i] = threading.Thread(target = self.invoke_execution, name = thread_name, args = (mythread,jsondata_dict[i],socketIO,wxObject,configvalues,qc_soc,qtest_soc,zephyr_soc,aws_mode))
+                self.seperate_log(th[i], browsers_data[i]) #function that creates different logs for each browser
                 th[i].start()
             for i in th:
                 th[i].join()
@@ -1407,7 +1420,27 @@ class Controller():
         if not(terminate_flag):
             status = COMPLETED
         return status
+        
+    def seperate_log(self, cur_thread, id):
+        try:
+            browser_name = {'1':'Chrome', '2':'FireFox', '3':'IE', '6': 'Safari', '7':'EdgeLegacy', '8':'EdgeChromium'}
+            log_filepath = os.environ['AVO_ASSURE_HOME'] + '/logs/ParallelExec_' + str(browser_name[id]) + '.log'
+            file1 = open(log_filepath, 'a+')
+            threadName = cur_thread.name #Get name of each thread
+            log_handler = logging.FileHandler(log_filepath)
+            log_handler = TimedRotatingFileHandler(log_filepath, 'midnight', 1, 5, None, False, False)
+            formatter = logging.Formatter("%(asctime)s %(levelname)s %(name)s.%(funcName)s:%(lineno)d %(message)s")
+            log_handler.setFormatter(formatter)
+            log_filter = ThreadLogFilter(threadName)
+            log_handler.addFilter(log_filter)
 
+            log = logging.getLogger()
+            log.addHandler(log_handler)
+
+            file1.close()    
+        except Exception as e:
+            log.error(e)
+    
     def step_execution_status(self,teststepproperty):
         #325 : Report - Skip status in report by providing value 0 in the output column in testcase grid is not handled.
         nostatusflag = False
