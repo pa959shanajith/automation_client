@@ -93,9 +93,8 @@ class MainNamespace(BaseNamespace):
         try:
             if(str(args[0]) == 'connected'):
                 if allow_connect:
-                    sch_mode = cw.schedule.GetValue() if root.gui else False
-                    if sch_mode: socketIO.emit('toggle_schedule',sch_mode)
-                    msg = ("Schedule" if sch_mode else "Normal") + " Mode: Connection to the Avo Assure Server established"
+                    dnd_mode = cw.schedule.GetValue() if root.gui else False
+                    msg = ("DND" if dnd_mode else "Normal") + " Mode: Connection to the Avo Assure Server established"
                     logger.print_on_console(msg)
                     log.info(msg)
                     msg = "ICE Name: " + root.ice_token["icename"]
@@ -129,12 +128,12 @@ class MainNamespace(BaseNamespace):
                 else: kill_conn = True
 
             elif(str(args[0]) == 'schedulingEnabled'):
-                logger.print_on_console('Schedule Mode Enabled')
-                log.info('Schedule Mode Enabled')
+                logger.print_on_console('DND Mode Enabled')
+                log.info('DND Mode Enabled')
                 
             elif(str(args[0]) == 'schedulingDisabled'):
-                logger.print_on_console('Schedule Mode Disabled')
-                log.info('Schedule Mode Disabled')
+                logger.print_on_console('DND Mode Disabled')
+                log.info('DND Mode Disabled')
 
             elif(str(args[0]) == 'checkConnection'):
                 err_res = None
@@ -1635,7 +1634,7 @@ def check_execution_lic(event):
         socketIO.emit(event,'ExecutionOnlyAllowed')
     return executionOnly
 
-def set_ICE_status(one_time_ping = False):
+def set_ICE_status(one_time_ping = False,connect=True):
     """
     def : set_ICE_status
     purpose : communicates ICE status (availble/busy)
@@ -1644,7 +1643,6 @@ def set_ICE_status(one_time_ping = False):
 
     """   
     global socketIO,root,execution_flag,cw
-    print("Sending status")
     ICE_name = root.ice_token["icename"]
     if not one_time_ping and socketIO is not None:
         status_ping_thread = threading.Timer(60, set_ICE_status,[])
@@ -1652,13 +1650,15 @@ def set_ICE_status(one_time_ping = False):
         status_ping_thread.start()     
     log.info('Ping Server')
     #Add ICE identification and stauts, which is busy by default
-    result = {"hostip":socket.gethostbyname(socket.gethostname()),"hostname":os.environ['username'],"time":str(datetime.now()),"icename":ICE_name,"connnected":True}
+    result = {"hostip":socket.gethostbyname(socket.gethostname()),"hostname":os.environ['username'],"time":str(datetime.now()),"icename":ICE_name,"connected":connect}
     result['status'] = execution_flag
     result['mode'] = cw.schedule.GetValue()
+   
     if socketIO is not None:
         socketIO.emit('ICE_status_change',result)
     
 def stop_ping_thread():
     global status_ping_thread
+    set_ICE_status(one_time_ping=True,connect=False)
     if status_ping_thread is not None:
         status_ping_thread.cancel()
