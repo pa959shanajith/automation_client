@@ -9,18 +9,23 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 
-import platform
-import wmi
-import system_constants
 import os
-import logger
 import time
 import logging
+import platform
 import pythoncom
-from constants import OUTPUT_CONSTANT
 from ast import literal_eval
-from constants import SYSTEM_OS
+import logger
 log = logging.getLogger('system_keywords.py')
+
+try:
+    pythoncom.CoInitialize()
+except:
+    log.error("Failed to coinitialize pythoncom in thread")
+import wmi
+import system_constants
+from constants import OUTPUT_CONSTANT
+from constants import SYSTEM_OS
 from encryption_utility import AESCipher
 
 
@@ -35,7 +40,6 @@ class System_Keywords():
         """Method that creates a COM object related to the machine name(required);user name(optional);password(optional)"""
         wmi_ref=None
         try:
-            pythoncom.CoInitialize()
             if machine_name is not None:
                 if len(machine_name)==3:
                     wmi_ref = wmi.WMI(computer=machine_name[0], user=machine_name[1], password=self.encryption_obj.decrypt(machine_name[2]))

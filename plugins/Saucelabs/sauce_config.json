@@ -1,7 +1,7 @@
 {
-    "sauce_username":"support.nineteen68",
-    "sauce_access_key":"fb23999f-bc40-4885-8c41-5cdbe7d2e2c7",
-    "remote_url":"https://support.nineteen68:fb23999f-bc40-4885-8c41-5cdbe7d2e2c7@ondemand.us-west-1.saucelabs.com:443/wd/hub",
+    "sauce_username":"<>",
+    "sauce_access_key":"<>",
+    "remote_url":"<>",
     "proxy":{
         "url":"<>",
         "username":"<>",
