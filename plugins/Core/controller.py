@@ -28,9 +28,7 @@ from constants import *
 import dynamic_variable_handler
 import reporting
 import core_utils
-import pyautogui 
-import cv2 
-import numpy as np 
+import recording
 from logging.handlers import TimedRotatingFileHandler
 local_cont = threading.local()
 #index for iterating the teststepproperty for executor
@@ -99,7 +97,6 @@ class Controller():
         local_cont.i = 0
         self.execution_mode = None
         self.__load_generic()
-        self.rec_status = False
 
     def __load_generic(self):
         try:
@@ -1112,10 +1109,11 @@ class Controller():
                                     local_cont.test_case_number=0
                                     #start video, create a video path
                                     video_path = ''
-                                    if self.execution_mode == SERIAL and json_data['apptype'] == 'Web': video_path = self.record_execution()
+                                    recorder_obj = recording.Recorder()
+                                    if self.execution_mode == SERIAL and json_data['apptype'] == 'Web': video_path = recorder_obj.record_execution()
                                     status,status_percentage = con.executor(tsplist,EXECUTE,last_tc_num,1,con.conthread,video_path)
                                     #end video
-                                    if self.execution_mode == SERIAL and json_data['apptype'] == 'Web': self.rec_status = False
+                                    if self.execution_mode == SERIAL and json_data['apptype'] == 'Web': recorder_obj.rec_status = False
                                     print('=======================================================================================================')
                                     logger.print_on_console( '***Scenario' ,str(sc_idx + 1) ,' execution completed***')
                                     print('=======================================================================================================')
@@ -1307,46 +1305,6 @@ class Controller():
             print('=======================================================================================================')
         return status
 
-
-    # Recording screen while execution(Currently for Web Apptype)
-    def record_execution(self):
-        try:
-            ##start screen recording
-            import constants
-            if constants.SCREENSHOT_PATH  not in ['screenshot_path', 'Disabled']:
-                filename = constants.SCREENSHOT_PATH+"ScreenRecording_"+datetime.now().strftime("%Y%m%d%H%M%S")+".avi"
-            else:
-                filename = "output/ScreenRecording_"+datetime.now().strftime("%Y%m%d%H%M%S")+".avi"
-                logger.print_on_console("Screen capturing disabled since user does not have sufficient privileges for screenshot folder. Video saved in 'Avoassure/output' folder\n")
-                log.info("Screen capturing disabled since user does not have sufficient privileges for screenshot folder. Video saved in 'Avoassure/output' folder\n")
-            resolution = tuple(pyautogui.size())#(1920, 1080)
-            codec = cv2.VideoWriter_fourcc(*"XVID")
-            log.info("Screen Recorded here:")
-            log.info(filename)
-            fps = 10.0
-            out = None
-            out = cv2.VideoWriter(filename, codec, fps, resolution)
-            self.rec_status = True
-            rec_th = threading.Thread(target = self.start_recording, name="start_recording", args = (out,))
-            rec_th.start()
-            
-        except Exception as e:
-            logger.print_on_console('Error in screen recording')
-            log.error(e,exc_info = True)
-        return filename
-
-    def start_recording(self,*args):
-        try:
-            out = args[0]
-            while self.rec_status:
-                img = pyautogui.screenshot()
-                frame = np.array(img)
-                frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                out.write(frame)
-            out.release()
-            print("Video saved!!!")
-        except Exception as e:
-            print(e)
 
 
     #generating report of AWS in Avo Assure by using AWS result(AWS device farm executed result present in test spec output.txt)
