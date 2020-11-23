@@ -1344,9 +1344,10 @@ class Controller():
                 frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                 out.write(frame)
             out.release()
-            print("Video saved!!!")
+            log.info("Video saved!!!")
         except Exception as e:
-            print(e)
+            logger.print_on_console('Error in screen recording')
+            log.error(e,exc_info = True)
 
 
     #generating report of AWS in Avo Assure by using AWS result(AWS device farm executed result present in test spec output.txt)
