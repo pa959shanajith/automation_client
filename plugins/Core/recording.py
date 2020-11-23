@@ -21,13 +21,13 @@ class Recorder():
             ##start screen recording
             import constants
             if constants.SCREENSHOT_PATH  not in ['screenshot_path', 'Disabled']:
-                filename = constants.SCREENSHOT_PATH+"ScreenRecording_"+datetime.now().strftime("%Y%m%d%H%M%S")+".avi"
+                filename = constants.SCREENSHOT_PATH+"ScreenRecording_"+datetime.now().strftime("%Y%m%d%H%M%S")+".mp4"
             else:
-                filename = "output/ScreenRecording_"+datetime.now().strftime("%Y%m%d%H%M%S")+".avi"
+                filename = "output/ScreenRecording_"+datetime.now().strftime("%Y%m%d%H%M%S")+".mp4"
                 logger.print_on_console("Screen capturing disabled since user does not have sufficient privileges for screenshot folder. Video saved in 'Avoassure/output' folder\n")
                 log.info("Screen capturing disabled since user does not have sufficient privileges for screenshot folder. Video saved in 'Avoassure/output' folder\n")
-            resolution = tuple(pyautogui.size())#(1920, 1080)
-            codec = cv2.VideoWriter_fourcc(*"XVID")
+            resolution = tuple(pyautogui.size())
+            codec = cv2.VideoWriter_fourcc(*"MP4V")
             log.info("Screen Recorded here:")
             log.info(filename)
             fps = 10.0
