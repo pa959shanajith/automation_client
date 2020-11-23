@@ -28,6 +28,9 @@ from constants import *
 import dynamic_variable_handler
 import reporting
 import core_utils
+import pyautogui 
+import cv2 
+import numpy as np 
 local_cont = threading.local()
 #index for iterating the teststepproperty for executor
 ##i = 0
@@ -84,6 +87,7 @@ class Controller():
         local_cont.i = 0
         self.execution_mode = None
         self.__load_generic()
+        self.rec_status = False
 
     def __load_generic(self):
         try:
@@ -745,7 +749,7 @@ class Controller():
         else:
             return index,TERMINATE
 
-    def executor(self,tsplist,action,last_tc_num,debugfrom_step,mythread):
+    def executor(self,tsplist,action,last_tc_num,debugfrom_step,mythread,*args):
         global status_percentage
         status_percentage = {TEST_RESULT_PASS:0,TEST_RESULT_FAIL:0,TERMINATE:0,"total":0}
         i=0
@@ -803,7 +807,9 @@ class Controller():
             self.reporting_obj.user_termination=True
             status_percentage[TERMINATE]+=1
             status_percentage["total"]+=1
-        self.reporting_obj.build_overallstatus(self.scenario_start_time,self.scenario_end_time,self.scenario_ellapsed_time)
+        ##send path to build overall status
+        video_path = args[0] if (args and args[0]) else ''
+        self.reporting_obj.build_overallstatus(self.scenario_start_time,self.scenario_end_time,self.scenario_ellapsed_time,video_path)
         logger.print_on_console('Step Elapsed time is : ',str(self.scenario_ellapsed_time))
         return status,status_percentage
 
@@ -1078,7 +1084,12 @@ class Controller():
                                     con.conthread=mythread
                                     con.tsp_list=tsplist
                                     local_cont.test_case_number=0
-                                    status,status_percentage = con.executor(tsplist,EXECUTE,last_tc_num,1,con.conthread)
+                                    #start video, create a video path
+                                    video_path = ''
+                                    if self.execution_mode == SERIAL and json_data['apptype'] == 'Web': video_path = self.record_execution()
+                                    status,status_percentage = con.executor(tsplist,EXECUTE,last_tc_num,1,con.conthread,video_path)
+                                    #end video
+                                    if self.execution_mode == SERIAL and json_data['apptype'] == 'Web': self.rec_status = False
                                     print('=======================================================================================================')
                                     logger.print_on_console( '***Scenario' ,str(sc_idx + 1) ,' execution completed***')
                                     print('=======================================================================================================')
@@ -1237,6 +1248,48 @@ class Controller():
             logger.print_on_console( '***Terminating the Execution***')
             print('=======================================================================================================')
         return status
+
+
+    # Recording screen while execution(Currently for Web Apptype)
+    def record_execution(self):
+        try:
+            ##start screen recording
+            import constants
+            if constants.SCREENSHOT_PATH != "Disabled":
+                filename = constants.SCREENSHOT_PATH+"ScreenRecording_"+datetime.now().strftime("%Y%m%d%H%M%S")+".avi"
+            else:
+                filename = "output/ScreenRecording_"+datetime.now().strftime("%Y%m%d%H%M%S")+".avi"
+                logger.print_on_console("Screen capturing disabled since user does not have sufficient privileges for screenshot folder. Video saved in 'Avoassure/output' folder\n")
+                log.info("Screen capturing disabled since user does not have sufficient privileges for screenshot folder. Video saved in 'Avoassure/output' folder\n")
+            resolution = tuple(pyautogui.size())#(1920, 1080)
+            codec = cv2.VideoWriter_fourcc(*"XVID")
+            log.info("Screen Recorded here:")
+            log.info(filename)
+            fps = 10.0
+            out = None
+            out = cv2.VideoWriter(filename, codec, fps, resolution)
+            self.rec_status = True
+            rec_th = threading.Thread(target = self.start_recording, name="start_recording", args = (out,))
+            rec_th.start()
+            
+        except Exception as e:
+            logger.print_on_console('Error in screen recording')
+            log.error(e,exc_info = True)
+        return filename
+
+    def start_recording(self,*args):
+        try:
+            out = args[0]
+            while self.rec_status:
+                img = pyautogui.screenshot()
+                frame = np.array(img)
+                frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                out.write(frame)
+            out.release()
+            print("Video saved!!!")
+        except Exception as e:
+            print(e)
+
 
     #generating report of AWS in Avo Assure by using AWS result(AWS device farm executed result present in test spec output.txt)
     def aws_report(self,aws_tsp,aws_scenario,step_results,suite_idx,execute_result_data,obj_reporting,json_data,socketIO):

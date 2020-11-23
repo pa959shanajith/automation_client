@@ -123,7 +123,7 @@ class Reporting:
         return description
 
 
-    def build_overallstatus(self,start_time,end_time,ellapsed_time):
+    def build_overallstatus(self,start_time,end_time,ellapsed_time,*args):
         """
         def : build_overallstatus
         purpose : builds the overallstatus field of report_json
@@ -148,6 +148,7 @@ class Reporting:
         obj[BROWSER_TYPE]=self.browser_type
         obj[DATE]=self.date
         obj[TIME]=self.time
+        if args and args[0]: obj['video'] = args[0]
         self.overallstatus_array.append(obj)
 
     def build_overallstatus_conditionCheck(self):
