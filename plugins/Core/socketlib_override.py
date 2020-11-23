@@ -20,6 +20,8 @@ import storage
 from socketIO_client.exceptions import *
 from socketIO_client.transports import *
 
+log = logging.getLogger("socketio-lib.py")
+
 CHUNK_MAX_LIMIT = 15*1024*1024 # 15 MB
 CHUNK_SIZE = 10*1024*1024 # 10 MB
 PACKET_TIMEOUT = 60 # Seconds
@@ -197,6 +199,7 @@ def socketIO_get_response(request, *args, **kw):
 """
 def socketIO_wait(self, seconds=None, **kw):
     self._heartbeat_thread.hurry()
+    self._heartbeat_thread.setName("socketIO_heartbeat")
     #self._transport.set_timeout(seconds=1)
     #print(self._transport._connection.gettimeout())
     time.sleep(1)
@@ -233,11 +236,14 @@ def socketIO_wait(self, seconds=None, **kw):
     This is needed to free up memory consumed by stored packet, send next packet in queue.
 """
 def socketIO_on_data_ack(self, pack_id, *args):
-    #print("Ack'd "+str(pack_id))
+    # log.info("Ack'd "+str(pack_id)+"\tLast_Sent: "+self._io.last_packet_sent)
     # Check if ack recieved matches with the packet sent, Only then process the ACK. Also match id_eof with id
     if (self._io.last_packet_sent != str(pack_id)) and (self._io.last_packet_sent.replace("_eof", '') != str(pack_id)): return None
     if (self._io.activeTimer != None and self._io.activeTimer.isAlive()):
         self._io.activeTimer.cancel()
+        self._io.activeTimer = None
+    # else:
+    #     log.error("Timer Fault.\tArg1-"+ str(self._io.activeTimer != None)+"\tArg2-"+str(self._io.activeTimer.isAlive() if self._io.activeTimer != None else False))
     idx = pack_id.split('_')
     idx = idx[1] if len(idx) == 2 else None
     if idx == "eof": return None # EOF ACK packets always emit one more ACK. So ignore current one
@@ -289,15 +295,16 @@ def socketIO_emit(self, event, *args, **kw):
             del payload
 
 def socketIO_send_pckt(self, event, *args, **kw):
-    #print("Sending "+str(args[0]))
+    # log.info("Sending: "+str(args[0]) + "\tThread Alive: "+str((self.activeTimer != None and self.activeTimer.isAlive())))
     self.last_packet_sent = str(args[0])
+    if not ("dnack" in kw and kw["dnack"]):
+        self.activeTimer = Timer(PACKET_TIMEOUT, self.send_pckt, (event,) + args, kw)
+        self.activeTimer.setName("packet#"+str(args[0])+"_timeout")
+        self.activeTimer.start()
     try:
         self._emit(event, *args, **kw)
     except:
         pass
-    if not ("dnack" in kw and kw["dnack"]):
-        self.activeTimer = Timer(PACKET_TIMEOUT, self.send_pckt, (event,) + args, kw)
-        self.activeTimer.start()
     del args
 
 

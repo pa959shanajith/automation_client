@@ -28,20 +28,32 @@ from constants import *
 import dynamic_variable_handler
 import reporting
 import core_utils
+from logging.handlers import TimedRotatingFileHandler
 local_cont = threading.local()
 #index for iterating the teststepproperty for executor
 ##i = 0
-#Terminate Flag
 terminate_flag=False
+manual_terminate_flag=False
 pause_flag=False
 iris_flag = True
 iris_constant_step = -1
 socket_object = None
-count = 0
+saucelabs_count = 0
 # test_case_number = 0
 log = logging.getLogger("controller.py")
 status_percentage = {TEST_RESULT_PASS:0,TEST_RESULT_FAIL:0,TERMINATE:0,"total":0}
 
+class ThreadLogFilter(logging.Filter):
+    """
+    This filter only show log entries for specified thread name
+    """
+
+    def __init__(self, thread_name, *args, **kwargs):
+        logging.Filter.__init__(self, *args, **kwargs)
+        self.thread_name = thread_name
+
+    def filter(self, record):
+        return record.threadName == self.thread_name
 class Controller():
     mobile_web_dispatcher_obj = None
     oebs_dispatcher_obj = None
@@ -160,6 +172,7 @@ class Controller():
             # core_utils.get_all_the_imports('ImageProcessing')
             core_utils.get_all_the_imports('WebScrape')
             core_utils.get_all_the_imports('Web')
+            core_utils.get_all_the_imports('Saucelabs')
             if iris_flag:
                 core_utils.get_all_the_imports('IRIS')
             import web_dispatcher
@@ -216,7 +229,7 @@ class Controller():
             self.system_dispatcher_obj.action=self.action
         except Exception as e:
             logger.print_on_console('Error loading System plugin')
-            log.error(e)
+            log.error(e,exc_info=True)
 
 
     def __load_aws(self):
@@ -280,8 +293,8 @@ class Controller():
             log.info('Input: '+str(i + 1)+ '= '+repr(inpval[i]))
 
     def clear_data(self):
-        global terminate_flag,pause_flag,iris_constant_step
-        terminate_flag=pause_flag=False
+        global terminate_flag,manual_terminate_flag,pause_flag,iris_constant_step
+        terminate_flag=manual_terminate_flag=pause_flag=False
         iris_constant_step = -1
 
     def resume_execution(self):
@@ -585,7 +598,6 @@ class Controller():
         global socket_object,iris_constant_step,status_percentage
         configvalues = self.configvalues
         try:
-            import time
             time.sleep(float(configvalues['stepExecutionWait']))
         except Exception as e:
             log.error('stepExecutionWait should be a integer, please change it in config.json')
@@ -907,12 +919,15 @@ class Controller():
         obj.clear_dyn_variables()
         return status
 
-    def invoke_execution(self,mythread,json_data,socketIO,wxObject,configvalues,qcObject,qtestObject,aws_mode):
-        global terminate_flag,count,status_percentage
+    def invoke_execution(self,mythread,json_data,socketIO,wxObject,configvalues,qcObject,qtestObject,zephyrObject,aws_mode):
+        global terminate_flag,status_percentage,saucelabs_count
         qc_url=''
         qc_password=''
         qc_username=''
-        qc_type=''
+        zephyr_accNo=''
+        zephyr_secKey=''
+        zephyr_acKey=''        
+        integration_type=''
         con = Controller()
         obj = handler.Handler()
         status=COMPLETED
@@ -922,6 +937,7 @@ class Controller():
         scen_id=[]
         condition_check_flag = False
         testcase_empty_flag = False
+        count = 0
         info_msg=''
         # t = test.Test()
         # suites_list,flag = t.gettsplist()
@@ -947,7 +963,6 @@ class Controller():
         #Iterate through the suites-list
         for suite,suite_id,suite_id_data in zip(suite_details,suiteId_list,suite_data):
             #EXECUTION GOES HERE
-            status = False
             flag=True
             if terminate_flag:
                 status=TERMINATE
@@ -987,7 +1002,7 @@ class Controller():
                                 logger.print_on_console( '***Scenario ' ,str(sc_idx + 1) ,' execution started***')
                                 print('=======================================================================================================')
                                 log.info('***Scenario '  + str(sc_idx + 1)+ ' execution started***')
-                            if('qctype' not in qc_creds and len(scenario)==2 and len(scenario['qcdetails'])==10):
+                            if('integrationType' not in qc_creds and len(scenario)==2 and len(scenario['qcdetails'])==10):
                                 qc_username=qc_creds['qcusername']
                                 qc_password=qc_creds['qcpassword']
                                 qc_url=qc_creds['qcurl']
@@ -997,17 +1012,28 @@ class Controller():
                                 qc_folder=qc_sceanrio_data['qcfolderpath']
                                 qc_tsList=qc_sceanrio_data['qctestset']
                                 qc_testrunname=qc_sceanrio_data['qctestcase']
-                            if('qctype' in qc_creds and qc_creds['qctype'] != ''):
+                            if('integrationType' in qc_creds and qc_creds['integrationType'] == 'qTest'):
                                 qc_username=qc_creds['qcusername']
                                 qc_password=qc_creds['qcpassword']
                                 qc_url=qc_creds['qcurl']
-                                qc_type=qc_creds['qctype']
+                                integration_type=qc_creds['integrationType']
                                 qc_stepsup=qc_creds['qteststeps']
                                 qc_sceanrio_data=scenario['qcdetails']
                                 qc_project=qc_sceanrio_data['qtestproject']
                                 qc_projectid=qc_sceanrio_data['qtestprojectid']
                                 qc_suite=qc_sceanrio_data['qtestsuite']
                                 qc_suiteid=qc_sceanrio_data['qtestsuiteid']
+                            if('integrationType' in qc_creds and qc_creds['integrationType'] == 'Zephyr'):
+                                zephyr_acKey=qc_creds['qcusername']
+                                zephyr_secKey=qc_creds['qcpassword']
+                                zephyr_accNo=qc_creds['qcurl']
+                                integration_type=qc_creds['integrationType']
+                                zephyr_sceanrio_data=scenario['qcdetails']
+                                zephyr_cycleid=zephyr_sceanrio_data['cycleid']
+                                zephyr_projectid=zephyr_sceanrio_data['projectid']
+                                zephy_versionid=zephyr_sceanrio_data['versionid']
+                                zephy_testid=zephyr_sceanrio_data['testid']  
+                                zephy_issueid=zephyr_sceanrio_data['issueid']                       
                                 
                             #Iterating through each test case in the scenario
                             for testcase in [eval(scenario[scenario_id])]:
@@ -1061,6 +1087,15 @@ class Controller():
                                     tsplist=[]
                                 sc_idx+=1
                                 execute_flag=False
+                            execution_env = json_data.get('exec_env', 'default').lower()
+                            if execution_env == 'saucelabs':
+                                self.__load_web()
+                                import script_generator
+                                scenario_name=json_data['suitedetails'][suite_idx-1]["scenarioNames"][sc_idx]
+                                saucelabs_obj=script_generator.SauceLabs_Operations(scenario_name,str(saucelabs_count))
+                                status=saucelabs_obj.complie_TC(tsplist,scenario_name,browser,str(saucelabs_count),execute_result_data,socketIO)
+                                saucelabs_count += 1
+                                execute_flag=False
                             if flag and execute_flag :
                                 #check for temrinate flag before execution
                                 tsplist = obj.read_step()
@@ -1081,13 +1116,15 @@ class Controller():
                                 logger.print_on_console( '***Saving report of Scenario' ,str(sc_idx  + 1 ),'***')
                                 log.info( '***Saving report of Scenario' +str(sc_idx + 1)+'***')
                                 os.chdir(self.cur_dir)
-                                filename='Scenario'+str(sc_idx + 1)+'.json'
+                                filename='Scenario'+str(count + 1)+'.json'
+                                count+=1
                                 #check if user has manually terminated during execution, then check if the teststep data and overallstatus is [] if so poputale default values in teststep data and overallstatus
-                                if terminate_flag ==True and execute_flag==True:
-                                    if con.reporting_obj.report_json['rows']==[] and con.reporting_obj.report_json['overallstatus']==[]:
+                                if terminate_flag:
+                                    if con.reporting_obj.report_json[ROWS]==[] and con.reporting_obj.report_json[OVERALLSTATUS]==[]:
                                         con.reporting_obj.add_to_reporting_obj()
                                 status_percentage["s_index"]=suite_idx-1
                                 status_percentage["index"]=sc_idx
+                                con.reporting_obj.user_termination=manual_terminate_flag
                                 con.reporting_obj.save_report_json(filename,json_data,status_percentage)
                                 execute_result_data["reportData"] = con.reporting_obj.report_json
                                 socketIO.emit('result_executeTestSuite', execute_result_data)
@@ -1095,7 +1132,7 @@ class Controller():
                                 sc_idx += 1
                                 #logic for condition check
                                 report_json=con.reporting_obj.report_json[OVERALLSTATUS]
-                                if qc_type!="qTest" and len(scenario['qcdetails'])==10 and (qc_url!='' and qc_password!='' and  qc_username!=''):
+                                if integration_type!="qTest" and integration_type!="Zephyr" and len(scenario['qcdetails'])==10 and (qc_url!='' and qc_password!='' and  qc_username!=''):
                                     qc_status_over=report_json[0]
                                     qc_update_status=qc_status_over['overallstatus']
                                     if(str(qc_update_status).lower()=='pass'):
@@ -1115,8 +1152,8 @@ class Controller():
                                         qc_status['qc_update_status'] = qc_update_status
                                         logger.print_on_console('****Updating QCDetails****')
                                         if qcObject is not None:
-                                            status = qcObject.update_qc_details(qc_status)
-                                            if status:
+                                            qc_status_updated = qcObject.update_qc_details(qc_status)
+                                            if qc_status_updated:
                                                 logger.print_on_console('****Updated QCDetails****')
                                             else:
                                                logger.print_on_console('****Failed to Update QCDetails****')
@@ -1124,7 +1161,7 @@ class Controller():
                                             logger.print_on_console('****Failed to Update QCDetails****')
                                     except Exception as e:
                                         logger.print_on_console('Error in Updating Qc details')
-                                if (qc_type=="qTest" and qc_url!='' and qc_password!='' and  qc_username!=''):
+                                if (integration_type=="qTest" and qc_url!='' and qc_password!='' and  qc_username!=''):
                                     qc_status_over=report_json[0]
                                     try:
                                         qc_status = {}
@@ -1153,8 +1190,8 @@ class Controller():
                                                     tsplistLen -= 1
                                         logger.print_on_console('****Updating qTest Details****')
                                         if qtestObject is not None:
-                                            status = qtestObject.update_qtest_run_details(qc_status,tsplistLen)
-                                            if status:
+                                            qc_status_updated = qtestObject.update_qtest_run_details(qc_status,tsplistLen)
+                                            if qc_status_updated:
                                                 logger.print_on_console('****Updated qTest Details****')
                                             else:
                                                logger.print_on_console('****Failed to Update qTest Details****')
@@ -1164,9 +1201,41 @@ class Controller():
                                         log.error('Error in Updating qTest details '+str(e))
                                         logger.print_on_console('Error in Updating qTest details')
 
+                                if (integration_type=="Zephyr" and zephyr_accNo!='' and zephyr_secKey!='' and  zephyr_acKey!=''):
+                                    zephyr_status_over=report_json[0]
+                                    try:
+                                        zephyr_status = {}
+                                        zephyr_status['zephyraction']='zephyrupdate'
+                                        zephyr_status['cycleId']=zephyr_cycleid
+                                        zephyr_status['testId']=zephy_testid
+                                        zephyr_status['issueId']=zephy_issueid
+                                        zephyr_status['projectId']=zephyr_projectid
+                                        zephyr_status['versionId']=zephy_versionid
+                                        zephyr_update_status=zephyr_status_over['overallstatus']
+                                        zephyr_status['status']={}
+                                        if(zephyr_update_status.lower()=='pass'):
+                                            zephyr_status['status']['id']='1'
+                                        elif(zephyr_update_status.lower()=='fail'):
+                                            zephyr_status['status']['id']='2'
+                                        elif(zephyr_update_status.lower()=='terminate'):
+                                            zephyr_status['status']['id']='5'
+                                        logger.print_on_console('****Updating Zephyr Details****')
+                                        if zephyrObject is not None:
+                                            zephry_update_status = zephyrObject.update_zephyr_test_details(zephyr_status)
+                                            if zephry_update_status:
+                                                logger.print_on_console('****Updated Zephyr Details****')
+                                            else:
+                                               logger.print_on_console('****Failed to Update Zephyr Details****')
+                                        else:
+                                            logger.print_on_console('****Failed to Update Zephyr Details****')
+                                    except Exception as e:
+                                        log.error('Error in Updating Zephyr details '+str(e))
+                                        logger.print_on_console('Error in Updating Zephyr details')
+
+
                                 #Check is made to fix issue #401
                                 if len(report_json)>0:
-                                    overall_status=report_json[0]['overallstatus']
+                                    overall_status=report_json[0][OVERALLSTATUS]
                                     if(condition_check_value==1):
                                         if(overall_status==TEST_RESULT_PASS):
                                             continue
@@ -1177,10 +1246,11 @@ class Controller():
                                 logger.print_on_console( '***Saving report of Scenario' ,str(sc_idx + 1),'***')
                                 log.info( '***Saving report of Scenario' +str(sc_idx + 1)+'***')
                                 os.chdir(self.cur_dir)
-                                filename='Scenario'+str(count  + 1)+'.json'
+                                filename='Scenario'+str(count + 1)+'.json'
                                 count+=1
                                 status_percentage["s_index"]=suite_idx-1
                                 status_percentage["index"]=sc_idx
+                                con.reporting_obj.user_termination=manual_terminate_flag
                                 con.reporting_obj.save_report_json_conditioncheck_testcase_empty(filename,info_msg,json_data,status_percentage)
                                 execute_result_data["reportData"] = con.reporting_obj.report_json_condition_check_testcase_empty
                                 socketIO.emit('result_executeTestSuite', execute_result_data)
@@ -1190,10 +1260,11 @@ class Controller():
                             logger.print_on_console( '***Saving report of Scenario' ,str(sc_idx + 1),'***')
                             log.info( '***Saving report of Scenario' +str(sc_idx + 1)+'***')
                             os.chdir(self.cur_dir)
-                            filename='Scenario'+str(count  + 1)+'.json'
+                            filename='Scenario'+str(count + 1)+'.json'
                             count+=1
                             status_percentage["s_index"]=suite_idx-1
                             status_percentage["index"]=sc_idx
+                            con.reporting_obj.user_termination=manual_terminate_flag
                             con.reporting_obj.save_report_json_conditioncheck(filename,json_data,status_percentage)
                             execute_result_data["reportData"] = con.reporting_obj.report_json_condition_check
                             socketIO.emit('result_executeTestSuite', execute_result_data)
@@ -1201,6 +1272,7 @@ class Controller():
                             sc_idx += 1
                             #logic for condition check
                             report_json=con.reporting_obj.report_json[OVERALLSTATUS]
+                        time.sleep(1)
             if aws_mode and not terminate_flag:
                 tc_obj.make_zip(pytest_files)
                 execution_status,step_results=self.aws_obj.run_aws_android_tests()
@@ -1213,7 +1285,7 @@ class Controller():
             #clearing dynamic variables at the end of execution to support dynamic variable at the scenario level
             obj.clear_dyn_variables()
             logger.print_on_console('***SUITE ', str(suite_idx) ,' EXECUTION COMPLETED***')
-            log.info('-----------------------------------------------')
+            log.info('---------------------------------------------------------------------')
             print('=======================================================================================================')
             suite_idx += 1
         del con
@@ -1288,6 +1360,7 @@ class Controller():
             status_percentage[TEST_RESULT_FAIL]=fail_val
             status_percentage["s_index"]=suite_idx-1
             status_percentage["index"]=sc_idx
+            obj_reporting.user_termination=manual_terminate_flag
             obj_reporting.save_report_json(filename,json_data,status_percentage)
             execute_result_data["scenarioId"]=aws_scenario[sc_idx]
             execute_result_data["reportData"] = obj_reporting.report_json
@@ -1295,9 +1368,9 @@ class Controller():
             sc_idx+=1
             idx_t+=1
 
-    def invoke_controller(self,action,mythread,debug_mode,runfrom_step,json_data,root_obj,socketIO,qc_soc,qtest_soc,*args):
+    def invoke_controller(self,action,mythread,debug_mode,runfrom_step,json_data,root_obj,socketIO,qc_soc,qtest_soc,zephyr_soc,*args):
         status = COMPLETED
-        global terminate_flag,pause_flag,socket_object
+        global socket_object
         self.conthread=mythread
         self.clear_data()
         wxObject = root_obj.cw
@@ -1311,9 +1384,9 @@ class Controller():
             self.execution_mode = json_data['exec_mode'].lower()
             kill_process()
             if self.execution_mode == SERIAL:
-                status=self.invoke_execution(mythread,json_data,socketIO,wxObject,self.configvalues,qc_soc,qtest_soc,aws_mode)
+                status=self.invoke_execution(mythread,json_data,socketIO,wxObject,self.configvalues,qc_soc,qtest_soc,zephyr_soc,aws_mode)
             elif self.execution_mode == PARALLEL:
-                status = self.invoke_parralel_exe(mythread,json_data,socketIO,wxObject,self.configvalues,qc_soc,qtest_soc,aws_mode)
+                status = self.invoke_parralel_exe(mythread,json_data,socketIO,wxObject,self.configvalues,qc_soc,qtest_soc,zephyr_soc,aws_mode)
         elif action==DEBUG:
             self.debug_choice=wxObject.choice
             self.debug_mode=debug_mode
@@ -1323,7 +1396,7 @@ class Controller():
             status=COMPLETED
         return status
 
-    def invoke_parralel_exe(self,mythread,json_data,socketIO,wxObject,configvalues,qc_soc,qtest_soc,aws_mode):
+    def invoke_parralel_exe(self,mythread,json_data,socketIO,wxObject,configvalues,qc_soc,qtest_soc,zephyr_soc,aws_mode):
         try:
             import copy
             browsers_data = json_data['suitedetails'][0]['browserType']
@@ -1333,7 +1406,9 @@ class Controller():
                 jsondata_dict[i] = copy.deepcopy(json_data)
                 for j in range(len(jsondata_dict[i]['suitedetails'])):
                     jsondata_dict[i]['suitedetails'][j]['browserType'] = [browsers_data[i]]
-                th[i] = threading.Thread(target = self.invoke_execution, args = (mythread,jsondata_dict[i],socketIO,wxObject,configvalues,qc_soc,qtest_soc,aws_mode))
+                thread_name = "test_thread_browser" + str(browsers_data[i])
+                th[i] = threading.Thread(target = self.invoke_execution, name = thread_name, args = (mythread,jsondata_dict[i],socketIO,wxObject,configvalues,qc_soc,qtest_soc,zephyr_soc,aws_mode))
+                self.seperate_log(th[i], browsers_data[i]) #function that creates different logs for each browser
                 th[i].start()
             for i in th:
                 th[i].join()
@@ -1345,7 +1420,24 @@ class Controller():
         if not(terminate_flag):
             status = COMPLETED
         return status
-
+        
+    def seperate_log(self, cur_thread, id):
+        try:
+            browser_name = {'1':'Chrome', '2':'FireFox', '3':'IE', '6': 'Safari', '7':'EdgeLegacy', '8':'EdgeChromium'}
+            log_filepath = os.path.normpath(os.path.dirname(configvalues["logFile_Path"]) + os.sep + 'TestautoV2_Parallel_' + str(browser_name[id]) + '.log').replace("\\","\\\\")
+            file1 = open(log_filepath, 'a+')
+            file1.close()
+            threadName = cur_thread.name #Get name of each thread
+            log_handler = TimedRotatingFileHandler(log_filepath, 'midnight', 1, 5, None, False, False)
+            formatter = logging.Formatter("%(asctime)s %(levelname)s %(name)s.%(funcName)s:%(lineno)d %(message)s")
+            log_handler.setFormatter(formatter)
+            log_filter = ThreadLogFilter(threadName)
+            log_handler.addFilter(log_filter)
+            log = logging.getLogger()
+            log.addHandler(log_handler)
+        except Exception as e:
+            log.error(e)
+    
     def step_execution_status(self,teststepproperty):
         #325 : Report - Skip status in report by providing value 0 in the output column in testcase grid is not handled.
         nostatusflag = False
