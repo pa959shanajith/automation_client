@@ -28,6 +28,7 @@ from constants import *
 import dynamic_variable_handler
 import reporting
 import core_utils
+import recording
 from logging.handlers import TimedRotatingFileHandler
 local_cont = threading.local()
 #index for iterating the teststepproperty for executor
@@ -757,7 +758,7 @@ class Controller():
         else:
             return index,TERMINATE
 
-    def executor(self,tsplist,action,last_tc_num,debugfrom_step,mythread):
+    def executor(self,tsplist,action,last_tc_num,debugfrom_step,mythread,*args):
         global status_percentage
         status_percentage = {TEST_RESULT_PASS:0,TEST_RESULT_FAIL:0,TERMINATE:0,"total":0}
         i=0
@@ -815,7 +816,9 @@ class Controller():
             self.reporting_obj.user_termination=True
             status_percentage[TERMINATE]+=1
             status_percentage["total"]+=1
-        self.reporting_obj.build_overallstatus(self.scenario_start_time,self.scenario_end_time,self.scenario_ellapsed_time)
+        ##send path to build overall status
+        video_path = args[0] if (args and args[0]) else ''
+        self.reporting_obj.build_overallstatus(self.scenario_start_time,self.scenario_end_time,self.scenario_ellapsed_time,video_path)
         logger.print_on_console('Step Elapsed time is : ',str(self.scenario_ellapsed_time))
         return status,status_percentage
 
@@ -1104,7 +1107,13 @@ class Controller():
                                     con.conthread=mythread
                                     con.tsp_list=tsplist
                                     local_cont.test_case_number=0
-                                    status,status_percentage = con.executor(tsplist,EXECUTE,last_tc_num,1,con.conthread)
+                                    #start video, create a video path
+                                    video_path = ''
+                                    recorder_obj = recording.Recorder()
+                                    if self.execution_mode == SERIAL and json_data['apptype'] == 'Web': video_path = recorder_obj.record_execution()
+                                    status,status_percentage = con.executor(tsplist,EXECUTE,last_tc_num,1,con.conthread,video_path)
+                                    #end video
+                                    if self.execution_mode == SERIAL and json_data['apptype'] == 'Web': recorder_obj.rec_status = False
                                     print('=======================================================================================================')
                                     logger.print_on_console( '***Scenario' ,str(sc_idx + 1) ,' execution completed***')
                                     print('=======================================================================================================')
@@ -1295,6 +1304,8 @@ class Controller():
             logger.print_on_console( '***Terminating the Execution***')
             print('=======================================================================================================')
         return status
+
+
 
     #generating report of AWS in Avo Assure by using AWS result(AWS device farm executed result present in test spec output.txt)
     def aws_report(self,aws_tsp,aws_scenario,step_results,suite_idx,execute_result_data,obj_reporting,json_data,socketIO):
