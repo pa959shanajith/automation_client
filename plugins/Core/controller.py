@@ -1419,7 +1419,7 @@ class Controller():
                     jsondata_dict[i]['suitedetails'][j]['browserType'] = [browsers_data[i]]
                 thread_name = "test_thread_browser" + str(browsers_data[i])
                 th[i] = threading.Thread(target = self.invoke_execution, name = thread_name, args = (mythread,jsondata_dict[i],socketIO,wxObject,configvalues,qc_soc,qtest_soc,zephyr_soc,aws_mode))
-                self.seperate_log(th[i], browsers_data[i]) #function that creates different logs for each browser
+                self.seperate_log(th[i], browsers_data[i], configvalues) #function that creates different logs for each browser
                 th[i].start()
             for i in th:
                 th[i].join()
@@ -1432,7 +1432,7 @@ class Controller():
             status = COMPLETED
         return status
         
-    def seperate_log(self, cur_thread, id):
+    def seperate_log(self, cur_thread, id, configvalues):
         try:
             browser_name = {'1':'Chrome', '2':'FireFox', '3':'IE', '6': 'Safari', '7':'EdgeLegacy', '8':'EdgeChromium'}
             log_filepath = os.path.normpath(os.path.dirname(configvalues["logFile_Path"]) + os.sep + 'TestautoV2_Parallel_' + str(browser_name[id]) + '.log').replace("\\","\\\\")
