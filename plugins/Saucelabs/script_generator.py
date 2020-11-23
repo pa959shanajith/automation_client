@@ -20,6 +20,7 @@ import generic_keywords
 import step_description_SL
 import subprocess
 import logger
+import sauceclient
 
 Saucelabs_path=os.environ['AVO_ASSURE_HOME']+os.sep+'plugins'+os.sep+'Saucelabs'
 python_cwd=os.environ['AVO_ASSURE_HOME']
@@ -596,7 +597,6 @@ def getWebElement(identifier):
             p = subprocess.Popen('python -m pytest '+file_py+".py", stdout=subprocess.PIPE, bufsize=1, shell=True, cwd=python_cwd)
             output=p.stdout.readlines()
             p.wait()
-            import sauceclient
             flag=True
             f1=open(self.filename1,"r")
             steps=f1.readlines()
@@ -618,13 +618,17 @@ def getWebElement(identifier):
             sc=sauceclient.SauceClient(self.username,self.access_key)
             j=sauceclient.Jobs(sc)
             all_jobs=j.get_jobs(start=int(now.timestamp()),full=True)
+            import constants
+            filename = datetime.now().strftime("%Y%m%d%H%M%S")
+            dirpath = constants.SCREENSHOT_PATH if (constants.SCREENSHOT_PATH not in ['screenshot_path', 'Disabled']) else Saucelabs_tests+os.sep
+            video_path = dirpath+'ScreenRecording_' +filename + '.mp4'
             for i in range(0,len(all_jobs)):
-                file_creations_status=j.get_job_asset_content(all_jobs[i]['id'],file_py,Saucelabs_tests+os.sep)
+                file_creations_status=j.get_job_asset_content(all_jobs[i]['id'],filename,dirpath)
                 status=all_jobs[i]['error']
                 if(status!=None):
                     logger.print_on_console("Error in Sauce Labs Execution")
                     flag=False
-            overallstatus=self.build_overallstatus(self.browsers[browser]['browserName'],overall_status,all_jobs[i],j)
+            overallstatus=self.build_overallstatus(self.browsers[browser]['browserName'],overall_status,all_jobs[i],j,video_path)
             execute_result_data['reportData'] = { 'rows' : report, "overallstatus" : overallstatus}
             socketIO.emit('result_executeTestSuite', execute_result_data)
             f1.close()
@@ -637,7 +641,7 @@ def getWebElement(identifier):
             f1.close()
             return False
 
-    def build_overallstatus(self,browser,overall_status,jobs,j):
+    def build_overallstatus(self,browser,overall_status,jobs,j,video_path):
         """
         def : build_overallstatus
         purpose : builds the overallstatus field of report_json
@@ -669,4 +673,5 @@ def getWebElement(identifier):
         obj['browserType']=browser
         obj['date']=date1
         obj['time']=time1
+        obj['video']=video_path
         return [obj]

@@ -1313,7 +1313,7 @@ class Controller():
         try:
             ##start screen recording
             import constants
-            if constants.SCREENSHOT_PATH != "Disabled":
+            if constants.SCREENSHOT_PATH  not in ['screenshot_path', 'Disabled']:
                 filename = constants.SCREENSHOT_PATH+"ScreenRecording_"+datetime.now().strftime("%Y%m%d%H%M%S")+".avi"
             else:
                 filename = "output/ScreenRecording_"+datetime.now().strftime("%Y%m%d%H%M%S")+".avi"
