@@ -133,7 +133,7 @@ class ClientWindow(wx.Frame):
         self.log.SetFont(font1)
 
         self.schedule = wx.CheckBox(self.panel, label = 'Do Not Disturb',pos=(120, 10), size=(100, 25))
-        self.schedule.SetToolTip(wx.ToolTip("Enable DND Mode"))
+        self.schedule.SetToolTip(wx.ToolTip("Enable Do Not Disturb Mode"))
         self.schedule.Bind(wx.EVT_CHECKBOX,self.onChecked_Schedule)
         self.schedule.Disable()
 
