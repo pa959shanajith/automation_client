@@ -94,7 +94,7 @@ class MainNamespace(BaseNamespace):
             if(str(args[0]) == 'connected'):
                 if allow_connect:
                     dnd_mode = cw.schedule.GetValue() if root.gui else False
-                    msg = ("DND" if dnd_mode else "Normal") + " Mode: Connection to the Avo Assure Server established"
+                    msg = ("Do Not Disturb" if dnd_mode else "Normal") + " Mode: Connection to the Avo Assure Server established"
                     logger.print_on_console(msg)
                     log.info(msg)
                     msg = "ICE Name: " + root.ice_token["icename"]
@@ -128,12 +128,12 @@ class MainNamespace(BaseNamespace):
                 else: kill_conn = True
 
             elif(str(args[0]) == 'schedulingEnabled'):
-                logger.print_on_console('DND Mode Enabled')
-                log.info('DND Mode Enabled')
+                logger.print_on_console('Do Not Disturb Mode Enabled')
+                log.info('Do Not Disturb Mode Enabled')
                 
             elif(str(args[0]) == 'schedulingDisabled'):
-                logger.print_on_console('DND Mode Disabled')
-                log.info('DND Mode Disabled')
+                logger.print_on_console('Do Not Disturb Mode Disabled')
+                log.info('Do Not Disturb Mode Disabled')
 
             elif(str(args[0]) == 'checkConnection'):
                 err_res = None
