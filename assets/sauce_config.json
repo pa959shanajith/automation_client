@@ -1,0 +1,11 @@
+{
+    "sauce_username":"<>",
+    "sauce_access_key":"<>",
+    "remote_url":"<>",
+    "proxy":{
+    "url":"<>",
+    "username":"<>",
+    "password":"<>"
+    },
+    "platform":"Windows 7"
+}

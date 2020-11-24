@@ -40,8 +40,10 @@ root = None
 cw = None
 browsername = None
 qcdata = None
+zephyrdata = None
 qcObject = None
 qtestObject = None
+zephyrObject = None
 soc=None
 browsercheckFlag=False
 updatecheckFlag=False
@@ -192,6 +194,13 @@ class MainNamespace(BaseNamespace):
                 logger.print_on_console(fail_msg)
                 log.info(fail_msg)
                 kill_conn = True
+
+            elif(str(args[0]) == 'decline'):
+                fail_msg="Please accept Avo Assure terms and conditions before connecting to Avo Assure Server"
+                logger.print_on_console(fail_msg)
+                log.info(fail_msg)
+                kill_conn = True
+                if root.gui: cw.connectbutton.Enable()
 
         except Exception as e:
             err_msg='Error while Connecting to Server'
@@ -623,6 +632,28 @@ class MainNamespace(BaseNamespace):
             try: socketIO.emit('qcresponse','Error:Qtest Operations')
             except: pass
 
+    def on_zephyrlogin(self, *args):
+        global zephyrObject
+        err_msg = None
+        try:
+            if(zephyrObject == None):
+                core_utils.get_all_the_imports('Zephyr')
+                import ZephyrController
+                zephyrObject = ZephyrController.ZephyrWindow()
+
+            zephyrdata = args[0]
+            response = zephyrObject.zephyr_dict[zephyrdata.pop('zephyraction')](zephyrdata)
+            socketIO.emit('qcresponse', response)
+        except KeyError:
+            err_msg = 'Invalid Zephyr operation'
+        except Exception as e:
+            err_msg = 'Error in Zephyr operations'
+            log.error(e, exc_info=True)
+        if err_msg is not None:
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
+            try: socketIO.emit('qcresponse','Error:Zephyr Operations')
+            except: pass
 
     def on_render_screenshot(self,*args):
         try:
@@ -982,7 +1013,7 @@ class TestThread(threading.Thread):
                 logger.print_on_console('This app type is not part of the license.')
                 status=TERMINATE
             else:
-                status = self.con.invoke_controller(self.action,self,self.debug_mode,runfrom_step,self.json_data,self.main,socketIO,qcObject,qtestObject,self.aws_mode)
+                status = self.con.invoke_controller(self.action,self,self.debug_mode,runfrom_step,self.json_data,self.main,socketIO,qcObject,qtestObject,zephyrObject,self.aws_mode)
 
             logger.print_on_console('Execution status '+status)
 

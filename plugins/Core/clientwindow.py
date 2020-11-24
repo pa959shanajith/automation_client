@@ -121,7 +121,7 @@ class ClientWindow(wx.Frame):
         self.rollbackItem = wx.MenuItem(self.helpMenu, 162, text="Rollback", kind=wx.ITEM_NORMAL)
         self.helpMenu.Append(self.rollbackItem)
         self.rollbackItem.Enable(False)
-        #self.menubar.Append(self.helpMenu, '&Help')
+        self.menubar.Append(self.helpMenu, '&Help')
 
         self.Bind(wx.EVT_MENU, self.menuhandler)
         self.connectbutton = wx.BitmapButton(self.panel, bitmap=self.connect_img,pos=(10, 10), size=(100, 25), name='connect')
