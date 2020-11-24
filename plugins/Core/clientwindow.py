@@ -132,8 +132,8 @@ class ClientWindow(wx.Frame):
         self.log.SetForegroundColour((0,50,250))
         self.log.SetFont(font1)
 
-        self.schedule = wx.CheckBox(self.panel, label = 'Do Not Disturb',pos=(120, 10), size=(100, 25))
-        self.schedule.SetToolTip(wx.ToolTip("Enable Do Not Disturb Mode"))
+        self.schedule = wx.CheckBox(self.panel, label = 'Schedule',pos=(120, 10), size=(100, 25))
+        self.schedule.SetToolTip(wx.ToolTip("Enable Scheduling Mode"))
         self.schedule.Bind(wx.EVT_CHECKBOX,self.onChecked_Schedule)
         self.schedule.Disable()
 
@@ -294,12 +294,10 @@ class ClientWindow(wx.Frame):
             core.connection_Timer = threading.Timer(conn_time*60*60, root.closeConnection)
             core.connection_Timer.start()
         mode=self.schedule.GetValue()
-        msg = ("En" if mode else "Dis") + "abling Do Not Disturb mode"
+        msg = ("En" if mode else "Dis") + "abling Schedule mode"
         logger.print_on_console(msg)
         log.info(msg)
-        core.set_ICE_status(one_time_ping = True)
-    
-
+        core.socketIO.emit('toggle_schedule',mode)
 
     def onRadioBox(self,e):
         self.choice=self.rbox.GetStringSelection()
@@ -349,7 +347,6 @@ class ClientWindow(wx.Frame):
             root.testthread.resume(False)
         self.schedule.Enable()
         core.execution_flag = False
-        core.set_ICE_status(one_time_ping = True)
 
     def OnClear(self,event):
         self.log.Clear()
