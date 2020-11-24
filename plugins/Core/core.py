@@ -1346,6 +1346,8 @@ class Main():
         #Disconnects socket client
         global socketIO
         try:
+            stop_ping_thread()
+            log.info('Cancelling Ping Thread')
             if socketIO is not None:
                 if disconn:
                     log.info('Sending socket disconnect request')
@@ -1355,8 +1357,7 @@ class Main():
                 socketIO = None
                 self.socketthread.join()
                 log.info('Connection Closed')
-            stop_ping_thread()
-            log.info('Cancelling Ping Thread')
+            
 
         except Exception as e:
             log.error("Error while closing connection")
@@ -1691,5 +1692,6 @@ def set_ICE_status(one_time_ping = False,connect=True):
 def stop_ping_thread():
     global status_ping_thread
     set_ICE_status(one_time_ping=True,connect=False)
-    if status_ping_thread is not None:
+    if status_ping_thread is not None and status_ping_thread.is_alive():
         status_ping_thread.cancel()
+
