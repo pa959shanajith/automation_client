@@ -1005,16 +1005,13 @@ class Controller():
                                 logger.print_on_console( '***Scenario ' ,str(sc_idx + 1) ,' execution started***')
                                 print('=======================================================================================================')
                                 log.info('***Scenario '  + str(sc_idx + 1)+ ' execution started***')
-                            if('integrationType' not in qc_creds and len(scenario)==2 and len(scenario['qcdetails'])==10):
+                            # if('integrationType' not in qc_creds and len(scenario)==2 and len(scenario['qcdetails'])==10):
+                            if('integrationType' in qc_creds and qc_creds['integrationType'] == 'ALM'):
                                 qc_username=qc_creds['qcusername']
                                 qc_password=qc_creds['qcpassword']
                                 qc_url=qc_creds['qcurl']
+                                integration_type=qc_creds['integrationType']
                                 qc_sceanrio_data=scenario['qcdetails']
-                                qc_domain=qc_sceanrio_data['qcdomain']
-                                qc_project=qc_sceanrio_data['qcproject']
-                                qc_folder=qc_sceanrio_data['qcfolderpath']
-                                qc_tsList=qc_sceanrio_data['qctestset']
-                                qc_testrunname=qc_sceanrio_data['qctestcase']
                             if('integrationType' in qc_creds and qc_creds['integrationType'] == 'qTest'):
                                 qc_username=qc_creds['qcusername']
                                 qc_password=qc_creds['qcpassword']
@@ -1141,35 +1138,77 @@ class Controller():
                                 sc_idx += 1
                                 #logic for condition check
                                 report_json=con.reporting_obj.report_json[OVERALLSTATUS]
-                                if integration_type!="qTest" and integration_type!="Zephyr" and len(scenario['qcdetails'])==10 and (qc_url!='' and qc_password!='' and  qc_username!=''):
-                                    qc_status_over=report_json[0]
-                                    qc_update_status=qc_status_over['overallstatus']
-                                    if(str(qc_update_status).lower()=='pass'):
-                                        qc_update_status='Passed'
-                                    elif(str(qc_update_status).lower()=='fail'):
-                                        qc_update_status='Failed'
-                                    else:
-                                        qc_update_status='Not Completed'
-                                    try:
-                                        qc_status = {}
-                                        qc_status['qcaction']='qcupdate'
-                                        qc_status['qc_domain']=qc_domain
-                                        qc_status['qc_project']=qc_project
-                                        qc_status['qc_folder']=qc_folder
-                                        qc_status['qc_tsList']=qc_tsList
-                                        qc_status['qc_testrunname']=qc_testrunname
-                                        qc_status['qc_update_status'] = qc_update_status
-                                        logger.print_on_console('****Updating QCDetails****')
-                                        if qcObject is not None:
-                                            qc_status_updated = qcObject.update_qc_details(qc_status)
-                                            if qc_status_updated:
-                                                logger.print_on_console('****Updated QCDetails****')
-                                            else:
-                                               logger.print_on_console('****Failed to Update QCDetails****')
+                                # if integration_type!="qTest" and integration_type!="Zephyr" and len(scenario['qcdetails'])==10 and (qc_url!='' and qc_password!='' and  qc_username!=''):
+                                if  integration_type=="ALM" and (qc_url!='' and qc_password!='' and  qc_username!=''):
+                                    if type(qc_sceanrio_data) is not list:
+                                        qc_domain=qc_sceanrio_data['qcdomain']
+                                        qc_project=qc_sceanrio_data['qcproject']
+                                        qc_folder=qc_sceanrio_data['qcfolderpath']
+                                        qc_tsList=qc_sceanrio_data['qctestset']
+                                        qc_testrunname=qc_sceanrio_data['qctestcase']
+                                        qc_status_over=report_json[0]
+                                        qc_update_status=qc_status_over['overallstatus']
+                                        if(str(qc_update_status).lower()=='pass'):
+                                            qc_update_status='Passed'
+                                        elif(str(qc_update_status).lower()=='fail'):
+                                            qc_update_status='Failed'
                                         else:
-                                            logger.print_on_console('****Failed to Update QCDetails****')
-                                    except Exception as e:
-                                        logger.print_on_console('Error in Updating Qc details')
+                                            qc_update_status='Not Completed'
+                                        try:
+                                            qc_status = {}
+                                            qc_status['qcaction']='qcupdate'
+                                            qc_status['qc_domain']=qc_domain
+                                            qc_status['qc_project']=qc_project
+                                            qc_status['qc_folder']=qc_folder
+                                            qc_status['qc_tsList']=qc_tsList
+                                            qc_status['qc_testrunname']=qc_testrunname
+                                            qc_status['qc_update_status'] = qc_update_status
+                                            logger.print_on_console('****Updating QCDetails****')
+                                            if qcObject is not None:
+                                                qc_status_updated = qcObject.update_qc_details(qc_status)
+                                                if qc_status_updated:
+                                                    logger.print_on_console('****Updated QCDetails****')
+                                                else:
+                                                    logger.print_on_console('****Failed to Update QCDetails****')
+                                            else:
+                                                logger.print_on_console('****Failed to Update QCDetails****')
+                                        except Exception as e:
+                                            logger.print_on_console('Error in Updating Qc details')
+                                    else:
+                                        for i in range(len(qc_sceanrio_data)):
+                                            qc_domain=qc_sceanrio_data[i]['qcdomain']
+                                            qc_project=qc_sceanrio_data[i]['qcproject']
+                                            qc_folder=qc_sceanrio_data[i]['qcfolderpath']
+                                            qc_tsList=qc_sceanrio_data[i]['qctestset']
+                                            qc_testrunname=qc_sceanrio_data[i]['qctestcase']
+                                            qc_status_over=report_json[0]
+                                            qc_update_status=qc_status_over['overallstatus']
+                                            if(str(qc_update_status).lower()=='pass'):
+                                                qc_update_status='Passed'
+                                            elif(str(qc_update_status).lower()=='fail'):
+                                                qc_update_status='Failed'
+                                            else:
+                                                qc_update_status='Not Completed'
+                                            try:
+                                                qc_status = {}
+                                                qc_status['qcaction']='qcupdate'
+                                                qc_status['qc_domain']=qc_domain
+                                                qc_status['qc_project']=qc_project
+                                                qc_status['qc_folder']=qc_folder
+                                                qc_status['qc_tsList']=qc_tsList
+                                                qc_status['qc_testrunname']=qc_testrunname
+                                                qc_status['qc_update_status'] = qc_update_status
+                                                logger.print_on_console('****Updating QCDetails****')
+                                                if qcObject is not None:
+                                                    qc_status_updated = qcObject.update_qc_details(qc_status)
+                                                    if qc_status_updated:
+                                                        logger.print_on_console('****Updated QCDetails****')
+                                                    else:
+                                                        logger.print_on_console('****Failed to Update QCDetails****')
+                                                else:
+                                                    logger.print_on_console('****Failed to Update QCDetails****')
+                                            except Exception as e:
+                                                logger.print_on_console('Error in Updating Qc details')
                                 if (integration_type=="qTest" and qc_url!='' and qc_password!='' and  qc_username!=''):
                                     qc_status_over=report_json[0]
                                     try:
