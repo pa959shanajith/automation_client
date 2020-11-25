@@ -11,6 +11,7 @@ import uuid
 import signal
 import subprocess
 from datetime import datetime
+from selenium import webdriver
 from random import random
 import core_utils
 import logger
@@ -442,7 +443,6 @@ class MainNamespace(BaseNamespace):
             global mobileWebScrapeObj,mobileWebScrapeFlag,action,data
             #con = controller.Controller()
             global browsername
-            compare_flag=False
             browsername = args[0]+";"+args[1]
             args = list(args)
             d = args[2]
@@ -458,7 +458,6 @@ class MainNamespace(BaseNamespace):
                 webscrape=UserObjectScrape_MW.UserObject()
                 webscrape.get_user_object(d,socketIO)
             elif action == 'compare':
-                compare_flag=True
                 mobileWebScrapeFlag=True
                 # task = d['task']
                 data['view'] = d['viewString']
@@ -1521,8 +1520,6 @@ def check_browser():
                 log.error(e)
             global chromeFlag,firefoxFlag,edgeFlag,chromiumFlag
             logger.print_on_console('Browser compatibility check started')
-            from selenium import webdriver
-            from selenium.webdriver import ChromeOptions
             p = subprocess.Popen('"' + CHROME_DRIVER_PATH + '" --version', stdout=subprocess.PIPE, bufsize=1, shell=True)
             a = p.stdout.readline()
             a = a.decode('utf-8')[13:17]
