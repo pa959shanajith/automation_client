@@ -728,15 +728,13 @@ class MainNamespace(BaseNamespace):
 
     def on_update_screenshot_path(self,*args):
         global socketIO
+        if root.gui: benchmark.init(args[1], socketIO)
+        intv = 120000
+        if args and len(args) >= 2:
+            try: intv = int(args[2])
+            except: pass
+        set_ICE_status(False, True, intv)
         spath=args[0]
-        if args and len(args) >=2:
-            try:
-                set_ICE_status(False,True,args[2])
-            except Exception as e:
-                set_ICE_status(False,True,120000)
-        else:
-            set_ICE_status(False,True,120000)
-        if root.gui: benchmark.init(args[1],socketIO)
         import constants
         if(SYSTEM_OS=='Darwin'):
             spath=spath["mac"]

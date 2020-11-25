@@ -298,8 +298,6 @@ class ClientWindow(wx.Frame):
         logger.print_on_console(msg)
         log.info(msg)
         core.set_ICE_status(one_time_ping = True)
-    
-
 
     def onRadioBox(self,e):
         self.choice=self.rbox.GetStringSelection()
