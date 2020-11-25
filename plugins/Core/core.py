@@ -729,6 +729,13 @@ class MainNamespace(BaseNamespace):
     def on_update_screenshot_path(self,*args):
         global socketIO
         spath=args[0]
+        if args and len(args) >=2:
+            try:
+                set_ICE_status(False,True,args[2])
+            except Exception as e:
+                set_ICE_status(False,True,120000)
+        else:
+            set_ICE_status(False,True,120000)
         if root.gui: benchmark.init(args[1],socketIO)
         import constants
         if(SYSTEM_OS=='Darwin'):
@@ -913,7 +920,6 @@ class ConnectionThread(threading.Thread):
             kw_args = self.get_ice_session()
             socketIO = SocketIO(server_IP, server_port, MainNamespace, **kw_args)
             root.socketIO = socketIO
-            set_ICE_status(False)
             socketIO.wait()
         except ValueError as e:
             err = e
@@ -1666,7 +1672,7 @@ def check_execution_lic(event):
         socketIO.emit(event,'ExecutionOnlyAllowed')
     return executionOnly
 
-def set_ICE_status(one_time_ping = False,connect=True):
+def set_ICE_status(one_time_ping = False,connect=True,interval = 60000):
     """
     def : set_ICE_status
     purpose : communicates ICE status (availble/busy)
@@ -1677,7 +1683,7 @@ def set_ICE_status(one_time_ping = False,connect=True):
     global socketIO,root,execution_flag,cw
     ICE_name = root.ice_token["icename"]
     if not one_time_ping and socketIO is not None:
-        status_ping_thread = threading.Timer(60, set_ICE_status,[])
+        status_ping_thread = threading.Timer(int(interval)/2000, set_ICE_status,[])
         status_ping_thread.setName("Status Ping")
         status_ping_thread.start()     
     log.info('Ping Server')
