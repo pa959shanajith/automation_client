@@ -46,6 +46,7 @@ which is our log file.
 """
 if sys.platform == 'win32':
     from ctypes import windll
+    windll.shcore.SetProcessDpiAwareness(0)
     import msvcrt
     __builtins__open = __builtins__.open
     def __open_inheritance_hack(*args, **kwargs):
