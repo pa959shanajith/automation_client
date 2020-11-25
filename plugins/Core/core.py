@@ -69,7 +69,6 @@ configvalues = {}
 execution_flag = False
 closeActiveConnection = False
 connection_Timer = None
-status_ping_thread = None
 core_utils_obj = core_utils.CoreUtils()
 AVO_ASSURE_HOME = os.environ["AVO_ASSURE_HOME"]
 IMAGES_PATH = normpath(AVO_ASSURE_HOME + "/assets/images") + opl
@@ -95,8 +94,9 @@ class MainNamespace(BaseNamespace):
         try:
             if(str(args[0]) == 'connected'):
                 if allow_connect:
-                    dnd_mode = cw.schedule.GetValue() if root.gui else False
-                    msg = ("Do Not Disturb" if dnd_mode else "Normal") + " Mode: Connection to the Avo Assure Server established"
+                    sch_mode = cw.schedule.GetValue() if root.gui else False
+                    if sch_mode: socketIO.emit('toggle_schedule',sch_mode)
+                    msg = ("Schedule" if sch_mode else "Normal") + " Mode: Connection to the Avo Assure Server established"
                     logger.print_on_console(msg)
                     log.info(msg)
                     msg = "ICE Name: " + root.ice_token["icename"]
@@ -130,12 +130,12 @@ class MainNamespace(BaseNamespace):
                 else: kill_conn = True
 
             elif(str(args[0]) == 'schedulingEnabled'):
-                logger.print_on_console('Do Not Disturb Mode Enabled')
-                log.info('Do Not Disturb Mode Enabled')
+                logger.print_on_console('Schedule Mode Enabled')
+                log.info('Schedule Mode Enabled')
                 
             elif(str(args[0]) == 'schedulingDisabled'):
-                logger.print_on_console('Do Not Disturb Mode Disabled')
-                log.info('Do Not Disturb Mode Disabled')
+                logger.print_on_console('Schedule Mode Disabled')
+                log.info('Schedule Mode Disabled')
 
             elif(str(args[0]) == 'checkConnection'):
                 err_res = None
@@ -910,7 +910,7 @@ class ConnectionThread(threading.Thread):
             root.ice_token = None
             if root.gui: cw.enable_register()
             return False
-        global socketIO, allow_connect,execution_flags
+        global socketIO, allow_connect
         allow_connect = False
         err = None
         err_msg = "Error in Server Connection"
@@ -1010,8 +1010,6 @@ class TestThread(threading.Thread):
                 apptype = (self.json_data)[0]['apptype']
             else:
                 execution_flag = True
-                #set ICE status as busy
-                set_ICE_status(True)
                 if root.gui: benchmark.stop(True)
                 apptype = self.json_data['apptype']
             if apptype == "DesktopJava": apptype = "oebs"
@@ -1064,8 +1062,6 @@ class TestThread(threading.Thread):
 
         self.main.testthread = None
         execution_flag = False
-        #set ICE status as available
-        set_ICE_status(True)
         if self.main.gui:
             if self.cw.choice=='RunfromStep': self.cw.breakpoint.Enable()
             else: self.cw.breakpoint.Disable()
@@ -1352,8 +1348,6 @@ class Main():
         #Disconnects socket client
         global socketIO
         try:
-            stop_ping_thread()
-            log.info('Cancelling Ping Thread')
             if socketIO is not None:
                 if disconn:
                     log.info('Sending socket disconnect request')
@@ -1363,8 +1357,6 @@ class Main():
                 socketIO = None
                 self.socketthread.join()
                 log.info('Connection Closed')
-            
-
         except Exception as e:
             log.error("Error while closing connection")
             log.error(e,exc_info=True)
