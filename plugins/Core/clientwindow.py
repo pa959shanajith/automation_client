@@ -1260,7 +1260,7 @@ class About_window(wx.Frame):
     def __init__(self, parent, id, title):
         try:
             data = self.get_client_manifest()
-            msg = str(self.get_Info_1(data)) + str(self.get_Info_2(data)) + str(self.get_Info_4(data)) + str(self.get_Info_3())
+            msg = str(self.get_Info_1(data)) + str(self.get_Info_2(data)) + str(self.get_Info_4()) + str(self.get_Info_3())
             #------------------------------------Different co-ordinates for Windows and Mac
             if SYSTEM_OS=='Windows':
                 upload_fields= {
