@@ -118,7 +118,7 @@ class Update_Rollback:
     def fetch_current_value(self):
         """Returns the latest production version available"""
         keys = list(self.data_tags.keys())
-        keys.sort()
+        keys.sort(key=lambda s:list(map(int, s.split('.'))))
         if (len(keys)>0):return keys[-1]
         else: return 'N/A'
 
