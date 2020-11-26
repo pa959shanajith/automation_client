@@ -1534,7 +1534,7 @@ class DebugWindow(wx.Frame):
 
 def check_update(flag):
     global update_obj
-    SERVER_LOC = "https://" + str(configvalues['server_ip']) + ':' + str(configvalues['server_port']) + '/fileserver/'
+    SERVER_LOC = "https://" + str(configvalues['server_ip']) + ':' + str(configvalues['server_port']) + '/patchupdate/'
     #------------------------------------------------------------getting server manifest
     def get_server_manifest_data():
         data = None
