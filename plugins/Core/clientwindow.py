@@ -1306,7 +1306,7 @@ class About_window(wx.Frame):
     def get_Info_1(self,data):
         str1=''
         try:
-            str1='Version : '+list(data['version'])[0]+'.'+list(data['version'][list(data['version'])[0]]['subversion'])[0]+' \n'
+            str1='Version : '+list(data['iceversion'])[0]+'.'+list(data['iceversion'][list(data['iceversion'])[0]]['subversion'])[0]+' \n'
         except Exception as e:
             log.error(e)
         return str1
@@ -1314,7 +1314,7 @@ class About_window(wx.Frame):
     def get_Info_2(self,data):
         str1=''
         try:
-            str1='Updated on : '+(data['version'][list(data['version'])[0]]['subversion'][list(data['version'][list(data['version'])[0]]['subversion'])[0]]['updated_on'])+' \n'
+            str1='Updated on : '+(data['iceversion'][list(data['iceversion'])[0]]['subversion'][list(data['iceversion'][list(data['iceversion'])[0]]['subversion'])[0]]['updated_on'])+' \n'
         except Exception as e:
             log.error(e)
         return str1
@@ -1322,7 +1322,7 @@ class About_window(wx.Frame):
 ##    def get_Info_3(self,data):
 ##        str1=''
 ##        try:
-##            str1='Baseline : '+(data['version'][list(data['version'])[0]]['subversion'][list(data['version'][list(data['version'])[0]]['subversion'])[0]]['baseline'])+' \n'
+##            str1='Baseline : '+(data['iceversion'][list(data['iceversion'])[0]]['subversion'][list(data['iceversion'][list(data['iceversion'])[0]]['subversion'])[0]]['baseline'])+' \n'
 ##        except Exception as e:
 ##            log.error(e)
 ##        return str1
