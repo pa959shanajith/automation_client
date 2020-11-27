@@ -164,7 +164,7 @@ class Updater:
             import traceback
             traceback.print_exc()
 
-    def end_point_builder(self,base_folder,new_version_list):
+    def end_point_builder(self,new_version_list):
         """Builds the end point url of the file to download"""
         end_points_list = []
         try:
@@ -172,7 +172,7 @@ class Updater:
             log.info( "Building the end point URL's" )
             print ( "=>Building the end point URL's" )
             for ver in new_version_list:
-                end_points_list.append(str(self.SERVER_LOC) +'/'+ str(base_folder) + '/'+ str(ver) +'.7z')
+                end_points_list.append(str(self.SERVER_LOC) + '/' + str(ver[:3]) + '/' + str(ver) +'.7z')
             print ( "=>End Point URL's are built : ", str(end_points_list) )
             log.info( "End Point URL's are built : " + str(end_points_list) )
         except Exception as e:
@@ -187,40 +187,47 @@ class Updater:
             Any changes made in versioning need no be implemented here"""
         try:
             log.debug( 'Inside get_update_files function' )
-            for k in self.ver_client:
-                print(k)
-                d = self.ver_client[k][0]
-                e = self.ver_client[k][1]
-            #find the latest prod version
-            new_version_list = []
-            temp_variable = None
-            number = {}
-            for i in self.vers_aval:
-                #major/minor version has gone ahead
-                if ( float(self.vers_aval[i][0]) > float(d) ):
-                    if ( temp_variable == None ):
-                        temp_variable = float(self.vers_aval[i][0])
-                        number = i
-                    else:
-                        if ( temp_variable < float(self.vers_aval[i][0]) ):
-                            temp_variable = None
-                            temp_variable = float(self.vers_aval[i][0])
-                            number = i
-                else:
-                    print ('=>same prod version')
-                    pass
-            print ( '=>latest production version avaliable : ', temp_variable )
-            log.info( 'latest production version avaliable : ' + str(temp_variable)  )
+            """
+            rule:
+            1.get both current version list and get newer version versions,
+            2.check for the latest baseline avaliable in new_version_list, from baseline True till latest baseline False
+            3.if Baseline = Flase throughout newer version/same version , update from current version till the latest
+            Note : we assume that the version list has already been checked for min,max server versions in update_module.py/pyd
+            Eg: self.vers_aval = {'3.0.2':['3.0','False'], '3.0.11':['3.0','False'], '3.0.1':['3.0','False'], '3.0.0':['3.0','False'], '2.0.123':['2.0','False'], '2.0.124':['2.0','False'], '2.0.125':['2.0','False']}
+            Eg: self.ver_client = {'3.0.2':['3.0']}
+            """
+            NVL = []
             new_dict={}
-            #sorting based on date
             for i in self.vers_aval:
-                if ( float(self.vers_aval[i][0]) == temp_variable ):
+                #1.get both current version list and newer version list
+                if ( float(self.vers_aval[i][0]) >= float(list(self.ver_client.values())[0][0]) ):
+                    print('=>newer version/same version')
                     new_dict.update( {str(i) : self.vers_aval[i]} )
-                    new_version_list.append(i)
+                    NVL.append(i)
+                else:
+                    print ('=>older prod version')
 
-            new_version_list.sort()
-            new_dictionary = {}
-            new_dictionary = sorted(new_dict.items(), key = lambda x : x[1])
+            NVL.sort(key=lambda s:list(map(int, s.split('.'))),reverse=True) # sort list in order
+
+            #get from after current client version and excludes older versions
+            nNVL=[]
+            for i in range(0,len(NVL)):
+                if (NVL[i]==list(self.ver_client.keys())[0]):
+                    nNVL=NVL[0:i]
+                    break
+
+            #2.baseline list
+            new_version_list=[]
+            for i in range(0,len(nNVL)):
+                if (str(new_dict[nNVL[i]][1]).lower()=='true'):
+                    new_version_list=nNVL[0:i+1]
+                    break
+
+            #3.no new baseline found
+            if not (new_version_list):
+                new_version_list=nNVL[:]
+
+            new_version_list.sort(key=lambda s:list(map(int, s.split('.')))) # sort list in order
             print ( '=>Number of changes that happened since then ( lastest delta changes ) : ', str(new_version_list)  )
             log.info( 'Number of changes that happened since then ( lastest delta changes ) : ' + str(new_version_list) )
         except Exception as e:
@@ -228,7 +235,7 @@ class Updater:
             log.error( "Error occoured in get_update_files : " + str(e) )
             import traceback
             traceback.print_exc()
-        return temp_variable, new_version_list
+        return new_version_list
 
     def download_files(self,end_point_list):
         """downloads files from the generated endpoints list"""

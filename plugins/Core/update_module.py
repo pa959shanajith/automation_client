@@ -99,8 +99,7 @@ class Update_Rollback:
                     data_L.append(data_from_server['iceversion'][v]['subversion'][sv])
                     data_key = data_from_server['iceversion'][v]['subversion'][sv]['tag']
                     data_value.append(data_from_server['iceversion'][v]['subversion'][sv]['p_tag'])
-##                    data_value.append(data_from_server['iceversion'][v]['subversion'][sv]['c_tag'])
-##                    data_value.append(data_from_server['iceversion'][v]['subversion'][sv]['fixes'])
+                    data_value.append(data_from_server['iceversion'][v]['subversion'][sv]['baseline'])
                     self.data_tags.update( {data_key : data_value} )
                         #data_tags.append(data_from_server['version'][v]['subversion'][sv]['tag'])
 ##                    elif ( data_from_server['iceversion'][v]['subversion'][sv]['sha256'] == cdata ):
