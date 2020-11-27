@@ -20,12 +20,69 @@ import generic_keywords
 import step_description_SL
 import subprocess
 import logger
+import sauceclient
+
+log = logging.getLogger('saucelabs_script_generator.py')
+
+def request_content(self, url, filename, dirpath=None, body=None, content_type=''):
+    """Send http request for asset content"""
+    headers = self.make_auth_headers(content_type)
+    connection = sauceclient.http_client.HTTPSConnection('saucelabs.com')
+    full_url = url + 'screenshots.zip'
+    filename1 = 'SaucelabsScreenshots_'+filename + '.zip'
+    connection.request('GET', full_url, body, headers=headers)
+    response1 = connection.getresponse()
+    data = response1.read()
+    if dirpath:
+        if os.path.exists(dirpath):
+            full_path = os.path.join(dirpath, filename1)
+            log.info('Screenshot Asset Path: '+full_path)
+            with open(full_path, 'wb') as file_handle:
+                file_handle.write(data)
+        else:
+            raise NotADirectoryError("Path does not exist")
+    else:
+        with open(filename1, 'wb') as file_handle:
+            file_handle.write(data)
+    full_url = url + 'video.mp4'
+    filename2 = 'ScreenRecording_' +filename + '.mp4'
+    connection.request('GET', full_url, body, headers=headers)
+    response2 = connection.getresponse()
+    data = response2.read()
+    if dirpath:
+        if os.path.exists(dirpath):
+            full_path = os.path.join(dirpath, filename2)
+            log.info("Video Asset Path: "+full_path)
+            with open(full_path, 'wb') as file_handle:
+                file_handle.write(data)
+        else:
+            raise NotADirectoryError("Path does not exist")
+    else:
+        with open(filename2, 'wb') as file_handle:
+            file_handle.write(data)
+    connection.close()
+    if response1.status not in [200, 201]:
+        raise sauceclient.SauceException('{}: {}.\nSauce Status NOT OK'.format(
+            response1.status, response1.reason), response1=response1)
+    if response2.status not in [200, 201]:
+        raise sauceclient.SauceException('{}: {}.\nSauce Status NOT OK'.format(
+            response2.status, response2.reason), response2=response2)
+    return True
+
+def get_job_asset_content(self, job_id, filename, dirpath=None):
+    """Get content collected for a specific asset on a specific job."""
+    endpoint = 'https://saucelabs.com/rest/v1/{}/jobs/{}/assets/'.format(
+        self.client.sauce_username, job_id)
+    return self.client.request_content(endpoint,filename,dirpath)
+
+sauceclient.SauceClient.request_content = request_content
+sauceclient.Jobs.get_job_asset_content = get_job_asset_content
 
 Saucelabs_path=os.environ['AVO_ASSURE_HOME']+os.sep+'plugins'+os.sep+'Saucelabs'
 python_cwd=os.environ['AVO_ASSURE_HOME']
 Saucelabs_tests=Saucelabs_path+os.sep+'tests'
-Saucelabs_config_path=Saucelabs_path+os.sep+'sauce_config.json'
-scenario_name=""        
+Saucelabs_config_path=os.environ['AVO_ASSURE_HOME']+os.sep+'assets'+os.sep+'sauce_config.json'
+scenario_name=""
 
 class SauceLabs_Operations():
 
@@ -596,7 +653,6 @@ def getWebElement(identifier):
             p = subprocess.Popen('python -m pytest '+file_py+".py", stdout=subprocess.PIPE, bufsize=1, shell=True, cwd=python_cwd)
             output=p.stdout.readlines()
             p.wait()
-            import sauceclient
             flag=True
             f1=open(self.filename1,"r")
             steps=f1.readlines()
@@ -618,13 +674,17 @@ def getWebElement(identifier):
             sc=sauceclient.SauceClient(self.username,self.access_key)
             j=sauceclient.Jobs(sc)
             all_jobs=j.get_jobs(start=int(now.timestamp()),full=True)
+            import constants
+            filename = datetime.now().strftime("%Y%m%d%H%M%S")
+            dirpath = constants.SCREENSHOT_PATH if (constants.SCREENSHOT_PATH not in ['screenshot_path', 'Disabled']) else Saucelabs_tests+os.sep
+            video_path = dirpath+'ScreenRecording_' +filename + '.mp4'
             for i in range(0,len(all_jobs)):
-                file_creations_status=j.get_job_asset_content(all_jobs[i]['id'],file_py,Saucelabs_tests+os.sep)
+                file_creations_status=j.get_job_asset_content(all_jobs[i]['id'],filename,dirpath)
                 status=all_jobs[i]['error']
                 if(status!=None):
                     logger.print_on_console("Error in Sauce Labs Execution")
                     flag=False
-            overallstatus=self.build_overallstatus(self.browsers[browser]['browserName'],overall_status,all_jobs[i],j)
+            overallstatus=self.build_overallstatus(self.browsers[browser]['browserName'],overall_status,all_jobs[i],j,video_path)
             execute_result_data['reportData'] = { 'rows' : report, "overallstatus" : overallstatus}
             socketIO.emit('result_executeTestSuite', execute_result_data)
             f1.close()
@@ -637,7 +697,7 @@ def getWebElement(identifier):
             f1.close()
             return False
 
-    def build_overallstatus(self,browser,overall_status,jobs,j):
+    def build_overallstatus(self,browser,overall_status,jobs,j,video_path):
         """
         def : build_overallstatus
         purpose : builds the overallstatus field of report_json
@@ -669,4 +729,5 @@ def getWebElement(identifier):
         obj['browserType']=browser
         obj['date']=date1
         obj['time']=time1
+        obj['video']=video_path
         return [obj]

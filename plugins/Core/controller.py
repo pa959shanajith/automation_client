@@ -28,6 +28,7 @@ from constants import *
 import dynamic_variable_handler
 import reporting
 import core_utils
+import recording
 from logging.handlers import TimedRotatingFileHandler
 local_cont = threading.local()
 #index for iterating the teststepproperty for executor
@@ -757,7 +758,7 @@ class Controller():
         else:
             return index,TERMINATE
 
-    def executor(self,tsplist,action,last_tc_num,debugfrom_step,mythread):
+    def executor(self,tsplist,action,last_tc_num,debugfrom_step,mythread,*args):
         global status_percentage
         status_percentage = {TEST_RESULT_PASS:0,TEST_RESULT_FAIL:0,TERMINATE:0,"total":0}
         i=0
@@ -815,7 +816,9 @@ class Controller():
             self.reporting_obj.user_termination=True
             status_percentage[TERMINATE]+=1
             status_percentage["total"]+=1
-        self.reporting_obj.build_overallstatus(self.scenario_start_time,self.scenario_end_time,self.scenario_ellapsed_time)
+        ##send path to build overall status
+        video_path = args[0] if (args and args[0]) else ''
+        self.reporting_obj.build_overallstatus(self.scenario_start_time,self.scenario_end_time,self.scenario_ellapsed_time,video_path)
         logger.print_on_console('Step Elapsed time is : ',str(self.scenario_ellapsed_time))
         return status,status_percentage
 
@@ -1002,16 +1005,13 @@ class Controller():
                                 logger.print_on_console( '***Scenario ' ,str(sc_idx + 1) ,' execution started***')
                                 print('=======================================================================================================')
                                 log.info('***Scenario '  + str(sc_idx + 1)+ ' execution started***')
-                            if('integrationType' not in qc_creds and len(scenario)==2 and len(scenario['qcdetails'])==10):
+                            # if('integrationType' not in qc_creds and len(scenario)==2 and len(scenario['qcdetails'])==10):
+                            if('integrationType' in qc_creds and qc_creds['integrationType'] == 'ALM'):
                                 qc_username=qc_creds['qcusername']
                                 qc_password=qc_creds['qcpassword']
                                 qc_url=qc_creds['qcurl']
+                                integration_type=qc_creds['integrationType']
                                 qc_sceanrio_data=scenario['qcdetails']
-                                qc_domain=qc_sceanrio_data['qcdomain']
-                                qc_project=qc_sceanrio_data['qcproject']
-                                qc_folder=qc_sceanrio_data['qcfolderpath']
-                                qc_tsList=qc_sceanrio_data['qctestset']
-                                qc_testrunname=qc_sceanrio_data['qctestcase']
                             if('integrationType' in qc_creds and qc_creds['integrationType'] == 'qTest'):
                                 qc_username=qc_creds['qcusername']
                                 qc_password=qc_creds['qcpassword']
@@ -1104,7 +1104,13 @@ class Controller():
                                     con.conthread=mythread
                                     con.tsp_list=tsplist
                                     local_cont.test_case_number=0
-                                    status,status_percentage = con.executor(tsplist,EXECUTE,last_tc_num,1,con.conthread)
+                                    #start video, create a video path
+                                    video_path = ''
+                                    recorder_obj = recording.Recorder()
+                                    if self.execution_mode == SERIAL and json_data['apptype'] == 'Web': video_path = recorder_obj.record_execution()
+                                    status,status_percentage = con.executor(tsplist,EXECUTE,last_tc_num,1,con.conthread,video_path)
+                                    #end video
+                                    if self.execution_mode == SERIAL and json_data['apptype'] == 'Web': recorder_obj.rec_status = False
                                     print('=======================================================================================================')
                                     logger.print_on_console( '***Scenario' ,str(sc_idx + 1) ,' execution completed***')
                                     print('=======================================================================================================')
@@ -1132,35 +1138,77 @@ class Controller():
                                 sc_idx += 1
                                 #logic for condition check
                                 report_json=con.reporting_obj.report_json[OVERALLSTATUS]
-                                if integration_type!="qTest" and integration_type!="Zephyr" and len(scenario['qcdetails'])==10 and (qc_url!='' and qc_password!='' and  qc_username!=''):
-                                    qc_status_over=report_json[0]
-                                    qc_update_status=qc_status_over['overallstatus']
-                                    if(str(qc_update_status).lower()=='pass'):
-                                        qc_update_status='Passed'
-                                    elif(str(qc_update_status).lower()=='fail'):
-                                        qc_update_status='Failed'
-                                    else:
-                                        qc_update_status='Not Completed'
-                                    try:
-                                        qc_status = {}
-                                        qc_status['qcaction']='qcupdate'
-                                        qc_status['qc_domain']=qc_domain
-                                        qc_status['qc_project']=qc_project
-                                        qc_status['qc_folder']=qc_folder
-                                        qc_status['qc_tsList']=qc_tsList
-                                        qc_status['qc_testrunname']=qc_testrunname
-                                        qc_status['qc_update_status'] = qc_update_status
-                                        logger.print_on_console('****Updating QCDetails****')
-                                        if qcObject is not None:
-                                            qc_status_updated = qcObject.update_qc_details(qc_status)
-                                            if qc_status_updated:
-                                                logger.print_on_console('****Updated QCDetails****')
-                                            else:
-                                               logger.print_on_console('****Failed to Update QCDetails****')
+                                # if integration_type!="qTest" and integration_type!="Zephyr" and len(scenario['qcdetails'])==10 and (qc_url!='' and qc_password!='' and  qc_username!=''):
+                                if  integration_type=="ALM" and (qc_url!='' and qc_password!='' and  qc_username!=''):
+                                    if type(qc_sceanrio_data) is not list:
+                                        qc_domain=qc_sceanrio_data['qcdomain']
+                                        qc_project=qc_sceanrio_data['qcproject']
+                                        qc_folder=qc_sceanrio_data['qcfolderpath']
+                                        qc_tsList=qc_sceanrio_data['qctestset']
+                                        qc_testrunname=qc_sceanrio_data['qctestcase']
+                                        qc_status_over=report_json[0]
+                                        qc_update_status=qc_status_over['overallstatus']
+                                        if(str(qc_update_status).lower()=='pass'):
+                                            qc_update_status='Passed'
+                                        elif(str(qc_update_status).lower()=='fail'):
+                                            qc_update_status='Failed'
                                         else:
-                                            logger.print_on_console('****Failed to Update QCDetails****')
-                                    except Exception as e:
-                                        logger.print_on_console('Error in Updating Qc details')
+                                            qc_update_status='Not Completed'
+                                        try:
+                                            qc_status = {}
+                                            qc_status['qcaction']='qcupdate'
+                                            qc_status['qc_domain']=qc_domain
+                                            qc_status['qc_project']=qc_project
+                                            qc_status['qc_folder']=qc_folder
+                                            qc_status['qc_tsList']=qc_tsList
+                                            qc_status['qc_testrunname']=qc_testrunname
+                                            qc_status['qc_update_status'] = qc_update_status
+                                            logger.print_on_console('****Updating QCDetails****')
+                                            if qcObject is not None:
+                                                qc_status_updated = qcObject.update_qc_details(qc_status)
+                                                if qc_status_updated:
+                                                    logger.print_on_console('****Updated QCDetails****')
+                                                else:
+                                                    logger.print_on_console('****Failed to Update QCDetails****')
+                                            else:
+                                                logger.print_on_console('****Failed to Update QCDetails****')
+                                        except Exception as e:
+                                            logger.print_on_console('Error in Updating Qc details')
+                                    else:
+                                        for i in range(len(qc_sceanrio_data)):
+                                            qc_domain=qc_sceanrio_data[i]['qcdomain']
+                                            qc_project=qc_sceanrio_data[i]['qcproject']
+                                            qc_folder=qc_sceanrio_data[i]['qcfolderpath']
+                                            qc_tsList=qc_sceanrio_data[i]['qctestset']
+                                            qc_testrunname=qc_sceanrio_data[i]['qctestcase']
+                                            qc_status_over=report_json[0]
+                                            qc_update_status=qc_status_over['overallstatus']
+                                            if(str(qc_update_status).lower()=='pass'):
+                                                qc_update_status='Passed'
+                                            elif(str(qc_update_status).lower()=='fail'):
+                                                qc_update_status='Failed'
+                                            else:
+                                                qc_update_status='Not Completed'
+                                            try:
+                                                qc_status = {}
+                                                qc_status['qcaction']='qcupdate'
+                                                qc_status['qc_domain']=qc_domain
+                                                qc_status['qc_project']=qc_project
+                                                qc_status['qc_folder']=qc_folder
+                                                qc_status['qc_tsList']=qc_tsList
+                                                qc_status['qc_testrunname']=qc_testrunname
+                                                qc_status['qc_update_status'] = qc_update_status
+                                                logger.print_on_console('****Updating QCDetails****')
+                                                if qcObject is not None:
+                                                    qc_status_updated = qcObject.update_qc_details(qc_status)
+                                                    if qc_status_updated:
+                                                        logger.print_on_console('****Updated QCDetails****')
+                                                    else:
+                                                        logger.print_on_console('****Failed to Update QCDetails****')
+                                                else:
+                                                    logger.print_on_console('****Failed to Update QCDetails****')
+                                            except Exception as e:
+                                                logger.print_on_console('Error in Updating Qc details')
                                 if (integration_type=="qTest" and qc_url!='' and qc_password!='' and  qc_username!=''):
                                     qc_status_over=report_json[0]
                                     try:
@@ -1296,6 +1344,8 @@ class Controller():
             print('=======================================================================================================')
         return status
 
+
+
     #generating report of AWS in Avo Assure by using AWS result(AWS device farm executed result present in test spec output.txt)
     def aws_report(self,aws_tsp,aws_scenario,step_results,suite_idx,execute_result_data,obj_reporting,json_data,socketIO):
         sc_idx=0
@@ -1424,7 +1474,7 @@ class Controller():
     def seperate_log(self, cur_thread, id):
         try:
             browser_name = {'1':'Chrome', '2':'FireFox', '3':'IE', '6': 'Safari', '7':'EdgeLegacy', '8':'EdgeChromium'}
-            log_filepath = os.path.normpath(os.path.dirname(configvalues["logFile_Path"]) + os.sep + 'TestautoV2_Parallel_' + str(browser_name[id]) + '.log').replace("\\","\\\\")
+            log_filepath = os.path.normpath(os.path.dirname(self.configvalues["logFile_Path"]) + os.sep + 'TestautoV2_Parallel_' + str(browser_name[id]) + '.log').replace("\\","\\\\")
             file1 = open(log_filepath, 'a+')
             file1.close()
             threadName = cur_thread.name #Get name of each thread
