@@ -243,22 +243,28 @@ class OutlookKeywords:
                         # while True:
                         attachments_item = msg.Attachments
                         nbrOfAttachmentInMessage = attachments_item.Count
+                        # logger.print_on_console( nbrOfAttachmentInMessage )
                         x = 1
-                        # no=0
-                        # yes=0
+                        no=0
+                        yes=0
                         while x <= nbrOfAttachmentInMessage:
                             attachment_item = attachments_item.Item(x)
                             fn = attachment_item.FileName
                             filename = fn.split('.')
-                            if filename[-1] in ['png']:  #['png','jpg']
-                                AttachmentStatus = outlook_constants.ATTACH_STATUS_NO
-                                break #(no=no+1)
+                            # logger.print_on_console( filename )
+                            if filename[-1] in ['png','jpg']:  #['png']
+                                # AttachmentStatus = outlook_constants.ATTACH_STATUS_NO
+                                no=no+1
+                                # continue 
                             else:
-                                AttachmentStatus = outlook_constants.ATTACH_STATUS_YES
-                                break #(yes=yes+1)
+                                # AttachmentStatus = outlook_constants.ATTACH_STATUS_YES
+                                yes=yes+1
+                                # continue
                             x+=1
-                        # if yes>1:
-                        #     AttachmentStatus = outlook_constants.ATTACH_STATUS_YES
+                        if yes>no:
+                            AttachmentStatus = outlook_constants.ATTACH_STATUS_YES
+                        elif yes==no:
+                            AttachmentStatus = outlook_constants.ATTACH_STATUS_YES
                         try:
                                 msg.Display()
                                 Flag = True
