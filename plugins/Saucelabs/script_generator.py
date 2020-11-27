@@ -600,7 +600,11 @@ def getWebElement(identifier):
                             stack.pop()
                         else:
                             flag=False
-                    
+                    if i.name in self.generic_keys:
+                        self.generic_keys[i.name](space,input_value)
+                    else:
+                        logger.print_on_console(i.name+" keyword is not supported in saucelabs execution.")
+                        return False
                 elif i.apptype == 'Web':
                     self.f.write(space+"try:")
                     space+='\t'
@@ -623,7 +627,7 @@ def getWebElement(identifier):
                         if i.name in self.web_keys:
                             xpath=i.objectname.split(';')[0]
                             if(i.name=="waitForElementVisible"):
-                                i.inputval=xpath
+                                input_value="'"+xpath+"'"
                             self.f.write(space+"webelement=getWebElement("+repr(i.objectname)+")")
                             self.f.write(space+"if webelement!=None:")
                             space=space+"\t"
