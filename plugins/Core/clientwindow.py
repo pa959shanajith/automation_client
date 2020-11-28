@@ -340,21 +340,16 @@ class ClientWindow(wx.Frame):
             root.testthread.con.aws_obj.stop_job()
         except:
             pass
+        # Stop all SauceLabs jobs on click of terminate
         try:
-            import sauceclient
-            Saucelabs_path=os.environ['AVO_ASSURE_HOME']+os.sep+'plugins'+os.sep+'Saucelabs'
-            Saucelabs_config_path=Saucelabs_path+os.sep+'sauce_config.json'
-            conf = open(Saucelabs_config_path, 'r')
-            config= json.load(conf)
-            username=config["sauce_username"]
-            access_key=config["sauce_access_key"]
-            conf.close()
-            sc=sauceclient.SauceClient(username,access_key)
-            j=sauceclient.Jobs(sc)
-            all_jobs=j.get_jobs(full=None,limit=2)
+            import script_generator
+            scl_ops = script_generator.SauceLabs_Operations()
+            sc = scl_ops.get_sauceclient()
+            j = scl_ops.get_saucejobs(sc)
+            all_jobs = j.get_jobs(full=None,limit=2)
             for i in range(0,len(all_jobs)):
                 if all_jobs[i]['status'] == 'in progress': j.stop_job(all_jobs[i]['id'])
-        except Exception as e:
+        except:
             pass
         #Handling the case where user clicks terminate when the execution is paused
         #Resume the execution

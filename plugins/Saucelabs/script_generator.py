@@ -108,15 +108,8 @@ class SauceLabs_Operations():
         dyn_var_obj = generic_keywords.DynamicVariables(self.f)
         generic_util = generic_keywords.Util(self.f)
         
-        conf = open(Saucelabs_config_path, 'r')
-        self.conf = json.load(conf)
-        conf.close()
+        self.conf = self.get_sauceconf()
         self.browsers={'1':{'browserName': "chrome", 'sauce:options':{}},'2':{'browserName': "firefox", 'sauce:options':{}},'3':{'browserName': "internet explorer", 'sauce:options':{}},'7':{'browserName': "MicrosoftEdge", 'sauce:options':{}}}
-        # self.proxies=self.conf["proxy"]
-        self.username=self.conf["sauce_username"]
-        self.access_key=self.conf["sauce_access_key"]
-        self.platform=self.conf["platform"]
-        self.url=self.conf["remote_url"]
         self.code="""import pytest
 from selenium import webdriver
 import logging
@@ -506,6 +499,24 @@ def getWebElement(identifier):
             # 'cellbycellcompare': generic_file.cell_by_cell_compare
             }
 
+
+    def get_sauceconf(self):
+        conf_obj = open(Saucelabs_config_path, 'r')
+        conf = json.load(conf_obj)
+        conf_obj.close()
+        # self.proxies=self.conf["proxy"]
+        self.username = conf["sauce_username"]
+        self.access_key = conf["sauce_access_key"]
+        self.platform = conf["platform"]
+        self.url = conf["remote_url"]
+        return conf
+
+    def get_sauceclient(self):
+        return sauceclient.SauceClient(self.username,self.access_key)
+
+    def get_saucejobs(self, sc):
+        return sauceclient.Jobs(sc)
+
     def complie_TC(self,tsp,scenario_name,browser,index,execute_result_data,socketIO):
         try:
             self.f.write(self.code)
@@ -675,8 +686,8 @@ def getWebElement(identifier):
                         overall_status='Fail'
                     del report[i]['input'],report[i]['output'],report[i]['dyn_var_map']
                     tsp_index+=1
-            sc=sauceclient.SauceClient(self.username,self.access_key)
-            j=sauceclient.Jobs(sc)
+            sc = self.get_sauceclient()
+            j = self.get_saucejobs(sc)
             all_jobs=j.get_jobs(start=int(now.timestamp()),full=True)
             import constants
             filename = datetime.now().strftime("%Y%m%d%H%M%S")
