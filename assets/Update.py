@@ -40,6 +40,7 @@ import win32con
 import wx
 import threading
 import time
+import hashlib
 #-------------------------------------------logging
 import logging
 import datetime
@@ -239,6 +240,7 @@ class Updater:
 
     def download_files(self,end_point_list):
         """downloads files from the generated endpoints list"""
+        warning_msg = None
         try:
             log.debug( 'Inside download_files function' )
             self.temp_location = tempfile.gettempdir()
@@ -247,17 +249,61 @@ class Updater:
                 temp_file_path = os.path.join(self.temp_location, filename)
                 fileObj = requests.get(str(url),verify=False)
                 open(temp_file_path, 'wb').write(fileObj.content)
-                print ('=>navigating to extract_files')
-                self.extract_files(temp_file_path)
-                print ('=>deleting the extracted file')
-                self.delete_temp_file(temp_file_path)
-                print (str(filename), ' was extracted and deleted')
-            pass
+                print ('=>performing sha256 check')
+                if (self.sha256_check(filename,temp_file_path)):
+                    print ('=>sha256 check PASS')
+                    print ('=>navigating to extract_files')
+                    self.extract_files(temp_file_path)
+                    print ('=>deleting the extracted file')
+                    self.delete_temp_file(temp_file_path)
+                    print (str(filename), ' was extracted and deleted')
+                else:
+                    warning_msg = "Warning!: atempt to download further has been disabled due to sha256 mismatch of file : " + str(filename)
+                    print('=>sha256 check FAIL: atempt to download further has been disabled due to sha256 mismatch.')
+                    log.error( warning_msg )
+                    print ('=>deleting the extracted file')
+                    self.delete_temp_file(temp_file_path)
+                    print (str(filename), ' was extracted and deleted')
+                    break
         except Exception as e:
             print ( "Error occoured in download_files : ", e )
             log.error( "Error occoured in download_files : " + str(e) )
             import traceback
             traceback.print_exc()
+        return warning_msg
+
+    def sha256_check(self,filename,temp_file_path):
+        log.debug( 'Inside sha256_check function' )
+        """This function should 1.Generate sha256 value of file downloaded
+                                2.Should compare this sha256 value to the respective sha256 value in manifest.json
+                                3.if matched then should proceed as normal
+                                4.if sha256 values dont match then a.generate and log an error message
+                                                                    b.Stop the process to download the next patch of end_point_list"""
+        def get_live_sha256(temp_file_path):
+            log.debug( 'Inside get_live_sha256 function' )
+            sha256 = None
+            try:
+                hashobj = hashlib.sha256()
+                with open(temp_file_path,"rb") as f:
+                    # Read and update hash string value in blocks of 4K
+                    for byte_block in iter(lambda: f.read(4096),b""):
+                        hashobj.update(byte_block)
+                    sha256 = hashobj.hexdigest()
+            except Exception as e:
+                print ( "Error occoured in get_live_sha256 : ", e )
+                log.error( "Error occoured in get_live_sha256 : " + str(e) )
+                import traceback
+                traceback.print_exc()
+            print( '=>Completed generating sha256 of file :', temp_file_path )
+            log.info( 'Completed generating sha256 of file : ' + str(temp_file_path) )
+            return sha256
+        manifest_sha256 = self.vers_aval[filename[:filename.index('.zip')]][2] #get the sha256 value of the file from manifest.json
+        live_sha256 = get_live_sha256(temp_file_path)
+        if ( manifest_sha256 == live_sha256 ): return True
+        else:
+            print( '=>Error : sha256 of downloaded file ' + filename + 'does not match the sha256 in manifest.json' )
+            log.error( 'Error : sha256 of downloaded file ' + filename + 'does not match the sha256 in manifest.json' )
+            return False
 
     def extract_files(self, temp_file_path):
         """get to portable 7z and open the cmd #2.EXTRACT TO DESTINATION"""
@@ -478,8 +524,11 @@ def main():
             comm_obj.percentageIncri(msg,70,"Latest files retrieved.")
             comm_obj.percentageIncri(msg,75,"Updating...")
             comm_obj.percentageIncri(msg,80,"Downloading and extracting files")
-            obj.download_files(end_point_list)#---------------------------------->6.From the endpoint url list a.download the file, b.extract file into Avo Assure ICE and c.delete the downloaded  7z file
-            comm_obj.percentageIncri(msg,85,"Files Downloaded and extracted")
+            warning_msg = obj.download_files(end_point_list)#---------------------------------->6.From the endpoint url list a.download the file, b.extract file into Avo Assure ICE and c.delete the downloaded  7z file
+            if ( warning_msg ):
+                comm_obj.percentageIncri(msg,85,warning_msg)
+                time.sleep(2)
+            else:comm_obj.percentageIncri(msg,85,"Files Downloaded and extracted")
             comm_obj.percentageIncri(msg,90,"Updating...")
             comm_obj.percentageIncri(msg,95,"Successfully Updated!")
             comm_obj.percentageIncri(msg,100,"Updated...")
