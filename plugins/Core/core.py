@@ -831,6 +831,7 @@ class MainNamespace(BaseNamespace):
                 return
             else:
                 msg = 'Connectivity issue with Avo Assure Server. Attempting to restore connectivity...'
+                stop_ping_thread()
                 logger.print_on_console(msg)
                 log.error(msg)
         if root.ice_token:
@@ -1675,9 +1676,12 @@ def set_ICE_status(one_time_ping = False,connect=True,interval = 60000):
     return : Timer
 
     """   
-    global socketIO,root,execution_flag,cw
+    global socketIO,root,execution_flag,cw,status_ping_thread
     ICE_name = root.ice_token["icename"]
     if not one_time_ping and socketIO is not None:
+        if status_ping_thread and status_ping_thread.is_alive():
+            status_ping_thread.cancel()
+            status_ping_thread = None
         status_ping_thread = threading.Timer(int(interval)/2000, set_ICE_status,[])
         status_ping_thread.setName("Status Ping")
         status_ping_thread.start()     
@@ -1685,7 +1689,10 @@ def set_ICE_status(one_time_ping = False,connect=True,interval = 60000):
     #Add ICE identification and stauts, which is busy by default
     result = {"hostip":socket.gethostbyname(socket.gethostname()),"hostname":os.environ['username'],"time":str(datetime.now()),"icename":ICE_name,"connected":connect}
     result['status'] = execution_flag
-    result['mode'] = cw.schedule.GetValue()
+    if cw is not None:
+        result['mode'] = cw.schedule.GetValue()
+    else:
+        result['mode'] = False
    
     if socketIO is not None:
         socketIO.emit('ICE_status_change',result)

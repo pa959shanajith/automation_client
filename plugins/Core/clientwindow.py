@@ -1271,8 +1271,7 @@ class About_window(wx.Frame):
     def __init__(self, parent, id, title):
         try:
             data = self.get_client_manifest()
-            msg = 'A product of Dimension Labs \n'
-            msg = msg +str(self.get_Info_1(data))+str(self.get_Info_2(data))+str(self.get_Info_3(data))+str(self.get_Info_4())+str(self.get_Info_5(data))+str(self.get_Info_6())
+            msg = str(self.get_Info_1(data)) + str(self.get_Info_2(data)) + str(self.get_Info_4()) + str(self.get_Info_3())
             #------------------------------------Different co-ordinates for Windows and Mac
             if SYSTEM_OS=='Windows':
                 upload_fields= {
@@ -1318,7 +1317,7 @@ class About_window(wx.Frame):
     def get_Info_1(self,data):
         str1=''
         try:
-            str1='Version : '+list(data['version'])[0]+'.'+list(data['version'][list(data['version'])[0]]['subversion'])[0]+' \n'
+            str1='Version : '+list(data['iceversion'])[0]+'.'+list(data['iceversion'][list(data['iceversion'])[0]]['subversion'])[0]+' \n'
         except Exception as e:
             log.error(e)
         return str1
@@ -1326,35 +1325,24 @@ class About_window(wx.Frame):
     def get_Info_2(self,data):
         str1=''
         try:
-            str1='Updated on : '+(data['version'][list(data['version'])[0]]['subversion'][list(data['version'][list(data['version'])[0]]['subversion'])[0]]['updated_on'])+' \n'
+            str1='Updated on : '+(data['iceversion'][list(data['iceversion'])[0]]['subversion'][list(data['iceversion'][list(data['iceversion'])[0]]['subversion'])[0]]['updated_on'])+' \n'
         except Exception as e:
             log.error(e)
         return str1
 
-    def get_Info_3(self,data):
-        str1=''
-        try:
-            str1='Baseline : '+(data['version'][list(data['version'])[0]]['subversion'][list(data['version'][list(data['version'])[0]]['subversion'])[0]]['baseline'])+' \n'
-        except Exception as e:
-            log.error(e)
-        return str1
+##    def get_Info_3(self,data):
+##        str1=''
+##        try:
+##            str1='Baseline : '+(data['iceversion'][list(data['iceversion'])[0]]['subversion'][list(data['iceversion'][list(data['iceversion'])[0]]['subversion'])[0]]['baseline'])+' \n'
+##        except Exception as e:
+##            log.error(e)
+##        return str1
 
-    def get_Info_4(self):
+    def get_Info_3(self):
         return '© Avo Automation\n'
 
-    def get_Info_5(self,data):
-        str1=''
-        try:
-            str1='Fixes :'+' \n'
-            b=(data['version'][list(data['version'])[0]]['subversion'][list(data['version'][list(data['version'])[0]]['subversion'])[0]]['fixes'])
-            for i in b:
-                str1=str1+i+' : '+b[i]+' \n'
-        except Exception as e:
-            log.error(e)
-        return str1
-
-    def get_Info_6(self):
-        return 'For any queries write to us @ : support.nineteen68@slkgroup.com'
+    def get_Info_4(self):
+        return 'For any queries write to us @ : support.nineteen68@slkgroup.com'+' \n'
 
     def close(self, event):
         self.Close()
@@ -1545,7 +1533,7 @@ class DebugWindow(wx.Frame):
 
 def check_update(flag):
     global update_obj
-    SERVER_LOC = "https://" + str(configvalues['server_ip']) + ':' + str(configvalues['server_port']) + '/fileserver/'
+    SERVER_LOC = "https://" + str(configvalues['server_ip']) + ':' + str(configvalues['server_port']) + '/patchupdate/'
     #------------------------------------------------------------getting server manifest
     def get_server_manifest_data():
         data = None
@@ -1569,6 +1557,8 @@ def check_update(flag):
     update_updater_module(data)
     UPDATE_MSG=update_obj.send_update_message()
     l_ver = update_obj.fetch_current_value()
+    SERVER_CHECK_MSG = update_obj.server_check_message()
+    if (SERVER_CHECK_MSG): logger.print_on_console(SERVER_CHECK_MSG)
     #check if update avaliable
     if ( UPDATE_MSG == 'Update Available!!! Click on update' and flag == True ):
         logger.print_on_console("An update is available. Click on 'Help' menu option -> 'Check for Updates' sub-menu option -> 'Update' button")
