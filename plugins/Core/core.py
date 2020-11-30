@@ -1694,7 +1694,10 @@ def set_ICE_status(one_time_ping = False,connect=True,interval = 60000):
     #Add ICE identification and stauts, which is busy by default
     result = {"hostip":socket.gethostbyname(socket.gethostname()),"hostname":os.environ['username'],"time":str(datetime.now()),"icename":ICE_name,"connected":connect}
     result['status'] = execution_flag
-    result['mode'] = cw.schedule.GetValue()
+    if cw is not None:
+        result['mode'] = cw.schedule.GetValue()
+    else:
+        result['mode'] = False
    
     if socketIO is not None:
         socketIO.emit('ICE_status_change',result)
