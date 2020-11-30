@@ -11,10 +11,12 @@ import uuid
 import signal
 import subprocess
 from datetime import datetime
+from selenium import webdriver
 from random import random
 import core_utils
 import logger
 import threading
+from os.path import normpath
 from constants import *
 import controller
 import readconfig
@@ -34,12 +36,15 @@ except ImportError:
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 log = logging.getLogger('core.py')
+opl = os.sep
 root = None
 cw = None
 browsername = None
 qcdata = None
+zephyrdata = None
 qcObject = None
 qtestObject = None
+zephyrObject = None
 soc=None
 browsercheckFlag=False
 updatecheckFlag=False
@@ -65,19 +70,20 @@ configvalues = {}
 execution_flag = False
 closeActiveConnection = False
 connection_Timer = None
+status_ping_thread = None
 core_utils_obj = core_utils.CoreUtils()
 AVO_ASSURE_HOME = os.environ["AVO_ASSURE_HOME"]
-IMAGES_PATH = AVO_ASSURE_HOME + "/assets/images/"
+IMAGES_PATH = normpath(AVO_ASSURE_HOME + "/assets/images") + opl
 os.environ["IMAGES_PATH"] = IMAGES_PATH
-ICE_CONST= AVO_ASSURE_HOME + "/assets/ice_const.json"
-CONFIG_PATH= AVO_ASSURE_HOME + "/assets/config.json"
-CERTIFICATE_PATH = AVO_ASSURE_HOME + "/assets/CA_BUNDLE"
-LOGCONFIG_PATH = AVO_ASSURE_HOME + "/assets/logging.conf"
-DRIVERS_PATH = AVO_ASSURE_HOME + "/lib/Drivers"
-CHROME_DRIVER_PATH = DRIVERS_PATH + "/chromedriver"
-GECKODRIVER_PATH = DRIVERS_PATH + "/geckodriver"
-EDGE_DRIVER_PATH = DRIVERS_PATH + "/MicrosoftWebDriver.exe"
-EDGE_CHROMIUM_DRIVER_PATH = DRIVERS_PATH + "/msedgedriver"
+ICE_CONST = normpath(AVO_ASSURE_HOME + "/assets/ice_const.json")
+CONFIG_PATH = normpath(AVO_ASSURE_HOME + "/assets/config.json")
+CERTIFICATE_PATH = normpath(AVO_ASSURE_HOME + "/assets/CA_BUNDLE")
+LOGCONFIG_PATH = normpath(AVO_ASSURE_HOME + "/assets/logging.conf")
+DRIVERS_PATH = normpath(AVO_ASSURE_HOME + "/lib/Drivers")
+CHROME_DRIVER_PATH = DRIVERS_PATH + opl + "chromedriver"
+GECKODRIVER_PATH = DRIVERS_PATH + opl + "geckodriver"
+EDGE_DRIVER_PATH = DRIVERS_PATH + opl + "MicrosoftWebDriver.exe"
+EDGE_CHROMIUM_DRIVER_PATH = DRIVERS_PATH + opl + "msedgedriver"
 if SYSTEM_OS == "Windows":
     CHROME_DRIVER_PATH += ".exe"
     GECKODRIVER_PATH += ".exe"
@@ -90,9 +96,8 @@ class MainNamespace(BaseNamespace):
         try:
             if(str(args[0]) == 'connected'):
                 if allow_connect:
-                    sch_mode = cw.schedule.GetValue() if root.gui else False
-                    if sch_mode: socketIO.emit('toggle_schedule',sch_mode)
-                    msg = ("Schedule" if sch_mode else "Normal") + " Mode: Connection to the Avo Assure Server established"
+                    dnd_mode = cw.schedule.GetValue() if root.gui else False
+                    msg = ("Do Not Disturb" if dnd_mode else "Normal") + " Mode: Connection to the Avo Assure Server established"
                     logger.print_on_console(msg)
                     log.info(msg)
                     msg = "ICE Name: " + root.ice_token["icename"]
@@ -126,12 +131,12 @@ class MainNamespace(BaseNamespace):
                 else: kill_conn = True
 
             elif(str(args[0]) == 'schedulingEnabled'):
-                logger.print_on_console('Schedule Mode Enabled')
-                log.info('Schedule Mode Enabled')
+                logger.print_on_console('Do Not Disturb Mode Enabled')
+                log.info('Do Not Disturb Mode Enabled')
                 
             elif(str(args[0]) == 'schedulingDisabled'):
-                logger.print_on_console('Schedule Mode Disabled')
-                log.info('Schedule Mode Disabled')
+                logger.print_on_console('Do Not Disturb Mode Disabled')
+                log.info('Do Not Disturb Mode Disabled')
 
             elif(str(args[0]) == 'checkConnection'):
                 err_res = None
@@ -190,6 +195,13 @@ class MainNamespace(BaseNamespace):
                 logger.print_on_console(fail_msg)
                 log.info(fail_msg)
                 kill_conn = True
+
+            elif(str(args[0]) == 'decline'):
+                fail_msg="Please accept Avo Assure terms and conditions before connecting to Avo Assure Server"
+                logger.print_on_console(fail_msg)
+                log.info(fail_msg)
+                kill_conn = True
+                if root.gui: cw.connectbutton.Enable()
 
         except Exception as e:
             err_msg='Error while Connecting to Server'
@@ -431,7 +443,6 @@ class MainNamespace(BaseNamespace):
             global mobileWebScrapeObj,mobileWebScrapeFlag,action,data
             #con = controller.Controller()
             global browsername
-            compare_flag=False
             browsername = args[0]+";"+args[1]
             args = list(args)
             d = args[2]
@@ -447,7 +458,6 @@ class MainNamespace(BaseNamespace):
                 webscrape=UserObjectScrape_MW.UserObject()
                 webscrape.get_user_object(d,socketIO)
             elif action == 'compare':
-                compare_flag=True
                 mobileWebScrapeFlag=True
                 # task = d['task']
                 data['view'] = d['viewString']
@@ -621,6 +631,28 @@ class MainNamespace(BaseNamespace):
             try: socketIO.emit('qcresponse','Error:Qtest Operations')
             except: pass
 
+    def on_zephyrlogin(self, *args):
+        global zephyrObject
+        err_msg = None
+        try:
+            if(zephyrObject == None):
+                core_utils.get_all_the_imports('Zephyr')
+                import ZephyrController
+                zephyrObject = ZephyrController.ZephyrWindow()
+
+            zephyrdata = args[0]
+            response = zephyrObject.zephyr_dict[zephyrdata.pop('zephyraction')](zephyrdata)
+            socketIO.emit('qcresponse', response)
+        except KeyError:
+            err_msg = 'Invalid Zephyr operation'
+        except Exception as e:
+            err_msg = 'Error in Zephyr operations'
+            log.error(e, exc_info=True)
+        if err_msg is not None:
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
+            try: socketIO.emit('qcresponse','Error:Zephyr Operations')
+            except: pass
 
     def on_render_screenshot(self,*args):
         try:
@@ -695,15 +727,20 @@ class MainNamespace(BaseNamespace):
 
     def on_update_screenshot_path(self,*args):
         global socketIO
+        if root.gui: benchmark.init(args[1], socketIO)
+        intv = 120000
+        if args and len(args) >= 2:
+            try: intv = int(args[2])
+            except: pass
+        set_ICE_status(False, True, intv)
         spath=args[0]
-        if root.gui: benchmark.init(args[1],socketIO)
         import constants
         if(SYSTEM_OS=='Darwin'):
             spath=spath["mac"]
         else:
             spath=spath["default"]
         if len(spath) != 0 and os.path.exists(spath):
-            constants.SCREENSHOT_PATH=os.path.normpath(spath)+os.sep
+            constants.SCREENSHOT_PATH=os.path.normpath(spath)+opl
         else:
             constants.SCREENSHOT_PATH="Disabled"
             logger.print_on_console("Screenshot capturing disabled since user does not have sufficient privileges for screenshot folder\n")
@@ -821,7 +858,7 @@ class MainNamespace(BaseNamespace):
 class ConnectionThread(threading.Thread):
     """Test Worker Thread Class."""
     daemon = True
-
+    name = "socketIO_connection"
     def __init__(self, ice_action):
         """Init Worker Thread Class."""
         super(ConnectionThread, self).__init__()
@@ -833,8 +870,8 @@ class ConnectionThread(threading.Thread):
             server_cert = False
         elif server_cert != "default":
             if os.path.exists(server_cert) == False:
-                server_cert = CERTIFICATE_PATH +'/server.crt'
-        client_cert = (CERTIFICATE_PATH + '/client.crt', CERTIFICATE_PATH + '/client.key')
+                server_cert = CERTIFICATE_PATH + opl +'server.crt'
+        client_cert = (CERTIFICATE_PATH + opl + 'client.crt', CERTIFICATE_PATH + opl + 'client.key')
         key='USERNAME'
         if key not in os.environ:
             key='USER'
@@ -870,9 +907,10 @@ class ConnectionThread(threading.Thread):
             root.ice_token = None
             if root.gui: cw.enable_register()
             return False
-        global socketIO, allow_connect
+        global socketIO, allow_connect,execution_flags
         allow_connect = False
-        err_msg=None
+        err = None
+        err_msg = "Error in Server Connection"
         server_port = int(configvalues['server_port'])
         server_IP = 'https://' + configvalues['server_ip']
         try:
@@ -881,18 +919,24 @@ class ConnectionThread(threading.Thread):
             root.socketIO = socketIO
             socketIO.wait()
         except ValueError as e:
-            err_msg = str(e).replace("[engine.io waiting for connection] ",'').replace("[SSL: CERTIFICATE_VERIFY_FAILED] ",'')
-            if "_ssl.c" in err_msg:
-                err_msg = err_msg[:err_msg.index("(_ssl")]
-                logger.print_on_console("Try changing Server Certificate Path to 'default'." +
-                    " If that also doesn't work, then disable server certificate check. But that" +
-                    " will result in an insecure HTTPS connection")
-        except Exception as e:
-            err_msg = "Error in server connection"
-            log.error(e,exc_info=True)
-        if (err_msg):
+            err = e
+            err_msg = "Error occured while connecting to server due to TLS certificate error."
+            error = str(e).replace("[engine.io waiting for connection] ",'').replace("[SSL: CERTIFICATE_VERIFY_FAILED] ",'')
+            if "_ssl.c" in error:
+                err = error[:error.index("(_ssl")]
+            elif 'SSLCertVerificationError' in error:
+                err = error.split('SSLCertVerificationError')[1][2:-3]
             logger.print_on_console(err_msg)
+            logger.print_on_console(err)
+            logger.print_on_console("Try changing Server Certificate Path to 'default'." +
+                " If that also doesn't work, then disable server certificate check. But that" +
+                " will result in an insecure HTTPS connection")
+        except Exception as e:
+            err = e
+            logger.print_on_console(err_msg)
+        if err:
             log.error(err_msg)
+            log.error(err,exc_info=True)
             if root.gui: cw.connectbutton.Enable()
 
 
@@ -903,6 +947,7 @@ class TestThread(threading.Thread):
     def __init__(self, main, action, json_data, aws_mode):
         """Init Worker Thread Class."""
         super(TestThread, self).__init__()
+        self.name = "test_thread"
         self.main = main
         self.cw = main.cw
         #flag to pause thread
@@ -962,6 +1007,8 @@ class TestThread(threading.Thread):
                 apptype = (self.json_data)[0]['apptype']
             else:
                 execution_flag = True
+                #set ICE status as busy
+                set_ICE_status(True)
                 if root.gui: benchmark.stop(True)
                 apptype = self.json_data['apptype']
             if apptype == "DesktopJava": apptype = "oebs"
@@ -969,7 +1016,7 @@ class TestThread(threading.Thread):
                 logger.print_on_console('This app type is not part of the license.')
                 status=TERMINATE
             else:
-                status = self.con.invoke_controller(self.action,self,self.debug_mode,runfrom_step,self.json_data,self.main,socketIO,qcObject,qtestObject,self.aws_mode)
+                status = self.con.invoke_controller(self.action,self,self.debug_mode,runfrom_step,self.json_data,self.main,socketIO,qcObject,qtestObject,zephyrObject,self.aws_mode)
 
             logger.print_on_console('Execution status '+status)
 
@@ -993,7 +1040,9 @@ class TestThread(threading.Thread):
                 else:
                     socketIO.emit('result_debugTestCaseWS',status)
             elif self.action==EXECUTE:
-                socketIO.emit('result_executeTestSuite', {"status":status, "batchId": batch_id})
+                result = {"status":status, "batchId": batch_id}
+                if controller.manual_terminate_flag: result["userTerminated"] = True
+                socketIO.emit('result_executeTestSuite', result)
         except Exception as e:
             log.error(e, exc_info=True)
             status=TERMINATE
@@ -1002,14 +1051,18 @@ class TestThread(threading.Thread):
                     self.cw.killChildWindow(debug=True)
                     socketIO.emit('result_debugTestCase',status)
                 elif self.action==EXECUTE:
-                    socketIO.emit('result_executeTestSuite', {"status":status, "batchId": batch_id})
+                    result = {"status":status, "batchId": batch_id}
+                    if controller.manual_terminate_flag: result["userTerminated"] = True
+                    socketIO.emit('result_executeTestSuite', result)
         if closeActiveConnection:
             closeActiveConnection = False
-            connection_Timer = threading.Timer(300, root.closeConnection)
+            connection_Timer = threading.Timer(300, self.main.closeConnection)
             connection_Timer.start()
 
         self.main.testthread = None
         execution_flag = False
+        #set ICE status as available
+        set_ICE_status(True)
         if self.main.gui:
             if self.cw.choice=='RunfromStep': self.cw.breakpoint.Enable()
             else: self.cw.breakpoint.Disable()
@@ -1113,6 +1166,7 @@ class Main():
     def close(self, *args):
         global connection_Timer
         controller.terminate_flag = True
+        controller.manual_terminate_flag = True
         controller.disconnect_flag = True
         if self.socketthread: logger.print_on_console('Disconnected from Avo Assure server')
         if (connection_Timer != None and connection_Timer.isAlive()):
@@ -1133,6 +1187,7 @@ class Main():
     def register(self, token, hold = False):
         ice_das_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
             'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
+        err = False
         emsg = "Error: Invalid Server address or Token . Please try again"
         try:
             token_dec = core_utils_obj.unwrap(token,ice_das_key).split("@")
@@ -1149,10 +1204,22 @@ class Main():
             if len(url) == 1: url.append("443")
             configvalues['server_port']=url[1]
             if not hold: self.connection("register")
+        except requests.exceptions.SSLError as e:
+            error = str(e)
+            if 'SSLCertVerificationError' in error:
+                err = error.split('SSLCertVerificationError')[1][2:-3]
+                emsg = "Error occured while connecting to server due to TLS certificate error."
+                logger.print_on_console(emsg)
+                logger.print_on_console(err)
+                logger.print_on_console("Try changing Server Certificate Path to 'default'." +
+                    " If that also doesn't work, then disable server certificate check. But that" +
+                    " will result in an insecure HTTPS connection")
         except Exception as e:
+            err = e
             logger.print_on_console(emsg)
+        if err:
             log.error(emsg)
-            log.error(e)
+            log.error(err)
             if self.gui: self.cw.enable_register()
             else: self._wants_to_close = True
 
@@ -1268,7 +1335,7 @@ class Main():
             else: emsg += "configuration file located at AVO_ASSURE_HOME/assets/config.json"
             emsg += ", and retry."
             if mode == "register":
-                self.ice_token=None
+                self.ice_token = None
                 emsg = "Connection refused: Invalid Server URL."
                 if self.gui:
                     emsg += " Click on Connect to retry Registration" 
@@ -1282,6 +1349,8 @@ class Main():
         #Disconnects socket client
         global socketIO
         try:
+            stop_ping_thread()
+            log.info('Cancelling Ping Thread')
             if socketIO is not None:
                 if disconn:
                     log.info('Sending socket disconnect request')
@@ -1291,6 +1360,8 @@ class Main():
                 socketIO = None
                 self.socketthread.join()
                 log.info('Connection Closed')
+            
+
         except Exception as e:
             log.error("Error while closing connection")
             log.error(e,exc_info=True)
@@ -1449,9 +1520,7 @@ def check_browser():
                 log.error(e)
             global chromeFlag,firefoxFlag,edgeFlag,chromiumFlag
             logger.print_on_console('Browser compatibility check started')
-            from selenium import webdriver
-            from selenium.webdriver import ChromeOptions
-            p = subprocess.Popen(CHROME_DRIVER_PATH + ' --version', stdout=subprocess.PIPE, bufsize=1, shell=True)
+            p = subprocess.Popen('"' + CHROME_DRIVER_PATH + '" --version', stdout=subprocess.PIPE, bufsize=1, shell=True)
             a = p.stdout.readline()
             a = a.decode('utf-8')[13:17]
             choptions1 = webdriver.ChromeOptions()
@@ -1476,15 +1545,15 @@ def check_browser():
             for k,v in list(CHROME_DRIVER_VERSION.items()):
                 if a == k:
                     if browser_ver >= v[0] and browser_ver <= v[1]:
-                        chromeFlag=True
-            if chromeFlag == False :
+                        chromeFlag = True
+            if chromeFlag == False:
                 logger.print_on_console('WARNING!! : Chrome version ',str(browser_ver),' is not supported.')
         except Exception as e:
             logger.print_on_console("Error in checking chrome version")
             log.error("Error in checking chrome version")
             log.error(e,exc_info=True)
         try:
-            p = subprocess.Popen(GECKODRIVER_PATH + ' --version', stdout=subprocess.PIPE, bufsize=1, shell=True)
+            p = subprocess.Popen('"' + GECKODRIVER_PATH + '" --version', stdout=subprocess.PIPE, bufsize=1, shell=True)
             a = p.stdout.readline()
             a = a.decode('utf-8')[12:16]
             caps=webdriver.DesiredCapabilities.FIREFOX
@@ -1519,7 +1588,7 @@ def check_browser():
         try:
             if('Windows-10' in platform.platform()):
                 #from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
-                p = subprocess.Popen(EDGE_DRIVER_PATH + ' --version', stdout=subprocess.PIPE, bufsize=1,cwd=DRIVERS_PATH,shell=True) 
+                p = subprocess.Popen('"' + EDGE_DRIVER_PATH + '" --version', stdout=subprocess.PIPE, bufsize=1,cwd=DRIVERS_PATH,shell=True) 
                 a = p.stdout.readline()
                 a = a.decode('utf-8')[28:40]
                 driver = webdriver.Edge(executable_path=EDGE_DRIVER_PATH)
@@ -1550,7 +1619,7 @@ def check_browser():
             options = Options()
             options.use_chromium = True
             caps =  options.to_capabilities()
-            p = subprocess.Popen(EDGE_CHROMIUM_DRIVER_PATH + ' --version', stdout=subprocess.PIPE, bufsize=1,cwd=DRIVERS_PATH,shell=True)
+            p = subprocess.Popen('"' + EDGE_CHROMIUM_DRIVER_PATH + '" --version', stdout=subprocess.PIPE, bufsize=1,cwd=DRIVERS_PATH,shell=True)
             a = p.stdout.readline()
             a = a.decode('utf-8')[13:17]
             if SYSTEM_OS == 'Darwin': #MAC check for edge chromium
@@ -1597,3 +1666,33 @@ def check_execution_lic(event):
         logger.print_on_console(msg)
         socketIO.emit(event,'ExecutionOnlyAllowed')
     return executionOnly
+
+def set_ICE_status(one_time_ping = False,connect=True,interval = 60000):
+    """
+    def : set_ICE_status
+    purpose : communicates ICE status (availble/busy)
+    param : status (bool)
+    return : Timer
+
+    """   
+    global socketIO,root,execution_flag,cw
+    ICE_name = root.ice_token["icename"]
+    if not one_time_ping and socketIO is not None:
+        status_ping_thread = threading.Timer(int(interval)/2000, set_ICE_status,[])
+        status_ping_thread.setName("Status Ping")
+        status_ping_thread.start()     
+    log.info('Ping Server')
+    #Add ICE identification and stauts, which is busy by default
+    result = {"hostip":socket.gethostbyname(socket.gethostname()),"hostname":os.environ['username'],"time":str(datetime.now()),"icename":ICE_name,"connected":connect}
+    result['status'] = execution_flag
+    result['mode'] = cw.schedule.GetValue()
+   
+    if socketIO is not None:
+        socketIO.emit('ICE_status_change',result)
+    
+def stop_ping_thread():
+    global status_ping_thread
+    set_ICE_status(one_time_ping=True,connect=False)
+    if status_ping_thread is not None and status_ping_thread.is_alive():
+        status_ping_thread.cancel()
+

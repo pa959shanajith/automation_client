@@ -318,15 +318,20 @@ class Launch_Keywords():
         verb = OUTPUT_CONSTANT
         err_msg = None
         windowname = ''
-        launch_time_out = 0
+        # launch_time_out = 0
+        win_handle_index = 0
+        win_handle_flag = False
         term = None
         try:
             if ( len(input_val) == 2 ):
                 windowname = input_val[0]
-                launch_time_out = input_val[1]
+                # launch_time_out = input_val[1]
+                win_handle_index = int(input_val[1])
+                win_handle_flag = True
             elif ( len(input_val) == 1 ):
                 windowname = input_val[0]
             title_matched_windows = self.getProcessWindows(windowname)
+            log.debug(len(title_matched_windows))
             hwnd = win32gui.FindWindow(None, windowname)
             threadid, temp_pid = win32process.GetWindowThreadProcessId(hwnd)
             flag = False
@@ -349,20 +354,43 @@ class Launch_Keywords():
                         var = 1
                         while var == 1:
                             title_matched_windows = self.getProcessWindows(windowname)
-                            if ( len(title_matched_windows) > 1 ):
-                                self.windowHandle = title_matched_windows[0]
-                                self.windowname = self.getWindowText(self.windowHandle)
-                                window_name = self.windowname
-                                logger.print_on_console( 'Given windowname is ' + windowname )
-                                logger.print_on_console( 'Select the type of scrape (Full scrape/Click and Add) from scrape window' )
-                                window_handle = title_matched_windows[0]
-                                window_pid = self.get_window_pid(self.windowname)
-                                self.windowHandle=title_matched_windows[0]
-                                app_win32 = Application(backend='win32').connect(process = window_pid)
-                                app_uia = Application(backend='uia').connect(process = window_pid)
-                                status = desktop_constants.TEST_RESULT_PASS
-                                result = desktop_constants.TEST_RESULT_TRUE
-                                break
+                            # print("no of window handles",len(title_matched_windows))
+                            log.debug(len(title_matched_windows))
+                            if ( win_handle_flag == True ):
+                                if ( win_handle_index <= title_matched_windows ):
+                                    if ( len(title_matched_windows) > 1 ):
+                                        self.windowHandle = title_matched_windows[win_handle_index]
+                                        self.windowname = self.getWindowText(self.windowHandle)
+                                        window_name = self.windowname
+                                        logger.print_on_console( 'Given windowname is ' + windowname )
+                                        logger.print_on_console( 'Select the type of scrape (Full scrape/Click and Add) from scrape window' )
+                                        window_handle = title_matched_windows[win_handle_index]
+                                        window_pid = self.get_window_pid(self.windowname)
+                                        self.windowHandle = title_matched_windows[win_handle_index]
+                                        app_win32 = Application(backend='win32').connect(process = window_pid)
+                                        app_uia = Application(backend='uia').connect(process = window_pid)
+                                        status = desktop_constants.TEST_RESULT_PASS
+                                        result = desktop_constants.TEST_RESULT_TRUE
+                                        break
+                                else:
+                                    error_msg = 'specified window handle is not present'
+                                    logger.print_on_console( error_msg )
+                                    log.info( error_msg )
+                            elif ( win_handle_flag == False ):
+                                if ( len(title_matched_windows) > 1 ):
+                                    self.windowHandle = title_matched_windows[0]
+                                    self.windowname = self.getWindowText(self.windowHandle)
+                                    window_name = self.windowname
+                                    logger.print_on_console( 'Given windowname is ' + windowname )
+                                    logger.print_on_console( 'Select the type of scrape (Full scrape/Click and Add) from scrape window' )
+                                    window_handle = title_matched_windows[0]
+                                    window_pid = self.get_window_pid(self.windowname)
+                                    self.windowHandle=title_matched_windows[0]
+                                    app_win32 = Application(backend='win32').connect(process = window_pid)
+                                    app_uia = Application(backend='uia').connect(process = window_pid)
+                                    status = desktop_constants.TEST_RESULT_PASS
+                                    result = desktop_constants.TEST_RESULT_TRUE
+                                    break
                 else:
                     self.multiInstance = title_matched_windows[0]
                     term = TERMINATE

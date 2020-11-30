@@ -49,7 +49,7 @@ class TableOperationKeywords():
                 try:
                     local_tk.log.debug('checking for element')
                     if webElement!=None:
-                        if webElement.get_attribute('role') == 'grid':
+                        if webElement.tag_name.lower() != 'table' and webElement.get_attribute('role') == 'grid':
                             body = True
                             right = True
                             if (args[0] != ['']):
@@ -58,15 +58,19 @@ class TableOperationKeywords():
                                 if (input_val[1].lower() != 'right') : right = False
                             if body:
                                 if right:
-                                    container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-center-cols-container')]")
+                                    try:
+                                        container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-body-container')]")
+                                    except:
+                                        container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-center-cols-container')]")
                                 else:
                                     container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-pinned-left-cols-container')]")
+                                rows = container.find_elements_by_xpath(".//div[@role='row']")
                             else:
                                 if right:
                                     container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-header-viewport')]")
                                 else:
                                     container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-pinned-left-header')]")
-                            rows = container.find_elements_by_xpath(".//div[@role='row']")
+                                rows = container.find_elements_by_xpath(".//div[contains(@class,'ag-header-row')]")
                             row_count = len(rows)
                             if(row_count>=0):
                                 status=TEST_RESULT_PASS
@@ -108,7 +112,7 @@ class TableOperationKeywords():
                 try:
                     local_tk.log.debug('checking for element')
                     if webElement!=None:
-                        if webElement.get_attribute('role') == 'grid':
+                        if webElement.tag_name.lower() != 'table' and webElement.get_attribute('role') == 'grid':
                             body = True
                             right = True
                             if (args[0] != ['']):
@@ -117,21 +121,25 @@ class TableOperationKeywords():
                                 if (input_val[1].lower() != 'right') : right = False
                             if body:
                                 if right:
-                                    container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-center-cols-container')]")
+                                    try:
+                                        container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-body-container')]")
+                                    except:
+                                        container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-center-cols-container')]")
                                 else:
                                     container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-pinned-left-cols-container')]")
+                                rows = container.find_elements_by_xpath(".//div[@role='row']")
                             else:
                                 if right:
                                     container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-header-viewport')]")
                                 else:
                                     container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-pinned-left-header')]")
-                            rows = container.find_elements_by_xpath(".//div[@role='row']")
+                                rows = container.find_elements_by_xpath(".//div[contains(@class,'ag-header-row')]")
                             for i in rows:
                                 try:
                                     if body:
                                         cells = i.find_elements_by_xpath(".//div[@role='gridcell']")
                                     else:
-                                        cells = i.find_elements_by_xpath(".//div[@role='columnheader']")
+                                        cells = i.find_elements_by_xpath(".//div[contains(@class,'ag-header-cell')]")
                                     if coloumn_count == len(cells):
                                         break
                                     coloumn_count = len(cells)
@@ -173,7 +181,7 @@ class TableOperationKeywords():
                 if visibleFlag==True:
                     local_tk.log.debug('reading the inputs')
                     if(len(input_val) > 1):
-                        if webElement.get_attribute('role') == 'grid':
+                        if webElement.tag_name.lower() != 'table' and webElement.get_attribute('role') == 'grid':
                             body = True
                             right = True
                             if len(input_val)==4:
@@ -183,22 +191,26 @@ class TableOperationKeywords():
                             col_number=int(input_val[1]) - 1
                             if body:
                                 if right:
-                                    container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-center-cols-container')]")
+                                    try:
+                                        container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-body-container')]")
+                                    except:
+                                        container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-center-cols-container')]")
                                 else:
                                     container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-pinned-left-cols-container')]")
+                                rows = container.find_elements_by_xpath(".//div[@role='row']")
                             else:
                                 if right:
                                     container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-header-viewport')]")
                                 else:
                                     container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-pinned-left-header')]")
-                            rows = container.find_elements_by_xpath(".//div[@role='row']")
+                                rows = container.find_elements_by_xpath(".//div[contains(@class,'ag-header-row')]")
                             row_count = len(rows)
                             if(row_count>=row_number):
                                 try:
                                     if body:
                                         cells = rows[row_number].find_elements_by_xpath(".//div[@role='gridcell']")
                                     else:
-                                        cells = rows[row_number].find_elements_by_xpath(".//div[@role='columnheader']")
+                                        cells = rows[row_number].find_elements_by_xpath(".//div[contains(@class,'ag-header-cell')]")
                                     coloumn_count = len(cells)
                                     if (coloumn_count>=col_number):
                                         try:
@@ -257,7 +269,7 @@ class TableOperationKeywords():
                 if visibleFlag==True:
                     local_tk.log.debug('reading the inputs')
                     if(len(input_val) > 1):
-                        if webElement.get_attribute('role') == 'grid':
+                        if webElement.tag_name.lower() != 'table' and webElement.get_attribute('role') == 'grid':
                             body = True
                             right = True
                             if len(input_val)==5:
@@ -267,22 +279,26 @@ class TableOperationKeywords():
                             col_number=int(input_val[1]) - 1
                             if body:
                                 if right:
-                                    container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-center-cols-container')]")
+                                    try:
+                                        container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-body-container')]")
+                                    except:
+                                        container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-center-cols-container')]")
                                 else:
                                     container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-pinned-left-cols-container')]")
+                                rows = container.find_elements_by_xpath(".//div[@role='row']")
                             else:
                                 if right:
                                     container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-header-viewport')]")
                                 else:
                                     container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-pinned-left-header')]")
-                            rows = container.find_elements_by_xpath(".//div[@role='row']")
+                                rows = container.find_elements_by_xpath(".//div[contains(@class,'ag-header-row')]")
                             row_count = len(rows)
                             if(row_count>=row_number):
                                 try:
                                     if body:
                                         cells = rows[row_number].find_elements_by_xpath(".//div[@role='gridcell']")
                                     else:
-                                        cells = rows[row_number].find_elements_by_xpath(".//div[@role='columnheader']")
+                                        cells = rows[row_number].find_elements_by_xpath(".//div[contains(@class,'ag-header-cell')]")
                                     coloumn_count = len(cells)
                                     if (coloumn_count>=col_number):
                                         try:
@@ -483,7 +499,7 @@ class TableOperationKeywords():
                 visibleFlag=True
                 if visibleFlag==True:
                     try:
-                        if webElement.get_attribute('role') == 'grid':
+                        if webElement.tag_name.lower() != 'table' and webElement.get_attribute('role') == 'grid':
                             body = True
                             right = True
                             if len(input_arr)==4:
@@ -491,22 +507,26 @@ class TableOperationKeywords():
                                 if (input_arr[3].lower() != 'right') : right = False
                             if body:
                                 if right:
-                                    container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-center-cols-container')]")
+                                    try:
+                                        container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-body-container')]")
+                                    except:
+                                        container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-center-cols-container')]")
                                 else:
                                     container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-pinned-left-cols-container')]")
+                                rows = container.find_elements_by_xpath(".//div[@role='row']")
                             else:
                                 if right:
                                     container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-header-viewport')]")
                                 else:
                                     container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-pinned-left-header')]")
-                            rows = container.find_elements_by_xpath(".//div[@role='row']")
+                                rows = container.find_elements_by_xpath(".//div[contains(@class,'ag-header-row')]")
                             row_count = len(rows)
                             if(row_count>=row_number):
                                 try:
                                     if body:
                                         cells = rows[row_number].find_elements_by_xpath(".//div[@role='gridcell']")
                                     else:
-                                        cells = rows[row_number].find_elements_by_xpath(".//div[@role='columnheader']")
+                                        cells = rows[row_number].find_elements_by_xpath(".//div[contains(@class,'ag-header-cell')]")
                                     coloumn_count = len(cells)
                                     if (coloumn_count>=col_number):
                                         try:
@@ -752,6 +772,7 @@ class TableOperationKeywords():
             methodoutput=TEST_RESULT_FALSE
             row_number=None
             err_msg=None
+            container=None
             local_tk.log.debug('reading the inputs')
             text=input_val[0].strip()
             coreutilsobj=core_utils.CoreUtils()
@@ -762,7 +783,7 @@ class TableOperationKeywords():
             if (webElement is not None):
                 if visibleFlag==True:
                     try:
-                        if webElement.get_attribute('role') == 'grid':
+                        if webElement.tag_name.lower() != 'table' and webElement.get_attribute('role') == 'grid':
                             body = True
                             right = True
                             if len(input_val)==3:
@@ -770,20 +791,24 @@ class TableOperationKeywords():
                                 if (input_val[2].lower() != 'right') : right = False
                             if body:
                                 if right:
-                                    container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-center-cols-container')]")
+                                    try:
+                                        container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-body-container')]")
+                                    except:
+                                        container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-center-cols-container')]")
                                 else:
                                     container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-pinned-left-cols-container')]")
+                                rows = container.find_elements_by_xpath(".//div[@role='row']")
                             else:
                                 if right:
                                     container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-header-viewport')]")
                                 else:
                                     container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-pinned-left-header')]")
-                            rows = container.find_elements_by_xpath(".//div[@role='row']")
+                                rows = container.find_elements_by_xpath(".//div[contains(@class,'ag-header-row')]")
                             for i in range(len(rows)):
                                 if body:
                                     cells = rows[i].find_elements_by_xpath(".//div[@role='gridcell']")
                                 else:
-                                    cells = rows[i].find_elements_by_xpath(".//div[@role='columnheader']")
+                                    cells = rows[i].find_elements_by_xpath(".//div[contains(@class,'ag-header-cell')]")
                                 for j in range(len(cells)):
                                     cellVal = self.getChildNodes(cells[j])
                                     cellVal=cellVal.strip()
@@ -805,8 +830,18 @@ class TableOperationKeywords():
                         logger.print_on_console('Got the result : ',str(row_number))
                     except Exception as e:
                         local_tk.log.error(e)
-                        logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
-                        err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                        if container==None:
+                            js='var temp = fun(arguments[0], arguments[1]); return temp; function fun(table, str) {     var m = [],         row, cell, xx, tx, ty, xxx, yyy, child;     for (yyy = 0; yyy < table.rows.length; yyy++) {         row = table.rows[yyy];         for (xxx = 0; xxx < row.cells.length; xxx++) {             cell = row.cells[xxx];             xx = xxx;             for (; m[yyy] && m[yyy][xx]; ++xx) {}             for (tx = xx; tx < xx + cell.colSpan; ++tx) {                 for (ty = yyy; ty < yyy + cell.rowSpan; ++ty) {                     if (!m[ty]) m[ty] = [];                     m[ty][tx] = true;                 }             }             if (cell.innerText.indexOf(str)>= 0) return yyy + cell.rowSpan;             else if (cell.children.length > 0) {                 for (var i = 0; i < cell.children.length; i++) {                     child = cell.children[i];                     if (child.value == str) return yyy + cell.rowSpan; 					else{ 					var a=child.value; 					if(a){ 					var b=a; 					if(b.indexOf(str)>=0)return yyy + cell.rowSpan; 					}	 				}			 					                 }             }         }     }     return null; };'
+                            row_number=browser_Keywords.local_bk.driver_obj.execute_script(js,webElement,text)
+                            if row_number:
+                                status=TEST_RESULT_PASS
+                                methodoutput=TEST_RESULT_TRUE
+                            local_tk.log.info('Got the result : %s',str(row_number))
+                            logger.print_on_console('Got the result : ',str(row_number))
+                        else:
+
+                            logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
+                            err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
                 else:
                     local_tk.log.info(ERROR_CODE_DICT['ERR_HIDDEN_OBJECT'])
                     err_msg = ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
@@ -821,6 +856,7 @@ class TableOperationKeywords():
             methodoutput=TEST_RESULT_FALSE
             col_number=None
             err_msg = None
+            container = None
             local_tk.driver=browser_Keywords.local_bk.driver_obj
             local_tk.log.debug('got the driver instance from browser keyword')
             visibleFlag=True
@@ -831,7 +867,7 @@ class TableOperationKeywords():
             if (webElement is not None):
                 if visibleFlag==True:
                     try:
-                        if webElement.get_attribute('role') == 'grid':
+                        if webElement.tag_name.lower() != 'table' and webElement.get_attribute('role') == 'grid':
                             body = True
                             right = True
                             if len(input_val)==3:
@@ -839,20 +875,24 @@ class TableOperationKeywords():
                                 if (input_val[2].lower() != 'right') : right = False
                             if body:
                                 if right:
-                                    container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-center-cols-container')]")
+                                    try:
+                                        container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-body-container')]")
+                                    except:
+                                        container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-center-cols-container')]")
                                 else:
                                     container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-pinned-left-cols-container')]")
+                                rows = container.find_elements_by_xpath(".//div[@role='row']")
                             else:
                                 if right:
                                     container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-header-viewport')]")
                                 else:
                                     container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-pinned-left-header')]")
-                            rows = container.find_elements_by_xpath(".//div[@role='row']")
+                                rows = container.find_elements_by_xpath(".//div[contains(@class,'ag-header-row')]")
                             for i in range(len(rows)):
                                 if body:
                                     cells = rows[i].find_elements_by_xpath(".//div[@role='gridcell']")
                                 else:
-                                    cells = rows[i].find_elements_by_xpath(".//div[@role='columnheader']")
+                                    cells = rows[i].find_elements_by_xpath(".//div[contains(@class,'ag-header-cell')]")
                                 for j in range(len(cells)):
                                     cellVal = self.getChildNodes(cells[j])
                                     cellVal=cellVal.strip()
@@ -865,7 +905,7 @@ class TableOperationKeywords():
                                 status=TEST_RESULT_PASS
                                 methodoutput=TEST_RESULT_TRUE
                         else:
-                            js='var temp = fun(arguments[0], arguments[1]); return temp; function fun(table, str) {     var m = [],         row, cell, xx, tx, ty, xxx, yyy, child;     for (yyy = 0; yyy < table.rows.length; yyy++) {         row = table.rows[yyy];         for (xxx = 0; xxx < row.cells.length; xxx++) {             cell = row.cells[xxx];             xx = xxx;             for (; m[yyy] && m[yyy][xx]; ++xx) {}             for (tx = xx; tx < xx + cell.colSpan; ++tx) {                 for (ty = yyy; ty < yyy + cell.rowSpan; ++ty) {                     if (!m[ty]) m[ty] = [];                     m[ty][tx] = true;                 }             }             if (cell.innerText.indexOf(str)>= 0) return xx + cell.colSpan;             else if (cell.children.length > 0) {                 for (var i = 0; i < cell.children.length; i++) {                     child = cell.children[i];                     if (child.value == str) return xx + cell.colSpan; 					else{ 					var a=child.value; 					if(a){ 					var b=a; 					if(b.indexOf(str)>=0)return xx + cell.colSpan; 					}	 				}			 					                 }             }         }     }     return null; };'
+                            js='var temp = fun(arguments[0], arguments[1]); return temp; function fun(table, str) {     var m = [],         row, cell, xx, tx, ty, xxx, yyy, child;     for (yyy = 0; yyy < table.rows.length; yyy++) {         row = table.rows[yyy];         for (xxx = 0; xxx < row.cells.length; xxx++) {             cell = row.cells[xxx];             xx = xxx;             for (; m[yyy] && m[yyy][xx]; ++xx) {}             for (tx = xx; tx < xx + cell.colSpan; ++tx) {                 for (ty = yyy; ty < yyy + cell.rowSpan; ++ty) {                     if (!m[ty]) m[ty] = [];                     m[ty][tx] = true;                 }             }             if (cell.innerText.indexOf(str)>= 0 && cell.innerText.length === str.length) return xx + cell.colSpan;             else if (cell.children.length > 0) {                 for (var i = 0; i < cell.children.length; i++) {                     child = cell.children[i];   var sap=child.value;  var check_match=sap;                if (str === check_match) return xx + cell.colSpan; 							 					                 }             }         }     }     return null; };'
                             col_number=local_tk.driver.execute_script(js,webElement,text)
                             if col_number:
                                 status=TEST_RESULT_PASS
@@ -875,7 +915,18 @@ class TableOperationKeywords():
                     except Exception as e:
                         local_tk.log.error(e)
                         logger.print_on_console(e)
-                        err_msg=e
+                        if container==None:
+                            js='var temp = fun(arguments[0], arguments[1]); return temp; function fun(table, str) {     var m = [],         row, cell, xx, tx, ty, xxx, yyy, child;     for (yyy = 0; yyy < table.rows.length; yyy++) {         row = table.rows[yyy];         for (xxx = 0; xxx < row.cells.length; xxx++) {             cell = row.cells[xxx];             xx = xxx;             for (; m[yyy] && m[yyy][xx]; ++xx) {}             for (tx = xx; tx < xx + cell.colSpan; ++tx) {                 for (ty = yyy; ty < yyy + cell.rowSpan; ++ty) {                     if (!m[ty]) m[ty] = [];                     m[ty][tx] = true;                 }             }             if (cell.innerText.indexOf(str)>= 0 && cell.innerText.length === str.length) return xx + cell.colSpan;             else if (cell.children.length > 0) {                 for (var i = 0; i < cell.children.length; i++) {                     child = cell.children[i];   var sap=child.value;  var check_match=sap;                if (str === check_match) return xx + cell.colSpan; 							 					                 }             }         }     }     return null; };'
+                            col_number=local_tk.driver.execute_script(js,webElement,text)
+                            if col_number:
+                                status=TEST_RESULT_PASS
+                                methodoutput=TEST_RESULT_TRUE
+                            local_tk.log.info('Got the result : %s',str(col_number))
+                            logger.print_on_console('Got the result : ',str(col_number))
+                        else:
+
+
+                            err_msg=e
                 else:
                     local_tk.log.info(ERROR_CODE_DICT['ERR_HIDDEN_OBJECT'])
                     err_msg = ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
@@ -1062,17 +1113,18 @@ class TableOperationKeywords():
                 try:
                     local_tk.log.debug('checking for element')
                     if webElement!=None:
-                        if webElement.get_attribute('role') == 'grid':
-                            container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-body-viewport')]//div[@class='ag-center-cols-container']")
+                        if webElement.tag_name.lower() != 'table' and webElement.get_attribute('role') == 'grid':
+                            container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-header-viewport')]")
                             loc = container.location
                             if loc.get('y') < 0:
                                 loc = container.location_once_scrolled_into_view
-                            local_tk.log.debug("Mouse hover at location:"+str(int(loc.get('x')) + 100)+","+str(int(loc.get('y') + 150)))
+                            size = container.size
+                            local_tk.log.debug("Mouse hover at location:"+str(int(loc.get('x')) + 100)+","+str(int(loc.get('y') + size.get('height') + 150)))
                             direction = input[0]
                             times = int(input[1])
                             if SYSTEM_OS == "Windows":
                                 user32 = windll.user32
-                                user32.SetCursorPos(int(loc.get('x')) + 100, int(loc.get('y') + 150))
+                                user32.SetCursorPos(int(loc.get('x')) + 100, int(loc.get('y') + size.get('height') + 150))
                                 time.sleep(1)
                                 if direction.lower() == 'up':
                                     for i in range(times):
@@ -1088,14 +1140,14 @@ class TableOperationKeywords():
                                 if direction.lower() == 'down':
                                     times = (times * (-4))
                                     mouse = Controller()
-                                    mouse.position = (int(loc.get('x')) + 100, int(loc.get('y') + 150))
+                                    mouse.position = (int(loc.get('x')) + 100, int(loc.get('y') + size.get('height') + 150))
                                     time.sleep(1)
                                     mouse.scroll(0, times)
                                     del mouse
                                 elif direction.lower() == 'up':
                                     times = (times * 4)
                                     mouse = Controller()
-                                    mouse.position = (int(loc.get('x')) + 100, int(loc.get('y') + 150))
+                                    mouse.position = (int(loc.get('x')) + 100, int(loc.get('y') + size.get('height') + 150))
                                     time.sleep(1)
                                     mouse.scroll(0, times)
                                     del mouse
@@ -1130,17 +1182,18 @@ class TableOperationKeywords():
                 try:
                     local_tk.log.debug('checking for element')
                     if webElement!=None:
-                        if webElement.get_attribute('role') == 'grid':
-                            container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-body-viewport')]//div[@class='ag-center-cols-container']")
+                        if webElement.tag_name.lower() != 'table' and webElement.get_attribute('role') == 'grid':
+                            container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-header-viewport')]")
                             loc = container.location
                             if loc.get('y') < 0:
                                 loc = container.location_once_scrolled_into_view
-                            local_tk.log.debug("Mouse hover at location:"+str(int(loc.get('x')) + 100)+","+str(int(loc.get('y') + 150)))
+                            size = container.size
+                            local_tk.log.debug("Mouse hover at location:"+str(int(loc.get('x')) + 100)+","+str(int(loc.get('y') + size.get('height') + 150)))
                             direction = input[0]
                             times = int(input[1])
                             if SYSTEM_OS == "Windows":
                                 user32 = windll.user32
-                                user32.SetCursorPos(int(loc.get('x')) + 100, int(loc.get('y') + 150))#self.robot.set_mouse_pos(int(loc.get('x')) + 100, int(loc.get('y') + 150))
+                                user32.SetCursorPos(int(loc.get('x')) + 100, int(loc.get('y') + size.get('height') + 150))
                                 time.sleep(1)
                                 if direction.lower() == 'right':
                                     for i in range(times):
@@ -1156,14 +1209,14 @@ class TableOperationKeywords():
                                 if direction.lower() == 'left':
                                     times = (times * (-4))
                                     mouse = Controller()
-                                    mouse.position = (int(loc.get('x')) + 100, int(loc.get('y') + 150))
+                                    mouse.position = (int(loc.get('x')) + 100, int(loc.get('y') + size.get('height') + 150))
                                     time.sleep(1)
                                     mouse.scroll(times,0)
                                     del mouse
                                 elif direction.lower() == 'right':
                                     times = (times * 4)
                                     mouse = Controller()
-                                    mouse.position = (int(loc.get('x')) + 100, int(loc.get('y') + 150))
+                                    mouse.position = (int(loc.get('x')) + 100, int(loc.get('y') + size.get('height') + 150))
                                     time.sleep(1)
                                     mouse.scroll(times,0)
                                     del mouse

@@ -160,9 +160,9 @@ class ElementKeywords:
                     click_obj=ButtonLinkKeyword()
                     local_eo.log.debug('ButtonLinkKeyword object created to call the click method')
                     status,methodoutput,output,err_msg=click_obj.click(webelement,args[0])
-                    local_eo.log.info(STATUS_METHODOUTPUT_UPDATE)
-                    status=TEST_RESULT_PASS
-                    methodoutput=TEST_RESULT_TRUE
+                    #local_eo.log.info(STATUS_METHODOUTPUT_UPDATE)
+                    #status=TEST_RESULT_PASS
+                    #methodoutput=TEST_RESULT_TRUE
                 else:
                     local_eo.log.error(ERR_DISABLED_OBJECT)
                     err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']

@@ -18,6 +18,7 @@ import tempfile
 import os
 import string
 import random
+import core_utils
 import dynamic_variable_handler
 import logging
 import fitz

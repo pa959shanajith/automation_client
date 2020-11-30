@@ -97,8 +97,6 @@ class Dispatcher:
             'horizontalscroll' : local_Wd.table_object.horizontalScroll,
             'verticalscroll' : local_Wd.table_object.verticalScroll,
 
-
-            'getinnertable' : local_Wd.table_object.getInnerTable,            
             #author : arpitha.b.v
             #added mapping of 'getCellToolTip' and 'verifyCellToolTip' to table object
             'getcelltooltip' : local_Wd.table_object.getCellToolTip,
@@ -527,7 +525,7 @@ class Dispatcher:
                     identifier = '.'+identifier.replace(' ','.')
                     type = 'css_selector'
                 webElement=getattr(driver,self.identifier_dict[type])(identifier)
-                if len(webElement) >= index:
+                if len(webElement) > index:
                     webElement = [webElement[index]]
             else:
                 webElement=getattr(driver,self.identifier_dict[type])(identifier)

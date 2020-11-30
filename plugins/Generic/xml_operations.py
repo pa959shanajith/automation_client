@@ -217,7 +217,7 @@ class XMLOperations():
         log.info(RETURN_RESULT)
         return status,methodoutput,block_count,err_msg
 
-    def get_tag_value(self,input_string,input_tag,block_number,child_tag,*args):
+    def get_tag_value(self,input_string,block_number,input_tag,child_tag,*args):
         """
         def : get_tag_value
         purpose : get_tag_value is used to get the Tag Value of the specified tag in the given XML

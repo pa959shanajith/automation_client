@@ -279,9 +279,15 @@ class QcWindow():
             response = requests.get(URL_for_testcases , params=payload, headers=self.headers, cookies=self.cookies)
             o = xmltodict.parse(response.content)
             y = json.loads(json.dumps(o))
-            tsn1 = testrunname.split("]")
-            tsn = (tsn1[1] + " " + tsn1[0] + "]")[1:]
-            testc_id = ''
+            tsn1 = []
+            tsn = []
+            testc_id = []
+            for z in testrunname:
+                tsn1.append(z.split("]"))
+            for x in tsn1:
+                xx=(x[1] + " " + x[0] + "]")[1:]
+                xx=xx.lstrip('0123456789')
+                tsn.append(xx)
             entity_len = int(y["Entities"]["@TotalResults"])
             if (entity_len == 1): y["Entities"]["Entity"] = [y["Entities"]["Entity"]]
             if (entity_len > 0):
@@ -291,17 +297,19 @@ class QcWindow():
                     flag = 0
                     for n in l:      
                         if n["@Name"] == "name":
-                            if n["Value"] == tsn: flag = 1                
+                            for nst in tsn:
+                                if n["Value"] == nst: flag = 1                
                         elif n["@Name"] == "id" and flag == 1:
-                            testc_id = n["Value"]                  
+                            testc_id.append(n["Value"])                  
             #updating status             
-            result =  data['qc_update_status'] 
-            URL_for_testcase_update = self.Qc_Url + midPoint + "/" + "test-instances"  + "/" + testc_id
-            data1 ='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Entity Type="test-instance"><Fields><Field Name="status"><Value>'+ result +'</Value></Field></Fields></Entity>'
-            payload = { "body": data1, "data": data1}
-            self.headers = {'Content-Type': "application/xml", 'Accept': "application/xml"}
-            response = requests.put(URL_for_testcase_update , data= data1, headers=self.headers, cookies=self.cookies)
-            #status = response.status_code == 200
+            result =  data['qc_update_status']
+            for t in testc_id:
+                URL_for_testcase_update = self.Qc_Url + midPoint + "/" + "test-instances"  + "/" + t
+                data1 ='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Entity Type="test-instance"><Fields><Field Name="status"><Value>'+ result +'</Value></Field></Fields></Entity>'
+                payload = { "body": data1, "data": data1}
+                self.headers = {'Content-Type': "application/xml", 'Accept': "application/xml"}
+                response = requests.put(URL_for_testcase_update , data= data1, headers=self.headers, cookies=self.cookies)
+                #status = response.status_code == 200
             status = True
         except Exception as e:
             err_msg = 'Error while updating data in ALM'
