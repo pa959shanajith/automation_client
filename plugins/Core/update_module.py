@@ -13,6 +13,7 @@ import json
 import os
 import logger
 import logging
+from distutils.version import LooseVersion, StrictVersion
 log = logging.getLogger('update_module.py')
 
 class Update_Rollback:
@@ -20,6 +21,9 @@ class Update_Rollback:
         """Initializing variables"""
         self.update_flag = False
         self.check_flag = False
+        self.MAX_FLAG = False
+        self.MIN_FLAG = False
+        self.server_version =None
         self.data_tags = {}
         self.client_tag = {}
         self.SERVER_LOC = None
@@ -68,6 +72,7 @@ class Update_Rollback:
         try:
             vers=list(data_from_server['iceversion'])
             vers.sort(reverse=True)
+            self.server_version = data_from_server['serverversion']
             #log.debug (vers)
             #cver=list(client_data['version'])
             #csubvers=list(client_data['version'][list(client_data['version'])[0]]['subversion'])
@@ -77,7 +82,11 @@ class Update_Rollback:
             cdata_value = []
             ckey = client_data['iceversion'][list(client_data['iceversion'])[0]]['subversion'][list(client_data['iceversion'][list(client_data['iceversion'])[0]]['subversion'])[0]]['tag']
             cdata_value.append(client_data['iceversion'][list(client_data['iceversion'])[0]]['subversion'][list(client_data['iceversion'][list(client_data['iceversion'])[0]]['subversion'])[0]]['p_tag'])
-##            cdata_value.append(client_data['iceversion'][list(client_data['iceversion'])[0]]['subversion'][list(client_data['iceversion'][list(client_data['iceversion'])[0]]['subversion'])[0]]['c_tag'])
+            #------------Server-Client min/max check
+            cmin_svr_val = client_data['iceversion'][list(client_data['iceversion'])[0]]['subversion'][list(client_data['iceversion'][list(client_data['iceversion'])[0]]['subversion'])[0]]['min-compatibility']
+            cmax_svr_val = client_data['iceversion'][list(client_data['iceversion'])[0]]['subversion'][list(client_data['iceversion'][list(client_data['iceversion'])[0]]['subversion'])[0]]['max-compatibility']
+            self.MIN_FLAG = LooseVersion(str(cmin_svr_val)) <= LooseVersion(str(self.server_version))# min server version has to be lesser than or equal to the Current Sever Version
+            self.MAX_FLAG = LooseVersion(str(cmax_svr_val)) == LooseVersion(str(self.server_version))# max server version has to be equal to the Current Server Version
             self.client_tag.update( {ckey : cdata_value} )
 
             cdate=client_data['iceversion'][list(client_data['iceversion'])[0]]['subversion'][list(client_data['iceversion'][list(client_data['iceversion'])[0]]['subversion'])[0]]['updated_on']
@@ -131,6 +140,18 @@ class Update_Rollback:
             update_msg = 'You are running the latest version of Avo Assure ICE'
         elif ( self.check_flag == False ):
             update_msg = 'An Error has occured while checking for new versions of Avo Assure ICE, kindly contact Support Team'
+        return update_msg
+
+    def server_check_message(self):
+        """Returns a message if there in incompatibility between ICE and Server"""
+        update_msg = None
+        if ( self.MIN_FLAG and self.MAX_FLAG ):
+                log.info( "SERVER_COMPATIBILITY_CHECK: PASS; ICE is compatible with current server version : " + str(self.server_version) + "." )
+                self.server_check_flag = True
+        else:
+            log.info( 'SERVER_COMPATIBILITY_CHECK: FAIL; ICE is incompatible with current server version : ' + str(self.server_version) + '. Please update to the latest ICE' )
+            update_msg = 'Warning!: ICE is incompatible with current server version : ' + str(self.server_version) + '; Please update to the latest ICE'
+            self.server_check_flag = False
         return update_msg
 
     def run_updater(self):
