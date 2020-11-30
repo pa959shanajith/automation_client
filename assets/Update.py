@@ -173,7 +173,7 @@ class Updater:
             log.info( "Building the end point URL's" )
             print ( "=>Building the end point URL's" )
             for ver in new_version_list:
-                end_points_list.append(str(self.SERVER_LOC) + '/' + str(ver[:3]) + '/' + str(ver) +'.7z')
+                end_points_list.append(str(self.SERVER_LOC) + str(ver[:3]) + '/' + str(ver) +'.zip')
             print ( "=>End Point URL's are built : ", str(end_points_list) )
             log.info( "End Point URL's are built : " + str(end_points_list) )
         except Exception as e:
@@ -194,7 +194,7 @@ class Updater:
             2.check for the latest baseline avaliable in new_version_list, from baseline True till latest baseline False
             3.if Baseline = Flase throughout newer version/same version , update from current version till the latest
             Note : we assume that the version list has already been checked for min,max server versions in update_module.py/pyd
-            Eg: self.vers_aval = {'3.0.2':['3.0','False'], '3.0.11':['3.0','False'], '3.0.1':['3.0','False'], '3.0.0':['3.0','False'], '2.0.123':['2.0','False'], '2.0.124':['2.0','False'], '2.0.125':['2.0','False']}
+            Eg: self.vers_aval = {'3.0.2':['3.0','False','<sha256 of file>'], '3.0.11':['3.0','False','<sha256 of file>'], '3.0.1':['3.0','False','<sha256 of file>'], '3.0.0':['3.0','False','<sha256 of file>'], '2.0.123':['2.0','False','<sha256 of file>'], '2.0.124':['2.0','False','<sha256 of file>'], '2.0.125':['2.0','False','<sha256 of file>']}
             Eg: self.ver_client = {'3.0.2':['3.0']}
             """
             NVL = []
