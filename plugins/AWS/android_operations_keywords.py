@@ -1087,17 +1087,13 @@ class MobileOpeartions():
                                             status=TEST_RESULT_PASS
                                             result=TEST_RESULT_TRUE
                                         else:
-                                            err_msg='Invalid input'
-                                            log.error('Invalid input')
+                                            log.error('INVALID INPUT')
                                     else:
-                                        err_msg='Invalid input'
-                                        log.error('Invalid input')
+                                        log.error('INVALID INPUT')
                                 else:
-                                    err_msg='Invalid input'
-                                    log.error('Invalid input')
+                                   log.error('INVALID INPUT')
                             else:
-                                err_msg='Invalid input'
-                                log.error('Invalid input')
+                                log.error('INVALID INPUT')
 
                         elif count == 1:
                             if input_date[0] !='':
@@ -1105,24 +1101,21 @@ class MobileOpeartions():
                                 element[0].set_text(input_date[0])
                                 Tflag = True
                             else:
-                                err_msg='Invalid input'
-                                log.error('Invalid input')
+                                log.error('INVALID INPUT')
 
                             if input_date[1] !='':
                                 element[1].set_text(input_date[1])
                                 value=element[1].text
                                 Tflag1 = True
                             else:
-                                err_msg='Invalid input'
-                                log.error('Invalid input')
+                                log.error('INVALID INPUT')
 
                             if input_date[2] !='':
                                 element[2].set_text(input_date[2])
                                 value=element[2].text
                                 Tflag2 = True
                             else:
-                                err_msg='Invalid input'
-                                log.error('Invalid input')
+                                log.error('INVALID INPUT')
 
                             if Tflag == True and Tflag1 ==True and Tflag2== True:
                                 value0=element[0].text
@@ -1146,16 +1139,18 @@ class MobileOpeartions():
                                     result=TEST_RESULT_TRUE
                         else:
                             err_msg='Incompatible element'
-                            log.error('Incompatible element')
+                            # log.error('Incompatible element')
                     else:
-                        err_msg='element is disabled'
-                        log.error('element is disabled')
+                        err_msg=ERROR_CODE_DICT['ERR_WEB_ELEMENT_DISABLED']
                 else:
-                    err_msg='element is not visible'
-                    log.error('element is not visible')
+                    err_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
             else:
                 err_msg='webelement is None'
-                log.error('webelement is None')
+                # log.error('webelement is None')
+            else:
+                err_msg=ERROR_CODE_DICT['ERR_ELEMENT_NOT_EXISTS']
+            if err_msg:
+                log.error(err_msg)
         except Exception as e:
                 log.error(e)
         return status,result,output,err_msg
@@ -1207,11 +1202,13 @@ class MobileOpeartions():
                             status=TEST_RESULT_PASS
                             result=TEST_RESULT_TRUE
                     else:
-                        err_msg='element is disabled'
-                        log.error('element is disabled')
+                        err_msg=ERROR_CODE_DICT['ERR_WEB_ELEMENT_DISABLED']
                 else:
-                    err_msg='element is not visible'
-                    log.error('element is not visible')
+                    err_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
+            else:
+                err_msg=ERROR_CODE_DICT['ERR_ELEMENT_NOT_EXISTS']
+            if err_msg:
+                log.error(err_msg)
         except Exception as e:
                 log.error(e)
         return status,result,output,err_msg
@@ -1251,24 +1248,21 @@ class MobileOpeartions():
                                     time.sleep(1)
                                     Tflag = True
                                 else:
-                                    err_msg='Invalid input'
-                                    log.error('Invalid input')
+                                    log.error('INVALID INPUT')
 
                                 if input_date[1] !='':
                                     element[1].set_text(input_date[1])
                                     time.sleep(2)
                                     Tflag1 = True
                                 else:
-                                    err_msg='Invalid input'
-                                    log.error('Invalid input')
+                                    log.error('INVALID INPUT')
 
                                 if input_date[2] !='':
                                     element[2].set_text(input_date[2])
                                     time.sleep(3)
                                     Tflag2=True
                                 else:
-                                    err_msg='Invalid input'
-                                    log.error('Invalid input')
+                                    log.error('INVALID INPUT')
 
                                 if Tflag == True and Tflag1 ==True and Tflag2== True:
                                     value0=element[0].text
@@ -1293,17 +1287,17 @@ class MobileOpeartions():
                                         status=TEST_RESULT_PASS
                                         methodoutput=TEST_RESULT_TRUE
                             else:
-                                err_msg='Invalid input'
-                                log.error('Invalid input')
+                                log.error('INVALID INPUT')
                         else:
-                            err_msg = 'Widget not compatible'
-                            log.error('Widget not compatible')
+                            log.error('WIDGET_INCOMPATIBLE')
                     else:
-                        err_msg='element is disabled'
-                        log.error('element is disabled')
+                        err_msg=ERROR_CODE_DICT['ERR_WEB_ELEMENT_DISABLED']
                 else:
-                    err_msg='element is not visible'
-                    log.error('element is not visible')
+                    err_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
+            else:
+                err_msg=ERROR_CODE_DICT['ERR_ELEMENT_NOT_EXISTS']
+            if err_msg:
+                log.error(err_msg)
         except Exception as e:
                 log.error(e)
         return status,methodoutput,output,err_msg
@@ -1339,14 +1333,15 @@ class MobileOpeartions():
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
                         else :
-                            err_msg='Widget not compatible'
-                            log.error('Widget not compatible')
+                            log.error('WIDGET_INCOMPATIBLE')
                     else:
-                        err_msg='element is disabled'
-                        log.error('element is disabled')
+                        err_msg=ERROR_CODE_DICT['ERR_WEB_ELEMENT_DISABLED']
                 else:
-                    err_msg='element is not visible'
-                    log.error('element is not visible')
+                    err_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
+            else:
+                err_msg=ERROR_CODE_DICT['ERR_ELEMENT_NOT_EXISTS']
+            if err_msg:
+                log.error(err_msg)
         except Exception as e:
                 log.error(e)
         return status,methodoutput,output,err_msg

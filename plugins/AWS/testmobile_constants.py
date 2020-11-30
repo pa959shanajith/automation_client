@@ -29,6 +29,8 @@ ELEMENT_EXISTS= 'Element Exists'
 
 ELEMENT_VISIBLE= 'Element is Visible'
 
+WIDGET_INCOMPATIBLE = 'Incompatible widget'
+
 ERROR_CODE_DICT ={
                     'ERR_INVALID_INPUT':'Input error: please provide the valid input.',
                     'ERR_HIDDEN_OBJECT':'Element is Hidden.',
