@@ -295,7 +295,7 @@ class StepDescription:
             return 'Accept the Popup'
         def getPopUpText():
             return 'Get the text of the Popup and save the text '+"'" + output+"'"+ ' in ' +"'"+tsp.outputval+"'"
-        def sendfunctionkeys():
+        def sendFunctionKeys():
             return 'Press ' + "'"+input+"'"+ ' key'
         #Textbox keywords
         def setText():

@@ -1452,6 +1452,9 @@ class Controller():
             browsers_data = json_data['suitedetails'][0]['browserType']
             jsondata_dict = {}
             th={}
+            log1 = logging.getLogger("controller.py") #Disable loggers from imported modules
+            if(log1.handlers): 
+                log1.handlers.clear()
             for i in range (len(browsers_data)):
                 jsondata_dict[i] = copy.deepcopy(json_data)
                 for j in range(len(jsondata_dict[i]['suitedetails'])):
@@ -1473,6 +1476,7 @@ class Controller():
         
     def seperate_log(self, cur_thread, id):
         try:
+            log = logging.getLogger("controller.py")
             browser_name = {'1':'Chrome', '2':'FireFox', '3':'IE', '6': 'Safari', '7':'EdgeLegacy', '8':'EdgeChromium'}
             log_filepath = os.path.normpath(os.path.dirname(self.configvalues["logFile_Path"]) + os.sep + 'TestautoV2_Parallel_' + str(browser_name[id]) + '.log').replace("\\","\\\\")
             file1 = open(log_filepath, 'a+')
@@ -1483,7 +1487,6 @@ class Controller():
             log_handler.setFormatter(formatter)
             log_filter = ThreadLogFilter(threadName)
             log_handler.addFilter(log_filter)
-            log = logging.getLogger()
             log.addHandler(log_handler)
         except Exception as e:
             log.error(e)

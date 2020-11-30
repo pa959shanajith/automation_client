@@ -11,6 +11,7 @@ import uuid
 import signal
 import subprocess
 from datetime import datetime
+from selenium import webdriver
 from random import random
 import core_utils
 import logger
@@ -442,7 +443,6 @@ class MainNamespace(BaseNamespace):
             global mobileWebScrapeObj,mobileWebScrapeFlag,action,data
             #con = controller.Controller()
             global browsername
-            compare_flag=False
             browsername = args[0]+";"+args[1]
             args = list(args)
             d = args[2]
@@ -458,7 +458,6 @@ class MainNamespace(BaseNamespace):
                 webscrape=UserObjectScrape_MW.UserObject()
                 webscrape.get_user_object(d,socketIO)
             elif action == 'compare':
-                compare_flag=True
                 mobileWebScrapeFlag=True
                 # task = d['task']
                 data['view'] = d['viewString']
@@ -728,15 +727,13 @@ class MainNamespace(BaseNamespace):
 
     def on_update_screenshot_path(self,*args):
         global socketIO
+        if root.gui: benchmark.init(args[1], socketIO)
+        intv = 120000
+        if args and len(args) >= 2:
+            try: intv = int(args[2])
+            except: pass
+        set_ICE_status(False, True, intv)
         spath=args[0]
-        if args and len(args) >=2:
-            try:
-                set_ICE_status(False,True,args[2])
-            except Exception as e:
-                set_ICE_status(False,True,120000)
-        else:
-            set_ICE_status(False,True,120000)
-        if root.gui: benchmark.init(args[1],socketIO)
         import constants
         if(SYSTEM_OS=='Darwin'):
             spath=spath["mac"]
@@ -1524,8 +1521,6 @@ def check_browser():
                 log.error(e)
             global chromeFlag,firefoxFlag,edgeFlag,chromiumFlag
             logger.print_on_console('Browser compatibility check started')
-            from selenium import webdriver
-            from selenium.webdriver import ChromeOptions
             p = subprocess.Popen('"' + CHROME_DRIVER_PATH + '" --version', stdout=subprocess.PIPE, bufsize=1, shell=True)
             a = p.stdout.readline()
             a = a.decode('utf-8')[13:17]

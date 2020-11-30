@@ -298,8 +298,6 @@ class ClientWindow(wx.Frame):
         logger.print_on_console(msg)
         log.info(msg)
         core.set_ICE_status(one_time_ping = True)
-    
-
 
     def onRadioBox(self,e):
         self.choice=self.rbox.GetStringSelection()
@@ -340,6 +338,17 @@ class ClientWindow(wx.Frame):
         #Calling AWS stop job on terminate (if present)
         try:
             root.testthread.con.aws_obj.stop_job()
+        except:
+            pass
+        # Stop all SauceLabs jobs on click of terminate
+        try:
+            import script_generator
+            scl_ops = script_generator.SauceLabs_Operations()
+            sc = scl_ops.get_sauceclient()
+            j = scl_ops.get_saucejobs(sc)
+            all_jobs = j.get_jobs(full=None,limit=2)
+            for i in range(0,len(all_jobs)):
+                if all_jobs[i]['status'] == 'in progress': j.stop_job(all_jobs[i]['id'])
         except:
             pass
         #Handling the case where user clicks terminate when the execution is paused
@@ -726,7 +735,6 @@ class Config_window(wx.Frame):
         self.conn_timeout.Bind(wx.EVT_CHAR, self.handle_keypress)
 
         lblList = ['Yes', 'No']
-        lblList1 = ['Yes', 'No', 'Default']
         lblList2 = ['64-bit', '32-bit']
         lblList3 = ['All', 'Fail']
         lblList4 = ['False', 'True']
@@ -1301,7 +1309,7 @@ class About_window(wx.Frame):
         try:
             with open(MANIFEST_LOC) as f:
                 data = json.load(f)
-        except Exception as e:
+        except:
             msg = 'Unable to fetch package manifest.'
             logger.print_on_console(msg)
             log.error(msg)

@@ -20,7 +20,7 @@ class Util:
         self.f=f
 
     def wait(self,space,input,*args):
-        self.f.write(space+"input="+int(input[0]))
+        self.f.write(space+"input="+str(int(input[0][1:-1])))
         self.f.write(space+"time.sleep(input)")
         self.f.write(space+"status='Pass'")
 
