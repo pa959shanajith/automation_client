@@ -490,6 +490,11 @@ class StepDescription:
             return 'Control switched to window '+"'"+input+"'"
         def getElementTagValue():
             return 'Get the html tag value of ' + "'" + tsp.custname + "'" + ' and save the value ' +"'"+output+"'"+' in ' +"'"+tsp.outputval+"'"
+        def getAttributeValue():
+            return 'Get the attribute ' + "'" + tsp.inputval[0] + "'" + ' of ' + "'" + tsp.custname + "'" + ' and save the value ' +"'"+output+"'"+' in ' +"'"+tsp.outputval+"'"
+        def verifyAttribute():
+            input=inputval[0].split(';')
+            return 'verify the attribute ' + "'"+ input[0] +"'"+ ' has value stored in ' +"'" + input[1] + "'"+' present in the ' +"'"+tsp.custname+"'"
 
         #Table keywords
         def getcelltooltip():
