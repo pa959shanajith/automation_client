@@ -1087,13 +1087,13 @@ class MobileOpeartions():
                                             status=TEST_RESULT_PASS
                                             result=TEST_RESULT_TRUE
                                         else:
-                                            log.error('INVALID INPUT')
+                                            log.error(INVALID_INPUT)
                                     else:
-                                        log.error('INVALID INPUT')
+                                        log.error(INVALID_INPUT)
                                 else:
-                                   log.error('INVALID INPUT')
+                                   log.error(INVALID_INPUT)
                             else:
-                                log.error('INVALID INPUT')
+                                log.error(INVALID_INPUT)
 
                         elif count == 1:
                             if input_date[0] !='':
@@ -1101,21 +1101,21 @@ class MobileOpeartions():
                                 element[0].set_text(input_date[0])
                                 Tflag = True
                             else:
-                                log.error('INVALID INPUT')
+                                log.error(INVALID_INPUT)
 
                             if input_date[1] !='':
                                 element[1].set_text(input_date[1])
                                 value=element[1].text
                                 Tflag1 = True
                             else:
-                                log.error('INVALID INPUT')
+                                log.error(INVALID_INPUT)
 
                             if input_date[2] !='':
                                 element[2].set_text(input_date[2])
                                 value=element[2].text
                                 Tflag2 = True
                             else:
-                                log.error('INVALID INPUT')
+                                log.error(INVALID_INPUT)
 
                             if Tflag == True and Tflag1 ==True and Tflag2== True:
                                 value0=element[0].text
@@ -1248,21 +1248,21 @@ class MobileOpeartions():
                                     time.sleep(1)
                                     Tflag = True
                                 else:
-                                    log.error('INVALID INPUT')
+                                    log.error(INVALID_INPUT)
 
                                 if input_date[1] !='':
                                     element[1].set_text(input_date[1])
                                     time.sleep(2)
                                     Tflag1 = True
                                 else:
-                                    log.error('INVALID INPUT')
+                                    log.error(INVALID_INPUT)
 
                                 if input_date[2] !='':
                                     element[2].set_text(input_date[2])
                                     time.sleep(3)
                                     Tflag2=True
                                 else:
-                                    log.error('INVALID INPUT')
+                                    log.error(INVALID_INPUT)
 
                                 if Tflag == True and Tflag1 ==True and Tflag2== True:
                                     value0=element[0].text
@@ -1287,9 +1287,9 @@ class MobileOpeartions():
                                         status=TEST_RESULT_PASS
                                         methodoutput=TEST_RESULT_TRUE
                             else:
-                                log.error('INVALID INPUT')
+                                log.error(INVALID_INPUT)
                         else:
-                            log.error('WIDGET_INCOMPATIBLE')
+                            log.error(WIDGET_INCOMPATIBLE)
                     else:
                         err_msg=ERROR_CODE_DICT['ERR_WEB_ELEMENT_DISABLED']
                 else:
@@ -1333,7 +1333,7 @@ class MobileOpeartions():
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
                         else :
-                            log.error('WIDGET_INCOMPATIBLE')
+                            log.error(WIDGET_INCOMPATIBLE)
                     else:
                         err_msg=ERROR_CODE_DICT['ERR_WEB_ELEMENT_DISABLED']
                 else:
