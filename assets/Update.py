@@ -40,6 +40,7 @@ import win32con
 import wx
 import threading
 import time
+import hashlib
 #-------------------------------------------logging
 import logging
 import datetime
@@ -164,7 +165,7 @@ class Updater:
             import traceback
             traceback.print_exc()
 
-    def end_point_builder(self,base_folder,new_version_list):
+    def end_point_builder(self,new_version_list):
         """Builds the end point url of the file to download"""
         end_points_list = []
         try:
@@ -172,7 +173,7 @@ class Updater:
             log.info( "Building the end point URL's" )
             print ( "=>Building the end point URL's" )
             for ver in new_version_list:
-                end_points_list.append(str(self.SERVER_LOC) +'/'+ str(base_folder) + '/'+ str(ver) +'.7z')
+                end_points_list.append(str(self.SERVER_LOC) + str(ver[:3]) + '/' + str(ver) +'.zip')
             print ( "=>End Point URL's are built : ", str(end_points_list) )
             log.info( "End Point URL's are built : " + str(end_points_list) )
         except Exception as e:
@@ -187,40 +188,47 @@ class Updater:
             Any changes made in versioning need no be implemented here"""
         try:
             log.debug( 'Inside get_update_files function' )
-            for k in self.ver_client:
-                print(k)
-                d = self.ver_client[k][0]
-                e = self.ver_client[k][1]
-            #find the latest prod version
-            new_version_list = []
-            temp_variable = None
-            number = {}
-            for i in self.vers_aval:
-                #major/minor version has gone ahead
-                if ( float(self.vers_aval[i][0]) > float(d) ):
-                    if ( temp_variable == None ):
-                        temp_variable = float(self.vers_aval[i][0])
-                        number = i
-                    else:
-                        if ( temp_variable < float(self.vers_aval[i][0]) ):
-                            temp_variable = None
-                            temp_variable = float(self.vers_aval[i][0])
-                            number = i
-                else:
-                    print ('=>same prod version')
-                    pass
-            print ( '=>latest production version avaliable : ', temp_variable )
-            log.info( 'latest production version avaliable : ' + str(temp_variable)  )
+            """
+            rule:
+            1.get both current version list and get newer version versions,
+            2.check for the latest baseline avaliable in new_version_list, from baseline True till latest baseline False
+            3.if Baseline = Flase throughout newer version/same version , update from current version till the latest
+            Note : we assume that the version list has already been checked for min,max server versions in update_module.py/pyd
+            Eg: self.vers_aval = {'3.0.2':['3.0','False','<sha256 of file>'], '3.0.11':['3.0','False','<sha256 of file>'], '3.0.1':['3.0','False','<sha256 of file>'], '3.0.0':['3.0','False','<sha256 of file>'], '2.0.123':['2.0','False','<sha256 of file>'], '2.0.124':['2.0','False','<sha256 of file>'], '2.0.125':['2.0','False','<sha256 of file>']}
+            Eg: self.ver_client = {'3.0.2':['3.0']}
+            """
+            NVL = []
             new_dict={}
-            #sorting based on date
             for i in self.vers_aval:
-                if ( float(self.vers_aval[i][0]) == temp_variable ):
+                #1.get both current version list and newer version list
+                if ( float(self.vers_aval[i][0]) >= float(list(self.ver_client.values())[0][0]) ):
+                    print('=>newer version/same version')
                     new_dict.update( {str(i) : self.vers_aval[i]} )
-                    new_version_list.append(i)
+                    NVL.append(i)
+                else:
+                    print ('=>older prod version')
 
-            new_version_list.sort()
-            new_dictionary = {}
-            new_dictionary = sorted(new_dict.items(), key = lambda x : x[1])
+            NVL.sort(key=lambda s:list(map(int, s.split('.'))),reverse=True) # sort list in order
+
+            #get from after current client version and excludes older versions
+            nNVL=[]
+            for i in range(0,len(NVL)):
+                if (NVL[i]==list(self.ver_client.keys())[0]):
+                    nNVL=NVL[0:i]
+                    break
+
+            #2.baseline list
+            new_version_list=[]
+            for i in range(0,len(nNVL)):
+                if (str(new_dict[nNVL[i]][1]).lower()=='true'):
+                    new_version_list=nNVL[0:i+1]
+                    break
+
+            #3.no new baseline found
+            if not (new_version_list):
+                new_version_list=nNVL[:]
+
+            new_version_list.sort(key=lambda s:list(map(int, s.split('.')))) # sort list in order
             print ( '=>Number of changes that happened since then ( lastest delta changes ) : ', str(new_version_list)  )
             log.info( 'Number of changes that happened since then ( lastest delta changes ) : ' + str(new_version_list) )
         except Exception as e:
@@ -228,10 +236,11 @@ class Updater:
             log.error( "Error occoured in get_update_files : " + str(e) )
             import traceback
             traceback.print_exc()
-        return temp_variable, new_version_list
+        return new_version_list
 
     def download_files(self,end_point_list):
         """downloads files from the generated endpoints list"""
+        warning_msg = None
         try:
             log.debug( 'Inside download_files function' )
             self.temp_location = tempfile.gettempdir()
@@ -240,17 +249,61 @@ class Updater:
                 temp_file_path = os.path.join(self.temp_location, filename)
                 fileObj = requests.get(str(url),verify=False)
                 open(temp_file_path, 'wb').write(fileObj.content)
-                print ('=>navigating to extract_files')
-                self.extract_files(temp_file_path)
-                print ('=>deleting the extracted file')
-                self.delete_temp_file(temp_file_path)
-                print (str(filename), ' was extracted and deleted')
-            pass
+                print ('=>performing sha256 check')
+                if (self.sha256_check(filename,temp_file_path)):
+                    print ('=>sha256 check PASS')
+                    print ('=>navigating to extract_files')
+                    self.extract_files(temp_file_path)
+                    print ('=>deleting the extracted file')
+                    self.delete_temp_file(temp_file_path)
+                    print (str(filename), ' was extracted and deleted')
+                else:
+                    warning_msg = "Warning!: atempt to download further has been disabled due to sha256 mismatch of file : " + str(filename)
+                    print('=>sha256 check FAIL: atempt to download further has been disabled due to sha256 mismatch.')
+                    log.error( warning_msg )
+                    print ('=>deleting the extracted file')
+                    self.delete_temp_file(temp_file_path)
+                    print (str(filename), ' was extracted and deleted')
+                    break
         except Exception as e:
             print ( "Error occoured in download_files : ", e )
             log.error( "Error occoured in download_files : " + str(e) )
             import traceback
             traceback.print_exc()
+        return warning_msg
+
+    def sha256_check(self,filename,temp_file_path):
+        log.debug( 'Inside sha256_check function' )
+        """This function should 1.Generate sha256 value of file downloaded
+                                2.Should compare this sha256 value to the respective sha256 value in manifest.json
+                                3.if matched then should proceed as normal
+                                4.if sha256 values dont match then a.generate and log an error message
+                                                                    b.Stop the process to download the next patch of end_point_list"""
+        def get_live_sha256(temp_file_path):
+            log.debug( 'Inside get_live_sha256 function' )
+            sha256 = None
+            try:
+                hashobj = hashlib.sha256()
+                with open(temp_file_path,"rb") as f:
+                    # Read and update hash string value in blocks of 4K
+                    for byte_block in iter(lambda: f.read(4096),b""):
+                        hashobj.update(byte_block)
+                    sha256 = hashobj.hexdigest()
+            except Exception as e:
+                print ( "Error occoured in get_live_sha256 : ", e )
+                log.error( "Error occoured in get_live_sha256 : " + str(e) )
+                import traceback
+                traceback.print_exc()
+            print( '=>Completed generating sha256 of file :', temp_file_path )
+            log.info( 'Completed generating sha256 of file : ' + str(temp_file_path) )
+            return sha256
+        manifest_sha256 = self.vers_aval[filename[:filename.index('.zip')]][2] #get the sha256 value of the file from manifest.json
+        live_sha256 = get_live_sha256(temp_file_path)
+        if ( manifest_sha256 == live_sha256 ): return True
+        else:
+            print( '=>Error : sha256 of downloaded file ' + filename + 'does not match the sha256 in manifest.json' )
+            log.error( 'Error : sha256 of downloaded file ' + filename + 'does not match the sha256 in manifest.json' )
+            return False
 
     def extract_files(self, temp_file_path):
         """get to portable 7z and open the cmd #2.EXTRACT TO DESTINATION"""
@@ -463,16 +516,19 @@ def main():
             comm_obj.percentageIncri(msg,35,"Backup created.")
             comm_obj.percentageIncri(msg,40,"Updating...")
             comm_obj.percentageIncri(msg,45,"Verifying latest files.")
-            temp_variable,new_version_list = obj.get_update_files()#---------------------------------->4.Get latest files to update
+            new_version_list = obj.get_update_files()#---------------------------------->4.Get latest files to update
             comm_obj.percentageIncri(msg,50,"Latest files verified.")
             comm_obj.percentageIncri(msg,55,"Updating...")
             comm_obj.percentageIncri(msg,60,"Retrieving the latest files.")
-            end_point_list = obj.end_point_builder(temp_variable, new_version_list)#---------------------------------->5.Create endpoint url list for the files to download
+            end_point_list = obj.end_point_builder(new_version_list)#---------------------------------->5.Create endpoint url list for the files to download
             comm_obj.percentageIncri(msg,70,"Latest files retrieved.")
             comm_obj.percentageIncri(msg,75,"Updating...")
             comm_obj.percentageIncri(msg,80,"Downloading and extracting files")
-            obj.download_files(end_point_list)#---------------------------------->6.From the endpoint url list a.download the file, b.extract file into Avo Assure ICE and c.delete the downloaded  7z file
-            comm_obj.percentageIncri(msg,85,"Files Downloaded and extracted")
+            warning_msg = obj.download_files(end_point_list)#---------------------------------->6.From the endpoint url list a.download the file, b.extract file into Avo Assure ICE and c.delete the downloaded  7z file
+            if ( warning_msg ):
+                comm_obj.percentageIncri(msg,85,warning_msg)
+                time.sleep(2)
+            else:comm_obj.percentageIncri(msg,85,"Files Downloaded and extracted")
             comm_obj.percentageIncri(msg,90,"Updating...")
             comm_obj.percentageIncri(msg,95,"Successfully Updated!")
             comm_obj.percentageIncri(msg,100,"Updated...")

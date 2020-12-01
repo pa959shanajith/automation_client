@@ -36,6 +36,7 @@ import logging
 from itertools import islice
 import re
 import win32com.client
+import zipfile
 log = logging.getLogger('file_operations.py')
 
 
@@ -230,7 +231,7 @@ class FileOperations:
             res = os.path.isfile(file2)
             filename = os.path.basename(file2)
             input_ext = os.path.splitext(source_path)[1]
-            ext_list=['.txt','.csv','.xlsx','.xls','doc','.docx','.pdf']
+            ext_list=['.txt','.csv','.xlsx','.xls','.doc','.docx','.pdf','.zip']
             if(extension in ext_list):
                 if(not res or opt=='1'): 
                     if(input_ext=='.txt' and extension=='.csv'):
@@ -295,14 +296,23 @@ class FileOperations:
                             doc.SaveAs(file2, FileFormat = 17)
                         doc.Close()
                         word.Quit()
-                        
+
+                    elif(extension=='.zip'):
+                        zipf = zipfile.ZipFile(file2, 'w', zipfile.ZIP_DEFLATED)
+                        for root, dirs, files in os.walk(source_path):
+                            for f in files:
+                                if(filename==f):
+                                    continue
+                                else:
+                                    zipf.write(os.path.join(root, f))
+                        zipf.close()
                     else:
-                        err_msg = 'File conversion support is not given for ' + str(source_path) + ' to ' + str(file2)
+                        err_msg = 'File conversion support is not given for ' + str(input_ext) + ' to ' + str(extension)
                 else:
-                    err_msg = 'File already exists in the destination path'
+                    err_msg = 'File/Folder already exists in the destination path'
                 if(not err_msg):
-                    log.debug('File successfully converted from ' + str(source_path) + ' to ' + str(file2) ) 
-                    logger.print_on_console('File successfully converted from ' + str(source_path) + ' to ' + str(file2) )                                          
+                    log.debug('Successfully converted from ' + str(source_path) + ' to ' + str(file2) ) 
+                    logger.print_on_console('Successfully converted from ' + str(source_path) + ' to ' + str(file2) )
                     status=TEST_RESULT_PASS
                     result=TEST_RESULT_TRUE
             else:
@@ -323,14 +333,20 @@ class FileOperations:
         err_msg = None
         output_res = OUTPUT_CONSTANT
         try:
-            if(extension=='' or extension==' '): extension='null'
+            if(extension.strip() == ''): extension='null'
+            if(opt.strip() == ''): opt=0
             if( source_path and destination_path ):
                 try:
                     if( os.path.splitext(source_path)[1] and not os.path.splitext(destination_path)[1] ):
                         #file ops
                         if ( os.path.isfile(source_path) ):
                             if( os.path.isdir(destination_path) ):# #destination should be a folder only
-                                destination_path = destination_path + '/' + os.path.basename(source_path)
+                                if(extension=='null'):
+                                    destination_path = destination_path + '/' + os.path.basename(source_path)
+                                elif(extension.startswith('.')):
+                                    destination_path = destination_path + '/' + os.path.basename(source_path).split('.')[0]+extension
+                                else:
+                                    destination_path = destination_path + '/' + os.path.basename(source_path).split('.')[0]+'.'+extension
                                 if ( shutil.disk_usage(os.path.dirname(destination_path)).free / 1048576 > os.path.getsize(source_path) / 1048576):
                                     if( int(opt) == 0 ):
                                         #dont-overwrite
@@ -368,25 +384,36 @@ class FileOperations:
                         #folder ops
                         if( os.path.isdir(source_path) ):
                             if (os.path.isdir(destination_path)):
-                                destination_path = destination_path + '/' + os.path.basename(source_path)
+                                if(extension=='null'):
+                                    destination_path = destination_path + '/' + os.path.basename(source_path)
+                                elif(extension.startswith('.')):
+                                    destination_path = destination_path + '/' + os.path.basename(source_path).split('.')[0]+extension
+                                else:
+                                    destination_path = destination_path + '/' + os.path.basename(source_path).split('.')[0]+'.'+extension
                                 if ( shutil.disk_usage(os.path.dirname(destination_path)).free / 1000000 > os.path.getsize(source_path)):
                                     if( int(opt) == 0 ):
                                         #dont - overwrite
-                                        if( not os.path.isdir(destination_path + '/' + os.path.basename(source_path)) ):
+                                        if( not os.path.exists(destination_path) ):
                                             logger.print_on_console( "Copying the directory to destination. Please wait..." )
-                                            shutil.copytree(source_path, destination_path)
-                                            log.debug( 'Folder successfully copied to ' + str(source_path) + ' from ' + str(destination_path) )
-                                            status=TEST_RESULT_PASS
-                                            result=TEST_RESULT_TRUE
+                                            if( extension!= 'null'):
+                                                status,result,err_msg=self.saveFileAs(source_path,destination_path,opt,extension)
+                                            else:
+                                                shutil.copytree(source_path, destination_path)
+                                                log.debug( 'Folder successfully copied to ' + str(source_path) + ' from ' + str(destination_path) )
+                                                status=TEST_RESULT_PASS
+                                                result=TEST_RESULT_TRUE
                                         else:
                                             err_msg = 'Folder already exists in the directory'
                                     elif( int(opt) == 1 ):
                                         #overwrite
                                             logger.print_on_console( "Copying the directory to destination. Please wait..." )
-                                            shutil.copytree(source_path, destination_path)
-                                            log.debug( 'Folder successfully copied to ' + str(source_path) + ' from ' + str(destination_path) )
-                                            status=TEST_RESULT_PASS
-                                            result=TEST_RESULT_TRUE
+                                            if( extension!= 'null'):
+                                                status,result,err_msg=self.saveFileAs(source_path,destination_path,opt,extension)
+                                            else:
+                                                shutil.copytree(source_path, destination_path)
+                                                log.debug( 'Folder successfully copied to ' + str(source_path) + ' from ' + str(destination_path) )
+                                                status=TEST_RESULT_PASS
+                                                result=TEST_RESULT_TRUE
                                     else:
                                         err_msg = 'Invalid option, Please provide 1 or 0'
                                 else:
@@ -431,11 +458,11 @@ class FileOperations:
         del source_path, destination_path, opt #deleting variables
         return status, result, output_res, err_msg
 
-    def moveFileFolder(self, source_path, destination_path, opt = 0):
+    def moveFileFolder(self, source_path, destination_path, opt = 0, extension = 'null'):
         """
         def: moveFileFolder
-        purpose: Copy from input path 1, to input path 2, optional(0(default)- overwrite/1- overwrite )
-        param: <path of source file>,<path of destination(full file path)>,,bool
+        purpose: Copy from input path 1, to input path 2, optional(0(default)- overwrite/1- overwrite ), extension(optional)
+        param: <path of source file>,<path of destination(full file path)>,bool,extension(to convert file to other formats)
         return: bool
         """
         status = TEST_RESULT_FAIL
@@ -443,37 +470,50 @@ class FileOperations:
         err_msg = None
         output_res = OUTPUT_CONSTANT
         try:
+            if(extension.strip() == ''): extension='null'
+            if(opt.strip() == ''): opt=0
             if( source_path and destination_path ):
                 try:
                     if( os.path.splitext(source_path)[1] and not os.path.splitext(destination_path)[1] ):
                         #file ops
                         if ( os.path.isfile(source_path) ):
                             if( os.path.isdir(destination_path) ):# #destination should be a folder only
+                                if(extension=='null'):
+                                    destination_path = destination_path + '/' + os.path.basename(source_path)
+                                elif(extension.startswith('.')):
+                                     destination_path = destination_path + '/' + os.path.basename(source_path).split('.')[0]+extension
+                                else:
+                                    destination_path = destination_path + '/' + os.path.basename(source_path).split('.')[0]+'.'+extension
                                 if( int(opt) == 0 ):
-                                    if ( not os.path.isfile(destination_path + '/' + os.path.basename(source_path)) ):
+                                    if ( not os.path.isfile(destination_path) ):
                                         logger.print_on_console( "Moving the file to destination. Please wait..." )
-                                        shutil.move(source_path,destination_path)
+                                        if(extension!='null'):
+                                            status,result,err_msg=self.saveFileAs(source_path,destination_path,opt,extension)
+                                        else:
+                                            shutil.move(source_path,destination_path)
+                                            log.debug('File successfully moved from ' + str(source_path) + ' to ' + str(destination_path))
+                                            status=TEST_RESULT_PASS
+                                            result=TEST_RESULT_TRUE
                                         if ( os.path.isfile(source_path) ):#delete the file if still present in path(shutil only copies if location is on another disk)
                                             pathlib.Path(source_path).unlink()
-                                        log.debug('File successfully moved from ' + str(source_path) + ' to ' + str(destination_path))
-                                        status=TEST_RESULT_PASS
-                                        result=TEST_RESULT_TRUE
                                     else:
                                         err_msg = 'File already exists in the directory'
                                 elif( int(opt) == 1 ):
                                     #----- if file exists then overwrite
-                                    overwrite_fn = destination_path + '/' + os.path.basename(source_path)
-                                    if os.path.isfile(overwrite_fn):
+                                    if os.path.isfile(destination_path):
                                         log.info( 'File already exists in destination path, performing overwrite by deletion' )
-                                        os.remove(overwrite_fn)
+                                        os.remove(destination_path)
                                     #----- if file exists then overwrite
                                     logger.print_on_console( "Moving the file to destination. Please wait..." )
-                                    shutil.move(source_path,destination_path)
+                                    if(extension!='null'):
+                                        status,result,err_msg=self.saveFileAs(source_path,destination_path,opt,extension)
+                                    else:
+                                        shutil.move(source_path,destination_path)
+                                        log.debug('File successfully moved from ' + str(source_path) + ' to ' + str(destination_path))
+                                        status=TEST_RESULT_PASS
+                                        result=TEST_RESULT_TRUE
                                     if (os.path.isfile(source_path)):#delete the file if still present in path(shutil only copies if location is on another disk)
                                         pathlib.Path(source_path).unlink()
-                                    log.debug('File successfully moved from ' + str(source_path) + ' to ' + str(destination_path))
-                                    status=TEST_RESULT_PASS
-                                    result=TEST_RESULT_TRUE
                                 else:
                                     err_msg = 'Invalid option, Please provide 1 or 0'
                             else:
@@ -484,27 +524,39 @@ class FileOperations:
                         #folder ops
                         if( os.path.isdir(source_path) ):
                             if (os.path.isdir(destination_path)):
+                                if(extension=='null'):
+                                    destination_path = destination_path + '/' + os.path.basename(source_path)
+                                elif(extension.startswith('.')):
+                                    destination_path = destination_path + '/' + os.path.basename(source_path).split('.')[0]+extension
+                                else:
+                                    destination_path = destination_path + '/' + os.path.basename(source_path).split('.')[0]+'.'+extension
                                 if( int(opt) == 0 ):
-                                    if ( not os.path.isdir(destination_path + '/' + os.path.basename(source_path)) ):
+                                    if ( not os.path.exists(destination_path) ):
                                         logger.print_on_console( "Moving the folder to destination. Please wait..." )
-                                        shutil.move(source_path,destination_path)
+                                        if(extension!='null'):
+                                            status,result,err_msg=self.saveFileAs(source_path,destination_path,opt,extension)
+                                        else:
+                                            shutil.move(source_path,destination_path)
+                                            log.debug('Folder successfully moved to ' + str(source_path) + ' from ' + str(source_path))
+                                            status=TEST_RESULT_PASS
+                                            result=TEST_RESULT_TRUE
                                         if (os.path.isdir(source_path)):#delete the folder if still present in path(shutil only copies if location is on another disk)
                                             shutil.rmtree(source_path)
-                                        log.debug('Folder successfully moved to ' + str(source_path) + ' from ' + str(source_path))
-                                        status=TEST_RESULT_PASS
-                                        result=TEST_RESULT_TRUE
                                     else:
                                         err_msg = 'Folder already exists in the directory'
                                 elif( int(opt) == 1 ):
-                                    if ( os.path.isdir(destination_path + '/' + os.path.basename(source_path)) ):
-                                        shutil.rmtree( destination_path + '/' + os.path.basename(source_path) )
+                                    if ( os.path.isdir(destination_path)):
+                                        shutil.rmtree(destination_path)
                                     logger.print_on_console( "Moving the folder to destination. Please wait..." )
-                                    shutil.move(source_path,destination_path)
+                                    if(extension!='null'):
+                                        status,result,err_msg=self.saveFileAs(source_path,destination_path,opt,extension)
+                                    else:
+                                        shutil.move(source_path,destination_path)
+                                        log.debug('Folder successfully moved to ' + str(source_path) + ' from ' + str(source_path))
+                                        status=TEST_RESULT_PASS
+                                        result=TEST_RESULT_TRUE
                                     if (os.path.isdir(source_path)):#delete the folder if still present in path(shutil only copies if location is on another disk)
                                         shutil.rmtree(source_path)
-                                    log.debug('Folder successfully moved to ' + str(source_path) + ' from ' + str(source_path))
-                                    status=TEST_RESULT_PASS
-                                    result=TEST_RESULT_TRUE
                                 else:
                                     err_msg = 'Invalid option, Please provide 1 or 0'
                             else:
