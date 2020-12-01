@@ -567,15 +567,16 @@ class TableOperationKeywords():
                                                 #logger.print_on_console('click action performed successfully')
                                         else:
                                             try:
-                                                local_tk.log.debug('performing click')
-                                                cell.click()
+                                                local_tk.log.debug('performing java script click')
+                                                js = 'var evType; element=arguments[0]; if (document.createEvent) {     evType = "Click executed through part-1";     var evt = document.createEvent("MouseEvents");     evt.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);   	setTimeout(function() {     	element.dispatchEvent(evt);     }, 100); } else {     evType = "Click executed through part-2";   	setTimeout(function() {     element.click();   	}, 100); } return (evType);'
+                                                click=local_tk.driver.execute_script(js,webElement)
                                                 status=TEST_RESULT_PASS
                                                 methodoutput=TEST_RESULT_TRUE
                                                 local_tk.log.info('click action performed successfully')
                                                 #logger.print_on_console('click action performed successfully')
                                             except Exception as e:
-                                                js = 'var evType; element=arguments[0]; if (document.createEvent) {     evType = "Click executed through part-1";     var evt = document.createEvent("MouseEvents");     evt.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);   	setTimeout(function() {     	element.dispatchEvent(evt);     }, 100); } else {     evType = "Click executed through part-2";   	setTimeout(function() {     element.click();   	}, 100); } return (evType);'
-                                                click=local_tk.driver.execute_script(js,webElement)
+                                                local_tk.log.debug('performing click')
+                                                cell.click()
                                                 status=TEST_RESULT_PASS
                                                 methodoutput=TEST_RESULT_TRUE
                                                 local_tk.log.info('click action performed successfully')
