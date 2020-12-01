@@ -1145,9 +1145,6 @@ class MobileOpeartions():
                 else:
                     err_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
             else:
-                err_msg='webelement is None'
-                # log.error('webelement is None')
-            else:
                 err_msg=ERROR_CODE_DICT['ERR_ELEMENT_NOT_EXISTS']
             if err_msg:
                 log.error(err_msg)
