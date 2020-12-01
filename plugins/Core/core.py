@@ -262,10 +262,17 @@ class MainNamespace(BaseNamespace):
             log.error(e,exc_info=True)
 
     def on_executeTestSuite(self, *args):
-        global cw, execution_flag
+        global cw, execution_flag, qcObject
         try:
             exec_data = args[0]
             batch_id = exec_data["batchId"]
+            if("qccredentials" in exec_data and "integrationType" in exec_data["qccredentials"]):
+                integrationType = exec_data["qccredentials"]["integrationType"]
+                if(integrationType == 'ALM'):
+                    if(qcObject == None):
+                        core_utils.get_all_the_imports('Qc')
+                        import QcController
+                        qcObject = QcController.QcWindow()
             aws_mode=False
             if len(args)>0 and args[0]['apptype']=='MobileApp':
                 if args[0]['suitedetails'][0]['browserType'][0]=='2':

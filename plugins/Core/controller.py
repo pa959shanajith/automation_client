@@ -1182,6 +1182,9 @@ class Controller():
                                     try:
                                         qc_status = {}
                                         qc_status['qcaction']='qcupdate'
+                                        qc_status['qcurl']=qc_url
+                                        qc_status['qcusername']=qc_username
+                                        qc_status['qcpassword']=qc_password
                                         qc_status['qc_domain']=qc_domain
                                         qc_status['qc_project']=qc_project
                                         qc_status['qc_folder']=qc_folder
@@ -1217,6 +1220,9 @@ class Controller():
                                         try:
                                             qc_status = {}
                                             qc_status['qcaction']='qcupdate'
+                                            qc_status['qcurl']=qc_url
+                                            qc_status['qcusername']=qc_username
+                                            qc_status['qcpassword']=qc_password
                                             qc_status['qc_domain']=qc_domain
                                             qc_status['qc_project']=qc_project
                                             qc_status['qc_folder']=qc_folder

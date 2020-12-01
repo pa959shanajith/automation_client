@@ -245,6 +245,12 @@ class QcWindow():
     def update_qc_details(self,data):
         status = False
         try:
+            if(self.Qc_Url == None) :
+                qcLoginLoad = {}
+                qcLoginLoad["qcUsername"] = data['qcusername']
+                qcLoginLoad["qcPassword"] = data['qcpassword']
+                qcLoginLoad["qcURL"] = data['qcurl']
+                self.login(qcLoginLoad)
             almDomain =  data['qc_domain']
             almProject = data['qc_project']
             tsFolder = data['qc_folder']
