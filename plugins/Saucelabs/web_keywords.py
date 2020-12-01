@@ -68,8 +68,8 @@ class Browser_Keywords:
         self.f.write(space+"status='Pass'")
     
     def switchToWindow(self,space,input,*args):
-        inp=int(input[0][1:-1])
-        self.f.write(space+"driver.switch_to.window(driver.window_handles["+str(int(inp)-1)+"])")
+        self.f.write(space+"input='"+str(int(input[0][1:-1]))+"'")
+        self.f.write(space+"driver.switch_to.window(driver.window_handles[int(input)-1])")
         self.f.write(space+"status='Pass'")
     
     def navigateWithAuthenticate(self,space,input,*args):
@@ -328,13 +328,13 @@ class Element_Keywords:
     def uploadFile(self,space,webelement,input,*args):
         input=input[0].replace("\\","/")
         self.f.write(space+"input="+input)
-        self.f.write(space+""+webelement+".sendKeys(input)")
+        self.f.write(space+""+webelement+".send_keys(input)")
         self.f.write(space+"status='Pass'")
 
     def dropFile(self,space,webelement,input,*args):
         input=input[0].replace("\\","/")
         self.f.write(space+"input="+input)
-        self.f.write(space+""+webelement+".sendKeys(input)")
+        self.f.write(space+""+webelement+".send_keys(input)")
         self.f.write(space+"status='Pass'")
 
     def getElementText(self,space,webelement,input,*args):
@@ -361,7 +361,7 @@ class Element_Keywords:
     def verifyToolTipText(self,space,webelement,input,*args):
         self.f.write(space+"input="+input[0])
         self.f.write(space+"tooltip="+webelement+".get_attribute('title')")
-        self.f.write(space+"output='True' if tooltip == input[0] else 'False'")
+        self.f.write(space+"output='True' if tooltip == input else 'False'")
         self.f.write(space+"status='Pass' if output == 'True' else 'Fail'")
 
 class Radio_checkbox_Keywords():
@@ -579,11 +579,12 @@ class Util_Keywords():
         self.f.write(space+"status='Pass' if output == 'True' else 'Fail'")
 
     def drag(self,space,webelement,input,*args):
-        self.f.write(space+"action=webdriver.ActionChains(driver).clickAndHold("+webelement+").move_to_element("+webelement+").double_click("+webelement+").perform()")
+        self.f.write(space+"action=webdriver.ActionChains(driver).click_and_hold("+webelement+").move_to_element("+webelement+")")
         self.f.write(space+"status='Pass'")
 
     def drop(self,space,webelement,input,*args):
         self.f.write(space+"action.release("+webelement+").perform()")
+        self.f.write(space+"action=''")
         self.f.write(space+"status='Pass'")
 
     def waitForElementVisible(self,space,webelement,input,*args):
