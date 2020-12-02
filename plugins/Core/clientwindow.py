@@ -343,7 +343,7 @@ class ClientWindow(wx.Frame):
         # Stop all SauceLabs jobs on click of terminate
         try:
             import script_generator
-            scl_ops = script_generator.SauceLabs_Operations('','')
+            scl_ops = script_generator.Sauce_Config()
             sc = scl_ops.get_sauceclient()
             j = scl_ops.get_saucejobs(sc)
             all_jobs = j.get_jobs(full=None,limit=2)
