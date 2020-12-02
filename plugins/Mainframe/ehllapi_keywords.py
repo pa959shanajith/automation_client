@@ -21,6 +21,7 @@ import core_utils
 log = logging.getLogger('ehllapi_keywords.py')
 emulator = None
 soc_api = None
+atmpt = 0
 core_utils_obj = core_utils.CoreUtils()
 
 def dataTransmitter(a,*args):
@@ -42,7 +43,7 @@ def dataTransmitter(a,*args):
         return json.loads(core_utils_obj.unwrap(data, key))
 
 def check_n_init(emulator_type):
-    global emulator, soc_api
+    global emulator, soc_api, atmpt
     if emulator is None:
         path = subprocess.os.environ["AVO_ASSURE_HOME"] + "/plugins/Mainframe/AvoAssureMFapi.exe"
         emulator = subprocess.Popen(path, shell=True)
@@ -57,12 +58,36 @@ def check_n_init(emulator_type):
                 logger.print_on_console(data["emsg"])
                 raise Exception(data["emsg"])
         except Exception as e:
-            err_msg = "Error: Unable to launch AvoAssureMFapi."
-            log.error(err_msg)
-            log.error(e)
-            logger.print_on_console(err_msg)
-            subprocess.os.system("TASKKILL /F /IM AvoAssureMFapi.exe")
-            emulator = None
+            if(emulator_type.lower()!='hod'):
+                err_msg = "Error: Unable to launch AvoAssureMFapi."
+                log.error(err_msg)
+                log.error(e)
+                logger.print_on_console(err_msg)
+                subprocess.os.system("TASKKILL /F /IM AvoAssureMFapi.exe")
+                emulator = None
+            else:
+                try:
+                    time.sleep(1)
+                    data = dataTransmitter("test", emulator_type)
+                    if data["stat"] != 0:
+                        err_msg = "Error: Unable to launch AvoAssureMFapi."
+                        log.error(err_msg)
+                        log.error(data["emsg"])
+                        logger.print_on_console(err_msg)
+                except:
+                    soc_api.close()
+                    soc_api = None
+                    if( atmpt < 60 ):
+                        atmpt = atmpt + 1
+                        log.info('Attempting to start||connect to AvoAssureMFapi.exe, attempt no.: ' + str(atmpt))
+                        check_n_init(emulator_type)
+                    else:
+                        err_msg = "Error: Unable to launch AvoAssureMFapi."
+                        log.error(err_msg)
+                        log.error(e)
+                        logger.print_on_console(err_msg)
+                        subprocess.os.system("TASKKILL /F /IM AvoAssureMFapi.exe")
+                        emulator = None
     else:
         try:
             data = dataTransmitter("test", emulator_type)
@@ -89,6 +114,8 @@ class EhllapiKeywords:
         self.cols = 0
 
     def launch_mainframe(self,emulator_path,emulator_type):
+        global atmpt, emulator
+        emulator = None
         err_msg=None
         output=OUTPUT_CONSTANT
         return_value = None
@@ -96,6 +123,7 @@ class EhllapiKeywords:
             self.emulator_path = emulator_path
             self.emulator_type = emulator_type
             check_n_init(self.emulator_type)
+            atmpt = 0
             data = dataTransmitter("launchmainframe", self.emulator_path)
             return_value = data["stat"]
             time.sleep(5)
