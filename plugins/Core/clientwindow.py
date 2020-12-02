@@ -58,6 +58,7 @@ class RedirectText(object):
         if(color=='RED'): rgb_color=(220,53,69)
         elif(color=='GREEN'): rgb_color=(40,167,69)
         elif(color=='YELLOW'): rgb_color=(255, 193, 7)
+        else: rgb_color=(0, 50, 250)
         wx.CallAfter(self.out.BeginTextColour, rgb_color)
         self.write(string+'\n')
         wx.CallAfter(self.out.EndTextColour)
