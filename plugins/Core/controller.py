@@ -975,7 +975,7 @@ class Controller():
             print('=======================================================================================================')
             log.info('***SUITE '+str(suite_idx) +' EXECUTION STARTED***')
             logger.print_on_console('***SUITE ', str(suite_idx) ,' EXECUTION STARTED***')
-            log.info('-----------------------------------------------')
+            log.info('---------------------------------------------------------------------')
             print('=======================================================================================================')
             do_not_execute = False
             #Check for the disabled scenario
