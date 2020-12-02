@@ -4,7 +4,7 @@
 *.exe
 *.log
 *.DS_Store
-./*.json
+/*.json
 *.dll
 DLLs/*
 include/*

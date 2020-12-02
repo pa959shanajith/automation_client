@@ -123,7 +123,7 @@ class Reporting:
         return description
 
 
-    def build_overallstatus(self,start_time,end_time,ellapsed_time):
+    def build_overallstatus(self,start_time,end_time,ellapsed_time,*args):
         """
         def : build_overallstatus
         purpose : builds the overallstatus field of report_json
@@ -148,6 +148,7 @@ class Reporting:
         obj[BROWSER_TYPE]=self.browser_type
         obj[DATE]=self.date
         obj[TIME]=self.time
+        if args and args[0]: obj['video'] = args[0]
         self.overallstatus_array.append(obj)
 
     def build_overallstatus_conditionCheck(self):
@@ -265,7 +266,7 @@ class Reporting:
         purpose : report message if testcase is empty
         in scenario
         """
-        log.info("report testcase empty description:", description)
+        log.info("Report testcase empty description: " + description)
         obj={}
         obj[ID]='1'
         obj[KEYWORD]=''
@@ -273,7 +274,7 @@ class Reporting:
         obj[COMMENTS]=''
         obj[STEP]=PROGRAM_TERMINATION
         # Bug #246 (Himanshu) Status bar in reports
-        obj[STATUS]='Terminate'
+        obj[STATUS]=TERMINATE
         obj[STEP_DESCRIPTION]=description
         self.report_string_testcase_empty.append(obj)
         self.id_counter+=1
@@ -306,7 +307,6 @@ class Reporting:
         def : generate_keyword_step
         purpose : create each step in the report
         param : report_obj - Instance of <reporting_pojo>
-
 
         """
         if report_obj.testscript_name != self.testscript_name:
@@ -346,7 +346,6 @@ class Reporting:
         def : generate_report_step
         purpose : calls the method 'generate_keyword_step' to add each step to the report
         param : tsp,status,controller_instance,ellapsedtime,keyword_flag
-
 
         """
         comments=''
@@ -400,7 +399,7 @@ class Reporting:
         if len(args)>0:
             if args[0] != None:
                 result_tuple=args[0]
-                if "Terminate" not in result_tuple:
+                if TERMINATE not in result_tuple:
                     comments= result_tuple[3]
                 if(len(result_tuple) == 5):
                     screenshot_path = result_tuple[4]
@@ -418,24 +417,23 @@ class Reporting:
         self.id_counter+=1
 
 
-
     def print_report_json(self):
-
         """
         def : print_report_json
         purpose : printing the report json
 
-
         """
-
         print('--------------------------------------------------------------------')
         print(json.dumps(self.report_json))
         print('--------------------------------------------------------------------')
 
 
-
     def save_report_json(self,filename,json_data,i):
         try:
+            terminated_by = 'N/A'
+            if self.report_json[OVERALLSTATUS][0][OVERALLSTATUS] == TERMINATE:
+                terminated_by = USER_TERMINATED if self.user_termination else PROGRAM_TERMINATED
+            self.report_json[OVERALLSTATUS][0][TERMINATED_BY] = terminated_by
             report_json=copy.deepcopy(self.report_json)
             log.debug('Saving report json to a file')
             if ("suitedetails" in json_data):
@@ -452,8 +450,8 @@ class Reporting:
                     report_json[OVERALLSTATUS][0]["pass"]="0"
                     report_json[OVERALLSTATUS][0]["fail"]="0"
                     report_json[OVERALLSTATUS][0]["terminate"]="0"
-            if len(report_json["rows"]) != 0:
-                for i in report_json["rows"]:
+            if len(report_json[ROWS]) != 0:
+                for i in report_json[ROWS]:
                     if i[COMMENTS]:
                         report_json[COMMENTS_LENGTH].append(i[COMMENTS])
             with open(filename, 'w') as outfile:
@@ -469,6 +467,7 @@ class Reporting:
         try:
             log.debug('Saving report json to a file')
             self.build_overallstatus_conditionCheck()
+            self.report_json_condition_check[OVERALLSTATUS][0][TERMINATED_BY] = USER_TERMINATED if self.user_termination else PROGRAM_TERMINATED
             report_json_condition_check=copy.deepcopy(self.report_json_condition_check)
             if ("suitedetails" in json_data):
                 report_json_condition_check[OVERALLSTATUS][0][RELEASE_NAME]=json_data["suitedetails"][i["s_index"]]['releaseid']
@@ -498,6 +497,7 @@ class Reporting:
             log.debug('Saving report json to a file')
             self.add_report_testcase_empty(description)
             self.build_overallstatus_conditionCheck_testcase_empty()
+            self.report_json_condition_check_testcase_empty[OVERALLSTATUS][0][TERMINATED_BY] = USER_TERMINATED if self.user_termination else PROGRAM_TERMINATED
             report_json_condition_check_testcase_empty=copy.deepcopy(self.report_json_condition_check_testcase_empty)
             if ("suitedetails" in json_data):
                 report_json_condition_check_testcase_empty[OVERALLSTATUS][0][RELEASE_NAME]=json_data["suitedetails"][i["s_index"]]['releaseid']
@@ -537,7 +537,7 @@ class Reporting:
         overallstatus_obj[OVERALLSTATUS]=TERMINATE
         overallstatus_obj[BROWSER_TYPE]='N/A'
         overallstatus_array.append(overallstatus_obj)
-        self.report_json['overallstatus']=overallstatus_array
+        self.report_json[OVERALLSTATUS]=overallstatus_array
         row_array=[]
         row_obj={}
         row_obj[ID]=0

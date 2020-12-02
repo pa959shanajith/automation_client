@@ -121,7 +121,7 @@ class ClientWindow(wx.Frame):
         self.rollbackItem = wx.MenuItem(self.helpMenu, 162, text="Rollback", kind=wx.ITEM_NORMAL)
         self.helpMenu.Append(self.rollbackItem)
         self.rollbackItem.Enable(False)
-        #self.menubar.Append(self.helpMenu, '&Help')
+        self.menubar.Append(self.helpMenu, '&Help')
 
         self.Bind(wx.EVT_MENU, self.menuhandler)
         self.connectbutton = wx.BitmapButton(self.panel, bitmap=self.connect_img,pos=(10, 10), size=(100, 25), name='connect')
@@ -132,8 +132,8 @@ class ClientWindow(wx.Frame):
         self.log.SetForegroundColour((0,50,250))
         self.log.SetFont(font1)
 
-        self.schedule = wx.CheckBox(self.panel, label = 'Schedule',pos=(120, 10), size=(100, 25))
-        self.schedule.SetToolTip(wx.ToolTip("Enable Scheduling Mode"))
+        self.schedule = wx.CheckBox(self.panel, label = 'Do Not Disturb',pos=(120, 10), size=(100, 25))
+        self.schedule.SetToolTip(wx.ToolTip("Enable Do Not Disturb Mode"))
         self.schedule.Bind(wx.EVT_CHECKBOX,self.onChecked_Schedule)
         self.schedule.Disable()
 
@@ -294,10 +294,10 @@ class ClientWindow(wx.Frame):
             core.connection_Timer = threading.Timer(conn_time*60*60, root.closeConnection)
             core.connection_Timer.start()
         mode=self.schedule.GetValue()
-        msg = ("En" if mode else "Dis") + "abling Schedule mode"
+        msg = ("En" if mode else "Dis") + "abling Do Not Disturb mode"
         logger.print_on_console(msg)
         log.info(msg)
-        core.socketIO.emit('toggle_schedule',mode)
+        core.set_ICE_status(one_time_ping = True)
 
     def onRadioBox(self,e):
         self.choice=self.rbox.GetStringSelection()
@@ -334,9 +334,21 @@ class ClientWindow(wx.Frame):
         logger.print_on_console(msg)
         log.info(msg)
         controller.terminate_flag=True
+        controller.manual_terminate_flag=True
         #Calling AWS stop job on terminate (if present)
         try:
             root.testthread.con.aws_obj.stop_job()
+        except:
+            pass
+        # Stop all SauceLabs jobs on click of terminate
+        try:
+            import script_generator
+            scl_ops = script_generator.SauceLabs_Operations('','')
+            sc = scl_ops.get_sauceclient()
+            j = scl_ops.get_saucejobs(sc)
+            all_jobs = j.get_jobs(full=None,limit=2)
+            for i in range(0,len(all_jobs)):
+                if all_jobs[i]['status'] == 'in progress': j.stop_job(all_jobs[i]['id'])
         except:
             pass
         #Handling the case where user clicks terminate when the execution is paused
@@ -346,6 +358,7 @@ class ClientWindow(wx.Frame):
             root.testthread.resume(False)
         self.schedule.Enable()
         core.execution_flag = False
+        core.set_ICE_status(one_time_ping = True)
 
     def OnClear(self,event):
         self.log.Clear()
@@ -566,6 +579,11 @@ class Config_window(wx.Frame):
         else:
             self.chrome_profile.SetValue('default')
 
+        if isConfigJson['clear_cache'] == 'Yes':
+            self.chrome_profile.SetValue('default')
+            self.chrome_profile.SetEditable(False)
+            self.chrome_profile.SetBackgroundColour((211,211,211))
+
         self.ff_path=wx.StaticText(self.panel, label="Firefox Path", pos=config_fields["Ffox_path"][0],size=config_fields["Ffox_path"][1], style=0, name="")
         self.firefox_path=wx.TextCtrl(self.panel, pos=config_fields["Ffox_path"][2], size=config_fields["Ffox_path"][3])
         self.firefox_path_btn=wx.Button(self.panel, label="...", pos=config_fields["Ffox_path"][4], size=config_fields["Ffox_path"][5])
@@ -717,7 +735,6 @@ class Config_window(wx.Frame):
         self.conn_timeout.Bind(wx.EVT_CHAR, self.handle_keypress)
 
         lblList = ['Yes', 'No']
-        lblList1 = ['Yes', 'No', 'Default']
         lblList2 = ['64-bit', '32-bit']
         lblList3 = ['All', 'Fail']
         lblList4 = ['False', 'True']
@@ -843,13 +860,23 @@ class Config_window(wx.Frame):
             self.rbox15.SetSelection(1)
         self.rbox15.SetToolTip(wx.ToolTip("Enables or disables Headless execution mode for Browser"))
 
+        #adding the radio button for clear cache:
+        self.rbox16 = wx.RadioBox(self.panel1, label = "Clear Cache", choices = lblList,
+            majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
+        if isConfigJson != False and isConfigJson['clear_cache'].title() == lblList[0]:
+            self.rbox16.SetSelection(0)
+        else:
+            self.rbox16.SetSelection(1)
+        self.rbox16.SetToolTip(wx.ToolTip("Enables or disables Clear Cache"))
+        self.rbox16.Bind(wx.EVT_RADIOBOX, self.OnClearCache)
+
         #Adding GridSizer which will show the radio buttons into grid of 7 rows and 2 colums it can be changed based on the requirements
         self.gs=wx.GridSizer(8,2,5,5)
         self.gs.AddMany([(self.rbox1,0,wx.EXPAND), (self.rbox2,0,wx.EXPAND), (self.rbox9,0,wx.EXPAND),
             (self.rbox5,0,wx.EXPAND), (self.rbox6,0,wx.EXPAND), (self.rbox3,0,wx.EXPAND),
             (self.rbox4,0,wx.EXPAND), (self.rbox8,0,wx.EXPAND), (self.rbox7,0,wx.EXPAND),
             (self.rbox10,0,wx.EXPAND), (self.rbox11,0,wx.EXPAND), (self.rbox12,0,wx.EXPAND),
-            (self.rbox13,0,wx.EXPAND), (self.rbox14,0,wx.EXPAND), (self.rbox15,0,wx.EXPAND)])
+            (self.rbox13,0,wx.EXPAND), (self.rbox14,0,wx.EXPAND), (self.rbox15,0,wx.EXPAND),(self.rbox16,0,wx.EXPAND)])
 
         #adding  GridSizer to bSizer which is a box sizer
         self.bSizer.Add(self.gs, 1, wx.EXPAND | wx.TOP, 5)
@@ -899,6 +926,17 @@ class Config_window(wx.Frame):
             self.demo.SetForegroundColour('#848484')
         evt.Skip()
 
+    def OnClearCache(self,event):
+        if self.rbox16.GetStringSelection()=='Yes':
+            self.chrome_profile.SetValue('default')
+            self.chrome_profile.SetEditable(False)
+            self.chrome_profile_btn.Disable()
+            self.chrome_profile.SetBackgroundColour((211,211,211))
+        else:
+            self.chrome_profile.SetEditable(False)
+            self.chrome_profile.SetBackgroundColour((255,255,255))
+            self.chrome_profile_btn.Enable()
+
     """This method verifies and checks if correct data is present,then creates a dictionary and sends this dictionary to jsonCreater()"""
     def config_check(self,event):
         data = {}
@@ -934,6 +972,7 @@ class Config_window(wx.Frame):
         update_check = self.rbox14.GetStringSelection()
         headless_mode = self.rbox15.GetStringSelection()
         delay_string_in = self.Delay_input.GetValue()
+        clear_cache = self.rbox16.GetStringSelection()
         if extn_enabled == 'Yes' and headless_mode == 'Yes':
             self.error_msg.SetLabel("Extension Enable must be disabled when Headless Mode is enabled")
             self.error_msg.SetForegroundColour((255,0,0))
@@ -968,6 +1007,7 @@ class Config_window(wx.Frame):
         data['update_check']= update_check.strip()
         data['headless_mode']=headless_mode.strip()
         data['delay_stringinput']=delay_string_in.strip()
+        data['clear_cache']=clear_cache.strip()
         config_data=data
         if (data['server_ip']!='' and data['server_port']!='' and data['server_cert']!='' and
             data['chrome_path']!='' and data['queryTimeOut'] not in ['','sec'] and data['logFile_Path']!='' and
@@ -1231,8 +1271,7 @@ class About_window(wx.Frame):
     def __init__(self, parent, id, title):
         try:
             data = self.get_client_manifest()
-            msg = 'A product of Dimension Labs \n'
-            msg = msg +str(self.get_Info_1(data))+str(self.get_Info_2(data))+str(self.get_Info_3(data))+str(self.get_Info_4())+str(self.get_Info_5(data))+str(self.get_Info_6())
+            msg = str(self.get_Info_1(data)) + str(self.get_Info_2(data)) + str(self.get_Info_4()) + str(self.get_Info_3())
             #------------------------------------Different co-ordinates for Windows and Mac
             if SYSTEM_OS=='Windows':
                 upload_fields= {
@@ -1269,7 +1308,7 @@ class About_window(wx.Frame):
         try:
             with open(MANIFEST_LOC) as f:
                 data = json.load(f)
-        except Exception as e:
+        except:
             msg = 'Unable to fetch package manifest.'
             logger.print_on_console(msg)
             log.error(msg)
@@ -1278,7 +1317,7 @@ class About_window(wx.Frame):
     def get_Info_1(self,data):
         str1=''
         try:
-            str1='Version : '+list(data['version'])[0]+'.'+list(data['version'][list(data['version'])[0]]['subversion'])[0]+' \n'
+            str1='Version : '+list(data['iceversion'])[0]+'.'+list(data['iceversion'][list(data['iceversion'])[0]]['subversion'])[0]+' \n'
         except Exception as e:
             log.error(e)
         return str1
@@ -1286,35 +1325,24 @@ class About_window(wx.Frame):
     def get_Info_2(self,data):
         str1=''
         try:
-            str1='Updated on : '+(data['version'][list(data['version'])[0]]['subversion'][list(data['version'][list(data['version'])[0]]['subversion'])[0]]['updated_on'])+' \n'
+            str1='Updated on : '+(data['iceversion'][list(data['iceversion'])[0]]['subversion'][list(data['iceversion'][list(data['iceversion'])[0]]['subversion'])[0]]['updated_on'])+' \n'
         except Exception as e:
             log.error(e)
         return str1
 
-    def get_Info_3(self,data):
-        str1=''
-        try:
-            str1='Baseline : '+(data['version'][list(data['version'])[0]]['subversion'][list(data['version'][list(data['version'])[0]]['subversion'])[0]]['baseline'])+' \n'
-        except Exception as e:
-            log.error(e)
-        return str1
+##    def get_Info_3(self,data):
+##        str1=''
+##        try:
+##            str1='Baseline : '+(data['iceversion'][list(data['iceversion'])[0]]['subversion'][list(data['iceversion'][list(data['iceversion'])[0]]['subversion'])[0]]['baseline'])+' \n'
+##        except Exception as e:
+##            log.error(e)
+##        return str1
 
-    def get_Info_4(self):
+    def get_Info_3(self):
         return '© Avo Automation\n'
 
-    def get_Info_5(self,data):
-        str1=''
-        try:
-            str1='Fixes :'+' \n'
-            b=(data['version'][list(data['version'])[0]]['subversion'][list(data['version'][list(data['version'])[0]]['subversion'])[0]]['fixes'])
-            for i in b:
-                str1=str1+i+' : '+b[i]+' \n'
-        except Exception as e:
-            log.error(e)
-        return str1
-
-    def get_Info_6(self):
-        return 'For any queries write to us @ : support.nineteen68@slkgroup.com'
+    def get_Info_4(self):
+        return 'For any queries write to us @ : support.nineteen68@slkgroup.com'+' \n'
 
     def close(self, event):
         self.Close()
@@ -1505,7 +1533,7 @@ class DebugWindow(wx.Frame):
 
 def check_update(flag):
     global update_obj
-    SERVER_LOC = "https://" + str(configvalues['server_ip']) + ':' + str(configvalues['server_port']) + '/fileserver/'
+    SERVER_LOC = "https://" + str(configvalues['server_ip']) + ':' + str(configvalues['server_port']) + '/patchupdate/'
     #------------------------------------------------------------getting server manifest
     def get_server_manifest_data():
         data = None
@@ -1529,6 +1557,8 @@ def check_update(flag):
     update_updater_module(data)
     UPDATE_MSG=update_obj.send_update_message()
     l_ver = update_obj.fetch_current_value()
+    SERVER_CHECK_MSG = update_obj.server_check_message()
+    if (SERVER_CHECK_MSG): logger.print_on_console(SERVER_CHECK_MSG)
     #check if update avaliable
     if ( UPDATE_MSG == 'Update Available!!! Click on update' and flag == True ):
         logger.print_on_console("An update is available. Click on 'Help' menu option -> 'Check for Updates' sub-menu option -> 'Update' button")

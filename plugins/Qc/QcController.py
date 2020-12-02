@@ -245,64 +245,80 @@ class QcWindow():
     def update_qc_details(self,data):
         status = False
         try:
+            if(self.Qc_Url == None) :
+                qcLoginLoad = {}
+                qcLoginLoad["qcUsername"] = data['qcusername']
+                qcLoginLoad["qcPassword"] = data['qcpassword']
+                qcLoginLoad["qcURL"] = data['qcurl']
+                self.login(qcLoginLoad)
             almDomain =  data['qc_domain']
             almProject = data['qc_project']
             tsFolder = data['qc_folder']
             tsList = data['qc_tsList']
             testrunname = data['qc_testrunname']
-            midPoint = "/rest/domains/" + almDomain + "/projects/" + almProject 
-            URL = self.Qc_Url + midPoint + "/" + "test-set-folders"
-            URL_for_testsets = self.Qc_Url + midPoint + "/" + "test-sets"
-            URL_for_testcases = self.Qc_Url + midPoint + "/" + "test-instances"
-            folderName = tsFolder.split("\\")[-1]
-            parentID = self.get_folder_parent_id(URL, folderName)
-            #fetching testset id
-            payload = {"query": "{parent-id[" + str(parentID) + "]}", "fields": "id,name"}
-            res1 = requests.get(URL_for_testsets, params=payload, headers=self.headers, cookies=self.cookies)
-            o2 = xmltodict.parse(res1.content)
-            y2 = json.loads(json.dumps(o2))
-            test_id = None
-            entity_len = int(y2["Entities"]["@TotalResults"])
-            if (entity_len == 1): y2["Entities"]["Entity"] = [y2["Entities"]["Entity"]]
-            if (entity_len > 0):
-                k2 = y2["Entities"]["Entity"]
-                for c in k2:
-                    l = c["Fields"]["Field"]
-                    flag = 0
-                    for t in l:
-                        if t["@Name"] == "name" :
-                            if(t["Value"] == tsList): flag = 1
-                        elif( t["@Name"] == "id" and flag == 1):
-                            test_id = t["Value"]
-            payload = {"query": "{cycle-id[" + str(test_id) + "]}", "fields": "name"}
-            #fetching test case id 
-            response = requests.get(URL_for_testcases , params=payload, headers=self.headers, cookies=self.cookies)
-            o = xmltodict.parse(response.content)
-            y = json.loads(json.dumps(o))
-            tsn1 = testrunname.split("]")
-            tsn = (tsn1[1] + " " + tsn1[0] + "]")[1:]
-            testc_id = ''
-            entity_len = int(y["Entities"]["@TotalResults"])
-            if (entity_len == 1): y["Entities"]["Entity"] = [y["Entities"]["Entity"]]
-            if (entity_len > 0):
-                k2 = y["Entities"]["Entity"]
-                for c in k2:
-                    l = c["Fields"]["Field"]
-                    flag = 0
-                    for n in l:      
-                        if n["@Name"] == "name":
-                            if n["Value"] == tsn: flag = 1                
-                        elif n["@Name"] == "id" and flag == 1:
-                            testc_id = n["Value"]                  
-            #updating status             
-            result =  data['qc_update_status'] 
-            URL_for_testcase_update = self.Qc_Url + midPoint + "/" + "test-instances"  + "/" + testc_id
-            data1 ='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Entity Type="test-instance"><Fields><Field Name="status"><Value>'+ result +'</Value></Field></Fields></Entity>'
-            payload = { "body": data1, "data": data1}
-            self.headers = {'Content-Type': "application/xml", 'Accept': "application/xml"}
-            response = requests.put(URL_for_testcase_update , data= data1, headers=self.headers, cookies=self.cookies)
-            #status = response.status_code == 200
-            status = True
+            for indexTest in range(len(tsFolder)):
+                midPoint = "/rest/domains/" + almDomain + "/projects/" + almProject 
+                URL = self.Qc_Url + midPoint + "/" + "test-set-folders"
+                URL_for_testsets = self.Qc_Url + midPoint + "/" + "test-sets"
+                URL_for_testcases = self.Qc_Url + midPoint + "/" + "test-instances"
+                folderName = tsFolder[indexTest].split("\\")[-1]
+                parentID = self.get_folder_parent_id(URL, folderName)
+                #fetching testset id
+                payload = {"query": "{parent-id[" + str(parentID) + "]}", "fields": "id,name"}
+                res1 = requests.get(URL_for_testsets, params=payload, headers=self.headers, cookies=self.cookies)
+                o2 = xmltodict.parse(res1.content)
+                y2 = json.loads(json.dumps(o2))
+                test_id = None
+                entity_len = int(y2["Entities"]["@TotalResults"])
+                if (entity_len == 1): y2["Entities"]["Entity"] = [y2["Entities"]["Entity"]]
+                if (entity_len > 0):
+                    k2 = y2["Entities"]["Entity"]
+                    for c in k2:
+                        l = c["Fields"]["Field"]
+                        flag = 0
+                        for t in l:
+                            if t["@Name"] == "name" :
+                                if(t["Value"] == tsList[indexTest]): flag = 1
+                            elif( t["@Name"] == "id" and flag == 1):
+                                test_id = t["Value"]
+                payload = {"query": "{cycle-id[" + str(test_id) + "]}", "fields": "name"}
+                #fetching test case id 
+                response = requests.get(URL_for_testcases , params=payload, headers=self.headers, cookies=self.cookies)
+                o = xmltodict.parse(response.content)
+                y = json.loads(json.dumps(o))
+                tsn1 = []
+                tsn = []
+                testc_id = []
+                # for z in testrunname:
+                tsn1.append(testrunname[indexTest].split("]"))
+                for x in tsn1:
+                    xx=(x[1] + " " + x[0] + "]")[1:]
+                    xx=xx.lstrip('0123456789')
+                    tsn.append(xx)
+                entity_len = int(y["Entities"]["@TotalResults"])
+                if (entity_len == 1): y["Entities"]["Entity"] = [y["Entities"]["Entity"]]
+                if (entity_len > 0):
+                    k2 = y["Entities"]["Entity"]
+                    for c in k2:
+                        l = c["Fields"]["Field"]
+                        flag = 0
+                        for n in l:      
+                            if n["@Name"] == "name":
+                                for nst in tsn:
+                                    if n["Value"] == nst: flag = 1                
+                            elif n["@Name"] == "id" and flag == 1:
+                                testc_id.append(n["Value"])                  
+                #updating status             
+                result =  data['qc_update_status']
+                for t in testc_id:
+                    URL_for_testcase_update = self.Qc_Url + midPoint + "/" + "test-instances"  + "/" + t
+                    data1 ='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Entity Type="test-instance"><Fields><Field Name="status"><Value>'+ result +'</Value></Field></Fields></Entity>'
+                    payload = { "body": data1, "data": data1}
+                    self.headers = {'Content-Type': "application/xml", 'Accept': "application/xml"}
+                    response = requests.put(URL_for_testcase_update , data= data1, headers=self.headers, cookies=self.cookies)
+                    #status = response.status_code == 200
+                if indexTest == 0: status = response.status_code == 200
+                else: status = response.status_code == 200 and status
         except Exception as e:
             err_msg = 'Error while updating data in ALM'
             log.error(err_msg)
