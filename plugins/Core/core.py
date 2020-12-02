@@ -1029,7 +1029,7 @@ class TestThread(threading.Thread):
             logger.print_on_console('Execution status '+status)
 
             if status==TERMINATE:
-                logger.print_on_console('---------Termination Completed-------')
+                logger.print_on_console('---------Termination Completed-------',color="YELLOW")
             if self.action==DEBUG:
                 testcasename = handler.local_handler.testcasename
                 self.cw.killChildWindow(debug=True)
@@ -1108,6 +1108,8 @@ class Main():
             clientwindow.root = root
             cw = clientwindow.ClientWindow()
             self.cw = cw
+        else:
+            logger.init_colorama(autoreset=True)
 
         """ Creating Root Logger using logger file config and setting logfile path, which is in config.json """
         try:
