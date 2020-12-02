@@ -764,7 +764,7 @@ start = timer()
                 file_creations_status=j.get_job_asset_content(all_jobs[i]['id'],filename,dirpath)
                 status=all_jobs[i]['error']
                 import controller
-                if controller.manual_terminate_flag:
+                if controller.terminate_flag:
                     overall_status="Terminate"
                     step={
                         "id": len(report)+1,
@@ -786,7 +786,7 @@ start = timer()
             import traceback
             traceback.print_exc()
             logger.print_on_console("Error in Sauce Labs Execution")
-            logger.print_on_console(e)
+            log.error(e)
             self.f.close()
             f1.close()
             return False
