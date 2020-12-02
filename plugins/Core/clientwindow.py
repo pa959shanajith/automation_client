@@ -1317,7 +1317,7 @@ class About_window(wx.Frame):
     def get_Info_1(self,data):
         str1=''
         try:
-            str1='Version : '+list(data['iceversion'])[0]+'.'+list(data['iceversion'][list(data['iceversion'])[0]]['subversion'])[0]+' \n'
+            str1='Avo Assure ICE '+list(data['iceversion'])[0]+'.'+list(data['iceversion'][list(data['iceversion'])[0]]['subversion'])[0] + ' (64-bit)' +' \n'
         except Exception as e:
             log.error(e)
         return str1
@@ -1342,7 +1342,7 @@ class About_window(wx.Frame):
         return '© Avo Automation\n'
 
     def get_Info_4(self):
-        return 'For any queries write to us @ : support.nineteen68@slkgroup.com'+' \n'
+        return 'For any queries write to us at support.nineteen68@slkgroup.com'+' \n'
 
     def close(self, event):
         self.Close()
