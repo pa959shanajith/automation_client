@@ -107,8 +107,8 @@ class SauceLabs_Operations():
         genric_folder = generic_keywords.FolderOperation(self.f)
         dyn_var_obj = generic_keywords.DynamicVariables(self.f)
         generic_util = generic_keywords.Util(self.f)
-        
-        self.conf = self.get_sauceconf()
+        self.obj=Sauce_Config()
+        self.conf = self.obj.get_sauceconf()
         self.browsers={'1':{'browserName': "chrome", 'sauce:options':{}},'2':{'browserName': "firefox", 'sauce:options':{}},'3':{'browserName': "internet explorer", 'sauce:options':{}},'7':{'browserName': "MicrosoftEdge", 'sauce:options':{}},'8':{'browserName': "MicrosoftEdge", 'sauce:options':{}}}
         self.code="""import pytest
 from selenium import webdriver
@@ -224,6 +224,24 @@ def addTeststep(step):
         addforloop(count)
         if(input==output):
             loopId=0
+    elif step['name'] in ['if','endIf','elseIf','else']:
+        text="Encountered :"+step['name']
+        if step['name'] in ['if','elseIf']:
+            text=text+" Condition is "+output
+        obj["id"]=count
+        obj["Keyword"]=step['name']
+        obj["parentId"]=parentId
+        obj["status"]=""
+        obj["Step"]=step['stepnum']
+        obj["Comments"]=err_msg
+        obj["StepDescription"]=text
+        obj["screenshot_path"]=""
+        obj["EllapsedTime"]=str(timedelta(seconds=end-start))
+        obj["Remark"]=""
+        obj["testcase_details"]=""
+        obj['input']=input
+        obj['output']=output
+        obj['dyn_var_map']=dyn_var_map
     else:
         obj["id"]=count
         obj["Keyword"]=step['name']
@@ -239,6 +257,9 @@ def addTeststep(step):
         obj['input']=input
         obj['output']=output
         obj['dyn_var_map']=dyn_var_map
+    obj['index']=step['index']
+    obj['apptype']=step['apptype']
+    obj['inputval']=step['inputval']
     output=""
     input=""
     err_msg=""
@@ -251,7 +272,10 @@ def addTeststep(step):
 
 def check_dyn_var(inp):
     global input,dyn_var_map
-    return dyn_var_map[inp]
+    if inp in dyn_var_map:
+        return dyn_var_map[inp]
+    else:
+        return inp
 
 def store_dyn_var(out):
     global output,dyn_var_map
@@ -525,22 +549,6 @@ start = timer()
             }
 
 
-    def get_sauceconf(self):
-        conf_obj = open(Saucelabs_config_path, 'r')
-        conf = json.load(conf_obj)
-        conf_obj.close()
-        # self.proxies=self.conf["proxy"]
-        self.username = conf["sauce_username"]
-        self.access_key = conf["sauce_access_key"]
-        self.platform = conf["platform"]
-        self.url = conf["remote_url"]
-        return conf
-
-    def get_sauceclient(self):
-        return sauceclient.SauceClient(self.username,self.access_key)
-
-    def get_saucejobs(self, sc):
-        return sauceclient.Jobs(sc)
 
     def complie_TC(self,tsp,scenario_name,browser,index,execute_result_data,socketIO):
         try:
@@ -568,7 +576,10 @@ start = timer()
                 step={
                     "name":i.name,
                     "stepnum": "Step"+str(i.stepnum),
-                    "testscript_name": i.testscript_name
+                    "testscript_name": i.testscript_name,
+                    "inputval":i.inputval,
+                    "apptype":i.apptype,
+                    "index":i.index
                 }
                 all_input=i.inputval[0].split(';')
                 input_value=[]
@@ -579,13 +590,12 @@ start = timer()
                         inputs="'"+inp+"'"
                     input_value.append(inputs)
                 if i.apptype == 'Generic':
-                    self.f.write(space+"try:")
-                    space+='\t'
                     if i.name =='for':
                         self.f.write(space+"input=int("+input_value[0][1:-1]+")+1")
                         self.f.write(space+"for i in range(1,input):")
                         self.f.write(space+"\toutput=i")
                         self.f.write(space+"\tstatus='Pass'")
+                        self.f.write(space+"\taddTeststep("+repr(step)+")")
                         space=space+"\t"
                         stack.append("for")
                     elif i.name == 'if':
@@ -594,48 +604,78 @@ start = timer()
                         if "check_dyn_var(" not in input_value[2]:
                             input_value[2]=input_value[2].replace(")","")
                         # input=""+check_dyn_var('MsgCancel')+"=="+check_dyn_var('MsgCancel')
-                        self.f.write(space+"expr=str("+input_value[0]+")+"+input_value[1]+"+str("+input_value[2]+")")
+                        self.f.write(space+"expr='\"'+str("+input_value[0]+")+'\"'+"+input_value[1]+"+'\"'+str("+input_value[2]+")+'\"'")
                         self.f.write(space+"output=str(eval(expr))")
+                        self.f.write(space+"addTeststep("+repr(step)+")")
                         self.f.write(space+"if eval(expr):")
                         self.f.write(space+"\tstatus='Pass'")
-                        space=space+"\t"
+                        space+='\t'
                         stack.append("if")
                     elif i.name == 'elseIf':
-                        self.f.write(space+"expr=''+"+input_value[0]+"+"+input_value[1]+"+"+input_value[2])
-                        self.f.write(space+"output=str(eval(expr))")
-                        self.f.write(space+"if eval(expr):")
-                        self.f.write(space+"\tstatus='Pass'")
-                        space=space+"\t"
-                        stack.append("elif")
-                    elif i.name == 'endIf':
                         if stack[-1]=='if' or stack[-1]=='elseIf':
                             space=space[:-1]
-                            stack.pop()
+                            self.f.write(space+"expr=''+"+input_value[0]+"+"+input_value[1]+"+"+input_value[2])
+                            self.f.write(space+"output=str(eval(expr))")
+                            self.f.write(space+"addTeststep("+repr(step)+")")
+                            self.f.write(space+"elif eval(expr):")
+                            self.f.write(space+"\tstatus='Pass'")
+                            space+='\t'
+                            stack.append("elif")
+                        else:
+                            logger.print_on_console("Dangling: elseIf in " +str(i.testscript_name))
+                            return False
+                    elif i.name == 'endIf':
+                        if stack[-1]=='if' or stack[-1]=='elseIf' or stack[-1]=='else':
                             self.f.write(space+"output=''")
                             self.f.write(space+"status='Pass'")
+                            stack.pop()
+                            if ('{' in i.outputval and '}' in i.outputval):
+                                self.f.write(space+"store_dyn_var("+repr(i.outputval)+")")
+                            space=space[:-1]
+                            self.f.write(space+"addTeststep("+repr(step)+")")
                         else:
-                            flag=False
+                            logger.print_on_console("Dangling: endIf in " +str(i.testscript_name))
+                            return False
                     elif i.name == 'endFor':
                         if stack[-1]=='for':
                             self.f.write(space+"output=''")
                             self.f.write(space+"status='Pass'")
-                            space=space[:-1]
                             stack.pop()
+                            if ('{' in i.outputval and '}' in i.outputval):
+                                self.f.write(space+"store_dyn_var("+repr(i.outputval)+")")
+                            self.f.write(space+"addTeststep("+repr(step)+")")
+                            space=space[:-1]
                         else:
-                            flag=False
+                            logger.print_on_console("Dangling: elseFor in " +str(i.testscript_name))
+                            return False
+                    elif i.name == 'else':
+                        if stack[-1]=='if' or stack[-1]=='elseIf':
+                            space=space[:-1]
+                            self.f.write(space+"\taddTeststep("+repr(step)+")")
+                            self.f.write(space+"else:")
+                            self.f.write(space+"\tstatus='Pass'")
+                            space+='\t'
+                            stack.append("else")
+                        else:
+                            logger.print_on_console("Dangling: else in " +str(i.testscript_name))
+                            return False
                     elif i.name in self.generic_keys:
+                        self.f.write(space+"try:")
+                        space+='\t'
                         self.generic_keys[i.name](space,input_value)
+                        space=space[:-1]
+                        self.f.write(space+"except Exception as e:")
+                        self.f.write(space+"\toutput='False'")
+                        self.f.write(space+"\terr_msg='Input error: please provide the valid input.'")
+                        self.f.write(space+"\tprint(e)")
+                        if ('{' in i.outputval and '}' in i.outputval):
+                            self.f.write(space+"store_dyn_var("+repr(i.outputval)+")")
+                        self.f.write(space+"addTeststep("+repr(step)+")")
                     else:
                         logger.print_on_console(i.name+" keyword is not supported in saucelabs execution.")
                         return False
-                    space=space[:-1]
-                    self.f.write(space+"except Exception as e:")
-                    self.f.write(space+"\toutput='False'")
-                    self.f.write(space+"\terr_msg='Input error: please provide the valid input.'")
-                    self.f.write(space+"\tprint(e)")
-                    if ('{' in i.outputval and '}' in i.outputval):
-                        self.f.write(space+"store_dyn_var("+repr(i.outputval)+")")
-                    self.f.write(space+"addTeststep("+repr(step)+")")
+                    
+                    
                 elif i.apptype == 'Web':
                     self.f.write(space+"try:")
                     space+='\t'
@@ -648,10 +688,10 @@ start = timer()
                                 return False
                     elif i.custname=='@Browser':
                         if(i.name=="openBrowser"):
-                            self.browsers[browser]["platform"]=self.platform
+                            self.browsers[browser]["platform"]=self.conf["platform"]
                             self.browsers[browser]["sauce:options"].update({"name":scenario_name})
                             self.browsers[browser]["sauce:options"].update({"idleTimeout":10})
-                            self.web_keys[i.name](space,self.url,self.browsers[browser])
+                            self.web_keys[i.name](space,self.conf['remote_url'],self.browsers[browser])
                         else:
                             self.web_keys[i.name](space,input_value)
                     else:
@@ -702,18 +742,20 @@ start = timer()
             tsp_index=0
             for i in range(0,len(report)):
                 if report[i]['Keyword'] in ['if','elseIf']:
-                    report[i]['StepDescription'] = 'Encountered :'+report[i]['Keyword']+' Condition is'+report[i]['output']
+                    report[i]['StepDescription'] = 'Encountered :'+report[i]['Keyword']+' Condition is '+report[i]['output']
+                    del report[i]['input'],report[i]['output'],report[i]['dyn_var_map'],report[i]['apptype'],report[i]['index'],report[i]['inputval']
                 elif report[i]['Keyword'] == 'endIf':
-                    report[i]['StepDescription'] = 'Encountered : endIf'
+                    report[i]['StepDescription'] = 'Encountered :endIf'
+                    del report[i]['input'],report[i]['output'],report[i]['dyn_var_map'],report[i]['apptype'],report[i]['index'],report[i]['inputval']
                 if report[i]['StepDescription'] == '':
-                    report[i]['StepDescription'] = apptype_description[tsp[tsp_index].apptype.lower()](tsp[tsp_index].name,tsp[tsp_index],tsp[tsp_index].inputval,report[i]['input'],report[i]['output'])
+                    report[i]['StepDescription'] = apptype_description[report[i]['apptype'].lower()](report[i]['Keyword'],tsp[report[i]['index']],report[i]['inputval'],report[i]['input'],report[i]['output'])
                     if report[i]['status']=='Fail':
                         overall_status='Fail'
-                    del report[i]['input'],report[i]['output'],report[i]['dyn_var_map']
-                    tsp_index+=1
-            sc = self.get_sauceclient()
-            j = self.get_saucejobs(sc)
+                    del report[i]['input'],report[i]['output'],report[i]['dyn_var_map'],report[i]['apptype'],report[i]['index'],report[i]['inputval']
+            sc = self.obj.get_sauceclient()
+            j = self.obj.get_saucejobs(sc)
             all_jobs=j.get_jobs(start=int(now.timestamp()),full=True)
+            time.sleep(5)
             import constants
             filename = datetime.now().strftime("%Y%m%d%H%M%S")
             dirpath = constants.SCREENSHOT_PATH if (constants.SCREENSHOT_PATH not in ['screenshot_path', 'Disabled']) else Saucelabs_tests+os.sep
@@ -721,8 +763,19 @@ start = timer()
             for i in range(0,len(all_jobs)):
                 file_creations_status=j.get_job_asset_content(all_jobs[i]['id'],filename,dirpath)
                 status=all_jobs[i]['error']
+                import controller
+                if controller.manual_terminate_flag:
+                    overall_status="Terminate"
+                    step={
+                        "id": len(report)+1,
+                        "Keyword": "",
+                        "parentId": "",
+                        "Comments": "",
+                        "Step": "Terminated",
+                        "StepDescription": "Terminated by the user"
+                    }
+                    report.append(step)
                 if(status!=None):
-                    logger.print_on_console("Error in Sauce Labs Execution")
                     flag=False
             overallstatus=self.build_overallstatus(self.browsers[browser]['browserName'],overall_status,all_jobs[i],j,video_path)
             execute_result_data['reportData'] = { 'rows' : report, "overallstatus" : overallstatus}
@@ -732,6 +785,7 @@ start = timer()
         except Exception as e:
             import traceback
             traceback.print_exc()
+            logger.print_on_console("Error in Sauce Labs Execution")
             logger.print_on_console(e)
             self.f.close()
             f1.close()
@@ -771,3 +825,22 @@ start = timer()
         obj['time']=time1
         obj['video']=video_path
         return [obj]
+
+class Sauce_Config():
+
+    def get_sauceconf(self):
+        conf_obj = open(Saucelabs_config_path, 'r')
+        conf = json.load(conf_obj)
+        conf_obj.close()
+        # self.proxies=self.conf["proxy"]
+        self.username = conf["sauce_username"]
+        self.access_key = conf["sauce_access_key"]
+        self.platform = conf["platform"]
+        self.url = conf["remote_url"]
+        return conf
+
+    def get_sauceclient(self):
+        return sauceclient.SauceClient(self.username,self.access_key)
+
+    def get_saucejobs(self, sc):
+        return sauceclient.Jobs(sc)

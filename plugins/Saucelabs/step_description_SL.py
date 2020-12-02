@@ -5,41 +5,42 @@ class StepDescription:
             if type(output) is list:
                     output=','.join(output)
         #Date operations
-        def getcurrenttime():
+        inputval=inputval[0].split(";")
+        def getCurrentTime():
             return 'Get current time of the system and save the time '+ "'"+ output + "'"+ ' in '+ "'"+ tsp.outputval+ "'"
-        def getcurrentdate():
+        def getCurrentDate():
             return 'Get current date of the system and save the date '+ "'" + str(output)+ "'" + ' in '+ "'"+ tsp.outputval+ "'"
-        def getcurrentdateandtime():
+        def getCurrentDateAndTime():
             return 'Get current date time of the system and save the date time '+"'"+ inputval[0] +"' and '"+ inputval[1] + "'"+ ' in '+"'"+ tsp.outputval+"'"
-        def getcurrentday():
+        def getCurrentDay():
             return 'Get current day of the system and save the day '+ "'" + str(output)+ "'" + ' in '+ "'"+ tsp.outputval+ "'"
-        def getcurrentdaydateandtime():
+        def getCurrentDayDateAndTime():
             return 'Get current day date time of the system and save the day date time '+"'"+ str(output) + "'"+ ' in '+"'"+ tsp.outputval+"'"
-        def dateaddition():
+        def dateAddition():
             return "Add the date '"+ inputval[0] + "' to '"+ inputval[1]+ "' number of days and save the date '" + output + "' in '"+ tsp.outputval+"'"
-        def datecompare():
+        def dateCompare():
             return "Compare '" + inputval[1]+ "' and '" + inputval[0] + "'."
         def datedifference():
             return "Get the difference between the dates '"+ inputval[0]+ "' and '"+ inputval[1]+ "' and save the date '" + output+ "' in '"+ tsp.outputval + "'"
-        def yearaddition():
+        def yearAddition():
             return "Add "+inputval[0] +" years to date '"+inputval[1]+ "' and save the date '"+output+"' in '"+tsp.outputval+ "'"
-        def monthaddition():
+        def monthAddition():
             return "Add "+inputval[0] +" months to date '"+inputval[1]+ "' and save the date '"+output+"' in '"+tsp.outputval+ "'"
-        def changedateformat():
+        def changeDateFormat():
             return "Change the format of the date '"+ inputval[0] + "' to format '"+ inputval[1]+ "' and save the date  '" + output + "' in "+"'"+tsp.outputval+"'"
 
         #File operations
-        def createfile():
+        def createFile():
             return "Create a file: '"+ inputval[1] +"' in the path: '"+ inputval[0]+"'"
-        def verifyfileexists():
+        def verifyFileExists():
             return "Verify '"+ inputval[1] +"' file exists in the path: '" + inputval[0]+"'"
-        def deletefile():
+        def deleteFile():
             return "delete: '"+ inputval[1] +"' file from the path: '"+ inputval[0]+"'"
-        def renamefile():
+        def renameFile():
             return "rename filename '"+ inputval[1] +"' to '"+ inputval[2]+"' in the path '"+ inputval[0]+"'"
         def savefile():
             return "File saved: '"+ inputval[1] +"'and stored in: '"+ inputval[0]+"'"
-        def executefile():
+        def executeFile():
             return "Perform execution of the file'"+ input+"'"
         def verifycontent():
             return "Verify '"+ inputval[1]+"' is present in the file '"+ inputval[0]+"'"
@@ -101,13 +102,13 @@ class StepDescription:
             return  "Cleard all the content of the file '"
 
         #Folder operations
-        def createfolder():
+        def createFolder():
             return "Create a folder: '"+ inputval[1] + "' in the path: '" + inputval[0]+"'"
-        def verifyfolderexists():
+        def verifyFolderExists():
             return "Verify '"+ inputval[1] + "' folder exists in the path: '" + inputval[0]+"'"
-        def deletefolder():
+        def deleteFolder():
             return "Delete: '" + inputval[1] + "' folder from the path: '" + inputval[0]+"'"
-        def renamefolder():
+        def renameFolder():
             return "Rename folder '" + str(inputval[1]) +"' to '"+ str(inputval[2])+ "' in the path '"+ inputval[0]+"'"
 
         #Math opeartions
@@ -121,15 +122,15 @@ class StepDescription:
             return "Verify objects '"+ inputval[0] +"' and '"+ inputval[1]+"' and save the result in '"+ tsp.outputval +"'."
 
         #String operations
-        def tolowercase():
+        def toLowerCase():
             return 'Change ' +"'"+ input+"'"+ ' to Lower case and save the value ' +"'"+ output+"'"+' in '+"'"+ tsp.outputval+"'"
         ##def evaluate():
             ##return 'Evaluate Mathematical expression ' +"'"+ input+ "'"+' and save the result ' +"'"+ output +"'"+ ' in '+"'"+ tsp.outputval+"'"
-        def touppercase():
+        def toUpperCase():
             return 'Change ' +"'"+ input+"'"+ ' to Upper case and save the value ' +"'"+ output+"'"+ ' in ' +"'"+ tsp.outputval+"'"
         def trim():
             return 'Trim ' +"'"+ input+"'"+ ' and save the value ' +"'"+ output +"'"+ ' in '+"'"+ tsp.outputval+"'"
-        def typecast():
+        def typeCast():
             return 'Type cast '+"'"+ str(inputval[0])+"'"+' to '+"'"+ str(inputval[1])+"'"+' and save the value '+"'"+ output+"'"+' in '+"'"+tsp.outputval+"'"
         def split():
             return 'Split the string ' +"'"+ str(inputval[0])+"'"+' with split character '+"'"+str(inputval[1])+"'"+' and save the value: '+"'"+ output+"'"+' in '+"'"+tsp.outputval+"'"
@@ -145,11 +146,11 @@ class StepDescription:
             return "Verify input string '"+ input + "' contains '"+ inputval[1] + "'"
         def replace():
             return "In string '"+ inputval[0] + "' replace '"+ inputval[1] + "' with '"+ inputval[2]+ "' and save the updated input string '" + output+ "' in '" + tsp.outputval + "'"
-        def getstringlength():
+        def getStringLength():
             return "Get the length of the string '" + input+ "' and save the length '" + output + "' in '"+ tsp.outputval + "'"
-        def getsubstring():
+        def getSubString():
             return "Get Substring of the string '"+ inputval[0]+ "' with index/range '"+ inputval[1]+ "'  and save the Substring '" + output+ "' in '"+ tsp.outputval + "'"
-        def stringgeneration():
+        def stringGeneration():
             if input.find("num") != -1:
                 return "Generate a number having a length '"+ input + "'."
             else:
@@ -168,21 +169,21 @@ class StepDescription:
             return 'Pause the application until the user interrupts'
 
         #Dynamic variable keywords
-        def createdynvariable():
+        def createDynVariable():
             return "Create a variable '"+str(inputval[0])+"' with value '"+ str(inputval[1]) + "'"
-        def deletedynvariable():
+        def deleteDynVariable():
             return ("Delete variable "+str(inputval)).replace('[','').replace(']','')
         def displayvariablevalue():
             return output.replace('\n',' ')
-        def verifyvalues():
+        def verifyValues():
             return "Verify values '" + str(inputval[0]) + "' and '" + inputval[1]+ "' and save the result in '"+ tsp.outputval + "'."
         def capturescreenshot():
             return 'Captured Screenshot'
         def comparecontent():
             return "Compare the contents of file '"+ str(inputval[0])+ "' and '"+ str(inputval[1])+ "'"
-        def copyvalue():
+        def copyValue():
             return "Copy value to variable '"+str(inputval[0])+ "' from variable '"+str(inputval[1])+ "'"
-        def getindexcount():
+        def getIndexCount():
             if '@' in output:
                 row,col=output.split('@')
                 return "The index count for the dynamic variable "+ inputval[0] + " is " + "Row: "+str(row) + " and Column: "+str(col)
@@ -192,7 +193,7 @@ class StepDescription:
             return "Get the line number of content '"+str(inputval[0])+ "' from file '"+str(inputval[1])+"' and save the value '" + output + "' in "+tsp.outputval
         def getparam():
             return "Get data from file '"+str(inputval[0])+ "' and  sheet '"+str(inputval[1])+ "'"
-        def modifyvalue():
+        def modifyValue():
             return "Modify variable '"+ str(inputval[0]) + "' value to '"+str(inputval[1])+ "'"
         def mousepress():
             return 'Mouse left button pressed'
