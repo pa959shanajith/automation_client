@@ -823,6 +823,7 @@ class MainNamespace(BaseNamespace):
     def on_disconnect(self, *args):
         if not allow_connect: return
         log.info('Disconnect triggered')
+        stop_ping_thread()
         if (socketIO is not None) and (not socketIO.waiting_for_close):
             ice_das_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
                 'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
@@ -838,7 +839,6 @@ class MainNamespace(BaseNamespace):
                 return
             else:
                 msg = 'Connectivity issue with Avo Assure Server. Attempting to restore connectivity...'
-                stop_ping_thread()
                 logger.print_on_console(msg)
                 log.error(msg)
         if root.ice_token:
@@ -1358,7 +1358,7 @@ class Main():
     def killSocket(self, disconn=False):
         #Disconnects socket client
         global socketIO
-        try:
+        try:            
             stop_ping_thread()
             log.info('Cancelling Ping Thread')
             if socketIO is not None:
@@ -1686,7 +1686,6 @@ def set_ICE_status(one_time_ping = False,connect=True,interval = 60000):
 
     """   
     global socketIO,root,execution_flag,cw,status_ping_thread
-    ICE_name = root.ice_token["icename"]
     if not one_time_ping and socketIO is not None:
         if status_ping_thread and status_ping_thread.is_alive():
             status_ping_thread.cancel()
@@ -1696,7 +1695,7 @@ def set_ICE_status(one_time_ping = False,connect=True,interval = 60000):
         status_ping_thread.start()     
     log.info('Ping Server')
     #Add ICE identification and stauts, which is busy by default
-    result = {"hostip":socket.gethostbyname(socket.gethostname()),"hostname":os.environ['username'],"time":str(datetime.now()),"icename":ICE_name,"connected":connect}
+    result = {"hostip":socket.gethostbyname(socket.gethostname()),"hostname":os.environ['username'],"time":str(datetime.now()),"connected":connect}
     result['status'] = execution_flag
     if cw is not None:
         result['mode'] = cw.schedule.GetValue()
@@ -1711,4 +1710,6 @@ def stop_ping_thread():
     set_ICE_status(one_time_ping=True,connect=False)
     if status_ping_thread is not None and status_ping_thread.is_alive():
         status_ping_thread.cancel()
+        time.sleep(0.5)
+        status_ping_thread = None
 
