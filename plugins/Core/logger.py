@@ -20,7 +20,7 @@ import datetime
 import os
 import sys
 import core
-
+from colorama import Fore, Style, init
 from inspect import getframeinfo, stack
 
 def print_on_console(message,*args, **kwargs):
@@ -31,6 +31,7 @@ def print_on_console(message,*args, **kwargs):
         filename=os.path.basename(caller.filename)[0:-3]
 
         resultant=''
+        style1=''
         if isinstance(message,bytes): message=message.decode('utf-8')
         elif not isinstance(message,str): message=str(message)
         for values in args:
@@ -42,9 +43,13 @@ def print_on_console(message,*args, **kwargs):
         if 'color' in kwargs:
             if core.root.gui:
                 sys.stdout.write(msg_part_1)
-                sys.stdout.write_color('{},{}'.format(msg_part_2 + os.linesep,kwargs['color']))
+                sys.stdout.write_color(msg_part_2 + os.linesep, kwargs['color'])
             else:
-                print(msg_part_1 + msg_part_2)
+                init()
+                if(kwargs['color']=="RED"): style1=Fore.RED
+                elif(kwargs['color']=="GREEN"): style1=Fore.GREEN
+                elif(kwargs['color']=="YELLOW"): style1=Fore.YELLOW
+                print(style1+msg_part_1 + msg_part_2+Style.RESET_ALL)
         else:
             print(msg_part_1 + msg_part_2)
     except Exception as e:

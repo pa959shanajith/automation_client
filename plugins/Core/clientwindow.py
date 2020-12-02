@@ -54,12 +54,12 @@ class RedirectText(object):
         wx.CallAfter(self.out.WriteText, string)
         wx.CallAfter(self.out.ShowPosition,self.out.GetLastPosition())
 
-    def write_color(self,string):
-        if(string.split(',')[1]=='RED'): rgb_color=(220,53,69)
-        elif(string.split(',')[1]=='GREEN'): rgb_color=(40,167,69)
-        else: rgb_color=(255, 193, 7)
+    def write_color(self, string, color):
+        if(color=='RED'): rgb_color=(220,53,69)
+        elif(color=='GREEN'): rgb_color=(40,167,69)
+        elif(color=='YELLOW'): rgb_color=(255, 193, 7)
         wx.CallAfter(self.out.BeginTextColour, rgb_color)
-        self.write(string.split(',')[0]+'\n')
+        self.write(string+'\n')
         wx.CallAfter(self.out.EndTextColour)
         wx.CallAfter(self.out.BeginTextColour, (0, 50, 250))
 
