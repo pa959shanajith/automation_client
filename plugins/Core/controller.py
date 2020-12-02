@@ -748,7 +748,9 @@ class Controller():
             if teststepproperty.outputval.split(";")[-1].strip() != STEPSTATUS_INREPORTS_ZERO:
                 status_percentage[self.keyword_status]+=1
                 status_percentage["total"]+=1
-            logger.print_on_console(keyword+' executed and the status is '+self.keyword_status+'\n')
+            if(self.keyword_status=='Pass'): setcolor="GREEN"
+            elif(self.keyword_status=='Fail') : setcolor="RED"
+            logger.print_on_console(keyword+' executed and the status is '+self.keyword_status+'\n',color=setcolor)
             log.info(keyword+' executed and the status is '+self.keyword_status+'\n')
             #Checking for stop keyword
             if teststepproperty.name.lower()==STOP:
@@ -784,7 +786,7 @@ class Controller():
                         self.reporting_obj.overallstatus=TERMINATE
                         status_percentage[TERMINATE]+=1
                         status_percentage["total"]+=1
-                        logger.print_on_console('Terminating the execution')
+                        logger.print_on_console('Terminating the execution',color="YELLOW")
                         status=i
                         break
                     ## Issue #160
@@ -802,7 +804,7 @@ class Controller():
                     status=False
                     i=i+1
             else:
-                logger.print_on_console('Terminating the execution')
+                logger.print_on_console('Terminating the execution',color="YELLOW")
                 #Changing the overallstatus of the report_obj to Terminate - (Sushma)
                 self.reporting_obj.overallstatus=TERMINATE
                 status=TERMINATE
@@ -1346,7 +1348,7 @@ class Controller():
         del obj
         if status==TERMINATE:
             print('=======================================================================================================')
-            logger.print_on_console( '***Terminating the Execution***')
+            logger.print_on_console( '***Terminating the Execution***',color="YELLOW")
             print('=======================================================================================================')
         return status
 
@@ -1459,7 +1461,7 @@ class Controller():
             jsondata_dict = {}
             th={}
             log1 = logging.getLogger("controller.py") #Disable loggers from imported modules
-            if(log1.handlers): 
+            if(log1.handlers):
                 log1.handlers.clear()
             for i in range (len(browsers_data)):
                 jsondata_dict[i] = copy.deepcopy(json_data)

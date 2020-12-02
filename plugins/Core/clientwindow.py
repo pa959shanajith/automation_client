@@ -8,6 +8,7 @@ import core_utils
 import logger
 import threading
 import wx.lib.scrolledpanel
+import wx.richtext
 from constants import *
 import controller
 import readconfig
@@ -50,7 +51,17 @@ class RedirectText(object):
         self.out=aWxTextCtrl
 
     def write(self,string):
-        wx.CallAfter(self.out.AppendText, string)
+        wx.CallAfter(self.out.WriteText, string)
+        wx.CallAfter(self.out.ShowPosition,self.out.GetLastPosition())
+
+    def write_color(self,string):
+        if(string.split(',')[1]=='RED'): rgb_color=(220,53,69)
+        elif(string.split(',')[1]=='GREEN'): rgb_color=(40,167,69)
+        else: rgb_color=(255, 193, 7)
+        wx.CallAfter(self.out.BeginTextColour, rgb_color)
+        self.write(string.split(',')[0]+'\n')
+        wx.CallAfter(self.out.EndTextColour)
+        wx.CallAfter(self.out.BeginTextColour, (0, 50, 250))
 
     def flush(self):
         pass
@@ -127,9 +138,11 @@ class ClientWindow(wx.Frame):
         self.connectbutton = wx.BitmapButton(self.panel, bitmap=self.connect_img,pos=(10, 10), size=(100, 25), name='connect')
         self.connectbutton.Bind(wx.EVT_BUTTON, self.OnNodeConnect)
         self.connectbutton.SetToolTip(wx.ToolTip("Connect to Avo Assure Server"))
-        self.log = wx.TextCtrl(self.panel, wx.ID_ANY, pos=(12, 38), size=(760,500), style = wx.TE_MULTILINE|wx.TE_READONLY)
+        # self.log = wx.TextCtrl(self.panel, wx.ID_ANY, pos=(12, 38), size=(760,500), style = wx.TE_MULTILINE|wx.TE_READONLY)
+        self.log = wx.richtext.RichTextCtrl(self.panel, wx.ID_ANY, pos=(12, 38), size=(760,500), style = wx.TE_RICH2)
         font1 = wx.Font(10, wx.MODERN, wx.NORMAL, wx.NORMAL,  False, 'Consolas')
-        self.log.SetForegroundColour((0,50,250))
+        # self.log.SetForegroundColour((0,50,250))
+        self.log.BeginTextColour((0, 50, 250))
         self.log.SetFont(font1)
 
         self.schedule = wx.CheckBox(self.panel, label = 'Do Not Disturb',pos=(120, 10), size=(100, 25))
@@ -331,7 +344,7 @@ class ClientWindow(wx.Frame):
         else:
             msg = "---------Termination Started-------"
             if root.gui: benchmark.stop(True)
-        logger.print_on_console(msg)
+        logger.print_on_console(msg,color="YELLOW")
         log.info(msg)
         controller.terminate_flag=True
         controller.manual_terminate_flag=True

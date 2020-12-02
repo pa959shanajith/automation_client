@@ -18,10 +18,12 @@
 import time
 import datetime
 import os
+import sys
+import core
 
 from inspect import getframeinfo, stack
 
-def print_on_console(message,*args):
+def print_on_console(message,*args, **kwargs):
     try:
         ts = time.time()
         sttime = datetime.datetime.fromtimestamp(ts).strftime('%y-%m-%d %H:%M:%S')
@@ -35,7 +37,14 @@ def print_on_console(message,*args):
             if isinstance(values,bytes): values=values.decode('utf-8')
             elif not isinstance(values,str): values=str(values)
             resultant+=values
-        print(sttime + ':  CONSOLE: ' +filename + ':'+str(caller.lineno) +' ' + message + resultant)
+        msg_part_1 = sttime + ':  CONSOLE: ' +filename + ':'+str(caller.lineno) +' '
+        msg_part_2 = message + resultant
+        if 'color' in kwargs:
+            if core.root.gui:
+                sys.stdout.write(msg_part_1)
+                sys.stdout.write_color('{},{}'.format(msg_part_2 + os.linesep,kwargs['color']))
+        else:
+            print(msg_part_1 + msg_part_2)
     except Exception as e:
         import traceback
         print(traceback.format_exc())
