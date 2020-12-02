@@ -477,7 +477,8 @@ class TableOperationKeywords():
             """
 
 
-        def verifyCellToolTip(self,webElement,input_val,*args):
+        def doubleCellClick(self,webElement,input_val,*args):
+            # verifyCellToolTip
             logger.print_on_console('Executing keyword : verifyCellToolTip')
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
@@ -855,6 +856,207 @@ class TableOperationKeywords():
 ##            return status,methodoutput,output_val,err_msg
 
 
+        def verifyCellToolTip(self,webElement,input_arr,*args):
+            #doubleCellClick
+            logger.print_on_console('Executing keyword : doubleCellClick')
+            status=TEST_RESULT_FAIL
+            methodoutput=TEST_RESULT_FALSE
+            err_msg=None
+            index = False
+            output_val=OUTPUT_CONSTANT
+            local_tk.log.debug('reading the inputs')
+            if(len(input_arr) > 1):
+                                              
+                                              
+                local_tk.driver=browser_Keywords.local_bk.driver_obj
+                local_tk.log.debug('got the driver instance from browser keyword')
+                visibleFlag=True
+                if visibleFlag==True:
+                    try:
+                        if webElement.tag_name.lower() == 'table':
+                            if len(input_arr)==2:
+                                local_tk.log.info('normal cell click')
+                                #logger.print_on_console('normal cell click inside the cell')
+                                row_number=int(input_arr[0])-1
+                                col_number=int(input_arr[1])-1
+                                cell=self.javascriptExecutor(webElement,row_number,col_number)
+                                element_list=cell.find_elements_by_xpath('.//*')
+                                if len(list(element_list))>0:
+                                    xpath=self.getElemntXpath(element_list[0])
+                                    cell=local_tk.driver.find_element_by_xpath(xpath)
+                                try:
+                                    local_tk.log.debug('checking for element not none')
+                                    if(cell!=None):
+                                        local_tk.log.debug('checking for element enabled')
+                                        if cell.is_enabled():
+                                            try:
+                                                local_tk.log.debug('performing java script click')
+                                                webdriver.ActionChains(browser_Keywords.local_bk.driver_obj).move_to_element(cell).double_click(cell).perform()
+                                                status=webconstants.TEST_RESULT_PASS
+                                                methodoutput=TEST_RESULT_TRUE
+                                                local_tk.log.info('click action performed successfully')
+                                            except Exception as e:
+                                                local_tk.log.debug('error occured for doublecellclick')
+                                                logger.print_on_console('error occured for doublecellclick')
+                                except Exception as e:
+                                    local_tk.log.error(e)
+                                    logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
+                                    err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                            elif len(input_arr)>2:
+                                local_tk.log.info('click on an element inside a cell')
+                                #logger.print_on_console('click on an element inside a cell')
+                                row_number=int(input_arr[0])-1
+                                col_number=int(input_arr[1])-1
+                                tag=input_arr[2].lower()
+                                index=int(input_arr[3])
+                                eleStatus=False
+                                counter = 1
+                                local_tk.log.debug('finding the cell with given inputs')
+                                cell=self.javascriptExecutor(webElement,row_number,col_number)
+                                element_list=cell.find_elements_by_xpath('.//*')
+                                #---------------------------condition when element list returns empty
+                                if len(element_list)==0:
+                                    element_list.append(cell)
+                                #---------------------------condition when element list returns empty
+                                for member in element_list:
+                                    js1='function getElementXPath(elt) {var path = "";for (; elt && elt.nodeType == 1; elt = elt.parentNode){idx = getElementIdx(elt);xname = elt.tagName;if (idx >= 1){xname += "[" + idx + "]";}path = "/" + xname + path;}return path;}function getElementIdx(elt){var count = 1;for (var sib = elt.previousSibling; sib ; sib = sib.previousSibling){if(sib.nodeType == 1 && sib.tagName == elt.tagName){count++;}}return count;}return getElementXPath(arguments[0]).toLowerCase();'
+                                    xpath=browser_Keywords.local_bk.driver_obj.execute_script(js1,member)
+                                    cellChild = browser_Keywords.local_bk.driver_obj.find_element_by_xpath(xpath)
+                                    tagName = cellChild.tag_name
+                                    tagType = cellChild.get_attribute('type')
+                                    xpath_elements=xpath.split('/')
+                                    lastElement=xpath_elements[len(xpath_elements)-1]
+                                    childindex=lastElement[lastElement.find("[")+1:lastElement.find("]")]
+                                    childindex = int(childindex)
+                                    if tag=='button':
+                                        local_tk.log.debug('clicking on button')
+                                        if( (tagName==('input') and tagType==('button')) or tagType==('submit') or tagType==('reset') or tagType==('file')):
+                                            if index==childindex:
+                                                eleStatus =True
+                                            else:
+                                                if counter==index:
+                                                    index =childindex
+                                                    eleStatus =True
+                                                else:
+                                                    counter+=1
+                                    elif tag=='image':
+                                        local_tk.log.debug('clicking on image')
+                                        if(tagName==('input') and (tagType==('img') or tagType==('image'))):
+                                            if index==childindex:
+                                                eleStatus =True
+                                            else:
+                                                if counter==index:
+                                                    index =childindex
+                                                    eleStatus =True
+                                                else:
+                                                    counter+=1
+                                        elif tagName =='img':
+                                            local_tk.log.debug('clicking on img')
+                                            if index==childindex:
+                                                eleStatus =True
+                                            else:
+                                                if counter==index:
+                                                    index =childindex
+                                                    eleStatus =True
+                                                else:
+                                                    counter+=1
+                                    elif tag=='img':
+                                        local_tk.log.debug('clicking on img')
+                                        if index==childindex:
+                                                eleStatus =True
+                                        else:
+                                            if counter==index:
+                                                index =childindex
+                                                eleStatus =True
+                                            else:
+                                                counter+=1
+                                    elif tag=='checkbox':
+                                        local_tk.log.debug('clicking on check box')
+                                        if(tagName==('input') and (tagType==('checkbox')) ):
+                                            if index==childindex:
+                                                eleStatus =True
+                                            else:
+                                                if counter==index:
+                                                    index =childindex
+                                                    eleStatus =True
+                                                else:
+                                                    counter+=1
+                                    elif tag=='radiobutton':
+                                        local_tk.log.debug('clicking on radio button')
+                                        if (tagName==('input') and tagType==('radio')):
+                                            if index==childindex:
+                                                eleStatus =True
+                                            else:
+                                                if counter==index:
+                                                    index =childindex
+                                                    eleStatus =True
+                                                else:
+                                                    counter+=1
+                                    elif tag=='textbox':
+                                        local_tk.log.debug('clicking on radio text box')
+                                        if (tagName==('input') and (tagType==('text') or tagType==('email') or tagType==('password') or tagType==('range') or tagType==('search') or tagType==('url')) ):
+                                            if index==childindex:
+                                                eleStatus =True
+                                            else:
+                                                if counter==index:
+                                                    index =childindex
+                                                    eleStatus =True
+                                                else:
+                                                    counter+=1
+                                    elif tag=='link':
+                                        local_tk.log.debug('clicking on link')
+                                        if(tagName==('a')):
+                                            if index==childindex:
+                                                eleStatus =True
+                                            else:
+                                                if counter==index:
+                                                    index =childindex
+                                                    eleStatus =True
+                                                else:
+                                                    counter+=1
+                                    else:
+                                        local_tk.log.debug('Found an occurence of '+tagName)
+                                        if tag==tagName:
+                                            if index==childindex:
+                                                eleStatus =True
+                                            else:
+                                                if counter==index:
+                                                    index =childindex
+                                                    eleStatus =True
+                                                else:
+                                                    counter+=1
+                                    if eleStatus==True:
+                                        if cellChild.is_enabled():
+                                            try:
+                                                if not (cellChild is None):
+                                                    browser_Keywords.local_bk.driver_obj.execute_script("arguments[0].scrollIntoView(true);",cellChild)
+                                                    try:
+                                                        local_tk.log.debug('performing click')
+                                                        webdriver.ActionChains(browser_Keywords.local_bk.driver_obj).move_to_element(cellChild).double_click(cellChild).perform()
+                                                        status=webconstants.TEST_RESULT_PASS
+                                                        methodoutput=TEST_RESULT_TRUE
+                                                        break
+                                                    except Exception as e:
+                                                        local_tk.log.debug('error occured for doublecellclick')
+                                                        logger.print_on_console('error occured for doublecellclick')
+                                                        break
+                                            except Exception as e:
+                                                local_tk.log.error(e)
+                                                logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
+                                                err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                    except Exception as e:
+                        local_tk.log.error(e)
+                        logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
+                        err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                else:
+                    local_tk.log.info(ERROR_CODE_DICT['ERR_HIDDEN_OBJECT'])
+                    err_msg = ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
+                    logger.print_on_console(ERROR_CODE_DICT['ERR_HIDDEN_OBJECT'])
+            else:
+                local_tk.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+            return status,methodoutput,output_val,err_msg
 
         def getRowNumByText(self,webElement,input_val,*args):
             logger.print_on_console('Executing keyword : getRowNumByText')
