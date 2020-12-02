@@ -43,6 +43,8 @@ def print_on_console(message,*args, **kwargs):
             if core.root.gui:
                 sys.stdout.write(msg_part_1)
                 sys.stdout.write_color('{},{}'.format(msg_part_2 + os.linesep,kwargs['color']))
+            else:
+                print(msg_part_1 + msg_part_2)
         else:
             print(msg_part_1 + msg_part_2)
     except Exception as e:
