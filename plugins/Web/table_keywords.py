@@ -174,6 +174,7 @@ class TableOperationKeywords():
             methodoutput=TEST_RESULT_FALSE
             cellVal=None
             err_msg=None
+            index = False
             local_tk.driver=browser_Keywords.local_bk.driver_obj
             logger.print_on_console('got the driver instance from browser keyword')
             visibleFlag=True
@@ -184,11 +185,16 @@ class TableOperationKeywords():
                         if webElement.tag_name.lower() != 'table' and webElement.get_attribute('role') == 'grid':
                             body = True
                             right = True
-                            if len(input_val)==4:
+                            if len(input_val)>=4:
                                 if (input_val[2].lower() != 'body') : body = False
                                 if (input_val[3].lower() != 'right') : right = False
-                            row_number=int(input_val[0]) - 1
-                            col_number=int(input_val[1]) - 1
+                            if len(input_val)<=4:
+                                index = True
+                                row_number=int(input_val[0]) - 1
+                                col_number=int(input_val[1]) - 1
+                            else:
+                                row_number=input_val[0]
+                                col_number=input_val[1]
                             if body:
                                 if right:
                                     try:
@@ -204,25 +210,40 @@ class TableOperationKeywords():
                                 else:
                                     container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-pinned-left-header')]")
                                 rows = container.find_elements_by_xpath(".//div[contains(@class,'ag-header-row')]")
-                            row_count = len(rows)
-                            if(row_count>=row_number):
-                                try:
-                                    if body:
-                                        cells = rows[row_number].find_elements_by_xpath(".//div[@role='gridcell']")
-                                    else:
-                                        cells = rows[row_number].find_elements_by_xpath(".//div[contains(@class,'ag-header-cell')]")
-                                    coloumn_count = len(cells)
-                                    if (coloumn_count>=col_number):
-                                        try:
-                                            cellVal = self.getChildNodes(cells[col_number])
-                                            cellVal=cellVal.strip()
-                                            local_tk.log.info('Got the result : %s',str(cellVal))
-                                            logger.print_on_console('Cell value is : ',str(cellVal))
-                                            status=TEST_RESULT_PASS
-                                            methodoutput=TEST_RESULT_TRUE
-                                        except:pass
-                                except:pass
-
+                            if (index):
+                                row_count = len(rows)
+                                if(row_count>=row_number):
+                                    try:
+                                        if body:
+                                            cells = rows[row_number].find_elements_by_xpath(".//div[@role='gridcell']")
+                                        else:
+                                            cells = rows[row_number].find_elements_by_xpath(".//div[contains(@class,'ag-header-cell')]")
+                                        coloumn_count = len(cells)
+                                        if (coloumn_count>=col_number):
+                                            try:
+                                                cellVal = self.getChildNodes(cells[col_number])
+                                                cellVal=cellVal.strip()
+                                                local_tk.log.info('Got the result : %s',str(cellVal))
+                                                logger.print_on_console('Cell value is : ',str(cellVal))
+                                                status=TEST_RESULT_PASS
+                                                methodoutput=TEST_RESULT_TRUE
+                                            except:pass
+                                    except:pass
+                            else:
+                                for i in rows:
+                                    if i.get_attribute(input_arr[4]) == row_number:
+                                        if body:
+                                            cells = i.find_elements_by_xpath(".//div[@role='gridcell']")
+                                        else:
+                                            cells = i.find_elements_by_xpath(".//div[contains(@class,'ag-header-cell')]")
+                                        for j in cells:
+                                            if j.get_attribute(input_arr[5]) == col_number:
+                                                cellVal = self.getChildNodes(j)
+                                                cellVal=cellVal.strip()
+                                                local_tk.log.info('Got the result : %s',str(cellVal))
+                                                logger.print_on_console('Cell value is : ',str(cellVal))
+                                                status=TEST_RESULT_PASS
+                                                methodoutput=TEST_RESULT_TRUE
                         else:
                             row_num=int(input_val[0])
                             col_num=int(input_val[1])
@@ -261,6 +282,7 @@ class TableOperationKeywords():
             methodoutput=TEST_RESULT_FALSE
             cellVal=None
             err_msg=None
+            index = False
             local_tk.driver=browser_Keywords.local_bk.driver_obj
             local_tk.log.debug('got the driver instance from browser keyword')
             visibleFlag=True
@@ -272,11 +294,16 @@ class TableOperationKeywords():
                         if webElement.tag_name.lower() != 'table' and webElement.get_attribute('role') == 'grid':
                             body = True
                             right = True
-                            if len(input_val)==5:
+                            if len(input_val)>=5:
                                 if (input_val[3].lower() != 'body') : body = False
                                 if (input_val[4].lower() != 'right') : right = False
-                            row_number=int(input_val[0]) - 1
-                            col_number=int(input_val[1]) - 1
+                            if len(input_val)<=5:
+                                index = True
+                                row_number=int(input_val[0]) - 1
+                                col_number=int(input_val[1]) - 1
+                            else:
+                                row_number=input_val[0]
+                                col_number=input_val[1]
                             if body:
                                 if right:
                                     try:
@@ -292,35 +319,60 @@ class TableOperationKeywords():
                                 else:
                                     container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-pinned-left-header')]")
                                 rows = container.find_elements_by_xpath(".//div[contains(@class,'ag-header-row')]")
-                            row_count = len(rows)
-                            if(row_count>=row_number):
-                                try:
-                                    if body:
-                                        cells = rows[row_number].find_elements_by_xpath(".//div[@role='gridcell']")
-                                    else:
-                                        cells = rows[row_number].find_elements_by_xpath(".//div[contains(@class,'ag-header-cell')]")
-                                    coloumn_count = len(cells)
-                                    if (coloumn_count>=col_number):
-                                        try:
-                                            cellVal = self.getChildNodes(cells[col_number])
-                                            cellVal=cellVal.strip()
-                                            expected_value=input_val[2].strip()
-                                            coreutilsobj=core_utils.CoreUtils()
-                                            expected_value=coreutilsobj.get_UTF_8(expected_value)
-                                            if(cellVal == expected_value):
-                                                local_tk.log.info('Got the result : %s', 'PASS')
-                                                logger.print_on_console('Got the result : ','PASS')
-                                                status=TEST_RESULT_PASS
-                                                methodoutput=TEST_RESULT_TRUE
-                                            else:
-                                                local_tk.log.info(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
-                                                err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
-                                                logger.print_on_console(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
-                                                logger.print_on_console('Actual value is : ',str(cellVal))
-                                                logger.print_on_console('Expected value is : ',str(expected_value))
-                                        except:pass
-                                except:pass
-
+                            if (index):
+                                row_count = len(rows)
+                                if(row_count>=row_number):
+                                    try:
+                                        if body:
+                                            cells = rows[row_number].find_elements_by_xpath(".//div[@role='gridcell']")
+                                        else:
+                                            cells = rows[row_number].find_elements_by_xpath(".//div[contains(@class,'ag-header-cell')]")
+                                        coloumn_count = len(cells)
+                                        if (coloumn_count>=col_number):
+                                            try:
+                                                cellVal = self.getChildNodes(cells[col_number])
+                                                cellVal=cellVal.strip()
+                                                expected_value=input_val[2].strip()
+                                                coreutilsobj=core_utils.CoreUtils()
+                                                expected_value=coreutilsobj.get_UTF_8(expected_value)
+                                                if(cellVal == expected_value):
+                                                    local_tk.log.info('Got the result : %s', 'PASS')
+                                                    logger.print_on_console('Got the result : ','PASS')
+                                                    status=TEST_RESULT_PASS
+                                                    methodoutput=TEST_RESULT_TRUE
+                                                else:
+                                                    local_tk.log.info(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
+                                                    err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
+                                                    logger.print_on_console(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
+                                                    logger.print_on_console('Actual value is : ',str(cellVal))
+                                                    logger.print_on_console('Expected value is : ',str(expected_value))
+                                            except:pass
+                                    except:pass
+                            else:
+                                for i in rows:
+                                    if i.get_attribute(input_arr[5]) == row_number:
+                                        if body:
+                                            cells = i.find_elements_by_xpath(".//div[@role='gridcell']")
+                                        else:
+                                            cells = i.find_elements_by_xpath(".//div[contains(@class,'ag-header-cell')]")
+                                        for j in cells:
+                                            if j.get_attribute(input_arr[6]) == col_number:
+                                                cellVal = self.getChildNodes(j)
+                                                cellVal=cellVal.strip()
+                                                expected_value=input_val[2].strip()
+                                                coreutilsobj=core_utils.CoreUtils()
+                                                expected_value=coreutilsobj.get_UTF_8(expected_value)
+                                                if(cellVal == expected_value):
+                                                    local_tk.log.info('Got the result : %s', 'PASS')
+                                                    logger.print_on_console('Got the result : ','PASS')
+                                                    status=TEST_RESULT_PASS
+                                                    methodoutput=TEST_RESULT_TRUE
+                                                else:
+                                                    local_tk.log.info(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
+                                                    err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
+                                                    logger.print_on_console(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
+                                                    logger.print_on_console('Actual value is : ',str(cellVal))
+                                                    logger.print_on_console('Expected value is : ',str(expected_value))
                         else:
                             row_num=int(input_val[0])
                             col_num=int(input_val[1])
@@ -391,8 +443,8 @@ class TableOperationKeywords():
                             logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                         else:
                             local_tk.log.debug('perfoming java script on element')
-                            contents = self.getTooltip(webElement, row_number,
-        							col_number);
+                            contents = self.getTooltip(webElement, row_number,col_number)
+                           
                             if contents !=None:
                                 tooltip=contents
                                 status=TEST_RESULT_PASS
@@ -448,8 +500,8 @@ class TableOperationKeywords():
                             logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                         else:
                             local_tk.log.debug('perfoming java script on element')
-                            contents = self.getTooltip(webElement, row_number,
-        							col_number);
+                            contents = self.getTooltip(webElement, row_number, col_number)
+                           
                             if contents !=None:
                                 verifytooltip=contents
                                 expected_value=input_val[2].strip()
@@ -489,11 +541,12 @@ class TableOperationKeywords():
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
             err_msg=None
+            index = False
             output_val=OUTPUT_CONSTANT
             local_tk.log.debug('reading the inputs')
             if(len(input_arr) > 1):
-                row_number=int(input_arr[0])-1
-                col_number=int(input_arr[1])-1
+                                              
+                                              
                 local_tk.driver=browser_Keywords.local_bk.driver_obj
                 local_tk.log.debug('got the driver instance from browser keyword')
                 visibleFlag=True
@@ -502,9 +555,16 @@ class TableOperationKeywords():
                         if webElement.tag_name.lower() != 'table' and webElement.get_attribute('role') == 'grid':
                             body = True
                             right = True
-                            if len(input_arr)==4:
+                            if len(input_arr)>=4:
                                 if (input_arr[2].lower() != 'body') : body = False
                                 if (input_arr[3].lower() != 'right') : right = False
+                            if len(input_arr)<=4:
+                                index = True
+                                row_number=int(input_arr[0])-1
+                                col_number=int(input_arr[1])-1
+                            else:
+                                row_number=input_arr[0]
+                                col_number=input_arr[1]
                             if body:
                                 if right:
                                     try:
@@ -520,24 +580,52 @@ class TableOperationKeywords():
                                 else:
                                     container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-pinned-left-header')]")
                                 rows = container.find_elements_by_xpath(".//div[contains(@class,'ag-header-row')]")
-                            row_count = len(rows)
-                            if(row_count>=row_number):
-                                try:
-                                    if body:
-                                        cells = rows[row_number].find_elements_by_xpath(".//div[@role='gridcell']")
-                                    else:
-                                        cells = rows[row_number].find_elements_by_xpath(".//div[contains(@class,'ag-header-cell')]")
-                                    coloumn_count = len(cells)
-                                    if (coloumn_count>=col_number):
-                                        try:
-                                            cells[col_number].click()
-                                            status=TEST_RESULT_PASS
-                                            methodoutput=TEST_RESULT_TRUE
-                                        except:pass
-                                except:pass
+                            if (index):
+                                row_count = len(rows)
+                                if(row_count>=row_number):
+                                    try:
+                                        if body:
+                                            cells = rows[row_number].find_elements_by_xpath(".//div[@role='gridcell']")
+                                        else:
+                                            cells = rows[row_number].find_elements_by_xpath(".//div[contains(@class,'ag-header-cell')]")
+                                        coloumn_count = len(cells)
+                                        if (coloumn_count>=col_number):
+                                            try:
+                                                cells[col_number].click()
+                                                status=TEST_RESULT_PASS
+                                                methodoutput=TEST_RESULT_TRUE
+                                            except:
+                                                try:
+                                                    local_tk.driver.execute_script("arguments[0].scrollIntoView(true);arguments[0].click();", cells[col_number])
+                                                    status=TEST_RESULT_PASS
+                                                    methodoutput=TEST_RESULT_TRUE
+                                                except:pass
+                                    except:pass
+                            else:
+                                for i in rows:
+                                    if i.get_attribute(input_arr[4]) == row_number:
+                                        if body:
+                                            cells = i.find_elements_by_xpath(".//div[@role='gridcell']")
+                                        else:
+                                            cells = i.find_elements_by_xpath(".//div[contains(@class,'ag-header-cell')]")
+                                        for j in cells:
+                                            if j.get_attribute(input_arr[5]) == col_number:
+                                                try:
+                                                    j.click()
+                                                    status=TEST_RESULT_PASS
+                                                    methodoutput=TEST_RESULT_TRUE
+                                                    break
+                                                except:
+                                                    try:
+                                                        local_tk.driver.execute_script("arguments[0].scrollIntoView(true);arguments[0].click(); ", j)
+                                                        status=TEST_RESULT_PASS
+                                                        methodoutput=TEST_RESULT_TRUE
+                                                    except:pass
                         elif len(input_arr)==2:
                             local_tk.log.info('normal cell click')
                             #logger.print_on_console('normal cell click inside the cell')
+                            row_number=int(input_arr[0])-1
+                            col_number=int(input_arr[1])-1
                             cell=self.javascriptExecutor(webElement,row_number,col_number)
                             element_list=cell.find_elements_by_xpath('.//*')
                             if len(list(element_list))>0:
@@ -588,6 +676,8 @@ class TableOperationKeywords():
                         elif len(input_arr)>2:
                             local_tk.log.info('click on an element inside a cell')
                             #logger.print_on_console('click on an element inside a cell')
+                            row_number=int(input_arr[0])-1
+                            col_number=int(input_arr[1])-1
                             tag=input_arr[2].lower()
                             index=int(input_arr[3])
                             eleStatus=False
@@ -871,7 +961,7 @@ class TableOperationKeywords():
                         if webElement.tag_name.lower() != 'table' and webElement.get_attribute('role') == 'grid':
                             body = True
                             right = True
-                            if len(input_val)==3:
+                            if len(input_val)>=3:
                                 if (input_val[1].lower() != 'body') : body = False
                                 if (input_val[2].lower() != 'right') : right = False
                             if body:
@@ -898,7 +988,10 @@ class TableOperationKeywords():
                                     cellVal = self.getChildNodes(cells[j])
                                     cellVal=cellVal.strip()
                                     if text in cellVal:
-                                        col_number = j+1
+                                        if len(input_val)==4:
+                                            col_number = cells[j].get_attribute(input_val[3])
+                                        else:
+                                            col_number = j+1
                                         break
                                 if col_number:
                                     break
@@ -1115,17 +1208,17 @@ class TableOperationKeywords():
                     local_tk.log.debug('checking for element')
                     if webElement!=None:
                         if webElement.tag_name.lower() != 'table' and webElement.get_attribute('role') == 'grid':
-                            container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-header-viewport')]")
-                            loc = container.location
-                            if loc.get('y') < 0:
-                                loc = container.location_once_scrolled_into_view
-                            size = container.size
-                            local_tk.log.debug("Mouse hover at location:"+str(int(loc.get('x')) + 100)+","+str(int(loc.get('y') + size.get('height') + 150)))
+                            # container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-header-viewport')]")
+                            # loc = container.location
+                            # if loc.get('y') < 0:
+                            #     loc = container.location_once_scrolled_into_view
+                            # size = container.size
+                            # local_tk.log.debug("Mouse hover at location:"+str(int(loc.get('x')) + 100)+","+str(int(loc.get('y') + size.get('height') + 150)))
                             direction = input[0]
                             times = int(input[1])
                             if SYSTEM_OS == "Windows":
                                 user32 = windll.user32
-                                user32.SetCursorPos(int(loc.get('x')) + 100, int(loc.get('y') + size.get('height') + 150))
+                                # user32.SetCursorPos(int(loc.get('x')) + 100, int(loc.get('y') + size.get('height') + 150))
                                 time.sleep(1)
                                 if direction.lower() == 'up':
                                     for i in range(times):
@@ -1184,17 +1277,17 @@ class TableOperationKeywords():
                     local_tk.log.debug('checking for element')
                     if webElement!=None:
                         if webElement.tag_name.lower() != 'table' and webElement.get_attribute('role') == 'grid':
-                            container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-header-viewport')]")
-                            loc = container.location
-                            if loc.get('y') < 0:
-                                loc = container.location_once_scrolled_into_view
-                            size = container.size
-                            local_tk.log.debug("Mouse hover at location:"+str(int(loc.get('x')) + 100)+","+str(int(loc.get('y') + size.get('height') + 150)))
+                            # container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-header-viewport')]")
+                            # loc = container.location
+                            # if loc.get('y') < 0:
+                            #     loc = container.location_once_scrolled_into_view
+                            # size = container.size
+                            # local_tk.log.debug("Mouse hover at location:"+str(int(loc.get('x')) + 100)+","+str(int(loc.get('y') + size.get('height') + 150)))
                             direction = input[0]
                             times = int(input[1])
                             if SYSTEM_OS == "Windows":
                                 user32 = windll.user32
-                                user32.SetCursorPos(int(loc.get('x')) + 100, int(loc.get('y') + size.get('height') + 150))
+                                # user32.SetCursorPos(int(loc.get('x')) + 100, int(loc.get('y') + size.get('height') + 150))
                                 time.sleep(1)
                                 if direction.lower() == 'right':
                                     for i in range(times):
@@ -1241,24 +1334,3 @@ class TableOperationKeywords():
                 err_msg = ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
                 logger.print_on_console(ERROR_CODE_DICT['ERR_HIDDEN_OBJECT'])
             return status,methodoutput,output_val,err_msg
-
-
-
-##if __name__ == '__main__':
-##
-##        driver = webdriver.Chrome( executable_path='chromedriver.exe')
-##        res=raw_input('click ok after navigating')
-##        time.sleep(5)
-##        a=TableOperationKeywords()
-##        element = driver.find_element_by_xpath('/html/body/form/div[3]/table/tbody/tr[3]/td[2]/div[1]/div[4]/div[1]/div[2]/table')
-##        print type(element)
-##        print element
-##        nested_table=element.find_elements_by_tag_name('table')
-##        for table in nested_table:
-##            print a.getCellValue(nested_table[0],1,1,driver,True)
-##
-##
-##        res,rownum=a.getCellValue(True,element[0],1,3,driver)
-####        res=a.verifyCellValue(True,element[0],1,3,rownum,driver)
-##
-##        print 'End of main's

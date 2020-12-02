@@ -107,11 +107,13 @@ class Spinner_Keywords():
                         if className != 'RadioButton' :
                             driver.back()
                     else:
-                        err_msg='element is disabled'
-                        log.error('element is disabled')
+                        err_msg=ERROR_CODE_DICT['ERR_WEB_ELEMENT_DISABLED']
                 else:
-                    err_msg='element is not visible'
-                    log.error('element is not visible')
+                    err_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
+            else:
+                err_msg=ERROR_CODE_DICT['ERR_ELEMENT_NOT_EXISTS']
+            if err_msg:
+                log.error(err_msg)
         except Exception as e:
                 log.error(e)
         return status,result,output,err_msg
@@ -213,18 +215,16 @@ class Spinner_Keywords():
                                 status=TEST_RESULT_PASS
                                 result=TEST_RESULT_TRUE
                         else :
-                                err_msg='count not matching'
                                 log.error('count not matching')
-                                print(err_msg)
                                 log.info("Count: "+len(text))
                     else:
-                        err_msg='element is disabled'
-                        log.error('element is disabled')
-                        print(err_msg)
+                        err_msg=ERROR_CODE_DICT['ERR_WEB_ELEMENT_DISABLED']
                 else:
-                    err_msg='element is not visible'
-                    log.error('element is not visible')
-                    print(err_msg)
+                    err_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
+            else:
+                err_msg=ERROR_CODE_DICT['ERR_ELEMENT_NOT_EXISTS']
+            if err_msg:
+                log.error(err_msg)
         except Exception as e:
                 log.error(e)
         return status,result,output,err_msg
@@ -281,9 +281,7 @@ class Spinner_Keywords():
                                         flag=True
                                         break
                                 else :
-                                    err_msg='invalid input'
-                                    log.error('invalid input')
-                                    print(err_msg)
+                                    log.error(INVALID_INPUT)
                             if status == TEST_RESULT_PASS :
                                 break
                             length1=len(text)
@@ -308,8 +306,7 @@ class Spinner_Keywords():
                                         flag=True
                                         break
                                 else :
-                                    err_msg='invalid input'
-                                    log.error('invalid input')
+                                    log.error(INVALID_INPUT)
                             if status == TEST_RESULT_PASS :
                                 break
                             length3=len(text)
@@ -334,9 +331,7 @@ class Spinner_Keywords():
                                                 flag=True
                                                 break
                                         else :
-                                            err_msg='invalid input'
-                                            log.error('invalid input')
-                                            print(err_msg)
+                                            log.error(INVALID_INPUT)
                             length2=len(text)
                             # import time
                             # time.sleep(3)
@@ -344,9 +339,7 @@ class Spinner_Keywords():
 
                             if (length1==length2):
                                 if flag == False:
-                                    err_msg='invalid input'
-                                    log.error('invalid input')
-                                    print(err_msg)
+                                    log.error(INVALID_INPUT)
                                 break
 
 
@@ -355,13 +348,13 @@ class Spinner_Keywords():
                                 break
 
                     else:
-                        err_msg='element is disabled'
-                        log.error('element is disabled')
-                        print(err_msg)
+                        err_msg=ERROR_CODE_DICT['ERR_WEB_ELEMENT_DISABLED']
                 else:
-                    err_msg='element is not visible'
-                    log.error('element is not visible')
-                    print(err_msg)
+                    err_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
+            else:
+                err_msg=ERROR_CODE_DICT['ERR_ELEMENT_NOT_EXISTS']
+            if err_msg:
+                log.error(err_msg)
         except Exception as e:
                 log.error(e)
 
@@ -431,9 +424,7 @@ class Spinner_Keywords():
                                     else :
                                         driver.back()
                                         var = 'true'
-                                        err_msg='invalid input'
-                                        log.error('invalid input')
-                                        print(err_msg)
+                                        log.error(INVALID_INPUT)
                             else:
                                 for j in obj:
                                     if input is not None:
@@ -451,9 +442,7 @@ class Spinner_Keywords():
                                             else :
                                                 driver.back()
                                                 var='true'
-                                                err_msg='invalid input'
-                                                log.error('invalid input')
-                                                print(err_msg)
+                                                log.error(INVALID_INPUT)
                                                 break
                             if status == TEST_RESULT_PASS :
                                 break
@@ -491,9 +480,7 @@ class Spinner_Keywords():
                                                         break
 
                                             else :
-                                                err_msg='invalid input'
-                                                log.error('invalid input')
-                                                print(err_msg)
+                                                log.error(INVALID_INPUT)
 
                             length2=len(text)
                             # import time
@@ -502,9 +489,7 @@ class Spinner_Keywords():
 
                             if (length1==length2):
                                 if flag == False:
-                                    err_msg='invalid input'
-                                    log.error('invalid input')
-                                    print(err_msg)
+                                    log.error(INVALID_INPUT)
                                     if var=='':
                                         driver.back()
                                         var='true'
@@ -519,13 +504,13 @@ class Spinner_Keywords():
                             driver.back()
                             var='true'
                     else:
-                        err_msg='element is disabled'
-                        log.error('element is disabled')
-                        print(err_msg)
+                        err_msg=ERROR_CODE_DICT['ERR_WEB_ELEMENT_DISABLED']
                 else:
-                    err_msg='element is not visible'
-                    log.error('element is not visible')
-                    print(err_msg)
+                    err_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
+            else:
+                err_msg=ERROR_CODE_DICT['ERR_ELEMENT_NOT_EXISTS']
+            if err_msg:
+                log.error(err_msg)
         except Exception as e:
                 log.error(e)
 
@@ -583,9 +568,7 @@ class Spinner_Keywords():
                                     result=TEST_RESULT_TRUE
                                     flag=True
                             else :
-                                err_msg='invalid input'
-                                log.error('invalid input')
-                                print(err_msg)
+                                log.error(INVALID_INPUT)
                             if status == TEST_RESULT_PASS :
                                 break
                             length1=len(text)
@@ -608,9 +591,7 @@ class Spinner_Keywords():
                                     result=TEST_RESULT_TRUE
                                     flag=True
                             else :
-                                err_msg='invalid input'
-                                log.error('invalid input')
-                                print(err_msg)
+                                log.error(INVALID_INPUT)
                             if status == TEST_RESULT_PASS :
                                 break
                             length3=len(text)
@@ -635,9 +616,7 @@ class Spinner_Keywords():
                                         result=TEST_RESULT_TRUE
                                         flag=True
                                 else :
-                                    err_msg='invalid input'
-                                    log.error('invalid input')
-                                    print(err_msg)
+                                    log.error(INVALID_INPUT)
                             length2=len(text)
                             # import time
                             # time.sleep(3)
@@ -645,9 +624,7 @@ class Spinner_Keywords():
 
                             if (length1==length2):
                                 if flag == False:
-                                    err_msg='invalid input'
-                                    log.error('invalid input')
-                                    print(err_msg)
+                                    log.error(INVALID_INPUT)
                                     if className == 'CheckedTextView' :
                                         driver.back()
                                         var = 'true'
@@ -657,13 +634,13 @@ class Spinner_Keywords():
                                 driver.back()
 
                     else:
-                        err_msg='element is disabled'
-                        log.error('element is disabled')
-                        print(err_msg)
+                        err_msg=ERROR_CODE_DICT['ERR_WEB_ELEMENT_DISABLED']
                 else:
-                    err_msg='element is not visible'
-                    log.error('element is not visible')
-                    print(err_msg)
+                    err_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
+            else:
+                err_msg=ERROR_CODE_DICT['ERR_ELEMENT_NOT_EXISTS']
+            if err_msg:
+                log.error(err_msg)
         except Exception as e:
                 log.error(e)
 
@@ -720,9 +697,7 @@ class Spinner_Keywords():
                                             result=TEST_RESULT_TRUE
                                             flag=True
                                 else :
-                                    err_msg='invalid input'
-                                    log.error('invalid input')
-                                    print(err_msg)
+                                    log.error(INVALID_INPUT)
                             if flag :
                                 break
                             else :
@@ -735,13 +710,13 @@ class Spinner_Keywords():
                             driver.back()
 
                     else:
-                        err_msg='element is disabled'
-                        log.error('element is disabled')
-                        print(err_msg)
+                        err_msg=ERROR_CODE_DICT['ERR_WEB_ELEMENT_DISABLED']
                 else:
-                    err_msg='element is not visible'
-                    log.error('element is not visible')
-                    print(err_msg)
+                    err_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
+            else:
+                err_msg=ERROR_CODE_DICT['ERR_ELEMENT_NOT_EXISTS']
+            if err_msg:
+                log.error(err_msg)
         except Exception as e:
                 log.error(e)
 
@@ -798,9 +773,7 @@ class Spinner_Keywords():
                                                 result=TEST_RESULT_TRUE
                                                 flag=True
                                 else :
-                                    err_msg='invalid input'
-                                    log.error('invalid input')
-                                    print(err_msg)
+                                    log.error(INVALID_INPUT)
                             if flag :
                                 break
                             else :
@@ -813,13 +786,13 @@ class Spinner_Keywords():
                             driver.back()
 
                     else:
-                        err_msg='element is disabled'
-                        log.error('element is disabled')
-                        print(err_msg)
+                        err_msg=ERROR_CODE_DICT['ERR_WEB_ELEMENT_DISABLED']
                 else:
-                    err_msg='element is not visible'
-                    log.error('element is not visible')
-                    print(err_msg)
+                    err_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
+            else:
+                err_msg=ERROR_CODE_DICT['ERR_ELEMENT_NOT_EXISTS']
+            if err_msg:
+                log.error(err_msg)
         except Exception as e:
                 log.error(e)
 
@@ -935,22 +908,20 @@ class Spinner_Keywords():
                                 break
 
                             else :
-                                    err_msg='invalid input'
-                                    log.error('invalid input')
-                                    print(err_msg)
+                                    log.error(INVALID_INPUT)
                                     break
                         if className != 'RadioButton' :
                             driver.back()
 
 
                     else:
-                        err_msg='element is disabled'
-                        log.error('element is disabled')
-                        print(err_msg)
+                        err_msg=ERROR_CODE_DICT['ERR_WEB_ELEMENT_DISABLED']
                 else:
-                    err_msg='element is not visible'
-                    log.error('element is not visible')
-                    print(err_msg)
+                    err_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
+            else:
+                err_msg=ERROR_CODE_DICT['ERR_ELEMENT_NOT_EXISTS']
+            if err_msg:
+                log.error(err_msg)
         except Exception as e:
                 log.error(e)
 
@@ -1050,13 +1021,13 @@ class Spinner_Keywords():
                             driver.back()
 
                     else:
-                        err_msg='element is disabled'
-                        log.error('element is disabled')
-                        print(err_msg)
+                        err_msg=ERROR_CODE_DICT['ERR_WEB_ELEMENT_DISABLED']
                 else:
-                    err_msg='element is not visible'
-                    log.error('element is not visible')
-                    print(err_msg)
+                    err_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
+            else:
+                err_msg=ERROR_CODE_DICT['ERR_ELEMENT_NOT_EXISTS']
+            if err_msg:
+                log.error(err_msg)
         except Exception as e:
                 log.error(e)
 
@@ -1155,21 +1126,19 @@ class Spinner_Keywords():
                                     break
 
                                 else :
-                                        err_msg='invalid input'
-                                        log.error('invalid input')
-                                        print(err_msg)
+                                        log.error(INVALID_INPUT)
                                         break
 
                         if className != 'RadioButton' :
                             driver.back()
                     else:
-                        err_msg='element is disabled'
-                        log.error('element is disabled')
-                        print(err_msg)
+                        err_msg=ERROR_CODE_DICT['ERR_WEB_ELEMENT_DISABLED']
                 else:
-                    err_msg='element is not visible'
-                    log.error('element is not visible')
-                    print(err_msg)
+                    err_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
+            else:
+                err_msg=ERROR_CODE_DICT['ERR_ELEMENT_NOT_EXISTS']
+            if err_msg:
+                log.error(err_msg)
         except Exception as e:
                 log.error(e)
 
@@ -1275,13 +1244,13 @@ class Spinner_Keywords():
                         if className != 'RadioButton' :
                             driver.back()
                     else:
-                        err_msg='element is disabled'
-                        log.error('element is disabled')
-                        print(err_msg)
+                        err_msg=ERROR_CODE_DICT['ERR_WEB_ELEMENT_DISABLED']
                 else:
-                    err_msg='element is not visible'
-                    log.error('element is not visible')
-                    print(err_msg)
+                    err_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
+            else:
+                err_msg=ERROR_CODE_DICT['ERR_ELEMENT_NOT_EXISTS']
+            if err_msg:
+                log.error(err_msg)
         except Exception as e:
                 log.error(e)
 
@@ -1373,9 +1342,7 @@ class Spinner_Keywords():
                                         if k in text:
                                             count=count+1
                                         else :
-                                            err_msg='invalid input'
-                                            log.error('invalid input')
-                                            print(err_msg)
+                                            log.error(INVALID_INPUT)
                                             break
                                     if count==len(input):
                                         log.info("Output: "+text)
@@ -1385,9 +1352,7 @@ class Spinner_Keywords():
 
 
                                 else :
-                                        err_msg='invalid input'
-                                        log.error('invalid input')
-                                        print(err_msg)
+                                        log.error(INVALID_INPUT)
                                         break
 
                             if (length1==length2):
@@ -1397,13 +1362,13 @@ class Spinner_Keywords():
                         if className != 'RadioButton' :
                             driver.back()
                     else:
-                        err_msg='element is disabled'
-                        log.error('element is disabled')
-                        print(err_msg)
+                        err_msg=ERROR_CODE_DICT['ERR_WEB_ELEMENT_DISABLED']
                 else:
-                    err_msg='element is not visible'
-                    log.error('element is not visible')
-                    print(err_msg)
+                    err_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
+            else:
+                err_msg=ERROR_CODE_DICT['ERR_ELEMENT_NOT_EXISTS']
+            if err_msg:
+                log.error(err_msg)
         except Exception as e:
                 log.error(e)
 
