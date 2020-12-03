@@ -537,7 +537,7 @@ class UtilWebKeywords:
                             browser_ver = browser_Keywords.local_bk.driver_obj.capabilities['version']
                         elif 'browserVersion' in  browser_Keywords.local_bk.driver_obj.capabilities.keys():
                             browser_ver = browser_Keywords.local_bk.driver_obj.capabilities['browserVersion']
-                        if webelement.is_displayed() and isinstance(browser_Keywords.local_bk.driver_obj,webdriver.Chrome) and browser_ver>='83':
+                        if webelement.is_displayed() and isinstance(browser_Keywords.local_bk.driver_obj,webdriver.Chrome) and browser_ver=='83':
                             location=webelement.location
                         else:
                             location=obj.get_element_location(webelement)
