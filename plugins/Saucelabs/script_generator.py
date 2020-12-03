@@ -288,7 +288,8 @@ def check_url(url):
     if res is None:
         driver.switch_to.default_content()
     else:
-        url_list=url.split('/')
+        driver.switch_to.default_content()
+        url_list=url.split('/')[:-1]
         for i in url_list:
             if 'i' in i:
                 tag='iframe'
@@ -296,7 +297,7 @@ def check_url(url):
             elif 'f' in i:
                 tag='frame'
                 index=i.split('f')[0]
-            driver.find_elements_by_tag_name('iframe')[index]
+            driver.switch_to.frame(driver.find_elements_by_tag_name(tag)[int(index)])
 
 def getWebElement(identifier):
     identifiers=identifier.split(';')
@@ -360,15 +361,15 @@ start = timer()
             'unselectCheckbox': radio_check_obj.unselectCheckbox,
 
             'getRowCount' : table_obj.getRowCount,
-            'getColoumnCount' : table_obj.getColoumnCount,
+            'getColumnCount' : table_obj.getColumnCount,
             'getCellValue' : table_obj.getCellValue,
             'verifyCellValue' : table_obj.verifyCellValue,
             'cellClick' : table_obj.cellClick,
             'getRowNumByText' : table_obj.getRowNumByText,
             'getColNumByText' : table_obj.getColNumByText,
             'getInnerTable' : table_obj.getInnerTable,
-            'getcelltooltip' : table_obj.getCellToolTip,
-            'verifycelltooltip' : table_obj.verifyCellToolTip,
+            'getCellToolTip' : table_obj.getCellToolTip,
+            'verifyCellToolTip' : table_obj.verifyCellToolTip,
 
             'getElementText' : element_obj.getElementText,
             'verifyElementText' : element_obj.verifyElementText,
@@ -390,7 +391,7 @@ start = timer()
             'sendSecureValue':textbox_obj.sendSecureValue,
 
             'selectValueByIndex':dropdown_obj.selectValueByIndex,
-            'getcount':dropdown_obj.getCount,
+            'getCount':dropdown_obj.getCount,
             'selectValueByText':dropdown_obj.selectValueByText,
             'verifySelectedValues':dropdown_obj.verifySelectedValues,
             'verifySelectedValue':dropdown_obj.verifySelectedValue,
@@ -686,7 +687,7 @@ start = timer()
                             else:
                                 logger.print_on_console(i.name+" keyword is not supported in saucelabs execution.")
                                 return False
-                    elif i.custname=='@Browser':
+                    elif i.custname=='@Browser' or i.custname=='@BrowserPopUp':
                         if(i.name=="openBrowser"):
                             self.browsers[browser]["platform"]=self.conf["platform"]
                             self.browsers[browser]["sauce:options"].update({"name":scenario_name})
