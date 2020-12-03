@@ -1286,13 +1286,12 @@ class About_window(wx.Frame):
     def __init__(self, parent, id, title):
         try:
             data = self.get_client_manifest()
-            msg = str(self.get_Info_1(data)) + str(self.get_Info_2(data)) + str(self.get_Info_4()) + str(self.get_Info_3())
             #------------------------------------Different co-ordinates for Windows and Mac
             if SYSTEM_OS=='Windows':
                 upload_fields= {
-                "Frame":[(300, 150),(465,220)],
+                "Frame":[(300, 150),(400,220)],
                 "disp_msg":[(12,18),(80, 28),(100,18), (310,-1),(415,18),(30, -1)],
-                "Close":[(340,148), (100, 28)]
+                "Close":[(280,148), (100, 28)]
             }
             else:
                 upload_fields={
@@ -1306,10 +1305,14 @@ class About_window(wx.Frame):
             self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
             self.SetIcon(self.wicon)
             self.panel = wx.Panel(self)
-            self.disp_msg = wx.TextCtrl(self.panel, pos = upload_fields["disp_msg"][0], size = (425, 120), style = wx.TE_MULTILINE|wx.TE_READONLY)
+            self.image = wx.StaticBitmap(self.panel, -1, wx.Bitmap(IMAGES_PATH + 'AVO_Assure.png', wx.BITMAP_TYPE_ANY), wx.Point(10, 10))
+            self.msg1=wx.StaticText(self.panel, -1, str(self.get_Info_1(data)), wx.Point(170, 20), wx.Size(200, 50)).SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.BOLD))
+            self.msg2=wx.StaticText(self.panel, -1, str(self.get_Info_2(data)), wx.Point(170, 55), wx.Size(200, 50))
+            self.msg3=wx.StaticText(self.panel, -1, str(self.get_Info_4()), wx.Point(10, 90), wx.Size(350, 50))
+            self.msg4=wx.StaticText(self.panel, -1, str(self.get_Info_3()), wx.Point(10, 120), wx.Size(200, 50))
             self.close_btn = wx.Button(self.panel, label="Close",pos=upload_fields["Close"][0], size=upload_fields["Close"][1])
             self.close_btn.Bind(wx.EVT_BUTTON, self.close)
-            self.disp_msg.AppendText( msg )
+            self.version_stat = wx.StaticText
             self.Centre()
             wx.Frame(self.panel)
             self.Show()
