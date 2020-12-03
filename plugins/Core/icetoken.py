@@ -9,12 +9,14 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 import os
-import sys
-from core_utils import CoreUtils
 import wx
-import logging
-import logger
+import sys
 import json
+import codecs
+import logging
+from uuid import uuid4 as uuid
+from core_utils import CoreUtils
+import logger
 
 log = logging.getLogger('icetoken.py')
 
@@ -28,7 +30,8 @@ class ICEToken():
     """ Check for the ICE token. If exists, returns decrypted token """
     def check_token(self):
         self.token_folder=self.get_token_folder()
-        self.token_file=self.token_folder+os.sep+"token.enc"
+        self.tokenid_file=os.environ["AVO_ASSURE_HOME"] + os.sep + "lib" + os.sep + "METADATA"
+        self.token_file=self.token_folder+os.sep+self.get_token_id()+".enc"
         if os.path.exists(self.token_file):
             log.debug("Token exists")
             """ Decrypt the token with token key """
@@ -78,6 +81,23 @@ class ICEToken():
         else:
             print(sys.platform+" platform yet to be supported")
         return token_folder
+
+    """ Returns the tokenid to get token from appdatafolder """
+    def get_token_id(self):
+        token_id = '-'
+        if os.path.exists(self.tokenid_file):
+            with open(self.tokenid_file, 'rb') as f:
+                try:
+                    token_id = codecs.decode(f.read(), 'hex').decode('utf-8')
+                except Exception as e:
+                    print(e)
+                    pass
+        if token_id == '-':
+            token_id = str(uuid())
+            with open(self.tokenid_file, 'wb') as f:
+                f.write(codecs.encode(token_id.encode('utf-8'), 'hex'))
+                f.close()
+        return token_id
 
 class Token_window(wx.Frame):
     """Initialization and defining the wx-components of the pop-up"""

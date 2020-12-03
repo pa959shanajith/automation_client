@@ -363,7 +363,7 @@ class StepDescription:
                 return 'Select value '+"'" +input+"'" +' with visible text '+"'" +visible_text+"'" +' of the type '+"'" +ele_type+"'" +' with the index '+"'" +cust_index+"'" +' present in '+ "'" + tsp.custname + "'"
             else:
                 return 'Select the value '+output+' with the index '+input+' present in the table cell '+"'" + tsp.custname+'['+inputval[0]+']['+inputval[1]+']'+"'."
-        def getcount():
+        def getCount():
             return 'Get the count of values in the '+ "'" + tsp.custname + "'"+ ' and save the count ' +"'"+output+"'"+' in '+"'"+tsp.outputval+"'"
         #Radio checkbox keywords
         def selectRadioButton():
@@ -498,15 +498,15 @@ class StepDescription:
             return 'verify the attribute ' + "'"+ input[0] +"'"+ ' has value stored in ' +"'" + input[1] + "'"+' present in the ' +"'"+tsp.custname+"'"
 
         #Table keywords
-        def getcelltooltip():
+        def getCellToolTip():
             return 'Get the cell tooltip from the '+ "'" + tsp.custname +'['+inputval[0]+']['+inputval[1]+']'+ "'"+ ' and save the tool tip text ' +"'"+output+"'"+' in ' +"'"+tsp.outputval+"'"
-        def verifycelltooltip():
+        def verifyCellToolTip():
             return 'Verify cell tooltip value '+"'"+input+"'"+' is present in the '+ "'"+ tsp.custname +'['+inputval[0]+']['+inputval[1]+']'+ "' table."
         # def cellclick():
         #     return 'Click on ' + "'" + tsp.custname + "'"
         def getRowCount():
             return 'Get row count of the ' + "'" + tsp.custname + "'" + ' and save the count ' +"'"+output+"'"+' in '+"'"+tsp.outputval+"'"
-        def getColoumnCount():
+        def getColumnCount():
             return 'Get column count of the '+ "'" + tsp.custname + "'"+ ' and save the count '+"'"+output+"'"+' in '+"'"+tsp.outputval+"'"
         def verifyCellValue():
             input = inputL[2:]# getting list elements from pos 3 till end
