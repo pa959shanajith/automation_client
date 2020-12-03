@@ -1020,6 +1020,7 @@ class Singleton_DriverUtil():
                     choptions = webdriver.ChromeOptions()
                     choptions.add_argument('start-maximized')
                     choptions.add_experimental_option('useAutomationExtension', False)
+                    choptions.add_experimental_option("excludeSwitches",["enable-automation"])
                     if headless_mode: choptions.add_argument('--headless')
                        
                     if configvalues['extn_enabled'].lower()=='yes' and os.path.exists(webconstants.EXTENSION_PATH):
@@ -1054,6 +1055,7 @@ class Singleton_DriverUtil():
                 caps['marionette'] = True
                 from selenium.webdriver.firefox.options import Options
                 firefox_options = Options()
+                firefox_options.set_preference("useAutomationExtension", False)
                 if headless_mode:
                     firefox_options.add_argument('--headless')
                 exec_path = webconstants.GECKODRIVER_PATH
