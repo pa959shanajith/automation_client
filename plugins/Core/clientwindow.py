@@ -1312,7 +1312,6 @@ class About_window(wx.Frame):
             self.msg4=wx.StaticText(self.panel, -1, str(self.get_Info_3()), wx.Point(10, 120), wx.Size(200, 50))
             self.close_btn = wx.Button(self.panel, label="Close",pos=upload_fields["Close"][0], size=upload_fields["Close"][1])
             self.close_btn.Bind(wx.EVT_BUTTON, self.close)
-            self.version_stat = wx.StaticText
             self.Centre()
             wx.Frame(self.panel)
             self.Show()
