@@ -212,7 +212,6 @@ class Dropdown_Keywords():
         self.f.write(space+"iListSize = len(iList)")
         self.f.write(space+"output=iListSize")
         self.f.write(space+"status='Pass'")
-    
     def verifyCount(self,space,webelement,input,*args):
         self.f.write(space+"input="+input[0])
         self.f.write(space+"select = Select("+webelement+")")
@@ -235,8 +234,8 @@ class Dropdown_Keywords():
         self.f.write(space+"select = Select("+webelement+")")
         self.f.write(space+"all_value = select.all_selected_options")
         self.f.write(space+"temp="+input_val)
-        self.f.write(space+"import copy\ntemp1=copy.deepcopy(temp)")
-        self.f.write(space+"for i in range(0,len(temp)):\n\tif temp[i] in all_value:\n\t\ttemp1.remove(temp[i])")
+        self.f.write(space+"import copy"+space+"temp1=copy.deepcopy(temp)")
+        self.f.write(space+"for i in range(0,len(temp)):"+space+"\\tif temp[i] in all_value:"+space+"\\t\ttemp1.remove(temp[i])")
         self.f.write(space+"output='True' if len(temp1)==0 else 'False'")
         self.f.write(space+"status='Pass' if output == 'True' else 'Fail'")
 
@@ -263,7 +262,7 @@ class Dropdown_Keywords():
         self.f.write(space+"temp=[]")
         self.f.write(space+"flag==True")
         self.f.write(space+"for x in range(0,opt_len): temp.append(select.options[x].text)")
-        self.f.write(space+"for i in input:\n\tif i not in temp:\n\t\tflag=False\n\t\tbreak")
+        self.f.write(space+"for i in input:"+space+"\tif i not in temp:"+space+"\t\tflag=False"+space+"\t\tbreak")
         self.f.write(space+"output='True' if flag else 'False'")
         self.f.write(space+"status='Pass' if output == 'True' else 'Fail'")
 
@@ -394,7 +393,7 @@ class Table_Keywords():
         self.f.write(space+"output=driver.execute_script('var targetTable = arguments[0]; var rowCount = targetTable.rows; return rowCount.length;',"+webelement+")")
         self.f.write(space+"status='Pass'")
 
-    def getColoumnCount(self,space,webelement,input,*args):
+    def getColumnCount(self,space,webelement,input,*args):
         self.f.write(space+"output=driver.execute_script('var targetTable = arguments[0]; var columnCount = 0; var rows = targetTable.rows; if(rows.length > 0) { 	for (var i = 0; i < rows.length; i++) { 		var cells = rows[i].cells; 		var tempColumnCount = 0; 		for (var j = 0; j < cells.length; j++) { 			tempColumnCount += cells[j].colSpan; 		} 		if (tempColumnCount > columnCount) { 			columnCount = tempColumnCount; 		} 	} } return columnCount;',"+webelement+")")
         self.f.write(space+"status='Pass'")
 
@@ -445,11 +444,11 @@ class Table_Keywords():
     def cellClick(self,space,webelement,input,*args):
         self.f.write(space+"row="+input[0])
         self.f.write(space+"col="+input[1])
-        self.f.write(space+"input="+input[3])
         if len(input)==2:
             self.f.write(space+"remoteele=driver.execute_script('var temp = fun(arguments[0], arguments[2], arguments[1]); return temp;  function fun(table, x, y) {     var m = [],         row, cell, xx, tx, ty, xxx, yyy;     for (yyy = 0; yyy < table.rows.length; yyy++) {         row = table.rows[yyy];         for (xxx = 0; xxx < row.cells.length; xxx++) {             cell = row.cells[xxx];             xx = xxx;             for (; m[yyy] && m[yyy][xx]; ++xx) {}             for (tx = xx; tx < xx + cell.colSpan; ++tx) {                 for (ty = yyy; ty < yyy + cell.rowSpan; ++ty) {                     if (!m[ty]) m[ty] = [];                     m[ty][tx] = true;                 }             }             if (xx <= x && x < xx + cell.colSpan && yyy <= y && y < yyy + cell.rowSpan) return cell;         }     }     return null; };',"+webelement+",row,col)")
             self.f.write(space+"remoteele.find_elements_by_xpath('.//*')[0].click()")
         elif len(input)>2:
+            self.f.write(space+"input="+input[3])
             self.f.write(space+"remoteele=driver.execute_script('var temp = fun(arguments[0], arguments[2], arguments[1]); return temp;  function fun(table, x, y) {     var m = [],         row, cell, xx, tx, ty, xxx, yyy;     for (yyy = 0; yyy < table.rows.length; yyy++) {         row = table.rows[yyy];         for (xxx = 0; xxx < row.cells.length; xxx++) {             cell = row.cells[xxx];             xx = xxx;             for (; m[yyy] && m[yyy][xx]; ++xx) {}             for (tx = xx; tx < xx + cell.colSpan; ++tx) {                 for (ty = yyy; ty < yyy + cell.rowSpan; ++ty) {                     if (!m[ty]) m[ty] = [];                     m[ty][tx] = true;                 }             }             if (xx <= x && x < xx + cell.colSpan && yyy <= y && y < yyy + cell.rowSpan) return cell;         }     }     return null; };',"+webelement+",row,col)")
             if input[2].lower=='button':
                 obj="//input[@type='button' or @type='button' or @type='submit' or @type='reset' or @type='file']"
