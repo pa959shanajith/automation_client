@@ -266,7 +266,7 @@ class FileOperations:
                                 for r in range(sheet.nrows):
                                     c.writerow(sheet.row_values(r))
 
-                    elif(input_ext=='.csv' and (extension=='.xlsx' or extension=='.xls')):
+                    elif(input_ext=='.csv' and extension=='.xlsx'):
                         workbook = openpyxl.Workbook()
                         worksheet = workbook.create_sheet(index=0, title='Sheet1')
                         with open(source_path, 'rt', encoding='utf8') as f:
@@ -276,6 +276,16 @@ class FileOperations:
                                     worksheet.cell(r+1, c+1, col)
                         workbook.save(os.path.join(os.path.dirname(file2), filename))
                         workbook.close()
+                    
+                    elif(input_ext=='.csv' and extension=='.xls'):
+                        with open(source_path, 'rt') as f:
+                            reader = csv.reader(f)
+                            workbook = xlwt.Workbook()
+                            sheet = workbook.add_sheet("Sheet 1")
+                            for rowi, row in enumerate(reader):
+                                for coli, value in enumerate(row):
+                                    sheet.write(rowi,coli,value)
+                            workbook.save(file2)
 
                     elif((input_ext=='.xlsx' and extension=='.xls') or (input_ext=='.xls' and extension=='.xlsx')):
                         excel = win32com.client.gencache.EnsureDispatch('Excel.Application')
@@ -317,7 +327,7 @@ class FileOperations:
                             zip_ref.close()
                         else:
                             err_msg = 'Folder already exists in the destination path'
-							
+
                     else:
                         err_msg = 'File conversion support is not given for ' + str(input_ext) + ' to ' + str(extension)
                 else:
