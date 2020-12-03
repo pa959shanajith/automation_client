@@ -221,6 +221,8 @@ class FileOperations:
 
     def saveFileAs(self,source_path,destination_path,opt,extension):
         import csv
+        import pythoncom
+        pythoncom.CoInitialize()
         status = TEST_RESULT_FAIL
         result = TEST_RESULT_FALSE
         err_msg = None
@@ -231,7 +233,7 @@ class FileOperations:
             res = os.path.isfile(file2)
             filename = os.path.basename(file2)
             input_ext = os.path.splitext(source_path)[1]
-            ext_list=['.txt','.csv','.xlsx','.xls','.doc','.docx','.pdf','.zip']
+            ext_list=['.txt','.csv','.xlsx','.xls','.doc','.docx','.pdf','.zip','.unzip']
             if(extension in ext_list):
                 if(not res or opt=='1'): 
                     if(input_ext=='.txt' and extension=='.csv'):
@@ -306,6 +308,16 @@ class FileOperations:
                                 else:
                                     zipf.write(os.path.join(root, f))
                         zipf.close()
+
+                    elif(input_ext=='.zip'):
+                        unzip_path=os.path.dirname(destination_path)+'\\'+file1.split('.')[0]
+                        if(not os.path.isdir(source_path.split('.')[0])):
+                            with zipfile.ZipFile(source_path, 'r') as zip_ref:
+                                zip_ref.extractall(unzip_path)
+                            zip_ref.close()
+                        else:
+                            err_msg = 'Folder already exists in the destination path'
+							
                     else:
                         err_msg = 'File conversion support is not given for ' + str(input_ext) + ' to ' + str(extension)
                 else:
@@ -318,6 +330,7 @@ class FileOperations:
             else:
                 err_msg = 'Supported extensions for conversions are '+ str(ext_list)
         except Exception as e:
+            log.error(e)
             err_msg = 'Error occurred while file conversion in copyFileFolder'
         return status, result, err_msg
             
