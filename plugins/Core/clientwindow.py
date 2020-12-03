@@ -145,6 +145,7 @@ class ClientWindow(wx.Frame):
         # self.log.SetForegroundColour((0,50,250))
         self.log.BeginTextColour((0, 50, 250))
         self.log.SetFont(font1)
+        self.log.Disable() #Disable cursor on client window
 
         self.schedule = wx.CheckBox(self.panel, label = 'Do Not Disturb',pos=(120, 10), size=(100, 25))
         self.schedule.SetToolTip(wx.ToolTip("Enable Do Not Disturb Mode"))
