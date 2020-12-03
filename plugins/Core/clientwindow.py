@@ -1332,7 +1332,7 @@ class About_window(wx.Frame):
     def get_Info_1(self,data):
         str1=''
         try:
-            str1='Avo Assure ICE '+list(data['iceversion'])[0]+'.'+list(data['iceversion'][list(data['iceversion'])[0]]['subversion'])[0] + ' (64-bit)' +' \n'
+            str1='Avo Assure ICE '+list(data['version'])[0]+'.'+list(data['version'][list(data['version'])[0]])[0] + ' (64-bit)' +' \n'
         except Exception as e:
             log.error(e)
         return str1
@@ -1340,7 +1340,7 @@ class About_window(wx.Frame):
     def get_Info_2(self,data):
         str1=''
         try:
-            str1='Updated on : '+(data['iceversion'][list(data['iceversion'])[0]]['subversion'][list(data['iceversion'][list(data['iceversion'])[0]]['subversion'])[0]]['updated_on'])+' \n'
+            str1='Updated on : '+(data['version'][list(data['version'])[0]][list(data['version'][list(data['version'])[0]])[0]]['updated_on'])+' \n'
         except Exception as e:
             log.error(e)
         return str1
