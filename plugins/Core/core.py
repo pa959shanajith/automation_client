@@ -1695,7 +1695,7 @@ def set_ICE_status(one_time_ping = False,connect=True,interval = 60000):
         status_ping_thread.start()     
     log.info('Ping Server')
     #Add ICE identification and stauts, which is busy by default
-    result = {"hostip":socket.gethostbyname(socket.gethostname()),"hostname":os.environ['username'],"time":str(datetime.now()),"connected":connect}
+    result = {"hostip":socket.gethostbyname(socket.gethostname()),"time":str(datetime.now()),"connected":connect}
     result['status'] = execution_flag
     if cw is not None:
         result['mode'] = cw.schedule.GetValue()

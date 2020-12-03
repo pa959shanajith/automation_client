@@ -171,7 +171,7 @@ def convertToBinary(rr):
         rr[i] = dec2bin(rr[i])
   
 def ping(host):
-    p = subprocess.Popen(["ping.exe",host], stdout = subprocess.PIPE, shell = True)
+    p = subprocess.Popen(["ping",host], stdout = subprocess.PIPE, shell = True)
     result = p.communicate()[0]
     for row in str(result).split("\\r\\n"):
         if 'Average' in row:
@@ -236,7 +236,10 @@ def execute(name,schedTime):
             logger.print_on_console("Terminating Benchmark Execution")
             start(delta.seconds,name,schedTime)
             return 
-        socketIO.emit('benchmark_ping',{'cpuscore':b,"memoryscore":c,"networkscore":a,"percent_received":str(percent * 100) + '%',"hostip":socket.gethostbyname(socket.gethostname()),"hostname":os.environ['username'],"systemscore":result,"time":str(datetime.datetime.now())})
+        key='USERNAME'
+        if key not in os.environ:
+            key='USER'
+        socketIO.emit('benchmark_ping',{'cpuscore':b,"memoryscore":c,"networkscore":a,"percent_received":str(percent * 100) + '%',"hostip":socket.gethostbyname(socket.gethostname()),"hostname":os.environ[key],"systemscore":result,"time":str(datetime.datetime.now())})
         start(delta.seconds,name,schedTime)
         return
     except Exception as e:
