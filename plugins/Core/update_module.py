@@ -72,7 +72,7 @@ class Update_Rollback:
         try:
             vers=list(data_from_server['iceversion'])
             vers.sort(reverse=True)
-            self.server_version = data_from_server['serverversion']
+            self.server_version = data_from_server['version']
             #log.debug (vers)
             #cver=list(client_data['version'])
             #csubvers=list(client_data['version'][list(client_data['version'])[0]]['subversion'])
@@ -80,20 +80,20 @@ class Update_Rollback:
             #log.debug (cdata)
             """build arguments for client data"""
             cdata_value = []
-            ckey = client_data['iceversion'][list(client_data['iceversion'])[0]]['subversion'][list(client_data['iceversion'][list(client_data['iceversion'])[0]]['subversion'])[0]]['tag']
-            cdata_value.append(client_data['iceversion'][list(client_data['iceversion'])[0]]['subversion'][list(client_data['iceversion'][list(client_data['iceversion'])[0]]['subversion'])[0]]['p_tag'])
+            ckey = client_data['iceversion'][list(client_data['iceversion'])[0]][list(client_data['iceversion'][list(client_data['iceversion'])[0]])[0]]['tag']
+            cdata_value.append(client_data['iceversion'][list(client_data['iceversion'])[0]][list(client_data['iceversion'][list(client_data['iceversion'])[0]])[0]]['p_tag'])
             #------------Server-Client min/max check
-            cmin_svr_val = client_data['iceversion'][list(client_data['iceversion'])[0]]['subversion'][list(client_data['iceversion'][list(client_data['iceversion'])[0]]['subversion'])[0]]['min-compatibility']
-            cmax_svr_val = client_data['iceversion'][list(client_data['iceversion'])[0]]['subversion'][list(client_data['iceversion'][list(client_data['iceversion'])[0]]['subversion'])[0]]['max-compatibility']
+            cmin_svr_val = client_data['iceversion'][list(client_data['iceversion'])[0]][list(client_data['iceversion'][list(client_data['iceversion'])[0]])[0]]['min-compatibility']
+            cmax_svr_val = client_data['iceversion'][list(client_data['iceversion'])[0]][list(client_data['iceversion'][list(client_data['iceversion'])[0]])[0]]['max-compatibility']
             self.MIN_FLAG = LooseVersion(str(cmin_svr_val)) <= LooseVersion(str(self.server_version))# min server version has to be lesser than or equal to the Current Sever Version
             self.MAX_FLAG = LooseVersion(str(cmax_svr_val)) == LooseVersion(str(self.server_version))# max server version has to be equal to the Current Server Version
             self.client_tag.update( {ckey : cdata_value} )
 
-            cdate=client_data['iceversion'][list(client_data['iceversion'])[0]]['subversion'][list(client_data['iceversion'][list(client_data['iceversion'])[0]]['subversion'])[0]]['updated_on']
+            cdate=client_data['iceversion'][list(client_data['iceversion'])[0]][list(client_data['iceversion'][list(client_data['iceversion'])[0]])[0]]['updated_on']
             #log.debug (cdate)
             for v in vers:
                 #subvers=data_from_server['version'][v]['subversion'].keys()
-                subvers = list(data_from_server['iceversion'][v]['subversion'])
+                subvers = list(data_from_server['iceversion'][v])
                 subvers.sort(reverse = True)
                 #log.debug (subvers)
                 for sv in subvers:
@@ -105,11 +105,11 @@ class Update_Rollback:
 ##                    if ( data_from_server['iceversion'][v]['subversion'][sv]['sha256'] != cdata ):
                     data_value=[]
                     data_key = ''
-                    data_L.append(data_from_server['iceversion'][v]['subversion'][sv])
-                    data_key = data_from_server['iceversion'][v]['subversion'][sv]['tag']
-                    data_value.append(data_from_server['iceversion'][v]['subversion'][sv]['p_tag'])
-                    data_value.append(data_from_server['iceversion'][v]['subversion'][sv]['baseline'])
-                    data_value.append(data_from_server['iceversion'][v]['subversion'][sv]['sha256'])
+                    data_L.append(data_from_server['iceversion'][v][sv])
+                    data_key = data_from_server['iceversion'][v][sv]['tag']
+                    data_value.append(data_from_server['iceversion'][v][sv]['p_tag'])
+                    data_value.append(data_from_server['iceversion'][v][sv]['baseline'])
+                    data_value.append(data_from_server['iceversion'][v][sv]['sha256'])
                     self.data_tags.update( {data_key : data_value} )
                         #data_tags.append(data_from_server['version'][v]['subversion'][sv]['tag'])
 ##                    elif ( data_from_server['iceversion'][v]['subversion'][sv]['sha256'] == cdata ):
