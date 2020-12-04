@@ -477,8 +477,7 @@ class TableOperationKeywords():
             """
 
 
-        def doubleCellClick(self,webElement,input_val,*args):
-            # verifyCellToolTip
+        def verifyCellToolTip(self,webElement,input_val,*args):
             logger.print_on_console('Executing keyword : verifyCellToolTip')
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
@@ -856,8 +855,7 @@ class TableOperationKeywords():
 ##            return status,methodoutput,output_val,err_msg
 
 
-        def verifyCellToolTip(self,webElement,input_arr,*args):
-            #doubleCellClick
+        def doubleCellClick(self,webElement,input_arr,*args):
             logger.print_on_console('Executing keyword : doubleCellClick')
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
@@ -875,8 +873,8 @@ class TableOperationKeywords():
                     try:
                         if webElement.tag_name.lower() == 'table':
                             if len(input_arr)==2:
-                                local_tk.log.info('normal cell click')
-                                #logger.print_on_console('normal cell click inside the cell')
+                                local_tk.log.info('normal doubleCellClick')
+                                #logger.print_on_console('normal doubleCellClick inside the cell')
                                 row_number=int(input_arr[0])-1
                                 col_number=int(input_arr[1])-1
                                 cell=self.javascriptExecutor(webElement,row_number,col_number)
@@ -890,21 +888,20 @@ class TableOperationKeywords():
                                         local_tk.log.debug('checking for element enabled')
                                         if cell.is_enabled():
                                             try:
-                                                local_tk.log.debug('performing java script click')
+                                                local_tk.log.debug('performing doublecell click')
                                                 webdriver.ActionChains(browser_Keywords.local_bk.driver_obj).move_to_element(cell).double_click(cell).perform()
                                                 status=webconstants.TEST_RESULT_PASS
                                                 methodoutput=TEST_RESULT_TRUE
                                                 local_tk.log.info('click action performed successfully')
                                             except Exception as e:
-                                                local_tk.log.debug('error occured for doublecellclick')
-                                                logger.print_on_console('error occured for doublecellclick')
+                                                local_tk.log.debug('error occured in doublecellclick')
                                 except Exception as e:
                                     local_tk.log.error(e)
                                     logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
                                     err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
                             elif len(input_arr)>2:
-                                local_tk.log.info('click on an element inside a cell')
-                                #logger.print_on_console('click on an element inside a cell')
+                                local_tk.log.info('doubleclick on an element inside a cell')
+                                #logger.print_on_console('doubleclick on an element inside a cell')
                                 row_number=int(input_arr[0])-1
                                 col_number=int(input_arr[1])-1
                                 tag=input_arr[2].lower()
@@ -929,7 +926,7 @@ class TableOperationKeywords():
                                     childindex=lastElement[lastElement.find("[")+1:lastElement.find("]")]
                                     childindex = int(childindex)
                                     if tag=='button':
-                                        local_tk.log.debug('clicking on button')
+                                        local_tk.log.debug('double clicking on button')
                                         if( (tagName==('input') and tagType==('button')) or tagType==('submit') or tagType==('reset') or tagType==('file')):
                                             if index==childindex:
                                                 eleStatus =True
@@ -940,7 +937,7 @@ class TableOperationKeywords():
                                                 else:
                                                     counter+=1
                                     elif tag=='image':
-                                        local_tk.log.debug('clicking on image')
+                                        local_tk.log.debug('double clicking on image')
                                         if(tagName==('input') and (tagType==('img') or tagType==('image'))):
                                             if index==childindex:
                                                 eleStatus =True
@@ -951,7 +948,7 @@ class TableOperationKeywords():
                                                 else:
                                                     counter+=1
                                         elif tagName =='img':
-                                            local_tk.log.debug('clicking on img')
+                                            local_tk.log.debug('double clicking on img')
                                             if index==childindex:
                                                 eleStatus =True
                                             else:
@@ -961,7 +958,7 @@ class TableOperationKeywords():
                                                 else:
                                                     counter+=1
                                     elif tag=='img':
-                                        local_tk.log.debug('clicking on img')
+                                        local_tk.log.debug('double clicking on img')
                                         if index==childindex:
                                                 eleStatus =True
                                         else:
@@ -971,7 +968,7 @@ class TableOperationKeywords():
                                             else:
                                                 counter+=1
                                     elif tag=='checkbox':
-                                        local_tk.log.debug('clicking on check box')
+                                        local_tk.log.debug('double clicking on check box')
                                         if(tagName==('input') and (tagType==('checkbox')) ):
                                             if index==childindex:
                                                 eleStatus =True
@@ -982,7 +979,7 @@ class TableOperationKeywords():
                                                 else:
                                                     counter+=1
                                     elif tag=='radiobutton':
-                                        local_tk.log.debug('clicking on radio button')
+                                        local_tk.log.debug('double clicking on radio button')
                                         if (tagName==('input') and tagType==('radio')):
                                             if index==childindex:
                                                 eleStatus =True
@@ -993,7 +990,7 @@ class TableOperationKeywords():
                                                 else:
                                                     counter+=1
                                     elif tag=='textbox':
-                                        local_tk.log.debug('clicking on radio text box')
+                                        local_tk.log.debug('double clicking on text box')
                                         if (tagName==('input') and (tagType==('text') or tagType==('email') or tagType==('password') or tagType==('range') or tagType==('search') or tagType==('url')) ):
                                             if index==childindex:
                                                 eleStatus =True
@@ -1004,7 +1001,7 @@ class TableOperationKeywords():
                                                 else:
                                                     counter+=1
                                     elif tag=='link':
-                                        local_tk.log.debug('clicking on link')
+                                        local_tk.log.debug('double clicking on link')
                                         if(tagName==('a')):
                                             if index==childindex:
                                                 eleStatus =True
@@ -1031,14 +1028,13 @@ class TableOperationKeywords():
                                                 if not (cellChild is None):
                                                     browser_Keywords.local_bk.driver_obj.execute_script("arguments[0].scrollIntoView(true);",cellChild)
                                                     try:
-                                                        local_tk.log.debug('performing click')
+                                                        local_tk.log.debug('performing double click')
                                                         webdriver.ActionChains(browser_Keywords.local_bk.driver_obj).move_to_element(cellChild).double_click(cellChild).perform()
                                                         status=webconstants.TEST_RESULT_PASS
                                                         methodoutput=TEST_RESULT_TRUE
                                                         break
                                                     except Exception as e:
-                                                        local_tk.log.debug('error occured for doublecellclick')
-                                                        logger.print_on_console('error occured for doublecellclick')
+                                                        local_tk.log.debug('error occured in doublecellclick')
                                                         break
                                             except Exception as e:
                                                 local_tk.log.error(e)
