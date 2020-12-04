@@ -51,7 +51,9 @@ class RedirectText(object):
         self.out=aWxTextCtrl
 
     def write(self,string):
+        wx.CallAfter(self.out.MoveEnd)
         wx.CallAfter(self.out.WriteText, string)
+        wx.CallAfter(self.out.MoveEnd)
         wx.CallAfter(self.out.ShowPosition,self.out.GetLastPosition())
 
     def write_color(self, string, color):
@@ -60,7 +62,7 @@ class RedirectText(object):
         elif(color=='YELLOW'): rgb_color=(255, 193, 7)
         else: rgb_color=(0, 50, 250)
         wx.CallAfter(self.out.BeginTextColour, rgb_color)
-        self.write(string+'\n')
+        self.write(string)
         wx.CallAfter(self.out.EndTextColour)
         wx.CallAfter(self.out.BeginTextColour, (0, 50, 250))
 
@@ -140,7 +142,7 @@ class ClientWindow(wx.Frame):
         self.connectbutton.Bind(wx.EVT_BUTTON, self.OnNodeConnect)
         self.connectbutton.SetToolTip(wx.ToolTip("Connect to Avo Assure Server"))
         # self.log = wx.TextCtrl(self.panel, wx.ID_ANY, pos=(12, 38), size=(760,500), style = wx.TE_MULTILINE|wx.TE_READONLY)
-        self.log = wx.richtext.RichTextCtrl(self.panel, wx.ID_ANY, pos=(12, 38), size=(760,500), style = wx.TE_MULTILINE|wx.TE_READONLY|wx.TE_RICH2)
+        self.log = wx.richtext.RichTextCtrl(self.panel, wx.ID_ANY, pos=(12, 38), size=(760,500), style = wx.richtext.RE_MULTILINE|wx.richtext.RE_READONLY|wx.TE_RICH2)
         font1 = wx.Font(10, wx.MODERN, wx.NORMAL, wx.NORMAL,  False, 'Consolas')
         # self.log.SetForegroundColour((0,50,250))
         self.log.BeginTextColour((0, 50, 250))
