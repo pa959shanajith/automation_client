@@ -1108,8 +1108,8 @@ class Main():
             clientwindow.root = root
             cw = clientwindow.ClientWindow()
             self.cw = cw
-        else:
-            logger.init_colorama(autoreset=True)
+        # else:
+        #     logger.init_colorama(autoreset=True)
 
         """ Creating Root Logger using logger file config and setting logfile path, which is in config.json """
         try:
