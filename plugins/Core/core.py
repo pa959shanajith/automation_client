@@ -1621,9 +1621,9 @@ def check_browser():
                     if edgeFlag == False:
                         logger.print_on_console('WARNING!! : Edge Legacy version ',str(browser_ver),' is not supported.')
                 else:
-                    logger.print_on_console("Warning!! : To perform MS Edge Legacy check, all instances of it should be closed. Close the instances and restart ICE again!!")
+                    logger.print_on_console("WARNING!! : To perform MS Edge Legacy check, all instances of MS Edge legacy should be closed. Close the instances and restart ICE again")
             else:
-                logger.print_on_console("WARNING!! : Edge Legacy is supported only in Windows10 platform") 
+                logger.print_on_console("WARNING!! : MS Edge Legacy is supported only in Windows10 platform") 
         except Exception as e:
             logger.print_on_console("Error in checking Edge Legacy version")
             log.error("Error in checking Edge Legacy version")
