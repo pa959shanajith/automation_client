@@ -361,6 +361,7 @@ class ClientWindow(wx.Frame):
         try:
             import script_generator
             scl_ops = script_generator.Sauce_Config()
+            conf= scl_ops.get_sauceconf()
             sc = scl_ops.get_sauceclient()
             j = scl_ops.get_saucejobs(sc)
             all_jobs = j.get_jobs(full=None,limit=2)
