@@ -173,7 +173,7 @@ class Updater:
             log.info( "Building the end point URL's" )
             print ( "=>Building the end point URL's" )
             for ver in new_version_list:
-                end_points_list.append(str(self.SERVER_LOC) + str(ver[:3]) + '/' + str(ver) +'.zip')
+                end_points_list.append(str(self.SERVER_LOC) + '.'.join(ver.split('.')[:2]) + '/' + str(ver) +'.zip')
             print ( "=>End Point URL's are built : ", str(end_points_list) )
             log.info( "End Point URL's are built : " + str(end_points_list) )
         except Exception as e:

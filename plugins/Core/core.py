@@ -1372,8 +1372,6 @@ class Main():
                 socketIO = None
                 self.socketthread.join()
                 log.info('Connection Closed')
-            
-
         except Exception as e:
             log.error("Error while closing connection")
             log.error(e,exc_info=True)
