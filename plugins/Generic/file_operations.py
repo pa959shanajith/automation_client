@@ -297,10 +297,15 @@ class FileOperations:
                         wb.Close()
                         excel.Application.Quit()
 
-                    elif((input_ext=='.docx' or input_ext=='.doc') and extension=='.pdf'):
+                    elif((input_ext=='.docx' or input_ext=='.doc') and (extension=='.pdf' or extension=='.docx' or extension=='.doc')):
                         word = win32com.client.Dispatch('Word.Application')
                         doc = word.Documents.Open(source_path)
-                        doc.SaveAs(file2, FileFormat = 17)
+                        if(extension=='.docx'):
+                            doc.SaveAs(file2, FileFormat = 16)
+                        elif(extension=='.doc'):
+                            doc.SaveAs(file2, FileFormat = 0)
+                        else:
+                            doc.SaveAs(file2, FileFormat = 17)
                         doc.Close()
                         word.Quit()
 
