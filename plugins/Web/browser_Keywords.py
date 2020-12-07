@@ -1146,21 +1146,26 @@ class Singleton_DriverUtil():
 
         elif(browser_num == '7'):
             try:
-                if('Windows-10' in platform.platform()):
-                    caps = webdriver.DesiredCapabilities.EDGE.copy()
-                    bit_64 = configvalues['bit_64']
-                    if ((str(bit_64).lower()) == 'no'):
-                        edgepath = webconstants.EDGE_DRIVER_PATH
+                if core.edgeFlagComp:
+                    if core.edgeFlag:
+                        caps = webdriver.DesiredCapabilities.EDGE.copy()
+                        bit_64 = configvalues['bit_64']
+                        if ((str(bit_64).lower()) == 'no'):
+                            edgepath = webconstants.EDGE_DRIVER_PATH
+                        else:
+                            edgepath = webconstants.EDGE_DRIVER_PATH
+                        driver = webdriver.Edge(capabilities=caps,executable_path=edgepath)
+                        drivermap.append(driver)
+                        driver.maximize_window()
+                        logger.print_on_console('Edge Legacy browser started')
+                        local_bk.log.info('Edge Legacy browser started')
                     else:
-                        edgepath = webconstants.EDGE_DRIVER_PATH
-                    driver = webdriver.Edge(capabilities=caps,executable_path=edgepath)
-                    drivermap.append(driver)
-                    driver.maximize_window()
-                    logger.print_on_console('Edge Legacy browser started')
-                    local_bk.log.info('Edge Legacy browser started')
+                        logger.print_on_console('Edge Legacy is not supported')
+                        local_bk.log.info('Edge Legacy is not supported')
+                        driver = None
                 else:
-                    logger.print_on_console('Edge Legacy is supported only in Windows10 platform')
-                    local_bk.log.info('Edge Legacy is supported only in Windows10 platform')
+                    logger.print_on_console('Edge Legacy browser compatibility check failed')
+                    local_bk.log.info('Edge Legacy browser compatibility check failed')
                     driver = None
             except Exception as e:
                 logger.print_on_console("Requested browser is not available")
@@ -1168,18 +1173,23 @@ class Singleton_DriverUtil():
 
         elif(browser_num == '8'):
             try:
-                from selenium.webdriver.edge.options import Options
-                options = Options()
-                options.use_chromium = True
-                caps1 = options.to_capabilities()
-                chromium_path = webconstants.EDGE_CHROMIUM_DRIVER_PATH
-                if SYSTEM_OS == "Darwin":
-                    caps1['platform'] = 'MAC'
-                driver = webdriver.Edge(capabilities=caps1,executable_path=chromium_path)
-                drivermap.append(driver)
-                driver.maximize_window()
-                logger.print_on_console('Edge Chromium browser started')
-                local_bk.log.info('Edge Chromium browser started')
+                if(core.chromiumFlag):
+                    from selenium.webdriver.edge.options import Options
+                    options = Options()
+                    options.use_chromium = True
+                    caps1 = options.to_capabilities()
+                    chromium_path = webconstants.EDGE_CHROMIUM_DRIVER_PATH
+                    if SYSTEM_OS == "Darwin":
+                        caps1['platform'] = 'MAC'
+                    driver = webdriver.Edge(capabilities=caps1,executable_path=chromium_path)
+                    drivermap.append(driver)
+                    driver.maximize_window()
+                    logger.print_on_console('Edge Chromium browser started')
+                    local_bk.log.info('Edge Chromium browser started')
+                else:
+                    logger.print_on_console('Edge Chromium version is not supported')
+                    local_bk.log.info('Edge Chromium version is not supported')
+                    driver = None
             except Exception as e:
                 logger.print_on_console("Requested browser is not available")
                 local_bk.log.info('Requested browser is not available')

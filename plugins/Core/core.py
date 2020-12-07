@@ -50,6 +50,7 @@ browsercheckFlag=False
 updatecheckFlag=False
 chromeFlag=False
 edgeFlag=False
+edgeFlagComp=False
 chromiumFlag=False
 firefoxFlag=False
 edgeFlag=False
@@ -1528,7 +1529,7 @@ def check_browser():
             except Exception as e:
                 logger.print_on_console("Unable to locate ICE parameters")
                 log.error(e)
-            global chromeFlag,firefoxFlag,edgeFlag,chromiumFlag
+            global chromeFlag,firefoxFlag,edgeFlag,chromiumFlag, edgeFlagComp
             logger.print_on_console('Browser compatibility check started')
             p = subprocess.Popen('"' + CHROME_DRIVER_PATH + '" --version', stdout=subprocess.PIPE, bufsize=1, shell=True)
             a = p.stdout.readline()
@@ -1597,27 +1598,32 @@ def check_browser():
         #Checking browser for microsoft edge
         try:
             if('Windows-10' in platform.platform()):
-                #from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
-                p = subprocess.Popen('"' + EDGE_DRIVER_PATH + '" --version', stdout=subprocess.PIPE, bufsize=1,cwd=DRIVERS_PATH,shell=True) 
-                a = p.stdout.readline()
-                a = a.decode('utf-8')[28:40]
-                driver = webdriver.Edge(executable_path=EDGE_DRIVER_PATH)
-                browser_ver = driver.capabilities['browserVersion']
-                browser_ver1 = browser_ver.encode('utf-8')
-                browser_ver = float(browser_ver1[:8])
-                try:
-                    driver.close()
-                    driver.quit()
-                except:
-                    pass
-                for k,v in list(EDGE_VERSION.items()):
-                    if a == k:
-                        if str(browser_ver) >= v[0] or str(browser_ver) <= v[1]:
-                            edgeFlag = True
-                if edgeFlag == False:
-                    logger.print_on_console('WARNING!! : Edge Legacy version ',str(browser_ver),' is not supported.')
+                import psutil
+                edgeFlagComp = not ("MicrosoftEdge.exe" in (p.name() for p in psutil.process_iter())) 
+                if edgeFlagComp:
+                    #from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+                    p = subprocess.Popen('"' + EDGE_DRIVER_PATH + '" --version', stdout=subprocess.PIPE, bufsize=1,cwd=DRIVERS_PATH,shell=True) 
+                    a = p.stdout.readline()
+                    a = a.decode('utf-8')[28:40]
+                    driver = webdriver.Edge(executable_path=EDGE_DRIVER_PATH)
+                    browser_ver = driver.capabilities['browserVersion']
+                    browser_ver1 = browser_ver.encode('utf-8')
+                    browser_ver = float(browser_ver1[:8])
+                    try:
+                        driver.close()
+                        driver.quit()
+                    except:
+                        pass
+                    for k,v in list(EDGE_VERSION.items()):
+                        if a == k:
+                            if str(browser_ver) >= v[0] or str(browser_ver) <= v[1]:
+                                edgeFlag = True
+                    if edgeFlag == False:
+                        logger.print_on_console('WARNING!! : Edge Legacy version ',str(browser_ver),' is not supported.')
+                else:
+                    logger.print_on_console("WARNING!! : To perform MS Edge Legacy check, all instances of MS Edge legacy should be closed. Close the instances and restart ICE again")
             else:
-               logger.print_on_console("WARNING!! : Edge Legacy is supported only in Windows10 platform") 
+                logger.print_on_console("WARNING!! : MS Edge Legacy is supported only in Windows10 platform") 
         except Exception as e:
             logger.print_on_console("Error in checking Edge Legacy version")
             log.error("Error in checking Edge Legacy version")
