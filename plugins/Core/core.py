@@ -50,7 +50,7 @@ browsercheckFlag=False
 updatecheckFlag=False
 chromeFlag=False
 edgeFlag=False
-flag11=False
+edgeFlagComp=False
 chromiumFlag=False
 firefoxFlag=False
 edgeFlag=False
@@ -1529,7 +1529,7 @@ def check_browser():
             except Exception as e:
                 logger.print_on_console("Unable to locate ICE parameters")
                 log.error(e)
-            global chromeFlag,firefoxFlag,edgeFlag,chromiumFlag, flag11
+            global chromeFlag,firefoxFlag,edgeFlag,chromiumFlag, edgeFlagComp
             logger.print_on_console('Browser compatibility check started')
             p = subprocess.Popen('"' + CHROME_DRIVER_PATH + '" --version', stdout=subprocess.PIPE, bufsize=1, shell=True)
             a = p.stdout.readline()
@@ -1599,8 +1599,8 @@ def check_browser():
         try:
             if('Windows-10' in platform.platform()):
                 import psutil
-                flag11 = not("MicrosoftEdge.exe" in (p.name() for p in psutil.process_iter())) 
-                if(flag11):
+                edgeFlagComp = not ("MicrosoftEdge.exe" in (p.name() for p in psutil.process_iter())) 
+                if edgeFlagComp:
                     #from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
                     p = subprocess.Popen('"' + EDGE_DRIVER_PATH + '" --version', stdout=subprocess.PIPE, bufsize=1,cwd=DRIVERS_PATH,shell=True) 
                     a = p.stdout.readline()

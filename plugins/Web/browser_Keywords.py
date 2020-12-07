@@ -1146,8 +1146,8 @@ class Singleton_DriverUtil():
 
         elif(browser_num == '7'):
             try:
-                if(core.flag11):
-                    if(core.edgeFlag):
+                if core.edgeFlagComp:
+                    if core.edgeFlag:
                         caps = webdriver.DesiredCapabilities.EDGE.copy()
                         bit_64 = configvalues['bit_64']
                         if ((str(bit_64).lower()) == 'no'):
