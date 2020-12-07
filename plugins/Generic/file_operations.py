@@ -297,17 +297,25 @@ class FileOperations:
                         wb.Close()
                         excel.Application.Quit()
 
-                    elif(((input_ext=='.doc' or input_ext=='.docx') and (extension=='.pdf' or extension=='.doc' or extension=='.docx')) or (input_ext=='.pdf' and (extension=='.doc' or extension=='.docx')) ):
+                    elif((input_ext=='.docx' or input_ext=='.doc') and extension=='.pdf'):
                         word = win32com.client.Dispatch('Word.Application')
                         doc = word.Documents.Open(source_path)
-                        if(extension=='.docx'):
-                            doc.SaveAs(file2, FileFormat = 16)
-                        elif(extension=='.doc'):
-                            doc.SaveAs(file2, FileFormat = 0)
-                        else:
-                            doc.SaveAs(file2, FileFormat = 17)
+                        doc.SaveAs(file2, FileFormat = 17)
                         doc.Close()
                         word.Quit()
+
+                    elif(input_ext=='.pdf' and (extension=='.docx' or extension=='.doc')):
+                        import PyPDF2
+                        import docx
+                        mydoc = docx.Document()
+                        pdfFileObj = open(source_path, 'rb')
+                        pdfReader = PyPDF2.PdfFileReader(pdfFileObj)
+                        for pageNum in range(0, pdfReader.numPages):
+                            pageObj = pdfReader.getPage(pageNum)
+                            pdfContent = pageObj.extractText()
+                            mydoc.add_paragraph(pdfContent)
+
+                        mydoc.save(destination_path)
 
                     elif(extension=='.zip'):
                         zipf = zipfile.ZipFile(file2, 'w', zipfile.ZIP_DEFLATED)
@@ -326,7 +334,7 @@ class FileOperations:
                                 zip_ref.extractall(unzip_path)
                             zip_ref.close()
                         else:
-                            err_msg = 'Folder already exists in the destination path'
+                            err_msg = 'Zip folder already exists in the destination path'
 
                     else:
                         err_msg = 'File conversion support is not given for ' + str(input_ext) + ' to ' + str(extension)
