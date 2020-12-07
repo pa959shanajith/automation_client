@@ -1109,7 +1109,7 @@ class Main():
             cw = clientwindow.ClientWindow()
             self.cw = cw
         # else:
-        #     logger.init_colorama(autoreset=True)
+            #     logger.init_colorama(autoreset=True)
 
         """ Creating Root Logger using logger file config and setting logfile path, which is in config.json """
         try:
@@ -1366,6 +1366,8 @@ class Main():
                     log.info('Sending socket disconnect request')
                     socketIO.send('unavailableLocalServer', dnack = True)
                 socketIO.disconnect()
+                if socketIO.activeTimer is not None and socketIO.activeTimer.isAlive(): 
+                    socketIO.activeTimer.cancel()
                 del socketIO
                 socketIO = None
                 self.socketthread.join()
@@ -1707,7 +1709,6 @@ def set_ICE_status(one_time_ping = False,connect=True,interval = 60000):
     
 def stop_ping_thread():
     global status_ping_thread
-    set_ICE_status(one_time_ping=True,connect=False)
     if status_ping_thread is not None and status_ping_thread.is_alive():
         status_ping_thread.cancel()
         time.sleep(0.5)
