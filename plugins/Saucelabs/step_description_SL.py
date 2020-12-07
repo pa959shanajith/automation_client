@@ -283,8 +283,12 @@ class StepDescription:
                     cust_index= input[2]
                     input =input[3]                 #since the last parameter is the input for custom elements
         #-----------------------------------------
-        if type(output) is int:
-            output=str(output)
+        output=str(output)
+        if type(input) is list:
+            for i in input:
+                i=str(i)
+        else:
+            input=str(input)
         #Popup keywords
         def verifyPopUpText():
             return 'Verify ' +"'"+ input+"'"+ '  is the Popup text '
@@ -330,20 +334,20 @@ class StepDescription:
         def getSelected():
             return 'Get Selected value of '+ "'" + tsp.custname + "'"+ ' and save the value ' +"'"+output +"'"+' in '+"'"+tsp.outputval+"'"
         def selectMultipleValuesByText():
-            return 'Select values ' +"'"+ input +"'"+ ' in the '+ "'" + tsp.custname + "'"
+            return 'Select values ' +"'"+ str(input) +"'"+ ' in the '+ "'" + tsp.custname + "'"
         def deselectAll():
             return 'Deselect all values in the '+ "'" + tsp.custname + "'"
         def getValueByIndex():
             return 'Get value with index ' +"'"+ input +"'"+' in the '+ "'" + tsp.custname + "'" + ' and save the value ' +"'"+output +"'"+' in '+"'"+tsp.outputval+"'"
-        def verifyvaluesexists():
+        def verifyValuesExists():
             return 'Verify values ' +"'"+ input +"'"+ ' exists in the '+ "'" + tsp.custname + "'"
         def selectValueByText():
             if tsp.custname=="@Custom":
                 return 'Select text '+"'" +input+"'" +' with visible text '+"'" +visible_text+"'" +' of the type '+"'" +ele_type+"'" +' with the index '+"'" +cust_index+"'" +' present in '+ "'" + tsp.custname + "'"
             else:
                 return 'Select value '+"'"+input+"'"+' in ' + tsp.custname
-        def getmultiplevaluesbyindexes():
-            return 'Get values with indexes ' +"'"+ input +"'"+ ' in the '+ "'" + tsp.custname + "'"+ ' and save the value ' + output + ' in  '+ tsp.outputval
+        def getMultipleValuesByIndexes():
+            return 'Get values with indexes ' +"'"+ str(input) +"'"+ ' in the '+ "'" + tsp.custname + "'"+ ' and save the value ' + output + ' in  '+ tsp.outputval
         def verifySelectedValue():
             return 'Verify value ' +"'"+ input +"'"+ ' is selected in the '+ "'" + tsp.custname + "'"
         def verifySelectedValues():
@@ -351,9 +355,9 @@ class StepDescription:
         def getAllValues():
             return 'Get all the values present in the '+"'"+tsp.custname+"' and save the values '"+ output + ' in ' + "'" + tsp.outputval + "' ."
         def verifyAllValues():
-            return 'Verify values ' +"'"+ input +"'"+ ' are present in the '+ "'" + tsp.custname + "'"
+            return 'Verify values ' +"'"+ str(input) +"'"+ ' are present in the '+ "'" + tsp.custname + "'"
         def selectMultipleValuesByIndexes():
-            return 'Select values with index values ' +"'"+ input +"'"+ ' in the '+ "'" + tsp.custname + "'"
+            return 'Select values with index values ' +"'"+ str(input) +"'"+ ' in the '+ "'" + tsp.custname + "'"
         def selectAllValues():
             return 'Select all values in the ' +"'" + tsp.custname + "'"
         def verifyCount():
@@ -362,7 +366,7 @@ class StepDescription:
             if tsp.custname=="@Custom":
                 return 'Select value '+"'" +input+"'" +' with visible text '+"'" +visible_text+"'" +' of the type '+"'" +ele_type+"'" +' with the index '+"'" +cust_index+"'" +' present in '+ "'" + tsp.custname + "'"
             else:
-                return 'Select the value '+output+' with the index '+input+' present in the table cell '+"'" + tsp.custname+'['+inputval[0]+']['+inputval[1]+']'+"'."
+                return 'Select the value with the index '+input+' in ' + tsp.custname
         def getCount():
             return 'Get the count of values in the '+ "'" + tsp.custname + "'"+ ' and save the count ' +"'"+output+"'"+' in '+"'"+tsp.outputval+"'"
         #Radio checkbox keywords
@@ -370,9 +374,9 @@ class StepDescription:
             return 'Select '+ "'" + tsp.custname + "'"
         def getStatus():
             return 'Get the status of the ' + "'" + tsp.custname + "'"+ ' and save the status ' +"'"+output+"'"+' in '+"'"+tsp.outputval+"'"
-        def selectCheckBox():
+        def selectCheckbox():
             return 'Select '+ "'" + tsp.custname + "'"
-        def unselectCheckBox():
+        def unselectCheckbox():
             return 'Unselect '+ "'" + tsp.custname + "'"
 
         #Browser keywords
@@ -419,9 +423,9 @@ class StepDescription:
             return 'Get the tool tip from the '+ "'" + tsp.custname + "'"+ ' and save the tool tip text ' +"'"+output+"'"+ ' in ' +"'"+tsp.outputval+"'"
         def verifyToolTipText():
             return 'Verify ' +"'"+ input +"'"+ ' is the tooltip of  '+ "'" + tsp.custname + "'"
-        def clickelement():
+        def clickElement():
             return 'Click on '+ "'" + tsp.custname + "'"
-        def mouseclick():
+        def mouseClick():
             if len(inputval)>0:
                 return 'Mouse Click on  '+ "'" + tsp.custname +'['+inputval[0]+']['+inputval[1]+']'+"'"
             else:
@@ -499,9 +503,11 @@ class StepDescription:
 
         #Table keywords
         def getCellToolTip():
-            return 'Get the cell tooltip from the '+ "'" + tsp.custname +'['+inputval[0]+']['+inputval[1]+']'+ "'"+ ' and save the tool tip text ' +"'"+output+"'"+' in ' +"'"+tsp.outputval+"'"
+            inputval=tsp.inputval[0].split(';')
+            return 'Get the cell tooltip from the '+ "'" + tsp.custname +'['+str(inputval[0])+']['+str(inputval[1])+']'+ "'"+ ' and save the tool tip text ' +"'"+output+"'"+' in ' +"'"+tsp.outputval+"'"
         def verifyCellToolTip():
-            return 'Verify cell tooltip value '+"'"+input+"'"+' is present in the '+ "'"+ tsp.custname +'['+inputval[0]+']['+inputval[1]+']'+ "' table."
+            inputval=tsp.inputval[0].split(';')
+            return 'Verify cell tooltip value '+"'"+input+"'"+' is present in the '+ "'"+ tsp.custname +'['+str(inputval[0])+']['+str(inputval[1])+']'+ "' table."
         # def cellclick():
         #     return 'Click on ' + "'" + tsp.custname + "'"
         def getRowCount():
@@ -509,8 +515,9 @@ class StepDescription:
         def getColumnCount():
             return 'Get column count of the '+ "'" + tsp.custname + "'"+ ' and save the count '+"'"+output+"'"+' in '+"'"+tsp.outputval+"'"
         def verifyCellValue():
-            input = inputL[2:]# getting list elements from pos 3 till end
-            input = ','.join(input)# if list is make it into a string
+            inputval=tsp.inputval[0].split(';')
+            # input = input[2:]# getting list elements from pos 3 till end
+            # input = ','.join(input)# if list is make it into a string
             return 'Verify cell value'+"'"+str(input)+"'" +'  is present in the '+ "'" + tsp.custname +'['+inputval[0]+']['+inputval[1]+']'+"' table."
 
         def getColNumByText():
@@ -518,7 +525,8 @@ class StepDescription:
         def getRowNumByText():
             return 'Get row number of ' + "'" + tsp.custname + "'" + ' by text '+"'"+input +"'"+' and save the row number ' +"'"+output +"'"+ ' in '+"'"+tsp.outputval+"'"
         def getCellValue():
-            return 'Get cell value of ' + "'" + tsp.custname +'['+inputval[0]+']['+inputval[1]+']'+"'" + ' in the table and save the value ' +"'"+output +"'"+ ' in '+"'"+tsp.outputval+"'"
+            inputval=tsp.inputval[0].split(';')
+            return 'Get cell value of ' + "'" + tsp.custname +'['+str(inputval[0])+']['+str(inputval[0])+']'+"'" + ' in the table and save the value ' +"'"+output +"'"+ ' in '+"'"+tsp.outputval+"'"
         #custom keyword
         def getobjectcount():
             return 'Get Object count of the type '+"'" +ele_type+"'" +' and save the count '+"'" +output+"'" +' in '+"'"+tsp.outputval+"'"

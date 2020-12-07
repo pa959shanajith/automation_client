@@ -400,13 +400,13 @@ start = timer()
             'selectMultipleValuesByIndexes':dropdown_obj.selectMultipleValuesByIndexes,
             'getSelected':dropdown_obj.getSelected,
             'selectMultipleValuesByText':dropdown_obj.selectMultipleValuesByText,
-            # 'getMultipleValuesByIndexes':dropdown_obj.getMultipleValuesByIndexes,
+            'getMultipleValuesByIndexes':dropdown_obj.getMultipleValuesByIndexes,
             'verifyAllValues':dropdown_obj.verifyAllValues,
             'selectByAbsoluteValue':dropdown_obj.selectByAbsoluteValue,
 
             'getAllValues':dropdown_obj.getAllValues,
             'getValueByIndex':dropdown_obj.getValueByIndex,
-            # 'verifyValuesExists':dropdown_obj.verifyValuesExists,
+            'verifyValuesExists':dropdown_obj.verifyValuesExists,
             'deselectAll':dropdown_obj.deselectAll,
 
 
@@ -572,7 +572,8 @@ start = timer()
                 return False
             path=Saucelabs_tests+os.sep+scenario_name+index+'.txt'
             path=path.replace('\\','\\\\')
-            self.f.write("\nf=open('"+path+"','w+')")        
+            self.f.write("\nf=open('"+path+"','w+')")
+            step_index=0        
             for i in tsp:
                 step={
                     "name":i.name,
@@ -580,8 +581,9 @@ start = timer()
                     "testscript_name": i.testscript_name,
                     "inputval":i.inputval,
                     "apptype":i.apptype,
-                    "index":i.index
+                    "index":step_index
                 }
+                step_index += 1
                 all_input=i.inputval[0].split(';')
                 input_value=[]
                 for inp in all_input:
@@ -695,6 +697,9 @@ start = timer()
                             self.web_keys[i.name](space,self.conf['remote_url'],self.browsers[browser])
                         else:
                             self.web_keys[i.name](space,input_value)
+                    elif i.custname=='@Custom':
+                        logger.print_on_console("@Custom is not supported in saucelabs execution.")
+                        return False
                     else:
                         if i.name in self.web_keys:
                             xpath=i.objectname.split(';')[0]
@@ -714,6 +719,8 @@ start = timer()
                             logger.print_on_console(i.name+" keyword is not supported in saucelabs execution.")
                             return False
                     space=space[:-1]
+                    self.f.write(space+"except WebDriverException:")
+                    self.f.write(space+"\texit()")
                     self.f.write(space+"except Exception as e:")
                     self.f.write(space+"\toutput='False'")
                     self.f.write(space+"\terr_msg='Input error: please provide the valid input.'")
@@ -776,8 +783,7 @@ start = timer()
                         "StepDescription": "Terminated by the user"
                     }
                     report.append(step)
-                if(status!=None):
-                    flag=False
+                flag='Terminate'
             overallstatus=self.build_overallstatus(self.browsers[browser]['browserName'],overall_status,all_jobs[i],j,video_path)
             execute_result_data['reportData'] = { 'rows' : report, "overallstatus" : overallstatus}
             socketIO.emit('result_executeTestSuite', execute_result_data)

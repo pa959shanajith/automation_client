@@ -1094,9 +1094,15 @@ class Controller():
                                 self.__load_web()
                                 import script_generator
                                 scenario_name=json_data['suitedetails'][suite_idx-1]["scenarioNames"][sc_idx]
-                                saucelabs_obj=script_generator.SauceLabs_Operations(scenario_name,str(saucelabs_count))
-                                status=saucelabs_obj.complie_TC(tsplist,scenario_name,browser,str(saucelabs_count),execute_result_data,socketIO)
+                                if not terminate_flag:
+                                    saucelabs_obj=script_generator.SauceLabs_Operations(scenario_name,str(saucelabs_count))
+                                    status=saucelabs_obj.complie_TC(tsplist,scenario_name,browser,str(saucelabs_count),execute_result_data,socketIO)
+                                if status==TERMINATE:
+                                    terminate_flag=True
+                                    msg='***Scenario'+str(sc_idx+ 1)+': '+scenario_name+' is Terminated ***'
+                                    logger.print_on_console(msg)
                                 saucelabs_count += 1
+                                sc_idx += 1
                                 execute_flag=False
                             if flag and execute_flag :
                                 #check for temrinate flag before execution
