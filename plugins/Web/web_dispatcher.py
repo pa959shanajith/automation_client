@@ -93,6 +93,7 @@ class Dispatcher:
             'getrownumbytext' : local_Wd.table_object.getRowNumByText,
             'getcolnumbytext' : local_Wd.table_object.getColNumByText,
             'getinnertable' : local_Wd.table_object.getInnerTable,
+            'doublecellclick' : local_Wd.table_object.doubleCellClick,
             # grid keywords
             'horizontalscroll' : local_Wd.table_object.horizontalScroll,
             'verticalscroll' : local_Wd.table_object.verticalScroll,

@@ -51,18 +51,21 @@ class RedirectText(object):
         self.out=aWxTextCtrl
 
     def write(self,string):
-        wx.CallAfter(self.out.WriteText, string)
-        wx.CallAfter(self.out.ShowPosition,self.out.GetLastPosition())
+        wx.CallAfter(self.out.AppendText, string)
+        # wx.CallAfter(self.out.MoveEnd)
+        # wx.CallAfter(self.out.WriteText, string)
+        # wx.CallAfter(self.out.MoveEnd)
+        # wx.CallAfter(self.out.ShowPosition,self.out.GetLastPosition())
 
-    def write_color(self, string, color):
-        if(color=='RED'): rgb_color=(220,53,69)
-        elif(color=='GREEN'): rgb_color=(40,167,69)
-        elif(color=='YELLOW'): rgb_color=(255, 193, 7)
-        else: rgb_color=(0, 50, 250)
-        wx.CallAfter(self.out.BeginTextColour, rgb_color)
-        self.write(string+'\n')
-        wx.CallAfter(self.out.EndTextColour)
-        wx.CallAfter(self.out.BeginTextColour, (0, 50, 250))
+    # def write_color(self, string, color):
+    #     if(color=='RED'): rgb_color=(220,53,69)
+    #     elif(color=='GREEN'): rgb_color=(40,167,69)
+    #     elif(color=='YELLOW'): rgb_color=(255, 193, 7)
+    #     else: rgb_color=(0, 50, 250)
+    #     wx.CallAfter(self.out.BeginTextColour, rgb_color)
+    #     self.write(string)
+    #     wx.CallAfter(self.out.EndTextColour)
+    #     wx.CallAfter(self.out.BeginTextColour, (0, 50, 250))
 
     def flush(self):
         pass
@@ -139,11 +142,11 @@ class ClientWindow(wx.Frame):
         self.connectbutton = wx.BitmapButton(self.panel, bitmap=self.connect_img,pos=(10, 10), size=(100, 25), name='connect')
         self.connectbutton.Bind(wx.EVT_BUTTON, self.OnNodeConnect)
         self.connectbutton.SetToolTip(wx.ToolTip("Connect to Avo Assure Server"))
-        # self.log = wx.TextCtrl(self.panel, wx.ID_ANY, pos=(12, 38), size=(760,500), style = wx.TE_MULTILINE|wx.TE_READONLY)
-        self.log = wx.richtext.RichTextCtrl(self.panel, wx.ID_ANY, pos=(12, 38), size=(760,500), style = wx.TE_RICH2)
+        self.log = wx.TextCtrl(self.panel, wx.ID_ANY, pos=(12, 38), size=(760,500), style = wx.TE_MULTILINE|wx.TE_READONLY)
+        # self.log = wx.richtext.RichTextCtrl(self.panel, wx.ID_ANY, pos=(12, 38), size=(760,500), style = wx.richtext.RE_MULTILINE|wx.richtext.RE_READONLY|wx.TE_RICH2)
         font1 = wx.Font(10, wx.MODERN, wx.NORMAL, wx.NORMAL,  False, 'Consolas')
-        # self.log.SetForegroundColour((0,50,250))
-        self.log.BeginTextColour((0, 50, 250))
+        self.log.SetForegroundColour((0,50,250))
+        # self.log.BeginTextColour((0, 50, 250))
         self.log.SetFont(font1)
 
         self.schedule = wx.CheckBox(self.panel, label = 'Do Not Disturb',pos=(120, 10), size=(100, 25))
@@ -1286,13 +1289,12 @@ class About_window(wx.Frame):
     def __init__(self, parent, id, title):
         try:
             data = self.get_client_manifest()
-            msg = str(self.get_Info_1(data)) + str(self.get_Info_2(data)) + str(self.get_Info_4()) + str(self.get_Info_3())
             #------------------------------------Different co-ordinates for Windows and Mac
             if SYSTEM_OS=='Windows':
                 upload_fields= {
-                "Frame":[(300, 150),(465,220)],
+                "Frame":[(300, 150),(400,220)],
                 "disp_msg":[(12,18),(80, 28),(100,18), (310,-1),(415,18),(30, -1)],
-                "Close":[(340,148), (100, 28)]
+                "Close":[(280,148), (100, 28)]
             }
             else:
                 upload_fields={
@@ -1306,10 +1308,13 @@ class About_window(wx.Frame):
             self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
             self.SetIcon(self.wicon)
             self.panel = wx.Panel(self)
-            self.disp_msg = wx.TextCtrl(self.panel, pos = upload_fields["disp_msg"][0], size = (425, 120), style = wx.TE_MULTILINE|wx.TE_READONLY)
+            self.image = wx.StaticBitmap(self.panel, -1, wx.Bitmap(IMAGES_PATH + 'AVO_Assure.png', wx.BITMAP_TYPE_ANY), wx.Point(10, 10))
+            self.msg1=wx.StaticText(self.panel, -1, str(self.get_Info_1(data)), wx.Point(170, 20), wx.Size(200, 50)).SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.BOLD))
+            self.msg2=wx.StaticText(self.panel, -1, str(self.get_Info_2(data)), wx.Point(170, 55), wx.Size(200, 50))
+            self.msg3=wx.StaticText(self.panel, -1, str(self.get_Info_4()), wx.Point(10, 90), wx.Size(350, 50))
+            self.msg4=wx.StaticText(self.panel, -1, str(self.get_Info_3()), wx.Point(10, 120), wx.Size(200, 50))
             self.close_btn = wx.Button(self.panel, label="Close",pos=upload_fields["Close"][0], size=upload_fields["Close"][1])
             self.close_btn.Bind(wx.EVT_BUTTON, self.close)
-            self.disp_msg.AppendText( msg )
             self.Centre()
             wx.Frame(self.panel)
             self.Show()
@@ -1332,7 +1337,7 @@ class About_window(wx.Frame):
     def get_Info_1(self,data):
         str1=''
         try:
-            str1='Avo Assure ICE '+list(data['iceversion'])[0]+'.'+list(data['iceversion'][list(data['iceversion'])[0]]['subversion'])[0] + ' (64-bit)' +' \n'
+            str1='Avo Assure ICE '+list(data['version'])[0]+'.'+list(data['version'][list(data['version'])[0]])[0] + ' (64-bit)' +' \n'
         except Exception as e:
             log.error(e)
         return str1
@@ -1340,7 +1345,7 @@ class About_window(wx.Frame):
     def get_Info_2(self,data):
         str1=''
         try:
-            str1='Updated on : '+(data['iceversion'][list(data['iceversion'])[0]]['subversion'][list(data['iceversion'][list(data['iceversion'])[0]]['subversion'])[0]]['updated_on'])+' \n'
+            str1='Updated on : '+(data['version'][list(data['version'])[0]][list(data['version'][list(data['version'])[0]])[0]]['updated_on'])+' \n'
         except Exception as e:
             log.error(e)
         return str1
