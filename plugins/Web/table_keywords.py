@@ -1105,7 +1105,7 @@ class TableOperationKeywords():
                                         if len(input_val)==4:
                                             row_number = cells[j].get_attribute(input_val[3])
                                         else:
-                                            row_number = j+1
+                                            row_number = i+1
                                         break
                                 if row_number:
                                     break
