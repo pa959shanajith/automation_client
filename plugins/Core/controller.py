@@ -1112,13 +1112,15 @@ class Controller():
                                     con.conthread=mythread
                                     con.tsp_list=tsplist
                                     local_cont.test_case_number=0
-                                    #start video, create a video path
+                                    #create a video path
                                     video_path = ''
                                     recorder_obj = recording.Recorder()
-                                    if self.execution_mode == SERIAL and json_data['apptype'] == 'Web': video_path = recorder_obj.record_execution()
+                                    record_flag = str(configvalues['screen_rec']).lower()
+                                    #start screen recording
+                                    if (record_flag=='yes') and self.execution_mode == SERIAL and json_data['apptype'] == 'Web': video_path = recorder_obj.record_execution()
                                     status,status_percentage = con.executor(tsplist,EXECUTE,last_tc_num,1,con.conthread,video_path)
                                     #end video
-                                    if self.execution_mode == SERIAL and json_data['apptype'] == 'Web': recorder_obj.rec_status = False
+                                    if (record_flag=='yes') and self.execution_mode == SERIAL and json_data['apptype'] == 'Web': recorder_obj.rec_status = False
                                     print('=======================================================================================================')
                                     logger.print_on_console( '***Scenario' ,str(sc_idx + 1) ,' execution completed***')
                                     print('=======================================================================================================')
