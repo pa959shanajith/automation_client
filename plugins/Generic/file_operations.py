@@ -257,6 +257,7 @@ class FileOperations:
                             c = csv.writer(f)
                             for r in sh.rows:
                                 c.writerow([cell.value for cell in r])
+                        wb.close()
 
                     elif(input_ext=='.xls' and extension=='.csv'):
                         with open_workbook(source_path) as wb:
@@ -308,19 +309,10 @@ class FileOperations:
                             doc.SaveAs(file2, FileFormat = 17)
                         doc.Close()
                         word.Quit()
-
+                        
                     elif(input_ext=='.pdf' and (extension=='.docx' or extension=='.doc')):
-                        import PyPDF2
-                        import docx
-                        mydoc = docx.Document()
-                        pdfFileObj = open(source_path, 'rb')
-                        pdfReader = PyPDF2.PdfFileReader(pdfFileObj)
-                        for pageNum in range(0, pdfReader.numPages):
-                            pageObj = pdfReader.getPage(pageNum)
-                            pdfContent = pageObj.extractText()
-                            mydoc.add_paragraph(pdfContent)
-
-                        mydoc.save(destination_path)
+                        from pdf2docx import parse
+                        parse(source_path, file2)
 
                     elif(extension=='.zip'):
                         zipf = zipfile.ZipFile(file2, 'w', zipfile.ZIP_DEFLATED)
