@@ -28,7 +28,7 @@ class readConfig():
         "queryTimeOut":"", "timeOut":"", "stepExecutionWait":"", "displayVariableTimeOut":"",
         "retrieveURL":"", "delay":"", "ignoreVisibilityCheck":"", "exception_flag":"",
         "server_cert":"", "enableSecurityCheck":"","browser_check":"","disable_server_cert":"","highlight_check":"","firefox_path":"",
-        "prediction_for_iris_objects":"","hide_soft_key":"","connection_timeout":"","extn_enabled":"","headless_mode":"","update_check":"","delay_stringinput":"","clear_cache":""}
+        "prediction_for_iris_objects":"","hide_soft_key":"","connection_timeout":"","extn_enabled":"","headless_mode":"","update_check":"","delay_stringinput":"","clear_cache":"","screen_rec":""}
         if os.path.isfile(self.config_path)==True:
             try:
                 conf = open(self.config_path, 'r')
@@ -64,6 +64,7 @@ class readConfig():
                 configvalues['headless_mode'] = params['headless_mode']
                 configvalues['delay_stringinput']=params['delay_stringinput']
                 configvalues['clear_cache']=params['clear_cache']
+                configvalues['screen_rec']=params['screen_rec']
             except Exception as e:
                 configvalues['errorflag']=e
         else:

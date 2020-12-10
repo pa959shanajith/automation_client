@@ -23,6 +23,7 @@
     "queryTimeOut": "3",
     "retrieveURL": "Yes",
     "screenShot_Flag": "All",
+    "screen_rec": "Yes",
     "server_cert": "./assets/CA_BUNDLE/server.crt",
     "server_ip": "localhost",
     "server_port": "8443",
