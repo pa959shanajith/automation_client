@@ -780,16 +780,10 @@ class IRISKeywords():
                     pythoncom.CoInitialize()
                     pyautogui.click()
                     robot = Robot()
-                    robot.ctrl_press('a')
-                    time.sleep(1)
-                    robot.key_press('backspace')
                     time.sleep(1)
                     robot.type_string(input_val_temp, delay=0.2)
                 else:
                     pyautogui.click()
-                    pyautogui.hotkey('ctrl','a')
-                    time.sleep(1)
-                    pyautogui.press('backspace')
                     time.sleep(1)
                     pyautogui.typewrite(input_val_temp) ## Pending
                 status= TEST_RESULT_PASS
