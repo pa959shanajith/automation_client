@@ -1547,7 +1547,8 @@ def check_update(flag):
         emsg = "Error in fetching update manifest from server"
         try:
             request = requests.get(SERVER_LOC + "/manifest.json", verify=False)
-            data = json.loads(request.text) #will return json of the manifest
+            if(request.status_code ==200):
+                data = json.loads(request.text) #will return json of the manifest
         except Exception as e:
             log.error(emsg)
             log.error(e,exc_info=True)
@@ -1578,6 +1579,9 @@ def check_update(flag):
             logger.print_on_console( "Client manifest unavaliable." )
             log.info( "Client manifest unavaliable." )
         else:
+            statcode=requests.get(SERVER_LOC + "/manifest.json", verify=False).status_code
+            if(statcode == 404) : UPDATE_MSG = UPDATE_MSG[:UPDATE_MSG.index(',')+1] + ' "manifest.json" not found, Please ensure "manifest.json" is present in patch updater folder'
+            elif(statcode !=404 or statcode !=200): UPDATE_MSG = UPDATE_MSG[:UPDATE_MSG.index(',')+1] + ' "manifest.json error". ERROR_CODE: ' + str(statcode)
             logger.print_on_console( UPDATE_MSG )
             log.info( UPDATE_MSG )
     return False,l_ver

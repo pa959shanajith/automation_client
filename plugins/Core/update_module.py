@@ -126,6 +126,9 @@ class Update_Rollback:
         if ( self.MIN_FLAG and self.MAX_FLAG ):
                 log.info( "SERVER_COMPATIBILITY_CHECK: PASS; ICE is compatible with current server version : " + str(self.server_version) + "." )
                 self.server_check_flag = True
+        elif( self.server_version is None ):
+            log.info( 'SERVER_COMPATIBILITY_CHECK: FAIL; Unable to get severversion' )
+            self.server_check_flag = False
         else:
             log.info( 'SERVER_COMPATIBILITY_CHECK: FAIL; ICE is incompatible with current server version : ' + str(self.server_version) + '. Please update to the latest ICE' )
             update_msg = 'Warning!: ICE is incompatible with current server version : ' + str(self.server_version) + '; Please update to the latest ICE'

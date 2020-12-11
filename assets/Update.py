@@ -248,22 +248,28 @@ class Updater:
                 filename = url[url.rindex('/')+1:]
                 temp_file_path = os.path.join(self.temp_location, filename)
                 fileObj = requests.get(str(url),verify=False)
-                open(temp_file_path, 'wb').write(fileObj.content)
-                print ('=>performing sha256 check')
-                if (self.sha256_check(filename,temp_file_path)):
-                    print ('=>sha256 check PASS')
-                    print ('=>navigating to extract_files')
-                    self.extract_files(temp_file_path)
-                    print ('=>deleting the extracted file')
-                    self.delete_temp_file(temp_file_path)
-                    print (str(filename), ' was extracted and deleted')
+                if(fileObj.status_code == 200):
+                    open(temp_file_path, 'wb').write(fileObj.content)
+                    print ('=>performing sha256 check')
+                    if (self.sha256_check(filename,temp_file_path)):
+                        print ('=>sha256 check PASS')
+                        print ('=>navigating to extract_files')
+                        self.extract_files(temp_file_path)
+                        print ('=>deleting the extracted file')
+                        self.delete_temp_file(temp_file_path)
+                        print (str(filename), ' was extracted and deleted')
+                    else:
+                        warning_msg = "Warning!: atempt to download further has been disabled due to sha256 mismatch of file : " + str(filename)
+                        print('=>sha256 check FAIL: atempt to download further has been disabled due to sha256 mismatch.')
+                        log.error( warning_msg )
+                        print ('=>deleting the extracted file')
+                        self.delete_temp_file(temp_file_path)
+                        print (str(filename), ' was extracted and deleted')
+                        break
                 else:
-                    warning_msg = "Warning!: atempt to download further has been disabled due to sha256 mismatch of file : " + str(filename)
-                    print('=>sha256 check FAIL: atempt to download further has been disabled due to sha256 mismatch.')
+                    warning_msg = "Warning!: atempt to download further has been disabled due to end-point not being found : " + str(filename) + ". Status Code: " + str(fileObj.status_code)
+                    print('=>End point check FAIL: atempt to download further has been disabled due to end-point not being found. Status Code: ' + str(fileObj.status_code))
                     log.error( warning_msg )
-                    print ('=>deleting the extracted file')
-                    self.delete_temp_file(temp_file_path)
-                    print (str(filename), ' was extracted and deleted')
                     break
         except Exception as e:
             print ( "Error occoured in download_files : ", e )
