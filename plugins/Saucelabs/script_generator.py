@@ -719,9 +719,9 @@ start = timer()
                             logger.print_on_console(i.name+" keyword is not supported in saucelabs execution.")
                             return False
                     space=space[:-1]
-                    self.f.write(space+"except WebDriverException:")
-                    self.f.write(space+"\texit()")
                     self.f.write(space+"except Exception as e:")
+                    self.f.write(space+"\tif hasattr(e,'msg') and e.msg.find(\"can't receive further commands\")!=-1:")
+                    self.f.write(space+"\t\texit()")
                     self.f.write(space+"\toutput='False'")
                     self.f.write(space+"\terr_msg='Input error: please provide the valid input.'")
                     self.f.write(space+"\tprint(e)")
@@ -783,15 +783,13 @@ start = timer()
                         "StepDescription": "Terminated by the user"
                     }
                     report.append(step)
-                flag='Terminate'
+                    flag='Terminate'
             overallstatus=self.build_overallstatus(self.browsers[browser]['browserName'],overall_status,all_jobs[i],j,video_path)
             execute_result_data['reportData'] = { 'rows' : report, "overallstatus" : overallstatus}
             socketIO.emit('result_executeTestSuite', execute_result_data)
             f1.close()
             return flag
         except Exception as e:
-            import traceback
-            traceback.print_exc()
             logger.print_on_console("Error in Sauce Labs Execution")
             log.error(e)
             self.f.close()

@@ -27,6 +27,7 @@ import browser_Keywords
 import logging
 import core_utils
 import threading
+import readconfig
 local_tk = threading.local()
 
 class TableOperationKeywords():
@@ -34,6 +35,8 @@ class TableOperationKeywords():
             local_tk.log = logging.getLogger('table_keywords.py')
             local_tk.driver=''
 
+        def __check_visibility_from_config(self):
+            return readconfig.configvalues['ignoreVisibilityCheck'].strip().lower() == "yes"
 
 #   returns the row count of table if the table found with the given xpath
         def getRowCount(self,webElement,*args):
@@ -655,16 +658,21 @@ class TableOperationKeywords():
                                                 #logger.print_on_console('click action performed successfully')
                                         else:
                                             try:
-                                                local_tk.log.debug('performing java script click')
-                                                js = 'var evType; element=arguments[0]; if (document.createEvent) {     evType = "Click executed through part-1";     var evt = document.createEvent("MouseEvents");     evt.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);   	setTimeout(function() {     	element.dispatchEvent(evt);     }, 100); } else {     evType = "Click executed through part-2";   	setTimeout(function() {     element.click();   	}, 100); } return (evType);'
-                                                click=local_tk.driver.execute_script(js,webElement)
+                                                if self.__check_visibility_from_config():
+                                                    local_tk.log.debug('performing java script click')
+                                                    js = 'var evType; element=arguments[0]; if (document.createEvent) {     evType = "Click executed through part-1";     var evt = document.createEvent("MouseEvents");     evt.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);   	setTimeout(function() {     	element.dispatchEvent(evt);     }, 100); } else {     evType = "Click executed through part-2";   	setTimeout(function() {     element.click();   	}, 100); } return (evType);'
+                                                    click=local_tk.driver.execute_script(js,webElement)
+                                                else:
+                                                    local_tk.log.debug('performing click')
+                                                    cell.click()
                                                 status=TEST_RESULT_PASS
                                                 methodoutput=TEST_RESULT_TRUE
                                                 local_tk.log.info('click action performed successfully')
                                                 #logger.print_on_console('click action performed successfully')
                                             except Exception as e:
-                                                local_tk.log.debug('performing click')
-                                                cell.click()
+                                                local_tk.log.debug('performing java script click')
+                                                js = 'var evType; element=arguments[0]; if (document.createEvent) {     evType = "Click executed through part-1";     var evt = document.createEvent("MouseEvents");     evt.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);   	setTimeout(function() {     	element.dispatchEvent(evt);     }, 100); } else {     evType = "Click executed through part-2";   	setTimeout(function() {     element.click();   	}, 100); } return (evType);'
+                                                click=local_tk.driver.execute_script(js,webElement)
                                                 status=TEST_RESULT_PASS
                                                 methodoutput=TEST_RESULT_TRUE
                                                 local_tk.log.info('click action performed successfully')

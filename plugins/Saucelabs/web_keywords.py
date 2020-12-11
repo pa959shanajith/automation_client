@@ -297,7 +297,7 @@ class Dropdown_Keywords():
     def getValueByIndex(self,space,webelement,input,*args):
         self.f.write(space+"input="+input[0])
         self.f.write(space+"select = Select("+webelement+")")
-        self.f.write(space+"output=select.options[input].text")
+        self.f.write(space+"output=select.options[int(input)].text")
         self.f.write(space+"status='Pass'")
 
     def deselectAll(self,space,webelement,input,*args):
@@ -494,7 +494,7 @@ class Table_Keywords():
                 obj="//input[@type='text' or @type='email' or @type='password' or @type='range' or @type='search' or @type='url']"
             else:
                 obj="//"+input[2].lower()
-            self.f.write(space+"remoteele.find_elements_by_xpath('"+obj+"')[input].click()")
+            self.f.write(space+"remoteele.find_elements_by_xpath('"+obj+"')[int(input)].click()")
         self.f.write(space+"status='Pass'")
 
 class Textbox_Keywords():
