@@ -454,7 +454,7 @@ class common_functions:
     def __init__(self):
         pass
 
-    def close_ICE(self):
+    def close_ICE(self,PID):
         """Killing ICE via PID"""
         try:
             log.debug( 'Inside close_ICE function')
