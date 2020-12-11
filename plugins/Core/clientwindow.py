@@ -1580,7 +1580,8 @@ def check_update(flag):
             log.info( "Client manifest unavaliable." )
         else:
             statcode=requests.get(SERVER_LOC + "/manifest.json", verify=False).status_code
-            if(statcode == 404) : UPDATE_MSG = UPDATE_MSG[:UPDATE_MSG.index(',')+1] + ' "manifest.json" not found, Please ensure "manifest.json" is present in patch updater folder'
+            if( requests.get(SERVER_LOC, verify=False).status_code == 404) : UPDATE_MSG = UPDATE_MSG[:UPDATE_MSG.index(',')+1] + ' Patch updater server not hosted.'
+            elif(statcode == 404) : UPDATE_MSG = UPDATE_MSG[:UPDATE_MSG.index(',')+1] + ' "manifest.json" not found, Please ensure "manifest.json" is present in patch updater folder'
             elif(statcode !=404 or statcode !=200): UPDATE_MSG = UPDATE_MSG[:UPDATE_MSG.index(',')+1] + ' "manifest.json error". ERROR_CODE: ' + str(statcode)
             logger.print_on_console( UPDATE_MSG )
             log.info( UPDATE_MSG )
