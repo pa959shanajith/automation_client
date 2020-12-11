@@ -1301,6 +1301,10 @@ class About_window(wx.Frame):
     def __init__(self, parent, id, title):
         try:
             data = self.get_client_manifest()
+            msg1='Avo Assure ICE '+list(data['version'])[0]+'.'+list(data['version'][list(data['version'])[0]])[0] + ' (64-bit)' +' \n'
+            msg2='Updated on : '+(data['version'][list(data['version'])[0]][list(data['version'][list(data['version'])[0]])[0]]['updated_on'])+' \n'
+            msg3='For any queries write to us at support.nineteen68@slkgroup.com'+' \n'
+            msg4='© Avo Automation\n'
             #------------------------------------Different co-ordinates for Windows and Mac
             if SYSTEM_OS=='Windows':
                 upload_fields= {
@@ -1321,10 +1325,10 @@ class About_window(wx.Frame):
             self.SetIcon(self.wicon)
             self.panel = wx.Panel(self)
             self.image = wx.StaticBitmap(self.panel, -1, wx.Bitmap(IMAGES_PATH + 'AVO_Assure.png', wx.BITMAP_TYPE_ANY), wx.Point(10, 10))
-            self.msg1=wx.StaticText(self.panel, -1, str(self.get_Info_1(data)), wx.Point(170, 20), wx.Size(200, 50)).SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.BOLD))
-            self.msg2=wx.StaticText(self.panel, -1, str(self.get_Info_2(data)), wx.Point(170, 55), wx.Size(200, 50))
-            self.msg3=wx.StaticText(self.panel, -1, str(self.get_Info_4()), wx.Point(10, 90), wx.Size(350, 50))
-            self.msg4=wx.StaticText(self.panel, -1, str(self.get_Info_3()), wx.Point(10, 120), wx.Size(200, 50))
+            self.msg1=wx.StaticText(self.panel, -1, str(msg1), wx.Point(170, 20), wx.Size(200, 50)).SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.BOLD))
+            self.msg2=wx.StaticText(self.panel, -1, str(msg2), wx.Point(170, 55), wx.Size(200, 50))
+            self.msg3=wx.StaticText(self.panel, -1, str(msg3), wx.Point(10, 90), wx.Size(350, 50))
+            self.msg4=wx.StaticText(self.panel, -1, str(msg4), wx.Point(10, 120), wx.Size(200, 50))
             self.close_btn = wx.Button(self.panel, label="Close",pos=upload_fields["Close"][0], size=upload_fields["Close"][1])
             self.close_btn.Bind(wx.EVT_BUTTON, self.close)
             self.Centre()
@@ -1345,36 +1349,6 @@ class About_window(wx.Frame):
             logger.print_on_console(msg)
             log.error(msg)
         return data
-
-    def get_Info_1(self,data):
-        str1=''
-        try:
-            str1='Avo Assure ICE '+list(data['version'])[0]+'.'+list(data['version'][list(data['version'])[0]])[0] + ' (64-bit)' +' \n'
-        except Exception as e:
-            log.error(e)
-        return str1
-
-    def get_Info_2(self,data):
-        str1=''
-        try:
-            str1='Updated on : '+(data['version'][list(data['version'])[0]][list(data['version'][list(data['version'])[0]])[0]]['updated_on'])+' \n'
-        except Exception as e:
-            log.error(e)
-        return str1
-
-##    def get_Info_3(self,data):
-##        str1=''
-##        try:
-##            str1='Baseline : '+(data['iceversion'][list(data['iceversion'])[0]]['subversion'][list(data['iceversion'][list(data['iceversion'])[0]]['subversion'])[0]]['baseline'])+' \n'
-##        except Exception as e:
-##            log.error(e)
-##        return str1
-
-    def get_Info_3(self):
-        return '© Avo Automation\n'
-
-    def get_Info_4(self):
-        return 'For any queries write to us at support.nineteen68@slkgroup.com'+' \n'
 
     def close(self, event):
         self.Close()
