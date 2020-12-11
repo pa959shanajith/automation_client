@@ -135,7 +135,7 @@ class Update_Rollback:
     def run_updater(self):
         """function to run Updater.py/Updater.exe ' UPDATE ' feature"""
         try:
-            update_cmd = str(self.updater_loc) + ' ' + str(self.option) + ' """' + str(self.data_tags) + '""" """' + str(self.client_tag) + '""" ' + str(self.SERVER_LOC) + ' ' + str(self.Update_loc) + ' ' + str(self.loc_7z)
+            update_cmd = str(self.updater_loc) + ' ' + str(self.option) + ' """' + str(self.data_tags) + '""" """' + str(self.client_tag) + '""" ' + str(self.SERVER_LOC) + ' ' + str(self.Update_loc) + ' ' + str(self.loc_7z) + ' ' + str(os.getpid())
             msg = "Sending the following data to Updater."
             if (self.updater_loc.endswith(".py")):
                 update_cmd = 'python ' + update_cmd
@@ -149,7 +149,7 @@ class Update_Rollback:
     def run_rollback(self):
         """function to run Updater.py/Updater.exe ' ROLLBACK ' feature"""
         try:
-            update_cmd = str(self.updater_loc) + ' ' + str(self.option) + ' ' + str(self.Update_loc) + ' ' + str(self.loc_7z)
+            update_cmd = str(self.updater_loc) + ' ' + str(self.option) + ' ' + str(self.Update_loc) + ' ' + str(self.loc_7z) + ' ' + str(os.getpid())
             msg = "Sending the following data to Updater."
             if (self.updater_loc.endswith(".py")):
                 update_cmd = 'python ' + update_cmd

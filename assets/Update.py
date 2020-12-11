@@ -449,13 +449,16 @@ class common_functions:
         pass
 
     def close_ICE(self):
-        """Killing ICE via window title"""
+        """Killing ICE via PID"""
         try:
             log.debug( 'Inside close_ICE function')
             hwnd = win32gui.FindWindow(None, 'Avo Assure ICE')
             win32gui.PostMessage(hwnd, win32con.WM_CLOSE, 0, 0)
             time.sleep(5)
-            os.system('taskkill /F /FI "WINDOWTITLE eq Avo Assure ICE"')
+            print('=>Closing Avo Assure ICE with PID :' + str(PID))
+            log.info('Closing Avo Assure ICE with PID :' + str(PID))
+            os.system('taskkill /F /PID ' + str(PID))
+            #os.system('taskkill /F /FI "WINDOWTITLE eq Avo Assure ICE"')
             print ( '=>closed ICE' )
             log.info( 'ICE was closed' )
         except Exception as e:
@@ -506,7 +509,7 @@ def main():
             msg.StartThread(msg.showProgress)
             comm_obj.percentageIncri(msg,5,"Updating...")
             comm_obj.percentageIncri(msg,10,"Closing ICE...")
-            comm_obj.close_ICE()#---------------------------------->1.Close ICE
+            comm_obj.close_ICE(sys.argv[7])#---------------------------------->1.Close ICE
             comm_obj.percentageIncri(msg,15,"ICE closed.")
             comm_obj.percentageIncri(msg,20,"Updating...")
             obj.assignment(json.loads(sys.argv[2].replace("'",'\"')[1:-1]), json.loads(sys.argv[3].replace("'", '\"')[1:-1]), sys.argv[4], sys.argv[5], sys.argv[6])#---------------------------------->2.Assign Values
@@ -550,7 +553,7 @@ def main():
             comm_obj.percentageIncri(msg,20,"Rolling back changes...")
             res = obj.backup_check()#---------------------------------> Check if backup has been created
             comm_obj.percentageIncri(msg,25,"Closing ICE...")
-            comm_obj.close_ICE()#---------------------------------->1.Close ICE
+            comm_obj.close_ICE(sys.argv[4])#---------------------------------->1.Close ICE
             comm_obj.percentageIncri(msg,30,"ICE Closed.")
             comm_obj.percentageIncri(msg,35,"Rolling back changes...")
             if ( res == True ):
