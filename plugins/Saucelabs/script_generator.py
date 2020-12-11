@@ -720,7 +720,7 @@ start = timer()
                             return False
                     space=space[:-1]
                     self.f.write(space+"except Exception as e:")
-                    self.f.write(space+"\tif e.msg.find(\"can't receive further commands\")!=-1:")
+                    self.f.write(space+"\tif hasattr(e,'msg') and e.msg.find(\"can't receive further commands\")!=-1:")
                     self.f.write(space+"\t\texit()")
                     self.f.write(space+"\toutput='False'")
                     self.f.write(space+"\terr_msg='Input error: please provide the valid input.'")

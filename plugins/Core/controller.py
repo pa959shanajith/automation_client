@@ -1101,6 +1101,10 @@ class Controller():
                                     terminate_flag=True
                                     msg='***Scenario'+str(sc_idx+ 1)+': '+scenario_name+' is Terminated ***'
                                     logger.print_on_console(msg)
+                                else:
+                                    print('=======================================================================================================')
+                                    logger.print_on_console( '***Scenario' ,str(sc_idx + 1) ,' execution completed***')
+                                    print('=======================================================================================================')
                                 saucelabs_count += 1
                                 sc_idx += 1
                                 execute_flag=False
