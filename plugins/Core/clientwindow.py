@@ -1301,8 +1301,8 @@ class About_window(wx.Frame):
     def __init__(self, parent, id, title):
         try:
             data = self.get_client_manifest()
-            msg1='Avo Assure ICE '+list(data['version'])[0]+'.'+list(data['version'][list(data['version'])[0]])[0] + ' (64-bit)' +' \n'
-            msg2='Updated on : '+(data['version'][list(data['version'])[0]][list(data['version'][list(data['version'])[0]])[0]]['updated_on'])+' \n'
+            msg1='Avo Assure ICE '+ str(data['version']) + ' (64-bit)' +' \n'
+            msg2='Updated on : '+ str(data['updated_on']) +' \n'
             msg3='For any queries write to us at support.nineteen68@slkgroup.com'+' \n'
             msg4='© Avo Automation\n'
             #------------------------------------Different co-ordinates for Windows and Mac

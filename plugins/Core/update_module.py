@@ -74,15 +74,15 @@ class Update_Rollback:
             self.server_version = data_from_server['version']
             """build arguments for client data"""
             cdata_value = []
-            ckey = client_data['version'][list(client_data['version'])[0]][list(client_data['version'][list(client_data['version'])[0]])[0]]['tag']
-            cdata_value.append(client_data['version'][list(client_data['version'])[0]][list(client_data['version'][list(client_data['version'])[0]])[0]]['p_tag'])
+            ckey = client_data['version']
+            cdata_value.append(client_data['p_tag'])
             #------------Server-Client min/max check
-            cmin_svr_val = client_data['version'][list(client_data['version'])[0]][list(client_data['version'][list(client_data['version'])[0]])[0]]['min-compatibility']
-            cmax_svr_val = client_data['version'][list(client_data['version'])[0]][list(client_data['version'][list(client_data['version'])[0]])[0]]['max-compatibility']
+            cmin_svr_val = client_data['min-compatibility']
+            cmax_svr_val = client_data['min-compatibility']
             self.MIN_FLAG = LooseVersion(str(cmin_svr_val)) <= LooseVersion(str(self.server_version))# min server version has to be lesser than or equal to the Current Sever Version
             self.MAX_FLAG = LooseVersion(str(cmax_svr_val)) == LooseVersion(str(self.server_version))# max server version has to be equal to the Current Server Version
             self.client_tag.update( {ckey : cdata_value} )
-            cdate=client_data['version'][list(client_data['version'])[0]][list(client_data['version'][list(client_data['version'])[0]])[0]]['updated_on']
+            cdate = client_data['updated_on']
 
             for v in vers:
                 subvers = list(data_from_server['iceversion'][v])
