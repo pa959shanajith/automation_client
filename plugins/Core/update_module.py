@@ -74,15 +74,15 @@ class Update_Rollback:
             self.server_version = data_from_server['version']
             """build arguments for client data"""
             cdata_value = []
-            ckey = client_data['version'][list(client_data['version'])[0]][list(client_data['version'][list(client_data['version'])[0]])[0]]['tag']
-            cdata_value.append(client_data['version'][list(client_data['version'])[0]][list(client_data['version'][list(client_data['version'])[0]])[0]]['p_tag'])
+            ckey = client_data['version']
+            cdata_value.append(client_data['p_tag'])
             #------------Server-Client min/max check
-            cmin_svr_val = client_data['version'][list(client_data['version'])[0]][list(client_data['version'][list(client_data['version'])[0]])[0]]['min-compatibility']
-            cmax_svr_val = client_data['version'][list(client_data['version'])[0]][list(client_data['version'][list(client_data['version'])[0]])[0]]['max-compatibility']
+            cmin_svr_val = client_data['min-compatibility']
+            cmax_svr_val = client_data['min-compatibility']
             self.MIN_FLAG = LooseVersion(str(cmin_svr_val)) <= LooseVersion(str(self.server_version))# min server version has to be lesser than or equal to the Current Sever Version
             self.MAX_FLAG = LooseVersion(str(cmax_svr_val)) == LooseVersion(str(self.server_version))# max server version has to be equal to the Current Server Version
             self.client_tag.update( {ckey : cdata_value} )
-            cdate=client_data['version'][list(client_data['version'])[0]][list(client_data['version'][list(client_data['version'])[0]])[0]]['updated_on']
+            cdate = client_data['updated_on']
 
             for v in vers:
                 subvers = list(data_from_server['iceversion'][v])
@@ -126,6 +126,9 @@ class Update_Rollback:
         if ( self.MIN_FLAG and self.MAX_FLAG ):
                 log.info( "SERVER_COMPATIBILITY_CHECK: PASS; ICE is compatible with current server version : " + str(self.server_version) + "." )
                 self.server_check_flag = True
+        elif( self.server_version is None ):
+            log.info( 'SERVER_COMPATIBILITY_CHECK: FAIL; Unable to get severversion' )
+            self.server_check_flag = False
         else:
             log.info( 'SERVER_COMPATIBILITY_CHECK: FAIL; ICE is incompatible with current server version : ' + str(self.server_version) + '. Please update to the latest ICE' )
             update_msg = 'Warning!: ICE is incompatible with current server version : ' + str(self.server_version) + '; Please update to the latest ICE'
@@ -135,7 +138,7 @@ class Update_Rollback:
     def run_updater(self):
         """function to run Updater.py/Updater.exe ' UPDATE ' feature"""
         try:
-            update_cmd = str(self.updater_loc) + ' ' + str(self.option) + ' """' + str(self.data_tags) + '""" """' + str(self.client_tag) + '""" ' + str(self.SERVER_LOC) + ' ' + str(self.Update_loc) + ' ' + str(self.loc_7z)
+            update_cmd = str(self.updater_loc) + ' ' + str(self.option) + ' """' + str(self.data_tags) + '""" """' + str(self.client_tag) + '""" ' + str(self.SERVER_LOC) + ' ' + str(self.Update_loc) + ' ' + str(self.loc_7z) + ' ' + str(os.getpid())
             msg = "Sending the following data to Updater."
             if (self.updater_loc.endswith(".py")):
                 update_cmd = 'python ' + update_cmd
@@ -149,7 +152,7 @@ class Update_Rollback:
     def run_rollback(self):
         """function to run Updater.py/Updater.exe ' ROLLBACK ' feature"""
         try:
-            update_cmd = str(self.updater_loc) + ' ' + str(self.option) + ' ' + str(self.Update_loc) + ' ' + str(self.loc_7z)
+            update_cmd = str(self.updater_loc) + ' ' + str(self.option) + ' ' + str(self.Update_loc) + ' ' + str(self.loc_7z) + ' ' + str(os.getpid())
             msg = "Sending the following data to Updater."
             if (self.updater_loc.endswith(".py")):
                 update_cmd = 'python ' + update_cmd
