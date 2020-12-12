@@ -35,7 +35,6 @@ import dynamic_variable_handler
 import logging
 from itertools import islice
 import re
-import win32com.client
 import zipfile
 log = logging.getLogger('file_operations.py')
 
@@ -289,27 +288,35 @@ class FileOperations:
                             workbook.save(file2)
 
                     elif((input_ext=='.xlsx' and extension=='.xls') or (input_ext=='.xls' and extension=='.xlsx')):
-                        excel = win32com.client.gencache.EnsureDispatch('Excel.Application')
-                        wb = excel.Workbooks.Open(source_path)
-                        if(extension=='.xls'):
-                            wb.SaveAs(file2, FileFormat = 56)
+                        if SYSTEM_OS != 'Darwin':
+                            import win32com.client
+                            excel = win32com.client.gencache.EnsureDispatch('Excel.Application')
+                            wb = excel.Workbooks.Open(source_path)
+                            if(extension=='.xls'):
+                                wb.SaveAs(file2, FileFormat = 56)
+                            else:
+                                wb.SaveAs(file2, FileFormat = 51)
+                            wb.Close()
+                            excel.Application.Quit()
                         else:
-                            wb.SaveAs(file2, FileFormat = 51)
-                        wb.Close()
-                        excel.Application.Quit()
+                            err_msg = 'File conversion support is not given for ' + str(input_ext) + ' to ' + str(extension) + ' in Mac OS'
 
                     elif((input_ext=='.docx' or input_ext=='.doc') and (extension=='.pdf' or extension=='.docx' or extension=='.doc')):
-                        word = win32com.client.Dispatch('Word.Application')
-                        doc = word.Documents.Open(source_path)
-                        if(extension=='.docx'):
-                            doc.SaveAs(file2, FileFormat = 16)
-                        elif(extension=='.doc'):
-                            doc.SaveAs(file2, FileFormat = 0)
+                        if SYSTEM_OS != 'Darwin':
+                            import win32com.client
+                            word = win32com.client.Dispatch('Word.Application')
+                            doc = word.Documents.Open(source_path)
+                            if(extension=='.docx'):
+                                doc.SaveAs(file2, FileFormat = 16)
+                            elif(extension=='.doc'):
+                                doc.SaveAs(file2, FileFormat = 0)
+                            else:
+                                doc.SaveAs(file2, FileFormat = 17)
+                            doc.Close()
+                            word.Quit()
                         else:
-                            doc.SaveAs(file2, FileFormat = 17)
-                        doc.Close()
-                        word.Quit()
-                        
+                            err_msg = 'File conversion support is not given for ' + str(input_ext) + ' to ' + str(extension) + ' in Mac OS'
+
                     elif(input_ext=='.pdf' and (extension=='.docx' or extension=='.doc')):
                         from pdf2docx import parse
                         parse(source_path, file2)
