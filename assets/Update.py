@@ -160,8 +160,8 @@ class Updater:
             log.debug( 'Success : Added ' + source_client_manifest + " to archive" )
             log.debug( 'Successfully created backup of Avo Assure ICE' )
         except Exception as e:
-            print ( "Error occoured in create_backup : ", e )
-            log.error( "Error occoured in create_backup : " + str(e) )
+            print ( "Error occurred in create_backup : ", e )
+            log.error( "Error occurred in create_backup : " + str(e) )
             import traceback
             traceback.print_exc()
 
@@ -177,8 +177,8 @@ class Updater:
             print ( "=>End Point URL's are built : ", str(end_points_list) )
             log.info( "End Point URL's are built : " + str(end_points_list) )
         except Exception as e:
-            print ( "Error occoured in end_point_builder : ", e )
-            log.error( "Error occoured in end_point_builder : " + str(e) )
+            print ( "Error occurred in end_point_builder : ", e )
+            log.error( "Error occurred in end_point_builder : " + str(e) )
             import traceback
             traceback.print_exc()
         return end_points_list
@@ -232,8 +232,8 @@ class Updater:
             print ( '=>Number of changes that happened since then ( lastest delta changes ) : ', str(new_version_list)  )
             log.info( 'Number of changes that happened since then ( lastest delta changes ) : ' + str(new_version_list) )
         except Exception as e:
-            print ( "Error occoured in get_update_files : ", e )
-            log.error( "Error occoured in get_update_files : " + str(e) )
+            print ( "Error occurred in get_update_files : ", e )
+            log.error( "Error occurred in get_update_files : " + str(e) )
             import traceback
             traceback.print_exc()
         return new_version_list
@@ -272,8 +272,8 @@ class Updater:
                     log.error( warning_msg )
                     break
         except Exception as e:
-            print ( "Error occoured in download_files : ", e )
-            log.error( "Error occoured in download_files : " + str(e) )
+            print ( "Error occurred in download_files : ", e )
+            log.error( "Error occurred in download_files : " + str(e) )
             import traceback
             traceback.print_exc()
         return warning_msg
@@ -321,8 +321,8 @@ class Updater:
             log.info( 'Completed extraction of package at : ' + str(self.temp_location) )
         except Exception as e:
             print( '=>Extraction could not complete \n' )
-            print ( "Error occoured in extract_files : ", e )
-            log.error( "Error occoured in extract_files : " + str(e) )
+            print ( "Error occurred in extract_files : ", e )
+            log.error( "Error occurred in extract_files : " + str(e) )
             import traceback
             traceback.print_exc()
 
@@ -336,8 +336,8 @@ class Updater:
             print( '=>Temp file deleted' )
             log.info( 'Temp file : ' + str(temp_file_path) + ' deleted.' )
         except Exception as e:
-            print ( "Error occoured in delete_temp_file : ", e )
-            log.error( "Error occoured in delete_temp_file : " + str(e) )
+            print ( "Error occurred in delete_temp_file : ", e )
+            log.error( "Error occurred in delete_temp_file : " + str(e) )
             import traceback
             traceback.print_exc()
 
@@ -362,8 +362,8 @@ class Rollback():
                 print( '=>AvoAssureICE_backup.7z does not exist, in location : ' + str(self.ROLLBACK_LOC) )
                 log.info( "AvoAssureICE_backup.7z does not exist, in location : " + str(self.ROLLBACK_LOC) )
         except Exception as e:
-            print ( "=>Error occoured in backup_check : ", e )
-            log.error( "Error occoured in backup_check : " + str(e) )
+            print ( "=>Error occurred in backup_check : ", e )
+            log.error( "Error occurred in backup_check : " + str(e) )
             import traceback
             traceback.print_exc()
         return res
@@ -394,8 +394,8 @@ class Rollback():
             print( '=>Deleted : ',self.AVOASSUREICE_LOC+"\\assets\\about_manifest.json" )
             log.info( 'Deleted : ' + str(self.AVOASSUREICE_LOC+"\\assets\\about_manifest.json") )
         except Exception as e:
-            print ( "=>Error occoured in delete_old_instance : ", e )
-            log.error( "Error occoured in delete_old_instance : " + str(e) )
+            print ( "=>Error occurred in delete_old_instance : ", e )
+            log.error( "Error occurred in delete_old_instance : " + str(e) )
             import traceback
             traceback.print_exc()
 
@@ -409,8 +409,8 @@ class Rollback():
             log.info( 'Completed extraction of package at : ' + str(self.AVOASSUREICE_LOC) )
         except Exception as e:
             print( '=>Extraction could not complete \n' )
-            print ( "=>Error occoured in rollback_changes : ", e )
-            log.error( "Error occoured in rollback_changes : " + str(e) )
+            print ( "=>Error occurred in rollback_changes : ", e )
+            log.error( "Error occurred in rollback_changes : " + str(e) )
             import traceback
             traceback.print_exc()
 
@@ -425,8 +425,8 @@ class Rollback():
             print( '=>Deleted : ',self.ROLLBACK_LOC )
             log.info( 'Deleted : ' + str(self.ROLLBACK_LOC) )
         except Exception as e:
-            print ( "=>Error occoured in delete_rollback : ", e )
-            log.error( "Error occoured in delete_rollback : " + str(e) )
+            print ( "=>Error occurred in delete_rollback : ", e )
+            log.error( "Error occurred in delete_rollback : " + str(e) )
             import traceback
             traceback.print_exc()
 
@@ -445,8 +445,8 @@ class Rollback():
             #---------------------------------------------move about_manifest to assets.
             shutil.move(self.AVOASSUREICE_LOC+"\\about_manifest.json", self.AVOASSUREICE_LOC+"\\assets\\about_manifest.json")
         except Exception as e:
-            print ( "=>Error occoured in modify_client_manifest : ", e )
-            log.error( "Error occoured in modify_client_manifest : " + str(e) )
+            print ( "=>Error occurred in modify_client_manifest : ", e )
+            log.error( "Error occurred in modify_client_manifest : " + str(e) )
             import traceback
             traceback.print_exc()
 
@@ -468,8 +468,8 @@ class common_functions:
             print ( '=>closed ICE' )
             log.info( 'ICE was closed' )
         except Exception as e:
-            print ( "Error occoured in close_ICE : ", e )
-            log.error( "Error occoured in close_ICE : " + str(e) )
+            print ( "Error occurred in close_ICE : ", e )
+            log.error( "Error occurred in close_ICE : " + str(e) )
             import traceback
             traceback.print_exc()
 
@@ -481,8 +481,8 @@ class common_functions:
             subprocess.Popen(loc,cwd=os.path.dirname(loc), creationflags=subprocess.CREATE_NEW_CONSOLE)
             log.debug( 'Restarted ICE.' )
         except Exception as e:
-            print ( "=>Error occoured in restartICE : ", e )
-            log.error( "Error occoured in restartICE : " + str(e) )
+            print ( "=>Error occurred in restartICE : ", e )
+            log.error( "Error occurred in restartICE : " + str(e) )
             import traceback
             traceback.print_exc()
 
