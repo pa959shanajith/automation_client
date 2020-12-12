@@ -95,9 +95,10 @@ class Message(wx.Frame):
         time.sleep(take_time)
         (keepGoing, skip) = self.progress.Update(taskPercent, update_msg)
 
-    def ShowMessage(self):
-        dlg = wx.MessageBox("Avo Assure ICE updated successfully. Click 'OK' start ICE.", 'Info',
-            wx.OK | wx.ICON_INFORMATION)
+    def ShowMessage(self,warning=None):
+        if (warning=='rollback'): dlg = wx.MessageBox("Avo Assure ICE rolled back successfully. Click 'OK' start ICE.", 'Info',wx.OK | wx.ICON_INFORMATION)
+        elif (warning) : dlg = wx.MessageBox("Avo Assure ICE updated with warnings. Click 'OK' start ICE.", 'Info',wx.OK | wx.ICON_INFORMATION)
+        else : dlg = wx.MessageBox("Avo Assure ICE updated successfully. Click 'OK' start ICE.", 'Info',wx.OK | wx.ICON_INFORMATION)
         if (dlg == 4 ):
             self.Close()
 
@@ -303,6 +304,7 @@ class Updater:
             print( '=>Completed generating sha256 of file :', temp_file_path )
             log.info( 'Completed generating sha256 of file : ' + str(temp_file_path) )
             return sha256
+        filename = filename[filename.rindex('_')+1:]#AvoAssure_ICE_X.Y.Z.zip is stripped to X.Y.Z.zip to match in self.vers_aval
         manifest_sha256 = self.vers_aval[filename[:filename.index('.zip')]][2] #get the sha256 value of the file from manifest.json
         live_sha256 = get_live_sha256(temp_file_path)
         if ( manifest_sha256 == live_sha256 ): return True
@@ -541,13 +543,15 @@ def main():
                 comm_obj.percentageIncri(msg,90,"Updating...")
                 comm_obj.percentageIncri(msg,95,"Updated to latest available patch.")
                 comm_obj.percentageIncri(msg,100,"Updated...")
+                msg.destoryProgress()
+                msg.ShowMessage(warning_msg)
             else:
                 comm_obj.percentageIncri(msg,85,"Files downloaded and extracted")
                 comm_obj.percentageIncri(msg,90,"Updating...")
                 comm_obj.percentageIncri(msg,95,"Successfully Updated!")
                 comm_obj.percentageIncri(msg,100,"Updated...")
-            msg.destoryProgress()
-            msg.ShowMessage()
+                msg.destoryProgress()
+                msg.ShowMessage()
             comm_obj.restartICE(sys.argv[5])#---------------------------------->7.Restart ICE
 
         elif ( sys.argv[1] == 'ROLLBACK' ):
@@ -586,7 +590,7 @@ def main():
                 comm_obj.percentageIncri(msg,95,"Successfully rolled back changes!")
                 comm_obj.percentageIncri(msg,100,"Success!")
                 msg.destoryProgress()
-                msg.ShowMessage()
+                msg.ShowMessage('rollback')
             elif ( res == False ):
                 i = 35
                 while ( i >= 1 ):
