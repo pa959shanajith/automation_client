@@ -537,10 +537,15 @@ def main():
             if ( warning_msg ):
                 comm_obj.percentageIncri(msg,85,warning_msg)
                 time.sleep(2)
-            else:comm_obj.percentageIncri(msg,85,"Files Downloaded and extracted")
-            comm_obj.percentageIncri(msg,90,"Updating...")
-            comm_obj.percentageIncri(msg,95,"Successfully Updated!")
-            comm_obj.percentageIncri(msg,100,"Updated...")
+                comm_obj.percentageIncri(msg,87,"Error occurred while updating to latest patch")
+                comm_obj.percentageIncri(msg,90,"Updating...")
+                comm_obj.percentageIncri(msg,95,"Updated to latest available patch.")
+                comm_obj.percentageIncri(msg,100,"Updated...")
+            else:
+                comm_obj.percentageIncri(msg,85,"Files downloaded and extracted")
+                comm_obj.percentageIncri(msg,90,"Updating...")
+                comm_obj.percentageIncri(msg,95,"Successfully Updated!")
+                comm_obj.percentageIncri(msg,100,"Updated...")
             msg.destoryProgress()
             msg.ShowMessage()
             comm_obj.restartICE(sys.argv[5])#---------------------------------->7.Restart ICE
