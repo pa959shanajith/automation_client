@@ -78,7 +78,7 @@ class Update_Rollback:
             cdata_value.append(client_data['p_tag'])
             #------------Server-Client min/max check
             cmin_svr_val = client_data['min-compatibility']
-            cmax_svr_val = client_data['min-compatibility']
+            cmax_svr_val = client_data['max-compatibility']
             self.MIN_FLAG = LooseVersion(str(cmin_svr_val)) <= LooseVersion(str(self.server_version))# min server version has to be lesser than or equal to the Current Sever Version
             self.MAX_FLAG = LooseVersion(str(cmax_svr_val)) == LooseVersion(str(self.server_version))# max server version has to be equal to the Current Server Version
             self.client_tag.update( {ckey : cdata_value} )
