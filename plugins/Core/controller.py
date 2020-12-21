@@ -43,7 +43,7 @@ saucelabs_count = 0
 # test_case_number = 0
 log = logging.getLogger("controller.py")
 status_percentage = {TEST_RESULT_PASS:0,TEST_RESULT_FAIL:0,TERMINATE:0,"total":0}
-
+process_ids = []
 class ThreadLogFilter(logging.Filter):
     """
     This filter only show log entries for specified thread name
@@ -1557,11 +1557,13 @@ def kill_process():
             # os.system("killall -9 Safari")
                 # This kills all instances of safari browser even if it is not opened by Avo Assure.
                 # Issue when Avo Assure is opened in Safari browser
-            os.system("killall -9 safaridriver")
-            os.system("killall -9 node_appium")
-            os.system("killall -9 xcodebuild")
-            os.system("killall -9 chromedriver")
-            os.system("killall -9 geckodriver")
+            for id in process_ids:
+                os.system("kilall -9 " + id)
+            # os.system("killall -9 safaridriver")
+            # os.system("killall -9 node_appium")
+            # os.system("killall -9 xcodebuild")
+            # os.system("killall -9 chromedriver")
+            # os.system("killall -9 geckodriver")
         except Exception as e:
             logger.print_on_console('Exception in stopping server')
             log.error(e)
@@ -1570,11 +1572,14 @@ def kill_process():
     else:
         try:
             import win32com.client
-            my_processes = ['msedgedriver.exe','MicrosoftWebDriver.exe','MicrosoftEdge.exe','chromedriver.exe','IEDriverServer.exe','IEDriverServer64.exe','CobraWinLDTP.exe','phantomjs.exe','geckodriver.exe']
-            wmi=win32com.client.GetObject('winmgmts:')
-            for p in wmi.InstancesOf('win32_process'):
-                if p.Name in my_processes:
-                    os.system("TASKKILL /F /T /IM " + p.Name )
+            for id in process_ids:
+                os.system("TASKKILL /F /T /PID " + str(id))
+                process_ids.remove(id)
+            # my_processes = ['msedgedriver.exe','MicrosoftWebDriver.exe','MicrosoftEdge.exe','chromedriver.exe','IEDriverServer.exe','IEDriverServer64.exe','CobraWinLDTP.exe','phantomjs.exe','geckodriver.exe']
+            # wmi=win32com.client.GetObject('winmgmts:')
+            # for p in wmi.InstancesOf('win32_process'):
+            #     if p.pid in process_ids:
+            #         os.system("TASKKILL /F /T /IM " + p.pid)
         except Exception as e:
             log.error(e)
 
