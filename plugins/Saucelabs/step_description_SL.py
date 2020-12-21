@@ -5,41 +5,42 @@ class StepDescription:
             if type(output) is list:
                     output=','.join(output)
         #Date operations
-        def getcurrenttime():
+        inputval=inputval[0].split(";")
+        def getCurrentTime():
             return 'Get current time of the system and save the time '+ "'"+ output + "'"+ ' in '+ "'"+ tsp.outputval+ "'"
-        def getcurrentdate():
+        def getCurrentDate():
             return 'Get current date of the system and save the date '+ "'" + str(output)+ "'" + ' in '+ "'"+ tsp.outputval+ "'"
-        def getcurrentdateandtime():
+        def getCurrentDateAndTime():
             return 'Get current date time of the system and save the date time '+"'"+ inputval[0] +"' and '"+ inputval[1] + "'"+ ' in '+"'"+ tsp.outputval+"'"
-        def getcurrentday():
+        def getCurrentDay():
             return 'Get current day of the system and save the day '+ "'" + str(output)+ "'" + ' in '+ "'"+ tsp.outputval+ "'"
-        def getcurrentdaydateandtime():
+        def getCurrentDayDateAndTime():
             return 'Get current day date time of the system and save the day date time '+"'"+ str(output) + "'"+ ' in '+"'"+ tsp.outputval+"'"
-        def dateaddition():
+        def dateAddition():
             return "Add the date '"+ inputval[0] + "' to '"+ inputval[1]+ "' number of days and save the date '" + output + "' in '"+ tsp.outputval+"'"
-        def datecompare():
+        def dateCompare():
             return "Compare '" + inputval[1]+ "' and '" + inputval[0] + "'."
         def datedifference():
             return "Get the difference between the dates '"+ inputval[0]+ "' and '"+ inputval[1]+ "' and save the date '" + output+ "' in '"+ tsp.outputval + "'"
-        def yearaddition():
+        def yearAddition():
             return "Add "+inputval[0] +" years to date '"+inputval[1]+ "' and save the date '"+output+"' in '"+tsp.outputval+ "'"
-        def monthaddition():
+        def monthAddition():
             return "Add "+inputval[0] +" months to date '"+inputval[1]+ "' and save the date '"+output+"' in '"+tsp.outputval+ "'"
-        def changedateformat():
+        def changeDateFormat():
             return "Change the format of the date '"+ inputval[0] + "' to format '"+ inputval[1]+ "' and save the date  '" + output + "' in "+"'"+tsp.outputval+"'"
 
         #File operations
-        def createfile():
+        def createFile():
             return "Create a file: '"+ inputval[1] +"' in the path: '"+ inputval[0]+"'"
-        def verifyfileexists():
+        def verifyFileExists():
             return "Verify '"+ inputval[1] +"' file exists in the path: '" + inputval[0]+"'"
-        def deletefile():
+        def deleteFile():
             return "delete: '"+ inputval[1] +"' file from the path: '"+ inputval[0]+"'"
-        def renamefile():
+        def renameFile():
             return "rename filename '"+ inputval[1] +"' to '"+ inputval[2]+"' in the path '"+ inputval[0]+"'"
         def savefile():
             return "File saved: '"+ inputval[1] +"'and stored in: '"+ inputval[0]+"'"
-        def executefile():
+        def executeFile():
             return "Perform execution of the file'"+ input+"'"
         def verifycontent():
             return "Verify '"+ inputval[1]+"' is present in the file '"+ inputval[0]+"'"
@@ -101,13 +102,13 @@ class StepDescription:
             return  "Cleard all the content of the file '"
 
         #Folder operations
-        def createfolder():
+        def createFolder():
             return "Create a folder: '"+ inputval[1] + "' in the path: '" + inputval[0]+"'"
-        def verifyfolderexists():
+        def verifyFolderExists():
             return "Verify '"+ inputval[1] + "' folder exists in the path: '" + inputval[0]+"'"
-        def deletefolder():
+        def deleteFolder():
             return "Delete: '" + inputval[1] + "' folder from the path: '" + inputval[0]+"'"
-        def renamefolder():
+        def renameFolder():
             return "Rename folder '" + str(inputval[1]) +"' to '"+ str(inputval[2])+ "' in the path '"+ inputval[0]+"'"
 
         #Math opeartions
@@ -121,15 +122,15 @@ class StepDescription:
             return "Verify objects '"+ inputval[0] +"' and '"+ inputval[1]+"' and save the result in '"+ tsp.outputval +"'."
 
         #String operations
-        def tolowercase():
+        def toLowerCase():
             return 'Change ' +"'"+ input+"'"+ ' to Lower case and save the value ' +"'"+ output+"'"+' in '+"'"+ tsp.outputval+"'"
         ##def evaluate():
             ##return 'Evaluate Mathematical expression ' +"'"+ input+ "'"+' and save the result ' +"'"+ output +"'"+ ' in '+"'"+ tsp.outputval+"'"
-        def touppercase():
+        def toUpperCase():
             return 'Change ' +"'"+ input+"'"+ ' to Upper case and save the value ' +"'"+ output+"'"+ ' in ' +"'"+ tsp.outputval+"'"
         def trim():
             return 'Trim ' +"'"+ input+"'"+ ' and save the value ' +"'"+ output +"'"+ ' in '+"'"+ tsp.outputval+"'"
-        def typecast():
+        def typeCast():
             return 'Type cast '+"'"+ str(inputval[0])+"'"+' to '+"'"+ str(inputval[1])+"'"+' and save the value '+"'"+ output+"'"+' in '+"'"+tsp.outputval+"'"
         def split():
             return 'Split the string ' +"'"+ str(inputval[0])+"'"+' with split character '+"'"+str(inputval[1])+"'"+' and save the value: '+"'"+ output+"'"+' in '+"'"+tsp.outputval+"'"
@@ -145,11 +146,11 @@ class StepDescription:
             return "Verify input string '"+ input + "' contains '"+ inputval[1] + "'"
         def replace():
             return "In string '"+ inputval[0] + "' replace '"+ inputval[1] + "' with '"+ inputval[2]+ "' and save the updated input string '" + output+ "' in '" + tsp.outputval + "'"
-        def getstringlength():
+        def getStringLength():
             return "Get the length of the string '" + input+ "' and save the length '" + output + "' in '"+ tsp.outputval + "'"
-        def getsubstring():
+        def getSubString():
             return "Get Substring of the string '"+ inputval[0]+ "' with index/range '"+ inputval[1]+ "'  and save the Substring '" + output+ "' in '"+ tsp.outputval + "'"
-        def stringgeneration():
+        def stringGeneration():
             if input.find("num") != -1:
                 return "Generate a number having a length '"+ input + "'."
             else:
@@ -168,21 +169,21 @@ class StepDescription:
             return 'Pause the application until the user interrupts'
 
         #Dynamic variable keywords
-        def createdynvariable():
+        def createDynVariable():
             return "Create a variable '"+str(inputval[0])+"' with value '"+ str(inputval[1]) + "'"
-        def deletedynvariable():
+        def deleteDynVariable():
             return ("Delete variable "+str(inputval)).replace('[','').replace(']','')
         def displayvariablevalue():
             return output.replace('\n',' ')
-        def verifyvalues():
+        def verifyValues():
             return "Verify values '" + str(inputval[0]) + "' and '" + inputval[1]+ "' and save the result in '"+ tsp.outputval + "'."
         def capturescreenshot():
             return 'Captured Screenshot'
         def comparecontent():
             return "Compare the contents of file '"+ str(inputval[0])+ "' and '"+ str(inputval[1])+ "'"
-        def copyvalue():
+        def copyValue():
             return "Copy value to variable '"+str(inputval[0])+ "' from variable '"+str(inputval[1])+ "'"
-        def getindexcount():
+        def getIndexCount():
             if '@' in output:
                 row,col=output.split('@')
                 return "The index count for the dynamic variable "+ inputval[0] + " is " + "Row: "+str(row) + " and Column: "+str(col)
@@ -192,7 +193,7 @@ class StepDescription:
             return "Get the line number of content '"+str(inputval[0])+ "' from file '"+str(inputval[1])+"' and save the value '" + output + "' in "+tsp.outputval
         def getparam():
             return "Get data from file '"+str(inputval[0])+ "' and  sheet '"+str(inputval[1])+ "'"
-        def modifyvalue():
+        def modifyValue():
             return "Modify variable '"+ str(inputval[0]) + "' value to '"+str(inputval[1])+ "'"
         def mousepress():
             return 'Mouse left button pressed'
@@ -282,8 +283,12 @@ class StepDescription:
                     cust_index= input[2]
                     input =input[3]                 #since the last parameter is the input for custom elements
         #-----------------------------------------
-        if type(output) is int:
-            output=str(output)
+        output=str(output)
+        if type(input) is list:
+            for i in input:
+                i=str(i)
+        else:
+            input=str(input)
         #Popup keywords
         def verifyPopUpText():
             return 'Verify ' +"'"+ input+"'"+ '  is the Popup text '
@@ -295,7 +300,7 @@ class StepDescription:
             return 'Accept the Popup'
         def getPopUpText():
             return 'Get the text of the Popup and save the text '+"'" + output+"'"+ ' in ' +"'"+tsp.outputval+"'"
-        def sendfunctionkeys():
+        def sendFunctionKeys():
             return 'Press ' + "'"+input+"'"+ ' key'
         #Textbox keywords
         def setText():
@@ -329,20 +334,20 @@ class StepDescription:
         def getSelected():
             return 'Get Selected value of '+ "'" + tsp.custname + "'"+ ' and save the value ' +"'"+output +"'"+' in '+"'"+tsp.outputval+"'"
         def selectMultipleValuesByText():
-            return 'Select values ' +"'"+ input +"'"+ ' in the '+ "'" + tsp.custname + "'"
+            return 'Select values ' +"'"+ str(input) +"'"+ ' in the '+ "'" + tsp.custname + "'"
         def deselectAll():
             return 'Deselect all values in the '+ "'" + tsp.custname + "'"
         def getValueByIndex():
             return 'Get value with index ' +"'"+ input +"'"+' in the '+ "'" + tsp.custname + "'" + ' and save the value ' +"'"+output +"'"+' in '+"'"+tsp.outputval+"'"
-        def verifyvaluesexists():
+        def verifyValuesExists():
             return 'Verify values ' +"'"+ input +"'"+ ' exists in the '+ "'" + tsp.custname + "'"
         def selectValueByText():
             if tsp.custname=="@Custom":
                 return 'Select text '+"'" +input+"'" +' with visible text '+"'" +visible_text+"'" +' of the type '+"'" +ele_type+"'" +' with the index '+"'" +cust_index+"'" +' present in '+ "'" + tsp.custname + "'"
             else:
                 return 'Select value '+"'"+input+"'"+' in ' + tsp.custname
-        def getmultiplevaluesbyindexes():
-            return 'Get values with indexes ' +"'"+ input +"'"+ ' in the '+ "'" + tsp.custname + "'"+ ' and save the value ' + output + ' in  '+ tsp.outputval
+        def getMultipleValuesByIndexes():
+            return 'Get values with indexes ' +"'"+ str(input) +"'"+ ' in the '+ "'" + tsp.custname + "'"+ ' and save the value ' + output + ' in  '+ tsp.outputval
         def verifySelectedValue():
             return 'Verify value ' +"'"+ input +"'"+ ' is selected in the '+ "'" + tsp.custname + "'"
         def verifySelectedValues():
@@ -350,9 +355,9 @@ class StepDescription:
         def getAllValues():
             return 'Get all the values present in the '+"'"+tsp.custname+"' and save the values '"+ output + ' in ' + "'" + tsp.outputval + "' ."
         def verifyAllValues():
-            return 'Verify values ' +"'"+ input +"'"+ ' are present in the '+ "'" + tsp.custname + "'"
+            return 'Verify values ' +"'"+ str(input) +"'"+ ' are present in the '+ "'" + tsp.custname + "'"
         def selectMultipleValuesByIndexes():
-            return 'Select values with index values ' +"'"+ input +"'"+ ' in the '+ "'" + tsp.custname + "'"
+            return 'Select values with index values ' +"'"+ str(input) +"'"+ ' in the '+ "'" + tsp.custname + "'"
         def selectAllValues():
             return 'Select all values in the ' +"'" + tsp.custname + "'"
         def verifyCount():
@@ -361,17 +366,17 @@ class StepDescription:
             if tsp.custname=="@Custom":
                 return 'Select value '+"'" +input+"'" +' with visible text '+"'" +visible_text+"'" +' of the type '+"'" +ele_type+"'" +' with the index '+"'" +cust_index+"'" +' present in '+ "'" + tsp.custname + "'"
             else:
-                return 'Select the value '+output+' with the index '+input+' present in the table cell '+"'" + tsp.custname+'['+inputval[0]+']['+inputval[1]+']'+"'."
-        def getcount():
+                return 'Select the value with the index '+input+' in ' + tsp.custname
+        def getCount():
             return 'Get the count of values in the '+ "'" + tsp.custname + "'"+ ' and save the count ' +"'"+output+"'"+' in '+"'"+tsp.outputval+"'"
         #Radio checkbox keywords
         def selectRadioButton():
             return 'Select '+ "'" + tsp.custname + "'"
         def getStatus():
             return 'Get the status of the ' + "'" + tsp.custname + "'"+ ' and save the status ' +"'"+output+"'"+' in '+"'"+tsp.outputval+"'"
-        def selectCheckBox():
+        def selectCheckbox():
             return 'Select '+ "'" + tsp.custname + "'"
-        def unselectCheckBox():
+        def unselectCheckbox():
             return 'Unselect '+ "'" + tsp.custname + "'"
 
         #Browser keywords
@@ -418,9 +423,9 @@ class StepDescription:
             return 'Get the tool tip from the '+ "'" + tsp.custname + "'"+ ' and save the tool tip text ' +"'"+output+"'"+ ' in ' +"'"+tsp.outputval+"'"
         def verifyToolTipText():
             return 'Verify ' +"'"+ input +"'"+ ' is the tooltip of  '+ "'" + tsp.custname + "'"
-        def clickelement():
+        def clickElement():
             return 'Click on '+ "'" + tsp.custname + "'"
-        def mouseclick():
+        def mouseClick():
             if len(inputval)>0:
                 return 'Mouse Click on  '+ "'" + tsp.custname +'['+inputval[0]+']['+inputval[1]+']'+"'"
             else:
@@ -490,21 +495,29 @@ class StepDescription:
             return 'Control switched to window '+"'"+input+"'"
         def getElementTagValue():
             return 'Get the html tag value of ' + "'" + tsp.custname + "'" + ' and save the value ' +"'"+output+"'"+' in ' +"'"+tsp.outputval+"'"
+        def getAttributeValue():
+            return 'Get the attribute ' + "'" + tsp.inputval[0] + "'" + ' of ' + "'" + tsp.custname + "'" + ' and save the value ' +"'"+output+"'"+' in ' +"'"+tsp.outputval+"'"
+        def verifyAttribute():
+            input=inputval[0].split(';')
+            return 'verify the attribute ' + "'"+ input[0] +"'"+ ' has value stored in ' +"'" + input[1] + "'"+' present in the ' +"'"+tsp.custname+"'"
 
         #Table keywords
-        def getcelltooltip():
-            return 'Get the cell tooltip from the '+ "'" + tsp.custname +'['+inputval[0]+']['+inputval[1]+']'+ "'"+ ' and save the tool tip text ' +"'"+output+"'"+' in ' +"'"+tsp.outputval+"'"
-        def verifycelltooltip():
-            return 'Verify cell tooltip value '+"'"+input+"'"+' is present in the '+ "'"+ tsp.custname +'['+inputval[0]+']['+inputval[1]+']'+ "' table."
+        def getCellToolTip():
+            inputval=tsp.inputval[0].split(';')
+            return 'Get the cell tooltip from the '+ "'" + tsp.custname +'['+str(inputval[0])+']['+str(inputval[1])+']'+ "'"+ ' and save the tool tip text ' +"'"+output+"'"+' in ' +"'"+tsp.outputval+"'"
+        def verifyCellToolTip():
+            inputval=tsp.inputval[0].split(';')
+            return 'Verify cell tooltip value '+"'"+input+"'"+' is present in the '+ "'"+ tsp.custname +'['+str(inputval[0])+']['+str(inputval[1])+']'+ "' table."
         # def cellclick():
         #     return 'Click on ' + "'" + tsp.custname + "'"
         def getRowCount():
             return 'Get row count of the ' + "'" + tsp.custname + "'" + ' and save the count ' +"'"+output+"'"+' in '+"'"+tsp.outputval+"'"
-        def getColoumnCount():
+        def getColumnCount():
             return 'Get column count of the '+ "'" + tsp.custname + "'"+ ' and save the count '+"'"+output+"'"+' in '+"'"+tsp.outputval+"'"
         def verifyCellValue():
-            input = inputL[2:]# getting list elements from pos 3 till end
-            input = ','.join(input)# if list is make it into a string
+            inputval=tsp.inputval[0].split(';')
+            # input = input[2:]# getting list elements from pos 3 till end
+            # input = ','.join(input)# if list is make it into a string
             return 'Verify cell value'+"'"+str(input)+"'" +'  is present in the '+ "'" + tsp.custname +'['+inputval[0]+']['+inputval[1]+']'+"' table."
 
         def getColNumByText():
@@ -512,7 +525,8 @@ class StepDescription:
         def getRowNumByText():
             return 'Get row number of ' + "'" + tsp.custname + "'" + ' by text '+"'"+input +"'"+' and save the row number ' +"'"+output +"'"+ ' in '+"'"+tsp.outputval+"'"
         def getCellValue():
-            return 'Get cell value of ' + "'" + tsp.custname +'['+inputval[0]+']['+inputval[1]+']'+"'" + ' in the table and save the value ' +"'"+output +"'"+ ' in '+"'"+tsp.outputval+"'"
+            inputval=tsp.inputval[0].split(';')
+            return 'Get cell value of ' + "'" + tsp.custname +'['+str(inputval[0])+']['+str(inputval[0])+']'+"'" + ' in the table and save the value ' +"'"+output +"'"+ ' in '+"'"+tsp.outputval+"'"
         #custom keyword
         def getobjectcount():
             return 'Get Object count of the type '+"'" +ele_type+"'" +' and save the count '+"'" +output+"'" +' in '+"'"+tsp.outputval+"'"

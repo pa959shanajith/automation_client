@@ -50,6 +50,7 @@ browsercheckFlag=False
 updatecheckFlag=False
 chromeFlag=False
 edgeFlag=False
+edgeFlagComp=False
 chromiumFlag=False
 firefoxFlag=False
 edgeFlag=False
@@ -71,11 +72,15 @@ execution_flag = False
 closeActiveConnection = False
 connection_Timer = None
 status_ping_thread = None
+update_obj = None
 core_utils_obj = core_utils.CoreUtils()
 AVO_ASSURE_HOME = os.environ["AVO_ASSURE_HOME"]
 IMAGES_PATH = normpath(AVO_ASSURE_HOME + "/assets/images") + opl
 os.environ["IMAGES_PATH"] = IMAGES_PATH
 ICE_CONST = normpath(AVO_ASSURE_HOME + "/assets/ice_const.json")
+MANIFEST_LOC = normpath(AVO_ASSURE_HOME + "/assets/about_manifest.json")
+LOC_7Z = normpath(AVO_ASSURE_HOME + '/Lib/7zip/7z.exe')
+UPDATER_LOC = normpath(AVO_ASSURE_HOME + '/assets/Update.exe')
 CONFIG_PATH = normpath(AVO_ASSURE_HOME + "/assets/config.json")
 CERTIFICATE_PATH = normpath(AVO_ASSURE_HOME + "/assets/CA_BUNDLE")
 LOGCONFIG_PATH = normpath(AVO_ASSURE_HOME + "/assets/logging.conf")
@@ -113,11 +118,13 @@ class MainNamespace(BaseNamespace):
                         cw.rbox.Enable()
                     if browsercheckFlag == False:
                         check_browser()
-                    if updatecheckFlag == False and root.gui:
+                    #if updatecheckFlag == False and root.gui:
+                    if updatecheckFlag == False:
                         msg='Checking for client package updates'
                         logger.print_on_console(msg)
                         log.info(msg)
-                        updatecheckFlag = clientwindow.check_update(True)
+                        check_PatchUpdate()
+                        #updatecheckFlag = clientwindow.check_update(True)
                     if executionOnly:
                         msg='Execution only Mode enabled'
                         logger.print_on_console(msg)
@@ -133,7 +140,7 @@ class MainNamespace(BaseNamespace):
             elif(str(args[0]) == 'schedulingEnabled'):
                 logger.print_on_console('Do Not Disturb Mode Enabled')
                 log.info('Do Not Disturb Mode Enabled')
-                
+
             elif(str(args[0]) == 'schedulingDisabled'):
                 logger.print_on_console('Do Not Disturb Mode Disabled')
                 log.info('Do Not Disturb Mode Disabled')
@@ -218,7 +225,7 @@ class MainNamespace(BaseNamespace):
         try:
             appType=args[2]
             appType=appType.lower()
-            headless_mode = str(configvalues['headless_mode'])=='Yes' 
+            headless_mode = str(configvalues['headless_mode'])=='Yes'
             if headless_mode:
                 logger.print_on_console('Object cannot be highlighted in headless mode')
                 log.error('Object cannot be highlighted in headless mode')
@@ -262,10 +269,17 @@ class MainNamespace(BaseNamespace):
             log.error(e,exc_info=True)
 
     def on_executeTestSuite(self, *args):
-        global cw, execution_flag
+        global cw, execution_flag, qcObject
         try:
             exec_data = args[0]
             batch_id = exec_data["batchId"]
+            if("qccredentials" in exec_data and "integrationType" in exec_data["qccredentials"]):
+                integrationType = exec_data["qccredentials"]["integrationType"]
+                if(integrationType == 'ALM'):
+                    if(qcObject == None):
+                        core_utils.get_all_the_imports('Qc')
+                        import QcController
+                        qcObject = QcController.QcWindow()
             aws_mode=False
             if len(args)>0 and args[0]['apptype']=='MobileApp':
                 if args[0]['suitedetails'][0]['browserType'][0]=='2':
@@ -314,11 +328,11 @@ class MainNamespace(BaseNamespace):
             args = list(args)
             d = args[0]
             action = d['action']
-            headless_mode = str(configvalues['headless_mode'])=='Yes' 
+            headless_mode = str(configvalues['headless_mode'])=='Yes'
             if headless_mode and action == 'scrape':
                 log.info("Scraping cannot be performed in headless mode")
-                logger.print_on_console("Scraping cannot be performed in headless mode") 
-                socketIO.emit('scrape','Terminate')  
+                logger.print_on_console("Scraping cannot be performed in headless mode")
+                socketIO.emit('scrape','Terminate')
                 return None
             data = {}
             if action == 'userobject':
@@ -354,7 +368,7 @@ class MainNamespace(BaseNamespace):
                     elif str(task) == 'OPEN BROWSER EDGE':
                         browsername = '7'
                     elif str(task) == 'OPEN BROWSER CHROMIUM':
-                        browsername = '8'                     
+                        browsername = '8'
                 wx.PostEvent(cw.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, cw.GetId()))
         except Exception as e:
             err_msg='Error while Scraping Web application'
@@ -816,6 +830,7 @@ class MainNamespace(BaseNamespace):
     def on_disconnect(self, *args):
         if not allow_connect: return
         log.info('Disconnect triggered')
+        stop_ping_thread()
         if (socketIO is not None) and (not socketIO.waiting_for_close):
             ice_das_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
                 'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
@@ -1021,7 +1036,7 @@ class TestThread(threading.Thread):
             logger.print_on_console('Execution status '+status)
 
             if status==TERMINATE:
-                logger.print_on_console('---------Termination Completed-------')
+                logger.print_on_console('---------Termination Completed-------',color="YELLOW")
             if self.action==DEBUG:
                 testcasename = handler.local_handler.testcasename
                 self.cw.killChildWindow(debug=True)
@@ -1100,6 +1115,8 @@ class Main():
             clientwindow.root = root
             cw = clientwindow.ClientWindow()
             self.cw = cw
+        # else:
+            #     logger.init_colorama(autoreset=True)
 
         """ Creating Root Logger using logger file config and setting logfile path, which is in config.json """
         try:
@@ -1338,7 +1355,7 @@ class Main():
                 self.ice_token = None
                 emsg = "Connection refused: Invalid Server URL."
                 if self.gui:
-                    emsg += " Click on Connect to retry Registration" 
+                    emsg += " Click on Connect to retry Registration"
                     cw.enable_register()
             logger.print_on_console(emsg)
             log.error(emsg)
@@ -1356,12 +1373,12 @@ class Main():
                     log.info('Sending socket disconnect request')
                     socketIO.send('unavailableLocalServer', dnack = True)
                 socketIO.disconnect()
+                if socketIO.activeTimer is not None and socketIO.activeTimer.isAlive():
+                    socketIO.activeTimer.cancel()
                 del socketIO
                 socketIO = None
                 self.socketthread.join()
                 log.info('Connection Closed')
-            
-
         except Exception as e:
             log.error("Error while closing connection")
             log.error(e,exc_info=True)
@@ -1518,7 +1535,7 @@ def check_browser():
             except Exception as e:
                 logger.print_on_console("Unable to locate ICE parameters")
                 log.error(e)
-            global chromeFlag,firefoxFlag,edgeFlag,chromiumFlag
+            global chromeFlag,firefoxFlag,edgeFlag,chromiumFlag, edgeFlagComp
             logger.print_on_console('Browser compatibility check started')
             p = subprocess.Popen('"' + CHROME_DRIVER_PATH + '" --version', stdout=subprocess.PIPE, bufsize=1, shell=True)
             a = p.stdout.readline()
@@ -1587,27 +1604,32 @@ def check_browser():
         #Checking browser for microsoft edge
         try:
             if('Windows-10' in platform.platform()):
-                #from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
-                p = subprocess.Popen('"' + EDGE_DRIVER_PATH + '" --version', stdout=subprocess.PIPE, bufsize=1,cwd=DRIVERS_PATH,shell=True) 
-                a = p.stdout.readline()
-                a = a.decode('utf-8')[28:40]
-                driver = webdriver.Edge(executable_path=EDGE_DRIVER_PATH)
-                browser_ver = driver.capabilities['browserVersion']
-                browser_ver1 = browser_ver.encode('utf-8')
-                browser_ver = float(browser_ver1[:8])
-                try:
-                    driver.close()
-                    driver.quit()
-                except:
-                    pass
-                for k,v in list(EDGE_VERSION.items()):
-                    if a == k:
-                        if str(browser_ver) >= v[0] or str(browser_ver) <= v[1]:
-                            edgeFlag = True
-                if edgeFlag == False:
-                    logger.print_on_console('WARNING!! : Edge Legacy version ',str(browser_ver),' is not supported.')
+                import psutil
+                edgeFlagComp = not ("MicrosoftEdge.exe" in (p.name() for p in psutil.process_iter()))
+                if edgeFlagComp:
+                    #from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+                    p = subprocess.Popen('"' + EDGE_DRIVER_PATH + '" --version', stdout=subprocess.PIPE, bufsize=1,cwd=DRIVERS_PATH,shell=True)
+                    a = p.stdout.readline()
+                    a = a.decode('utf-8')[28:40]
+                    driver = webdriver.Edge(executable_path=EDGE_DRIVER_PATH)
+                    browser_ver = driver.capabilities['browserVersion']
+                    browser_ver1 = browser_ver.encode('utf-8')
+                    browser_ver = float(browser_ver1[:8])
+                    try:
+                        driver.close()
+                        driver.quit()
+                    except:
+                        pass
+                    for k,v in list(EDGE_VERSION.items()):
+                        if a == k:
+                            if str(browser_ver) >= v[0] or str(browser_ver) <= v[1]:
+                                edgeFlag = True
+                    if edgeFlag == False:
+                        logger.print_on_console('WARNING!! : Edge Legacy version ',str(browser_ver),' is not supported.')
+                else:
+                    logger.print_on_console("WARNING!! : To perform MS Edge Legacy check, all instances of MS Edge legacy should be closed. Close the instances and restart ICE again")
             else:
-               logger.print_on_console("WARNING!! : Edge Legacy is supported only in Windows10 platform") 
+                logger.print_on_console("WARNING!! : MS Edge Legacy is supported only in Windows10 platform")
         except Exception as e:
             logger.print_on_console("Error in checking Edge Legacy version")
             log.error("Error in checking Edge Legacy version")
@@ -1658,6 +1680,63 @@ def check_browser():
         logger.print_on_console('Browser compatibility check completed')
     return browsercheckFlag
 
+def check_PatchUpdate():
+    try:
+        global patchcheckFlag
+        import update_module
+        flag = True
+        if ( os.path.isfile(CONFIG_PATH)==True):
+            configvalues = json.load(open(CONFIG_PATH))
+            SERVER_LOC = "https://" + str(configvalues['server_ip']) + ':' + str(configvalues['server_port']) + '/patchupdate/'
+            manifest_req= requests.get(SERVER_LOC+'/manifest.json',verify=False)
+            data = None
+            if(manifest_req.status_code == 200):
+                data = json.loads(manifest_req.text)
+        def update_updater_module(data):
+            global update_obj
+            update_obj = update_module.Update_Rollback()
+            update_obj.update(data, MANIFEST_LOC, SERVER_LOC, AVO_ASSURE_HOME, LOC_7Z, UPDATER_LOC, 'UPDATE')
+
+        if (data):
+            update_updater_module(data)
+            UPDATE_MSG=update_obj.send_update_message()
+            l_ver = update_obj.fetch_current_value()
+            SERVER_CHECK_MSG = update_obj.server_check_message()
+            if (SERVER_CHECK_MSG): logger.print_on_console(SERVER_CHECK_MSG)
+            #check if update avaliable
+            if ( UPDATE_MSG == 'Update Available!!! Click on update' and flag == True ):
+                logger.print_on_console("An update is available. Click on 'Help' menu option -> 'Check for Updates' sub-menu option -> 'Update' button")
+                logger.print_on_console('The latest ICE version : ',l_ver)
+                log.info(UPDATE_MSG)
+            elif ( UPDATE_MSG == 'You are running the latest version of Avo Assure ICE' and flag == True ):
+                logger.print_on_console( "No updates available" )
+                log.info( "No updates available" )
+            elif ( UPDATE_MSG == 'An Error has occured while checking for new versions of Avo Assure ICE, kindly contact Support Team'):
+                if not (os.path.exists(MANIFEST_LOC)):
+                    logger.print_on_console( "Client manifest unavaliable." )
+                    log.info( "Client manifest unavaliable." )
+                else:
+                    statcode=requests.get(SERVER_LOC + "/manifest.json", verify=False).status_code
+                    if( requests.get(SERVER_LOC, verify=False).status_code == 404) : UPDATE_MSG = UPDATE_MSG[:UPDATE_MSG.index(',')+1] + ' Patch updater server not hosted.'
+                    elif(statcode == 404) : UPDATE_MSG = UPDATE_MSG[:UPDATE_MSG.index(',')+1] + ' "manifest.json" not found, Please ensure "manifest.json" is present in patch updater folder'
+                    elif(statcode !=404 or statcode !=200): UPDATE_MSG = UPDATE_MSG[:UPDATE_MSG.index(',')+1] + ' "manifest.json error". ERROR_CODE: ' + str(statcode)
+                    logger.print_on_console( UPDATE_MSG )
+                    log.info( UPDATE_MSG )
+            patchcheckFlag = True
+        else:
+            err = "Error while checking for manifest.json"
+            logger.print_on_console(err)
+            log.debug(err)
+            patchcheckFlag = False
+    except Exception as e:
+        err = "Error while checking for patch update"
+        logger.print_on_console(err)
+        log.debug(err)
+        log.debug(e)
+        patchcheckFlag = False
+    finally:
+        logger.print_on_console('Browser compatibility check completed')
+    return patchcheckFlag
 
 def check_execution_lic(event):
     if executionOnly:
@@ -1674,25 +1753,31 @@ def set_ICE_status(one_time_ping = False,connect=True,interval = 60000):
     param : status (bool)
     return : Timer
 
-    """   
-    global socketIO,root,execution_flag,cw
-    ICE_name = root.ice_token["icename"]
+    """
+    global socketIO,root,execution_flag,cw,status_ping_thread
     if not one_time_ping and socketIO is not None:
+        if status_ping_thread and status_ping_thread.is_alive():
+            status_ping_thread.cancel()
+            status_ping_thread = None
         status_ping_thread = threading.Timer(int(interval)/2000, set_ICE_status,[])
         status_ping_thread.setName("Status Ping")
-        status_ping_thread.start()     
+        status_ping_thread.start()
     log.info('Ping Server')
     #Add ICE identification and stauts, which is busy by default
-    result = {"hostip":socket.gethostbyname(socket.gethostname()),"hostname":os.environ['username'],"time":str(datetime.now()),"icename":ICE_name,"connected":connect}
+    result = {"hostip":socket.gethostbyname(socket.gethostname()),"time":str(datetime.now()),"connected":connect}
     result['status'] = execution_flag
-    result['mode'] = cw.schedule.GetValue()
-   
+    if cw is not None:
+        result['mode'] = cw.schedule.GetValue()
+    else:
+        result['mode'] = False
+
     if socketIO is not None:
         socketIO.emit('ICE_status_change',result)
-    
+
 def stop_ping_thread():
     global status_ping_thread
-    set_ICE_status(one_time_ping=True,connect=False)
     if status_ping_thread is not None and status_ping_thread.is_alive():
         status_ping_thread.cancel()
+        time.sleep(0.5)
+        status_ping_thread = None
 

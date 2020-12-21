@@ -8,6 +8,7 @@ import core_utils
 import logger
 import threading
 import wx.lib.scrolledpanel
+import wx.richtext
 from constants import *
 import controller
 import readconfig
@@ -51,6 +52,20 @@ class RedirectText(object):
 
     def write(self,string):
         wx.CallAfter(self.out.AppendText, string)
+        # wx.CallAfter(self.out.MoveEnd)
+        # wx.CallAfter(self.out.WriteText, string)
+        # wx.CallAfter(self.out.MoveEnd)
+        # wx.CallAfter(self.out.ShowPosition,self.out.GetLastPosition())
+
+    # def write_color(self, string, color):
+    #     if(color=='RED'): rgb_color=(220,53,69)
+    #     elif(color=='GREEN'): rgb_color=(40,167,69)
+    #     elif(color=='YELLOW'): rgb_color=(255, 193, 7)
+    #     else: rgb_color=(0, 50, 250)
+    #     wx.CallAfter(self.out.BeginTextColour, rgb_color)
+    #     self.write(string)
+    #     wx.CallAfter(self.out.EndTextColour)
+    #     wx.CallAfter(self.out.BeginTextColour, (0, 50, 250))
 
     def flush(self):
         pass
@@ -128,8 +143,10 @@ class ClientWindow(wx.Frame):
         self.connectbutton.Bind(wx.EVT_BUTTON, self.OnNodeConnect)
         self.connectbutton.SetToolTip(wx.ToolTip("Connect to Avo Assure Server"))
         self.log = wx.TextCtrl(self.panel, wx.ID_ANY, pos=(12, 38), size=(760,500), style = wx.TE_MULTILINE|wx.TE_READONLY)
+        # self.log = wx.richtext.RichTextCtrl(self.panel, wx.ID_ANY, pos=(12, 38), size=(760,500), style = wx.richtext.RE_MULTILINE|wx.richtext.RE_READONLY|wx.TE_RICH2)
         font1 = wx.Font(10, wx.MODERN, wx.NORMAL, wx.NORMAL,  False, 'Consolas')
         self.log.SetForegroundColour((0,50,250))
+        # self.log.BeginTextColour((0, 50, 250))
         self.log.SetFont(font1)
 
         self.schedule = wx.CheckBox(self.panel, label = 'Do Not Disturb',pos=(120, 10), size=(100, 25))
@@ -331,13 +348,25 @@ class ClientWindow(wx.Frame):
         else:
             msg = "---------Termination Started-------"
             if root.gui: benchmark.stop(True)
-        logger.print_on_console(msg)
+        logger.print_on_console(msg,color="YELLOW")
         log.info(msg)
         controller.terminate_flag=True
         controller.manual_terminate_flag=True
         #Calling AWS stop job on terminate (if present)
         try:
             root.testthread.con.aws_obj.stop_job()
+        except:
+            pass
+        # Stop all SauceLabs jobs on click of terminate
+        try:
+            import script_generator
+            scl_ops = script_generator.Sauce_Config()
+            conf= scl_ops.get_sauceconf()
+            sc = scl_ops.get_sauceclient()
+            j = scl_ops.get_saucejobs(sc)
+            all_jobs = j.get_jobs(full=None,limit=2)
+            for i in range(0,len(all_jobs)):
+                if all_jobs[i]['status'] == 'in progress': j.stop_job(all_jobs[i]['id'])
         except:
             pass
         #Handling the case where user clicks terminate when the execution is paused
@@ -859,13 +888,23 @@ class Config_window(wx.Frame):
         self.rbox16.SetToolTip(wx.ToolTip("Enables or disables Clear Cache"))
         self.rbox16.Bind(wx.EVT_RADIOBOX, self.OnClearCache)
 
-        #Adding GridSizer which will show the radio buttons into grid of 7 rows and 2 colums it can be changed based on the requirements
-        self.gs=wx.GridSizer(8,2,5,5)
+        #adding the radio button for Screen Recording:
+        self.rbox17 = wx.RadioBox(self.panel1, label = "Screen Recording", choices = lblList,
+            majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
+        if isConfigJson != False and isConfigJson['screen_rec'].title() == lblList[0]:
+            self.rbox17.SetSelection(0)
+        else:
+            self.rbox17.SetSelection(1)
+        self.rbox17.SetToolTip(wx.ToolTip("Enables or disables Screen Recording"))
+
+        #Adding GridSizer which will show the radio buttons into grid of 9 rows and 2 colums it can be changed based on the requirements
+        self.gs=wx.GridSizer(9,2,5,5)
         self.gs.AddMany([(self.rbox1,0,wx.EXPAND), (self.rbox2,0,wx.EXPAND), (self.rbox9,0,wx.EXPAND),
             (self.rbox5,0,wx.EXPAND), (self.rbox6,0,wx.EXPAND), (self.rbox3,0,wx.EXPAND),
             (self.rbox4,0,wx.EXPAND), (self.rbox8,0,wx.EXPAND), (self.rbox7,0,wx.EXPAND),
             (self.rbox10,0,wx.EXPAND), (self.rbox11,0,wx.EXPAND), (self.rbox12,0,wx.EXPAND),
-            (self.rbox13,0,wx.EXPAND), (self.rbox14,0,wx.EXPAND), (self.rbox15,0,wx.EXPAND),(self.rbox16,0,wx.EXPAND)])
+            (self.rbox13,0,wx.EXPAND), (self.rbox14,0,wx.EXPAND), (self.rbox15,0,wx.EXPAND),
+            (self.rbox16,0,wx.EXPAND), (self.rbox17,0,wx.EXPAND)])
 
         #adding  GridSizer to bSizer which is a box sizer
         self.bSizer.Add(self.gs, 1, wx.EXPAND | wx.TOP, 5)
@@ -962,6 +1001,7 @@ class Config_window(wx.Frame):
         headless_mode = self.rbox15.GetStringSelection()
         delay_string_in = self.Delay_input.GetValue()
         clear_cache = self.rbox16.GetStringSelection()
+        screen_rec = self.rbox17.GetStringSelection()
         if extn_enabled == 'Yes' and headless_mode == 'Yes':
             self.error_msg.SetLabel("Extension Enable must be disabled when Headless Mode is enabled")
             self.error_msg.SetForegroundColour((255,0,0))
@@ -997,6 +1037,7 @@ class Config_window(wx.Frame):
         data['headless_mode']=headless_mode.strip()
         data['delay_stringinput']=delay_string_in.strip()
         data['clear_cache']=clear_cache.strip()
+        data['screen_rec']=screen_rec.strip()
         config_data=data
         if (data['server_ip']!='' and data['server_port']!='' and data['server_cert']!='' and
             data['chrome_path']!='' and data['queryTimeOut'] not in ['','sec'] and data['logFile_Path']!='' and
@@ -1260,14 +1301,16 @@ class About_window(wx.Frame):
     def __init__(self, parent, id, title):
         try:
             data = self.get_client_manifest()
-            msg = 'A product of Dimension Labs \n'
-            msg = msg +str(self.get_Info_1(data))+str(self.get_Info_2(data))+str(self.get_Info_3(data))+str(self.get_Info_4())+str(self.get_Info_5(data))+str(self.get_Info_6())
+            msg1='Avo Assure ICE '+ str(data['version']) + ' (64-bit)' +' \n'
+            msg2='Updated on : '+ str(data['updated_on']) +' \n'
+            msg3='For any queries write to us at support.nineteen68@slkgroup.com'+' \n'
+            msg4='© Avo Automation\n'
             #------------------------------------Different co-ordinates for Windows and Mac
             if SYSTEM_OS=='Windows':
                 upload_fields= {
-                "Frame":[(300, 150),(465,220)],
+                "Frame":[(300, 150),(400,220)],
                 "disp_msg":[(12,18),(80, 28),(100,18), (310,-1),(415,18),(30, -1)],
-                "Close":[(340,148), (100, 28)]
+                "Close":[(280,148), (100, 28)]
             }
             else:
                 upload_fields={
@@ -1281,10 +1324,13 @@ class About_window(wx.Frame):
             self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
             self.SetIcon(self.wicon)
             self.panel = wx.Panel(self)
-            self.disp_msg = wx.TextCtrl(self.panel, pos = upload_fields["disp_msg"][0], size = (425, 120), style = wx.TE_MULTILINE|wx.TE_READONLY)
+            self.image = wx.StaticBitmap(self.panel, -1, wx.Bitmap(IMAGES_PATH + 'AVO_Assure.png', wx.BITMAP_TYPE_ANY), wx.Point(10, 10))
+            self.msg1=wx.StaticText(self.panel, -1, str(msg1), wx.Point(170, 20), wx.Size(200, 50)).SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.BOLD))
+            self.msg2=wx.StaticText(self.panel, -1, str(msg2), wx.Point(170, 55), wx.Size(200, 50))
+            self.msg3=wx.StaticText(self.panel, -1, str(msg3), wx.Point(10, 90), wx.Size(350, 50))
+            self.msg4=wx.StaticText(self.panel, -1, str(msg4), wx.Point(10, 120), wx.Size(200, 50))
             self.close_btn = wx.Button(self.panel, label="Close",pos=upload_fields["Close"][0], size=upload_fields["Close"][1])
             self.close_btn.Bind(wx.EVT_BUTTON, self.close)
-            self.disp_msg.AppendText( msg )
             self.Centre()
             wx.Frame(self.panel)
             self.Show()
@@ -1303,47 +1349,6 @@ class About_window(wx.Frame):
             logger.print_on_console(msg)
             log.error(msg)
         return data
-
-    def get_Info_1(self,data):
-        str1=''
-        try:
-            str1='Version : '+list(data['version'])[0]+'.'+list(data['version'][list(data['version'])[0]]['subversion'])[0]+' \n'
-        except Exception as e:
-            log.error(e)
-        return str1
-
-    def get_Info_2(self,data):
-        str1=''
-        try:
-            str1='Updated on : '+(data['version'][list(data['version'])[0]]['subversion'][list(data['version'][list(data['version'])[0]]['subversion'])[0]]['updated_on'])+' \n'
-        except Exception as e:
-            log.error(e)
-        return str1
-
-    def get_Info_3(self,data):
-        str1=''
-        try:
-            str1='Baseline : '+(data['version'][list(data['version'])[0]]['subversion'][list(data['version'][list(data['version'])[0]]['subversion'])[0]]['baseline'])+' \n'
-        except Exception as e:
-            log.error(e)
-        return str1
-
-    def get_Info_4(self):
-        return '© Avo Automation\n'
-
-    def get_Info_5(self,data):
-        str1=''
-        try:
-            str1='Fixes :'+' \n'
-            b=(data['version'][list(data['version'])[0]]['subversion'][list(data['version'][list(data['version'])[0]]['subversion'])[0]]['fixes'])
-            for i in b:
-                str1=str1+i+' : '+b[i]+' \n'
-        except Exception as e:
-            log.error(e)
-        return str1
-
-    def get_Info_6(self):
-        return 'For any queries write to us @ : support.nineteen68@slkgroup.com'
 
     def close(self, event):
         self.Close()
@@ -1534,7 +1539,7 @@ class DebugWindow(wx.Frame):
 
 def check_update(flag):
     global update_obj
-    SERVER_LOC = "https://" + str(configvalues['server_ip']) + ':' + str(configvalues['server_port']) + '/fileserver/'
+    SERVER_LOC = "https://" + str(configvalues['server_ip']) + ':' + str(configvalues['server_port']) + '/patchupdate/'
     #------------------------------------------------------------getting server manifest
     def get_server_manifest_data():
         data = None
@@ -1542,7 +1547,8 @@ def check_update(flag):
         emsg = "Error in fetching update manifest from server"
         try:
             request = requests.get(SERVER_LOC + "/manifest.json", verify=False)
-            data = json.loads(request.text) #will return json of the manifest
+            if(request.status_code ==200):
+                data = json.loads(request.text) #will return json of the manifest
         except Exception as e:
             log.error(emsg)
             log.error(e,exc_info=True)
@@ -1558,6 +1564,8 @@ def check_update(flag):
     update_updater_module(data)
     UPDATE_MSG=update_obj.send_update_message()
     l_ver = update_obj.fetch_current_value()
+    SERVER_CHECK_MSG = update_obj.server_check_message()
+    if (SERVER_CHECK_MSG): logger.print_on_console(SERVER_CHECK_MSG)
     #check if update avaliable
     if ( UPDATE_MSG == 'Update Available!!! Click on update' and flag == True ):
         logger.print_on_console("An update is available. Click on 'Help' menu option -> 'Check for Updates' sub-menu option -> 'Update' button")
@@ -1571,6 +1579,10 @@ def check_update(flag):
             logger.print_on_console( "Client manifest unavaliable." )
             log.info( "Client manifest unavaliable." )
         else:
+            statcode=requests.get(SERVER_LOC + "/manifest.json", verify=False).status_code
+            if( requests.get(SERVER_LOC, verify=False).status_code == 404) : UPDATE_MSG = UPDATE_MSG[:UPDATE_MSG.index(',')+1] + ' Patch updater server not hosted.'
+            elif(statcode == 404) : UPDATE_MSG = UPDATE_MSG[:UPDATE_MSG.index(',')+1] + ' "manifest.json" not found, Please ensure "manifest.json" is present in patch updater folder'
+            elif(statcode !=404 or statcode !=200): UPDATE_MSG = UPDATE_MSG[:UPDATE_MSG.index(',')+1] + ' "manifest.json error". ERROR_CODE: ' + str(statcode)
             logger.print_on_console( UPDATE_MSG )
             log.info( UPDATE_MSG )
     return False,l_ver

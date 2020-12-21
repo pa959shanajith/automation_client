@@ -2,7 +2,6 @@ import sys
 import os
 import logging
 import argparse
-import logger
 import readconfig
 import platform
 import constants

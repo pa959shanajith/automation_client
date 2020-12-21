@@ -124,7 +124,7 @@ class GeneratePDFReport(wx.Frame):
             self.l4.SetLabel("Source is not a JSON File")
             error_flag = True
         try:
-            with open(source, 'r') as read_file:
+            with open(source, 'rb') as read_file:
                 json_data = json.load(read_file)
                 if not (("overallstatus" in json_data) and ("rows" in json_data)):
                     self.l4.SetLabel("Invalid report JSON File")

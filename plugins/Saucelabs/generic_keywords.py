@@ -20,8 +20,8 @@ class Util:
         self.f=f
 
     def wait(self,space,input,*args):
-        self.f.write(space+"input="+int(input[0]))
-        self.f.write(space+"time.sleep(input)")
+        self.f.write(space+"input='"+str(int(input[0][1:-1]))+"'")
+        self.f.write(space+"time.sleep(int(input))")
         self.f.write(space+"status='Pass'")
 
     def executeFile(self,space,input,*args):
@@ -43,29 +43,25 @@ class DynamicVariables:
         # self.f.write(space+"variable_map=OrderedDict()")
 
     def createDynVariable(self,space,input,*args):
-        inputVal=input.split(';')
-        self.f.write(space+"variable="+inputVal[0])
-        self.f.write(space+"value="+inputVal[1])
+        self.f.write(space+"variable="+input[0])
+        self.f.write(space+"value="+input[1])
         self.f.write(space+"dyn_var_map[variable]=value")
         self.f.write(space+"status='Pass'")
 
     def modifyValue(self,space,input,*args):
-        inputVal=input.split(';')
-        self.f.write(space+"variable="+inputVal[0])
-        self.f.write(space+"value="+inputVal[1])
+        self.f.write(space+"variable="+input[0])
+        self.f.write(space+"value="+input[1])
         self.f.write(space+"dyn_var_map[variable]=value")
         self.f.write(space+"status='Pass'")
 
     def copyValue(self,space,input,*args):
-        inputVal=input.split(';')
-        self.f.write(space+"variable="+inputVal[0])
-        self.f.write(space+"value="+inputVal[1])
+        self.f.write(space+"variable="+input[0])
+        self.f.write(space+"value="+input[1])
         self.f.write(space+"variable_map[variable]=value")
         self.f.write(space+"status='Pass'")
 
     def deleteDynVariable(self,space,input,*args):
-        inputVal=input.split(';')
-        self.f.write(space+"variable="+inputVal[0])
+        self.f.write(space+"variable="+input[0])
         self.f.write(space+"dyn_var_map.pop(variable)")
         self.f.write(space+"status='Pass'")
 
@@ -75,7 +71,7 @@ class FolderOperation:
         self.f=f
 
     def createFolder(self,space,input,*args):
-        inputVal=input.split(';')
+        inputVal=input
         inputpath=inputVal[0]
         folder_name=inputVal[1]
         input_val=inputpath+os.sep+folder_name
@@ -84,7 +80,7 @@ class FolderOperation:
         self.f.write(space+"status='Pass'")
 
     def verifyFolderExists(self,space,input,*args):
-        inputVal=input.split(';')
+        inputVal=input
         inputpath=inputVal[0]
         folder_name=inputVal[1]
         input_val=inputpath+os.sep+folder_name
@@ -93,7 +89,7 @@ class FolderOperation:
         self.f.write(space+"status='Pass' if output else 'Fail'")
 
     def renameFolder(self,space,input,*args):
-        inputVal=input.split(';')
+        inputVal=input
         inputpath=inputVal[0]
         folder_name=inputVal[1]
         rename_folder=inputVal[2]
@@ -105,7 +101,7 @@ class FolderOperation:
         self.f.write(space+"status='Pass'")
 
     def deleteFolder(self,space,input,*args):
-        inputVal=input.split(';')
+        inputVal=input
         inputpath=inputVal[0]
         folder_name=inputVal[1]
         input_val=inputpath+os.sep+folder_name
@@ -137,40 +133,40 @@ class StringOperation:
         self.f.write(space+"status='Pass'")
 
     def left(self,space,input):
-        inputVal=input.split(';')
+        inputVal=input
         self.f.write(space+"input="+inputVal[0])
         self.f.write(space+"index="+inputVal[1])
         self.f.write(space+"output=input[:index]")
         self.f.write(space+"status='Pass'")
 
     def right(self,space,input):
-        inputVal=input.split(';')
+        inputVal=input
         self.f.write(space+"input="+inputVal[0])
         self.f.write(space+"index="+inputVal[1])
         self.f.write(space+"output=input[-index:]")
         self.f.write(space+"status='Pass'")
 
     def mid(self,space,input):
-        inputVal=input.split(';')
+        inputVal=input
         self.f.write(space+"input="+inputVal[0])
         self.f.write(space+"output=input[int(len(input)/2)]")
         self.f.write(space+"status='Pass'")
 
     def getStringLength(self,space,input):
-        inputVal=input.split(';')
+        inputVal=input
         self.f.write(space+"input="+inputVal[0])
         self.f.write(space+"output=len(input)")
         self.f.write(space+"status='Pass'")
 
     def find(self,space,input):
-        inputVal=input.split(';')
+        inputVal=input
         self.f.write(space+"input="+inputVal[0])
         self.f.write(space+"substring="+inputVal[1])
         self.f.write(space+"output=.find(substring)")
         self.f.write(space+"status='Pass'")
 
     def replace(self,space,input):
-        inputVal=input.split(';')
+        inputVal=input
         self.f.write(space+"input="+inputVal[0])
         self.f.write(space+"substring="+inputVal[1])
         self.f.write(space+"newsubstring="+inputVal[2])
@@ -178,20 +174,20 @@ class StringOperation:
         self.f.write(space+"status='Pass'")
 
     def split(self,space,input):
-        inputVal=input.split(';')
+        inputVal=input
         self.f.write(space+"input="+inputVal[0])
         self.f.write(space+"character="+inputVal[1])
         self.f.write(space+"output=input.split(character)")
         self.f.write(space+"status='Pass'")
 
     def concatenate(self,space,input):
-        inputVal=input.split(';')
+        inputVal=input
         self.f.write(space+"input="+inputVal)
         self.f.write(space+"output=''.join(input)")
         self.f.write(space+"status='Pass'")
 
     def getSubString(self,space,input):
-        inputVal=input.split(';')
+        inputVal=input
         self.f.write(space+"input="+inputVal[0])
         index=inputVal[1]
         if '-' in index:
@@ -205,7 +201,7 @@ class StringOperation:
         self.f.write(space+"status='Pass'")
 
     def stringGeneration(self,space,input):
-        inputVal=input.split(';')
+        inputVal=input
         data_type=inputVal[0]
         self.f.write(space+"input="+inputVal[1])
         if data_type=='char':
@@ -215,7 +211,7 @@ class StringOperation:
         self.f.write(space+"status='Pass'")
 
     def typeCast(self,space,input):
-        inputVal=input.split(';')
+        inputVal=input
         self.f.write(space+"input="+inputVal[0])
         to_value=inputVal[1]
         if(to_value=="string"):
@@ -227,7 +223,7 @@ class StringOperation:
         self.f.write(space+"status='Pass'")
 
     def verifyValues(self,space,input):
-        inputVal=input.split(';')
+        inputVal=input
         self.f.write(space+"input1="+inputVal[0])
         self.f.write(space+"input2="+inputVal[1])
         self.f.write(space+"output= input1==input2")
@@ -272,7 +268,6 @@ class DateOperation:
             }
 
     def getCurrentDate(self,space,input):
-        input=input[0].split(';')
         if input[0] in self.dict1:
             ret_format=self.dict1[input[0]]
         else:
@@ -283,7 +278,6 @@ class DateOperation:
         self.f.write(space+"status='Pass'")
     
     def getCurrentTime(self,space,input):
-        input=input[0].split(';')
         if input[0] in self.dict1:
             ret_format=self.dict1[input[0]]
         else:
@@ -294,7 +288,6 @@ class DateOperation:
         self.f.write(space+"status='Pass'")
 
     def getCurrentDateAndTime(self,space,input):
-        input=input[0].split(';')
         if input[0] in self.dict1:
             ret_format=self.dict1[input[0]]
         else:
@@ -369,7 +362,7 @@ class FileOperation:
         self.f.write(space+"status='Pass'")
 
     def renameFile(self,space,input):
-        inputval=input[0].split(";")
+        inputval=input
         rename_path=inputval[0]+'/'+inputval[2]
         inputpath=inputval[0]+'/'+inputval[1]
         self.f.write(space+"inputpath="+inputpath)
@@ -378,14 +371,14 @@ class FileOperation:
         self.f.write(space+"status='Pass'")
 
     def deleteFile(self,space,input):
-        inputval=input[0].split(";")
+        inputval=input
         inputpath=inputval[0]+'/'+inputval[1]
         self.f.write(space+"inputpath="+inputpath)
         self.f.write(space+"os.remove(inputpath)")
         self.f.write(space+"status='Pass'")
 
     def verifyFileExists(self,space,input):
-        inputval=input[0].split(";")
+        inputval=input
         inputpath=inputval[0]+'/'+inputval[1]
         self.f.write(space+"output=os.path.isfile(inputpath)")
         self.f.write(space+"status='Pass' if output else 'Fail'")

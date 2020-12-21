@@ -496,7 +496,7 @@ class WSkeywords:
                 log.error(err_msg)
                 logger.print_on_console(ws_constants.METHOD_INVALID_INPUT)
             self.get_cookies()
-            response=requests.put(req, headers=self.baseReqHeader, cookies=self.req_cookies, proxies=self.proxies, cert=self.client_cert, verify=self.server_cert, auth=self.req_auth, params=self.req_params)
+            response=requests.put(req, data=self.baseReqBody, headers=self.baseReqHeader, cookies=self.req_cookies, proxies=self.proxies, cert=self.client_cert, verify=self.server_cert, auth=self.req_auth, params=self.req_params)
             status,methodoutput,output=self.__saveResults(response)
         except Exception as e:
             err_msg=str(e)
@@ -521,7 +521,7 @@ class WSkeywords:
                 log.error(err_msg)
                 logger.print_on_console(ws_constants.METHOD_INVALID_INPUT)
             self.get_cookies()
-            response=requests.delete(req, headers=self.baseReqHeader, cookies=self.req_cookies, proxies=self.proxies, cert=self.client_cert, verify=self.server_cert, auth=self.req_auth, params=self.req_params)
+            response=requests.delete(req, data=self.baseReqBody, headers=self.baseReqHeader, cookies=self.req_cookies, proxies=self.proxies, cert=self.client_cert, verify=self.server_cert, auth=self.req_auth, params=self.req_params)
             status,methodoutput,output=self.__saveResults(response)
         except Exception as e:
             err_msg=str(e)

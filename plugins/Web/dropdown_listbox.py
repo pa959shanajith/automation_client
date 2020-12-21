@@ -360,10 +360,15 @@ class DropdownKeywords():
                                         iList = select.options
                                         flag = False
                                         data_list = []
-                                        for i in range(0, len(iList)):
-                                            values = iList[i].text.lower()
-                                            if inp_val.lower() in values:
-                                                data_list.append(iList[i].text)
+                                        if len(input)==1:
+                                            for i, each_item in enumerate(select.options):
+                                                if inp_val.lower() in each_item.text.lower():
+                                                    data_list.append(each_item.text)
+                                                    break
+                                        else:
+                                            for i, each_item in enumerate(select.options):
+                                                if inp_val.lower() in each_item.text.lower():
+                                                    data_list.append(each_item.text)
                                         if len(data_list) > 0:
                                             if len(input) == 2:
                                                 if int(input[1]) < len(data_list) and int(input[1]) >= 0:

@@ -68,8 +68,8 @@ class Browser_Keywords:
         self.f.write(space+"status='Pass'")
     
     def switchToWindow(self,space,input,*args):
-        inp=int(input[0][1:-1])
-        self.f.write(space+"driver.switch_to.window(driver.window_handles["+str(int(inp)-1)+"])")
+        self.f.write(space+"input='"+str(int(input[0][1:-1]))+"'")
+        self.f.write(space+"driver.switch_to.window(driver.window_handles[int(input)-1])")
         self.f.write(space+"status='Pass'")
     
     def navigateWithAuthenticate(self,space,input,*args):
@@ -98,7 +98,7 @@ class Browser_Keywords:
         self.f.write(space+"input="+input[0])
         occurrences_javascript = "function occurrences(string, subString, allowOverlapping) {      string += '';     subString += '';     if (subString.length <= 0) return (string.length + 1);      var n = 0,pos = 0,step = allowOverlapping ? 1 : subString.length;      while (true) {         pos = string.indexOf(subString, pos);         if (pos >= 0) {             ++n;             pos += step;         } else break;     }     return n; }; function saddNodesOuter(sarray, scollection) { 	for (var i = 0; scollection && scollection.length && i < scollection.length; i++) { 		sarray.push(scollection[i]); 	} }; function stext_content(f) { 	var sfirstText = ''; 	var stextdisplay = ''; 	for (var z = 0; z < f.childNodes.length; z++) { 		var scurNode = f.childNodes[z]; 		swhitespace = /^\\s*$/; 		if (scurNode.nodeName === '#text' && !(swhitespace.test(scurNode.nodeValue))) { 			sfirstText = scurNode.nodeValue; 			stextdisplay = stextdisplay + sfirstText; 		} 	} 	return (stextdisplay); }; var sae = []; var substr = arguments[0]; var sele = arguments.length > 1 ? arguments[1].getElementsByTagName('*') :  document.getElementsByTagName('*'); var text_occurrences = 0; saddNodesOuter(sae, sele);  for(var j=0;j<sae.length;j++){ 	stagname = sae[j].tagName.toLowerCase(); 	 	if (stagname != 'script' && stagname != 'meta' && stagname != 'html' && stagname != 'head' && stagname != 'style' && stagname != 'body' && stagname != 'form' && stagname != 'link' && stagname != 'noscript' && stagname != 'option' && stagname != '!' && stagname != 'code' && stagname != 'pre' && stagname != 'br' && stagname != 'animatetransform' && stagname != 'noembed') { 		text_occurrences += occurrences(stext_content(sae[j]),substr); 	} 	 }; return text_occurrences;bstr = arguments[0]; var sele = arguments.length > 1 ? arguments[1].getElementsByTagName('*') :  document.getElementsByTagName('*'); var text_occurrences = 0; saddNodesOuter(sae, sele);  for(var j=0;j<sae.length;j++){ 	stagname = sae[j].tagName.toLowerCase(); 	 	if (stagname != 'script' && stagname != 'meta' && stagname != 'html' && stagname != 'head' && stagname != 'style' && stagname != 'body' && stagname != 'form' && stagname != 'link' && stagname != 'noscript' && stagname != 'option' && stagname != '!' && stagname != 'code' && stagname != 'pre' && stagname != 'br' && stagname != 'animatetransform' && stagname != 'noembed') { 		text_occurrences += occurrences(stext_content(sae[j]),substr); 	} 	 }; return text_occurrences;"
         self.f.write(space+"output=int(driver.execute_script(\""+occurrences_javascript+"\",input))")
-        self.f.write(space+"status='Pass'")
+        self.f.write(space+"status='Pass' if output != 0 else 'Fail'")
 
     def closeBrowser(self,space,*args):
         self.f.write(space+"driver.quit()")
@@ -170,7 +170,7 @@ class Dropdown_Keywords():
     def selectAllValues(self,space,webelement,input,*args):
         self.f.write(space+"input="+input[0])
         self.f.write(space+"select = Select("+webelement+")")
-        self.f.write(space+"for i in range(0.len(select.options)):")
+        self.f.write(space+"for i in range(0,len(select.options)):")
         self.f.write(space+"\tNone if select.options[i].is_selected() else select.select_by_visible_text(input)")
         self.f.write(space+"status='Pass'")
         
@@ -180,11 +180,35 @@ class Dropdown_Keywords():
         self.f.write(space+"status='Pass'")
 
     def selectMultipleValuesByIndexes(self,space,webelement,input,*args):
-        input=input[0].split(',')
+        inputval=[]
         for i in input:
-            self.f.write(space+"input="+i)
-            self.f.write(space+"driver.execute_script('arguments[0].selectedIndex=arguments[1]',"+webelement+",input)")
+            inputval.append(i[1:-1])
+        self.f.write(space+"input="+str(inputval))
+        for i in input:
+            self.f.write(space+"input1="+i)
+            self.f.write(space+"driver.execute_script('arguments[0].selectedIndex=arguments[1]',"+webelement+",int(input1)-1)")
         self.f.write(space+"status='Pass'")
+
+    def getMultipleValuesByIndexes(self,space,webelement,input,*args):
+        inputval=[]
+        for i in input:
+            inputval.append(i[1:-1])
+        self.f.write(space+"input="+str(inputval))
+        self.f.write(space+"total=driver.execute_script('return arguments[0].childElementCount', "+webelement+")")
+        self.f.write(space+"output=[]")
+        self.f.write(space+"for inputindex in input:")
+        self.f.write(space+"\toutput.append(str(driver.execute_script('return arguments[0].options[arguments[1]].text', "+webelement+",int(inputindex)-1)))")
+        self.f.write(space+"status='Pass'")
+
+    def verifyValuesExists(self,space,webelement,input,*args):
+        self.f.write(space+"select = Select(webelement)")
+        self.f.write(space+"option_len = select.options")
+        self.f.write(space+"opt_len = len(option_len)")
+        self.f.write(space+"inp_val_len = len(input)")
+        self.f.write(space+"temp=[]")
+        self.f.write(space+"[temp.append(select.options[x].text.strip()) for x in range(0,opt_len)]")
+        self.f.write(space+"for y in range(0,inp_val_len):"+space+"\tinput_temp = input[y].strip()"+space+"\tif (input_temp in temp):"+space+"\t\tcount+=1"+space+"\t\toutput = 'True'"+space+"\telse:"+space+"\t\toutput='False'")
+        self.f.write(space+"status='Pass' if output == 'True' else 'Fail'")
 
     def selectByAbsoluteValue(self,space,webelement,input,*args):
         self.f.write(space+"input="+input[0])
@@ -200,10 +224,13 @@ class Dropdown_Keywords():
 
     def selectMultipleValuesByText(self,space,webelement,input,*args):
         self.f.write(space+"select = Select("+webelement+")")
-        input=input[0].split(',')
+        inputval=[]
         for i in input:
-            self.f.write(space+"input="+i)
-            self.f.write(space+"select.select_by_visible_text(input)")
+            inputval.append(i[1:-1])
+        self.f.write(space+"input="+str(inputval))
+        for i in input:
+            self.f.write(space+"input1="+i)
+            self.f.write(space+"select.select_by_visible_text(input1)")
         self.f.write(space+"status='Pass'")
 
     def getCount(self,space,webelement,input,*args):
@@ -212,7 +239,7 @@ class Dropdown_Keywords():
         self.f.write(space+"iListSize = len(iList)")
         self.f.write(space+"output=iListSize")
         self.f.write(space+"status='Pass'")
-    
+
     def verifyCount(self,space,webelement,input,*args):
         self.f.write(space+"input="+input[0])
         self.f.write(space+"select = Select("+webelement+")")
@@ -222,7 +249,7 @@ class Dropdown_Keywords():
         self.f.write(space+"status='Pass' if output == 'True' else 'Fail'")
 
     def verifySelectedValue(self,space,webelement,input,*args):
-        input_val=input[0].split(",")
+        input_val=input
         self.f.write(space+"input="+input_val[0])
         self.f.write(space+"select = Select("+webelement+")")
         self.f.write(space+"first_value = select.first_selected_option.text")
@@ -231,12 +258,12 @@ class Dropdown_Keywords():
 
     def verifySelectedValues(self,space,webelement,input,*args):
         input_val=input[0].split(",")
-        self.f.write(space+"input="+input_val)
+        self.f.write(space+"input="+input_val[0])
         self.f.write(space+"select = Select("+webelement+")")
         self.f.write(space+"all_value = select.all_selected_options")
-        self.f.write(space+"temp="+input_val)
-        self.f.write(space+"import copy\ntemp1=copy.deepcopy(temp)")
-        self.f.write(space+"for i in range(0,len(temp)):\n\tif temp[i] in all_value:\n\t\ttemp1.remove(temp[i])")
+        self.f.write(space+"temp="+input_val[0])
+        self.f.write(space+"import copy"+space+"temp1=copy.deepcopy(temp)")
+        self.f.write(space+"for i in range(0,len(temp)):"+space+"\tif temp[i] in all_value:"+space+"\t\ttemp1.remove(temp[i])")
         self.f.write(space+"output='True' if len(temp1)==0 else 'False'")
         self.f.write(space+"status='Pass' if output == 'True' else 'Fail'")
 
@@ -263,14 +290,14 @@ class Dropdown_Keywords():
         self.f.write(space+"temp=[]")
         self.f.write(space+"flag==True")
         self.f.write(space+"for x in range(0,opt_len): temp.append(select.options[x].text)")
-        self.f.write(space+"for i in input:\n\tif i not in temp:\n\t\tflag=False\n\t\tbreak")
+        self.f.write(space+"for i in input:"+space+"\tif i not in temp:"+space+"\t\tflag=False"+space+"\t\tbreak")
         self.f.write(space+"output='True' if flag else 'False'")
         self.f.write(space+"status='Pass' if output == 'True' else 'Fail'")
 
     def getValueByIndex(self,space,webelement,input,*args):
         self.f.write(space+"input="+input[0])
         self.f.write(space+"select = Select("+webelement+")")
-        self.f.write(space+"output=select.options[input].text")
+        self.f.write(space+"output=select.options[int(input)].text")
         self.f.write(space+"status='Pass'")
 
     def deselectAll(self,space,webelement,input,*args):
@@ -328,13 +355,13 @@ class Element_Keywords:
     def uploadFile(self,space,webelement,input,*args):
         input=input[0].replace("\\","/")
         self.f.write(space+"input="+input)
-        self.f.write(space+""+webelement+".sendKeys(input)")
+        self.f.write(space+""+webelement+".send_keys(input)")
         self.f.write(space+"status='Pass'")
 
     def dropFile(self,space,webelement,input,*args):
         input=input[0].replace("\\","/")
         self.f.write(space+"input="+input)
-        self.f.write(space+""+webelement+".sendKeys(input)")
+        self.f.write(space+""+webelement+".send_keys(input)")
         self.f.write(space+"status='Pass'")
 
     def getElementText(self,space,webelement,input,*args):
@@ -361,7 +388,7 @@ class Element_Keywords:
     def verifyToolTipText(self,space,webelement,input,*args):
         self.f.write(space+"input="+input[0])
         self.f.write(space+"tooltip="+webelement+".get_attribute('title')")
-        self.f.write(space+"output='True' if tooltip == input[0] else 'False'")
+        self.f.write(space+"output='True' if tooltip == input else 'False'")
         self.f.write(space+"status='Pass' if output == 'True' else 'Fail'")
 
 class Radio_checkbox_Keywords():
@@ -394,7 +421,7 @@ class Table_Keywords():
         self.f.write(space+"output=driver.execute_script('var targetTable = arguments[0]; var rowCount = targetTable.rows; return rowCount.length;',"+webelement+")")
         self.f.write(space+"status='Pass'")
 
-    def getColoumnCount(self,space,webelement,input,*args):
+    def getColumnCount(self,space,webelement,input,*args):
         self.f.write(space+"output=driver.execute_script('var targetTable = arguments[0]; var columnCount = 0; var rows = targetTable.rows; if(rows.length > 0) { 	for (var i = 0; i < rows.length; i++) { 		var cells = rows[i].cells; 		var tempColumnCount = 0; 		for (var j = 0; j < cells.length; j++) { 			tempColumnCount += cells[j].colSpan; 		} 		if (tempColumnCount > columnCount) { 			columnCount = tempColumnCount; 		} 	} } return columnCount;',"+webelement+")")
         self.f.write(space+"status='Pass'")
 
@@ -409,16 +436,16 @@ class Table_Keywords():
     def getCellValue(self,space,webelement,input,*args):
         self.f.write(space+"row="+input[0])
         self.f.write(space+"col="+input[1])
-        self.f.write(space+"remoteele=driver.execute_script('var temp = fun(arguments[0], arguments[2], arguments[1]); return temp;  function fun(table, x, y) {     var m = [],         row, cell, xx, tx, ty, xxx, yyy;     for (yyy = 0; yyy < table.rows.length; yyy++) {         row = table.rows[yyy];         for (xxx = 0; xxx < row.cells.length; xxx++) {             cell = row.cells[xxx];             xx = xxx;             for (; m[yyy] && m[yyy][xx]; ++xx) {}             for (tx = xx; tx < xx + cell.colSpan; ++tx) {                 for (ty = yyy; ty < yyy + cell.rowSpan; ++ty) {                     if (!m[ty]) m[ty] = [];                     m[ty][tx] = true;                 }             }             if (xx <= x && x < xx + cell.colSpan && yyy <= y && y < yyy + cell.rowSpan) return cell;         }     }     return null; };',"+webelement+",row,col)")
-        self.f.write(space+"output=driver.execute_script(\"var mytarget = arguments[0]; var mynodes = mytarget.childNodes; var result = []; if (typeof  String.prototype.trim  !== 'function')  {       String.prototype.trim  =   function()  {             return  this.replace(/^\\s+|\\s+$/g,'');        } } recursfunc(mynodes); return result.toString();  function recursfunc(mynodes) {     for (var i = 0; i < mynodes.length; i++) {         if (mynodes[i].nodeName.toUpperCase() == \'#TEXT\') {             if ((mynodes[i].parentNode.nodeName.toUpperCase() != \'OPTION\') & (mynodes[i].parentNode.nodeName.toUpperCase() != \'SCRIPT\')) {                 var myvalue = mynodes[i].nodeValue;                 if (myvalue.trim().length > 0) {                     result.push(myvalue);                 }             }         } else if (mynodes[i].nodeName.toUpperCase() == \'INPUT\') {             if (mynodes[i].type.toUpperCase() == \'RADIO\') {                 if (mynodes[i].checked == true) {                     var myvalue = \'Selected\';                 } else {                     var myvalue = \'Unselected\';                 }             } else if (mynodes[i].type.toUpperCase() == \'CHECKBOX\') {                 if (mynodes[i].checked == true) {                     var myvalue = \'Checked\';                 } else {                     var myvalue = \'Unchecked\';                 }             } else if ((mynodes[i].type.toUpperCase() == \'BUTTON\') | (mynodes[i].type.toUpperCase() == \'SUBMIT\') | (mynodes[i].type.toUpperCase() == \'TEXT\')) {                 var myvalue = mynodes[i].value;             } else if (mynodes[i].type.toUpperCase() == \'IMAGE\') {                 var myvalue = mynodes[i].title;                 if (myvalue.trim().length < 1) {                     myvalue = mynodes[i].value;                     if (myvalue != undefined) {                         if (myvalue.trim().length < 1) {                             myvalue = \'Image\';                         }                     } else {                         myvalue = \'Image\';                     }                 }             }else{ var myvalue=mynodes[i].value; }             result.push(myvalue);         } else if (mynodes[i].nodeName.toUpperCase() == \'IMG\') {             var myvalue = mynodes[i].title;             if (myvalue.trim().length < 1) {                 myvalue = mynodes[i].value;                 if (myvalue != undefined) {                     if (myvalue.trim().length < 1) {                         myvalue = \'Image\';                     }                 } else {                     myvalue = \'Image\';                 }             }             result.push(myvalue);         } else if (mynodes[i].nodeName.toUpperCase() == \'TEXTAREA\') {             var myvalue = mynodes[i].value;             result.push(myvalue);         } else if (mynodes[i].nodeName.toUpperCase() == \'SELECT\') {             var myselect = mynodes[i].selectedOptions;             if (myselect != undefined | myselect != null) {                 for (var j = 0; j < myselect.length; j++) {                     var myvalue = mynodes[i].selectedOptions[j].textContent;                     result.push(myvalue);                 }             } else {                 var myvalue = dropdowncallie(mynodes[i]);                 result.push(myvalue);             }         } else if ((mynodes[i].nodeName.toUpperCase() == \'I\')) {             var myvalue = mynodes[i].textContent;             result.push(myvalue);         }         if (mynodes[i].hasChildNodes()) {             recursfunc(mynodes[i].childNodes);         }     } }  function dropdowncallie(op) {     var x = op.options[op.selectedIndex].text;     return x; };\","+webelement+")")
+        self.f.write(space+"remoteele=driver.execute_script('var temp = fun(arguments[0], arguments[2], arguments[1]); return temp;  function fun(table, x, y) {     var m = [],         row, cell, xx, tx, ty, xxx, yyy;     for (yyy = 0; yyy < table.rows.length; yyy++) {         row = table.rows[yyy];         for (xxx = 0; xxx < row.cells.length; xxx++) {             cell = row.cells[xxx];             xx = xxx;             for (; m[yyy] && m[yyy][xx]; ++xx) {}             for (tx = xx; tx < xx + cell.colSpan; ++tx) {                 for (ty = yyy; ty < yyy + cell.rowSpan; ++ty) {                     if (!m[ty]) m[ty] = [];                     m[ty][tx] = true;                 }             }             if (xx <= x && x < xx + cell.colSpan && yyy <= y && y < yyy + cell.rowSpan) return cell;         }     }     return null; };',"+webelement+",int(row)-1,int(col)-1)")
+        self.f.write(space+"output=driver.execute_script(\"var mytarget = arguments[0]; var mynodes = mytarget.childNodes; var result = []; if (typeof  String.prototype.trim  !== 'function')  {       String.prototype.trim  =   function()  {             return  this.replace(/^\\s+|\\s+$/g,'');        } } recursfunc(mynodes); return result.toString();  function recursfunc(mynodes) {     for (var i = 0; i < mynodes.length; i++) {         if (mynodes[i].nodeName.toUpperCase() == \'#TEXT\') {             if ((mynodes[i].parentNode.nodeName.toUpperCase() != \'OPTION\') & (mynodes[i].parentNode.nodeName.toUpperCase() != \'SCRIPT\')) {                 var myvalue = mynodes[i].nodeValue;                 if (myvalue.trim().length > 0) {                     result.push(myvalue);                 }             }         } else if (mynodes[i].nodeName.toUpperCase() == \'INPUT\') {             if (mynodes[i].type.toUpperCase() == \'RADIO\') {                 if (mynodes[i].checked == true) {                     var myvalue = \'Selected\';                 } else {                     var myvalue = \'Unselected\';                 }             } else if (mynodes[i].type.toUpperCase() == \'CHECKBOX\') {                 if (mynodes[i].checked == true) {                     var myvalue = \'Checked\';                 } else {                     var myvalue = \'Unchecked\';                 }             } else if ((mynodes[i].type.toUpperCase() == \'BUTTON\') | (mynodes[i].type.toUpperCase() == \'SUBMIT\') | (mynodes[i].type.toUpperCase() == \'TEXT\')) {                 var myvalue = mynodes[i].value;             } else if (mynodes[i].type.toUpperCase() == \'IMAGE\') {                 var myvalue = mynodes[i].title;                 if (myvalue.trim().length < 1) {                     myvalue = mynodes[i].value;                     if (myvalue != undefined) {                         if (myvalue.trim().length < 1) {                             myvalue = \'Image\';                         }                     } else {                         myvalue = \'Image\';                     }                 }             }else{ var myvalue=mynodes[i].value; }             result.push(myvalue);         } else if (mynodes[i].nodeName.toUpperCase() == \'IMG\') {             var myvalue = mynodes[i].title;             if (myvalue.trim().length < 1) {                 myvalue = mynodes[i].value;                 if (myvalue != undefined) {                     if (myvalue.trim().length < 1) {                         myvalue = \'Image\';                     }                 } else {                     myvalue = \'Image\';                 }             }             result.push(myvalue);         } else if (mynodes[i].nodeName.toUpperCase() == \'TEXTAREA\') {             var myvalue = mynodes[i].value;             result.push(myvalue);         } else if (mynodes[i].nodeName.toUpperCase() == \'SELECT\') {             var myselect = mynodes[i].selectedOptions;             if (myselect != undefined | myselect != null) {                 for (var j = 0; j < myselect.length; j++) {                     var myvalue = mynodes[i].selectedOptions[j].textContent;                     result.push(myvalue);                 }             } else {                 var myvalue = dropdowncallie(mynodes[i]);                 result.push(myvalue);             }         } else if ((mynodes[i].nodeName.toUpperCase() == \'I\')) {             var myvalue = mynodes[i].textContent;             result.push(myvalue);         }         if (mynodes[i].hasChildNodes()) {             recursfunc(mynodes[i].childNodes);         }     } }  function dropdowncallie(op) {     var x = op.options[op.selectedIndex].text;     return x; };\",remoteele)")
         self.f.write(space+"status='Pass'")
 
     def verifyCellValue(self,space,webelement,input,*args):
         self.f.write(space+"row="+input[0])
         self.f.write(space+"col="+input[1])
         self.f.write(space+"input="+input[2])
-        self.f.write(space+"remoteele=driver.execute_script('var temp = fun(arguments[0], arguments[2], arguments[1]); return temp;  function fun(table, x, y) {     var m = [],         row, cell, xx, tx, ty, xxx, yyy;     for (yyy = 0; yyy < table.rows.length; yyy++) {         row = table.rows[yyy];         for (xxx = 0; xxx < row.cells.length; xxx++) {             cell = row.cells[xxx];             xx = xxx;             for (; m[yyy] && m[yyy][xx]; ++xx) {}             for (tx = xx; tx < xx + cell.colSpan; ++tx) {                 for (ty = yyy; ty < yyy + cell.rowSpan; ++ty) {                     if (!m[ty]) m[ty] = [];                     m[ty][tx] = true;                 }             }             if (xx <= x && x < xx + cell.colSpan && yyy <= y && y < yyy + cell.rowSpan) return cell;         }     }     return null; };',"+webelement+",row,col)")
-        self.f.write(space+"content=driver.execute_script(\"var mytarget = arguments[0]; var mynodes = mytarget.childNodes; var result = []; if (typeof  String.prototype.trim  !== 'function')  {       String.prototype.trim  =   function()  {             return  this.replace(/^\\s+|\\s+$/g,'');        } } recursfunc(mynodes); return result.toString();  function recursfunc(mynodes) {     for (var i = 0; i < mynodes.length; i++) {         if (mynodes[i].nodeName.toUpperCase() == \'#TEXT\') {             if ((mynodes[i].parentNode.nodeName.toUpperCase() != \'OPTION\') & (mynodes[i].parentNode.nodeName.toUpperCase() != \'SCRIPT\')) {                 var myvalue = mynodes[i].nodeValue;                 if (myvalue.trim().length > 0) {                     result.push(myvalue);                 }             }         } else if (mynodes[i].nodeName.toUpperCase() == \'INPUT\') {             if (mynodes[i].type.toUpperCase() == \'RADIO\') {                 if (mynodes[i].checked == true) {                     var myvalue = \'Selected\';                 } else {                     var myvalue = \'Unselected\';                 }             } else if (mynodes[i].type.toUpperCase() == \'CHECKBOX\') {                 if (mynodes[i].checked == true) {                     var myvalue = \'Checked\';                 } else {                     var myvalue = \'Unchecked\';                 }             } else if ((mynodes[i].type.toUpperCase() == \'BUTTON\') | (mynodes[i].type.toUpperCase() == \'SUBMIT\') | (mynodes[i].type.toUpperCase() == \'TEXT\')) {                 var myvalue = mynodes[i].value;             } else if (mynodes[i].type.toUpperCase() == \'IMAGE\') {                 var myvalue = mynodes[i].title;                 if (myvalue.trim().length < 1) {                     myvalue = mynodes[i].value;                     if (myvalue != undefined) {                         if (myvalue.trim().length < 1) {                             myvalue = \'Image\';                         }                     } else {                         myvalue = \'Image\';                     }                 }             }else{ var myvalue=mynodes[i].value; }             result.push(myvalue);         } else if (mynodes[i].nodeName.toUpperCase() == \'IMG\') {             var myvalue = mynodes[i].title;             if (myvalue.trim().length < 1) {                 myvalue = mynodes[i].value;                 if (myvalue != undefined) {                     if (myvalue.trim().length < 1) {                         myvalue = \'Image\';                     }                 } else {                     myvalue = \'Image\';                 }             }             result.push(myvalue);         } else if (mynodes[i].nodeName.toUpperCase() == \'TEXTAREA\') {             var myvalue = mynodes[i].value;             result.push(myvalue);         } else if (mynodes[i].nodeName.toUpperCase() == \'SELECT\') {             var myselect = mynodes[i].selectedOptions;             if (myselect != undefined | myselect != null) {                 for (var j = 0; j < myselect.length; j++) {                     var myvalue = mynodes[i].selectedOptions[j].textContent;                     result.push(myvalue);                 }             } else {                 var myvalue = dropdowncallie(mynodes[i]);                 result.push(myvalue);             }         } else if ((mynodes[i].nodeName.toUpperCase() == \'I\')) {             var myvalue = mynodes[i].textContent;             result.push(myvalue);         }         if (mynodes[i].hasChildNodes()) {             recursfunc(mynodes[i].childNodes);         }     } }  function dropdowncallie(op) {     var x = op.options[op.selectedIndex].text;     return x; };\","+webelement+")")
+        self.f.write(space+"remoteele=driver.execute_script('var temp = fun(arguments[0], arguments[2], arguments[1]); return temp;  function fun(table, x, y) {     var m = [],         row, cell, xx, tx, ty, xxx, yyy;     for (yyy = 0; yyy < table.rows.length; yyy++) {         row = table.rows[yyy];         for (xxx = 0; xxx < row.cells.length; xxx++) {             cell = row.cells[xxx];             xx = xxx;             for (; m[yyy] && m[yyy][xx]; ++xx) {}             for (tx = xx; tx < xx + cell.colSpan; ++tx) {                 for (ty = yyy; ty < yyy + cell.rowSpan; ++ty) {                     if (!m[ty]) m[ty] = [];                     m[ty][tx] = true;                 }             }             if (xx <= x && x < xx + cell.colSpan && yyy <= y && y < yyy + cell.rowSpan) return cell;         }     }     return null; };',"+webelement+",int(row)-1,int(col)-1)")
+        self.f.write(space+"content=driver.execute_script(\"var mytarget = arguments[0]; var mynodes = mytarget.childNodes; var result = []; if (typeof  String.prototype.trim  !== 'function')  {       String.prototype.trim  =   function()  {             return  this.replace(/^\\s+|\\s+$/g,'');        } } recursfunc(mynodes); return result.toString();  function recursfunc(mynodes) {     for (var i = 0; i < mynodes.length; i++) {         if (mynodes[i].nodeName.toUpperCase() == \'#TEXT\') {             if ((mynodes[i].parentNode.nodeName.toUpperCase() != \'OPTION\') & (mynodes[i].parentNode.nodeName.toUpperCase() != \'SCRIPT\')) {                 var myvalue = mynodes[i].nodeValue;                 if (myvalue.trim().length > 0) {                     result.push(myvalue);                 }             }         } else if (mynodes[i].nodeName.toUpperCase() == \'INPUT\') {             if (mynodes[i].type.toUpperCase() == \'RADIO\') {                 if (mynodes[i].checked == true) {                     var myvalue = \'Selected\';                 } else {                     var myvalue = \'Unselected\';                 }             } else if (mynodes[i].type.toUpperCase() == \'CHECKBOX\') {                 if (mynodes[i].checked == true) {                     var myvalue = \'Checked\';                 } else {                     var myvalue = \'Unchecked\';                 }             } else if ((mynodes[i].type.toUpperCase() == \'BUTTON\') | (mynodes[i].type.toUpperCase() == \'SUBMIT\') | (mynodes[i].type.toUpperCase() == \'TEXT\')) {                 var myvalue = mynodes[i].value;             } else if (mynodes[i].type.toUpperCase() == \'IMAGE\') {                 var myvalue = mynodes[i].title;                 if (myvalue.trim().length < 1) {                     myvalue = mynodes[i].value;                     if (myvalue != undefined) {                         if (myvalue.trim().length < 1) {                             myvalue = \'Image\';                         }                     } else {                         myvalue = \'Image\';                     }                 }             }else{ var myvalue=mynodes[i].value; }             result.push(myvalue);         } else if (mynodes[i].nodeName.toUpperCase() == \'IMG\') {             var myvalue = mynodes[i].title;             if (myvalue.trim().length < 1) {                 myvalue = mynodes[i].value;                 if (myvalue != undefined) {                     if (myvalue.trim().length < 1) {                         myvalue = \'Image\';                     }                 } else {                     myvalue = \'Image\';                 }             }             result.push(myvalue);         } else if (mynodes[i].nodeName.toUpperCase() == \'TEXTAREA\') {             var myvalue = mynodes[i].value;             result.push(myvalue);         } else if (mynodes[i].nodeName.toUpperCase() == \'SELECT\') {             var myselect = mynodes[i].selectedOptions;             if (myselect != undefined | myselect != null) {                 for (var j = 0; j < myselect.length; j++) {                     var myvalue = mynodes[i].selectedOptions[j].textContent;                     result.push(myvalue);                 }             } else {                 var myvalue = dropdowncallie(mynodes[i]);                 result.push(myvalue);             }         } else if ((mynodes[i].nodeName.toUpperCase() == \'I\')) {             var myvalue = mynodes[i].textContent;             result.push(myvalue);         }         if (mynodes[i].hasChildNodes()) {             recursfunc(mynodes[i].childNodes);         }     } }  function dropdowncallie(op) {     var x = op.options[op.selectedIndex].text;     return x; };\",remoteele)")
         self.f.write(space+"output='True' if content == input else 'False'")
         self.f.write(space+"status='Pass' if output == 'True' else 'Fail'")
 
@@ -445,12 +472,12 @@ class Table_Keywords():
     def cellClick(self,space,webelement,input,*args):
         self.f.write(space+"row="+input[0])
         self.f.write(space+"col="+input[1])
-        self.f.write(space+"input="+input[3])
         if len(input)==2:
-            self.f.write(space+"remoteele=driver.execute_script('var temp = fun(arguments[0], arguments[2], arguments[1]); return temp;  function fun(table, x, y) {     var m = [],         row, cell, xx, tx, ty, xxx, yyy;     for (yyy = 0; yyy < table.rows.length; yyy++) {         row = table.rows[yyy];         for (xxx = 0; xxx < row.cells.length; xxx++) {             cell = row.cells[xxx];             xx = xxx;             for (; m[yyy] && m[yyy][xx]; ++xx) {}             for (tx = xx; tx < xx + cell.colSpan; ++tx) {                 for (ty = yyy; ty < yyy + cell.rowSpan; ++ty) {                     if (!m[ty]) m[ty] = [];                     m[ty][tx] = true;                 }             }             if (xx <= x && x < xx + cell.colSpan && yyy <= y && y < yyy + cell.rowSpan) return cell;         }     }     return null; };',"+webelement+",row,col)")
+            self.f.write(space+"remoteele=driver.execute_script('var temp = fun(arguments[0], arguments[2], arguments[1]); return temp;  function fun(table, x, y) {     var m = [],         row, cell, xx, tx, ty, xxx, yyy;     for (yyy = 0; yyy < table.rows.length; yyy++) {         row = table.rows[yyy];         for (xxx = 0; xxx < row.cells.length; xxx++) {             cell = row.cells[xxx];             xx = xxx;             for (; m[yyy] && m[yyy][xx]; ++xx) {}             for (tx = xx; tx < xx + cell.colSpan; ++tx) {                 for (ty = yyy; ty < yyy + cell.rowSpan; ++ty) {                     if (!m[ty]) m[ty] = [];                     m[ty][tx] = true;                 }             }             if (xx <= x && x < xx + cell.colSpan && yyy <= y && y < yyy + cell.rowSpan) return cell;         }     }     return null; };',"+webelement+",int(row)-1,int(col)-1)")
             self.f.write(space+"remoteele.find_elements_by_xpath('.//*')[0].click()")
         elif len(input)>2:
-            self.f.write(space+"remoteele=driver.execute_script('var temp = fun(arguments[0], arguments[2], arguments[1]); return temp;  function fun(table, x, y) {     var m = [],         row, cell, xx, tx, ty, xxx, yyy;     for (yyy = 0; yyy < table.rows.length; yyy++) {         row = table.rows[yyy];         for (xxx = 0; xxx < row.cells.length; xxx++) {             cell = row.cells[xxx];             xx = xxx;             for (; m[yyy] && m[yyy][xx]; ++xx) {}             for (tx = xx; tx < xx + cell.colSpan; ++tx) {                 for (ty = yyy; ty < yyy + cell.rowSpan; ++ty) {                     if (!m[ty]) m[ty] = [];                     m[ty][tx] = true;                 }             }             if (xx <= x && x < xx + cell.colSpan && yyy <= y && y < yyy + cell.rowSpan) return cell;         }     }     return null; };',"+webelement+",row,col)")
+            self.f.write(space+"input="+input[3])
+            self.f.write(space+"remoteele=driver.execute_script('var temp = fun(arguments[0], arguments[2], arguments[1]); return temp;  function fun(table, x, y) {     var m = [],         row, cell, xx, tx, ty, xxx, yyy;     for (yyy = 0; yyy < table.rows.length; yyy++) {         row = table.rows[yyy];         for (xxx = 0; xxx < row.cells.length; xxx++) {             cell = row.cells[xxx];             xx = xxx;             for (; m[yyy] && m[yyy][xx]; ++xx) {}             for (tx = xx; tx < xx + cell.colSpan; ++tx) {                 for (ty = yyy; ty < yyy + cell.rowSpan; ++ty) {                     if (!m[ty]) m[ty] = [];                     m[ty][tx] = true;                 }             }             if (xx <= x && x < xx + cell.colSpan && yyy <= y && y < yyy + cell.rowSpan) return cell;         }     }     return null; };',"+webelement+",int(row)-1,int(col)-1)")
             if input[2].lower=='button':
                 obj="//input[@type='button' or @type='button' or @type='submit' or @type='reset' or @type='file']"
             elif input[2].lower=='img':
@@ -467,7 +494,7 @@ class Table_Keywords():
                 obj="//input[@type='text' or @type='email' or @type='password' or @type='range' or @type='search' or @type='url']"
             else:
                 obj="//"+input[2].lower()
-            self.f.write(space+"remoteele.find_elements_by_xpath('"+obj+"')[input].click()")
+            self.f.write(space+"remoteele.find_elements_by_xpath('"+obj+"')[int(input)].click()")
         self.f.write(space+"status='Pass'")
 
 class Textbox_Keywords():
@@ -579,15 +606,16 @@ class Util_Keywords():
         self.f.write(space+"status='Pass' if output == 'True' else 'Fail'")
 
     def drag(self,space,webelement,input,*args):
-        self.f.write(space+"action=webdriver.ActionChains(driver).clickAndHold("+webelement+").move_to_element("+webelement+").double_click("+webelement+").perform()")
+        self.f.write(space+"action=webdriver.ActionChains(driver).click_and_hold("+webelement+").move_to_element("+webelement+")")
         self.f.write(space+"status='Pass'")
 
     def drop(self,space,webelement,input,*args):
         self.f.write(space+"action.release("+webelement+").perform()")
+        self.f.write(space+"action=''")
         self.f.write(space+"status='Pass'")
 
     def waitForElementVisible(self,space,webelement,input,*args):
-        self.f.write(space+"input="+input[0])
+        self.f.write(space+"input="+input)
         self.f.write(space+"from selenium.webdriver.support.ui import WebDriverWait")
         self.f.write(space+"from selenium.webdriver.support import expected_conditions as EC")
         self.f.write(space+"from selenium.common.exceptions import TimeoutException")

@@ -88,7 +88,7 @@ class SauceLabs_Operations():
 
     def __init__(self,scenario_name,index):
         self.filename=Saucelabs_tests+os.sep+scenario_name+index+".py"
-        self.filename1=Saucelabs_tests+os.sep+"report.txt"
+        self.filename1=Saucelabs_tests+os.sep+scenario_name+index+".txt"
         self.f=open(self.filename,"w")
         open(self.filename1,"w").close()
         browser_obj = web_keywords.Browser_Keywords(self.f)
@@ -107,16 +107,9 @@ class SauceLabs_Operations():
         genric_folder = generic_keywords.FolderOperation(self.f)
         dyn_var_obj = generic_keywords.DynamicVariables(self.f)
         generic_util = generic_keywords.Util(self.f)
-        
-        conf = open(Saucelabs_config_path, 'r')
-        self.conf = json.load(conf)
-        conf.close()
-        self.browsers={'1':{'browserName': "chrome", 'sauce:options':{}},'2':{'browserName': "firefox", 'sauce:options':{}},'3':{'browserName': "internet explorer", 'sauce:options':{}},'7':{'browserName': "MicrosoftEdge", 'sauce:options':{}}}
-        # self.proxies=self.conf["proxy"]
-        self.username=self.conf["sauce_username"]
-        self.access_key=self.conf["sauce_access_key"]
-        self.platform=self.conf["platform"]
-        self.url=self.conf["remote_url"]
+        self.obj=Sauce_Config()
+        self.conf = self.obj.get_sauceconf()
+        self.browsers={'1':{'browserName': "chrome", 'sauce:options':{}},'2':{'browserName': "firefox", 'sauce:options':{}},'3':{'browserName': "internet explorer", 'sauce:options':{}},'7':{'browserName': "MicrosoftEdge", 'sauce:options':{}},'8':{'browserName': "MicrosoftEdge", 'sauce:options':{}}}
         self.code="""import pytest
 from selenium import webdriver
 import logging
@@ -126,11 +119,15 @@ import json
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.common.action_chains import ActionChains
+from timeit import default_timer as timer
+from datetime import timedelta
 count=0
 report=[]
 testscriptname=''
 input=''
 output=''
+err_msg=''
+action=''
 status='Fail'
 parentId=0
 loopId=0
@@ -157,7 +154,7 @@ def addTestscriptName(testscript_name):
     report.append(obj)
 
 def addforloop(step):
-    global count,parentId,input,output,dyn_var_map
+    global count,parentId,input,output,dyn_var_map,start
     obj={}
     obj["id"]=count
     obj["parentId"]=parentId
@@ -170,7 +167,7 @@ def addforloop(step):
     obj["Comments"]=step['stepnum']
     obj["Step"]=""
     obj["screenshot_path"]=""
-    obj["EllapsedTime"]=""
+    obj["EllapsedTime"]=str(timedelta(seconds=end-start))
     obj["Remark"]=""
     obj["testcase_details"]=""
     obj['input']=input
@@ -179,12 +176,14 @@ def addforloop(step):
     loopId=count
     parentId=count
     count+=1
+    start = timer()
     report.append(obj)
     
 def addTeststep(step):
-    global testscriptname,count,report,input,output,status,dyn_var_map,f,parentId,loopId
+    global testscriptname,count,report,input,output,status,dyn_var_map,f,parentId,loopId,start,err_msg
     count+=1
     obj={}
+    end = timer()
     if step['testscript_name']!=testscriptname:
         addTestscriptName(step['testscript_name'])
     if step['name']=='for':
@@ -197,10 +196,10 @@ def addTeststep(step):
         obj["id"]=count
         obj["parentId"]=parentId
         obj["Step"]=''
-        obj["Comments"]=step['stepnum']
+        obj["Comments"]=err_msg
         obj["StepDescription"]='Iteration '+str(output)+' started'
         obj["screenshot_path"]=""
-        obj["EllapsedTime"]=""
+        obj["EllapsedTime"]=str(timedelta(seconds=end-start))
         obj["Remark"]=""
         obj["testcase_details"]=""
         obj['input']=input
@@ -213,10 +212,10 @@ def addTeststep(step):
         obj["id"]=count
         obj["parentId"]=parentId
         obj["Step"]=''
-        obj["Comments"]=step['stepnum']
+        obj["Comments"]=err_msg
         obj["StepDescription"]='Iteration: '+str(output)+' executed'
         obj["screenshot_path"]=""
-        obj["EllapsedTime"]=""
+        obj["EllapsedTime"]=str(timedelta(seconds=end-start))
         obj["Remark"]=""
         obj["testcase_details"]=""
         obj['input']=input
@@ -225,23 +224,46 @@ def addTeststep(step):
         addforloop(count)
         if(input==output):
             loopId=0
+    elif step['name'] in ['if','endIf','elseIf','else']:
+        text="Encountered :"+step['name']
+        if step['name'] in ['if','elseIf']:
+            text=text+" Condition is "+output
+        obj["id"]=count
+        obj["Keyword"]=step['name']
+        obj["parentId"]=parentId
+        obj["status"]=""
+        obj["Step"]=step['stepnum']
+        obj["Comments"]=err_msg
+        obj["StepDescription"]=text
+        obj["screenshot_path"]=""
+        obj["EllapsedTime"]=str(timedelta(seconds=end-start))
+        obj["Remark"]=""
+        obj["testcase_details"]=""
+        obj['input']=input
+        obj['output']=output
+        obj['dyn_var_map']=dyn_var_map
     else:
         obj["id"]=count
         obj["Keyword"]=step['name']
         obj["parentId"]=parentId
         obj["status"]=status
         obj["Step"]=step['stepnum']
-        obj["Comments"]=step['stepnum']
+        obj["Comments"]=err_msg
         obj["StepDescription"]=""
         obj["screenshot_path"]=""
-        obj["EllapsedTime"]=""
+        obj["EllapsedTime"]=str(timedelta(seconds=end-start))
         obj["Remark"]=""
         obj["testcase_details"]=""
         obj['input']=input
         obj['output']=output
         obj['dyn_var_map']=dyn_var_map
+    obj['index']=step['index']
+    obj['apptype']=step['apptype']
+    obj['inputval']=step['inputval']
     output=""
     input=""
+    err_msg=""
+    start = timer()
     status="Fail"
     report.append(obj)
     f.truncate(0)
@@ -250,12 +272,32 @@ def addTeststep(step):
 
 def check_dyn_var(inp):
     global input,dyn_var_map
-    return dyn_var_map[inp]
+    if inp in dyn_var_map:
+        return dyn_var_map[inp]
+    else:
+        return inp
 
 def store_dyn_var(out):
     global output,dyn_var_map
     if '{' in out and '}'in out:
         dyn_var_map[out[1:-1]]=output
+
+def check_url(url):
+    import re
+    res=re.match(('-?\\d+(\\.\\d+)?'),url)
+    if res is None:
+        driver.switch_to.default_content()
+    else:
+        driver.switch_to.default_content()
+        url_list=url.split('/')[:-1]
+        for i in url_list:
+            if 'i' in i:
+                tag='iframe'
+                index=i.split('i')[0]
+            elif 'f' in i:
+                tag='frame'
+                index=i.split('f')[0]
+            driver.switch_to.frame(driver.find_elements_by_tag_name(tag)[int(index)])
 
 def getWebElement(identifier):
     identifiers=identifier.split(';')
@@ -290,6 +332,7 @@ def getWebElement(identifier):
                         temp = None
     webelement = temp
     return webelement
+start = timer()
 """
         self.web_keys = {
             # 'getobjectcount':local_Wd.custom_object.get_object_count,
@@ -318,15 +361,15 @@ def getWebElement(identifier):
             'unselectCheckbox': radio_check_obj.unselectCheckbox,
 
             'getRowCount' : table_obj.getRowCount,
-            'getColoumnCount' : table_obj.getColoumnCount,
+            'getColumnCount' : table_obj.getColumnCount,
             'getCellValue' : table_obj.getCellValue,
             'verifyCellValue' : table_obj.verifyCellValue,
             'cellClick' : table_obj.cellClick,
             'getRowNumByText' : table_obj.getRowNumByText,
             'getColNumByText' : table_obj.getColNumByText,
             'getInnerTable' : table_obj.getInnerTable,
-            'getcelltooltip' : table_obj.getCellToolTip,
-            'verifycelltooltip' : table_obj.verifyCellToolTip,
+            'getCellToolTip' : table_obj.getCellToolTip,
+            'verifyCellToolTip' : table_obj.verifyCellToolTip,
 
             'getElementText' : element_obj.getElementText,
             'verifyElementText' : element_obj.verifyElementText,
@@ -335,7 +378,7 @@ def getWebElement(identifier):
             'verifyToolTipText' : element_obj.verifyToolTipText,
             'drag':util_obj.drag,
             'drop':util_obj.drop,
-            'dropFile': element_obj.dropFile,
+            # 'dropFile': element_obj.dropFile,
 
             'setText':textbox_obj.setText,
             'sendValue':textbox_obj.sendValue,
@@ -348,7 +391,7 @@ def getWebElement(identifier):
             'sendSecureValue':textbox_obj.sendSecureValue,
 
             'selectValueByIndex':dropdown_obj.selectValueByIndex,
-            'getcount':dropdown_obj.getCount,
+            'getCount':dropdown_obj.getCount,
             'selectValueByText':dropdown_obj.selectValueByText,
             'verifySelectedValues':dropdown_obj.verifySelectedValues,
             'verifySelectedValue':dropdown_obj.verifySelectedValue,
@@ -357,13 +400,13 @@ def getWebElement(identifier):
             'selectMultipleValuesByIndexes':dropdown_obj.selectMultipleValuesByIndexes,
             'getSelected':dropdown_obj.getSelected,
             'selectMultipleValuesByText':dropdown_obj.selectMultipleValuesByText,
-            # 'getMultipleValuesByIndexes':dropdown_obj.getMultipleValuesByIndexes,
+            'getMultipleValuesByIndexes':dropdown_obj.getMultipleValuesByIndexes,
             'verifyAllValues':dropdown_obj.verifyAllValues,
             'selectByAbsoluteValue':dropdown_obj.selectByAbsoluteValue,
 
             'getAllValues':dropdown_obj.getAllValues,
             'getValueByIndex':dropdown_obj.getValueByIndex,
-            # 'verifyValuesExists':dropdown_obj.verifyValuesExists,
+            'verifyValuesExists':dropdown_obj.verifyValuesExists,
             'deselectAll':dropdown_obj.deselectAll,
 
 
@@ -506,6 +549,8 @@ def getWebElement(identifier):
             # 'cellbycellcompare': generic_file.cell_by_cell_compare
             }
 
+
+
     def complie_TC(self,tsp,scenario_name,browser,index,execute_result_data,socketIO):
         try:
             self.f.write(self.code)
@@ -525,15 +570,20 @@ def getWebElement(identifier):
             if (len(stack1)!=0):
                 logger.print_on_console("Dangling if/for statement")
                 return False
-            path=Saucelabs_tests+os.sep+'report.txt'
+            path=Saucelabs_tests+os.sep+scenario_name+index+'.txt'
             path=path.replace('\\','\\\\')
-            self.f.write("\nf=open('"+path+"','w+')")        
+            self.f.write("\nf=open('"+path+"','w+')")
+            step_index=0        
             for i in tsp:
                 step={
                     "name":i.name,
                     "stepnum": "Step"+str(i.stepnum),
-                    "testscript_name": i.testscript_name
+                    "testscript_name": i.testscript_name,
+                    "inputval":i.inputval,
+                    "apptype":i.apptype,
+                    "index":step_index
                 }
+                step_index += 1
                 all_input=i.inputval[0].split(';')
                 input_value=[]
                 for inp in all_input:
@@ -548,8 +598,6 @@ def getWebElement(identifier):
                         self.f.write(space+"for i in range(1,input):")
                         self.f.write(space+"\toutput=i")
                         self.f.write(space+"\tstatus='Pass'")
-                        if ('{' in i.outputval and '}' in i.outputval):
-                            self.f.write(space+"store_dyn_var("+repr(i.outputval)+")")
                         self.f.write(space+"\taddTeststep("+repr(step)+")")
                         space=space+"\t"
                         stack.append("for")
@@ -559,47 +607,77 @@ def getWebElement(identifier):
                         if "check_dyn_var(" not in input_value[2]:
                             input_value[2]=input_value[2].replace(")","")
                         # input=""+check_dyn_var('MsgCancel')+"=="+check_dyn_var('MsgCancel')
-                        self.f.write(space+"expr=str("+input_value[0]+")+"+input_value[1]+"+str("+input_value[2]+")")
+                        self.f.write(space+"expr='\"'+str("+input_value[0]+")+'\"'+"+input_value[1]+"+'\"'+str("+input_value[2]+")+'\"'")
                         self.f.write(space+"output=str(eval(expr))")
+                        self.f.write(space+"addTeststep("+repr(step)+")")
                         self.f.write(space+"if eval(expr):")
                         self.f.write(space+"\tstatus='Pass'")
-                        if ('{' in i.outputval and '}' in i.outputval):
-                            self.f.write(space+"store_dyn_var("+repr(i.outputval)+")")
-                        self.f.write(space+"\taddTeststep("+repr(step)+")")
-                        space=space+"\t"
+                        space+='\t'
                         stack.append("if")
                     elif i.name == 'elseIf':
-                        self.f.write(space+"expr=''+"+input_value[0]+"+"+input_value[1]+"+"+input_value[2])
-                        self.f.write(space+"output=str(eval(expr))")
-                        self.f.write(space+"if eval(expr):")
-                        self.f.write(space+"\tstatus='Pass'")
-                        if ('{' in i.outputval and '}' in i.outputval):
-                            self.f.write(space+"store_dyn_var("+repr(i.outputval)+")")
-                        self.f.write(space+"addTeststep("+repr(step)+")")
-                        space=space+"\t"
-                        stack.append("elif")
-                    elif i.name == 'endIf':
                         if stack[-1]=='if' or stack[-1]=='elseIf':
                             space=space[:-1]
-                            stack.pop()
+                            self.f.write(space+"expr=''+"+input_value[0]+"+"+input_value[1]+"+"+input_value[2])
+                            self.f.write(space+"output=str(eval(expr))")
+                            self.f.write(space+"addTeststep("+repr(step)+")")
+                            self.f.write(space+"elif eval(expr):")
+                            self.f.write(space+"\tstatus='Pass'")
+                            space+='\t'
+                            stack.append("elif")
+                        else:
+                            logger.print_on_console("Dangling: elseIf in " +str(i.testscript_name))
+                            return False
+                    elif i.name == 'endIf':
+                        if stack[-1]=='if' or stack[-1]=='elseIf' or stack[-1]=='else':
                             self.f.write(space+"output=''")
                             self.f.write(space+"status='Pass'")
+                            stack.pop()
                             if ('{' in i.outputval and '}' in i.outputval):
                                 self.f.write(space+"store_dyn_var("+repr(i.outputval)+")")
+                            space=space[:-1]
                             self.f.write(space+"addTeststep("+repr(step)+")")
                         else:
-                            flag=False
+                            logger.print_on_console("Dangling: endIf in " +str(i.testscript_name))
+                            return False
                     elif i.name == 'endFor':
                         if stack[-1]=='for':
                             self.f.write(space+"output=''")
                             self.f.write(space+"status='Pass'")
+                            stack.pop()
                             if ('{' in i.outputval and '}' in i.outputval):
                                 self.f.write(space+"store_dyn_var("+repr(i.outputval)+")")
                             self.f.write(space+"addTeststep("+repr(step)+")")
                             space=space[:-1]
-                            stack.pop()
                         else:
-                            flag=False
+                            logger.print_on_console("Dangling: elseFor in " +str(i.testscript_name))
+                            return False
+                    elif i.name == 'else':
+                        if stack[-1]=='if' or stack[-1]=='elseIf':
+                            space=space[:-1]
+                            self.f.write(space+"\taddTeststep("+repr(step)+")")
+                            self.f.write(space+"else:")
+                            self.f.write(space+"\tstatus='Pass'")
+                            space+='\t'
+                            stack.append("else")
+                        else:
+                            logger.print_on_console("Dangling: else in " +str(i.testscript_name))
+                            return False
+                    elif i.name in self.generic_keys:
+                        self.f.write(space+"try:")
+                        space+='\t'
+                        self.generic_keys[i.name](space,input_value)
+                        space=space[:-1]
+                        self.f.write(space+"except Exception as e:")
+                        self.f.write(space+"\toutput='False'")
+                        self.f.write(space+"\terr_msg='Input error: please provide the valid input.'")
+                        self.f.write(space+"\tprint(e)")
+                        if ('{' in i.outputval and '}' in i.outputval):
+                            self.f.write(space+"store_dyn_var("+repr(i.outputval)+")")
+                        self.f.write(space+"addTeststep("+repr(step)+")")
+                    else:
+                        logger.print_on_console(i.name+" keyword is not supported in saucelabs execution.")
+                        return False
+                    
                     
                 elif i.apptype == 'Web':
                     self.f.write(space+"try:")
@@ -611,19 +689,26 @@ def getWebElement(identifier):
                             else:
                                 logger.print_on_console(i.name+" keyword is not supported in saucelabs execution.")
                                 return False
-                    elif i.custname=='@Browser':
+                    elif i.custname=='@Browser' or i.custname=='@BrowserPopUp':
                         if(i.name=="openBrowser"):
-                            self.browsers['platform']=self.platform
+                            self.browsers[browser]["platform"]=self.conf["platform"]
                             self.browsers[browser]["sauce:options"].update({"name":scenario_name})
                             self.browsers[browser]["sauce:options"].update({"idleTimeout":10})
-                            self.web_keys[i.name](space,self.url,self.browsers[browser])
+                            self.web_keys[i.name](space,self.conf['remote_url'],self.browsers[browser])
                         else:
                             self.web_keys[i.name](space,input_value)
+                    elif i.custname=='@Custom':
+                        logger.print_on_console("@Custom is not supported in saucelabs execution.")
+                        return False
                     else:
                         if i.name in self.web_keys:
                             xpath=i.objectname.split(';')[0]
                             if(i.name=="waitForElementVisible"):
-                                i.inputval=xpath
+                                input_value="'"+xpath+"'"
+                            self.f.write(space+"check_url("+repr(i.url)+")")
+                            a=i.objectname.split(';')
+                            a[10]=''
+                            i.objectname=';'.join(a)
                             self.f.write(space+"webelement=getWebElement("+repr(i.objectname)+")")
                             self.f.write(space+"if webelement!=None:")
                             space=space+"\t"
@@ -635,7 +720,10 @@ def getWebElement(identifier):
                             return False
                     space=space[:-1]
                     self.f.write(space+"except Exception as e:")
+                    self.f.write(space+"\tif hasattr(e,'msg') and e.msg.find(\"can't receive further commands\")!=-1:")
+                    self.f.write(space+"\t\texit()")
                     self.f.write(space+"\toutput='False'")
+                    self.f.write(space+"\terr_msg='Input error: please provide the valid input.'")
                     self.f.write(space+"\tprint(e)")
                     if ('{' in i.outputval and '}' in i.outputval):
                         self.f.write(space+"store_dyn_var("+repr(i.outputval)+")")
@@ -650,7 +738,7 @@ def getWebElement(identifier):
             from datetime import datetime
             now=datetime.now()
             file_py=Saucelabs_tests+os.sep+scenario_name+index
-            p = subprocess.Popen('python -m pytest '+file_py+".py", stdout=subprocess.PIPE, bufsize=1, shell=True, cwd=python_cwd)
+            p = subprocess.Popen('python -m pytest "'+file_py+'.py"', stdout=subprocess.PIPE, bufsize=1, shell=True, cwd=python_cwd)
             output=p.stdout.readlines()
             p.wait()
             flag=True
@@ -662,18 +750,20 @@ def getWebElement(identifier):
             tsp_index=0
             for i in range(0,len(report)):
                 if report[i]['Keyword'] in ['if','elseIf']:
-                    report[i]['StepDescription'] = 'Encountered :'+report[i]['Keyword']+' Condition is'+report[i]['output']
+                    report[i]['StepDescription'] = 'Encountered :'+report[i]['Keyword']+' Condition is '+report[i]['output']
+                    del report[i]['input'],report[i]['output'],report[i]['dyn_var_map'],report[i]['apptype'],report[i]['index'],report[i]['inputval']
                 elif report[i]['Keyword'] == 'endIf':
-                    report[i]['StepDescription'] = 'Encountered : endIf'
+                    report[i]['StepDescription'] = 'Encountered :endIf'
+                    del report[i]['input'],report[i]['output'],report[i]['dyn_var_map'],report[i]['apptype'],report[i]['index'],report[i]['inputval']
                 if report[i]['StepDescription'] == '':
-                    report[i]['StepDescription'] = apptype_description[tsp[tsp_index].apptype.lower()](tsp[tsp_index].name,tsp[tsp_index],tsp[tsp_index].inputval,report[i]['input'],report[i]['output'])
+                    report[i]['StepDescription'] = apptype_description[report[i]['apptype'].lower()](report[i]['Keyword'],tsp[report[i]['index']],report[i]['inputval'],report[i]['input'],report[i]['output'])
                     if report[i]['status']=='Fail':
                         overall_status='Fail'
-                    del report[i]['input'],report[i]['output'],report[i]['dyn_var_map']
-                    tsp_index+=1
-            sc=sauceclient.SauceClient(self.username,self.access_key)
-            j=sauceclient.Jobs(sc)
+                    del report[i]['input'],report[i]['output'],report[i]['dyn_var_map'],report[i]['apptype'],report[i]['index'],report[i]['inputval']
+            sc = self.obj.get_sauceclient()
+            j = self.obj.get_saucejobs(sc)
             all_jobs=j.get_jobs(start=int(now.timestamp()),full=True)
+            time.sleep(5)
             import constants
             filename = datetime.now().strftime("%Y%m%d%H%M%S")
             dirpath = constants.SCREENSHOT_PATH if (constants.SCREENSHOT_PATH not in ['screenshot_path', 'Disabled']) else Saucelabs_tests+os.sep
@@ -681,18 +771,27 @@ def getWebElement(identifier):
             for i in range(0,len(all_jobs)):
                 file_creations_status=j.get_job_asset_content(all_jobs[i]['id'],filename,dirpath)
                 status=all_jobs[i]['error']
-                if(status!=None):
-                    logger.print_on_console("Error in Sauce Labs Execution")
-                    flag=False
+                import controller
+                if controller.terminate_flag:
+                    overall_status="Terminate"
+                    step={
+                        "id": len(report)+1,
+                        "Keyword": "",
+                        "parentId": "",
+                        "Comments": "",
+                        "Step": "Terminated",
+                        "StepDescription": "Terminated by the user"
+                    }
+                    report.append(step)
+                    flag='Terminate'
             overallstatus=self.build_overallstatus(self.browsers[browser]['browserName'],overall_status,all_jobs[i],j,video_path)
             execute_result_data['reportData'] = { 'rows' : report, "overallstatus" : overallstatus}
             socketIO.emit('result_executeTestSuite', execute_result_data)
             f1.close()
             return flag
         except Exception as e:
-            import traceback
-            traceback.print_exc()
-            logger.print_on_console(e)
+            logger.print_on_console("Error in Sauce Labs Execution")
+            log.error(e)
             self.f.close()
             f1.close()
             return False
@@ -731,3 +830,22 @@ def getWebElement(identifier):
         obj['time']=time1
         obj['video']=video_path
         return [obj]
+
+class Sauce_Config():
+
+    def get_sauceconf(self):
+        conf_obj = open(Saucelabs_config_path, 'r')
+        conf = json.load(conf_obj)
+        conf_obj.close()
+        # self.proxies=self.conf["proxy"]
+        self.username = conf["sauce_username"]
+        self.access_key = conf["sauce_access_key"]
+        self.platform = conf["platform"]
+        self.url = conf["remote_url"]
+        return conf
+
+    def get_sauceclient(self):
+        return sauceclient.SauceClient(self.username,self.access_key)
+
+    def get_saucejobs(self, sc):
+        return sauceclient.Jobs(sc)

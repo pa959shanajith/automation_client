@@ -93,6 +93,7 @@ class Dispatcher:
             'getrownumbytext' : local_Wd.table_object.getRowNumByText,
             'getcolnumbytext' : local_Wd.table_object.getColNumByText,
             'getinnertable' : local_Wd.table_object.getInnerTable,
+            'doublecellclick' : local_Wd.table_object.doubleCellClick,
             # grid keywords
             'horizontalscroll' : local_Wd.table_object.horizontalScroll,
             'verticalscroll' : local_Wd.table_object.verticalScroll,
@@ -549,22 +550,22 @@ class Dispatcher:
             local_Wd.log.debug('Identifiers are ')
             local_Wd.log.debug(identifiers)
             if len(identifiers)>=3:
-                #find by classname
-                webElement=self.element_locator(driver,'classname',identifiers[5],'5')
+                #find by Relative xpath
+                webElement=self.element_locator(driver,'rxpath',identifiers[0],'1')
                 if not(webElement):
                     #find by id
                     webElement=self.element_locator(driver,'id',identifiers[1],'2')
                     if not(webElement):
-                        #find by Relative xpath
-                        webElement=self.element_locator(driver,'rxpath',identifiers[0],'1')
+                        #find by absolute xpath
+                        webElement=self.element_locator(driver,'xpath',identifiers[2],'3')
                         if not(webElement):
-                            #find by absolute xpath
-                            webElement=self.element_locator(driver,'xpath',identifiers[2],'3')
+                            #find by name
+                            webElement=self.element_locator(driver,'name',identifiers[3],'4')
                             if not(webElement):
-                                #find by name
-                                webElement=self.element_locator(driver,'name',identifiers[3],'4')
+                                 #find by classname
+                                webElement=self.element_locator(driver,'classname',identifiers[5],'5')
                                 if not(webElement):
-                                    #find by css selector
+                                #find by css selector
                                     if len(identifiers) > 11:
                                         webElement=self.element_locator(driver,'css_selector',identifiers[11],'6')
                                     if not(webElement):
