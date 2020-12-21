@@ -454,6 +454,9 @@ class TableOperationKeywords():
                                 methodoutput=TEST_RESULT_TRUE
                                 local_tk.log.info('Got the result : %s',str(tooltip))
                                 logger.print_on_console('Got the result : ',str(tooltip))
+                            else:
+                                tooltip=None
+                                err_msg = 'No cell tool tip present for the cell'
                     else:
                         local_tk.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                         err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
