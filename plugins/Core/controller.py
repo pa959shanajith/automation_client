@@ -571,7 +571,8 @@ class Controller():
                     else:
                         keyword_lower = tsp.name.lower()
                         #list containing keywords that should not print output on console, add keyword here to stop printing
-                        exception_list = ['getxmlblockdata','findimageinpdf','comparepdfs']
+                        #Fix for #17330 Addition of getAllValues in exception_list 
+                        exception_list = ['getxmlblockdata','findimageinpdf','comparepdfs','getallvalues']
                         if (tsp.apptype.lower()!='desktop' and keyword_lower not in exception_list) : logger.print_on_console('Result obtained is ',",".join([str(display_keyword_response[local_cont.i])
                         if not isinstance(display_keyword_response[local_cont.i],str) else display_keyword_response[local_cont.i] for local_cont.i in range(len(display_keyword_response))]))
             else:
