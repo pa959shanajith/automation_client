@@ -1584,6 +1584,7 @@ def kill_process():
             if hasattr(browser_Keywords_MW, 'driver_obj'):
                 if (browser_Keywords_MW.driver_obj):
                     browser_Keywords_MW.driver_obj = None
+        except ImportError:pass
         except Exception as e:
             log.error(e)
 
