@@ -40,7 +40,6 @@ class TableOperationKeywords():
 
 #   returns the row count of table if the table found with the given xpath
         def getRowCount(self,webElement,*args):
-            logger.print_on_console('Executing keyword : getRowCount')
             local_tk.driver=browser_Keywords.local_bk.driver_obj
             local_tk.log.debug('got the driver instance from browser keyword')
             status=TEST_RESULT_FAIL
@@ -79,6 +78,10 @@ class TableOperationKeywords():
                                 status=TEST_RESULT_PASS
                                 methodoutput=TEST_RESULT_TRUE
                                 logger.print_on_console('Row count is  : ',str(row_count))
+                            else:
+                                err_msg='Error fetching row count'
+                                local_tk.log.error('Error fetching row count')
+                                logger.print_on_console('Error fetching row count')
                         else:
                             local_tk.log.debug('performing java script on element')
                             js='var targetTable = arguments[0]; var rowCount = targetTable.rows; return rowCount.length;'
@@ -87,6 +90,10 @@ class TableOperationKeywords():
                                 status=TEST_RESULT_PASS
                                 methodoutput=TEST_RESULT_TRUE
                                 logger.print_on_console('Row count is  : ',str(row_count))
+                            else:
+                                err_msg='Error fetching row count'
+                                local_tk.log.error('Error fetching row count')
+                                logger.print_on_console('Error fetching row count')
                     else:
                         err_msg='Element not found'
                         local_tk.log.error('Element not found')
@@ -103,7 +110,6 @@ class TableOperationKeywords():
 
 #   returns the no of coloumns of the table if the table found with the given xpath
         def getColoumnCount(self,webElement,*args):
-            logger.print_on_console('Executing keyword : getColoumnCount')
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
             coloumn_count=0
@@ -151,6 +157,10 @@ class TableOperationKeywords():
                                 status=TEST_RESULT_PASS
                                 methodoutput=TEST_RESULT_TRUE
                                 logger.print_on_console('Column count is : ',str(coloumn_count))
+                            else:
+                                err_msg='Error fetching column count'
+                                local_tk.log.error('Error fetching column count')
+                                logger.print_on_console('Error fetching column count')
                         else:
                             local_tk.log.debug('performing java script on element')
                             js='var targetTable = arguments[0]; var columnCount = 0; var rows = targetTable.rows; if(rows.length > 0) { 	for (var i = 0; i < rows.length; i++) { 		var cells = rows[i].cells; 		var tempColumnCount = 0; 		for (var j = 0; j < cells.length; j++) { 			tempColumnCount += cells[j].colSpan; 		} 		if (tempColumnCount > columnCount) { 			columnCount = tempColumnCount; 		} 	} } return columnCount;'
@@ -160,6 +170,10 @@ class TableOperationKeywords():
                                 methodoutput=TEST_RESULT_TRUE
                                 # local_tk.log.info('Column count is : ',coloumn_count)
                                 logger.print_on_console('Column count is : ',str(coloumn_count))
+                            else:
+                                err_msg='Error fetching column count'
+                                local_tk.log.error('Error fetching column count')
+                                logger.print_on_console('Error fetching column count')
                 except Exception as e:
                     local_tk.log.error(e)
                     logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
@@ -172,14 +186,13 @@ class TableOperationKeywords():
 
 #   returns the cell value of cell with ',' seperated values, if the table found with the given xpath
         def getCellValue(self,webElement,input_val,*args):
-            logger.print_on_console('Executing keyword : ','getCellValue')
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
             cellVal=None
             err_msg=None
             index = False
             local_tk.driver=browser_Keywords.local_bk.driver_obj
-            logger.print_on_console('got the driver instance from browser keyword')
+            local_tk.log.debug('got the driver instance from browser keyword')
             visibleFlag=True
             try:
                 if visibleFlag==True:
@@ -230,8 +243,22 @@ class TableOperationKeywords():
                                                 logger.print_on_console('Cell value is : ',str(cellVal))
                                                 status=TEST_RESULT_PASS
                                                 methodoutput=TEST_RESULT_TRUE
-                                            except:pass
-                                    except:pass
+                                            except Exception as e:
+                                                local_tk.log.error(e)
+                                                logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
+                                                err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                                        else:
+                                            err_msg='Invalid input: Col number more than col count'
+                                            local_tk.log.error('Invalid input: Col number more than col count')
+                                            logger.print_on_console('Invalid input: Col number more than col count')
+                                    except Exception as e:
+                                        local_tk.log.error(e)
+                                        logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
+                                        err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                                else:
+                                    err_msg='Invalid input: Row number more than row count'
+                                    local_tk.log.error('Invalid input: Row number more than row count')
+                                    logger.print_on_console('Invalid input: Row number more than row count')
                             else:
                                 for i in rows:
                                     if i.get_attribute(input_arr[4]) == row_number:
@@ -247,6 +274,14 @@ class TableOperationKeywords():
                                                 logger.print_on_console('Cell value is : ',str(cellVal))
                                                 status=TEST_RESULT_PASS
                                                 methodoutput=TEST_RESULT_TRUE
+                                            else:
+                                                err_msg='Invalid input: Column not found'
+                                                local_tk.log.error('Invalid input: Column not found')
+                                                logger.print_on_console('Invalid input: Column not found')
+                                    else:
+                                        err_msg='Invalid input: Row not found'
+                                        local_tk.log.error('Invalid input: Row not found')
+                                        logger.print_on_console('Invalid input: Row not found')
                         else:
                             row_num=int(input_val[0])
                             col_num=int(input_val[1])
@@ -280,7 +315,6 @@ class TableOperationKeywords():
 
 #   verifies the cell value with the given text input, if the table found with the given xpath
         def verifyCellValue(self,webElement,input_val,*args):
-            logger.print_on_console('Executing keyword : verifyCellValue')
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
             cellVal=None
@@ -349,8 +383,22 @@ class TableOperationKeywords():
                                                     logger.print_on_console(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
                                                     logger.print_on_console('Actual value is : ',str(cellVal))
                                                     logger.print_on_console('Expected value is : ',str(expected_value))
-                                            except:pass
-                                    except:pass
+                                            except Exception as e:
+                                                local_tk.log.error(e)
+                                                logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
+                                                err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                                        else:
+                                            err_msg='Invalid input: Col number more than col count'
+                                            local_tk.log.error('Invalid input: Col number more than col count')
+                                            logger.print_on_console('Invalid input: Col number more than col count')
+                                    except Exception as e:
+                                        local_tk.log.error(e)
+                                        logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
+                                        err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                                else:
+                                    err_msg='Invalid input: Row number more than row count'
+                                    local_tk.log.error('Invalid input: Row number more than row count')
+                                    logger.print_on_console('Invalid input: Row number more than row count')
                             else:
                                 for i in rows:
                                     if i.get_attribute(input_arr[5]) == row_number:
@@ -376,6 +424,14 @@ class TableOperationKeywords():
                                                     logger.print_on_console(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
                                                     logger.print_on_console('Actual value is : ',str(cellVal))
                                                     logger.print_on_console('Expected value is : ',str(expected_value))
+                                            else:
+                                                err_msg='Invalid input: Column not found'
+                                                local_tk.log.error('Invalid input: Column not found')
+                                                logger.print_on_console('Invalid input: Column not found')
+                                    else:
+                                        err_msg='Invalid input: Row not found'
+                                        local_tk.log.error('Invalid input: Row not found')
+                                        logger.print_on_console('Invalid input: Row not found')
                         else:
                             row_num=int(input_val[0])
                             col_num=int(input_val[1])
@@ -424,7 +480,6 @@ class TableOperationKeywords():
         224 Issue fixed : Invalid input are coming in getCellToolTip
         """
         def getCellToolTip(self,webElement,input_val,*args):
-            logger.print_on_console('Executing keyword : getCellToolTip')
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
             tooltip=None
@@ -481,7 +536,6 @@ class TableOperationKeywords():
 
 
         def verifyCellToolTip(self,webElement,input_val,*args):
-            logger.print_on_console('Executing keyword : verifyCellToolTip')
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
             verifytooltip=None
@@ -540,7 +594,6 @@ class TableOperationKeywords():
 
 #   lclicks on the given cell, if the table found with the given xpath
         def cellClick(self,webElement,input_arr,*args):
-            logger.print_on_console('Executing keyword : cellClick')
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
             err_msg=None
@@ -594,16 +647,37 @@ class TableOperationKeywords():
                                         coloumn_count = len(cells)
                                         if (coloumn_count>=col_number):
                                             try:
-                                                cells[col_number].click()
-                                                status=TEST_RESULT_PASS
-                                                methodoutput=TEST_RESULT_TRUE
+                                                if self.__check_visibility_from_config():
+                                                    local_tk.log.debug('performing java script click')
+                                                    js = 'var evType; element=arguments[0]; if (document.createEvent) {     evType = "Click executed through part-1";     var evt = document.createEvent("MouseEvents");     evt.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);   	setTimeout(function() {     	element.dispatchEvent(evt);     }, 100); } else {     evType = "Click executed through part-2";   	setTimeout(function() {     element.click();   	}, 100); } return (evType);'
+                                                    click=local_tk.driver.execute_script(js,cells[col_number])
+                                                    status=TEST_RESULT_PASS
+                                                    methodoutput=TEST_RESULT_TRUE
+                                                else:
+                                                    cells[col_number].click()
+                                                    status=TEST_RESULT_PASS
+                                                    methodoutput=TEST_RESULT_TRUE
                                             except:
                                                 try:
                                                     local_tk.driver.execute_script("arguments[0].scrollIntoView(true);arguments[0].click();", cells[col_number])
                                                     status=TEST_RESULT_PASS
                                                     methodoutput=TEST_RESULT_TRUE
-                                                except:pass
-                                    except:pass
+                                                except Exception as e:
+                                                    local_tk.log.error(e)
+                                                    logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
+                                                    err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                                        else:
+                                            err_msg='Invalid input: Col number more than col count'
+                                            local_tk.log.error('Invalid input: Col number more than col count')
+                                            logger.print_on_console('Invalid input: Col number more than col count')
+                                    except Exception as e:
+                                        local_tk.log.error(e)
+                                        logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
+                                        err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                                else:
+                                    err_msg='Invalid input: Row number more than row count'
+                                    local_tk.log.error('Invalid input: Row number more than row count')
+                                    logger.print_on_console('Invalid input: Row number more than row count')
                             else:
                                 for i in rows:
                                     if i.get_attribute(input_arr[4]) == row_number:
@@ -614,16 +688,35 @@ class TableOperationKeywords():
                                         for j in cells:
                                             if j.get_attribute(input_arr[5]) == col_number:
                                                 try:
-                                                    j.click()
-                                                    status=TEST_RESULT_PASS
-                                                    methodoutput=TEST_RESULT_TRUE
-                                                    break
+                                                    if self.__check_visibility_from_config():
+                                                        local_tk.log.debug('performing java script click')
+                                                        js = 'var evType; element=arguments[0]; if (document.createEvent) {     evType = "Click executed through part-1";     var evt = document.createEvent("MouseEvents");     evt.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);   	setTimeout(function() {     	element.dispatchEvent(evt);     }, 100); } else {     evType = "Click executed through part-2";   	setTimeout(function() {     element.click();   	}, 100); } return (evType);'
+                                                        click=local_tk.driver.execute_script(js,j)
+                                                        status=TEST_RESULT_PASS
+                                                        methodoutput=TEST_RESULT_TRUE
+                                                        break
+                                                    else:
+                                                        j.click()
+                                                        status=TEST_RESULT_PASS
+                                                        methodoutput=TEST_RESULT_TRUE
+                                                        break
                                                 except:
                                                     try:
                                                         local_tk.driver.execute_script("arguments[0].scrollIntoView(true);arguments[0].click(); ", j)
                                                         status=TEST_RESULT_PASS
                                                         methodoutput=TEST_RESULT_TRUE
-                                                    except:pass
+                                                    except Exception as e:
+                                                        local_tk.log.error(e)
+                                                        logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
+                                                        err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                                            else:
+                                                err_msg='Invalid input: Column not found'
+                                                local_tk.log.error('Invalid input: Column not found')
+                                                logger.print_on_console('Invalid input: Column not found')
+                                    else:
+                                        err_msg='Invalid input: Row not found'
+                                        local_tk.log.error('Invalid input: Row not found')
+                                        logger.print_on_console('Invalid input: Row not found')
                         elif len(input_arr)==2:
                             local_tk.log.info('normal cell click')
                             #logger.print_on_console('normal cell click inside the cell')
@@ -865,7 +958,6 @@ class TableOperationKeywords():
 
 
         def doubleCellClick(self,webElement,input_arr,*args):
-            logger.print_on_console('Executing keyword : doubleCellClick')
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
             err_msg=None
@@ -1064,7 +1156,6 @@ class TableOperationKeywords():
             return status,methodoutput,output_val,err_msg
 
         def getRowNumByText(self,webElement,input_val,*args):
-            logger.print_on_console('Executing keyword : getRowNumByText')
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
             row_number=None
@@ -1120,6 +1211,10 @@ class TableOperationKeywords():
                             if row_number:
                                 status=TEST_RESULT_PASS
                                 methodoutput=TEST_RESULT_TRUE
+                            else:
+                                err_msg = 'Error in fetching Row number'
+                                local_tk.log.info('Error in fetching Row number')
+                                logger.print_on_console('Error in fetching Row number')
                         else:
                             js='var temp = fun(arguments[0], arguments[1]); return temp; function fun(table, str) {     var m = [],         row, cell, xx, tx, ty, xxx, yyy, child;     for (yyy = 0; yyy < table.rows.length; yyy++) {         row = table.rows[yyy];         for (xxx = 0; xxx < row.cells.length; xxx++) {             cell = row.cells[xxx];             xx = xxx;             for (; m[yyy] && m[yyy][xx]; ++xx) {}             for (tx = xx; tx < xx + cell.colSpan; ++tx) {                 for (ty = yyy; ty < yyy + cell.rowSpan; ++ty) {                     if (!m[ty]) m[ty] = [];                     m[ty][tx] = true;                 }             }             if (cell.innerText.indexOf(str)>= 0) return yyy + cell.rowSpan;             else if (cell.children.length > 0) {                 for (var i = 0; i < cell.children.length; i++) {                     child = cell.children[i];                     if (child.value == str) return yyy + cell.rowSpan; 					else{ 					var a=child.value; 					if(a){ 					var b=a; 					if(b.indexOf(str)>=0)return yyy + cell.rowSpan; 					}	 				}			 					                 }             }         }     }     return null; };'
                             row_number=browser_Keywords.local_bk.driver_obj.execute_script(js,webElement,text)
@@ -1139,7 +1234,6 @@ class TableOperationKeywords():
                             local_tk.log.info('Got the result : %s',str(row_number))
                             logger.print_on_console('Got the result : ',str(row_number))
                         else:
-
                             logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
                             err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
                 else:
@@ -1151,7 +1245,6 @@ class TableOperationKeywords():
             return status,methodoutput,row_number,err_msg
 
         def getColNumByText(self,webElement,input_val,*args):
-            logger.print_on_console('Executing keyword : getColNumByText')
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
             col_number=None
@@ -1207,6 +1300,10 @@ class TableOperationKeywords():
                             if col_number:
                                 status=TEST_RESULT_PASS
                                 methodoutput=TEST_RESULT_TRUE
+                            else:
+                                err_msg = 'Error in fetching Col number'
+                                local_tk.log.info('Error in fetching Col number')
+                                logger.print_on_console('Error in fetching Row number')
                         else:
                             js='var temp = fun(arguments[0], arguments[1]); return temp; function fun(table, str) {     var m = [],         row, cell, xx, tx, ty, xxx, yyy, child;     for (yyy = 0; yyy < table.rows.length; yyy++) {         row = table.rows[yyy];         for (xxx = 0; xxx < row.cells.length; xxx++) {             cell = row.cells[xxx];             xx = xxx;             for (; m[yyy] && m[yyy][xx]; ++xx) {}             for (tx = xx; tx < xx + cell.colSpan; ++tx) {                 for (ty = yyy; ty < yyy + cell.rowSpan; ++ty) {                     if (!m[ty]) m[ty] = [];                     m[ty][tx] = true;                 }             }             if (cell.innerText.indexOf(str)>= 0 && cell.innerText.length === str.length) return xx + cell.colSpan;             else if (cell.children.length > 0) {                 for (var i = 0; i < cell.children.length; i++) {                     child = cell.children[i];   var sap=child.value;  var check_match=sap;                if (str === check_match) return xx + cell.colSpan; 							 					                 }             }         }     }     return null; };'
                             col_number=local_tk.driver.execute_script(js,webElement,text)
@@ -1227,9 +1324,8 @@ class TableOperationKeywords():
                             local_tk.log.info('Got the result : %s',str(col_number))
                             logger.print_on_console('Got the result : ',str(col_number))
                         else:
-
-
-                            err_msg=e
+                            logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
+                            err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
                 else:
                     local_tk.log.info(ERROR_CODE_DICT['ERR_HIDDEN_OBJECT'])
                     err_msg = ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
@@ -1404,7 +1500,6 @@ class TableOperationKeywords():
 
 
         def verticalScroll(self,webElement,input,*args):
-            logger.print_on_console('Executing keyword : verticalScroll')
             local_tk.driver=browser_Keywords.local_bk.driver_obj
             local_tk.log.debug('got the driver instance from browser keyword')
             status=TEST_RESULT_FAIL
@@ -1473,7 +1568,6 @@ class TableOperationKeywords():
 
 
         def horizontalScroll(self,webElement,input,*args):
-            logger.print_on_console('Executing keyword : horizontalScroll')
             local_tk.driver=browser_Keywords.local_bk.driver_obj
             local_tk.log.debug('got the driver instance from browser keyword')
             status=TEST_RESULT_FAIL
@@ -1512,14 +1606,14 @@ class TableOperationKeywords():
                                 if direction.lower() == 'left':
                                     times = (times * (-4))
                                     mouse = Controller()
-                                    mouse.position = (int(loc.get('x')) + 100, int(loc.get('y') + size.get('height') + 150))
+                                    # mouse.position = (int(loc.get('x')) + 100, int(loc.get('y') + size.get('height') + 150))
                                     time.sleep(1)
                                     mouse.scroll(times,0)
                                     del mouse
                                 elif direction.lower() == 'right':
                                     times = (times * 4)
                                     mouse = Controller()
-                                    mouse.position = (int(loc.get('x')) + 100, int(loc.get('y') + size.get('height') + 150))
+                                    # mouse.position = (int(loc.get('x')) + 100, int(loc.get('y') + size.get('height') + 150))
                                     time.sleep(1)
                                     mouse.scroll(times,0)
                                     del mouse
