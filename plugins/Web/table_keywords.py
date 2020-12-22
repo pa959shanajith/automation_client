@@ -1519,47 +1519,67 @@ class TableOperationKeywords():
                             # size = container.size
                             # local_tk.log.debug("Mouse hover at location:"+str(int(loc.get('x')) + 100)+","+str(int(loc.get('y') + size.get('height') + 150)))
                             direction = input[0]
-                            times = int(input[1])
-                            if SYSTEM_OS == "Windows":
-                                user32 = windll.user32
-                                # user32.SetCursorPos(int(loc.get('x')) + 100, int(loc.get('y') + size.get('height') + 150))
-                                time.sleep(1)
-                                if direction.lower() == 'up':
-                                    for i in range(times):
-                                        user32.mouse_event(0x0800, None, None, 400, None)
-                                elif direction.lower() == 'down':
-                                    for i in range(times):
-                                        user32.mouse_event(0x0800, None, None, -400, None)
+                            try:
+                                times = int(input[1])
+                            except:
+                                times = 0
+                                err_msg='Invalid input: "times" should be a non-zero integer'
+                                local_tk.log.error('Invalid input: "times" should be a non-zero integer')
+                                logger.print_on_console('Invalid input: "times" should be a non-zero integer')
+                            if times > 0:
+                                if SYSTEM_OS == "Windows":
+                                    user32 = windll.user32
+                                    # user32.SetCursorPos(int(loc.get('x')) + 100, int(loc.get('y') + size.get('height') + 150))
+                                    time.sleep(1)
+                                    if direction.lower() == 'up':
+                                        for i in range(times):
+                                            user32.mouse_event(0x0800, None, None, 400, None)
+                                        status=TEST_RESULT_PASS
+                                        methodoutput=TEST_RESULT_TRUE
+                                    elif direction.lower() == 'down':
+                                        for i in range(times):
+                                            user32.mouse_event(0x0800, None, None, -400, None)
+                                        status=TEST_RESULT_PASS
+                                        methodoutput=TEST_RESULT_TRUE
+                                    else:
+                                        err_msg='Direction given is incorrect'
+                                        local_tk.log.error('Direction given is incorrect')
+                                        logger.print_on_console('Direction given is incorrect')
                                 else:
-                                    err_msg='Direction given is incorrect'
-                                    local_tk.log.error('Direction given is incorrect')
-                                    logger.print_on_console('Direction given is incorrect')
+                                    if direction.lower() == 'down':
+                                        times = (times * (-4))
+                                        mouse = Controller()
+                                        mouse.position = (int(loc.get('x')) + 100, int(loc.get('y') + size.get('height') + 150))
+                                        time.sleep(1)
+                                        mouse.scroll(0, times)
+                                        del mouse
+                                        status=TEST_RESULT_PASS
+                                        methodoutput=TEST_RESULT_TRUE
+                                    elif direction.lower() == 'up':
+                                        times = (times * 4)
+                                        mouse = Controller()
+                                        mouse.position = (int(loc.get('x')) + 100, int(loc.get('y') + size.get('height') + 150))
+                                        time.sleep(1)
+                                        mouse.scroll(0, times)
+                                        del mouse
+                                        status=TEST_RESULT_PASS
+                                        methodoutput=TEST_RESULT_TRUE
+                                    else:
+                                        err_msg='Direction given is incorrect'
+                                        local_tk.log.error('Direction given is incorrect')
+                                        logger.print_on_console('Direction given is incorrect')
                             else:
-                                if direction.lower() == 'down':
-                                    times = (times * (-4))
-                                    mouse = Controller()
-                                    mouse.position = (int(loc.get('x')) + 100, int(loc.get('y') + size.get('height') + 150))
-                                    time.sleep(1)
-                                    mouse.scroll(0, times)
-                                    del mouse
-                                elif direction.lower() == 'up':
-                                    times = (times * 4)
-                                    mouse = Controller()
-                                    mouse.position = (int(loc.get('x')) + 100, int(loc.get('y') + size.get('height') + 150))
-                                    time.sleep(1)
-                                    mouse.scroll(0, times)
-                                    del mouse
-
-                            status=TEST_RESULT_PASS
-                            methodoutput=TEST_RESULT_TRUE
+                                err_msg='Invalid input: "times" should be a non-zero integer'
+                                local_tk.log.error('Invalid input: "times" should be a non-zero integer')
+                                logger.print_on_console('Invalid input: "times" should be a non-zero integer')
                     else:
                         err_msg='Element not found'
                         local_tk.log.error('Element not found')
                         logger.print_on_console('Element not found')
                 except Exception as e:
-                    local_tk.log.error(e, exc_info = True)
-                    logger.print_on_console(e)
-                    err_msg = ERROR_CODE_DICT['MSG_ELEMENT_NOT_FOUND']
+                    local_tk.log.error(e,exc_info=True)
+                    logger.print_on_console("Error while scrolling")
+                    err_msg = "Error while scrolling"
             else:
                 local_tk.log.info(ERROR_CODE_DICT['ERR_HIDDEN_OBJECT'])
                 err_msg = ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
@@ -1587,51 +1607,67 @@ class TableOperationKeywords():
                             # size = container.size
                             # local_tk.log.debug("Mouse hover at location:"+str(int(loc.get('x')) + 100)+","+str(int(loc.get('y') + size.get('height') + 150)))
                             direction = input[0]
-                            times = int(input[1])
-                            if SYSTEM_OS == "Windows":
-                                user32 = windll.user32
-                                # user32.SetCursorPos(int(loc.get('x')) + 100, int(loc.get('y') + size.get('height') + 150))
-                                time.sleep(1)
-                                if direction.lower() == 'right':
-                                    for i in range(times):
-                                        user32.mouse_event(0x01000, None, None, 400, None)
-                                elif direction.lower() == 'left':
-                                    for i in range(times):
-                                        user32.mouse_event(0x01000, None, None, -400, None)
+                            try:
+                                times = int(input[1])
+                            except:
+                                times = 0
+                                err_msg='Invalid input: "times" should be a non-zero integer'
+                                local_tk.log.error('Invalid input: "times" should be a non-zero integer')
+                                logger.print_on_console('Invalid input: "times" should be a non-zero integer')
+                            if times > 0:
+                                if SYSTEM_OS == "Windows":
+                                    user32 = windll.user32
+                                    # user32.SetCursorPos(int(loc.get('x')) + 100, int(loc.get('y') + size.get('height') + 150))
+                                    time.sleep(1)
+                                    if direction.lower() == 'right':
+                                        for i in range(times):
+                                            user32.mouse_event(0x01000, None, None, 400, None)
+                                            status=TEST_RESULT_PASS
+                                            methodoutput=TEST_RESULT_TRUE
+                                    elif direction.lower() == 'left':
+                                        for i in range(times):
+                                            user32.mouse_event(0x01000, None, None, -400, None)
+                                            status=TEST_RESULT_PASS
+                                            methodoutput=TEST_RESULT_TRUE
+                                    else:
+                                        err_msg='Direction given is incorrect'
+                                        local_tk.log.error('Direction given is incorrect')
+                                        logger.print_on_console('Direction given is incorrect')
                                 else:
-                                    err_msg='Direction given is incorrect'
-                                    local_tk.log.error('Direction given is incorrect')
-                                    logger.print_on_console('Direction given is incorrect')
+                                    if direction.lower() == 'left':
+                                        times = (times * (-4))
+                                        mouse = Controller()
+                                        # mouse.position = (int(loc.get('x')) + 100, int(loc.get('y') + size.get('height') + 150))
+                                        time.sleep(1)
+                                        mouse.scroll(times,0)
+                                        del mouse
+                                        status=TEST_RESULT_PASS
+                                        methodoutput=TEST_RESULT_TRUE
+                                    elif direction.lower() == 'right':
+                                        times = (times * 4)
+                                        mouse = Controller()
+                                        # mouse.position = (int(loc.get('x')) + 100, int(loc.get('y') + size.get('height') + 150))
+                                        time.sleep(1)
+                                        mouse.scroll(times,0)
+                                        del mouse
+                                        status=TEST_RESULT_PASS
+                                        methodoutput=TEST_RESULT_TRUE
+                                    else:
+                                        err_msg='Direction given is incorrect'
+                                        local_tk.log.error('Direction given is incorrect')
+                                        logger.print_on_console('Direction given is incorrect')
                             else:
-                                if direction.lower() == 'left':
-                                    times = (times * (-4))
-                                    mouse = Controller()
-                                    # mouse.position = (int(loc.get('x')) + 100, int(loc.get('y') + size.get('height') + 150))
-                                    time.sleep(1)
-                                    mouse.scroll(times,0)
-                                    del mouse
-                                elif direction.lower() == 'right':
-                                    times = (times * 4)
-                                    mouse = Controller()
-                                    # mouse.position = (int(loc.get('x')) + 100, int(loc.get('y') + size.get('height') + 150))
-                                    time.sleep(1)
-                                    mouse.scroll(times,0)
-                                    del mouse
-                                else:
-                                    err_msg='Direction given is incorrect'
-                                    local_tk.log.error('Direction given is incorrect')
-                                    logger.print_on_console('Direction given is incorrect')
-
-                            status=TEST_RESULT_PASS
-                            methodoutput=TEST_RESULT_TRUE
+                                err_msg='Invalid input: "times" should be a non-zero integer'
+                                local_tk.log.error('Invalid input: "times" should be a non-zero integer')
+                                logger.print_on_console('Invalid input: "times" should be a non-zero integer')
                     else:
                         err_msg='Element not found'
                         local_tk.log.error('Element not found')
                         logger.print_on_console('Element not found')
                 except Exception as e:
                     local_tk.log.error(e,exc_info=True)
-                    logger.print_on_console(e)
-                    err_msg = ERROR_CODE_DICT['MSG_ELEMENT_NOT_FOUND']
+                    logger.print_on_console("Error while scrolling")
+                    err_msg = "Error while scrolling"
             else:
                 local_tk.log.info(ERROR_CODE_DICT['ERR_HIDDEN_OBJECT'])
                 err_msg = ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
