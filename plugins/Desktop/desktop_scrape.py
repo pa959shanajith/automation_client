@@ -114,7 +114,10 @@ class ScrapeWindow(wx.Frame):
             elif ( verify_pname == 'fail' ):
                 self.socketIO.emit('scrape', 'Fail')
                 logger.print_on_console( 'Wrong Window Name, Please check the Window Name and provide valid one' )
+                self.Hide()
+                time.sleep(1)
                 self.parent.schedule.Enable()
+                self.Close()
             else:
                 self.socketIO.emit('scrape', 'Fail')
                 logger.print_on_console( 'Wrong Process Id, Please check the Process Id and provide valid one' )
