@@ -154,7 +154,6 @@ class BrowserKeywords():
                         pid = pidchromium.pid
                         local_bk.pid_set.append(pid)
                     hwndg = utilobject.bring_Window_Front(pid)
-                    if pid not in controller.process_ids: controller.process_ids.append(pid)
                 self.update_pid_set(enableSecurityFlag)
                 local_bk.webdriver_list.append(local_bk.driver_obj)
                 local_bk.parent_handle =  None
@@ -606,8 +605,6 @@ class BrowserKeywords():
                 logger.print_on_console('browser closed')
                 local_bk.log.info('browser closed')
                 ## Issue #190 Driver control won't switch back to parent window
-                for id in local_bk.pid_set:
-                    if id in controller.process_ids: controller.process_ids.remove(id) 
                 del drivermap[:]
                 del local_bk.webdriver_list[:]
                 del local_bk.pid_set[:]
@@ -835,7 +832,6 @@ class BrowserKeywords():
                 pidchromium = p.children()[0]
                 pid = pidchromium.pid
                 local_bk.pid_set.append(pid)
-            if pid not in controller.process_ids: controller.process_ids.append(pid)
             hwndg = utilobject.bring_Window_Front(pid)
 
     def switch_to_window(self,webelement,input,*args):
