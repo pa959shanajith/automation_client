@@ -182,6 +182,9 @@ class OebsDispatcher:
                   'verifydisabled':self.oebs_keywords.verifydisabled,
                   'verifyenabled':self.oebs_keywords.verifyenabled,
                   'setfocus':self.oebs_keywords.setfocus,
+                  #added for the issue #8010 Azure.
+                  'getallvalues':self.oebs_keywords.getallvalues,
+                  'setsecuretext':self.oebs_keywords.setsecuretext,
 
                   'cleartext':self.oebs_keywords.cleartext,
                   'verifytext':self.oebs_keywords.verifytext,
