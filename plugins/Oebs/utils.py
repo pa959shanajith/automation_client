@@ -358,6 +358,9 @@ class Utils:
             else:
                 if  self.getWindowText(ancestor)!=None and len(self.getWindowText(ancestor))>0:
                     image=self.capture_window( ancestor)
+                elif self.getWindowText(window_handle)!=None and len(self.getWindowText(window_handle))>0:
+                    win32gui.SetForegroundWindow(window_handle)
+                    image=self.capture_window(window_handle)
                 elif self.getWindowText(parent)!=None and len(self.getWindowText(parent))>0:
                     image=self.capture_window(parent)
             if image==None:
