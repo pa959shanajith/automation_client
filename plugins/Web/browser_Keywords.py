@@ -29,6 +29,7 @@ import psutil
 import readconfig
 import core_utils
 import time
+import controller
 from sendfunction_keys import SendFunctionKeys as SF
 driver_pre = None
 drivermap = []
@@ -1035,6 +1036,7 @@ class Singleton_DriverUtil():
                     driver = webdriver.Chrome(executable_path=exec_path,chrome_options=choptions)
                     # driver.navigate().refresh()
                     ##driver = webdriver.Chrome(desired_capabilities= choptions.to_capabilities(), executable_path = exec_path)
+                    controller.process_ids.append(driver.service.process.pid)
                     drivermap.append(driver)
                     driver.maximize_window()
                     msg = ('Headless ' if headless_mode else '') + 'Chrome browser started'
@@ -1067,6 +1069,7 @@ class Singleton_DriverUtil():
                     else:
                         driver = webdriver.Firefox(capabilities=caps, executable_path=exec_path,options=firefox_options)
                     # driver.navigate().refresh()
+                    controller.process_ids.append(driver.service.process.pid)
                     drivermap.append(driver)
                     driver.maximize_window()
                     msg = ('Headless ' if headless_mode else '') + 'Firefox browser started'
@@ -1094,6 +1097,7 @@ class Singleton_DriverUtil():
                 else:
                     iepath = webconstants.IE_DRIVER_PATH_64
                 driver = webdriver.Ie(capabilities=caps,executable_path=iepath)
+                controller.process_ids.append(driver.service.process.pid)
                 # browser_ver=driver.capabilities['version']
                 # browser_ver1 = browser_ver.encode('utf-8')
                 # browser_ver = int(browser_ver1)
@@ -1116,6 +1120,7 @@ class Singleton_DriverUtil():
         elif(browser_num == '4'):
             try:
                 driver = webdriver.Opera()
+                controller.process_ids.append(driver.service.process.pid)
                 drivermap.append(driver)
                 logger.print_on_console('Opera browser started')
             except Exception as e:
@@ -1124,7 +1129,8 @@ class Singleton_DriverUtil():
 
         elif(browser_num == '5'):
             try:
-                driver = webdriver.PhantomJS(executable_path=webconstants.PHANTOM_DRIVER_PATH)
+                driver = webdriver.PhantomJS(executable_path=webconstants.PHANTOM_DRIVER_PATH)                    
+                controller.process_ids.append(driver.service.process.pid)
                 drivermap.append(driver)
                 logger.print_on_console('Phantom browser started')
             except Exception as e:
@@ -1134,6 +1140,7 @@ class Singleton_DriverUtil():
         elif(browser_num == '6'):
             try:
                 driver = webdriver.Safari()
+                controller.process_ids.append(driver.service.process.pid)
                 driver.maximize_window()
                 drivermap.append(driver)
 
@@ -1182,6 +1189,7 @@ class Singleton_DriverUtil():
                     if SYSTEM_OS == "Darwin":
                         caps1['platform'] = 'MAC'
                     driver = webdriver.Edge(capabilities=caps1,executable_path=chromium_path)
+                    controller.process_ids.append(driver.service.process.pid)
                     drivermap.append(driver)
                     driver.maximize_window()
                     logger.print_on_console('Edge Chromium browser started')
