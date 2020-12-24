@@ -33,6 +33,7 @@ if SYSTEM_OS!='Darwin':
 import readconfig
 import device_keywords_MW
 import core_utils
+import controller
 #New Thread to navigate to given url for the keyword 'naviagteWithAut'
 class TestThread(threading.Thread):
     """Test Worker Thread Class."""
@@ -74,6 +75,7 @@ class BrowserKeywords():
                 path = curdir + '/plugins/Mobility/MobileApp/node_modules/appium/build/lib/main.js'
                 nodePath = os.environ["AVO_ASSURE_HOME"] + "/Lib/Drivers/node.exe"
                 proc = subprocess.Popen([nodePath, path], shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)
+                controller.process_ids.append(proc.pid)
                 start = time.time()
                 timeout = 120 #tentative; as it depends on the system performance.
                 server_flag = False
@@ -99,6 +101,7 @@ class BrowserKeywords():
                 path = curdir + '/plugins/Mobility/MobileApp/node_modules/appium/build/lib/main.js'
                 nodePath = curdir + '/plugins/Mobility/MobileApp/node_modules/node_appium'
                 proc = subprocess.Popen([nodePath, path], shell=False, stdin=None, stdout=None, stderr=None, close_fds=True)
+                controller.process_ids.append(proc.pid)
                 time.sleep(25) # psutil.net_connections() doesn't work on Mac, insearch of alternatives
                 logger.print_on_console('Browser session started')
                 return True
@@ -849,6 +852,7 @@ class Singleton_DriverUtil():
             choptions.add_argument('start-maximized')
             choptions.add_argument('--disable-extensions')
             driver = webdriver.Chrome(chrome_options=choptions, executable_path=chrome_path)
+            controller.process_ids.append(driver.service.process.pid)
             drivermap.append(driver)
             logger.print_on_console('Chrome browser started')
             log.info('Chrome browser started')
@@ -896,6 +900,7 @@ class Singleton_DriverUtil():
                 # opening firefox browser through selenium if the version 47 and less than 47
                 if int(version) < 48:
                     driver = webdriver.Firefox()
+                    controller.process_ids.append(driver.service.process.pid)
                     drivermap.append(driver)
                     driver.maximize_window()
                     logger.print_on_console('Firefox browser started')
@@ -904,6 +909,7 @@ class Singleton_DriverUtil():
                     caps=webdriver.DesiredCapabilities.FIREFOX
                     caps['marionette'] = True
                     driver = webdriver.Firefox(capabilities=caps,executable_path=webconstants_MW.GECKODRIVER_PATH)
+                    controller.process_ids.append(driver.service.process.pid)
                     drivermap.append(driver)
                     driver.maximize_window()
                     logger.print_on_console('geckodriver started')
@@ -926,6 +932,7 @@ class Singleton_DriverUtil():
             else:
                 iepath = webconstants_MW.IE_DRIVER_PATH_64
             driver = webdriver.Ie(capabilities=caps,executable_path=iepath)
+            controller.process_ids.append(driver.service.process.pid)
             drivermap.append(driver)
             driver.maximize_window()
             logger.print_on_console('IE browser started')
@@ -933,16 +940,19 @@ class Singleton_DriverUtil():
 
         elif(browser_num == '4'):
             driver = webdriver.Opera()
+            controller.process_ids.append(driver.service.process.pid)
             drivermap.append(driver)
             logger.print_on_console('Opera browser started')
 
         elif(browser_num == '5'):
             driver = webdriver.PhantomJS(executable_path=webconstants_MW.PHANTOM_DRIVER_PATH)
+            controller.process_ids.append(driver.service.process.pid)
             drivermap.append(driver)
             logger.print_on_console('Phantom browser started')
 
         elif(browser_num == '6'):
             driver = webdriver.Safari()
+            controller.process_ids.append(driver.service.process.pid)
             drivermap.append(driver)
             logger.print_on_console('Safari browser started')
             log.info('Safari browser started')

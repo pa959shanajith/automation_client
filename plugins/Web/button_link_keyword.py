@@ -110,11 +110,15 @@ class ButtonLinkKeyword():
                                 # Js="""function clickon(x,y){var ev=document.createEvent("MouseEvent");var el=document.elementFromPoint(x,y);ev.initMouseEvent("click",true,true,window,null,x,y,0,0,false,false,false,false,0,null);el.dispatchEvent(ev);} arguments[0].clickon(arguments[1],arguments[2])"""
                                 # browser_Keywords.local_bk.driver_obj.execute_script(Js,webelement,x_coord,y_coord)
                             else:
-                                clickinfo = browser_Keywords.local_bk.driver_obj.execute_script(webconstants.CLICK_JAVASCRIPT,webelement)
-                                local_blk.log.info('Click operation performed using javascript click')
-                                local_blk.log.info(STATUS_METHODOUTPUT_UPDATE)
-                                status = webconstants.TEST_RESULT_PASS
-                                methodoutput = webconstants.TEST_RESULT_TRUE
+                                clickinfo = browser_Keywords.local_bk.driver_obj.execute_async_script(webconstants.CLICK_JAVASCRIPT,webelement)
+                                if clickinfo is not None:
+                                    status = webconstants.TEST_RESULT_PASS
+                                    methodoutput = webconstants.TEST_RESULT_TRUE
+                                    local_blk.log.info('Click operation performed using javascript click')
+                                    local_blk.log.info(STATUS_METHODOUTPUT_UPDATE)
+                                else:
+                                    raise Exception("Element not pressable")
+                                
                         except Exception as e:
                             # local_blk.log.info('Click operation performed using javascript click')
                             # local_blk.log.error('selenium click  error occured, Trying to click using Javascript')
@@ -127,9 +131,15 @@ class ButtonLinkKeyword():
                     local_blk.log.info(WEB_ELEMENT_DISABLED)
                     err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
         except Exception as e:
-            local_blk.log.error(e)
-            logger.print_on_console(e)
-            err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+            if clickinfo is None: 
+                err_msg=ERROR_CODE_DICT['CLICKABLE_EXCEPTION']
+                local_blk.log.error('Element not pressable')
+                logger.print_on_console('Element not pressable')
+            else: 
+                err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                local_blk.log.error(e)
+                logger.print_on_console(e)
+            
         local_blk.log.info(RETURN_RESULT)
         return status,methodoutput,output,err_msg
 

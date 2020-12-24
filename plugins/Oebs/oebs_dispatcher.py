@@ -121,6 +121,7 @@ class OebsDispatcher:
                   'getobjectforcustom' : self.oebs_keywords.getobjectforcustom,
                   'drop'    : self.oebs_keywords.drop,
                   'drag'     : self.oebs_keywords.drag,
+                  'mousehover'     : self.oebs_keywords.mousehover,
                   'waitforelementvisible'  : self.oebs_keywords.waitforelementvisible,
                   'toggleminimize' : self.oebs_keywords.toggleminimize,
                   'togglemaximize'      : self.oebs_keywords.togglemaximize,
@@ -174,6 +175,7 @@ class OebsDispatcher:
                   'rightclick':self.oebs_keywords.rightclick,
                   'verifydoesnotexists':self.oebs_keywords.verifydoesnotexists,
                   'verifyexists':self.oebs_keywords.verifyexists,
+                  'verifyelementexists':self.oebs_keywords.verifyelementexists,
                   'gettooltiptext':self.oebs_keywords.gettooltiptext,
                   'verifytooltiptext':self.oebs_keywords.verifytooltiptext,
                   'verifyreadonly':self.oebs_keywords.verifyreadonly,
@@ -182,6 +184,9 @@ class OebsDispatcher:
                   'verifydisabled':self.oebs_keywords.verifydisabled,
                   'verifyenabled':self.oebs_keywords.verifyenabled,
                   'setfocus':self.oebs_keywords.setfocus,
+                  #added for the issue #8010 Azure.
+                  'getallvalues':self.oebs_keywords.getallvalues,
+                  'setsecuretext':self.oebs_keywords.setsecuretext,
 
                   'cleartext':self.oebs_keywords.cleartext,
                   'verifytext':self.oebs_keywords.verifytext,
