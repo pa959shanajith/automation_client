@@ -620,6 +620,7 @@ class UtilWebKeywords:
                         self.generic_sendfucntion_keys(input[0],input[1])
                     else:
                         self.generic_sendfucntion_keys(input[0],*args)
+                browser_Keywords.BrowserKeywords.update_window_handles()
                 status=TEST_RESULT_PASS
                 methodoutput=TEST_RESULT_TRUE
         except Exception as e:
