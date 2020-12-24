@@ -233,6 +233,8 @@ class BrowserKeywords():
             h=local_bk.driver_obj.current_window_handle
             local_bk.all_handles.append(h)
             local_bk.recent_handles.append(h)
+            if isinstance(local_bk.driver_obj,webdriver.Ie):
+                local_bk.driver_obj.maximize_window()
             status=webconstants.TEST_RESULT_PASS
             result=webconstants.TEST_RESULT_TRUE
         except Exception as e:
@@ -871,6 +873,14 @@ class BrowserKeywords():
                         local_bk.log.info('Switched to window handle '+str(local_bk.driver_obj.current_window_handle))
                         logger.print_on_console('Control switched from window ' + str(from_window)
     							+ " to window " + str(to_window))
+                        if isinstance(local_bk.driver_obj,webdriver.Ie):
+                            win_name=local_bk.driver_obj.title
+                            if win_name == '':
+                                win_name='Blank Page'
+                            hwnd=win32gui.FindWindow(None, win_name+" - Internet Explorer")
+                            if hwnd==0:
+                                hwnd=win32gui.FindWindow(None, win_name+" - Windows Internet Explorer")
+                            win32gui.SetForegroundWindow(hwnd)
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
                     else:
