@@ -156,7 +156,7 @@ class QcWindow():
                         testruns = [{'id':j['id'],'name':j['name']} for j in resp1]
                     newObj['testsuites'].append({'id':i['id'],'name':i['name'],'testruns':testruns})
                 # newObj[cycle['name']] = [{'name':i['name'],'id':i['id']} for i in cycle['test-suites']]
-                res.append(newObj)
+            res.append(newObj)
         except Exception as e:
             err_msg = 'Error while fetching testsuites from qTest'
             log.error(err_msg)
@@ -168,6 +168,12 @@ class QcWindow():
         status = False
         stepLength = None
         try:
+            if(self.Qc_Url == None) :
+                qtestLoginLoad = {}
+                qtestLoginLoad["qcUsername"] = data['qcusername']
+                qtestLoginLoad["qcPassword"] = data['qcpassword']
+                qtestLoginLoad["qcURL"] = data['qcurl']
+                self.login(qtestLoginLoad)
             updateRequest = {}
             updateRequest['submittedBy'] = data['user']
             if data['qc_status_over']['overallstatus'].lower() == "pass":
