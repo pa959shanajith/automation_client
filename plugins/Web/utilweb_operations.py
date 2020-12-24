@@ -943,7 +943,7 @@ class UtilWebKeywords:
             if webelement != None and webelement !='':
                 local_uo.log.info(INPUT_IS)
                 local_uo.log.info(input)
-                if len(input)<3 and attr_name:
+                if attr_name:
                     if attr_name != 'required':
                         output = webelement.get_attribute(attr_name)
                     else:
@@ -971,7 +971,7 @@ class UtilWebKeywords:
                         logger.print_on_console(err_msg)
                         local_uo.log.error(err_msg)
                 else:
-                    err_msg = 'Input is empty/Number of inputs exceeded'
+                    err_msg = 'Input is empty.'
                     logger.print_on_console(err_msg)
                     local_uo.log.error(err_msg)
         except NoSuchAttributeException as ex:
