@@ -822,6 +822,7 @@ class DropdownKeywords():
         status=webconstants_MW.TEST_RESULT_FAIL
         result=webconstants_MW.TEST_RESULT_FALSE
         visibilityFlag=True
+        inputEmptyFlag=True
         verb = OUTPUT_CONSTANT
         err_msg=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
@@ -830,13 +831,15 @@ class DropdownKeywords():
             is_visble=utilobj.is_visible(webelement)
             if len(args)>0 and args[0] != '':
                 visibilityFlag=args[0]
+            if len(input)>0 and input[0]=='':
+                inputEmptyFlag = False
             if ((webelement.is_enabled())):
                 log.info('Recieved web element from the web dispatcher')
                 if not(visibilityFlag=='yes' and is_visble):
                     try:
                         # performing js code
                         log.debug('element is invisible, performing js code')
-                        if input is not None and len(input) != 0:
+                        if input is not None and len(input) != 0 and inputEmptyFlag:
                                 flag = False
                                 log.info('userinput count is')
                                 log.info(len(input))
@@ -1145,6 +1148,7 @@ class DropdownKeywords():
         status=webconstants_MW.TEST_RESULT_FAIL
         result=webconstants_MW.TEST_RESULT_FALSE
         visibilityFlag=True
+        inputEmptyFlag=True
         output = None
         err_msg=None
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
@@ -1153,13 +1157,15 @@ class DropdownKeywords():
             is_visble=utilobj.is_visible(webelement)
             if len(args)>0 and args[0] != '':
                 visibilityFlag=args[0]
+            if len(input)>0 and input[0]=='':
+                inputEmptyFlag = False
             ##if ((webelement.is_enabled())):
             log.info('Recieved web element from the web dispatcher')
             if not(visibilityFlag=='yes' and is_visble):
                 try:
                     # performing js code
                     log.debug('element is invisible, performing js code')
-                    if input is not None and len(input) != 0:
+                    if input is not None and len(input) != 0 and inputEmptyFlag:
                         flag = False
                         resultoptions = []
                         log.info('userinput count is')
