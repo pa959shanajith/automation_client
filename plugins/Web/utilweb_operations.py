@@ -880,10 +880,23 @@ class UtilWebKeywords:
         attr_name=input[0]
         local_uo.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
+            if(len(input)==3):
+                row_number=int(input[1])-1
+                col_number=int(input[2])-1
+                from table_keywords import TableOperationKeywords
+                tableops = TableOperationKeywords()
+                cell=tableops.javascriptExecutor(webelement,row_number,col_number)
+                element_list=cell.find_elements_by_xpath('.//*')
+                if len(list(element_list))>0:
+                    xpath=tableops.getElemntXpath(element_list[0])
+                    cell=browser_Keywords.local_bk.driver_obj.find_element_by_xpath(xpath)
+                if(cell!=None):
+                    webelement=cell
+
             if webelement != None and webelement !='':
                 local_uo.log.info(INPUT_IS)
                 local_uo.log.info(input)
-                if len(input)<2 and attr_name:
+                if attr_name:
                     if attr_name != 'required':
                         output = webelement.get_attribute(attr_name)
                     else:
@@ -897,7 +910,7 @@ class UtilWebKeywords:
                         logger.print_on_console(err_msg)
                         local_uo.log.error(err_msg)
                 else:
-                    err_msg = 'Failed to fetch the attribute value/Number of inputs exceeded'
+                    err_msg = 'Failed to fetch the attribute value.'
                     logger.print_on_console(err_msg)
                     local_uo.log.error(err_msg)
         except Exception as e:
@@ -914,6 +927,19 @@ class UtilWebKeywords:
         attr_name=input[0]
         local_uo.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
+            if(len(input)==4):
+                row_number=int(input[2])-1
+                col_number=int(input[3])-1
+                from table_keywords import TableOperationKeywords
+                tableops = TableOperationKeywords()
+                cell=tableops.javascriptExecutor(webelement,row_number,col_number)
+                element_list=cell.find_elements_by_xpath('.//*')
+                if len(list(element_list))>0:
+                    xpath=tableops.getElemntXpath(element_list[0])
+                    cell=browser_Keywords.local_bk.driver_obj.find_element_by_xpath(xpath)
+                if(cell!=None):
+                    webelement=cell
+
             if webelement != None and webelement !='':
                 local_uo.log.info(INPUT_IS)
                 local_uo.log.info(input)
