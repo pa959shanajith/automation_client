@@ -21,6 +21,7 @@ import oebs_serverUtilities
 from oebs_utilops import UtilOperations
 import time
 import pythoncom
+from encryption_utility import AESCipher
 pythoncom.CoInitialize()
 shell = win32com.client.Dispatch("WScript.Shell")
 
@@ -206,6 +207,144 @@ class TextOperations:
         oebs_key_objects.keyword_output.append(str(keywordresult))
         oebs_key_objects.keyword_output.append(str(keywordresponse))
 
+    #implemented for #8010-Azure
+    def setsecuretext(self,acc):
+
+        del oebs_key_objects.custom_msg[:]
+        #sets the keywordresult to FAIL
+        keywordresult=MSG_FAIL
+        #this is the response obtained from the keyword
+        keywordresponse=MSG_FALSE
+        try:
+            #gets the entire context information
+            time.sleep(3)
+            curaccinfo = acc.getAccessibleContextInfo()
+            log.debug('Received Object Context',DEF_SETTEXT)
+            if 'enabled' in curaccinfo.states:
+                #checks whether action can be performed on the object
+                if curaccinfo.accessibleAction == 1:
+                    #checks whether text object editable
+                    if 'editable' in curaccinfo.states:
+                        log.debug('Text Box is accessible',DEF_SETTEXT)
+                        #checks element is accessible
+                        if curaccinfo.accessibleText == 1:
+                            if len(oebs_key_objects.keyword_input) == 1:
+                                #checks if the text is empty
+                                if (oebs_key_objects.keyword_input[0] != ''):
+                                    text=oebs_key_objects.keyword_input[0]
+                                    log.debug('SecureText to be set is %s',text)
+                                    #if text != None:
+                                    #gets the full length of the text
+                                    character=acc.getAccessibleTextInfo(0,1)
+                                    #decrypt the text:
+                                    encryption_obj = AESCipher()
+                                    text = encryption_obj.decrypt(text)
+                                    #sets the text value to the object
+                                    result = acc.setTextContents(text)
+                                    if result:
+                                        #sets the result to pass
+                                        keywordresult=MSG_PASS
+                                        keywordresponse=MSG_TRUE
+                                else:
+                                    log.debug('MSG:%s',MSG_INVALID_INPUT)
+                                    oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
+                            else:
+                                log.debug('MSG:%s',MSG_INVALID_INPUT)
+                                oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
+                        else:
+                            log.debug('MSG:%s',MSG_INVALID_OBJECT)
+                            oebs_key_objects.custom_msg.append(MSG_INVALID_OBJECT)
+                    else:
+                        log.debug('MSG:%s',MSG_OBJECT_READONLY)
+                        oebs_key_objects.custom_msg.append(MSG_OBJECT_READONLY)
+                else:
+                    #gets the entire context information
+                    curaccinfo = acc.getAccessibleContextInfo()
+                    log.debug('Text Box is accessible',DEF_SETTEXT)
+                    x_coor = int(curaccinfo.x + (0.5 * curaccinfo.width))
+                    y_coor = int(curaccinfo.y + (0.5 * curaccinfo.height))
+                    log.debug('Text Box is accessible {}'.format(DEF_SETTEXT))
+                    if len(oebs_key_objects.keyword_input) == 1:
+                        #if text != None:
+                        if (oebs_key_objects.keyword_input[0] != ''):
+                            text=oebs_key_objects.keyword_input[0]
+                            #decrypt the text:
+                            encryption_obj = AESCipher()
+                            text = encryption_obj.decrypt(text)
+                            index = len(text)
+                            log.debug('Text to be set is %s',text)
+                            #Visibility check for scrollbar
+                            if(self.utilops_obj.getObjectVisibility(acc,x_coor,y_coor)):
+                                oebs_mouseops.MouseOperation('click',x_coor,y_coor)
+
+                                #code added to gain the FOCUSED state for the textbox
+                                for mouseindex in range(3):
+                                    curaccinfo = acc.getAccessibleContextInfo()
+                                    if 'focused' in curaccinfo.states:
+                                        break
+                                    else:
+                                        time.sleep(3)
+
+                                #checks whether text object editable
+                                if 'editable' in curaccinfo.states:
+                                    #code enables to check the status of the mouse
+                                    #periodically for 10 sec(max)
+                                    #mkes the count value 1 once mouse is active
+
+                                    #Commenting a code waiting for 10 sec in setText operation
+
+                                    mousestate=oebs_mouseops.GetCursorInfo('state')
+                                    while(mousestate == 65543):
+                                         mousestate=oebs_mouseops.GetCursorInfo('state')
+
+
+                                    if 'focused' in curaccinfo.states:
+                                        #gets the full length of the text
+                                        character=acc.getAccessibleTextInfo(0,1)
+
+                                        self.keywordops_obj.keyboard_operation('keypress','HOME')
+                                        #clears the text untill all characters are deleted
+                                        for num in range(character.charCount):
+                                            shell.SendKeys("{DELETE}")
+
+
+                                        #sets the text value to the object
+                                        for length in range(index):
+                                            shell.SendKeys('{'+text[length]+'}')
+                                            #sets the result to pass;
+                                            keywordresult=MSG_PASS
+                                            keywordresponse=MSG_TRUE
+                                    else:
+                                        log.debug('MSG:%s',MSG_ELEMENT_NON_EDITABLE)
+                                        oebs_key_objects.custom_msg.append(MSG_ELEMENT_NON_EDITABLE)
+
+                                else:
+                                    log.debug('MSG:%s',MSG_OBJECT_READONLY)
+                                    oebs_key_objects.custom_msg.append(MSG_OBJECT_READONLY)
+                            else:
+                                log.debug('MSG:%s',MSG_ELEMENT_NOT_VISIBLE)
+                                oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_VISIBLE)
+                        else:
+                            log.debug('MSG:%s',MSG_INVALID_INPUT)
+                            oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
+                    else:
+                        log.debug('MSG:%s',MSG_INVALID_NOOF_INPUT)
+                        oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
+            else:
+                log.debug('MSG:%s',MSG_DISABLED_OBJECT)
+                oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
+        except Exception as e:
+            self.utilities_obj.cleardata()
+            log.error('%s',e)
+            log.debug('Status %s',keywordresult)
+            oebs_key_objects.custom_msg=[]
+            oebs_key_objects.custom_msg.append(str(e))
+        log.debug('Status %s',keywordresult)
+        # response is sent to the client
+        self.utilities_obj.cleardata()
+        oebs_key_objects.keyword_output.append(str(keywordresult))
+        oebs_key_objects.keyword_output.append(str(keywordresponse))
+
    #Method to verifytext of the given Object location matches with the User Provided Text
     def verifytext(self,acc):
         del oebs_key_objects.custom_msg[:]
@@ -255,8 +394,6 @@ class TextOperations:
         self.utilities_obj.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))
         oebs_key_objects.keyword_output.append(str(verifyresponse))
-
-
 
     #Method to cleartext of the given Object location matches with the User Provided Text
     def cleartext(self,acc):

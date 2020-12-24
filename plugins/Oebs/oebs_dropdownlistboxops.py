@@ -639,6 +639,48 @@ class DropdownListboxOperations:
         oebs_key_objects.keyword_output.append(str(keywordresult))
         oebs_key_objects.keyword_output.append(str(keywordresponse))
 
+
+    #Added for the issue #8010
+    def getallvalues(self,acc):
+        del oebs_key_objects.custom_msg[:]
+        #sets the keywordresult to FAIL
+        keywordresult = MSG_FAIL
+        #sets the verifyresponse to FALSE
+        keywordresponse = MSG_FALSE
+        #outputvalues = []
+        #inputValues = oebs_key_objects.keyword_input
+        try:
+            charinfo = acc.getAccessibleContextInfo()
+            log.debug('Received Object Context',DEF_VERIFYALLVALUES)
+            #check for dropdown
+            if charinfo.role == 'combo box':
+                #calling getvaluesdropdown def to get all values in dropdown
+                    generatedvalues  = self.getvaluesdropdown(acc)
+                    if len(generatedvalues)!=0:
+                        keywordresult=MSG_PASS
+                        keywordresponse=str(generatedvalues)
+            #check for listbox
+            elif charinfo.role == 'list':
+                #calling getvalueslist def to get all values in list
+                listvalues = self.getvalueslist(acc)
+                if len(listvalues)!=0:
+                        keywordresult=MSG_PASS
+                        keywordresponse = str(listvalues)
+            else:
+                log.debug('%s',MSG_INVALID_OBJECT)
+                oebs_key_objects.custom_msg.append(MSG_INVALID_OBJECT)
+            if keywordresult == MSG_FAIL:
+                oebs_key_objects.custom_msg.append(MSG_VERIFYFAIL)
+        except Exception as e:
+            self.utilities_obj.cleardata()
+            log.debug('%s',e)
+            log.debug('Status %s',keywordresult)
+        log.debug('Status %s',keywordresult)
+        # response is sent to the client
+        self.utilities_obj.cleardata()
+        oebs_key_objects.keyword_output.append(str(keywordresult))
+        oebs_key_objects.keyword_output.append(str(keywordresponse))
+
     #Method to selects all text of the given Object location
     def selectallvalues(self,acc):
         del oebs_key_objects.custom_msg[:]
