@@ -130,7 +130,7 @@ class ScrapeWindow(wx.Frame):
             self.visibilityCheck.Disable()
             if(self.irisFlag):
                     self.cropbutton.Disable()
-            if not isinstance(self.driver,webdriver.Ie) and len(self.driver.window_handles) > 1 and not self.window_selected:
+            if len(self.driver.window_handles) > 1 and not self.window_selected:
                 self.fullscrapebutton.Hide()
                 self.visibilityCheck.Hide()
                 self.startbutton.Hide()
@@ -317,12 +317,30 @@ class ScrapeWindow(wx.Frame):
         if self.window_handle_number < len(self.driver.window_handles) - 1:
             self.window_handle_number += 1
             self.driver.switch_to.window(self.driver.window_handles[self.window_handle_number])
+            if isinstance(self.driver,webdriver.Ie):
+                import win32gui
+                win_name=self.driver.title
+                if win_name == '':
+                    win_name='Blank Page'
+                hwnd=win32gui.FindWindow(None, win_name+" - Internet Explorer")
+                if hwnd==0:
+                    hwnd=win32gui.FindWindow(None, win_name+" - Windows Internet Explorer")
+                win32gui.SetForegroundWindow(hwnd)
             logger.print_on_console("Currently selected window/tab's URL: ", self.driver.current_url)
 
     def on_prev(self,event):
         if self.window_handle_number > 0:
             self.window_handle_number -= 1
             self.driver.switch_to.window(self.driver.window_handles[self.window_handle_number])
+            if isinstance(self.driver,webdriver.Ie):
+                import win32gui
+                win_name=self.driver.title
+                if win_name == '':
+                    win_name='Blank Page'
+                hwnd=win32gui.FindWindow(None, win_name+" - Internet Explorer")
+                if hwnd==0:
+                    hwnd=win32gui.FindWindow(None, win_name+" - Windows Internet Explorer")
+                win32gui.SetForegroundWindow(hwnd)
             logger.print_on_console("Currently selected window/tab's URL: ", self.driver.current_url)
 
 
