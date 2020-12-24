@@ -312,6 +312,18 @@ class OebsKeywords:
         log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
         return self.utilities_obj.clientresponse()
 
+    def verifyelementexists(self,applicationname,objectname,keyword,inputs,outputs):
+        # accessContext object gets value on call of swooptoelement definition
+        global accessContext
+        log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
+        #self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if (accessContext):
+            if str(accessContext) != 'fail':
+                self.elementsops_obj.verifyelementexists(accessContext)
+        log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
+        return self.utilities_obj.clientresponse()
+
     def verifydoesnotexists(self,applicationname,objectname,keyword,inputs,outputs):
         # accessContext object gets value on call of swooptoelement definition
         global accessContext
@@ -859,6 +871,17 @@ class OebsKeywords:
         accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
         if (accessContext):
             self.utilops_obj.drop(accessContext)
+        log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
+        return self.utilities_obj.clientresponse()
+
+    def mousehover(self,applicationname,objectname,keyword,inputs,outputs):
+        # accessContext object gets value on call of swooptoelement definition
+        global accessContext
+        log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
+        #self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if (accessContext):
+            self.utilops_obj.mousehover(accessContext)
         log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
         return self.utilities_obj.clientresponse()
 

@@ -117,6 +117,32 @@ class ElementOperations:
         oebs_key_objects.keyword_output.append(str(keywordresult))
         oebs_key_objects.keyword_output.append(str(keywordresponse))
 
+    def verifyelementexists(self,acc):
+        del oebs_key_objects.custom_msg[:]
+         #sets the keywordresult to FAIL
+        keywordresult = MSG_FAIL
+        verifyresponse = MSG_FALSE
+        try:
+            #gets the entire context information
+            curaccinfo = acc.getAccessibleContextInfo()
+            log.debug('Received Object Context',DEF_VERIFYEXISTS)
+            if('showing' in curaccinfo.states and 'visible' in curaccinfo.states):
+                verifyresponse = MSG_TRUE
+                keywordresult = MSG_PASS
+            else:
+                log.debug('%s',DEF_VERIFYEXISTS,MSG_INVALID_INPUT)
+                oebs_key_objects.custom_msg.append(MSG_HIDDEN_OBJECT)
+        except Exception as e:
+            self.utilities_obj.cleardata()
+            log.debug('%s',DEF_VERIFYEXISTS,e)
+            log.debug('Status %s',DEF_VERIFYEXISTS,keywordresult)
+        log.debug('Status %s',DEF_VERIFYEXISTS,keywordresult)
+        log.debug('Verify Element Exists Response %s',DEF_VERIFYEXISTS,str(verifyresponse))
+        # response is sent to the client
+        self.utilities_obj.cleardata()
+        oebs_key_objects.keyword_output.append(str(keywordresult))
+        oebs_key_objects.keyword_output.append(str(verifyresponse))
+
 
     #Method to verify element text of the given Object location matches with the User Provided Text
     def verifyelementtext(self,acc):
