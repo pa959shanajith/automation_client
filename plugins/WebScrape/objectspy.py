@@ -78,6 +78,7 @@ class Object_Mapper():
                         # print "new: ",new_properties['xpath']
                         # log.debug("changed object found")
                         # Xpath Encryption logic implemented
+                        new_properties['custname']=element['custname']
                         new_properties['url'] = self.coreutilsobj.scrape_wrap(new_properties['url'])
                         xpath_string = new_properties['xpath'].split(';')
                         left_part = self.coreutilsobj.scrape_wrap(';'.join(xpath_string[:2]))
