@@ -238,32 +238,25 @@ class OutlookKeywords:
                             if ( recipient.Type == 1 ):
                                 ToMailID += recipient.PropertyAccessor.GetProperty(outlook_constants.PR_SMTP_ADDRESS) + ';'
                         ToMailID = ToMailID[: - 1]
-                        # if ( msg.Attachments.Count > 0 ):
-                        #     AttachmentStatus = outlook_constants.ATTACH_STATUS_YES
-                        # while True:
                         attachments_item = msg.Attachments
                         nbrOfAttachmentInMessage = attachments_item.Count
-                        # logger.print_on_console( nbrOfAttachmentInMessage )
+                        log.info( "total number of attachments present in the input mail is %s",str(nbrOfAttachmentInMessage) )
                         x = 1
-                        no=0
-                        yes=0
+                        img_count=0
+                        non_img_count=0
                         while x <= nbrOfAttachmentInMessage:
                             attachment_item = attachments_item.Item(x)
                             fn = attachment_item.FileName
+                            log.info( fn )
                             filename = fn.split('.')
-                            # logger.print_on_console( filename )
-                            if filename[-1] in ['png','jpg']:  #['png']
-                                # AttachmentStatus = outlook_constants.ATTACH_STATUS_NO
-                                no=no+1
-                                # continue 
+                            if filename[-1].lower() in ['png','jpg']:
+                                img_count=img_count+1
                             else:
-                                # AttachmentStatus = outlook_constants.ATTACH_STATUS_YES
-                                yes=yes+1
-                                # continue
+                                non_img_count=non_img_count+1
                             x+=1
-                        if yes>no:
+                        if non_img_count>img_count:
                             AttachmentStatus = outlook_constants.ATTACH_STATUS_YES
-                        elif yes==no:
+                        elif non_img_count==img_count:
                             AttachmentStatus = outlook_constants.ATTACH_STATUS_YES
                         try:
                                 msg.Display()

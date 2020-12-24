@@ -357,7 +357,7 @@ class Launch_Keywords():
                             # print("no of window handles",len(title_matched_windows))
                             log.debug(len(title_matched_windows))
                             if ( win_handle_flag == True ):
-                                if ( win_handle_index <= len(title_matched_windows) ):
+                                if ( win_handle_index <= title_matched_windows ):
                                     if ( len(title_matched_windows) > 1 ):
                                         self.windowHandle = title_matched_windows[win_handle_index]
                                         self.windowname = self.getWindowText(self.windowHandle)
