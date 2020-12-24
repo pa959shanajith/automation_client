@@ -879,28 +879,53 @@ class UtilWebKeywords:
         err_msg=None
         output=None
         attr_name=input[0]
+        eleStatus=False
         local_uo.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
-            if webelement != None and webelement !='':
-                local_uo.log.info(INPUT_IS)
-                local_uo.log.info(input)
-                if len(input)<2 and attr_name:
-                    if attr_name != 'required':
-                        output = webelement.get_attribute(attr_name)
+            if(len(input)==3):
+                row_number=int(input[1])-1
+                col_number=int(input[2])-1
+                from table_keywords import TableOperationKeywords
+                tableops = TableOperationKeywords()
+                cell=tableops.javascriptExecutor(webelement,row_number,col_number)
+                element_list=cell.find_elements_by_xpath('.//*')
+                if len(list(element_list))>0:
+                    xpath=tableops.getElemntXpath(element_list[0])
+                    cell=browser_Keywords.local_bk.driver_obj.find_element_by_xpath(xpath)
+                if(cell!=None):
+                    webelement=cell
+                    eleStatus=True
+            elif(len(input)>3):
+                webelement1=None
+                row_number=int(input[1])-1
+                col_number=int(input[2])-1
+                tag=input[3].lower()
+                index=int(input[4])
+                eleStatus, webelement1=self.get_table_cell(webelement, row_number, col_number, tag, index)
+                if(webelement1):
+                    webelement=webelement1
+                
+            if(eleStatus or len(input)==1):
+                if webelement != None and webelement !='':
+                    local_uo.log.info(INPUT_IS)
+                    local_uo.log.info(input)
+                    if attr_name:
+                        if attr_name != 'required':
+                            output = webelement.get_attribute(attr_name)
+                        else:
+                            output = browser_Keywords.local_bk.driver_obj.execute_script("return arguments[0].getAttribute('required')",webelement)
+                        if output != None and output !='':
+                            logger.print_on_console('Output: ',output)
+                            status = TEST_RESULT_PASS
+                            methodoutput = TEST_RESULT_TRUE
+                        else:
+                            err_msg = 'Attribute does not exists'
+                            logger.print_on_console(err_msg)
+                            local_uo.log.error(err_msg)
                     else:
-                        output = browser_Keywords.local_bk.driver_obj.execute_script("return arguments[0].getAttribute('required')",webelement)
-                    if output != None and output !='':
-                        logger.print_on_console('Output: ',output)
-                        status = TEST_RESULT_PASS
-                        methodoutput = TEST_RESULT_TRUE
-                    else:
-                        err_msg = 'Attribute does not exists'
+                        err_msg = 'Failed to fetch the attribute value.'
                         logger.print_on_console(err_msg)
                         local_uo.log.error(err_msg)
-                else:
-                    err_msg = 'Failed to fetch the attribute value/Number of inputs exceeded'
-                    logger.print_on_console(err_msg)
-                    local_uo.log.error(err_msg)
         except Exception as e:
             err_msg = 'Error occured while fetching attribute value'
             logger.print_on_console(err_msg)
@@ -911,44 +936,70 @@ class UtilWebKeywords:
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         err_msg=None
+        eleStatus=False
         output=OUTPUT_CONSTANT
         attr_name=input[0]
         local_uo.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
-            if webelement != None and webelement !='':
-                local_uo.log.info(INPUT_IS)
-                local_uo.log.info(input)
-                if len(input)<3 and attr_name:
-                    if attr_name != 'required':
-                        output = webelement.get_attribute(attr_name)
-                    else:
-                        output = browser_Keywords.local_bk.driver_obj.execute_script("return arguments[0].getAttribute('required')",webelement)
-                    if output != None and output !='':
-                        local_uo.log.info(output)
-                        if len(input)>1:
-                            result = input[1]
-                            if output == result:
-                                local_uo.log.info('Attribute values matched')
-                                logger.print_on_console('Attribute values matched')
+            if(len(input)==4):
+                row_number=int(input[2])-1
+                col_number=int(input[3])-1
+                from table_keywords import TableOperationKeywords
+                tableops = TableOperationKeywords()
+                cell=tableops.javascriptExecutor(webelement,row_number,col_number)
+                element_list=cell.find_elements_by_xpath('.//*')
+                if len(list(element_list))>0:
+                    xpath=tableops.getElemntXpath(element_list[0])
+                    cell=browser_Keywords.local_bk.driver_obj.find_element_by_xpath(xpath)
+                if(cell!=None):
+                    webelement=cell
+                    eleStatus=True
+
+            elif(len(input)>4):
+                webelement1=None
+                row_number=int(input[2])-1
+                col_number=int(input[3])-1
+                tag=input[4].lower()
+                index=int(input[5])+1
+                eleStatus, webelement1=self.get_table_cell(webelement, row_number, col_number, tag, index)
+                if(webelement1):
+                    webelement=webelement1
+
+            if(eleStatus or len(input)<=2):
+                if webelement != None and webelement !='':
+                    local_uo.log.info(INPUT_IS)
+                    local_uo.log.info(input)
+                    if attr_name:
+                        if attr_name != 'required':
+                            output = webelement.get_attribute(attr_name)
+                        else:
+                            output = browser_Keywords.local_bk.driver_obj.execute_script("return arguments[0].getAttribute('required')",webelement)
+                        if output != None and output !='':
+                            local_uo.log.info(output)
+                            if len(input)==2 and input[1] != '':
+                                result = input[1]
+                                if output == result:
+                                    local_uo.log.info('Attribute values matched')
+                                    logger.print_on_console('Attribute values matched')
+                                    status = TEST_RESULT_PASS
+                                    methodoutput = TEST_RESULT_TRUE
+                                else:
+                                    err_msg = 'Attribute values does not match'
+                                    logger.print_on_console(err_msg)
+                                    local_uo.log.error(err_msg)
+                            else:
+                                local_uo.log.info('Attribute exists')
+                                logger.print_on_console('Attribute exists')
                                 status = TEST_RESULT_PASS
                                 methodoutput = TEST_RESULT_TRUE
-                            else:
-                                err_msg = 'Attribute values does not match'
-                                logger.print_on_console(err_msg)
-                                local_uo.log.error(err_msg)
                         else:
-                            local_uo.log.info('Attribute exists')
-                            logger.print_on_console('Attribute exists')
-                            status = TEST_RESULT_PASS
-                            methodoutput = TEST_RESULT_TRUE
+                            err_msg = 'Attribute does not exixts'
+                            logger.print_on_console(err_msg)
+                            local_uo.log.error(err_msg)
                     else:
-                        err_msg = 'Attribute does not exixts'
+                        err_msg = 'Input is empty.'
                         logger.print_on_console(err_msg)
                         local_uo.log.error(err_msg)
-                else:
-                    err_msg = 'Input is empty/Number of inputs exceeded'
-                    logger.print_on_console(err_msg)
-                    local_uo.log.error(err_msg)
         except NoSuchAttributeException as ex:
             err_msg = 'Attribute does not exixts'
             logger.print_on_console(err_msg)
@@ -958,3 +1009,115 @@ class UtilWebKeywords:
             logger.print_on_console(err_msg)
             local_uo.log.error(e)
         return status,methodoutput,output,err_msg
+
+    def get_table_cell(self,webelement, row_number, col_number, tag, index):
+        eleStatus=False
+        webelement1=None
+        counter = 1
+        from table_keywords import TableOperationKeywords
+        tableops = TableOperationKeywords()
+        cell=tableops.javascriptExecutor(webelement,row_number,col_number)
+        element_list=cell.find_elements_by_xpath('.//*')
+        if len(element_list)==0:
+            element_list.append(cell)
+        for member in element_list:
+            js1='function getElementXPath(elt) {var path = "";for (; elt && elt.nodeType == 1; elt = elt.parentNode){idx = getElementIdx(elt);xname = elt.tagName;if (idx >= 1){xname += "[" + idx + "]";}path = "/" + xname + path;}return path;}function getElementIdx(elt){var count = 1;for (var sib = elt.previousSibling; sib ; sib = sib.previousSibling){if(sib.nodeType == 1 && sib.tagName == elt.tagName){count++;}}return count;}return getElementXPath(arguments[0]).toLowerCase();'
+            xpath=browser_Keywords.local_bk.driver_obj.execute_script(js1,member)
+            cellChild = browser_Keywords.local_bk.driver_obj.find_element_by_xpath(xpath)
+            tagName = cellChild.tag_name
+            tagType = cellChild.get_attribute('type')
+            xpath_elements=xpath.split('/')
+            lastElement=xpath_elements[len(xpath_elements)-1]
+            childindex=lastElement[lastElement.find("[")+1:lastElement.find("]")]
+            childindex = int(childindex)
+            if tag=='button':
+                if( (tagName==('input') and tagType==('button')) or tagType==('submit') or tagType==('reset') or tagType==('file')):
+                    if index==childindex:
+                        eleStatus =True
+                    else:
+                        if counter==index:
+                            index =childindex
+                            eleStatus =True
+                        else:
+                            counter+=1
+            elif tag=='image':
+                if(tagName==('input') and (tagType==('img') or tagType==('image'))):
+                    if index==childindex:
+                        eleStatus =True
+                    else:
+                        if counter==index:
+                            index =childindex
+                            eleStatus =True
+                        else:
+                            counter+=1
+                elif tagName =='img':
+                    if index==childindex:
+                        eleStatus =True
+                    else:
+                        if counter==index:
+                            index =childindex
+                            eleStatus =True
+                        else:
+                            counter+=1
+            elif tag=='img':
+                if index==childindex:
+                    eleStatus =True
+                else:
+                    if counter==index:
+                        index =childindex
+                        eleStatus =True
+                    else:
+                        counter+=1
+            elif tag=='checkbox':
+                if(tagName==('input') and (tagType==('checkbox')) ):
+                    if index==childindex:
+                        eleStatus =True
+                    else:
+                        if counter==index:
+                            index =childindex
+                            eleStatus =True
+                        else:
+                            counter+=1
+            elif tag=='radiobutton':
+                if (tagName==('input') and tagType==('radio')):
+                    if index==childindex:
+                        eleStatus =True
+                    else:
+                        if counter==index:
+                            index =childindex
+                            eleStatus =True
+                        else:
+                            counter+=1
+            elif tag=='textbox':
+                if (tagName==('input') and (tagType==('text') or tagType==('email') or tagType==('password') or tagType==('range') or tagType==('search') or tagType==('url')) ):
+                    if index==childindex:
+                        eleStatus =True
+                    else:
+                        if counter==index:
+                            index =childindex
+                            eleStatus =True
+                        else:
+                            counter+=1
+            elif tag=='link':
+                if(tagName==('a')):
+                    if index==childindex:
+                        eleStatus =True
+                    else:
+                        if counter==index:
+                            index =childindex
+                            eleStatus =True
+                        else:
+                            counter+=1
+            else:
+                if tag==tagName:
+                    if index==childindex:
+                        eleStatus =True
+                    else:
+                        if counter==index:
+                            index =childindex
+                            eleStatus =True
+                        else:
+                            counter+=1
+        if eleStatus==True:
+            webelement1=cellChild
+        return eleStatus, webelement1

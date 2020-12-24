@@ -259,7 +259,8 @@ class TextFile:
                             file.write(content)
                         else:
                             ##print "NotZero"
-                            file.write("\n"+content)
+                            #fix for #14921: Removed \n before writing content
+                            file.write(content)
                     except:
                         ##print "except"
                         if os.stat(input_path).st_size == 0:
@@ -269,9 +270,9 @@ class TextFile:
                             file.write(content.encode('UTF-8'))
                     for i in range(0,(len(args)-1)):
                         try:
-                            file.write("\n")
+                            #fix for #14921
                             file.write(args[i])
-
+                            file.write("\n")
                         except:
                             file.write("\n")
                             file.write(args[i].encode('UTF-8'))

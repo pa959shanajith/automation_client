@@ -312,6 +312,18 @@ class OebsKeywords:
         log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
         return self.utilities_obj.clientresponse()
 
+    def verifyelementexists(self,applicationname,objectname,keyword,inputs,outputs):
+        # accessContext object gets value on call of swooptoelement definition
+        global accessContext
+        log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
+        #self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if (accessContext):
+            if str(accessContext) != 'fail':
+                self.elementsops_obj.verifyelementexists(accessContext)
+        log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
+        return self.utilities_obj.clientresponse()
+
     def verifydoesnotexists(self,applicationname,objectname,keyword,inputs,outputs):
         # accessContext object gets value on call of swooptoelement definition
         global accessContext
@@ -862,6 +874,17 @@ class OebsKeywords:
         log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
         return self.utilities_obj.clientresponse()
 
+    def mousehover(self,applicationname,objectname,keyword,inputs,outputs):
+        # accessContext object gets value on call of swooptoelement definition
+        global accessContext
+        log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
+        #self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if (accessContext):
+            self.utilops_obj.mousehover(accessContext)
+        log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
+        return self.utilities_obj.clientresponse()
+
     def getobjectforcustom(self,windowname,parentXpath,type,eleIndex):
         tempne = []
         self.utils_obj.windowsrun()
@@ -875,3 +898,30 @@ class OebsKeywords:
         else:
             log.debug('MSG: %s',MSG_NOT_JAVA_WINDOW_INFO)
             return 'fail'
+    
+    #added for the issue #8010-Azure:
+    def getallvalues(self,applicationname,objectname,keyword,inputs,outputs):
+        # accessContext object gets value on call of swooptoelement definition
+        global accessContext
+        log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
+        #self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if (accessContext):
+           self.dropdownlistboxops_obj.getallvalues(accessContext)
+           if str(accessContext) != 'fail':
+            log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
+            return self.utilities_obj.clientresponse()
+
+    #implemented the setsecuretext for the issue #8010-Azure.
+    def setsecuretext(self,applicationname,objectname,keyword,inputs,outputs):
+        # accessContext object gets value on call of swooptoelement definition
+        global accessContext
+        log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
+        #self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        if (accessContext):
+            if str(accessContext) != 'fail':
+                self.txtops_obj.setsecuretext(accessContext)
+        log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
+
+        return self.utilities_obj.clientresponse()
