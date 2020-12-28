@@ -807,7 +807,7 @@ class Config_window(wx.Frame):
             self.rbox3.SetSelection(0)
         self.rbox3.SetToolTip(wx.ToolTip("Facilitates capturing the screenshots of the test steps based on its value"))
 
-        self.rbox4 = wx.RadioBox(self.panel1, label = 'Retrieve URL', choices = lblList,
+        self.rbox4 = wx.RadioBox(self.panel1, label = 'Http Status Code Check', choices = lblList,
             majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
         if isConfigJson!=False and isConfigJson['retrieveURL'].title()!=lblList[0]:
             self.rbox4.SetSelection(1)
