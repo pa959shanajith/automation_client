@@ -130,3 +130,31 @@ class Delay_keywords:
         if err_msg!=None:
             logger.print_on_console(err_msg)
         return status,methodoutput,output,err_msg,display_input
+
+    def nullCheck(self,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        output=OUTPUT_CONSTANT
+        err_msg=None
+        ncFlag=False
+        try:
+            if not (args is None or args is ''):
+                input_list=list(args)
+                y=input_list[0]
+                if y == None or y == "null":
+                    ncFlag = True
+                    methodoutput = ncFlag
+                    status=TEST_RESULT_PASS
+                    status_msg = "Null value is present in the given input"
+                    logger.print_on_console(status_msg)
+                else:
+                    err_msg = "Null value is not present in the given input"
+            else:
+                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+        except Exception as e:
+            log.error(e)
+            logger.print_on_console(e)
+            err_msg="Error checking null value"
+        if err_msg!=None:
+            logger.print_on_console(err_msg)
+        return status,methodoutput,output,err_msg
