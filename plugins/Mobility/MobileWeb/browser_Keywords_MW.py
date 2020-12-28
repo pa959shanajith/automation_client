@@ -33,6 +33,7 @@ if SYSTEM_OS!='Darwin':
 import readconfig
 import device_keywords_MW
 import core_utils
+import controller
 #New Thread to navigate to given url for the keyword 'naviagteWithAut'
 class TestThread(threading.Thread):
     """Test Worker Thread Class."""
@@ -74,6 +75,7 @@ class BrowserKeywords():
                 path = curdir + '/plugins/Mobility/MobileApp/node_modules/appium/build/lib/main.js'
                 nodePath = os.environ["AVO_ASSURE_HOME"] + "/Lib/Drivers/node.exe"
                 proc = subprocess.Popen([nodePath, path], shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)
+                controller.process_ids.append(proc.pid)
                 start = time.time()
                 timeout = 120 #tentative; as it depends on the system performance.
                 server_flag = False
@@ -99,6 +101,7 @@ class BrowserKeywords():
                 path = curdir + '/plugins/Mobility/MobileApp/node_modules/appium/build/lib/main.js'
                 nodePath = curdir + '/plugins/Mobility/MobileApp/node_modules/node_appium'
                 proc = subprocess.Popen([nodePath, path], shell=False, stdin=None, stdout=None, stderr=None, close_fds=True)
+                controller.process_ids.append(proc.pid)
                 time.sleep(25) # psutil.net_connections() doesn't work on Mac, insearch of alternatives
                 logger.print_on_console('Browser session started')
                 return True
@@ -155,60 +158,65 @@ class BrowserKeywords():
                     return status, result, output, err_msg
                 device_object = device_keywords_MW.Device_Keywords()
                 input_list = inputs
-                device_id = input_list[0]
-                if device_id == 'wifi':
-                    device_id=device_object.wifi_connect()
-                if device_id != '':
-                    self.start_server()
-                    obj = Singleton_DriverUtil()
-                    # Logic to make sure that logic of usage of existing driver is not applicable to execution
-                    time.sleep(5)
-                    desired_caps = {}
-                    desired_caps['platformName'] = 'Android'
-                    desired_caps['platformVersion'] =input_list[1]
-                    desired_caps['deviceName'] = device_id
-                    desired_caps['udid'] = device_id
-                    #desired_caps['skipUnlock'] = True
-                    desired_caps['automationName'] = 'UiAutomator2'
-                    desired_caps['browserName'] = 'Chrome'
-                    desired_caps['clearSystemFiles']=True
-                    desired_caps['noReset'] = True
-                    desired_caps['fullReset'] = False
-                    desired_caps['newCommandTimeout'] = 0
-                    desired_caps['eventTimings'] = True
-                    desired_caps['enablePerformanceLogging'] = True
-                    desired_caps['chromedriverExecutable'] =  os.environ["AVO_ASSURE_HOME"] + "/Lib/Drivers/chromedriver_mobile.exe"
-                    driver= webdriver.Remote('http://localhost:4723/wd/hub', desired_caps)
-                    log.info('FILE: browser_keywords_MW.py , DEF: openChromeBrowser() , MSG:  Navigating to blank page')
-                    driver.get(domconstants_MW.BLANK_PAGE)
-                    driver_obj = driver
-                    log.info('FILE: browser_keywords_MW.py , DEF: openChromeBrowser() , MSG:  Chrome browser opened successfully')
-                    parent_handle =  None
-                try:
-                    parent_handle = driver_obj.current_window_handle
-                except Exception as nosuchWindowExc:
-                    log.error(nosuchWindowExc)
-                    log.warn("A window or tab was closed manually from the browser!")
-                if parent_handle is not None:
-                    self.update_recent_handle(parent_handle)
-                    self.all_handles.append(parent_handle)
-                elif len(self.all_handles) > 0:
-                    driver_handles = driver_obj.window_handles
-                    switch_to_handle = None
-                    for handle in self.all_handles:
-                        if handle in driver_handles:
-                            switch_to_handle = handle
-                            break
-                    if switch_to_handle is not None:
-                        log.info("driver will now switch to the first window/tab")
-                        driver_obj.switch_to.window(switch_to_handle)
+                if len(input_list) > 2:
+                    device_id = input_list[0]
+                    if device_id == 'wifi':
+                        device_id=device_object.wifi_connect()
+                    if device_id != '':
+                        self.start_server()
+                        obj = Singleton_DriverUtil()
+                        # Logic to make sure that logic of usage of existing driver is not applicable to execution
+                        time.sleep(5)
+                        desired_caps = {}
+                        desired_caps['platformName'] = 'Android'
+                        desired_caps['platformVersion'] =input_list[1]
+                        desired_caps['deviceName'] = device_id
+                        desired_caps['udid'] = device_id
+                        #desired_caps['skipUnlock'] = True
+                        desired_caps['automationName'] = 'UiAutomator2'
+                        desired_caps['browserName'] = 'Chrome'
+                        desired_caps['clearSystemFiles']=True
+                        desired_caps['noReset'] = True
+                        desired_caps['fullReset'] = False
+                        desired_caps['newCommandTimeout'] = 0
+                        desired_caps['eventTimings'] = True
+                        desired_caps['enablePerformanceLogging'] = True
+                        desired_caps['chromedriverExecutable'] =  os.environ["AVO_ASSURE_HOME"] + "/Lib/Drivers/chromedriver_mobile.exe"
+                        driver= webdriver.Remote('http://localhost:4723/wd/hub', desired_caps)
+                        log.info('FILE: browser_keywords_MW.py , DEF: openChromeBrowser() , MSG:  Navigating to blank page')
+                        driver.get(domconstants_MW.BLANK_PAGE)
+                        driver_obj = driver
+                        log.info('FILE: browser_keywords_MW.py , DEF: openChromeBrowser() , MSG:  Chrome browser opened successfully')
+                        parent_handle =  None
+                        try:
+                            parent_handle = driver_obj.current_window_handle
+                        except Exception as nosuchWindowExc:
+                            log.error(nosuchWindowExc)
+                            log.warn("A window or tab was closed manually from the browser!")
+                        if parent_handle is not None:
+                            self.update_recent_handle(parent_handle)
+                            self.all_handles.append(parent_handle)
+                        elif len(self.all_handles) > 0:
+                            driver_handles = driver_obj.window_handles
+                            switch_to_handle = None
+                            for handle in self.all_handles:
+                                if handle in driver_handles:
+                                    switch_to_handle = handle
+                                    break
+                            if switch_to_handle is not None:
+                                log.info("driver will now switch to the first window/tab")
+                                driver_obj.switch_to.window(switch_to_handle)
+                            else:
+                                log.info("driver will now switch to any available window/tab")
+                                driver_obj.switch_to.window(driver_handles[0])
+                        result = webconstants_MW.TEST_RESULT_TRUE
+                        status = webconstants_MW.TEST_RESULT_PASS
                     else:
-                        log.info("driver will now switch to any available window/tab")
-                        driver_obj.switch_to.window(driver_handles[0])
-                result = webconstants_MW.TEST_RESULT_TRUE
-                status = webconstants_MW.TEST_RESULT_PASS
+                        logger.print_on_console('please enter device ID')
+                else:
+                    logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
         except Exception as e:
-            err_msg = 'ERROR OCURRED WHILE OPENING BROWSER'
+            err_msg = 'error occured while opening browser'
             if SYSTEM_OS == 'Darwin':
                 curdir = os.environ["AVO_ASSURE_HOME"]
                 path_node_modules = curdir + '/plugins/Mobility/MobileApp/node_modules'
@@ -301,7 +309,7 @@ class BrowserKeywords():
             else:
                 logger.print_on_console(webconstants_MW.INVALID_INPUT)
         except Exception as e:
-            err_msg='ERROR OCURRED WHILE NAVIGATING TO URL'
+            err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
             log.error(e)
         if err_msg is not None:
             logger.print_on_console(err_msg)
@@ -321,7 +329,7 @@ class BrowserKeywords():
             obj.execute_key('tab',1)
             obj.execute_key('enter',1)
         except Exception as e:
-            err_msg='ERROR OCURRED IN TYPE FUNCTION '
+            err_msg='error occured in type function'
             logger.print_on_console(err_msg)
             log.error(e)
         return
@@ -657,8 +665,6 @@ class BrowserKeywords():
                 ## Issue #190 Driver control won't switch back to parent window
                 if to_window>len(window_handles):
                     err_msg='Window '+input+' not found'
-                    logger.print_on_console(err_msg)
-                    log.error(err_msg)
                 else:
                     log.info('The available window handles are ')
                     log.info(window_handles)
@@ -846,6 +852,7 @@ class Singleton_DriverUtil():
             choptions.add_argument('start-maximized')
             choptions.add_argument('--disable-extensions')
             driver = webdriver.Chrome(chrome_options=choptions, executable_path=chrome_path)
+            controller.process_ids.append(driver.service.process.pid)
             drivermap.append(driver)
             logger.print_on_console('Chrome browser started')
             log.info('Chrome browser started')
@@ -893,6 +900,7 @@ class Singleton_DriverUtil():
                 # opening firefox browser through selenium if the version 47 and less than 47
                 if int(version) < 48:
                     driver = webdriver.Firefox()
+                    controller.process_ids.append(driver.service.process.pid)
                     drivermap.append(driver)
                     driver.maximize_window()
                     logger.print_on_console('Firefox browser started')
@@ -901,6 +909,7 @@ class Singleton_DriverUtil():
                     caps=webdriver.DesiredCapabilities.FIREFOX
                     caps['marionette'] = True
                     driver = webdriver.Firefox(capabilities=caps,executable_path=webconstants_MW.GECKODRIVER_PATH)
+                    controller.process_ids.append(driver.service.process.pid)
                     drivermap.append(driver)
                     driver.maximize_window()
                     logger.print_on_console('geckodriver started')
@@ -923,6 +932,7 @@ class Singleton_DriverUtil():
             else:
                 iepath = webconstants_MW.IE_DRIVER_PATH_64
             driver = webdriver.Ie(capabilities=caps,executable_path=iepath)
+            controller.process_ids.append(driver.service.process.pid)
             drivermap.append(driver)
             driver.maximize_window()
             logger.print_on_console('IE browser started')
@@ -930,16 +940,19 @@ class Singleton_DriverUtil():
 
         elif(browser_num == '4'):
             driver = webdriver.Opera()
+            controller.process_ids.append(driver.service.process.pid)
             drivermap.append(driver)
             logger.print_on_console('Opera browser started')
 
         elif(browser_num == '5'):
             driver = webdriver.PhantomJS(executable_path=webconstants_MW.PHANTOM_DRIVER_PATH)
+            controller.process_ids.append(driver.service.process.pid)
             drivermap.append(driver)
             logger.print_on_console('Phantom browser started')
 
         elif(browser_num == '6'):
             driver = webdriver.Safari()
+            controller.process_ids.append(driver.service.process.pid)
             drivermap.append(driver)
             logger.print_on_console('Safari browser started')
             log.info('Safari browser started')

@@ -148,6 +148,49 @@ class UtilOperations:
         oebs_key_objects.keyword_output.append(str(keywordresult))
         oebs_key_objects.keyword_output.append(str(verifyresponse))
 
+    def mousehover(self,acc):
+        del oebs_key_objects.custom_msg[:]
+         #sets the keywordresult to FAIL
+        keywordresult=MSG_FAIL
+        verifyresponse = MSG_FALSE
+        try:
+            curaccinfo = acc.getAccessibleContextInfo()
+            objstates = curaccinfo.states
+            if 'enabled' in objstates:
+                x1 = curaccinfo.x
+                y1 = curaccinfo.y
+                width = curaccinfo.width
+                height = curaccinfo.height
+                x2 = x1 + width
+                y2 = y1 + height
+                x_cor = (x1+x2)/2
+                y_cor = (y1+y2)/2
+                #converting the float to int:
+                x_cor = int(x_cor)
+                y_cor = int(y_cor)
+                #x_cor = x2
+                #y_cor = y2
+                print(x_cor)
+                oebs_mouseops.MouseOperation('move',x_cor,y_cor)
+                verifyresponse = MSG_TRUE
+                keywordresult = MSG_PASS
+                log.debug('%s',keywordresult)
+            else:
+                log.debug('%s %s',DEF_DRAG)
+                oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
+                verifyresponse = MSG_FALSE
+                keywordresult = MSG_FAIL
+                log.debug('%s',keywordresult)
+
+        except Exception as e:
+            self.utilities_obj.cleardata()
+            log.debug('%s',e)
+            log.debug('Status: %s',keywordresult)
+        log.debug('Status: %s',keywordresult)
+        # response is sent to the client
+        self.utilities_obj.cleardata()
+        oebs_key_objects.keyword_output.append(str(keywordresult))
+        oebs_key_objects.keyword_output.append(str(verifyresponse))
 
     #Method to check given object is enabled
     def verifyenabled(self,acc):

@@ -217,6 +217,9 @@ class TableOperationKeywords():
                                 methodoutput=TEST_RESULT_TRUE
                                 log.info('Got the result : %s',str(tooltip))
                                 logger.print_on_console('Got the result : ',str(tooltip))
+                            else:
+                                tooltip=None
+                                err_msg = 'No cell tool tip present for the cell'
                     else:
                         err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                 except Exception as e:
@@ -528,7 +531,7 @@ class TableOperationKeywords():
             if (webElement is not None):
                 if visibleFlag==True:
                     try:
-                        js='var temp = fun(arguments[0], arguments[1]); return temp; function fun(table, str) {     var m = [],         row, cell, xx, tx, ty, xxx, yyy, child;     for (yyy = 0; yyy < table.rows.length; yyy++) {         row = table.rows[yyy];         for (xxx = 0; xxx < row.cells.length; xxx++) {             cell = row.cells[xxx];             xx = xxx;             for (; m[yyy] && m[yyy][xx]; ++xx) {}             for (tx = xx; tx < xx + cell.colSpan; ++tx) {                 for (ty = yyy; ty < yyy + cell.rowSpan; ++ty) {                     if (!m[ty]) m[ty] = [];                     m[ty][tx] = true;                 }             }             if (cell.innerText.indexOf(str)>= 0) return yyy + cell.rowSpan;             else if (cell.children.length > 0) {                 for (var i = 0; i < cell.children.length; i++) {                     child = cell.children[i];                     if (child.value == str) return yyy + cell.rowSpan; 					else{ 					var a=child.value; 					if(a){ 					var b=a; 					if(b.indexOf(str)>=0)return yyy + cell.rowSpan; 					}	 				}			 					                 }             }         }     }     return null; };'
+                        js='var temp = fun(arguments[0], arguments[1]); return temp; function fun(table, str) {     var m = [],         row, cell, xx, tx, ty, xxx, yyy, child;     for (yyy = 0; yyy < table.rows.length; yyy++) {         row = table.rows[yyy];         for (xxx = 0; xxx < row.cells.length; xxx++) {             cell = row.cells[xxx];             xx = xxx;             for (; m[yyy] && m[yyy][xx]; ++xx) {}             for (tx = xx; tx < xx + cell.colSpan; ++tx) {                 for (ty = yyy; ty < yyy + cell.rowSpan; ++ty) {                     if (!m[ty]) m[ty] = [];                     m[ty][tx] = true;                 }             }             if (cell.innerText.indexOf(str)>= 0 && cell.innerText==str) return yyy + cell.rowSpan;             else if (cell.children.length > 0) {                 for (var i = 0; i < cell.children.length; i++) {                     child = cell.children[i];                     if (child.value == str) return yyy + cell.rowSpan; 					else{ 					var a=child.value; 					if(a){ 					var b=a; 					if(b.indexOf(str)>=0 && b==str)return yyy + cell.rowSpan; 					}	 				}			 					                 }             }         }     }     return null; };'
                         row_number=browser_Keywords_MW.driver_obj.execute_script(js,webElement,text)
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
@@ -645,6 +648,7 @@ class TableOperationKeywords():
                         cell_row = input_val[0]
                         log.info('cell row')
                         log.info(cell_row)
+                        input_val[1]=str(int(input_val[1])-1)
                         cell_col = input_val[1]
                         log.info('cell_col')
                         log.info(cell_col)
