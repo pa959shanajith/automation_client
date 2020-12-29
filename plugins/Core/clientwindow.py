@@ -478,27 +478,28 @@ class ClientWindow(wx.Frame):
         root.debug_scrape()
 
     def DisableAll(self):
-        self.enabledStatus = [self.menubar.IsEnabledTop(0),self.menubar.IsEnabledTop(1),
-            self.connectbutton.IsEnabled(),self.schedule.IsEnabled(),self.rbox.IsEnabled(),
-            self.cancelbutton.IsEnabled(),self.terminatebutton.IsEnabled(),self.clearbutton.IsEnabled()]
-        self.menubar.EnableTop(0,False)
-        self.menubar.EnableTop(1,False)
+        self.enabledStatus = [self.connectbutton.IsEnabled(),self.schedule.IsEnabled(),
+            self.rbox.IsEnabled(),self.cancelbutton.IsEnabled(),
+            self.terminatebutton.IsEnabled(),self.clearbutton.IsEnabled()]
+            # self.menubar.IsEnabledTop(0),self.menubar.IsEnabledTop(1)]
         self.connectbutton.Disable()
         self.schedule.Disable()
         self.rbox.Disable()
         self.cancelbutton.Disable()
         self.terminatebutton.Disable()
         self.clearbutton.Disable()
+        # self.menubar.EnableTop(0,False) # Disable File Menu
+        # self.menubar.EnableTop(1,False) # Disable Edit Menu
 
     def EnableAll(self):
-        if self.enabledStatus[0]: self.menubar.EnableTop(0,True)
-        if self.enabledStatus[1]: self.menubar.EnableTop(1,True)
-        if self.enabledStatus[2]: self.connectbutton.Enable()
-        if self.enabledStatus[3]: self.schedule.Enable()
-        if self.enabledStatus[4]: self.rbox.Enable()
-        if self.enabledStatus[5]: self.cancelbutton.Enable()
-        if self.enabledStatus[6]: self.terminatebutton.Enable()
-        if self.enabledStatus[7]: self.clearbutton.Enable()
+        if self.enabledStatus[0]: self.connectbutton.Enable()
+        if self.enabledStatus[1]: self.schedule.Enable()
+        if self.enabledStatus[2]: self.rbox.Enable()
+        if self.enabledStatus[3]: self.cancelbutton.Enable()
+        if self.enabledStatus[4]: self.terminatebutton.Enable()
+        if self.enabledStatus[5]: self.clearbutton.Enable()
+        # if self.enabledStatus[6]: self.menubar.EnableTop(0,True)
+        # if self.enabledStatus[7]: self.menubar.EnableTop(1,True)
 
 
 """Checks if config file is present, if not prompts the user to enter config file details"""

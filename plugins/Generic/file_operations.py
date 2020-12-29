@@ -225,6 +225,7 @@ class FileOperations:
         status = TEST_RESULT_FAIL
         result = TEST_RESULT_FALSE
         err_msg = None
+        fileFlag = False
         try:
             file1 = os.path.basename(source_path)
             if(not extension.startswith('.')): extension = '.'+extension    
@@ -234,7 +235,7 @@ class FileOperations:
             input_ext = os.path.splitext(source_path)[1]
             ext_list=['.txt','.csv','.xlsx','.xls','.doc','.docx','.pdf','.zip','.unzip']
             if(extension in ext_list):
-                if(not res or opt=='1'): 
+                if((input_ext in ['.xlsx', '.xls']) or (not res or opt=='1')): 
                     if(input_ext=='.txt' and extension=='.csv'):
                         with open(source_path, 'r') as in_file:
                             stripped = (line.strip() for line in in_file)
@@ -251,20 +252,37 @@ class FileOperations:
 
                     elif(input_ext=='.xlsx' and extension=='.csv'):
                         wb = openpyxl.load_workbook(source_path)
-                        sh = wb.get_active_sheet()
-                        with open(file2, 'w', newline="") as f:
-                            c = csv.writer(f)
-                            for r in sh.rows:
-                                c.writerow([cell.value for cell in r])
-                        wb.close()
+                        sh = wb.worksheets
+                        for sheet in sh:
+                            if(not len(sh)==1):
+                                file2=destination_path.split('.')[0]+'_'+sheet.title+'.csv'
+                            if(not os.path.isfile(file2) or opt=='1'):
+                                with open(file2, 'w', newline="") as f:
+                                    c = csv.writer(f)
+                                    for r in sheet.rows:
+                                        c.writerow([cell.value for cell in r])
+                                wb.close()
+                            else:
+                                fileFlag=True
+                        if(fileFlag):
+                            err_msg = 'One or more files already exists with the same name in the destination path.'
 
                     elif(input_ext=='.xls' and extension=='.csv'):
                         with open_workbook(source_path) as wb:
-                            sheet = wb.sheet_by_index(0)
-                            with open(file2, 'w', newline="") as f:
-                                c = csv.writer(f)
-                                for r in range(sheet.nrows):
-                                    c.writerow(sheet.row_values(r))
+                            sheet_name=wb.sheet_names()
+                            for i in range(len(sheet_name)):
+                                if(not len(sheet_name)==1):
+                                    file2=destination_path.split('.')[0]+'_'+sheet_name[i]+'.csv'
+                                if(not os.path.isfile(file2) or opt=='1'):
+                                    sheet = wb.sheet_by_index(i)
+                                    with open(file2, 'w', newline="") as f:
+                                        c = csv.writer(f)
+                                        for r in range(sheet.nrows):
+                                            c.writerow(sheet.row_values(r))
+                                else:
+                                    fileFlag=True
+                            if(fileFlag):
+                                err_msg = 'One or more files already exists with the same name in the destination path.'
 
                     elif(input_ext=='.csv' and extension=='.xlsx'):
                         workbook = openpyxl.Workbook()
@@ -345,8 +363,8 @@ class FileOperations:
                 else:
                     err_msg = 'File/Folder already exists in the destination path'
                 if(not err_msg):
-                    log.debug('Successfully converted from ' + str(source_path) + ' to ' + str(file2) ) 
-                    logger.print_on_console('Successfully converted from ' + str(source_path) + ' to ' + str(file2) )
+                    log.debug('Successfully converted ' + str(source_path) + ' to ' + str(extension)+' extension.') 
+                    logger.print_on_console('Successfully converted ' + str(source_path) + ' to ' + str(extension)+' extension.')
                     status=TEST_RESULT_PASS
                     result=TEST_RESULT_TRUE
             else:
@@ -385,7 +403,7 @@ class FileOperations:
                                 if ( shutil.disk_usage(os.path.dirname(destination_path)).free / 1048576 > os.path.getsize(source_path) / 1048576):
                                     if( int(opt) == 0 ):
                                         #dont-overwrite
-                                        if ( not os.path.isfile(destination_path) ): #already exists
+                                        if ( not os.path.isfile(destination_path) or extension!='null'): #already exists
                                             logger.print_on_console( "Copying the file to destination. Please wait..." )
                                             if( extension!= 'null'):
                                                 status,result,err_msg=self.saveFileAs(source_path,destination_path,opt,extension)
@@ -520,7 +538,7 @@ class FileOperations:
                                 else:
                                     destination_path = destination_path + '/' + os.path.basename(source_path).split('.')[0]+'.'+extension
                                 if( int(opt) == 0 ):
-                                    if ( not os.path.isfile(destination_path) ):
+                                    if ( not os.path.isfile(destination_path) or extension!='null'):
                                         logger.print_on_console( "Moving the file to destination. Please wait..." )
                                         if(extension!='null'):
                                             status,result,err_msg=self.saveFileAs(source_path,destination_path,opt,extension)
