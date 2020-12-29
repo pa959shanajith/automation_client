@@ -849,7 +849,15 @@ class FileOperations:
                 if file_ext not in ['.xls','.xlsx']:
                     if res == True:
                         log.debug('clearing the content of file')
-                        res,content,err_msg=self.dict[file_ext+'_get_content'](*params)
+                        if len(params)==1:
+                            params.append("getfullcontent")
+                            res,content,err_msg=self.dict[file_ext+'_get_content'](*params)
+                        else:
+                            if params[1] in ["", " "]:
+                                params[1] = "nolinenumber"
+                                res,content,err_msg=self.dict[file_ext+'_get_content'](*params)
+                            else:
+                                res,content,err_msg=self.dict[file_ext+'_get_content'](*params)
                         if res:
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE

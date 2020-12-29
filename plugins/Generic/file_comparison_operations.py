@@ -139,6 +139,10 @@ class TextFile:
                 content = myFile.read()
                 if linenumber == "getfullcontent":
                     status=True
+                elif linenumber == 'nolinenumber':
+                    display_msg = "WARNING: Fetching entire text file content as the line number is not specified."
+                    logger.print_on_console(display_msg)
+                    status=True
                 else:
                     linenumber = int(linenumber)
                     split_content = content.splitlines()
@@ -157,8 +161,8 @@ class TextFile:
             err_msg=generic_constants.ERR_MSG1+'Fetching Text content'+generic_constants.ERR_MSG2
             log.error(e)
         log.info('Status is '+str(status))
-        if err_msg!=None:
-            logger.print_on_console(err_msg)
+        # if err_msg!=None:
+        #     logger.print_on_console(err_msg)
         return status,content,err_msg
 
     def get_linenumber(self,input_path,content):
