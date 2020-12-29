@@ -18,8 +18,10 @@ if SYSTEM_OS=='Windows':
     import win32process
     import win32con
 from PIL import Image
+import cv2
 import domconstants
 import logging
+import numpy 
 log = logging.getLogger("webscrape_utils.py")
 
 class WebScrape_Utils:
@@ -48,7 +50,7 @@ class WebScrape_Utils:
     def fullpage_screenshot(self,driver, screen_shot_path):
         try:
             total_width = driver.execute_script("return document.body.offsetWidth")
-            total_height = driver.execute_script("return document.body.parentNode.scrollHeight")
+            total_height = driver.execute_script("return document.documentElement.scrollHeight")
             viewport_width = driver.execute_script("return window.innerWidth")
             viewport_height = driver.execute_script("return window.innerHeight")
             #scroll to the top of the page
@@ -67,27 +69,23 @@ class WebScrape_Utils:
             if total_width > 0 and total_height > 0 and viewport_width > 0 and viewport_height > 0:
 
                 i = 0
-                while i < total_height:
+                while i - viewport_height < total_height:
                     ii = 0
                     top_height = i + viewport_height
-
                     if top_height > total_height:
                         top_height = total_height
-
+                    if i > total_height:    
+                        i = total_height
                     while ii < total_width:
                         top_width = ii + viewport_width
-
                         if top_width > total_width:
                             top_width = total_width
-
                         rectangles.append((ii, i, top_width, top_height))
-
                         ii = ii + viewport_width
-
                     i = i + viewport_height
-
-                stitched_image = Image.new('RGB', (total_width, total_height))
+                stitched_image = Image.new('RGB', (total_width, total_height + viewport_height))
                 previous = None
+                previous_image = None
                 part = 0
                 for rectangle in rectangles:
                     if not previous is None:
@@ -96,11 +94,19 @@ class WebScrape_Utils:
                     file_name = "part_{0}.png".format(part)
                     driver.get_screenshot_as_file(file_name)
                     screenshot = Image.open(file_name)
-                    if rectangle[1] + viewport_height > total_height:
-                        offset = (rectangle[0], total_height - viewport_height)
-                    else:
-                        offset = (rectangle[0], rectangle[1])
+                    if previous_image:
+                        current = numpy.array(screenshot) 
+                        prev = numpy.array(previous_image)
+                        current = current[:, :, ::-1].copy()
+                        prev = prev[:, :, ::-1].copy()
+                        difference = cv2.subtract(current, prev)    
+                        result = not numpy.any(difference)
+                        if result: 
+                            stitched_image = stitched_image.crop((0,0,total_width,total_height))
+                            continue
+                    offset = (rectangle[0], rectangle[1])
                     stitched_image.paste(screenshot, offset)
+                    previous_image = screenshot
                     del screenshot
                     os.remove(file_name)
                     part = part + 1
