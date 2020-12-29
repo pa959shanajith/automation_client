@@ -94,6 +94,12 @@ class TextboxKeywords:
 
     def __check_IE_64bit_from_config(self):
         return readconfig.configvalues['bit_64'].strip().lower() == "yes"
+    
+    def __invalidInput(self):
+        err_msg="Input cannot be empty/null"
+        local_to.log.error(err_msg)
+        logger.print_on_console(err_msg)
+        return err_msg
 
     def set_text(self,webelement,input,*args):
         """
@@ -109,6 +115,10 @@ class TextboxKeywords:
         err_msg=None
         check_flag=True
         local_to.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        if(input[0].isspace() or input[0]==''):
+            err_msg=self.__invalidInput()
+            return status,methodoutput,output,err_msg
+        
         if webelement is not None:
             try:
                 if webelement.is_enabled():
@@ -192,6 +202,9 @@ class TextboxKeywords:
         err_msg=None
         check_flag=True
         local_to.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        if(input[0].isspace() or input[0]==''):
+            err_msg=self.__invalidInput()
+            return status,methodoutput,output,err_msg
         if webelement is not None:
             try:
                 if webelement.is_enabled():

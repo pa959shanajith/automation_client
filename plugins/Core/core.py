@@ -1753,7 +1753,7 @@ def check_PatchUpdate():
         log.debug(e)
         patchcheckFlag = False
     finally:
-        logger.print_on_console('Browser compatibility check completed')
+        logger.print_on_console('Check for client patch update completed')
     return patchcheckFlag
 
 def check_execution_lic(event):
