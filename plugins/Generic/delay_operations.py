@@ -89,7 +89,11 @@ class Delay_keywords:
             try:
                 if not (args is None or args is ''):
                     input_list=list(args)
-                    index=input_list.index(';')
+                    semicolon_count=input_list.count(";")
+                    if semicolon_count>1:
+                        index=input_list.index(';',2)
+                    else:
+                        index=input_list.index(';')
                     values=input_list[0:index]
                     variables=input_list[index+1:len(input_list)]
                     flag_invalid_syntax=False
