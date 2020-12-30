@@ -623,6 +623,10 @@ class UtilWebKeywords:
                 browser_Keywords.BrowserKeywords.update_window_handles()
                 status=TEST_RESULT_PASS
                 methodoutput=TEST_RESULT_TRUE
+        except ElementNotInteractableException as ex:
+            err_msg='Element is not interactable'
+            logger.print_on_console(ex)
+            local_uo.log.info(err_msg)
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
         return status,methodoutput,output,err_msg
