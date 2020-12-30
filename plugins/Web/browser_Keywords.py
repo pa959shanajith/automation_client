@@ -1199,7 +1199,7 @@ class Singleton_DriverUtil():
                     if SYSTEM_OS == "Darwin":
                         caps1['platform'] = 'MAC'
                     driver = webdriver.Edge(capabilities=caps1,executable_path=chromium_path)
-                    controller.process_ids.append(driver.service.process.pid)
+                    controller.process_ids.append(driver.edge_service.process.pid)
                     drivermap.append(driver)
                     driver.maximize_window()
                     logger.print_on_console('Edge Chromium browser started')
