@@ -83,35 +83,43 @@ class WebScrape_Utils:
                         rectangles.append((ii, i, top_width, top_height))
                         ii = ii + viewport_width
                     i = i + viewport_height
-                stitched_image = Image.new('RGB', (total_width, total_height + viewport_height))
+                stitched_image = None
                 previous = None
-                previous_image = None
+                previous_screenshot = None
                 part = 0
-                for rectangle in rectangles:
+                height = 0
+                images = {'total_height':0, 'total_width': total_width, 'viewport_height': viewport_height,'viewport_width': viewport_width,"imagedata": [], "reported_height": total_height}
+                while True:
                     if not previous is None:
-                        driver.execute_script("window.scrollTo({0}, {1})".format(rectangle[0], rectangle[1]))
+                        driver.execute_script("window.scrollTo({0}, {1})".format(total_width,height))
                         time.sleep(0.2)
                     file_name = "part_{0}.png".format(part)
                     driver.get_screenshot_as_file(file_name)
                     screenshot = Image.open(file_name)
-                    if previous_image:
+                    prev_height = height
+                    height = height + viewport_height
+                    offset = (0,height)
+                    if previous_screenshot:
+                        result = False
                         current = numpy.array(screenshot) 
-                        prev = numpy.array(previous_image)
+                        prev = numpy.array(previous_screenshot)
                         current = current[:, :, ::-1].copy()
                         prev = prev[:, :, ::-1].copy()
-                        difference = cv2.subtract(current, prev)    
-                        result = not numpy.any(difference)
-                        if result: 
-                            stitched_image = stitched_image.crop((0,0,total_width,total_height))
-                            continue
-                    offset = (rectangle[0], rectangle[1])
-                    stitched_image.paste(screenshot, offset)
-                    previous_image = screenshot
+                        res = cv2.absdiff(prev, current)
+                        res = res.astype(numpy.uint8)
+                        percentage = (numpy.count_nonzero(res) * 100)/ res.size
+                        if percentage < 1: result = True
+                        if result:
+                            images['total_height'] = height - viewport_height
+                            stitched_image = self.get_screenshot(images,driver)
+                            break            
+                    images["imagedata"].append({'screenshot':screenshot,'height':prev_height})
+                    previous_screenshot = screenshot
                     del screenshot
                     os.remove(file_name)
                     part = part + 1
-                    previous = rectangle
-                    driver.execute_script("window.scrollTo({0}, {1})".format(rectangle[0], rectangle[1]))
+                    #previous = rectangle
+                    driver.execute_script("window.scrollTo({0}, {1})".format(total_width,height))
                     code = '''var elems = document.body.getElementsByTagName("*"); var len = elems.length; document.body.style.removeProperty('max-width'); document.body.style.removeProperty('overflow-x'); for (var i=0;i<len;i++) { 	if (window.getComputedStyle(elems[i],null).getPropertyValue('position') == 'fixed') { 		elems[i].style.removeProperty('opacity'); 	} }'''
                     driver.execute_script(code)
                 stitched_image.save(screen_shot_path)
@@ -123,6 +131,31 @@ class WebScrape_Utils:
         except Exception as e:
             screen = driver.get_screenshot_as_base64()
         return screen
+
+    def get_screenshot(self, images, driver):
+        stitched_image = None
+        calculate_offset = True
+        previous = None
+        part = 0
+        total_width = images['total_width']
+        viewport_height = images['viewport_height']
+        viewport_width = images['viewport_width']
+        if images['total_height'] - images['reported_height'] > viewport_height: 
+            total_height = images['total_height']
+            calculate_offset = False
+        else:  total_height = images['reported_height']
+        stitched_image = Image.new('RGB', (total_width, total_height))
+        for image in images["imagedata"]:
+            screenshot = image['screenshot']
+            if image['height'] + viewport_height > total_height and calculate_offset:
+                offset = (0, total_height - viewport_height)
+            else:
+                offset = (0, image['height'])
+            stitched_image.paste(screenshot, offset)
+            del screenshot
+            part = part + 1
+
+        return stitched_image
 
     """Method to switch into frames and iframes"""
     def switchtoframe_webscrape(self,driver,currenthandle,mypath):
