@@ -276,24 +276,16 @@ class MainNamespace(BaseNamespace):
             if("integration" in exec_data):
                 # integrationType = exec_data["qccredentials"]["integrationType"]
                 if(exec_data["integration"]["alm"]["url"] != ""):
-                    integrationType = "ALM"
-                elif(exec_data["integration"]["qtest"]["url"] != ""):
-                    integrationType = "qTest"
-                elif(exec_data["integration"]["zephyr"]["accountid"] != ""):
-                    integrationType = "Zephyr"
-                else:
-                    integrationType = ""
-                if(integrationType == 'ALM'):
                     if(qcObject == None):
                         core_utils.get_all_the_imports('Qc')
                         import QcController
                         qcObject = QcController.QcWindow()
-                if(integrationType == 'qTest'):
+                if(exec_data["integration"]["qtest"]["url"] != ""):
                     if(qtestObject == None):
                         core_utils.get_all_the_imports('QTest')
                         import QTestController
-                        qtestObject = QTestController.QcWindow()
-                if(integrationType == 'Zephyr'):
+                        qtestObject = QTestController.QTestWindow()
+                if(exec_data["integration"]["zephyr"]["accountid"] != ""):
                     if(zephyrObject == None):
                         core_utils.get_all_the_imports('Zephyr')
                         import ZephyrController
@@ -647,7 +639,7 @@ class MainNamespace(BaseNamespace):
             if(qtestObject == None):
                 core_utils.get_all_the_imports('QTest')
                 import QTestController
-                qtestObject = QTestController.QcWindow()
+                qtestObject = QTestController.QTestWindow()
 
             qcdata = args[0]
             response = qtestObject.qc_dict[qcdata.pop('qcaction')](qcdata)

@@ -875,8 +875,10 @@ class Config_window(wx.Frame):
             majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
         if isConfigJson != False and isConfigJson['headless_mode'].title() == lblList[0]:
             self.rbox15.SetSelection(0)
+            self.headlessOldVal = "Yes"
         else:
             self.rbox15.SetSelection(1)
+            self.headlessOldVal = "No"
         self.rbox15.SetToolTip(wx.ToolTip("Enables or disables Headless execution mode for Browser"))
 
         #adding the radio button for clear cache:
@@ -1007,6 +1009,8 @@ class Config_window(wx.Frame):
             self.error_msg.SetLabel("Extension Enable must be disabled when Headless Mode is enabled")
             self.error_msg.SetForegroundColour((255,0,0))
             return
+        if self.headlessOldVal != headless_mode:
+            controller.kill_process()
         #----------------creating data dictionary
         data['server_ip'] = server_add.strip()
         data['server_port'] = server_port.strip()

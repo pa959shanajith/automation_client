@@ -933,7 +933,6 @@ class Controller():
         zephyr_accNo=''
         zephyr_secKey=''
         zephyr_acKey=''        
-        integration_type=''
         con = Controller()
         obj = handler.Handler()
         status=COMPLETED
@@ -1011,31 +1010,32 @@ class Controller():
                             # if('integrationType' not in qc_creds and len(scenario)==2 and len(scenario['qcdetails'])==10):
 
                             # if('integrationType' in qc_creds and qc_creds['integrationType'] == 'ALM'):
+                            integ = 0
                             if(qc_creds["alm"]["url"] != "" and len(scenario["qcdetails"]) != 0):
                                 qc_username=qc_creds['alm']['username']
                                 qc_password=qc_creds['alm']['password']
                                 qc_url=qc_creds['alm']['url']
-                                integration_type="ALM"
-                                qc_sceanrio_data=scenario['qcdetails']
+                                qc_sceanrio_data=scenario['qcdetails'][integ]
+                                integ += 1
                             # if('integrationType' in qc_creds and qc_creds['integrationType'] == 'qTest'):
                             if(qc_creds["qtest"]["url"] != "" and len(scenario["qcdetails"]) != 0):
-                                qc_username=qc_creds["qtest"]["username"]
-                                qc_password=qc_creds["qtest"]["password"]
-                                qc_url=qc_creds["qtest"]["url"]
-                                integration_type="qTest"
-                                qc_stepsup=qc_creds["qtest"]["qteststeps"]
-                                qc_sceanrio_data=scenario['qcdetails']
-                                qc_project=qc_sceanrio_data['qtestproject']
-                                qc_projectid=qc_sceanrio_data['qtestprojectid']
-                                qc_suite=qc_sceanrio_data['qtestsuite']
-                                qc_suiteid=qc_sceanrio_data['qtestsuiteid']
+                                qtest_username=qc_creds["qtest"]["username"]
+                                qtest_password=qc_creds["qtest"]["password"]
+                                qtest_url=qc_creds["qtest"]["url"]
+                                qtest_stepsup=qc_creds["qtest"]["qteststeps"]
+                                qc_sceanrio_data=scenario['qcdetails'][integ]
+                                integ += 1
+                                qtest_project=qc_sceanrio_data['qtestproject']
+                                qtest_projectid=qc_sceanrio_data['qtestprojectid']
+                                qtest_suite=qc_sceanrio_data['qtestsuite']
+                                qtest_suiteid=qc_sceanrio_data['qtestsuiteid']
                             # if('integrationType' in qc_creds and qc_creds['integrationType'] == 'Zephyr'):
                             if(qc_creds["zephyr"]["accountid"] != "" and len(scenario["qcdetails"]) != 0):
                                 zephyr_acKey=qc_creds["zephyr"]["accesskey"]
                                 zephyr_secKey=qc_creds["zephyr"]["secretkey"]
                                 zephyr_accNo=qc_creds["zephyr"]["accountid"]
-                                integration_type="Zephyr"
-                                zephyr_sceanrio_data=scenario['qcdetails']
+                                zephyr_sceanrio_data=scenario['qcdetails'][integ]
+                                integ += 1
                                 zephyr_cycleid=zephyr_sceanrio_data['cycleid']
                                 zephyr_projectid=zephyr_sceanrio_data['projectid']
                                 zephy_versionid=zephyr_sceanrio_data['versionid']
@@ -1261,21 +1261,21 @@ class Controller():
                                             logger.print_on_console('Error in Updating Qc details')
                             # if (integration_type=="qTest" and qc_url!='' and qc_password!='' and  qc_username!=''):
                             if len(scenario['qcdetails'])!=0 and qc_creds['qtest']['url'] != '':
-                                qc_status_over=report_json[0]
+                                qtest_status_over=report_json[0]
                                 try:
-                                    qc_status = {}
-                                    qc_status['qcaction']='qcupdate'
-                                    qc_status['qc_project']=qc_project
-                                    qc_status['qc_projectid']=qc_projectid
-                                    qc_status['qc_suite']=qc_suite
-                                    qc_status['qc_suiteid']=qc_suiteid
-                                    qc_status['user']=qc_username
-                                    qc_status['qc_status_over'] = qc_status_over
-                                    qc_status['qc_stepsup']=qc_stepsup
-                                    qc_status['qcurl']=qc_url
-                                    qc_status['qcusername']=qc_username
-                                    qc_status['qcpassword']=qc_password
-                                    qc_status['steps']=[]
+                                    qtest_status = {}
+                                    qtest_status['qtestaction']='qtestupdate'
+                                    qtest_status['qtest_project']=qtest_project
+                                    qtest_status['qtest_projectid']=qtest_projectid
+                                    qtest_status['qtest_suite']=qtest_suite
+                                    qtest_status['qtest_suiteid']=qtest_suiteid
+                                    qtest_status['user']=qtest_username
+                                    qtest_status['qtest_status_over'] = qtest_status_over
+                                    qtest_status['qtest_stepsup']=qtest_stepsup
+                                    qtest_status['qtesturl']=qtest_url
+                                    qtest_status['qtestusername']=qtest_username
+                                    qtest_status['qtestpassword']=qtest_password
+                                    qtest_status['steps']=[]
                                     for i in con.reporting_obj.report_json['rows']:
                                         if 'Keyword' in i and i['Keyword'] == 'TestCase Name':
                                             pass
@@ -1283,17 +1283,17 @@ class Controller():
                                             pass
                                         else:
                                             if(i['status'].lower()=='pass'):
-                                                qc_status['steps'].append(601)
+                                                qtest_status['steps'].append(601)
                                             elif(i['status'].lower()=='fail'):
-                                                qc_status['steps'].append(602)
+                                                qtest_status['steps'].append(602)
                                             elif(i['status'].lower()=='terminate'):
-                                                qc_status['steps'].append(603)
+                                                qtest_status['steps'].append(603)
                                             else:
                                                 tsplistLen -= 1
                                     logger.print_on_console('****Updating qTest Details****')
                                     if qtestObject is not None:
-                                        qc_status_updated = qtestObject.update_qtest_run_details(qc_status,tsplistLen)
-                                        if qc_status_updated:
+                                        qtest_status_updated = qtestObject.update_qtest_run_details(qtest_status,tsplistLen)
+                                        if qtest_status_updated:
                                             logger.print_on_console('****Updated qTest Details****')
                                         else:
                                             logger.print_on_console('****Failed to Update qTest Details****')
@@ -1473,7 +1473,6 @@ class Controller():
         elif action==DEBUG:
             self.debug_choice=wxObject.choice
             self.debug_mode=debug_mode
-            kill_process()
             self.wx_object=wxObject
             status=self.invoke_debug(mythread,runfrom_step,json_data)
         if status != TERMINATE:
