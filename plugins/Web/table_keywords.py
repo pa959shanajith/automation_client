@@ -276,13 +276,13 @@ class TableOperationKeywords():
                                         logger.print_on_console('Invalid input: Row number more than row count')
                                 else:
                                     for i in rows:
-                                        if i.get_attribute(input_arr[4]) == row_number:
+                                        if i.get_attribute(input_val[4]) == row_number:
                                             if body:
                                                 cells = i.find_elements_by_xpath(".//div[@role='gridcell']")
                                             else:
                                                 cells = i.find_elements_by_xpath(".//div[contains(@class,'ag-header-cell')]")
                                             for j in cells:
-                                                if j.get_attribute(input_arr[5]) == col_number:
+                                                if j.get_attribute(input_val[5]) == col_number:
                                                     cellVal = self.getChildNodes(j)
                                                     cellVal=cellVal.strip()
                                                     local_tk.log.info('Got the result : %s',str(cellVal))
@@ -421,13 +421,13 @@ class TableOperationKeywords():
                                         logger.print_on_console('Invalid input: Row number more than row count')
                                 else:
                                     for i in rows:
-                                        if i.get_attribute(input_arr[5]) == row_number:
+                                        if i.get_attribute(input_val[5]) == row_number:
                                             if body:
                                                 cells = i.find_elements_by_xpath(".//div[@role='gridcell']")
                                             else:
                                                 cells = i.find_elements_by_xpath(".//div[contains(@class,'ag-header-cell')]")
                                             for j in cells:
-                                                if j.get_attribute(input_arr[6]) == col_number:
+                                                if j.get_attribute(input_val[6]) == col_number:
                                                     cellVal = self.getChildNodes(j)
                                                     cellVal=cellVal.strip()
                                                     expected_value=input_val[2].strip()
