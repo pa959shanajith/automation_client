@@ -21,7 +21,7 @@
     "logFile_Path": "./logs/TestautoV2.log",
     "prediction_for_iris_objects": "No",
     "queryTimeOut": "3",
-    "retrieveURL": "Yes",
+    "httpStatusCode": "Yes",
     "screenShot_Flag": "All",
     "screen_rec": "Yes",
     "server_cert": "./assets/CA_BUNDLE/server.crt",
