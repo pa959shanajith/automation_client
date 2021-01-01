@@ -183,7 +183,8 @@ class Dispatcher:
             'navigatewithauthenticate':local_Wd.browser_object.navigate_with_authenticate,
             'navigateback':local_Wd.browser_object.navigate_back,
             'opennewtab':local_Wd.browser_object.openNewTab,
-            'execute_js':local_Wd.browser_object.execute_js
+            'execute_js':local_Wd.browser_object.execute_js,
+            'getbrowsername': local_Wd.browser_object.getBrowserName
         }
         self.exception_flag=''
         self.action=None

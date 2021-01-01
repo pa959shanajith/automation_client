@@ -39,6 +39,10 @@ class Browser_Keywords:
     def getCurrentURL(self,space,*args):
         self.f.write(space+"output=driver.current_url")
         self.f.write(space+"status='Pass'")
+
+    def getBrowserName(self,space,*args):
+        self.f.write(space+"output=driver.name")
+        self.f.write(space+"status='Pass'")
     
     def verifyCurrentURL(self,space,input,*args):
         inp_url=input[0]
