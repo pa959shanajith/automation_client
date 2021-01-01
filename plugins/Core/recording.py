@@ -7,6 +7,7 @@ import time
 from timeit import default_timer as timer
 import logging
 import logger
+import os
 
 
 log = logging.getLogger("controller.py")
@@ -18,12 +19,16 @@ class Recorder():
         self.rec_status = False
 
     # Recording screen while execution(Currently for Web Apptype)
-    def record_execution(self):
+    def record_execution(self,*args):
         try:
             ##start screen recording
             import constants
             if constants.SCREENSHOT_PATH  not in ['screenshot_path', 'Disabled']:
-                filename = constants.SCREENSHOT_PATH+"ScreenRecording_"+datetime.now().strftime("%Y%m%d%H%M%S")+".mp4"
+                details=args[0]['suitedetails']
+                path = constants.SCREENSHOT_PATH+details[0]['projectname']+'\\'+details[0]['releaseid']+'\\'+details[0]['cyclename']+'\\'+datetime.now().strftime("%Y-%m-%d")+'\\'
+                if(not os.path.exists(path)):
+                    os.makedirs(path)
+                filename = path+"ScreenRecording_"+datetime.now().strftime("%Y%m%d%H%M%S")+".mp4"
             else:
                 filename = "output/ScreenRecording_"+datetime.now().strftime("%Y%m%d%H%M%S")+".mp4"
                 logger.print_on_console("Screen capturing disabled since user does not have sufficient privileges for screenshot folder. Video saved in 'Avoassure/output' folder\n")

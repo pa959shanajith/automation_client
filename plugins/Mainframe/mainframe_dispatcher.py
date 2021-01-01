@@ -28,7 +28,7 @@ class MainframeDispatcher:
         self.exception_flag=''
         self.action = None
 
-    def dispatcher(self,teststepproperty,input):
+    def dispatcher(self,teststepproperty,input,mythread):
         objectname = teststepproperty.objectname
         objectname = objectname.strip()
         keyword = teststepproperty.name.lower()
@@ -67,12 +67,13 @@ class MainframeDispatcher:
             if self.action == constants.EXECUTE:
                 if result !=constants.TERMINATE:
                     result=list(result)
+                    screen_details=mythread.json_data['suitedetails'][0]
                     if configvalues['screenShot_Flag'].lower() == 'fail':
                         if result[0].lower() == 'fail':
-                            file_path = screen_shot_obj.captureScreenshot()
+                            file_path = screen_shot_obj.captureScreenshot(screen_details)
                             result.append(file_path[2])
                     elif configvalues['screenShot_Flag'].lower() == 'all':
-                        file_path = screen_shot_obj.captureScreenshot()
+                        file_path = screen_shot_obj.captureScreenshot(screen_details)
                         result.append(file_path[2])
         except Exception as e:
             log.error(e)

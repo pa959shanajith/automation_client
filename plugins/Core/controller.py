@@ -834,7 +834,7 @@ class Controller():
         return res
 
     def invokeoebskeyword(self,teststepproperty,dispatcher_obj,inputval,iris_flag):
-        res = dispatcher_obj.dispatcher(teststepproperty,inputval,iris_flag)
+        res = dispatcher_obj.dispatcher(teststepproperty,inputval,iris_flag,self.conthread)
         return res
 
     def invokewebservicekeyword(self,teststepproperty,dispatcher_obj,inputval,socket_object):
@@ -852,23 +852,23 @@ class Controller():
         return res
 
     def invokemobilekeyword(self,teststepproperty,dispatcher_obj,inputval,reporting_obj):
-        res = dispatcher_obj.dispatcher(teststepproperty,inputval,self.reporting_obj)
+        res = dispatcher_obj.dispatcher(teststepproperty,inputval,self.reporting_obj,self.conthread)
         return res
 
     def invokemobileappkeyword(self,teststepproperty,dispatcher_obj,inputval,reporting_obj, iris_flag):
-        res = dispatcher_obj.dispatcher(teststepproperty,inputval,self.reporting_obj, iris_flag)
+        res = dispatcher_obj.dispatcher(teststepproperty,inputval,self.reporting_obj, iris_flag,self.conthread)
         return res
 
     def invokeDesktopkeyword(self,teststepproperty,dispatcher_obj,inputval,iris_flag):
-        res = dispatcher_obj.dispatcher(teststepproperty,inputval,iris_flag)
+        res = dispatcher_obj.dispatcher(teststepproperty,inputval,iris_flag,self.conthread)
         return res
 
     def invokeSAPkeyword(self,teststepproperty,dispatcher_obj,inputval,iris_flag):
-        res = dispatcher_obj.dispatcher(teststepproperty,inputval,iris_flag)
+        res = dispatcher_obj.dispatcher(teststepproperty,inputval,iris_flag,self.conthread)
         return res
 
     def invokemainframekeyword(self,teststepproperty,dispatcher_obj,inputval):
-        res = dispatcher_obj.dispatcher(teststepproperty,inputval)
+        res = dispatcher_obj.dispatcher(teststepproperty,inputval,self.conthread)
         return res
 
     def invokepdfkeyword(self, teststepproperty, dispatcher_obj,inputval,iris_flag):
@@ -1126,7 +1126,7 @@ class Controller():
                                     recorder_obj = recording.Recorder()
                                     record_flag = str(configvalues['screen_rec']).lower()
                                     #start screen recording
-                                    if (record_flag=='yes') and self.execution_mode == SERIAL and json_data['apptype'] == 'Web': video_path = recorder_obj.record_execution()
+                                    if (record_flag=='yes') and self.execution_mode == SERIAL and json_data['apptype'] == 'Web': video_path = recorder_obj.record_execution(json_data)
                                     status,status_percentage = con.executor(tsplist,EXECUTE,last_tc_num,1,con.conthread,video_path)
                                     #end video
                                     if (record_flag=='yes') and self.execution_mode == SERIAL and json_data['apptype'] == 'Web': recorder_obj.rec_status = False

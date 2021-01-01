@@ -58,6 +58,9 @@ class Screenshot():
                         output=None
                     else:
                         filename=self.generateUniqueFileName()
+                        path=path+args[0]['projectname']+'\\'+args[0]['releaseid']+'\\'+args[0]['cyclename']+'\\'+datetime.datetime.now().strftime("%Y-%m-%d")+'\\'
+                        if(not os.path.exists(path)):
+                            os.makedirs(path)
                         filePath = path + filename
                         output = filePath+'.png'
                 except Exception as e:
