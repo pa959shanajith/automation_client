@@ -1009,8 +1009,6 @@ class Config_window(wx.Frame):
             self.error_msg.SetLabel("Extension Enable must be disabled when Headless Mode is enabled")
             self.error_msg.SetForegroundColour((255,0,0))
             return
-        if self.headlessOldVal != headless_mode:
-            controller.kill_process()
         #----------------creating data dictionary
         data['server_ip'] = server_add.strip()
         data['server_port'] = server_port.strip()
@@ -1287,6 +1285,8 @@ class Config_window(wx.Frame):
             core.browsercheckFlag=True
             core.chromeFlag=core.firefoxFlag=False
         core.updatecheckFlag = configvalues['update_check'].lower() == 'no'
+        if self.headlessOldVal != configvalues['headless_mode']:
+            controller.kill_process()
         try:
             logfilename = os.path.normpath(configvalues["logFile_Path"]).replace("\\","\\\\")
             logging.config.fileConfig(LOGCONFIG_PATH,defaults={'logfilename': logfilename},disable_existing_loggers=False)
