@@ -740,6 +740,35 @@ class BrowserKeywords():
             err_msg=self.__web_driver_exception(e)
         return status,result,output,err_msg
 
+    def getBrowserName(self, *args):
+        global local_bk
+        status=webconstants.TEST_RESULT_FAIL
+        result=webconstants.TEST_RESULT_FALSE
+        browsername=None
+        err_msg=None
+        configvalues = readconfig.configvalues
+        try:
+            if str(configvalues['headless_mode'])=='Yes':
+                browsername = 'Headless'
+                logger.print_on_console('Browser Name: ',browsername)
+                local_bk.log.info('Browser Name: '+ browsername)
+                status=webconstants.TEST_RESULT_PASS
+                result=webconstants.TEST_RESULT_TRUE
+            elif(local_bk.driver_obj != None):
+                browsername = webconstants.BROWSER_NAME_MAP[local_bk.driver_obj.name.strip()]
+                logger.print_on_console('Browser Name: ',browsername)
+                local_bk.log.info('Browser Name: '+ browsername)
+                status=webconstants.TEST_RESULT_PASS
+                result=webconstants.TEST_RESULT_TRUE
+            else:
+                err_msg = 'Browser not available'
+                logger.print_on_console(err_msg)
+                local_bk.log.error(err_msg)
+                local_bk.log.error('Driver object is null')
+        except Exception as e:
+            err_msg=self.__web_driver_exception(e)
+        return status,result,browsername,err_msg
+
     def update_window_handles(self):
         global local_bk
     	## Issue #190 Driver control won't switch back to parent window
