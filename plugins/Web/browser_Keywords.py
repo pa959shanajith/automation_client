@@ -29,7 +29,6 @@ import psutil
 import readconfig
 import core_utils
 import time
-import controller
 from sendfunction_keys import SendFunctionKeys as SF
 driver_pre = None
 drivermap = []
@@ -600,7 +599,16 @@ class BrowserKeywords():
                     if(current_handle == x):
                         break
                 count = count - 2
-                local_bk.webdriver_list[driver_instance].quit()
+                if isinstance(local_bk.driver_obj,webdriver.Ie):
+                    import win32com.client
+                    wmi=win32com.client.GetObject('winmgmts:')
+                    proc=wmi.ExecQuery('select * from Win32_Process where Name="IEDriverServer64.exe"')
+                    if len(proc)>0:
+                        for i in proc:
+                            os.system("TASKKILL /F /T /PID " + str(i.ProcessId))
+                            time.sleep(5)
+                else:
+                    local_bk.webdriver_list[driver_instance].quit()
                 local_bk.driver_obj = None
                 if SYSTEM_OS == 'Darwin':
                     os.system("killall -9 Safari")
@@ -1041,6 +1049,7 @@ class Singleton_DriverUtil():
         return d
 
     def getBrowser(self,browser_num):
+        import controller
         global local_bk, drivermap
         del local_bk.recent_handles[:]
         del local_bk.all_handles[:]
@@ -1170,7 +1179,7 @@ class Singleton_DriverUtil():
 
         elif(browser_num == '5'):
             try:
-                driver = webdriver.PhantomJS(executable_path=webconstants.PHANTOM_DRIVER_PATH)                    
+                driver = webdriver.PhantomJS(executable_path=webconstants.PHANTOM_DRIVER_PATH)
                 controller.process_ids.append(driver.service.process.pid)
                 drivermap.append(driver)
                 logger.print_on_console('Phantom browser started')
@@ -1358,6 +1367,3 @@ class Singleton_DriverUtil():
                 break
         local_bk.log.info('Flag:',str(flag1))
         return flag1
-
-
-
