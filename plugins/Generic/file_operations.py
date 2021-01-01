@@ -1107,9 +1107,11 @@ class FileOperations:
 
         """
         try:
+            import time
+            from sendfunction_keys import SendFunctionKeys
+            obj=SendFunctionKeys()
             configvalues = readconfig.readConfig().readJson()
             delay_stringinput = float(configvalues['delay_stringinput'])
-            import time
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
             err_msg=None
@@ -1135,10 +1137,6 @@ class FileOperations:
                     log.info('File has been saved')
                 else:
                 """
-
-                from sendfunction_keys import SendFunctionKeys
-                obj=SendFunctionKeys()
-
                 #Get the focus on Windows Dialog box by pressing 'alt+d'
                 obj.press_multiple_keys(['alt','d'],1)      ##added timer after every step
                 time.sleep(1)
@@ -1166,12 +1164,12 @@ class FileOperations:
 
                 status=TEST_RESULT_PASS
                 methodoutput=TEST_RESULT_TRUE
-
                 log.info('File has been saved')
-
-
             else:
-                err_msg=generic_constants.INVALID_INPUT
+                err_msg='Invalid file path'
+                time.sleep(1)
+                obj.execute_key('esc',1)
+                time.sleep(1)
         except (IOError,WindowsError):
             err_msg=ERROR_CODE_DICT['ERR_FILE_NOT_ACESSIBLE']
         except Exception as e:

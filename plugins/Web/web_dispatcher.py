@@ -436,7 +436,7 @@ class Dispatcher:
                     driver=browser_Keywords.local_bk.driver_obj
                     if local_Wd.popup_object.check_if_no_popup_exists() and (keyword not in [GET_POPUP_TEXT,VERIFY_POPUP_TEXT]):
                         driver.switch_to.default_content()
-                    if flag and webelement==None and teststepproperty.custname!='@Browser':
+                    if flag and webelement==None and teststepproperty.custname!='@Browser' and teststepproperty.name!='verifyDoesNotExists':
                         result=list(result)
                         result[3]=WEB_ELEMENT_NOT_FOUND
 
