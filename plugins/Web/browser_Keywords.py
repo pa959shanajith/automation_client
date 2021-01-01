@@ -1032,8 +1032,10 @@ class Singleton_DriverUtil():
                     choptions.add_argument('start-maximized')
                     choptions.add_experimental_option('useAutomationExtension', False)
                     choptions.add_experimental_option("excludeSwitches",["enable-automation"])
+                    if headless_mode:
+                        WINDOW_SIZE = "1350,650"
+                        choptions.add_argument("--window-size=%s" % WINDOW_SIZE)
                     if headless_mode: choptions.add_argument('--headless')
-                       
                     if configvalues['extn_enabled'].lower()=='yes' and os.path.exists(webconstants.EXTENSION_PATH):
                         choptions.add_extension(webconstants.EXTENSION_PATH)
                     else:
@@ -1199,7 +1201,7 @@ class Singleton_DriverUtil():
                     if SYSTEM_OS == "Darwin":
                         caps1['platform'] = 'MAC'
                     driver = webdriver.Edge(capabilities=caps1,executable_path=chromium_path)
-                    controller.process_ids.append(driver.service.process.pid)
+                    controller.process_ids.append(driver.edge_service.process.pid)
                     drivermap.append(driver)
                     driver.maximize_window()
                     logger.print_on_console('Edge Chromium browser started')

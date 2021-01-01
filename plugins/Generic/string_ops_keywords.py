@@ -411,7 +411,7 @@ class StringOperation:
         try:
             input_vals = args
             len_input_val = len(input_vals)
-            if len_input_val >= 2:
+            if len_input_val >= 2 and not None in input_vals:
 ##                output = ''.join(input_vals)
                 output=''
                 coreutilsobj=core_utils.CoreUtils()

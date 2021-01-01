@@ -436,7 +436,7 @@ class Dispatcher:
                     driver=browser_Keywords.local_bk.driver_obj
                     if local_Wd.popup_object.check_if_no_popup_exists() and (keyword not in [GET_POPUP_TEXT,VERIFY_POPUP_TEXT]):
                         driver.switch_to.default_content()
-                    if flag and webelement==None and teststepproperty.custname!='@Browser':
+                    if flag and webelement==None and teststepproperty.custname!='@Browser' and teststepproperty.name!='verifyDoesNotExists':
                         result=list(result)
                         result[3]=WEB_ELEMENT_NOT_FOUND
 
@@ -456,15 +456,20 @@ class Dispatcher:
                 result=list(result)
                 result[3]=err_msg
             screen_shot_obj = screenshot_keywords.Screenshot()
+            headless_mode = str(configvalues['headless_mode'])=='Yes' 
             if self.action == EXECUTE:
                 if result != TERMINATE:
                     result=list(result)
                     if configvalues['screenShot_Flag'].lower() == 'fail':
                         if result[0].lower() == 'fail':
                             file_path = screen_shot_obj.captureScreenshot()
+                            if headless_mode:
+                                driver.save_screenshot(file_path[2])
                             result.append(file_path[2])
                     elif configvalues['screenShot_Flag'].lower() == 'all':
                         file_path = screen_shot_obj.captureScreenshot()
+                        if headless_mode:
+                            driver.save_screenshot(file_path[2])
                         result.append(file_path[2])
         except TypeError as e:
             local_Wd.log.error(e,exc_info=True)
