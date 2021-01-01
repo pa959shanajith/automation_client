@@ -90,9 +90,14 @@ class SendFunctionKeys:
 
                     else:
                         log.debug('sending the keys in input')
-                        self.execute_key(input,count)
-                status=TEST_RESULT_PASS
-                methodoutput=TEST_RESULT_TRUE
+                        try:
+                            self.execute_key(input,count)
+                            status=TEST_RESULT_PASS
+                            methodoutput=TEST_RESULT_TRUE
+                        except Exception as e:
+                            log.error(e)
+                            log.debug('Invalid input')
+                            err_msg = "Function key '{}' is not recognized.".format(input)
             else:
                 log.debug('Invalid input')
                 err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']

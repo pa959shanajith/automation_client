@@ -52,7 +52,7 @@ class Highlight():
                             self.currenthandle = eachdriverhand
 
             # Switch to current handle and further to outer page
-            if self.currenthandle != None:
+            if self.currenthandle != None or self.currenthandle != '':
                 self.driver.switch_to.window(self.currenthandle)
             self.driver.switch_to.default_content()
 

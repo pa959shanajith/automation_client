@@ -89,7 +89,7 @@ class Delay_keywords:
             try:
                 if not (args is None or args is ''):
                     input_list=list(args)
-                    index=input_list.index(';')
+                    index=next(i for i in reversed(range(len(input_list))) if input_list[i] == ';')
                     values=input_list[0:index]
                     variables=input_list[index+1:len(input_list)]
                     flag_invalid_syntax=False
