@@ -875,8 +875,10 @@ class Config_window(wx.Frame):
             majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
         if isConfigJson != False and isConfigJson['headless_mode'].title() == lblList[0]:
             self.rbox15.SetSelection(0)
+            self.headlessOldVal = "Yes"
         else:
             self.rbox15.SetSelection(1)
+            self.headlessOldVal = "No"
         self.rbox15.SetToolTip(wx.ToolTip("Enables or disables Headless execution mode for Browser"))
 
         #adding the radio button for clear cache:
@@ -1283,6 +1285,8 @@ class Config_window(wx.Frame):
             core.browsercheckFlag=True
             core.chromeFlag=core.firefoxFlag=False
         core.updatecheckFlag = configvalues['update_check'].lower() == 'no'
+        if self.headlessOldVal != configvalues['headless_mode']:
+            controller.kill_process()
         try:
             logfilename = os.path.normpath(configvalues["logFile_Path"]).replace("\\","\\\\")
             logging.config.fileConfig(LOGCONFIG_PATH,defaults={'logfilename': logfilename},disable_existing_loggers=False)

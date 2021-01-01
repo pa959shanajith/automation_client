@@ -55,7 +55,7 @@ class ZephyrWindow():
                 'iss': self.access_key,
                 'exp': time.time()+exp,
                 'iat': time.time()
-            }
+            } 
 
             self.relative_path = "/public/rest/api/1.0/serverinfo"
             self.canonical_path = 'GET&'+self.relative_path+'&'
@@ -101,7 +101,7 @@ class ZephyrWindow():
                 res = []
                 return res
         except Exception as e:
-            err_msg='Error while Login in qTest'
+            err_msg='Error while Login in Zephyr'
             log.error(err_msg)
             logger.print_on_console(err_msg)
             log.error(e, exc_info=True)
@@ -173,7 +173,7 @@ class ZephyrWindow():
                                     newObj['tests'] = issue
                             res.append(newObj)
         except Exception as eproject:
-            err_msg = 'Error while fetching releases from qTest'
+            err_msg = 'Error while fetching releases from Zephyr'
             log.error(err_msg)
             logger.print_on_console(err_msg)
             log.error(eproject, exc_info=True)
@@ -182,6 +182,13 @@ class ZephyrWindow():
     def update_zephyr_test_details(self,data):
         status = False
         try:
+            if(self.account_id == None) :
+                qcLoginLoad = {}
+                qcLoginLoad["zephyr_accNo"] = data['zephyr_accNo']
+                qcLoginLoad["zephyr_secKey"] = data['zephyr_secKey']
+                qcLoginLoad["zephyr_acKey"] = data['zephyr_acKey']
+                qcLoginLoad["execFlag"] = "1"
+                self.login(qcLoginLoad)
             # update status demo
             self.relative_path = "/public/rest/api/1.0/execution/"+str(data['testId'])
             rel_path = "/public/rest/api/1.0/execution/"+str(data['testId'])
@@ -205,7 +212,7 @@ class ZephyrWindow():
             resp = requests.put(self.base_url+self.relative_path, headers=self._headers,json=exec_data,verify=False)
             status = (resp.status_code == 200)
         except Exception as e:
-            err_msg = 'Error while updating data in qTest'
+            err_msg = 'Error while updating data in Zephyr'
             log.error(err_msg)
             logger.print_on_console(err_msg)
             log.error(e, exc_info=True)
