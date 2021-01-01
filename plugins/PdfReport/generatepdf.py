@@ -124,7 +124,7 @@ class GeneratePDFReport(wx.Frame):
         elif source.split('.')[-1].lower() != 'json':
             self.l4.SetLabel("Source is not a JSON File")
             error_flag = True
-        elif re.search('[<>:"/\|?*]',dest_file) is not None:
+        elif re.search(r'[<>:"/\\|?*]',dest_file) is not None:
             self.l4.SetLabel("File name can't contain following characters: \\ / < | : ? * > \"")
             error_flag=True
         try:
