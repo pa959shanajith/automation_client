@@ -462,6 +462,7 @@ class Dropdown_Keywords():
                                     if (flag == True):
                                         status = desktop_constants.TEST_RESULT_PASS
                                         result = desktop_constants.TEST_RESULT_TRUE
+                                        verb=OUTPUT_CONSTANT
                                 if ( checkName == 'ListView' ):
                                     items = list(element.items())
                                     elelist = element.texts()
@@ -484,6 +485,7 @@ class Dropdown_Keywords():
                                     if (flag == True):
                                         status = desktop_constants.TEST_RESULT_PASS
                                         result = desktop_constants.TEST_RESULT_TRUE
+                                        verb=OUTPUT_CONSTANT
                             #================================================================
                    else:
                        err_msg = 'Element not present on the page where operation is trying to be performed'
