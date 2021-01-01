@@ -498,7 +498,6 @@ class UtilWebKeywords:
                     if isinstance(browser_Keywords.driver_obj, webdriver.Firefox):
                         javascript = "return window.mozInnerScreenY"
                         value = browser_Keywords.driver_obj.execute_script(javascript)
-                        logger.print_on_console(value)
                         offset = int(value)
                         location = webelement.location
                         obj.mouse_move(int(location.get('x') + 18), int(location.get('y') + offset + 18))
@@ -523,7 +522,6 @@ class UtilWebKeywords:
                     if isinstance(browser_Keywords.local_bk.driver_obj,webdriver.Firefox):
                         javascript = "return window.mozInnerScreenY"
                         value=browser_Keywords.local_bk.driver_obj.execute_script(javascript)
-                        logger.print_on_console(value)
                         offset=int(value)
                         robot=pyrobot.Robot()
                         robot.set_mouse_pos(int(location.get('x')+18),int(location.get('y')+offset+18))
@@ -625,6 +623,10 @@ class UtilWebKeywords:
                 browser_Keywords.BrowserKeywords.update_window_handles()
                 status=TEST_RESULT_PASS
                 methodoutput=TEST_RESULT_TRUE
+        except ElementNotInteractableException as ex:
+            err_msg='Element is not interactable'
+            logger.print_on_console(ex)
+            local_uo.log.info(err_msg)
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
         return status,methodoutput,output,err_msg
