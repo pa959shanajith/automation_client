@@ -761,9 +761,10 @@ class BrowserKeywords():
                 status=webconstants.TEST_RESULT_PASS
                 result=webconstants.TEST_RESULT_TRUE
             else:
-                logger.print_on_console('Driver object is null')
+                err_msg = 'Browser not available'
+                logger.print_on_console(err_msg)
+                local_bk.log.error(err_msg)
                 local_bk.log.error('Driver object is null')
-                err_msg = 'Driver object is null'
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
         return status,result,browsername,err_msg
