@@ -51,6 +51,10 @@ class WebScrape_Utils:
             total_height = driver.execute_script("return document.body.parentNode.scrollHeight")
             viewport_width = driver.execute_script("return window.innerWidth")
             viewport_height = driver.execute_script("return window.innerHeight")
+            driver.execute_script("window.scrollTo({0}, {1})".format(0, total_height))
+            time.sleep(1)
+            total_height = driver.execute_script("return document.body.parentNode.scrollHeight")
+
             #scroll to the top of the page
             driver.execute_script("window.scrollTo(0,0)")
             rectangles = []
