@@ -498,7 +498,6 @@ class UtilWebKeywords:
                     if isinstance(browser_Keywords.driver_obj, webdriver.Firefox):
                         javascript = "return window.mozInnerScreenY"
                         value = browser_Keywords.driver_obj.execute_script(javascript)
-                        logger.print_on_console(value)
                         offset = int(value)
                         location = webelement.location
                         obj.mouse_move(int(location.get('x') + 18), int(location.get('y') + offset + 18))
@@ -523,7 +522,6 @@ class UtilWebKeywords:
                     if isinstance(browser_Keywords.local_bk.driver_obj,webdriver.Firefox):
                         javascript = "return window.mozInnerScreenY"
                         value=browser_Keywords.local_bk.driver_obj.execute_script(javascript)
-                        logger.print_on_console(value)
                         offset=int(value)
                         robot=pyrobot.Robot()
                         robot.set_mouse_pos(int(location.get('x')+18),int(location.get('y')+offset+18))
@@ -537,7 +535,9 @@ class UtilWebKeywords:
                             browser_ver = browser_Keywords.local_bk.driver_obj.capabilities['version']
                         elif 'browserVersion' in  browser_Keywords.local_bk.driver_obj.capabilities.keys():
                             browser_ver = browser_Keywords.local_bk.driver_obj.capabilities['browserVersion']
-                        if webelement.is_displayed() and isinstance(browser_Keywords.local_bk.driver_obj,webdriver.Chrome) and browser_ver=='83':
+                        window_height = browser_Keywords.local_bk.driver_obj.get_window_size()['height']
+                        element_height = webelement.location.get('y')
+                        if webelement.is_displayed() and isinstance(browser_Keywords.local_bk.driver_obj,webdriver.Chrome) and element_height<window_height and element_height>0:
                             location=webelement.location
                         else:
                             location=obj.get_element_location(webelement)

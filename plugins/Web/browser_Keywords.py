@@ -1032,8 +1032,10 @@ class Singleton_DriverUtil():
                     choptions.add_argument('start-maximized')
                     choptions.add_experimental_option('useAutomationExtension', False)
                     choptions.add_experimental_option("excludeSwitches",["enable-automation"])
+                    if headless_mode:
+                        WINDOW_SIZE = "1350,650"
+                        choptions.add_argument("--window-size=%s" % WINDOW_SIZE)
                     if headless_mode: choptions.add_argument('--headless')
-                       
                     if configvalues['extn_enabled'].lower()=='yes' and os.path.exists(webconstants.EXTENSION_PATH):
                         choptions.add_extension(webconstants.EXTENSION_PATH)
                     else:

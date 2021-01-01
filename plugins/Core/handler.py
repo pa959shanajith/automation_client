@@ -218,7 +218,7 @@ class Handler():
             batch_id=new_obj['batchId']
             execution_ids=new_obj['executionIds']
             exec_mode=new_obj['exec_mode']
-            qc_creds=new_obj['qccredentials']
+            qc_creds=new_obj['integration']
             for json_data,suite_id in zip(suite_details,suiteId_list):
                 suite_data.append(json_data[suite_id])
                 if 'scenarioIds' in json_data:

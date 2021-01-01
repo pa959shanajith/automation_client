@@ -1,11 +1,11 @@
 #-------------------------------------------------------------------------------
-# Name:        QcTestLab.py
+# Name:        QTestController.py
 # Purpose:
 #
-# Author:      chethan.singh
+# Author:      keerthana.pai
 #
-# Created:     10/05/2017
-# Copyright:   (c) chethan.singh 2017
+# Created:     28/12/2020
+# Copyright:   (c) keerthana.pai 2020
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 
@@ -18,13 +18,13 @@ import logging
 import xmltodict
 import base64
 import datetime
-log = logging.getLogger("Qccontroller.py")
+log = logging.getLogger("QTestController.py")
 
-class QcWindow():
+class QTestWindow():
     cookies = None
     headers = None
     _headers = None
-    Qc_Url = None
+    qTest_Url = None
     access_token = None
     token_type = None
     project_dict = None
@@ -41,13 +41,13 @@ class QcWindow():
     def login(self,filePath):
         res = "invalidcredentials"
         try:
-            user_name=filePath["qcUsername"]
-            pass_word=filePath["qcPassword"]
-            self.Qc_Url=filePath["qcURL"]
+            user_name=filePath["qtestusername"]
+            pass_word=filePath["qtestpassword"]
+            self.qTest_Url=filePath["qtesturl"]
             self.headers = {'cache-control': "no-cache"}
-            login_url = self.Qc_Url + '/oauth/token'
+            login_url = self.qTest_Url + '/oauth/token'
             myobj = {'grant_type': 'password', 'username': user_name, 'password':pass_word}
-            splitUrl = bytes(self.Qc_Url.split("//")[1].split(".")[0]+':','ascii')
+            splitUrl = bytes(self.qTest_Url.split("//")[1].split(".")[0]+':','ascii')
             encSt = base64.b64encode(splitUrl)
             headersVal = {'Authorization':'Basic %s'% encSt.decode('ascii')}
             resp = requests.post(login_url,  headers=headersVal, data = myobj, verify=False)
@@ -64,7 +64,7 @@ class QcWindow():
                     'accept': 'application/json',
                     'Authorization' : self.token_type+" "+self.access_token
                 }
-                DomainURL = self.Qc_Url + '/api/v3/projects'
+                DomainURL = self.qTest_Url + '/api/v3/projects'
                 _resp = requests.get(DomainURL, headers=self._headers,verify=False)   
                 JsonObject = _resp.json()
                 res = [{'id':i['id'],'name':i['name']} for i in JsonObject]
@@ -83,7 +83,7 @@ class QcWindow():
         try:
             project_name = filePath["domain"]
             releases = []
-            releaseURL = self.Qc_Url + '/api/v3/projects/'+str(self.project_dict[project_name])+'/releases?includeClosed=true'
+            releaseURL = self.qTest_Url + '/api/v3/projects/'+str(self.project_dict[project_name])+'/releases?includeClosed=true'
             resp = requests.get(releaseURL, headers=self._headers,verify=False)
             JsonObject = resp.json()
             # JsonObject.append({'links': [{'rel': 'test-cycles', 'href': 'dummy.dummy'}], 'name': 'rel1'})
@@ -92,7 +92,7 @@ class QcWindow():
                 if 'links' in item:
                     self.release_dict[item['name']] = [i['href'] for i in item['links'] if i['rel']=='test-cycles']
                 else:
-                    self.release_dict[item['name']] = [self.Qc_Url + "/api/v3/projects/"+str(self.project_dict[project_name])+"/test-cycles?parentType=release&parentId="+str(item['id'])]
+                    self.release_dict[item['name']] = [self.qTest_Url + "/api/v3/projects/"+str(self.project_dict[project_name])+"/test-cycles?parentType=release&parentId="+str(item['id'])]
             if len(JsonObject) >0:
                 releases = list(self.release_dict.keys())
                 res["project"] = releases
@@ -118,9 +118,9 @@ class QcWindow():
                 projectid = i['qtestprojectid']
                 # maptype = i['maptype']
                 # if(maptype == 'testsuite'):
-                #     URL = self.Qc_Url + '/api/v3/projects/' + str(projectid) + '/test-suites/' + str(suiteid)
+                #     URL = self.qTest_Url + '/api/v3/projects/' + str(projectid) + '/test-suites/' + str(suiteid)
                 # elif(maptype == 'testrun'):
-                URL = self.Qc_Url + '/api/v3/projects/' + str(projectid) + '/test-runs/' + str(suiteid)
+                URL = self.qTest_Url + '/api/v3/projects/' + str(projectid) + '/test-runs/' + str(suiteid)
                 response = requests.get(URL,  headers=self._headers, verify=False)
                 resp = response.json()
                 if 'name' in resp:
@@ -147,7 +147,7 @@ class QcWindow():
                 newObj['testsuites'] = []
                 # newObj["testsuites"]=[{'name':i['name'],'id':i['id']} for i in cycle['test-suites']]
                 for i in cycle['test-suites']:
-                    gettestrunAPI = self.Qc_Url + "/api/v3/projects/"+str(almDomain)+"/test-runs?parentId="+str(i['id'])+"&parentType=test-suite"
+                    gettestrunAPI = self.qTest_Url + "/api/v3/projects/"+str(almDomain)+"/test-runs?parentId="+str(i['id'])+"&parentType=test-suite"
                     res1 = requests.get(gettestrunAPI,  headers=self._headers,verify=False)
                     resp1 = res1.json()
                     if 'items' in resp1:
@@ -156,7 +156,7 @@ class QcWindow():
                         testruns = [{'id':j['id'],'name':j['name']} for j in resp1]
                     newObj['testsuites'].append({'id':i['id'],'name':i['name'],'testruns':testruns})
                 # newObj[cycle['name']] = [{'name':i['name'],'id':i['id']} for i in cycle['test-suites']]
-                res.append(newObj)
+            res.append(newObj)
         except Exception as e:
             err_msg = 'Error while fetching testsuites from qTest'
             log.error(err_msg)
@@ -168,24 +168,30 @@ class QcWindow():
         status = False
         stepLength = None
         try:
+            if(self.qTest_Url == None) :
+                qtestLoginLoad = {}
+                qtestLoginLoad["qtestusername"] = data['qtestusername']
+                qtestLoginLoad["qtestpassword"] = data['qtestpassword']
+                qtestLoginLoad["qtesturl"] = data['qtesturl']
+                self.login(qtestLoginLoad)
             updateRequest = {}
             updateRequest['submittedBy'] = data['user']
-            if data['qc_status_over']['overallstatus'].lower() == "pass":
+            if data['qtest_status_over']['overallstatus'].lower() == "pass":
                 updateRequest['status']={"id":601}
-            elif data['qc_status_over']['overallstatus'].lower() == "fail":
+            elif data['qtest_status_over']['overallstatus'].lower() == "fail":
                 updateRequest['status']={"id":602}
-            elif data['qc_status_over']['overallstatus'].lower() == "terminate":
+            elif data['qtest_status_over']['overallstatus'].lower() == "terminate":
                 updateRequest['status']={"id":603}
             # Converting time format
             # From: YYYY-MM-DD hh:mm:ss.ffffff
             # To: YYYY-MM-DDThh:mm:ss.fffZ
-            updateRequest['exe_start_date']=data['qc_status_over']['StartTime'][:10]+"T"+data['qc_status_over']['StartTime'][11:23]+"Z"
-            updateRequest['exe_end_date']=data['qc_status_over']['EndTime'][:10]+"T"+data['qc_status_over']['EndTime'][11:23]+"Z"
-            getstepsAPI = self.Qc_Url + "/api/v3/projects/"+str(data['qc_projectid'])+"/test-runs/"+str(data['qc_suiteid'])+"?expand=testcase.teststep"
+            updateRequest['exe_start_date']=data['qtest_status_over']['StartTime'][:10]+"T"+data['qtest_status_over']['StartTime'][11:23]+"Z"
+            updateRequest['exe_end_date']=data['qtest_status_over']['EndTime'][:10]+"T"+data['qtest_status_over']['EndTime'][11:23]+"Z"
+            getstepsAPI = self.qTest_Url + "/api/v3/projects/"+str(data['qtest_projectid'])+"/test-runs/"+str(data['qtest_suiteid'])+"?expand=testcase.teststep"
             res2 = requests.get(getstepsAPI,  headers=self._headers,verify=False)
             resp2 = res2.json()
             
-            if data['qc_stepsup']:
+            if data['qtest_stepsup']:
                 updateRequest['test_step_logs'] = []
                 # if(len(resp2['test_case']['test_steps'])>len(data['steps'])):
                 stepLength = len(data['steps'])
@@ -207,7 +213,7 @@ class QcWindow():
                         updateRequest['test_step_logs'].extend([{"test_step_id":step,"status":{"id":stepStatus}} for step in stepId])
                         break
 
-            updatetestlog = self.Qc_Url + "/api/v3/projects/"+str(data['qc_projectid'])+"/test-runs/"+str(data['qc_suiteid'])+"/test-logs"
+            updatetestlog = self.qTest_Url + "/api/v3/projects/"+str(data['qtest_projectid'])+"/test-runs/"+str(data['qtest_suiteid'])+"/test-logs"
             res3 = requests.post(updatetestlog, headers = self._headers, json=updateRequest,verify=False) 
             status = (res3.status_code == 201)
         except Exception as e:
