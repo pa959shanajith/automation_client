@@ -45,10 +45,10 @@ class Clickandadd():
                      ' from browserops.py class .....')
             if SYSTEM_OS=='Windows':
                 toolwindow = win32gui.GetForegroundWindow()
-##            win32gui.ShowWindow(toolwindow, win32con.SW_MINIMIZE)
+            #win32gui.ShowWindow(toolwindow, win32con.SW_MINIMIZE)
             if SYSTEM_OS=='Windows':
                 actwindow = win32gui.GetForegroundWindow()
-##            win32gui.ShowWindow(actwindow, win32con.SW_MAXIMIZE)
+            #win32gui.ShowWindow(actwindow, win32con.SW_MAXIMIZE)
             log.info('Minimizing the foreground window i.e tool and assuming AUT on top .....')
             javascript_hasfocus = """return(document.hasFocus());"""
             time.sleep(6)
@@ -123,7 +123,6 @@ class Clickandadd():
             maindir = os.environ["AVO_ASSURE_HOME"]
             screen_shot_path = maindir + '/output/' + domconstants.SCREENSHOT_IMG
             log.info('Obtained driver from browserops.py class .....')
-
             tempne_stopclicknadd = []
             log.info('Performing the stopclickandd operation on default/outer page')
             tempreturn_stopclicknadd = driver.execute_script(webscrape_utils_obj.javascript_stopclicknadd)
@@ -134,10 +133,16 @@ class Clickandadd():
             def callback_scrape_stop_cna_iframes(myipath, tempne_stopclicknadd):
                 for iframes in (list(range(len(driver.find_elements_by_tag_name(domconstants.IFRAME))))):
                     path = myipath + str(iframes) + 'i' + '/'
+                    rect = driver.find_elements_by_tag_name(domconstants.IFRAME)[0].rect
                     if webscrape_utils_obj.switchtoframe_webscrape(driver, currenthandle, path):
+                        in_iframe = driver.execute_script(webscrape_utils_obj.javascript_in_iframe)
                         log.debug('switched to iframe/frame %s', path)
                         temp = driver.execute_script(webscrape_utils_obj.javascript_stopclicknadd, path)
                         if temp is not None:
+                            if in_iframe:
+                                for element in temp:
+                                    element['top'] = element['top'] + rect['y']                                    
+                                    element['left'] = element['left'] + rect['x']
                             log.debug('Stop ClickAndAdd scrape operation on iframe %s is done', path)
                             tempne_stopclicknadd.extend(temp)
                             callback_scrape_stop_cna_iframes(path, tempne_stopclicknadd)
