@@ -29,7 +29,6 @@ import psutil
 import readconfig
 import core_utils
 import time
-import controller
 from sendfunction_keys import SendFunctionKeys as SF
 driver_pre = None
 drivermap = []
@@ -600,7 +599,16 @@ class BrowserKeywords():
                     if(current_handle == x):
                         break
                 count = count - 2
-                local_bk.webdriver_list[driver_instance].quit()
+                if isinstance(local_bk.driver_obj,webdriver.Ie):
+                    import win32com.client
+                    wmi=win32com.client.GetObject('winmgmts:')
+                    proc=wmi.ExecQuery('select * from Win32_Process where Name="IEDriverServer64.exe"')
+                    if len(proc)>0:
+                        for i in proc:
+                            os.system("TASKKILL /F /T /PID " + str(i.ProcessId))
+                            time.sleep(5)
+                else:
+                    local_bk.webdriver_list[driver_instance].quit()
                 local_bk.driver_obj = None
                 if SYSTEM_OS == 'Darwin':
                     os.system("killall -9 Safari")
@@ -1032,10 +1040,8 @@ class Singleton_DriverUtil():
                     choptions.add_argument('start-maximized')
                     choptions.add_experimental_option('useAutomationExtension', False)
                     choptions.add_experimental_option("excludeSwitches",["enable-automation"])
-                    if headless_mode:
-                        WINDOW_SIZE = "1350,650"
-                        choptions.add_argument("--window-size=%s" % WINDOW_SIZE)
                     if headless_mode: choptions.add_argument('--headless')
+                       
                     if configvalues['extn_enabled'].lower()=='yes' and os.path.exists(webconstants.EXTENSION_PATH):
                         choptions.add_extension(webconstants.EXTENSION_PATH)
                     else:
@@ -1048,7 +1054,6 @@ class Singleton_DriverUtil():
                     driver = webdriver.Chrome(executable_path=exec_path,chrome_options=choptions)
                     # driver.navigate().refresh()
                     ##driver = webdriver.Chrome(desired_capabilities= choptions.to_capabilities(), executable_path = exec_path)
-                    controller.process_ids.append(driver.service.process.pid)
                     drivermap.append(driver)
                     driver.maximize_window()
                     msg = ('Headless ' if headless_mode else '') + 'Chrome browser started'
@@ -1081,7 +1086,6 @@ class Singleton_DriverUtil():
                     else:
                         driver = webdriver.Firefox(capabilities=caps, executable_path=exec_path,options=firefox_options)
                     # driver.navigate().refresh()
-                    controller.process_ids.append(driver.service.process.pid)
                     drivermap.append(driver)
                     driver.maximize_window()
                     msg = ('Headless ' if headless_mode else '') + 'Firefox browser started'
@@ -1109,7 +1113,6 @@ class Singleton_DriverUtil():
                 else:
                     iepath = webconstants.IE_DRIVER_PATH_64
                 driver = webdriver.Ie(capabilities=caps,executable_path=iepath)
-                controller.process_ids.append(driver.service.process.pid)
                 # browser_ver=driver.capabilities['version']
                 # browser_ver1 = browser_ver.encode('utf-8')
                 # browser_ver = int(browser_ver1)
@@ -1132,7 +1135,6 @@ class Singleton_DriverUtil():
         elif(browser_num == '4'):
             try:
                 driver = webdriver.Opera()
-                controller.process_ids.append(driver.service.process.pid)
                 drivermap.append(driver)
                 logger.print_on_console('Opera browser started')
             except Exception as e:
@@ -1141,8 +1143,7 @@ class Singleton_DriverUtil():
 
         elif(browser_num == '5'):
             try:
-                driver = webdriver.PhantomJS(executable_path=webconstants.PHANTOM_DRIVER_PATH)                    
-                controller.process_ids.append(driver.service.process.pid)
+                driver = webdriver.PhantomJS(executable_path=webconstants.PHANTOM_DRIVER_PATH)
                 drivermap.append(driver)
                 logger.print_on_console('Phantom browser started')
             except Exception as e:
@@ -1152,7 +1153,6 @@ class Singleton_DriverUtil():
         elif(browser_num == '6'):
             try:
                 driver = webdriver.Safari()
-                controller.process_ids.append(driver.service.process.pid)
                 driver.maximize_window()
                 drivermap.append(driver)
 
@@ -1201,7 +1201,6 @@ class Singleton_DriverUtil():
                     if SYSTEM_OS == "Darwin":
                         caps1['platform'] = 'MAC'
                     driver = webdriver.Edge(capabilities=caps1,executable_path=chromium_path)
-                    controller.process_ids.append(driver.edge_service.process.pid)
                     drivermap.append(driver)
                     driver.maximize_window()
                     logger.print_on_console('Edge Chromium browser started')
