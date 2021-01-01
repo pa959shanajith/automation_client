@@ -42,7 +42,7 @@ class Reporting:
         self.pid_list=[]
         self.parent_id=0
         self.id_counter=1
-        self.testscript_name=None
+        self.testscript_num=None
         self.overallstatus=TEST_RESULT_PASS
         self.browser_version='NA'
         self.browser_type='NA'
@@ -302,15 +302,15 @@ class Reporting:
 
 
 
-    def generate_keyword_step(self,report_obj):
+    def generate_keyword_step(self,report_obj,testscript_num):
         """
         def : generate_keyword_step
         purpose : create each step in the report
         param : report_obj - Instance of <reporting_pojo>
 
         """
-        if report_obj.testscript_name != self.testscript_name:
-            self.testscript_name=report_obj.testscript_name
+        if testscript_num != self.testscript_num:
+            self.testscript_num=testscript_num
             self.add_testscriptname(report_obj)
             try:
                 report_obj._id+=1
@@ -413,7 +413,7 @@ class Reporting:
                     screenshot_path = None
 
         reporting_pojo_obj=reporting_pojo.ReportingStep(self.id_counter,name,parent_id,status,str(step_num),comments,step_description,str(ellapsedtime),step_testcase_name,screenshot_path,remark,testcase_details)
-        self.generate_keyword_step(reporting_pojo_obj)
+        self.generate_keyword_step(reporting_pojo_obj,tsp.testcase_num)
         self.id_counter+=1
 
 

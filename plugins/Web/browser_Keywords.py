@@ -740,6 +740,35 @@ class BrowserKeywords():
             err_msg=self.__web_driver_exception(e)
         return status,result,output,err_msg
 
+    def getBrowserName(self, *args):
+        global local_bk
+        status=webconstants.TEST_RESULT_FAIL
+        result=webconstants.TEST_RESULT_FALSE
+        browsername=None
+        err_msg=None
+        configvalues = readconfig.configvalues
+        try:
+            if str(configvalues['headless_mode'])=='Yes':
+                browsername = 'Headless'
+                logger.print_on_console('Browser Name: ',browsername)
+                local_bk.log.info('Browser Name: '+ browsername)
+                status=webconstants.TEST_RESULT_PASS
+                result=webconstants.TEST_RESULT_TRUE
+            elif(local_bk.driver_obj != None):
+                browsername = webconstants.BROWSER_NAME_MAP[local_bk.driver_obj.name.strip()]
+                logger.print_on_console('Browser Name: ',browsername)
+                local_bk.log.info('Browser Name: '+ browsername)
+                status=webconstants.TEST_RESULT_PASS
+                result=webconstants.TEST_RESULT_TRUE
+            else:
+                err_msg = 'Browser not available'
+                logger.print_on_console(err_msg)
+                local_bk.log.error(err_msg)
+                local_bk.log.error('Driver object is null')
+        except Exception as e:
+            err_msg=self.__web_driver_exception(e)
+        return status,result,browsername,err_msg
+
     def update_window_handles(self):
         global local_bk
     	## Issue #190 Driver control won't switch back to parent window
@@ -1032,8 +1061,10 @@ class Singleton_DriverUtil():
                     choptions.add_argument('start-maximized')
                     choptions.add_experimental_option('useAutomationExtension', False)
                     choptions.add_experimental_option("excludeSwitches",["enable-automation"])
+                    if headless_mode:
+                        WINDOW_SIZE = "1350,650"
+                        choptions.add_argument("--window-size=%s" % WINDOW_SIZE)
                     if headless_mode: choptions.add_argument('--headless')
-                       
                     if configvalues['extn_enabled'].lower()=='yes' and os.path.exists(webconstants.EXTENSION_PATH):
                         choptions.add_extension(webconstants.EXTENSION_PATH)
                     else:
@@ -1199,7 +1230,7 @@ class Singleton_DriverUtil():
                     if SYSTEM_OS == "Darwin":
                         caps1['platform'] = 'MAC'
                     driver = webdriver.Edge(capabilities=caps1,executable_path=chromium_path)
-                    controller.process_ids.append(driver.service.process.pid)
+                    controller.process_ids.append(driver.edge_service.process.pid)
                     drivermap.append(driver)
                     driver.maximize_window()
                     logger.print_on_console('Edge Chromium browser started')

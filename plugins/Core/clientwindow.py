@@ -807,9 +807,9 @@ class Config_window(wx.Frame):
             self.rbox3.SetSelection(0)
         self.rbox3.SetToolTip(wx.ToolTip("Facilitates capturing the screenshots of the test steps based on its value"))
 
-        self.rbox4 = wx.RadioBox(self.panel1, label = 'Retrieve URL', choices = lblList,
+        self.rbox4 = wx.RadioBox(self.panel1, label = 'Http Status Code Check', choices = lblList,
             majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
-        if isConfigJson!=False and isConfigJson['retrieveURL'].title()!=lblList[0]:
+        if isConfigJson!=False and isConfigJson['httpStatusCode'].title()!=lblList[0]:
             self.rbox4.SetSelection(1)
         else:
             self.rbox4.SetSelection(0)
@@ -875,8 +875,10 @@ class Config_window(wx.Frame):
             majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
         if isConfigJson != False and isConfigJson['headless_mode'].title() == lblList[0]:
             self.rbox15.SetSelection(0)
+            self.headlessOldVal = "Yes"
         else:
             self.rbox15.SetSelection(1)
+            self.headlessOldVal = "No"
         self.rbox15.SetToolTip(wx.ToolTip("Enables or disables Headless execution mode for Browser"))
 
         #adding the radio button for clear cache:
@@ -975,7 +977,7 @@ class Config_window(wx.Frame):
         if self.rbox2.GetStringSelection()!='64-bit':
             bit_64='No'
         screenShot_Flag=self.rbox3.GetStringSelection()
-        retrieveURL=self.rbox4.GetStringSelection()
+        httpStatusCode=self.rbox4.GetStringSelection()
         exception_flag=self.rbox5.GetStringSelection()
         ignoreVisibilityCheck=self.rbox6.GetStringSelection()
         enableSecurityCheck=self.rbox7.GetStringSelection()
@@ -1021,7 +1023,7 @@ class Config_window(wx.Frame):
         data['timeOut'] = time_out.strip()
         data['stepExecutionWait'] = stepExecutionWait.strip()
         data['displayVariableTimeOut'] = displayVariableTimeOut.strip()
-        data['retrieveURL'] = retrieveURL.strip()
+        data['httpStatusCode'] = httpStatusCode.strip()
         data['delay'] = delay.strip()
         data['ignoreVisibilityCheck'] = ignoreVisibilityCheck.strip()
         data['enableSecurityCheck'] = enableSecurityCheck.strip()
@@ -1283,6 +1285,8 @@ class Config_window(wx.Frame):
             core.browsercheckFlag=True
             core.chromeFlag=core.firefoxFlag=False
         core.updatecheckFlag = configvalues['update_check'].lower() == 'no'
+        if self.headlessOldVal != configvalues['headless_mode']:
+            controller.kill_process()
         try:
             logfilename = os.path.normpath(configvalues["logFile_Path"]).replace("\\","\\\\")
             logging.config.fileConfig(LOGCONFIG_PATH,defaults={'logfilename': logfilename},disable_existing_loggers=False)

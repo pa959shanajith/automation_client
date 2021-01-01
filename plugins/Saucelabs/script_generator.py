@@ -447,7 +447,8 @@ start = timer()
             'navigateWithAuthenticate':browser_obj.navigateWithAuthenticate,
             'navigateBack':browser_obj.navigateBack,
             'openNewTab':browser_obj.openNewTab,
-            'execute_js':browser_obj.execute_js
+            'execute_js':browser_obj.execute_js,
+            'getBrowserName':browser_obj.getBrowserName
         }
         self.generic_keys={
             'toLowerCase': generic_string.toLowerCase,
