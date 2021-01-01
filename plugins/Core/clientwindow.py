@@ -809,7 +809,7 @@ class Config_window(wx.Frame):
 
         self.rbox4 = wx.RadioBox(self.panel1, label = 'Http Status Code Check', choices = lblList,
             majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
-        if isConfigJson!=False and isConfigJson['retrieveURL'].title()!=lblList[0]:
+        if isConfigJson!=False and isConfigJson['httpStatusCode'].title()!=lblList[0]:
             self.rbox4.SetSelection(1)
         else:
             self.rbox4.SetSelection(0)
@@ -975,7 +975,7 @@ class Config_window(wx.Frame):
         if self.rbox2.GetStringSelection()!='64-bit':
             bit_64='No'
         screenShot_Flag=self.rbox3.GetStringSelection()
-        retrieveURL=self.rbox4.GetStringSelection()
+        httpStatusCode=self.rbox4.GetStringSelection()
         exception_flag=self.rbox5.GetStringSelection()
         ignoreVisibilityCheck=self.rbox6.GetStringSelection()
         enableSecurityCheck=self.rbox7.GetStringSelection()
@@ -1021,7 +1021,7 @@ class Config_window(wx.Frame):
         data['timeOut'] = time_out.strip()
         data['stepExecutionWait'] = stepExecutionWait.strip()
         data['displayVariableTimeOut'] = displayVariableTimeOut.strip()
-        data['retrieveURL'] = retrieveURL.strip()
+        data['httpStatusCode'] = httpStatusCode.strip()
         data['delay'] = delay.strip()
         data['ignoreVisibilityCheck'] = ignoreVisibilityCheck.strip()
         data['enableSecurityCheck'] = enableSecurityCheck.strip()
