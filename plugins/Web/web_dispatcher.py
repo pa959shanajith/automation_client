@@ -443,7 +443,7 @@ class Dispatcher:
                     if keyword == GET_INNER_TABLE and (output != '' and output.startswith('{') and output.endswith('}')):
                         local_Wd.webelement_map[output]=result[2]
                     elif keyword not in [OPEN_BROWSER,CLOSE_BROWSER,GET_POPUP_TEXT,VERIFY_POPUP_TEXT]:
-                        if configvalues['retrieveURL'].lower() == 'yes':
+                        if configvalues['httpStatusCode'].lower() == 'yes':
                             if result[0].lower() == 'fail':
                                 res,_=self.check_url_error_code()
                                 if res:
