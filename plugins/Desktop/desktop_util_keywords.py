@@ -185,6 +185,8 @@ class Util_Keywords():
                                 status = desktop_constants.TEST_RESULT_PASS
                                 result = desktop_constants.TEST_RESULT_TRUE
                                 log.info( STATUS_METHODOUTPUT_UPDATE )
+                            else:
+                                err_msg = "The Element is visible."
                         else:
                             err_msg = 'Element not present on the page where operation is trying to be performed'
                             log.info( err_msg )
