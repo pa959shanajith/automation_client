@@ -292,7 +292,6 @@ class Dropdown_Keywords():
                                 result = desktop_constants.TEST_RESULT_TRUE
                                 log.info( STATUS_METHODOUTPUT_UPDATE )
                             else:
-                                else:
                                 err_msg = 'Count mismatched'
                                 logger.print_on_console( err_msg )
                                 log.info( err_msg )
