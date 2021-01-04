@@ -200,6 +200,8 @@ class ButtonLinkKeyword():
                         log.info(STATUS_METHODOUTPUT_UPDATE)
                         status = desktop_constants.TEST_RESULT_PASS
                         result = desktop_constants.TEST_RESULT_TRUE
+                    else:
+                        err_msg = 'Button name mismatched'
                 else:
                     err_msg = 'Element not present on the page where operation is trying to be performed'
             if ( err_msg ):

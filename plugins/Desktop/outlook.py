@@ -338,7 +338,7 @@ class OutlookKeywords:
                     else:
                         error_msg = 'Invalid Input'
                 if ( Fail_Flag == True ):
-                    logger.print_on_console( 'Error : mail does not have such info' )
+                    error_msg = 'Error : mail does not have such info'
                 if ( error_msg ):
                     log.info( error_msg )
                     logger.print_on_console( error_msg )
@@ -736,6 +736,8 @@ class OutlookKeywords:
                         if ( Flg == True ):
                             status = desktop_constants.TEST_RESULT_PASS
                             method_output = desktop_constants.TEST_RESULT_TRUE
+                        else:
+                            error_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                     except Exception as e:
                         error_msg = desktop_constants.ERROR_MSG + ' : ' + str(e)
                         log.error( error_msg )
