@@ -25,7 +25,7 @@ class Recorder():
             import constants
             if constants.SCREENSHOT_PATH  not in ['screenshot_path', 'Disabled']:
                 details=args[0]['suitedetails']
-                path = constants.SCREENSHOT_PATH+details[0]['projectname']+'\\'+details[0]['releaseid']+'\\'+details[0]['cyclename']+'\\'+datetime.now().strftime("%Y-%m-%d")+'\\'
+                path = constants.SCREENSHOT_PATH+details[0]['projectname']+os.sep+details[0]['releaseid']+os.sep+details[0]['cyclename']+os.sep+datetime.now().strftime("%Y-%m-%d")+os.sep
                 if(not os.path.exists(path)):
                     os.makedirs(path)
                 filename = path+"ScreenRecording_"+datetime.now().strftime("%Y%m%d%H%M%S")+".mp4"
