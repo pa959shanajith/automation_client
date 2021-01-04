@@ -50,7 +50,11 @@ class ButtonLinkKeyword():
                 local_blk.log.debug('Check for the element enable')
                 if isinstance(browser_Keywords.local_bk.driver_obj,webdriver.Firefox ):
                     browser_Keywords.local_bk.driver_obj.execute_script('arguments[0].scrollIntoView()',webelement)
-                if webelement.is_enabled():
+                if webelement.get_attribute("type") == 'file':
+                    local_blk.log.info(WEB_ELEMENT_FILE_TYPE)
+                    err_msg=ERROR_CODE_DICT['CLICKABLE_EXCEPTION']
+                    logger.print_on_console(ERROR_CODE_DICT['CLICKABLE_EXCEPTION'])
+                elif webelement.is_enabled():
                     local_blk.log.debug(WEB_ELEMENT_ENABLED)
                     if isinstance(browser_Keywords.local_bk.driver_obj,webdriver.Ie):
                         local_blk.log.info('Opened browser : Internet Explorer Instance')
@@ -111,14 +115,10 @@ class ButtonLinkKeyword():
                                 # browser_Keywords.local_bk.driver_obj.execute_script(Js,webelement,x_coord,y_coord)
                             else:
                                 clickinfo = browser_Keywords.local_bk.driver_obj.execute_async_script(webconstants.CLICK_JAVASCRIPT,webelement)
-                                if clickinfo is not None:
-                                    status = webconstants.TEST_RESULT_PASS
-                                    methodoutput = webconstants.TEST_RESULT_TRUE
-                                    local_blk.log.info('Click operation performed using javascript click')
-                                    local_blk.log.info(STATUS_METHODOUTPUT_UPDATE)
-                                else:
-                                    raise Exception("Element not pressable")
-                                
+                                status = webconstants.TEST_RESULT_PASS
+                                methodoutput = webconstants.TEST_RESULT_TRUE
+                                local_blk.log.info('Click operation performed using javascript click')
+                                local_blk.log.info(STATUS_METHODOUTPUT_UPDATE)
                         except Exception as e:
                             # local_blk.log.info('Click operation performed using javascript click')
                             # local_blk.log.error('selenium click  error occured, Trying to click using Javascript')
@@ -131,14 +131,9 @@ class ButtonLinkKeyword():
                     local_blk.log.info(WEB_ELEMENT_DISABLED)
                     err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
         except Exception as e:
-            if clickinfo is None: 
-                err_msg=ERROR_CODE_DICT['CLICKABLE_EXCEPTION']
-                local_blk.log.error('Element not pressable')
-                logger.print_on_console('Element not pressable')
-            else: 
-                err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
-                local_blk.log.error(e)
-                logger.print_on_console(e)
+            err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+            local_blk.log.error(e)
+            logger.print_on_console(e)
             
         local_blk.log.info(RETURN_RESULT)
         return status,methodoutput,output,err_msg
@@ -488,7 +483,13 @@ class ButtonLinkKeyword():
                 local_blk.log.debug(webelement)
                 local_blk.log.debug('Check for the element enable')
                 if webelement.is_enabled():
-                    if SYSTEM_OS != 'Darwin' and isinstance(browser_Keywords.local_bk.driver_obj,webdriver.Firefox):
+                    if webelement.get_attribute('type') == "file":
+                        if os.path.isfile(inputfile):
+                            webelement.send_keys(inputfile)
+                            status = webconstants.TEST_RESULT_PASS
+                        else:
+                            err_msg=ERROR_CODE_DICT['ERR_IIO_EXCEPTION']
+                    elif SYSTEM_OS != 'Darwin' and isinstance(browser_Keywords.local_bk.driver_obj,webdriver.Firefox):
                         local_blk.log.debug('Mozilla Firefox Instance')
                         clickinfo = browser_Keywords.local_bk.driver_obj.execute_script(webconstants.CLICK_JAVASCRIPT,webelement)
                         local_blk.log.info('upload_file click info')
