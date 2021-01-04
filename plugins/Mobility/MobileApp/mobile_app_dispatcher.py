@@ -148,7 +148,7 @@ class MobileDispatcher:
         'verifydate':date_keywords_object.verify_date
     }
 
-    def dispatcher(self,teststepproperty,input,reporting_obj, iris_flag):
+    def dispatcher(self,teststepproperty,input,reporting_obj, iris_flag, mythread):
         global apptypes,ip
         objectname = teststepproperty.objectname
         object_name_ios = objectname
@@ -205,12 +205,13 @@ class MobileDispatcher:
                         screen_shot_obj = mob_screenshot.Screenshot()
                         configobj = readconfig.readConfig()
                         configvalues = configobj.readJson()
+                        screen_details=mythread.json_data['suitedetails'][0]
                         if configvalues['screenShot_Flag'].lower() == 'fail':
                             if result[0].lower() == 'fail':
-                                file_path =screen_shot_obj.captureScreenshot()
+                                file_path =screen_shot_obj.captureScreenshot(screen_details)
                                 result.append(file_path[2])
                         elif configvalues['screenShot_Flag'].lower() == 'all':
-                            file_path = screen_shot_obj.captureScreenshot()
+                            file_path = screen_shot_obj.captureScreenshot(screen_details)
                             result.append(file_path[2])
         except TypeError as e:
             err_msg=ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']

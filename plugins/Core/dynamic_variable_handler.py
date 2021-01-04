@@ -32,10 +32,10 @@ class DynamicVariables:
     def getDBdata(self,inp_value,con_obj):
         res=False
         dyn_value=None
-        variable=re.findall("\{(.*?)\[",inp_value)
+        variable=re.findall(r"\{(.*?)\[",inp_value)
         if len(variable)>0 and variable[0] != '' and DB_VAR in local_dynamic.dynamic_variable_map:
             dbvalue=local_dynamic.dynamic_variable_map[DB_VAR]
-            temp_dbvalue=re.findall("\{(.*?)\[",dbvalue[-1])
+            temp_dbvalue=re.findall(r"\{(.*?)\[",dbvalue[-1])
             #To Fix issue with displaying/Fetching of Databse values
             if len(temp_dbvalue)==0:
                 temp_dbvalue.append(dbvalue[-1])
@@ -48,8 +48,8 @@ class DynamicVariables:
                 res=True
         return res,dyn_value
 
-    #To replace the dynamic vraiable by it's actual value
-    def replace_dynamic_variable(self,input_var,keyword,con_obj):
+    #To replace the dynamic variable by it's actual value
+    def replace_dynamic_variable(self,input_var,keyword,con_obj,exchange_val=False):
         coreutilsobj=core_utils.CoreUtils()
         input_var=coreutilsobj.get_UTF_8(input_var)
         actual_value=input_var
@@ -63,25 +63,18 @@ class DynamicVariables:
                     if actual_value==None:
                         db_result=self.getDBdata(value,con_obj)
                         actual_value=db_result[1]
-                        
+
             elif self.check_for_dynamicvariables(input_var,keyword)==TEST_RESULT_TRUE:
                 temp_value=self.get_dynamic_value(input_var)
                 if temp_value is None:
                     actual_value=temp_value
-                else:
-                    try:
-                        dyn_data=temp_value.tag_name
-                    except:
-                        dyn_data=''
-                    if not ((isinstance(temp_value,str))or (dyn_data !='')):
-                        if actual_value is not None:
-                            actual_value=actual_value.replace(input_var,str(temp_value))
+                elif actual_value is not None:
+                    if hasattr(temp_value, "tag_name") or exchange_val:
+                        actual_value=temp_value
                     else:
-                        if actual_value is not None:
-                            if dyn_data !='':
-                                actual_value=temp_value
-                            else:
-                                actual_value=actual_value.replace(input_var,temp_value)
+                        if isinstance(temp_value,str):
+                            temp_value = str(temp_value)
+                        actual_value=actual_value.replace(input_var,temp_value)
         else:
             status,nested_var=self.check_dynamic_inside_dynamic(input_var)
             if status==TEST_RESULT_TRUE:
@@ -90,18 +83,14 @@ class DynamicVariables:
 
     #To Store the output from keyword as an array if it is multiple values
     def store_as_array(self,variable,value):
+        variable=variable[0:len(variable)-1]
         if len(value)>0 and not(isinstance(value[0],list)):
-            variable=variable[0:len(variable)-1]
             for i in range(len(value)):
                 local_dynamic.dynamic_variable_map[variable+'['+str(i)+']}']=value[i]
-            local_dynamic.dynamic_variable_map[variable+'}'] = value
-
         else:
-            variable=variable[0:len(variable)-1]
             for i in range(len(value)):
                 for j in range(len(value[i])):
                     local_dynamic.dynamic_variable_map[variable+'['+str(i)+']['+str(j)+']}']=value[i][j]
-            local_dynamic.dynamic_variable_map[variable+'}'] = value
 
 
      #To Store the output from keyword as an array if it is single value
@@ -109,13 +98,13 @@ class DynamicVariables:
         if self.check_for_dynamicvariables(output_var,keyword,True)==TEST_RESULT_TRUE:
             if isinstance(output_value,list):
                 if not(keyword.lower() in DATABASE_KEYWORDS):
+                    local_dynamic.dynamic_variable_map[output_var]=output_value
                     self.store_as_array(output_var,output_value)
                 else:
                     output_value.append(output_var)
                     local_dynamic.dynamic_variable_map[DB_VAR]=output_value
             else:
                 local_dynamic.dynamic_variable_map[output_var]=output_value
-
 
 
      #To Check if the given pattern of the variable matches '{a}'
@@ -154,7 +143,7 @@ class DynamicVariables:
                         local_dynamic.log.debug('Not a json input')
             if not(json_flag):
                 if '{' in outputval and '}' in outputval:
-                    var_list=re.findall("\{(.*?)\}",outputval)
+                    var_list=re.findall(r"\{(.*?)\}",outputval)
                     if len(var_list)>0:
                         status = TEST_RESULT_TRUE
         return status

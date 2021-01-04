@@ -209,6 +209,10 @@ class ElementKeywords():
                         log.info( STATUS_METHODOUTPUT_UPDATE )
                         status = desktop_constants.TEST_RESULT_PASS
                         result = desktop_constants.TEST_RESULT_TRUE
+                    else:
+                        err_msg = 'Element Text mismatched'
+                        log.info( err_msg )
+                        logger.print_on_console( err_msg )
                 else:
                    err_msg = 'Element not present on the page where operation is trying to be performed'
                    log.info( err_msg )

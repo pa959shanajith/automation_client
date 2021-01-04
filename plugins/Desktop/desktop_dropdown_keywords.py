@@ -278,15 +278,23 @@ class Dropdown_Keywords():
                             else:
                                 count = element.item_count()
                             if ( count == int(input_val[0]) ):
-                             status = desktop_constants.TEST_RESULT_PASS
-                             result = desktop_constants.TEST_RESULT_TRUE
-                             log.info( STATUS_METHODOUTPUT_UPDATE )
+                                status = desktop_constants.TEST_RESULT_PASS
+                                result = desktop_constants.TEST_RESULT_TRUE
+                                log.info( STATUS_METHODOUTPUT_UPDATE )
+                            else:
+                                err_msg = 'Count mismatched'
+                                logger.print_on_console( err_msg )
+                                log.info( err_msg )
                         elif ( element.friendly_class_name() == 'ComboBox' ):
                             count = element.item_count()
                             if ( count == int(input_val[0]) ):
                                 status = desktop_constants.TEST_RESULT_PASS
                                 result = desktop_constants.TEST_RESULT_TRUE
                                 log.info( STATUS_METHODOUTPUT_UPDATE )
+                            else:
+                                err_msg = 'Count mismatched'
+                                logger.print_on_console( err_msg )
+                                log.info( err_msg )
                     else:
                         err_msg = 'Element not present on the page where operation is trying to be performed'
                         log.info( err_msg )
