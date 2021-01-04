@@ -50,7 +50,7 @@ class ButtonLinkKeyword():
                 local_blk.log.debug('Check for the element enable')
                 if isinstance(browser_Keywords.local_bk.driver_obj,webdriver.Firefox ):
                     browser_Keywords.local_bk.driver_obj.execute_script('arguments[0].scrollIntoView()',webelement)
-                if webelement.get_attribute("type") == 'file':
+                if webelement.tag_name =='input' and webelement.get_attribute("type") == 'file':
                     local_blk.log.info(WEB_ELEMENT_FILE_TYPE)
                     err_msg=ERROR_CODE_DICT['CLICKABLE_EXCEPTION']
                     logger.print_on_console(ERROR_CODE_DICT['CLICKABLE_EXCEPTION'])
@@ -114,7 +114,7 @@ class ButtonLinkKeyword():
                                 # Js="""function clickon(x,y){var ev=document.createEvent("MouseEvent");var el=document.elementFromPoint(x,y);ev.initMouseEvent("click",true,true,window,null,x,y,0,0,false,false,false,false,0,null);el.dispatchEvent(ev);} arguments[0].clickon(arguments[1],arguments[2])"""
                                 # browser_Keywords.local_bk.driver_obj.execute_script(Js,webelement,x_coord,y_coord)
                             else:
-                                clickinfo = browser_Keywords.local_bk.driver_obj.execute_async_script(webconstants.CLICK_JAVASCRIPT,webelement)
+                                clickinfo = browser_Keywords.local_bk.driver_obj.execute_script(webconstants.CLICK_JAVASCRIPT,webelement)
                                 status = webconstants.TEST_RESULT_PASS
                                 methodoutput = webconstants.TEST_RESULT_TRUE
                                 local_blk.log.info('Click operation performed using javascript click')
@@ -133,7 +133,8 @@ class ButtonLinkKeyword():
         except Exception as e:
             err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
             local_blk.log.error(e)
-            logger.print_on_console(e)
+            local_blk.log.error(err_msg)
+            logger.print_on_console(err_msg)
             
         local_blk.log.info(RETURN_RESULT)
         return status,methodoutput,output,err_msg
@@ -483,7 +484,7 @@ class ButtonLinkKeyword():
                 local_blk.log.debug(webelement)
                 local_blk.log.debug('Check for the element enable')
                 if webelement.is_enabled():
-                    if webelement.get_attribute('type') == "file":
+                    if webelement.tag_name =='input' and webelement.get_attribute('type') == 'file':
                         if os.path.isfile(inputfile):
                             webelement.send_keys(inputfile)
                             status = webconstants.TEST_RESULT_PASS
