@@ -77,7 +77,7 @@ class DynamicVariables:
             coreutilsobj=core_utils.CoreUtils()
             if not(variable is None or value is None or variable is '' or value is ''):
                 variable=coreutilsobj.get_UTF_8(variable)
-##                value=coreutilsobj.get_UTF_8(value)
+                # value=coreutilsobj.get_UTF_8(value)
                 #Check if the given variable to be modified is dynamic or not
                 log.debug('Check if the given variable to be modified is dynamic or not')
                 res=self.dyn_obj.check_for_dynamicvariables(variable)
@@ -88,10 +88,10 @@ class DynamicVariables:
                         #Get the old value of the variable
                         log.debug('Get the old value of the variable')
                         oldvalue=self.dyn_obj.get_dynamic_value(variable)
-##                        #Check if the value to be updated is also dynamic and get its value
-##                        log.debug('Check if the value to be updated is also dynamic and get its value')
-##                        if self.dyn_obj.check_for_dynamicvariables(value)==TEST_RESULT_PASS:
-##                            value=self.dyn_obj.get_dynamic_value(value)
+                        # #Check if the value to be updated is also dynamic and get its value
+                        # log.debug('Check if the value to be updated is also dynamic and get its value')
+                        # if self.dyn_obj.check_for_dynamicvariables(value)==TEST_RESULT_PASS:
+                        #     value=self.dyn_obj.get_dynamic_value(value)
                         #Modify the given variable with the new value
                         log.debug('Modify the given variable with the new value')
                         dynamic_variable_handler.local_dynamic.dynamic_variable_map[variable]=value
@@ -99,8 +99,6 @@ class DynamicVariables:
                         methodoutput=TEST_RESULT_TRUE
                         log.debug('Variable modified: Old value ',str(variable),' = ',str(oldvalue),' New value ',str(variable),' = ',str(value))
                         logger.print_on_console('Variable modified: Old value ',str(variable),' = ',str(oldvalue),' New value ',str(variable),' = ',str(value))
-##                        log.debug('Variable modified: Old value '+str(variable)+'='+str(oldvalue)+'New value '+str(variable)+'='+str(value))
-##                        logger.print_on_console('Variable modified: Old value '+str(variable)+'='+str(oldvalue)+'New value '+str(variable)+'='+str(value))
                     else:
                         err_msg=ERROR_CODE_DICT['ERR_DYNVAR']
                 else:
@@ -110,7 +108,6 @@ class DynamicVariables:
             if err_msg is not None:
                 log.error(err_msg)
                 logger.print_on_console(err_msg)
-
         except Exception as e:
             log.error(e)
             logger.print_on_console(e)
@@ -131,36 +128,11 @@ class DynamicVariables:
                 log.debug('Check if the given variable to be modified is dynamic or not')
                 res=self.dyn_obj.check_for_dynamicvariables(variable)
                 if res==TEST_RESULT_TRUE:
-                    dynamic_variable_handler.local_dynamic.dynamic_variable_map[variable]=value
+                    self.dyn_obj.store_dynamic_value(variable,value,"copyvalue")
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
-                    log.debug('Variable copied is ',str(variable),' = ',str(value))
+                    log.debug('Variable copied is ' + str(variable) + ' = ' + str(value))
                     logger.print_on_console('Variable copied is ',str(variable),' = ',str(value))
-
-                    #Fixing issue #123(ALM) check for the variable if it already exists is removed
-##                    #Check if the variable already exists
-##                    log.debug('Check if the variable already exists')
-##                    if not(dynamic_variable_handler.dynamic_variable_map.has_key(variable)):
-
-##                    #Check if the value to be updated is dynamic and get its value
-##                    log.debug('Check if the value to be updated is dynamic and get its value')
-##                    value=coreutilsobj.get_UTF_8(value)
-##                    if self.dyn_obj.check_for_dynamicvariables(value)==TEST_RESULT_TRUE:
-##                        value=self.dyn_obj.get_dynamic_value(value)
-##                        #Add the variable to the map with the given value
-##                        dynamic_variable_handler.dynamic_variable_map[variable]=value
-##                        status=TEST_RESULT_PASS
-##                        methodoutput=TEST_RESULT_TRUE
-##                        log.debug('Variable copied is ',variable,' = ',value)
-##                        logger.print_on_console('Variable copied is ',variable,' = ',value)
-####                        log.debug('Variable copied is '+str(variable)+'='+str(value))
-####                        logger.print_on_console('Variable copied is '+str(variable)+'='+str(value))
-##                    else:
-##                        log.debug('Invalid Input: 2nd input should be dynamic variable')
-##                        logger.print_on_console('Invalid Input: 2nd input should be dynamic variable')
-
-##                    else:
-##                        err_msg=ERROR_CODE_DICT['ERR_DYNVAR']
                 else:
                    err_msg=INVALID_INPUT
             else:
@@ -170,7 +142,7 @@ class DynamicVariables:
                 logger.print_on_console(err_msg)
         except Exception as e:
             log.error(e)
-            logger.print_on_console(e)
+            logger.print_on_console("Error occured while copying value")
             err_msg=INPUT_ERROR
         return status,methodoutput,output_res,err_msg
 
