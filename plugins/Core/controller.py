@@ -1127,7 +1127,7 @@ class Controller():
                                     recorder_obj = recording.Recorder()
                                     record_flag = str(configvalues['screen_rec']).lower()
                                     #start screen recording
-                                    if (record_flag=='yes') and self.execution_mode == SERIAL and json_data['apptype'] == 'Web': video_path = recorder_obj.record_execution(json_data)
+                                    if (record_flag=='yes') and self.execution_mode == SERIAL and json_data['apptype'] == 'Web': video_path = recorder_obj.record_execution(json_data['suitedetails'][0])
                                     status,status_percentage = con.executor(tsplist,EXECUTE,last_tc_num,1,con.conthread,video_path)
                                     #end video
                                     if (record_flag=='yes') and self.execution_mode == SERIAL and json_data['apptype'] == 'Web': recorder_obj.rec_status = False
