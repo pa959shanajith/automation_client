@@ -58,7 +58,7 @@ class Screenshot():
                         output=None
                     else:
                         filename=self.generateUniqueFileName()
-                        path=path+args[0]['projectname']+'\\'+args[0]['releaseid']+'\\'+args[0]['cyclename']+'\\'+datetime.datetime.now().strftime("%Y-%m-%d")+'\\'
+                        path=path+args[0]['projectname']+os.sep+args[0]['releaseid']+os.sep+args[0]['cyclename']+os.sep+datetime.datetime.now().strftime("%Y-%m-%d")+os.sep
                         if(not os.path.exists(path)):
                             os.makedirs(path)
                         filePath = path + filename
