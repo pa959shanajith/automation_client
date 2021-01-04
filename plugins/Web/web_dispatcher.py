@@ -355,7 +355,7 @@ class Dispatcher:
             return webelement
 
 
-        def find_browser_info(reporting_obj):
+        def find_browser_info(reporting_obj,mythread):
             #Find the browser type and browser name if driver_obj is not None
             if browser_Keywords.local_bk.driver_obj is not None:
                 local_Wd.log.info('Finding the browser information')
@@ -450,7 +450,7 @@ class Dispatcher:
                                 if res:
                                     result=TERMINATE
                     elif keyword==OPEN_BROWSER:
-                        find_browser_info(reporting_obj)
+                        find_browser_info(reporting_obj,mythread)
 
             else:
                 err_msg=INVALID_KEYWORD
@@ -461,14 +461,15 @@ class Dispatcher:
             if self.action == EXECUTE:
                 if result != TERMINATE:
                     result=list(result)
+                    screen_details=mythread.json_data['suitedetails'][0]
                     if configvalues['screenShot_Flag'].lower() == 'fail':
                         if result[0].lower() == 'fail':
-                            file_path = screen_shot_obj.captureScreenshot()
+                            file_path = screen_shot_obj.captureScreenshot(screen_details)
                             if headless_mode:
                                 driver.save_screenshot(file_path[2])
                             result.append(file_path[2])
                     elif configvalues['screenShot_Flag'].lower() == 'all':
-                        file_path = screen_shot_obj.captureScreenshot()
+                        file_path = screen_shot_obj.captureScreenshot(screen_details)
                         if headless_mode:
                             driver.save_screenshot(file_path[2])
                         result.append(file_path[2])

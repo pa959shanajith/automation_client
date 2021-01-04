@@ -184,7 +184,7 @@ class DesktopDispatcher:
         self.action = None
         self.outook_obj = outlook.OutlookKeywords()
 
-    def dispatcher(self,teststepproperty, input, iris_flag):
+    def dispatcher(self,teststepproperty, input, iris_flag, mythread):
         objectname = teststepproperty.objectname
         output = teststepproperty.outputval
         objectname = objectname.strip()
@@ -286,14 +286,15 @@ class DesktopDispatcher:
             if ( self.action == constants.EXECUTE ):
                 if  ( result != constants.TERMINATE  ):
                     result = list(result)
+                    screen_details=mythread.json_data['suitedetails'][0]
                     if ( configvalues['screenShot_Flag'].lower() == 'fail' ):
                         if ( result[0].lower() == 'fail' ):
                             if ( keyword not in desktop_constants.APPLICATION_KEYWORDS ):
-                                file_path = screen_shot_obj.captureScreenshot()
+                                file_path = screen_shot_obj.captureScreenshot(screen_details)
                                 result.append(file_path[2])
                     elif configvalues['screenShot_Flag'].lower() == 'all':
                         if  ( keyword not in desktop_constants.APPLICATION_KEYWORDS ):
-                            file_path = screen_shot_obj.captureScreenshot()
+                            file_path = screen_shot_obj.captureScreenshot(screen_details)
                             result.append(file_path[2])
         except TypeError as e:
             err_msg = constants.ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']
