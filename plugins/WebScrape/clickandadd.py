@@ -133,13 +133,15 @@ class Clickandadd():
             def callback_scrape_stop_cna_iframes(myipath, tempne_stopclicknadd):
                 for iframes in (list(range(len(driver.find_elements_by_tag_name(domconstants.IFRAME))))):
                     path = myipath + str(iframes) + 'i' + '/'
-                    rect = driver.find_elements_by_tag_name(domconstants.IFRAME)[iframes].rect
+                    rect = None
+                    if iframes < len(driver.find_elements_by_tag_name(domconstants.IFRAME)):
+                        rect = driver.find_elements_by_tag_name(domconstants.IFRAME)[iframes].rect
                     if webscrape_utils_obj.switchtoframe_webscrape(driver, currenthandle, path):
                         in_iframe = driver.execute_script(webscrape_utils_obj.javascript_in_iframe)
                         log.debug('switched to iframe/frame %s', path)
                         temp = driver.execute_script(webscrape_utils_obj.javascript_stopclicknadd, path)
                         if temp is not None:
-                            if in_iframe:
+                            if in_iframe and rect is not None:
                                 for element in temp:
                                     element['top'] = element['top'] + rect['y']                                    
                                     element['left'] = element['left'] + rect['x']
