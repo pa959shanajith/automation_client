@@ -180,6 +180,7 @@ ERROR_CODE_DICT = {
                     'ERR_INPUT_EXCEEDS': 'The input provided exceeds the number of windows open',
                     'ERR_WEB_DRIVER_EXCEPTION': 'Error occurred with browser',
                     'CLICKABLE_EXCEPTION': 'File type input Element is not Clickable, use uploadFile keyword instead.',
+                    'PRESSABLE_EXCEPTION': 'File type input Element is not Pressable, use uploadFile keyword instead.',
                     'ERR_NO_SUCH_WINDOW_EXCEPTION': """Requested web page can't be found.""",
                     'ERR_UNHANDELED_ALERT_EXCEPTION': 'Error occurred due to unexpected alert.',
                     'ERR_INVALID_SELECTOR_EXCEPTION': 'Object Not Found.',
