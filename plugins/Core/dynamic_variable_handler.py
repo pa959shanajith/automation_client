@@ -49,7 +49,7 @@ class DynamicVariables:
         return res,dyn_value
 
     #To replace the dynamic variable by it's actual value
-    def replace_dynamic_variable(self,input_var,keyword,con_obj,exchange_val=False):
+    def replace_dynamic_variable(self,input_var,keyword,con_obj,no_exch_val=False):
         coreutilsobj=core_utils.CoreUtils()
         input_var=coreutilsobj.get_UTF_8(input_var)
         actual_value=input_var
@@ -69,11 +69,10 @@ class DynamicVariables:
                 if temp_value is None:
                     actual_value=temp_value
                 elif actual_value is not None:
-                    if hasattr(temp_value, "tag_name") or exchange_val:
+                    if hasattr(temp_value, "tag_name") or no_exch_val:
                         actual_value=temp_value
                     else:
-                        if isinstance(temp_value,str):
-                            temp_value = str(temp_value)
+                        if not isinstance(temp_value,str): temp_value = str(temp_value)
                         actual_value=actual_value.replace(input_var,temp_value)
         else:
             status,nested_var=self.check_dynamic_inside_dynamic(input_var)

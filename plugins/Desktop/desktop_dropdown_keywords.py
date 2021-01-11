@@ -466,6 +466,7 @@ class Dropdown_Keywords():
                                         if ( item not in verb ):
                                             flag = False
                                             err_msg = 'Failed to verify selected value'
+                                            verb=OUTPUT_CONSTANT
                                             break
                                     if (flag == True):
                                         status = desktop_constants.TEST_RESULT_PASS
@@ -489,6 +490,7 @@ class Dropdown_Keywords():
                                         if ( item not in newlist ):
                                             flag = False
                                             err_msg = 'Failed to verify selected value'
+                                            verb=OUTPUT_CONSTANT
                                             break
                                     if (flag == True):
                                         status = desktop_constants.TEST_RESULT_PASS
