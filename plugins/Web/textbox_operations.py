@@ -392,6 +392,12 @@ class TextboxKeywords:
         local_to.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
             try:
+                # 4243:Failure of the test step along with appriopriate error message
+                if input[0] is None:
+                    err_msg=ERROR_CODE_DICT['NULL_DATA']
+                    local_to.log.error(err_msg)
+                    logger.print_on_console(err_msg)
+                    return status,methodoutput,output,err_msg
                 if webelement.tag_name == 'table':
                     if len(input)==5:
                         row_num=int(input[0])

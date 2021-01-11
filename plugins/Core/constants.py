@@ -112,6 +112,7 @@ PARALLEL = 'parallel'
 SERIAL = 'serial'
 
 ERROR_CODE_DICT = {
+                    'NULL_DATA' : 'Cannot verify text with the null data',
                     'MSG_STATUS' : 'Executed and the status is:',
                     'ERR_INVALID_INPUT':'Input error: please provide the valid input.',
                     'INCORRECT_VARIABLE_FORMAT':'Incorrect variable format to store custom object',
