@@ -44,6 +44,7 @@ saucelabs_count = 0
 log = logging.getLogger("controller.py")
 status_percentage = {TEST_RESULT_PASS:0,TEST_RESULT_FAIL:0,TERMINATE:0,"total":0}
 process_ids = []
+screen_testcase_map= {}
 class ThreadLogFilter(logging.Filter):
     """
     This filter only show log entries for specified thread name
@@ -66,6 +67,9 @@ class Controller():
     mainframe_dispatcher_obj = None
     system_dispatcher_obj = None
     pdf_dispatcher_obj = None
+    core_utils.get_all_the_imports('Web')
+    import web_accessibility_testing
+    accessibility_testing_obj = web_accessibility_testing.Web_Accessibility_Testing()
     def __init__(self):
         global local_cont
         local_cont.web_dispatcher_obj = None
@@ -763,9 +767,10 @@ class Controller():
             return index,TERMINATE
 
     def executor(self,tsplist,action,last_tc_num,debugfrom_step,mythread,*args):
-        global status_percentage
+        global status_percentage, screen_testcase_map
         status_percentage = {TEST_RESULT_PASS:0,TEST_RESULT_FAIL:0,TERMINATE:0,"total":0}
         i=0
+        accessibility_reports = []
         status=True
         self.scenario_start_time=datetime.now()
         start_time_string=self.scenario_start_time.strftime(TIME_FORMAT)
@@ -782,7 +787,14 @@ class Controller():
                 self.last_tc_num=last_tc_num
                 self.debugfrom_step=debugfrom_step
                 try:
+                    index = i
                     i = self.methodinvocation(i)
+                    if index + 1 >= len(tsplist) or tsplist[index].testscript_name != tsplist[index + 1].testscript_name: 
+                        import browser_Keywords
+                        if hasattr(browser_Keywords.local_bk, 'driver_obj') and browser_Keywords.local_bk.driver_obj is not None:
+                            acc_result = self.accessibility_testing_obj.runCrawler(browser_Keywords.local_bk.driver_obj, None, screen_testcase_map[tsplist[index].testscript_name], screen_testcase_map["executionid"])
+                            if acc_result and acc_result != "fail":
+                                accessibility_reports.append(acc_result)
                     if i== TERMINATE:
                         #Changing the overallstatus of the report_obj to Terminate - (Sushma)
                         self.reporting_obj.overallstatus=TERMINATE
@@ -824,7 +836,7 @@ class Controller():
         video_path = args[0] if (args and args[0]) else ''
         self.reporting_obj.build_overallstatus(self.scenario_start_time,self.scenario_end_time,self.scenario_ellapsed_time,video_path)
         logger.print_on_console('Step Elapsed time is : ',str(self.scenario_ellapsed_time))
-        return status,status_percentage
+        return status,status_percentage, accessibility_reports
 
     def invokegenerickeyword(self,teststepproperty,dispatcher_obj,inputval):
         res = dispatcher_obj.dispatcher(teststepproperty,self.wx_object,self.conthread,*inputval)
@@ -927,7 +939,7 @@ class Controller():
         return status
 
     def invoke_execution(self,mythread,json_data,socketIO,wxObject,configvalues,qcObject,qtestObject,zephyrObject,aws_mode):
-        global terminate_flag,status_percentage,saucelabs_count
+        global terminate_flag,status_percentage,saucelabs_count, screen_testcase_map
         qc_url=''
         qc_password=''
         qc_username=''
@@ -1047,6 +1059,12 @@ class Controller():
                             #Iterating through each test case in the scenario
                             for testcase in [eval(scenario[scenario_id])]:
                                 #check for temrinate flag before parsing tsp list
+                                for step in testcase:
+                                    screen_testcase_map[step['testcasename']] = {}
+                                    screen_testcase_map[step['testcasename']]["screenname"] = step['screenname']
+                                    screen_testcase_map[step['testcasename']]["screenid"] = step['screenid']
+                                    screen_testcase_map[step['testcasename']]["cycleid"] = suite['cycleid']
+                                    screen_testcase_map["executionid"] = execute_result_data['executionId']
                                 if terminate_flag:
                                     break
                                 flag,_,last_tc_num,testcase_empty_flag,empty_testcase_names=obj.parse_json(testcase,dataparam_path_value)
@@ -1129,7 +1147,7 @@ class Controller():
                                     record_flag = str(configvalues['screen_rec']).lower()
                                     #start screen recording
                                     if (record_flag=='yes') and self.execution_mode == SERIAL and json_data['apptype'] == 'Web': video_path = recorder_obj.record_execution(json_data['suitedetails'][0])
-                                    status,status_percentage = con.executor(tsplist,EXECUTE,last_tc_num,1,con.conthread,video_path)
+                                    status,status_percentage, accessibility_reports = con.executor(tsplist,EXECUTE,last_tc_num,1,con.conthread,video_path)
                                     #end video
                                     if (record_flag=='yes') and self.execution_mode == SERIAL and json_data['apptype'] == 'Web': recorder_obj.rec_status = False
                                     print('=======================================================================================================')
@@ -1154,6 +1172,7 @@ class Controller():
                                 con.reporting_obj.user_termination=manual_terminate_flag
                                 con.reporting_obj.save_report_json(filename,json_data,status_percentage)
                                 execute_result_data["reportData"] = con.reporting_obj.report_json
+                                execute_result_data["accessibility_reports"] = accessibility_reports
                                 socketIO.emit('result_executeTestSuite', execute_result_data)
                                 obj.clearList(con)
                                 sc_idx += 1
