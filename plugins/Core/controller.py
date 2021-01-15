@@ -791,8 +791,9 @@ class Controller():
                     i = self.methodinvocation(i)
                     if index + 1 >= len(tsplist) or tsplist[index].testscript_name != tsplist[index + 1].testscript_name: 
                         import browser_Keywords
-                        if hasattr(browser_Keywords.local_bk, 'driver_obj') and browser_Keywords.local_bk.driver_obj is not None:
-                            acc_result = self.accessibility_testing_obj.runCrawler(browser_Keywords.local_bk.driver_obj, None, screen_testcase_map[tsplist[index].testscript_name], screen_testcase_map["executionid"])
+                        script_info =  screen_testcase_map[tsplist[index].testscript_name]
+                        if hasattr(browser_Keywords.local_bk, 'driver_obj') and browser_Keywords.local_bk.driver_obj is not None and len(script_info['accessibility_parameters']) > 0:
+                            acc_result = self.accessibility_testing_obj.runCrawler(browser_Keywords.local_bk.driver_obj, script_info, screen_testcase_map["executionid"])
                             if acc_result and acc_result != "fail":
                                 accessibility_reports.append(acc_result)
                     if i== TERMINATE:
@@ -1002,6 +1003,7 @@ class Controller():
                     #Logic to iterate through each scenario in the suite
                     for scenario,scenario_id,condition_check_value,dataparam_path_value in zip(suite_id_data,scenarioIds[suite_id],condition_check[suite_id],dataparam_path[suite_id]):
                         execute_flag=True
+                        accessibility_parameters = suite['accessibilityMap'][scenario_id]
                         con.reporting_obj=reporting.Reporting()
                         con.configvalues=configvalues
                         con.exception_flag=self.exception_flag
@@ -1065,6 +1067,7 @@ class Controller():
                                     screen_testcase_map[step['testcasename']]["screenid"] = step['screenid']
                                     screen_testcase_map[step['testcasename']]["cycleid"] = suite['cycleid']
                                     screen_testcase_map["executionid"] = execute_result_data['executionId']
+                                    screen_testcase_map[step['testcasename']]['accessibility_parameters'] = accessibility_parameters
                                 if terminate_flag:
                                     break
                                 flag,_,last_tc_num,testcase_empty_flag,empty_testcase_names=obj.parse_json(testcase,dataparam_path_value)

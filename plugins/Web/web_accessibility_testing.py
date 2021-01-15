@@ -155,10 +155,13 @@ class Web_Accessibility_Testing:
             self.crawlStatus = False
 
 
-    def runCrawler(self, driver, rules, script_info, executionid):
+    def runCrawler(self, driver, script_info, executionid):
         result = {} 
         result["status"] = "fail"
-        self.searchData = [{'count': 10, 'name': 'A', 'pass': True, 'selected': False, 'tag': 'wcag2a'}, {'count': 0, 'name': 'AA', 'pass': True, 'selected': True, 'tag': 'wcag2aa'}, {'count': 0, 'name': 'Section 508', 'pass': True, 'selected': True, 'tag': 'section508'}, {'count': 0, 'name': 'Best-Practice', 'pass': True, 'selected': True, 'tag': 'best-practice'}]
+        rules_map = {"A":{'count': 10, 'name': 'A', 'pass': True, 'selected': False, 'tag': 'wcag2a'},"AA":{'count': 0, 'name': 'AA', 'pass': True, 'selected': False, 'tag': 'wcag2aa'},"508":{'count': 0, 'name': 'Section 508', 'pass': True, 'selected': False, 'tag': 'section508'},"Best Practice":{'count': 0, 'name': 'Best-Practice', 'pass': True, 'selected': False, 'tag': 'best-practice'}}
+        for i in script_info["accessibility_parameters"]:
+            rules_map[i]["selected"] = True
+        self.searchData = list(rules_map.values())
         self.socketIO = core.socketIO
         log.debug("inside runCrawler method")
         mainobj = core.root
