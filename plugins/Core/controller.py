@@ -1003,7 +1003,10 @@ class Controller():
                     #Logic to iterate through each scenario in the suite
                     for scenario,scenario_id,condition_check_value,dataparam_path_value in zip(suite_id_data,scenarioIds[suite_id],condition_check[suite_id],dataparam_path[suite_id]):
                         execute_flag=True
-                        accessibility_parameters = suite['accessibilityMap'][scenario_id]
+                        if "accessibilityMap" in suite and scenario_id in suite['accessibilityMap']:
+                            accessibility_parameters = suite['accessibilityMap'][scenario_id]
+                        else:
+                            accessibility_parameters = []
                         con.reporting_obj=reporting.Reporting()
                         con.configvalues=configvalues
                         con.exception_flag=self.exception_flag
