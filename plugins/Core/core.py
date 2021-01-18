@@ -892,7 +892,8 @@ class ConnectionThread(threading.Thread):
 
     def get_ice_session(self):
         server_cert = configvalues['server_cert']
-        if configvalues["disable_server_cert"] == "Yes":
+        tls_security = configvalues['tls_security']
+        if tls_security == "Low":
             server_cert = False
         elif server_cert != "default":
             if os.path.exists(server_cert) == False:
@@ -918,6 +919,7 @@ class ConnectionThread(threading.Thread):
             'ice_action': self.ice_action, 'icesession': icesession_enc}
         args = {"cert": client_cert, "params": params}
         if server_cert != "default": args["verify"] = server_cert
+        if tls_security != "High": args['assert_hostname'] = False
         return args
 
     def run(self):
@@ -927,13 +929,13 @@ class ConnectionThread(threading.Thread):
         if "hostname" in root.ice_token: reg_hostname=root.ice_token["hostname"]
         """Check if registered hostname in the Token matches with the current hostname"""
         if reg_hostname != hostname:
-            msg="Access denied: Hostname doesn't match. ICE is registered with a  different hostname "+reg_hostname
+            msg="Access denied: Hostname doesn't match. ICE is registered with a different hostname "+reg_hostname
             logger.print_on_console(msg)
             log.error(msg)
             root.ice_token = None
             if root.gui: cw.enable_register()
             return False
-        global socketIO, allow_connect,execution_flags
+        global socketIO, allow_connect
         allow_connect = False
         err = None
         err_msg = "Error in Server Connection"
@@ -947,22 +949,30 @@ class ConnectionThread(threading.Thread):
         except ValueError as e:
             err = e
             err_msg = "Error occured while connecting to server due to TLS certificate error."
+            desc_err_msg = ("Try changing Server Certificate Path to 'default'." +
+                " If that doesn't work, then try lowering TLS security Level in ICE configuration." +
+                "\nNote: Setting TLS security level to 'Low' will result in an insecure HTTPS connection\n")
             error = str(e).replace("[engine.io waiting for connection] ",'').replace("[SSL: CERTIFICATE_VERIFY_FAILED] ",'')
             if "_ssl.c" in error:
                 err = error[:error.index("(_ssl")]
-            elif 'SSLCertVerificationError' in error:
-                err = error.split('SSLCertVerificationError')[1][2:-3]
+            elif 'SSLCertVerificationError' in error and "doesn't match" in error:
+                err = "[TLS Hostname Mismatch] " + error.split('SSLCertVerificationError')[1][2:-3]
+                desc_err_msg = ("Provide a valid hostname for which TLS certificate is issued for." +
+                    " If that doesn't work, then try setting TLS security Level to 'Med' in ICE configuration\n")
+            elif 'bad handshake' in error and 'certificate verify failed' in error:
+                err = "[TLS Certificate Mismatch] TLS certificate does not match with Server"
+            else:
+                err = "[TLS Certificate Error] TLS certificate is either invalid"
             logger.print_on_console(err_msg)
             logger.print_on_console(err)
-            logger.print_on_console("Try changing Server Certificate Path to 'default'." +
-                " If that also doesn't work, then disable server certificate check. But that" +
-                " will result in an insecure HTTPS connection")
+            logger.print_on_console(desc_err_msg)
         except Exception as e:
             err = e
             logger.print_on_console(err_msg)
+            log.error(err, exc_info=True)
         if err:
             log.error(err_msg)
-            log.error(err,exc_info=True)
+            log.error(err)
             if root.gui: cw.connectbutton.Enable()
 
 
