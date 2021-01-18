@@ -102,6 +102,14 @@ class BrowserKeywords():
                 elif d != None:
                     #driver exist in map, get it
                     local_bk.driver_obj = d
+                    if(isinstance(local_bk.driver_obj,webdriver.Firefox)):
+                        try:
+                            win_name=local_bk.driver_obj.title+' — Mozilla Firefox'
+                            if(win32gui.FindWindow(None,win_name)!=0):
+                                handle=win32gui.FindWindow(None,win_name)
+                                win32gui.SetForegroundWindow(handle)
+                        except:
+                            pass 
                 else:
                     #instantiate new browser and add it to the map
                     local_bk.driver_obj = obj.getBrowser(self.browser_num)

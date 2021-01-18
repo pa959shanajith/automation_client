@@ -391,14 +391,18 @@ class ButtonLinkKeyword():
                 local_blk.log.debug(webelement)
                 local_blk.log.debug('Check for the element enable')
                 if webelement.is_enabled():
-                    local_blk.log.debug(WEB_ELEMENT_ENABLED)
-                    local_blk.log.debug('Going to perform click operation')
-                    time.sleep(0.5)
-                    webelement.click()
-                    local_blk.log.info('press operation performed using selenium click')
-                    local_blk.log.info(STATUS_METHODOUTPUT_UPDATE)
-                    status = webconstants.TEST_RESULT_PASS
-                    methodoutput = webconstants.TEST_RESULT_TRUE
+                    if webelement.tag_name =='input' and webelement.get_attribute("type") == 'file':
+                        local_blk.log.info(WEB_ELEMENT_FILE_TYPE)
+                        err_msg=ERROR_CODE_DICT['PRESSABLE_EXCEPTION']
+                    else:
+                        local_blk.log.debug(WEB_ELEMENT_ENABLED)
+                        local_blk.log.debug('Going to perform click operation')
+                        time.sleep(0.5)
+                        webelement.click()
+                        local_blk.log.info('press operation performed using selenium click')
+                        local_blk.log.info(STATUS_METHODOUTPUT_UPDATE)
+                        status = webconstants.TEST_RESULT_PASS
+                        methodoutput = webconstants.TEST_RESULT_TRUE
                 else:
                     err_msg = WEB_ELEMENT_DISABLED
         except Exception as e:
