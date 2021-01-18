@@ -760,22 +760,6 @@ class Config_window(wx.Frame):
         lblList5 = ['High', 'Med', 'Low']
         self.bSizer = wx.BoxSizer( wx.VERTICAL )
 
-        self.rbox1 = wx.RadioBox(self.panel1, label = 'Ignore Certificate', choices = lblList,
-            majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
-        self.rbox1.SetToolTip(wx.ToolTip("Indicates if the errors of the AUT website's security certificates are to be ignored or not. It is applicable only for IE"))
-        if isConfigJson!=False and isConfigJson['ignore_certificate'].title()==lblList[0]:
-            self.rbox1.SetSelection(0)
-        else:
-            self.rbox1.SetSelection(1)
-
-        self.rbox2 = wx.RadioBox(self.panel1, label = 'IE Architecture Type', choices = lblList2,
-            majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
-        if isConfigJson!=False and isConfigJson['bit_64'].title() != 'Yes':
-            self.rbox2.SetSelection(1)
-        else:
-            self.rbox2.SetSelection(0)
-        self.rbox2.SetToolTip(wx.ToolTip("Checks if the Client machine is a 64-bit machine or 32-bit"))
-
         self.rbox9 = wx.RadioBox(self.panel1, label = 'TLS Security Level', choices = lblList5,
             majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
         if isConfigJson!=False:
@@ -792,6 +776,22 @@ class Config_window(wx.Frame):
             " hostname verification of Avo Assure in case of unavailability of a valid certificate." +
             "\nHigh: Enforce TLS Certificate and Hostname Verification\nMed: Enforce TLS Certificate and" + 
             " Disable Hostname Verification\nLow: Disable TLS Certificate and Hostname Verification"))
+
+        self.rbox1 = wx.RadioBox(self.panel1, label = 'Ignore AUT Certificate', choices = lblList,
+            majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
+        self.rbox1.SetToolTip(wx.ToolTip("Indicates if the errors of the AUT website's security certificates are to be ignored or not. It is applicable only for IE"))
+        if isConfigJson!=False and isConfigJson['ignore_certificate'].title()==lblList[0]:
+            self.rbox1.SetSelection(0)
+        else:
+            self.rbox1.SetSelection(1)
+
+        self.rbox2 = wx.RadioBox(self.panel1, label = 'IE Architecture Type', choices = lblList2,
+            majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
+        if isConfigJson!=False and isConfigJson['bit_64'].title() != 'Yes':
+            self.rbox2.SetSelection(1)
+        else:
+            self.rbox2.SetSelection(0)
+        self.rbox2.SetToolTip(wx.ToolTip("Checks if the Client machine is a 64-bit machine or 32-bit"))
 
         self.rbox5 = wx.RadioBox(self.panel1, label = 'Exception Flag',choices = lblList4,
             majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
@@ -817,7 +817,7 @@ class Config_window(wx.Frame):
             self.rbox3.SetSelection(0)
         self.rbox3.SetToolTip(wx.ToolTip("Facilitates capturing the screenshots of the test steps based on its value"))
 
-        self.rbox4 = wx.RadioBox(self.panel1, label = 'Http Status Code Check', choices = lblList,
+        self.rbox4 = wx.RadioBox(self.panel1, label = 'HTTP Status Code Check', choices = lblList,
             majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
         if isConfigJson!=False and isConfigJson['httpStatusCode'].title()!=lblList[0]:
             self.rbox4.SetSelection(1)
@@ -912,7 +912,7 @@ class Config_window(wx.Frame):
 
         #Adding GridSizer which will show the radio buttons into grid of 9 rows and 2 colums it can be changed based on the requirements
         self.gs=wx.GridSizer(9,2,5,5)
-        self.gs.AddMany([(self.rbox1,0,wx.EXPAND), (self.rbox2,0,wx.EXPAND), (self.rbox9,0,wx.EXPAND),
+        self.gs.AddMany([(self.rbox9,0,wx.EXPAND), (self.rbox1,0,wx.EXPAND), (self.rbox2,0,wx.EXPAND),
             (self.rbox5,0,wx.EXPAND), (self.rbox6,0,wx.EXPAND), (self.rbox3,0,wx.EXPAND),
             (self.rbox4,0,wx.EXPAND), (self.rbox8,0,wx.EXPAND), (self.rbox7,0,wx.EXPAND),
             (self.rbox10,0,wx.EXPAND), (self.rbox11,0,wx.EXPAND), (self.rbox12,0,wx.EXPAND),
