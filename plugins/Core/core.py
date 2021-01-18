@@ -30,9 +30,9 @@ import update_module
 from icetoken import ICEToken
 import benchmark
 try:
-    from socketlib_override import SocketIO,BaseNamespace
+    from socketlib_override import SocketIO, BaseNamespace, socketIO_prepare_http_session as prepare_http_session
 except ImportError:
-    from socketIO_client import SocketIO,BaseNamespace
+    from socketIO_client import SocketIO, BaseNamespace, prepare_http_session
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 log = logging.getLogger('core.py')
@@ -94,6 +94,25 @@ if SYSTEM_OS == "Windows":
     CHROME_DRIVER_PATH += ".exe"
     GECKODRIVER_PATH += ".exe"
     EDGE_CHROMIUM_DRIVER_PATH += ".exe"
+
+
+def _process_ssl_errors(e):
+    err = "[TLS Certificate Error] TLS certificate is invalid"
+    err_msg = "Error occured while connecting to server due to TLS certificate error."
+    desc_err_msg = ("Try changing Server Certificate Path to 'default'." +
+        " If that doesn't work, then try lowering TLS security Level in ICE configuration." +
+        "\nNote: Setting TLS security level to 'Low' will result in an insecure HTTPS connection\n")
+    error = str(e).replace("[engine.io waiting for connection] ",'').replace("[SSL: CERTIFICATE_VERIFY_FAILED] ",'')
+    if "_ssl.c" in error:
+        err = error[:error.index("(_ssl")]
+    elif 'SSLCertVerificationError' in error and "doesn't match" in error:
+        err = "[TLS Hostname Mismatch] " + error.split('SSLCertVerificationError')[1][2:-3]
+        desc_err_msg = ("Provide a valid hostname for which TLS certificate is issued for." +
+            " If that doesn't work, then try setting TLS security Level to 'Med' in ICE configuration\n")
+    elif 'bad handshake' in error and 'certificate verify failed' in error:
+        err = "[TLS Certificate Mismatch] TLS certificate does not match with Server"
+    return err, err_msg, desc_err_msg
+
 
 class MainNamespace(BaseNamespace):
     def on_message(self, *args):
@@ -947,22 +966,7 @@ class ConnectionThread(threading.Thread):
             root.socketIO = socketIO
             socketIO.wait()
         except ValueError as e:
-            err = e
-            err_msg = "Error occured while connecting to server due to TLS certificate error."
-            desc_err_msg = ("Try changing Server Certificate Path to 'default'." +
-                " If that doesn't work, then try lowering TLS security Level in ICE configuration." +
-                "\nNote: Setting TLS security level to 'Low' will result in an insecure HTTPS connection\n")
-            error = str(e).replace("[engine.io waiting for connection] ",'').replace("[SSL: CERTIFICATE_VERIFY_FAILED] ",'')
-            if "_ssl.c" in error:
-                err = error[:error.index("(_ssl")]
-            elif 'SSLCertVerificationError' in error and "doesn't match" in error:
-                err = "[TLS Hostname Mismatch] " + error.split('SSLCertVerificationError')[1][2:-3]
-                desc_err_msg = ("Provide a valid hostname for which TLS certificate is issued for." +
-                    " If that doesn't work, then try setting TLS security Level to 'Med' in ICE configuration\n")
-            elif 'bad handshake' in error and 'certificate verify failed' in error:
-                err = "[TLS Certificate Mismatch] TLS certificate does not match with Server"
-            else:
-                err = "[TLS Certificate Error] TLS certificate is either invalid"
+            err, err_msg, desc_err_msg = _process_ssl_errors(e)
             logger.print_on_console(err_msg)
             logger.print_on_console(err)
             logger.print_on_console(desc_err_msg)
@@ -1244,15 +1248,10 @@ class Main():
             configvalues['server_port']=url[1]
             if not hold: self.connection("register")
         except requests.exceptions.SSLError as e:
-            error = str(e)
-            if 'SSLCertVerificationError' in error:
-                err = error.split('SSLCertVerificationError')[1][2:-3]
-                emsg = "Error occured while connecting to server due to TLS certificate error."
-                logger.print_on_console(emsg)
-                logger.print_on_console(err)
-                logger.print_on_console("Try changing Server Certificate Path to 'default'." +
-                    " If that also doesn't work, then disable server certificate check. But that" +
-                    " will result in an insecure HTTPS connection")
+            err, err_msg, desc_err_msg = _process_ssl_errors(str(e))
+            logger.print_on_console(err_msg)
+            logger.print_on_console(err)
+            logger.print_on_console(desc_err_msg)
         except Exception as e:
             err = e
             logger.print_on_console(emsg)
@@ -1270,10 +1269,12 @@ class Main():
                     return None
                 kw_args = ConnectionThread(mode).get_ice_session()
                 data = kw_args.pop('params')
+                prep_req = prepare_http_session(kw_args)
                 del data['username']
                 del data['ice_action']
+                kw_args.pop('assert_hostname', None)
                 server_url = "https://"+self.server_url+"/ICE_provisioning_register"
-                res = requests.post(server_url, data=data, **kw_args)
+                res = prep_req.post(server_url, data=data, **kw_args)
                 response = res.content
                 try:
                     err_res = None
@@ -1627,7 +1628,7 @@ def check_browser():
         try:
             if('Windows-10' in platform.platform()):
                 import psutil
-                edgeFlagComp = not ("MicrosoftEdge.exe" in (p.name() for p in psutil.process_iter()))
+                edgeFlagComp = "MicrosoftEdge.exe" not in [p.name() for p in psutil.process_iter()]
                 if edgeFlagComp:
                     #from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
                     p = subprocess.Popen('"' + EDGE_DRIVER_PATH + '" --version', stdout=subprocess.PIPE, bufsize=1,cwd=DRIVERS_PATH,shell=True)
@@ -1707,11 +1708,12 @@ def check_PatchUpdate():
         global patchcheckFlag
         import update_module
         flag = True
-        if ( os.path.isfile(CONFIG_PATH)==True):
+        data = None
+        SERVER_LOC = ''
+        if os.path.isfile(CONFIG_PATH) == True:
             configvalues = json.load(open(CONFIG_PATH))
             SERVER_LOC = "https://" + str(configvalues['server_ip']) + ':' + str(configvalues['server_port']) + '/patchupdate/'
             manifest_req= requests.get(SERVER_LOC+'/manifest.json',verify=False)
-            data = None
             if(manifest_req.status_code == 200):
                 data = json.loads(manifest_req.text)
         def update_updater_module(data):
@@ -1719,7 +1721,7 @@ def check_PatchUpdate():
             update_obj = update_module.Update_Rollback()
             update_obj.update(data, MANIFEST_LOC, SERVER_LOC, AVO_ASSURE_HOME, LOC_7Z, UPDATER_LOC, 'UPDATE')
 
-        if (data):
+        if data:
             update_updater_module(data)
             UPDATE_MSG=update_obj.send_update_message()
             l_ver = update_obj.fetch_current_value()
@@ -1784,8 +1786,8 @@ def set_ICE_status(one_time_ping = False,connect=True,interval = 60000):
         status_ping_thread = threading.Timer(int(interval)/2000, set_ICE_status,[])
         status_ping_thread.setName("Status Ping")
         status_ping_thread.start()
-    log.info('Ping Server')
-    #Add ICE identification and stauts, which is busy by default
+    log.debug('Ping Server')
+    # Add ICE identification and status, which is busy by default
     result = {"hostip":socket.gethostbyname(socket.gethostname()),"time":str(datetime.now()),"connected":connect}
     result['status'] = execution_flag or termination_inprogress
     if cw is not None:
