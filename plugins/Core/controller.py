@@ -1610,18 +1610,29 @@ def kill_process():
         log.info('Stale processes killed')
         logger.print_on_console('Stale processes killed')
     else:
-        try:
-            import win32com.client
-            for id in process_ids:
+        index = 0
+        tries = {}
+        while(len(process_ids) > 0):
+            try:
+                id = process_ids.pop()
+                if id in tries and tries[id] >= 3:
+                    logger.print_on_console("Unable to kill process wit PID: " + str(id))
+                    continue
+                elif id in tries:
+                    tries[id] += 1
+                else:
+                    tries[id] = 1
+                process_ids.append(id)
                 os.system("TASKKILL /F /T /PID " + str(id))
-                process_ids.remove(id)
+                process_ids.pop()
+            except Exception as e:
+                log.error(e)
             # my_processes = ['msedgedriver.exe','MicrosoftWebDriver.exe','MicrosoftEdge.exe','chromedriver.exe','IEDriverServer.exe','IEDriverServer64.exe','CobraWinLDTP.exe','phantomjs.exe','geckodriver.exe']
             # wmi=win32com.client.GetObject('winmgmts:')
             # for p in wmi.InstancesOf('win32_process'):
             #     if p.pid in process_ids:
             #         os.system("TASKKILL /F /T /IM " + p.pid)
-        except Exception as e:
-            log.error(e)
+        
 
         try:
             import browser_Keywords_MW

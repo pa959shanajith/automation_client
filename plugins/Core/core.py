@@ -1004,6 +1004,7 @@ class TestThread(threading.Thread):
         # This is the code executing in the new thread.
         global execution_flag, closeActiveConnection, connection_Timer, termination_inprogress
         batch_id = None
+        termination_inprogress = True
         try:
             self.con = controller.Controller()
             self.con.configvalues=configvalues
@@ -1048,7 +1049,6 @@ class TestThread(threading.Thread):
 
             if status==TERMINATE:
                 logger.print_on_console('---------Termination Completed-------',color="YELLOW")
-                termination_inprogress = False
             if self.action==DEBUG:
                 testcasename = handler.local_handler.testcasename
                 self.cw.killChildWindow(debug=True)
@@ -1089,6 +1089,7 @@ class TestThread(threading.Thread):
         self.main.testthread = None
         execution_flag = False
         #set ICE status as available
+        termination_inprogress = False
         set_ICE_status(True)
         if self.main.gui:
             if self.cw.choice=='RunfromStep': self.cw.breakpoint.Enable()
