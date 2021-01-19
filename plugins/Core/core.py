@@ -1775,7 +1775,7 @@ def set_ICE_status(one_time_ping = False,connect=True,interval = 60000):
         status_ping_thread = threading.Timer(int(interval)/2000, set_ICE_status,[])
         status_ping_thread.setName("Status Ping")
         status_ping_thread.start()
-    log.info('Ping Server')
+    log.debug('Ping Server')
     #Add ICE identification and stauts, which is busy by default
     result = {"hostip":socket.gethostbyname(socket.gethostname()),"time":str(datetime.now()),"connected":connect}
     result['status'] = execution_flag or termination_inprogress
