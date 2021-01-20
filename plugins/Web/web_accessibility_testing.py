@@ -116,11 +116,6 @@ class Web_Accessibility_Testing:
                     else:
                         rule["pass"] = True
                         rule["count"] = 0
-                try:
-                    driver.close()
-                    driver.quit()
-                except:
-                    pass
                 obj["accessibility"] = results
                 obj["access-rules"] = self.searchData
 
