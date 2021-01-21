@@ -30,6 +30,7 @@ import sap_constants
 import constants
 import screenshot_keywords
 import readconfig
+import iris_operations
 
 class SAPDispatcher:
 
@@ -191,6 +192,7 @@ class SAPDispatcher:
 
         self.exception_flag = ''
         self.action = None
+        self.iris_object = iris_operations.IRISKeywords()
 #-----------------------------------------------------------------for custom objects
     custom_dict = {
                     "click" : ['radiobutton', 'checkbox', 'input', 'button', 'select', 'table', 'label'],
@@ -245,21 +247,22 @@ class SAPDispatcher:
             logger.print_on_console( "Error occured in dispatcher" )
 #-----------------------------------------------------------------for custom objects
         try:
-            if ( iris_flag ):
-                import iris_operations
-                iris_object = iris_operations.IRISKeywords()
-                self.sap_dict['clickiris'] = iris_object.clickiris
-                self.sap_dict['doubleclickiris'] = iris_object.doubleclickiris
-                self.sap_dict['rightclickiris'] = iris_object.rightclickiris
-                self.sap_dict['settextiris'] = iris_object.settextiris
-                self.sap_dict['setsecuretextiris'] = iris_object.setsecuretextiris
-                self.sap_dict['gettextiris'] = iris_object.gettextiris
-                self.sap_dict['getrowcountiris'] = iris_object.getrowcountiris
-                self.sap_dict['getcolcountiris'] = iris_object.getcolcountiris
-                self.sap_dict['getcellvalueiris'] = iris_object.getcellvalueiris
-                self.sap_dict['verifyexistsiris'] = iris_object.verifyexistsiris
-                self.sap_dict['verifytextiris'] = iris_object.verifytextiris
-                self.sap_dict['cleartextiris'] = iris_object.cleartextiris
+            #-----------------------------------------------------------------iris-keywords
+            self.sap_dict['clickiris'] = self.iris_object.clickiris
+            self.sap_dict['doubleclickiris'] = self.iris_object.doubleclickiris
+            self.sap_dict['rightclickiris'] = self.iris_object.rightclickiris
+            self.sap_dict['settextiris'] = self.iris_object.settextiris
+            self.sap_dict['setsecuretextiris'] = self.iris_object.setsecuretextiris
+            self.sap_dict['gettextiris'] = self.iris_object.gettextiris
+            self.sap_dict['getrowcountiris'] = self.iris_object.getrowcountiris
+            self.sap_dict['getcolcountiris'] = self.iris_object.getcolcountiris
+            self.sap_dict['getcellvalueiris'] = self.iris_object.getcellvalueiris
+            self.sap_dict['verifyexistsiris'] = self.iris_object.verifyexistsiris
+            self.sap_dict['verifytextiris'] = self.iris_object.verifytextiris
+            self.sap_dict['cleartextiris'] = self.iris_object.cleartextiris
+            self.sap_dict['dragiris'] = self.iris_object.dragiris
+            self.sap_dict['dropiris'] = self.iris_object.dropiris
+            self.sap_dict['mousehoveriris'] = self.iris_object.mousehoveriris
 
             keyword = keyword.lower()
             if ( keyword in list(self.sap_dict.keys()) ):
@@ -279,6 +282,8 @@ class SAPDispatcher:
                             self.launch_keywords_obj.setWindowToForeground(wnd)
                         if ( teststepproperty.custom_flag ):
                             result = self.sap_dict[keyword](objectname, input, output, teststepproperty.parent_xpath)
+                        elif ( teststepproperty.objectname.split(';')[-1] == 'constant' and keyword.lower() == 'verifyexistsiris' ):
+                            result = self.sap_dict[keyword](objectname, input, output, 'constant')
                         else:
                             result = self.sap_dict[keyword](objectname, input, output)
                     else:

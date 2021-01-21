@@ -35,6 +35,7 @@ import json
 from selenium import webdriver
 import threading
 import wx
+import iris_operations
 local_Wd = threading.local()
 
 class Dispatcher:
@@ -52,6 +53,7 @@ class Dispatcher:
         local_Wd.statict_text_object = static_text_keywords.StaticTextKeywords()
         local_Wd.custom_object=custom_keyword.CustomKeyword()
         local_Wd.webelement_map=OrderedDict()
+        iris_object = iris_operations.IRISKeywords()
         local_Wd.log = logging.getLogger('web_dispatcher.py')
         self.identifier_dict={
             'rxpath': 'find_elements_by_xpath',
@@ -235,21 +237,22 @@ class Dispatcher:
 
         result=[TEST_RESULT_FAIL,TEST_RESULT_FALSE,OUTPUT_CONSTANT,err_msg]
 
-        if(iris_flag):
-            import iris_operations
-            iris_object = iris_operations.IRISKeywords()
-            self.web_dict['clickiris'] = iris_object.clickiris
-            self.web_dict['doubleclickiris'] = iris_object.doubleclickiris
-            self.web_dict['rightclickiris'] = iris_object.rightclickiris
-            self.web_dict['settextiris'] = iris_object.settextiris
-            self.web_dict['setsecuretextiris'] = iris_object.setsecuretextiris
-            self.web_dict['gettextiris'] = iris_object.gettextiris
-            self.web_dict['getrowcountiris'] = iris_object.getrowcountiris
-            self.web_dict['getcolcountiris'] = iris_object.getcolcountiris
-            self.web_dict['getcellvalueiris'] = iris_object.getcellvalueiris
-            self.web_dict['verifyexistsiris'] = iris_object.verifyexistsiris
-            self.web_dict['verifytextiris'] = iris_object.verifytextiris
-            self.web_dict['cleartextiris'] = iris_object.cleartextiris
+        #---------------------------------------------------------------iris keywords
+        self.web_dict['clickiris'] = iris_object.clickiris
+        self.web_dict['doubleclickiris'] = iris_object.doubleclickiris
+        self.web_dict['rightclickiris'] = iris_object.rightclickiris
+        self.web_dict['settextiris'] = iris_object.settextiris
+        self.web_dict['setsecuretextiris'] = iris_object.setsecuretextiris
+        self.web_dict['gettextiris'] = iris_object.gettextiris
+        self.web_dict['getrowcountiris'] = iris_object.getrowcountiris
+        self.web_dict['getcolcountiris'] = iris_object.getcolcountiris
+        self.web_dict['getcellvalueiris'] = iris_object.getcellvalueiris
+        self.web_dict['verifyexistsiris'] = iris_object.verifyexistsiris
+        self.web_dict['verifytextiris'] = iris_object.verifytextiris
+        self.web_dict['cleartextiris'] = iris_object.cleartextiris
+        self.web_dict['dragiris'] = iris_object.dragiris
+        self.web_dict['dropiris'] = iris_object.dropiris
+        self.web_dict['mousehoveriris'] = iris_object.mousehoveriris
 
         def print_error(err_msg):
             err_msg=ERROR_CODE_DICT[err_msg]
@@ -420,6 +423,8 @@ class Dispatcher:
                     elif teststepproperty.cord!='' and teststepproperty.cord!=None:
                         if teststepproperty.custom_flag:
                             result = self.web_dict[keyword](webelement,input,output,teststepproperty.parent_xpath)
+                        elif (teststepproperty.objectname.split(';')[-1] == 'constant' and keyword.lower() == 'verifyexistsiris'):
+                            result = self.web_dict[keyword](webelement,input,output,'constant')
                         else:
                             result = self.web_dict[keyword](webelement,input,output)
                     else:
@@ -457,7 +462,7 @@ class Dispatcher:
                 result=list(result)
                 result[3]=err_msg
             screen_shot_obj = screenshot_keywords.Screenshot()
-            headless_mode = str(configvalues['headless_mode'])=='Yes' 
+            headless_mode = str(configvalues['headless_mode'])=='Yes'
             if self.action == EXECUTE:
                 if result != TERMINATE:
                     result=list(result)

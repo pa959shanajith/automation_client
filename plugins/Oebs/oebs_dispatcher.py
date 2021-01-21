@@ -21,7 +21,7 @@ import constants
 import oebs_msg
 import screenshot_keywords
 import readconfig
-
+import iris_operations
 log = logging.getLogger('oebs_dispatcher.py')
 
 class OebsDispatcher:
@@ -34,6 +34,7 @@ class OebsDispatcher:
     def __init__(self):
         self.exception_flag=''
         self.action = None
+        self.iris_object = iris_operations.IRISKeywords()
 
 
     custom_dict={
@@ -198,21 +199,22 @@ class OebsDispatcher:
 
                 }
 
-            if(iris_flag):
-                import iris_operations
-                iris_object = iris_operations.IRISKeywords()
-                dict['clickiris'] = iris_object.clickiris
-                dict['doubleclickiris'] = iris_object.doubleclickiris
-                dict['rightclickiris'] = iris_object.rightclickiris
-                dict['settextiris'] = iris_object.settextiris
-                dict['setsecuretextiris'] = iris_object.setsecuretextiris
-                dict['gettextiris'] = iris_object.gettextiris
-                dict['getrowcountiris'] = iris_object.getrowcountiris
-                dict['getcolcountiris'] = iris_object.getcolcountiris
-                dict['getcellvalueiris'] = iris_object.getcellvalueiris
-                dict['verifyexistsiris'] = iris_object.verifyexistsiris
-                dict['verifytextiris'] = iris_object.verifytextiris
-                dict['cleartextiris'] = iris_object.cleartextiris
+            #-------------------------------------------------------------------iris keywords
+            dict['clickiris'] = self.iris_object.clickiris
+            dict['doubleclickiris'] = self.iris_object.doubleclickiris
+            dict['rightclickiris'] = self.iris_object.rightclickiris
+            dict['settextiris'] = self.iris_object.settextiris
+            dict['setsecuretextiris'] = self.iris_object.setsecuretextiris
+            dict['gettextiris'] = self.iris_object.gettextiris
+            dict['getrowcountiris'] = self.iris_object.getrowcountiris
+            dict['getcolcountiris'] = self.iris_object.getcolcountiris
+            dict['getcellvalueiris'] = self.iris_object.getcellvalueiris
+            dict['verifyexistsiris'] = self.iris_object.verifyexistsiris
+            dict['verifytextiris'] = self.iris_object.verifytextiris
+            dict['cleartextiris'] = self.iris_object.cleartextiris
+            dict['dragiris'] = self.iris_object.dragiris
+            dict['dropiris'] = self.iris_object.dropiris
+            dict['mousehoveriris'] = self.iris_object.mousehoveriris
 
             keyword=keyword.lower()
             if keyword in list(dict.keys()):
@@ -220,10 +222,12 @@ class OebsDispatcher:
                     obj_props = tsp.objectname.split(';')
                     coord = [obj_props[2],obj_props[3],obj_props[4],obj_props[5]]
                     ele = {'cord': tsp.cord, 'coordinates': coord}
-                    if(tsp.custom_flag):
-                        result = dict[keyword](ele,input,output,tsp.parent_xpath)
+                    if ( tsp.custom_flag ):
+                        result = dict[keyword](ele, input, output, tsp.parent_xpath)
+                    elif ( tsp.objectname.split(';')[-1] == 'constant' and keyword.lower() == 'verifyexistsiris' ):
+                        result = dict[keyword](ele, input, output, 'constant')
                     else:
-                        result= dict[keyword](ele,input,output)
+                        result = dict[keyword](ele, input, output)
                 else:
                     result=dict[keyword](*message)
                 if keyword == 'findwindowandattach':

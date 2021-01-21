@@ -32,6 +32,7 @@ from pywinauto.application import Application
 import pywinauto
 from pywinauto.findwindows import find_window
 from pywinauto.win32functions import SetForegroundWindow
+import iris_operations
 log = logging.getLogger( 'desktop_dispatcher.py' )
 
 class DesktopDispatcher:
@@ -183,6 +184,7 @@ class DesktopDispatcher:
         self.exception_flag = ''
         self.action = None
         self.outook_obj = outlook.OutlookKeywords()
+        self.iris_object = iris_operations.IRISKeywords()
 
     def dispatcher(self,teststepproperty, input, iris_flag, mythread):
         objectname = teststepproperty.objectname
@@ -209,21 +211,23 @@ class DesktopDispatcher:
         self.desktop_dict['setattachments'] = self.outook_obj.send_attachments
         self.desktop_dict['sendemail'] = self.outook_obj.send_mail
 
-        if ( iris_flag ):
-            import iris_operations
-            iris_object = iris_operations.IRISKeywords()
-            self.desktop_dict['clickiris'] = iris_object.clickiris
-            self.desktop_dict['doubleclickiris'] = iris_object.doubleclickiris
-            self.desktop_dict['rightclickiris'] = iris_object.rightclickiris
-            self.desktop_dict['settextiris'] = iris_object.settextiris
-            self.desktop_dict['setsecuretextiris'] = iris_object.setsecuretextiris
-            self.desktop_dict['gettextiris'] = iris_object.gettextiris
-            self.desktop_dict['getrowcountiris'] = iris_object.getrowcountiris
-            self.desktop_dict['getcolcountiris'] = iris_object.getcolcountiris
-            self.desktop_dict['getcellvalueiris'] = iris_object.getcellvalueiris
-            self.desktop_dict['verifyexistsiris'] = iris_object.verifyexistsiris
-            self.desktop_dict['verifytextiris'] = iris_object.verifytextiris
-            self.desktop_dict['cleartextiris'] = iris_object.cleartextiris
+        #----------------------------------------------------------------iris keywords-desktop
+        self.desktop_dict['clickiris'] = self.iris_object.clickiris
+        self.desktop_dict['doubleclickiris'] = self.iris_object.doubleclickiris
+        self.desktop_dict['rightclickiris'] = self.iris_object.rightclickiris
+        self.desktop_dict['settextiris'] = self.iris_object.settextiris
+        self.desktop_dict['setsecuretextiris'] = self.iris_object.setsecuretextiris
+        self.desktop_dict['gettextiris'] = self.iris_object.gettextiris
+        self.desktop_dict['getrowcountiris'] = self.iris_object.getrowcountiris
+        self.desktop_dict['getcolcountiris'] = self.iris_object.getcolcountiris
+        self.desktop_dict['getcellvalueiris'] = self.iris_object.getcellvalueiris
+        self.desktop_dict['verifyexistsiris'] = self.iris_object.verifyexistsiris
+        self.desktop_dict['verifytextiris'] = self.iris_object.verifytextiris
+        self.desktop_dict['cleartextiris'] = self.iris_object.cleartextiris
+        self.desktop_dict['dragiris'] = self.iris_object.dragiris
+        self.desktop_dict['dropiris'] = self.iris_object.dropiris
+        self.desktop_dict['mousehoveriris'] = self.iris_object.mousehoveriris
+
         try:
             if ( objectname == desktop_constants.CUSTOM and teststepproperty.custom_flag ):
                 ele_type = input[0].lower()
@@ -259,6 +263,8 @@ class DesktopDispatcher:
                         ele = {'cord': teststepproperty.cord, 'coordinates': coord}
                         if ( teststepproperty.custom_flag ):
                             result = self.desktop_dict[keyword](ele, input, output, teststepproperty.parent_xpath)
+                        elif ( teststepproperty.objectname.split(';')[-1] == 'constant' and keyword.lower() == 'verifyexistsiris' ):
+                            result = self.desktop_dict[keyword](ele, input, output, 'constant')
                         else:
                             result = self.desktop_dict[keyword](ele, input, output)
                     else:
