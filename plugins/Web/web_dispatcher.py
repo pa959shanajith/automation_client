@@ -188,6 +188,23 @@ class Dispatcher:
             'execute_js':local_Wd.browser_object.execute_js,
             'getbrowsername': local_Wd.browser_object.getBrowserName
         }
+        #---------------------------------------------------------------iris keywords
+        self.web_dict['clickiris'] = iris_object.clickiris
+        self.web_dict['doubleclickiris'] = iris_object.doubleclickiris
+        self.web_dict['rightclickiris'] = iris_object.rightclickiris
+        self.web_dict['settextiris'] = iris_object.settextiris
+        self.web_dict['setsecuretextiris'] = iris_object.setsecuretextiris
+        self.web_dict['gettextiris'] = iris_object.gettextiris
+        self.web_dict['getrowcountiris'] = iris_object.getrowcountiris
+        self.web_dict['getcolcountiris'] = iris_object.getcolcountiris
+        self.web_dict['getcellvalueiris'] = iris_object.getcellvalueiris
+        self.web_dict['verifyexistsiris'] = iris_object.verifyexistsiris
+        self.web_dict['verifytextiris'] = iris_object.verifytextiris
+        self.web_dict['cleartextiris'] = iris_object.cleartextiris
+        self.web_dict['dragiris'] = iris_object.dragiris
+        self.web_dict['dropiris'] = iris_object.dropiris
+        self.web_dict['mousehoveriris'] = iris_object.mousehoveriris
+
         self.exception_flag=''
         self.action=None
         self.wxObject=None
@@ -236,23 +253,6 @@ class Dispatcher:
             'tab','waitforelementvisible','mousehover','press','verifyenabled','verifydisabled','verifyreadonly','getattributevalue','verifyattribute','getrowcount','getcolumncount','getcellvalue','verifycellvalue','getcelltooltip','verifycelltooltip','cellclick','getrownumbytext','getcolnumbytext','getinnertable','selectbyabsolutevalue']}
 
         result=[TEST_RESULT_FAIL,TEST_RESULT_FALSE,OUTPUT_CONSTANT,err_msg]
-
-        #---------------------------------------------------------------iris keywords
-        self.web_dict['clickiris'] = iris_object.clickiris
-        self.web_dict['doubleclickiris'] = iris_object.doubleclickiris
-        self.web_dict['rightclickiris'] = iris_object.rightclickiris
-        self.web_dict['settextiris'] = iris_object.settextiris
-        self.web_dict['setsecuretextiris'] = iris_object.setsecuretextiris
-        self.web_dict['gettextiris'] = iris_object.gettextiris
-        self.web_dict['getrowcountiris'] = iris_object.getrowcountiris
-        self.web_dict['getcolcountiris'] = iris_object.getcolcountiris
-        self.web_dict['getcellvalueiris'] = iris_object.getcellvalueiris
-        self.web_dict['verifyexistsiris'] = iris_object.verifyexistsiris
-        self.web_dict['verifytextiris'] = iris_object.verifytextiris
-        self.web_dict['cleartextiris'] = iris_object.cleartextiris
-        self.web_dict['dragiris'] = iris_object.dragiris
-        self.web_dict['dropiris'] = iris_object.dropiris
-        self.web_dict['mousehoveriris'] = iris_object.mousehoveriris
 
         def print_error(err_msg):
             err_msg=ERROR_CODE_DICT[err_msg]

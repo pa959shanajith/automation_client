@@ -41,7 +41,8 @@ class Cropandadd():
             if(os.path.isfile("object_image.png")):
                 os.remove("object_image.png")
         except Exception as e:
-            print(e)
+            log.info("Error occured in getobjecttext : ")
+            log.error(e)
         del image,img,b64img
         return text
 
@@ -51,9 +52,9 @@ class Cropandadd():
         try:
             label = label_image.LabelImage()
             res = label.start(obj)
-
         except Exception as e:
-            print(e)
+            log.info("Error occured in getobjectlable : ")
+            log.error(e)
         return res
 
     def startcropandadd(self,wx_window):
@@ -167,10 +168,16 @@ class Cropandadd():
             self.stopflag = True
             configvalues = readconfig.readConfig().readJson()
             if(configvalues['prediction_for_iris_objects'].lower()=='yes'):
-                objectText = self.getobjecttext(self.data['view'][i]['cord'])
-                objectType = self.getobjectlable({'custname': self.data['view'][i]['custname'],'cord':self.data['view'][i]['cord']})
-                self.data['view'][i]['objectType'] = objectType[self.data['view'][i]['custname']]
-                self.data['view'][i]['objectText'] = objectText
+                logger.print_on_console("Starting prediction...")
+                for i in range(0,len(self.data['view'])):
+                    objectText = self.getobjecttext(self.data['view'][i]['cord'])
+                    objectType = self.getobjectlable({'custname': self.data['view'][i]['custname'],'cord':self.data['view'][i]['cord']})
+                    self.data['view'][i]['objectType'] = objectType[self.data['view'][i]['custname']]
+                    self.data['view'][i]['objectText'] = objectText
+            elif(configvalues['prediction_for_iris_objects'].lower()=='no'):
+                for i in range(0,len(self.data['view'])):
+                    self.data['view'][i]['objectType'] = "Others"
+                    self.data['view'][i]['objectText'] = "Prediction Disabled"
             return self.data
         except Exception as e:
             log.error(e)
