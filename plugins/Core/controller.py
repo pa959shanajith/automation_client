@@ -794,7 +794,7 @@ class Controller():
                         script_info =  screen_testcase_map[tsplist[index].testscript_name]
                         if hasattr(browser_Keywords.local_bk, 'driver_obj') and browser_Keywords.local_bk.driver_obj is not None and len(script_info['accessibility_parameters']) > 0:
                             acc_result = self.accessibility_testing_obj.runCrawler(browser_Keywords.local_bk.driver_obj, script_info, screen_testcase_map["executionid"])
-                            if acc_result and acc_result != "fail":
+                            if acc_result and acc_result["status"] != "fail":
                                 accessibility_reports.append(acc_result)
                     if i== TERMINATE:
                         #Changing the overallstatus of the report_obj to Terminate - (Sushma)

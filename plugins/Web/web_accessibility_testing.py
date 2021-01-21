@@ -71,10 +71,14 @@ class Web_Accessibility_Testing:
         agents = {"safari": webconstants.SAFARI_AGENT,
                   "firefox": webconstants.FX_AGENT,
                   "chrome": webconstants.CHROME_AGENT,
-                  "ie": webconstants.IE_AGENT
+                  "internet explorer": webconstants.IE_AGENT,
+                  "default": webconstants.EDGE_AGENT
                   }
         try:
-            headers = {'User-Agent': agents[agent]}
+            if agent in agents:
+                headers = {'User-Agent': agents[agent]}
+            else:
+                headers = {'User-Agent': agents[default]}
             # if URL is for file type .pdf, .docx or .zip (mentioned in webconstants.py),
             # we will send only header request, will not download entire content
 
@@ -95,12 +99,12 @@ class Web_Accessibility_Testing:
                 for rule in self.searchData:
                     if rule["selected"]:
                         accessTags.append(rule["tag"])
-                accessOptions = {'runOnly': {
-                    'type': "tag", 'values': accessTags}}
+                accessOptions = {'runOnly': {'type': "tag", 'values': accessTags}}
                 axe = Axe(driver)
                 # Inject axe-core javascript into page.
                 axe.inject()
-                results = axe.run(options=accessOptions)
+                results = self.run(options=accessOptions, browsertype = agent, driver = driver)
+                #results = axe.run(options=accessOptions, browsertype = agent)
                 violationCount = dict()
                 for violation in results["violations"]:
                     for tag in violation["tags"]:
@@ -150,6 +154,38 @@ class Web_Accessibility_Testing:
             self.crawlStatus = False
 
 
+    def run(self, context=None, options=None, browsertype = None, driver = None):
+        """
+        Run axe against the current page.
+
+        :param context: which page part(s) to analyze and/or what to exclude.
+        :param options: dictionary of aXe options.
+        """
+        template = (
+            "var callback = arguments[arguments.length - 1];"
+            + "axe.run(%s).then(function(results) { callback(results)})"
+        )
+        args = ""
+
+        if browsertype is not None and browsertype == "internet explorer":
+            ie_script = 'var head = document.getElementsByTagName("head")[0];var script = document.createElement("script");script.src = "https://cdnjs.cloudflare.com/ajax/libs/bluebird/3.3.4/bluebird.min.js";head.appendChild(script);'
+            driver.execute_script(ie_script)
+        # If context parameter is passed, add to args
+        if context is not None:
+            args += "%r" % context
+        # Add comma delimiter only if both parameters are passed
+        if context is not None and options is not None:
+            args += ","
+        # If options parameter is passed, add to args
+        if options is not None:
+            args += "%s" % options
+
+        command = template % args
+        response = driver.execute_async_script(command)
+        return response
+
+
+
     def runCrawler(self, driver, script_info, executionid):
         result = {} 
         result["status"] = "fail"
@@ -178,13 +214,16 @@ class Web_Accessibility_Testing:
             start_obj = {"name": "", "parent": "None", "level": 0, "noOfTries": 0}
             result = self.parse(start_obj, level, driver)
             result['agent'] = agent
+            result['status'] = "success"
             result["screenname"] = script_info['screenname']
             result["screenid"] = script_info['screenid']
             result['executionid'] = executionid
             result['cycleid'] = script_info['cycleid']
             self.crawlStatus = True
         except Exception as e:
-            log.info("Something went wrong")
+            logger.print_on_console('Error in running accessibility testing')
+            result['status'] = "fail"
+            log.error(e,exc_info=True)
         # Stop everything in the case of disconnection from server
         if controller.disconnect_flag:
             return True
