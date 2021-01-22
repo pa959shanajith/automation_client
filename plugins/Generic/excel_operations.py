@@ -1473,8 +1473,8 @@ class ExcelXLSX:
             if(sheet.max_row==1 and sheet.max_column==1 and sheet.cell(1,1).value is None):
                 row_count=0
             else:
-            row_count=sheet.max_row
-            status=True
+                row_count=sheet.max_row
+                status=True
         except Exception as e:
             err_msg='Error getting the row count of .xlsx file'
             log.error(e)
@@ -1500,8 +1500,8 @@ class ExcelXLSX:
             if(sheet.max_row==1 and sheet.max_column==1 and sheet.cell(1,1).value is None):
                 col_count=0
             else:
-            col_count=sheet.max_column
-            status=True
+                col_count=sheet.max_column
+                status=True
         except Exception as e:
             err_msg='Error getting the col count of .xlsx file'
             log.error(e)
