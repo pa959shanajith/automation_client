@@ -15,6 +15,8 @@ import time
 import logging
 from uuid import uuid4 as uuid
 from threading import Timer
+import requests
+from urllib3.connection import HTTPConnection
 import socketIO_client
 import storage
 from socketIO_client.exceptions import *
@@ -25,7 +27,6 @@ log = logging.getLogger("socketio-lib.py")
 CHUNK_MAX_LIMIT = 15*1024*1024 # 15 MB
 CHUNK_SIZE = 10*1024*1024 # 10 MB
 PACKET_TIMEOUT = 60 # Seconds
-VERIFY_HOSTNAME = False
 PAGINATE_INDEX = "p@gIn8"
 
 try:
@@ -37,14 +38,25 @@ except:
 __all__ = ['SocketIO','BaseNamespace']
 
 
-##import requests
-##def http_adapter_init_poolmanager(self, connections, maxsize, block=requests.adapters.DEFAULT_POOLBLOCK, **pool_kwargs):
-##    self._pool_connections = connections
-##    self._pool_maxsize = maxsize
-##    self._pool_block = block
-##    self.poolmanager = requests.adapters.PoolManager(num_pools=connections, maxsize=maxsize,
-##        block=block, strict=True, assert_hostname=VERIFY_HOSTNAME, **pool_kwargs)
-##requests.adapters.HTTPAdapter.init_poolmanager = http_adapter_init_poolmanager
+""" Wrapper class for requests.adapters.HTTPAdapter
+    This is needed because this library doesn't have option to provide
+    socket_options or other kwargs to pass to pool manager.
+"""
+class HTTPAdapterWithExtraOptions(requests.adapters.HTTPAdapter):
+    def __init__(self, *args, **kwargs):
+        self.socket_options = kwargs.pop("socket_options", None)
+        self.assert_hostname = kwargs.pop("assert_hostname", None)
+        super(HTTPAdapterWithExtraOptions, self).__init__(*args, **kwargs)
+
+    def init_poolmanager(self, *args, **kwargs):
+        if self.socket_options is not None:
+            if isinstance(self.socket_options, tuple):
+                self.socket_options = [self.socket_options]
+            kwargs["socket_options"] = HTTPConnection.default_socket_options + self.socket_options
+        if self.assert_hostname is not None:
+            kwargs["assert_hostname"] = self.assert_hostname
+        super(HTTPAdapterWithExtraOptions, self).init_poolmanager(*args, **kwargs)
+
 
 """ Override SocketIO library's _warn method used for logging.
     This is needed because this library doesn't gives anything to stdout or stderr
@@ -52,8 +64,11 @@ __all__ = ['SocketIO','BaseNamespace']
 """
 def socketIO_warn(self, msg, *attrs):
     self._log(logging.WARNING, msg, *attrs)
-    if ("[SSL: CERTIFICATE_VERIFY_FAILED]" in msg) or ("hostname" in msg and "doesn't match " in msg):
+    if (("[ssl: certificate_verify_failed]" in msg.lower()) or
+        ('certificate verify failed' in msg.lower()) or
+        ("hostname" in msg and "doesn't match " in msg)):
         raise ValueError("[Certificate Mismatch] "+ msg)
+
 
 """ Override SocketIO library's _transport method used for generating new Transport instance.
     This is needed because this library opens new instance after invoking disconnect. Ref #1823.
@@ -69,10 +84,12 @@ def socketIO_transport(self):
     self._reset_heartbeat()
     return self._transport_instance
 
+
 """ Add property to SocketIO library to check closing status of socketIO object """
 @property
 def socketIO_waiting_for_close(self):
     return self._should_stop_waiting()
+
 
 """ Override SocketIO library's _close method used for closing a Transport instance.
     This is needed because this library never actually closes the connection.
@@ -98,6 +115,7 @@ def socketIO_close(self):
     self._transport_instance.close()
     self._opened = False
 
+
 """ Add close method in transports.XHR_PollingTransport for closing a Transport instance connection.
     This is needed because this library never actually closes the connection.
     Ref: https://github.com/invisibleroads/socketIO-client/issues/176
@@ -106,6 +124,7 @@ def socketIO_close(self):
 def socketIO_XHR_close(self):
     pass
 
+
 """ Add close method in transports.WebsocketTransport for closing a Transport instance connection.
     This is needed because this library never actually closes the connection.
     Ref: https://github.com/invisibleroads/socketIO-client/issues/176
@@ -113,6 +132,7 @@ def socketIO_XHR_close(self):
 """
 def socketIO_WS_close(self):
     self._connection.close()
+
 
 """ Override SocketIO library's parser._read_packet_length method used for reading packets.
     This is needed because this library doesn't support Socket.io 2.x
@@ -126,6 +146,7 @@ def socketIO_read_packet_length(content, content_index):
     packet_length_string = content.decode()[start:content_index]
     return content_index, int(packet_length_string)
 
+
 """ Override SocketIO library's parser._read_packet_text method used for reading packets.
     This is needed because this library doesn't support Socket.io 2.x
     Ref: https://github.com/invisibleroads/socketIO-client/compare/master...nexus-devs:master
@@ -136,6 +157,7 @@ def socketIO_read_packet_text(content, content_index, packet_length):
         content_index += 1
     packet_text = content.decode()[content_index:content_index + packet_length]
     return content_index + packet_length, packet_text.encode()
+
 
 """ Override SocketIO library's transports.WebsocketTransport.__init__ method
     used for creating websocket connection.
@@ -161,19 +183,24 @@ def socketIO_WS_init(self, http_session, is_secure, url, engineIO_session=None):
         if proxy_url_pack.username:
             kw['http_proxy_auth'] = (
                 proxy_url_pack.username, proxy_url_pack.password)
+    kw['sslopt'] = {}
+    if hasattr(http_session, 'assert_hostname'): # Do not perform hostname check
+        kw['sslopt']['check_hostname'] = False
     if http_session.verify:
-        kw['sslopt'] = {'cert_reqs': ssl.CERT_REQUIRED, 'ca_certs': http_session.verify, 'check_hostname': VERIFY_HOSTNAME}  ## New Change
+        kw['sslopt']['cert_reqs'] = ssl.CERT_REQUIRED
+        if not isinstance(http_session.verify, bool): kw['sslopt']['ca_certs'] = http_session.verify
         if http_session.cert:  # Specify certificate path on disk
             if isinstance(http_session.cert, six.string_types):
                 kw['ca_certs'] = http_session.cert
             else:
                 kw['ca_certs'] = http_session.cert[0]
     else:  # Do not verify the SSL certificate
-        kw['sslopt'] = {'cert_reqs': ssl.CERT_NONE}
+        kw['sslopt']['cert_reqs'] = ssl.CERT_NONE
     try:
         self._connection = create_connection(ws_url, **kw)
     except Exception as e:
         raise ConnectionError(e)
+
 
 """ Override SocketIO library's transports.get_response method used for processing
     XHR-polling response. This is needed because this library doesn't handle NGINX 504 Error.
@@ -194,6 +221,23 @@ def socketIO_get_response(request, *args, **kw):
             status_code, response.text))
     return response
 
+
+""" Override SocketIO library's transports.prepare_http_session method used for creating
+    XHR-polling request. This is needed to provide extra options like disable hostname
+    verification or provide additional socket options.
+"""
+def socketIO_prepare_http_session(kw):
+    http_session = prepare_http_session(kw)
+    opts = {}
+    verify_host = kw.get('assert_hostname', None)
+    if verify_host is not None:
+        http_session.assert_hostname = opts['assert_hostname'] = verify_host
+    # opts['socket_options'] = [(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)]
+    http_session.mount('https://', HTTPAdapterWithExtraOptions(**opts))
+    http_session.mount('http://', HTTPAdapterWithExtraOptions(**opts))
+    return http_session
+
+
 """ Override SocketIO library's wait method used for creating a blocking connection.
     This is needed because this library doesn't handle empty packages.
 """
@@ -204,7 +248,7 @@ def socketIO_wait(self, seconds=None, **kw):
     #print(self._transport._connection.gettimeout())
     time.sleep(1)
     warning_screen = self._yield_warning_screen(seconds)
-    for elapsed_time in warning_screen:
+    for _ in warning_screen:
         if self._should_stop_waiting(**kw):
             break
         try:
@@ -232,6 +276,7 @@ def socketIO_wait(self, seconds=None, **kw):
     self._heartbeat_thread.relax()
     #self._transport.set_timeout()
 
+
 """ Add a ACK_EVENT listener in SocketIO library's socketIO_client.BaseNamespace class
     This is needed to free up memory consumed by stored packet, send next packet in queue.
 """
@@ -256,6 +301,7 @@ def socketIO_on_data_ack(self, pack_id, *args):
             pckt = store.get_packet(store.next_id, idx)
             if pckt: self._io.send_pckt(pckt[0], *pckt[1], **pckt[2])
 
+
 def socketIO_save_pckt(self, packid, event, *fargs, **fkw):
     fargs = (packid,) + fargs
     idx = packid.split('_')
@@ -266,6 +312,7 @@ def socketIO_save_pckt(self, packid, event, *fargs, **fkw):
     elif not (self.activeTimer != None and self.activeTimer.isAlive()):
         pckt = store.get_packet(store.next_id)
         if pckt: self.send_pckt(pckt[0], *pckt[1], **pckt[2])
+
 
 """ Override SocketIO library's emit method used for sending data.
     This is needed because this library doesn't support packet size larger than 100 MB
@@ -294,6 +341,7 @@ def socketIO_emit(self, event, *args, **kw):
             self.save_pckt(pack_id+"_eof", event, sub_pack_id, **kw)
             del payload
 
+
 def socketIO_send_pckt(self, event, *args, **kw):
     # log.info("Sending: "+str(args[0]) + "\tThread Alive: "+str((self.activeTimer != None and self.activeTimer.isAlive())))
     self.last_packet_sent = str(args[0])
@@ -319,6 +367,8 @@ def socketIO_send(self, data='', callback=None, **kw):
 socketIO_client.parsers._read_packet_length = socketIO_read_packet_length
 socketIO_client.parsers._read_packet_text = socketIO_read_packet_text
 socketIO_client.transports.get_response = socketIO_get_response
+socketIO_client.transports._prepare_http_session = socketIO_client.transports.prepare_http_session
+socketIO_client.prepare_http_session = socketIO_client.transports.prepare_http_session = socketIO_prepare_http_session
 socketIO_client.XHR_PollingTransport.close = socketIO_XHR_close
 socketIO_client.WebsocketTransport.__init__ = socketIO_WS_init
 socketIO_client.WebsocketTransport.close = socketIO_WS_close

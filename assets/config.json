@@ -7,7 +7,6 @@
     "connection_timeout": "0",
     "delay": "0.3",
     "delay_stringinput": "1",
-    "disable_server_cert": "No",
     "displayVariableTimeOut": "1",
     "enableSecurityCheck": "No",
     "exception_flag": "false",
@@ -29,5 +28,6 @@
     "server_port": "8443",
     "stepExecutionWait": "1",
     "timeOut": "1",
+    "tls_security": "High",
     "update_check": "No"
 }

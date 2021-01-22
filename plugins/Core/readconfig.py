@@ -27,7 +27,7 @@ class readConfig():
         "chrome_path":"", "chrome_profile":"","bit_64":"", "logFile_Path":"", "screenShot_Flag":"",
         "queryTimeOut":"", "timeOut":"", "stepExecutionWait":"", "displayVariableTimeOut":"",
         "httpStatusCode":"", "delay":"", "ignoreVisibilityCheck":"", "exception_flag":"",
-        "server_cert":"", "enableSecurityCheck":"","browser_check":"","disable_server_cert":"","highlight_check":"","firefox_path":"",
+        "server_cert":"", "enableSecurityCheck":"","browser_check":"","tls_security":"","highlight_check":"","firefox_path":"",
         "prediction_for_iris_objects":"","hide_soft_key":"","connection_timeout":"","extn_enabled":"","headless_mode":"","update_check":"","delay_stringinput":"","clear_cache":"","screen_rec":""}
         if os.path.isfile(self.config_path)==True:
             try:
@@ -54,7 +54,7 @@ class readConfig():
                 configvalues['server_cert']=params['server_cert']
                 configvalues['enableSecurityCheck'] = params['enableSecurityCheck']
                 configvalues['browser_check'] = params['browser_check']
-                configvalues['disable_server_cert'] = params['disable_server_cert']
+                configvalues['tls_security'] = params['tls_security']
                 configvalues['highlight_check'] = params['highlight_check']
                 configvalues['prediction_for_iris_objects'] = params['prediction_for_iris_objects']
                 configvalues['hide_soft_key'] = params['hide_soft_key']
