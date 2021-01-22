@@ -13,7 +13,6 @@ from selenium.webdriver.firefox.options import Options
 from axe_selenium_python import Axe
 from selenium import webdriver
 import platform
-import readconfig
 import os
 import webconstants
 import controller
@@ -22,9 +21,7 @@ from urllib.parse import urljoin, urlparse
 import requests
 import tldextract
 from bs4 import BeautifulSoup
-import threading
 import core
-import json
 import logger
 import logging
 import time
@@ -43,21 +40,11 @@ if SYSTEM_OS == "Windows":
 class Web_Accessibility_Testing:
 
     def __init__(self):
-        self.queue = []
-        self.visited = set()
-        self.edgedata = []  # list of forward nodes (links)
-        self.reversedLinks = []  # list of backward nodes(reversedlinks)
         self.subdomains = []
         self.others = []
         self.domain = ""
         self.subdomain = ""
-        self.discovered = set()
-        self.rooturl = ""
-        self.start_url = ""
         self.crawlStatus = True
-        self.notParsedURLs = []
-        self.socketIO = None
-        self.totalSearchTextCount = 0
         self.accessTest = False
         self.searchData = None
 
@@ -78,7 +65,7 @@ class Web_Accessibility_Testing:
             if agent in agents:
                 headers = {'User-Agent': agents[agent]}
             else:
-                headers = {'User-Agent': agents[default]}
+                headers = {'User-Agent': agents["default"]}
             # if URL is for file type .pdf, .docx or .zip (mentioned in webconstants.py),
             # we will send only header request, will not download entire content
 
@@ -141,15 +128,12 @@ class Web_Accessibility_Testing:
                     obj['type'] = 'page'
                 return obj
             else:
-                headerResponse = requests.get(url, headers=headers, verify=False, stream=True)
-                obj["status"] = headerResponse.status_code
-                obj['type'] = "others"
-                self.socketIO.emit('result_web_crawler', json.dumps(obj))
+                obj['error'] = "Invalid URL"
+                logger.print_on_console("Invalid URL : ", url)
         except Exception as e:
             obj['error'] = str(e)
-            obj['status'] = 400
             log.error(e)
-            logger.print_on_console("Problem accessing url : ", url)
+            logger.print_on_console("Error occurred in accessing url : ", url)
             logger.print_on_console("----------------------------")
             self.crawlStatus = False
 
@@ -193,7 +177,6 @@ class Web_Accessibility_Testing:
         for i in script_info["accessibility_parameters"]:
             rules_map[i]["selected"] = True
         self.searchData = list(rules_map.values())
-        self.socketIO = core.socketIO
         log.debug("inside runCrawler method")
         mainobj = core.root
         agent = driver.capabilities['browserName']
@@ -213,6 +196,9 @@ class Web_Accessibility_Testing:
                 mainobj.cw.terminatebutton.Enable()
             start_obj = {"name": "", "parent": "None", "level": 0, "noOfTries": 0}
             result = self.parse(start_obj, level, driver)
+            if "error" in result:
+                result['status'] = "fail"
+                return result
             result['agent'] = agent
             result['status'] = "success"
             result["screenname"] = script_info['screenname']

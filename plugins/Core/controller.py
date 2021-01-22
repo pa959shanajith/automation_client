@@ -766,7 +766,7 @@ class Controller():
         else:
             return index,TERMINATE
 
-    def executor(self,tsplist,action,last_tc_num,debugfrom_step,mythread,*args):
+    def executor(self,tsplist,action,last_tc_num,debugfrom_step,mythread,*args, accessibility_testing = False):
         global status_percentage, screen_testcase_map
         status_percentage = {TEST_RESULT_PASS:0,TEST_RESULT_FAIL:0,TERMINATE:0,"total":0}
         i=0
@@ -789,7 +789,7 @@ class Controller():
                 try:
                     index = i
                     i = self.methodinvocation(i)
-                    if index + 1 >= len(tsplist) or tsplist[index].testscript_name != tsplist[index + 1].testscript_name: 
+                    if (index + 1 >= len(tsplist) or tsplist[index].testscript_name != tsplist[index + 1].testscript_name) and accessibility_testing: 
                         import browser_Keywords
                         script_info =  screen_testcase_map[tsplist[index].testscript_name]
                         if hasattr(browser_Keywords.local_bk, 'driver_obj') and browser_Keywords.local_bk.driver_obj is not None and len(script_info['accessibility_parameters']) > 0:
@@ -911,7 +911,7 @@ class Controller():
         if flag:
             if runfrom_step > 0 and runfrom_step <= tsplist[len(tsplist)-1].stepnum:
                 self.conthread=mythread
-                status,status_percentage = self.executor(tsplist,DEBUG,last_tc_num,runfrom_step,mythread)
+                status, status_percentage, accessibility_reports = self.executor(tsplist,DEBUG,last_tc_num,runfrom_step,mythread, accessibility_testing = False)
             else:
                 logger.print_on_console( 'Invalid step number!! Please provide run from step number from 1 to ',tsplist[len(tsplist)-1].stepnum,'\n')
                 log.info('Invalid step number!! Please provide run from step number')
@@ -1153,7 +1153,7 @@ class Controller():
                                     record_flag = str(configvalues['screen_rec']).lower()
                                     #start screen recording
                                     if (record_flag=='yes') and self.execution_mode == SERIAL and json_data['apptype'] == 'Web': video_path = recorder_obj.record_execution(json_data['suitedetails'][0])
-                                    status,status_percentage, accessibility_reports = con.executor(tsplist,EXECUTE,last_tc_num,1,con.conthread,video_path)
+                                    status,status_percentage, accessibility_reports = con.executor(tsplist,EXECUTE,last_tc_num,1,con.conthread,video_path, accessibility_testing = True)
                                     #end video
                                     if (record_flag=='yes') and self.execution_mode == SERIAL and json_data['apptype'] == 'Web': recorder_obj.rec_status = False
                                     print('=======================================================================================================')
