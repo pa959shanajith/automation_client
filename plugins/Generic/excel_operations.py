@@ -702,11 +702,11 @@ class ExcelXLS:
                                 break
                         
                     else:       
-                    if row<=last_row:
-                        sheet.Rows(row).Delete()
-                        status=True
-                    else:
-                        err_msg=ERROR_CODE_DICT["ERR_ROW_DOESN'T_EXIST"]
+                        if row<=last_row:
+                            sheet.Rows(row).Delete()
+                            status=True
+                        else:
+                            err_msg=ERROR_CODE_DICT["ERR_ROW_DOESN'T_EXIST"]
                 else:
                     err_msg='Excel is Read only'
         except Exception as e:
