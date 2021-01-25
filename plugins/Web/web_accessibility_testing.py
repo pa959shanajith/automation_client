@@ -45,11 +45,16 @@ class Web_Accessibility_Testing:
         self.domain = ""
         self.subdomain = ""
         self.crawlStatus = True
-        self.accessTest = False
         self.searchData = None
 
-    def parse(self, obj, lev, driver):
+    def parse(self, obj, driver):
+        """
+        Parse crawled document and inject axe script to run accessibility testing
 
+        :param obj: final report object
+        :param script_info: details about the screen which is being tested
+        :param driver: reference of webdriver object
+        """
         agent = driver.capabilities['browserName']
         url = driver.current_url
         obj['url'] = url
@@ -171,17 +176,24 @@ class Web_Accessibility_Testing:
 
 
     def runCrawler(self, driver, script_info, executionid):
+        """
+        Crawl through the html document at level 0 and test each element in the document.
+
+        :param driver: reference of the webdriver which contains the website to be tested
+        :param script_info: details about the screen which is being tested
+        :param executionid: unique id of this execution for reference
+        """
         result = {} 
         result["status"] = "fail"
+        #Add new standards here
         rules_map = {"A":{'count': 10, 'name': 'A', 'pass': True, 'selected': False, 'tag': 'wcag2a'},"AA":{'count': 0, 'name': 'AA', 'pass': True, 'selected': False, 'tag': 'wcag2aa'},"508":{'count': 0, 'name': 'Section 508', 'pass': True, 'selected': False, 'tag': 'section508'},"Best Practice":{'count': 0, 'name': 'Best-Practice', 'pass': True, 'selected': False, 'tag': 'best-practice'}}
+        #Enable standards to be tested
         for i in script_info["accessibility_parameters"]:
             rules_map[i]["selected"] = True
         self.searchData = list(rules_map.values())
         log.debug("inside runCrawler method")
         mainobj = core.root
         agent = driver.capabilities['browserName']
-        level = 0
-        self.accessTest = True
         start = time.clock()
         msg = "Accessibility Testing started"
         log.info(msg)
@@ -195,7 +207,7 @@ class Web_Accessibility_Testing:
             if mainobj.gui:
                 mainobj.cw.terminatebutton.Enable()
             start_obj = {"name": "", "parent": "None", "level": 0, "noOfTries": 0}
-            result = self.parse(start_obj, level, driver)
+            result = self.parse(start_obj, driver)
             if "error" in result:
                 result['status'] = "fail"
                 return result
