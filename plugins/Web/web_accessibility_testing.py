@@ -211,6 +211,8 @@ class Web_Accessibility_Testing:
             if "error" in result:
                 result['status'] = "fail"
                 return result
+            if agent == 'msedge': agent = "edge chromium"
+            elif 'edge' in agent.lower(): agent = "edge legacy"
             result['agent'] = agent
             result['status'] = "success"
             result["screenname"] = script_info['screenname']
