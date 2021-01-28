@@ -790,7 +790,7 @@ class Controller():
                     index = i
                     i = self.methodinvocation(i)
                     #Check wether accessibility testing has to be executed
-                    if (index + 1 >= len(tsplist) or tsplist[index].testscript_name != tsplist[index + 1].testscript_name) and accessibility_testing: 
+                    if (index + 1 >= len(tsplist) or tsplist[index].testscript_name != tsplist[index + 1].testscript_name and screen_testcase_map[tsplist[index].testscript_name]['screenid'] != screen_testcase_map[tsplist[index + 1].testscript_name]['screenid']) and accessibility_testing : 
                         import browser_Keywords
                         script_info =  screen_testcase_map[tsplist[index].testscript_name]
                         #Check if browser is present or not
