@@ -135,12 +135,14 @@ class Web_Accessibility_Testing:
             else:
                 obj['error'] = "Invalid URL"
                 logger.print_on_console("Invalid URL : ", url)
+                return obj
         except Exception as e:
             obj['error'] = str(e)
             log.error(e)
             logger.print_on_console("Error occurred in accessing url : ", url)
             logger.print_on_console("----------------------------")
             self.crawlStatus = False
+            return obj
 
 
     def run(self, context=None, options=None, browsertype = None, driver = None):

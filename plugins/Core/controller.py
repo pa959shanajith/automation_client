@@ -790,7 +790,7 @@ class Controller():
                     index = i
                     i = self.methodinvocation(i)
                     #Check wether accessibility testing has to be executed
-                    if (index + 1 >= len(tsplist) or tsplist[index].testscript_name != tsplist[index + 1].testscript_name and screen_testcase_map[tsplist[index].testscript_name]['screenid'] != screen_testcase_map[tsplist[index + 1].testscript_name]['screenid']) and accessibility_testing : 
+                    if (index + 1 >= len(tsplist) or (tsplist[index].testscript_name != tsplist[index + 1].testscript_name and screen_testcase_map[tsplist[index].testscript_name]['screenid'] != screen_testcase_map[tsplist[index + 1].testscript_name]['screenid'])) and accessibility_testing : 
                         import browser_Keywords
                         script_info =  screen_testcase_map[tsplist[index].testscript_name]
                         #Check if browser is present or not
@@ -1183,7 +1183,8 @@ class Controller():
                                 con.reporting_obj.user_termination=manual_terminate_flag
                                 con.reporting_obj.save_report_json(filename,json_data,status_percentage)
                                 execute_result_data["reportData"] = con.reporting_obj.report_json
-                                execute_result_data["accessibility_reports"] = accessibility_reports
+                                if len(accessibility_reports) > 0:
+                                    execute_result_data["accessibility_reports"] = accessibility_reports
                                 socketIO.emit('result_executeTestSuite', execute_result_data)
                                 obj.clearList(con)
                                 sc_idx += 1
