@@ -124,7 +124,14 @@ def get_ocr(image):
     cv2.imwrite(filename, thresh_img)
 
     """Step 6: Load the image as a PIL/Pillow image, apply OCR, and then delete the temporary file"""
-    text = pytesseract.image_to_string(Image.open(filename))
+    try:
+        text = pytesseract.image_to_string(Image.open(filename))
+    except Exception as e:
+        log.info('WARNING!: error occured in get_ocr, ERR_MSG : ' + str(e))
+        if(TESSERACT_PATH_EXISTS) :
+            log.info('pytessaract is not pointing to TESSERACT_PATH, adding TESSERACT_PATH to path')
+            pytesseract.tesseract_cmd = TESSERACT_PATH + '/tesseract'
+            text = pytesseract.image_to_string(Image.open(filename))
     os.remove(filename)
 
     del image, rez_image, gray_img, filter_img, thresh_img, filename #deleting variables
@@ -1483,7 +1490,7 @@ class IRISKeywords():
         Input: N/A
         OutPut: Boolean Value
         """
-        log.info('Inside clickiris and No. of arguments passed are : '+str(len(args)))
+        log.info('Inside mousehoveriris and No. of arguments passed are : '+str(len(args)))
         status = TEST_RESULT_FAIL
         result = TEST_RESULT_FALSE
         err_msg = None

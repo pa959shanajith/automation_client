@@ -41,8 +41,8 @@ class Cropandadd():
             if(os.path.isfile("object_image.png")):
                 os.remove("object_image.png")
         except Exception as e:
-            log.info("Error occured in getobjecttext : ")
-            log.error(e)
+            log.error("Error occured in getobjecttext : " + str(e))
+            logger.print_on_console("Error occured in getobjecttext")
         del image,img,b64img
         return text
 
@@ -53,8 +53,8 @@ class Cropandadd():
             label = label_image.LabelImage()
             res = label.start(obj)
         except Exception as e:
-            log.info("Error occured in getobjectlable : ")
-            log.error(e)
+            log.error("Error occured in getobjecttext : " + str(e))
+            logger.print_on_console("Error occured in getobjecttext")
         return res
 
     def startcropandadd(self,wx_window):
@@ -150,7 +150,7 @@ class Cropandadd():
                         os.remove("cropped.png")
                     break
         except Exception as e:
-            log.error(e)
+            log.error("Error occured in capturing iris object, ERR_MSG : " + str(e))
             logger.print_on_console("Error occured in capturing iris object")
 
     def stopcropandadd(self):
@@ -172,13 +172,14 @@ class Cropandadd():
                 for i in range(0,len(self.data['view'])):
                     objectText = self.getobjecttext(self.data['view'][i]['cord'])
                     objectType = self.getobjectlable({'custname': self.data['view'][i]['custname'],'cord':self.data['view'][i]['cord']})
-                    self.data['view'][i]['objectType'] = objectType[self.data['view'][i]['custname']]
+                    if(objectType): self.data['view'][i]['objectType'] = objectType[self.data['view'][i]['custname']]
+                    else:self.data['view'][i]['objectType'] = "UnrecognizableObject"
                     self.data['view'][i]['objectText'] = objectText
             elif(configvalues['prediction_for_iris_objects'].lower()=='no'):
                 for i in range(0,len(self.data['view'])):
-                    self.data['view'][i]['objectType'] = "Others"
+                    self.data['view'][i]['objectType'] = "UnrecognizableObject"
                     self.data['view'][i]['objectText'] = "Prediction Disabled"
             return self.data
         except Exception as e:
-            log.error(e)
+            log.error("Error occured in stop IRIS, ERR_MSG : ", str(e))
             logger.print_on_console("Error occured in stop IRIS")
