@@ -2,6 +2,7 @@ import os, json, wx, shutil, threading
 from pdfkitlib_override import pdfkit
 import logger
 import logging
+import re
 log = logging.getLogger('generatepdf.py')
 template_path = os.environ["AVO_ASSURE_HOME"] + "/plugins/PdfReport/template.html"
 report_path = os.environ["AVO_ASSURE_HOME"] + "/plugins/PdfReport/report.json"
@@ -123,6 +124,9 @@ class GeneratePDFReport(wx.Frame):
         elif source.split('.')[-1].lower() != 'json':
             self.l4.SetLabel("Source is not a JSON File")
             error_flag = True
+        elif re.search(r'[<>:"/\\|?*]',dest_file) is not None:
+            self.l4.SetLabel("File name can't contain following characters: \\ / < | : ? * > \"")
+            error_flag=True
         try:
             with open(source, 'rb') as read_file:
                 json_data = json.load(read_file)

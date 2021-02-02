@@ -29,7 +29,6 @@ import psutil
 import readconfig
 import core_utils
 import time
-import controller
 from sendfunction_keys import SendFunctionKeys as SF
 driver_pre = None
 drivermap = []
@@ -103,6 +102,14 @@ class BrowserKeywords():
                 elif d != None:
                     #driver exist in map, get it
                     local_bk.driver_obj = d
+                    if(isinstance(local_bk.driver_obj,webdriver.Firefox)):
+                        try:
+                            win_name=local_bk.driver_obj.title+' — Mozilla Firefox'
+                            if(win32gui.FindWindow(None,win_name)!=0):
+                                handle=win32gui.FindWindow(None,win_name)
+                                win32gui.SetForegroundWindow(handle)
+                        except:
+                            pass 
                 else:
                     #instantiate new browser and add it to the map
                     local_bk.driver_obj = obj.getBrowser(self.browser_num)
@@ -600,7 +607,16 @@ class BrowserKeywords():
                     if(current_handle == x):
                         break
                 count = count - 2
-                local_bk.webdriver_list[driver_instance].quit()
+                if isinstance(local_bk.driver_obj,webdriver.Ie):
+                    import win32com.client
+                    wmi=win32com.client.GetObject('winmgmts:')
+                    proc=wmi.ExecQuery('select * from Win32_Process where Name="IEDriverServer64.exe"')
+                    if len(proc)>0:
+                        for i in proc:
+                            os.system("TASKKILL /F /T /PID " + str(i.ProcessId))
+                            time.sleep(5)
+                else:
+                    local_bk.webdriver_list[driver_instance].quit()
                 local_bk.driver_obj = None
                 if SYSTEM_OS == 'Darwin':
                     os.system("killall -9 Safari")
@@ -739,6 +755,35 @@ class BrowserKeywords():
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
         return status,result,output,err_msg
+
+    def getBrowserName(self, *args):
+        global local_bk
+        status=webconstants.TEST_RESULT_FAIL
+        result=webconstants.TEST_RESULT_FALSE
+        browsername=None
+        err_msg=None
+        configvalues = readconfig.configvalues
+        try:
+            if str(configvalues['headless_mode'])=='Yes':
+                browsername = 'Headless'
+                logger.print_on_console('Browser Name: ',browsername)
+                local_bk.log.info('Browser Name: '+ browsername)
+                status=webconstants.TEST_RESULT_PASS
+                result=webconstants.TEST_RESULT_TRUE
+            elif(local_bk.driver_obj != None):
+                browsername = webconstants.BROWSER_NAME_MAP[local_bk.driver_obj.name.strip()]
+                logger.print_on_console('Browser Name: ',browsername)
+                local_bk.log.info('Browser Name: '+ browsername)
+                status=webconstants.TEST_RESULT_PASS
+                result=webconstants.TEST_RESULT_TRUE
+            else:
+                err_msg = 'Browser not available'
+                logger.print_on_console(err_msg)
+                local_bk.log.error(err_msg)
+                local_bk.log.error('Driver object is null')
+        except Exception as e:
+            err_msg=self.__web_driver_exception(e)
+        return status,result,browsername,err_msg
 
     def update_window_handles(self):
         global local_bk
@@ -1012,6 +1057,7 @@ class Singleton_DriverUtil():
         return d
 
     def getBrowser(self,browser_num):
+        import controller
         global local_bk, drivermap
         del local_bk.recent_handles[:]
         del local_bk.all_handles[:]
@@ -1032,8 +1078,10 @@ class Singleton_DriverUtil():
                     choptions.add_argument('start-maximized')
                     choptions.add_experimental_option('useAutomationExtension', False)
                     choptions.add_experimental_option("excludeSwitches",["enable-automation"])
+                    if headless_mode:
+                        WINDOW_SIZE = "1350,650"
+                        choptions.add_argument("--window-size=%s" % WINDOW_SIZE)
                     if headless_mode: choptions.add_argument('--headless')
-                       
                     if configvalues['extn_enabled'].lower()=='yes' and os.path.exists(webconstants.EXTENSION_PATH):
                         choptions.add_extension(webconstants.EXTENSION_PATH)
                     else:
@@ -1139,7 +1187,7 @@ class Singleton_DriverUtil():
 
         elif(browser_num == '5'):
             try:
-                driver = webdriver.PhantomJS(executable_path=webconstants.PHANTOM_DRIVER_PATH)                    
+                driver = webdriver.PhantomJS(executable_path=webconstants.PHANTOM_DRIVER_PATH)
                 controller.process_ids.append(driver.service.process.pid)
                 drivermap.append(driver)
                 logger.print_on_console('Phantom browser started')
@@ -1199,7 +1247,7 @@ class Singleton_DriverUtil():
                     if SYSTEM_OS == "Darwin":
                         caps1['platform'] = 'MAC'
                     driver = webdriver.Edge(capabilities=caps1,executable_path=chromium_path)
-                    controller.process_ids.append(driver.service.process.pid)
+                    controller.process_ids.append(driver.edge_service.process.pid)
                     drivermap.append(driver)
                     driver.maximize_window()
                     logger.print_on_console('Edge Chromium browser started')
@@ -1327,6 +1375,3 @@ class Singleton_DriverUtil():
                 break
         local_bk.log.info('Flag:',str(flag1))
         return flag1
-
-
-

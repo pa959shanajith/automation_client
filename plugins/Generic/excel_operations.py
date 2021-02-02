@@ -162,7 +162,7 @@ class ExcelFile:
         return status,methodoutput,output,err_msg
 
 
-    def delete_row(self,row):
+    def delete_row(self,row,*args):
         """
         def : delete_row
         purpose : calls the respective method to delete the given row of excel
@@ -184,7 +184,7 @@ class ExcelFile:
                     log.info(info_msg)
                     myfile = open(self.excel_path, "a+") # or "a+", whatever you need
                     myfile.close()
-                    res,err_msg=self.dict['delete_row_'+file_ext](int(row),self.excel_path,self.sheetname)
+                    res,err_msg=self.dict['delete_row_'+file_ext](int(row),self.excel_path,self.sheetname,*args)
                     if res:
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
@@ -656,7 +656,7 @@ class ExcelXLS:
         return status,err_msg
 
 
-    def delete_row_xls(self,row,excel_path,sheetname):
+    def delete_row_xls(self,row,excel_path,sheetname,*args):
         """
         def : delete_row_xls
         purpose : deletes the given row of both .xls and .xlsx files
@@ -688,11 +688,25 @@ class ExcelXLS:
                 if not(excel_file.ReadOnly):
                     sheet = excel.Sheets(sheetname)
                     last_row=sheet.UsedRange.Rows.Count
-                    if row<=last_row:
-                        sheet.Rows(row).Delete()
-                        status=True
-                    else:
-                        err_msg=ERROR_CODE_DICT["ERR_ROW_DOESN'T_EXIST"]
+                    if len(args)>0:
+                        rows_to_delete=[int(value) for value in args]
+                        rows_to_delete.append(row)
+                        rows_to_delete.sort(reverse=True)
+                        for row_number in rows_to_delete:
+                            if row_number<=last_row:
+                                sheet.Rows(row_number).Delete()
+                                status=True
+                            else:
+                                err_msg=ERROR_CODE_DICT["ERR_ROW_DOESN'T_EXIST"]
+                                status=False
+                                break
+                        
+                    else:       
+                        if row<=last_row:
+                            sheet.Rows(row).Delete()
+                            status=True
+                        else:
+                            err_msg=ERROR_CODE_DICT["ERR_ROW_DOESN'T_EXIST"]
                 else:
                     err_msg='Excel is Read only'
         except Exception as e:
@@ -1157,14 +1171,33 @@ class ExcelXLSX:
                     cell.number_format=type
                     value=int(value)
                     flag=True
-                elif type in ['f','b']:
+                elif type=='f':
+                    cell.number_format='General'
+                    if not value.startswith('='):
+                        value='='+value
                     flag=True
-                    value='='+value
+                elif type=='b':          
+                    cell.number_format='General'  
+                    if value.lower() in ['true','false']:
+                        value=value.lower()
+                        flag=True
+                    else:
+                        flag=False
+                        status=False
+                        err_msg=ERROR_CODE_DICT['EXCEL_INPUT_INVALID']
+                        # err_msg="Boolean input must be provided for boolean type"
+                elif type=='General':
+                    cell.number_format='@'
+                    flag=True
                 else:
+                    cell.number_format='General'
                     flag=True
                     ##value=str(value)
-                cell.value=value
-                status=True
+                # cell.value=value
+                # status=True
+                if flag:
+                    cell.value=value
+                    status=True
             else:
                 logger.print_on_console('Cell Type not supported')
            else:
@@ -1249,7 +1282,7 @@ class ExcelXLSX:
         return status
 
 
-    def delete_row_xlsx(self,row,excel_path,sheetname):
+    def delete_row_xlsx(self,row,excel_path,sheetname,*args):
         """
         def : delete_row_xlsx
         purpose : calls delete_row_xls to delete a row in given .xlsx file
@@ -1259,7 +1292,7 @@ class ExcelXLSX:
         """
         #same functionality as compare_content_xlsx
         obj=ExcelXLS()
-        return obj.delete_row_xls(row,excel_path,sheetname)
+        return obj.delete_row_xls(row,excel_path,sheetname,*args)
 
 
     def compare_content_xlsx(self,input_path1,sheetname1,input_path2,sheetname2,*args):
@@ -1418,7 +1451,7 @@ class ExcelXLSX:
         except Exception as e:
             err_msg = 'Error writing to excel cell of .xlsx file'
             log.error(e)
-            logger.print_on_console(err_msg)
+            # logger.print_on_console(err_msg)
         return status,err_msg
 
 
@@ -1437,8 +1470,11 @@ class ExcelXLSX:
             log.debug('Fetching row count of '+generic_constants.INPUT_IS+excel_path+' '+sheetname)
             book=openpyxl.load_workbook(excel_path)
             sheet=book.get_sheet_by_name(sheetname)
-            row_count=sheet.max_row
-            status=True
+            if(sheet.max_row==1 and sheet.max_column==1 and sheet.cell(1,1).value is None):
+                row_count=0
+            else:
+                row_count=sheet.max_row
+                status=True
         except Exception as e:
             err_msg='Error getting the row count of .xlsx file'
             log.error(e)
@@ -1461,8 +1497,11 @@ class ExcelXLSX:
             log.debug('Fetching col count of '+generic_constants.INPUT_IS+excel_path+' '+sheetname)
             book=openpyxl.load_workbook(excel_path)
             sheet=book.get_sheet_by_name(sheetname)
-            col_count=sheet.max_column
-            status=True
+            if(sheet.max_row==1 and sheet.max_column==1 and sheet.cell(1,1).value is None):
+                col_count=0
+            else:
+                col_count=sheet.max_column
+                status=True
         except Exception as e:
             err_msg='Error getting the col count of .xlsx file'
             log.error(e)

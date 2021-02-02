@@ -83,6 +83,8 @@ class StepDescription:
             return "Compare images '" + inputval[0]+ "' and '" + inputval[1]+ "'"
         def imagesimilaritypercentage():
             return "Compare images '" + inputval[0]+ "' and '" + inputval[1]+ "'"
+        def getbrowsername():
+            return "Get the name of the browser and save the browser name '"+output+"' in '"+tsp.outputval+"'"
         def clearfilecontent():
 #            this needs to be implemeted
 ##            if(testStepProperty.getInputVal().size() == 2){

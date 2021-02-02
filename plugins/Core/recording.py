@@ -7,6 +7,7 @@ import time
 from timeit import default_timer as timer
 import logging
 import logger
+import os
 
 
 log = logging.getLogger("controller.py")
@@ -18,12 +19,15 @@ class Recorder():
         self.rec_status = False
 
     # Recording screen while execution(Currently for Web Apptype)
-    def record_execution(self):
+    def record_execution(self,*args):
         try:
             ##start screen recording
             import constants
             if constants.SCREENSHOT_PATH  not in ['screenshot_path', 'Disabled']:
-                filename = constants.SCREENSHOT_PATH+"ScreenRecording_"+datetime.now().strftime("%Y%m%d%H%M%S")+".mp4"
+                path = constants.SCREENSHOT_PATH+args[0]['projectname']+os.sep+args[0]['releaseid']+os.sep+args[0]['cyclename']+os.sep+datetime.now().strftime("%Y-%m-%d")+os.sep
+                if not os.path.exists(path):
+                    os.makedirs(path)
+                filename = path+"ScreenRecording_"+datetime.now().strftime("%Y%m%d%H%M%S")+".mp4"
             else:
                 filename = "output/ScreenRecording_"+datetime.now().strftime("%Y%m%d%H%M%S")+".mp4"
                 logger.print_on_console("Screen capturing disabled since user does not have sufficient privileges for screenshot folder. Video saved in 'Avoassure/output' folder\n")
@@ -37,7 +41,6 @@ class Recorder():
             self.rec_status = True
             rec_th = threading.Thread(target = self.start_recording, name="start_recording", args = (out,fps))
             rec_th.start()
-            
         except Exception as e:
             logger.print_on_console('Error in screen recording')
             log.error(e,exc_info = True)

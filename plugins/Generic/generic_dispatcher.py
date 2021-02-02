@@ -186,7 +186,7 @@ class GenericKeywordDispatcher:
                     if keyword != generic_constants.SENDFUNCTIONKEYS:
                         message.append(';')
                     message.extend(actual_input)
-                    if keyword ==generic_constants.DISPLAY_VARIABLE_VALUE or keyword == generic_constants.PAUSE:
+                    if keyword == generic_constants.DISPLAY_VARIABLE_VALUE or keyword == generic_constants.PAUSE:
                         message.append(wxObject)
                         message.append(mythread)
                 elif keyword in generic_constants.DATA_BASE_KEYWORDS:

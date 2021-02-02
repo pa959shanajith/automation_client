@@ -85,8 +85,9 @@ class TextboxKeywords:
         return err_msg
 
     def __web_driver_exception(self,e):
-        logger.print_on_console(e)
+        local_to.log.error(e)
         err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+        logger.print_on_console(err_msg)
         return err_msg
 
     def __check_visibility_from_config(self):
@@ -99,6 +100,11 @@ class TextboxKeywords:
         err_msg="Input cannot be empty/null"
         local_to.log.error(err_msg)
         logger.print_on_console(err_msg)
+        return err_msg
+
+    def _noneGetText(self):
+        err_msg="GetText encountered None"
+        local_to.log.error(err_msg)
         return err_msg
 
     def set_text(self,webelement,input,*args):
@@ -300,16 +306,19 @@ class TextboxKeywords:
         #get the text using selenium in-built method
         text=webelement.get_attribute('value')
         if text is None or text == '':
-            #if failed, use javascript to get the text
-            text = browser_Keywords.local_bk.driver_obj.execute_script("""return arguments[0].value""",webelement)
-            if text is None or text is '':
-                #if failed, use the id to get the text
-                id = webelement.get_attribute('id')
-                if(id != '' and id is not None):
-                    text = browser_Keywords.local_bk.driver_obj.execute_script("return document.getElementById(arguments[0]).value",id)
-                    #finally everything failed then return the placeholder
-                    if text is None or text is '':
-                        text=webelement.get_attribute('placeholder')
+            if webelement.tag_name != "input":
+                text = browser_Keywords.local_bk.driver_obj.execute_script("""return arguments[0].textContent""",webelement)
+            else:
+                #if failed, use javascript to get the text
+                text = browser_Keywords.local_bk.driver_obj.execute_script("""return arguments[0].value""",webelement)
+                if text is None or text is '':
+                    #if failed, use the id to get the text
+                    id = webelement.get_attribute('id')
+                    if(id != '' and id is not None):
+                        text = browser_Keywords.local_bk.driver_obj.execute_script("return document.getElementById(arguments[0]).value",id)
+                        #finally everything failed then return the placeholder
+                        if text is None or text is '':
+                            text=webelement.get_attribute('placeholder')
         local_to.log.debug('Text returning from __get_text is ')
         local_to.log.debug(text)
         return text
@@ -364,8 +373,11 @@ class TextboxKeywords:
                         err_msg=self._index_zero()
                 if check_flag==True:
                     text=self.__get_text(webelement)
-                    status=TEST_RESULT_PASS
-                    methodoutput=TEST_RESULT_TRUE
+                    if text is None:
+                        err_msg=self._noneGetText()
+                    else:
+                        status=TEST_RESULT_PASS
+                        methodoutput=TEST_RESULT_TRUE                   
             except UnboundLocalError as e:
                 err_msg=self.__unbound_local_error(e)
             except Exception as e:
@@ -383,6 +395,12 @@ class TextboxKeywords:
         local_to.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
             try:
+                # 4243:Failure of the test step along with appriopriate error message
+                if input[0] is None:
+                    err_msg=ERROR_CODE_DICT['NULL_DATA']
+                    local_to.log.error(err_msg)
+                    logger.print_on_console(err_msg)
+                    return status,methodoutput,output,err_msg
                 if webelement.tag_name == 'table':
                     if len(input)==5:
                         row_num=int(input[0])
@@ -419,7 +437,6 @@ class TextboxKeywords:
                         err_msg=self._index_zero()
                 if check_flag==True:
                     text=self.__get_text(webelement)
-                    local_to.log.debug('Text is '+text)
                     input=input[0]
                     coreutilsobj=core_utils.CoreUtils()
                     input=coreutilsobj.get_UTF_8(input)
