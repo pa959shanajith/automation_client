@@ -223,7 +223,7 @@ class SAPDispatcher:
 #-----------------------------------------------------------------for custom objects
 
 
-    def dispatcher(self, teststepproperty, input, iris_flag, mythread):
+    def dispatcher(self, teststepproperty, input, mythread):
         objectname = teststepproperty.objectname
         output = teststepproperty.outputval
         objectname = objectname.strip()

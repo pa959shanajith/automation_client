@@ -105,7 +105,7 @@ class OebsDispatcher:
         message=[windowname,objectname,tsp.name,input,tsp.outputval]
         return message
 
-    def dispatcher(self,tsp,input,iris_flag,mythread,*message):
+    def dispatcher(self,tsp,input,mythread,*message):
          logger.print_on_console('Keyword is '+tsp.name)
          keyword=tsp.name
          err_msg=None

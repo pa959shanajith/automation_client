@@ -210,7 +210,7 @@ class Dispatcher:
         self.wxObject=None
         self.thread=None
 
-    def dispatcher(self,teststepproperty,input,reporting_obj,iris_flag,wxObject,mythread):
+    def dispatcher(self,teststepproperty,input,reporting_obj,wxObject,mythread):
         objectname = teststepproperty.objectname
         output = teststepproperty.outputval
         objectname = objectname.strip()
