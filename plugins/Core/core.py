@@ -138,6 +138,7 @@ class MainNamespace(BaseNamespace):
                         cw.rbox.Enable()
                     if browsercheckFlag == False:
                         check_browser()
+                    check_proxy()
                     #if updatecheckFlag == False and root.gui:
                     if updatecheckFlag == False:
                         msg='Checking for client package updates'
@@ -1714,7 +1715,7 @@ def check_PatchUpdate():
         if os.path.isfile(CONFIG_PATH) == True:
             configvalues = json.load(open(CONFIG_PATH))
             SERVER_LOC = "https://" + str(configvalues['server_ip']) + ':' + str(configvalues['server_port']) + '/patchupdate/'
-            manifest_req= requests.get(SERVER_LOC+'/manifest.json',verify=False)
+            manifest_req= requests.get(SERVER_LOC+'/manifest.json',verify=False,proxies=proxies_config)
             if(manifest_req.status_code == 200):
                 data = json.loads(manifest_req.text)
         def update_updater_module(data):
@@ -1741,8 +1742,8 @@ def check_PatchUpdate():
                     logger.print_on_console( "Client manifest unavaliable." )
                     log.info( "Client manifest unavaliable." )
                 else:
-                    statcode=requests.get(SERVER_LOC + "/manifest.json", verify=False).status_code
-                    if( requests.get(SERVER_LOC, verify=False).status_code == 404) : UPDATE_MSG = UPDATE_MSG[:UPDATE_MSG.index(',')+1] + ' Patch updater server not hosted.'
+                    statcode=requests.get(SERVER_LOC + "/manifest.json", verify=False,proxies=proxies_config).status_code
+                    if( requests.get(SERVER_LOC, verify=False,proxies=proxies_config).status_code == 404) : UPDATE_MSG = UPDATE_MSG[:UPDATE_MSG.index(',')+1] + ' Patch updater server not hosted.'
                     elif(statcode == 404) : UPDATE_MSG = UPDATE_MSG[:UPDATE_MSG.index(',')+1] + ' "manifest.json" not found, Please ensure "manifest.json" is present in patch updater folder'
                     elif(statcode !=404 or statcode !=200): UPDATE_MSG = UPDATE_MSG[:UPDATE_MSG.index(',')+1] + ' "manifest.json error". ERROR_CODE: ' + str(statcode)
                     logger.print_on_console( UPDATE_MSG )
@@ -1806,3 +1807,12 @@ def stop_ping_thread():
         time.sleep(0.5)
         status_ping_thread = None
 
+def check_proxy():
+    global proxies_config
+    proxy=json.load(open(PROXY_PATH))
+    if 'enabled' in proxy and proxy['enabled']== 'Enabled':
+        proxy_url=proxy['username']+":"+proxy['password']+"@"+proxy['url']
+        proxies_config = {"http":"http://"+proxy_url,
+                    "https":":https://"+proxy_url}
+    elif 'enabled' in proxy and proxy['enabled']== 'Disabled':
+        proxies_config={}

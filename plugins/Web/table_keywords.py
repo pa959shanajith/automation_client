@@ -297,6 +297,41 @@ class TableOperationKeywords():
                                             err_msg='Invalid input: Row not found'
                                             local_tk.log.error('Invalid input: Row not found')
                                             logger.print_on_console('Invalid input: Row not found')
+                        elif (webElement.find_element_by_xpath('.//ancestor::lightning-datatable') != None):
+                            row_num=int(input_val[0])
+                            col_num=int(input_val[1])
+                            row_count=self.getRowCountJs(webElement)
+                            col_count=self.getColoumnCountJs(webElement)
+                            if row_num-1>row_count or col_num-1>col_count:
+                                local_tk.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                                logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                            else:
+                                cellVal = ""
+                                remoteWebElement=self.javascriptExecutor(webElement,row_num-1,col_num-1)
+                                # cellVal = remoteWebElement.text
+                                child_ele=[]
+                                if(cellVal == ""):
+                                    child_ele = remoteWebElement.find_elements_by_xpath('.//lightning-base-formatted-text')
+                                    if(len(child_ele)==0):
+                                        child_ele = remoteWebElement.find_elements_by_xpath('.//lightning-formatted-date-time')
+                                        if(len(child_ele)==0):
+                                            child_ele = remoteWebElement.find_elements_by_xpath('.//lightning-formatted-number')
+                                            if(len(child_ele)==0):
+                                                child_ele = remoteWebElement.find_elements_by_xpath('.//lightning-formatted-email')
+                                                if(len(child_ele)==0):
+                                                    child_ele = remoteWebElement.find_elements_by_xpath('.//lightning-formatted-phone')
+                                                    if(len(child_ele)==0):
+                                                        child_ele = remoteWebElement.find_elements_by_xpath('.//lightning-formatted-url')
+                                                        if(len(child_ele)==0):
+                                                            child_ele = remoteWebElement.find_elements_by_xpath('.//lightning-formatted-location')
+                                if(len(child_ele)>0):
+                                    cellVal=child_ele[0].text                            
+                                cellVal = cellVal.strip()
+                                local_tk.log.info('Got the result : %s',str(cellVal))
+                                logger.print_on_console('Cell value is : ',str(cellVal))
+                                status=TEST_RESULT_PASS
+                                methodoutput=TEST_RESULT_TRUE
                         else:
                             row_num=int(input_val[0])
                             col_num=int(input_val[1])
@@ -452,6 +487,51 @@ class TableOperationKeywords():
                                             err_msg='Invalid input: Row not found'
                                             local_tk.log.error('Invalid input: Row not found')
                                             logger.print_on_console('Invalid input: Row not found')
+                        elif (webElement.find_element_by_xpath('.//ancestor::lightning-datatable') != None):
+                            row_num=int(input_val[0])
+                            col_num=int(input_val[1])
+                            row_count=self.getRowCountJs(webElement)
+                            col_count=self.getColoumnCountJs(webElement)
+                            if row_num-1>row_count or col_num-1>col_count:
+                                local_tk.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                                logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                            else:
+                                cellVal = ""
+                                remoteWebElement=self.javascriptExecutor(webElement,row_num-1,col_num-1)
+                                # cellVal = remoteWebElement.text
+                                child_ele=[]
+                                if(cellVal == ""):
+                                    child_ele = remoteWebElement.find_elements_by_xpath('.//lightning-base-formatted-text')
+                                    if(len(child_ele)==0):
+                                        child_ele = remoteWebElement.find_elements_by_xpath('.//lightning-formatted-date-time')
+                                        if(len(child_ele)==0):
+                                            child_ele = remoteWebElement.find_elements_by_xpath('.//lightning-formatted-number')
+                                            if(len(child_ele)==0):
+                                                child_ele = remoteWebElement.find_elements_by_xpath('.//lightning-formatted-email')
+                                                if(len(child_ele)==0):
+                                                    child_ele = remoteWebElement.find_elements_by_xpath('.//lightning-formatted-phone')
+                                                    if(len(child_ele)==0):
+                                                        child_ele = remoteWebElement.find_elements_by_xpath('.//lightning-formatted-url')
+                                                        if(len(child_ele)==0):
+                                                            child_ele = remoteWebElement.find_elements_by_xpath('.//lightning-formatted-location')
+                                if(len(child_ele)>0):
+                                    cellVal=child_ele[0].text
+                                cellVal = cellVal.strip()
+                                expected_value=input_val[2].strip()
+                                coreutilsobj=core_utils.CoreUtils()
+                                expected_value=coreutilsobj.get_UTF_8(expected_value)
+                                if(cellVal == expected_value):
+                                    local_tk.log.info('Got the result : %s', 'PASS')
+                                    logger.print_on_console('Got the result : ','PASS')
+                                    status=TEST_RESULT_PASS
+                                    methodoutput=TEST_RESULT_TRUE
+                                else:
+                                    local_tk.log.info(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
+                                    err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
+                                    logger.print_on_console(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
+                                    logger.print_on_console('Actual value is : ',str(cellVal))
+                                    logger.print_on_console('Expected value is : ',str(expected_value))
                         else:
                             row_num=int(input_val[0])
                             col_num=int(input_val[1])
@@ -510,7 +590,31 @@ class TableOperationKeywords():
             if visibleFlag==True:
                 try:
                     local_tk.log.debug('reading the inputs')
-                    if(len(input_val) > 1):
+                    if (webElement.find_element_by_xpath('.//ancestor::lightning-datatable') != None):
+                        row_number=int(input_val[0])
+                        col_number=int(input_val[1])
+                        row_count=self.getRowCountJs(webElement)
+                        col_count=self.getColoumnCountJs(webElement)
+                        if row_number>row_count or col_number>col_count:
+                            local_tk.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                            err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                            logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                        else:
+                            local_tk.log.debug('perfoming java script on element')
+                            remoteWebElement=self.javascriptExecutor(webElement,row_number-1,col_number-1)
+                            ele=remoteWebElement.find_elements_by_xpath('.//*')
+                            for i in ele:
+                                contents=i.get_attribute('title') 
+                                if contents!=None and contents.strip() != '':
+                                    tooltip=contents
+                                    status=TEST_RESULT_PASS
+                                    methodoutput=TEST_RESULT_TRUE
+                                    local_tk.log.info('Got the result : %s',str(tooltip))
+                                    logger.print_on_console('Got the result : ',str(tooltip))
+                                else:
+                                    tooltip=None
+                                    err_msg = 'No cell tool tip present for the cell'
+                    elif(len(input_val) > 1):
                         row_number=int(input_val[0])
                         col_number=int(input_val[1])
                         row_count=self.getRowCountJs(webElement)
@@ -569,7 +673,38 @@ class TableOperationKeywords():
             if visibleFlag==True:
                 try:
                     local_tk.log.debug('reading the inputs')
-                    if(len(input_val) > 1):
+                    if (webElement.find_element_by_xpath('.//ancestor::lightning-datatable') != None and len(input_val) > 1):
+                        row_number=int(input_val[0])
+                        col_number=int(input_val[1])
+                        row_count=self.getRowCountJs(webElement)
+                        col_count=self.getColoumnCountJs(webElement)
+                        if row_number>row_count or col_number>col_count:
+                            local_tk.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                            err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                            logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                        else:
+                            local_tk.log.debug('perfoming java script on element')
+                            remoteWebElement=self.javascriptExecutor(webElement,row_number-1,col_number-1)
+                            ele=remoteWebElement.find_elements_by_xpath('.//*')
+                            for i in ele:
+                                contents=i.get_attribute('title') 
+                                if contents !=None and contents.strip() != '':
+                                    verifytooltip=contents
+                                    expected_value=input_val[2].strip()
+                                    coreutilsobj=core_utils.CoreUtils()
+                                    expected_value=coreutilsobj.get_UTF_8(expected_value)
+                                if(verifytooltip == expected_value):
+                                    local_tk.log.info('Got the result : %s', str(verifytooltip))
+                                    logger.print_on_console('Got the result : ',str(verifytooltip))
+                                    status=TEST_RESULT_PASS
+                                    methodoutput=TEST_RESULT_TRUE
+                                else:
+                                    local_tk.log.info(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
+                                    err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
+                                    logger.print_on_console(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
+                                    logger.print_on_console('Actual value is : ',str(verifytooltip))
+                                    logger.print_on_console('Expected value is : ',str(expected_value))
+                    elif(len(input_val) > 1):
                         row_number=int(input_val[0])
                         col_number=int(input_val[1])
                         row_count=self.getRowCountJs(webElement)
@@ -743,6 +878,41 @@ class TableOperationKeywords():
                                             err_msg='Invalid input: Row not found'
                                             local_tk.log.error('Invalid input: Row not found')
                                             logger.print_on_console('Invalid input: Row not found')
+                        elif (webElement.find_element_by_xpath('.//ancestor::lightning-datatable') != None):
+                            row_num=int(input_arr[0])
+                            col_num=int(input_arr[1])
+                            row_count=self.getRowCountJs(webElement)
+                            col_count=self.getColoumnCountJs(webElement)
+                            if row_num-1>row_count or col_num-1>col_count:
+                                local_tk.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                                logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                            else:
+                                remoteWebElement=self.javascriptExecutor(webElement,row_num-1,col_num-1)
+                                child_ele=[]
+                                child_ele=remoteWebElement.find_elements_by_xpath('.//a')
+                                if(len(child_ele)==0):
+                                    child_ele=remoteWebElement.find_elements_by_xpath('.//input')
+                                    if(len(child_ele)==0):
+                                        child_ele=remoteWebElement.find_elements_by_xpath('.//button')
+                                        if(len(child_ele)==0):
+                                            child_ele = remoteWebElement.find_elements_by_xpath('.//lightning-base-formatted-text')
+                                            if(len(child_ele)==0):
+                                                child_ele = remoteWebElement.find_elements_by_xpath('.//lightning-formatted-date-time')
+                                                if(len(child_ele)==0):
+                                                    child_ele = remoteWebElement.find_elements_by_xpath('.//lightning-formatted-number')
+                                                    if(len(child_ele)==0):
+                                                        child_ele = remoteWebElement.find_elements_by_xpath('.//lightning-formatted-email')
+                                                        if(len(child_ele)==0):
+                                                            child_ele = remoteWebElement.find_elements_by_xpath('.//lightning-formatted-phone')
+                                                            if(len(child_ele)==0):
+                                                                child_ele = remoteWebElement.find_elements_by_xpath('.//lightning-formatted-url')
+                                                                if(len(child_ele)==0):
+                                                                    child_ele = remoteWebElement.find_elements_by_xpath('.//lightning-formatted-location')
+                                if(len(child_ele)>0):
+                                    child_ele[0].click()
+                                    status=TEST_RESULT_PASS
+                                    methodoutput=TEST_RESULT_TRUE
                         elif len(input_arr)==2:
                             local_tk.log.info('normal cell click')
                             #logger.print_on_console('normal cell click inside the cell')
@@ -1246,6 +1416,19 @@ class TableOperationKeywords():
                                     err_msg = 'Error in fetching Row number'
                                     local_tk.log.info('Error in fetching Row number')
                                     logger.print_on_console('Error in fetching Row number')
+                        elif (webElement.find_element_by_xpath('.//ancestor::lightning-datatable') != None):
+                            cell=webElement.find_elements_by_xpath('//*[text()="'+text+'"]')
+                            if len(cell)!=0:
+                                tr=cell[0].find_element_by_xpath('.//ancestor::tr')
+                                rows=webElement.find_elements_by_xpath('.//tr')
+                                for i in range(0,len(rows)):
+                                    if rows[i]==tr:
+                                        row_number=i+1
+                                        status=TEST_RESULT_PASS
+                                        methodoutput=TEST_RESULT_TRUE
+                                        break
+                            local_tk.log.info('Got the result : %s',str(row_number))
+                            logger.print_on_console('Got the result : ',str(row_number))
                         else:
                             js='var temp = fun(arguments[0], arguments[1]); return temp; function fun(table, str) {     var m = [],         row, cell, xx, tx, ty, xxx, yyy, child;     for (yyy = 0; yyy < table.rows.length; yyy++) {         row = table.rows[yyy];         for (xxx = 0; xxx < row.cells.length; xxx++) {             cell = row.cells[xxx];             xx = xxx;             for (; m[yyy] && m[yyy][xx]; ++xx) {}             for (tx = xx; tx < xx + cell.colSpan; ++tx) {                 for (ty = yyy; ty < yyy + cell.rowSpan; ++ty) {                     if (!m[ty]) m[ty] = [];                     m[ty][tx] = true;                 }             }             if (cell.innerText.indexOf(str)>= 0 && cell.innerText==str) return yyy + cell.rowSpan;             else if (cell.children.length > 0) {                 for (var i = 0; i < cell.children.length; i++) {                     child = cell.children[i];                     if (child.value == str) return yyy + cell.rowSpan; 					else{ 					var a=child.value; 					if(a){ 					var b=a; 					if(b.indexOf(str)>=0 && b==str)return yyy + cell.rowSpan; 					}	 				}			 					                 }             }         }     }     return null; };'
                             row_number=browser_Keywords.local_bk.driver_obj.execute_script(js,webElement,text)
@@ -1340,6 +1523,24 @@ class TableOperationKeywords():
                                     err_msg = 'Error in fetching Col number'
                                     local_tk.log.info('Error in fetching Col number')
                                     logger.print_on_console('Error in fetching Row number')
+                        elif (webElement.find_element_by_xpath('.//ancestor::lightning-datatable') != None):
+                            cell=webElement.find_element_by_xpath('//*[text()="'+text+'"]')
+                            if len(cell)!=0:
+                                tc=cell.find_elements_by_xpath('.//ancestor::th')
+                                if len(tc)==0:
+                                    tc=cell.find_elements_by_xpath('.//ancestor::td')
+                                if(len(tc)!=0):
+                                    tr=tc[0].find_elements_by_xpath('.//ancestor::tr')
+                                    cols=tr[0].find_elements_by_xpath('.//th')
+                                    cols+=tr[0].find_elements_by_xpath('.//td')
+                                    for i in range(0,len(cols)):
+                                        if cols[i]==tc[0]:
+                                            col_number=i+1
+                                            status=TEST_RESULT_PASS
+                                            methodoutput=TEST_RESULT_TRUE
+                                            break
+                            local_tk.log.info('Got the result : %s',str(col_number))
+                            logger.print_on_console('Got the result : ',str(col_number))
                         else:
                             js='var temp = fun(arguments[0], arguments[1]); return temp; function fun(table, str) {     var m = [],         row, cell, xx, tx, ty, xxx, yyy, child;     for (yyy = 0; yyy < table.rows.length; yyy++) {         row = table.rows[yyy];         for (xxx = 0; xxx < row.cells.length; xxx++) {             cell = row.cells[xxx];             xx = xxx;             for (; m[yyy] && m[yyy][xx]; ++xx) {}             for (tx = xx; tx < xx + cell.colSpan; ++tx) {                 for (ty = yyy; ty < yyy + cell.rowSpan; ++ty) {                     if (!m[ty]) m[ty] = [];                     m[ty][tx] = true;                 }             }             if (cell.innerText.indexOf(str)>= 0 && cell.innerText.length === str.length) return xx + cell.colSpan;             else if (cell.children.length > 0) {                 for (var i = 0; i < cell.children.length; i++) {                     child = cell.children[i];   var sap=child.value;  var check_match=sap;                if (str === check_match) return xx + cell.colSpan; 							 					                 }             }         }     }     return null; };'
                             col_number=local_tk.driver.execute_script(js,webElement,text)
