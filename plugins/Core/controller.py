@@ -67,12 +67,11 @@ class Controller():
     mainframe_dispatcher_obj = None
     system_dispatcher_obj = None
     pdf_dispatcher_obj = None
-    core_utils.get_all_the_imports('Web')
-    import web_accessibility_testing
-    accessibility_testing_obj = web_accessibility_testing.Web_Accessibility_Testing()
+
     def __init__(self):
         global local_cont
         local_cont.web_dispatcher_obj = None
+        local_cont.accessibility_testing_obj = None
         local_cont.generic_dispatcher_obj = None
         local_cont.test_case_number = 0
         self.action=None
@@ -181,9 +180,11 @@ class Controller():
             if iris_flag:
                 core_utils.get_all_the_imports('IRIS')
             import web_dispatcher
+            import web_accessibility_testing
             local_cont.web_dispatcher_obj = web_dispatcher.Dispatcher()
             local_cont.web_dispatcher_obj.exception_flag=self.exception_flag
             local_cont.web_dispatcher_obj.action=self.action
+            local_cont.accessibility_testing_obj = web_accessibility_testing.Web_Accessibility_Testing()
         except Exception as e:
             logger.print_on_console('Error loading Web plugin')
             log.error(e)
@@ -770,8 +771,8 @@ class Controller():
         global status_percentage, screen_testcase_map
         status_percentage = {TEST_RESULT_PASS:0,TEST_RESULT_FAIL:0,TERMINATE:0,"total":0}
         i=0
-        accessibility_reports = []
         status=True
+        accessibility_reports = []
         self.scenario_start_time=datetime.now()
         start_time_string=self.scenario_start_time.strftime(TIME_FORMAT)
         logger.print_on_console('Scenario Execution start time is : '+start_time_string,'\n')
@@ -791,15 +792,16 @@ class Controller():
                     i = self.methodinvocation(i)
                     #Check wether accessibility testing has to be executed
                     if (index + 1 >= len(tsplist) or (tsplist[index].testscript_name != tsplist[index + 1].testscript_name and screen_testcase_map[tsplist[index].testscript_name]['screenid'] != screen_testcase_map[tsplist[index + 1].testscript_name]['screenid'])) and accessibility_testing : 
+                        if local_cont.accessibility_testing_obj is None: self.__load_web()
                         import browser_Keywords
                         script_info =  screen_testcase_map[tsplist[index].testscript_name]
                         #Check if browser is present or not
                         if hasattr(browser_Keywords.local_bk, 'driver_obj') and browser_Keywords.local_bk.driver_obj is not None and len(script_info['accessibility_parameters']) > 0:
-                            acc_result = self.accessibility_testing_obj.runCrawler(browser_Keywords.local_bk.driver_obj, script_info, screen_testcase_map["executionid"])
+                            acc_result = local_cont.accessibility_testing_obj.runCrawler(browser_Keywords.local_bk.driver_obj, script_info, screen_testcase_map["executionid"])
                             #Check if accessibility Testing was successful
                             if acc_result and acc_result["status"] != "fail":
                                 accessibility_reports.append(acc_result)
-                    if i== TERMINATE:
+                    if i == TERMINATE:
                         #Changing the overallstatus of the report_obj to Terminate - (Sushma)
                         self.reporting_obj.overallstatus=TERMINATE
                         status_percentage[TERMINATE]+=1
@@ -840,7 +842,7 @@ class Controller():
         video_path = args[0] if (args and args[0]) else ''
         self.reporting_obj.build_overallstatus(self.scenario_start_time,self.scenario_end_time,self.scenario_ellapsed_time,video_path)
         logger.print_on_console('Step Elapsed time is : ',str(self.scenario_ellapsed_time))
-        return status,status_percentage, accessibility_reports
+        return status,status_percentage,accessibility_reports
 
     def invokegenerickeyword(self,teststepproperty,dispatcher_obj,inputval):
         res = dispatcher_obj.dispatcher(teststepproperty,self.wx_object,self.conthread,*inputval)
@@ -903,7 +905,7 @@ class Controller():
         logger.print_on_console('***DEBUG STARTED***')
         print('=======================================================================================================')
         for testcase in scenario:
-            flag,browser_type,last_tc_num,testcase_empty_flag,empty_testcase_names=obj.parse_json(testcase)
+            flag,browser_type,last_tc_num,_,=obj.parse_json(testcase)
             if flag == False:
                 break
             print('\n')
@@ -914,7 +916,7 @@ class Controller():
         if flag:
             if runfrom_step > 0 and runfrom_step <= tsplist[len(tsplist)-1].stepnum:
                 self.conthread=mythread
-                status, status_percentage, accessibility_reports = self.executor(tsplist,DEBUG,last_tc_num,runfrom_step,mythread, accessibility_testing = False)
+                status,_,_ = self.executor(tsplist,DEBUG,last_tc_num,runfrom_step,mythread, accessibility_testing = False)
             else:
                 logger.print_on_console( 'Invalid step number!! Please provide run from step number from 1 to ',tsplist[len(tsplist)-1].stepnum,'\n')
                 log.info('Invalid step number!! Please provide run from step number')
@@ -1158,7 +1160,7 @@ class Controller():
                                     record_flag = str(configvalues['screen_rec']).lower()
                                     #start screen recording
                                     if (record_flag=='yes') and self.execution_mode == SERIAL and json_data['apptype'] == 'Web': video_path = recorder_obj.record_execution(json_data['suitedetails'][0])
-                                    status,status_percentage, accessibility_reports = con.executor(tsplist,EXECUTE,last_tc_num,1,con.conthread,video_path, accessibility_testing = True)
+                                    status,status_percentage,accessibility_reports = con.executor(tsplist,EXECUTE,last_tc_num,1,con.conthread,video_path, accessibility_testing = True)
                                     #end video
                                     if (record_flag=='yes') and self.execution_mode == SERIAL and json_data['apptype'] == 'Web': recorder_obj.rec_status = False
                                     print('=======================================================================================================')
