@@ -28,12 +28,14 @@ configvalues = None
 update_obj = None
 SERVER_LOC = None
 pdfgentool = None
+proxy={}
 AVO_ASSURE_HOME = os.environ["AVO_ASSURE_HOME"]
 IMAGES_PATH = AVO_ASSURE_HOME + "/assets/images/"
 os.environ["IMAGES_PATH"] = IMAGES_PATH
 CONFIG_PATH= AVO_ASSURE_HOME + "/assets/config.json"
 CERTIFICATE_PATH = AVO_ASSURE_HOME + "/assets/CA_BUNDLE"
 LOGCONFIG_PATH = AVO_ASSURE_HOME + "/assets/logging.conf"
+PROXY_PATH= AVO_ASSURE_HOME + "/assets/proxy.json"
 DRIVERS_PATH = AVO_ASSURE_HOME + "/lib/Drivers"
 CHROME_DRIVER_PATH = DRIVERS_PATH + "/chromedriver"
 GECKODRIVER_PATH = DRIVERS_PATH + "/geckodriver"
@@ -119,6 +121,8 @@ class ClientWindow(wx.Frame):
 
         self.configItem = wx.MenuItem(self.editMenu, 103,text = "&Configuration",kind = wx.ITEM_NORMAL)
         self.editMenu.Append(self.configItem)
+        self.proxyconfigItem = wx.MenuItem(self.editMenu, 104,text = "&Proxy Configuration",kind = wx.ITEM_NORMAL)
+        self.editMenu.Append(self.proxyconfigItem)
         self.menubar.Append(self.editMenu, '&Edit')
 
         self.pdfReportItem = wx.MenuItem(self.toolMenu, 151,text = "Generate PDF &Report",kind = wx.ITEM_NORMAL)
@@ -231,6 +235,17 @@ class ClientWindow(wx.Frame):
                 Config_window(parent = None,id = -1, title="Avo Assure Configuration")
             except Exception as e:
                 msg = "Error while updating configuration"
+                logger.print_on_console(msg)
+                log.info(msg)
+                log.error(e)
+        elif id==104:     # When user selects Edit > Proxy Configuraion
+            try:
+                msg = '--Edit Proxy Config selected--'
+                logger.print_on_console(msg)
+                log.info(msg)
+                ProxyConfig_window(parent = None,id = -1, title="Avo Assure Proxy Configuration")
+            except Exception as e:
+                msg = "Error while updating proxy configuration"
                 logger.print_on_console(msg)
                 log.info(msg)
                 log.error(e)
@@ -1561,7 +1576,7 @@ def check_update(flag):
         request = None
         emsg = "Error in fetching update manifest from server"
         try:
-            request = requests.get(SERVER_LOC + "/manifest.json", verify=False)
+            request = requests.get(SERVER_LOC + "/manifest.json", verify=False,proxies=proxies_config)
             if(request.status_code ==200):
                 data = json.loads(request.text) #will return json of the manifest
         except Exception as e:
@@ -1594,10 +1609,146 @@ def check_update(flag):
             logger.print_on_console( "Client manifest unavaliable." )
             log.info( "Client manifest unavaliable." )
         else:
-            statcode=requests.get(SERVER_LOC + "/manifest.json", verify=False).status_code
-            if( requests.get(SERVER_LOC, verify=False).status_code == 404) : UPDATE_MSG = UPDATE_MSG[:UPDATE_MSG.index(',')+1] + ' Patch updater server not hosted.'
+            statcode=requests.get(SERVER_LOC + "/manifest.json", verify=False,proxies=proxies_config).status_code
+            if( requests.get(SERVER_LOC, verify=False,proxies=proxies_config).status_code == 404) : UPDATE_MSG = UPDATE_MSG[:UPDATE_MSG.index(',')+1] + ' Patch updater server not hosted.'
             elif(statcode == 404) : UPDATE_MSG = UPDATE_MSG[:UPDATE_MSG.index(',')+1] + ' "manifest.json" not found, Please ensure "manifest.json" is present in patch updater folder'
             elif(statcode !=404 or statcode !=200): UPDATE_MSG = UPDATE_MSG[:UPDATE_MSG.index(',')+1] + ' "manifest.json error". ERROR_CODE: ' + str(statcode)
             logger.print_on_console( UPDATE_MSG )
             log.info( UPDATE_MSG )
     return False,l_ver
+
+
+
+class ProxyConfig_window(wx.Frame):
+    """Initialization and defining the wx-components of the pop-up"""
+    def __init__(self, parent, id, title):
+        try:
+            data = self.readproxyconfig()
+            #------------------------------------Different co-ordinates for Windows and Mac
+            if SYSTEM_OS=='Windows':
+                upload_fields= {
+                "Frame":[(300, 150),(400,220)],
+                "disp_msg":[(12,18),(80, 28),(100,18), (310,-1),(415,18),(30, -1)],
+                "proxy_enable":[(12,10), (150, 48)],
+                "proxy_url":[(12,65),(95, 20),(110,61), (250,-1)],
+                "username":[(12,95),(95, 20),(110,91), (250,-1)],
+                "passwd":[(12,125),(95, 20),(110,121), (250,-1)],
+                "Save":[(92,148), (100, 28)],
+                "Close":[(192,148), (100, 28)]
+            }
+            else:
+                upload_fields={
+                "Frame":[(300, 150),(550,220)],#(diff +85,+10 from windows)
+                "disp_msg":[(12,38),(80,28),(116,38),(382,-1),(504,38),(30, -1)],
+                "Close":[(285,88),(100, 28)]
+            }
+            lblList = ['Enabled', 'Disabled']
+            wx.Frame.__init__(self, parent, title=title,pos=upload_fields["Frame"][0], size=upload_fields["Frame"][1], style = wx.CAPTION|wx.CLIP_CHILDREN)
+            self.SetBackgroundColour('#e6e7e8')
+            self.iconpath = IMAGES_PATH +"avo.ico"
+            self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
+            self.SetIcon(self.wicon)
+            self.panel = wx.Panel(self)
+            self.rbox1 = wx.RadioBox(self.panel, label = 'Enable Proxy', choices = lblList,
+            majorDimension = 1, style = wx.RA_SPECIFY_ROWS, pos=upload_fields["proxy_enable"][0], size=upload_fields["proxy_enable"][1])
+            self.rbox1.SetToolTip(wx.ToolTip("Indicates if the errors of the AUT website's security certificates are to be ignored or not. It is applicable only for IE"))
+            self.rbox1.Bind(wx.EVT_RADIOBOX, self.radio_check)
+            self.proxy_url_path=wx.StaticText(self.panel, label="Proxy URL", pos=upload_fields["proxy_url"][0],size=upload_fields["proxy_url"][1], style=0, name="")
+            self.proxy_url=wx.TextCtrl(self.panel, pos=upload_fields["proxy_url"][2], size=upload_fields["proxy_url"][3])
+            if data!=False:
+                self.proxy_url.SetValue(data['url'])
+            else:
+                self.proxy_url.SetValue('')
+
+            self.proxy_user_path=wx.StaticText(self.panel, label="Proxy Username", pos=upload_fields["username"][0],size=upload_fields["username"][1], style=0, name="")
+            self.proxy_user=wx.TextCtrl(self.panel, pos=upload_fields["username"][2], size=upload_fields["username"][3])
+            if data!=False:
+                self.proxy_user.SetValue(data['username'])
+            else:
+                self.proxy_user.SetValue('')
+
+            self.proxy_pass_path=wx.StaticText(self.panel, label="Proxy Password", pos=upload_fields["passwd"][0],size=upload_fields["passwd"][1], style=0, name="")
+            self.proxy_pass=wx.TextCtrl(self.panel, pos=upload_fields["passwd"][2], size=upload_fields["passwd"][3])
+            if data!=False:
+                self.proxy_pass.SetValue(data['password'])
+            else:
+                self.proxy_pass.SetValue('')
+
+            if data!=False and data['enabled'].title()==lblList[0]:
+                self.rbox1.SetSelection(0)
+                self.enable_all()
+            else:
+                self.rbox1.SetSelection(1)
+                self.disable_all()
+            # self.image = wx.StaticBitmap(self.panel, -1, wx.Bitmap(IMAGES_PATH + 'AVO_Assure.png', wx.BITMAP_TYPE_ANY), wx.Point(10, 10))
+            self.close_btn = wx.Button(self.panel, label="Close",pos=upload_fields["Close"][0], size=upload_fields["Close"][1])
+            self.close_btn.Bind(wx.EVT_BUTTON, self.close)
+            self.save_btn=wx.Button(self.panel, label="Save",pos=upload_fields["Save"][0], size=upload_fields["Save"][1])
+            self.save_btn.Bind(wx.EVT_BUTTON, self.save)
+            self.Centre()
+            wx.Frame(self.panel)
+            self.Show()
+        except Exception as e:
+            logger.print_on_console("Error occured in Proxy Config")
+            log.error("Error occured in Proxy Config ,Err msg : " + str(e))
+
+
+    def readproxyconfig(self):
+        try:
+            with open(PROXY_PATH) as json_data:
+                return json.load(json_data)
+        except Exception as e:
+            log.error(e)
+            return False
+            #return "Config file absent"
+
+    def jsonCreater(self,data):
+        try:
+            if wx.MessageBox("Would you like to save updated proxy config?","Confirm Save",wx.ICON_QUESTION | wx.YES_NO) == wx.YES:
+                # Write JSON file
+                with io.open(PROXY_PATH, 'w', encoding='utf8') as outfile:
+                    str_ = json.dumps(data,indent=4, sort_keys=True,separators=(',', ': '), ensure_ascii=False)
+                    outfile.write(str(str_))
+                logger.print_on_console('--Proxy Configuration saved--')
+                log.info('--Proxy Configuration saved--')
+                self.updated = True
+        except Exception as e:
+            msg = "Error while updating configuration"
+            logger.print_on_console(msg)
+            log.info(msg)
+            log.error(e)
+
+    def close(self, event):
+        self.Destroy()
+
+    def save(self,event):
+        global proxy,proxies_config
+        data={}
+        data['enabled']=self.rbox1.GetStringSelection()
+        data['url']=self.proxy_url.GetValue()
+        data['username']=self.proxy_user.GetValue()
+        data['password']=self.proxy_pass.GetValue()
+        proxy=data
+        if 'enabled' in proxy and proxy['enabled']== 'Enabled':
+            proxy_url=proxy['username']+":"+proxy['password']+"@"+proxy['url']
+            proxies_config = {"http":"http://"+proxy_url,
+                        "https":":https://"+proxy_url}
+        elif 'enabled' in proxy and proxy['enabled']== 'Disabled':
+            proxies_config={}
+        self.jsonCreater(data)
+
+    def enable_all(self):
+        self.proxy_url.Enable(True)
+        self.proxy_user.Enable(True)
+        self.proxy_pass.Enable(True)
+
+    def disable_all(self):
+        self.proxy_url.Enable(False)
+        self.proxy_user.Enable(False)
+        self.proxy_pass.Enable(False)
+
+    def radio_check(self,event):
+        if self.rbox1.GetStringSelection()=='Enabled':
+            self.enable_all()
+        else:
+            self.disable_all()
