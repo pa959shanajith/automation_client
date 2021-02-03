@@ -352,7 +352,6 @@ class ClientWindow(wx.Frame):
         log.info(msg)
         controller.terminate_flag=True
         controller.manual_terminate_flag=True
-        core.termination_inprogress = True
         #Calling AWS stop job on terminate (if present)
         try:
             root.testthread.con.aws_obj.stop_job()
@@ -1318,7 +1317,7 @@ class About_window(wx.Frame):
             data = self.get_client_manifest()
             msg1='Avo Assure ICE '+ str(data['version']) + ' (64-bit)' +' \n'
             msg2='Updated on : '+ str(data['updated_on']) +' \n'
-            msg3='For any queries write to us at support.nineteen68@slkgroup.com'+' \n'
+            msg3='For any queries write to us at support@avoautomation.com'+' \n'
             msg4='© Avo Automation\n'
             #------------------------------------Different co-ordinates for Windows and Mac
             if SYSTEM_OS=='Windows':
