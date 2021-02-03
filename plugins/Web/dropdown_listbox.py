@@ -1760,17 +1760,13 @@ class DropdownKeywords():
                             inp_val=coreutilsobj.get_UTF_8(inp_val)
                             if len(inp_val.strip()) != 0:
                                 select = Select(webelement)
-                                iList = select.options
-                                temp=[]
-                                for i in range (0,len(iList)):
-                                    internal_val = iList[i].text
-                                    temp.append(internal_val)
-                                if (inp_val in temp):
+                                try:
                                     select.select_by_visible_text(inp_val)
                                     status=webconstants.TEST_RESULT_PASS
                                     result=webconstants.TEST_RESULT_TRUE
                                     local_ddl.log.info('Values Match')
-                                else:
+                                except Exception as e:
+                                    local_ddl.log.debug("Error Recived {}".format(e))
                                     logger.print_on_console(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
                                     local_ddl.log.info(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
                                     err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']

@@ -43,6 +43,7 @@ saucelabs_count = 0
 log = logging.getLogger("controller.py")
 status_percentage = {TEST_RESULT_PASS:0,TEST_RESULT_FAIL:0,TERMINATE:0,"total":0}
 process_ids = []
+screen_testcase_map= {}
 class ThreadLogFilter(logging.Filter):
     """
     This filter only show log entries for specified thread name
@@ -65,9 +66,11 @@ class Controller():
     mainframe_dispatcher_obj = None
     system_dispatcher_obj = None
     pdf_dispatcher_obj = None
+
     def __init__(self):
         global local_cont
         local_cont.web_dispatcher_obj = None
+        local_cont.accessibility_testing_obj = None
         local_cont.generic_dispatcher_obj = None
         local_cont.test_case_number = 0
         self.action=None
@@ -174,9 +177,11 @@ class Controller():
             core_utils.get_all_the_imports('Saucelabs')
             core_utils.get_all_the_imports('IRIS')
             import web_dispatcher
+            import web_accessibility_testing
             local_cont.web_dispatcher_obj = web_dispatcher.Dispatcher()
             local_cont.web_dispatcher_obj.exception_flag=self.exception_flag
             local_cont.web_dispatcher_obj.action=self.action
+            local_cont.accessibility_testing_obj = web_accessibility_testing.Web_Accessibility_Testing()
         except Exception as e:
             logger.print_on_console('Error loading Web plugin')
             log.error(e)
@@ -745,9 +750,10 @@ class Controller():
             if teststepproperty.outputval.split(";")[-1].strip() != STEPSTATUS_INREPORTS_ZERO:
                 status_percentage[self.keyword_status]+=1
                 status_percentage["total"]+=1
-            if(self.keyword_status=='Pass'): setcolor="GREEN"
-            elif(self.keyword_status=='Fail') : setcolor="RED"
-            logger.print_on_console(keyword+' executed and the status is '+self.keyword_status+'\n',color=setcolor)
+            kwargs = {}
+            if(self.keyword_status=='Pass'): kwargs["setcolor"]="GREEN"
+            elif(self.keyword_status=='Fail') : kwargs["setcolor"]="RED"
+            logger.print_on_console(keyword+' executed and the status is '+self.keyword_status+'\n',**kwargs)
             log.info(keyword+' executed and the status is '+self.keyword_status+'\n')
             #Checking for stop keyword
             if teststepproperty.name.lower()==STOP:
@@ -757,11 +763,12 @@ class Controller():
         else:
             return index,TERMINATE
 
-    def executor(self,tsplist,action,last_tc_num,debugfrom_step,mythread,*args):
-        global status_percentage
+    def executor(self,tsplist,action,last_tc_num,debugfrom_step,mythread,*args, accessibility_testing = False):
+        global status_percentage, screen_testcase_map
         status_percentage = {TEST_RESULT_PASS:0,TEST_RESULT_FAIL:0,TERMINATE:0,"total":0}
         i=0
         status=True
+        accessibility_reports = []
         self.scenario_start_time=datetime.now()
         start_time_string=self.scenario_start_time.strftime(TIME_FORMAT)
         logger.print_on_console('Scenario Execution start time is : '+start_time_string,'\n')
@@ -777,8 +784,20 @@ class Controller():
                 self.last_tc_num=last_tc_num
                 self.debugfrom_step=debugfrom_step
                 try:
+                    index = i
                     i = self.methodinvocation(i)
-                    if i== TERMINATE:
+                    #Check wether accessibility testing has to be executed
+                    if (index + 1 >= len(tsplist) or (tsplist[index].testscript_name != tsplist[index + 1].testscript_name and screen_testcase_map[tsplist[index].testscript_name]['screenid'] != screen_testcase_map[tsplist[index + 1].testscript_name]['screenid'])) and accessibility_testing : 
+                        if local_cont.accessibility_testing_obj is None: self.__load_web()
+                        import browser_Keywords
+                        script_info =  screen_testcase_map[tsplist[index].testscript_name]
+                        #Check if browser is present or not
+                        if hasattr(browser_Keywords.local_bk, 'driver_obj') and browser_Keywords.local_bk.driver_obj is not None and len(script_info['accessibility_parameters']) > 0:
+                            acc_result = local_cont.accessibility_testing_obj.runCrawler(browser_Keywords.local_bk.driver_obj, script_info, screen_testcase_map["executionid"])
+                            #Check if accessibility Testing was successful
+                            if acc_result and acc_result["status"] != "fail":
+                                accessibility_reports.append(acc_result)
+                    if i == TERMINATE:
                         #Changing the overallstatus of the report_obj to Terminate - (Sushma)
                         self.reporting_obj.overallstatus=TERMINATE
                         status_percentage[TERMINATE]+=1
@@ -819,7 +838,7 @@ class Controller():
         video_path = args[0] if (args and args[0]) else ''
         self.reporting_obj.build_overallstatus(self.scenario_start_time,self.scenario_end_time,self.scenario_ellapsed_time,video_path)
         logger.print_on_console('Step Elapsed time is : ',str(self.scenario_ellapsed_time))
-        return status,status_percentage
+        return status,status_percentage,accessibility_reports
 
     def invokegenerickeyword(self,teststepproperty,dispatcher_obj,inputval):
         res = dispatcher_obj.dispatcher(teststepproperty,self.wx_object,self.conthread,*inputval)
@@ -882,7 +901,7 @@ class Controller():
         logger.print_on_console('***DEBUG STARTED***')
         print('=======================================================================================================')
         for testcase in scenario:
-            flag,browser_type,last_tc_num,testcase_empty_flag,empty_testcase_names=obj.parse_json(testcase)
+            flag,browser_type,last_tc_num,_,_=obj.parse_json(testcase)
             if flag == False:
                 break
             print('\n')
@@ -893,7 +912,7 @@ class Controller():
         if flag:
             if runfrom_step > 0 and runfrom_step <= tsplist[len(tsplist)-1].stepnum:
                 self.conthread=mythread
-                status,status_percentage = self.executor(tsplist,DEBUG,last_tc_num,runfrom_step,mythread)
+                status,_,_ = self.executor(tsplist,DEBUG,last_tc_num,runfrom_step,mythread, accessibility_testing = False)
             else:
                 logger.print_on_console( 'Invalid step number!! Please provide run from step number from 1 to ',tsplist[len(tsplist)-1].stepnum,'\n')
                 log.info('Invalid step number!! Please provide run from step number')
@@ -922,7 +941,7 @@ class Controller():
         return status
 
     def invoke_execution(self,mythread,json_data,socketIO,wxObject,configvalues,qcObject,qtestObject,zephyrObject,aws_mode):
-        global terminate_flag,status_percentage,saucelabs_count
+        global terminate_flag,status_percentage,saucelabs_count,screen_testcase_map
         qc_url=''
         qc_password=''
         qc_username=''
@@ -936,6 +955,7 @@ class Controller():
         aws_scenario=[]
         step_results=[]
         scen_id=[]
+        pytest_files=[]
         condition_check_flag = False
         testcase_empty_flag = False
         count = 0
@@ -985,17 +1005,24 @@ class Controller():
                     #Logic to iterate through each scenario in the suite
                     for scenario,scenario_id,condition_check_value,dataparam_path_value in zip(suite_id_data,scenarioIds[suite_id],condition_check[suite_id],dataparam_path[suite_id]):
                         execute_flag=True
+                        #check if accessibility parameters are present if not initialize empty array
+                        if "accessibilityMap" in suite and scenario_id in suite['accessibilityMap']:
+                            accessibility_parameters = suite['accessibilityMap'][scenario_id]
+                        else:
+                            accessibility_parameters = []
                         con.reporting_obj=reporting.Reporting()
                         con.configvalues=configvalues
                         con.exception_flag=self.exception_flag
                         con.wx_object=wxObject
                         handler.local_handler.tspList=[]
+                        accessibility_reports = []
                         execute_result_data = {
                             'testsuiteId': suite_id,
                             'scenarioId': scenario_id,
                             'batchId': batch_id,
                             'executionId': execution_ids[suite_idx-1],
-                            'reportData': None}
+                            'reportData': None
+                        }
                         #condition check for scenario execution and reporting for condition check
                         if not(condition_check_flag):
                              #check for terminate flag before printing loggers
@@ -1041,6 +1068,14 @@ class Controller():
 
                             #Iterating through each test case in the scenario
                             for testcase in [eval(scenario[scenario_id])]:
+                                #For every unique screen in list of test cases, store screen data
+                                for step in testcase:
+                                    screen_testcase_map[step['testcasename']] = {}
+                                    screen_testcase_map[step['testcasename']]["screenname"] = step['screenname']
+                                    screen_testcase_map[step['testcasename']]["screenid"] = step['screenid']
+                                    screen_testcase_map[step['testcasename']]["cycleid"] = suite['cycleid']
+                                    screen_testcase_map["executionid"] = execute_result_data['executionId']
+                                    screen_testcase_map[step['testcasename']]['accessibility_parameters'] = accessibility_parameters
                                 #check for temrinate flag before parsing tsp list
                                 if terminate_flag:
                                     break
@@ -1124,7 +1159,7 @@ class Controller():
                                     record_flag = str(configvalues['screen_rec']).lower()
                                     #start screen recording
                                     if (record_flag=='yes') and self.execution_mode == SERIAL and json_data['apptype'] == 'Web': video_path = recorder_obj.record_execution(json_data['suitedetails'][0])
-                                    status,status_percentage = con.executor(tsplist,EXECUTE,last_tc_num,1,con.conthread,video_path)
+                                    status,status_percentage,accessibility_reports = con.executor(tsplist,EXECUTE,last_tc_num,1,con.conthread,video_path, accessibility_testing = True)
                                     #end video
                                     if (record_flag=='yes') and self.execution_mode == SERIAL and json_data['apptype'] == 'Web': recorder_obj.rec_status = False
                                     print('=======================================================================================================')
@@ -1149,6 +1184,8 @@ class Controller():
                                 con.reporting_obj.user_termination=manual_terminate_flag
                                 con.reporting_obj.save_report_json(filename,json_data,status_percentage)
                                 execute_result_data["reportData"] = con.reporting_obj.report_json
+                                if len(accessibility_reports) > 0:
+                                    execute_result_data["accessibility_reports"] = accessibility_reports
                                 socketIO.emit('result_executeTestSuite', execute_result_data)
                                 obj.clearList(con)
                                 sc_idx += 1
@@ -1459,8 +1496,7 @@ class Controller():
         if local_cont.web_dispatcher_obj != None:
             local_cont.web_dispatcher_obj.action=action
         if action==EXECUTE:
-            if len(args)>0:
-                aws_mode=args[0]
+            aws_mode = len(args)>0 and args[0]
             self.execution_mode = json_data['exec_mode'].lower()
             kill_process()
             if self.execution_mode == SERIAL:
@@ -1500,8 +1536,9 @@ class Controller():
         except Exception as e:
             logger.print_on_console("Exception in Parallel Execution")
             log.error("Exception in Parallel Execution. Error: " + str(e))
-        if not(terminate_flag):
-            status = COMPLETED
+        status = COMPLETED
+        if terminate_flag:
+            status = TERMINATE
         return status
 
     def seperate_log(self, cur_thread, id):
@@ -1580,18 +1617,28 @@ def kill_process():
         log.info('Stale processes killed')
         logger.print_on_console('Stale processes killed')
     else:
-        try:
-            import win32com.client
-            for id in process_ids:
+        tries = {}
+        while(len(process_ids) > 0):
+            try:
+                id = process_ids.pop()
+                if id in tries and tries[id] >= 3:
+                    logger.print_on_console("Unable to kill process wit PID: " + str(id))
+                    continue
+                elif id in tries:
+                    tries[id] += 1
+                else:
+                    tries[id] = 1
+                process_ids.append(id)
                 os.system("TASKKILL /F /T /PID " + str(id))
-                process_ids.remove(id)
+                process_ids.pop()
+            except Exception as e:
+                log.error(e)
             # my_processes = ['msedgedriver.exe','MicrosoftWebDriver.exe','MicrosoftEdge.exe','chromedriver.exe','IEDriverServer.exe','IEDriverServer64.exe','CobraWinLDTP.exe','phantomjs.exe','geckodriver.exe']
             # wmi=win32com.client.GetObject('winmgmts:')
             # for p in wmi.InstancesOf('win32_process'):
             #     if p.pid in process_ids:
             #         os.system("TASKKILL /F /T /IM " + p.pid)
-        except Exception as e:
-            log.error(e)
+        
 
         try:
             import browser_Keywords_MW
