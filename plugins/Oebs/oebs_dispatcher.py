@@ -104,7 +104,7 @@ class OebsDispatcher:
         message=[windowname,objectname,tsp.name,input,tsp.outputval]
         return message
 
-    def dispatcher(self,tsp,input,iris_flag,*message):
+    def dispatcher(self,tsp,input,iris_flag,mythread,*message):
          logger.print_on_console('Keyword is '+tsp.name)
          keyword=tsp.name
          err_msg=None
@@ -240,12 +240,13 @@ class OebsDispatcher:
             if self.action == constants.EXECUTE:
                 if result !=constants.TERMINATE:
                     result=list(result)
+                    screen_details=mythread.json_data['suitedetails'][0]
                     if configvalues['screenShot_Flag'].lower() == 'fail':
                         if result[0].lower() == 'fail':
-                            filepath = screen_shot_obj.captureScreenshot()
+                            filepath = screen_shot_obj.captureScreenshot(screen_details)
                             result.append(filepath[2])
                     elif configvalues['screenShot_Flag'].lower() == 'all':
-                        filepath = screen_shot_obj.captureScreenshot()
+                        filepath = screen_shot_obj.captureScreenshot(screen_details)
                         result.append(filepath[2])
          except TypeError as e:
             err_msg=constants.ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']

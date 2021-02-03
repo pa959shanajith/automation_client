@@ -238,8 +238,30 @@ class OutlookKeywords:
                             if ( recipient.Type == 1 ):
                                 ToMailID += recipient.PropertyAccessor.GetProperty(outlook_constants.PR_SMTP_ADDRESS) + ';'
                         ToMailID = ToMailID[: - 1]
-                        if ( msg.Attachments.Count > 0 ):
+                        attachments_item = msg.Attachments
+                        nbrOfAttachmentInMessage = attachments_item.Count
+                        log.info( "total number of attachments present in the input mail is %s",str(nbrOfAttachmentInMessage) )
+                        x = 1
+                        img_count=0
+                        non_img_count=0
+                        body_image_count=0
+                        while x <= nbrOfAttachmentInMessage:
+                            attachment_item = attachments_item.Item(x)
+                            fn = attachment_item.FileName
+                            log.info( fn )
+                            filename = fn.split('.')
+                            if filename[-1].lower() in ['png','jpg','gif']:
+                                if ('image0' in filename[0]):
+                                    body_image_count=body_image_count+1
+                                else:
+                                    img_count=img_count+1
+                            else:
+                                non_img_count=non_img_count+1
+                            x+=1
+                        if (non_img_count>0 or img_count>0):
                             AttachmentStatus = outlook_constants.ATTACH_STATUS_YES
+                        elif ( body_image_count > img_count and body_image_count > non_img_count ):
+                            AttachmentStatus = outlook_constants.ATTACH_STATUS_NO
                         try:
                                 msg.Display()
                                 Flag = True
@@ -316,7 +338,7 @@ class OutlookKeywords:
                     else:
                         error_msg = 'Invalid Input'
                 if ( Fail_Flag == True ):
-                    logger.print_on_console( 'Error : mail does not have such info' )
+                    error_msg = 'Error : mail does not have such info'
                 if ( error_msg ):
                     log.info( error_msg )
                     logger.print_on_console( error_msg )
@@ -714,6 +736,8 @@ class OutlookKeywords:
                         if ( Flg == True ):
                             status = desktop_constants.TEST_RESULT_PASS
                             method_output = desktop_constants.TEST_RESULT_TRUE
+                        else:
+                            error_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                     except Exception as e:
                         error_msg = desktop_constants.ERROR_MSG + ' : ' + str(e)
                         log.error( error_msg )

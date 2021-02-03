@@ -417,6 +417,8 @@ class StepDescription:
             return 'Clear the cache of browser'
         def refresh():
             return 'Refresh the web page'
+        def getbrowsername():
+            return "Get the name of the browser and save the browser name '"+output+"' in '"+tsp.outputval+"'"
 
         #Element keywords
         def getToolTipText():

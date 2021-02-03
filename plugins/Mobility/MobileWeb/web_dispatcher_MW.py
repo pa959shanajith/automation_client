@@ -175,7 +175,7 @@ class Dispatcher:
         self.exception_flag=''
         self.action=None
 
-    def dispatcher(self,teststepproperty,input,reporting_obj):
+    def dispatcher(self,teststepproperty,input,reporting_obj,mythread):
         objectname = teststepproperty.objectname
         output = teststepproperty.outputval
         objectname = objectname.strip()
@@ -317,7 +317,7 @@ class Dispatcher:
         
         
 
-        def find_browser_info(reporting_obj):
+        def find_browser_info(reporting_obj,mythread):
             #Find the browser type and browser name if driver_obj is not None
             if browser_Keywords_MW.driver_obj is not None:
                 log.info('Finding the browser information')
@@ -410,14 +410,14 @@ class Dispatcher:
                         webelement_map[output]=result[2]
 
                     elif keyword not in [OPEN_BROWSER,CLOSE_BROWSER,GET_POPUP_TEXT,VERIFY_POPUP_TEXT]:
-                        if configvalues['retrieveURL'].lower() == 'yes':
+                        if configvalues['httpStatusCode'].lower() == 'yes':
                             if result[0].lower() == 'fail':
                                 res,value=self.check_url_error_code()
                                 if res:
                                     result=TERMINATE
 
                     elif keyword==OPEN_BROWSER:
-                        find_browser_info(reporting_obj)
+                        find_browser_info(reporting_obj,mythread)
 
 
             else:
@@ -428,12 +428,13 @@ class Dispatcher:
             if self.action == EXECUTE:
                 if result != TERMINATE:
                     result=list(result)
+                    screen_details=mythread.json_data['suitedetails'][0]
                     if configvalues['screenShot_Flag'].lower() == 'fail':
                         if result[0].lower() == 'fail':
-                            file_path = screen_shot_obj.captureScreenshot()
+                            file_path = screen_shot_obj.captureScreenshot(screen_details)
                             result.append(file_path[2])
                     elif configvalues['screenShot_Flag'].lower() == 'all':
-                        file_path = screen_shot_obj.captureScreenshot()
+                        file_path = screen_shot_obj.captureScreenshot(screen_details)
                         result.append(file_path[2])
         except TypeError as e:
             log.error(e,exc_info=True)

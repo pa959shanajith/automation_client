@@ -156,7 +156,7 @@ class UtilOperations:
 
                 methodoutput=TEST_RESULT_TRUE
                 status=TEST_RESULT_PASS
-                log.info('Result is ',output)
+                log.info('Result is %s',output)
                 logger.print_on_console('Result is ',output)
 
             except Exception as e:
@@ -235,7 +235,6 @@ class UtilOperations:
         return status,methodoutput,output,err_msg
 
     def image_similarity_percentage(self,file1,file2):
-
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -283,7 +282,7 @@ class UtilOperations:
                         logger.print_on_console("Image similarity percentage is: "+str((1-err)*100)+"%")
                         methodoutput=TEST_RESULT_TRUE
                         status=TEST_RESULT_PASS
-                        log.info('Result is ',output)
+                        log.info('Result is %s',output)
                         logger.print_on_console('Result is ',output)
             else:
                 err_msg=ERROR_CODE_DICT['ERR_NO_IMAGE_SOURCE']

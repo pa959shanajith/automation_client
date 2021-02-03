@@ -579,9 +579,22 @@ class UtilWebKeywords:
         return status,methodoutput,output,err_msg
 
     def generic_sendfucntion_keys(self,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        output=OUTPUT_CONSTANT
+        err_msg=None
+        result = None
         from sendfunction_keys import SendFunctionKeys
         obj=SendFunctionKeys()
-        obj.sendfunction_keys(input,*args)
+        try:
+            result=obj.sendfunction_keys(input,*args)
+            if result[0]!="Fail":
+                status=TEST_RESULT_PASS
+                methodoutput=TEST_RESULT_TRUE
+        except Exception as e:
+            log.error(e)
+            err_msg = e
+        return status,methodoutput,output,err_msg
 
 
     def sendfunction_keys(self,webelement,input,*args):
@@ -589,6 +602,7 @@ class UtilWebKeywords:
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
+        result = None
         local_uo.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if webelement is not None:
@@ -610,19 +624,23 @@ class UtilWebKeywords:
                         local_uo.log.debug('It is a textbox')
                         #self.generic_sendfucntion_keys(input1.lower(),*args)
                         if(len(input)>1):
-                            self.generic_sendfucntion_keys(input[0],input[1])
+                            #self.generic_sendfucntion_keys(input[0],input[1])
+                            result=self.generic_sendfucntion_keys(*input)
                         else:
-                            self.generic_sendfucntion_keys(input[0],*args)
+                            result = self.generic_sendfucntion_keys(input[0],*args)
                 else:
                     local_uo.log.debug('Calling Generic sendfunction keys')
                     #self.generic_sendfucntion_keys(input.lower(),*args)
                     if(len(input)>1):
-                        self.generic_sendfucntion_keys(input[0],input[1])
+                        #self.generic_sendfucntion_keys(input[0],input[1])
+                        result = self.generic_sendfucntion_keys(*input)
                     else:
-                        self.generic_sendfucntion_keys(input[0],*args)
-                browser_Keywords.BrowserKeywords.update_window_handles()
-                status=TEST_RESULT_PASS
-                methodoutput=TEST_RESULT_TRUE
+                        result = self.generic_sendfucntion_keys(input[0],*args)
+                if result[0]!="Fail":
+                    winhandcheck=browser_Keywords.BrowserKeywords()
+                    winhandcheck.update_window_handles()
+                    status=TEST_RESULT_PASS
+                    methodoutput=TEST_RESULT_TRUE     
         except ElementNotInteractableException as ex:
             err_msg='Element is not interactable'
             logger.print_on_console(ex)
@@ -694,17 +712,16 @@ class UtilWebKeywords:
                         webelement=cell
                         if cell.is_enabled():
                             ele_coordinates=cell.location
-                            logger.print_on_console(ele_coordinates)
+                            local_uo.log.debug(ele_coordinates)
                             hwnd=win32gui.GetForegroundWindow()
                             local_uo.log.debug('Handle found ')
                             local_uo.log.debug(hwnd)
                             if isinstance(browser_Keywords.local_bk.driver_obj,webdriver.Firefox):
                                 info_msg='Firefox browser'
                                 local_uo.log.info(info_msg)
-                                logger.print_on_console(info_msg)
                                 javascript = "return window.mozInnerScreenY"
                                 value=browser_Keywords.local_bk.driver_obj.execute_script(javascript)
-                                logger.print_on_console(value)
+                                local_uo.log.debug(value)
                                 offset=int(value)
                                 robot=pyrobot.Robot()
                                 robot.set_mouse_pos(int(ele_coordinates.get('x')+9),int(ele_coordinates.get('y')+offset-5))
@@ -719,17 +736,17 @@ class UtilWebKeywords:
                             else:
                                 utils=Utils()
                                 utils.enumwindows()
-                                logger.print_on_console("UTIL WIND")
+                                local_uo.log.debug("UTIL WIND")
                                 rect=utils.rect
                                 robot=pyrobot.Robot()
                                 local_uo.log.debug('Setting the mouse position')
-                                logger.print_on_console('before loc')
+                                local_uo.log.debug('before loc')
                                 location=utils.get_element_location(webelement)
-                                logger.print_on_console(location)
+                                local_uo.log.debug(location)
                                 robot.set_mouse_pos(int(location.get('x'))+9,int(location.get('y')+rect[1]+6))
-                                logger.print_on_console('after loc')
+                                local_uo.log.debug('after loc')
                                 robot.mouse_down('left')
-                                logger.print_on_console('button press')
+                                local_uo.log.debug('button press')
                                 robot.mouse_up('left')
                                 status=TEST_RESULT_PASS
                                 methodoutput=TEST_RESULT_TRUE

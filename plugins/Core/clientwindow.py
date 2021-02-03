@@ -352,6 +352,7 @@ class ClientWindow(wx.Frame):
         log.info(msg)
         controller.terminate_flag=True
         controller.manual_terminate_flag=True
+        core.termination_inprogress = True
         #Calling AWS stop job on terminate (if present)
         try:
             root.testthread.con.aws_obj.stop_job()
@@ -361,7 +362,7 @@ class ClientWindow(wx.Frame):
         try:
             import script_generator
             scl_ops = script_generator.Sauce_Config()
-            conf= scl_ops.get_sauceconf()
+            _ = scl_ops.get_sauceconf()
             sc = scl_ops.get_sauceclient()
             j = scl_ops.get_saucejobs(sc)
             all_jobs = j.get_jobs(full=None,limit=2)
@@ -621,6 +622,15 @@ class Config_window(wx.Frame):
         else:
             self.log_file_path.SetValue(isConfigJson['logFile_Path'])
 
+        self.sev_cert=wx.StaticText(self.panel, label="Server Certificate", pos=config_fields["S_cert"][0],size=config_fields["S_cert"][1], style=0, name="")
+        self.server_cert=wx.TextCtrl(self.panel, pos=config_fields["S_cert"][2], size=config_fields["S_cert"][3])
+        self.server_cert_btn=wx.Button(self.panel, label="...",pos=config_fields["S_cert"][4], size=config_fields["S_cert"][5])
+        self.server_cert_btn.Bind(wx.EVT_BUTTON, self.fileBrowser_servcert)
+        if (not isConfigJson) or (isConfigJson and isConfigJson['server_cert']=='./assets/CA_BUNDLE/server.crt'):
+            self.server_cert.SetValue(os.path.normpath(CERTIFICATE_PATH + '/server.crt'))
+        else:
+            self.server_cert.SetValue(isConfigJson['server_cert'])
+
         font_italic = wx.Font(10, wx.DEFAULT, wx.FONTSTYLE_ITALIC, wx.NORMAL)
         self.qu_timeout=wx.StaticText(self.panel, label="Query Timeout", pos=config_fields["Q_timeout"][0],size=config_fields["Q_timeout"][1], style=0, name="")
         self.query_timeout=wx.TextCtrl(self.panel, pos=config_fields["Q_timeout"][2], size=config_fields["Q_timeout"][3])
@@ -655,18 +665,6 @@ class Config_window(wx.Frame):
         else:
             self.delay.SetValue("0.3")
 
-        #Delay input box kept for provide the delay in typestring.
-        self.delay_stringinput=wx.StaticText(self.panel, label="Delay for String Input", pos=config_fields["Delay_Stringinput"][0],size=config_fields["Delay_Stringinput"][1], style=0, name="")
-        self.Delay_input=wx.TextCtrl(self.panel, pos=config_fields["Delay_Stringinput"][2], size=config_fields["Delay_Stringinput"][3])
-        if isConfigJson['delay_stringinput']=="":
-            self.Delay_input.SetValue("sec")
-            self.Delay_input.SetFont(font_italic)
-            self.Delay_input.SetForegroundColour('#848484')
-        elif isConfigJson!=False:
-            self.Delay_input.SetValue(isConfigJson['delay_stringinput'])
-        else:
-            self.Delay_input.SetValue("0.005")
-
         self.stepExecWait=wx.StaticText(self.panel, label="Step Execution Wait", pos=config_fields["Step_exec"][0],size=config_fields["Step_exec"][1], style=0, name="")
         self.step_exe_wait=wx.TextCtrl(self.panel, pos=config_fields["Step_exec"][2], size=config_fields["Step_exec"][3])
         if isConfigJson['stepExecutionWait']=="":
@@ -687,15 +685,6 @@ class Config_window(wx.Frame):
         else:
             self.disp_var_timeout.SetValue(isConfigJson['displayVariableTimeOut'])
 
-        self.sev_cert=wx.StaticText(self.panel, label="Server Certificate", pos=config_fields["S_cert"][0],size=config_fields["S_cert"][1], style=0, name="")
-        self.server_cert=wx.TextCtrl(self.panel, pos=config_fields["S_cert"][2], size=config_fields["S_cert"][3])
-        self.server_cert_btn=wx.Button(self.panel, label="...",pos=config_fields["S_cert"][4], size=config_fields["S_cert"][5])
-        self.server_cert_btn.Bind(wx.EVT_BUTTON, self.fileBrowser_servcert)
-        if (not isConfigJson) or (isConfigJson and isConfigJson['server_cert']=='./assets/CA_BUNDLE/server.crt'):
-            self.server_cert.SetValue(os.path.normpath(CERTIFICATE_PATH + '/server.crt'))
-        else:
-            self.server_cert.SetValue(isConfigJson['server_cert'])
-
         self.connection_timeout=wx.StaticText(self.panel, label="Connection Timeout", pos=config_fields["C_Timeout"][0],size=config_fields["C_Timeout"][1], style=0, name="")
         self.conn_timeout=wx.TextCtrl(self.panel, id=9, pos=config_fields["C_Timeout"][2], size=config_fields["C_Timeout"][3])
         if isConfigJson!=False and int(isConfigJson['connection_timeout'])>=8:
@@ -703,9 +692,20 @@ class Config_window(wx.Frame):
         else:
             self.conn_timeout.SetValue("0")
 
+        #Delay input box kept for provide the delay in typestring.
+        self.delay_stringinput=wx.StaticText(self.panel, label="Delay for String Input", pos=config_fields["Delay_Stringinput"][0],size=config_fields["Delay_Stringinput"][1], style=0, name="")
+        self.Delay_input=wx.TextCtrl(self.panel, pos=config_fields["Delay_Stringinput"][2], size=config_fields["Delay_Stringinput"][3])
+        if isConfigJson['delay_stringinput']=="":
+            self.Delay_input.SetValue("sec")
+            self.Delay_input.SetFont(font_italic)
+            self.Delay_input.SetForegroundColour('#848484')
+        elif isConfigJson!=False:
+            self.Delay_input.SetValue(isConfigJson['delay_stringinput'])
+        else:
+            self.Delay_input.SetValue("0.005")
+
         self.config_param=wx.StaticText(self.panel,label="Config Parameters",pos=(10,290),size=(100,30), style=0, name="")
         font = wx.Font(9, wx.DEFAULT, wx.NORMAL, wx.NORMAL)
-        #font.SetUnderlined(True)
         self.config_param.SetFont(font)
 
         #ToolTips for static texts boxes
@@ -757,9 +757,27 @@ class Config_window(wx.Frame):
         lblList2 = ['64-bit', '32-bit']
         lblList3 = ['All', 'Fail']
         lblList4 = ['False', 'True']
+        lblList5 = ['High', 'Med', 'Low']
         self.bSizer = wx.BoxSizer( wx.VERTICAL )
 
-        self.rbox1 = wx.RadioBox(self.panel1, label = 'Ignore Certificate', choices = lblList,
+        self.rbox9 = wx.RadioBox(self.panel1, label = 'TLS Security Level', choices = lblList5,
+            majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
+        if isConfigJson!=False:
+            tls_level_val = isConfigJson['tls_security'].title()
+            if tls_level_val == lblList5[1]:
+                self.rbox9.SetSelection(1)
+            elif tls_level_val == lblList5[2]:
+                self.rbox9.SetSelection(2)
+            else:
+                self.rbox9.SetSelection(0)
+        else:
+            self.rbox9.SetSelection(0)
+        self.rbox9.SetToolTip(wx.ToolTip("Gives the user an option to bypass TLS certificate verification and/or" +
+            " hostname verification of Avo Assure in case of unavailability of a valid certificate." +
+            "\nHigh: Enforce TLS Certificate and Hostname Verification\nMed: Enforce TLS Certificate and" + 
+            " Disable Hostname Verification\nLow: Disable TLS Certificate and Hostname Verification"))
+
+        self.rbox1 = wx.RadioBox(self.panel1, label = 'Ignore AUT Certificate', choices = lblList,
             majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
         self.rbox1.SetToolTip(wx.ToolTip("Indicates if the errors of the AUT website's security certificates are to be ignored or not. It is applicable only for IE"))
         if isConfigJson!=False and isConfigJson['ignore_certificate'].title()==lblList[0]:
@@ -774,14 +792,6 @@ class Config_window(wx.Frame):
         else:
             self.rbox2.SetSelection(0)
         self.rbox2.SetToolTip(wx.ToolTip("Checks if the Client machine is a 64-bit machine or 32-bit"))
-
-        self.rbox9 = wx.RadioBox(self.panel1, label = 'Disable Server Cert Check', choices = lblList,
-            majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
-        if isConfigJson!=False and isConfigJson['disable_server_cert'].title() == lblList[0]:
-            self.rbox9.SetSelection(0)
-        else:
-            self.rbox9.SetSelection(1)
-        self.rbox9.SetToolTip(wx.ToolTip("Gives the user an option to bypass certificate verification of secure websites in case of unavailability of a valid certificate"))
 
         self.rbox5 = wx.RadioBox(self.panel1, label = 'Exception Flag',choices = lblList4,
             majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
@@ -807,9 +817,9 @@ class Config_window(wx.Frame):
             self.rbox3.SetSelection(0)
         self.rbox3.SetToolTip(wx.ToolTip("Facilitates capturing the screenshots of the test steps based on its value"))
 
-        self.rbox4 = wx.RadioBox(self.panel1, label = 'Retrieve URL', choices = lblList,
+        self.rbox4 = wx.RadioBox(self.panel1, label = 'HTTP Status Code Check', choices = lblList,
             majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
-        if isConfigJson!=False and isConfigJson['retrieveURL'].title()!=lblList[0]:
+        if isConfigJson!=False and isConfigJson['httpStatusCode'].title()!=lblList[0]:
             self.rbox4.SetSelection(1)
         else:
             self.rbox4.SetSelection(0)
@@ -902,7 +912,7 @@ class Config_window(wx.Frame):
 
         #Adding GridSizer which will show the radio buttons into grid of 9 rows and 2 colums it can be changed based on the requirements
         self.gs=wx.GridSizer(9,2,5,5)
-        self.gs.AddMany([(self.rbox1,0,wx.EXPAND), (self.rbox2,0,wx.EXPAND), (self.rbox9,0,wx.EXPAND),
+        self.gs.AddMany([(self.rbox9,0,wx.EXPAND), (self.rbox1,0,wx.EXPAND), (self.rbox2,0,wx.EXPAND),
             (self.rbox5,0,wx.EXPAND), (self.rbox6,0,wx.EXPAND), (self.rbox3,0,wx.EXPAND),
             (self.rbox4,0,wx.EXPAND), (self.rbox8,0,wx.EXPAND), (self.rbox7,0,wx.EXPAND),
             (self.rbox10,0,wx.EXPAND), (self.rbox11,0,wx.EXPAND), (self.rbox12,0,wx.EXPAND),
@@ -921,7 +931,7 @@ class Config_window(wx.Frame):
         self.close_btn.Bind(wx.EVT_BUTTON, self.close)
         self.Bind(wx.EVT_CLOSE, self.close)
 
-        if wxObject.connectbutton.GetName().lower() != "connect":
+        if wxObject.connectbutton.GetName().lower() == "disconnect":
             self.sev_add.Enable(False)
             self.server_add.Enable(False)
             self.sev_port.Enable(False)
@@ -929,6 +939,7 @@ class Config_window(wx.Frame):
             self.sev_cert.Enable(False)
             self.server_cert.Enable(False)
             self.server_cert_btn.Enable(False)
+            self.rbox9.Enable(False)
 
         self.Centre()
         wx.Frame(self.panel)
@@ -972,12 +983,10 @@ class Config_window(wx.Frame):
     def config_check(self,event):
         data = {}
         config_data={}
-        bit_64='Yes'
         ignore_certificate=self.rbox1.GetStringSelection()
-        if self.rbox2.GetStringSelection()!='64-bit':
-            bit_64='No'
+        bit_64=self.rbox2.GetStringSelection()
         screenShot_Flag=self.rbox3.GetStringSelection()
-        retrieveURL=self.rbox4.GetStringSelection()
+        httpStatusCode=self.rbox4.GetStringSelection()
         exception_flag=self.rbox5.GetStringSelection()
         ignoreVisibilityCheck=self.rbox6.GetStringSelection()
         enableSecurityCheck=self.rbox7.GetStringSelection()
@@ -994,7 +1003,7 @@ class Config_window(wx.Frame):
         displayVariableTimeOut=self.disp_var_timeout.GetValue()
         server_cert=self.server_cert.GetValue()
         browser_check=self.rbox8.GetStringSelection()
-        disable_server_cert=self.rbox9.GetStringSelection()
+        tls_security=self.rbox9.GetStringSelection()
         highlight_check=self.rbox10.GetStringSelection()
         iris_prediction = self.rbox11.GetStringSelection()
         hide_soft_key = self.rbox12.GetStringSelection()
@@ -1016,21 +1025,21 @@ class Config_window(wx.Frame):
         data['chrome_path'] = chrome_path.strip() if chrome_path.strip().lower()!='default' else 'default'
         data['chrome_profile'] = chrome_profile.strip() if chrome_profile.strip().lower()!='default' else 'default'
         data['firefox_path'] = firefox_path.strip() if firefox_path.strip().lower()!='default' else 'default'
-        data['bit_64'] = bit_64.strip()
+        data['bit_64'] = 'Yes' if bit_64.strip()=='64-bit' else 'No'
         data['logFile_Path'] = logFile_Path.strip()
         data['screenShot_Flag'] = screenShot_Flag.strip()
         data['queryTimeOut'] = queryTimeOut.strip()
         data['timeOut'] = time_out.strip()
         data['stepExecutionWait'] = stepExecutionWait.strip()
         data['displayVariableTimeOut'] = displayVariableTimeOut.strip()
-        data['retrieveURL'] = retrieveURL.strip()
+        data['httpStatusCode'] = httpStatusCode.strip()
         data['delay'] = delay.strip()
         data['ignoreVisibilityCheck'] = ignoreVisibilityCheck.strip()
         data['enableSecurityCheck'] = enableSecurityCheck.strip()
         data['exception_flag'] = exception_flag.strip().lower()
         data['server_cert'] =server_cert.strip()
         data['browser_check']=browser_check.strip()
-        data['disable_server_cert'] = disable_server_cert.strip()
+        data['tls_security'] = tls_security.strip()
         data['highlight_check'] = highlight_check.strip()
         data['prediction_for_iris_objects'] = iris_prediction.strip()
         data['hide_soft_key'] = hide_soft_key.strip()
@@ -1045,7 +1054,8 @@ class Config_window(wx.Frame):
         if (data['server_ip']!='' and data['server_port']!='' and data['server_cert']!='' and
             data['chrome_path']!='' and data['queryTimeOut'] not in ['','sec'] and data['logFile_Path']!='' and
             data['delay'] not in ['','sec'] and data['timeOut'] not in ['','sec'] and data['stepExecutionWait'] not in ['','sec'] and
-            data['displayVariableTimeOut'] not in ['','sec'] and data['delay_stringinput'] not in ['','sec'] and data['firefox_path']!='' and  data['connection_timeout'] not in ['','0 or >=8 hrs']):
+            data['displayVariableTimeOut'] not in ['','sec'] and data['delay_stringinput'] not in ['','sec'] and
+            data['firefox_path']!='' and data['connection_timeout'] not in ['','0 or >=8 hrs']):
             #---------------------------------------resetting the static texts
             self.error_msg.SetLabel("")
             self.sev_add.SetLabel('Server Address')

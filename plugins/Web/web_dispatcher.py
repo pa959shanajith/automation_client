@@ -183,7 +183,8 @@ class Dispatcher:
             'navigatewithauthenticate':local_Wd.browser_object.navigate_with_authenticate,
             'navigateback':local_Wd.browser_object.navigate_back,
             'opennewtab':local_Wd.browser_object.openNewTab,
-            'execute_js':local_Wd.browser_object.execute_js
+            'execute_js':local_Wd.browser_object.execute_js,
+            'getbrowsername': local_Wd.browser_object.getBrowserName
         }
         self.exception_flag=''
         self.action=None
@@ -354,7 +355,7 @@ class Dispatcher:
             return webelement
 
 
-        def find_browser_info(reporting_obj):
+        def find_browser_info(reporting_obj,mythread):
             #Find the browser type and browser name if driver_obj is not None
             if browser_Keywords.local_bk.driver_obj is not None:
                 local_Wd.log.info('Finding the browser information')
@@ -443,13 +444,13 @@ class Dispatcher:
                     if keyword == GET_INNER_TABLE and (output != '' and output.startswith('{') and output.endswith('}')):
                         local_Wd.webelement_map[output]=result[2]
                     elif keyword not in [OPEN_BROWSER,CLOSE_BROWSER,GET_POPUP_TEXT,VERIFY_POPUP_TEXT]:
-                        if configvalues['retrieveURL'].lower() == 'yes':
+                        if configvalues['httpStatusCode'].lower() == 'yes':
                             if result[0].lower() == 'fail':
                                 res,_=self.check_url_error_code()
                                 if res:
                                     result=TERMINATE
                     elif keyword==OPEN_BROWSER:
-                        find_browser_info(reporting_obj)
+                        find_browser_info(reporting_obj,mythread)
 
             else:
                 err_msg=INVALID_KEYWORD
@@ -460,14 +461,15 @@ class Dispatcher:
             if self.action == EXECUTE:
                 if result != TERMINATE:
                     result=list(result)
+                    screen_details=mythread.json_data['suitedetails'][0]
                     if configvalues['screenShot_Flag'].lower() == 'fail':
                         if result[0].lower() == 'fail':
-                            file_path = screen_shot_obj.captureScreenshot()
+                            file_path = screen_shot_obj.captureScreenshot(screen_details)
                             if headless_mode:
                                 driver.save_screenshot(file_path[2])
                             result.append(file_path[2])
                     elif configvalues['screenShot_Flag'].lower() == 'all':
-                        file_path = screen_shot_obj.captureScreenshot()
+                        file_path = screen_shot_obj.captureScreenshot(screen_details)
                         if headless_mode:
                             driver.save_screenshot(file_path[2])
                         result.append(file_path[2])
