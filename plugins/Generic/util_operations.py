@@ -308,8 +308,8 @@ class UtilOperations:
         try:
             log.debug('reading the inputs')
             if input1 != None and input2 != None and input1 != '' and input2 != '' :
-#                input1=str(input1).replace('\n','').replace('\r','')
-#                input2=str(input2).replace('\n','').replace('\r','')
+                # input1=str(input1).replace('\n','').replace('\r','')
+                # input2=str(input2).replace('\n','').replace('\r','')
                 if input1==input2:
                     log.debug('Values are equal')
                     logger.print_on_console('Values are equal')
@@ -363,7 +363,30 @@ class UtilOperations:
             logger.print_on_console(err_msg)
         return status,result,output,err_msg
 
-
-
-
-
+    def nullCheck(self,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        output=OUTPUT_CONSTANT
+        err_msg=None
+        ncFlag=False
+        try:
+            if not (args is None or args is ''):
+                input_list=list(args)
+                y=input_list[0]
+                if y == None or y == "null":
+                    ncFlag = True
+                    methodoutput = ncFlag
+                    status=TEST_RESULT_PASS
+                    status_msg = "Null value is present in the given input"
+                    logger.print_on_console(status_msg)
+                else:
+                    err_msg = "Null value is not present in the given input"
+            else:
+                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+        except Exception as e:
+            log.error(e)
+            logger.print_on_console(e)
+            err_msg="Error checking null value"
+        if err_msg!=None:
+            logger.print_on_console(err_msg)
+        return status,methodoutput,output,err_msg

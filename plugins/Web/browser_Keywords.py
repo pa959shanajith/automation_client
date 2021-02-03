@@ -1155,7 +1155,7 @@ class Singleton_DriverUtil():
                 else:
                     iepath = webconstants.IE_DRIVER_PATH_64
                 driver = webdriver.Ie(capabilities=caps,executable_path=iepath)
-                controller.process_ids.append(driver.service.process.pid)
+                controller.process_ids.append(driver.iedriver.process.pid)
                 # browser_ver=driver.capabilities['version']
                 # browser_ver1 = browser_ver.encode('utf-8')
                 # browser_ver = int(browser_ver1)

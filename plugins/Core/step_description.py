@@ -191,6 +191,10 @@ class StepDescription:
         def pause():
             return 'Pause the application until the user interrupts'
 
+        #null check keyword
+        def nullcheck():
+            return "Perform Null check for the given input '"+str(inputval[0]) + "'"
+
         #Dynamic variable keywords
         def createdynvariable():
             return "Create a variable '"+str(inputval[0])+"' with value '"+ str(inputval[1]) + "'"

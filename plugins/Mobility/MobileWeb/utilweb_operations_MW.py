@@ -675,84 +675,145 @@ class UtilWebKeywords:
         return status,methodoutput,output,err_msg
 
     def get_attribute_value(self,webelement,input,*args):
-        # get_attribute_value
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         err_msg=None
         output=None
         attr_name=input[0]
-        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        eleStatus=False
+        local_uo.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
-            if webelement != None and webelement !='':
-                log.info(INPUT_IS)
-                log.info(input)
-                if len(input)<2 and attr_name:
-                    if attr_name != 'required':
-                        output = webelement.get_attribute(attr_name)
+            if(len(input)==3):
+                row_number=int(input[1])-1
+                col_number=int(input[2])-1
+                from table_keywords import TableOperationKeywords
+                tableops = TableOperationKeywords()
+                cell=tableops.javascriptExecutor(webelement,row_number,col_number)
+                element_list=cell.find_elements_by_xpath('.//*')
+                if len(list(element_list))>0:
+                    xpath=tableops.getElemntXpath(element_list[0])
+                    cell=browser_Keywords.local_bk.driver_obj.find_element_by_xpath(xpath)
+                if(cell!=None):
+                    webelement=cell
+                    eleStatus=True
+            elif(len(input)>3):
+                webelement1=None
+                row_number=int(input[1])-1
+                col_number=int(input[2])-1
+                tag=input[3].lower()
+                index=int(input[4])
+                eleStatus, webelement1=self.get_table_cell(webelement, row_number, col_number, tag, index)
+                if(webelement1):
+                    webelement=webelement1
+                
+            if(eleStatus or len(input)==1):
+                if webelement != None and webelement !='':
+                    local_uo.log.info(INPUT_IS)
+                    local_uo.log.info(input)
+                    if attr_name:
+                        if attr_name != 'required':
+                            output = webelement.get_attribute(attr_name)
+                        else:
+                            output = browser_Keywords.local_bk.driver_obj.execute_script("return arguments[0].getAttribute('required')",webelement)
+                        if output != None and output !='':
+                            logger.print_on_console('Output: ',output)
+                            status = TEST_RESULT_PASS
+                            methodoutput = TEST_RESULT_TRUE
+                        else:
+                            err_msg = 'Attribute does not exists'
+                            logger.print_on_console(err_msg)
+                            local_uo.log.error(err_msg)
                     else:
-                        output = browser_Keywords_MW.driver_obj.execute_script("return arguments[0].getAttribute('required')",webelement)
-                    if output != None and output !='':
-                        logger.print_on_console('Output: ',output)
-                        status = TEST_RESULT_PASS
-                        methodoutput = TEST_RESULT_TRUE
-                    else:
-                        err_msg = 'Attribute does not exists'
-                else:
-                    err_msg = 'Failed to fetch the attribute value/Number of inputs exceeded'
+                        err_msg = 'Failed to fetch the attribute value.'
+                        logger.print_on_console(err_msg)
+                        local_uo.log.error(err_msg)
         except Exception as e:
             err_msg = 'Error occured while fetching attribute value'
-            log.error(e)
-        if err_msg is not None:
             logger.print_on_console(err_msg)
-            log.error(err_msg)
+            local_uo.log.error(e)
         return status,methodoutput,output,err_msg
 
     def verify_attribute(self,webelement,input,*args):
-        # verify_attribute
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         err_msg=None
+        eleStatus=False
+        original_attr=None
         output=OUTPUT_CONSTANT
         attr_name=input[0]
-        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        local_uo.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
-            if webelement != None and webelement !='':
-                log.info(INPUT_IS)
-                log.info(input)
-                if len(input)<3 and attr_name:
-                    if attr_name != 'required':
-                        output = webelement.get_attribute(attr_name)
-                    else:
-                        output = browser_Keywords_MW.driver_obj.execute_script("return arguments[0].getAttribute('required')",webelement)
-                    if output != None and output !='':
-                        log.info(output)
-                        if len(input)>1:
-                            result = input[1]
-                            if output == result:
-                                log.info('Attribute values matched')
-                                logger.print_on_console('Attribute values matched')
+            if(len(input)==4):
+                row_number=int(input[2])-1
+                col_number=int(input[3])-1
+                from table_keywords import TableOperationKeywords
+                tableops = TableOperationKeywords()
+                cell=tableops.javascriptExecutor(webelement,row_number,col_number)
+                element_list=cell.find_elements_by_xpath('.//*')
+                if len(list(element_list))>0:
+                    xpath=tableops.getElemntXpath(element_list[0])
+                    cell=browser_Keywords.local_bk.driver_obj.find_element_by_xpath(xpath)
+                if(cell!=None):
+                    webelement=cell
+                    eleStatus=True
+
+            elif(len(input)>4):
+                webelement1=None
+                row_number=int(input[2])-1
+                col_number=int(input[3])-1
+                tag=input[4].lower()
+                index=int(input[5])+1
+                eleStatus, webelement1=self.get_table_cell(webelement, row_number, col_number, tag, index)
+                if(webelement1):
+                    webelement=webelement1
+
+            if(eleStatus or len(input)<=2):
+                if webelement != None and webelement !='':
+                    local_uo.log.info(INPUT_IS)
+                    local_uo.log.info(input)
+                    if attr_name:
+                        if attr_name != 'required':
+                            original_attr = webelement.get_attribute(attr_name)
+                        else:
+                            original_attr = browser_Keywords.local_bk.driver_obj.execute_script("return arguments[0].getAttribute('required')",webelement)
+                        if original_attr != None and original_attr !='':
+                            local_uo.log.info(original_attr)
+                            if len(input)==2 and input[1] != '':
+                                result = input[1]
+                                if original_attr == result:
+                                    local_uo.log.info('Attribute values matched')
+                                    logger.print_on_console('Attribute values matched')
+                                    status = TEST_RESULT_PASS
+                                    methodoutput = TEST_RESULT_TRUE
+                                else:
+                                    err_msg = 'Attribute values does not match'
+                                    logger.print_on_console(err_msg)
+                                    local_uo.log.error(err_msg)
+                            else:
+                                local_uo.log.info('Attribute exists')
+                                logger.print_on_console('Attribute exists')
                                 status = TEST_RESULT_PASS
                                 methodoutput = TEST_RESULT_TRUE
-                            else:
-                                err_msg = 'Attribute values does not match'
                         else:
-                            log.info('Attribute exists')
-                            logger.print_on_console('Attribute exists')
-                            status = TEST_RESULT_PASS
-                            methodoutput = TEST_RESULT_TRUE
+                            err_msg = 'Attribute does not exixts'
+                            logger.print_on_console(err_msg)
+                            local_uo.log.error(err_msg)
                     else:
-                        err_msg = 'Attribute does not exixts'
+                        err_msg = 'Input is empty.'
+                        logger.print_on_console(err_msg)
+                        local_uo.log.error(err_msg)
                 else:
-                    err_msg = 'Input is empty/Number of inputs exceeded'
+                    err_msg = 'Web element not found'
+                    logger.print_on_console(err_msg)
+                    local_uo.log.error(err_msg)
         except NoSuchAttributeException as ex:
             err_msg = 'Attribute does not exixts'
-            log.error(ex)
+            logger.print_on_console(err_msg)
+            local_uo.log.error(ex)
         except Exception as e:
             err_msg = 'Error occured while verifying attribute'
-            log.error(e)
-        if err_msg is not None:
             logger.print_on_console(err_msg)
-            log.error(err_msg)
+            local_uo.log.error(e)
         return status,methodoutput,output,err_msg
 
 
