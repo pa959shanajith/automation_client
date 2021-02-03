@@ -142,6 +142,7 @@ class GenericKeywordDispatcher:
             'modifyvalue':local_generic.dyn_var_obj.modify_value,
             'deletedynvariable':local_generic.dyn_var_obj.delete_dyn_value,
             'displayvariablevalue':local_generic.generic_delay.display_variable_value,
+            'nullcheck':local_generic.util_operation_obj.nullCheck,
             'verifyvalues':local_generic.util_operation_obj.verify_values,
             'getindexcount':local_generic.util_operation_obj.getIndexCount,
             'writewordfile': local_generic.generic_word.writeWordFile,
