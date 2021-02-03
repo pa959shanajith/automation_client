@@ -36,7 +36,6 @@ local_cont = threading.local()
 terminate_flag=False
 manual_terminate_flag=False
 pause_flag=False
-iris_flag = True
 iris_constant_step = -1
 socket_object = None
 saucelabs_count = 0
@@ -161,8 +160,7 @@ class Controller():
     def __load_oebs(self):
         try:
             core_utils.get_all_the_imports('Oebs')
-            if iris_flag:
-                core_utils.get_all_the_imports('IRIS')
+            core_utils.get_all_the_imports('IRIS')
             import oebs_dispatcher
             self.oebs_dispatcher_obj = oebs_dispatcher.OebsDispatcher()
             self.oebs_dispatcher_obj.exception_flag=self.exception_flag
@@ -177,8 +175,7 @@ class Controller():
             core_utils.get_all_the_imports('WebScrape')
             core_utils.get_all_the_imports('Web')
             core_utils.get_all_the_imports('Saucelabs')
-            if iris_flag:
-                core_utils.get_all_the_imports('IRIS')
+            core_utils.get_all_the_imports('IRIS')
             import web_dispatcher
             import web_accessibility_testing
             local_cont.web_dispatcher_obj = web_dispatcher.Dispatcher()
@@ -192,8 +189,7 @@ class Controller():
     def __load_desktop(self):
         try:
             core_utils.get_all_the_imports('Desktop')
-            if iris_flag:
-                core_utils.get_all_the_imports('IRIS')
+            core_utils.get_all_the_imports('IRIS')
             import desktop_dispatcher
             self.desktop_dispatcher_obj = desktop_dispatcher.DesktopDispatcher()
             self.desktop_dispatcher_obj.exception_flag=self.exception_flag
@@ -205,8 +201,7 @@ class Controller():
     def __load_sap(self):
         try:
             core_utils.get_all_the_imports('SAP')
-            if iris_flag:
-                core_utils.get_all_the_imports('IRIS')
+            core_utils.get_all_the_imports('IRIS')
             import sap_dispatcher
             self.sap_dispatcher_obj = sap_dispatcher.SAPDispatcher()
             self.sap_dispatcher_obj.exception_flag=self.exception_flag
@@ -577,7 +572,7 @@ class Controller():
                     else:
                         keyword_lower = tsp.name.lower()
                         #list containing keywords that should not print output on console, add keyword here to stop printing
-                        #Fix for #17330 Addition of getAllValues in exception_list 
+                        #Fix for #17330 Addition of getAllValues in exception_list
                         exception_list = ['getxmlblockdata','findimageinpdf','comparepdfs','getallvalues']
                         if (tsp.apptype.lower()!='desktop' and keyword_lower not in exception_list) : logger.print_on_console('Result obtained is ',",".join([str(display_keyword_response[local_cont.i])
                         if not isinstance(display_keyword_response[local_cont.i],str) else display_keyword_response[local_cont.i] for local_cont.i in range(len(display_keyword_response))]))
@@ -684,7 +679,7 @@ class Controller():
                     #Web apptype module call
                     if local_cont.web_dispatcher_obj == None:
                         self.__load_web()
-                    result = self.invokewebkeyword(teststepproperty,local_cont.web_dispatcher_obj,inpval,args[0],iris_flag)
+                    result = self.invokewebkeyword(teststepproperty,local_cont.web_dispatcher_obj,inpval,args[0])
                 elif teststepproperty.apptype.lower() == APPTYPE_MOBILE:
                     #MobileWeb apptype module call
                     if self.mobile_web_dispatcher_obj == None:
@@ -694,7 +689,7 @@ class Controller():
                     #MobileApp apptype module call
                     if self.mobile_app_dispatcher_obj==None:
                         self.__load_mobile_app()
-                    result = self.invokemobileappkeyword(teststepproperty,self.mobile_app_dispatcher_obj,inpval,args[0], iris_flag)
+                    result = self.invokemobileappkeyword(teststepproperty,self.mobile_app_dispatcher_obj,inpval,args[0])
                 elif teststepproperty.apptype.lower() == APPTYPE_WEBSERVICE:
                     #Webservice apptype module call
                     if self.webservice_dispatcher_obj == None:
@@ -704,19 +699,19 @@ class Controller():
                     #Desktop apptype module call
                     if self.desktop_dispatcher_obj == None:
                         self.__load_desktop()
-                    result = self.invokeDesktopkeyword(teststepproperty,self.desktop_dispatcher_obj,inpval,iris_flag)
+                    result = self.invokeDesktopkeyword(teststepproperty,self.desktop_dispatcher_obj,inpval)
                     #----------------------------------------------------------------------------------------------SAP change
                 elif teststepproperty.apptype.lower() == APPTYPE_SAP:
                     #SAP apptype module call
                     if self.sap_dispatcher_obj == None:
                         self.__load_sap()
-                    result = self.invokeSAPkeyword(teststepproperty,self.sap_dispatcher_obj,inpval,iris_flag)
+                    result = self.invokeSAPkeyword(teststepproperty,self.sap_dispatcher_obj,inpval)
                 #----------------------------------------------------------------------------------------------SAP change
                 elif teststepproperty.apptype.lower() == APPTYPE_DESKTOP_JAVA:
                     #OEBS apptype module call
                     if self.oebs_dispatcher_obj == None:
                         self.__load_oebs()
-                    result = self.invokeoebskeyword(teststepproperty,self.oebs_dispatcher_obj,inpval,iris_flag)
+                    result = self.invokeoebskeyword(teststepproperty,self.oebs_dispatcher_obj,inpval)
             #----------------------------------------------------------------------------------------------Mainframe change
                 elif teststepproperty.apptype.lower() == APPTYPE_MAINFRAME:
                     #Mainframe apptype module call
@@ -728,7 +723,7 @@ class Controller():
                     #pdf apptype module call
                     if self.pdf_dispatcher_obj == None:
                         self.__load_pdf()
-                    result = self.invokepdfkeyword(teststepproperty,self.pdf_dispatcher_obj,inpval,iris_flag)
+                    result = self.invokepdfkeyword(teststepproperty,self.pdf_dispatcher_obj,inpval)
 			#Fixed issue num #389 (Taiga)
             temp_result=result
             if result!=TERMINATE:
@@ -853,8 +848,8 @@ class Controller():
         res = dispatcher_obj.dispatcher(teststepproperty,inputval)
         return res
 
-    def invokeoebskeyword(self,teststepproperty,dispatcher_obj,inputval,iris_flag):
-        res = dispatcher_obj.dispatcher(teststepproperty,inputval,iris_flag,self.conthread)
+    def invokeoebskeyword(self,teststepproperty,dispatcher_obj,inputval):
+        res = dispatcher_obj.dispatcher(teststepproperty,inputval,self.conthread)
         return res
 
     def invokewebservicekeyword(self,teststepproperty,dispatcher_obj,inputval,socket_object):
@@ -867,32 +862,32 @@ class Controller():
         res = dispatcher_obj.dispatcher(teststepproperty,socket_object,*inputval)
         return res
 
-    def invokewebkeyword(self,teststepproperty,dispatcher_obj,inputval,reporting_obj,iris_flag):
-        res = dispatcher_obj.dispatcher(teststepproperty,inputval,self.reporting_obj,iris_flag,self.wx_object,self.conthread)
+    def invokewebkeyword(self,teststepproperty,dispatcher_obj,inputval,reporting_obj):
+        res = dispatcher_obj.dispatcher(teststepproperty,inputval,self.reporting_obj,self.wx_object,self.conthread)
         return res
 
     def invokemobilekeyword(self,teststepproperty,dispatcher_obj,inputval,reporting_obj):
         res = dispatcher_obj.dispatcher(teststepproperty,inputval,self.reporting_obj,self.conthread)
         return res
 
-    def invokemobileappkeyword(self,teststepproperty,dispatcher_obj,inputval,reporting_obj, iris_flag):
-        res = dispatcher_obj.dispatcher(teststepproperty,inputval,self.reporting_obj, iris_flag,self.conthread)
+    def invokemobileappkeyword(self,teststepproperty,dispatcher_obj,inputval,reporting_obj):
+        res = dispatcher_obj.dispatcher(teststepproperty,inputval,self.reporting_obj,self.conthread)
         return res
 
-    def invokeDesktopkeyword(self,teststepproperty,dispatcher_obj,inputval,iris_flag):
-        res = dispatcher_obj.dispatcher(teststepproperty,inputval,iris_flag,self.conthread)
+    def invokeDesktopkeyword(self,teststepproperty,dispatcher_obj,inputval):
+        res = dispatcher_obj.dispatcher(teststepproperty,inputval,self.conthread)
         return res
 
-    def invokeSAPkeyword(self,teststepproperty,dispatcher_obj,inputval,iris_flag):
-        res = dispatcher_obj.dispatcher(teststepproperty,inputval,iris_flag,self.conthread)
+    def invokeSAPkeyword(self,teststepproperty,dispatcher_obj,inputval):
+        res = dispatcher_obj.dispatcher(teststepproperty,inputval,self.conthread)
         return res
 
     def invokemainframekeyword(self,teststepproperty,dispatcher_obj,inputval):
         res = dispatcher_obj.dispatcher(teststepproperty,inputval,self.conthread)
         return res
 
-    def invokepdfkeyword(self, teststepproperty, dispatcher_obj,inputval,iris_flag):
-        res = dispatcher_obj.dispatcher(teststepproperty, inputval, iris_flag)
+    def invokepdfkeyword(self, teststepproperty, dispatcher_obj,inputval):
+        res = dispatcher_obj.dispatcher(teststepproperty, inputval)
         return res
 
     def invoke_debug(self,mythread,runfrom_step,json_data):
@@ -952,7 +947,7 @@ class Controller():
         qc_username=''
         zephyr_accNo=''
         zephyr_secKey=''
-        zephyr_acKey=''        
+        zephyr_acKey=''
         con = Controller()
         obj = handler.Handler()
         status=COMPLETED
@@ -972,7 +967,7 @@ class Controller():
         self.action=EXECUTE
         log.info( 'No  of Suites : '+str(len(suiteId_list)))
         logger.print_on_console('No  of Suites : ',str(len(suiteId_list)))
-        headless_mode = str(configvalues['headless_mode'])=='Yes' 
+        headless_mode = str(configvalues['headless_mode'])=='Yes'
         if headless_mode:
             log.info('Execution in headless mode')
             logger.print_on_console('Execution in headless mode')
@@ -1068,9 +1063,9 @@ class Controller():
                                 zephyr_cycleid=zephyr_sceanrio_data['cycleid']
                                 zephyr_projectid=zephyr_sceanrio_data['projectid']
                                 zephy_versionid=zephyr_sceanrio_data['versionid']
-                                zephy_testid=zephyr_sceanrio_data['testid']  
-                                zephy_issueid=zephyr_sceanrio_data['issueid']                       
-                                
+                                zephy_testid=zephyr_sceanrio_data['testid']
+                                zephy_issueid=zephyr_sceanrio_data['issueid']
+
                             #Iterating through each test case in the scenario
                             for testcase in [eval(scenario[scenario_id])]:
                                 #For every unique screen in list of test cases, store screen data
@@ -1318,7 +1313,7 @@ class Controller():
                                     for i in con.reporting_obj.report_json['rows']:
                                         if 'Keyword' in i and i['Keyword'] == 'TestCase Name':
                                             pass
-                                        elif 'Step' in i and i['Step'] == 'Terminated': 
+                                        elif 'Step' in i and i['Step'] == 'Terminated':
                                             pass
                                         else:
                                             if(i['status'].lower()=='pass'):
@@ -1562,7 +1557,7 @@ class Controller():
             log.addHandler(log_handler)
         except Exception as e:
             log.error(e)
-    
+
     def step_execution_status(self,teststepproperty):
         #325 : Report - Skip status in report by providing value 0 in the output column in testcase grid is not handled.
         nostatusflag = False
