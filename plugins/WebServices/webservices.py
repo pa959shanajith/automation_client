@@ -408,7 +408,6 @@ class WSkeywords:
                 err_msg = ws_constants.ERR_SET_PARAMS
         except Exception as e:
             log.error(e)
-            logger.de
             err_msg=ws_constants.ERR_MSG1+'setParams'
         if err_msg!=None:
             log.error(err_msg)
