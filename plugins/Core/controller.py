@@ -755,9 +755,10 @@ class Controller():
             if teststepproperty.outputval.split(";")[-1].strip() != STEPSTATUS_INREPORTS_ZERO:
                 status_percentage[self.keyword_status]+=1
                 status_percentage["total"]+=1
-            if(self.keyword_status=='Pass'): setcolor="GREEN"
-            elif(self.keyword_status=='Fail') : setcolor="RED"
-            logger.print_on_console(keyword+' executed and the status is '+self.keyword_status+'\n',color=setcolor)
+            kwargs = {}
+            if(self.keyword_status=='Pass'): kwargs["setcolor"]="GREEN"
+            elif(self.keyword_status=='Fail') : kwargs["setcolor"]="RED"
+            logger.print_on_console(keyword+' executed and the status is '+self.keyword_status+'\n',**kwargs)
             log.info(keyword+' executed and the status is '+self.keyword_status+'\n')
             #Checking for stop keyword
             if teststepproperty.name.lower()==STOP:
@@ -905,7 +906,7 @@ class Controller():
         logger.print_on_console('***DEBUG STARTED***')
         print('=======================================================================================================')
         for testcase in scenario:
-            flag,browser_type,last_tc_num,_,=obj.parse_json(testcase)
+            flag,browser_type,last_tc_num,_,_=obj.parse_json(testcase)
             if flag == False:
                 break
             print('\n')
@@ -945,7 +946,7 @@ class Controller():
         return status
 
     def invoke_execution(self,mythread,json_data,socketIO,wxObject,configvalues,qcObject,qtestObject,zephyrObject,aws_mode):
-        global terminate_flag,status_percentage,saucelabs_count, screen_testcase_map
+        global terminate_flag,status_percentage,saucelabs_count,screen_testcase_map
         qc_url=''
         qc_password=''
         qc_username=''
@@ -959,6 +960,7 @@ class Controller():
         aws_scenario=[]
         step_results=[]
         scen_id=[]
+        pytest_files=[]
         condition_check_flag = False
         testcase_empty_flag = False
         count = 0
@@ -1018,12 +1020,14 @@ class Controller():
                         con.exception_flag=self.exception_flag
                         con.wx_object=wxObject
                         handler.local_handler.tspList=[]
+                        accessibility_reports = []
                         execute_result_data = {
                             'testsuiteId': suite_id,
                             'scenarioId': scenario_id,
                             'batchId': batch_id,
                             'executionId': execution_ids[suite_idx-1],
-                            'reportData': None}
+                            'reportData': None
+                        }
                         #condition check for scenario execution and reporting for condition check
                         if not(condition_check_flag):
                              #check for terminate flag before printing loggers
@@ -1497,8 +1501,7 @@ class Controller():
         if local_cont.web_dispatcher_obj != None:
             local_cont.web_dispatcher_obj.action=action
         if action==EXECUTE:
-            if len(args)>0:
-                aws_mode=args[0]
+            aws_mode = len(args)>0 and args[0]
             self.execution_mode = json_data['exec_mode'].lower()
             kill_process()
             if self.execution_mode == SERIAL:
@@ -1538,10 +1541,11 @@ class Controller():
         except Exception as e:
             logger.print_on_console("Exception in Parallel Execution")
             log.error("Exception in Parallel Execution. Error: " + str(e))
-        if not(terminate_flag):
-            status = COMPLETED
+        status = COMPLETED
+        if terminate_flag:
+            status = TERMINATE
         return status
-        
+
     def seperate_log(self, cur_thread, id):
         try:
             log = logging.getLogger("controller.py")
@@ -1618,7 +1622,6 @@ def kill_process():
         log.info('Stale processes killed')
         logger.print_on_console('Stale processes killed')
     else:
-        index = 0
         tries = {}
         while(len(process_ids) > 0):
             try:
