@@ -958,6 +958,7 @@ class UtilWebKeywords:
         methodoutput=TEST_RESULT_FALSE
         err_msg=None
         eleStatus=False
+        original_attr=None
         output=OUTPUT_CONSTANT
         attr_name=input[0]
         local_uo.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
@@ -992,14 +993,14 @@ class UtilWebKeywords:
                     local_uo.log.info(input)
                     if attr_name:
                         if attr_name != 'required':
-                            output = webelement.get_attribute(attr_name)
+                            original_attr = webelement.get_attribute(attr_name)
                         else:
-                            output = browser_Keywords.local_bk.driver_obj.execute_script("return arguments[0].getAttribute('required')",webelement)
-                        if output != None and output !='':
-                            local_uo.log.info(output)
+                            original_attr = browser_Keywords.local_bk.driver_obj.execute_script("return arguments[0].getAttribute('required')",webelement)
+                        if original_attr != None and original_attr !='':
+                            local_uo.log.info(original_attr)
                             if len(input)==2 and input[1] != '':
                                 result = input[1]
-                                if output == result:
+                                if original_attr == result:
                                     local_uo.log.info('Attribute values matched')
                                     logger.print_on_console('Attribute values matched')
                                     status = TEST_RESULT_PASS
@@ -1021,6 +1022,10 @@ class UtilWebKeywords:
                         err_msg = 'Input is empty.'
                         logger.print_on_console(err_msg)
                         local_uo.log.error(err_msg)
+                else:
+                    err_msg = 'Web element not found'
+                    logger.print_on_console(err_msg)
+                    local_uo.log.error(err_msg)
         except NoSuchAttributeException as ex:
             err_msg = 'Attribute does not exixts'
             logger.print_on_console(err_msg)
