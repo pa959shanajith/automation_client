@@ -470,8 +470,7 @@ class Dispatcher:
             try:
                 urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', browser_Keywords_MW.driver_obj.current_url)
                 if urls != []:
-                    import clientwindow
-                    response=requests.get(urls[0],verify=False,proxies=clientwindow.proxies_config)
+                    response=requests.get(urls[0],verify=False,proxies=readconfig.proxies)
                     status_code=response.status_code
                     log.info(status_code)
                     if status_code in STATUS_CODE_DICT:

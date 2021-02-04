@@ -16,7 +16,7 @@ import time
 import json
 import logger
 import logging
-import clientwindow
+import readconfig
 from datetime import datetime
 
 log = logging.getLogger('aws_operations.py')
@@ -137,10 +137,7 @@ class AWS_Operations:
         try:
             with open(file_path,"rb") as fp:
                 data = fp.read()
-                if len(self.proxies)>0:
-                    result = requests.put(url,proxies=clientwindow.proxies_config,verify=False, data=data)
-                else:
-                    result = requests.put(url, data=data)
+                result = requests.put(url, proxies=readconfig.proxies, verify=False, data=data)
                 assert result.status_code == 200
         except Exception as e:
             logger.print_on_console('Error while uploading presigned URL')
@@ -412,7 +409,7 @@ class AWS_Operations:
                         if a['extension']=='txt':
                             result_file=output_file
                         output_url=a['url']
-                        r=requests.get(output_url,proxies=clientwindow.proxies_config)
+                        r=requests.get(output_url, proxies=readconfig.proxies)
                         fd=open(output_file,'wb')
                         fd.write(r.content)
                         fd.close()

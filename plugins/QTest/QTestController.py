@@ -18,7 +18,7 @@ import logging
 import xmltodict
 import base64
 import datetime
-import clientwindow
+import readconfig
 log = logging.getLogger("QTestController.py")
 
 class QTestWindow():
@@ -51,7 +51,7 @@ class QTestWindow():
             splitUrl = bytes(self.qTest_Url.split("//")[1].split(".")[0]+':','ascii')
             encSt = base64.b64encode(splitUrl)
             headersVal = {'Authorization':'Basic %s'% encSt.decode('ascii')}
-            resp = requests.post(login_url,  headers=headersVal, data = myobj, verify=False,proxies=clientwindow.proxies_config)
+            resp = requests.post(login_url,  headers=headersVal, data = myobj, verify=False,proxies=readconfig.proxies)
             if resp.status_code == 200:
                 response = json.loads(resp.text)
                 self.access_token = response['access_token']
@@ -66,7 +66,7 @@ class QTestWindow():
                     'Authorization' : self.token_type+" "+self.access_token
                 }
                 DomainURL = self.qTest_Url + '/api/v3/projects'
-                _resp = requests.get(DomainURL, headers=self._headers,verify=False,proxies=clientwindow.proxies_config)   
+                _resp = requests.get(DomainURL, headers=self._headers,verify=False,proxies=readconfig.proxies)   
                 JsonObject = _resp.json()
                 res = [{'id':i['id'],'name':i['name']} for i in JsonObject]
                 self.project_dict = {}
@@ -85,7 +85,7 @@ class QTestWindow():
             project_name = filePath["domain"]
             releases = []
             releaseURL = self.qTest_Url + '/api/v3/projects/'+str(self.project_dict[project_name])+'/releases?includeClosed=true'
-            resp = requests.get(releaseURL, headers=self._headers,verify=False,proxies=clientwindow.proxies_config)
+            resp = requests.get(releaseURL, headers=self._headers,verify=False,proxies=readconfig.proxies)
             JsonObject = resp.json()
             # JsonObject.append({'links': [{'rel': 'test-cycles', 'href': 'dummy.dummy'}], 'name': 'rel1'})
             self.release_dict = {}
@@ -122,7 +122,7 @@ class QTestWindow():
                 #     URL = self.qTest_Url + '/api/v3/projects/' + str(projectid) + '/test-suites/' + str(suiteid)
                 # elif(maptype == 'testrun'):
                 URL = self.qTest_Url + '/api/v3/projects/' + str(projectid) + '/test-runs/' + str(suiteid)
-                response = requests.get(URL,  headers=self._headers, verify=False,proxies=clientwindow.proxies_config)
+                response = requests.get(URL,  headers=self._headers, verify=False,proxies=readconfig.proxies)
                 resp = response.json()
                 if 'name' in resp:
                     i['qtestsuite'] = resp['name']
@@ -139,7 +139,7 @@ class QTestWindow():
             almDomain = filePath["domain"]
             almProject = filePath["project"]
             folderUrl = self.release_dict[almProject][0] + '&expand=descendants'
-            response = requests.get(folderUrl, headers=self._headers,verify=False,proxies=clientwindow.proxies_config)
+            response = requests.get(folderUrl, headers=self._headers,verify=False,proxies=readconfig.proxies)
             JsonObject = response.json()
             # JsonObject = []
             for cycle in JsonObject:
@@ -149,7 +149,7 @@ class QTestWindow():
                 # newObj["testsuites"]=[{'name':i['name'],'id':i['id']} for i in cycle['test-suites']]
                 for i in cycle['test-suites']:
                     gettestrunAPI = self.qTest_Url + "/api/v3/projects/"+str(almDomain)+"/test-runs?parentId="+str(i['id'])+"&parentType=test-suite"
-                    res1 = requests.get(gettestrunAPI,  headers=self._headers,verify=False,proxies=clientwindow.proxies_config)
+                    res1 = requests.get(gettestrunAPI,  headers=self._headers,verify=False,proxies=readconfig.proxies)
                     resp1 = res1.json()
                     if 'items' in resp1:
                         testruns = [{'id':j['id'],'name':j['name']} for j in resp1['items']]
@@ -189,7 +189,7 @@ class QTestWindow():
             updateRequest['exe_start_date']=data['qtest_status_over']['StartTime'][:10]+"T"+data['qtest_status_over']['StartTime'][11:23]+"Z"
             updateRequest['exe_end_date']=data['qtest_status_over']['EndTime'][:10]+"T"+data['qtest_status_over']['EndTime'][11:23]+"Z"
             getstepsAPI = self.qTest_Url + "/api/v3/projects/"+str(data['qtest_projectid'])+"/test-runs/"+str(data['qtest_suiteid'])+"?expand=testcase.teststep"
-            res2 = requests.get(getstepsAPI,  headers=self._headers,verify=False,proxies=clientwindow.proxies_config)
+            res2 = requests.get(getstepsAPI,  headers=self._headers,verify=False,proxies=readconfig.proxies)
             resp2 = res2.json()
             
             if data['qtest_stepsup']:
@@ -215,7 +215,7 @@ class QTestWindow():
                         break
 
             updatetestlog = self.qTest_Url + "/api/v3/projects/"+str(data['qtest_projectid'])+"/test-runs/"+str(data['qtest_suiteid'])+"/test-logs"
-            res3 = requests.post(updatetestlog, headers = self._headers, json=updateRequest,verify=False,proxies=clientwindow.proxies_config) 
+            res3 = requests.post(updatetestlog, headers = self._headers, json=updateRequest,verify=False,proxies=readconfig.proxies) 
             status = (res3.status_code == 201)
         except Exception as e:
             err_msg = 'Error while updating data in qTest'

@@ -40,6 +40,7 @@ import logging
 from constants import *
 import encryption_utility
 import handler
+import readconfig
 from OpenSSL import crypto
 log = logging.getLogger('webservices.py')
 class WSkeywords:
@@ -63,7 +64,7 @@ class WSkeywords:
         self.certdetails = {}
         self.req_auth = None
         self.req_cookies = None
-        self.proxies = {}
+        self.proxies = readconfig.proxies
 
     def clearValues(self):
         self.baseEndPointURL=''
@@ -82,7 +83,7 @@ class WSkeywords:
         self.certdetails = {}
         self.req_auth = None
         self.req_cookies = None
-        self.proxies = {}
+        self.proxies = readconfig.proxies
 
     def clearCertFiles(self):
         try:

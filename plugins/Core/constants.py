@@ -9,6 +9,11 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 
+import os
+from os.path import normpath
+
+OS_SEP = os.sep
+
 IF='if'
 
 ELSE_IF='elseif'
@@ -182,13 +187,13 @@ ERROR_CODE_DICT = {
                     'ERR_WEB_DRIVER_EXCEPTION': 'Error occurred with browser',
                     'CLICKABLE_EXCEPTION': 'File type input Element is not Clickable, use uploadFile keyword instead.',
                     'PRESSABLE_EXCEPTION': 'File type input Element is not Pressable, use uploadFile keyword instead.',
-                    'ERR_NO_SUCH_WINDOW_EXCEPTION': """Requested web page can't be found.""",
+                    'ERR_NO_SUCH_WINDOW_EXCEPTION': "Requested web page can't be found.",
                     'ERR_UNHANDELED_ALERT_EXCEPTION': 'Error occurred due to unexpected alert.',
                     'ERR_INVALID_SELECTOR_EXCEPTION': 'Object Not Found.',
                     'ERR_ELEMENT_NOT_VISIBLE_EXCEPTION': 'Object is hidden.',
                     'ERR_NO_SUCH_ELEMENT_EXCEPTION': 'Object Not Found.',
                     'ERR_INVALID_ELEMENT_STATE_EXCEPTION': 'The current operation cannot be performed because of the object state.',
-                    'ERR_TIME_OUT_EXCEPTION': """Can't locate the object in the specified time.""",
+                    'ERR_TIME_OUT_EXCEPTION': "Can't locate the object in the specified time.",
                     'ERR_NO_ALERT_PRESENT_EXCEPTION': 'Alert not present.',
                     'ERR_SAX_EXCEPTION': 'Input error: please provide the valid input.',
                     'ERR_JSON_EXCEPTION': 'Please provide valid JSON.',
@@ -200,7 +205,6 @@ ERROR_CODE_DICT = {
                     'ERR_ILLEGAL_STATE_EXCEPTION': 'The current operation cannot be performed because of the object state.',
                     'ERR_OBJECT_VISIBLE': 'The Element is visible.',
                     'ERR_EMPTY_STACK_EVAL_EXCEPTION': 'Input error:Verify syntax.',
-
                     'ERR_PARSE_EXCEPTION': 'Input Error:Please provide valid input.',
                     'ERR_INVALID_OPERATION': 'Invalid input: Operation name invalid or missing.',
                     'ERR_INVALID_HEADER': 'Invalid input: Header name invalid or missing.',
@@ -215,7 +219,7 @@ ERROR_CODE_DICT = {
                     'ERR_SET_CURSOR': 'Row or Column value exceeds the limit specified(22/80).',
                     'ERR_JOB_STATUS': 'Job Status is Failed.',
                     'ERR_GETTEXT_MAINFRAME': 'Text not found.',
-                    'ERR_DATE_MISMATCH': 'Inputs donot match.',
+                    'ERR_DATE_MISMATCH': 'Inputs do not match.',
                     'ERR_DATE_VALID': 'Please provide valid date.',
                     'ERR_DISPLAY_TIMEOUT': 'Display Timeout cannot be less than or equal to 0.',
                     'ERR_CONTENT_NULL': 'Invalid Input:No content found in the specified location.',
@@ -224,13 +228,12 @@ ERROR_CODE_DICT = {
                     'ERR_EVAL_DIVIDEBYZERO_FLAG': 'Ooops !! Divide by zero occured, Hence evaluate method failed.',
                     'ERR_EVAL_LONGRESULT_FLAG': 'Input|Output value exceeds seventeen digits.',
                     'ERR_INVALID_NO_INPUT': 'Input Error: Invalid number of inputs.',
-                    'ERR_GETPARAM_EXCEL': """Excel sheet doesn't contain column names.""",
+                    'ERR_GETPARAM_EXCEL': "Excel sheet doesn't contain column names.",
                     'ERR_GETPARAM_UNIQUECOLUMN': 'Excel sheet should contain Unique Column names',
                     'ERR_XML_INVALID': 'Invalid XML format.',
                     'ERR_DYNVAR': 'Variable does not Exist.',
                     'ERR_DYNVAR_ALREADY_EXISTS': 'Variable already exists',
-                    'ERR_XML_TAGNAMES': """XML file doesn't contain tag names.""",
-                    'ERR_DATE_MISMATCH': 'Inputs donot match.',
+                    'ERR_XML_TAGNAMES': "XML file doesn't contain tag names.",
                     'MSG_EXTERNAL_DATALIST_STATICVARIABLE': 'Invalid Input:No externalData List exists for static variable.',
                     'ERR_CAPTURE_SCREENSHOT':'Unable to capture the screenshots.',
                     'ERR_DOUBLECLICK':'Error occurred while performing double click.',
@@ -278,13 +281,12 @@ ERROR_CODE_DICT = {
                     'ERR_SCREENSHOT_PATH':'Screenshot not captured - User does not have sufficient privileges for screenshot folder\n',
                     #Excel error messages
                     'ERR_ROW_NUMBER':'Invalid row number',
-                    """ERR_ROW_DOESN'T_EXIST""": """Row doesn't exist""",
-                    """ERR_COL_DOESN'T_EXIST""":"""Column doesn't exist""",
-                    'ERR_CONTROLLER_IO':'Generating Json report failed\n',
-                    'ERR_FILE_FORMAT':'The specified file is not Excel file\n',
+                    "ERR_ROW_DOESN'T_EXIST": "Row doesn't exist",
+                    "ERR_COL_DOESN'T_EXIST": "Column doesn't exist",
+                    'ERR_FILE_FORMAT': 'The specified file is not Excel file\n',
                     #JumpBy error messages
-                    """ERR_JUMPY_STEP_DOESN'T_EXISTS""" : """Invalid input, jumpBy Step doesn't exist""",
-                    """ERR_JUMPBY_CAN'T_BE_0""":"""Invalid input, jumpBy Step?cannot be '0'""",
+                    "ERR_JUMPY_STEP_DOESN'T_EXISTS" : "Invalid input, jumpBy Step doesn't exist",
+                    "ERR_JUMPBY_CAN'T_BE_0": "Invalid input, jumpBy Step?cannot be '0'",
                     'ERR_CUSTOM_ELE_NOTFOUND':'Error occured in finding Custom element',
                     # Database Keywords
                     "ERR_DB_CONNECTION": "Error with database connection",
@@ -393,9 +395,9 @@ INVALID_INPUT = 'Invalid input, Please provide the valid input'
 
 WEB_ELEMENT_FOUND_INSIDE_IFRAME='Web Element is found inside iframe/frame '
 
-OUTPUT_CONSTANT ="""9cc33d6fe25973868b30f4439f09901a"""
+OUTPUT_CONSTANT ="9cc33d6fe25973868b30f4439f09901a"
 
-MD5_TEMP_RES  ="""9cc33d6fe25973868b30f4439f09901a"""
+MD5_TEMP_RES  ="9cc33d6fe25973868b30f4439f09901a"
 
 MSG_CUSTOM_FOUND='Custom Object is Found'
 
@@ -470,3 +472,42 @@ SYSTEM_OS = 'Windows'
 AWSKEYWORDS=[]
 
 line_separator = "======================================================================================================="
+
+AVO_ASSURE_HOME = os.environ["AVO_ASSURE_HOME"]
+
+IMAGES_PATH = normpath(AVO_ASSURE_HOME + "/assets/images") + OS_SEP
+
+os.environ["IMAGES_PATH"] = IMAGES_PATH
+
+ICE_CONST = normpath(AVO_ASSURE_HOME + "/assets/ice_const.json")
+
+MANIFEST_LOC = normpath(AVO_ASSURE_HOME + "/assets/about_manifest.json")
+
+LOC_7Z = normpath(AVO_ASSURE_HOME + '/Lib/7zip/7z.exe')
+
+UPDATER_LOC = normpath(AVO_ASSURE_HOME + '/assets/Update.exe')
+
+CONFIG_PATH = normpath(AVO_ASSURE_HOME + "/assets/config.json")
+
+PROXY_PATH= normpath(AVO_ASSURE_HOME + "/assets/proxy.json")
+
+CERTIFICATE_PATH = normpath(AVO_ASSURE_HOME + "/assets/CA_BUNDLE")
+
+LOGCONFIG_PATH = normpath(AVO_ASSURE_HOME + "/assets/logging.conf")
+
+DRIVERS_PATH = normpath(AVO_ASSURE_HOME + "/lib/Drivers")
+
+CHROME_DRIVER_PATH = DRIVERS_PATH + OS_SEP + "chromedriver"
+
+GECKODRIVER_PATH = DRIVERS_PATH + OS_SEP + "geckodriver"
+
+EDGE_DRIVER_PATH = DRIVERS_PATH + OS_SEP + "MicrosoftWebDriver.exe"
+
+EDGE_CHROMIUM_DRIVER_PATH = DRIVERS_PATH + OS_SEP + "msedgedriver"
+
+if SYSTEM_OS == "Windows":
+    CHROME_DRIVER_PATH += ".exe"
+    GECKODRIVER_PATH += ".exe"
+    EDGE_CHROMIUM_DRIVER_PATH += ".exe"
+
+if (os.path.exists(UPDATER_LOC[:-3] + "py")): UPDATER_LOC = UPDATER_LOC[:-3] + "py"
