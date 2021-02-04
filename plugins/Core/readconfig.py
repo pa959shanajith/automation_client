@@ -73,11 +73,10 @@ class readConfig():
             configvalues['configmissing']=os.path.isfile(self.config_path)
         return configvalues
 
-
 class readProxyConfig():
 
     def __init__(self):
-        self.proxy_path = os.path.normpath(AVO_ASSURE_HOME + "/assets/proxy.json")
+        self.proxy_path = constants.PROXY_PATH
 
     def readJson(self):
         global proxies

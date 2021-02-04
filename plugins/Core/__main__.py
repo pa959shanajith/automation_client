@@ -2,9 +2,7 @@ import sys
 import os
 import logging
 import argparse
-import readconfig
 import platform
-import constants
 log = logging.getLogger('Avo_Assure')
 
 parser = argparse.ArgumentParser(description="Avo Assure ICE Platform")
@@ -36,6 +34,9 @@ if args.register or args.connect:
             except: parser.error("Invalid Token provided for register operation")
         if args.host is None:
             print("No value provided for host. Reading values from configuration file")
+
+import constants
+import readconfig
 configvalues = readconfig.readConfig().readJson()
 proxies = readconfig.readProxyConfig().readJson()
 

@@ -1213,7 +1213,6 @@ class Config_window(wx.Frame):
                 self.connection_timeout.SetLabel('Connection Timeout')
                 self.connection_timeout.SetForegroundColour((0,0,0))
 
-
     """jsonCreater saves the data in json form, location of file to be saved must be defined. This method will overwrite the existing .json file"""
     def jsonCreater(self,data):
         try:
@@ -1663,20 +1662,29 @@ class ProxyConfig_window(wx.Frame):
             'username': self.proxy_user.GetValue(),
             'password': self.proxy_pass.GetValue()
         }
-        self.proxy_url_path.SetForegroundColour((0,0,0))
-        self.proxy_user_path.SetForegroundColour((0,0,0))
-        self.proxy_pass_path.SetForegroundColour((0,0,0))
         nosave = False
         if data['enabled'] == "Enabled":
             if not (data['url'].startswith("http://") or data['url'].startswith("https://")):
+                self.proxy_url_path.SetLabel('Proxy URL*')
                 self.proxy_url_path.SetForegroundColour((255,0,0))
                 nosave = True
+            else:
+                self.proxy_url_path.SetLabel('Proxy URL')
+                self.proxy_url_path.SetForegroundColour((0,0,0))
             if len(data['username']) == 0 and len(data['password']) != 0:
+                self.proxy_user_path.SetLabel('Proxy Username*')
                 self.proxy_user_path.SetForegroundColour((255,0,0))
                 nosave = True
+            else:
+                self.proxy_user_path.SetLabel('Proxy Username')
+                self.proxy_user_path.SetForegroundColour((0,0,0))
             if len(data['username']) != 0 and len(data['password']) == 0:
+                self.proxy_pass_path.SetLabel('Proxy Password*')
                 self.proxy_pass_path.SetForegroundColour((255,0,0))
                 nosave = True
+            else:
+                self.proxy_pass_path.SetLabel('Proxy Password')
+                self.proxy_pass_path.SetForegroundColour((0,0,0))
         if not nosave:
             self.jsonCreater(data)
 
