@@ -14,7 +14,8 @@ import constants
 import json
 import os
 configvalues = None
-##log = logging.getLogger('readconfig.py')
+proxies_config = {}
+log = logging.getLogger('readconfig.py')
 
 class readConfig():
 
@@ -70,3 +71,32 @@ class readConfig():
         else:
             configvalues['configmissing']=os.path.isfile(self.config_path)
         return configvalues
+
+class readProxyConfig():
+
+    def __init__(self):
+        self.proxy_path= AVO_ASSURE_HOME + "/assets/proxy.json"
+
+    def readJson(self):
+        if os.path.isfile(self.proxy_path)==True:
+            try:
+                conf = open(self.proxy_path, 'r')
+                proxy = json.load(conf)
+                if 'enabled' in proxy and proxy['enabled']== 'Enabled':
+                    proxy['password']=self.decrypt(proxy['password'])
+                    proxy_url=proxy['username']+":"+proxy['password']+"@"+proxy['url']
+                    proxies_config = {"http":"http://"+proxy_url,
+                                "https":":https://"+proxy_url}
+                elif 'enabled' in proxy and proxy['enabled']== 'Disabled':
+                    proxies_config={}
+            except Exception as e:
+                log.error(e,exc_info=True)
+        return proxies_config
+
+    def decrypt(enc):
+        import base64
+        from Crypto.Cipher import AES
+        unpad = lambda s : s[0:-ord(s[-1])]
+        enc = base64.b64decode(enc)
+        cipher = AES.new(b'\x74\x68\x69\x73\x49\x73\x41\x53\x65\x63\x72\x65\x74\x4b\x65\x79', AES.MODE_ECB)
+        return unpad(cipher.decrypt(enc).decode('utf-8'))

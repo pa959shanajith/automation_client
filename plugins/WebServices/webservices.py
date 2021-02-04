@@ -40,6 +40,8 @@ import logging
 from constants import *
 import encryption_utility
 import handler
+import readconfig
+proxies_val=readconfig.readProxyConfig().readJson()
 from OpenSSL import crypto
 log = logging.getLogger('webservices.py')
 class WSkeywords:
@@ -519,7 +521,7 @@ class WSkeywords:
                         req_body=json.dumps(self.baseReqBody)
                 else:
                     req_body=self.baseReqBody
-                response = requests.post(self.baseEndPointURL, data = req_body, headers=self.baseReqHeader, cookies=self.req_cookies, proxies=self.proxies, cert=self.client_cert, verify=self.server_cert, auth=self.req_auth, params=self.req_params)
+                response = requests.post(self.baseEndPointURL, data = req_body, headers=self.baseReqHeader, cookies=self.req_cookies, proxies=proxies_val, cert=self.client_cert, verify=self.server_cert, auth=self.req_auth, params=self.req_params)
 
                 if response != None and response != False:
                     self.clearCertFiles()
@@ -550,7 +552,7 @@ class WSkeywords:
             elif not (self.baseEndPointURL is ''):
                 req=self.baseEndPointURL
             self.get_cookies()
-            response=requests.get(req, headers=self.baseReqHeader, cookies=self.req_cookies, proxies=self.proxies, cert=self.client_cert, verify=self.server_cert, auth=self.req_auth, params=self.req_params)
+            response=requests.get(req, headers=self.baseReqHeader, cookies=self.req_cookies, proxies=proxies_val, cert=self.client_cert, verify=self.server_cert, auth=self.req_auth, params=self.req_params)
             logger.print_on_console('Response: ',response)
             log.info(response)
             status,methodoutput,output=self.__saveResults(response)
@@ -577,7 +579,7 @@ class WSkeywords:
                 log.error(err_msg)
                 logger.print_on_console(ws_constants.METHOD_INVALID_INPUT)
             self.get_cookies()
-            response=requests.put(req, data=self.baseReqBody, headers=self.baseReqHeader, cookies=self.req_cookies, proxies=self.proxies, cert=self.client_cert, verify=self.server_cert, auth=self.req_auth, params=self.req_params)
+            response=requests.put(req, data=self.baseReqBody, headers=self.baseReqHeader, cookies=self.req_cookies, proxies=proxies_val, cert=self.client_cert, verify=self.server_cert, auth=self.req_auth, params=self.req_params)
             status,methodoutput,output=self.__saveResults(response)
         except Exception as e:
             err_msg=str(e)
@@ -602,7 +604,7 @@ class WSkeywords:
                 log.error(err_msg)
                 logger.print_on_console(ws_constants.METHOD_INVALID_INPUT)
             self.get_cookies()
-            response=requests.delete(req, data=self.baseReqBody, headers=self.baseReqHeader, cookies=self.req_cookies, proxies=self.proxies, cert=self.client_cert, verify=self.server_cert, auth=self.req_auth, params=self.req_params)
+            response=requests.delete(req, data=self.baseReqBody, headers=self.baseReqHeader, cookies=self.req_cookies, proxies=proxies_val, cert=self.client_cert, verify=self.server_cert, auth=self.req_auth, params=self.req_params)
             status,methodoutput,output=self.__saveResults(response)
         except Exception as e:
             err_msg=str(e)

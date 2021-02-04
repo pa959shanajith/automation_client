@@ -16,7 +16,8 @@ import time
 import json
 import logger
 import logging
-import clientwindow
+import readconfig
+proxies_val=readconfig.readProxyConfig().readJson()
 from datetime import datetime
 
 log = logging.getLogger('aws_operations.py')
@@ -137,8 +138,8 @@ class AWS_Operations:
         try:
             with open(file_path,"rb") as fp:
                 data = fp.read()
-                if len(self.proxies)>0:
-                    result = requests.put(url,proxies=clientwindow.proxies_config,verify=False, data=data)
+                if len(proxies_val)>0:
+                    result = requests.put(url,proxies=proxies_val,verify=False, data=data)
                 else:
                     result = requests.put(url, data=data)
                 assert result.status_code == 200
@@ -412,7 +413,7 @@ class AWS_Operations:
                         if a['extension']=='txt':
                             result_file=output_file
                         output_url=a['url']
-                        r=requests.get(output_url,proxies=clientwindow.proxies_config)
+                        r=requests.get(output_url,proxies=proxies_val)
                         fd=open(output_file,'wb')
                         fd.write(r.content)
                         fd.close()

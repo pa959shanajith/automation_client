@@ -68,6 +68,7 @@ socketIO = None
 allow_connect = False
 plugins_list = []
 configvalues = {}
+proxies_config = readconfig.readProxyConfig().readJson()
 execution_flag = False
 closeActiveConnection = False
 connection_Timer = None
@@ -83,6 +84,7 @@ MANIFEST_LOC = normpath(AVO_ASSURE_HOME + "/assets/about_manifest.json")
 LOC_7Z = normpath(AVO_ASSURE_HOME + '/Lib/7zip/7z.exe')
 UPDATER_LOC = normpath(AVO_ASSURE_HOME + '/assets/Update.exe')
 CONFIG_PATH = normpath(AVO_ASSURE_HOME + "/assets/config.json")
+PROXY_PATH= normpath(AVO_ASSURE_HOME + "/assets/proxy.json")
 CERTIFICATE_PATH = normpath(AVO_ASSURE_HOME + "/assets/CA_BUNDLE")
 LOGCONFIG_PATH = normpath(AVO_ASSURE_HOME + "/assets/logging.conf")
 DRIVERS_PATH = normpath(AVO_ASSURE_HOME + "/lib/Drivers")
@@ -116,7 +118,7 @@ def _process_ssl_errors(e):
 
 class MainNamespace(BaseNamespace):
     def on_message(self, *args):
-        global action,cw,browsername,desktopScrapeFlag,allow_connect,connection_Timer,updatecheckFlag,executionOnly
+        global action,cw,browsername,desktopScrapeFlag,allow_connect,connection_Timer,updatecheckFlag,executionOnly,proxies_config
         kill_conn = False
         try:
             if(str(args[0]) == 'connected'):
@@ -138,7 +140,7 @@ class MainNamespace(BaseNamespace):
                         cw.rbox.Enable()
                     if browsercheckFlag == False:
                         check_browser()
-                    check_proxy()
+                    proxies_config=readconfig.readProxyConfig().readJson()
                     #if updatecheckFlag == False and root.gui:
                     if updatecheckFlag == False:
                         msg='Checking for client package updates'
@@ -937,7 +939,7 @@ class ConnectionThread(threading.Thread):
         icesession_enc = core_utils_obj.wrap(json.dumps(root.icesession), ice_das_key)
         params={'username': username, 'icename': root.ice_token["icename"],
             'ice_action': self.ice_action, 'icesession': icesession_enc}
-        args = {"cert": client_cert, "params": params}
+        args = {"cert": client_cert, "params": params,"proxies": proxies_config}
         if server_cert != "default": args["verify"] = server_cert
         if tls_security != "High": args['assert_hostname'] = False
         return args
@@ -1806,13 +1808,3 @@ def stop_ping_thread():
         status_ping_thread.cancel()
         time.sleep(0.5)
         status_ping_thread = None
-
-def check_proxy():
-    global proxies_config
-    proxy=json.load(open(PROXY_PATH))
-    if 'enabled' in proxy and proxy['enabled']== 'Enabled':
-        proxy_url=proxy['username']+":"+proxy['password']+"@"+proxy['url']
-        proxies_config = {"http":"http://"+proxy_url,
-                    "https":":https://"+proxy_url}
-    elif 'enabled' in proxy and proxy['enabled']== 'Disabled':
-        proxies_config={}

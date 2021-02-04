@@ -25,6 +25,8 @@ import core
 import logger
 import logging
 import time
+import readconfig
+proxies_val=readconfig.readProxyConfig().readJson()
 log = logging.getLogger(__name__)
 
 # imports for Accessibility
@@ -76,7 +78,7 @@ class Web_Accessibility_Testing:
 
             if not url.endswith(webconstants.IGNORE_FILE_EXTENSIONS):
                 obj["noOfTries"] = obj["noOfTries"] + 1
-                r = requests.get(url, headers=headers, verify=False,timeout=webconstants.REQUEST_URL_TIMEOUT)
+                r = requests.get(url, headers=headers, verify=False,timeout=webconstants.REQUEST_URL_TIMEOUT,proxies=proxies_val)
                 rurl = r.url
 
                 # Check whether this URL redirects to some other URL

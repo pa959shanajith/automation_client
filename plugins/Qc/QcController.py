@@ -16,7 +16,8 @@ import requests
 import logger
 import logging
 import xmltodict
-import clientwindow
+import readconfig
+proxies_val=readconfig.readProxyConfig().readJson()
 log = logging.getLogger("Qccontroller.py")
 
 class QcWindow():
@@ -43,14 +44,14 @@ class QcWindow():
             self.Qc_Url=filePath["qcURL"]
             self.headers = {'cache-control': "no-cache"}
             login_url = self.Qc_Url + '/authentication-point/authenticate'
-            resp = requests.post(login_url, auth=HTTPBasicAuth(user_name, pass_word),  headers=self.headers,proxies=clientwindow.proxies_config)
+            resp = requests.post(login_url, auth=HTTPBasicAuth(user_name, pass_word),  headers=self.headers,proxies=proxies_val)
             if resp.status_code == 200:
                 cookieName = resp.headers.get('Set-Cookie')
                 LWSSO_COOKIE_KEY = cookieName[cookieName.index("=") + 1: cookieName.index(";")]
                 self.cookies = {'LWSSO_COOKIE_KEY': LWSSO_COOKIE_KEY}
 
             qcSessionEndPoint = self.Qc_Url + "/rest/site-session"    
-            response = requests.post(qcSessionEndPoint, headers=self.headers, cookies=self.cookies,proxies=clientwindow.proxies_config)
+            response = requests.post(qcSessionEndPoint, headers=self.headers, cookies=self.cookies,proxies=proxies_val)
             if response.status_code == 200 | response.status_code == 201:
                 cookieName = response.headers.get('Set-Cookie').split(",")[1]
                 QCSession = cookieName[cookieName.index("=") + 1: cookieName.index(";")]
@@ -65,7 +66,7 @@ class QcWindow():
                 'accept': 'application/json'
             }
             DomainURL = self.Qc_Url + '/rest/domains/'
-            _resp = requests.get(DomainURL, headers=self._headers, cookies=self.cookies,proxies=clientwindow.proxies_config)   
+            _resp = requests.get(DomainURL, headers=self._headers, cookies=self.cookies,proxies=proxies_val)   
             JsonObject = _resp.json()
             domain_obj=JsonObject['Domains']['Domain']
             DomainList=[]
@@ -90,7 +91,7 @@ class QcWindow():
             domain_name = filePath["domain"]
             projects = []
             ProjectURL = self.Qc_Url + '/rest/domains/' + domain_name + '/projects'
-            resp = requests.get(ProjectURL, headers=self._headers, cookies=self.cookies,proxies=clientwindow.proxies_config)
+            resp = requests.get(ProjectURL, headers=self._headers, cookies=self.cookies,proxies=proxies_val)
             JsonObject = resp.json()
             list_projects = []
             if type(JsonObject['Projects']['Project']) is list:
@@ -116,7 +117,7 @@ class QcWindow():
         parentID = 0
         payload = {"query": "{name['" + folderName + "']}", "fields": "parent-id"}
         try:
-            response = requests.get(URL, params=payload, headers=self.headers, cookies=self.cookies,proxies=clientwindow.proxies_config)
+            response = requests.get(URL, params=payload, headers=self.headers, cookies=self.cookies,proxies=proxies_val)
             o = xmltodict.parse(response.content)
             y = json.loads(json.dumps(o))
             k = y["Entities"]["Entity"]["Fields"]["Field"]
@@ -141,7 +142,7 @@ class QcWindow():
             URL_for_testsets = self.Qc_Url + midPoint + "/" + "test-sets"
             parentID = self.get_folder_parent_id(URL, folderName)
             payload1 = {"query": "{parent-id[" + parentID + "]}", "fields": "id,name"}
-            response1 = requests.get(URL, params=payload1, headers=self.headers, cookies=self.cookies,proxies=clientwindow.proxies_config)
+            response1 = requests.get(URL, params=payload1, headers=self.headers, cookies=self.cookies,proxies=proxies_val)
             o1 = xmltodict.parse(response1.content)
             y1 = json.loads(json.dumps(o1))
             folder_list = []
@@ -158,7 +159,7 @@ class QcWindow():
 
             #fetching testsets
             payload = {"query": "{parent-id[" + parentID + "]}", "fields": "id,name"}
-            res1 = requests.get(URL_for_testsets, params=payload, headers=self.headers, cookies=self.cookies,proxies=clientwindow.proxies_config)
+            res1 = requests.get(URL_for_testsets, params=payload, headers=self.headers, cookies=self.cookies,proxies=proxies_val)
             o2 = xmltodict.parse(res1.content)
             y2 = json.loads(json.dumps(o2))
             tests_list = []
@@ -200,7 +201,7 @@ class QcWindow():
             parentID = self.get_folder_parent_id(URL, folderName)
             #fetching testsets
             payload = {"query": "{parent-id[" + parentID + "]}", "fields": "id,name"}
-            res1 = requests.get(URL_for_testsets, params=payload, headers=self.headers, cookies=self.cookies,proxies=clientwindow.proxies_config)
+            res1 = requests.get(URL_for_testsets, params=payload, headers=self.headers, cookies=self.cookies,proxies=proxies_val)
             o2 = xmltodict.parse(res1.content)
             y2 = json.loads(json.dumps(o2))
             test_id = None
@@ -219,7 +220,7 @@ class QcWindow():
 
             payload = {"query": "{cycle-id[" + str(test_id) + "]}", "fields": "test-id,name,status"}
             #fetching test cases 
-            response = requests.get(URL_for_testcases , params=payload, headers=self.headers, cookies=self.cookies,proxies=clientwindow.proxies_config)
+            response = requests.get(URL_for_testcases , params=payload, headers=self.headers, cookies=self.cookies,proxies=proxies_val)
             o = xmltodict.parse(response.content)
             y = json.loads(json.dumps(o))
             test_case_list = []
@@ -266,7 +267,7 @@ class QcWindow():
                 parentID = self.get_folder_parent_id(URL, folderName)
                 #fetching testset id
                 payload = {"query": "{parent-id[" + str(parentID) + "]}", "fields": "id,name"}
-                res1 = requests.get(URL_for_testsets, params=payload, headers=self.headers, cookies=self.cookies,proxies=clientwindow.proxies_config)
+                res1 = requests.get(URL_for_testsets, params=payload, headers=self.headers, cookies=self.cookies,proxies=proxies_val)
                 o2 = xmltodict.parse(res1.content)
                 y2 = json.loads(json.dumps(o2))
                 test_id = None
@@ -284,7 +285,7 @@ class QcWindow():
                                 test_id = t["Value"]
                 payload = {"query": "{cycle-id[" + str(test_id) + "]}", "fields": "name"}
                 #fetching test case id 
-                response = requests.get(URL_for_testcases , params=payload, headers=self.headers, cookies=self.cookies,proxies=clientwindow.proxies_config)
+                response = requests.get(URL_for_testcases , params=payload, headers=self.headers, cookies=self.cookies,proxies=proxies_val)
                 o = xmltodict.parse(response.content)
                 y = json.loads(json.dumps(o))
                 tsn1 = []
@@ -316,7 +317,7 @@ class QcWindow():
                     data1 ='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Entity Type="test-instance"><Fields><Field Name="status"><Value>'+ result +'</Value></Field></Fields></Entity>'
                     payload = { "body": data1, "data": data1}
                     self.headers = {'Content-Type': "application/xml", 'Accept': "application/xml"}
-                    response = requests.put(URL_for_testcase_update , data= data1, headers=self.headers, cookies=self.cookies,proxies=clientwindow.proxies_config)
+                    response = requests.put(URL_for_testcase_update , data= data1, headers=self.headers, cookies=self.cookies,proxies=proxies_val)
                     #status = response.status_code == 200
                 if indexTest == 0: status = response.status_code == 200
                 else: status = response.status_code == 200 and status
@@ -330,7 +331,7 @@ class QcWindow():
     def quit_qc(self,filepath):
         res = None
         try:
-            resp = requests.get(self.Qc_Url + '/authentication-point/logout',proxies=clientwindow.proxies_config)
+            resp = requests.get(self.Qc_Url + '/authentication-point/logout',proxies=proxies_val)
             #status = resp.status_code == 200
             res = "closedqc"
         except Exception as e:

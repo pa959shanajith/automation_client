@@ -241,7 +241,8 @@ class BodyGenarator():
 
     def server_certs(self,wsdl , operation_name, soap_type, serverCertificate,serverCerificate_pass,auth_uname,auth_pass):
         trust_cert_path=None
-        import clientwindow
+        import readconfig
+        proxies_val=readconfig.readProxyConfig().readJson()
         import webservices as w
         obj=w.WSkeywords()
         if (not(auth_uname == '' or auth_uname == None) and not(auth_pass == '' or auth_pass == None)):
@@ -251,10 +252,10 @@ class BodyGenarator():
                 trust_cert= obj.extract_jks(serverCertificate,serverCerificate_pass.encode('utf-8'))
                 if trust_cert:
                     trust_cert_path = os.environ["AVO_ASSURE_HOME"]+'\\TRUSTSTORECERT.pem'
-                    resp = requests.get(wsdl, auth=HTTPBasicAuth(auth_uname, auth_pass),verify=trust_cert_path,proxies=clientwindow.proxies_config)
+                    resp = requests.get(wsdl, auth=HTTPBasicAuth(auth_uname, auth_pass),verify=trust_cert_path,proxies=proxies_val)
                     status_code = resp.status_code
             else:
-                resp = requests.get(wsdl, verify=False,auth=HTTPBasicAuth(auth_uname, auth_pass),proxies=clientwindow.proxies_config)
+                resp = requests.get(wsdl, verify=False,auth=HTTPBasicAuth(auth_uname, auth_pass),proxies=proxies_val)
                 status_code = resp.status_code
         else:
             if (not(serverCertificate== '' or serverCertificate==None) and not(serverCerificate_pass=='' or serverCerificate_pass==None)):
@@ -262,10 +263,10 @@ class BodyGenarator():
                 trust_cert= obj.extract_jks(serverCertificate,serverCerificate_pass.encode('utf-8'))
                 if trust_cert:
                     trust_cert_path = os.environ["AVO_ASSURE_HOME"]+'\\TRUSTSTORECERT.pem'
-                    resp = requests.get(wsdl, verify=trust_cert_path,proxies=clientwindow.proxies_config)
+                    resp = requests.get(wsdl, verify=trust_cert_path,proxies=proxies_val)
                     status_code = resp.status_code
             else:
-                resp = requests.get(wsdl, verify=False,proxies=clientwindow.proxies_config)
+                resp = requests.get(wsdl, verify=False,proxies=proxies_val)
                 status_code = resp.status_code
         auth_set= True
         return resp

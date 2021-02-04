@@ -242,14 +242,15 @@ class Updater:
     def download_files(self,end_point_list):
         """downloads files from the generated endpoints list"""
         warning_msg = None
-        import client_window
+        import readconfig
+        proxies_val=readconfig.readProxyConfig().readJson()
         try:
             log.debug( 'Inside download_files function' )
             self.temp_location = tempfile.gettempdir()
             for url in end_point_list:
                 filename = url[url.rindex('/')+1:]
                 temp_file_path = os.path.join(self.temp_location, filename)
-                fileObj = requests.get(str(url),verify=False,proxies=clientwindow.proxies_config)
+                fileObj = requests.get(str(url),verify=False,proxies=proxies_val)
                 if(fileObj.status_code == 200):
                     open(temp_file_path, 'wb').write(fileObj.content)
                     print ('=>performing sha256 check')
