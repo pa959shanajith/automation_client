@@ -37,6 +37,7 @@ if args.register or args.connect:
         if args.host is None:
             print("No value provided for host. Reading values from configuration file")
 configvalues = readconfig.readConfig().readJson()
+proxies = readconfig.readProxyConfig().readJson()
 
 """
 This code snippet blocks the inheritance of file handlers from
@@ -67,6 +68,7 @@ if __name__ == "__main__":
         if not os.path.exists(path+"output"): os.mkdir(path+"output")
         import core
         core.configvalues = configvalues
+        core.proxies = proxies
         core.Main(appName, args)
     except Exception as e:
         log.error(e, exc_info=True)

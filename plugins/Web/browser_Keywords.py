@@ -1238,7 +1238,7 @@ class Singleton_DriverUtil():
 
         elif(browser_num == '8'):
             try:
-                if(core.chromiumFlag):
+                if core.chromiumFlag:
                     from selenium.webdriver.edge.options import Options
                     options = Options()
                     options.use_chromium = True

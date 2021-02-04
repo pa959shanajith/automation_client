@@ -33,10 +33,8 @@ try:
     from socketlib_override import SocketIO, BaseNamespace, socketIO_prepare_http_session as prepare_http_session
 except ImportError:
     from socketIO_client import SocketIO, BaseNamespace, prepare_http_session
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
-requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
 log = logging.getLogger('core.py')
-opl = os.sep
 root = None
 cw = None
 browsername = None
@@ -68,7 +66,7 @@ socketIO = None
 allow_connect = False
 plugins_list = []
 configvalues = {}
-proxies_config = readconfig.readProxyConfig().readJson()
+proxies = None
 execution_flag = False
 closeActiveConnection = False
 connection_Timer = None
@@ -76,26 +74,6 @@ status_ping_thread = None
 update_obj = None
 termination_inprogress = False
 core_utils_obj = core_utils.CoreUtils()
-AVO_ASSURE_HOME = os.environ["AVO_ASSURE_HOME"]
-IMAGES_PATH = normpath(AVO_ASSURE_HOME + "/assets/images") + opl
-os.environ["IMAGES_PATH"] = IMAGES_PATH
-ICE_CONST = normpath(AVO_ASSURE_HOME + "/assets/ice_const.json")
-MANIFEST_LOC = normpath(AVO_ASSURE_HOME + "/assets/about_manifest.json")
-LOC_7Z = normpath(AVO_ASSURE_HOME + '/Lib/7zip/7z.exe')
-UPDATER_LOC = normpath(AVO_ASSURE_HOME + '/assets/Update.exe')
-CONFIG_PATH = normpath(AVO_ASSURE_HOME + "/assets/config.json")
-PROXY_PATH= normpath(AVO_ASSURE_HOME + "/assets/proxy.json")
-CERTIFICATE_PATH = normpath(AVO_ASSURE_HOME + "/assets/CA_BUNDLE")
-LOGCONFIG_PATH = normpath(AVO_ASSURE_HOME + "/assets/logging.conf")
-DRIVERS_PATH = normpath(AVO_ASSURE_HOME + "/lib/Drivers")
-CHROME_DRIVER_PATH = DRIVERS_PATH + opl + "chromedriver"
-GECKODRIVER_PATH = DRIVERS_PATH + opl + "geckodriver"
-EDGE_DRIVER_PATH = DRIVERS_PATH + opl + "MicrosoftWebDriver.exe"
-EDGE_CHROMIUM_DRIVER_PATH = DRIVERS_PATH + opl + "msedgedriver"
-if SYSTEM_OS == "Windows":
-    CHROME_DRIVER_PATH += ".exe"
-    GECKODRIVER_PATH += ".exe"
-    EDGE_CHROMIUM_DRIVER_PATH += ".exe"
 
 
 def _process_ssl_errors(e):
@@ -118,7 +96,7 @@ def _process_ssl_errors(e):
 
 class MainNamespace(BaseNamespace):
     def on_message(self, *args):
-        global action,cw,browsername,desktopScrapeFlag,allow_connect,connection_Timer,updatecheckFlag,executionOnly,proxies_config
+        global action,cw,browsername,desktopScrapeFlag,allow_connect,connection_Timer,updatecheckFlag,executionOnly
         kill_conn = False
         try:
             if(str(args[0]) == 'connected'):
@@ -140,7 +118,6 @@ class MainNamespace(BaseNamespace):
                         cw.rbox.Enable()
                     if browsercheckFlag == False:
                         check_browser()
-                    proxies_config=readconfig.readProxyConfig().readJson()
                     #if updatecheckFlag == False and root.gui:
                     if updatecheckFlag == False:
                         msg='Checking for client package updates'
@@ -787,7 +764,7 @@ class MainNamespace(BaseNamespace):
         else:
             spath=spath["default"]
         if len(spath) != 0 and os.path.exists(spath):
-            constants.SCREENSHOT_PATH=os.path.normpath(spath)+opl
+            constants.SCREENSHOT_PATH=os.path.normpath(spath)+OS_SEP
         else:
             constants.SCREENSHOT_PATH="Disabled"
             logger.print_on_console("Screenshot capturing disabled since user does not have sufficient privileges for screenshot folder\n")
@@ -904,23 +881,29 @@ class MainNamespace(BaseNamespace):
 
 
 class ConnectionThread(threading.Thread):
-    """Test Worker Thread Class."""
+    """Socket Connection Thread Class."""
     daemon = True
     name = "socketIO_connection"
+
     def __init__(self, ice_action):
         """Init Worker Thread Class."""
         super(ConnectionThread, self).__init__()
         self.ice_action = ice_action
 
-    def get_ice_session(self):
+    def get_ice_session(self, no_params = False):
         server_cert = configvalues['server_cert']
         tls_security = configvalues['tls_security']
         if tls_security == "Low":
             server_cert = False
         elif server_cert != "default":
             if os.path.exists(server_cert) == False:
-                server_cert = CERTIFICATE_PATH + opl +'server.crt'
-        client_cert = (CERTIFICATE_PATH + opl + 'client.crt', CERTIFICATE_PATH + opl + 'client.key')
+                server_cert = CERTIFICATE_PATH + OS_SEP +'server.crt'
+        client_cert = (CERTIFICATE_PATH + OS_SEP + 'client.crt', CERTIFICATE_PATH + OS_SEP + 'client.key')
+        args = {"cert": client_cert, "proxies": proxies}
+        if server_cert != "default": args["verify"] = server_cert
+        if tls_security != "High": args['assert_hostname'] = False
+        if no_params:
+            return args
         key='USERNAME'
         if key not in os.environ:
             key='USER'
@@ -939,9 +922,7 @@ class ConnectionThread(threading.Thread):
         icesession_enc = core_utils_obj.wrap(json.dumps(root.icesession), ice_das_key)
         params={'username': username, 'icename': root.ice_token["icename"],
             'ice_action': self.ice_action, 'icesession': icesession_enc}
-        args = {"cert": client_cert, "params": params,"proxies": proxies_config}
-        if server_cert != "default": args["verify"] = server_cert
-        if tls_security != "High": args['assert_hostname'] = False
+        args["params"] = params
         return args
 
     def run(self):
@@ -1713,13 +1694,14 @@ def check_PatchUpdate():
         import update_module
         flag = True
         data = None
-        SERVER_LOC = ''
-        if os.path.isfile(CONFIG_PATH) == True:
-            configvalues = json.load(open(CONFIG_PATH))
-            SERVER_LOC = "https://" + str(configvalues['server_ip']) + ':' + str(configvalues['server_port']) + '/patchupdate/'
-            manifest_req= requests.get(SERVER_LOC+'/manifest.json',verify=False,proxies=proxies_config)
-            if(manifest_req.status_code == 200):
-                data = json.loads(manifest_req.text)
+        SERVER_LOC = "https://" + str(configvalues['server_ip']) + ':' + str(configvalues['server_port']) + '/patchupdate/'
+        req_kw_args = ConnectionThread(None).get_ice_session(no_params=True)
+        req_kw_args.pop('assert_hostname', None)
+
+        manifest_req = requests.get(SERVER_LOC+'/manifest.json', **req_kw_args)
+        if(manifest_req.status_code == 200):
+            data = json.loads(manifest_req.text)
+
         def update_updater_module(data):
             global update_obj
             update_obj = update_module.Update_Rollback()
@@ -1744,8 +1726,8 @@ def check_PatchUpdate():
                     logger.print_on_console( "Client manifest unavaliable." )
                     log.info( "Client manifest unavaliable." )
                 else:
-                    statcode=requests.get(SERVER_LOC + "/manifest.json", verify=False,proxies=proxies_config).status_code
-                    if( requests.get(SERVER_LOC, verify=False,proxies=proxies_config).status_code == 404) : UPDATE_MSG = UPDATE_MSG[:UPDATE_MSG.index(',')+1] + ' Patch updater server not hosted.'
+                    statcode=requests.get(SERVER_LOC + "/manifest.json", **req_kw_args).status_code
+                    if( requests.get(SERVER_LOC, **req_kw_args).status_code == 404) : UPDATE_MSG = UPDATE_MSG[:UPDATE_MSG.index(',')+1] + ' Patch updater server not hosted.'
                     elif(statcode == 404) : UPDATE_MSG = UPDATE_MSG[:UPDATE_MSG.index(',')+1] + ' "manifest.json" not found, Please ensure "manifest.json" is present in patch updater folder'
                     elif(statcode !=404 or statcode !=200): UPDATE_MSG = UPDATE_MSG[:UPDATE_MSG.index(',')+1] + ' "manifest.json error". ERROR_CODE: ' + str(statcode)
                     logger.print_on_console( UPDATE_MSG )

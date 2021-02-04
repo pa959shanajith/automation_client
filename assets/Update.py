@@ -102,6 +102,46 @@ class Message(wx.Frame):
         if (dlg == 4 ):
             self.Close()
 
+class getProxy():
+
+    def __init__(self):
+        self.proxy_path = os.path.normpath(str(os.getcwd())+"/assets/proxy.json")
+
+    def readJson(self):
+        if os.path.isfile(self.proxy_path)==True:
+            try:
+                conf = open(self.proxy_path, 'r')
+                proxy = json.load(conf)
+                conf.close()
+                if 'enabled' in proxy and proxy['enabled'] == 'Enabled':
+                    scheme = 'http'
+                    if proxy['url'][0:7] == "http://":
+                        proxy['url'] = proxy['url'][7:]
+                    elif proxy['url'][0:9] == "https://":
+                        scheme = 'https'
+                        proxy['url'] = proxy['url'][8:]
+                    proxy['password'] = self.unwrap(proxy['password'])
+                    proxy_url = scheme + "://" + proxy['username']+":"+proxy['password']+"@"+proxy['url']
+                    proxies = {
+                        "http": proxy_url,
+                        "https": proxy_url
+                    }
+                elif 'enabled' in proxy and proxy['enabled'] == 'Disabled':
+                    proxies = {}
+                else:
+                    proxies = None
+            except Exception as e:
+                log.error(e,exc_info=True)
+        return proxies
+
+    def unwrap(self, enc):
+        import base64
+        from Crypto.Cipher import AES
+        unpad = lambda s : s[0:-ord(s[-1])]
+        enc = base64.b64decode(enc)
+        cipher = AES.new(b'\x74\x68\x69\x73'+b'\x49\x73\x41\x53\x65'+b'\x63\x72\x65\x74\x4b\x65\x79', AES.MODE_ECB)
+        return unpad(cipher.decrypt(enc).decode('utf-8'))
+
 class Updater:
     def __init__(self):
         #------------initialization
@@ -242,8 +282,7 @@ class Updater:
     def download_files(self,end_point_list):
         """downloads files from the generated endpoints list"""
         warning_msg = None
-        import readconfig
-        proxies_val=readconfig.readProxyConfig().readJson()
+        proxies_val = getProxy().readJson()
         try:
             log.debug( 'Inside download_files function' )
             self.temp_location = tempfile.gettempdir()

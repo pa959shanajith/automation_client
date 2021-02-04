@@ -242,7 +242,7 @@ class BodyGenarator():
     def server_certs(self,wsdl , operation_name, soap_type, serverCertificate,serverCerificate_pass,auth_uname,auth_pass):
         trust_cert_path=None
         import readconfig
-        proxies_val=readconfig.readProxyConfig().readJson()
+        proxies_val = readconfig.proxies
         import webservices as w
         obj=w.WSkeywords()
         if (not(auth_uname == '' or auth_uname == None) and not(auth_pass == '' or auth_pass == None)):

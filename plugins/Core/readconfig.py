@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------------
-# Name:        module1
+# Name:        readconfig.py
 # Purpose:
 #
 # Author:      prudhvi.gujjuboyina
@@ -14,13 +14,14 @@ import constants
 import json
 import os
 configvalues = None
-proxies_config = {}
+proxies = None
 log = logging.getLogger('readconfig.py')
+
 
 class readConfig():
 
     def __init__(self):
-        self.config_path = os.environ["AVO_ASSURE_HOME"] + '/assets/config.json'
+        self.config_path = constants.CONFIG_PATH
 
     def readJson(self):
         global configvalues
@@ -72,28 +73,41 @@ class readConfig():
             configvalues['configmissing']=os.path.isfile(self.config_path)
         return configvalues
 
+
 class readProxyConfig():
 
     def __init__(self):
-        self.proxy_path= AVO_ASSURE_HOME + "/assets/proxy.json"
+        self.proxy_path = os.path.normpath(AVO_ASSURE_HOME + "/assets/proxy.json")
 
     def readJson(self):
+        global proxies
         if os.path.isfile(self.proxy_path)==True:
             try:
                 conf = open(self.proxy_path, 'r')
                 proxy = json.load(conf)
-                if 'enabled' in proxy and proxy['enabled']== 'Enabled':
-                    proxy['password']=self.decrypt(proxy['password'])
-                    proxy_url=proxy['username']+":"+proxy['password']+"@"+proxy['url']
-                    proxies_config = {"http":"http://"+proxy_url,
-                                "https":":https://"+proxy_url}
-                elif 'enabled' in proxy and proxy['enabled']== 'Disabled':
-                    proxies_config={}
+                conf.close()
+                if 'enabled' in proxy and proxy['enabled'] == 'Enabled':
+                    scheme = 'http'
+                    if proxy['url'][0:7] == "http://":
+                        proxy['url'] = proxy['url'][7:]
+                    elif proxy['url'][0:9] == "https://":
+                        scheme = 'https'
+                        proxy['url'] = proxy['url'][8:]
+                    proxy['password'] = self.unwrap(proxy['password'])
+                    proxy_url = scheme + "://" + proxy['username']+":"+proxy['password']+"@"+proxy['url']
+                    proxies = {
+                        "http": proxy_url,
+                        "https": proxy_url
+                    }
+                elif 'enabled' in proxy and proxy['enabled'] == 'Disabled':
+                    proxies = {}
+                else:
+                    proxies = None
             except Exception as e:
                 log.error(e,exc_info=True)
-        return proxies_config
+        return proxies
 
-    def decrypt(enc):
+    def unwrap(self, enc):
         import base64
         from Crypto.Cipher import AES
         unpad = lambda s : s[0:-ord(s[-1])]
