@@ -593,7 +593,7 @@ class WSkeywords:
         log.debug(STATUS_METHODOUTPUT_LOCALVARIABLES)
         output=None
         err_msg=None
-        try:s
+        try:
             if not (self.baseEndPointURL is '' or self.baseOperation is '' or self.baseReqHeader is ''):
                 req=self.baseEndPointURL+'/'+self.baseOperation
             elif not (self.baseEndPointURL is ''):
