@@ -69,9 +69,6 @@ class QTestWindow():
                 _resp = requests.get(DomainURL, headers=self._headers,verify=False,proxies=readconfig.proxies)   
                 JsonObject = _resp.json()
                 res = [{'id':i['id'],'name':i['name']} for i in JsonObject]
-                self.project_dict = {}
-                for item in JsonObject:
-                    self.project_dict[item['name']] = item['id']
         except Exception as e:
             err_msg='Error while Login in qTest'
             log.error(err_msg)
@@ -82,21 +79,19 @@ class QTestWindow():
     def get_projects(self,filePath):
         res = {"project": []}
         try:
-            project_name = filePath["domain"]
-            releases = []
-            releaseURL = self.qTest_Url + '/api/v3/projects/'+str(self.project_dict[project_name])+'/releases?includeClosed=true'
-            resp = requests.get(releaseURL, headers=self._headers,verify=False,proxies=readconfig.proxies)
+            project_id = filePath["domain"]
+            releaseURL = self.qTest_Url + '/api/v3/projects/'+str(project_id)+'/releases?includeClosed=true'
+            resp = requests.get(releaseURL, headers=self._headers,verify=False)
             JsonObject = resp.json()
             # JsonObject.append({'links': [{'rel': 'test-cycles', 'href': 'dummy.dummy'}], 'name': 'rel1'})
             self.release_dict = {}
             for item in JsonObject:
                 if 'links' in item:
-                    self.release_dict[item['name']] = [i['href'] for i in item['links'] if i['rel']=='test-cycles']
+                    self.release_dict[str(item['id'])] = [i['href'] for i in item['links'] if i['rel']=='test-cycles']
                 else:
-                    self.release_dict[item['name']] = [self.qTest_Url + "/api/v3/projects/"+str(self.project_dict[project_name])+"/test-cycles?parentType=release&parentId="+str(item['id'])]
+                    self.release_dict[str(item['id'])] = [self.qTest_Url + "/api/v3/projects/"+str(project_id)+"/test-cycles?parentType=release&parentId="+str(item['id'])]
             if len(JsonObject) >0:
-                releases = list(self.release_dict.keys())
-                res["project"] = releases
+                res["project"] = [{'id':i['id'],'name':i['name']} for i in JsonObject]
             else:
                 err_msg = 'Selected qTest project has no releases'
                 log.error(err_msg)
@@ -142,6 +137,7 @@ class QTestWindow():
             response = requests.get(folderUrl, headers=self._headers,verify=False,proxies=readconfig.proxies)
             JsonObject = response.json()
             # JsonObject = []
+            newObj = {}
             for cycle in JsonObject:
                 newObj = {}
                 newObj["cycle"]=cycle['name']
