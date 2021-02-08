@@ -63,7 +63,6 @@ if sys.platform == 'win32':
 if __name__ == "__main__":
     try:
         appName = "Avo Assure ICE"
-        constants.SYSTEM_OS = platform.system()
         path = os.environ["AVO_ASSURE_HOME"]+os.sep
         if not os.path.exists(path+"logs"): os.mkdir(path+"logs")
         if not os.path.exists(path+"output"): os.mkdir(path+"output")
