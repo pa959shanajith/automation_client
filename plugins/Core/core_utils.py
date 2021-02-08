@@ -14,6 +14,7 @@ import sys
 import logging
 log = logging.getLogger("core_utils.py")
 import os
+import json
 import codecs
 from Crypto.Cipher import AES
 
@@ -27,7 +28,13 @@ class CoreUtils():
     # sends data length in bytes if memoryformat not provided
     def getdatasize(self,inputdata,memoryformat):
         try:
-            datalength = sys.getsizeof(inputdata)
+            try:
+                datalength = len(json.dumps(inputdata))
+            except:
+                try:
+                    datalength = str(inputdata)
+                except:
+                    datalength = sys.getsizeof(inputdata)
             log.info('Data size in bytes:')
             log.info(datalength)
             kilobytes = datalength/1024

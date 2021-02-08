@@ -91,6 +91,11 @@ def _process_ssl_errors(e):
             " If that doesn't work, then try setting TLS security Level to 'Med' in ICE configuration\n")
     elif 'bad handshake' in error and 'certificate verify failed' in error:
         err = "[TLS Certificate Mismatch] TLS certificate does not match with Server"
+    elif 'certificate' in error and 'key values mismatch' in error:
+        desc_err_msg = "Client Certificate CA bundle is invalid."
+    logger.print_on_console(err_msg)
+    logger.print_on_console(err)
+    logger.print_on_console(desc_err_msg)
     return err, err_msg, desc_err_msg
 
 
@@ -950,17 +955,16 @@ class ConnectionThread(threading.Thread):
             root.socketIO = socketIO
             socketIO.wait()
         except ValueError as e:
-            err, err_msg, desc_err_msg = _process_ssl_errors(e)
-            logger.print_on_console(err_msg)
-            logger.print_on_console(err)
-            logger.print_on_console(desc_err_msg)
+            err, err_msg, _ = _process_ssl_errors(e)
         except Exception as e:
             err = e
-            logger.print_on_console(err_msg)
-            log.error(err, exc_info=True)
+            if 'certificate' in str(e):
+                err, err_msg, _ = _process_ssl_errors(e)
+            else:
+                logger.print_on_console(err_msg)
         if err:
             log.error(err_msg)
-            log.error(err)
+            log.error(err, exc_info=True)
             if root.gui: cw.connectbutton.Enable()
 
 
@@ -1233,16 +1237,16 @@ class Main():
             configvalues['server_port']=url[1]
             if not hold: self.connection("register")
         except requests.exceptions.SSLError as e:
-            err, err_msg, desc_err_msg = _process_ssl_errors(str(e))
-            logger.print_on_console(err_msg)
-            logger.print_on_console(err)
-            logger.print_on_console(desc_err_msg)
+            err, err_msg, _ = _process_ssl_errors(str(e))
         except Exception as e:
             err = e
-            logger.print_on_console(emsg)
+            if 'certificate' in str(e):
+                err, err_msg, _ = _process_ssl_errors(e)
+            else:
+                logger.print_on_console(emsg)
         if err:
-            log.error(emsg)
-            log.error(err)
+            log.error(err_msg)
+            log.error(err, exc_info=True)
             if self.gui: self.cw.enable_register()
             else: self._wants_to_close = True
 

@@ -10,6 +10,7 @@
 #-------------------------------------------------------------------------------
 
 import os
+import platform
 from os.path import normpath
 
 OS_SEP = os.sep
@@ -467,7 +468,7 @@ EDGE_VERSION = {"10.0.17763.1":[44.17763,44.17763]}
 
 EDGE_CHROMIUM_VERSION = {"80.0":[80,80]}
 
-SYSTEM_OS = 'Windows'
+SYSTEM_OS = platform.system()
 
 AWSKEYWORDS=[]
 

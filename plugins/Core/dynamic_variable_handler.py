@@ -18,6 +18,7 @@ import core_utils
 import logging
 #log = logging.getLogger('dynamic_variable_handler.py')
 import ast
+import math
 import threading
 import json
 import controller
@@ -225,7 +226,7 @@ class DynamicVariables:
                 if e.replace('(','').strip()=='' or e.replace(')','').strip()=='' or e.replace('(','').replace(')','').strip()=='':
                     invalid_flag=True
                     invalid_msg=keyword+': Expression must have atleast two operands present for comparision\n'
-                    log.error(keyword+': Expression must have atleast two operands present for comparision')
+                    local_dynamic.log.error(keyword+': Expression must have atleast two operands present for comparision')
             for i in range(len(input_list)):
                 input_list[i]=input_list[i].strip()
             local_dynamic.log.debug('Stage 0: %s',input_list)
@@ -295,17 +296,27 @@ class DynamicVariables:
                         inp_err_list[i]=exp[i]=self.replace_dynamic_variable(exp[i],keyword,con_obj)
                         if exp[i] is None:
                             exp[i]='null'
+                    inf_val = False
                     try:
-                        if type(exp[i]) is int or type(exp[i]) is float:
-                            exp[i]=str(exp[i])
-                        else:
-                            tmp=float(exp[i])
-                    except Exception as e:
-                        if k==2:
-                            invalid_msg+=keyword+': Only numbers are allowed in expression\n'
+                        if float(exp[i]) == math.inf:
+                            inf_val = True
+                            invalid_msg+=keyword+': Value provided in expression is too huge to evaluate\n'
                             invalid_flag=True
                             inp_err_list[i]=' "'+exp[i]+'" '
-                        exp[i]="'"+exp[i].replace("\\","\\\\").replace("'","\\'")+"'"
+                            exp[i]="'"+exp[i].replace("\\","\\\\").replace("'","\\'")+"'"
+                    except: pass
+                    if not inf_val:
+                        try:
+                            if type(exp[i]) is int or type(exp[i]) is float:
+                                exp[i]=str(exp[i])
+                            else:
+                                _=float(exp[i])
+                        except Exception as e:
+                            if k==2:
+                                invalid_msg+=keyword+': Only numbers are allowed in expression\n'
+                                invalid_flag=True
+                                inp_err_list[i]=' "'+exp[i]+'" '
+                            exp[i]="'"+exp[i].replace("\\","\\\\").replace("'","\\'")+"'"
             local_dynamic.log.debug('Stage 4: %s',exp)
         except Exception as e:
             local_dynamic.log.error(e)

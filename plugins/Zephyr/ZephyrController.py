@@ -185,9 +185,9 @@ class ZephyrWindow():
         try:
             if(self.account_id == None) :
                 qcLoginLoad = {}
-                qcLoginLoad["zephyr_accNo"] = data['zephyr_accNo']
-                qcLoginLoad["zephyr_secKey"] = data['zephyr_secKey']
-                qcLoginLoad["zephyr_acKey"] = data['zephyr_acKey']
+                qcLoginLoad["zephyrAccNo"] = data['zephyr_accNo']
+                qcLoginLoad["zephyrSecKey"] = data['zephyr_secKey']
+                qcLoginLoad["zephyrAcKey"] = data['zephyr_acKey']
                 qcLoginLoad["execFlag"] = "1"
                 self.login(qcLoginLoad)
             # update status demo
