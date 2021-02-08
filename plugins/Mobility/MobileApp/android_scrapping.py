@@ -219,6 +219,10 @@ class InstallAndLaunch():
     '''
     def get_screenshot(self, resizeImg=False):
         coords = None
+        img_ratio = None
+        new_height = None
+        new_width = None
+        resized_screenshot_img = None
         user32 = ctypes.windll.user32
         if driver is not None:
             screen_shot = driver.get_screenshot_as_file("test_screenshot.png")

@@ -469,6 +469,20 @@ class iris_mobile_class():
     '''
     def gotoobject(self, objectname, cord, original_device_width, original_device_height):
         t=None
+        aspect_ratio=None
+        resized_x=None
+        resized_y=None
+        resized_template_width=None
+        resized_template_height=None
+        template_height=None
+        template_width=None
+        new_height=None
+        new_width=None
+        device_coords=None
+        device_height=None
+        device_width=None
+        point=None
+        min_dist=None
         try:
             encoded_image = cord.replace('b', '', 1)                # getting the base64 dataobject_image for finding object on device
             decoded_image = base64.b64decode(encoded_image)         # decoding the dataobject_image
