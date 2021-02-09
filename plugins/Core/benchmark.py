@@ -197,6 +197,8 @@ def network():
             else:
                 resArray.append(ping(host[j]))
     sum = 0
+    if len(resArray) == 0:
+        return -99,-99
     for i in range(len(resArray)):
         sum += resArray[i]
     #print("Network Performance",sum/len(resArray))
