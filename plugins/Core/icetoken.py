@@ -53,6 +53,7 @@ class ICEToken():
     def kill_window(self):
         if self.tokenwindow:
             self.tokenwindow.Destroy()
+        self.tokenwindow = None
 
     """ Save the encrypted token in the localappdata folder """
     def save_token(self, token):
@@ -103,7 +104,7 @@ class Token_window(wx.Frame):
     """Initialization and defining the wx-components of the pop-up"""
     def __init__(self, parent, id, title,images_path=None):
         try:
-            wx.Frame.__init__(self, parent=None, title=title, pos=(300, 150), size=(210, 180), style = wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER  |wx.MAXIMIZE_BOX | wx.CLOSE_BOX))
+            wx.Frame.__init__(self, parent=None, title=title, pos=(300, 150), size=(210, 180), style = wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER  | wx.MAXIMIZE_BOX))
             self.SetBackgroundColour('#e6e7e8')
             self.parent=parent
             self.iconpath = images_path +"avo.ico"
@@ -120,6 +121,7 @@ class Token_window(wx.Frame):
                 self.url.SetValue(self.parent.server_url)
             self.token_name.SetValue('Token')
             self.Centre()
+            self.Bind(wx.EVT_CLOSE, self.close)
             wx.Frame(self.panel)
             self.Show()
         except Exception as e:
@@ -133,4 +135,8 @@ class Token_window(wx.Frame):
         token = self.token_name.GetValue().strip()
         self.parent.server_url = url
         self.parent.register(token)
-        self.Destroy()
+        self.parent.token_obj.kill_window()
+
+    def close(self, event):
+        self.parent.cw.connectbutton.Enable()
+        self.parent.token_obj.kill_window()

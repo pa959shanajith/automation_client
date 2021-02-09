@@ -1220,15 +1220,15 @@ class Main():
         ice_das_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
             'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
         err = False
-        emsg = "Error: Invalid Server address or Token . Please try again"
+        err_msg = "Error: Invalid Server address or Token . Please try again"
         try:
             token_dec = core_utils_obj.unwrap(token,ice_das_key).split("@")
             token_info = {'token':token_dec[0],'icetype':token_dec[1] ,'icename':token_dec[2]}
             if self.gui and token_info["icetype"] != "normal":
-                emsg = "Token is provisioned for CI-CD ICE. Either use a token provisioned for Normal mode or register ICE in command line mode."
+                err_msg = "Token is provisioned for CI-CD ICE. Either use a token provisioned for Normal mode or register ICE in command line mode."
                 raise ValueError("Invalid Token/ICE mode")
             if not self.gui and token_info["icetype"] == "normal":
-                emsg = "Token is provisioned for Normal ICE. Either use a token provisioned for CI-CD mode or register ICE in GUI mode."
+                err_msg = "Token is provisioned for Normal ICE. Either use a token provisioned for CI-CD mode or register ICE in GUI mode."
                 raise ValueError("Invalid Token/ICE mode")
             self.ice_token = token_info
             url = self.server_url.split(":")
@@ -1243,7 +1243,7 @@ class Main():
             if 'certificate' in str(e):
                 err, err_msg, _ = _process_ssl_errors(e)
             else:
-                logger.print_on_console(emsg)
+                logger.print_on_console(err_msg)
         if err:
             log.error(err_msg)
             log.error(err, exc_info=True)
@@ -1444,7 +1444,9 @@ class Main():
                 return True
             else:
                 if self.gui:
-                    if not verifyonly: self.token_obj.token_window(self, IMAGES_PATH)
+                    if not verifyonly:
+                        cw.enable_register(enable_button=False)
+                        self.token_obj.token_window(self, IMAGES_PATH)
                 else:
                     if self.opts.host is not None: self.server_url = self.opts.host
                     if self.opts.register:

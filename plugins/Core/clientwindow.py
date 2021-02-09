@@ -407,11 +407,11 @@ class ClientWindow(wx.Frame):
             self.connectbutton.Enable()
             self.rbox.Disable()
 
-    def enable_register(self):
+    def enable_register(self, enable_button = True):
         self.connectbutton.SetBitmapLabel(self.register_img)
         self.connectbutton.SetName("register")
         self.connectbutton.SetToolTip(wx.ToolTip("Register ICE with Avo Assure Server"))
-        self.connectbutton.Enable()
+        if enable_button: self.connectbutton.Enable()
 
     def killChildWindow(self, debug=False, scrape=False, display=False, pdf=False,register=False):
         #Close the debug window
@@ -1299,7 +1299,7 @@ class Config_window(wx.Frame):
         except Exception as e:
             log.error(e)
         wxObject.EnableAll()
-        if self.updated:
+        if self.updated and root.token_obj.tokenwindow is None:
             wxObject.connectbutton.Enable()
         msg = '--Edit Config closed--'
         logger.print_on_console(msg)
