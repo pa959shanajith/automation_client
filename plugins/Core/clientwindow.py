@@ -25,25 +25,10 @@ root = None
 wxObject = None
 icesession = None
 configvalues = None
+proxies = None
 update_obj = None
 SERVER_LOC = None
 pdfgentool = None
-AVO_ASSURE_HOME = os.environ["AVO_ASSURE_HOME"]
-IMAGES_PATH = AVO_ASSURE_HOME + "/assets/images/"
-os.environ["IMAGES_PATH"] = IMAGES_PATH
-CONFIG_PATH= AVO_ASSURE_HOME + "/assets/config.json"
-CERTIFICATE_PATH = AVO_ASSURE_HOME + "/assets/CA_BUNDLE"
-LOGCONFIG_PATH = AVO_ASSURE_HOME + "/assets/logging.conf"
-DRIVERS_PATH = AVO_ASSURE_HOME + "/lib/Drivers"
-CHROME_DRIVER_PATH = DRIVERS_PATH + "/chromedriver"
-GECKODRIVER_PATH = DRIVERS_PATH + "/geckodriver"
-if SYSTEM_OS == "Windows":
-    CHROME_DRIVER_PATH += ".exe"
-    GECKODRIVER_PATH += ".exe"
-MANIFEST_LOC= AVO_ASSURE_HOME + '/assets/about_manifest.json'
-LOC_7Z = AVO_ASSURE_HOME + '/Lib/7zip/7z.exe'
-UPDATER_LOC = AVO_ASSURE_HOME + '/assets/Update.exe'
-if (os.path.exists(UPDATER_LOC[:-3] + "py")): UPDATER_LOC = UPDATER_LOC[:-3] + "py"
 
 
 class RedirectText(object):
@@ -119,6 +104,8 @@ class ClientWindow(wx.Frame):
 
         self.configItem = wx.MenuItem(self.editMenu, 103,text = "&Configuration",kind = wx.ITEM_NORMAL)
         self.editMenu.Append(self.configItem)
+        self.proxyconfigItem = wx.MenuItem(self.editMenu, 104,text = "&Proxy Configuration",kind = wx.ITEM_NORMAL)
+        self.editMenu.Append(self.proxyconfigItem)
         self.menubar.Append(self.editMenu, '&Edit')
 
         self.pdfReportItem = wx.MenuItem(self.toolMenu, 151,text = "Generate PDF &Report",kind = wx.ITEM_NORMAL)
@@ -231,6 +218,17 @@ class ClientWindow(wx.Frame):
                 Config_window(parent = None,id = -1, title="Avo Assure Configuration")
             except Exception as e:
                 msg = "Error while updating configuration"
+                logger.print_on_console(msg)
+                log.info(msg)
+                log.error(e)
+        elif id==104:     # When user selects Edit > Proxy Configuraion
+            try:
+                msg = '--Edit Proxy Config selected--'
+                logger.print_on_console(msg)
+                log.info(msg)
+                ProxyConfig_window(parent = None,id = -1, title="Avo Assure Proxy Configuration")
+            except Exception as e:
+                msg = "Error while updating proxy configuration"
                 logger.print_on_console(msg)
                 log.info(msg)
                 log.error(e)
@@ -352,7 +350,6 @@ class ClientWindow(wx.Frame):
         log.info(msg)
         controller.terminate_flag=True
         controller.manual_terminate_flag=True
-        core.termination_inprogress = True
         #Calling AWS stop job on terminate (if present)
         try:
             root.testthread.con.aws_obj.stop_job()
@@ -410,11 +407,11 @@ class ClientWindow(wx.Frame):
             self.connectbutton.Enable()
             self.rbox.Disable()
 
-    def enable_register(self):
+    def enable_register(self, enable_button = True):
         self.connectbutton.SetBitmapLabel(self.register_img)
         self.connectbutton.SetName("register")
         self.connectbutton.SetToolTip(wx.ToolTip("Register ICE with Avo Assure Server"))
-        self.connectbutton.Enable()
+        if enable_button: self.connectbutton.Enable()
 
     def killChildWindow(self, debug=False, scrape=False, display=False, pdf=False,register=False):
         #Close the debug window
@@ -1216,7 +1213,6 @@ class Config_window(wx.Frame):
                 self.connection_timeout.SetLabel('Connection Timeout')
                 self.connection_timeout.SetForegroundColour((0,0,0))
 
-
     """jsonCreater saves the data in json form, location of file to be saved must be defined. This method will overwrite the existing .json file"""
     def jsonCreater(self,data):
         try:
@@ -1303,7 +1299,7 @@ class Config_window(wx.Frame):
         except Exception as e:
             log.error(e)
         wxObject.EnableAll()
-        if self.updated:
+        if self.updated and root.token_obj.tokenwindow is None:
             wxObject.connectbutton.Enable()
         msg = '--Edit Config closed--'
         logger.print_on_console(msg)
@@ -1318,7 +1314,7 @@ class About_window(wx.Frame):
             data = self.get_client_manifest()
             msg1='Avo Assure ICE '+ str(data['version']) + ' (64-bit)' +' \n'
             msg2='Updated on : '+ str(data['updated_on']) +' \n'
-            msg3='For any queries write to us at support.nineteen68@slkgroup.com'+' \n'
+            msg3='For any queries write to us at support@avoautomation.com'+' \n'
             msg4='© Avo Automation\n'
             #------------------------------------Different co-ordinates for Windows and Mac
             if SYSTEM_OS=='Windows':
@@ -1552,16 +1548,168 @@ class DebugWindow(wx.Frame):
         root.testthread.resume(True)
 
 
+class ProxyConfig_window(wx.Frame):
+    """Initialization and defining the wx-components of the pop-up"""
+    def __init__(self, parent, id, title):
+        try:
+            data = self.readproxyconfig()
+            #------------------------------------Different co-ordinates for Windows and Mac
+            if SYSTEM_OS=='Windows':
+                upload_fields= {
+                "Frame":[(300, 150),(400,220)],
+                "disp_msg":[(12,18),(80, 28),(100,18), (310,-1),(415,18),(30, -1)],
+                "proxy_enable":[(12,10), (150, 48)],
+                "proxy_url":[(12,65),(95, 20),(110,61), (250,-1)],
+                "username":[(12,95),(95, 20),(110,91), (250,-1)],
+                "passwd":[(12,125),(95, 20),(110,121), (250,-1)],
+                "Save":[(92,148), (100, 28)],
+                "Close":[(192,148), (100, 28)]
+            }
+            else:
+                upload_fields={
+                "Frame":[(300, 150),(550,220)],#(diff +85,+10 from windows)
+                "disp_msg":[(12,38),(80,28),(116,38),(382,-1),(504,38),(30, -1)],
+                "Close":[(285,88),(100, 28)]
+            }
+            lblList = ['Enabled', 'Disabled']
+            wx.Frame.__init__(self, parent, title=title,pos=upload_fields["Frame"][0], size=upload_fields["Frame"][1], style = wx.CAPTION|wx.CLIP_CHILDREN)
+            self.SetBackgroundColour('#e6e7e8')
+            self.iconpath = IMAGES_PATH + "avo.ico"
+            self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
+            self.SetIcon(self.wicon)
+            self.panel = wx.Panel(self)
+            self.rbox1 = wx.RadioBox(self.panel, label = 'Enable Proxy', choices = lblList, majorDimension = 1,
+                style = wx.RA_SPECIFY_ROWS, pos=upload_fields["proxy_enable"][0], size=upload_fields["proxy_enable"][1])
+            self.rbox1.SetToolTip(wx.ToolTip("Enable or Disable Proxy in Avo Assure ICE"))
+            self.rbox1.Bind(wx.EVT_RADIOBOX, self.radio_check)
+            self.proxy_url_path=wx.StaticText(self.panel, label="Proxy URL", pos=upload_fields["proxy_url"][0],size=upload_fields["proxy_url"][1], style=0, name="")
+            self.proxy_url_path.SetToolTip(wx.ToolTip("Proxy URL (must start with http:// or https://)"))
+            self.proxy_url=wx.TextCtrl(self.panel, pos=upload_fields["proxy_url"][2], size=upload_fields["proxy_url"][3])
+            if data != False:
+                self.proxy_url.SetValue(data['url'])
+            else:
+                self.proxy_url.SetValue('')
+
+            self.proxy_user_path=wx.StaticText(self.panel, label="Proxy Username", pos=upload_fields["username"][0],size=upload_fields["username"][1], style=0, name="")
+            self.proxy_user_path.SetToolTip(wx.ToolTip("Username for proxy authentication"))
+            self.proxy_user = wx.TextCtrl(self.panel, pos=upload_fields["username"][2], size=upload_fields["username"][3])
+            if data != False:
+                self.proxy_user.SetValue(data['username'])
+            else:
+                self.proxy_user.SetValue('')
+
+            self.proxy_pass_path=wx.StaticText(self.panel, label="Proxy Password", pos=upload_fields["passwd"][0],size=upload_fields["passwd"][1], style=0, name="")
+            self.proxy_pass_path.SetToolTip(wx.ToolTip("Password for proxy authentication"))
+            self.proxy_pass=wx.TextCtrl(self.panel, pos=upload_fields["passwd"][2], size=upload_fields["passwd"][3])
+            if data != False:
+                self.proxy_pass.SetValue(data['password'])
+            else:
+                self.proxy_pass.SetValue('')
+
+            if data != False and data['enabled'].title()==lblList[0]:
+                self.rbox1.SetSelection(0)
+                self.toggle_all(True)
+            else:
+                self.rbox1.SetSelection(1)
+                self.toggle_all(False)
+
+            # self.image = wx.StaticBitmap(self.panel, -1, wx.Bitmap(IMAGES_PATH + 'AVO_Assure.png', wx.BITMAP_TYPE_ANY), wx.Point(10, 10))
+            self.close_btn = wx.Button(self.panel, label="Close",pos=upload_fields["Close"][0], size=upload_fields["Close"][1])
+            self.close_btn.Bind(wx.EVT_BUTTON, self.close)
+            self.save_btn=wx.Button(self.panel, label="Save",pos=upload_fields["Save"][0], size=upload_fields["Save"][1])
+            self.save_btn.Bind(wx.EVT_BUTTON, self.save)
+            self.Centre()
+            wx.Frame(self.panel)
+            self.Show()
+        except Exception as e:
+            logger.print_on_console("Error occured in Proxy Config")
+            log.error("Error occured in Proxy Config. Err msg : " + str(e))
+
+    def readproxyconfig(self):
+        try:
+            with open(PROXY_PATH) as json_data:
+                return json.load(json_data)
+        except Exception as e:
+            log.error(e)
+            return False
+
+    def jsonCreater(self, data):
+        try:
+            if wx.MessageBox("Would you like to save updated proxy config?","Confirm Save",wx.ICON_QUESTION | wx.YES_NO) == wx.YES:
+                # Write JSON file
+                with io.open(PROXY_PATH, 'w', encoding='utf8') as outfile:
+                    str_ = json.dumps(data,indent=4, sort_keys=True,separators=(',', ': '), ensure_ascii=False)
+                    outfile.write(str(str_))
+                logger.print_on_console('--Proxy Configuration saved--')
+                log.info('--Proxy Configuration saved--')
+                self.updated = True
+        except Exception as e:
+            msg = "Error while updating configuration"
+            logger.print_on_console(msg)
+            log.info(msg)
+            log.error(e)
+
+    def close(self, event):
+        self.Destroy()
+        global proxies
+        proxies = readconfig.readProxyConfig().readJson()
+        core.proxies = proxies
+
+    def save(self,event):
+        data = {
+            'enabled': self.rbox1.GetStringSelection(),
+            'url': self.proxy_url.GetValue(),
+            'username': self.proxy_user.GetValue(),
+            'password': self.proxy_pass.GetValue()
+        }
+        nosave = False
+        if data['enabled'] == "Enabled":
+            if not (data['url'].startswith("http://") or data['url'].startswith("https://")):
+                self.proxy_url_path.SetLabel('Proxy URL*')
+                self.proxy_url_path.SetForegroundColour((255,0,0))
+                nosave = True
+            else:
+                self.proxy_url_path.SetLabel('Proxy URL')
+                self.proxy_url_path.SetForegroundColour((0,0,0))
+            if len(data['username']) == 0 and len(data['password']) != 0:
+                self.proxy_user_path.SetLabel('Proxy Username*')
+                self.proxy_user_path.SetForegroundColour((255,0,0))
+                nosave = True
+            else:
+                self.proxy_user_path.SetLabel('Proxy Username')
+                self.proxy_user_path.SetForegroundColour((0,0,0))
+            if len(data['username']) != 0 and len(data['password']) == 0:
+                self.proxy_pass_path.SetLabel('Proxy Password*')
+                self.proxy_pass_path.SetForegroundColour((255,0,0))
+                nosave = True
+            else:
+                self.proxy_pass_path.SetLabel('Proxy Password')
+                self.proxy_pass_path.SetForegroundColour((0,0,0))
+        if not nosave:
+            self.jsonCreater(data)
+
+    def toggle_all(self, value):
+        self.proxy_url.Enable(value)
+        self.proxy_user.Enable(value)
+        self.proxy_pass.Enable(value)
+
+    def radio_check(self,event):
+        self.toggle_all(self.rbox1.GetStringSelection() == 'Enabled')
+
+
 def check_update(flag):
     global update_obj
     SERVER_LOC = "https://" + str(configvalues['server_ip']) + ':' + str(configvalues['server_port']) + '/patchupdate/'
+    req_kw_args = ConnectionThread(None).get_ice_session(no_params=True)
+    req_kw_args.pop('assert_hostname', None)
+
     #------------------------------------------------------------getting server manifest
     def get_server_manifest_data():
         data = None
         request = None
         emsg = "Error in fetching update manifest from server"
         try:
-            request = requests.get(SERVER_LOC + "/manifest.json", verify=False)
+            request = requests.get(SERVER_LOC + "/manifest.json", **req_kw_args)
             if(request.status_code ==200):
                 data = json.loads(request.text) #will return json of the manifest
         except Exception as e:
@@ -1594,8 +1742,8 @@ def check_update(flag):
             logger.print_on_console( "Client manifest unavaliable." )
             log.info( "Client manifest unavaliable." )
         else:
-            statcode=requests.get(SERVER_LOC + "/manifest.json", verify=False).status_code
-            if( requests.get(SERVER_LOC, verify=False).status_code == 404) : UPDATE_MSG = UPDATE_MSG[:UPDATE_MSG.index(',')+1] + ' Patch updater server not hosted.'
+            statcode=requests.get(SERVER_LOC + "/manifest.json", **req_kw_args).status_code
+            if( requests.get(SERVER_LOC, **req_kw_args).status_code == 404) : UPDATE_MSG = UPDATE_MSG[:UPDATE_MSG.index(',')+1] + ' Patch updater server not hosted.'
             elif(statcode == 404) : UPDATE_MSG = UPDATE_MSG[:UPDATE_MSG.index(',')+1] + ' "manifest.json" not found, Please ensure "manifest.json" is present in patch updater folder'
             elif(statcode !=404 or statcode !=200): UPDATE_MSG = UPDATE_MSG[:UPDATE_MSG.index(',')+1] + ' "manifest.json error". ERROR_CODE: ' + str(statcode)
             logger.print_on_console( UPDATE_MSG )

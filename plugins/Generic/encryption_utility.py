@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------------
-# Name:        module2
+# Name:        encryption_utility.py
 # Purpose:
 #
 # Author:      rakesh.v
@@ -59,4 +59,3 @@ class AESCipher:
         if err_msg is not None:
             logger.print_on_console(err_msg)
             log.info(err_msg)
-

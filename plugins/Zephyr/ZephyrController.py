@@ -21,6 +21,7 @@ import datetime
 import jwt
 import time
 import hashlib
+import readconfig
 log = logging.getLogger("ZephyrController.py")
 
 class ZephyrWindow():
@@ -66,7 +67,7 @@ class ZephyrWindow():
                 'Content-Type': 'text/plain',
                 'zapiAccessKey': self.access_key
             }
-            respon = requests.get(self.base_url+self.relative_path, headers=self._headers,verify=False)
+            respon = requests.get(self.base_url+self.relative_path, headers=self._headers,verify=False,proxies=readconfig.proxies)
 
             if execFlag == "0":
                 self.jira_url = filePath["zephyrJiraUrl"]
@@ -80,12 +81,12 @@ class ZephyrWindow():
                 headersVal = {'Authorization':'Basic %s'% encSt.decode('ascii')}
                 #checking account id
                 acc_id_url = self.jira_url+"/rest/api/3/myself"
-                acc_id_resp = requests.get(acc_id_url, headers=headersVal,verify=False)
+                acc_id_resp = requests.get(acc_id_url, headers=headersVal,verify=False,proxies=readconfig.proxies)
                 if acc_id_resp.status_code == 200:
                     res_str = acc_id_resp.json()
                     if not (res_str["accountId"] == self.account_id):
                         return res            
-                resp = requests.get(self.jira_url+login_url, headers=headersVal, verify=False)
+                resp = requests.get(self.jira_url+login_url, headers=headersVal, verify=False,proxies=readconfig.proxies)
                 JsonObject = None
                 if resp.status_code == 200 and respon.status_code == 200:
                     # response = json.loads(resp.text)
@@ -116,7 +117,7 @@ class ZephyrWindow():
             tokengen = self.jira_username + ":" + self.jira_access_token
             encSt = base64.b64encode(bytes(tokengen, 'utf-8'))
             headersVal = {'Authorization':'Basic %s'% encSt.decode('ascii')}
-            resp = requests.get(versions, headers=headersVal, verify=False)
+            resp = requests.get(versions, headers=headersVal, verify=False,proxies=readconfig.proxies)
             response = resp.json()
             self.versions = []
             if resp.status_code == 200:
@@ -140,7 +141,7 @@ class ZephyrWindow():
                     'zapiAccessKey': self.access_key
                 }
 
-                resp = requests.get(self.base_url+self.relative_path, headers=self._headers,verify=False)
+                resp = requests.get(self.base_url+self.relative_path, headers=self._headers,verify=False,proxies=readconfig.proxies)
                 JsonObject = resp.json()
                 if resp.status_code == 200:
                     for i in JsonObject:
@@ -165,7 +166,7 @@ class ZephyrWindow():
                                 'zapiAccessKey': self.access_key
                             }
 
-                            resp = requests.get(self.base_url+self.relative_path, headers=self._headers,verify=False)
+                            resp = requests.get(self.base_url+self.relative_path, headers=self._headers,verify=False,proxies=readconfig.proxies)
                             JsonObject = resp.json()
                             if resp.status_code == 200:
                                 if 'searchObjectList' in JsonObject and len(JsonObject['searchObjectList']) != 0:
@@ -184,9 +185,9 @@ class ZephyrWindow():
         try:
             if(self.account_id == None) :
                 qcLoginLoad = {}
-                qcLoginLoad["zephyr_accNo"] = data['zephyr_accNo']
-                qcLoginLoad["zephyr_secKey"] = data['zephyr_secKey']
-                qcLoginLoad["zephyr_acKey"] = data['zephyr_acKey']
+                qcLoginLoad["zephyrAccNo"] = data['zephyr_accNo']
+                qcLoginLoad["zephyrSecKey"] = data['zephyr_secKey']
+                qcLoginLoad["zephyrAcKey"] = data['zephyr_acKey']
                 qcLoginLoad["execFlag"] = "1"
                 self.login(qcLoginLoad)
             # update status demo
@@ -209,7 +210,7 @@ class ZephyrWindow():
                 'zapiAccessKey': self.access_key
             }
 
-            resp = requests.put(self.base_url+self.relative_path, headers=self._headers,json=exec_data,verify=False)
+            resp = requests.put(self.base_url+self.relative_path, headers=self._headers,json=exec_data,verify=False,proxies=readconfig.proxies)
             status = (resp.status_code == 200)
         except Exception as e:
             err_msg = 'Error while updating data in Zephyr'

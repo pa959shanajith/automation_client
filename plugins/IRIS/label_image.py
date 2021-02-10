@@ -100,35 +100,35 @@ class LabelImage():
 
             labels = load_labels(label_file)
             file_name = os.environ['AVO_ASSURE_HOME'] + '/test.png'
-
+            obj=view
             with tf.Session(graph=graph) as sess:
-                for obj in view:
-                    byte_mirror = base64.b64encode(obj['cord'].encode('utf-8'))
-                    b64 = base64.b64decode(byte_mirror)
-                    mirror = b64[2:len(b64)-1]
-                    with open('test.png','wb') as f:
-                        f.write(base64.b64decode(mirror))
-                    t = read_tensor_from_image_file(
-                      file_name,
-                      input_height=input_height,
-                      input_width=input_width,
-                      input_mean=input_mean,
-                      input_std=input_std)
-                    results = sess.run(output_operation.outputs[0], {
-                        input_operation.outputs[0]: t
-                    })
-                    results = np.squeeze(results)
+                #for obj in view:
+                byte_mirror = base64.b64encode(obj['cord'].encode('utf-8'))
+                b64 = base64.b64decode(byte_mirror)
+                mirror = b64[2:len(b64)-1]
+                with open('test.png','wb') as f:
+                    f.write(base64.b64decode(mirror))
+                t = read_tensor_from_image_file(
+                  file_name,
+                  input_height=input_height,
+                  input_width=input_width,
+                  input_mean=input_mean,
+                  input_std=input_std)
+                results = sess.run(output_operation.outputs[0], {
+                    input_operation.outputs[0]: t
+                })
+                results = np.squeeze(results)
 
-                    top_k = results.argsort()[-5:][::-1]
+                top_k = results.argsort()[-5:][::-1]
 
-                    result = {}
-                    for i in top_k:
-                        result[results[i]] = labels[i]
-                    if(float(max(result.keys()))>0.75):
-                        prediction_results[obj['custname']] = result[max(result.keys())]
-                        prediction_results[obj['custname']] = prediction_results[obj['custname']][0].upper() + prediction_results[obj['custname']][1:]
-                    else:
-                        prediction_results[obj['custname']] = 'Unable to recognize object type'
+                result = {}
+                for i in top_k:
+                    result[results[i]] = labels[i]
+                if(float(max(result.keys()))>0.75):
+                    prediction_results[obj['custname']] = result[max(result.keys())]
+                    prediction_results[obj['custname']] = prediction_results[obj['custname']][0].upper() + prediction_results[obj['custname']][1:]
+                else:
+                    prediction_results[obj['custname']] = 'UnrecognizableObject'
             if(os.path.isfile(file_name)):
                 os.remove(file_name)
         except Exception as e:

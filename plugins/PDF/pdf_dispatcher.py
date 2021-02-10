@@ -38,7 +38,7 @@ class PDFDispatcher:
         self.exception_flag=''
         self.action = None
 
-    def dispatcher(self,teststepproperty,input,iris_flag):
+    def dispatcher(self,teststepproperty,input):
         objectname = teststepproperty.objectname
         output = teststepproperty.outputval
         objectname = objectname.strip()

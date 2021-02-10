@@ -76,22 +76,27 @@ class SendFunctionKeys:
         try:
             log.debug('reading the inputs')
             input=str(input)
-            if not(input is None or input is ''):
+            if not(input is None or input is '' or input == 'None'):
                 count=self.get_args(args)
-                if count == 'type':
+                if count[1] == 'type':
                     log.debug('sending the keys in input')
                     configvalues = readconfig.readConfig().readJson()
-                    self.type(input, float(configvalues['delay_stringinput']))
+                    for i in range(count[0]):
+                        self.type(input, float(configvalues['delay_stringinput']))
+                    status=TEST_RESULT_PASS
+                    methodoutput=TEST_RESULT_TRUE
                 else:
                     if '+' in input:
                         keys_list=input.split('+')
                         log.debug('sending multiple  keys')
-                        self.press_multiple_keys(keys_list,count)
+                        self.press_multiple_keys(keys_list,count[0])
+                        status=TEST_RESULT_PASS
+                        methodoutput=TEST_RESULT_TRUE
 
                     else:
                         log.debug('sending the keys in input')
                         try:
-                            self.execute_key(input,count)
+                            self.execute_key(input,count[0])
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
                         except Exception as e:
@@ -157,16 +162,20 @@ class SendFunctionKeys:
 
     def get_args(self,args):
         value=1
+        string_input = None
         if len(args)>1 :
             if args[0] is not None or args[0] != '':
-                if (args[0].startswith('|') and args[0].endswith('|')) or (args[0].startswith('{') and args[0].endswith('}')):
-                    value= 'type'
-                elif args[-1]!='':
+                for each_args in args:
+                    #if (args[0].startswith('|') and args[0].endswith('|')) or (args[0].startswith('{') and args[0].endswith('}')):
+                    if (each_args.startswith('|') and each_args.endswith('|')) or (each_args.startswith('{') and each_args.endswith('}')):
+                        #value= 'type'
+                        string_input='type'
+                if args[-1]!='':
                     if (re.match(('^\d+$'),args[-1]))!=False:
                         value=int(args[-1])
         elif len(args)==1:
             if (args[0].startswith('|') and args[0].endswith('|')) or (args[0].startswith('{') and args[0].endswith('}')):
-                    value= 'type'
-            else:
-                value=value
-        return value
+                    #value= 'type'
+                    string_input='type'
+            value=value
+        return value,string_input

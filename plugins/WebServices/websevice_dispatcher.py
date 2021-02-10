@@ -41,7 +41,7 @@ class Dispatcher:
                   'setparam':self.webservice.setParam
                 }
             if keyword in ws_dict.keys():
-                if keyword in ['settagvalue','settagattribute']:
+                if keyword in ['settagvalue','settagattribute','setparam']:
                     message=list(message)
                     message.append(tsp.objectname)
                 elif keyword == 'executerequest':

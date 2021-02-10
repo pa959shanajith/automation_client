@@ -2,9 +2,7 @@ import sys
 import os
 import logging
 import argparse
-import readconfig
 import platform
-import constants
 log = logging.getLogger('Avo_Assure')
 
 parser = argparse.ArgumentParser(description="Avo Assure ICE Platform")
@@ -36,7 +34,11 @@ if args.register or args.connect:
             except: parser.error("Invalid Token provided for register operation")
         if args.host is None:
             print("No value provided for host. Reading values from configuration file")
+
+import constants
+import readconfig
 configvalues = readconfig.readConfig().readJson()
+proxies = readconfig.readProxyConfig().readJson()
 
 """
 This code snippet blocks the inheritance of file handlers from
@@ -61,12 +63,12 @@ if sys.platform == 'win32':
 if __name__ == "__main__":
     try:
         appName = "Avo Assure ICE"
-        constants.SYSTEM_OS = platform.system()
         path = os.environ["AVO_ASSURE_HOME"]+os.sep
         if not os.path.exists(path+"logs"): os.mkdir(path+"logs")
         if not os.path.exists(path+"output"): os.mkdir(path+"output")
         import core
         core.configvalues = configvalues
+        core.proxies = proxies
         core.Main(appName, args)
     except Exception as e:
         log.error(e, exc_info=True)

@@ -101,7 +101,7 @@ class Utils:
         except Exception as e:
             status=False
             log.error(e)
-            logger.print_on_console(e)
+            #logger.print_on_console(e)
         return status
 
     def find_oebswindow_and_attach(self,windowname,*args):

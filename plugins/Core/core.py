@@ -33,10 +33,8 @@ try:
     from socketlib_override import SocketIO, BaseNamespace, socketIO_prepare_http_session as prepare_http_session
 except ImportError:
     from socketIO_client import SocketIO, BaseNamespace, prepare_http_session
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
-requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
 log = logging.getLogger('core.py')
-opl = os.sep
 root = None
 cw = None
 browsername = None
@@ -68,6 +66,7 @@ socketIO = None
 allow_connect = False
 plugins_list = []
 configvalues = {}
+proxies = None
 execution_flag = False
 closeActiveConnection = False
 connection_Timer = None
@@ -75,25 +74,6 @@ status_ping_thread = None
 update_obj = None
 termination_inprogress = False
 core_utils_obj = core_utils.CoreUtils()
-AVO_ASSURE_HOME = os.environ["AVO_ASSURE_HOME"]
-IMAGES_PATH = normpath(AVO_ASSURE_HOME + "/assets/images") + opl
-os.environ["IMAGES_PATH"] = IMAGES_PATH
-ICE_CONST = normpath(AVO_ASSURE_HOME + "/assets/ice_const.json")
-MANIFEST_LOC = normpath(AVO_ASSURE_HOME + "/assets/about_manifest.json")
-LOC_7Z = normpath(AVO_ASSURE_HOME + '/Lib/7zip/7z.exe')
-UPDATER_LOC = normpath(AVO_ASSURE_HOME + '/assets/Update.exe')
-CONFIG_PATH = normpath(AVO_ASSURE_HOME + "/assets/config.json")
-CERTIFICATE_PATH = normpath(AVO_ASSURE_HOME + "/assets/CA_BUNDLE")
-LOGCONFIG_PATH = normpath(AVO_ASSURE_HOME + "/assets/logging.conf")
-DRIVERS_PATH = normpath(AVO_ASSURE_HOME + "/lib/Drivers")
-CHROME_DRIVER_PATH = DRIVERS_PATH + opl + "chromedriver"
-GECKODRIVER_PATH = DRIVERS_PATH + opl + "geckodriver"
-EDGE_DRIVER_PATH = DRIVERS_PATH + opl + "MicrosoftWebDriver.exe"
-EDGE_CHROMIUM_DRIVER_PATH = DRIVERS_PATH + opl + "msedgedriver"
-if SYSTEM_OS == "Windows":
-    CHROME_DRIVER_PATH += ".exe"
-    GECKODRIVER_PATH += ".exe"
-    EDGE_CHROMIUM_DRIVER_PATH += ".exe"
 
 
 def _process_ssl_errors(e):
@@ -111,6 +91,11 @@ def _process_ssl_errors(e):
             " If that doesn't work, then try setting TLS security Level to 'Med' in ICE configuration\n")
     elif 'bad handshake' in error and 'certificate verify failed' in error:
         err = "[TLS Certificate Mismatch] TLS certificate does not match with Server"
+    elif 'certificate' in error and 'key values mismatch' in error:
+        desc_err_msg = "Client Certificate CA bundle is invalid."
+    logger.print_on_console(err_msg)
+    logger.print_on_console(err)
+    logger.print_on_console(desc_err_msg)
     return err, err_msg, desc_err_msg
 
 
@@ -784,7 +769,7 @@ class MainNamespace(BaseNamespace):
         else:
             spath=spath["default"]
         if len(spath) != 0 and os.path.exists(spath):
-            constants.SCREENSHOT_PATH=os.path.normpath(spath)+opl
+            constants.SCREENSHOT_PATH=os.path.normpath(spath)+OS_SEP
         else:
             constants.SCREENSHOT_PATH="Disabled"
             logger.print_on_console("Screenshot capturing disabled since user does not have sufficient privileges for screenshot folder\n")
@@ -901,23 +886,29 @@ class MainNamespace(BaseNamespace):
 
 
 class ConnectionThread(threading.Thread):
-    """Test Worker Thread Class."""
+    """Socket Connection Thread Class."""
     daemon = True
     name = "socketIO_connection"
+
     def __init__(self, ice_action):
         """Init Worker Thread Class."""
         super(ConnectionThread, self).__init__()
         self.ice_action = ice_action
 
-    def get_ice_session(self):
+    def get_ice_session(self, no_params = False):
         server_cert = configvalues['server_cert']
         tls_security = configvalues['tls_security']
         if tls_security == "Low":
             server_cert = False
         elif server_cert != "default":
             if os.path.exists(server_cert) == False:
-                server_cert = CERTIFICATE_PATH + opl +'server.crt'
-        client_cert = (CERTIFICATE_PATH + opl + 'client.crt', CERTIFICATE_PATH + opl + 'client.key')
+                server_cert = CERTIFICATE_PATH + OS_SEP +'server.crt'
+        client_cert = (CERTIFICATE_PATH + OS_SEP + 'client.crt', CERTIFICATE_PATH + OS_SEP + 'client.key')
+        args = {"cert": client_cert, "proxies": proxies}
+        if server_cert != "default": args["verify"] = server_cert
+        if tls_security != "High": args['assert_hostname'] = False
+        if no_params:
+            return args
         key='USERNAME'
         if key not in os.environ:
             key='USER'
@@ -936,9 +927,7 @@ class ConnectionThread(threading.Thread):
         icesession_enc = core_utils_obj.wrap(json.dumps(root.icesession), ice_das_key)
         params={'username': username, 'icename': root.ice_token["icename"],
             'ice_action': self.ice_action, 'icesession': icesession_enc}
-        args = {"cert": client_cert, "params": params}
-        if server_cert != "default": args["verify"] = server_cert
-        if tls_security != "High": args['assert_hostname'] = False
+        args["params"] = params
         return args
 
     def run(self):
@@ -966,17 +955,16 @@ class ConnectionThread(threading.Thread):
             root.socketIO = socketIO
             socketIO.wait()
         except ValueError as e:
-            err, err_msg, desc_err_msg = _process_ssl_errors(e)
-            logger.print_on_console(err_msg)
-            logger.print_on_console(err)
-            logger.print_on_console(desc_err_msg)
+            err, err_msg, _ = _process_ssl_errors(e)
         except Exception as e:
             err = e
-            logger.print_on_console(err_msg)
-            log.error(err, exc_info=True)
+            if 'certificate' in str(e):
+                err, err_msg, _ = _process_ssl_errors(e)
+            else:
+                logger.print_on_console(err_msg)
         if err:
             log.error(err_msg)
-            log.error(err)
+            log.error(err, exc_info=True)
             if root.gui: cw.connectbutton.Enable()
 
 
@@ -1018,6 +1006,7 @@ class TestThread(threading.Thread):
         # This is the code executing in the new thread.
         global execution_flag, closeActiveConnection, connection_Timer, termination_inprogress
         batch_id = None
+        termination_inprogress = True
         try:
             self.con = controller.Controller()
             self.con.configvalues=configvalues
@@ -1062,7 +1051,6 @@ class TestThread(threading.Thread):
 
             if status==TERMINATE:
                 logger.print_on_console('---------Termination Completed-------',color="YELLOW")
-                termination_inprogress = False
             if self.action==DEBUG:
                 testcasename = handler.local_handler.testcasename
                 self.cw.killChildWindow(debug=True)
@@ -1103,6 +1091,7 @@ class TestThread(threading.Thread):
         self.main.testthread = None
         execution_flag = False
         #set ICE status as available
+        termination_inprogress = False
         set_ICE_status(True)
         if self.main.gui:
             if self.cw.choice=='RunfromStep': self.cw.breakpoint.Enable()
@@ -1231,15 +1220,15 @@ class Main():
         ice_das_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
             'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
         err = False
-        emsg = "Error: Invalid Server address or Token . Please try again"
+        err_msg = "Error: Invalid Server address or Token . Please try again"
         try:
             token_dec = core_utils_obj.unwrap(token,ice_das_key).split("@")
             token_info = {'token':token_dec[0],'icetype':token_dec[1] ,'icename':token_dec[2]}
             if self.gui and token_info["icetype"] != "normal":
-                emsg = "Token is provisioned for CI-CD ICE. Either use a token provisioned for Normal mode or register ICE in command line mode."
+                err_msg = "Token is provisioned for CI-CD ICE. Either use a token provisioned for Normal mode or register ICE in command line mode."
                 raise ValueError("Invalid Token/ICE mode")
             if not self.gui and token_info["icetype"] == "normal":
-                emsg = "Token is provisioned for Normal ICE. Either use a token provisioned for CI-CD mode or register ICE in GUI mode."
+                err_msg = "Token is provisioned for Normal ICE. Either use a token provisioned for CI-CD mode or register ICE in GUI mode."
                 raise ValueError("Invalid Token/ICE mode")
             self.ice_token = token_info
             url = self.server_url.split(":")
@@ -1248,16 +1237,16 @@ class Main():
             configvalues['server_port']=url[1]
             if not hold: self.connection("register")
         except requests.exceptions.SSLError as e:
-            err, err_msg, desc_err_msg = _process_ssl_errors(str(e))
-            logger.print_on_console(err_msg)
-            logger.print_on_console(err)
-            logger.print_on_console(desc_err_msg)
+            err, err_msg, _ = _process_ssl_errors(str(e))
         except Exception as e:
             err = e
-            logger.print_on_console(emsg)
+            if 'certificate' in str(e):
+                err, err_msg, _ = _process_ssl_errors(e)
+            else:
+                logger.print_on_console(err_msg)
         if err:
-            log.error(emsg)
-            log.error(err)
+            log.error(err_msg)
+            log.error(err, exc_info=True)
             if self.gui: self.cw.enable_register()
             else: self._wants_to_close = True
 
@@ -1455,7 +1444,9 @@ class Main():
                 return True
             else:
                 if self.gui:
-                    if not verifyonly: self.token_obj.token_window(self, IMAGES_PATH)
+                    if not verifyonly:
+                        cw.enable_register(enable_button=False)
+                        self.token_obj.token_window(self, IMAGES_PATH)
                 else:
                     if self.opts.host is not None: self.server_url = self.opts.host
                     if self.opts.register:
@@ -1709,13 +1700,14 @@ def check_PatchUpdate():
         import update_module
         flag = True
         data = None
-        SERVER_LOC = ''
-        if os.path.isfile(CONFIG_PATH) == True:
-            configvalues = json.load(open(CONFIG_PATH))
-            SERVER_LOC = "https://" + str(configvalues['server_ip']) + ':' + str(configvalues['server_port']) + '/patchupdate/'
-            manifest_req= requests.get(SERVER_LOC+'/manifest.json',verify=False)
-            if(manifest_req.status_code == 200):
-                data = json.loads(manifest_req.text)
+        SERVER_LOC = "https://" + str(configvalues['server_ip']) + ':' + str(configvalues['server_port']) + '/patchupdate/'
+        req_kw_args = ConnectionThread(None).get_ice_session(no_params=True)
+        req_kw_args.pop('assert_hostname', None)
+
+        manifest_req = requests.get(SERVER_LOC+'/manifest.json', **req_kw_args)
+        if(manifest_req.status_code == 200):
+            data = json.loads(manifest_req.text)
+
         def update_updater_module(data):
             global update_obj
             update_obj = update_module.Update_Rollback()
@@ -1740,8 +1732,8 @@ def check_PatchUpdate():
                     logger.print_on_console( "Client manifest unavaliable." )
                     log.info( "Client manifest unavaliable." )
                 else:
-                    statcode=requests.get(SERVER_LOC + "/manifest.json", verify=False).status_code
-                    if( requests.get(SERVER_LOC, verify=False).status_code == 404) : UPDATE_MSG = UPDATE_MSG[:UPDATE_MSG.index(',')+1] + ' Patch updater server not hosted.'
+                    statcode=requests.get(SERVER_LOC + "/manifest.json", **req_kw_args).status_code
+                    if( requests.get(SERVER_LOC, **req_kw_args).status_code == 404) : UPDATE_MSG = UPDATE_MSG[:UPDATE_MSG.index(',')+1] + ' Patch updater server not hosted.'
                     elif(statcode == 404) : UPDATE_MSG = UPDATE_MSG[:UPDATE_MSG.index(',')+1] + ' "manifest.json" not found, Please ensure "manifest.json" is present in patch updater folder'
                     elif(statcode !=404 or statcode !=200): UPDATE_MSG = UPDATE_MSG[:UPDATE_MSG.index(',')+1] + ' "manifest.json error". ERROR_CODE: ' + str(statcode)
                     logger.print_on_console( UPDATE_MSG )
@@ -1804,4 +1796,3 @@ def stop_ping_thread():
         status_ping_thread.cancel()
         time.sleep(0.5)
         status_ping_thread = None
-

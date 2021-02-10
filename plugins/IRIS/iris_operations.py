@@ -24,7 +24,9 @@ if SYSTEM_OS != 'Darwin':
     import pywinauto
 vertical = []
 horizontal = []
-verifyexists = []
+relativeCoordinates = []
+verifyFlag = False
+dropIrisFlag = False
 TESSERACT_PATH = os.environ["AVO_ASSURE_HOME"] + '/Lib/Tesseract-OCR'
 TESSERACT_PATH_EXISTS = os.path.isdir(TESSERACT_PATH)
 
@@ -122,7 +124,14 @@ def get_ocr(image):
     cv2.imwrite(filename, thresh_img)
 
     """Step 6: Load the image as a PIL/Pillow image, apply OCR, and then delete the temporary file"""
-    text = pytesseract.image_to_string(Image.open(filename))
+    try:
+        text = pytesseract.image_to_string(Image.open(filename))
+    except Exception as e:
+        log.info('WARNING!: error occured in get_ocr, ERR_MSG : ' + str(e))
+        if(TESSERACT_PATH_EXISTS) :
+            log.info('pytessaract is not pointing to TESSERACT_PATH, adding TESSERACT_PATH to path')
+            pytesseract.tesseract_cmd = TESSERACT_PATH + '/tesseract'
+            text = pytesseract.image_to_string(Image.open(filename))
     os.remove(filename)
 
     del image, rez_image, gray_img, filter_img, thresh_img, filename #deleting variables
@@ -134,6 +143,7 @@ def hough_transform_p(img, pos):
     Input : Image, Position
     Output : N/A, assigns sorted line pos to horizontal and vertical global variables
     Method Referenced in : getrowcountiris, getcolcountiris
+    Reference : https://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_imgproc/py_houghlines/py_houghlines.html
     """
     global horizontal,vertical
     # open and process images
@@ -204,7 +214,30 @@ def gotoobject(elem):
 
     template = cv2.imread('sample.png',0)
     w, h = template.shape[::-1]
+    """
+    Template matching:
+        Template matching is a technique in digital image processing for finding small parts of an image which match a template image.
+        It can be used in manufacturing as a part of quality control, a way to navigate a mobile robot, or as a way to detect edges in images.
+        The main challenges in the template matching task are: occlusion, detection of non-rigid transformations, illumination and background changes, background clutter and scale changes.
+
+        T′(x′,y′)=T(x′,y′)−1/(w⋅h)⋅∑x′′,y′′T(x′′,y′′)
+
+    Template matching methods:
+       1. cv2.TM_CCOEFF( Template Matching Correlation Coefficient ) : The −1/(w⋅h)⋅∑x″,y″T(x″,y″) in the TM_CCOEFF method is simply used to a) make the template and image zero mean and b) make the dark parts of the image negative values and the bright parts of the image positive values.
+       This means that when bright parts of the template and image overlap you'll get a positive value in the dot product, as well as when dark parts overlap with dark parts (-ve value x -ve value gives +ve value). That means you get a +ve score for both bright parts matching and dark parts matching.
+       When you have dark on template (-ve) and bright on image (+ve) you get a -ve value. And when you have bright on template (+ve) and dark on image (-ve) you also get a -ve value. This means you get a negative score on mismatches.
+       2. cv2.TM_CCOEFF_NORMED :
+       3. cv2.TM_CCORR( Template Matching Correlation ) : When the −1/(w⋅h)⋅∑x″,y″T(x″,y″) term is absent, i.e. in TM_CCORR method, then you don't get any penalty when there are mismatches between the template and the image. Effectively this method is measuring where you get the brightest set of pixels
+       in the image that are the same shape to the template.
+       4. cv2.TM_CCORR_NORMED :
+       5. cv2.TM_SQDIFF( Template Matching Square Difference ) :
+       6. cv2.TM_SQDIFF_NORMED :
+    """
     res = cv2.matchTemplate(img_gray,template,cv2.TM_CCOEFF_NORMED)
+
+    """
+    KeyPoint Matching
+    """
     threshold = 0.9
     loc = np.where( res >= threshold)
     ind = np.unravel_index(np.argmax(res, axis=None), res.shape)
@@ -214,37 +247,36 @@ def gotoobject(elem):
     min_dist = None
     for pt in zip(*loc[::-1]):
         total_points.append(pt)
-        cv2.rectangle(img_rgb, pt, (pt[0] + w, pt[1] + h), (0,0,255), 2)
+        cv2.rectangle(img_rgb, pt, (pt[0] + w, pt[1] + h), (0,0,255), 2) #cv2.rectangle(img, top_left, bottom_right, 255, 2)
     #cv2.imwrite('res1.png',img_rgb)
     if(len(pt) > 0):
         if(len(total_points)>1):
             """If multiple matches are found, choose the one which is closest to the captured coordinates."""
             point = ()
-            min_dist = sys.maxsize
+            min_dist = sys.maxsize # sys.maxsize - fetches the largest value a variable of data type Py_ssize_t can store
             for p in total_points:
-                dist = math.sqrt( (int(elem['coordinates'][0]) - p[0])**2 + (int(elem['coordinates'][1]) - p[1])**2 )
+                dist = math.sqrt( (int(elem['coordinates'][0]) - p[0])**2 + (int(elem['coordinates'][1]) - p[1])**2 ) #finding the square root
                 if(dist<min_dist):
                     min_dist = dist
                     point = p
         else:
             point = (ind[1],ind[0])
-        pyautogui.moveTo(point[0]+ int(w/2),point[1] + int(h/2))
+        if(not dropIrisFlag): pyautogui.moveTo(point[0]+ int(w/2),point[1] + int(h/2))
     else:
         """If no matches are found, try scaling down the image. If still no match, try scaling up."""
         point,w,h = scaleUpOrDown(0.2,elem,template,img_rgb)
         if(len(point)>0):
-            pyautogui.moveTo(point[0]+ int(w/2),point[1] + int(h/2))
+            if(not dropIrisFlag):pyautogui.moveTo(point[0]+ int(w/2),point[1] + int(h/2))
         else:
             point,w,h = scaleUpOrDown(2.0,elem,template,img_rgb)
             if(len(point)>0):
-                pyautogui.moveTo(point[0]+ int(w/2),point[1] + int(h/2))
+                if(not dropIrisFlag):pyautogui.moveTo(point[0]+ int(w/2),point[1] + int(h/2))
     if(os.path.isfile('sample.png')):
         os.remove('sample.png')
     if(os.path.isfile('test.png')):
         os.remove('test.png')
-    del elem, mirror, img_rgb, img_gray, fh, im, template, w, h, res, threshold, loc, ind, pt, total_points, dist, min_dist #deleting variables
-    return point
-
+    del elem, mirror, img_rgb, img_gray, fh, im, template, res, threshold, loc, ind, pt, total_points, dist, min_dist #deleting variables
+    return point, w, h
 
 def find_relative_image(elements, const_new_coordinates):
     """
@@ -439,6 +471,16 @@ def get_byte_mirror(element_cord):
     return img
 
 class IRISKeywords():
+    def __init__(self):
+        self.dragIrisPos = {'x':'','y':''}
+        self.dragIrisFlag = False
+        global relativeCoordinates
+        global verifyFlag
+        global dropIrisFlag
+        relativeCoordinates = []
+        verifyFlag = False
+        dropIrisFlag = False
+
     def clickiris(self,element,*args):
         """
         Discription: Performs a click operation on the IRIS object, if VerifyExistIRIS is provided then uses that(IRIS object) as a parent reference, then finds the element to perform action.
@@ -459,21 +501,23 @@ class IRISKeywords():
         height = None
         try:
             img = None
-            if(len(args) == 3 and args[2]!='' and len(verifyexists)>0):
+            if(len(args) == 3 and args[2]!='' and verifyFlag ):
+                log.info('IRIS element recognised as a relative element')
                 elem_coordinates = element['coordinates']
                 const_coordintes = args[2]['coordinates']
                 elements = [(const_coordintes[0],const_coordintes[1]),
                         (const_coordintes[2],const_coordintes[3]),
                         (elem_coordinates[0], elem_coordinates[1]),
                         (elem_coordinates[2], elem_coordinates[3])]
-                img, res = find_relative_image(elements, verifyexists)
+                img, res = find_relative_image(elements, relativeCoordinates)
                 log.info( 'Relative image co-ordinates : ' + str(res) )
                 width = res[2] - res[0]
                 height = res[3] - res[1]
                 pyautogui.moveTo(res[0]+ int(width/2),res[1] + int(height/2))
                 log.info( "Element co-ordinates after finding relative image are : " + str(res) )
             else:
-                res = gotoobject(element)
+                log.info('IRIS element recognised as a non-relative element')
+                res, width, height = gotoobject(element)
             if( len(res) > 0 ):
                 if SYSTEM_OS != 'Darwin': pythoncom.CoInitialize()
                 log.info('Performing clickiris')
@@ -512,20 +556,22 @@ class IRISKeywords():
         width = None
         height = None
         try:
-            if(len(args) == 3 and args[2]!='' and len(verifyexists)>0):
+            if(len(args) == 3 and args[2]!='' and verifyFlag ):
+                log.info('IRIS element recognised as a relative element')
                 elem_coordinates = element['coordinates']
                 const_coordintes = args[2]['coordinates']
                 elements = [(const_coordintes[0],const_coordintes[1]),
                         (const_coordintes[2],const_coordintes[3]),
                         (elem_coordinates[0], elem_coordinates[1]),
                         (elem_coordinates[2], elem_coordinates[3])]
-                img, res = find_relative_image(elements, verifyexists)
+                img, res = find_relative_image(elements, relativeCoordinates)
                 log.info( 'Relative image co-ordinates : ' + str(res) )
                 width = res[2] - res[0]
                 height = res[3] - res[1]
                 pyautogui.moveTo(res[0]+ int(width/2),res[1] + int(height/2))
             else:
-                res = gotoobject(element)
+                log.info('IRIS element recognised as a non-relative element')
+                res, width, height = gotoobject(element)
             if(len(res)>0):
                 if SYSTEM_OS != 'Darwin': pythoncom.CoInitialize()
                 log.info('Performing doubleClick')
@@ -560,20 +606,22 @@ class IRISKeywords():
         width = None
         height = None
         try:
-            if(len(args) == 3 and args[2]!='' and len(verifyexists)>0):
+            if(len(args) == 3 and args[2]!='' and verifyFlag ):
+                log.info('IRIS element recognised as a relative element')
                 elem_coordinates = element['coordinates']
                 const_coordintes = args[2]['coordinates']
                 elements = [(const_coordintes[0],const_coordintes[1]),
                         (const_coordintes[2],const_coordintes[3]),
                         (elem_coordinates[0], elem_coordinates[1]),
                         (elem_coordinates[2], elem_coordinates[3])]
-                img, res = find_relative_image(elements, verifyexists)
+                img, res = find_relative_image(elements, relativeCoordinates)
                 log.info( 'Relative image co-ordinates : ' + str(res) )
                 width = res[2] - res[0]
                 height = res[3] - res[1]
                 pyautogui.moveTo(res[0]+ int(width/2),res[1] + int(height/2))
             else:
-                res = gotoobject(element)
+                log.info('IRIS element recognised as a non-relative element')
+                res, width, height = gotoobject(element)
             if(len(res)>0):
                 if SYSTEM_OS != 'Darwin': pythoncom.CoInitialize()
                 log.info('Performing rightClick')
@@ -612,20 +660,22 @@ class IRISKeywords():
         width = None
         height = None
         try:
-            if(len(args) == 3 and args[2]!='' and len(verifyexists)>0):
+            if(len(args) == 3 and args[2]!='' and verifyFlag ):
+                log.info('IRIS element recognised as a relative element')
                 elem_coordinates = element['coordinates']
                 const_coordintes = args[2]['coordinates']
                 elements = [(const_coordintes[0],const_coordintes[1]),
                         (const_coordintes[2],const_coordintes[3]),
                         (elem_coordinates[0], elem_coordinates[1]),
                         (elem_coordinates[2], elem_coordinates[3])]
-                img, res = find_relative_image(elements, verifyexists)
+                img, res = find_relative_image(elements, relativeCoordinates)
                 log.info( 'Relative image co-ordinates : ' + str(res) )
                 width = res[2] - res[0]
                 height = res[3] - res[1]
                 pyautogui.moveTo(res[0]+ int(width/2),res[1] + int(height/2))
             else:
-                res = gotoobject(element)
+                log.info('IRIS element recognised as a non-relative element')
+                res, width, height = gotoobject(element)
             if(len(res)>0):
                 if SYSTEM_OS != 'Darwin':
                     pythoncom.CoInitialize()
@@ -674,20 +724,22 @@ class IRISKeywords():
         height = None
         flag = False
         try:
-            if(len(args) == 3 and args[2]!='' and len(verifyexists)>0):
+            if(len(args) == 3 and args[2]!='' and verifyFlag ):
+                log.info('IRIS element recognised as a relative element')
                 elem_coordinates = element['coordinates']
                 const_coordintes = args[2]['coordinates']
                 elements = [(const_coordintes[0],const_coordintes[1]),
                         (const_coordintes[2],const_coordintes[3]),
                         (elem_coordinates[0], elem_coordinates[1]),
                         (elem_coordinates[2], elem_coordinates[3])]
-                img, res = find_relative_image(elements, verifyexists)
+                img, res = find_relative_image(elements, relativeCoordinates)
                 log.info( 'Relative image co-ordinates : ' + str(res) )
                 width = res[2] - res[0]
                 height = res[3] - res[1]
                 pyautogui.moveTo(res[0]+ int(width/2),res[1] + int(height/2))
             else:
-                res = gotoobject(element)
+                log.info('IRIS element recognised as a non-relative element')
+                res, width, height = gotoobject(element)
             if(len(res) > 0):
                 pythoncom.CoInitialize()
                 if (args[0][0] == None or args[0][0] == '' or args[0][0] == str(0)):
@@ -759,28 +811,30 @@ class IRISKeywords():
         width = None
         height = None
         try:
-            if(len(args) == 3 and args[2]!='' and len(verifyexists)>0):
+            if(len(args) == 3 and args[2]!='' and verifyFlag ):
+                log.info('IRIS element recognised as a relative element')
                 elem_coordinates = element['coordinates']
                 const_coordintes = args[2]['coordinates']
                 elements = [(const_coordintes[0],const_coordintes[1]),
                         (const_coordintes[2],const_coordintes[3]),
                         (elem_coordinates[0], elem_coordinates[1]),
                         (elem_coordinates[2], elem_coordinates[3])]
-                img, res = find_relative_image(elements, verifyexists)
+                img, res = find_relative_image(elements, relativeCoordinates)
                 log.info( 'Relative image co-ordinates : ' + str(res) )
                 width = res[2] - res[0]
                 height = res[3] - res[1]
                 pyautogui.moveTo(res[0]+ int(width/2),res[1] + int(height/2))
             else:
-                res = gotoobject(element)
+                log.info('IRIS element recognised as a non-relative element')
+                res, width, height = gotoobject(element)
             if( len(res) > 0 ):
                 encryption_obj = AESCipher()
                 input_val_temp = encryption_obj.decrypt( args[0][0] )
                 if SYSTEM_OS != 'Darwin':
                     pythoncom.CoInitialize()
                     pyautogui.click()
-                    robot = Robot()
                     time.sleep(1)
+                    robot = Robot()
                     robot.type_string(input_val_temp, delay=0.2)
                 else:
                     pyautogui.click()
@@ -819,6 +873,7 @@ class IRISKeywords():
         const_coordintes = None
         elements = []
         height = None
+        width = None
         #-----------
         image = None
         text = ''
@@ -833,17 +888,19 @@ class IRISKeywords():
                     pytesseract.tesseract_cmd = TESSERACT_PATH + '/bin/tesseract'
                     os.environ["TESSDATA_PREFIX"] = TESSERACT_PATH + '/share/tessdata'
                 #---------------------------------------------------------------taking Tessaract path for respective OS
-                if(len(args) == 3 and args[2]!='' and len(verifyexists)>0):
+                if(len(args) == 3 and args[2]!='' and verifyFlag ):
+                    log.info('IRIS element recognised as a relative element')
                     elem_coordinates = element['coordinates']
                     const_coordintes = args[2]['coordinates']
                     elements = [(const_coordintes[0],const_coordintes[1]),
                             (const_coordintes[2],const_coordintes[3]),
                             (elem_coordinates[0], elem_coordinates[1]),
                             (elem_coordinates[2], elem_coordinates[3])]
-                    img, res = find_relative_image(elements, verifyexists)
+                    img, res = find_relative_image(elements, relativeCoordinates)
                     log.info( 'Relative image co-ordinates : '+str(res) )
                 else:
-                    res = gotoobject(element)
+                    log.info('IRIS element recognised as a non-relative element')
+                    res, width, height = gotoobject(element)
                     if(res): img = get_byte_mirror(element['cord'])
                 if (res and img):
                     with open("cropped.png", "wb") as f:
@@ -981,7 +1038,7 @@ class IRISKeywords():
             err_msg = "Error occurred in GetTextIris, Err_Msg : " + str(e)
             log.error( err_msg )
             logger.print_on_console( "Error occurred in GetTextIris" )
-        del element, args, img, res, elem_coordinates, const_coordintes, elements, height, image, text, opt # deleting variables
+        del element, args, img, res, elem_coordinates, const_coordintes, elements, height, width, image, text, opt # deleting variables
         return status, result, value, err_msg
 
     def getrowcountiris(self,element,*args):
@@ -1001,19 +1058,23 @@ class IRISKeywords():
         elem_coordinates = None
         const_coordintes = None
         elements =[]
+        height = None
+        width = None
         try:
             img = None
-            if(len(args) == 3 and args[2]!='' and len(verifyexists)>0):
+            if(len(args) == 3 and args[2]!='' and verifyFlag ):
+                log.info('IRIS element recognised as a relative element')
                 elem_coordinates = element['coordinates']
                 const_coordintes = args[2]['coordinates']
                 elements = [(const_coordintes[0],const_coordintes[1]),
                         (const_coordintes[2],const_coordintes[3]),
                         (elem_coordinates[0], elem_coordinates[1]),
                         (elem_coordinates[2], elem_coordinates[3])]
-                img, res = find_relative_image(elements, verifyexists)
+                img, res = find_relative_image(elements, relativeCoordinates)
                 log.info( 'Relative image co-ordinates : '+str(res) )
             else:
-                res = gotoobject(element)
+                log.info('IRIS element recognised as a non-relative element')
+                res, width, height = gotoobject(element)
                 if(res): img = get_byte_mirror(element['cord'])
             if( res and img ):
                 with open("cropped.png", "wb") as f:
@@ -1040,7 +1101,7 @@ class IRISKeywords():
         except Exception as e:
             log.error("Error occurred in GetRowCountIris, Err_Msg : ",e)
             logger.print_on_console("Error occurred in GetRowCountIris")
-        del element, args, img, res, elem_coordinates, const_coordintes, elements # deleting variables
+        del element, args, img, res, elem_coordinates, const_coordintes, elements, height, width # deleting variables
         return status,result,value,err_msg
 
     def getcolcountiris(self,element,*args):
@@ -1061,18 +1122,22 @@ class IRISKeywords():
         const_coordintes = None
         elements = []
         rotated = None
+        height = None
+        width = None
         try:
-            if(len(args) == 3 and args[2]!='' and len(verifyexists)>0):
+            if(len(args) == 3 and args[2]!='' and verifyFlag ):
+                log.info('IRIS element recognised as a relative element')
                 elem_coordinates = element['coordinates']
                 const_coordintes = args[2]['coordinates']
                 elements = [(const_coordintes[0],const_coordintes[1]),
                         (const_coordintes[2],const_coordintes[3]),
                         (elem_coordinates[0], elem_coordinates[1]),
                         (elem_coordinates[2], elem_coordinates[3])]
-                img, res = find_relative_image(elements, verifyexists)
+                img, res = find_relative_image(elements, relativeCoordinates)
                 log.info( 'Relative image co-ordinates : '+str(res) )
             else:
-                res = gotoobject(element)
+                log.info('IRIS element recognised as a non-relative element')
+                res, width, height = gotoobject(element)
                 if(res): img = get_byte_mirror(element['cord'])
             if( res and img ):
                 with open("cropped.png", "wb") as f:
@@ -1100,7 +1165,7 @@ class IRISKeywords():
             err_msg = "Error occurred in GetColCountIris, Err_Msg : " + str(e)
             log.error( err_msg )
             logger.print_on_console( "Error occurred in GetColCountIris" )
-        del element, args, img, res, elem_coordinates, const_coordintes, elements, rotated # deleting variables
+        del element, args, img, res, elem_coordinates, const_coordintes, elements, rotated, height, width # deleting variables
         return status, result, value, err_msg
 
     def getcellvalueiris(self,element,*args):
@@ -1122,23 +1187,27 @@ class IRISKeywords():
         elem_coordinates = None
         const_coordintes = None
         elements = []
+        height = None
+        width = None
         try:
             self.getrowcountiris(element)
             if( TESSERACT_PATH_EXISTS ):
                 pytesseract.tesseract_cmd = TESSERACT_PATH + '/tesseract'
                 os.environ["TESSDATA_PREFIX"] = TESSERACT_PATH + '/tessdata'
                 img = None
-                if( len(args) == 3 and args[2] != '' and len(verifyexists) > 0 ):
+                if( len(args) == 3 and args[2] != '' and verifyFlag ):
+                    log.info('IRIS element recognised as a relative element')
                     elem_coordinates = element['coordinates']
                     const_coordintes = args[2]['coordinates']
                     elements = [(const_coordintes[0],const_coordintes[1]),
                             (const_coordintes[2],const_coordintes[3]),
                             (elem_coordinates[0], elem_coordinates[1]),
                             (elem_coordinates[2], elem_coordinates[3])]
-                    img, res = find_relative_image(elements, verifyexists)
+                    img, res = find_relative_image(elements, relativeCoordinates)
                     log.info( 'Relative image co-ordinates : '+str(res) )
                 else:
-                    res = gotoobject(element)
+                    log.info('IRIS element recognised as a non-relative element')
+                    res, width, height = gotoobject(element)
                     if(res): img = get_byte_mirror(element['cord'])
                 if( res and img ):
                     with open("cropped.png", "wb") as f:
@@ -1161,7 +1230,7 @@ class IRISKeywords():
             err_msg = "Error occurred in GetCellValueIris, Err_Msg : " + str(e)
             log.error( err_msg )
             logger.print_on_console( "Error occurred in GetCellValueIris" )
-        del element, args, img, res, elem_coordinates, const_coordintes, elements, row, col # deleting variables
+        del element, args, img, res, elem_coordinates, const_coordintes, elements, row, col, width, height # deleting variables
         return status,result,value,err_msg
 
     def verifyexistsiris(self,element,*args):
@@ -1183,32 +1252,44 @@ class IRISKeywords():
         width = None
         height = None
         try:
-            global verifyexists
-            if( len(args) == 3 and args[2] != '' and len(verifyexists) > 0 ):
+            global relativeCoordinates
+            global verifyFlag
+            if( len(args) == 3 and args[2] != '' and args[2] !='constant' and verifyFlag ):
+                log.info('IRIS element recognised as a relative element')
                 elem_coordinates = element['coordinates']
                 const_coordintes = args[2]['coordinates']
                 elements = [(const_coordintes[0],const_coordintes[1]),
                         (const_coordintes[2],const_coordintes[3]),
                         (elem_coordinates[0], elem_coordinates[1]),
                         (elem_coordinates[2], elem_coordinates[3])]
-                img, res = find_relative_image(elements, verifyexists)
+                img, res = find_relative_image(elements, relativeCoordinates)
                 log.info( 'Relative image co-ordinates : '+str(res) )
                 width = res[2] - res[0]
                 height = res[3] - res[1]
                 pyautogui.moveTo(res[0]+ int(width/2),res[1] + int(height/2))
             else:
-                res = gotoobject(element)
+                log.info('IRIS element recognised as a non-relative element')
+                res, width, height = gotoobject(element)
             if( len(res) > 0 ):
                 status= TEST_RESULT_PASS
                 result = TEST_RESULT_TRUE
-                verifyexists = res
-                logger.print_on_console('Element exists.')
+                if( len(args) == 3 and args[2] == 'constant' ):
+                    relativeCoordinates = res
+                    verifyFlag = True
+                    logger.print_on_console('Element exists and identified as constant')
+                    log.info('verifyFlag set to True, Parent element recognised - all iris objects will be treated as relative IRIS elements.')
+                else:
+                    logger.print_on_console('Element exists.')
             else:
                 err_msg = "Object not found."
+                verifyFlag = False
+                log.info('verifyFlag set to False, Parent element unrecognised - all iris objects will be treated as regular IRIS elements.')
             if ( err_msg ):
                 log.info( err_msg )
                 logger.print_on_console( err_msg )
         except Exception as e:
+            verifyFlag = False
+            log.info('verifyFlag set to Flase, Parent element unrecognised - all iris objects will be treated as regular IRIS elements.')
             err_msg = "Error occurred in VerifyExistsIris, Err_Msg : " + str(e)
             log.error( err_msg )
             logger.print_on_console( "Error occurred in VerifyExistsIris" )
@@ -1234,21 +1315,25 @@ class IRISKeywords():
         image = None
         text = ''
         verifytext = args[0][0]
+        height = None
+        width = None
         try:
             if( TESSERACT_PATH_EXISTS ):
                 pytesseract.tesseract_cmd = TESSERACT_PATH + '/tesseract'
                 os.environ["TESSDATA_PREFIX"] = TESSERACT_PATH + '/tessdata'
-                if(len(args) == 3 and args[2]!='' and len(verifyexists)>0):
+                if(len(args) == 3 and args[2]!='' and verifyFlag ):
+                    log.info('IRIS element recognised as a relative element')
                     elem_coordinates = element['coordinates']
                     const_coordintes = args[2]['coordinates']
                     elements = [(const_coordintes[0],const_coordintes[1]),
                             (const_coordintes[2],const_coordintes[3]),
                             (elem_coordinates[0], elem_coordinates[1]),
                             (elem_coordinates[2], elem_coordinates[3])]
-                    img, res = find_relative_image(elements, verifyexists)
+                    img, res = find_relative_image(elements, relativeCoordinates)
                     log.info( 'Relative image co-ordinates : '+str(res) )
                 else:
-                    res = gotoobject(element)
+                    log.info('IRIS element recognised as a non-relative element')
+                    res, width, height = gotoobject(element)
                     if(res): img = get_byte_mirror(element['cord'])
                 if( res and img ):
                     with open("cropped.png", "wb") as f:
@@ -1275,5 +1360,178 @@ class IRISKeywords():
             err_msg = "Error occurred in VerifyTextIris, Err_Msg : " + str(e)
             log.error( err_msg )
             logger.print_on_console( "Error occurred in VerifyTextIris" )
-        del element, args, img, res, elem_coordinates, const_coordintes, elements, text, verifytext, image # deleting variables
+        del element, args, img, res, elem_coordinates, const_coordintes, elements, text, verifytext, image, height, width # deleting variables
+        return status, result, value, err_msg
+
+    def dragiris(self,element,*args):
+        """
+        Discription: Set mouse position to the center of the scraped element and hold that element
+        Input: N/A
+        Output: Boolean Value
+        """
+        log.info('Inside dragIris and No. of arguments passed are : '+str(len(args)))
+        status = TEST_RESULT_FAIL
+        result = TEST_RESULT_FALSE
+        err_msg = None
+        value = OUTPUT_CONSTANT
+        img = None
+        res = None
+        elem_coordinates = None
+        const_coordintes = None
+        elements = []
+        width = None
+        height = None
+        img = None
+        try:
+            if(len(args) == 3 and args[2]!='' and verifyFlag ):
+                elem_coordinates = element['coordinates']
+                const_coordintes = args[2]['coordinates']
+                elements = [(const_coordintes[0],const_coordintes[1]),
+                        (const_coordintes[2],const_coordintes[3]),
+                        (elem_coordinates[0], elem_coordinates[1]),
+                        (elem_coordinates[2], elem_coordinates[3])]
+                img, res = find_relative_image(elements, relativeCoordinates)
+                width = res[2] - res[0]
+                height = res[3] - res[1]
+                log.info('Moving the mouse cursor to the element that needs to be dragged')
+                pyautogui.moveTo(res[0]+ int(width/2),res[1] + int(height/2))
+                self.dragIrisPos['x'] = res[0] + int(width/2)
+                self.dragIrisPos['y'] = res[1] + int(height/2)
+                log.info('Moved the mouse cursor to the element that needs to be dragged')
+                log.info( 'Relative image co-ordinates : ' + str(res) )
+            else:
+                res, width, height = gotoobject(element)
+                self.dragIrisPos['x'] = res[0] + int(width/2)
+                self.dragIrisPos['y'] = res[0] + int(height/2)
+                log.info( 'Image co-ordinates : ' + str(res) )
+            if( len(res) > 0 ):
+                self.dragIrisFlag = True
+                status= TEST_RESULT_PASS
+                result = TEST_RESULT_TRUE
+            else:
+                err_msg = "Object not found"
+                self.dragIrisFlag = False
+            if ( err_msg ):
+                log.info( err_msg )
+                logger.print_on_console( err_msg )
+        except Exception as e:
+            self.dragIrisFlag = False
+            err_msg = "Error occurred in dragIris, Err_Msg : " + str(e)
+            log.error( err_msg )
+            logger.print_on_console( "Error occurred in dragIris" )
+        del element, args, img, res, elem_coordinates, const_coordintes, elements, height, width # deleting variables
+        return status, result, value, err_msg
+
+    def dropiris(self,element,*args):
+        """
+        Discription: Drop the dragiris-element to the target element described in dropiris
+        Input: N/A
+        Output: Boolean Value
+        """
+        log.info('Inside dropIris and No. of arguments passed are : '+str(len(args)))
+        status = TEST_RESULT_FAIL
+        result = TEST_RESULT_FALSE
+        err_msg = None
+        value = OUTPUT_CONSTANT
+        img = None
+        res = None
+        elem_coordinates = None
+        const_coordintes = None
+        elements = []
+        width = None
+        height = None
+        img = None
+        try:
+            global dropIrisFlag
+            if ( self.dragIrisFlag ):
+                #check if co-ordinates are on the drag-element if True ignor , if False then move mouse cursor to drag-element
+                x, y = pyautogui.position()
+                if( self.dragIrisPos['x'] != x and self.dragIrisPos['y'] != y ): pyautogui.moveTo(self.dragIrisPos['x'], self.dragIrisPos['y'])
+
+                if(len(args) == 3 and args[2]!='' and verifyFlag ):
+                    elem_coordinates = element['coordinates']
+                    const_coordintes = args[2]['coordinates']
+                    elements = [(const_coordintes[0],const_coordintes[1]),
+                            (const_coordintes[2],const_coordintes[3]),
+                            (elem_coordinates[0], elem_coordinates[1]),
+                            (elem_coordinates[2], elem_coordinates[3])]
+                    img, res = find_relative_image(elements, relativeCoordinates)
+                    log.info( 'Relative image co-ordinates : ' + str(res) )
+                    width = res[2] - res[0]
+                    height = res[3] - res[1]
+                else:
+                    dropIrisFlag = True
+                    res, width, height = gotoobject(element)
+                    dropIrisFlag = False
+                    log.info( 'Image co-ordinates : ' + str(res) )
+                if( len(res) > 0 ):
+                    log.info('Dragging the element to drop location')
+                    pyautogui.dragTo(res[0]+ int(width/2),res[1] + int(height/2),1,button='left') #dragTo(X,Y,time in seconds to drag over,left/right click)
+                    log.info('Dragged the element to drop location')
+                    status= TEST_RESULT_PASS
+                    result = TEST_RESULT_TRUE
+                else:
+                    err_msg = "Object not found"
+            else:
+                err_msg = "Error: dragIris is not selected, cannot drag item"
+            if ( err_msg ):
+                log.info( err_msg )
+                logger.print_on_console( err_msg )
+        except Exception as e:
+            err_msg = "Error occurred in dropIris, Err_Msg : " + str(e)
+            log.error( err_msg )
+            logger.print_on_console( "Error occurred in dropIris" )
+        del element, args, img, res, elem_coordinates, const_coordintes, elements, height, width # deleting variables
+        return status, result, value, err_msg
+
+    def mousehoveriris(self,element,*args):
+        """
+        Discription: Performs a mousehover operation on the element.
+        Input: N/A
+        OutPut: Boolean Value
+        """
+        log.info('Inside mousehoveriris and No. of arguments passed are : '+str(len(args)))
+        status = TEST_RESULT_FAIL
+        result = TEST_RESULT_FALSE
+        err_msg = None
+        value = OUTPUT_CONSTANT
+        img = None
+        res = None
+        elem_coordinates = None
+        const_coordintes = None
+        elements = []
+        width = None
+        height = None
+        try:
+            img = None
+            if(len(args) == 3 and args[2]!='' and verifyFlag ):
+                log.info('IRIS element recognised as a relative element')
+                elem_coordinates = element['coordinates']
+                const_coordintes = args[2]['coordinates']
+                elements = [(const_coordintes[0],const_coordintes[1]),
+                        (const_coordintes[2],const_coordintes[3]),
+                        (elem_coordinates[0], elem_coordinates[1]),
+                        (elem_coordinates[2], elem_coordinates[3])]
+                img, res = find_relative_image(elements, relativeCoordinates)
+                log.info( 'Relative image co-ordinates : ' + str(res) )
+                width = res[2] - res[0]
+                height = res[3] - res[1]
+                pyautogui.moveTo(res[0]+ int(width/2),res[1] + int(height/2))
+                log.info( "Element co-ordinates after finding relative image are : " + str(res) )
+            else:
+                log.info('IRIS element recognised as a non-relative element')
+                res, width, height = gotoobject(element)
+            if( len(res) > 0 ):
+                status= TEST_RESULT_PASS
+                result = TEST_RESULT_TRUE
+            else:
+                err_msg = "Object not found"
+            if ( err_msg ):
+                log.info( err_msg )
+                logger.print_on_console( err_msg )
+        except Exception as e:
+            err_msg = "Error occurred in mousehoveriris, Err_Msg : " + str(e)
+            log.error(err_msg)
+            logger.print_on_console("Error occurred in MouseHoverIris")
+        del element, args, img, res, elem_coordinates, const_coordintes, elements, height, width # deleting variables
         return status, result, value, err_msg

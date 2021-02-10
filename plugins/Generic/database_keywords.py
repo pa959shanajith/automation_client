@@ -538,11 +538,14 @@ class DatabaseOperation():
                         for x in columns:
                             work_sheet.cell(row=i, column=j).value = x
                             j=j+1
-                            max_col_width = 2.4
-                            adjusted_width = (len(x) + 2) * 1.2
-                            if adjusted_width > max_col_width:
-                                max_col_width=adjusted_width
-                            work_sheet.column_dimensions[get_column_letter(j)].width = max_col_width
+                            try:
+                                max_col_width = 2.4
+                                adjusted_width = (len(str(x)) + 2) * 1.2
+                                if adjusted_width > max_col_width:
+                                    max_col_width=adjusted_width
+                                work_sheet.column_dimensions[get_column_letter(j)].width = max_col_width
+                            except Exception as e:
+                                log.info("Setting the dimensions for the column: {}".format(e))
                         try:
                             del x,columns,j,i,max_col_width,adjusted_width
                         except Exception as e :
@@ -570,11 +573,14 @@ class DatabaseOperation():
                                         row = tuple(newrow)
                                         work_sheet.cell(row=k, column=l).value = y
                                 l+=1
-                                max_col_width = 2.4
-                                adjusted_width = (len(y) + 2) * 1.2
-                                if adjusted_width > max_col_width:
-                                    max_col_width=adjusted_width
-                                work_sheet.column_dimensions[get_column_letter(l)].width = max_col_width
+                                try:
+                                    max_col_width = 2.4
+                                    adjusted_width = (len(str(y)) + 2) * 1.2
+                                    if adjusted_width > max_col_width:
+                                        max_col_width=adjusted_width
+                                    work_sheet.column_dimensions[get_column_letter(l)].width = max_col_width
+                                except Exception as e:
+                                    log.info("Setting the dimensions for the rows: {}".format(e))
                             k+=1
                         
                         work_book.active=index_sheet

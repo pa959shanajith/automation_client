@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------------
-# Name:        module1
+# Name:        readconfig.py
 # Purpose:
 #
 # Author:      prudhvi.gujjuboyina
@@ -14,12 +14,14 @@ import constants
 import json
 import os
 configvalues = None
-##log = logging.getLogger('readconfig.py')
+proxies = None
+log = logging.getLogger('readconfig.py')
+
 
 class readConfig():
 
     def __init__(self):
-        self.config_path = os.environ["AVO_ASSURE_HOME"] + '/assets/config.json'
+        self.config_path = constants.CONFIG_PATH
 
     def readJson(self):
         global configvalues
@@ -70,3 +72,44 @@ class readConfig():
         else:
             configvalues['configmissing']=os.path.isfile(self.config_path)
         return configvalues
+
+class readProxyConfig():
+
+    def __init__(self):
+        self.proxy_path = constants.PROXY_PATH
+
+    def readJson(self):
+        global proxies
+        if os.path.isfile(self.proxy_path)==True:
+            try:
+                conf = open(self.proxy_path, 'r')
+                proxy = json.load(conf)
+                conf.close()
+                if 'enabled' in proxy and proxy['enabled'] == 'Enabled':
+                    scheme = 'http'
+                    if proxy['url'][0:7] == "http://":
+                        proxy['url'] = proxy['url'][7:]
+                    elif proxy['url'][0:9] == "https://":
+                        scheme = 'https'
+                        proxy['url'] = proxy['url'][8:]
+                    proxy['password'] = self.unwrap(proxy['password'])
+                    proxy_url = scheme + "://" + proxy['username']+":"+proxy['password']+"@"+proxy['url']
+                    proxies = {
+                        "http": proxy_url,
+                        "https": proxy_url
+                    }
+                elif 'enabled' in proxy and proxy['enabled'] == 'Disabled':
+                    proxies = {}
+                else:
+                    proxies = None
+            except Exception as e:
+                log.error(e,exc_info=True)
+        return proxies
+
+    def unwrap(self, enc):
+        import base64
+        from Crypto.Cipher import AES
+        unpad = lambda s : s[0:-ord(s[-1])]
+        enc = base64.b64decode(enc)
+        cipher = AES.new(b'\x74\x68\x69\x73\x49\x73\x41\x53\x65\x63\x72\x65\x74\x4b\x65\x79', AES.MODE_ECB)
+        return unpad(cipher.decrypt(enc).decode('utf-8'))
