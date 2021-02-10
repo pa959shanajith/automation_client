@@ -204,6 +204,12 @@ class Dispatcher:
         self.web_dict['dragiris'] = iris_object.dragiris
         self.web_dict['dropiris'] = iris_object.dropiris
         self.web_dict['mousehoveriris'] = iris_object.mousehoveriris
+        self.web_dict['setcellvalueiris'] = iris_object.setcellvalueiris
+        self.web_dict['verifycellvalueiris'] = iris_object.verifycellvalueiris
+        self.web_dict['clickcelliris'] = iris_object.clickcelliris
+        self.web_dict['doubleclickcelliris'] = iris_object.doubleclickcelliris
+        self.web_dict['rightclickcelliris'] = iris_object.rightclickcelliris
+        self.web_dict['mousehovercelliris'] = iris_object.mousehovercelliris
 
         self.exception_flag=''
         self.action=None

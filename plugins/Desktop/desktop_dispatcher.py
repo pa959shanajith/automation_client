@@ -227,6 +227,12 @@ class DesktopDispatcher:
         self.desktop_dict['dragiris'] = self.iris_object.dragiris
         self.desktop_dict['dropiris'] = self.iris_object.dropiris
         self.desktop_dict['mousehoveriris'] = self.iris_object.mousehoveriris
+        self.desktop_dict['setcellvalueiris'] = self.iris_object.setcellvalueiris
+        self.desktop_dict['verifycellvalueiris'] = self.iris_object.verifycellvalueiris
+        self.desktop_dict['clickcelliris'] = self.iris_object.clickcelliris
+        self.desktop_dict['doubleclickcelliris'] = self.iris_object.doubleclickcelliris
+        self.desktop_dict['rightclickcelliris'] = self.iris_object.rightclickcelliris
+        self.desktop_dict['mousehovercelliris'] = self.iris_object.mousehovercelliris
 
         try:
             if ( objectname == desktop_constants.CUSTOM and teststepproperty.custom_flag ):

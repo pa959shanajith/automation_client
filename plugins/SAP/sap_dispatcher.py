@@ -263,6 +263,12 @@ class SAPDispatcher:
             self.sap_dict['dragiris'] = self.iris_object.dragiris
             self.sap_dict['dropiris'] = self.iris_object.dropiris
             self.sap_dict['mousehoveriris'] = self.iris_object.mousehoveriris
+            self.sap_dict['setcellvalueiris'] = self.iris_object.setcellvalueiris
+            self.sap_dict['verifycellvalueiris'] = self.iris_object.verifycellvalueiris
+            self.sap_dict['clickcelliris'] = self.iris_object.clickcelliris
+            self.sap_dict['doubleclickcelliris'] = self.iris_object.doubleclickcelliris
+            self.sap_dict['rightclickcelliris'] = self.iris_object.rightclickcelliris
+            self.sap_dict['mousehovercelliris'] = self.iris_object.mousehovercelliris
 
             keyword = keyword.lower()
             if ( keyword in list(self.sap_dict.keys()) ):

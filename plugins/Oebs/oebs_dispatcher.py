@@ -215,6 +215,12 @@ class OebsDispatcher:
             dict['dragiris'] = self.iris_object.dragiris
             dict['dropiris'] = self.iris_object.dropiris
             dict['mousehoveriris'] = self.iris_object.mousehoveriris
+            dict['setcellvalueiris'] = self.iris_object.setcellvalueiris
+            dict['verifycellvalueiris'] = self.iris_object.verifycellvalueiris
+            dict['clickcelliris'] = self.iris_object.clickcelliris
+            dict['doubleclickcelliris'] = self.iris_object.doubleclickcelliris
+            dict['rightclickcelliris'] = self.iris_object.rightclickcelliris
+            dict['mousehovercelliris'] = self.iris_object.mousehovercelliris
 
             keyword=keyword.lower()
             if keyword in list(dict.keys()):
