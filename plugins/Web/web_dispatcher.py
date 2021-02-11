@@ -210,6 +210,7 @@ class Dispatcher:
         self.web_dict['doubleclickcelliris'] = iris_object.doubleclickcelliris
         self.web_dict['rightclickcelliris'] = iris_object.rightclickcelliris
         self.web_dict['mousehovercelliris'] = iris_object.mousehovercelliris
+        self.web_dict['getstatusiris'] = iris_object.getstatusiris
 
         self.exception_flag=''
         self.action=None

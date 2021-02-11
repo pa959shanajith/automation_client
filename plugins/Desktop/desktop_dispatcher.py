@@ -233,6 +233,7 @@ class DesktopDispatcher:
         self.desktop_dict['doubleclickcelliris'] = self.iris_object.doubleclickcelliris
         self.desktop_dict['rightclickcelliris'] = self.iris_object.rightclickcelliris
         self.desktop_dict['mousehovercelliris'] = self.iris_object.mousehovercelliris
+        self.desktop_dict['getstatusiris'] = self.iris_object.getstatusiris
 
         try:
             if ( objectname == desktop_constants.CUSTOM and teststepproperty.custom_flag ):

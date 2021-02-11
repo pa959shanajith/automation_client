@@ -241,6 +241,26 @@ def get_cell_position(image,row,column):
     del image, row, column, ele_h, ele_w #deleting variables
     return X, Y
 
+def image_match(imageA,imageB):
+    """
+    Def : This function will return True/False if two images match
+    Input : imageA,imageB
+    Output : Boolean
+    Method Referenced in : setcellvalueiris, clickcelliris, doubleclickcelliris, rightclickcelliris, mousehovercelliris
+    """
+    matchFlag = False
+    if(imageA.shape == imageB.shape):
+        log.debug('Images are of same size/shape')
+        diff = cv2.subtract(imageA,imageB)
+        b,g,r = cv2.split(diff)
+        if cv2.countNonZero(b) == 0 and cv2.countNonZero(g) == 0 and cv2.countNonZero(r) == 0:
+            log.debug('Images are identical; return true')
+            matchFlag = True
+        else: log.debug('Images are non - identical; return false')
+    else:
+        log.debug('Images are not of the same size/shape, returning False')
+    return matchFlag
+
 def gotoobject(elem):
     """
     Def : Return a match of the scraped IRIS image. Compares the IRIS Image over the DOM and returns Image co-ordinates, if multiple matches are found then compares best possible match via the original IRIS image co-ordinates.
@@ -2050,4 +2070,90 @@ class IRISKeywords():
             log.error(err_msg)
             logger.print_on_console("Error occurred in MouseHoverIris")
         del element, args, img, res, elem_coordinates, const_coordintes, elements, height, width # deleting variables
+        return status, result, value, err_msg
+
+    def getstatusiris(self,element,*args):
+        """
+        Discription: Performs a get status operation on the checkbox element.
+        Input: N/A
+        OutPut: Boolean Value
+        """
+        log.info('Inside getstatusiris and No. of arguments passed are : '+str(len(args)))
+        status = TEST_RESULT_FAIL
+        result = TEST_RESULT_FALSE
+        err_msg = None
+        value = OUTPUT_CONSTANT
+        img = None
+        res = None
+        elem_coordinates = None
+        const_coordintes = None
+        elements = []
+        width = None
+        height = None
+        try:
+            img = None
+            if(len(args) == 3 and args[2]!='' and verifyFlag ):
+                log.info('IRIS element recognised as a relative element')
+                elem_coordinates = element['coordinates']
+                const_coordintes = args[2]['coordinates']
+                elements = [(const_coordintes[0],const_coordintes[1]),
+                        (const_coordintes[2],const_coordintes[3]),
+                        (elem_coordinates[0], elem_coordinates[1]),
+                        (elem_coordinates[2], elem_coordinates[3])]
+                img, res = find_relative_image(elements, relativeCoordinates)
+                log.info( 'Relative image co-ordinates : ' + str(res) )
+                width = res[2] - res[0]
+                height = res[3] - res[1]
+                pyautogui.moveTo(res[0]+ int(width/2),res[1] + int(height/2))
+                log.info( "Element co-ordinates after finding relative image are : " + str(res) )
+            else:
+                log.info('IRIS element recognised as a non-relative element')
+                logger.print_on_console("Warning!: Parent element not detected, will lead to inconsistant results")
+                res, width, height = gotoobject(element)
+                if(res): img = get_byte_mirror(element['cord'])
+            if( len(res) > 0 ):
+                #1.get original image
+                originalImg = get_byte_mirror(element['cord'])
+                with open("original.png", "wb") as f:
+                    f.write(base64.b64decode(originalImg))
+                originalImage = cv2.imread("original.png")
+
+                #2. get target image
+                with open("compare.png", "wb") as f:
+                    f.write(base64.b64decode(img))
+                relativeImage = cv2.imread("compare.png")
+
+                #3. subtract target image with the original image
+                flg = False
+                matchFlag = image_match(originalImage,relativeImage)
+                if (args[0][0] == str(0)):
+                    #unchecked
+                    if matchFlag: val = 'unchecked'
+                    else: val = 'checked'
+                    flg = True
+                elif(args[0][0] == str(1)):
+                    #checked
+                    if matchFlag: val = 'checked'
+                    else: val = 'unchecked'
+                    flg = True
+                else:
+                    flg = False
+                if (flg == True):
+                    status= TEST_RESULT_PASS
+                    result = TEST_RESULT_TRUE
+                    value = val
+                else:
+                    err_msg ="Invalid input"
+                os.remove('original.png')
+                os.remove('compare.png')
+            else:
+                err_msg = "Object not found"
+            if ( err_msg ):
+                log.info( err_msg )
+                logger.print_on_console( err_msg )
+        except Exception as e:
+            err_msg = "Error occurred in getstatusiris, Err_Msg : " + str(e)
+            log.error(err_msg)
+            logger.print_on_console("Error occurred in getStatusIris")
+        del element, args, img, res, elem_coordinates, const_coordintes, elements, height, width, originalImage, relativeImage, matchFlag, flg # deleting variables
         return status, result, value, err_msg

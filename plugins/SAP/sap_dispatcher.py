@@ -269,6 +269,7 @@ class SAPDispatcher:
             self.sap_dict['doubleclickcelliris'] = self.iris_object.doubleclickcelliris
             self.sap_dict['rightclickcelliris'] = self.iris_object.rightclickcelliris
             self.sap_dict['mousehovercelliris'] = self.iris_object.mousehovercelliris
+            self.sap_dict['getstatusiris'] = self.iris_object.getstatusiris
 
             keyword = keyword.lower()
             if ( keyword in list(self.sap_dict.keys()) ):

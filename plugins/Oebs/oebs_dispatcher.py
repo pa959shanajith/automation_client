@@ -221,6 +221,7 @@ class OebsDispatcher:
             dict['doubleclickcelliris'] = self.iris_object.doubleclickcelliris
             dict['rightclickcelliris'] = self.iris_object.rightclickcelliris
             dict['mousehovercelliris'] = self.iris_object.mousehovercelliris
+            dict['getstatusiris'] = self.iris_object.getstatusiris
 
             keyword=keyword.lower()
             if keyword in list(dict.keys()):
