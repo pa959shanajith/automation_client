@@ -399,6 +399,7 @@ class MainNamespace(BaseNamespace):
             global browsername
             browsername = args
             core_utils.get_all_the_imports('Desktop')
+            core_utils.get_all_the_imports('IRIS')
             import desktop_scrape
             global desktopScrapeObj
             desktopScrapeObj=desktop_scrape
