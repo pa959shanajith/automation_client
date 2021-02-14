@@ -128,6 +128,113 @@ class TextboxKeywords:
         if webelement is not None:
             try:
                 if webelement.is_enabled():
+                    if webelement.tag_name.lower() == 'div' and webelement.get_attribute('role') == 'grid':
+                        body = True
+                        right = True
+                        index = False
+                        if len(input)>=5:
+                            if (input[3].lower() == 'body') : body = True
+                            elif (input[3].lower() == 'header') : body = False
+                            else: err_msg = "Invalid input"
+                            if (input[4].lower() == 'right') : right = True
+                            elif (input[4].lower() == 'left') : right = False
+                            elif not(err_msg): err_msg = "Invalid input"
+                        if not (err_msg):
+                            if len(input)<=5:
+                                index = True
+                                row_number=int(input[0])-1
+                                col_number=int(input[1])-1
+                            else:
+                                row_number=input[0]
+                                col_number=input[1]
+                            if body:
+                                if right:
+                                    try:
+                                        container = webelement.find_element_by_xpath(".//div[contains(@class,'ag-body-container')]")
+                                    except:
+                                        container = webelement.find_element_by_xpath(".//div[contains(@class,'ag-center-cols-container')]")
+                                else:
+                                    container = webelement.find_element_by_xpath(".//div[contains(@class,'ag-pinned-left-cols-container')]")
+                                rows = container.find_elements_by_xpath(".//div[@role='row']")
+                            else:
+                                if right:
+                                    container = webelement.find_element_by_xpath(".//div[contains(@class,'ag-header-viewport')]")
+                                else:
+                                    container = webelement.find_element_by_xpath(".//div[contains(@class,'ag-pinned-left-header')]")
+                                rows = container.find_elements_by_xpath(".//div[contains(@class,'ag-header-row')]")
+                            if (index):
+                                row_count = len(rows)
+                                if(row_count>=row_number):
+                                    try:
+                                        if body:
+                                            cells = rows[row_number].find_elements_by_xpath(".//div[@role='gridcell']")
+                                        else:
+                                            cells = rows[row_number].find_elements_by_xpath(".//div[contains(@class,'ag-header-cell')]")
+                                        coloumn_count = len(cells)
+                                        if (coloumn_count>=col_number):
+                                            try:
+                                                #cells[col_number].click()
+                                                txt_box=cells[col_number].find_elements_by_tag_name('input')
+                                                if len(txt_box)>0:
+                                                    webelement = txt_box[0]
+                                                    input = [input[2]]
+                                                else:
+                                                    check_flag=False
+                                                    err_msg='Object not found: Textbox not found inside the cell'
+                                                    local_to.log.error(err_msg)
+                                                    logger.print_on_console(err_msg)
+                                                status=TEST_RESULT_PASS
+                                                methodoutput=TEST_RESULT_TRUE
+                                            except Exception as e:
+                                                check_flag=False
+                                                local_to.log.error(e)
+                                                logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
+                                                err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                                        else:
+                                            check_flag=False
+                                            err_msg='Invalid input: Col number more than col count'
+                                            local_to.log.error(err_msg)
+                                            logger.print_on_console(err_msg)
+                                    except Exception as e:
+                                        check_flag=False
+                                        local_to.log.error(e)
+                                        logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
+                                        err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                                else:
+                                    check_flag=False
+                                    err_msg='Invalid input: Row number more than row count'
+                                    local_to.log.error('Invalid input: Row number more than row count')
+                                    logger.print_on_console('Invalid input: Row number more than row count')
+                            else:
+                                for i in rows:
+                                    if i.get_attribute(input[5]) == row_number:
+                                        if body:
+                                            cells = i.find_elements_by_xpath(".//div[@role='gridcell']")
+                                        else:
+                                            cells = i.find_elements_by_xpath(".//div[contains(@class,'ag-header-cell')]")
+                                        for j in cells:
+                                            if j.get_attribute(input[6]) == col_number:
+                                                try:
+                                                    #j.click()
+                                                    txt_box=j.find_elements_by_tag_name('input')
+                                                    if len(txt_box)>0:
+                                                        for t in txt_box:
+                                                            if t.get_attribute('type').lower() in ['text','email','number','password','range','search','url']:
+                                                                webelement = t
+                                                                input = [input[3]]
+                                                                break
+                                                    break
+                                                except Exception as e:
+                                                    check_flag=False
+                                                    local_to.log.error(e)
+                                                    logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
+                                                    err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                                        break
+                                if webelement.get_attribute('type').lower() not in ['text','email','number','password','range','search','url']:
+                                    check_flag=False
+                                    err_msg='Object not found: Textbox not found inside the cell'
+                                    local_rco.log.error(err_msg)
+                                    logger.print_on_console(err_msg)
                     if webelement.tag_name == 'table':
                         if len(input)==5:
                             row_num=int(input[0])
@@ -214,6 +321,113 @@ class TextboxKeywords:
         if webelement is not None:
             try:
                 if webelement.is_enabled():
+                    if webelement.tag_name.lower() == 'div' and webelement.get_attribute('role') == 'grid':
+                        body = True
+                        right = True
+                        index = False
+                        if len(input)>=5:
+                            if (input[3].lower() == 'body') : body = True
+                            elif (input[3].lower() == 'header') : body = False
+                            else: err_msg = "Invalid input"
+                            if (input[4].lower() == 'right') : right = True
+                            elif (input[4].lower() == 'left') : right = False
+                            elif not(err_msg): err_msg = "Invalid input"
+                        if not (err_msg):
+                            if len(input)<=5:
+                                index = True
+                                row_number=int(input[0])-1
+                                col_number=int(input[1])-1
+                            else:
+                                row_number=input[0]
+                                col_number=input[1]
+                            if body:
+                                if right:
+                                    try:
+                                        container = webelement.find_element_by_xpath(".//div[contains(@class,'ag-body-container')]")
+                                    except:
+                                        container = webelement.find_element_by_xpath(".//div[contains(@class,'ag-center-cols-container')]")
+                                else:
+                                    container = webelement.find_element_by_xpath(".//div[contains(@class,'ag-pinned-left-cols-container')]")
+                                rows = container.find_elements_by_xpath(".//div[@role='row']")
+                            else:
+                                if right:
+                                    container = webelement.find_element_by_xpath(".//div[contains(@class,'ag-header-viewport')]")
+                                else:
+                                    container = webelement.find_element_by_xpath(".//div[contains(@class,'ag-pinned-left-header')]")
+                                rows = container.find_elements_by_xpath(".//div[contains(@class,'ag-header-row')]")
+                            if (index):
+                                row_count = len(rows)
+                                if(row_count>=row_number):
+                                    try:
+                                        if body:
+                                            cells = rows[row_number].find_elements_by_xpath(".//div[@role='gridcell']")
+                                        else:
+                                            cells = rows[row_number].find_elements_by_xpath(".//div[contains(@class,'ag-header-cell')]")
+                                        coloumn_count = len(cells)
+                                        if (coloumn_count>=col_number):
+                                            try:
+                                                #cells[col_number].click()
+                                                txt_box=cells[col_number].find_elements_by_tag_name('input')
+                                                if len(txt_box)>0:
+                                                    webelement = txt_box[0]
+                                                    input = [input[2]]
+                                                else:
+                                                    check_flag=False
+                                                    err_msg='Object not found: Textbox not found inside the cell'
+                                                    local_to.log.error(err_msg)
+                                                    logger.print_on_console(err_msg)
+                                                status=TEST_RESULT_PASS
+                                                methodoutput=TEST_RESULT_TRUE
+                                            except Exception as e:
+                                                check_flag=False
+                                                local_to.log.error(e)
+                                                logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
+                                                err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                                        else:
+                                            check_flag=False
+                                            err_msg='Invalid input: Col number more than col count'
+                                            local_to.log.error(err_msg)
+                                            logger.print_on_console(err_msg)
+                                    except Exception as e:
+                                        check_flag=False
+                                        local_to.log.error(e)
+                                        logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
+                                        err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                                else:
+                                    check_flag=False
+                                    err_msg='Invalid input: Row number more than row count'
+                                    local_to.log.error('Invalid input: Row number more than row count')
+                                    logger.print_on_console('Invalid input: Row number more than row count')
+                            else:
+                                for i in rows:
+                                    if i.get_attribute(input[5]) == row_number:
+                                        if body:
+                                            cells = i.find_elements_by_xpath(".//div[@role='gridcell']")
+                                        else:
+                                            cells = i.find_elements_by_xpath(".//div[contains(@class,'ag-header-cell')]")
+                                        for j in cells:
+                                            if j.get_attribute(input[6]) == col_number:
+                                                try:
+                                                    #j.click()
+                                                    txt_box=j.find_elements_by_tag_name('input')
+                                                    if len(txt_box)>0:
+                                                        for t in txt_box:
+                                                            if t.get_attribute('type').lower() in ['text','email','number','password','range','search','url']:
+                                                                webelement = t
+                                                                input = [input[3]]
+                                                                break
+                                                    break
+                                                except Exception as e:
+                                                    check_flag=False
+                                                    local_to.log.error(e)
+                                                    logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
+                                                    err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                                        break
+                                if webelement.get_attribute('type').lower() not in ['text','email','number','password','range','search','url']:
+                                    check_flag=False
+                                    err_msg='Object not found: Textbox not found inside the cell'
+                                    local_rco.log.error(err_msg)
+                                    logger.print_on_console(err_msg)
                     if webelement.tag_name == 'table':
                         if len(input)==5:
                             row_num=int(input[0])
@@ -341,6 +555,111 @@ class TextboxKeywords:
         local_to.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
             try:
+                if webelement.tag_name.lower() == 'div' and webelement.get_attribute('role') == 'grid':
+                    body = True
+                    right = True
+                    index = False
+                    if len(input)>=4:
+                        if (input[2].lower() == 'body') : body = True
+                        elif (input[2].lower() == 'header') : body = False
+                        else: err_msg = "Invalid input"
+                        if (input[3].lower() == 'right') : right = True
+                        elif (input[3].lower() == 'left') : right = False
+                        elif not(err_msg): err_msg = "Invalid input"
+                    if not (err_msg):
+                        if len(input)<=4:
+                            index = True
+                            row_number=int(input[0])-1
+                            col_number=int(input[1])-1
+                        else:
+                            row_number=input[0]
+                            col_number=input[1]
+                        if body:
+                            if right:
+                                try:
+                                    container = webelement.find_element_by_xpath(".//div[contains(@class,'ag-body-container')]")
+                                except:
+                                    container = webelement.find_element_by_xpath(".//div[contains(@class,'ag-center-cols-container')]")
+                            else:
+                                container = webelement.find_element_by_xpath(".//div[contains(@class,'ag-pinned-left-cols-container')]")
+                            rows = container.find_elements_by_xpath(".//div[@role='row']")
+                        else:
+                            if right:
+                                container = webelement.find_element_by_xpath(".//div[contains(@class,'ag-header-viewport')]")
+                            else:
+                                container = webelement.find_element_by_xpath(".//div[contains(@class,'ag-pinned-left-header')]")
+                            rows = container.find_elements_by_xpath(".//div[contains(@class,'ag-header-row')]")
+                        if (index):
+                            row_count = len(rows)
+                            if(row_count>=row_number):
+                                try:
+                                    if body:
+                                        cells = rows[row_number].find_elements_by_xpath(".//div[@role='gridcell']")
+                                    else:
+                                        cells = rows[row_number].find_elements_by_xpath(".//div[contains(@class,'ag-header-cell')]")
+                                    coloumn_count = len(cells)
+                                    if (coloumn_count>=col_number):
+                                        try:
+                                            #cells[col_number].click()
+                                            txt_box=cells[col_number].find_elements_by_tag_name('input')
+                                            if len(txt_box)>0:
+                                                webelement = txt_box[0]
+                                            else:
+                                                check_flag=False
+                                                err_msg='Object not found: Textbox not found inside the cell'
+                                                local_to.log.error(err_msg)
+                                                logger.print_on_console(err_msg)
+                                            status=TEST_RESULT_PASS
+                                            methodoutput=TEST_RESULT_TRUE
+                                        except Exception as e:
+                                            check_flag=False
+                                            local_to.log.error(e)
+                                            logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
+                                            err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                                    else:
+                                        check_flag=False
+                                        err_msg='Invalid input: Col number more than col count'
+                                        local_to.log.error(err_msg)
+                                        logger.print_on_console(err_msg)
+                                except Exception as e:
+                                    check_flag=False
+                                    local_to.log.error(e)
+                                    logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
+                                    err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                            else:
+                                check_flag=False
+                                err_msg='Invalid input: Row number more than row count'
+                                local_to.log.error('Invalid input: Row number more than row count')
+                                logger.print_on_console('Invalid input: Row number more than row count')
+                        else:
+                            for i in rows:
+                                if i.get_attribute(input[4]) == row_number:
+                                    if body:
+                                        cells = i.find_elements_by_xpath(".//div[@role='gridcell']")
+                                    else:
+                                        cells = i.find_elements_by_xpath(".//div[contains(@class,'ag-header-cell')]")
+                                    for j in cells:
+                                        if j.get_attribute(input[5]) == col_number:
+                                            try:
+                                                #j.click()
+                                                txt_box=j.find_elements_by_tag_name('input')
+                                                if len(txt_box)>0:
+                                                    for t in txt_box:
+                                                        if t.get_attribute('type').lower() in ['text','email','number','password','range','search','url']:
+                                                            webelement = t
+                                                            break
+                                                break
+                                            except Exception as e:
+                                                check_flag=False
+                                                local_to.log.error(e)
+                                                logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
+                                                err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                                    break
+                            if webelement.get_attribute('type').lower() not in ['text','email','number','password','range','search','url']:
+                                check_flag=False
+                                err_msg='Object not found: Textbox not found inside the cell'
+                                local_rco.log.error(err_msg)
+                                logger.print_on_console(err_msg)
                 if webelement.tag_name == 'table':
                     if len(input)==4:
                         row_num=int(input[0])
@@ -401,6 +720,113 @@ class TextboxKeywords:
                     local_to.log.error(err_msg)
                     logger.print_on_console(err_msg)
                     return status,methodoutput,output,err_msg
+                if webelement.tag_name.lower() == 'div' and webelement.get_attribute('role') == 'grid':
+                    body = True
+                    right = True
+                    index = False
+                    if len(input)>=5:
+                        if (input[3].lower() == 'body') : body = True
+                        elif (input[3].lower() == 'header') : body = False
+                        else: err_msg = "Invalid input"
+                        if (input[4].lower() == 'right') : right = True
+                        elif (input[4].lower() == 'left') : right = False
+                        elif not(err_msg): err_msg = "Invalid input"
+                    if not (err_msg):
+                        if len(input)<=5:
+                            index = True
+                            row_number=int(input[0])-1
+                            col_number=int(input[1])-1
+                        else:
+                            row_number=input[0]
+                            col_number=input[1]
+                        if body:
+                            if right:
+                                try:
+                                    container = webelement.find_element_by_xpath(".//div[contains(@class,'ag-body-container')]")
+                                except:
+                                    container = webelement.find_element_by_xpath(".//div[contains(@class,'ag-center-cols-container')]")
+                            else:
+                                container = webelement.find_element_by_xpath(".//div[contains(@class,'ag-pinned-left-cols-container')]")
+                            rows = container.find_elements_by_xpath(".//div[@role='row']")
+                        else:
+                            if right:
+                                container = webelement.find_element_by_xpath(".//div[contains(@class,'ag-header-viewport')]")
+                            else:
+                                container = webelement.find_element_by_xpath(".//div[contains(@class,'ag-pinned-left-header')]")
+                            rows = container.find_elements_by_xpath(".//div[contains(@class,'ag-header-row')]")
+                        if (index):
+                            row_count = len(rows)
+                            if(row_count>=row_number):
+                                try:
+                                    if body:
+                                        cells = rows[row_number].find_elements_by_xpath(".//div[@role='gridcell']")
+                                    else:
+                                        cells = rows[row_number].find_elements_by_xpath(".//div[contains(@class,'ag-header-cell')]")
+                                    coloumn_count = len(cells)
+                                    if (coloumn_count>=col_number):
+                                        try:
+                                            #cells[col_number].click()
+                                            txt_box=cells[col_number].find_elements_by_tag_name('input')
+                                            if len(txt_box)>0:
+                                                webelement = txt_box[0]
+                                                input = [input[2]]
+                                            else:
+                                                check_flag=False
+                                                err_msg='Object not found: Textbox not found inside the cell'
+                                                local_to.log.error(err_msg)
+                                                logger.print_on_console(err_msg)
+                                            status=TEST_RESULT_PASS
+                                            methodoutput=TEST_RESULT_TRUE
+                                        except Exception as e:
+                                            check_flag=False
+                                            local_to.log.error(e)
+                                            logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
+                                            err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                                    else:
+                                        check_flag=False
+                                        err_msg='Invalid input: Col number more than col count'
+                                        local_to.log.error(err_msg)
+                                        logger.print_on_console(err_msg)
+                                except Exception as e:
+                                    check_flag=False
+                                    local_to.log.error(e)
+                                    logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
+                                    err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                            else:
+                                check_flag=False
+                                err_msg='Invalid input: Row number more than row count'
+                                local_to.log.error('Invalid input: Row number more than row count')
+                                logger.print_on_console('Invalid input: Row number more than row count')
+                        else:
+                            for i in rows:
+                                if i.get_attribute(input[5]) == row_number:
+                                    if body:
+                                        cells = i.find_elements_by_xpath(".//div[@role='gridcell']")
+                                    else:
+                                        cells = i.find_elements_by_xpath(".//div[contains(@class,'ag-header-cell')]")
+                                    for j in cells:
+                                        if j.get_attribute(input[6]) == col_number:
+                                            try:
+                                                #j.click()
+                                                txt_box=j.find_elements_by_tag_name('input')
+                                                if len(txt_box)>0:
+                                                    for t in txt_box:
+                                                        if t.get_attribute('type').lower() in ['text','email','number','password','range','search','url']:
+                                                            webelement = t
+                                                            input = [input[3]]
+                                                            break
+                                                break
+                                            except Exception as e:
+                                                check_flag=False
+                                                local_to.log.error(e)
+                                                logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
+                                                err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                                    break
+                            if webelement.get_attribute('type').lower() not in ['text','email','number','password','range','search','url']:
+                                check_flag=False
+                                err_msg='Object not found: Textbox not found inside the cell'
+                                local_rco.log.error(err_msg)
+                                logger.print_on_console(err_msg)
                 if webelement.tag_name == 'table':
                     if len(input)==5:
                         row_num=int(input[0])
@@ -468,6 +894,111 @@ class TextboxKeywords:
         if webelement is not None:
             try:
                 if webelement.is_enabled():
+                    if webelement.tag_name.lower() == 'div' and webelement.get_attribute('role') == 'grid':
+                        body = True
+                        right = True
+                        index = False
+                        if len(input)>=4:
+                            if (input[2].lower() == 'body') : body = True
+                            elif (input[2].lower() == 'header') : body = False
+                            else: err_msg = "Invalid input"
+                            if (input[3].lower() == 'right') : right = True
+                            elif (input[3].lower() == 'left') : right = False
+                            elif not(err_msg): err_msg = "Invalid input"
+                        if not (err_msg):
+                            if len(input)<=4:
+                                index = True
+                                row_number=int(input[0])-1
+                                col_number=int(input[1])-1
+                            else:
+                                row_number=input[0]
+                                col_number=input[1]
+                            if body:
+                                if right:
+                                    try:
+                                        container = webelement.find_element_by_xpath(".//div[contains(@class,'ag-body-container')]")
+                                    except:
+                                        container = webelement.find_element_by_xpath(".//div[contains(@class,'ag-center-cols-container')]")
+                                else:
+                                    container = webelement.find_element_by_xpath(".//div[contains(@class,'ag-pinned-left-cols-container')]")
+                                rows = container.find_elements_by_xpath(".//div[@role='row']")
+                            else:
+                                if right:
+                                    container = webelement.find_element_by_xpath(".//div[contains(@class,'ag-header-viewport')]")
+                                else:
+                                    container = webelement.find_element_by_xpath(".//div[contains(@class,'ag-pinned-left-header')]")
+                                rows = container.find_elements_by_xpath(".//div[contains(@class,'ag-header-row')]")
+                            if (index):
+                                row_count = len(rows)
+                                if(row_count>=row_number):
+                                    try:
+                                        if body:
+                                            cells = rows[row_number].find_elements_by_xpath(".//div[@role='gridcell']")
+                                        else:
+                                            cells = rows[row_number].find_elements_by_xpath(".//div[contains(@class,'ag-header-cell')]")
+                                        coloumn_count = len(cells)
+                                        if (coloumn_count>=col_number):
+                                            try:
+                                                #cells[col_number].click()
+                                                txt_box=cells[col_number].find_elements_by_tag_name('input')
+                                                if len(txt_box)>0:
+                                                    webelement = txt_box[0]
+                                                else:
+                                                    check_flag=False
+                                                    err_msg='Object not found: Textbox not found inside the cell'
+                                                    local_to.log.error(err_msg)
+                                                    logger.print_on_console(err_msg)
+                                                status=TEST_RESULT_PASS
+                                                methodoutput=TEST_RESULT_TRUE
+                                            except Exception as e:
+                                                check_flag=False
+                                                local_to.log.error(e)
+                                                logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
+                                                err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                                        else:
+                                            check_flag=False
+                                            err_msg='Invalid input: Col number more than col count'
+                                            local_to.log.error(err_msg)
+                                            logger.print_on_console(err_msg)
+                                    except Exception as e:
+                                        check_flag=False
+                                        local_to.log.error(e)
+                                        logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
+                                        err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                                else:
+                                    check_flag=False
+                                    err_msg='Invalid input: Row number more than row count'
+                                    local_to.log.error('Invalid input: Row number more than row count')
+                                    logger.print_on_console('Invalid input: Row number more than row count')
+                            else:
+                                for i in rows:
+                                    if i.get_attribute(input[4]) == row_number:
+                                        if body:
+                                            cells = i.find_elements_by_xpath(".//div[@role='gridcell']")
+                                        else:
+                                            cells = i.find_elements_by_xpath(".//div[contains(@class,'ag-header-cell')]")
+                                        for j in cells:
+                                            if j.get_attribute(input[5]) == col_number:
+                                                try:
+                                                    #j.click()
+                                                    txt_box=j.find_elements_by_tag_name('input')
+                                                    if len(txt_box)>0:
+                                                        for t in txt_box:
+                                                            if t.get_attribute('type').lower() in ['text','email','number','password','range','search','url']:
+                                                                webelement = t
+                                                                break
+                                                    break
+                                                except Exception as e:
+                                                    check_flag=False
+                                                    local_to.log.error(e)
+                                                    logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
+                                                    err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                                        break
+                                if webelement.get_attribute('type').lower() not in ['text','email','number','password','range','search','url']:
+                                    check_flag=False
+                                    err_msg='Object not found: Textbox not found inside the cell'
+                                    local_rco.log.error(err_msg)
+                                    logger.print_on_console(err_msg)
                     if webelement.tag_name == 'table':
                         if len(input)==4:
                             row_num=int(input[0])
@@ -532,6 +1063,111 @@ class TextboxKeywords:
         local_to.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
             try:
+                if webelement.tag_name.lower() == 'div' and webelement.get_attribute('role') == 'grid':
+                    body = True
+                    right = True
+                    index = False
+                    if len(input)>=4:
+                        if (input[2].lower() == 'body') : body = True
+                        elif (input[2].lower() == 'header') : body = False
+                        else: err_msg = "Invalid input"
+                        if (input[3].lower() == 'right') : right = True
+                        elif (input[3].lower() == 'left') : right = False
+                        elif not(err_msg): err_msg = "Invalid input"
+                    if not (err_msg):
+                        if len(input)<=4:
+                            index = True
+                            row_number=int(input[0])-1
+                            col_number=int(input[1])-1
+                        else:
+                            row_number=input[0]
+                            col_number=input[1]
+                        if body:
+                            if right:
+                                try:
+                                    container = webelement.find_element_by_xpath(".//div[contains(@class,'ag-body-container')]")
+                                except:
+                                    container = webelement.find_element_by_xpath(".//div[contains(@class,'ag-center-cols-container')]")
+                            else:
+                                container = webelement.find_element_by_xpath(".//div[contains(@class,'ag-pinned-left-cols-container')]")
+                            rows = container.find_elements_by_xpath(".//div[@role='row']")
+                        else:
+                            if right:
+                                container = webelement.find_element_by_xpath(".//div[contains(@class,'ag-header-viewport')]")
+                            else:
+                                container = webelement.find_element_by_xpath(".//div[contains(@class,'ag-pinned-left-header')]")
+                            rows = container.find_elements_by_xpath(".//div[contains(@class,'ag-header-row')]")
+                        if (index):
+                            row_count = len(rows)
+                            if(row_count>=row_number):
+                                try:
+                                    if body:
+                                        cells = rows[row_number].find_elements_by_xpath(".//div[@role='gridcell']")
+                                    else:
+                                        cells = rows[row_number].find_elements_by_xpath(".//div[contains(@class,'ag-header-cell')]")
+                                    coloumn_count = len(cells)
+                                    if (coloumn_count>=col_number):
+                                        try:
+                                            #cells[col_number].click()
+                                            txt_box=cells[col_number].find_elements_by_tag_name('input')
+                                            if len(txt_box)>0:
+                                                webelement = txt_box[0]
+                                            else:
+                                                check_flag=False
+                                                err_msg='Object not found: Textbox not found inside the cell'
+                                                local_to.log.error(err_msg)
+                                                logger.print_on_console(err_msg)
+                                            status=TEST_RESULT_PASS
+                                            methodoutput=TEST_RESULT_TRUE
+                                        except Exception as e:
+                                            check_flag=False
+                                            local_to.log.error(e)
+                                            logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
+                                            err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                                    else:
+                                        check_flag=False
+                                        err_msg='Invalid input: Col number more than col count'
+                                        local_to.log.error(err_msg)
+                                        logger.print_on_console(err_msg)
+                                except Exception as e:
+                                    check_flag=False
+                                    local_to.log.error(e)
+                                    logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
+                                    err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                            else:
+                                check_flag=False
+                                err_msg='Invalid input: Row number more than row count'
+                                local_to.log.error('Invalid input: Row number more than row count')
+                                logger.print_on_console('Invalid input: Row number more than row count')
+                        else:
+                            for i in rows:
+                                if i.get_attribute(input[4]) == row_number:
+                                    if body:
+                                        cells = i.find_elements_by_xpath(".//div[@role='gridcell']")
+                                    else:
+                                        cells = i.find_elements_by_xpath(".//div[contains(@class,'ag-header-cell')]")
+                                    for j in cells:
+                                        if j.get_attribute(input[5]) == col_number:
+                                            try:
+                                                #j.click()
+                                                txt_box=j.find_elements_by_tag_name('input')
+                                                if len(txt_box)>0:
+                                                    for t in txt_box:
+                                                        if t.get_attribute('type').lower() in ['text','email','number','password','range','search','url']:
+                                                            webelement = t
+                                                            break
+                                                break
+                                            except Exception as e:
+                                                check_flag=False
+                                                local_to.log.error(e)
+                                                logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
+                                                err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                                    break
+                            if webelement.get_attribute('type').lower() not in ['text','email','number','password','range','search','url']:
+                                check_flag=False
+                                err_msg='Object not found: Textbox not found inside the cell'
+                                local_rco.log.error(err_msg)
+                                logger.print_on_console(err_msg)
                 if webelement.tag_name == 'table':
                     if len(input)==4:
                         row_num=int(input[0])
@@ -586,6 +1222,113 @@ class TextboxKeywords:
         local_to.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
             try:
+                if webelement.tag_name.lower() == 'div' and webelement.get_attribute('role') == 'grid':
+                    body = True
+                    right = True
+                    index = False
+                    if len(input)>=5:
+                        if (input[3].lower() == 'body') : body = True
+                        elif (input[3].lower() == 'header') : body = False
+                        else: err_msg = "Invalid input"
+                        if (input[4].lower() == 'right') : right = True
+                        elif (input[4].lower() == 'left') : right = False
+                        elif not(err_msg): err_msg = "Invalid input"
+                    if not (err_msg):
+                        if len(input)<=5:
+                            index = True
+                            row_number=int(input[0])-1
+                            col_number=int(input[1])-1
+                        else:
+                            row_number=input[0]
+                            col_number=input[1]
+                        if body:
+                            if right:
+                                try:
+                                    container = webelement.find_element_by_xpath(".//div[contains(@class,'ag-body-container')]")
+                                except:
+                                    container = webelement.find_element_by_xpath(".//div[contains(@class,'ag-center-cols-container')]")
+                            else:
+                                container = webelement.find_element_by_xpath(".//div[contains(@class,'ag-pinned-left-cols-container')]")
+                            rows = container.find_elements_by_xpath(".//div[@role='row']")
+                        else:
+                            if right:
+                                container = webelement.find_element_by_xpath(".//div[contains(@class,'ag-header-viewport')]")
+                            else:
+                                container = webelement.find_element_by_xpath(".//div[contains(@class,'ag-pinned-left-header')]")
+                            rows = container.find_elements_by_xpath(".//div[contains(@class,'ag-header-row')]")
+                        if (index):
+                            row_count = len(rows)
+                            if(row_count>=row_number):
+                                try:
+                                    if body:
+                                        cells = rows[row_number].find_elements_by_xpath(".//div[@role='gridcell']")
+                                    else:
+                                        cells = rows[row_number].find_elements_by_xpath(".//div[contains(@class,'ag-header-cell')]")
+                                    coloumn_count = len(cells)
+                                    if (coloumn_count>=col_number):
+                                        try:
+                                            #cells[col_number].click()
+                                            txt_box=cells[col_number].find_elements_by_tag_name('input')
+                                            if len(txt_box)>0:
+                                                webelement = txt_box[0]
+                                                input = [input[2]]
+                                            else:
+                                                check_flag=False
+                                                err_msg='Object not found: Textbox not found inside the cell'
+                                                local_to.log.error(err_msg)
+                                                logger.print_on_console(err_msg)
+                                            status=TEST_RESULT_PASS
+                                            methodoutput=TEST_RESULT_TRUE
+                                        except Exception as e:
+                                            check_flag=False
+                                            local_to.log.error(e)
+                                            logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
+                                            err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                                    else:
+                                        check_flag=False
+                                        err_msg='Invalid input: Col number more than col count'
+                                        local_to.log.error(err_msg)
+                                        logger.print_on_console(err_msg)
+                                except Exception as e:
+                                    check_flag=False
+                                    local_to.log.error(e)
+                                    logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
+                                    err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                            else:
+                                check_flag=False
+                                err_msg='Invalid input: Row number more than row count'
+                                local_to.log.error('Invalid input: Row number more than row count')
+                                logger.print_on_console('Invalid input: Row number more than row count')
+                        else:
+                            for i in rows:
+                                if i.get_attribute(input[5]) == row_number:
+                                    if body:
+                                        cells = i.find_elements_by_xpath(".//div[@role='gridcell']")
+                                    else:
+                                        cells = i.find_elements_by_xpath(".//div[contains(@class,'ag-header-cell')]")
+                                    for j in cells:
+                                        if j.get_attribute(input[6]) == col_number:
+                                            try:
+                                                #j.click()
+                                                txt_box=j.find_elements_by_tag_name('input')
+                                                if len(txt_box)>0:
+                                                    for t in txt_box:
+                                                        if t.get_attribute('type').lower() in ['text','email','number','password','range','search','url']:
+                                                            webelement = t
+                                                            input = [input[3]]
+                                                            break
+                                                break
+                                            except Exception as e:
+                                                check_flag=False
+                                                local_to.log.error(e)
+                                                logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
+                                                err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                                    break
+                            if webelement.get_attribute('type').lower() not in ['text','email','number','password','range','search','url']:
+                                check_flag=False
+                                err_msg='Object not found: Textbox not found inside the cell'
+                                local_rco.log.error(err_msg)
+                                logger.print_on_console(err_msg)
                 if webelement.tag_name == 'table':
                     if len(input)==5:
                         row_num=int(input[0])
@@ -660,6 +1403,113 @@ class TextboxKeywords:
         if webelement is not None:
             try:
                 if webelement.is_enabled():
+                    if webelement.tag_name.lower() == 'div' and webelement.get_attribute('role') == 'grid':
+                        body = True
+                        right = True
+                        index = False
+                        if len(input)>=5:
+                            if (input[3].lower() == 'body') : body = True
+                            elif (input[3].lower() == 'header') : body = False
+                            else: err_msg = "Invalid input"
+                            if (input[4].lower() == 'right') : right = True
+                            elif (input[4].lower() == 'left') : right = False
+                            elif not(err_msg): err_msg = "Invalid input"
+                        if not (err_msg):
+                            if len(input)<=5:
+                                index = True
+                                row_number=int(input[0])-1
+                                col_number=int(input[1])-1
+                            else:
+                                row_number=input[0]
+                                col_number=input[1]
+                            if body:
+                                if right:
+                                    try:
+                                        container = webelement.find_element_by_xpath(".//div[contains(@class,'ag-body-container')]")
+                                    except:
+                                        container = webelement.find_element_by_xpath(".//div[contains(@class,'ag-center-cols-container')]")
+                                else:
+                                    container = webelement.find_element_by_xpath(".//div[contains(@class,'ag-pinned-left-cols-container')]")
+                                rows = container.find_elements_by_xpath(".//div[@role='row']")
+                            else:
+                                if right:
+                                    container = webelement.find_element_by_xpath(".//div[contains(@class,'ag-header-viewport')]")
+                                else:
+                                    container = webelement.find_element_by_xpath(".//div[contains(@class,'ag-pinned-left-header')]")
+                                rows = container.find_elements_by_xpath(".//div[contains(@class,'ag-header-row')]")
+                            if (index):
+                                row_count = len(rows)
+                                if(row_count>=row_number):
+                                    try:
+                                        if body:
+                                            cells = rows[row_number].find_elements_by_xpath(".//div[@role='gridcell']")
+                                        else:
+                                            cells = rows[row_number].find_elements_by_xpath(".//div[contains(@class,'ag-header-cell')]")
+                                        coloumn_count = len(cells)
+                                        if (coloumn_count>=col_number):
+                                            try:
+                                                #cells[col_number].click()
+                                                txt_box=cells[col_number].find_elements_by_tag_name('input')
+                                                if len(txt_box)>0:
+                                                    webelement = txt_box[0]
+                                                    input = [input[2]]
+                                                else:
+                                                    check_flag=False
+                                                    err_msg='Object not found: Textbox not found inside the cell'
+                                                    local_to.log.error(err_msg)
+                                                    logger.print_on_console(err_msg)
+                                                status=TEST_RESULT_PASS
+                                                methodoutput=TEST_RESULT_TRUE
+                                            except Exception as e:
+                                                check_flag=False
+                                                local_to.log.error(e)
+                                                logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
+                                                err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                                        else:
+                                            check_flag=False
+                                            err_msg='Invalid input: Col number more than col count'
+                                            local_to.log.error(err_msg)
+                                            logger.print_on_console(err_msg)
+                                    except Exception as e:
+                                        check_flag=False
+                                        local_to.log.error(e)
+                                        logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
+                                        err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                                else:
+                                    check_flag=False
+                                    err_msg='Invalid input: Row number more than row count'
+                                    local_to.log.error('Invalid input: Row number more than row count')
+                                    logger.print_on_console('Invalid input: Row number more than row count')
+                            else:
+                                for i in rows:
+                                    if i.get_attribute(input[5]) == row_number:
+                                        if body:
+                                            cells = i.find_elements_by_xpath(".//div[@role='gridcell']")
+                                        else:
+                                            cells = i.find_elements_by_xpath(".//div[contains(@class,'ag-header-cell')]")
+                                        for j in cells:
+                                            if j.get_attribute(input[6]) == col_number:
+                                                try:
+                                                    #j.click()
+                                                    txt_box=j.find_elements_by_tag_name('input')
+                                                    if len(txt_box)>0:
+                                                        for t in txt_box:
+                                                            if t.get_attribute('type').lower() in ['text','email','number','password','range','search','url']:
+                                                                webelement = t
+                                                                input = [input[3]]
+                                                                break
+                                                    break
+                                                except Exception as e:
+                                                    check_flag=False
+                                                    local_to.log.error(e)
+                                                    logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
+                                                    err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                                        break
+                                if webelement.get_attribute('type').lower() not in ['text','email','number','password','range','search','url']:
+                                    check_flag=False
+                                    err_msg='Object not found: Textbox not found inside the cell'
+                                    local_rco.log.error(err_msg)
+                                    logger.print_on_console(err_msg)
                     if webelement.tag_name == 'table':
                         if len(input)==5:
                             row_num=int(input[0])
@@ -744,6 +1594,113 @@ class TextboxKeywords:
         if webelement is not None:
             try:
                 if webelement.is_enabled():
+                    if webelement.tag_name.lower() == 'div' and webelement.get_attribute('role') == 'grid':
+                        body = True
+                        right = True
+                        index = False
+                        if len(input)>=5:
+                            if (input[3].lower() == 'body') : body = True
+                            elif (input[3].lower() == 'header') : body = False
+                            else: err_msg = "Invalid input"
+                            if (input[4].lower() == 'right') : right = True
+                            elif (input[4].lower() == 'left') : right = False
+                            elif not(err_msg): err_msg = "Invalid input"
+                        if not (err_msg):
+                            if len(input)<=5:
+                                index = True
+                                row_number=int(input[0])-1
+                                col_number=int(input[1])-1
+                            else:
+                                row_number=input[0]
+                                col_number=input[1]
+                            if body:
+                                if right:
+                                    try:
+                                        container = webelement.find_element_by_xpath(".//div[contains(@class,'ag-body-container')]")
+                                    except:
+                                        container = webelement.find_element_by_xpath(".//div[contains(@class,'ag-center-cols-container')]")
+                                else:
+                                    container = webelement.find_element_by_xpath(".//div[contains(@class,'ag-pinned-left-cols-container')]")
+                                rows = container.find_elements_by_xpath(".//div[@role='row']")
+                            else:
+                                if right:
+                                    container = webelement.find_element_by_xpath(".//div[contains(@class,'ag-header-viewport')]")
+                                else:
+                                    container = webelement.find_element_by_xpath(".//div[contains(@class,'ag-pinned-left-header')]")
+                                rows = container.find_elements_by_xpath(".//div[contains(@class,'ag-header-row')]")
+                            if (index):
+                                row_count = len(rows)
+                                if(row_count>=row_number):
+                                    try:
+                                        if body:
+                                            cells = rows[row_number].find_elements_by_xpath(".//div[@role='gridcell']")
+                                        else:
+                                            cells = rows[row_number].find_elements_by_xpath(".//div[contains(@class,'ag-header-cell')]")
+                                        coloumn_count = len(cells)
+                                        if (coloumn_count>=col_number):
+                                            try:
+                                                #cells[col_number].click()
+                                                txt_box=cells[col_number].find_elements_by_tag_name('input')
+                                                if len(txt_box)>0:
+                                                    webelement = txt_box[0]
+                                                    input = [input[2]]
+                                                else:
+                                                    check_flag=False
+                                                    err_msg='Object not found: Textbox not found inside the cell'
+                                                    local_to.log.error(err_msg)
+                                                    logger.print_on_console(err_msg)
+                                                status=TEST_RESULT_PASS
+                                                methodoutput=TEST_RESULT_TRUE
+                                            except Exception as e:
+                                                check_flag=False
+                                                local_to.log.error(e)
+                                                logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
+                                                err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                                        else:
+                                            check_flag=False
+                                            err_msg='Invalid input: Col number more than col count'
+                                            local_to.log.error(err_msg)
+                                            logger.print_on_console(err_msg)
+                                    except Exception as e:
+                                        check_flag=False
+                                        local_to.log.error(e)
+                                        logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
+                                        err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                                else:
+                                    check_flag=False
+                                    err_msg='Invalid input: Row number more than row count'
+                                    local_to.log.error('Invalid input: Row number more than row count')
+                                    logger.print_on_console('Invalid input: Row number more than row count')
+                            else:
+                                for i in rows:
+                                    if i.get_attribute(input[5]) == row_number:
+                                        if body:
+                                            cells = i.find_elements_by_xpath(".//div[@role='gridcell']")
+                                        else:
+                                            cells = i.find_elements_by_xpath(".//div[contains(@class,'ag-header-cell')]")
+                                        for j in cells:
+                                            if j.get_attribute(input[6]) == col_number:
+                                                try:
+                                                    #j.click()
+                                                    txt_box=j.find_elements_by_tag_name('input')
+                                                    if len(txt_box)>0:
+                                                        for t in txt_box:
+                                                            if t.get_attribute('type').lower() in ['text','email','number','password','range','search','url']:
+                                                                webelement = t
+                                                                input = [input[3]]
+                                                                break
+                                                    break
+                                                except Exception as e:
+                                                    check_flag=False
+                                                    local_to.log.error(e)
+                                                    logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
+                                                    err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                                        break
+                                if webelement.get_attribute('type').lower() not in ['text','email','number','password','range','search','url']:
+                                    check_flag=False
+                                    err_msg='Object not found: Textbox not found inside the cell'
+                                    local_rco.log.error(err_msg)
+                                    logger.print_on_console(err_msg)
                     if webelement.tag_name == 'table':
                         if len(input)==5:
                             row_num=int(input[0])

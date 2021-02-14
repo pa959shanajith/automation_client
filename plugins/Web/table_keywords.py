@@ -289,14 +289,13 @@ class TableOperationKeywords():
                                                     logger.print_on_console('Cell value is : ',str(cellVal))
                                                     status=TEST_RESULT_PASS
                                                     methodoutput=TEST_RESULT_TRUE
+                                                    break
                                                 else:
                                                     err_msg='Invalid input: Column not found'
-                                                    local_tk.log.error('Invalid input: Column not found')
-                                                    logger.print_on_console('Invalid input: Column not found')
+                                                    local_tk.log.debug('Invalid input: Column not found')
                                         else:
                                             err_msg='Invalid input: Row not found'
-                                            local_tk.log.error('Invalid input: Row not found')
-                                            logger.print_on_console('Invalid input: Row not found')
+                                            local_tk.log.debug('Invalid input: Row not found')
                         elif (webElement.find_element_by_xpath('.//ancestor::lightning-datatable') != None):
                             row_num=int(input_val[0])
                             col_num=int(input_val[1])
@@ -768,11 +767,11 @@ class TableOperationKeywords():
                             body = True
                             right = True
                             if len(input_arr)>=4:
-                                if (input_val[2].lower() == 'body') : body = True
-                                elif (input_val[2].lower() == 'header') : body = False
+                                if (input_arr[2].lower() == 'body') : body = True
+                                elif (input_arr[2].lower() == 'header') : body = False
                                 else: err_msg = "Invalid input"
-                                if (input_val[3].lower() == 'right') : right = True
-                                elif (input_val[3].lower() == 'left') : right = False
+                                if (input_arr[3].lower() == 'right') : right = True
+                                elif (input_arr[3].lower() == 'left') : right = False
                                 elif not(err_msg): err_msg = "Invalid input"
                             if not (err_msg):
                                 if len(input_arr)<=4:
@@ -1401,9 +1400,10 @@ class TableOperationKeywords():
                                     for j in range(len(cells)):
                                         cellVal = self.getChildNodes(cells[j])
                                         cellVal=cellVal.strip()
+                                        local_tk.log.debug("cellvalue:"+cellVal+" ; text:"+text+" ; attr:"+input_val[3])
                                         if text in cellVal:
                                             if len(input_val)==4:
-                                                row_number = cells[j].get_attribute(input_val[3])
+                                                row_number = rows[i].get_attribute(input_val[3])
                                             else:
                                                 row_number = i+1
                                             break
@@ -1508,6 +1508,7 @@ class TableOperationKeywords():
                                     for j in range(len(cells)):
                                         cellVal = self.getChildNodes(cells[j])
                                         cellVal=cellVal.strip()
+                                        local_tk.log.debug("cellvalue:"+cellVal+" ; text:"+text+" ; attr:"+input_val[3])
                                         if text in cellVal:
                                             if len(input_val)==4:
                                                 col_number = cells[j].get_attribute(input_val[3])
@@ -1522,7 +1523,7 @@ class TableOperationKeywords():
                                 else:
                                     err_msg = 'Error in fetching Col number'
                                     local_tk.log.info('Error in fetching Col number')
-                                    logger.print_on_console('Error in fetching Row number')
+                                    logger.print_on_console('Error in fetching Col number')
                         elif (webElement.find_element_by_xpath('.//ancestor::lightning-datatable') != None):
                             cell=webElement.find_element_by_xpath('//*[text()="'+text+'"]')
                             if len(cell)!=0:
