@@ -285,6 +285,7 @@ ERROR_CODE_DICT = {
                     "ERR_ROW_DOESN'T_EXIST": "Row doesn't exist",
                     "ERR_COL_DOESN'T_EXIST": "Column doesn't exist",
                     'ERR_FILE_FORMAT': 'The specified file is not Excel file\n',
+                    "ERR_MULTIROW_DOESN'T_EXIST":"Rows doesn't exist",
                     #JumpBy error messages
                     "ERR_JUMPY_STEP_DOESN'T_EXISTS" : "Invalid input, jumpBy Step doesn't exist",
                     "ERR_JUMPBY_CAN'T_BE_0": "Invalid input, jumpBy Step?cannot be '0'",

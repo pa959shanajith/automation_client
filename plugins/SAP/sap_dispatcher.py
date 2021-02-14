@@ -47,152 +47,175 @@ class SAPDispatcher:
     shell_tree_keywords_obj = sap_shell_tree_keywords.Shell_Tree_Keywords()
     shell_calendar_keywords_obj = sap_shell_calendar_keywords.Shell_Calendar_Keywords()
     scontainer_keywords_obj = sap_scontainer_keywords.SContainer_Keywords()
+    iris_object = iris_operations.IRISKeywords()
     sap_dict = {
-            #------------------------------------------------------launch keywords
-            'launchapplication' : launch_keywords_obj.launch_application,
-            'closeapplication' : launch_keywords_obj.closeApplication,
-            'getpagetitle' : launch_keywords_obj.getPageTitle,
-            'starttransaction' : launch_keywords_obj.startTransaction,
-            'serverconnect' : launch_keywords_obj.serverConnect,
-            'getpopuptext' : launch_keywords_obj.getPopUpText,
-            'getstatusbarmessage' : launch_keywords_obj.getStatusBarMessage,
-            'toolbaraction' : launch_keywords_obj.toolbar_actions,
-            'selectmenu': launch_keywords_obj.selectMenu,
-            'doubleclickstatusbar': launch_keywords_obj.doubleClickStatusBar,
-            "closedialogwindow": launch_keywords_obj.close_modal_window,
-            "maximizedialogwindow": launch_keywords_obj.maximize_modal_window,
-            "restoredialogwindow": launch_keywords_obj.restore_modal_window,
-            "getdialogwindowname": launch_keywords_obj.getWindowName,
-            #------------------------------------------------------textbox keywords
-            'settext' : editable_text_obj.setText,
-            'setsecuretext' : editable_text_obj.setSecureText,
-            'gettext' : editable_text_obj.getText,
-            'cleartext' : editable_text_obj.clearText,
-            'verifytext' : editable_text_obj.verifyText,
-            'gettextboxlength' : editable_text_obj.getTextboxLength,
-            'verifytextboxlength' : editable_text_obj.verifyTextboxLength,
-            #------------------------------------------------------radio btn keywords
-            'selectcheckbox' : radiocheckbox_keywords_obj.select_checkbox,
-            'unselectcheckbox' : radiocheckbox_keywords_obj.unselect_checkbox,
-            'selectradiobutton' : radiocheckbox_keywords_obj.select_radiobutton,
-            'getstatus' : radiocheckbox_keywords_obj.get_status,
-            #------------------------------------------------------button keywords
-            'getbuttonname' : button_link_obj.get_button_name,
-            'verifybuttonname' : button_link_obj.verify_button_name,
-            'uploadfile' : button_link_obj.button_uploadFile,
-            #------------------------------------------------------dropdown keywords
-            'getselected' : dropdown_keywords_obj.getSelected,
-            'getcount' : dropdown_keywords_obj.getCount,
-            'getvaluebyindex' : dropdown_keywords_obj.getValueByIndex,
-            'selectvaluebyindex' : dropdown_keywords_obj.selectValueByIndex,
-            'selectvaluebytext' : dropdown_keywords_obj.selectValueByText,
-            'verifycount' : dropdown_keywords_obj.verifyCount,
-            'verifyselectedvalue' : dropdown_keywords_obj.verifySelectedValue,
-            'verifyvaluesexists' : dropdown_keywords_obj.verifyValuesExists,
-            'verifyallvalues' : dropdown_keywords_obj.verifyAllValues,
-            'getallkeyvaluepairs' : dropdown_keywords_obj.getAllKeyValuePairs,
-            'selectkeybytext' : dropdown_keywords_obj.selectKeyByText,
-            'getkeybyindex' : dropdown_keywords_obj.getKeyByIndex,
-            #------------------------------------------------------element keywords
-            'click' : element_keywords_obj.click,
-            'rightclick' : element_keywords_obj.rightClick,
-            'doubleclick' : element_keywords_obj.doubleClick,
-            'mousehover' : element_keywords_obj.mouseHover,
-            'getelementtext' : element_keywords_obj.get_element_text,
-            'verifyelementtext' : element_keywords_obj.verify_element_text,
-            'gettooltiptext' : element_keywords_obj.getTooltipText,
-            'verifytooltiptext' : element_keywords_obj.verifyTooltipText,
-            'geticonname' : element_keywords_obj.getIconName,
-            'verifyiconname' : element_keywords_obj.verifyIconName,
-            'getinputhelp' : element_keywords_obj.getInputHelp,
-            'setfocus' : element_keywords_obj.setFocus,
-            'scrollup' : element_keywords_obj.scrollUp,
-            'scrolldown' : element_keywords_obj.scrollDown,
-            'scrollleft' : element_keywords_obj.scrollLeft,
-            'scrollright' : element_keywords_obj.scrollRight,
-            'movetabs' : element_keywords_obj.moveTabs,
-            'selecttab' : element_keywords_obj.selectTab,
-            #------------------------------------------------------sap util keywords
-            'verifyenabled' : saputil_keywords_obj.verifyEnabled,
-            'verifydisabled' : saputil_keywords_obj.verifyDisabled,
-            'verifyexists' : saputil_keywords_obj.verifyExists,
-            'verifyhidden' : saputil_keywords_obj.verifyHidden,
-            'verifyvisible' : saputil_keywords_obj.verifyVisible,
-            #-------------------------------------------------------table keywords
-            'getrowcount' : table_keywords_obj.getRowCount,
-            'getcolumncount' : table_keywords_obj.getColumnCount,
-            'getcolnumbytext' : table_keywords_obj.getColNumByText,
-            'getrownumbytext' : table_keywords_obj.getRowNumByText,
-            'getcellvalue' : table_keywords_obj.getCellValue,
-            'verifycellvalue' : table_keywords_obj.verifyCellValue,
-            #commenting dropdown code inside table cell
-            'verifytextexists' : table_keywords_obj.verifyTextExists,
-            # 'cellclick':table_keywords_obj.cellClick,
-            # 'selectvaluebyindex':table_keywords_obj.selectValueByIndex,
-            # 'selectvaluebytext':table_keywords_obj.selectValueByText,
-            # 'getselected':table_keywords_obj.getSelected,
-            'getcellstatus' : table_keywords_obj.getStatus,
-            'selectrow' : table_keywords_obj.selectRow,
-            'unselectrow' : table_keywords_obj.unselectRow,
-            'selectcolumn' : table_keywords_obj.selectColumn,
-            'unselectcolumn' : table_keywords_obj.unselectColumn,
-            'setcelltext' : table_keywords_obj.setCellText,
-            #Shell keywords
-            #-----------------------------------------------------shell_basic_keywords
-            'selectcontextmenubytext' : shell_keywords_obj.selectContextMenuByText,
-            #-----------------------------------------------------gridviewkeywords
-            'getcountofrows' : shell_gridview_toolbar_keywords_obj.get_rowCount,
-            'getcountofcolumns' : shell_gridview_toolbar_keywords_obj.get_colCount,
-            'selectrows' : shell_gridview_toolbar_keywords_obj.selectRows,
-            'presstoolbarbutton' : shell_gridview_toolbar_keywords_obj.pressToolBarButton,
-            'getcelltext' : shell_gridview_toolbar_keywords_obj.getCellText,
-            'clickcell' : shell_gridview_toolbar_keywords_obj.clickCell,
-            'doubleclickcell' : shell_gridview_toolbar_keywords_obj.doubleClickCell,
-            'setshelltext' : shell_gridview_toolbar_keywords_obj.setShellText,
-            'getrowcolbytext' : shell_gridview_toolbar_keywords_obj.getRowColByText,
-            'toolbaractionkeys' : shell_gridview_toolbar_keywords_obj.toolBarActionKeys,
-            'settextincell' : shell_gridview_toolbar_keywords_obj.setCellText,
-            'selectallrows' : shell_gridview_toolbar_keywords_obj.selectAllRows,
-            'unselectallselections' : shell_gridview_toolbar_keywords_obj.unselectAllSelections,
-            'scrolltorownumber' : shell_gridview_toolbar_keywords_obj.scrollToRowNumber,
-            'getcellcolor' : shell_gridview_toolbar_keywords_obj.getCellColor,
-            'selectcolumns' : shell_gridview_toolbar_keywords_obj.selectColumns,
-            'unselectcolumns' : shell_gridview_toolbar_keywords_obj.unSelectColumns,
-            'getallcolumnheaders' : shell_gridview_toolbar_keywords_obj.getAllColumnHeaders,
-            'getcolnumbycolheaders' : shell_gridview_toolbar_keywords_obj.getColNumByColHeaders,
-            #------------------------------------------------------treekeywords
-            'selecttreeelement' : shell_tree_keywords_obj.selectTreeElement,
-            'gettreenodetext' : shell_tree_keywords_obj.getTreeNodeText,
-            'gettreenodecount' : shell_tree_keywords_obj.getTreeNodeCount,
-            'singleselectparentofselected' : shell_tree_keywords_obj.singleSelectParentOfSelected,
-            'collapsetree' : shell_tree_keywords_obj.collapseTree,
-            'getcolvaluecorrtoselectednode' : shell_tree_keywords_obj.getColValueCorrToSelectedNode,
-            'selecttreenode' : shell_tree_keywords_obj.selectTreeNode,
-            'getnodenamebyindex' : shell_tree_keywords_obj.getNodeNameByIndex,
-            'verifytreepath' : shell_tree_keywords_obj.verifyTreePath,
-            #------------------------------------------------------calendarkeywords
-            'selectdate' : shell_calendar_keywords_obj.select_date,
-            #'selecttodaysdate' : shell_calendar_keywords_obj.select_todays_date,
-            'selectrange':shell_calendar_keywords_obj.select_range,
-            'selectmonth':shell_calendar_keywords_obj.select_month,
-            'selectweek':shell_calendar_keywords_obj.select_week,
-            #------------------------------------------------------scontainerkeywords
-            'getrowcountofcontainer':scontainer_keywords_obj.getRowCount,
-            'getcolcountofcontainer':scontainer_keywords_obj.getColCount,
-            'gettypeofcell':scontainer_keywords_obj.getTypeOfCell,
-            'gettextofcell':scontainer_keywords_obj.getTextOfCell,
-            'verifytextofcell':scontainer_keywords_obj.verifyTextOfCell,
-            'clickoncell':scontainer_keywords_obj.clickOnCell,
-            'doubleclickoncell':scontainer_keywords_obj.doubleClickOnCell,
-            'rightclickoncell':scontainer_keywords_obj.rightClickOnCell,
-            'setcellfocus' : scontainer_keywords_obj.setCellFocus
-            }
+        #------------------------------------------------------launch keywords
+        'launchapplication' : launch_keywords_obj.launch_application,
+        'closeapplication' : launch_keywords_obj.closeApplication,
+        'getpagetitle' : launch_keywords_obj.getPageTitle,
+        'starttransaction' : launch_keywords_obj.startTransaction,
+        'serverconnect' : launch_keywords_obj.serverConnect,
+        'getpopuptext' : launch_keywords_obj.getPopUpText,
+        'getstatusbarmessage' : launch_keywords_obj.getStatusBarMessage,
+        'toolbaraction' : launch_keywords_obj.toolbar_actions,
+        'selectmenu': launch_keywords_obj.selectMenu,
+        'doubleclickstatusbar': launch_keywords_obj.doubleClickStatusBar,
+        "closedialogwindow": launch_keywords_obj.close_modal_window,
+        "maximizedialogwindow": launch_keywords_obj.maximize_modal_window,
+        "restoredialogwindow": launch_keywords_obj.restore_modal_window,
+        "getdialogwindowname": launch_keywords_obj.getWindowName,
+        #------------------------------------------------------textbox keywords
+        'settext' : editable_text_obj.setText,
+        'setsecuretext' : editable_text_obj.setSecureText,
+        'gettext' : editable_text_obj.getText,
+        'cleartext' : editable_text_obj.clearText,
+        'verifytext' : editable_text_obj.verifyText,
+        'gettextboxlength' : editable_text_obj.getTextboxLength,
+        'verifytextboxlength' : editable_text_obj.verifyTextboxLength,
+        #------------------------------------------------------radio btn keywords
+        'selectcheckbox' : radiocheckbox_keywords_obj.select_checkbox,
+        'unselectcheckbox' : radiocheckbox_keywords_obj.unselect_checkbox,
+        'selectradiobutton' : radiocheckbox_keywords_obj.select_radiobutton,
+        'getstatus' : radiocheckbox_keywords_obj.get_status,
+        #------------------------------------------------------button keywords
+        'getbuttonname' : button_link_obj.get_button_name,
+        'verifybuttonname' : button_link_obj.verify_button_name,
+        'uploadfile' : button_link_obj.button_uploadFile,
+        #------------------------------------------------------dropdown keywords
+        'getselected' : dropdown_keywords_obj.getSelected,
+        'getcount' : dropdown_keywords_obj.getCount,
+        'getvaluebyindex' : dropdown_keywords_obj.getValueByIndex,
+        'selectvaluebyindex' : dropdown_keywords_obj.selectValueByIndex,
+        'selectvaluebytext' : dropdown_keywords_obj.selectValueByText,
+        'verifycount' : dropdown_keywords_obj.verifyCount,
+        'verifyselectedvalue' : dropdown_keywords_obj.verifySelectedValue,
+        'verifyvaluesexists' : dropdown_keywords_obj.verifyValuesExists,
+        'verifyallvalues' : dropdown_keywords_obj.verifyAllValues,
+        'getallkeyvaluepairs' : dropdown_keywords_obj.getAllKeyValuePairs,
+        'selectkeybytext' : dropdown_keywords_obj.selectKeyByText,
+        'getkeybyindex' : dropdown_keywords_obj.getKeyByIndex,
+        #------------------------------------------------------element keywords
+        'click' : element_keywords_obj.click,
+        'rightclick' : element_keywords_obj.rightClick,
+        'doubleclick' : element_keywords_obj.doubleClick,
+        'mousehover' : element_keywords_obj.mouseHover,
+        'getelementtext' : element_keywords_obj.get_element_text,
+        'verifyelementtext' : element_keywords_obj.verify_element_text,
+        'gettooltiptext' : element_keywords_obj.getTooltipText,
+        'verifytooltiptext' : element_keywords_obj.verifyTooltipText,
+        'geticonname' : element_keywords_obj.getIconName,
+        'verifyiconname' : element_keywords_obj.verifyIconName,
+        'getinputhelp' : element_keywords_obj.getInputHelp,
+        'setfocus' : element_keywords_obj.setFocus,
+        'scrollup' : element_keywords_obj.scrollUp,
+        'scrolldown' : element_keywords_obj.scrollDown,
+        'scrollleft' : element_keywords_obj.scrollLeft,
+        'scrollright' : element_keywords_obj.scrollRight,
+        'movetabs' : element_keywords_obj.moveTabs,
+        'selecttab' : element_keywords_obj.selectTab,
+        #------------------------------------------------------sap util keywords
+        'verifyenabled' : saputil_keywords_obj.verifyEnabled,
+        'verifydisabled' : saputil_keywords_obj.verifyDisabled,
+        'verifyexists' : saputil_keywords_obj.verifyExists,
+        'verifyhidden' : saputil_keywords_obj.verifyHidden,
+        'verifyvisible' : saputil_keywords_obj.verifyVisible,
+        #-------------------------------------------------------table keywords
+        'getrowcount' : table_keywords_obj.getRowCount,
+        'getcolumncount' : table_keywords_obj.getColumnCount,
+        'getcolnumbytext' : table_keywords_obj.getColNumByText,
+        'getrownumbytext' : table_keywords_obj.getRowNumByText,
+        'getcellvalue' : table_keywords_obj.getCellValue,
+        'verifycellvalue' : table_keywords_obj.verifyCellValue,
+        #commenting dropdown code inside table cell
+        'verifytextexists' : table_keywords_obj.verifyTextExists,
+        # 'cellclick':table_keywords_obj.cellClick,
+        # 'selectvaluebyindex':table_keywords_obj.selectValueByIndex,
+        # 'selectvaluebytext':table_keywords_obj.selectValueByText,
+        # 'getselected':table_keywords_obj.getSelected,
+        'getcellstatus' : table_keywords_obj.getStatus,
+        'selectrow' : table_keywords_obj.selectRow,
+        'unselectrow' : table_keywords_obj.unselectRow,
+        'selectcolumn' : table_keywords_obj.selectColumn,
+        'unselectcolumn' : table_keywords_obj.unselectColumn,
+        'setcelltext' : table_keywords_obj.setCellText,
+        #Shell keywords
+        #-----------------------------------------------------shell_basic_keywords
+        'selectcontextmenubytext' : shell_keywords_obj.selectContextMenuByText,
+        #-----------------------------------------------------gridviewkeywords
+        'getcountofrows' : shell_gridview_toolbar_keywords_obj.get_rowCount,
+        'getcountofcolumns' : shell_gridview_toolbar_keywords_obj.get_colCount,
+        'selectrows' : shell_gridview_toolbar_keywords_obj.selectRows,
+        'presstoolbarbutton' : shell_gridview_toolbar_keywords_obj.pressToolBarButton,
+        'getcelltext' : shell_gridview_toolbar_keywords_obj.getCellText,
+        'clickcell' : shell_gridview_toolbar_keywords_obj.clickCell,
+        'doubleclickcell' : shell_gridview_toolbar_keywords_obj.doubleClickCell,
+        'setshelltext' : shell_gridview_toolbar_keywords_obj.setShellText,
+        'getrowcolbytext' : shell_gridview_toolbar_keywords_obj.getRowColByText,
+        'toolbaractionkeys' : shell_gridview_toolbar_keywords_obj.toolBarActionKeys,
+        'settextincell' : shell_gridview_toolbar_keywords_obj.setCellText,
+        'selectallrows' : shell_gridview_toolbar_keywords_obj.selectAllRows,
+        'unselectallselections' : shell_gridview_toolbar_keywords_obj.unselectAllSelections,
+        'scrolltorownumber' : shell_gridview_toolbar_keywords_obj.scrollToRowNumber,
+        'getcellcolor' : shell_gridview_toolbar_keywords_obj.getCellColor,
+        'selectcolumns' : shell_gridview_toolbar_keywords_obj.selectColumns,
+        'unselectcolumns' : shell_gridview_toolbar_keywords_obj.unSelectColumns,
+        'getallcolumnheaders' : shell_gridview_toolbar_keywords_obj.getAllColumnHeaders,
+        'getcolnumbycolheaders' : shell_gridview_toolbar_keywords_obj.getColNumByColHeaders,
+        #------------------------------------------------------treekeywords
+        'selecttreeelement' : shell_tree_keywords_obj.selectTreeElement,
+        'gettreenodetext' : shell_tree_keywords_obj.getTreeNodeText,
+        'gettreenodecount' : shell_tree_keywords_obj.getTreeNodeCount,
+        'singleselectparentofselected' : shell_tree_keywords_obj.singleSelectParentOfSelected,
+        'collapsetree' : shell_tree_keywords_obj.collapseTree,
+        'getcolvaluecorrtoselectednode' : shell_tree_keywords_obj.getColValueCorrToSelectedNode,
+        'selecttreenode' : shell_tree_keywords_obj.selectTreeNode,
+        'getnodenamebyindex' : shell_tree_keywords_obj.getNodeNameByIndex,
+        'verifytreepath' : shell_tree_keywords_obj.verifyTreePath,
+        #------------------------------------------------------calendarkeywords
+        'selectdate' : shell_calendar_keywords_obj.select_date,
+        #'selecttodaysdate' : shell_calendar_keywords_obj.select_todays_date,
+        'selectrange':shell_calendar_keywords_obj.select_range,
+        'selectmonth':shell_calendar_keywords_obj.select_month,
+        'selectweek':shell_calendar_keywords_obj.select_week,
+        #------------------------------------------------------scontainerkeywords
+        'getrowcountofcontainer':scontainer_keywords_obj.getRowCount,
+        'getcolcountofcontainer':scontainer_keywords_obj.getColCount,
+        'gettypeofcell':scontainer_keywords_obj.getTypeOfCell,
+        'gettextofcell':scontainer_keywords_obj.getTextOfCell,
+        'verifytextofcell':scontainer_keywords_obj.verifyTextOfCell,
+        'clickoncell':scontainer_keywords_obj.clickOnCell,
+        'doubleclickoncell':scontainer_keywords_obj.doubleClickOnCell,
+        'rightclickoncell':scontainer_keywords_obj.rightClickOnCell,
+        'setcellfocus' : scontainer_keywords_obj.setCellFocus,
+        #-----------------------------------------------------------------iris-keywords
+        'clickiris':iris_object.clickiris,
+        'doubleclickiris':iris_object.doubleclickiris,
+        'rightclickiris':iris_object.rightclickiris,
+        'settextiris':iris_object.settextiris,
+        'setsecuretextiris':iris_object.setsecuretextiris,
+        'gettextiris':iris_object.gettextiris,
+        'getrowcountiris':iris_object.getrowcountiris,
+        'getcolcountiris':iris_object.getcolcountiris,
+        'getcellvalueiris':iris_object.getcellvalueiris,
+        'verifyexistsiris':iris_object.verifyexistsiris,
+        'verifytextiris':iris_object.verifytextiris,
+        'cleartextiris':iris_object.cleartextiris,
+        'dragiris':iris_object.dragiris,
+        'dropiris':iris_object.dropiris,
+        'mousehoveriris':iris_object.mousehoveriris,
+        'setcellvalueiris':iris_object.setcellvalueiris,
+        'verifycellvalueiris':iris_object.verifycellvalueiris,
+        'clickcelliris':iris_object.clickcelliris,
+        'doubleclickcelliris':iris_object.doubleclickcelliris,
+        'rightclickcelliris':iris_object.rightclickcelliris,
+        'mousehovercelliris':iris_object.mousehovercelliris,
+        'getstatusiris':iris_object.getstatusiris
+    }
 
     def __init__(self):
 
         self.exception_flag = ''
         self.action = None
-        self.iris_object = iris_operations.IRISKeywords()
 #-----------------------------------------------------------------for custom objects
     custom_dict = {
                     "click" : ['radiobutton', 'checkbox', 'input', 'button', 'select', 'table', 'label'],
@@ -247,23 +270,6 @@ class SAPDispatcher:
             logger.print_on_console( "Error occured in dispatcher" )
 #-----------------------------------------------------------------for custom objects
         try:
-            #-----------------------------------------------------------------iris-keywords
-            self.sap_dict['clickiris'] = self.iris_object.clickiris
-            self.sap_dict['doubleclickiris'] = self.iris_object.doubleclickiris
-            self.sap_dict['rightclickiris'] = self.iris_object.rightclickiris
-            self.sap_dict['settextiris'] = self.iris_object.settextiris
-            self.sap_dict['setsecuretextiris'] = self.iris_object.setsecuretextiris
-            self.sap_dict['gettextiris'] = self.iris_object.gettextiris
-            self.sap_dict['getrowcountiris'] = self.iris_object.getrowcountiris
-            self.sap_dict['getcolcountiris'] = self.iris_object.getcolcountiris
-            self.sap_dict['getcellvalueiris'] = self.iris_object.getcellvalueiris
-            self.sap_dict['verifyexistsiris'] = self.iris_object.verifyexistsiris
-            self.sap_dict['verifytextiris'] = self.iris_object.verifytextiris
-            self.sap_dict['cleartextiris'] = self.iris_object.cleartextiris
-            self.sap_dict['dragiris'] = self.iris_object.dragiris
-            self.sap_dict['dropiris'] = self.iris_object.dropiris
-            self.sap_dict['mousehoveriris'] = self.iris_object.mousehoveriris
-
             keyword = keyword.lower()
             if ( keyword in list(self.sap_dict.keys()) ):
                 if ( keyword == 'serverconnect' or keyword == 'launchapplication' or keyword == 'starttransaction' or keyword == 'toolbaraction' or keyword == 'selectmenu'):

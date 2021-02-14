@@ -194,6 +194,73 @@ def data_in_cells(image,row,column):
     del image, row, column #deleting variables
     return text
 
+def get_cell_position(image,row,column):
+    """
+    Def : This function will return the X and Y position of cell in the table
+    Input : image,row,column
+    Output : X,Y
+    Method Referenced in : setcellvalueiris, clickcelliris, doubleclickcelliris, rightclickcelliris, mousehovercelliris
+    """
+    validFlag = False
+    ele_w = None
+    ele_h = None
+    X = None
+    Y = None
+    try:
+        if(row<len(horizontal) and column<len(vertical)):
+            img = image[horizontal[row-1][0]+2:horizontal[row][0]-2,vertical[column-1][0]+2:vertical[column][0]-2]
+            ele_h,ele_w,c=img.shape
+            validFlag = True
+        else:
+            logger.print_on_console("Invalid Input for row and column number")
+
+        if (validFlag):
+            width = 0
+            r = 1
+            #To get width(left ->right) till the element then add the half width of target element to get total X
+            for i in range(1,column):
+                img = None
+                img = image[horizontal[r-1][0]+2:horizontal[r][0]-2,vertical[i-1][0]+2:vertical[i][0]-2]
+                h,wCell,c=img.shape
+                width = width + wCell
+            X = width + (ele_w/2)
+
+            #To get height(top -> bottom) till the element then add the half height of target element to get total Y
+            height = 0
+            for i in range(1,row):
+                img = None
+                img = image[horizontal[row-1][0]+2:horizontal[row][0]-2,vertical[column-1][0]+2:vertical[column][0]-2]
+                hCell,w,c=img.shape
+                height = height + hCell
+            Y = height + (ele_h/2)
+
+            del width, height, img, h, hCell, w, wCell, c #deleting variables
+    except Exception as e:
+        log.error("Error occurred in get_cell_position, Err_Msg : ",e)
+        logger.print_on_console("Error while fetching cell position.")
+    del image, row, column, ele_h, ele_w #deleting variables
+    return X, Y
+
+def image_match(imageA,imageB):
+    """
+    Def : This function will return True/False if two images match
+    Input : imageA,imageB
+    Output : Boolean
+    Method Referenced in : setcellvalueiris, clickcelliris, doubleclickcelliris, rightclickcelliris, mousehovercelliris
+    """
+    matchFlag = False
+    if(imageA.shape == imageB.shape):
+        log.debug('Images are of same size/shape')
+        diff = cv2.subtract(imageA,imageB)
+        b,g,r = cv2.split(diff)
+        if cv2.countNonZero(b) == 0 and cv2.countNonZero(g) == 0 and cv2.countNonZero(r) == 0:
+            log.debug('Images are identical; return true')
+            matchFlag = True
+        else: log.debug('Images are non - identical; return false')
+    else:
+        log.debug('Images are not of the same size/shape, returning False')
+    return matchFlag
+
 def gotoobject(elem):
     """
     Def : Return a match of the scraped IRIS image. Compares the IRIS Image over the DOM and returns Image co-ordinates, if multiple matches are found then compares best possible match via the original IRIS image co-ordinates.
@@ -1041,6 +1108,7 @@ class IRISKeywords():
         del element, args, img, res, elem_coordinates, const_coordintes, elements, height, width, image, text, opt # deleting variables
         return status, result, value, err_msg
 
+#--------------------------------------------------------------------------------------------------------------------------------- iris table keywords
     def getrowcountiris(self,element,*args):
         """
         Discription: This function returns total row count of the IRIS image(uses hough transform to get cells of the table)
@@ -1232,6 +1300,474 @@ class IRISKeywords():
             logger.print_on_console( "Error occurred in GetCellValueIris" )
         del element, args, img, res, elem_coordinates, const_coordintes, elements, row, col, width, height # deleting variables
         return status,result,value,err_msg
+
+    def setcellvalueiris(self,element,*args):
+        """
+        Discription: This function will set the cell text/value of the IRIS image(uses hough transform to get cells of the table)
+        Input: Row, Column, Text
+        OutPut: Boolean
+        """
+        log.info( 'Inside setcellvalueiris and No. of arguments passed are : ' + str(len(args)) )
+        global horizontal,vertical
+        status = TEST_RESULT_FAIL
+        result = TEST_RESULT_FALSE
+        err_msg=None
+        value = OUTPUT_CONSTANT
+        row = int(args[0][0])
+        col = int(args[0][1])
+        text = args[0][2]
+        img = None
+        res = None
+        elem_coordinates = None
+        const_coordintes = None
+        elements = []
+        height = None
+        width = None
+        try:
+            self.getrowcountiris(element)
+            if( TESSERACT_PATH_EXISTS ):
+                pytesseract.tesseract_cmd = TESSERACT_PATH + '/tesseract'
+                os.environ["TESSDATA_PREFIX"] = TESSERACT_PATH + '/tessdata'
+                img = None
+                if( len(args) == 3 and args[2] != '' and verifyFlag ):
+                    log.info('IRIS element recognised as a relative element')
+                    elem_coordinates = element['coordinates']
+                    const_coordintes = args[2]['coordinates']
+                    elements = [(const_coordintes[0],const_coordintes[1]),
+                            (const_coordintes[2],const_coordintes[3]),
+                            (elem_coordinates[0], elem_coordinates[1]),
+                            (elem_coordinates[2], elem_coordinates[3])]
+                    img, res = find_relative_image(elements, relativeCoordinates)
+                    width = res[2] - res[0]
+                    height = res[3] - res[1]
+                    log.info( 'Relative image co-ordinates : '+str(res) )
+                else:
+                    log.info('IRIS element recognised as a non-relative element')
+                    res, width, height = gotoobject(element)
+                    if(res): img = get_byte_mirror(element['cord'])
+                if( res and img ):
+                    with open("cropped.png", "wb") as f:
+                        f.write(base64.b64decode(img))
+                    img = cv2.imread("cropped.png")
+                    X,Y = get_cell_position(img,row,col)
+                    #--------------------------------------------------------equal in distance
+                    try:
+                        if(args[0][3] == str(1)):
+                            rows = len(horizontal)-1
+                            height_ele = height/rows
+                            Y = (height_ele*(row-1)) + (height_ele/2)
+                    except:pass
+                    #--------------------------------------------------------equal in distance
+                    pyautogui.moveTo(res[0]+ int(X), res[1]+ int(Y))
+                    if(text):
+                        if SYSTEM_OS != 'Darwin':
+                            pythoncom.CoInitialize()
+                            pyautogui.click()
+                            robot = Robot()
+                            time.sleep(1)
+                            robot.type_string(text, delay=0.2)
+                        else:
+                            pyautogui.click()
+                            time.sleep(1)
+                            pyautogui.typewrite(text) ## Pending
+                        status  = TEST_RESULT_PASS
+                        result = TEST_RESULT_TRUE
+                    else:
+                        err_msg = "Input text missing"
+                    os.remove('cropped.png')
+                else:
+                    err_msg = "Element not found on screen."
+            else:
+                err_msg = "Tesseract module not found"
+            if ( err_msg ):
+                log.info( err_msg )
+                logger.print_on_console( err_msg )
+        except Exception as e:
+            err_msg = "Error occurred in SetCellValueIris, Err_Msg : " + str(e)
+            log.error( err_msg )
+            logger.print_on_console( "Error occurred in SetCellValueIris" )
+        del element, args, img, res, elem_coordinates, const_coordintes, elements, row, col, width, height # deleting variables
+        return status,result,value,err_msg
+
+    def verifycellvalueiris(self,element,*args):
+        """
+        Discription: This function returns verifies cell text/value of the IRIS image(uses hough transform to get cells of the table)
+        Input: Row, Column ,Text
+        OutPut: Cell Text/Value
+        """
+        log.info( 'Inside verifycellvalueiris and No. of arguments passed are : ' + str(len(args)) )
+        global horizontal,vertical
+        status = TEST_RESULT_FAIL
+        result = TEST_RESULT_FALSE
+        err_msg=None
+        value = OUTPUT_CONSTANT
+        row = int(args[0][0])
+        col = int(args[0][1])
+        inptext = args[0][2]
+        img = None
+        res = None
+        elem_coordinates = None
+        const_coordintes = None
+        elements = []
+        height = None
+        width = None
+        try:
+            self.getrowcountiris(element)
+            if( TESSERACT_PATH_EXISTS ):
+                pytesseract.tesseract_cmd = TESSERACT_PATH + '/tesseract'
+                os.environ["TESSDATA_PREFIX"] = TESSERACT_PATH + '/tessdata'
+                img = None
+                if( len(args) == 3 and args[2] != '' and verifyFlag ):
+                    log.info('IRIS element recognised as a relative element')
+                    elem_coordinates = element['coordinates']
+                    const_coordintes = args[2]['coordinates']
+                    elements = [(const_coordintes[0],const_coordintes[1]),
+                            (const_coordintes[2],const_coordintes[3]),
+                            (elem_coordinates[0], elem_coordinates[1]),
+                            (elem_coordinates[2], elem_coordinates[3])]
+                    img, res = find_relative_image(elements, relativeCoordinates)
+                    log.info( 'Relative image co-ordinates : '+str(res) )
+                else:
+                    log.info('IRIS element recognised as a non-relative element')
+                    res, width, height = gotoobject(element)
+                    if(res): img = get_byte_mirror(element['cord'])
+                if( res and img ):
+                    with open("cropped.png", "wb") as f:
+                        f.write(base64.b64decode(img))
+                    img = cv2.imread("cropped.png")
+                    text = data_in_cells(img,row,col)
+                    if (inptext):
+                        if(text == inptext):
+                            status  = TEST_RESULT_PASS
+                            result = TEST_RESULT_TRUE
+                    else:
+                        err_msg = "Input text missing"
+                    os.remove('cropped.png')
+                else:
+                    err_msg = "Element not found on screen."
+            else:
+                err_msg = "Tesseract module not found"
+            if ( err_msg ):
+                log.info( err_msg )
+                logger.print_on_console( err_msg )
+        except Exception as e:
+            err_msg = "Error occurred in VerifyCellValueIris, Err_Msg : " + str(e)
+            log.error( err_msg )
+            logger.print_on_console( "Error occurred in VerifyCellValueIris" )
+        del element, args, img, res, elem_coordinates, const_coordintes, elements, row, col, width, height # deleting variables
+        return status,result,value,err_msg
+
+    def clickcelliris(self,element,*args):
+        """
+        Discription: This function will click the cell of the IRIS image(uses hough transform to get cells of the table)
+        Input: Row, Column
+        OutPut: Boolean
+        """
+        log.info( 'Inside clickcelliris and No. of arguments passed are : ' + str(len(args)) )
+        global horizontal,vertical
+        status = TEST_RESULT_FAIL
+        result = TEST_RESULT_FALSE
+        err_msg=None
+        value = OUTPUT_CONSTANT
+        row = int(args[0][0])
+        col = int(args[0][1])
+        img = None
+        res = None
+        elem_coordinates = None
+        const_coordintes = None
+        elements = []
+        height = None
+        width = None
+        try:
+            self.getrowcountiris(element)
+            if( TESSERACT_PATH_EXISTS ):
+                pytesseract.tesseract_cmd = TESSERACT_PATH + '/tesseract'
+                os.environ["TESSDATA_PREFIX"] = TESSERACT_PATH + '/tessdata'
+                img = None
+                if( len(args) == 3 and args[2] != '' and verifyFlag ):
+                    log.info('IRIS element recognised as a relative element')
+                    elem_coordinates = element['coordinates']
+                    const_coordintes = args[2]['coordinates']
+                    elements = [(const_coordintes[0],const_coordintes[1]),
+                            (const_coordintes[2],const_coordintes[3]),
+                            (elem_coordinates[0], elem_coordinates[1]),
+                            (elem_coordinates[2], elem_coordinates[3])]
+                    img, res = find_relative_image(elements, relativeCoordinates)
+                    width = res[2] - res[0]
+                    height = res[3] - res[1]
+                    log.info( 'Relative image co-ordinates : '+str(res) )
+                else:
+                    log.info('IRIS element recognised as a non-relative element')
+                    res, width, height = gotoobject(element)
+                    if(res): img = get_byte_mirror(element['cord'])
+                if( res and img ):
+                    with open("cropped.png", "wb") as f:
+                        f.write(base64.b64decode(img))
+                    img = cv2.imread("cropped.png")
+                    X, Y = get_cell_position(img,row,col)
+                    #--------------------------------------------------------equal in distance
+                    try:
+                        if(args[0][2] == str(1)):
+                            rows = len(horizontal)-1
+                            height_ele = height/rows
+                            Y = (height_ele*(row-1)) + (height_ele/2)
+                    except:pass
+                    #--------------------------------------------------------equal in distance
+                    pyautogui.moveTo(res[0]+ int(X), res[1]+ int(Y))
+                    if SYSTEM_OS != 'Darwin': pythoncom.CoInitialize()
+                    log.info('Performing clickcelliris')
+                    pyautogui.click()
+                    log.info('clickcelliris performed')
+                    status  = TEST_RESULT_PASS
+                    result = TEST_RESULT_TRUE
+                    os.remove('cropped.png')
+                else:
+                    err_msg = "Element not found on screen."
+            else:
+                err_msg = "Tesseract module not found"
+            if ( err_msg ):
+                log.info( err_msg )
+                logger.print_on_console( err_msg )
+        except Exception as e:
+            err_msg = "Error occurred in ClickCellIris, Err_Msg : " + str(e)
+            log.error( err_msg )
+            logger.print_on_console( "Error occurred in ClickCellIris" )
+        del element, args, img, res, elem_coordinates, const_coordintes, elements, row, col, width, height # deleting variables
+        return status,result,value,err_msg
+
+    def doubleclickcelliris(self,element,*args):
+        """
+        Discription: This function will double click the cell of the IRIS image(uses hough transform to get cells of the table)
+        Input: Row, Column
+        OutPut: Boolean
+        """
+        log.info( 'Inside doubleclickcelliris and No. of arguments passed are : ' + str(len(args)) )
+        global horizontal,vertical
+        status = TEST_RESULT_FAIL
+        result = TEST_RESULT_FALSE
+        err_msg=None
+        value = OUTPUT_CONSTANT
+        row = int(args[0][0])
+        col = int(args[0][1])
+        img = None
+        res = None
+        elem_coordinates = None
+        const_coordintes = None
+        elements = []
+        height = None
+        width = None
+        try:
+            self.getrowcountiris(element)
+            if( TESSERACT_PATH_EXISTS ):
+                pytesseract.tesseract_cmd = TESSERACT_PATH + '/tesseract'
+                os.environ["TESSDATA_PREFIX"] = TESSERACT_PATH + '/tessdata'
+                img = None
+                if( len(args) == 3 and args[2] != '' and verifyFlag ):
+                    log.info('IRIS element recognised as a relative element')
+                    elem_coordinates = element['coordinates']
+                    const_coordintes = args[2]['coordinates']
+                    elements = [(const_coordintes[0],const_coordintes[1]),
+                            (const_coordintes[2],const_coordintes[3]),
+                            (elem_coordinates[0], elem_coordinates[1]),
+                            (elem_coordinates[2], elem_coordinates[3])]
+                    img, res = find_relative_image(elements, relativeCoordinates)
+                    width = res[2] - res[0]
+                    height = res[3] - res[1]
+                    log.info( 'Relative image co-ordinates : '+str(res) )
+                else:
+                    log.info('IRIS element recognised as a non-relative element')
+                    res, width, height = gotoobject(element)
+                    if(res): img = get_byte_mirror(element['cord'])
+                if( res and img ):
+                    with open("cropped.png", "wb") as f:
+                        f.write(base64.b64decode(img))
+                    img = cv2.imread("cropped.png")
+                    X, Y = get_cell_position(img,row,col)
+                    #--------------------------------------------------------equal in distance
+                    try:
+                        if(args[0][2] == str(1)):
+                            rows = len(horizontal)-1
+                            height_ele = height/rows
+                            Y = (height_ele*(row-1)) + (height_ele/2)
+                    except:pass
+                    #--------------------------------------------------------equal in distance
+                    pyautogui.moveTo(res[0]+ int(X), res[1]+ int(Y))
+                    if SYSTEM_OS != 'Darwin': pythoncom.CoInitialize()
+                    log.info('Performing doubleClickCell')
+                    pyautogui.doubleClick()
+                    log.info('doubleClickCell performed')
+                    status  = TEST_RESULT_PASS
+                    result = TEST_RESULT_TRUE
+                    os.remove('cropped.png')
+                else:
+                    err_msg = "Element not found on screen."
+            else:
+                err_msg = "Tesseract module not found"
+            if ( err_msg ):
+                log.info( err_msg )
+                logger.print_on_console( err_msg )
+        except Exception as e:
+            err_msg = "Error occurred in DoubleClickCellIris, Err_Msg : " + str(e)
+            log.error( err_msg )
+            logger.print_on_console( "Error occurred in DoubleClickCellIris" )
+        del element, args, img, res, elem_coordinates, const_coordintes, elements, row, col, width, height # deleting variables
+        return status,result,value,err_msg
+
+    def rightclickcelliris(self,element,*args):
+        """
+        Discription: This function will right click the cell of the IRIS image(uses hough transform to get cells of the table)
+        Input: Row, Column
+        OutPut: Boolean
+        """
+        log.info( 'Inside rightclickcelliris and No. of arguments passed are : ' + str(len(args)) )
+        global horizontal,vertical
+        status = TEST_RESULT_FAIL
+        result = TEST_RESULT_FALSE
+        err_msg = None
+        value = OUTPUT_CONSTANT
+        row = int(args[0][0])
+        col = int(args[0][1])
+        img = None
+        res = None
+        elem_coordinates = None
+        const_coordintes = None
+        elements = []
+        height = None
+        width = None
+        try:
+            self.getrowcountiris(element)
+            if( TESSERACT_PATH_EXISTS ):
+                pytesseract.tesseract_cmd = TESSERACT_PATH + '/tesseract'
+                os.environ["TESSDATA_PREFIX"] = TESSERACT_PATH + '/tessdata'
+                img = None
+                if( len(args) == 3 and args[2] != '' and verifyFlag ):
+                    log.info('IRIS element recognised as a relative element')
+                    elem_coordinates = element['coordinates']
+                    const_coordintes = args[2]['coordinates']
+                    elements = [(const_coordintes[0],const_coordintes[1]),
+                            (const_coordintes[2],const_coordintes[3]),
+                            (elem_coordinates[0], elem_coordinates[1]),
+                            (elem_coordinates[2], elem_coordinates[3])]
+                    img, res = find_relative_image(elements, relativeCoordinates)
+                    width = res[2] - res[0]
+                    height = res[3] - res[1]
+                    log.info( 'Relative image co-ordinates : '+str(res) )
+                else:
+                    log.info('IRIS element recognised as a non-relative element')
+                    res, width, height = gotoobject(element)
+                    if(res): img = get_byte_mirror(element['cord'])
+                if( res and img ):
+                    with open("cropped.png", "wb") as f:
+                        f.write(base64.b64decode(img))
+                    img = cv2.imread("cropped.png")
+                    X, Y = get_cell_position(img,row,col)
+                    #--------------------------------------------------------equal in distance
+                    try:
+                        if(args[0][2] == str(1)):
+                            rows = len(horizontal)-1
+                            height_ele = height/rows
+                            Y = (height_ele*(row-1)) + (height_ele/2)
+                    except:pass
+                    #--------------------------------------------------------equal in distance
+                    pyautogui.moveTo(res[0]+ int(X), res[1]+ int(Y))
+                    if SYSTEM_OS != 'Darwin': pythoncom.CoInitialize()
+                    log.info('Performing rightClickCell')
+                    pyautogui.rightClick()
+                    log.info('rightClickCell performed')
+                    status  = TEST_RESULT_PASS
+                    result = TEST_RESULT_TRUE
+                    os.remove('cropped.png')
+                else:
+                    err_msg = "Element not found on screen."
+            else:
+                err_msg = "Tesseract module not found"
+            if ( err_msg ):
+                log.info( err_msg )
+                logger.print_on_console( err_msg )
+        except Exception as e:
+            err_msg = "Error occurred in RightClickCellIris, Err_Msg : " + str(e)
+            log.error( err_msg )
+            logger.print_on_console( "Error occurred in RightClickCellIris" )
+        del element, args, img, res, elem_coordinates, const_coordintes, elements, row, col, width, height # deleting variables
+        return status,result,value,err_msg
+
+    def mousehovercelliris(self,element,*args):
+        """
+        Discription: This function will right click the cell of the IRIS image(uses hough transform to get cells of the table)
+        Input: Row, Column
+        OutPut: Boolean
+        """
+        log.info( 'Inside mousehovercelliris and No. of arguments passed are : ' + str(len(args)) )
+        global horizontal,vertical
+        status = TEST_RESULT_FAIL
+        result = TEST_RESULT_FALSE
+        err_msg = None
+        value = OUTPUT_CONSTANT
+        row = int(args[0][0])
+        col = int(args[0][1])
+        img = None
+        res = None
+        elem_coordinates = None
+        const_coordintes = None
+        elements = []
+        height = None
+        width = None
+        try:
+            self.getrowcountiris(element)
+            if( TESSERACT_PATH_EXISTS ):
+                pytesseract.tesseract_cmd = TESSERACT_PATH + '/tesseract'
+                os.environ["TESSDATA_PREFIX"] = TESSERACT_PATH + '/tessdata'
+                img = None
+                if( len(args) == 3 and args[2] != '' and verifyFlag ):
+                    log.info('IRIS element recognised as a relative element')
+                    elem_coordinates = element['coordinates']
+                    const_coordintes = args[2]['coordinates']
+                    elements = [(const_coordintes[0],const_coordintes[1]),
+                            (const_coordintes[2],const_coordintes[3]),
+                            (elem_coordinates[0], elem_coordinates[1]),
+                            (elem_coordinates[2], elem_coordinates[3])]
+                    img, res = find_relative_image(elements, relativeCoordinates)
+                    width = res[2] - res[0]
+                    height = res[3] - res[1]
+                    log.info( 'Relative image co-ordinates : '+str(res) )
+                else:
+                    log.info('IRIS element recognised as a non-relative element')
+                    res, width, height = gotoobject(element)
+                    if(res): img = get_byte_mirror(element['cord'])
+                if( res and img ):
+                    with open("cropped.png", "wb") as f:
+                        f.write(base64.b64decode(img))
+                    img = cv2.imread("cropped.png")
+                    X, Y = get_cell_position(img,row,col)
+                    #--------------------------------------------------------equal in distance
+                    try:
+                        if(args[0][2] == str(1)):
+                            rows = len(horizontal)-1
+                            height_ele = height/rows
+                            Y = (height_ele*(row-1)) + (height_ele/2)
+                    except:pass
+                    #--------------------------------------------------------equal in distance
+                    if SYSTEM_OS != 'Darwin': pythoncom.CoInitialize()
+                    log.info('Performing mouseHoverCell')
+                    pyautogui.moveTo(res[0]+ int(X), res[1]+ int(Y))
+                    log.info('mouseHoverCell performed')
+                    status  = TEST_RESULT_PASS
+                    result = TEST_RESULT_TRUE
+                    os.remove('cropped.png')
+                else:
+                    err_msg = "Element not found on screen."
+            else:
+                err_msg = "Tesseract module not found"
+            if ( err_msg ):
+                log.info( err_msg )
+                logger.print_on_console( err_msg )
+        except Exception as e:
+            err_msg = "Error occurred in MouseHoverCellIris, Err_Msg : " + str(e)
+            log.error( err_msg )
+            logger.print_on_console( "Error occurred in MouseHoverCellIris" )
+        del element, args, img, res, elem_coordinates, const_coordintes, elements, row, col, width, height # deleting variables
+        return status,result,value,err_msg
+#--------------------------------------------------------------------------------------------------------------------------------- iris table keywords
 
     def verifyexistsiris(self,element,*args):
         """
@@ -1534,4 +2070,90 @@ class IRISKeywords():
             log.error(err_msg)
             logger.print_on_console("Error occurred in MouseHoverIris")
         del element, args, img, res, elem_coordinates, const_coordintes, elements, height, width # deleting variables
+        return status, result, value, err_msg
+
+    def getstatusiris(self,element,*args):
+        """
+        Discription: Performs a get status operation on the checkbox element.
+        Input: N/A
+        OutPut: Boolean Value
+        """
+        log.info('Inside getstatusiris and No. of arguments passed are : '+str(len(args)))
+        status = TEST_RESULT_FAIL
+        result = TEST_RESULT_FALSE
+        err_msg = None
+        value = OUTPUT_CONSTANT
+        img = None
+        res = None
+        elem_coordinates = None
+        const_coordintes = None
+        elements = []
+        width = None
+        height = None
+        try:
+            img = None
+            if(len(args) == 3 and args[2]!='' and verifyFlag ):
+                log.info('IRIS element recognised as a relative element')
+                elem_coordinates = element['coordinates']
+                const_coordintes = args[2]['coordinates']
+                elements = [(const_coordintes[0],const_coordintes[1]),
+                        (const_coordintes[2],const_coordintes[3]),
+                        (elem_coordinates[0], elem_coordinates[1]),
+                        (elem_coordinates[2], elem_coordinates[3])]
+                img, res = find_relative_image(elements, relativeCoordinates)
+                log.info( 'Relative image co-ordinates : ' + str(res) )
+                width = res[2] - res[0]
+                height = res[3] - res[1]
+                pyautogui.moveTo(res[0]+ int(width/2),res[1] + int(height/2))
+                log.info( "Element co-ordinates after finding relative image are : " + str(res) )
+            else:
+                log.info('IRIS element recognised as a non-relative element')
+                logger.print_on_console("Warning!: Parent element not detected, will lead to inconsistant results")
+                res, width, height = gotoobject(element)
+                if(res): img = get_byte_mirror(element['cord'])
+            if( len(res) > 0 ):
+                #1.get original image
+                originalImg = get_byte_mirror(element['cord'])
+                with open("original.png", "wb") as f:
+                    f.write(base64.b64decode(originalImg))
+                originalImage = cv2.imread("original.png")
+
+                #2. get target image
+                with open("compare.png", "wb") as f:
+                    f.write(base64.b64decode(img))
+                relativeImage = cv2.imread("compare.png")
+
+                #3. subtract target image with the original image
+                flg = False
+                matchFlag = image_match(originalImage,relativeImage)
+                if (args[0][0] == str(0)):
+                    #unchecked
+                    if matchFlag: val = 'unchecked'
+                    else: val = 'checked'
+                    flg = True
+                elif(args[0][0] == str(1)):
+                    #checked
+                    if matchFlag: val = 'checked'
+                    else: val = 'unchecked'
+                    flg = True
+                else:
+                    flg = False
+                if (flg == True):
+                    status= TEST_RESULT_PASS
+                    result = TEST_RESULT_TRUE
+                    value = val
+                else:
+                    err_msg ="Invalid input"
+                os.remove('original.png')
+                os.remove('compare.png')
+            else:
+                err_msg = "Object not found"
+            if ( err_msg ):
+                log.info( err_msg )
+                logger.print_on_console( err_msg )
+        except Exception as e:
+            err_msg = "Error occurred in getstatusiris, Err_Msg : " + str(e)
+            log.error(err_msg)
+            logger.print_on_console("Error occurred in getStatusIris")
+        del element, args, img, res, elem_coordinates, const_coordintes, elements, height, width, originalImage, relativeImage, matchFlag, flg # deleting variables
         return status, result, value, err_msg
