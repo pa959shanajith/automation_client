@@ -186,31 +186,31 @@ class Dispatcher:
             'navigateback':local_Wd.browser_object.navigate_back,
             'opennewtab':local_Wd.browser_object.openNewTab,
             'execute_js':local_Wd.browser_object.execute_js,
-            'getbrowsername': local_Wd.browser_object.getBrowserName
+            'getbrowsername': local_Wd.browser_object.getBrowserName,
+
+            'clickiris':iris_object.clickiris,
+            'doubleclickiris':iris_object.doubleclickiris,
+            'rightclickiris':iris_object.rightclickiris,
+            'settextiris':iris_object.settextiris,
+            'setsecuretextiris':iris_object.setsecuretextiris,
+            'gettextiris':iris_object.gettextiris,
+            'getrowcountiris':iris_object.getrowcountiris,
+            'getcolcountiris':iris_object.getcolcountiris,
+            'getcellvalueiris':iris_object.getcellvalueiris,
+            'verifyexistsiris':iris_object.verifyexistsiris,
+            'verifytextiris':iris_object.verifytextiris,
+            'cleartextiris':iris_object.cleartextiris,
+            'dragiris':iris_object.dragiris,
+            'dropiris':iris_object.dropiris,
+            'mousehoveriris':iris_object.mousehoveriris,
+            'setcellvalueiris':iris_object.setcellvalueiris,
+            'verifycellvalueiris':iris_object.verifycellvalueiris,
+            'clickcelliris':iris_object.clickcelliris,
+            'doubleclickcelliris':iris_object.doubleclickcelliris,
+            'rightclickcelliris':iris_object.rightclickcelliris,
+            'mousehovercelliris':iris_object.mousehovercelliris,
+            'getstatusiris':iris_object.getstatusiris
         }
-        #---------------------------------------------------------------iris keywords
-        self.web_dict['clickiris'] = iris_object.clickiris
-        self.web_dict['doubleclickiris'] = iris_object.doubleclickiris
-        self.web_dict['rightclickiris'] = iris_object.rightclickiris
-        self.web_dict['settextiris'] = iris_object.settextiris
-        self.web_dict['setsecuretextiris'] = iris_object.setsecuretextiris
-        self.web_dict['gettextiris'] = iris_object.gettextiris
-        self.web_dict['getrowcountiris'] = iris_object.getrowcountiris
-        self.web_dict['getcolcountiris'] = iris_object.getcolcountiris
-        self.web_dict['getcellvalueiris'] = iris_object.getcellvalueiris
-        self.web_dict['verifyexistsiris'] = iris_object.verifyexistsiris
-        self.web_dict['verifytextiris'] = iris_object.verifytextiris
-        self.web_dict['cleartextiris'] = iris_object.cleartextiris
-        self.web_dict['dragiris'] = iris_object.dragiris
-        self.web_dict['dropiris'] = iris_object.dropiris
-        self.web_dict['mousehoveriris'] = iris_object.mousehoveriris
-        self.web_dict['setcellvalueiris'] = iris_object.setcellvalueiris
-        self.web_dict['verifycellvalueiris'] = iris_object.verifycellvalueiris
-        self.web_dict['clickcelliris'] = iris_object.clickcelliris
-        self.web_dict['doubleclickcelliris'] = iris_object.doubleclickcelliris
-        self.web_dict['rightclickcelliris'] = iris_object.rightclickcelliris
-        self.web_dict['mousehovercelliris'] = iris_object.mousehovercelliris
-        self.web_dict['getstatusiris'] = iris_object.getstatusiris
 
         self.exception_flag=''
         self.action=None

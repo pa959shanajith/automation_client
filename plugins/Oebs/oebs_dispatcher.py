@@ -195,33 +195,31 @@ class OebsDispatcher:
                   'gettextboxlength':self.oebs_keywords.gettextboxlength,
                   'settext':self.oebs_keywords.settext,
                   'gettext':self.oebs_keywords.gettext,
-                  'closeapplictaion':self.utils_obj.close_application
+                  'closeapplictaion':self.utils_obj.close_application,
 
+                  'clickiris':self.iris_object.clickiris,
+                  'doubleclickiris':self.iris_object.doubleclickiris,
+                  'rightclickiris':self.iris_object.rightclickiris,
+                  'settextiris':self.iris_object.settextiris,
+                  'setsecuretextiris':self.iris_object.setsecuretextiris,
+                  'gettextiris':self.iris_object.gettextiris,
+                  'getrowcountiris':self.iris_object.getrowcountiris,
+                  'getcolcountiris':self.iris_object.getcolcountiris,
+                  'getcellvalueiris':self.iris_object.getcellvalueiris,
+                  'verifyexistsiris':self.iris_object.verifyexistsiris,
+                  'verifytextiris':self.iris_object.verifytextiris,
+                  'cleartextiris':self.iris_object.cleartextiris,
+                  'dragiris':self.iris_object.dragiris,
+                  'dropiris':self.iris_object.dropiris,
+                  'mousehoveriris':self.iris_object.mousehoveriris,
+                  'setcellvalueiris':self.iris_object.setcellvalueiris,
+                  'verifycellvalueiris':self.iris_object.verifycellvalueiris,
+                  'clickcelliris':self.iris_object.clickcelliris,
+                  'doubleclickcelliris':self.iris_object.doubleclickcelliris,
+                  'rightclickcelliris':self.iris_object.rightclickcelliris,
+                  'mousehovercelliris':self.iris_object.mousehovercelliris,
+                  'getstatusiris':self.iris_object.getstatusiris
                 }
-
-            #-------------------------------------------------------------------iris keywords
-            dict['clickiris'] = self.iris_object.clickiris
-            dict['doubleclickiris'] = self.iris_object.doubleclickiris
-            dict['rightclickiris'] = self.iris_object.rightclickiris
-            dict['settextiris'] = self.iris_object.settextiris
-            dict['setsecuretextiris'] = self.iris_object.setsecuretextiris
-            dict['gettextiris'] = self.iris_object.gettextiris
-            dict['getrowcountiris'] = self.iris_object.getrowcountiris
-            dict['getcolcountiris'] = self.iris_object.getcolcountiris
-            dict['getcellvalueiris'] = self.iris_object.getcellvalueiris
-            dict['verifyexistsiris'] = self.iris_object.verifyexistsiris
-            dict['verifytextiris'] = self.iris_object.verifytextiris
-            dict['cleartextiris'] = self.iris_object.cleartextiris
-            dict['dragiris'] = self.iris_object.dragiris
-            dict['dropiris'] = self.iris_object.dropiris
-            dict['mousehoveriris'] = self.iris_object.mousehoveriris
-            dict['setcellvalueiris'] = self.iris_object.setcellvalueiris
-            dict['verifycellvalueiris'] = self.iris_object.verifycellvalueiris
-            dict['clickcelliris'] = self.iris_object.clickcelliris
-            dict['doubleclickcelliris'] = self.iris_object.doubleclickcelliris
-            dict['rightclickcelliris'] = self.iris_object.rightclickcelliris
-            dict['mousehovercelliris'] = self.iris_object.mousehovercelliris
-            dict['getstatusiris'] = self.iris_object.getstatusiris
 
             keyword=keyword.lower()
             if keyword in list(dict.keys()):

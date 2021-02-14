@@ -4,14 +4,22 @@ import logging
 import argparse
 import platform
 log = logging.getLogger('Avo_Assure')
+ice_ver = '3.0'
+
+try:
+    cfile = os.path.abspath(__file__)
+    with open(os.path.normpath(os.path.dirname(cfile)+("/../.." if os.path.splitext(cfile)[-1]==".py" else "")+"/assets/about_manifest.json")) as m:
+        import json
+        ice_ver = json.load(m)["version"]
+except: pass
 
 parser = argparse.ArgumentParser(description="Avo Assure ICE Platform")
 parser.add_argument('-n', '--AVO_ASSURE_HOME', required=True, type=str, help='A Required path to Avo Assure root location')
-parser.add_argument('-v', '--version', action='version', version='Avo Assure ICE 2.0', help='Show Avo Assure ICE version information')
+parser.add_argument('-v', '--version', action='version', version=('Avo Assure ICE '+ice_ver), help='Show Avo Assure ICE version information')
 parser.add_argument('--register', action='store_true', help='Register Avo Assure ICE with Avo Assure Web Application.')
-reg_group = parser.add_argument_group("register")
+reg_group = parser.add_argument_group("Arguments for register/guest-connect")
 reg_group.add_argument('--host', type=str, help='Avo Assure Web Application URL. Eg: https://example.com:8443. If no value is provided then value is read from configuration file.')
-reg_group.add_argument('--token', type=str, help='Registration token obtained during ICE Provisioning. Input can be file or text.')
+reg_group.add_argument('--token', type=str, help='Registration token obtained during ICE Provisioning. Input can be filepath or text.')
 parser.add_argument('--connect', action='store_true', help='Establish a connection between Avo Assure Web Application and ICE.')
 args = parser.parse_args()
 if args.AVO_ASSURE_HOME and not os.path.exists(args.AVO_ASSURE_HOME+os.sep+'/plugins'):
