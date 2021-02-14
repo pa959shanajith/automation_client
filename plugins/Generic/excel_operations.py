@@ -179,7 +179,13 @@ class ExcelFile:
             if self.excel_path != None:
                 file_ext,res,err_msg=self.__get_ext(self.excel_path)
                 if res:
-                    info_msg=generic_constants.INPUT_IS+self.excel_path+' '+(self.sheetname or '')+' and the row is '+str(row)
+                    if len(args)>0:
+                        rows_to_delete=[int(value) for value in args]
+                        rows_to_delete.insert(0,int(row))
+                        display_row=' and the rows are '+str(rows_to_delete)
+                    else:
+                        display_row=' and the row is '+str(row)                                         
+                    info_msg=generic_constants.INPUT_IS+self.excel_path+' '+(self.sheetname or '')+' and the row is '+display_row
                     logger.print_on_console(info_msg)
                     log.info(info_msg)
                     myfile = open(self.excel_path, "a+") # or "a+", whatever you need
@@ -203,7 +209,7 @@ class ExcelFile:
         return status,methodoutput,output,err_msg
 
 
-    def read_cell(self,row,col,*args):
+    def read_cell(self,row,col):
         """
         def : read_cell
         purpose : calls the respective method to read the given cell of excel
@@ -233,7 +239,7 @@ class ExcelFile:
                         row=int(row)
                         col=self.convertStringToInt(col)
                     if row>0 and col>0:
-                        res,value,err_msg=self.dict['read_cell_'+file_ext](row,col,self.excel_path,self.sheetname,*args)
+                        res,value,err_msg=self.dict['read_cell_'+file_ext](row,col,self.excel_path,self.sheetname)
                     #872 added unicode support for info (Himanshu)
                         try:
                             info_msg='cell value is '+str(value)
@@ -696,10 +702,8 @@ class ExcelXLS:
                             if row_number<=last_row:
                                 sheet.Rows(row_number).Delete()
                                 status=True
-                            else:
-                                err_msg=ERROR_CODE_DICT["ERR_ROW_DOESN'T_EXIST"]
-                                status=False
-                                break
+                        if not status:
+                            err_msg=ERROR_CODE_DICT["ERR_MULTIROW_DOESN'T_EXIST"]
                         
                     else:       
                         if row<=last_row:
@@ -1179,12 +1183,12 @@ class ExcelXLSX:
                 elif type=='b':          
                     cell.number_format='General'  
                     if value.lower() in ['true','false']:
-                        value=value.lower()
+                        # value=value.lower()
                         flag=True
                     else:
                         flag=False
                         status=False
-                        err_msg=ERROR_CODE_DICT['EXCEL_INPUT_INVALID']
+                        raise ValueError
                         # err_msg="Boolean input must be provided for boolean type"
                 elif type=='General':
                     cell.number_format='@'
@@ -1204,13 +1208,15 @@ class ExcelXLSX:
                 cell.value=value
                 status=True
                 flag = True
+        except ValueError as e:
+            err_msg=ERROR_CODE_DICT['ERR_NUMBER_FORMAT_EXCEPTION']
         except IOError:
             err_msg=ERROR_CODE_DICT['ERR_FILE_NOT_ACESSIBLE']
             log.error(err_msg)
         except Exception as e:
             log.error(e)
             err_msg='Error writing to excel cell of .xlsx file'
-            logger.print_on_console(err_msg)
+            # logger.print_on_console(err_msg)
         book.save(input_path)
         if flag and status:
             self.excel_obj.open_and_save_file(input_path)
@@ -1362,7 +1368,7 @@ class ExcelXLSX:
         return status,err_msg
 
 
-    def read_cell_xlsx(self,row,col,excel_path,sheetname,*args):
+    def read_cell_xlsx(self,row,col,excel_path,sheetname):
         """
         def : read_cell_xlsx
         purpose : reads the cell value in the given row and column of .xls file
@@ -1448,6 +1454,8 @@ class ExcelXLSX:
                 err_msg = 'Excel is readonly'
                 logger.print_on_console(err_msg)
                 log.info(err_msg )
+        except IOError:
+            err_msg=ERROR_CODE_DICT['ERR_FILE_NOT_ACESSIBLE']        
         except Exception as e:
             err_msg = 'Error writing to excel cell of .xlsx file'
             log.error(e)
