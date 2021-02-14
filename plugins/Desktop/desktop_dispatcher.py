@@ -48,6 +48,8 @@ class DesktopDispatcher:
     desktop_custom_object_obj = desktop_custom_object.CustomObjectHandler()
     tree_keywords_obj = desktop_treeview_keywords.Tree_View_Keywords()
     table_keywords_obj = desktop_table_keywords.Table_Keywords()
+    outook_obj = outlook.OutlookKeywords()
+    iris_object = iris_operations.IRISKeywords()
 
     desktop_dict = { 'click': button_link_keywords_obj.click,
         'press' : button_link_keywords_obj.press,
@@ -121,7 +123,44 @@ class DesktopDispatcher:
         'selectrow' : table_keywords_obj.select_row,
         'clickcell' : table_keywords_obj.click_cell,
         'doubleclickcell' : table_keywords_obj.double_click_cell,
-        'verifycellvalue' : table_keywords_obj.verify_cell_value
+        'verifycellvalue' : table_keywords_obj.verify_cell_value,
+        'getemail' : outook_obj.GetEmail,
+        'getfrommailid' : outook_obj.GetFromMailId,
+        'getattachmentstatus' : outook_obj.GetAttachmentStatus,
+        'getsubject' : outook_obj.GetSubject,
+        'gettomailid' : outook_obj.GetToMailID,
+        'getbody' : outook_obj.GetBody,
+        'verifyemail' : outook_obj.VerifyEmail,
+        'switchtofolder' : outook_obj.switchToFolder,
+        'settomailid' : outook_obj.send_to_mail,
+        'setcc' : outook_obj.send_CC,
+        'setbcc' : outook_obj.send_BCC,
+        'setsubject' : outook_obj.send_subject,
+        'setbody' : outook_obj.send_body,
+        'setattachments' : outook_obj.send_attachments,
+        'sendemail' : outook_obj.send_mail,
+        'clickiris' : iris_object.clickiris,
+        'doubleclickiris' : iris_object.doubleclickiris,
+        'rightclickiris' : iris_object.rightclickiris,
+        'settextiris' : iris_object.settextiris,
+        'setsecuretextiris' : iris_object.setsecuretextiris,
+        'gettextiris' : iris_object.gettextiris,
+        'getrowcountiris' : iris_object.getrowcountiris,
+        'getcolcountiris' : iris_object.getcolcountiris,
+        'getcellvalueiris' : iris_object.getcellvalueiris,
+        'verifyexistsiris' : iris_object.verifyexistsiris,
+        'verifytextiris' : iris_object.verifytextiris,
+        'cleartextiris' : iris_object.cleartextiris,
+        'dragiris' : iris_object.dragiris,
+        'dropiris' : iris_object.dropiris,
+        'mousehoveriris' : iris_object.mousehoveriris,
+        'setcellvalueiris' : iris_object.setcellvalueiris,
+        'verifycellvalueiris' : iris_object.verifycellvalueiris,
+        'clickcelliris' : iris_object.clickcelliris,
+        'doubleclickcelliris' : iris_object.doubleclickcelliris,
+        'rightclickcelliris' : iris_object.rightclickcelliris,
+        'mousehovercelliris' : iris_object.mousehovercelliris,
+        'getstatusiris' : iris_object.getstatusiris
     }
 
 
@@ -183,8 +222,6 @@ class DesktopDispatcher:
     def __init__(self):
         self.exception_flag = ''
         self.action = None
-        self.outook_obj = outlook.OutlookKeywords()
-        self.iris_object = iris_operations.IRISKeywords()
 
     def dispatcher(self,teststepproperty, input, mythread):
         objectname = teststepproperty.objectname
@@ -194,39 +231,6 @@ class DesktopDispatcher:
         url = teststepproperty.url
         err_msg = None
         result = [desktop_constants.TEST_RESULT_FAIL, desktop_constants.TEST_RESULT_FALSE, constants.OUTPUT_CONSTANT, err_msg]
-
-        self.desktop_dict['getemail'] = self.outook_obj.GetEmail
-        self.desktop_dict['getfrommailid'] = self.outook_obj.GetFromMailId
-        self.desktop_dict['getattachmentstatus'] = self.outook_obj.GetAttachmentStatus
-        self.desktop_dict['getsubject'] = self.outook_obj.GetSubject
-        self.desktop_dict['gettomailid'] = self.outook_obj.GetToMailID
-        self.desktop_dict['getbody'] = self.outook_obj.GetBody
-        self.desktop_dict['verifyemail'] = self.outook_obj.VerifyEmail
-        self.desktop_dict['switchtofolder'] = self.outook_obj.switchToFolder
-        self.desktop_dict['settomailid'] = self.outook_obj.send_to_mail
-        self.desktop_dict['setcc'] = self.outook_obj.send_CC
-        self.desktop_dict['setbcc'] = self.outook_obj.send_BCC
-        self.desktop_dict['setsubject'] = self.outook_obj.send_subject
-        self.desktop_dict['setbody'] = self.outook_obj.send_body
-        self.desktop_dict['setattachments'] = self.outook_obj.send_attachments
-        self.desktop_dict['sendemail'] = self.outook_obj.send_mail
-
-        #----------------------------------------------------------------iris keywords-desktop
-        self.desktop_dict['clickiris'] = self.iris_object.clickiris
-        self.desktop_dict['doubleclickiris'] = self.iris_object.doubleclickiris
-        self.desktop_dict['rightclickiris'] = self.iris_object.rightclickiris
-        self.desktop_dict['settextiris'] = self.iris_object.settextiris
-        self.desktop_dict['setsecuretextiris'] = self.iris_object.setsecuretextiris
-        self.desktop_dict['gettextiris'] = self.iris_object.gettextiris
-        self.desktop_dict['getrowcountiris'] = self.iris_object.getrowcountiris
-        self.desktop_dict['getcolcountiris'] = self.iris_object.getcolcountiris
-        self.desktop_dict['getcellvalueiris'] = self.iris_object.getcellvalueiris
-        self.desktop_dict['verifyexistsiris'] = self.iris_object.verifyexistsiris
-        self.desktop_dict['verifytextiris'] = self.iris_object.verifytextiris
-        self.desktop_dict['cleartextiris'] = self.iris_object.cleartextiris
-        self.desktop_dict['dragiris'] = self.iris_object.dragiris
-        self.desktop_dict['dropiris'] = self.iris_object.dropiris
-        self.desktop_dict['mousehoveriris'] = self.iris_object.mousehoveriris
 
         try:
             if ( objectname == desktop_constants.CUSTOM and teststepproperty.custom_flag ):
