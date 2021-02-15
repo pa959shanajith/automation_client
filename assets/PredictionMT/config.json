@@ -1,0 +1,33 @@
+{
+    "active_model": "Lib/site-packages/prediction/retrained_graph.pb",
+    "all_versions": [
+        "1.0.0"
+    ],
+    "bottleneck_dir": "/tmp/bottleneck",
+    "checkpoint_path": "/tmp/_retrain_checkpoint",
+    "current_version": "1.0.0",
+    "eval_step_interval": "10",
+    "final_tensor_name": "final_result",
+    "flip_left_right": "False",
+    "how_many_training_steps": "4000",
+    "image_dir": "assets/PredictionMT/TrainingData",
+    "intermediate_output_graphs_dir": "/tmp/intermediate_graph/",
+    "intermediate_store_frequency": "0",
+    "learning_rate": "0.01",
+    "logFile_Path": "logs/TestautoV2_predictionmt.log",
+    "logging_verbosity": "INFO",
+    "output_labels": "Lib/site-packages/prediction/retrained_label.txt",
+    "print_misclassified_test_images": "False",
+    "random_brightness": "0",
+    "random_crop": "0",
+    "random_scale": "0",
+    "rollback_dir": "assets/PredictionMT/model_backup.7z",
+    "saved_model_dir": "",
+    "summaries_dir": "/tmp/retrain_logs",
+    "test_batch_size": "",
+    "testing_percentage": "10",
+    "tfhub_module": "https://tfhub.dev/google/imagenet/mobilenet_v1_100_224/feature_vector/3",
+    "train_batch_size": "100",
+    "validation_batch_size": "100",
+    "validation_percentage": "10"
+}
