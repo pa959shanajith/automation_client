@@ -1425,29 +1425,10 @@ if __name__ == '__main__':
   #----------------------------------------------------------------------------------------------
   image_dir = AVO_ASSURE_HOME + configs["image_dir"]
   active_model = AVO_ASSURE_HOME + configs["active_model"]
-  intermediate_output_graphs_dir = AVO_ASSURE_HOME + configs["intermediate_output_graphs_dir"]
-  intermediate_store_frequency = AVO_ASSURE_HOME + configs["intermediate_store_frequency"]
   output_labels = AVO_ASSURE_HOME + configs["output_labels"]
-  summaries_dir = AVO_ASSURE_HOME + configs["summaries_dir"]
-  how_many_training_steps = AVO_ASSURE_HOME + configs["how_many_training_steps"]
-  learning_rate = AVO_ASSURE_HOME + configs["learning_rate"]
-  testing_percentage = AVO_ASSURE_HOME + configs["testing_percentage"]
-  validation_percentage = AVO_ASSURE_HOME + configs["validation_percentage"]
-  eval_step_interval = AVO_ASSURE_HOME + configs["eval_step_interval"]
-  train_batch_size = AVO_ASSURE_HOME + configs["train_batch_size"]
-  test_batch_size = AVO_ASSURE_HOME + configs["test_batch_size"]
-  validation_batch_size = AVO_ASSURE_HOME + configs["validation_batch_size"]
-  print_misclassified_test_images = AVO_ASSURE_HOME + configs["print_misclassified_test_images"]
-  bottleneck_dir = AVO_ASSURE_HOME + configs["bottleneck_dir"]
-  final_tensor_name = AVO_ASSURE_HOME + configs["final_tensor_name"]
-  flip_left_right = AVO_ASSURE_HOME + configs["flip_left_right"]
-  random_crop = AVO_ASSURE_HOME + configs["random_crop"]
-  random_scale = AVO_ASSURE_HOME + configs["random_scale"]
-  random_brightness = AVO_ASSURE_HOME + configs["random_brightness"]
+  how_many_training_steps = configs["how_many_training_steps"]
+  train_batch_size = configs["train_batch_size"]
   tfhub_module = configs["tfhub_module"]
-  saved_model_dir = AVO_ASSURE_HOME + configs["saved_model_dir"]
-  logging_verbosity = AVO_ASSURE_HOME + configs["logging_verbosity"]
-  checkpoint_path = AVO_ASSURE_HOME + configs["checkpoint_path"]
   #-------------------------------------------------------------------------------------------
   parser = argparse.ArgumentParser()
   parser.add_argument(
@@ -1495,7 +1476,8 @@ if __name__ == '__main__':
   parser.add_argument(
       '--how_many_training_steps',
       type=int,
-      default=4000,
+      #default=4000,
+      default=int(how_many_training_steps),
       help='How many training steps to run before ending.'
   )
   parser.add_argument(
@@ -1525,7 +1507,8 @@ if __name__ == '__main__':
   parser.add_argument(
       '--train_batch_size',
       type=int,
-      default=100,
+      #default=100,
+      default=int(train_batch_size),
       help='How many images to train on at a time.'
   )
   parser.add_argument(
