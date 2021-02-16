@@ -158,7 +158,7 @@ class BrowserKeywords():
                     return status, result, output, err_msg
                 device_object = device_keywords_MW.Device_Keywords()
                 input_list = inputs
-                if len(input_list) > 2:
+                if len(input_list) >= 2:
                     device_id = input_list[0]
                     if device_id == 'wifi':
                         device_id=device_object.wifi_connect()
