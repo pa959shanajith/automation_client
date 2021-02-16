@@ -12,7 +12,6 @@ import time
 import controller
 import readconfig
 from constants import *
-import iris_operations as ioo
 import label_image
 if SYSTEM_OS != 'Darwin':
     import screeninfo
@@ -27,24 +26,6 @@ ix,iy = -1,-1
 log = logging.getLogger('cropandadd.py')
 
 class Cropandadd():
-    def getobjecttext(self,b64img):
-        #get iris text of image , return something , if nothing return Empty ot None
-        text = ''
-        image = None
-        img = None
-        try:
-            img = ioo.get_byte_mirror(b64img)
-            with open("object_image.png", "wb") as f:
-                f.write(base64.b64decode(img))
-            image = cv2.imread("object_image.png")
-            text = ioo.get_ocr(image)
-            if(os.path.isfile("object_image.png")):
-                os.remove("object_image.png")
-        except Exception as e:
-            log.error("Error occured in getobjecttext : " + str(e))
-            logger.print_on_console("Error occured in getobjecttext")
-        del image,img,b64img
-        return text
 
     def getobjectlable(self,obj):
         #get tensorflow image lable
@@ -53,8 +34,8 @@ class Cropandadd():
             label = label_image.LabelImage()
             res = label.start(obj)
         except Exception as e:
-            log.error("Error occured in getobjecttext : " + str(e))
-            logger.print_on_console("Error occured in getobjecttext")
+            log.error("Error occured in getobjectlable : " + str(e))
+            logger.print_on_console("Error occured in getobjectlable")
         return res
 
     def startcropandadd(self,wx_window):
@@ -115,7 +96,7 @@ class Cropandadd():
                         else:
                             custname = 'img_object_'+str(ix)+'_'+str(iy)+'_'+str(x)+'_'+str(y)
                             tag = 'relative'
-                        self.data['view'].append({'custname': custname,'cord':RGB_img_crop_im,'tag':tag,'width':abs(x-ix),'height':abs(y-iy),'top':iy,'left':ix,'xpath':'iris','objectType':'','objectText':''})
+                        self.data['view'].append({'custname': custname,'cord':RGB_img_crop_im,'tag':tag,'width':abs(x-ix),'height':abs(y-iy),'top':iy,'left':ix,'xpath':'iris','objectType':''})
                     if(constant_image):
                         cv2.rectangle(self.RGB_img,(ix,iy),(x,y),(0,0,255),1)
                     else:
@@ -170,15 +151,12 @@ class Cropandadd():
             if(configvalues['prediction_for_iris_objects'].lower()=='yes'):
                 logger.print_on_console("Starting prediction...")
                 for i in range(0,len(self.data['view'])):
-                    objectText = self.getobjecttext(self.data['view'][i]['cord'])
                     objectType = self.getobjectlable({'custname': self.data['view'][i]['custname'],'cord':self.data['view'][i]['cord']})
                     if(objectType): self.data['view'][i]['objectType'] = objectType[self.data['view'][i]['custname']]
                     else:self.data['view'][i]['objectType'] = "UnrecognizableObject"
-                    self.data['view'][i]['objectText'] = objectText
             elif(configvalues['prediction_for_iris_objects'].lower()=='no'):
                 for i in range(0,len(self.data['view'])):
                     self.data['view'][i]['objectType'] = "UnrecognizableObject"
-                    self.data['view'][i]['objectText'] = "Prediction Disabled"
             return self.data
         except Exception as e:
             log.error("Error occured in stop IRIS, ERR_MSG : ", str(e))
