@@ -1065,6 +1065,7 @@ class CreateWindow(wx.Frame):
 
 
     def start_training(self, event):
+          self.print_log("Training started...")
           self.msg.StartThread(self.msg.showProgress)
           self.comm_obj.percentageIncri(self.msg,5,"Backing Up Current Data...")
           self.backup_current_model()
@@ -1260,6 +1261,7 @@ class CreateWindow(wx.Frame):
             if FLAGS.saved_model_dir:
               export_model(module_spec, class_count, FLAGS.saved_model_dir)
             self.comm_obj.percentageIncri(self.msg,100,"Training Completed")
+            self.print_log("-----Data Trained Successfully-----")
 
     def backup_current_model(self):
         try:
@@ -1321,6 +1323,7 @@ class CreateWindow(wx.Frame):
         #log.debug("Redrawing version list box")
 
     def remove_temporary_files(self):
+        self.print_log("Cleaning Temporary Files")
         pass
 
     def show_rollback(self, event):
