@@ -91,10 +91,15 @@ class BrowserKeywords():
                     try:
                         import win32com.client
                         my_processes = ['chromedriver.exe','msedgedriver.exe','MicrosoftWebDriver.exe','MicrosoftEdge.exe','IEDriverServer.exe','IEDriverServer64.exe','CobraWinLDTP.exe','phantomjs.exe']
-                        wmi=win32com.client.GetObject('winmgmts:')
-                        for p in wmi.InstancesOf('win32_process'):
-                            if p.Name in my_processes:
-                                os.system("TASKKILL /F /IM " + p.Name)
+                        for i in drivermap:
+                            if (i.capabilities['browserName'] == 'internet explorer'):
+                                pid=local_bk.driver_obj.iedriver.process.pid
+                                os.system("TASKKILL /F /T /PID " + str(pid))
+                        else:
+                            wmi=win32com.client.GetObject('winmgmts:')
+                            for p in wmi.InstancesOf('win32_process'):
+                                if p.Name in my_processes:
+                                    os.system("TASKKILL /F /IM " + p.Name)
                     except Exception as e:
                         local_bk.log.error(e)
                     del drivermap[:]
@@ -596,11 +601,20 @@ class BrowserKeywords():
         result=webconstants.TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
+        empty_ie_window_handle=False
         if(len(local_bk.webdriver_list) > 0):
             try:
                 driver_instance = len(local_bk.webdriver_list)-1
                 winHandles = local_bk.webdriver_list[driver_instance].window_handles
-                current_handle = local_bk.webdriver_list[driver_instance].current_window_handle
+                if winHandles == []:
+                    if (local_bk.webdriver_list[driver_instance].capabilities['browserName'] == 'internet explorer'):
+                        pid=local_bk.webdriver_list[driver_instance].iedriver.process.pid
+                        os.system("TASKKILL /F /T /PID " + str(pid))
+                        time.sleep(5)
+                        local_bk.driver_obj = None
+                        empty_ie_window_handle = True
+                else:
+                    current_handle = local_bk.webdriver_list[driver_instance].current_window_handle
                 count = 0
                 for x in winHandles:
                     count+=1
@@ -616,7 +630,8 @@ class BrowserKeywords():
                             os.system("TASKKILL /F /T /PID " + str(i.ProcessId))
                             time.sleep(5)
                 else:
-                    local_bk.webdriver_list[driver_instance].quit()
+                    if(empty_ie_window_handle!=True):
+                        local_bk.webdriver_list[driver_instance].quit()
                 local_bk.driver_obj = None
                 if SYSTEM_OS == 'Darwin':
                     os.system("killall -9 Safari")
