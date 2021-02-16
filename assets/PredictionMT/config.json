@@ -1,0 +1,14 @@
+{
+    "active_model": "Lib/site-packages/prediction/retrained_graph.pb",
+    "all_versions": [
+        "1.0.0"
+    ],
+    "current_version": "1.0.0",
+    "how_many_training_steps": "4000",
+    "image_dir": "assets/PredictionMT/TrainingData",
+    "logFile_Path": "logs/TestautoV2_predictionmt.log",
+    "output_labels": "Lib/site-packages/prediction/retrained_label.txt",
+    "rollback_dir": "assets/PredictionMT/model_backup.7z",
+    "tfhub_module": "https://tfhub.dev/google/imagenet/mobilenet_v1_100_224/feature_vector/3",
+    "train_batch_size": "100"
+}
