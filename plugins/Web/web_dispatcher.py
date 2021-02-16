@@ -252,12 +252,12 @@ class Dispatcher:
                     'setsecuretext':['textbox','password'],
                     'sendsecurevalue':['textbox','password'],
 
-                    'getattributevalue':['radio','checkbox','dropdown','listbox','textbox','textarea','password','number','email','url'],
-                    'verifyattribute':['radio','checkbox','dropdown','listbox','textbox','textarea','password','number','email','url']
+                    'getattributevalue':['radio','checkbox','dropdown','listbox','textbox','textarea','password','number','email','url','grid'],
+                    'verifyattribute':['radio','checkbox','dropdown','listbox','textbox','textarea','password','number','email','url','grid']
 
                     }
         custom_dict_element={'element':['getobjectcount','getobject','clickelement','doubleclick','rightclick','getelementtext','verifyelementtext','drag', 'drop','gettooltiptext','verifytooltiptext','verifyexists', 'verifydoesnotexists', 'verifyhidden','verifyvisible', 'switchtotab','switchtowindow','setfocus','sendfunctionkeys',
-            'tab','waitforelementvisible','mousehover','press','verifyenabled','verifydisabled','verifyreadonly','getattributevalue','verifyattribute','getrowcount','getcolumncount','getcellvalue','verifycellvalue','getcelltooltip','verifycelltooltip','cellclick','getrownumbytext','getcolnumbytext','getinnertable','selectbyabsolutevalue']}
+            'tab','waitforelementvisible','mousehover','press','verifyenabled','verifydisabled','verifyreadonly','getattributevalue','verifyattribute','getrowcount','getcolumncount','getcellvalue','verifycellvalue','getcelltooltip','verifycelltooltip','cellclick','getrownumbytext','getcolnumbytext','getinnertable','selectbyabsolutevalue','horizontalscroll','verticalscroll']}
 
         result=[TEST_RESULT_FAIL,TEST_RESULT_FALSE,OUTPUT_CONSTANT,err_msg]
 
