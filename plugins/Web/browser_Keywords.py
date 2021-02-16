@@ -95,11 +95,11 @@ class BrowserKeywords():
                             if (i.capabilities['browserName'] == 'internet explorer'):
                                 pid=local_bk.driver_obj.iedriver.process.pid
                                 os.system("TASKKILL /F /T /PID " + str(pid))
-                        else:
-                            wmi=win32com.client.GetObject('winmgmts:')
-                            for p in wmi.InstancesOf('win32_process'):
-                                if p.Name in my_processes:
-                                    os.system("TASKKILL /F /IM " + p.Name)
+                            else:
+                                wmi=win32com.client.GetObject('winmgmts:')
+                                for p in wmi.InstancesOf('win32_process'):
+                                    if p.Name in my_processes:
+                                        os.system("TASKKILL /F /IM " + p.Name)
                     except Exception as e:
                         local_bk.log.error(e)
                     del drivermap[:]
