@@ -1842,7 +1842,8 @@ class IRISKeywords():
         status = TEST_RESULT_FAIL
         result = TEST_RESULT_FALSE
         err_msg = None
-        value = [args[0][0],'null']
+        #value = [args[0][0],'null']
+        value = OUTPUT_CONSTANT
         img = None
         res = None
         elem_coordinates = None
@@ -1883,7 +1884,7 @@ class IRISKeywords():
                         err_msg = "Values do not match"
                         logger.print_on_console("Expected value is:", verifytext)
                         logger.print_on_console("Actual value is:", text)
-                    value = [verifytext,text]
+                    #value = [verifytext,text]
                     os.remove('cropped.png')
                 else:
                     err_msg = "Element not found on screen."
