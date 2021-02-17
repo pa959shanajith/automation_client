@@ -259,7 +259,7 @@ class WSkeywords:
             else:
                 params = params.replace("'",'')
                 log.debug('Removed single quote from the input')
-                params=header.split('\n')
+                params=params.split('\n')
                 log.debug('params is split with newlines')
             param_dict={}
             if header and self.baseReqHeader is not None and isinstance(self.baseReqHeader,dict):
@@ -275,7 +275,7 @@ class WSkeywords:
                 if header:
                     self.baseReqHeader=param_dict
                     if 'Content-Type'.lower() in param_dict.keys():
-                        self.content_type=header_dict['Content-Type'.lower()]
+                        self.content_type=param_dict['Content-Type'.lower()]
                 else:
                     self.req_params=param_dict
                 log.info(param_dict)
@@ -319,68 +319,44 @@ class WSkeywords:
         return status,methodoutput,output,err_msg
 
 
-#     def setHeader(self,header):
-#         """
-#         def : setHeader
-#         purpose : sets the header provided in param header
-#         param header : header of the webservice to set
-#         return : Returns True if it sets the url else False
-#         """
-#         status = ws_constants.TEST_RESULT_FAIL
-#         methodoutput = ws_constants.TEST_RESULT_FALSE
-#         err_msg=None
-#         output=OUTPUT_CONSTANT
-#         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
-#         try:
-#             header=str(header)
-#             if header != None and header.strip() != '':
-#                 if header.find("##")!=-1:
-#                     header = str(header).replace('\n','').replace("'",'').strip()
-#                     log.debug('Removed new line and single quote from the input header')
-#                     header=header.split('##')
-#                     log.debug('Header is split with ##')
-#                 else:
-#                     header = str(header).replace("'",'').strip()
-#                     log.debug('Removed single quote from the input header')
-#                     header=header.split('\n')
-#                     log.debug('Header is split with newlines')
-#                 header_dict={}
-               
-#                 if self.baseReqHeader is not None and isinstance(self.baseReqHeader,dict):
-#                     header_dict=self.baseReqHeader
-#                 #to support update of header multiple times
-#                 for x in header:
-#                     if ':' in x:
-#                         index=x.index(':')
-#                         header_dict[x[0:index].strip().lower()]=x[index+1:].strip()
-#                 if len(header_dict) !=0:
-#                     self.baseReqHeader=header_dict
-#                     log.info(header_dict)
-#                     if 'Content-Type'.lower() in header_dict.keys():
-#                         self.content_type=header_dict['Content-Type'.lower()]
-#                 else:
-#                     self.baseReqHeader=header[0]
-#                 log.info('Header is set')
-#                 log.debug(STATUS_METHODOUTPUT_UPDATE)
-# ##                output=self.baseReqHeader
-#                 status = ws_constants.TEST_RESULT_PASS
-#                 methodoutput = ws_constants.TEST_RESULT_TRUE
-#                 logger.print_on_console('Request Header has been set to :',self.baseReqHeader)
-#             else:
-#                 err_msg = ERROR_CODE_DICT['ERR_INVALID_HEADER']
-#         except Exception as e:
-#             log.error(e)
-#             err_msg=ws_constants.ERR_MSG1+'setHeader'
-#         if err_msg!=None:
-#             log.error(err_msg)
-#             logger.print_on_console(err_msg)
-#         log.info(RETURN_RESULT)
-#         return status,methodoutput,output,err_msg
+    def setParamValue(self,value,key):
+        """
+        def : setParamValue
+        purpose : sets the parameters with given key and value
+        param : key,value
+        return : Returns True if it sets the url else False
+        """
+        status = ws_constants.TEST_RESULT_FAIL
+        methodoutput = ws_constants.TEST_RESULT_FALSE
+        err_msg=None
+        output=OUTPUT_CONSTANT
+        try:
+            if value != None and str(value).strip() != '':
+                if key != None and str(key).strip() != '':
+                    if self.req_params is None: self.req_params={}
+                    self.req_params[str(key).strip()]=str(value).strip()
+                    log.info('Parameter set with %s : %s',key,value)
+                    logger.print_on_console('Parameter set with '+key+' : '+value)
+                elif value.find('##') != -1 or value.find('\n') != -1  :
+                    self.buildRequest(value,header=False) 
+                    log.info('Request Parameter has been set to :'+str(self.req_params))
+                    logger.print_on_console('Request Parameter has been set to :',self.req_params)
+                status=ws_constants.TEST_RESULT_PASS
+                methodoutput=ws_constants.TEST_RESULT_TRUE
+            else:
+                err_msg=ws_constants.ERR_SET_PARAMS
+        except Exception as e:
+            log.error(e)
+            err_msg=ws_constants.ERR_MSG1+'setParamValue'
+        if err_msg!=None:
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
+        return status,methodoutput,output,err_msg
 
-    def setParam(self,paramValue,paramKey=''):
+    def setParam(self,paramValue):
         """
         def : setParam
-        purpose : sets the parameters provided in parameters
+        purpose : sets the parameters provided in the request
         param : parameters of the webservice to set
         return : Returns True if it sets the url else False
         """
@@ -392,13 +368,7 @@ class WSkeywords:
         try:
             if paramValue != None and str(paramValue).strip() != '':
                 paramValue=str(paramValue).strip()
-                if paramKey != '' and paramKey!= 'defaultListWS':
-                    if self.req_params is None : self.req_params= {}
-                    self.req_params[paramKey]=paramValue
-                elif paramValue.find('##') != -1 or paramValue.find('\n') != -1  :
-                    self.buildRequest(paramValue,header=False)
-                else:
-                    self.req_params = paramValue
+                self.req_params = paramValue
                 log.info('Input param value has been set to base Request Params ')
                 log.debug(STATUS_METHODOUTPUT_UPDATE)
 ##                 output=self.baseReqBody
