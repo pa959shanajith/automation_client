@@ -38,10 +38,11 @@ class Dispatcher:
                   'setproxies':self.webservice.setProxies,
                   # Authentication methods
                   'setbasicauth': self.webservice.setBasicAuth,
-                  'setparam':self.webservice.setParam
+                  'setparam':self.webservice.setParam,
+                  'setparamvalue':self.webservice.setParamValue
                 }
             if keyword in ws_dict.keys():
-                if keyword in ['settagvalue','settagattribute','setparam']:
+                if keyword in ['settagvalue','settagattribute','setparamvalue']:
                     message=list(message)
                     message.append(tsp.objectname)
                 elif keyword == 'executerequest':
