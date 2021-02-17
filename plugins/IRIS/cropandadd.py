@@ -27,15 +27,15 @@ log = logging.getLogger('cropandadd.py')
 
 class Cropandadd():
 
-    def getobjectlable(self,obj):
+    def getobjectlabel(self,obj):
         #get tensorflow image lable
         res = None
         try:
             label = label_image.LabelImage()
             res = label.start(obj)
         except Exception as e:
-            log.error("Error occured in getobjectlable : " + str(e))
-            logger.print_on_console("Error occured in getobjectlable")
+            log.error("Error occured in getobjectlabel : " + str(e))
+            logger.print_on_console("Error occured in getobjectlabel")
         return res
 
     def startcropandadd(self,wx_window):
@@ -151,7 +151,7 @@ class Cropandadd():
             if(configvalues['prediction_for_iris_objects'].lower()=='yes'):
                 logger.print_on_console("Starting prediction...")
                 for i in range(0,len(self.data['view'])):
-                    objectType = self.getobjectlable({'custname': self.data['view'][i]['custname'],'cord':self.data['view'][i]['cord']})
+                    objectType = self.getobjectlabel({'custname': self.data['view'][i]['custname'],'cord':self.data['view'][i]['cord']})
                     if(objectType): self.data['view'][i]['objectType'] = objectType[self.data['view'][i]['custname']]
                     else:self.data['view'][i]['objectType'] = "UnrecognizableObject"
             elif(configvalues['prediction_for_iris_objects'].lower()=='no'):
