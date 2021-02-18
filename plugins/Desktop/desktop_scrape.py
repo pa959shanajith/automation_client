@@ -109,8 +109,10 @@ class ScrapeWindow(wx.Frame):
                     wx.Frame(self.panel, style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER)
                     self.Show()
                 else:
-                    self.socketIO.emit('scrape', 'Fail')
+                    self.socketIO.emit('scrape','Terminate')
                     self.parent.schedule.Enable()
+                    time.sleep(1)
+                    self.Close()
             elif ( verify_pname == 'fail' ):
                 self.socketIO.emit('scrape', 'Fail')
                 logger.print_on_console( 'Wrong Window Name, Please check the Window Name and provide valid one' )
@@ -122,6 +124,8 @@ class ScrapeWindow(wx.Frame):
                 self.socketIO.emit('scrape', 'Fail')
                 logger.print_on_console( 'Wrong Process Id, Please check the Process Id and provide valid one' )
                 self.parent.schedule.Enable()
+                time.sleep(1)
+                self.Close()
             windowname = ''
         except Exception as e:
             log.error(e)
