@@ -894,6 +894,7 @@ class Controller():
         status=COMPLETED
         obj = handler.Handler()
         self.action=DEBUG
+        browser_active = True
         handler.local_handler.tspList=[]
         scenario=[json_data]
         print('=======================================================================================================')
@@ -909,6 +910,14 @@ class Controller():
             for k in range(len(tsplist)):
                 if tsplist[k].name.lower() == 'openbrowser' and tsplist[k].apptype.lower()=='web' and (IGNORE_THIS_STEP not in tsplist[k].inputval[0].split(';')):
                     tsplist[k].inputval = browser_type
+                    browser_active = False
+        if browser_active and browser_type and len(browser_type) > 0:
+            import browser_Keywords
+            driver_util = browser_Keywords.Singleton_DriverUtil()
+            if not driver_util.check_if_driver_exists_in_map(browser_type[0]):
+                status = TERMINATE
+                flag = False
+                logger.print_on_console('Requested Browser: not Active')
         if flag:
             if runfrom_step > 0 and runfrom_step <= tsplist[len(tsplist)-1].stepnum:
                 self.conthread=mythread
