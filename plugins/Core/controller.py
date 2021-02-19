@@ -917,7 +917,8 @@ class Controller():
             if not driver_util.check_if_driver_exists_in_map(browser_type[0]):
                 status = TERMINATE
                 flag = False
-                logger.print_on_console('Requested Browser: not Active')
+                logger.print_on_console('Requested browser not Active, please open browser.')
+                log.info('Invalid browser request')
         if flag:
             if runfrom_step > 0 and runfrom_step <= tsplist[len(tsplist)-1].stepnum:
                 self.conthread=mythread
