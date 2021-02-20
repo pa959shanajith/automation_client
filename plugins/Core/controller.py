@@ -973,7 +973,7 @@ class Controller():
         # t = test.Test()
         # suites_list,flag = t.gettsplist()
         #Getting all the details by parsing the json_data
-        suiteId_list,suite_details,browser_type,scenarioIds,suite_data,execution_ids,batch_id,condition_check,dataparam_path,self.execution_mode,qc_creds=obj.parse_json_execute(json_data)
+        suiteId_list,suite_details,browser_type,scenarioIds,suite_data,execution_ids,batch_id,condition_check,dataparam_path,self.execution_mode,qc_creds,report_type = obj.parse_json_execute(json_data)
         self.action=EXECUTE
         log.info( 'No  of Suites : '+str(len(suiteId_list)))
         logger.print_on_console('No  of Suites : ',str(len(suiteId_list)))
@@ -1196,6 +1196,7 @@ class Controller():
                                 execute_result_data["reportData"] = con.reporting_obj.report_json
                                 if len(accessibility_reports) > 0:
                                     execute_result_data["accessibility_reports"] = accessibility_reports
+                                execute_result_data['report_type'] = report_type
                                 socketIO.emit('result_executeTestSuite', execute_result_data)
                                 obj.clearList(con)
                                 sc_idx += 1
