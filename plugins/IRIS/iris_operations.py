@@ -484,34 +484,49 @@ def scaleUpOrDown(arg,elem,template,img_rgb):
     del arg, elem, template, img_rgb, img_gray, w, h, scale, resized, threshold, res, loc, ind, pt, total_points, min_dist, dist # deleting variables
     return point, resized_width, resized_height
 
-def update_dataset(image_data):
+def update_dataset(image_data, socketIO):
     """
-    Def : This method is to check and assign dataset values(button,textbox,etc) to the IRIS image
-    Input : image data
-    Output : boolean value
-    Method Referenced in : webserver
+    Def : This method will store IRIS image according to object type in the Training data folder(referenced in PredictionMT)
+    Input : image data, socketIo
+    Output : N/A
+    Method Referenced in : core.py
     """
     flag = False
+    err = None
+    data = 'fail'
     try:
-        if(image_data['type'] != 'others'):
-            mirror = get_byte_mirror(image_data['cord'])
-            filename = SCREENSHOT_PATH + '/Dataset/' + str(image_data['type']) + '/' + str(uuid4()).replace("-","") + ".png"
-            if (os.path.exists(SCREENSHOT_PATH + '/Dataset')):
-                with open(filename,'wb') as f:
-                    f.write(base64.b64decode(mirror))
-                flag = True
+        PREDICTION_CONFIG = os.environ["AVO_ASSURE_HOME"]+'/assets/PredictionMT/config.json'
+        if (os.path.exists(PREDICTION_CONFIG)):
+            config_file = open(PREDICTION_CONFIG, "r")
+            configs = json.load(config_file)
+            config_file.close()
+            DATASETPATH = os.environ["AVO_ASSURE_HOME"] +'/'+ configs['image_dir']
+            if(image_data['type'] not in ['others','unrecognizableobject'] ):
+                mirror = get_byte_mirror(image_data['cord'])
+                filename = DATASETPATH + '/' + str(image_data['type']) + '/' + str(uuid4()).replace("-","") + ".png"
+                if (os.path.exists(DATASETPATH)):
+                    with open(filename,'wb') as f:
+                        f.write(base64.b64decode(mirror))
+                    flag = True
+                else:
+                    err = "Error occurred in update_dataset, Err_Msg : Dataset folder not found."
+                del mirror, filename # deleting variables
             else:
-                log.error( "Dataset folder not found." )
-                logger.print_on_console( "Dataset folder not found." )
-            del mirror, filename # deleting variables
+                """When the selected type is others/unrecognizableobject"""
+                err = "No dataset avaliable for ObjectType : 'Others' "
         else:
-            """When the selected type is others"""
-            flag = True
+            err = "Error occurred in update_dataset, Err_Msg : Prediction config.json missing"
     except Exception as e:
+        err = "Error while updating dataset."
         log.error("Error occurred in update_dataset, Err_Msg : ",e)
-        logger.print_on_console("Error while updating dataset.")
+    if (flag == False and err):
+        log.debug( err )
+        logger.print_on_console( err )
+    elif(flag):
+        data = 'IRIS object saved succcessfully and added to object type : "' + str(image_data['type']) + '" in training data folder'
+        logger.print_on_console( data )
     del image_data # deleting variables
-    return flag
+    socketIO.emit('scrape',data)
 
 def get_byte_mirror(element_cord):
     """
