@@ -318,6 +318,7 @@ class Launch_Keywords():
         verb = OUTPUT_CONSTANT
         err_msg = None
         windowname = ''
+        sorted_title_matched_windows=[]
         # launch_time_out = 0
         win_handle_index = 0
         win_handle_flag = False
@@ -331,8 +332,10 @@ class Launch_Keywords():
             elif ( len(input_val) == 1 ):
                 windowname = input_val[0]
             title_matched_windows = self.getProcessWindows(windowname)
-            log.debug(len(title_matched_windows))
+            total_tmw = len(title_matched_windows)
+            log.info( "Number of title matched windows is %s",str(total_tmw) )
             hwnd = win32gui.FindWindow(None, windowname)
+            log.info( "value of hwnd is %s",str(hwnd) )
             threadid, temp_pid = win32process.GetWindowThreadProcessId(hwnd)
             flag = False
             if ( len( title_matched_windows ) > 1 ):
@@ -346,6 +349,7 @@ class Launch_Keywords():
                     for i in range(0, len(pidset)):
                         if ( pidset.pop() == temp_pid ):
                             flag = True
+                            break
                         else:
                             flag = False
                 if ( flag ):
@@ -357,18 +361,22 @@ class Launch_Keywords():
                             # print("no of window handles",len(title_matched_windows))
                             log.debug(len(title_matched_windows))
                             if ( win_handle_flag == True ):
-                                if ( win_handle_index <= title_matched_windows ):
+                                if ( win_handle_index < len(title_matched_windows) ):
                                     if ( len(title_matched_windows) > 1 ):
-                                        self.windowHandle = title_matched_windows[win_handle_index]
+                                        log.info( 'title matched windows is %s', str(title_matched_windows) )
+                                        sorted_title_matched_windows=self.timestamp_sort_for_tmw(title_matched_windows)
+                                        log.info( 'sorted title matched windows is %s', str(sorted_title_matched_windows) )
+                                        self.windowHandle = sorted_title_matched_windows[win_handle_index]
                                         self.windowname = self.getWindowText(self.windowHandle)
                                         window_name = self.windowname
-                                        logger.print_on_console( 'Given windowname is ' + windowname )
-                                        logger.print_on_console( 'Select the type of scrape (Full scrape/Click and Add) from scrape window' )
-                                        window_handle = title_matched_windows[win_handle_index]
-                                        window_pid = self.get_window_pid(self.windowname)
-                                        self.windowHandle = title_matched_windows[win_handle_index]
+                                        log.info( 'Given windowname is %s', window_name )
+                                        window_pid=self.get_window_pid_by_hwnd(self.windowHandle)
+                                        log.info( 'window handle is %s', str(self.windowHandle) )
+                                        log.info( 'connected to window pid is %s', str(window_pid) )
                                         app_win32 = Application(backend='win32').connect(process = window_pid)
                                         app_uia = Application(backend='uia').connect(process = window_pid)
+                                        # self.bring_Window_Front()
+                                        app_win32.top_window().set_focus()
                                         status = desktop_constants.TEST_RESULT_PASS
                                         result = desktop_constants.TEST_RESULT_TRUE
                                         break
@@ -376,13 +384,14 @@ class Launch_Keywords():
                                     error_msg = 'specified window handle is not present'
                                     logger.print_on_console( error_msg )
                                     log.info( error_msg )
+                                    term = TERMINATE
+                                    break
                             elif ( win_handle_flag == False ):
                                 if ( len(title_matched_windows) > 1 ):
                                     self.windowHandle = title_matched_windows[0]
                                     self.windowname = self.getWindowText(self.windowHandle)
                                     window_name = self.windowname
                                     logger.print_on_console( 'Given windowname is ' + windowname )
-                                    logger.print_on_console( 'Select the type of scrape (Full scrape/Click and Add) from scrape window' )
                                     window_handle = title_matched_windows[0]
                                     window_pid = self.get_window_pid(self.windowname)
                                     self.windowHandle=title_matched_windows[0]
@@ -411,6 +420,7 @@ class Launch_Keywords():
                             self.windowHandle = title_matched_windows[0]
                             app_win32 = Application(backend = 'win32').connect(process = window_pid)
                             app_uia = Application(backend = 'uia').connect(process = window_pid)
+                            app_win32.top_window().set_focus()
                             status = desktop_constants.TEST_RESULT_PASS
                             result = desktop_constants.TEST_RESULT_TRUE
                             break
@@ -488,6 +498,25 @@ class Launch_Keywords():
         hwnd = win32gui.FindWindow(None, title)
         threadid, pid = win32process.GetWindowThreadProcessId(hwnd)
         return pid
+
+    def get_window_pid_by_hwnd(self, hwnd):
+        threadid, pid = win32process.GetWindowThreadProcessId(hwnd)
+        return pid
+
+    def timestamp_sort_for_tmw(self, tmw):
+        #method to sort title matched windows using timestamp
+        sorted_tmw=[]
+        pid_dict={}
+        for i in tmw:
+            threadid, pid = win32process.GetWindowThreadProcessId(i)
+            p = psutil.Process(pid)
+            p.create_time()
+            tpid=time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(p.create_time()))
+            pid_dict[i]=tpid
+        pid_dict={k: v for k, v in sorted(pid_dict.items(), key=lambda item: item[1])}
+        sorted_tmw=list(pid_dict.keys())
+        return sorted_tmw
+
 
     def verifyWindowTitle(self):
         try:
