@@ -289,14 +289,15 @@ class TableOperationKeywords():
                                                     logger.print_on_console('Cell value is : ',str(cellVal))
                                                     status=TEST_RESULT_PASS
                                                     methodoutput=TEST_RESULT_TRUE
-                                                    break
                                                 else:
                                                     err_msg='Invalid input: Column not found'
-                                                    local_tk.log.debug('Invalid input: Column not found')
+                                                    local_tk.log.error('Invalid input: Column not found')
+                                                    logger.print_on_console('Invalid input: Column not found')
                                         else:
                                             err_msg='Invalid input: Row not found'
-                                            local_tk.log.debug('Invalid input: Row not found')
-                        elif (webElement.find_element_by_xpath('.//ancestor::lightning-datatable') != None):
+                                            local_tk.log.error('Invalid input: Row not found')
+                                            logger.print_on_console('Invalid input: Row not found')
+                        elif len(webElement.find_elements_by_xpath('.//ancestor::lightning-datatable')) >0:
                             row_num=int(input_val[0])
                             col_num=int(input_val[1])
                             row_count=self.getRowCountJs(webElement)
@@ -486,7 +487,7 @@ class TableOperationKeywords():
                                             err_msg='Invalid input: Row not found'
                                             local_tk.log.error('Invalid input: Row not found')
                                             logger.print_on_console('Invalid input: Row not found')
-                        elif (webElement.find_element_by_xpath('.//ancestor::lightning-datatable') != None):
+                        elif len(webElement.find_elements_by_xpath('.//ancestor::lightning-datatable')) >0:
                             row_num=int(input_val[0])
                             col_num=int(input_val[1])
                             row_count=self.getRowCountJs(webElement)
@@ -589,7 +590,7 @@ class TableOperationKeywords():
             if visibleFlag==True:
                 try:
                     local_tk.log.debug('reading the inputs')
-                    if (webElement.find_element_by_xpath('.//ancestor::lightning-datatable') != None):
+                    if len(webElement.find_elements_by_xpath('.//ancestor::lightning-datatable')) >0:
                         row_number=int(input_val[0])
                         col_number=int(input_val[1])
                         row_count=self.getRowCountJs(webElement)
@@ -877,7 +878,7 @@ class TableOperationKeywords():
                                             err_msg='Invalid input: Row not found'
                                             local_tk.log.error('Invalid input: Row not found')
                                             logger.print_on_console('Invalid input: Row not found')
-                        elif (webElement.find_element_by_xpath('.//ancestor::lightning-datatable') != None):
+                        elif len(webElement.find_elements_by_xpath('.//ancestor::lightning-datatable')) >0:
                             row_num=int(input_arr[0])
                             col_num=int(input_arr[1])
                             row_count=self.getRowCountJs(webElement)
@@ -1416,7 +1417,7 @@ class TableOperationKeywords():
                                     err_msg = 'Error in fetching Row number'
                                     local_tk.log.info('Error in fetching Row number')
                                     logger.print_on_console('Error in fetching Row number')
-                        elif (webElement.find_element_by_xpath('.//ancestor::lightning-datatable') != None):
+                        elif len(webElement.find_elements_by_xpath('.//ancestor::lightning-datatable')) >0:
                             cell=webElement.find_elements_by_xpath('//*[text()="'+text+'"]')
                             if len(cell)!=0:
                                 tr=cell[0].find_element_by_xpath('.//ancestor::tr')
@@ -1524,7 +1525,7 @@ class TableOperationKeywords():
                                     err_msg = 'Error in fetching Col number'
                                     local_tk.log.info('Error in fetching Col number')
                                     logger.print_on_console('Error in fetching Col number')
-                        elif (webElement.find_element_by_xpath('.//ancestor::lightning-datatable') != None):
+                        elif len(webElement.find_elements_by_xpath('.//ancestor::lightning-datatable')) >0:
                             cell=webElement.find_element_by_xpath('//*[text()="'+text+'"]')
                             if len(cell)!=0:
                                 tc=cell.find_elements_by_xpath('.//ancestor::th')
