@@ -1,487 +1,939 @@
 import os
 filename=""
 import logging
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.ui import Select
+from selenium.webdriver.common.action_chains import ActionChains
+from timeit import default_timer as timer
+from datetime import timedelta
+import time
+driver=None
+from constants import *
 log=logging.getLogger('web_keywords.py')
 class Browser_Keywords:
 
-    def __init__(self,f):
-        self.f=f
+    def __init__(self):
+        self.obj=Textbox_Keywords()
+        pass
     
-    def openBrowser(self,space,url,browser,*args):
-        self.f.write(space+"driver = webdriver.Remote(command_executor='"+url+"', desired_capabilities="+str(browser)+")")
-        self.f.write(space+"status='Pass'")
+    def openBrowser(self,url,browser,scenario,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        global driver
+        from selenium import webdriver
+        browser={'browserName': "chrome",'sauce:options':{'name':scenario}}
+        driver = webdriver.Remote(command_executor=url, desired_capabilities=browser)
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
-    def navigateToURL(self,space,input,*args):
-        if "'" in input[0]:
-            input[0]=input[0][1:-1]
+    def navigateToURL(self,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
         url=input[0]
         if url[0:7].lower()!='http://' and url[0:8].lower()!='https://' and url[0:5].lower()!='file:':
             url='http://'+url
-        self.f.write(space+"input='"+url+"'")
-        self.f.write(space+"driver.get(input)")
-        self.f.write(space+"status='Pass'")
+        input=url
+        driver.get(input)
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
-    def maximizeBrowser(self,space,*args):
-        self.f.write(space+"driver.maximize_window()")   
-        self.f.write(space+"status='Pass'") 
+    def maximizeBrowser(self,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        driver.maximize_window()
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
     
-    def verifyPageTitle(self,space,input,*args):
+    def verifyPageTitle(self,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
         inp_title=input[0]
-        self.f.write(space+"input="+inp_title)
-        self.f.write(space+"title=driver.title")
-        self.f.write(space+"output= 'True' if title==input else 'False'")
-        self.f.write(space+"status='Pass' if output == 'True' else 'Fail'")
+        input=inp_title
+        title=driver.title
+        output_val= 'True' if title==input else 'False'
+        status=TEST_RESULT_PASS if output_val == 'True' else 'Fail'
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg 
 
-    def getPageTitle(self,space,*args):
-        self.f.write(space+"output=driver.title")
-        self.f.write(space+"status='Pass'")
+    def getPageTitle(self,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        output_val=driver.title
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
-    def getCurrentURL(self,space,*args):
-        self.f.write(space+"output=driver.current_url")
-        self.f.write(space+"status='Pass'")
+    def getCurrentURL(self,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        output_val=driver.current_url
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
-    def getBrowserName(self,space,*args):
-        self.f.write(space+"output=driver.name")
-        self.f.write(space+"status='Pass'")
+    def getBrowserName(self,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        output_val=driver.name
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
     
-    def verifyCurrentURL(self,space,input,*args):
+    def verifyCurrentURL(self,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
         inp_url=input[0]
-        self.f.write(space+"input="+inp_url)
-        self.f.write(space+"url=driver.current_url")
-        self.f.write(space+"output = 'True' if url==input else 'False'")
-        self.f.write(space+"status='Pass' if output == 'True' else 'Fail'")
+        input=inp_url
+        url=driver.current_url
+        output_val = 'True' if url==input else 'False'
+        status=TEST_RESULT_PASS if output_val == 'True' else 'Fail'
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg 
     
-    def openNewTab(self,space,*args):
-        self.f.write(space+"driver.execute_script('window.open('');')")
-        self.f.write(space+"driver.switch_to.window(driver.window_handles[int(driver.window_handles.index(driver.current_window_handle))+1])")
-        self.f.write(space+"status='Pass'")
+    def openNewTab(self,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        driver.execute_script('window.open('');')
+        driver.switch_to.window(driver.window_handles[int(driver.window_handles.index(driver.current_window_handle))+1])
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
-    def refresh(self,space,*args):
-        self.f.write(space+"driver.refresh()")
-        self.f.write(space+"status='Pass'")
+    def refresh(self,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        driver.refresh()
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
-    def navigateBack(self,space,*args):
-        self.f.write(space+"driver.execute_script('window.history.go(-1)')")
-        self.f.write(space+"status='Pass'")
+    def navigateBack(self,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        driver.execute_script('window.history.go(-1)')
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
     
-    def closeSubWindows(self,space,input,*args):
+    def closeSubWindows(self,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
         # if(input[0].lower()=='all'):
         # else:
-        self.f.write(space+"driver.close()")
-        self.f.write(space+"driver.switch_to.window(driver.window_handles[-1])")
-        self.f.write(space+"status='Pass'")
+        driver.close()
+        driver.switch_to.window(driver.window_handles[-1])
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
     
-    def switchToWindow(self,space,input,*args):
-        self.f.write(space+"input='"+str(int(input[0][1:-1]))+"'")
-        self.f.write(space+"driver.switch_to.window(driver.window_handles[int(input)-1])")
-        self.f.write(space+"status='Pass'")
+    def switchToWindow(self,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        driver.switch_to.window(driver.window_handles[int(input[0])-1])
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
     
-    def navigateWithAuthenticate(self,space,input,*args):
+    def navigateWithAuthenticate(self,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
         input_val=input
-        self.f.write(space+"url="+input_val[0])
-        self.f.write(space+"user="+input_val[1])
-        self.f.write(space+"password=decrypt("+input_val[2]+")")
-        self.f.write(space+"if url[0:7].lower() == 'http://': url=url[0:7]+user+':'+password+'@'+url[7:]")
-        self.f.write(space+"elif url[0:8].lower() == 'https://': url=url[0:8]+user+':'+password+'@'+url[8:]")
-        # self.f.write(space+"url="+url)
-        self.f.write(space+"input=[url,user,password]")
-        self.f.write(space+"driver.get(url)")
-        self.f.write(space+"status='Pass'")
+        url=input_val[0]
+        user=input_val[1]
+        password=self.obj.decrypt(input_val[2])
+        if url[0:7].lower() == 'http://': url=url[0:7]+user+':'+password+'@'+url[7:]
+        elif url[0:8].lower() == 'https://': url=url[0:8]+user+':'+password+'@'+url[8:]
+        # url=url)
+        input=[url,user,password]
+        driver.get(url)
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
-    def execute_js(self,space,input,*args):
-        self.f.write(space+"driver.execute_script(inputval)")
-        self.f.write(space+"status='Pass'")
+    def execute_js(self,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        driver.execute_script(inputval)
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
-    def clearCache(self,space,*args):
-        self.f.write(space+"driver.get('chrome://settings/clearBrowserData')")
-        self.f.write(space+"time.sleep(5)")
-        self.f.write(space+"""driver.execute_script('return document.querySelector("body > settings-ui").shadowRoot.querySelector("#container").querySelector("#main").shadowRoot.querySelector("settings-basic-page").shadowRoot.querySelector("settings-privacy-page").shadowRoot.querySelector("settings-clear-browsing-data-dialog").shadowRoot.querySelector("#clearBrowsingDataDialog").querySelector("#clearBrowsingDataConfirm").click();')""")
-        self.f.write(space+"status='Pass'")
+    def clearCache(self,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        driver.get('chrome://settings/clearBrowserData')
+        time.sleep(5)
+        driver.execute_script('return document.querySelector("body > settings-ui.shadowRoot.querySelector("#container.querySelector("#main.shadowRoot.querySelector("settings-basic-page.shadowRoot.querySelector("settings-privacy-page.shadowRoot.querySelector("settings-clear-browsing-data-dialog.shadowRoot.querySelector("#clearBrowsingDataDialog.querySelector("#clearBrowsingDataConfirm.click()))))))));')
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
-    def verifyTextExists(self,space,input,*args):
-        self.f.write(space+"input="+input[0])
+    def verifyTextExists(self,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        input=input[0]
         occurrences_javascript = "function occurrences(string, subString, allowOverlapping) {      string += '';     subString += '';     if (subString.length <= 0) return (string.length + 1);      var n = 0,pos = 0,step = allowOverlapping ? 1 : subString.length;      while (true) {         pos = string.indexOf(subString, pos);         if (pos >= 0) {             ++n;             pos += step;         } else break;     }     return n; }; function saddNodesOuter(sarray, scollection) { 	for (var i = 0; scollection && scollection.length && i < scollection.length; i++) { 		sarray.push(scollection[i]); 	} }; function stext_content(f) { 	var sfirstText = ''; 	var stextdisplay = ''; 	for (var z = 0; z < f.childNodes.length; z++) { 		var scurNode = f.childNodes[z]; 		swhitespace = /^\\s*$/; 		if (scurNode.nodeName === '#text' && !(swhitespace.test(scurNode.nodeValue))) { 			sfirstText = scurNode.nodeValue; 			stextdisplay = stextdisplay + sfirstText; 		} 	} 	return (stextdisplay); }; var sae = []; var substr = arguments[0]; var sele = arguments.length > 1 ? arguments[1].getElementsByTagName('*') :  document.getElementsByTagName('*'); var text_occurrences = 0; saddNodesOuter(sae, sele);  for(var j=0;j<sae.length;j++){ 	stagname = sae[j].tagName.toLowerCase(); 	 	if (stagname != 'script' && stagname != 'meta' && stagname != 'html' && stagname != 'head' && stagname != 'style' && stagname != 'body' && stagname != 'form' && stagname != 'link' && stagname != 'noscript' && stagname != 'option' && stagname != '!' && stagname != 'code' && stagname != 'pre' && stagname != 'br' && stagname != 'animatetransform' && stagname != 'noembed') { 		text_occurrences += occurrences(stext_content(sae[j]),substr); 	} 	 }; return text_occurrences;bstr = arguments[0]; var sele = arguments.length > 1 ? arguments[1].getElementsByTagName('*') :  document.getElementsByTagName('*'); var text_occurrences = 0; saddNodesOuter(sae, sele);  for(var j=0;j<sae.length;j++){ 	stagname = sae[j].tagName.toLowerCase(); 	 	if (stagname != 'script' && stagname != 'meta' && stagname != 'html' && stagname != 'head' && stagname != 'style' && stagname != 'body' && stagname != 'form' && stagname != 'link' && stagname != 'noscript' && stagname != 'option' && stagname != '!' && stagname != 'code' && stagname != 'pre' && stagname != 'br' && stagname != 'animatetransform' && stagname != 'noembed') { 		text_occurrences += occurrences(stext_content(sae[j]),substr); 	} 	 }; return text_occurrences;"
-        self.f.write(space+"output=int(driver.execute_script(\""+occurrences_javascript+"\",input))")
-        self.f.write(space+"status='Pass' if output != 0 else 'Fail'")
+        output_val=int(driver.execute_script(occurrences_javascript,input))
+        status=TEST_RESULT_PASS if output_val != 0 else 'Fail'
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg 
 
-    def closeBrowser(self,space,*args):
-        self.f.write(space+"driver.quit()")
-        self.f.write(space+"status='Pass'")
+    def closeBrowser(self,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        driver.quit()
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
 class Browser_Popup_Keywords():
 
-    def __init__(self,f):
-        self.f=f
+    def __init__(self):
+        pass
 
-    def acceptPopUp(self,space,input,*args):
-        self.f.write(space+"driver.switch_to.alert.accept()")
-        self.f.write(space+"status='Pass'") 
+    def acceptPopUp(self,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        driver.switch_to.alert.accept()
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg 
     
-    def dismissPopUp(self,space,input,*args):
-        self.f.write(space+"driver.switch_to.alert.dismiss()")
-        self.f.write(space+"status='Pass'") 
+    def dismissPopUp(self,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        driver.switch_to.alert.dismiss()
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg 
 
-    def getPopUpText(self,space,input,*args):
-        self.f.write(space+"output=driver.switch_to.alert.text")
-        self.f.write(space+"status='Pass'") 
+    def getPopUpText(self,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        output_val=driver.switch_to.alert.text
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg 
     
-    def verifyPopUpText(self,space,input,*args):
+    def verifyPopUpText(self,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
         text=input[0]
-        self.f.write(space+"input="+text)
-        self.f.write(space+"popup_text = driver.switch_to.alert.accept()")
-        self.f.write(space+"outpuiut='True' if popup_text==input else 'False'")
-        self.f.write(space+"status='Pass' if output == 'True' else 'Fail'")
+        input=text
+        popup_text = driver.switch_to.alert.accept()
+        outpuiut='True' if popup_text==input else 'False'
+        status=TEST_RESULT_PASS if output_val == 'True' else 'Fail'
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg 
 
 class Button_link_Keywords():
 
-    def __init__(self,f):
-        self.f=f
+    def __init__(self):
+        pass
 
-    def getButtonName(self,space,webelement,input,*args):
-        self.f.write(space+"buttontext="+webelement+".text")
-        self.f.write(space+"buttontext="+webelement+".get_attribute('value') if buttontext == None or buttontext == '' else buttontext")
-        self.f.write(space+"output=buttontext")
-        self.f.write(space+"status='Pass'") 
+    def getButtonName(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        buttontext=webelement.text
+        buttontext=webelement.get_attribute('value') if buttontext == None or buttontext == '' else buttontext
+        output_val=buttontext
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg 
 
-    def verifyButtonName(self,space,webelement,input,*args):
+    def verifyButtonName(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
         verify_button=input[0]
-        self.f.write(space+"input="+verify_button)
-        self.f.write(space+"buttontext="+webelement+".text")
-        self.f.write(space+"buttontext="+webelement+".get_attribute('value') if buttontext == None or buttontext == '' else buttontext")
-        self.f.write(space+"output='True' if buttontext == input else 'False'")
-        self.f.write(space+"status='Pass' if output == 'True' else 'Fail'")
+        input=verify_button
+        buttontext=webelement.text
+        buttontext=webelement.get_attribute('value') if buttontext == None or buttontext == '' else buttontext
+        output_val='True' if buttontext == input else 'False'
+        status=TEST_RESULT_PASS if output_val == 'True' else 'Fail'
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
-    def getLinkText(self,space,webelement,input,*args):
-        self.f.write(space+"input="+input[0])
-        self.f.write(space+"linktext="+webelement+".get_attribute('href')")
-        self.f.write(space+"linktext="+webelement+".text if linktext == None or linktext == '' else linktext")
-        self.f.write(space+"output=linktext")
-        self.f.write(space+"status='Pass'") 
+    def getLinkText(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        input=input[0]
+        linktext=webelement.get_attribute('href')
+        linktext=webelement.text if linktext == None or linktext == '' else linktext
+        output_val=linktext
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg 
 
-    def verifyLinkText(self,space,webelement,input,*args):
+    def verifyLinkText(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
         verify_link=input[0]
-        self.f.write(space+"input="+verify_link)
-        self.f.write(space+"linktext="+webelement+".get_attribute('href')")
-        self.f.write(space+"linktext="+webelement+".text if linktext == None or linktext == '' else linktext")
-        self.f.write(space+"output='True' if linktext == input else 'False'")
-        self.f.write(space+"status='Pass' if output == 'True' else 'Fail'")
+        input=verify_link
+        linktext=webelement.get_attribute('href')
+        linktext=webelement.text if linktext == None or linktext == '' else linktext
+        output_val='True' if linktext == input else 'False'
+        status=TEST_RESULT_PASS if output_val == 'True' else 'Fail'
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
             
 class Dropdown_Keywords():
 
-    def __init__(self,f):
-        self.f=f
+    def __init__(self):
+        pass
 
-    def selectAllValues(self,space,webelement,input,*args):
-        self.f.write(space+"input="+input[0])
-        self.f.write(space+"select = Select("+webelement+")")
-        self.f.write(space+"for i in range(0,len(select.options)):")
-        self.f.write(space+"\tNone if select.options[i].is_selected() else select.select_by_visible_text(input)")
-        self.f.write(space+"status='Pass'")
+    def selectAllValues(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        input=input[0]
+        select = Select(webelement)
+        for i in range(0,len(select.options)):
+            None if select.options[i].is_selected() else select.select_by_visible_text(input)
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
         
-    def selectValueByIndex(self,space,webelement,input,*args):
-        self.f.write(space+"input="+input[0])
-        self.f.write(space+"driver.execute_script('arguments[0].selectedIndex=arguments[1]',"+webelement+",input)")
-        self.f.write(space+"status='Pass'")
+    def selectValueByIndex(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        input=input[0]
+        driver.execute_script('arguments[0].selectedIndex=arguments[1]',webelement,input)
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
-    def selectMultipleValuesByIndexes(self,space,webelement,input,*args):
+    def selectMultipleValuesByIndexes(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
         inputval=[]
         for i in input:
             inputval.append(i[1:-1])
-        self.f.write(space+"input="+str(inputval))
+        input=str(inputval)
         for i in input:
-            self.f.write(space+"input1="+i)
-            self.f.write(space+"driver.execute_script('arguments[0].selectedIndex=arguments[1]',"+webelement+",int(input1)-1)")
-        self.f.write(space+"status='Pass'")
+            input1=i
+            driver.execute_script('arguments[0].selectedIndex=arguments[1]',webelement,int(input1)-1)
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
-    def getMultipleValuesByIndexes(self,space,webelement,input,*args):
+    def getMultipleValuesByIndexes(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
         inputval=[]
         for i in input:
             inputval.append(i[1:-1])
-        self.f.write(space+"input="+str(inputval))
-        self.f.write(space+"total=driver.execute_script('return arguments[0].childElementCount', "+webelement+")")
-        self.f.write(space+"output=[]")
-        self.f.write(space+"for inputindex in input:")
-        self.f.write(space+"\toutput.append(str(driver.execute_script('return arguments[0].options[arguments[1]].text', "+webelement+",int(inputindex)-1)))")
-        self.f.write(space+"status='Pass'")
+        input=str(inputval)
+        total=driver.execute_script('return arguments[0].childElementCount', webelement)
+        output_val=[]
+        for inputindex in input:
+            output_val.append(str(driver.execute_script('return arguments[0].options[arguments[1]].text', webelement,int(inputindex)-1)))
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
-    def verifyValuesExists(self,space,webelement,input,*args):
-        self.f.write(space+"select = Select(webelement)")
-        self.f.write(space+"option_len = select.options")
-        self.f.write(space+"opt_len = len(option_len)")
-        self.f.write(space+"inp_val_len = len(input)")
-        self.f.write(space+"temp=[]")
-        self.f.write(space+"[temp.append(select.options[x].text.strip()) for x in range(0,opt_len)]")
-        self.f.write(space+"for y in range(0,inp_val_len):"+space+"\tinput_temp = input[y].strip()"+space+"\tif (input_temp in temp):"+space+"\t\tcount+=1"+space+"\t\toutput = 'True'"+space+"\telse:"+space+"\t\toutput='False'")
-        self.f.write(space+"status='Pass' if output == 'True' else 'Fail'")
+    def verifyValuesExists(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        select = Select(webelement)
+        option_len = select.options
+        opt_len = len(option_len)
+        inp_val_len = len(input)
+        temp=[]
+        [temp.append(select.options[x].text.strip()) for x in range(0,opt_len)]
+        for y in range(0,inp_val_len):
+            input_temp = input[y].strip()
+            if (input_temp in temp):
+                count+=1
+                output_val = 'True'
+            else:
+                output_val='False'
+        status=TEST_RESULT_PASS if output_val == 'True' else 'Fail'
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
-    def selectByAbsoluteValue(self,space,webelement,input,*args):
-        self.f.write(space+"input="+input[0])
-        self.f.write(space+"select = Select("+webelement+")")
-        self.f.write(space+"select.select_by_value(input)")
-        self.f.write(space+"status='Pass'")
+    def selectByAbsoluteValue(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        input=input[0]
+        select = Select(webelement)
+        select.select_by_value(input)
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
-    def selectValueByText(self,space,webelement,input,*args):
-        self.f.write(space+"input="+input[0])
-        self.f.write(space+"select = Select("+webelement+")")
-        self.f.write(space+"select.select_by_visible_text(input)")
-        self.f.write(space+"status='Pass'")
+    def selectValueByText(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        input=input[0]
+        select = Select(webelement)
+        select.select_by_visible_text(input)
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
-    def selectMultipleValuesByText(self,space,webelement,input,*args):
-        self.f.write(space+"select = Select("+webelement+")")
+    def selectMultipleValuesByText(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        select = Select(webelement)
         inputval=[]
         for i in input:
             inputval.append(i[1:-1])
-        self.f.write(space+"input="+str(inputval))
+        input=str(inputval)
         for i in input:
-            self.f.write(space+"input1="+i)
-            self.f.write(space+"select.select_by_visible_text(input1)")
-        self.f.write(space+"status='Pass'")
+            input1=i
+            select.select_by_visible_text(input1)
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
-    def getCount(self,space,webelement,input,*args):
-        self.f.write(space+"select = Select("+webelement+")")
-        self.f.write(space+"iList = select.options")
-        self.f.write(space+"iListSize = len(iList)")
-        self.f.write(space+"output=iListSize")
-        self.f.write(space+"status='Pass'")
+    def getCount(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        select = Select(webelement)
+        iList = select.options
+        iListSize = len(iList)
+        output_val=iListSize
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
-    def verifyCount(self,space,webelement,input,*args):
-        self.f.write(space+"input="+input[0])
-        self.f.write(space+"select = Select("+webelement+")")
-        self.f.write(space+"iList = select.options")
-        self.f.write(space+"iListSize = len(iList)")
-        self.f.write(space+"output='True' if iListSize == input else 'False'")
-        self.f.write(space+"status='Pass' if output == 'True' else 'Fail'")
+    def verifyCount(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        input=input[0]
+        select = Select(webelement)
+        iList = select.options
+        iListSize = len(iList)
+        output_val='True' if iListSize == input else 'False'
+        status=TEST_RESULT_PASS if output_val == 'True' else 'Fail'
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
-    def verifySelectedValue(self,space,webelement,input,*args):
+    def verifySelectedValue(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
         input_val=input
-        self.f.write(space+"input="+input_val[0])
-        self.f.write(space+"select = Select("+webelement+")")
-        self.f.write(space+"first_value = select.first_selected_option.text")
-        self.f.write(space+"output='True' if first_value == input else 'False'")
-        self.f.write(space+"status='Pass' if output == 'True' else 'Fail'")
+        input=input_val[0]
+        select = Select(webelement)
+        first_value = select.first_selected_option.text
+        output_val='True' if first_value == input else 'False'
+        status=TEST_RESULT_PASS if output_val == 'True' else 'Fail'
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
-    def verifySelectedValues(self,space,webelement,input,*args):
+    def verifySelectedValues(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
         input_val=input[0].split(",")
-        self.f.write(space+"input="+input_val[0])
-        self.f.write(space+"select = Select("+webelement+")")
-        self.f.write(space+"all_value = select.all_selected_options")
-        self.f.write(space+"temp="+input_val[0])
-        self.f.write(space+"import copy"+space+"temp1=copy.deepcopy(temp)")
-        self.f.write(space+"for i in range(0,len(temp)):"+space+"\tif temp[i] in all_value:"+space+"\t\ttemp1.remove(temp[i])")
-        self.f.write(space+"output='True' if len(temp1)==0 else 'False'")
-        self.f.write(space+"status='Pass' if output == 'True' else 'Fail'")
+        input=input_val[0]
+        select = Select(webelement)
+        all_value = select.all_selected_options
+        temp=input_val[0]
+        import copy
+        temp1=copy.deepcopy(temp)
+        for i in range(0,len(temp)):
+            if temp[i] in all_value:
+                temp1.remove(temp[i])
+        output_val='True' if len(temp1)==0 else 'False'
+        status=TEST_RESULT_PASS if output_val == 'True' else 'Fail'
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
-    def getAllValues(self,space,webelement,input,*args):
-        self.f.write(space+"select = Select("+webelement+")")
-        self.f.write(space+"opt_len = len(select.options)")
-        self.f.write(space+"temp=[]")
-        self.f.write(space+"for x in range(0,opt_len): temp.append(select.options[x].text)")
-        self.f.write(space+"output=temp")
-        self.f.write(space+"status='Pass'")
+    def getAllValues(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        select = Select(webelement)
+        opt_len = len(select.options)
+        temp=[]
+        for x in range(0,opt_len): temp.append(select.options[x].text)
+        output_val=temp
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
     
-    def getSelected(self,space,webelement,input,*args):
-        self.f.write(space+"select = Select("+webelement+")")
-        self.f.write(space+"opt_len = len(select.options)")
-        self.f.write(space+"temp=[]")
-        self.f.write(space+"for x in range(0,opt_len): temp.append(select.all_selected_options[x].text)")
-        self.f.write(space+"output=temp")
-        self.f.write(space+"status='Pass'")
+    def getSelected(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        select = Select(webelement)
+        opt_len = len(select.options)
+        temp=[]
+        for x in range(0,opt_len): temp.append(select.all_selected_options[x].text)
+        output_val=temp
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
     
-    def verifyAllValues(self,space,webelement,input,*args):
-        self.f.write(space+"input="+input[0])
-        self.f.write(space+"select = Select("+webelement+")")
-        self.f.write(space+"opt_len = len(select.options)")
-        self.f.write(space+"temp=[]")
-        self.f.write(space+"flag==True")
-        self.f.write(space+"for x in range(0,opt_len): temp.append(select.options[x].text)")
-        self.f.write(space+"for i in input:"+space+"\tif i not in temp:"+space+"\t\tflag=False"+space+"\t\tbreak")
-        self.f.write(space+"output='True' if flag else 'False'")
-        self.f.write(space+"status='Pass' if output == 'True' else 'Fail'")
+    def verifyAllValues(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        input=input[0]
+        select = Select(webelement)
+        opt_len = len(select.options)
+        temp=[]
+        flag=True
+        for x in range(0,opt_len): 
+            temp.append(select.options[x].text)
+        for i in input:
+            if i not in temp:
+                flag=False
+                break
+        output_val='True' if flag else 'False'
+        status=TEST_RESULT_PASS if output_val == 'True' else 'Fail'
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
-    def getValueByIndex(self,space,webelement,input,*args):
-        self.f.write(space+"input="+input[0])
-        self.f.write(space+"select = Select("+webelement+")")
-        self.f.write(space+"output=select.options[int(input)].text")
-        self.f.write(space+"status='Pass'")
+    def getValueByIndex(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        input=input[0]
+        select = Select(webelement)
+        output_val=select.options[int(input)].text
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
-    def deselectAll(self,space,webelement,input,*args):
-        self.f.write(space+"select = Select("+webelement+")")
-        self.f.write(space+"select.deselect_all()")
-        self.f.write(space+"status='Pass'")
+    def deselectAll(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        select = Select(webelement)
+        select.deselect_all()
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
 class Element_Keywords:
 
-    def __init__(self,f):
-        self.f=f
+    def __init__(self):
+        pass
 
-    def click(self,space,webelement,input,*args):
-        self.f.write(space+"driver.execute_script(\"var evType; element=arguments[0]; if (document.createEvent) {     evType = 'Click executed through part-1';     var evt = document.createEvent('MouseEvents');     evt.initMouseEvent('click', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);   	setTimeout(function() {     	element.dispatchEvent(evt);     }, 100); } else {     evType = 'Click executed through part-2';   	setTimeout(function() {     element.click();   	}, 100); } return (evType);\","+webelement+")")
-        self.f.write(space+"status='Pass'")
+    def click(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        driver.execute_script("var evType; element=arguments[0]; if (document.createEvent) {     evType = 'Click executed through part-1';     var evt = document.createEvent('MouseEvents');     evt.initMouseEvent('click', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);   	setTimeout(function() {     	element.dispatchEvent(evt);     }, 100); } else {     evType = 'Click executed through part-2';   	setTimeout(function() {     element.click();   	}, 100); } return (evType);",webelement)
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
-    def press(self,space,webelement,input,*args):
-        self.f.write(space+""+webelement+".click()")
-        self.f.write(space+"status='Pass'")
+    def press(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        webelement.click()
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
     
-    def doubleClick(self,space,webelement,input,*args):
-        self.f.write(space+"webdriver.ActionChains(driver).move_to_element("+webelement+").double_click("+webelement+").perform()")
-        self.f.write(space+"status='Pass'")
+    def doubleClick(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        webdriver.ActionChains(driver).move_to_element(webelement).double_click(webelement.perform())
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
-    def rightClick(self,space,webelement,input,*args):
-        self.f.write(space+"webdriver.ActionChains(driver).move_to_element("+webelement+").context_click("+webelement+").perform()")
-        self.f.write(space+"status='Pass'")
+    def rightClick(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        webdriver.ActionChains(driver).move_to_element(webelement).context_click(webelement.perform())
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
-    def getAttributeValue(self,space,webelement,input,*args):
+    def getAttributeValue(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
         attr_name=input[0]
-        self.f.write(space+"input="+attr_name)
-        self.f.write(space+"output="+webelement+".get_attribute(input)")
-        self.f.write(space+"status='Pass'")
+        input=attr_name
+        output_val=webelement.get_attribute(input)
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
-    def verifyAttribute(self,space,webelement,input,*args):
+    def verifyAttribute(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
         input_val=input
-        self.f.write(space+"input="+input_val[0])
-        self.f.write(space+"input1="+input_val[1])
-        self.f.write(space+"attr_val="+webelement+".get_attribute(input)")
-        self.f.write(space+"output='True' if attr_val == input1 else 'False'")
-        self.f.write(space+"status='Pass' if output == 'True' else 'Fail'")
+        input=input_val[0]
+        input1=input_val[1]
+        attr_val=webelement.get_attribute(input)
+        output_val='True' if attr_val == input1 else 'False'
+        status=TEST_RESULT_PASS if output_val == 'True' else 'Fail'
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
-    def mouseHover(self,space,webelement,input,*args):
-        self.f.write(space+"webdriver.ActionChains(driver).move_to_element("+webelement+").perform()")
-        self.f.write(space+"status='Pass'")
+    def mouseHover(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        webdriver.ActionChains(driver).move_to_element(webelement.perform())
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
-    def setFocus(self,space,webelement,input,*args):
-        self.f.write(space+"driver.execute_script('arguments[0].focus();',"+webelement+")")
-        self.f.write(space+"status='Pass'")
+    def setFocus(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        driver.execute_script('arguments[0].focus();',webelement)
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
-    def getElementTagValue(self,space,webelement,input,*args):
-        self.f.write(space+"output="+webelement+".tag_name")
-        self.f.write(space+"status='Pass'")
+    def getElementTagValue(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        output_val=webelement.tag_name
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
     
-    def uploadFile(self,space,webelement,input,*args):
+    def uploadFile(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
         input=input[0].replace("\\","/")
-        self.f.write(space+"input="+input)
-        self.f.write(space+""+webelement+".send_keys(input)")
-        self.f.write(space+"status='Pass'")
+        input=input
+        webelement.send_keys(input)
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
-    def dropFile(self,space,webelement,input,*args):
+    def dropFile(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
         input=input[0].replace("\\","/")
-        self.f.write(space+"input="+input)
-        self.f.write(space+""+webelement+".send_keys(input)")
-        self.f.write(space+"status='Pass'")
+        input=input
+        webelement.send_keys(input)
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
-    def getElementText(self,space,webelement,input,*args):
-        self.f.write(space+"text="+webelement+".get_attribute('value')")
-        self.f.write(space+"if(text is None or text is ''): text="+webelement+".get_attribute('name')")
-        self.f.write(space+"if(text is None or text is ''): text="+webelement+".get_attribute('title')")
-        self.f.write(space+"if(text is None or text is ''): text="+webelement+".get_attribute('placeholder')")
-        self.f.write(space+"output=text")
-        self.f.write(space+"status='Pass'")
+    def getElementText(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        text=webelement.get_attribute('value')
+        if(text is None or text is ''): text=webelement.get_attribute('name')
+        if(text is None or text is ''): text=webelement.get_attribute('title')
+        if(text is None or text is ''): text=webelement.get_attribute('placeholder')
+        output_val=text
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
     
-    def verifyElementText(self,space,webelement,input,*args):
-        self.f.write(space+"input="+input[0])
-        self.f.write(space+"text="+webelement+".get_attribute('value')")
-        self.f.write(space+"if(text is None or text is ''): text="+webelement+".get_attribute('name')")
-        self.f.write(space+"if(text is None or text is ''): text="+webelement+".get_attribute('title')")
-        self.f.write(space+"if(text is None or text is ''): text="+webelement+".get_attribute('placeholder')")
-        self.f.write(space+"output='True' if text == input else 'False'")
-        self.f.write(space+"status='Pass' if output == 'True' else 'Fail'")
+    def verifyElementText(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        input=input[0]
+        text=webelement.get_attribute('value')
+        if(text is None or text is ''): text=webelement.get_attribute('name')
+        if(text is None or text is ''): text=webelement.get_attribute('title')
+        if(text is None or text is ''): text=webelement.get_attribute('placeholder')
+        output_val='True' if text == input else 'False'
+        status=TEST_RESULT_PASS if output_val == 'True' else 'Fail'
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
-    def getToolTipText(self,space,webelement,input,*args):
-        self.f.write(space+"output="+webelement+".get_attribute('title')")
-        self.f.write(space+"status='Pass'")
+    def getToolTipText(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        output_val=webelement.get_attribute('title')
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
-    def verifyToolTipText(self,space,webelement,input,*args):
-        self.f.write(space+"input="+input[0])
-        self.f.write(space+"tooltip="+webelement+".get_attribute('title')")
-        self.f.write(space+"output='True' if tooltip == input else 'False'")
-        self.f.write(space+"status='Pass' if output == 'True' else 'Fail'")
+    def verifyToolTipText(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        input=input[0]
+        tooltip=webelement.get_attribute('title')
+        output_val='True' if tooltip == input else 'False'
+        status=TEST_RESULT_PASS if output_val == 'True' else 'Fail'
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
 class Radio_checkbox_Keywords():
 
-    def __init__(self,f):
-        self.f=f
+    def __init__(self):
+        pass
 
-    def selectRadioButton(self,space,webelement,input,*args):
-        self.f.write(space+""+webelement+".click()")
-        self.f.write(space+"status='Pass'")
+    def selectRadioButton(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        webelement.click()
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
-    def getStatus(self,space,webelement,input,*args):
-        self.f.write(space+"output='selected' if "+webelement+".is_selected() else 'unselected'")
-        self.f.write(space+"status='Pass'")
+    def getStatus(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        output_val='selected' if webelement.is_selected() else 'unselected'
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
-    def selectCheckbox(self,space,webelement,input,*args):
-        self.f.write(space+""+webelement+".click()")
-        self.f.write(space+"status='Pass'")
+    def selectCheckbox(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        webelement.click()
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
-    def unselectCheckbox(self,space,webelement,input,*args):
-        self.f.write(space+""+webelement+".click()")
-        self.f.write(space+"status='Pass'")
+    def unselectCheckbox(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        webelement.click()
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
 class Table_Keywords():
 
-    def __init__(self,f):
-        self.f=f
+    def __init__(self):
+        pass
 
-    def getRowCount(self,space,webelement,input,*args):
-        self.f.write(space+"output=driver.execute_script('var targetTable = arguments[0]; var rowCount = targetTable.rows; return rowCount.length;',"+webelement+")")
-        self.f.write(space+"status='Pass'")
+    def getRowCount(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        output_val=driver.execute_script('var targetTable = arguments[0]; var rowCount = targetTable.rows; return rowCount.length;',webelement)
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
-    def getColumnCount(self,space,webelement,input,*args):
-        self.f.write(space+"output=driver.execute_script('var targetTable = arguments[0]; var columnCount = 0; var rows = targetTable.rows; if(rows.length > 0) { 	for (var i = 0; i < rows.length; i++) { 		var cells = rows[i].cells; 		var tempColumnCount = 0; 		for (var j = 0; j < cells.length; j++) { 			tempColumnCount += cells[j].colSpan; 		} 		if (tempColumnCount > columnCount) { 			columnCount = tempColumnCount; 		} 	} } return columnCount;',"+webelement+")")
-        self.f.write(space+"status='Pass'")
+    def getColumnCount(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        output_val=driver.execute_script('var targetTable = arguments[0]; var columnCount = 0; var rows = targetTable.rows; if(rows.length > 0) { 	for (var i = 0; i < rows.length; i++) { 		var cells = rows[i].cells; 		var tempColumnCount = 0; 		for (var j = 0; j < cells.length; j++) { 			tempColumnCount += cells[j].colSpan; 		} 		if (tempColumnCount > columnCount) { 			columnCount = tempColumnCount; 		} 	} } return columnCount;',webelement)
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
-    def getRowNumByText(self,space,webelement,input,*args):
-        self.f.write(space+"output=driver.execute_script('var temp = fun(arguments[0], arguments[1]); return temp; function fun(table, str) {     var m = [],         row, cell, xx, tx, ty, xxx, yyy, child;     for (yyy = 0; yyy < table.rows.length; yyy++) {         row = table.rows[yyy];         for (xxx = 0; xxx < row.cells.length; xxx++) {             cell = row.cells[xxx];             xx = xxx;             for (; m[yyy] && m[yyy][xx]; ++xx) {}             for (tx = xx; tx < xx + cell.colSpan; ++tx) {                 for (ty = yyy; ty < yyy + cell.rowSpan; ++ty) {                     if (!m[ty]) m[ty] = [];                     m[ty][tx] = true;                 }             }             if (cell.innerText.indexOf(str)>= 0) return yyy + cell.rowSpan;             else if (cell.children.length > 0) {                 for (var i = 0; i < cell.children.length; i++) {                     child = cell.children[i];                     if (child.value == str) return yyy + cell.rowSpan; 					else{ 					var a=child.value; 					if(a){ 					var b=a; 					if(b.indexOf(str)>=0)return yyy + cell.rowSpan; 					}	 				}			 					                 }             }         }     }     return null; };',"+webelement+")")
-        self.f.write(space+"status='Pass'")
+    def getRowNumByText(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        output_val=driver.execute_script('var temp = fun(arguments[0], arguments[1]); return temp; function fun(table, str) {     var m = [],         row, cell, xx, tx, ty, xxx, yyy, child;     for (yyy = 0; yyy < table.rows.length; yyy++) {         row = table.rows[yyy];         for (xxx = 0; xxx < row.cells.length; xxx++) {             cell = row.cells[xxx];             xx = xxx;             for (; m[yyy] && m[yyy][xx]; ++xx) {}             for (tx = xx; tx < xx + cell.colSpan; ++tx) {                 for (ty = yyy; ty < yyy + cell.rowSpan; ++ty) {                     if (!m[ty]) m[ty] = [];                     m[ty][tx] = true;                 }             }             if (cell.innerText.indexOf(str)>= 0) return yyy + cell.rowSpan;             else if (cell.children.length > 0) {                 for (var i = 0; i < cell.children.length; i++) {                     child = cell.children[i];                     if (child.value == str) return yyy + cell.rowSpan; 					else{ 					var a=child.value; 					if(a){ 					var b=a; 					if(b.indexOf(str)>=0)return yyy + cell.rowSpan; 					}	 				}			 					                 }             }         }     }     return null; };',webelement,input)
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
-    def getColNumByText(self,space,webelement,input,*args):
-        self.f.write(space+"output=driver.execute_script('var temp = fun(arguments[0], arguments[1]); return temp; function fun(table, str) {     var m = [],         row, cell, xx, tx, ty, xxx, yyy, child;     for (yyy = 0; yyy < table.rows.length; yyy++) {         row = table.rows[yyy];         for (xxx = 0; xxx < row.cells.length; xxx++) {             cell = row.cells[xxx];             xx = xxx;             for (; m[yyy] && m[yyy][xx]; ++xx) {}             for (tx = xx; tx < xx + cell.colSpan; ++tx) {                 for (ty = yyy; ty < yyy + cell.rowSpan; ++ty) {                     if (!m[ty]) m[ty] = [];                     m[ty][tx] = true;                 }             }             if (cell.innerText.indexOf(str)>= 0) return xx + cell.colSpan;             else if (cell.children.length > 0) {                 for (var i = 0; i < cell.children.length; i++) {                     child = cell.children[i];                     if (child.value == str) return xx + cell.colSpan; 					else{ 					var a=child.value; 					if(a){ 					var b=a; 					if(b.indexOf(str)>=0)return xx + cell.colSpan; 					}	 				}			 					                 }             }         }     }     return null; };',"+webelement+")")
-        self.f.write(space+"status='Pass'")
+    def getColNumByText(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        output_val=driver.execute_script('var temp = fun(arguments[0], arguments[1]); return temp; function fun(table, str) {     var m = [],         row, cell, xx, tx, ty, xxx, yyy, child;     for (yyy = 0; yyy < table.rows.length; yyy++) {         row = table.rows[yyy];         for (xxx = 0; xxx < row.cells.length; xxx++) {             cell = row.cells[xxx];             xx = xxx;             for (; m[yyy] && m[yyy][xx]; ++xx) {}             for (tx = xx; tx < xx + cell.colSpan; ++tx) {                 for (ty = yyy; ty < yyy + cell.rowSpan; ++ty) {                     if (!m[ty]) m[ty] = [];                     m[ty][tx] = true;                 }             }             if (cell.innerText.indexOf(str)>= 0) return xx + cell.colSpan;             else if (cell.children.length > 0) {                 for (var i = 0; i < cell.children.length; i++) {                     child = cell.children[i];                     if (child.value == str) return xx + cell.colSpan; 					else{ 					var a=child.value; 					if(a){ 					var b=a; 					if(b.indexOf(str)>=0)return xx + cell.colSpan; 					}	 				}			 					                 }             }         }     }     return null; };',webelement,input)
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
     
-    def getCellValue(self,space,webelement,input,*args):
-        self.f.write(space+"row="+input[0])
-        self.f.write(space+"col="+input[1])
-        self.f.write(space+"remoteele=driver.execute_script('var temp = fun(arguments[0], arguments[2], arguments[1]); return temp;  function fun(table, x, y) {     var m = [],         row, cell, xx, tx, ty, xxx, yyy;     for (yyy = 0; yyy < table.rows.length; yyy++) {         row = table.rows[yyy];         for (xxx = 0; xxx < row.cells.length; xxx++) {             cell = row.cells[xxx];             xx = xxx;             for (; m[yyy] && m[yyy][xx]; ++xx) {}             for (tx = xx; tx < xx + cell.colSpan; ++tx) {                 for (ty = yyy; ty < yyy + cell.rowSpan; ++ty) {                     if (!m[ty]) m[ty] = [];                     m[ty][tx] = true;                 }             }             if (xx <= x && x < xx + cell.colSpan && yyy <= y && y < yyy + cell.rowSpan) return cell;         }     }     return null; };',"+webelement+",int(row)-1,int(col)-1)")
-        self.f.write(space+"output=driver.execute_script(\"var mytarget = arguments[0]; var mynodes = mytarget.childNodes; var result = []; if (typeof  String.prototype.trim  !== 'function')  {       String.prototype.trim  =   function()  {             return  this.replace(/^\\s+|\\s+$/g,'');        } } recursfunc(mynodes); return result.toString();  function recursfunc(mynodes) {     for (var i = 0; i < mynodes.length; i++) {         if (mynodes[i].nodeName.toUpperCase() == \'#TEXT\') {             if ((mynodes[i].parentNode.nodeName.toUpperCase() != \'OPTION\') & (mynodes[i].parentNode.nodeName.toUpperCase() != \'SCRIPT\')) {                 var myvalue = mynodes[i].nodeValue;                 if (myvalue.trim().length > 0) {                     result.push(myvalue);                 }             }         } else if (mynodes[i].nodeName.toUpperCase() == \'INPUT\') {             if (mynodes[i].type.toUpperCase() == \'RADIO\') {                 if (mynodes[i].checked == true) {                     var myvalue = \'Selected\';                 } else {                     var myvalue = \'Unselected\';                 }             } else if (mynodes[i].type.toUpperCase() == \'CHECKBOX\') {                 if (mynodes[i].checked == true) {                     var myvalue = \'Checked\';                 } else {                     var myvalue = \'Unchecked\';                 }             } else if ((mynodes[i].type.toUpperCase() == \'BUTTON\') | (mynodes[i].type.toUpperCase() == \'SUBMIT\') | (mynodes[i].type.toUpperCase() == \'TEXT\')) {                 var myvalue = mynodes[i].value;             } else if (mynodes[i].type.toUpperCase() == \'IMAGE\') {                 var myvalue = mynodes[i].title;                 if (myvalue.trim().length < 1) {                     myvalue = mynodes[i].value;                     if (myvalue != undefined) {                         if (myvalue.trim().length < 1) {                             myvalue = \'Image\';                         }                     } else {                         myvalue = \'Image\';                     }                 }             }else{ var myvalue=mynodes[i].value; }             result.push(myvalue);         } else if (mynodes[i].nodeName.toUpperCase() == \'IMG\') {             var myvalue = mynodes[i].title;             if (myvalue.trim().length < 1) {                 myvalue = mynodes[i].value;                 if (myvalue != undefined) {                     if (myvalue.trim().length < 1) {                         myvalue = \'Image\';                     }                 } else {                     myvalue = \'Image\';                 }             }             result.push(myvalue);         } else if (mynodes[i].nodeName.toUpperCase() == \'TEXTAREA\') {             var myvalue = mynodes[i].value;             result.push(myvalue);         } else if (mynodes[i].nodeName.toUpperCase() == \'SELECT\') {             var myselect = mynodes[i].selectedOptions;             if (myselect != undefined | myselect != null) {                 for (var j = 0; j < myselect.length; j++) {                     var myvalue = mynodes[i].selectedOptions[j].textContent;                     result.push(myvalue);                 }             } else {                 var myvalue = dropdowncallie(mynodes[i]);                 result.push(myvalue);             }         } else if ((mynodes[i].nodeName.toUpperCase() == \'I\')) {             var myvalue = mynodes[i].textContent;             result.push(myvalue);         }         if (mynodes[i].hasChildNodes()) {             recursfunc(mynodes[i].childNodes);         }     } }  function dropdowncallie(op) {     var x = op.options[op.selectedIndex].text;     return x; };\",remoteele)")
-        self.f.write(space+"status='Pass'")
+    def getCellValue(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        row=input[0]
+        col=input[1]
+        remoteele=driver.execute_script('var temp = fun(arguments[0], arguments[2], arguments[1]); return temp;  function fun(table, x, y) {     var m = [],         row, cell, xx, tx, ty, xxx, yyy;     for (yyy = 0; yyy < table.rows.length; yyy++) {         row = table.rows[yyy];         for (xxx = 0; xxx < row.cells.length; xxx++) {             cell = row.cells[xxx];             xx = xxx;             for (; m[yyy] && m[yyy][xx]; ++xx) {}             for (tx = xx; tx < xx + cell.colSpan; ++tx) {                 for (ty = yyy; ty < yyy + cell.rowSpan; ++ty) {                     if (!m[ty]) m[ty] = [];                     m[ty][tx] = true;                 }             }             if (xx <= x && x < xx + cell.colSpan && yyy <= y && y < yyy + cell.rowSpan) return cell;         }     }     return null; };',webelement,int(row)-1,int(col)-1)
+        output_val=driver.execute_script("var mytarget = arguments[0]; var mynodes = mytarget.childNodes; var result = []; if (typeof  String.prototype.trim  !== 'function')  {       String.prototype.trim  =   function()  {             return  this.replace(/^\\s+|\\s+$/g,'');        } } recursfunc(mynodes); return result.toString();  function recursfunc(mynodes) {     for (var i = 0; i < mynodes.length; i++) {         if (mynodes[i].nodeName.toUpperCase() == \'#TEXT\') {             if ((mynodes[i].parentNode.nodeName.toUpperCase() != \'OPTION\') & (mynodes[i].parentNode.nodeName.toUpperCase() != \'SCRIPT\')) {                 var myvalue = mynodes[i].nodeValue;                 if (myvalue.trim().length > 0) {                     result.push(myvalue);                 }             }         } else if (mynodes[i].nodeName.toUpperCase() == \'INPUT\') {             if (mynodes[i].type.toUpperCase() == \'RADIO\') {                 if (mynodes[i].checked == true) {                     var myvalue = \'Selected\';                 } else {                     var myvalue = \'Unselected\';                 }             } else if (mynodes[i].type.toUpperCase() == \'CHECKBOX\') {                 if (mynodes[i].checked == true) {                     var myvalue = \'Checked\';                 } else {                     var myvalue = \'Unchecked\';                 }             } else if ((mynodes[i].type.toUpperCase() == \'BUTTON\') | (mynodes[i].type.toUpperCase() == \'SUBMIT\') | (mynodes[i].type.toUpperCase() == \'TEXT\')) {                 var myvalue = mynodes[i].value;             } else if (mynodes[i].type.toUpperCase() == \'IMAGE\') {                 var myvalue = mynodes[i].title;                 if (myvalue.trim().length < 1) {                     myvalue = mynodes[i].value;                     if (myvalue != undefined) {                         if (myvalue.trim().length < 1) {                             myvalue = \'Image\';                         }                     } else {                         myvalue = \'Image\';                     }                 }             }else{ var myvalue=mynodes[i].value; }             result.push(myvalue);         } else if (mynodes[i].nodeName.toUpperCase() == \'IMG\') {             var myvalue = mynodes[i].title;             if (myvalue.trim().length < 1) {                 myvalue = mynodes[i].value;                 if (myvalue != undefined) {                     if (myvalue.trim().length < 1) {                         myvalue = \'Image\';                     }                 } else {                     myvalue = \'Image\';                 }             }             result.push(myvalue);         } else if (mynodes[i].nodeName.toUpperCase() == \'TEXTAREA\') {             var myvalue = mynodes[i].value;             result.push(myvalue);         } else if (mynodes[i].nodeName.toUpperCase() == \'SELECT\') {             var myselect = mynodes[i].selectedOptions;             if (myselect != undefined | myselect != null) {                 for (var j = 0; j < myselect.length; j++) {                     var myvalue = mynodes[i].selectedOptions[j].textContent;                     result.push(myvalue);                 }             } else {                 var myvalue = dropdowncallie(mynodes[i]);                 result.push(myvalue);             }         } else if ((mynodes[i].nodeName.toUpperCase() == \'I\')) {             var myvalue = mynodes[i].textContent;             result.push(myvalue);         }         if (mynodes[i].hasChildNodes()) {             recursfunc(mynodes[i].childNodes);         }     } }  function dropdowncallie(op) {     var x = op.options[op.selectedIndex].text;     return x; };",remoteele)
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
-    def verifyCellValue(self,space,webelement,input,*args):
-        self.f.write(space+"row="+input[0])
-        self.f.write(space+"col="+input[1])
-        self.f.write(space+"input="+input[2])
-        self.f.write(space+"remoteele=driver.execute_script('var temp = fun(arguments[0], arguments[2], arguments[1]); return temp;  function fun(table, x, y) {     var m = [],         row, cell, xx, tx, ty, xxx, yyy;     for (yyy = 0; yyy < table.rows.length; yyy++) {         row = table.rows[yyy];         for (xxx = 0; xxx < row.cells.length; xxx++) {             cell = row.cells[xxx];             xx = xxx;             for (; m[yyy] && m[yyy][xx]; ++xx) {}             for (tx = xx; tx < xx + cell.colSpan; ++tx) {                 for (ty = yyy; ty < yyy + cell.rowSpan; ++ty) {                     if (!m[ty]) m[ty] = [];                     m[ty][tx] = true;                 }             }             if (xx <= x && x < xx + cell.colSpan && yyy <= y && y < yyy + cell.rowSpan) return cell;         }     }     return null; };',"+webelement+",int(row)-1,int(col)-1)")
-        self.f.write(space+"content=driver.execute_script(\"var mytarget = arguments[0]; var mynodes = mytarget.childNodes; var result = []; if (typeof  String.prototype.trim  !== 'function')  {       String.prototype.trim  =   function()  {             return  this.replace(/^\\s+|\\s+$/g,'');        } } recursfunc(mynodes); return result.toString();  function recursfunc(mynodes) {     for (var i = 0; i < mynodes.length; i++) {         if (mynodes[i].nodeName.toUpperCase() == \'#TEXT\') {             if ((mynodes[i].parentNode.nodeName.toUpperCase() != \'OPTION\') & (mynodes[i].parentNode.nodeName.toUpperCase() != \'SCRIPT\')) {                 var myvalue = mynodes[i].nodeValue;                 if (myvalue.trim().length > 0) {                     result.push(myvalue);                 }             }         } else if (mynodes[i].nodeName.toUpperCase() == \'INPUT\') {             if (mynodes[i].type.toUpperCase() == \'RADIO\') {                 if (mynodes[i].checked == true) {                     var myvalue = \'Selected\';                 } else {                     var myvalue = \'Unselected\';                 }             } else if (mynodes[i].type.toUpperCase() == \'CHECKBOX\') {                 if (mynodes[i].checked == true) {                     var myvalue = \'Checked\';                 } else {                     var myvalue = \'Unchecked\';                 }             } else if ((mynodes[i].type.toUpperCase() == \'BUTTON\') | (mynodes[i].type.toUpperCase() == \'SUBMIT\') | (mynodes[i].type.toUpperCase() == \'TEXT\')) {                 var myvalue = mynodes[i].value;             } else if (mynodes[i].type.toUpperCase() == \'IMAGE\') {                 var myvalue = mynodes[i].title;                 if (myvalue.trim().length < 1) {                     myvalue = mynodes[i].value;                     if (myvalue != undefined) {                         if (myvalue.trim().length < 1) {                             myvalue = \'Image\';                         }                     } else {                         myvalue = \'Image\';                     }                 }             }else{ var myvalue=mynodes[i].value; }             result.push(myvalue);         } else if (mynodes[i].nodeName.toUpperCase() == \'IMG\') {             var myvalue = mynodes[i].title;             if (myvalue.trim().length < 1) {                 myvalue = mynodes[i].value;                 if (myvalue != undefined) {                     if (myvalue.trim().length < 1) {                         myvalue = \'Image\';                     }                 } else {                     myvalue = \'Image\';                 }             }             result.push(myvalue);         } else if (mynodes[i].nodeName.toUpperCase() == \'TEXTAREA\') {             var myvalue = mynodes[i].value;             result.push(myvalue);         } else if (mynodes[i].nodeName.toUpperCase() == \'SELECT\') {             var myselect = mynodes[i].selectedOptions;             if (myselect != undefined | myselect != null) {                 for (var j = 0; j < myselect.length; j++) {                     var myvalue = mynodes[i].selectedOptions[j].textContent;                     result.push(myvalue);                 }             } else {                 var myvalue = dropdowncallie(mynodes[i]);                 result.push(myvalue);             }         } else if ((mynodes[i].nodeName.toUpperCase() == \'I\')) {             var myvalue = mynodes[i].textContent;             result.push(myvalue);         }         if (mynodes[i].hasChildNodes()) {             recursfunc(mynodes[i].childNodes);         }     } }  function dropdowncallie(op) {     var x = op.options[op.selectedIndex].text;     return x; };\",remoteele)")
-        self.f.write(space+"output='True' if content == input else 'False'")
-        self.f.write(space+"status='Pass' if output == 'True' else 'Fail'")
+    def verifyCellValue(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        row=input[0]
+        col=input[1]
+        input=input[2]
+        remoteele=driver.execute_script('var temp = fun(arguments[0], arguments[2], arguments[1]); return temp;  function fun(table, x, y) {     var m = [],         row, cell, xx, tx, ty, xxx, yyy;     for (yyy = 0; yyy < table.rows.length; yyy++) {         row = table.rows[yyy];         for (xxx = 0; xxx < row.cells.length; xxx++) {             cell = row.cells[xxx];             xx = xxx;             for (; m[yyy] && m[yyy][xx]; ++xx) {}             for (tx = xx; tx < xx + cell.colSpan; ++tx) {                 for (ty = yyy; ty < yyy + cell.rowSpan; ++ty) {                     if (!m[ty]) m[ty] = [];                     m[ty][tx] = true;                 }             }             if (xx <= x && x < xx + cell.colSpan && yyy <= y && y < yyy + cell.rowSpan) return cell;         }     }     return null; };',webelement,int(row)-1,int(col)-1)
+        content=driver.execute_script("var mytarget = arguments[0]; var mynodes = mytarget.childNodes; var result = []; if (typeof  String.prototype.trim  !== 'function')  {       String.prototype.trim  =   function()  {             return  this.replace(/^\\s+|\\s+$/g,'');        } } recursfunc(mynodes); return result.toString();  function recursfunc(mynodes) {     for (var i = 0; i < mynodes.length; i++) {         if (mynodes[i].nodeName.toUpperCase() == \'#TEXT\') {             if ((mynodes[i].parentNode.nodeName.toUpperCase() != \'OPTION\') & (mynodes[i].parentNode.nodeName.toUpperCase() != \'SCRIPT\')) {                 var myvalue = mynodes[i].nodeValue;                 if (myvalue.trim().length > 0) {                     result.push(myvalue);                 }             }         } else if (mynodes[i].nodeName.toUpperCase() == \'INPUT\') {             if (mynodes[i].type.toUpperCase() == \'RADIO\') {                 if (mynodes[i].checked == true) {                     var myvalue = \'Selected\';                 } else {                     var myvalue = \'Unselected\';                 }             } else if (mynodes[i].type.toUpperCase() == \'CHECKBOX\') {                 if (mynodes[i].checked == true) {                     var myvalue = \'Checked\';                 } else {                     var myvalue = \'Unchecked\';                 }             } else if ((mynodes[i].type.toUpperCase() == \'BUTTON\') | (mynodes[i].type.toUpperCase() == \'SUBMIT\') | (mynodes[i].type.toUpperCase() == \'TEXT\')) {                 var myvalue = mynodes[i].value;             } else if (mynodes[i].type.toUpperCase() == \'IMAGE\') {                 var myvalue = mynodes[i].title;                 if (myvalue.trim().length < 1) {                     myvalue = mynodes[i].value;                     if (myvalue != undefined) {                         if (myvalue.trim().length < 1) {                             myvalue = \'Image\';                         }                     } else {                         myvalue = \'Image\';                     }                 }             }else{ var myvalue=mynodes[i].value; }             result.push(myvalue);         } else if (mynodes[i].nodeName.toUpperCase() == \'IMG\') {             var myvalue = mynodes[i].title;             if (myvalue.trim().length < 1) {                 myvalue = mynodes[i].value;                 if (myvalue != undefined) {                     if (myvalue.trim().length < 1) {                         myvalue = \'Image\';                     }                 } else {                     myvalue = \'Image\';                 }             }             result.push(myvalue);         } else if (mynodes[i].nodeName.toUpperCase() == \'TEXTAREA\') {             var myvalue = mynodes[i].value;             result.push(myvalue);         } else if (mynodes[i].nodeName.toUpperCase() == \'SELECT\') {             var myselect = mynodes[i].selectedOptions;             if (myselect != undefined | myselect != null) {                 for (var j = 0; j < myselect.length; j++) {                     var myvalue = mynodes[i].selectedOptions[j].textContent;                     result.push(myvalue);                 }             } else {                 var myvalue = dropdowncallie(mynodes[i]);                 result.push(myvalue);             }         } else if ((mynodes[i].nodeName.toUpperCase() == \'I\')) {             var myvalue = mynodes[i].textContent;             result.push(myvalue);         }         if (mynodes[i].hasChildNodes()) {             recursfunc(mynodes[i].childNodes);         }     } }  function dropdowncallie(op) {     var x = op.options[op.selectedIndex].text;     return x; };",remoteele)
+        output_val='True' if content == input else 'False'
+        status=TEST_RESULT_PASS if output_val == 'True' else 'Fail'
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
-    def getCellToolTip(self,space,webelement,input,*args):
-        self.f.write(space+"row="+input[0])
-        self.f.write(space+"col="+input[1])
-        self.f.write(space+"output=driver.execute_script(\"var temp = tooltip(arguments[0], arguments[1], arguments[2]); return temp; function tooltip(table, row, col) {     var no_of_rows = table.rows.length;     var no_of_col = table.rows[row - 1].cells.length;     var ele = table.rows[row - 1];     var i, j, k, tp;     for (i = 0; i < no_of_rows; i++) {         for (j = 0; j < no_of_col; j++) {             if (i == row - 1 && j == col - 1) {                 if (ele.cells[col - 1].hasAttribute('title')) {                           tp = ele.cells[col - 1].title;                     }                     else if (ele.cells[col - 1].children.length > 0) {                         for (k = 0; k < ele.cells[col - 1].children.length; k++) {                             finalele = recurseDomChildren(ele.cells[col - 1].children[k]);                             if (finalele != undefined && finalele != '') {                                                            if (finalele.hasAttribute('title') && finalele != undefined) {                                             tp = finalele.title;                                         break;                                     }                                 }                             }                         } else {                             if (ele.hasAttribute('title') && ele != undefined) {                                          tp = ele.title;                                 }                             }                         }                     }                 }                 return tp;             };              function recurseDomChildren(start) {                 var nodes, ele1;                 if (start.hasAttribute('title') && start != undefined) {                           ele1 = start;                         return ele1;                     }                     else if (start.childNodes.length > 0) {                         nodes = start.childNodes;                         ele1 = loopNodeChildren(nodes);                         if (ele1 != '') {                                      return ele1;                         }                     }                 }                  function loopNodeChildren(nodes) {                     var node, ele2;                     for (var i = 0; i < nodes.length; i++) {                         node = nodes[i];                         if (node.childNodes.length > 0) {                             ele2 = recurseDomChildren(node);                             if (ele2 != ''  && ele2 != undefined) {                                      if (ele2.hasAttribute('title')){                                                     break;                                     }                                 }                             }                             else if (node.nodeType === 1) {                                 if (node.hasAttribute('title') && node != undefined) {                                              ele2 = node;                                         break;                                     }                                 }                                 else {                                     ele2 = '';                                       }                             }                             return ele2;                         }; \","+webelement+",row,col)")
-        self.f.write(space+"status='Pass'")
+    def getCellToolTip(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        row=input[0]
+        col=input[1]
+        output_val=driver.execute_script("var temp = tooltip(arguments[0], arguments[1], arguments[2]); return temp; function tooltip(table, row, col) {     var no_of_rows = table.rows.length;     var no_of_col = table.rows[row - 1].cells.length;     var ele = table.rows[row - 1];     var i, j, k, tp;     for (i = 0; i < no_of_rows; i++) {         for (j = 0; j < no_of_col; j++) {             if (i == row - 1 && j == col - 1) {                 if (ele.cells[col - 1].hasAttribute('title')) {                           tp = ele.cells[col - 1].title;                     }                     else if (ele.cells[col - 1].children.length > 0) {                         for (k = 0; k < ele.cells[col - 1].children.length; k++) {                             finalele = recurseDomChildren(ele.cells[col - 1].children[k]);                             if (finalele != undefined && finalele != '') {                                                            if (finalele.hasAttribute('title') && finalele != undefined) {                                             tp = finalele.title;                                         break;                                     }                                 }                             }                         } else {                             if (ele.hasAttribute('title') && ele != undefined) {                                          tp = ele.title;                                 }                             }                         }                     }                 }                 return tp;             };              function recurseDomChildren(start) {                 var nodes, ele1;                 if (start.hasAttribute('title') && start != undefined) {                           ele1 = start;                         return ele1;                     }                     else if (start.childNodes.length > 0) {                         nodes = start.childNodes;                         ele1 = loopNodeChildren(nodes);                         if (ele1 != '') {                                      return ele1;                         }                     }                 }                  function loopNodeChildren(nodes) {                     var node, ele2;                     for (var i = 0; i < nodes.length; i++) {                         node = nodes[i];                         if (node.childNodes.length > 0) {                             ele2 = recurseDomChildren(node);                             if (ele2 != ''  && ele2 != undefined) {                                      if (ele2.hasAttribute('title')){                                                     break;                                     }                                 }                             }                             else if (node.nodeType === 1) {                                 if (node.hasAttribute('title') && node != undefined) {                                              ele2 = node;                                         break;                                     }                                 }                                 else {                                     ele2 = '';                                       }                             }                             return ele2;                         }; ",webelement,row,col)
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
-    def verifyCellToolTip(self,space,webelement,input,*args):
-        self.f.write(space+"row="+input[0])
-        self.f.write(space+"col="+input[1])
-        self.f.write(space+"input="+input[2])
-        self.f.write(space+"tooltip=driver.execute_script(\"var temp = tooltip(arguments[0], arguments[1], arguments[2]); return temp; function tooltip(table, row, col) {     var no_of_rows = table.rows.length;     var no_of_col = table.rows[row - 1].cells.length;     var ele = table.rows[row - 1];     var i, j, k, tp;     for (i = 0; i < no_of_rows; i++) {         for (j = 0; j < no_of_col; j++) {             if (i == row - 1 && j == col - 1) {                 if (ele.cells[col - 1].hasAttribute('title')) {                           tp = ele.cells[col - 1].title;                     }                     else if (ele.cells[col - 1].children.length > 0) {                         for (k = 0; k < ele.cells[col - 1].children.length; k++) {                             finalele = recurseDomChildren(ele.cells[col - 1].children[k]);                             if (finalele != undefined && finalele != '') {                                                            if (finalele.hasAttribute('title') && finalele != undefined) {                                             tp = finalele.title;                                         break;                                     }                                 }                             }                         } else {                             if (ele.hasAttribute('title') && ele != undefined) {                                          tp = ele.title;                                 }                             }                         }                     }                 }                 return tp;             };              function recurseDomChildren(start) {                 var nodes, ele1;                 if (start.hasAttribute('title') && start != undefined) {                           ele1 = start;                         return ele1;                     }                     else if (start.childNodes.length > 0) {                         nodes = start.childNodes;                         ele1 = loopNodeChildren(nodes);                         if (ele1 != '') {                                      return ele1;                         }                     }                 }                  function loopNodeChildren(nodes) {                     var node, ele2;                     for (var i = 0; i < nodes.length; i++) {                         node = nodes[i];                         if (node.childNodes.length > 0) {                             ele2 = recurseDomChildren(node);                             if (ele2 != ''  && ele2 != undefined) {                                      if (ele2.hasAttribute('title')){                                                     break;                                     }                                 }                             }                             else if (node.nodeType === 1) {                                 if (node.hasAttribute('title') && node != undefined) {                                              ele2 = node;                                         break;                                     }                                 }                                 else {                                     ele2 = '';                                       }                             }                             return ele2;                         }; \","+webelement+",row,col)")
-        self.f.write(space+"output='True' if tooltip == input else 'False'")
-        self.f.write(space+"status='Pass' if output == 'True' else 'Fail'")
+    def verifyCellToolTip(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        row=input[0]
+        col=input[1]
+        input=input[2]
+        tooltip=driver.execute_script("var temp = tooltip(arguments[0], arguments[1], arguments[2]); return temp; function tooltip(table, row, col) {     var no_of_rows = table.rows.length;     var no_of_col = table.rows[row - 1].cells.length;     var ele = table.rows[row - 1];     var i, j, k, tp;     for (i = 0; i < no_of_rows; i++) {         for (j = 0; j < no_of_col; j++) {             if (i == row - 1 && j == col - 1) {                 if (ele.cells[col - 1].hasAttribute('title')) {                           tp = ele.cells[col - 1].title;                     }                     else if (ele.cells[col - 1].children.length > 0) {                         for (k = 0; k < ele.cells[col - 1].children.length; k++) {                             finalele = recurseDomChildren(ele.cells[col - 1].children[k]);                             if (finalele != undefined && finalele != '') {                                                            if (finalele.hasAttribute('title') && finalele != undefined) {                                             tp = finalele.title;                                         break;                                     }                                 }                             }                         } else {                             if (ele.hasAttribute('title') && ele != undefined) {                                          tp = ele.title;                                 }                             }                         }                     }                 }                 return tp;             };              function recurseDomChildren(start) {                 var nodes, ele1;                 if (start.hasAttribute('title') && start != undefined) {                           ele1 = start;                         return ele1;                     }                     else if (start.childNodes.length > 0) {                         nodes = start.childNodes;                         ele1 = loopNodeChildren(nodes);                         if (ele1 != '') {                                      return ele1;                         }                     }                 }                  function loopNodeChildren(nodes) {                     var node, ele2;                     for (var i = 0; i < nodes.length; i++) {                         node = nodes[i];                         if (node.childNodes.length > 0) {                             ele2 = recurseDomChildren(node);                             if (ele2 != ''  && ele2 != undefined) {                                      if (ele2.hasAttribute('title')){                                                     break;                                     }                                 }                             }                             else if (node.nodeType === 1) {                                 if (node.hasAttribute('title') && node != undefined) {                                              ele2 = node;                                         break;                                     }                                 }                                 else {                                     ele2 = '';                                       }                             }                             return ele2;                         }; ",webelement,row,col)
+        output_val='True' if tooltip == input else 'False'
+        status=TEST_RESULT_PASS if output_val == 'True' else 'Fail'
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
-    def getInnerTable(self,space,webelement,input,*args):
-        self.f.write(space+"row="+input[0])
-        self.f.write(space+"col="+input[1])
-        self.f.write(space+"output=driver.execute_script(\"var temp = fun(arguments[0], arguments[1], arguments[2]); return temp;  function fun(table, x, y) {     row = table.rows[x];     cell = row.cells[y];     tableCheck = cell.getElementsByTagName('table'); if(tableCheck.length > 0){        console.log(tableCheck[0]);       return tableCheck[0];    }else{      return null; } }\","+webelement+",row,col)")
-        self.f.write(space+"status='Pass'")
+    def getInnerTable(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        row=input[0]
+        col=input[1]
+        output_val=driver.execute_script("var temp = fun(arguments[0], arguments[1], arguments[2]); return temp;  function fun(table, x, y) {     row = table.rows[x];     cell = row.cells[y];     tableCheck = cell.getElementsByTagName('table'); if(tableCheck.length > 0){        console.log(tableCheck[0]);       return tableCheck[0];    }else{      return null; } }",webelement,row,col)
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
-    def cellClick(self,space,webelement,input,*args):
-        self.f.write(space+"row="+input[0])
-        self.f.write(space+"col="+input[1])
+    def cellClick(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        row=input[0]
+        col=input[1]
         if len(input)==2:
-            self.f.write(space+"remoteele=driver.execute_script('var temp = fun(arguments[0], arguments[2], arguments[1]); return temp;  function fun(table, x, y) {     var m = [],         row, cell, xx, tx, ty, xxx, yyy;     for (yyy = 0; yyy < table.rows.length; yyy++) {         row = table.rows[yyy];         for (xxx = 0; xxx < row.cells.length; xxx++) {             cell = row.cells[xxx];             xx = xxx;             for (; m[yyy] && m[yyy][xx]; ++xx) {}             for (tx = xx; tx < xx + cell.colSpan; ++tx) {                 for (ty = yyy; ty < yyy + cell.rowSpan; ++ty) {                     if (!m[ty]) m[ty] = [];                     m[ty][tx] = true;                 }             }             if (xx <= x && x < xx + cell.colSpan && yyy <= y && y < yyy + cell.rowSpan) return cell;         }     }     return null; };',"+webelement+",int(row)-1,int(col)-1)")
-            self.f.write(space+"remoteele.find_elements_by_xpath('.//*')[0].click()")
+            remoteele=driver.execute_script('var temp = fun(arguments[0], arguments[2], arguments[1]); return temp;  function fun(table, x, y) {     var m = [],         row, cell, xx, tx, ty, xxx, yyy;     for (yyy = 0; yyy < table.rows.length; yyy++) {         row = table.rows[yyy];         for (xxx = 0; xxx < row.cells.length; xxx++) {             cell = row.cells[xxx];             xx = xxx;             for (; m[yyy] && m[yyy][xx]; ++xx) {}             for (tx = xx; tx < xx + cell.colSpan; ++tx) {                 for (ty = yyy; ty < yyy + cell.rowSpan; ++ty) {                     if (!m[ty]) m[ty] = [];                     m[ty][tx] = true;                 }             }             if (xx <= x && x < xx + cell.colSpan && yyy <= y && y < yyy + cell.rowSpan) return cell;         }     }     return null; };',webelement,int(row)-1,int(col)-1)
+            remoteele.find_elements_by_xpath('.//*')[0].click()
         elif len(input)>2:
-            self.f.write(space+"input="+input[3])
-            self.f.write(space+"remoteele=driver.execute_script('var temp = fun(arguments[0], arguments[2], arguments[1]); return temp;  function fun(table, x, y) {     var m = [],         row, cell, xx, tx, ty, xxx, yyy;     for (yyy = 0; yyy < table.rows.length; yyy++) {         row = table.rows[yyy];         for (xxx = 0; xxx < row.cells.length; xxx++) {             cell = row.cells[xxx];             xx = xxx;             for (; m[yyy] && m[yyy][xx]; ++xx) {}             for (tx = xx; tx < xx + cell.colSpan; ++tx) {                 for (ty = yyy; ty < yyy + cell.rowSpan; ++ty) {                     if (!m[ty]) m[ty] = [];                     m[ty][tx] = true;                 }             }             if (xx <= x && x < xx + cell.colSpan && yyy <= y && y < yyy + cell.rowSpan) return cell;         }     }     return null; };',"+webelement+",int(row)-1,int(col)-1)")
+            input=input[3]
+            remoteele=driver.execute_script('var temp = fun(arguments[0], arguments[2], arguments[1]); return temp;  function fun(table, x, y) {     var m = [],         row, cell, xx, tx, ty, xxx, yyy;     for (yyy = 0; yyy < table.rows.length; yyy++) {         row = table.rows[yyy];         for (xxx = 0; xxx < row.cells.length; xxx++) {             cell = row.cells[xxx];             xx = xxx;             for (; m[yyy] && m[yyy][xx]; ++xx) {}             for (tx = xx; tx < xx + cell.colSpan; ++tx) {                 for (ty = yyy; ty < yyy + cell.rowSpan; ++ty) {                     if (!m[ty]) m[ty] = [];                     m[ty][tx] = true;                 }             }             if (xx <= x && x < xx + cell.colSpan && yyy <= y && y < yyy + cell.rowSpan) return cell;         }     }     return null; };',webelement,int(row)-1,int(col)-1)
             if input[2].lower=='button':
                 obj="//input[@type='button' or @type='button' or @type='submit' or @type='reset' or @type='file']"
             elif input[2].lower=='img':
@@ -497,133 +949,283 @@ class Table_Keywords():
             elif input[2].lower=='textbox':
                 obj="//input[@type='text' or @type='email' or @type='password' or @type='range' or @type='search' or @type='url']"
             else:
-                obj="//"+input[2].lower()
-            self.f.write(space+"remoteele.find_elements_by_xpath('"+obj+"')[int(input)].click()")
-        self.f.write(space+"status='Pass'")
+                obj=input[2].lower()
+            remoteele.find_elements_by_xpath('obj')[int(input)].click()
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
 class Textbox_Keywords():
 
-    def __init__(self,f):
-        self.f=f
+    def __init__(self):
+        pass
         # self.key = b'\x74\x68\x69\x73\x49\x73\x41\x53\x65\x63\x72\x65\x74\x4b\x65\x79'
 
-    def clearText(self,space,webelement,input,*args):
-        self.f.write(space+""+webelement+".clear()")
-        self.f.write(space+"status='Pass'")
+    def clearText(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        webelement.clear()
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
-    def setText(self,space,webelement,input,*args):
-        self.f.write(space+"input="+input[0])
-        self.f.write(space+"driver.execute_script('arguments[0].value=arguments[1]',"+webelement+",input)")
-        self.f.write(space+"status='Pass'")
+    def setText(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        input=input[0]
+        driver.execute_script('arguments[0].value=arguments[1]',webelement,input)
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
-    def sendValue(self,space,webelement,input,*args):
-        self.f.write(space+"input="+input[0])
-        self.f.write(space+""+webelement+".send_keys(input)")
-        self.f.write(space+"status='Pass'")
+    def sendValue(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        input=input[0]
+        webelement.send_keys(input)
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
-    def getText(self,space,webelement,input,*args):
-        self.f.write(space+"output=driver.execute_script('return arguments[0].value',"+webelement+")")
-        self.f.write(space+"status='Pass'")
+    def getText(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        output_val=driver.execute_script('return arguments[0].value',webelement)
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
-    def verifyText(self,space,webelement,input,*args):
-        self.f.write(space+"input="+input[0])
-        self.f.write(space+"text_val=driver.execute_script('return arguments[0].value',"+webelement+")")
-        self.f.write(space+"output='True' if text_val == input else 'False'")
-        self.f.write(space+"status='Pass' if output == 'True' else 'Fail'")
+    def verifyText(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        input=input[0]
+        text_val=driver.execute_script('return arguments[0].value',webelement)
+        output_val='True' if text_val == input else 'False'
+        status=TEST_RESULT_PASS if output_val == 'True' else 'Fail'
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
-    def getTextboxLength(self,space,webelement,input,*args):
-        self.f.write(space+"output="+webelement+".get_attribute('maxlength')")
-        self.f.write(space+"status='Pass'")
+    def getTextboxLength(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        output_val=webelement.get_attribute('maxlength')
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
-    def verifyTextboxLength(self,space,webelement,input,*args):
-        self.f.write(space+"input="+input[0])
-        self.f.write(space+"text_len="+webelement+".get_attribute('maxlength')")
-        self.f.write(space+"output='True' if text_len == input else 'False'")
-        self.f.write(space+"status='Pass' if output == 'True' else 'Fail'")
+    def verifyTextboxLength(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        input=input[0]
+        text_len=webelement.get_attribute('maxlength')
+        output_val='True' if text_len == input else 'False'
+        status=TEST_RESULT_PASS if output_val == 'True' else 'Fail'
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
-    def setSecureText(self,space,webelement,input,*args):
-        self.f.write(space+"input="+input[0])
+    def setSecureText(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        input=input[0]
         # input=self.decrypt(input_val[0])
-        self.f.write(space+"driver.execute_script('arguments[0].value=arguments[1]',"+webelement+",decrypt(input))")
-        self.f.write(space+"status='Pass'")
+        driver.execute_script('arguments[0].value=arguments[1]',webelement,self.decrypt(input))
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
-    def sendSecureValue(self,space,webelement,input,*args):
-        self.f.write(space+"input="+input[0])
+    def sendSecureValue(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        input=input[0]
         # input=self.decrypt(input_val[0])
-        self.f.write(space+""+webelement+".send_keys(decrypt(input))")
-        self.f.write(space+"status='Pass'")
+        webelement.send_keys(self.decrypt(input))
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
     
-    # def decrypt(self,enc):
-    #     import base64
-    #     from Crypto.Cipher import AES
-    #     unpad = lambda s : s[0:-ord(s[-1])]
-    #     enc = base64.b64decode(enc)
-    #     cipher = AES.new(self.key, AES.MODE_ECB)
-    #     return unpad(cipher.decrypt(enc).decode('utf-8'))
+    def decrypt(self,enc):
+        import base64
+        from Crypto.Cipher import AES
+        unpad = lambda s : s[0:-ord(s[-1])]
+        enc = base64.b64decode(enc)
+        cipher = AES.new(self.key, AES.MODE_ECB)
+        return unpad(cipher.decrypt(enc).decode('utf-8'))
 
 class Util_Keywords():
 
-    def __init__(self,f):
-        self.f=f
+    def __init__(self):
+        self.action=None
+        pass
 
-    def tab(self,space,webelement,input,*args):
-        self.f.write(space+""+webelement+".send_keys(Keys.TAB)")
-        self.f.write(space+"status='Pass'")
+    def tab(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        webelement.send_keys(Keys.TAB)
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
-    def sendFunctionKeys(self,space,webelement,input,*args):
-        self.f.write(space+"input="+input[0])
-        self.f.write(space+""+webelement+".send_keys(input)")
-        self.f.write(space+"status='Pass'")
+    def sendFunctionKeys(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        input=input[0]
+        webelement.send_keys(input)
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
-    def verifyVisible(self,space,webelement,input,*args):
-        self.f.write(space+"visibility=driver.execute_script(\"var isVisible = (function() {     function inside(schild, sparent) {         while (schild) {             if (schild === sparent) return true;             schild = schild.parentNode;         }         return false;     };     return function(selem) {         if (document.hidden || selem.offsetWidth == 0 || selem.offsetHeight == 0 || selem.style.visibility == 'hidden' || selem.style.display == 'none' || selem.style.opacity === 0) return false;         var srect = selem.getBoundingClientRect();         if (window.getComputedStyle || selem.currentStyle) {             var sel = selem,                 scomp = null;             while (sel) {                 if (sel === document) {                     break;                 } else if (!sel.parentNode) return false;                 scomp = window.getComputedStyle ? window.getComputedStyle(sel, null) : sel.currentStyle;                 if (scomp && (scomp.visibility == 'hidden' || scomp.display == 'none' || (typeof scomp.opacity !== 'undefined' && !(scomp.opacity > 0)))) return false;                 sel = sel.parentNode;             }         }         return true;     } })(); var s = arguments[0]; return isVisible(s);\","+webelement+")")
-        self.f.write(space+"output='True' if visibility else 'False'")
-        self.f.write(space+"status='Pass' if output == 'True' else 'Fail'")
+    def verifyVisible(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        visibility=driver.execute_script("var isVisible = (function() {     function inside(schild, sparent) {         while (schild) {             if (schild === sparent) return true;             schild = schild.parentNode;         }         return false;     };     return function(selem) {         if (document.hidden || selem.offsetWidth == 0 || selem.offsetHeight == 0 || selem.style.visibility == 'hidden' || selem.style.display == 'none' || selem.style.opacity === 0) return false;         var srect = selem.getBoundingClientRect();         if (window.getComputedStyle || selem.currentStyle) {             var sel = selem,                 scomp = null;             while (sel) {                 if (sel === document) {                     break;                 } else if (!sel.parentNode) return false;                 scomp = window.getComputedStyle ? window.getComputedStyle(sel, null) : sel.currentStyle;                 if (scomp && (scomp.visibility == 'hidden' || scomp.display == 'none' || (typeof scomp.opacity !== 'undefined' && !(scomp.opacity > 0)))) return false;                 sel = sel.parentNode;             }         }         return true;     } })(); var s = arguments[0]; return isVisible(s);",webelement)
+        output_val='True' if visibility else 'False'
+        status=TEST_RESULT_PASS if output_val == 'True' else 'Fail'
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
-    def verifyHidden(self,space,webelement,input,*args):
-        self.f.write(space+"hidden=driver.execute_script(\"var isVisible = (function() {     function inside(schild, sparent) {         while (schild) {             if (schild === sparent) return true;             schild = schild.parentNode;         }         return false;     };     return function(selem) {         if (document.hidden || selem.offsetWidth == 0 || selem.offsetHeight == 0 || selem.style.visibility == 'hidden' || selem.style.display == 'none' || selem.style.opacity === 0) return false;         var srect = selem.getBoundingClientRect();         if (window.getComputedStyle || selem.currentStyle) {             var sel = selem,                 scomp = null;             while (sel) {                 if (sel === document) {                     break;                 } else if (!sel.parentNode) return false;                 scomp = window.getComputedStyle ? window.getComputedStyle(sel, null) : sel.currentStyle;                 if (scomp && (scomp.visibility == 'hidden' || scomp.display == 'none' || (typeof scomp.opacity !== 'undefined' && !(scomp.opacity > 0)))) return false;                 sel = sel.parentNode;             }         }         return true;     } })(); var s = arguments[0]; return isVisible(s);\","+webelement+")")
-        self.f.write(space+"output='True' if not(hidden) else 'False'")
-        self.f.write(space+"status='Pass' if output == 'True' else 'Fail'")
+    def verifyHidden(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        hidden=driver.execute_script("var isVisible = (function() {     function inside(schild, sparent) {         while (schild) {             if (schild === sparent) return true;             schild = schild.parentNode;         }         return false;     };     return function(selem) {         if (document.hidden || selem.offsetWidth == 0 || selem.offsetHeight == 0 || selem.style.visibility == 'hidden' || selem.style.display == 'none' || selem.style.opacity === 0) return false;         var srect = selem.getBoundingClientRect();         if (window.getComputedStyle || selem.currentStyle) {             var sel = selem,                 scomp = null;             while (sel) {                 if (sel === document) {                     break;                 } else if (!sel.parentNode) return false;                 scomp = window.getComputedStyle ? window.getComputedStyle(sel, null) : sel.currentStyle;                 if (scomp && (scomp.visibility == 'hidden' || scomp.display == 'none' || (typeof scomp.opacity !== 'undefined' && !(scomp.opacity > 0)))) return false;                 sel = sel.parentNode;             }         }         return true;     } })(); var s = arguments[0]; return isVisible(s);",webelement)
+        output_val='True' if not(hidden) else 'False'
+        status=TEST_RESULT_PASS if output_val == 'True' else 'Fail'
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
-    def verifyEnabled(self,space,webelement,input,*args):
-        self.f.write(space+"enabled = "+webelement+".is_enabled()")
-        self.f.write(space+"output='True' if enabled else 'False'")
-        self.f.write(space+"status='Pass' if output == 'True' else 'Fail'")
+    def verifyEnabled(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        enabled = webelement.is_enabled()
+        output_val='True' if enabled else 'False'
+        status=TEST_RESULT_PASS if output_val == 'True' else 'Fail'
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
-    def verifyDisabled(self,space,webelement,input,*args):
-        self.f.write(space+"disabled = "+webelement+".is_enabled()")
-        self.f.write(space+"output='True' if not(disabled) else 'False'")
-        self.f.write(space+"status='Pass' if output == 'True' else 'Fail'")
+    def verifyDisabled(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        disabled = webelement.is_enabled()
+        output_val='True' if not(disabled) else 'False'
+        status=TEST_RESULT_PASS if output_val == 'True' else 'Fail'
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
-    def verifyExists(self,space,webelement,input,*args):
-        self.f.write(space+"output='True' if "+webelement+" != None or "+webelement+" != '' else 'False'")
-        self.f.write(space+"status='Pass' if output == 'True' else 'Fail'")
+    def verifyExists(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        output_val='True' if webelement != None or webelement != '' else 'False'
+        status=TEST_RESULT_PASS if output_val == 'True' else 'Fail'
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
-    def verifyDoesNotExists(self,space,webelement,input,*args):
-        self.f.write(space+"output='True' if "+webelement+" == None or "+webelement+" == '' else 'False'")
-        self.f.write(space+"status='Pass' if output == 'True' else 'Fail'")
+    def verifyDoesNotExists(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        output_val='True' if webelement == None or webelement == '' else 'False'
+        status=TEST_RESULT_PASS if output_val == 'True' else 'Fail'
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
-    def verifyReadOnly(self,space,webelement,input,*args):
-        self.f.write(space+"readonly_value = "+webelement+".get_attribute('readonly')")
-        self.f.write(space+"output='True' if readonly_value is not None and readonly_value.lower() =='true' or readonly_value is '' else 'False'")
-        self.f.write(space+"status='Pass' if output == 'True' else 'Fail'")
+    def verifyReadOnly(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        readonly_value = webelement.get_attribute('readonly')
+        output_val='True' if readonly_value is not None and readonly_value.lower() =='true' or readonly_value is '' else 'False'
+        status=TEST_RESULT_PASS if output_val == 'True' else 'Fail'
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
-    def drag(self,space,webelement,input,*args):
-        self.f.write(space+"action=webdriver.ActionChains(driver).click_and_hold("+webelement+").move_to_element("+webelement+")")
-        self.f.write(space+"status='Pass'")
+    def drag(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        self.action=webdriver.ActionChains(driver).click_and_hold(webelement).move_to_element(webelement)
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
-    def drop(self,space,webelement,input,*args):
-        self.f.write(space+"action.release("+webelement+").perform()")
-        self.f.write(space+"action=''")
-        self.f.write(space+"status='Pass'")
+    def drop(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        self.action.release(webelement).perform()
+        self.action=''
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
 
-    def waitForElementVisible(self,space,webelement,input,*args):
-        self.f.write(space+"input="+input)
-        self.f.write(space+"from selenium.webdriver.support.ui import WebDriverWait")
-        self.f.write(space+"from selenium.webdriver.support import expected_conditions as EC")
-        self.f.write(space+"from selenium.common.exceptions import TimeoutException")
-        self.f.write(space+"from selenium.webdriver.common.by import By")
-        self.f.write(space+"element_present = EC.presence_of_element_located((By.XPATH, input))")
-        self.f.write(space+"WebDriverWait(driver, 10).until(element_present)")
-        self.f.write(space+"status='Pass'")
+    def waitForElementVisible(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_val=OUTPUT_CONSTANT
+        input=input
+        from selenium.webdriver.support.ui import WebDriverWait
+        from selenium.webdriver.support import expected_conditions as EC
+        from selenium.common.exceptions import TimeoutException
+        from selenium.webdriver.common.by import By
+        element_present = EC.presence_of_element_located((By.XPATH, input))
+        WebDriverWait(driver, 10).until(element_present)
+        status=TEST_RESULT_PASS
+        methodoutput=TEST_RESULT_TRUE
+        return status,methodoutput,output_val,err_msg
+
+class Sauce_Config():
+
+    def get_sauceconf(self):
+        Saucelabs_config_path=os.environ['AVO_ASSURE_HOME']+os.sep+'assets'+os.sep+'sauce_config.json'
+        import json
+        conf_obj = open(Saucelabs_config_path, 'r')
+        conf = json.load(conf_obj)
+        conf_obj.close()
+        # self.proxies=self.conf["proxy"]
+        self.username = conf["sauce_username"]
+        self.access_key = conf["sauce_access_key"]
+        self.platform = conf["platform"]
+        self.url = conf["remote_url"]
+        return conf
+
+    def get_sauceclient(self):
+        return sauceclient.SauceClient(self.username,self.access_key)
+
+    def get_saucejobs(self, sc):
+        return sauceclient.Jobs(sc)

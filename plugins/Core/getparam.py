@@ -533,7 +533,7 @@ class GetParam():
         reporting_obj.generate_report_step(self,'',step_description,'3.00',False)
         #Reporting part ends
 
-    def performdataparam(self,input,con,reporting_obj):
+    def performdataparam(self,input,con,reporting_obj,execution_env):
         try:
 
             endlopnum = list(self.info_dict[0].keys())[0]
@@ -677,7 +677,7 @@ class GetParam():
                                     iterations = len(list(data.values())[0])
                                     while (paramindex < endlopnum):
                                         input = self.retrievestaticvariable(data,paramindex,i-1)
-                                        paramindex =con.methodinvocation(paramindex,input)
+                                        paramindex =con.methodinvocation(paramindex,execution_env,input)
                                         if paramindex in [TERMINATE,BREAK_POINT,STOP]:
                                             return paramindex
                                     log.info( '***Data Param: Iteration ' + str(k) + ' completed***\n\n')
@@ -728,7 +728,7 @@ class GetParam():
                                 iterations = len(list(data.values())[0])
                                 while (paramindex < endlopnum):
                                     input = self.retrievestaticvariable(data,paramindex,filter)
-                                    paramindex =con.methodinvocation(paramindex,input)
+                                    paramindex =con.methodinvocation(paramindex,execution_env,input)
                                     if paramindex in [TERMINATE,BREAK_POINT,STOP]:
                                         return paramindex
                                 log.info( '***Data Param: Iteration '+str(k)+ ' completed***\n\n')
@@ -779,7 +779,7 @@ class GetParam():
                                 logger.print_on_console ('Iterations : ',iterations)
                                 while (paramindex < endlopnum):
                                     input = self.retrievestaticvariable(data,paramindex,i)
-                                    paramindex =con.methodinvocation(paramindex,input)
+                                    paramindex =con.methodinvocation(paramindex,execution_env,input)
                                     if paramindex in [TERMINATE,BREAK_POINT,STOP]:
                                         return paramindex
                                 log.info( '***Data Param: Iteration '+str(k)+ ' completed***\n\n')
