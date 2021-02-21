@@ -333,9 +333,9 @@ class Launch_Keywords():
                 windowname = input_val[0]
             title_matched_windows = self.getProcessWindows(windowname)
             total_tmw = len(title_matched_windows)
-            log.info( "Number of title matched windows is %s",str(total_tmw) )
+            log.debug( "Number of title matched windows is %s",str(total_tmw) )
             hwnd = win32gui.FindWindow(None, windowname)
-            log.info( "value of hwnd is %s",str(hwnd) )
+            log.debug( "value of hwnd is %s",str(hwnd) )
             threadid, temp_pid = win32process.GetWindowThreadProcessId(hwnd)
             flag = False
             if ( len( title_matched_windows ) > 1 ):
@@ -363,16 +363,16 @@ class Launch_Keywords():
                             if ( win_handle_flag == True ):
                                 if ( win_handle_index < len(title_matched_windows) ):
                                     if ( len(title_matched_windows) > 1 ):
-                                        log.info( 'title matched windows is %s', str(title_matched_windows) )
+                                        log.debug( 'title matched windows is %s', str(title_matched_windows) )
                                         sorted_title_matched_windows=self.timestamp_sort_for_tmw(title_matched_windows)
-                                        log.info( 'sorted title matched windows is %s', str(sorted_title_matched_windows) )
+                                        log.debug( 'sorted title matched windows is %s', str(sorted_title_matched_windows) )
                                         self.windowHandle = sorted_title_matched_windows[win_handle_index]
                                         self.windowname = self.getWindowText(self.windowHandle)
                                         window_name = self.windowname
-                                        log.info( 'Given windowname is %s', window_name )
+                                        log.debug( 'Given windowname is %s', window_name )
                                         window_pid=self.get_window_pid_by_hwnd(self.windowHandle)
-                                        log.info( 'window handle is %s', str(self.windowHandle) )
-                                        log.info( 'connected to window pid is %s', str(window_pid) )
+                                        log.debug( 'window handle is %s', str(self.windowHandle) )
+                                        log.debug( 'connected to window pid is %s', str(window_pid) )
                                         app_win32 = Application(backend='win32').connect(process = window_pid)
                                         app_uia = Application(backend='uia').connect(process = window_pid)
                                         # self.bring_Window_Front()
