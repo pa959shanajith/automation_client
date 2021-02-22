@@ -210,6 +210,7 @@ class Handler():
         scenarioIds={}
         browser_type={}
         dataparam_path={}
+        report_type = "functionalTesting"
         condition_check={}
         #Iterating through json array
         try:
@@ -219,6 +220,7 @@ class Handler():
             execution_ids=new_obj['executionIds']
             exec_mode=new_obj['exec_mode']
             qc_creds=new_obj['integration']
+            if 'reportType' in new_obj: report_type = new_obj['reportType']
             for json_data,suite_id in zip(suite_details,suiteId_list):
                 suite_data.append(json_data[suite_id])
                 if 'scenarioIds' in json_data:
@@ -232,7 +234,7 @@ class Handler():
         except Exception as e:
             local_handler.log.error("Error while parsing data")
             local_handler.log.error(e,exc_info=True)
-        return suiteId_list,suite_details,browser_type,scenarioIds,suite_data,execution_ids,batch_id,condition_check,dataparam_path,exec_mode,qc_creds
+        return suiteId_list,suite_details,browser_type,scenarioIds,suite_data,execution_ids,batch_id,condition_check,dataparam_path,exec_mode,qc_creds,report_type
 
     def validate(self,start,end):
         """

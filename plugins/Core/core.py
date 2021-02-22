@@ -355,6 +355,10 @@ class MainNamespace(BaseNamespace):
                 import UserObjectScrape
                 webscrape=UserObjectScrape.UserObject()
                 webscrape.get_user_object(d,socketIO)
+            elif action == 'update_dataset':
+                core_utils.get_all_the_imports('IRIS')
+                import iris_operations
+                iris_operations.update_dataset(d,socketIO)
             else:
                 if action == 'scrape':
                     task = d['task']
@@ -395,17 +399,22 @@ class MainNamespace(BaseNamespace):
         try:
             if check_execution_lic("scrape"): return None
             elif bool(cw.scrapewindow): return None
-            #con = controller.Controller()
-            global browsername
-            browsername = args
-            core_utils.get_all_the_imports('Desktop')
-            core_utils.get_all_the_imports('IRIS')
-            import desktop_scrape
-            global desktopScrapeObj
-            desktopScrapeObj=desktop_scrape
-            global desktopScrapeFlag
-            desktopScrapeFlag=True
-            wx.PostEvent(cw.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, cw.GetId()))
+            global action, socketIO
+            d = list(args)[0]
+            if (type(d)==dict): action = d['action']
+            else: action = None
+            if action == 'update_dataset':
+                core_utils.get_all_the_imports('IRIS')
+                import iris_operations
+                iris_operations.update_dataset(d,socketIO)
+            else:
+                global browsername, desktopScrapeObj, desktopScrapeFlag
+                browsername = args
+                core_utils.get_all_the_imports('Desktop')
+                import desktop_scrape
+                desktopScrapeObj=desktop_scrape
+                desktopScrapeFlag=True
+                wx.PostEvent(cw.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, cw.GetId()))
         except Exception as e:
             err_msg='Error while Scraping Desktop application'
             log.error(err_msg)
@@ -416,17 +425,22 @@ class MainNamespace(BaseNamespace):
         try:
             if check_execution_lic("scrape"): return None
             elif bool(cw.scrapewindow): return None
-
-            #con = controller.Controller()
-            global browsername
-            browsername = args[0]
-            core_utils.get_all_the_imports('SAP')
-            import sap_scrape
-            global sapScrapeObj
-            sapScrapeObj=sap_scrape
-            global sapScrapeFlag
-            sapScrapeFlag=True
-            wx.PostEvent(cw.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, cw.GetId()))
+            global action, socketIO
+            d = list(args)[0]
+            if (type(d)==dict): action = d['action']
+            else: action = None
+            if action == 'update_dataset':
+                core_utils.get_all_the_imports('IRIS')
+                import iris_operations
+                iris_operations.update_dataset(d,socketIO)
+            else:
+                global browsername, sapScrapeObj, sapScrapeFlag
+                browsername = args[0]
+                core_utils.get_all_the_imports('SAP')
+                import sap_scrape
+                sapScrapeObj=sap_scrape
+                sapScrapeFlag=True
+                wx.PostEvent(cw.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, cw.GetId()))
         except Exception as e:
             err_msg='Error while Scraping SAP application'
             log.error(err_msg)
@@ -530,15 +544,22 @@ class MainNamespace(BaseNamespace):
         try:
             if check_execution_lic("scrape"): return None
             elif bool(cw.scrapewindow): return None
-            global oebsScrapeObj,oebsScrapeFlag
-            #con = controller.Controller()
-            global browsername
-            browsername = args[0]
-            core_utils.get_all_the_imports('Oebs')
-            import scrape_dispatcher
-            oebsScrapeObj=scrape_dispatcher
-            oebsScrapeFlag=True
-            wx.PostEvent(cw.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, cw.GetId()))
+            global action, socketIO
+            d = list(args)[0]
+            if (type(d)==dict): action = d['action']
+            else: action = None
+            if action == 'update_dataset':
+                core_utils.get_all_the_imports('IRIS')
+                import iris_operations
+                iris_operations.update_dataset(d,socketIO)
+            else:
+                global browsername, oebsScrapeObj, oebsScrapeFlag
+                browsername = args[0]
+                core_utils.get_all_the_imports('Oebs')
+                import scrape_dispatcher
+                oebsScrapeObj=scrape_dispatcher
+                oebsScrapeFlag=True
+                wx.PostEvent(cw.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, cw.GetId()))
         except Exception as e:
             err_msg='Error while Scraping Oracle application'
             log.error(err_msg)

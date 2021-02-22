@@ -17,6 +17,7 @@ import os
 import json
 import codecs
 from Crypto.Cipher import AES
+path_added = []
 
 
 class CoreUtils():
@@ -128,11 +129,11 @@ class CoreUtils():
         mac = str(mac).replace('-',':')
         return str(mac).strip()
 
-
 def get_all_the_imports(plugin_path):
-        path= os.environ["AVO_ASSURE_HOME"] + '/plugins/'+plugin_path
-        sys.path.append(path)
-        for root, dirs, files in os.walk(path):
-            for d in dirs:
-                p = path + '/' + d
-                sys.path.append(p)
+    if plugin_path in path_added: return True
+    path = os.environ["AVO_ASSURE_HOME"] + os.sep + 'plugins' + os.sep + plugin_path
+    sys.path.append(path)
+    for _, dirs, _ in os.walk(path):
+        for d in dirs:
+            p = path + os.sep + d
+            sys.path.append(p)
