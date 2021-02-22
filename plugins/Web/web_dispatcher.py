@@ -36,10 +36,7 @@ from selenium import webdriver
 import threading
 import wx
 import iris_operations
-try
-    import web_keywords
-except ImportError:
-    pass
+import web_keywords
 
 local_Wd = threading.local()
 
