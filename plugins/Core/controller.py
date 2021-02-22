@@ -912,13 +912,17 @@ class Controller():
                     tsplist[k].inputval = browser_type
                     browser_active = False
         if browser_active and browser_type and len(browser_type) > 0:
-            import browser_Keywords
-            driver_util = browser_Keywords.Singleton_DriverUtil()
-            if not driver_util.check_if_driver_exists_in_map(browser_type[0]):
-                status = TERMINATE
-                flag = False
-                logger.print_on_console('Requested browser not Active, please open browser.')
-                log.info('Invalid browser request')
+            try:
+                import browser_Keywords
+                browser_keywords_available = True
+                driver_util = browser_Keywords.Singleton_DriverUtil()
+            except Exception as e:
+                browser_keywords_available = False
+            if not browser_keywords_available or not driver_util.check_if_driver_exists_in_map(browser_type[0]) or driver_util.check_if_driver_exists_in_map(browser_type[0]) == 'stale':
+                    status = TERMINATE
+                    flag = False
+                    logger.print_on_console('Requested browser not Active, please open browser.')
+                    log.info('Invalid browser request')
         if flag:
             if runfrom_step > 0 and runfrom_step <= tsplist[len(tsplist)-1].stepnum:
                 self.conthread=mythread
