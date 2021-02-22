@@ -922,7 +922,7 @@ class Controller():
         if flag:
             if runfrom_step > 0 and runfrom_step <= tsplist[len(tsplist)-1].stepnum:
                 self.conthread=mythread
-                execution_env = {'env':'saucelabs'}
+                execution_env = {'env':'default'}
                 status,_,_ = self.executor(tsplist,DEBUG,last_tc_num,runfrom_step,mythread,execution_env, accessibility_testing = False)
             else:
                 logger.print_on_console( 'Invalid step number!! Please provide run from step number from 1 to ',tsplist[len(tsplist)-1].stepnum,'\n')
