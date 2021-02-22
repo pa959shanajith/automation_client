@@ -104,15 +104,28 @@ class LabelImage():
                 mirror = b64[2:len(b64)-1]
                 with open('test.png','wb') as f:
                     f.write(base64.b64decode(mirror))
-                t = read_tensor_from_image_file(
-                  file_name,
-                  input_height=input_height,
-                  input_width=input_width,
-                  input_mean=input_mean,
-                  input_std=input_std)
-                results = sess.run(output_operation.outputs[0], {
-                    input_operation.outputs[0]: t
-                })
+                try:
+                    t = read_tensor_from_image_file(
+                      file_name,
+                      input_height=input_height,
+                      input_width=input_width,
+                      input_mean=input_mean,
+                      input_std=input_std)
+                    results = sess.run(output_operation.outputs[0], {
+                        input_operation.outputs[0]: t
+                    })
+                except:
+                    log.info('Detected an older db')
+                    log.debug('Detected an older db : changing tensor height/width to 299 ')
+                    t = read_tensor_from_image_file(
+                      file_name,
+                      input_height=299,
+                      input_width=299,
+                      input_mean=input_mean,
+                      input_std=input_std)
+                    results = sess.run(output_operation.outputs[0], {
+                        input_operation.outputs[0]: t
+                    })
                 results = np.squeeze(results)
 
                 top_k = results.argsort()[-5:][::-1]
