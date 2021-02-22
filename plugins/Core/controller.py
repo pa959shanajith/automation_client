@@ -323,7 +323,7 @@ class Controller():
             while self.conthread.paused:
                 self.conthread.pause_cond.wait()
 
-    def methodinvocation(self,index,*args):
+    def methodinvocation(self,index,execution_env,*args):
         global pause_flag
         result=(TEST_RESULT_FAIL,TEST_RESULT_FALSE,OUTPUT_CONSTANT,None)
 		#COmapring breakpoint with the step number of tsp instead of index - (Sushma)
@@ -377,7 +377,7 @@ class Controller():
                         start_time_string=start_time.strftime(TIME_FORMAT)
                         logger.print_on_console('Step Execution start time is : '+start_time_string)
                         log.info('Step Execution start time is : '+start_time_string)
-                        index,result = self.keywordinvocation(index,inpval,self.reporting_obj,*args)
+                        index,result = self.keywordinvocation(index,inpval,self.reporting_obj,execution_env,*args)
                         if tsp.name.lower()=='verifytextiris':
                             #testcase_details_orig=tsp.testcase_details
                             testcase_details=tsp.testcase_details
@@ -411,7 +411,7 @@ class Controller():
                             elif tsp != None and isinstance(tsp,for_step.For):
                                 index = tsp.invokeFor(inpval,self.reporting_obj)
                             elif tsp != None and isinstance(tsp,getparam.GetParam):
-                                index = tsp.performdataparam(inpval,self,self.reporting_obj)
+                                index = tsp.performdataparam(inpval,self,self.reporting_obj,execution_env)
                             elif tsp != None and isinstance(tsp,jumpBy.JumpBy):
                                 index = tsp.invoke_jumpby(inpval,self.reporting_obj)
                             elif tsp != None and isinstance(tsp,jumpTo.JumpTo):
@@ -679,7 +679,7 @@ class Controller():
                     #Web apptype module call
                     if local_cont.web_dispatcher_obj == None:
                         self.__load_web()
-                    result = self.invokewebkeyword(teststepproperty,local_cont.web_dispatcher_obj,inpval,args[0])
+                    result = self.invokewebkeyword(teststepproperty,local_cont.web_dispatcher_obj,inpval,args[0],args[1])
                 elif teststepproperty.apptype.lower() == APPTYPE_MOBILE:
                     #MobileWeb apptype module call
                     if self.mobile_web_dispatcher_obj == None:
@@ -763,7 +763,7 @@ class Controller():
         else:
             return index,TERMINATE
 
-    def executor(self,tsplist,action,last_tc_num,debugfrom_step,mythread,*args, accessibility_testing = False):
+    def executor(self,tsplist,action,last_tc_num,debugfrom_step,mythread,execution_env,*args, accessibility_testing = False):
         global status_percentage, screen_testcase_map
         status_percentage = {TEST_RESULT_PASS:0,TEST_RESULT_FAIL:0,TERMINATE:0,"total":0}
         i=0
@@ -785,7 +785,7 @@ class Controller():
                 self.debugfrom_step=debugfrom_step
                 try:
                     index = i
-                    i = self.methodinvocation(i)
+                    i = self.methodinvocation(i,execution_env)
                     #Check wether accessibility testing has to be executed
                     if (index + 1 >= len(tsplist) or (tsplist[index].testscript_name != tsplist[index + 1].testscript_name and screen_testcase_map[tsplist[index].testscript_name]['screenid'] != screen_testcase_map[tsplist[index + 1].testscript_name]['screenid'])) and accessibility_testing : 
                         if local_cont.accessibility_testing_obj is None: self.__load_web()
@@ -862,8 +862,8 @@ class Controller():
         res = dispatcher_obj.dispatcher(teststepproperty,socket_object,*inputval)
         return res
 
-    def invokewebkeyword(self,teststepproperty,dispatcher_obj,inputval,reporting_obj):
-        res = dispatcher_obj.dispatcher(teststepproperty,inputval,self.reporting_obj,self.wx_object,self.conthread)
+    def invokewebkeyword(self,teststepproperty,dispatcher_obj,inputval,reporting_obj,execution_env):
+        res = dispatcher_obj.dispatcher(teststepproperty,inputval,self.reporting_obj,self.wx_object,self.conthread,execution_env)
         return res
 
     def invokemobilekeyword(self,teststepproperty,dispatcher_obj,inputval,reporting_obj):
@@ -922,7 +922,8 @@ class Controller():
         if flag:
             if runfrom_step > 0 and runfrom_step <= tsplist[len(tsplist)-1].stepnum:
                 self.conthread=mythread
-                status,_,_ = self.executor(tsplist,DEBUG,last_tc_num,runfrom_step,mythread, accessibility_testing = False)
+                execution_env = {'env':'default'}
+                status,_,_ = self.executor(tsplist,DEBUG,last_tc_num,runfrom_step,mythread,execution_env, accessibility_testing = False)
             else:
                 logger.print_on_console( 'Invalid step number!! Please provide run from step number from 1 to ',tsplist[len(tsplist)-1].stepnum,'\n')
                 log.info('Invalid step number!! Please provide run from step number')
@@ -1138,23 +1139,24 @@ class Controller():
                                 execute_flag=False
                             execution_env = json_data.get('exec_env', 'default').lower()
                             if execution_env == 'saucelabs':
-                                self.__load_web()
-                                import script_generator
+                            #     self.__load_web()
+                            #     import script_generator
                                 scenario_name=json_data['suitedetails'][suite_idx-1]["scenarioNames"][sc_idx]
-                                if not terminate_flag:
-                                    saucelabs_obj=script_generator.SauceLabs_Operations(scenario_name,str(saucelabs_count))
-                                    status=saucelabs_obj.complie_TC(tsplist,scenario_name,browser,str(saucelabs_count),execute_result_data,socketIO)
-                                if status==TERMINATE:
-                                    terminate_flag=True
-                                    msg='***Scenario'+str(sc_idx+ 1)+': '+scenario_name+' is Terminated ***'
-                                    logger.print_on_console(msg)
-                                else:
-                                    print('=======================================================================================================')
-                                    logger.print_on_console( '***Scenario' ,str(sc_idx + 1) ,' execution completed***')
-                                    print('=======================================================================================================')
-                                saucelabs_count += 1
-                                sc_idx += 1
-                                execute_flag=False
+                                execution_env = {'env':'saucelabs','scenario':scenario_name}
+                            #     if not terminate_flag:
+                            #         saucelabs_obj=script_generator.SauceLabs_Operations(scenario_name,str(saucelabs_count))
+                            #         status=saucelabs_obj.complie_TC(tsplist,scenario_name,browser,str(saucelabs_count),execute_result_data,socketIO)
+                            #     if status==TERMINATE:
+                            #         terminate_flag=True
+                            #         msg='***Scenario'+str(sc_idx+ 1)+': '+scenario_name+' is Terminated ***'
+                            #         logger.print_on_console(msg)
+                            #     else:
+                            #         print('=======================================================================================================')
+                            #         logger.print_on_console( '***Scenario' ,str(sc_idx + 1) ,' execution completed***')
+                            #         print('=======================================================================================================')
+                            #     saucelabs_count += 1
+                            #     sc_idx += 1
+                            #     execute_flag=False
                             if flag and execute_flag :
                                 #check for temrinate flag before execution
                                 tsplist = obj.read_step()
@@ -1169,7 +1171,7 @@ class Controller():
                                     record_flag = str(configvalues['screen_rec']).lower()
                                     #start screen recording
                                     if (record_flag=='yes') and self.execution_mode == SERIAL and json_data['apptype'] == 'Web': video_path = recorder_obj.record_execution(json_data['suitedetails'][0])
-                                    status,status_percentage,accessibility_reports = con.executor(tsplist,EXECUTE,last_tc_num,1,con.conthread,video_path, accessibility_testing = True)
+                                    status,status_percentage,accessibility_reports = con.executor(tsplist,EXECUTE,last_tc_num,1,con.conthread,execution_env,video_path, accessibility_testing = True)
                                     #end video
                                     if (record_flag=='yes') and self.execution_mode == SERIAL and json_data['apptype'] == 'Web': recorder_obj.rec_status = False
                                     print('=======================================================================================================')

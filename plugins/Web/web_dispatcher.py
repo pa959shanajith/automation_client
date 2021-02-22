@@ -36,6 +36,8 @@ from selenium import webdriver
 import threading
 import wx
 import iris_operations
+import web_keywords
+
 local_Wd = threading.local()
 
 class Dispatcher:
@@ -52,6 +54,17 @@ class Dispatcher:
         local_Wd.util_object = utilweb_operations.UtilWebKeywords()
         local_Wd.statict_text_object = static_text_keywords.StaticTextKeywords()
         local_Wd.custom_object=custom_keyword.CustomKeyword()
+        
+        local_Wd.browser_obj_sl = web_keywords.Browser_Keywords()
+        local_Wd.browser_popup_obj_sl = web_keywords.Browser_Popup_Keywords()
+        local_Wd.button_link_obj_sl = web_keywords.Button_link_Keywords()
+        local_Wd.dropdown_obj_sl = web_keywords.Dropdown_Keywords()
+        local_Wd.element_obj_sl = web_keywords.Element_Keywords()
+        local_Wd.radio_check_obj_sl = web_keywords.Radio_checkbox_Keywords()
+        local_Wd.table_obj_sl = web_keywords.Table_Keywords()
+        local_Wd.textbox_obj_sl = web_keywords.Textbox_Keywords()
+        local_Wd.util_obj_sl = web_keywords.Util_Keywords()
+
         local_Wd.webelement_map=OrderedDict()
         iris_object = iris_operations.IRISKeywords()
         local_Wd.log = logging.getLogger('web_dispatcher.py')
@@ -63,6 +76,7 @@ class Dispatcher:
             'classname':'find_elements_by_class_name',
             'css_selector': 'find_elements_by_css_selector'
         }
+
         self.web_dict={
             'getobjectcount':local_Wd.custom_object.get_object_count,
             'getobject':local_Wd.custom_object.get_object,
@@ -81,7 +95,6 @@ class Dispatcher:
             'getpopuptext':local_Wd.popup_object.get_popup_text,
             'verifypopuptext':local_Wd.popup_object.verify_popup_text,
 
-
             'getstatus': local_Wd.radio_checkbox_object.get_status,
             'selectradiobutton': local_Wd.radio_checkbox_object.select_radiobutton,
             'selectcheckbox': local_Wd.radio_checkbox_object.select_checkbox,
@@ -99,9 +112,6 @@ class Dispatcher:
             # grid keywords
             'horizontalscroll' : local_Wd.table_object.horizontalScroll,
             'verticalscroll' : local_Wd.table_object.verticalScroll,
-
-            #author : arpitha.b.v
-            #added mapping of 'getCellToolTip' and 'verifyCellToolTip' to table object
             'getcelltooltip' : local_Wd.table_object.getCellToolTip,
             'verifycelltooltip' : local_Wd.table_object.verifyCellToolTip,
             'getelementtext' : local_Wd.element_object.get_element_text,
@@ -135,15 +145,10 @@ class Dispatcher:
             'getmultiplevaluesbyindexes':local_Wd.dropdown_list_object.getMultipleValuesByIndexes,
             'verifyallvalues':local_Wd.dropdown_list_object.verifyAllValues,
             'selectbyabsolutevalue':local_Wd.dropdown_list_object.selectByAbsoluteValue,
-
-            #author :arpitha.b.v
-            #Added mapping of "getAllValues" keyword values to dropdown's object
-
             'getallvalues':local_Wd.dropdown_list_object.getAllValues,
             'getvaluebyindex':local_Wd.dropdown_list_object.getValueByIndex,
             'verifyvaluesexists':local_Wd.dropdown_list_object.verifyValuesExists,
             'deselectall':local_Wd.dropdown_list_object.deselectAll,
-
 
             'verifyvisible':local_Wd.util_object.verify_visible,
             'verifyexists':local_Wd.util_object.verify_exists,
@@ -162,12 +167,8 @@ class Dispatcher:
             'imagesimilaritypercentage':local_Wd.util_object.image_similarity_percentage,
             'waitforelementvisible':local_Wd.element_object.waitforelement_visible,
             'getelementtagvalue': local_Wd.util_object.get_element_tag_value,
-
-            #author :priyanka.r
-            #Added getAttributeValue and verifyAttribute keywords
             'getattributevalue': local_Wd.util_object.get_attribute_value,
             'verifyattribute': local_Wd.util_object.verify_attribute,
-
 
             'openbrowser':local_Wd.browser_object.openBrowser,
             'navigatetourl':local_Wd.browser_object.navigateToURL,
@@ -212,12 +213,126 @@ class Dispatcher:
             'getstatusiris':iris_object.getstatusiris
         }
 
+        self.sauce_web_dict = {
+            # 'getobjectcount':local_Wd.custom_object.get_object_count,
+            # 'getobject':local_Wd.custom_object.get_object,
+            'click': local_Wd.element_obj_sl.click,
+            'press'  : local_Wd.element_obj_sl.press,
+            'doubleClick' : local_Wd.element_obj_sl.doubleClick,
+            'rightClick' : local_Wd.element_obj_sl.rightClick,
+            # 'uploadFile'  : local_Wd.element_obj_sl.uploadFile,
+
+            'verifyButtonName' : local_Wd.button_link_obj_sl.verifyButtonName,
+            'getButtonName': local_Wd.button_link_obj_sl.getButtonName,
+            'getLinkText'    : local_Wd.button_link_obj_sl.getLinkText,
+            'verifyLinkText' : local_Wd.button_link_obj_sl.verifyLinkText,
+
+            'acceptPopUp' : local_Wd.browser_popup_obj_sl.acceptPopUp,
+            'dismissPopUp': local_Wd.browser_popup_obj_sl.dismissPopUp,
+            'getPopUpText': local_Wd.browser_popup_obj_sl.getPopUpText,
+            'verifyPopUpText': local_Wd.browser_popup_obj_sl.verifyPopUpText,
+
+            'getStatus': local_Wd.radio_check_obj_sl.getStatus,
+            'selectRadioButton': local_Wd.radio_check_obj_sl.selectRadioButton,
+            'selectCheckbox': local_Wd.radio_check_obj_sl.selectCheckbox,
+            'unselectCheckbox': local_Wd.radio_check_obj_sl.unselectCheckbox,
+
+            'getRowCount' : local_Wd.table_obj_sl.getRowCount,
+            'getColumnCount' : local_Wd.table_obj_sl.getColumnCount,
+            'getCellValue' : local_Wd.table_obj_sl.getCellValue,
+            'verifyCellValue' : local_Wd.table_obj_sl.verifyCellValue,
+            'cellClick' : local_Wd.table_obj_sl.cellClick,
+            'getRowNumByText' : local_Wd.table_obj_sl.getRowNumByText,
+            'getColNumByText' : local_Wd.table_obj_sl.getColNumByText,
+            'getInnerTable' : local_Wd.table_obj_sl.getInnerTable,
+            'getCellToolTip' : local_Wd.table_obj_sl.getCellToolTip,
+            'verifyCellToolTip' : local_Wd.table_obj_sl.verifyCellToolTip,
+
+            'getElementText' : local_Wd.element_obj_sl.getElementText,
+            'verifyElementText' : local_Wd.element_obj_sl.verifyElementText,
+            'clickElement' : local_Wd.element_obj_sl.click,
+            'getToolTipText' : local_Wd.element_obj_sl.getToolTipText,
+            'verifyToolTipText' : local_Wd.element_obj_sl.verifyToolTipText,
+            'drag': local_Wd.util_obj_sl.drag,
+            'drop': local_Wd.util_obj_sl.drop,
+            # 'dropFile': local_Wd.element_obj_sl.dropFile,
+
+            'setText': local_Wd.textbox_obj_sl.setText,
+            'sendValue': local_Wd.textbox_obj_sl.sendValue,
+            'getText': local_Wd.textbox_obj_sl.getText,
+            'verifyText': local_Wd.textbox_obj_sl.verifyText,
+            'clearText': local_Wd.textbox_obj_sl.clearText,
+            'getTextboxLength': local_Wd.textbox_obj_sl.getTextboxLength,
+            'verifyTextboxLength': local_Wd.textbox_obj_sl.verifyTextboxLength,
+            'setSecureText': local_Wd.textbox_obj_sl.setSecureText,
+            'sendSecureValue': local_Wd.textbox_obj_sl.sendSecureValue,
+
+            'selectValueByIndex': local_Wd.dropdown_obj_sl.selectValueByIndex,
+            'getCount': local_Wd.dropdown_obj_sl.getCount,
+            'selectValueByText': local_Wd.dropdown_obj_sl.selectValueByText,
+            'verifySelectedValues': local_Wd.dropdown_obj_sl.verifySelectedValues,
+            'verifySelectedValue': local_Wd.dropdown_obj_sl.verifySelectedValue,
+            'verifyCount': local_Wd.dropdown_obj_sl.verifyCount,
+            'selectAllValues': local_Wd.dropdown_obj_sl.selectAllValues,
+            'selectMultipleValuesByIndexes': local_Wd.dropdown_obj_sl.selectMultipleValuesByIndexes,
+            'getSelected': local_Wd.dropdown_obj_sl.getSelected,
+            'selectMultipleValuesByText': local_Wd.dropdown_obj_sl.selectMultipleValuesByText,
+            'getMultipleValuesByIndexes': local_Wd.dropdown_obj_sl.getMultipleValuesByIndexes,
+            'verifyAllValues': local_Wd.dropdown_obj_sl.verifyAllValues,
+            'selectByAbsoluteValue': local_Wd.dropdown_obj_sl.selectByAbsoluteValue,
+            'getAllValues': local_Wd.dropdown_obj_sl.getAllValues,
+            'getValueByIndex': local_Wd.dropdown_obj_sl.getValueByIndex,
+            'verifyValuesExists': local_Wd.dropdown_obj_sl.verifyValuesExists,
+            'deselectAll': local_Wd.dropdown_obj_sl.deselectAll,
+
+            'verifyVisible': local_Wd.util_obj_sl.verifyVisible,
+            'verifyExists': local_Wd.util_obj_sl.verifyExists,
+            'verifyDoesNotExists': local_Wd.util_obj_sl.verifyDoesNotExists,
+            'verifyEnabled': local_Wd.util_obj_sl.verifyEnabled,
+            'verifyDisabled': local_Wd.util_obj_sl.verifyDisabled,
+            'verifyHidden': local_Wd.util_obj_sl.verifyHidden,
+            'verifyReadOnly': local_Wd.util_obj_sl.verifyReadOnly,
+            'tab': local_Wd.util_obj_sl.tab,
+            'sendFunctionKeys': local_Wd.util_obj_sl.sendFunctionKeys,
+            'setFocus': local_Wd.element_obj_sl.setFocus,
+            'mouseHover': local_Wd.element_obj_sl.mouseHover,
+            # 'rightclick':obj.rightclick,
+            # 'mouseclick': local_Wd.util_obj_sl.mouseClick,
+            # 'verifywebimages': local_Wd.util_obj_sl.verify_web_images,
+            # 'imagesimilaritypercentage': local_Wd.util_obj_sl.image_similarity_percentage,
+            'waitForElementVisible': local_Wd.util_obj_sl.waitForElementVisible,
+            'getElementTagValue': local_Wd.element_obj_sl.getElementTagValue,
+            'getAttributeValue': local_Wd.element_obj_sl.getAttributeValue,
+            'verifyAttribute': local_Wd.element_obj_sl.verifyAttribute,
+
+            'openBrowser': local_Wd.browser_obj_sl.openBrowser,
+            'navigateToURL': local_Wd.browser_obj_sl.navigateToURL,
+            'getPageTitle': local_Wd.browser_obj_sl.getPageTitle,
+            'getCurrentURL': local_Wd.browser_obj_sl.getCurrentURL,
+            'maximizeBrowser': local_Wd.browser_obj_sl.maximizeBrowser,
+            'refresh': local_Wd.browser_obj_sl.refresh,
+            'verifyCurrentURL': local_Wd.browser_obj_sl.verifyCurrentURL,
+            'closeBrowser': local_Wd.browser_obj_sl.closeBrowser,
+            'closeSubWindows': local_Wd.browser_obj_sl.closeSubWindows,
+            'switchToWindow': local_Wd.browser_obj_sl.switchToWindow,
+            'verifyTextExists': local_Wd.browser_obj_sl.verifyTextExists,
+            'verifyPageTitle': local_Wd.browser_obj_sl.verifyPageTitle,
+            'clearCache': local_Wd.browser_obj_sl.clearCache,
+            'navigateWithAuthenticate': local_Wd.browser_obj_sl.navigateWithAuthenticate,
+            'navigateBack': local_Wd.browser_obj_sl.navigateBack,
+            'openNewTab': local_Wd.browser_obj_sl.openNewTab,
+            'execute_js': local_Wd.browser_obj_sl.execute_js,
+            'getBrowserName': local_Wd.browser_obj_sl.getBrowserName
+        }
+
+        self.browsers_sl={'1':{'browserName': "chrome", 'sauce:options':{}},'2':{'browserName': "firefox", 'sauce:options':{}},'3':{'browserName': "internet explorer", 'sauce:options':{}},'7':{'browserName': "MicrosoftEdge", 'sauce:options':{}},'8':{'browserName': "MicrosoftEdge", 'sauce:options':{}}}
+        self.sauce_conf = web_keywords.Sauce_Config().get_sauceconf()
         self.exception_flag=''
         self.action=None
         self.wxObject=None
         self.thread=None
 
-    def dispatcher(self,teststepproperty,input,reporting_obj,wxObject,mythread):
+    def dispatcher(self,teststepproperty,input,reporting_obj,wxObject,mythread,execution_env):
         objectname = teststepproperty.objectname
         output = teststepproperty.outputval
         objectname = objectname.strip()
@@ -393,7 +508,28 @@ class Dispatcher:
                     reporting_obj.browser_type = BROWSER_NAME[7]
                 elif(reporting_obj.browser_type=='msedge'):
                     reporting_obj.browser_type = BROWSER_NAME[8]
-            if keyword in list(self.web_dict.keys()):
+            if execution_env['env'] == 'saucelabs' and teststepproperty.name in list(self.sauce_web_dict.keys()):  
+                if teststepproperty.custname=='@Browser' or teststepproperty.custname=='@BrowserPopUp': 
+                    if(teststepproperty.name=="openBrowser"):
+                        browser=teststepproperty.inputval[0]
+                        self.browsers_sl[browser]["platform"]=self.sauce_conf["platform"]
+                        self.browsers_sl[browser]["sauce:options"].update({"name":teststepproperty.testscript_name})
+                        self.browsers_sl[browser]["sauce:options"].update({"idleTimeout":25})
+                        result = self.sauce_web_dict[teststepproperty.name](self.sauce_conf['remote_url'],self.browsers_sl[browser],execution_env['scenario'])
+                        driver = web_keywords.driver
+                        browser_Keywords.local_bk.driver_obj = web_keywords.driver
+                    else:
+                        result = self.sauce_web_dict[teststepproperty.name](input)
+                elif teststepproperty.name in self.sauce_web_dict:
+                    xpath=teststepproperty.objectname.split(';')[0]
+                    if(teststepproperty.name=="waitForElementVisible"):
+                        input=xpath
+                    webelement=send_webelement_to_keyword(web_keywords.driver,objectname,url)
+                    result = self.sauce_web_dict[teststepproperty.name](webelement,input)
+                else:
+                    logger.print_on_console(teststepproperty.name+" keyword is not supported in saucelabs execution.")
+                    return False
+            elif execution_env['env'] == 'default' and keyword in list(self.web_dict.keys()):
                 flag=False
                 #Finding the webelement for NON_WEBELEMENT_KEYWORDS
                 if keyword not in NON_WEBELEMENT_KEYWORDS:

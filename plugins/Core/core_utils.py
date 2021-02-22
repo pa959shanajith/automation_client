@@ -131,6 +131,7 @@ class CoreUtils():
 
 def get_all_the_imports(plugin_path):
     if plugin_path in path_added: return True
+    path_added.append(plugin_path)
     path = os.environ["AVO_ASSURE_HOME"] + os.sep + 'plugins' + os.sep + plugin_path
     sys.path.append(path)
     for _, dirs, _ in os.walk(path):
