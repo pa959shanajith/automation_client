@@ -338,7 +338,6 @@ class MainNamespace(BaseNamespace):
     def on_webscrape(self,*args):
         try:
             global action,cw,browsername,desktopScrapeFlag,data,socketIO
-            core_utils.get_all_the_imports('IRIS')
             if check_execution_lic("scrape"): return None
             elif bool(cw.scrapewindow): return None
             args = list(args)
@@ -357,6 +356,7 @@ class MainNamespace(BaseNamespace):
                 webscrape=UserObjectScrape.UserObject()
                 webscrape.get_user_object(d,socketIO)
             elif action == 'update_dataset':
+                core_utils.get_all_the_imports('IRIS')
                 import iris_operations
                 iris_operations.update_dataset(d,socketIO)
             else:
@@ -399,23 +399,20 @@ class MainNamespace(BaseNamespace):
         try:
             if check_execution_lic("scrape"): return None
             elif bool(cw.scrapewindow): return None
-            #con = controller.Controller()
-            core_utils.get_all_the_imports('IRIS')
             global action, socketIO
             d = list(args)[0]
             if (type(d)==dict): action = d['action']
             else: action = None
-            if( action == 'update_dataset' ):
+            if action == 'update_dataset':
+                core_utils.get_all_the_imports('IRIS')
                 import iris_operations
                 iris_operations.update_dataset(d,socketIO)
             else:
-                global browsername
+                global browsername, desktopScrapeObj, desktopScrapeFlag
                 browsername = args
                 core_utils.get_all_the_imports('Desktop')
                 import desktop_scrape
-                global desktopScrapeObj
                 desktopScrapeObj=desktop_scrape
-                global desktopScrapeFlag
                 desktopScrapeFlag=True
                 wx.PostEvent(cw.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, cw.GetId()))
         except Exception as e:
@@ -428,23 +425,20 @@ class MainNamespace(BaseNamespace):
         try:
             if check_execution_lic("scrape"): return None
             elif bool(cw.scrapewindow): return None
-            #con = controller.Controller()
-            core_utils.get_all_the_imports('IRIS')
             global action, socketIO
             d = list(args)[0]
             if (type(d)==dict): action = d['action']
             else: action = None
-            if( action == 'update_dataset' ):
+            if action == 'update_dataset':
+                core_utils.get_all_the_imports('IRIS')
                 import iris_operations
                 iris_operations.update_dataset(d,socketIO)
             else:
-                global browsername
+                global browsername, sapScrapeObj, sapScrapeFlag
                 browsername = args[0]
                 core_utils.get_all_the_imports('SAP')
                 import sap_scrape
-                global sapScrapeObj
                 sapScrapeObj=sap_scrape
-                global sapScrapeFlag
                 sapScrapeFlag=True
                 wx.PostEvent(cw.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, cw.GetId()))
         except Exception as e:
@@ -550,18 +544,16 @@ class MainNamespace(BaseNamespace):
         try:
             if check_execution_lic("scrape"): return None
             elif bool(cw.scrapewindow): return None
-            global oebsScrapeObj,oebsScrapeFlag
-            #con = controller.Controller()
-            core_utils.get_all_the_imports('IRIS')
             global action, socketIO
             d = list(args)[0]
             if (type(d)==dict): action = d['action']
             else: action = None
-            if( action == 'update_dataset' ):
+            if action == 'update_dataset':
+                core_utils.get_all_the_imports('IRIS')
                 import iris_operations
                 iris_operations.update_dataset(d,socketIO)
             else:
-                global browsername
+                global browsername, oebsScrapeObj, oebsScrapeFlag
                 browsername = args[0]
                 core_utils.get_all_the_imports('Oebs')
                 import scrape_dispatcher
