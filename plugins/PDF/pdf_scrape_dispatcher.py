@@ -23,7 +23,7 @@ log = logging.getLogger('pdf_scrape_dispatcher.py')
 windownametoscrape = ''
 
 class ScrapeDispatcher(wx.Frame):
-    def __init__(self, parent,id, title,filePath,socketIO,irisFlag):
+    def __init__(self, parent,id, title,filePath,socketIO):
         try:
             wx.Frame.__init__(self, parent, title=title,pos=(300, 150),  size=(210, 150) ,style=wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER  |wx.MAXIMIZE_BOX|wx.CLOSE_BOX) )
             self.SetBackgroundColour('#e6e7e8')
@@ -33,7 +33,6 @@ class ScrapeDispatcher(wx.Frame):
 ##        obj = utils.Utils()
 ##            self.utils_obj=utils.Utils()
             self.core_utilsobject = core_utils.CoreUtils()
-            self.irisFlag = irisFlag
             self.parent = parent
             global windownametoscrape
             windownametoscrape = filePath
@@ -45,12 +44,11 @@ class ScrapeDispatcher(wx.Frame):
             self.startbutton.Bind(wx.EVT_TOGGLEBUTTON, self.clickandadd)   # need to implement OnExtract()
 ##            self.fullscrapebutton = wx.Button(self.panel, label="Full Scrape",pos=(12,38 ), size=(175, 28))
 ##            self.fullscrapebutton.Bind(wx.EVT_BUTTON, self.clickandadd)   # need to implement OnExtract()
-##            if(irisFlag):
-##                import cropandadd
-##                global cropandaddobj
-##                cropandaddobj = cropandadd.Cropandadd()
-##                self.cropbutton = wx.ToggleButton(self.panel, label="Start IRIS",pos=(12,68 ), size=(175, 28))
-##                self.cropbutton.Bind(wx.EVT_TOGGLEBUTTON, self.cropandadd)
+##            import cropandadd
+##            global cropandaddobj
+##            cropandaddobj = cropandadd.Cropandadd()
+##            self.cropbutton = wx.ToggleButton(self.panel, label="Start IRIS",pos=(12,68 ), size=(175, 28))
+##            self.cropbutton.Bind(wx.EVT_TOGGLEBUTTON, self.cropandadd)
 ##            self.Centre()
             self.Centre()
             style = self.GetWindowStyle()
@@ -122,7 +120,7 @@ class ScrapeDispatcher(wx.Frame):
             self.startbutton.Disable()
             pdfV = PDFViewer(None, size=(615,850))
             pdfV.Show()
-            event.GetEventObject().SetLabel("Stop IRIS")
+##            event.GetEventObject().SetLabel("Stop IRIS")
             time.sleep(1)
             status = cropandaddobj.startcropandadd(self)
         else:
