@@ -1157,6 +1157,8 @@ class Controller():
                             #     saucelabs_count += 1
                             #     sc_idx += 1
                             #     execute_flag=False
+                            else:
+                                execution_env = {'env':'default'}
                             if flag and execute_flag :
                                 #check for temrinate flag before execution
                                 tsplist = obj.read_step()
