@@ -339,8 +339,11 @@ class Dispatcher:
         url=teststepproperty.url.strip()
         keyword = teststepproperty.name
         keyword = keyword.lower()
-        if self.action == DEBUG and browser_Keywords.driver_pre != None:
-            browser_Keywords.local_bk.driver_obj=browser_Keywords.driver_pre
+        if self.action == DEBUG:
+            if not self.check_browser_exists(keyword, teststepproperty.browser_type):
+                return [TEST_RESULT_FAIL,TEST_RESULT_FALSE,OUTPUT_CONSTANT,"Requested Browser not Available"]
+            if browser_Keywords.driver_pre != None:
+                browser_Keywords.local_bk.driver_obj=browser_Keywords.driver_pre
         driver = browser_Keywords.local_bk.driver_obj
         self.wxObject=wxObject
         self.thread=mythread
@@ -696,7 +699,7 @@ class Dispatcher:
 
 
     def getwebelement(self,driver,objectname,stepnum,custname):
-##        objectname = str(objectname)
+        ##objectname = str(objectname)
         global obj_flag
         obj_flag=False
         webElement = None
@@ -847,3 +850,15 @@ class Dispatcher:
         if isinstance(webElement,list):
             webElement=webElement[0]
         return webElement
+
+    def check_browser_exists(self, keyword_name, browser_type):
+        try:
+            import browser_Keywords
+            browser_keywords_available = True
+            driver_util = browser_Keywords.Singleton_DriverUtil()
+        except Exception as e:
+            browser_keywords_available = False
+        if keyword_name != 'openbrowser' and (not browser_keywords_available or not driver_util.check_if_driver_exists_in_map(browser_type[0]) or driver_util.check_if_driver_exists_in_map(browser_type[0]) == 'stale'):
+            logger.print_on_console('Requested browser not Active, please open browser.')
+            return False
+        return True
