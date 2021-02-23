@@ -268,6 +268,7 @@ def gotoobject(elem):
     Output : point (matched image co-ordinates)
     Method Referenced in : clickiris, doubleclickiris, rightclickiris, settextiris, cleartextiris, setsecuretextiris, gettextiris, verifyexistsiris
     """
+    point = None
     mirror = get_byte_mirror(elem['cord'])
     img_rgb = base64.b64decode(mirror)
     fh = open("sample.png", "wb")
@@ -1833,12 +1834,14 @@ class IRISKeywords():
                     logger.print_on_console('Element exists.')
             else:
                 err_msg = "Object not found."
+                relativeCoordinates = []
                 verifyFlag = False
                 log.info('verifyFlag set to False, Parent element unrecognised - all iris objects will be treated as regular IRIS elements.')
             if ( err_msg ):
                 log.info( err_msg )
                 logger.print_on_console( err_msg )
         except Exception as e:
+            relativeCoordinates = []
             verifyFlag = False
             log.info('verifyFlag set to Flase, Parent element unrecognised - all iris objects will be treated as regular IRIS elements.')
             err_msg = "Error occurred in VerifyExistsIris, Err_Msg : " + str(e)
