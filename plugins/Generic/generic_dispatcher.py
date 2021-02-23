@@ -247,6 +247,13 @@ class GenericKeywordDispatcher:
                         output[0] = data[var][0]
                         output=';'.join(output)
                     result= self.generic_dict[keyword](input,output)
+                if (keyword =='writetocell'):
+                    if message[0].isdigit() and message[0].isdigit():
+                        result= self.generic_dict[keyword](*message)
+                    else:
+                        err_msg=constants.ERROR_CODE_DICT['ERR_COL_ROW_NUMBER']
+                        result[3]=err_msg
+                        result[2]=None                
                 else:
                     result= self.generic_dict[keyword](*message)
             else:

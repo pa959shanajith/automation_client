@@ -179,21 +179,14 @@ class ExcelFile:
             if self.excel_path != None:
                 file_ext,res,err_msg=self.__get_ext(self.excel_path)
                 if res:
-                    if len(args)>0:
-                        rows_to_delete=[int(value) for value in args]
-                        rows_to_delete.insert(0,int(row))
-                        display_row=' and the rows are '+str(rows_to_delete)
-                    else:
-                        display_row=' and the row is '+str(row)                                         
-                    info_msg=generic_constants.INPUT_IS+self.excel_path+' '+(self.sheetname or '')+' and the row is '+display_row
-                    logger.print_on_console(info_msg)
-                    log.info(info_msg)
                     myfile = open(self.excel_path, "a+") # or "a+", whatever you need
                     myfile.close()
                     res,err_msg=self.dict['delete_row_'+file_ext](int(row),self.excel_path,self.sheetname,*args)
                     if res:
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
+                        info_msg="Specified row(s) are deleted"
+                        logger.print_on_console(info_msg)                        
             else:
                 err_msg=generic_constants.FILE_PATH_NOT_SET
         except IOError:
