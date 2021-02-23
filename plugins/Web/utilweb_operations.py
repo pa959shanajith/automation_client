@@ -903,28 +903,18 @@ class UtilWebKeywords:
         eleStatus=False
         local_uo.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
-            if(len(input)==3):
-                row_number=int(input[1])-1
-                col_number=int(input[2])-1
-                from table_keywords import TableOperationKeywords
-                tableops = TableOperationKeywords()
-                cell=tableops.javascriptExecutor(webelement,row_number,col_number)
-                element_list=cell.find_elements_by_xpath('.//*')
-                if len(list(element_list))>0:
-                    xpath=tableops.getElemntXpath(element_list[0])
-                    cell=browser_Keywords.local_bk.driver_obj.find_element_by_xpath(xpath)
-                if(cell!=None):
-                    webelement=cell
-                    eleStatus=True
-            elif(len(input)>3):
+            if(len(input)==5 and input[3]!='' and input[4]!=''):
                 webelement1=None
                 row_number=int(input[1])-1
                 col_number=int(input[2])-1
                 tag=input[3].lower()
                 index=int(input[4])
                 eleStatus, webelement1=self.get_table_cell(webelement, row_number, col_number, tag, index)
-                if(webelement1):
-                    webelement=webelement1
+                webelement=webelement1
+            else:
+                err_msg = 'Input Error: Invalid number of inputs'
+                logger.print_on_console(err_msg)
+                local_uo.log.error(err_msg)
                 
             if(eleStatus or len(input)==1):
                 if webelement != None and webelement !='':
@@ -963,29 +953,18 @@ class UtilWebKeywords:
         attr_name=input[0]
         local_uo.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
-            if(len(input)==4):
-                row_number=int(input[2])-1
-                col_number=int(input[3])-1
-                from table_keywords import TableOperationKeywords
-                tableops = TableOperationKeywords()
-                cell=tableops.javascriptExecutor(webelement,row_number,col_number)
-                element_list=cell.find_elements_by_xpath('.//*')
-                if len(list(element_list))>0:
-                    xpath=tableops.getElemntXpath(element_list[0])
-                    cell=browser_Keywords.local_bk.driver_obj.find_element_by_xpath(xpath)
-                if(cell!=None):
-                    webelement=cell
-                    eleStatus=True
-
-            elif(len(input)>4):
+            if(len(input)==6 and (input[4]!='' and input[5]!='')):
                 webelement1=None
                 row_number=int(input[2])-1
                 col_number=int(input[3])-1
                 tag=input[4].lower()
-                index=int(input[5])+1
+                index=int(input[5])
                 eleStatus, webelement1=self.get_table_cell(webelement, row_number, col_number, tag, index)
-                if(webelement1):
-                    webelement=webelement1
+                webelement=webelement1
+            else:
+                err_msg = 'Input Error: Invalid number of inputs'
+                logger.print_on_console(err_msg)
+                local_uo.log.error(err_msg)
 
             if(eleStatus or len(input)<=2):
                 if webelement != None and webelement !='':
@@ -998,11 +977,11 @@ class UtilWebKeywords:
                             original_attr = browser_Keywords.local_bk.driver_obj.execute_script("return arguments[0].getAttribute('required')",webelement)
                         if original_attr != None and original_attr !='':
                             local_uo.log.info(original_attr)
-                            if len(input)==2 and input[1] != '':
+                            if input[1] != '':
                                 result = input[1]
                                 if original_attr == result:
-                                    local_uo.log.info('Attribute values matched')
-                                    logger.print_on_console('Attribute values matched')
+                                    local_uo.log.info('Attribute exists and values matched')
+                                    logger.print_on_console('Attribute exists and values matched')
                                     status = TEST_RESULT_PASS
                                     methodoutput = TEST_RESULT_TRUE
                                 else:
