@@ -399,11 +399,11 @@ class MainNamespace(BaseNamespace):
             if check_execution_lic("scrape"): return None
             elif bool(cw.scrapewindow): return None
             global action, socketIO
+            core_utils.get_all_the_imports('IRIS')
             d = list(args)[0]
             if (type(d)==dict): action = d['action']
             else: action = None
             if action == 'update_dataset':
-                core_utils.get_all_the_imports('IRIS')
                 import iris_operations
                 iris_operations.update_dataset(d,socketIO)
             else:
@@ -425,11 +425,11 @@ class MainNamespace(BaseNamespace):
             if check_execution_lic("scrape"): return None
             elif bool(cw.scrapewindow): return None
             global action, socketIO
+            core_utils.get_all_the_imports('IRIS')
             d = list(args)[0]
             if (type(d)==dict): action = d['action']
             else: action = None
             if action == 'update_dataset':
-                core_utils.get_all_the_imports('IRIS')
                 import iris_operations
                 iris_operations.update_dataset(d,socketIO)
             else:
@@ -544,11 +544,11 @@ class MainNamespace(BaseNamespace):
             if check_execution_lic("scrape"): return None
             elif bool(cw.scrapewindow): return None
             global action, socketIO
+            core_utils.get_all_the_imports('IRIS')
             d = list(args)[0]
             if (type(d)==dict): action = d['action']
             else: action = None
             if action == 'update_dataset':
-                core_utils.get_all_the_imports('IRIS')
                 import iris_operations
                 iris_operations.update_dataset(d,socketIO)
             else:
