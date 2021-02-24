@@ -171,6 +171,7 @@ class Dispatcher:
             'verifyattribute': local_Wd.util_object.verify_attribute,
 
             'openbrowser':local_Wd.browser_object.openBrowser,
+            'getforegroundwindow':local_Wd.browser_object.get_foreground_window,
             'navigatetourl':local_Wd.browser_object.navigateToURL,
             'getpagetitle':local_Wd.browser_object.getPageTitle,
             'getcurrenturl':local_Wd.browser_object.getCurrentURL,

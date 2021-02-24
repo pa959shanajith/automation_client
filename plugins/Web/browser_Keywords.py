@@ -995,6 +995,29 @@ class BrowserKeywords():
         logger.print_on_console('Window handles size '+str(len(window_handles)))
         return window_handles
 
+    def get_foreground_window(self, *args):
+        status=webconstants.TEST_RESULT_FAIL
+        result=webconstants.TEST_RESULT_FALSE
+        output=OUTPUT_CONSTANT
+        err_msg=None
+        try:
+            if isinstance(local_bk.driver_obj,webdriver.Ie):
+                local_bk.driver_obj.maximize_window()
+                status=webconstants.TEST_RESULT_PASS
+                result=webconstants.TEST_RESULT_TRUE
+                output = "Success"
+            else:
+                print(local_bk.driver_obj.current_window_handle)
+                local_bk.driver_obj.switch_to.window(local_bk.driver_obj.current_window_handle)
+                status=webconstants.TEST_RESULT_PASS
+                result=webconstants.TEST_RESULT_TRUE
+                output = "Success"
+        except Exception as e:
+            err_msg = e
+            local_bk.log.error( err_msg )
+            logger.print_on_console( err_msg )
+        return status, result, output, err_msg
+
 
 class Singleton_DriverUtil():
 
