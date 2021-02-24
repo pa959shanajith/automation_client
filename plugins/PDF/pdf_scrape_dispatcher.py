@@ -30,8 +30,8 @@ class ScrapeDispatcher(wx.Frame):
             self.iconpath = os.environ["IMAGES_PATH"] + "/avo.ico"
             self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
             global obj
-##        obj = utils.Utils()
-##            self.utils_obj=utils.Utils()
+            # obj = utils.Utils()
+            # self.utils_obj=utils.Utils()
             self.core_utilsobject = core_utils.CoreUtils()
             self.parent = parent
             global windownametoscrape
@@ -42,14 +42,14 @@ class ScrapeDispatcher(wx.Frame):
             self.panel = wx.Panel(self)
             self.startbutton = wx.ToggleButton(self.panel, label="Start PDF",pos=(12,38 ), size=(175, 28))
             self.startbutton.Bind(wx.EVT_TOGGLEBUTTON, self.clickandadd)   # need to implement OnExtract()
-##            self.fullscrapebutton = wx.Button(self.panel, label="Full Scrape",pos=(12,38 ), size=(175, 28))
-##            self.fullscrapebutton.Bind(wx.EVT_BUTTON, self.clickandadd)   # need to implement OnExtract()
-##            import cropandadd
-##            global cropandaddobj
-##            cropandaddobj = cropandadd.Cropandadd()
-##            self.cropbutton = wx.ToggleButton(self.panel, label="Start IRIS",pos=(12,68 ), size=(175, 28))
-##            self.cropbutton.Bind(wx.EVT_TOGGLEBUTTON, self.cropandadd)
-##            self.Centre()
+            # self.fullscrapebutton = wx.Button(self.panel, label="Full Scrape",pos=(12,38 ), size=(175, 28))
+            # self.fullscrapebutton.Bind(wx.EVT_BUTTON, self.clickandadd)   # need to implement OnExtract()
+            # import cropandadd
+            # global cropandaddobj
+            # cropandaddobj = cropandadd.Cropandadd()
+            # self.cropbutton = wx.ToggleButton(self.panel, label="Start IRIS",pos=(12,68 ), size=(175, 28))
+            # self.cropbutton.Bind(wx.EVT_TOGGLEBUTTON, self.cropandadd)
+            # self.Centre()
             self.Centre()
             style = self.GetWindowStyle()
             self.SetWindowStyle( style|wx.STAY_ON_TOP )
@@ -93,8 +93,7 @@ class ScrapeDispatcher(wx.Frame):
                 img.save('pdf.png')
                 with open("pdf.png", "rb") as image_file:
                           encoded_string = base64.b64encode(image_file.read())
-
-##                d = json.loads(d);
+                # d = json.loads(d);
                 d['mirror'] =encoded_string.decode('UTF-8').strip()
             except Exception as e:
                 logger.print_on_console('Error occured while capturing Screenshot',e)
@@ -104,11 +103,10 @@ class ScrapeDispatcher(wx.Frame):
             else:
                 logger.print_on_console('Scraped data exceeds max. Limit.')
                 self.socketIO.emit('scrape','Response Body exceeds max. Limit.')
-
-    ##            wx.MessageBox('CLICKANDADD: Scrape completed', 'Info',wx.OK | wx.ICON_INFORMATION)
+                # wx.MessageBox('CLICKANDADD: Scrape completed', 'Info',wx.OK | wx.ICON_INFORMATION)
             self.Close()
             self.parent.schedule.Enable()
-    ##            event.GetEventObject().SetLabel("Start ClickAndAdd")
+            # event.GetEventObject().SetLabel("Start ClickAndAdd")
             logger.print_on_console('Click and add scrape  completed')
             pdfV.Destroy()
 
@@ -116,11 +114,11 @@ class ScrapeDispatcher(wx.Frame):
         state = event.GetEventObject().GetValue()
         global cropandaddobj
         if state == True:
-##            self.fullscrapebutton.Disable()
+            # self.fullscrapebutton.Disable()
             self.startbutton.Disable()
             pdfV = PDFViewer(None, size=(615,850))
             pdfV.Show()
-##            event.GetEventObject().SetLabel("Stop IRIS")
+            # event.GetEventObject().SetLabel("Stop IRIS")
             time.sleep(1)
             status = cropandaddobj.startcropandadd(self)
         else:
