@@ -477,7 +477,7 @@ class Controller():
             if keyword.lower() not in [CREATE_DYN_VARIABLE]:
                 inpval[0]=self.dynamic_var_handler_obj.replace_dynamic_variable(inpval[0],keyword,self)
             if len(inpval)>1 and keyword.lower() in [COPY_VALUE,MODIFY_VALUE]:
-                exch = keyword.lower() != COPY_VALUE
+                exch = keyword.lower() == COPY_VALUE
                 inpval[1]=self.dynamic_var_handler_obj.replace_dynamic_variable(inpval[1],'',self,no_exch_val=exch)
         else:
             if keyword.lower() in WS_KEYWORDS or keyword.lower() == 'navigatetourl':
@@ -894,7 +894,6 @@ class Controller():
         status=COMPLETED
         obj = handler.Handler()
         self.action=DEBUG
-        browser_active = True
         handler.local_handler.tspList=[]
         scenario=[json_data]
         print('=======================================================================================================')
@@ -908,17 +907,10 @@ class Controller():
             print('\n')
             tsplist = obj.read_step()
             for k in range(len(tsplist)):
-                if tsplist[k].name.lower() == 'openbrowser' and tsplist[k].apptype.lower()=='web' and (IGNORE_THIS_STEP not in tsplist[k].inputval[0].split(';')):
-                    tsplist[k].inputval = browser_type
-                    browser_active = False
-        if browser_active and browser_type and len(browser_type) > 0:
-            import browser_Keywords
-            driver_util = browser_Keywords.Singleton_DriverUtil()
-            if not driver_util.check_if_driver_exists_in_map(browser_type[0]):
-                status = TERMINATE
-                flag = False
-                logger.print_on_console('Requested browser not Active, please open browser.')
-                log.info('Invalid browser request')
+                if tsplist[k].apptype.lower()=='web':
+                    tsplist[k].browser_type = browser_type
+                    if tsplist[k].name.lower() == 'openbrowser' and (IGNORE_THIS_STEP not in tsplist[k].inputval[0].split(';')):
+                        tsplist[k].inputval = browser_type
         if flag:
             if runfrom_step > 0 and runfrom_step <= tsplist[len(tsplist)-1].stepnum:
                 self.conthread=mythread
@@ -1139,24 +1131,24 @@ class Controller():
                                 execute_flag=False
                             execution_env = json_data.get('exec_env', 'default').lower()
                             if execution_env == 'saucelabs':
-                            #     self.__load_web()
-                            #     import script_generator
+                                # self.__load_web()
+                                # import script_generator
                                 scenario_name=json_data['suitedetails'][suite_idx-1]["scenarioNames"][sc_idx]
                                 execution_env = {'env':'saucelabs','scenario':scenario_name}
-                            #     if not terminate_flag:
-                            #         saucelabs_obj=script_generator.SauceLabs_Operations(scenario_name,str(saucelabs_count))
-                            #         status=saucelabs_obj.complie_TC(tsplist,scenario_name,browser,str(saucelabs_count),execute_result_data,socketIO)
-                            #     if status==TERMINATE:
-                            #         terminate_flag=True
-                            #         msg='***Scenario'+str(sc_idx+ 1)+': '+scenario_name+' is Terminated ***'
-                            #         logger.print_on_console(msg)
-                            #     else:
-                            #         print('=======================================================================================================')
-                            #         logger.print_on_console( '***Scenario' ,str(sc_idx + 1) ,' execution completed***')
-                            #         print('=======================================================================================================')
-                            #     saucelabs_count += 1
-                            #     sc_idx += 1
-                            #     execute_flag=False
+                                # if not terminate_flag:
+                                #     saucelabs_obj=script_generator.SauceLabs_Operations(scenario_name,str(saucelabs_count))
+                                #     status=saucelabs_obj.complie_TC(tsplist,scenario_name,browser,str(saucelabs_count),execute_result_data,socketIO)
+                                # if status==TERMINATE:
+                                #     terminate_flag=True
+                                #     msg='***Scenario'+str(sc_idx+ 1)+': '+scenario_name+' is Terminated ***'
+                                #     logger.print_on_console(msg)
+                                # else:
+                                #     print('=======================================================================================================')
+                                #     logger.print_on_console( '***Scenario' ,str(sc_idx + 1) ,' execution completed***')
+                                #     print('=======================================================================================================')
+                                # saucelabs_count += 1
+                                # sc_idx += 1
+                                # execute_flag=False
                             else:
                                 execution_env = {'env':'default'}
                             if flag and execute_flag :

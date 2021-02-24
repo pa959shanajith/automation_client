@@ -143,10 +143,10 @@ class Handler():
         testcase_empty_flag = []
         empty_testcase_names=[]
         browser_type=[]
-        extract_path = []
+        extract_path = None
         if(data_param_path is not None and data_param_path != ''):
             data_param_path_temp = str(data_param_path)
-            extract_path.append(data_param_path_temp)
+            extract_path = [data_param_path_temp]
         #Iterating through json array
         appType=None
         for json_data in new_obj:
@@ -190,10 +190,7 @@ class Handler():
                 browser_type=json_data['browsertype']
             elif 'browserType' in json_data:
                 browser_type=json_data['browserType']
-        if(data_param_path is None or str(data_param_path).strip() == ''):
-            flag=self.create_list(script,testcasename_list,None,appType)
-        else:
-            flag=self.create_list(script,testcasename_list,extract_path,appType)
+        flag=self.create_list(script,testcasename_list,extract_path,appType)
         return flag,browser_type,len(script),testcase_empty_flag,empty_testcase_names
 
 
@@ -608,10 +605,7 @@ class Handler():
 
         for i in range(len(testcase_copy)):
             for x in testcase_copy[i]:
-                if extract_path == None:
-                    step=self.extract_field(x,local_handler.tspIndex2,testscript_name[i],i+1)
-                else:
-                    step=self.extract_field(x,local_handler.tspIndex2,testscript_name[i],i+1,extract_path)
+                step=self.extract_field(x, local_handler.tspIndex2, testscript_name[i], i+1, extract_path)
                 if step is not None and step != False:
                     local_handler.tspList.append(step)
                 elif step == False:

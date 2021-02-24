@@ -37,6 +37,7 @@ class TestStepProperty():
         self.cord=cord
         self.original_device_height = original_device_height
         self.original_device_width = original_device_width
+        self.browser_type = None
     def print_step(self):
         log.info(str(self.index)+' '+self.name+' '+str(self.inputval)+' '+self.testscript_name+' '+self.apptype)
 
