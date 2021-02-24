@@ -137,7 +137,7 @@ class LabelImage():
                     prediction_results[obj['custname']] = result[max(result.keys())]
                     prediction_results[obj['custname']] = prediction_results[obj['custname']][0].upper() + prediction_results[obj['custname']][1:]
                 else:
-                    prediction_results[obj['custname']] = 'UnrecognizableObject'
+                    prediction_results[obj['custname']] = 'unrecognizableobject'
             if(os.path.isfile(file_name)):
                 os.remove(file_name)
         except Exception as e:

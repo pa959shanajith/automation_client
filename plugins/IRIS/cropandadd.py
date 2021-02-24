@@ -152,11 +152,11 @@ class Cropandadd():
                 logger.print_on_console("Starting prediction...")
                 for i in range(0,len(self.data['view'])):
                     objectType = self.getobjectlabel({'custname': self.data['view'][i]['custname'],'cord':self.data['view'][i]['cord']})
-                    if(objectType): self.data['view'][i]['objectType'] = objectType[self.data['view'][i]['custname']]
-                    else:self.data['view'][i]['objectType'] = "UnrecognizableObject"
+                    if(objectType): self.data['view'][i]['objectType'] = str(objectType[self.data['view'][i]['custname']]).lower()
+                    else:self.data['view'][i]['objectType'] = "unrecognizableobject"
             elif(configvalues['prediction_for_iris_objects'].lower()=='no'):
                 for i in range(0,len(self.data['view'])):
-                    self.data['view'][i]['objectType'] = "UnrecognizableObject"
+                    self.data['view'][i]['objectType'] = "unrecognizableobject"
             return self.data
         except Exception as e:
             log.error("Error occured in stop IRIS, ERR_MSG : ", str(e))
