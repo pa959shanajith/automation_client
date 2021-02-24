@@ -27,7 +27,7 @@ cropandaddobj = None
 obj=None
 
 class ScrapeWindow(wx.Frame):
-    def __init__(self, parent, id, title, filePath, socketIO, irisFlag):
+    def __init__(self, parent, id, title, filePath, socketIO):
         self.uk=SapUtilKeywords()
         wx.Frame.__init__(self, parent, title=title,
                    pos = (300, 150), size = (210, 150), style=wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER | wx.MAXIMIZE_BOX | wx.CLOSE_BOX) )
@@ -45,7 +45,6 @@ class ScrapeWindow(wx.Frame):
         input_val.append(fileLoc)
         input_val.append(windowname)
         status = obj.launch_application(input_val)
-        self.irisFlag = irisFlag
         self.scrapeoptions = ['Full', 'Button', 'Textbox', 'Dropdown', 'Label', 'Radiobutton', 'Checkbox', 'Table', 'Scroll Bar', 'Tab', 'Shell', 'SContainer', 'Other Tags']
         self.tag_map = {'Full':'full','Button':'button', 'Textbox':'input', 'Dropdown':'select', 'Label':'label', 'Radiobutton':'radiobutton', 'Checkbox':'checkbox', 'Table':'table', 'Scroll Bar':'GuiScrollContainer', 'Tab':'GuiTab', 'Shell':'shell', 'SContainer':'scontainer', 'Other Tags':'others'}
         if ( status != TERMINATE ):
@@ -64,12 +63,12 @@ class ScrapeWindow(wx.Frame):
             except Exception as e:
                 log.error(e)
                 logger.print_on_console(e)
-            if ( irisFlag ):
-                import cropandadd
-                global cropandaddobj
-                cropandaddobj = cropandadd.Cropandadd()
-                self.cropbutton = wx.ToggleButton(self.panel, label = "Start IRIS", pos = (12, 78), size = (175, 25))
-                self.cropbutton.Bind(wx.EVT_TOGGLEBUTTON, self.cropandadd)
+
+            import cropandadd
+            global cropandaddobj
+            cropandaddobj = cropandadd.Cropandadd()
+            self.cropbutton = wx.ToggleButton(self.panel, label = "Start IRIS", pos = (12, 78), size = (175, 25))
+            self.cropbutton.Bind(wx.EVT_TOGGLEBUTTON, self.cropandadd)
             self.Centre()
             style = self.GetWindowStyle()
             self.SetWindowStyle( style | wx.STAY_ON_TOP )
@@ -84,8 +83,7 @@ class ScrapeWindow(wx.Frame):
         if ( state == True ):
             self.fullscrapebutton.Disable()
             self.fullscrapedropdown.Disable()
-            if ( self.irisFlag ):
-                self.cropbutton.Disable()
+            self.cropbutton.Disable()
             sap_scraping_obj.clickandadd('STARTCLICKANDADD')
             event.GetEventObject().SetLabel("Stop ClickAndAdd")
         else:
@@ -115,8 +113,7 @@ class ScrapeWindow(wx.Frame):
     def fullscrape(self, event):
         self.startbutton.Disable()
         self.fullscrapedropdown.Disable()
-        if ( self.irisFlag ):
-            self.cropbutton.Disable()
+        self.cropbutton.Disable()
         SapGui = self.uk.getSapObject()
         wndname = sap_scraping_obj.getWindow(SapGui)
         wnd_title = wndname.__getattr__("Text")

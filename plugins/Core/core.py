@@ -60,7 +60,6 @@ mobileWebScrapeFlag=False
 pdfScrapeFlag = False
 debugFlag = False
 oebsScrapeFlag = False
-irisFlag = True
 executionOnly=False
 socketIO = None
 allow_connect = False
@@ -400,11 +399,11 @@ class MainNamespace(BaseNamespace):
             if check_execution_lic("scrape"): return None
             elif bool(cw.scrapewindow): return None
             global action, socketIO
+            core_utils.get_all_the_imports('IRIS')
             d = list(args)[0]
             if (type(d)==dict): action = d['action']
             else: action = None
             if action == 'update_dataset':
-                core_utils.get_all_the_imports('IRIS')
                 import iris_operations
                 iris_operations.update_dataset(d,socketIO)
             else:
@@ -426,11 +425,11 @@ class MainNamespace(BaseNamespace):
             if check_execution_lic("scrape"): return None
             elif bool(cw.scrapewindow): return None
             global action, socketIO
+            core_utils.get_all_the_imports('IRIS')
             d = list(args)[0]
             if (type(d)==dict): action = d['action']
             else: action = None
             if action == 'update_dataset':
-                core_utils.get_all_the_imports('IRIS')
                 import iris_operations
                 iris_operations.update_dataset(d,socketIO)
             else:
@@ -545,11 +544,11 @@ class MainNamespace(BaseNamespace):
             if check_execution_lic("scrape"): return None
             elif bool(cw.scrapewindow): return None
             global action, socketIO
+            core_utils.get_all_the_imports('IRIS')
             d = list(args)[0]
             if (type(d)==dict): action = d['action']
             else: action = None
             if action == 'update_dataset':
-                core_utils.get_all_the_imports('IRIS')
                 import iris_operations
                 iris_operations.update_dataset(d,socketIO)
             else:
@@ -1491,8 +1490,7 @@ class Main():
             global sapScrapeFlag,debugFlag,browsername,action,oebsScrapeFlag
             global socketIO,data
             cw.schedule.Disable()
-            if(irisFlag == True):
-                core_utils.get_all_the_imports('IRIS')
+            core_utils.get_all_the_imports('IRIS')
             if mobileScrapeFlag==True:
                 cw.scrapewindow = mobileScrapeObj.ScrapeWindow(parent = cw,id = -1, title="Avo Assure - Mobile Scrapper",filePath = browsername,socketIO = socketIO)
                 mobileScrapeFlag=False
@@ -1500,17 +1498,17 @@ class Main():
                 cw.scrapewindow = mobileWebScrapeObj.ScrapeWindow(parent = cw,id = -1, title="Avo Assure - Mobile Scrapper",browser = browsername,socketIO = socketIO,action=action,data=data)
                 mobileWebScrapeFlag=False
             elif desktopScrapeFlag==True:
-                cw.scrapewindow = desktopScrapeObj.ScrapeWindow(parent = cw,id = -1, title="Avo Assure - Desktop Scrapper",filePath = browsername,socketIO = socketIO,irisFlag = irisFlag)
+                cw.scrapewindow = desktopScrapeObj.ScrapeWindow(parent = cw,id = -1, title="Avo Assure - Desktop Scrapper",filePath = browsername,socketIO = socketIO)
                 desktopScrapeFlag=False
                 browsername = ''
             elif sapScrapeFlag==True:
-                cw.scrapewindow = sapScrapeObj.ScrapeWindow(parent = cw,id = -1, title="Avo Assure - SAP Scrapper",filePath = browsername,socketIO = socketIO,irisFlag = irisFlag)
+                cw.scrapewindow = sapScrapeObj.ScrapeWindow(parent = cw,id = -1, title="Avo Assure - SAP Scrapper",filePath = browsername,socketIO = socketIO)
                 sapScrapeFlag=False
             elif oebsScrapeFlag==True:
-                cw.scrapewindow = oebsScrapeObj.ScrapeDispatcher(parent = cw,id = -1, title="Avo Assure - Oebs Scrapper",filePath = browsername,socketIO = socketIO,irisFlag = irisFlag)
+                cw.scrapewindow = oebsScrapeObj.ScrapeDispatcher(parent = cw,id = -1, title="Avo Assure - Oebs Scrapper",filePath = browsername,socketIO = socketIO)
                 oebsScrapeFlag=False
             elif pdfScrapeFlag==True:
-                cw.scrapewindow = pdfScrapeObj.ScrapeDispatcher(parent = cw,id = -1, title="Avo Assure - PDF Scrapper",filePath = browsername,socketIO = socketIO,irisFlag = irisFlag)
+                cw.scrapewindow = pdfScrapeObj.ScrapeDispatcher(parent = cw,id = -1, title="Avo Assure - PDF Scrapper",filePath = browsername,socketIO = socketIO)
                 pdfScrapeFlag=False
             elif debugFlag == True:
                 cw.debugwindow = clientwindow.DebugWindow(parent = cw,id = -1, title="Debugger")
@@ -1525,7 +1523,7 @@ class Main():
                     core_utils.get_all_the_imports('WebScrape')
                     sys.coinit_flags = 2
                     import web_scrape
-                    cw.scrapewindow = web_scrape.ScrapeWindow(parent = cw,id = -1, title="Avo Assure - Web Scrapper",browser = browsername,socketIO = socketIO,action=action,data=data,irisFlag = irisFlag)
+                    cw.scrapewindow = web_scrape.ScrapeWindow(parent = cw,id = -1, title="Avo Assure - Web Scrapper",browser = browsername,socketIO = socketIO,action=action,data=data)
                     browsername = ''
                 else:
                     import pause_display_operation

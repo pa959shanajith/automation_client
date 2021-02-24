@@ -816,12 +816,19 @@ class FileOperationsPDF:
                     endIndex=len(content)
                     log.info('Start string: '+str(start)+' End string: '+str(end))
                     if not start is '':
-                        startIndex=content.find(start)+len(start)
+                        if content.find(start) == -1:
+                            err_msg="Start string not found in the content"
+                            log.error(err_msg)
+                        else:
+                            startIndex=content.find(start)+len(start)
                     if not end is '':
                         endIndex=content.find(end)
-                    content=content[startIndex:endIndex]
-                    log.info('Content between Start and End string is ')
-                    ## logger.print_on_console('Content between Start and End string is ')
+                    if not(err_msg):
+                        content=content[startIndex:endIndex]
+                        log.info('Content between Start and End string is ')
+                        ## logger.print_on_console('Content between Start and End string is ')
+                        log.info(content)
+                        status=True
                 elif len(args)==1:
                     # with open(args[0],'w') as file:
                     #     file.write(content)
@@ -831,11 +838,16 @@ class FileOperationsPDF:
                     endIndex=len(content)
                     log.info('Start string: '+str(start))
                     if not start is '':
-                        startIndex=content.find(start)+len(start)
-                    content=content[startIndex:endIndex]
-                    log.info('Content after Start string is ')
-                log.info(content)
-                status=True
+                        if content.find(start) == -1:
+                            err_msg="Start string not found in the content"
+                            log.error(err_msg)
+                        else:
+                            startIndex=content.find(start)+len(start)
+                    if not(err_msg):
+                        content=content[startIndex:endIndex]
+                        log.info('Content after Start string is ')
+                        log.info(content)
+                        status=True
         # try:
         #         log.debug('Get the content of pdf file: '+str(input_path)+','+str(pagenumber))
         #         reader=PdfFileReader(open(input_path,'rb'))

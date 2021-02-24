@@ -32,7 +32,7 @@ obj = None
 visiblity_status = False
 
 class ScrapeWindow(wx.Frame):
-    def __init__(self, parent,id, title, filePath, socketIO, irisFlag):
+    def __init__(self, parent,id, title, filePath, socketIO):
         try:
             wx.Frame.__init__(self, parent, title = title,
                        pos = (300, 150), size = (210, 180), style = wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER | wx.MAXIMIZE_BOX | wx.CLOSE_BOX) )
@@ -69,7 +69,6 @@ class ScrapeWindow(wx.Frame):
                     input_val.append(int(pid))
                     input_val.append(5)
                     status = obj.find_window_and_attach_pid(input_val)
-            self.irisFlag = irisFlag
             self.scrapeoptions = ['Full', 'Button', 'Textbox', 'Dropdown', 'Tree', 'Radiobutton', 'Checkbox', 'Table', 'List', 'Tab', 'DateTimePicker', 'Other Tags']
             self.tag_map = {'Full':'full','Button':'button', 'Textbox':'input', 'Dropdown':'select', 'Tree':'tree', 'Radiobutton':'radiobutton', 'Checkbox':'checkbox', 'Table':'table', 'List':'list', 'Tab':'tab', 'DateTimePicker':'datepicker', 'Other Tags':'label'}
             self.delay_time=["0s","5s","10s","15s","20s","25s"]
@@ -97,12 +96,11 @@ class ScrapeWindow(wx.Frame):
                     self.scrapeDelaydropdown.SetEditable(False)
                     self.scrapeDelaydropdown.SetToolTip(wx.ToolTip( "Set delay time before start of scraping." ))
 
-                    if ( irisFlag ):
-                        import cropandadd
-                        global cropandaddobj
-                        cropandaddobj = cropandadd.Cropandadd()
-                        self.cropbutton = wx.ToggleButton(self.panel, label = "Start IRIS", pos=(12, 108), size = (175, 25))
-                        self.cropbutton.Bind(wx.EVT_TOGGLEBUTTON, self.cropandadd)
+                    import cropandadd
+                    global cropandaddobj
+                    cropandaddobj = cropandadd.Cropandadd()
+                    self.cropbutton = wx.ToggleButton(self.panel, label = "Start IRIS", pos=(12, 108), size = (175, 25))
+                    self.cropbutton.Bind(wx.EVT_TOGGLEBUTTON, self.cropandadd)
                     self.Centre()
                     style = self.GetWindowStyle()
                     self.SetWindowStyle( style|wx.STAY_ON_TOP )
@@ -143,8 +141,7 @@ class ScrapeWindow(wx.Frame):
                     self.fullscrapedropdown.Disable()
                     self.scrapeDelaydropdown.Disable()
                     self.visibilityCheck.Disable()
-                    if(self.irisFlag):
-                        self.cropbutton.Disable()
+                    self.cropbutton.Disable()
                     desktop_scraping_obj.clickandadd('STARTCLICKANDADD', self)
                     event.GetEventObject().SetLabel("Stop ClickAndAdd")
                     logger.print_on_console( 'click and add initiated, select the elements from AUT' )
@@ -198,8 +195,7 @@ class ScrapeWindow(wx.Frame):
             self.fullscrapedropdown.Disable()
             self.scrapeDelaydropdown.Disable()
             self.visibilityCheck.Disable()
-            if ( self.irisFlag ):
-                self.cropbutton.Disable()
+            self.cropbutton.Disable()
             if ( desktop_launch_keywords.app_uia != None and desktop_launch_keywords.app_win32 != None ):
                 time.sleep(self.delay_time_map[self.scrapeDelaydropdown.GetValue()])
                 data = {}
