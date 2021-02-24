@@ -143,10 +143,10 @@ class Handler():
         testcase_empty_flag = []
         empty_testcase_names=[]
         browser_type=[]
-        extract_path = []
+        extract_path = None
         if(data_param_path is not None and data_param_path != ''):
             data_param_path_temp = str(data_param_path)
-            extract_path.append(data_param_path_temp)
+            extract_path = [data_param_path_temp]
         #Iterating through json array
         appType=None
         for json_data in new_obj:
@@ -190,10 +190,7 @@ class Handler():
                 browser_type=json_data['browsertype']
             elif 'browserType' in json_data:
                 browser_type=json_data['browserType']
-        if(data_param_path is None or str(data_param_path).strip() == ''):
-            flag=self.create_list(script,testcasename_list,None,appType,browser_type)
-        else:
-            flag=self.create_list(script,testcasename_list,extract_path,appType,browser_type)
+        flag=self.create_list(script,testcasename_list,extract_path,appType)
         return flag,browser_type,len(script),testcase_empty_flag,empty_testcase_names
 
 
@@ -468,7 +465,7 @@ class Handler():
                 logger.print_on_console('Commented step '+str(step['stepNo']))
         return flag
 
-    def create_step(self,index,keyword,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo,i,remark,testcase_details,cord,original_device_height,original_device_width,extract_path=None,browser_type=None):
+    def create_step(self,index,keyword,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo,i,remark,testcase_details,cord,original_device_height,original_device_width,extract_path=None):
         """
         def : create_step
         purpose : creates an object of each step
@@ -531,13 +528,13 @@ class Handler():
                             objectname = left_part+';'+xpath_string[1]+';'+right_part
                     except Exception as e:
                         local_handler.log.error(e)
-                tsp_step=TestStepProperty(keyword,index,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo,i,remark,testcase_details,cord,original_device_height,original_device_width,browser_type)
+                tsp_step=TestStepProperty(keyword,index,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo,i,remark,testcase_details,cord,original_device_height,original_device_width)
         except Exception as e:
             logger.print_on_console(e)
             local_handler.log.error(e)
         return tsp_step
 
-    def extract_field(self,step,index,testscript_name,i,extract_path = None, browser_type = None):
+    def extract_field(self,step,index,testscript_name,i,extract_path = None):
         """
         def : extract_field
         purpose : extracts the value of each key present in test step json
@@ -575,11 +572,11 @@ class Handler():
         #check if the step is commented before adding to the tsplist
         if not (len(outputArray)>=1 and  '##' == outputArray[-1] ):
             local_handler.tspIndex2+=1
-            return self.create_step(local_handler.tspIndex2,keyword,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo,i,remark,testcase_details,cord, original_device_height, original_device_width,extract_path,browser_type)
+            return self.create_step(local_handler.tspIndex2,keyword,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo,i,remark,testcase_details,cord, original_device_height, original_device_width,extract_path)
         return None
 
 
-    def create_list(self,testcase,testscript_name,extract_path= None,appType=None,browser_type = None):
+    def create_list(self,testcase,testscript_name,extract_path= None,appType=None):
         """
         def : create_list
         purpose : appends each test case step into gloabl tsplist
@@ -608,10 +605,7 @@ class Handler():
 
         for i in range(len(testcase_copy)):
             for x in testcase_copy[i]:
-                if extract_path == None:
-                    step=self.extract_field(x, local_handler.tspIndex2, testscript_name[i], i+1, None, browser_type)
-                else:
-                    step=self.extract_field(x, local_handler.tspIndex2, testscript_name[i], i+1, extract_path, browser_type)
+                step=self.extract_field(x, local_handler.tspIndex2, testscript_name[i], i+1, extract_path)
                 if step is not None and step != False:
                     local_handler.tspList.append(step)
                 elif step == False:

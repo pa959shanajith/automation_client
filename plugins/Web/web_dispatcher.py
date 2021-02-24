@@ -54,6 +54,7 @@ class Dispatcher:
         local_Wd.util_object = utilweb_operations.UtilWebKeywords()
         local_Wd.statict_text_object = static_text_keywords.StaticTextKeywords()
         local_Wd.custom_object=custom_keyword.CustomKeyword()
+        # local_Wd.driver_util = browser_Keywords.Singleton_DriverUtil()
         
         local_Wd.browser_obj_sl = web_keywords.Browser_Keywords()
         local_Wd.browser_popup_obj_sl = web_keywords.Browser_Popup_Keywords()
@@ -339,41 +340,33 @@ class Dispatcher:
         url=teststepproperty.url.strip()
         keyword = teststepproperty.name
         keyword = keyword.lower()
-        if self.action == DEBUG:
-            if not self.check_browser_exists(keyword, teststepproperty.browser_type):
-                return [TEST_RESULT_FAIL,TEST_RESULT_FALSE,OUTPUT_CONSTANT,"Requested Browser not Available"]
-            if browser_Keywords.driver_pre != None:
-                browser_Keywords.local_bk.driver_obj=browser_Keywords.driver_pre
+        if self.action == DEBUG and browser_Keywords.driver_pre != None:
+            browser_Keywords.local_bk.driver_obj=browser_Keywords.driver_pre
         driver = browser_Keywords.local_bk.driver_obj
         self.wxObject=wxObject
         self.thread=mythread
         webelement = None
-        element = None
         err_msg=None
         configvalues = readconfig.configvalues
 
         local_Wd.log.info('In Web dispatcher')
         custom_dict={
-                    'getstatus': ['radio','checkbox'],
-                    'selectradiobutton': ['radio'],
-                    'selectcheckbox': ['checkbox'],
-                    'unselectcheckbox': ['checkbox'],
-
-                    'selectvaluebyindex':['dropdown','listbox'],
-                    'selectvaluebytext': ['dropdown','listbox'],
-                    'getallvalues':['dropdown','listbox'],
-                    'verifyallvalues': ['dropdown','listbox'],
-
-                    'settext': ['textbox','textarea','password','number','email','url'],
-                    'sendvalue':['textbox','textarea','password','number','email','url'],
-                    'gettext': ['textbox','textarea','password','number','email','url'],
-                    'setsecuretext':['textbox','password'],
-                    'sendsecurevalue':['textbox','password'],
-
-                    'getattributevalue':['radio','checkbox','dropdown','listbox','textbox','textarea','password','number','email','url','grid'],
-                    'verifyattribute':['radio','checkbox','dropdown','listbox','textbox','textarea','password','number','email','url','grid']
-
-                    }
+            'getstatus': ['radio','checkbox'],
+            'selectradiobutton': ['radio'],
+            'selectcheckbox': ['checkbox'],
+            'unselectcheckbox': ['checkbox'],
+            'selectvaluebyindex':['dropdown','listbox'],
+            'selectvaluebytext': ['dropdown','listbox'],
+            'getallvalues':['dropdown','listbox'],
+            'verifyallvalues': ['dropdown','listbox'],
+            'settext': ['textbox','textarea','password','number','email','url'],
+            'sendvalue':['textbox','textarea','password','number','email','url'],
+            'gettext': ['textbox','textarea','password','number','email','url'],
+            'setsecuretext':['textbox','password'],
+            'sendsecurevalue':['textbox','password'],
+            'getattributevalue':['radio','checkbox','dropdown','listbox','textbox','textarea','password','number','email','url','grid'],
+            'verifyattribute':['radio','checkbox','dropdown','listbox','textbox','textarea','password','number','email','url','grid']
+        }
         custom_dict_element={'element':['getobjectcount','getobject','clickelement','doubleclick','rightclick','getelementtext','verifyelementtext','drag', 'drop','gettooltiptext','verifytooltiptext','verifyexists', 'verifydoesnotexists', 'verifyhidden','verifyvisible', 'switchtotab','switchtowindow','setfocus','sendfunctionkeys',
             'tab','waitforelementvisible','mousehover','press','verifyenabled','verifydisabled','verifyreadonly','getattributevalue','verifyattribute','getrowcount','getcolumncount','getcellvalue','verifycellvalue','getcelltooltip','verifycelltooltip','cellclick','getrownumbytext','getcolnumbytext','getinnertable','selectbyabsolutevalue','horizontalscroll','verticalscroll']}
 
@@ -500,17 +493,26 @@ class Dispatcher:
 
 
         try:
+            browsername = ''
+            if browser_Keywords.local_bk.driver_obj is not None:
+                browsername = BROWSER_NAME_MAP[browser_Keywords.local_bk.driver_obj.name.strip()]
+            if self.action == DEBUG and keyword != 'openbrowser':
+                req_browsername = BROWSER_NAME.get(int(teststepproperty.browser_type[0]), 'N/A')
+                # v = local_Wd.driver_util.check_if_driver_exists_in_map(teststepproperty.browser_type[0])
+                # if not v or v == 'stale':
+                if req_browsername != browsername:
+                    err_msg = 'Requested browser not Active, please open browser'
+                    logger.print_on_console(err_msg)
+                    local_Wd.log.error(err_msg)
+                    result[3] = "Requested Browser not Available"
+                    return result
             window_ops_list=['click','press','doubleclick','rightclick','uploadfile','acceptpopup','dismisspopup','selectradiobutton','selectcheckbox','unselectcheckbox','cellclick','clickelement','drag','drop','settext','sendvalue','cleartext','setsecuretext','sendsecurevalue','selectvaluebyindex','selectvaluebytext','selectallvalues','selectmultiplevaluesbyindexes','selectmultiplevaluesbytext','verifyvaluesexists','deselectall','setfocus','mousehover','tab','sendfunctionkeys','rightclick','mouseclick','openbrowser','navigatetourl','refresh','closebrowser','closesubwindows','switchtowindow','clearcache','navigatewithauthenticate']
             if browser_Keywords.local_bk.driver_obj is not None:
                 browser_info=browser_Keywords.local_bk.driver_obj.capabilities
-                reporting_obj.browser_type=browser_info.get('browserName')
+                reporting_obj.browser_type=browsername
                 reporting_obj.browser_version=browser_info.get('version')
                 if(reporting_obj.browser_version == '' or reporting_obj.browser_version == None):
                     reporting_obj.browser_version= browser_info['browserVersion']
-                if(reporting_obj.browser_type=='MicrosoftEdge'):
-                    reporting_obj.browser_type = BROWSER_NAME[7]
-                elif(reporting_obj.browser_type=='msedge'):
-                    reporting_obj.browser_type = BROWSER_NAME[8]
             if execution_env['env'] == 'saucelabs' and teststepproperty.name in list(self.sauce_web_dict.keys()):  
                 if teststepproperty.custname=='@Browser' or teststepproperty.custname=='@BrowserPopUp': 
                     if(teststepproperty.name=="openBrowser"):
@@ -697,7 +699,6 @@ class Dispatcher:
             local_Wd.log.error(e,exc_info=True)
         return webElement
 
-
     def getwebelement(self,driver,objectname,stepnum,custname):
         ##objectname = str(objectname)
         global obj_flag
@@ -850,15 +851,3 @@ class Dispatcher:
         if isinstance(webElement,list):
             webElement=webElement[0]
         return webElement
-
-    def check_browser_exists(self, keyword_name, browser_type):
-        try:
-            import browser_Keywords
-            browser_keywords_available = True
-            driver_util = browser_Keywords.Singleton_DriverUtil()
-        except Exception as e:
-            browser_keywords_available = False
-        if keyword_name != 'openbrowser' and (not browser_keywords_available or not driver_util.check_if_driver_exists_in_map(browser_type[0]) or driver_util.check_if_driver_exists_in_map(browser_type[0]) == 'stale'):
-            logger.print_on_console('Requested browser not Active, please open browser.')
-            return False
-        return True

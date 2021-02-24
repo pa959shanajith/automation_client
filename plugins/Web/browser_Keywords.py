@@ -1009,7 +1009,7 @@ class Singleton_DriverUtil():
                     try:
                         if len (i.window_handles) > 0:
                             d = i
-                    except Exception as e:
+                    except:
                         d = 'stale'
                         break
         elif browserType == '2':
@@ -1018,7 +1018,7 @@ class Singleton_DriverUtil():
                     try:
                         if len (i.window_handles) > 0:
                             d = i
-                    except Exception as e:
+                    except:
                         d = 'stale'
                         break
         elif browserType == '3':
@@ -1030,7 +1030,7 @@ class Singleton_DriverUtil():
                             break
                         else:
                             d = i
-                    except Exception as e:
+                    except:
                         d = 'stale'
                         break
         elif browserType == '6':
@@ -1042,7 +1042,7 @@ class Singleton_DriverUtil():
                             break
                         else:
                             d = i
-                    except Exception as e:
+                    except:
                         d = 'stale'
                         break
         elif browserType == '7':
@@ -1054,7 +1054,7 @@ class Singleton_DriverUtil():
                             break
                         else:
                             d = i
-                    except Exception as e:
+                    except:
                         d = 'stale'
                         break
         elif browserType == '8':
@@ -1066,7 +1066,7 @@ class Singleton_DriverUtil():
                             break
                         else:
                             d = i
-                    except Exception as e:
+                    except:
                         d = 'stale'
                         break
         return d
