@@ -14,7 +14,7 @@ import json
 import time
 import logging
 from uuid import uuid4 as uuid
-from threading import Timer
+import threading
 import requests
 from urllib3.connection import HTTPConnection
 import socketIO_client
@@ -38,11 +38,60 @@ except:
 __all__ = ['SocketIO','BaseNamespace']
 
 
-""" Wrapper class for requests.adapters.HTTPAdapter
-    This is needed because this library doesn't have option to provide
-    socket_options or other kwargs to pass to pool manager.
-"""
+class CustomTimer(threading.Thread):
+    """ Call a function after a specified number of seconds just like threading.Timer \n
+        But this implementation accepts one extra argument called `interval`. \n
+        If interval is not passed then default value is assumed to be entire timeout duration. \n
+        So, instead of sleeping for entire timeout duration this thread sleep in intervals,
+        making it easier to terminate.
+    """
+    daemon = True
+    def __init__(self, timeout=0, callback=lambda *x:x, *args, **kwargs):
+        super(CustomTimer, self).__init__()
+        self.name = kwargs.pop('name', 'Timer_Thread')
+        assert type(timeout) in [int, float], "Timeout Value has to be a floating point number or a integer"
+        self.timeout = max(timeout, 0)
+        self.timeleft = timeout
+        self.chunk = kwargs.pop('interval', timeout)
+        assert callable(callback), "callback has to be a callable function"
+        if callback is not None and callable(callback):
+            self.callback = callback
+        self.args = args
+        self.kwargs = kwargs
+        self.terminate = threading.Event()
+
+    @property
+    def is_cancelled(self):
+        return self.terminate.is_set()
+
+    @property
+    def is_active(self):
+        return self.is_alive() and not self.is_cancelled
+
+    @property
+    def is_inactive(self):
+        return not self.is_active
+
+    def cancel(self):
+        self.terminate.set()
+
+    def run(self):
+        while not self.terminate.is_set() and self.timeleft > 0:
+            if self.timeleft < self.chunk:
+                self.terminate.wait(self.timeleft)
+            else:
+                self.terminate.wait(self.chunk)
+            self.timeleft -= self.chunk
+        if not self.terminate.is_set():
+            self.callback(*self.args, **self.kwargs)
+            self.terminate.set()
+
+
 class HTTPAdapterWithExtraOptions(requests.adapters.HTTPAdapter):
+    """ Wrapper class for requests.adapters.HTTPAdapter \n
+        This is needed because this library doesn't have option to provide
+        socket_options or other kwargs to pass to pool manager.
+    """
     def __init__(self, *args, **kwargs):
         self.socket_options = kwargs.pop("socket_options", None)
         self.assert_hostname = kwargs.pop("assert_hostname", None)
@@ -58,11 +107,11 @@ class HTTPAdapterWithExtraOptions(requests.adapters.HTTPAdapter):
         super(HTTPAdapterWithExtraOptions, self).init_poolmanager(*args, **kwargs)
 
 
-""" Override SocketIO library's _warn method used for logging.
-    This is needed because this library doesn't gives anything to stdout or stderr
-    on exception/warning. Hence Adding custom check and raising exception. Ref #1847.
-"""
 def socketIO_warn(self, msg, *attrs):
+    """ Override SocketIO library's _warn method used for logging. \n
+        This is needed because this library doesn't gives anything to stdout or stderr \n
+        on exception/warning. Hence Adding custom check and raising exception. Ref #1847.
+    """
     self._log(logging.WARNING, msg, *attrs)
     if (("[ssl: certificate_verify_failed]" in msg.lower()) or
         ('certificate verify failed' in msg.lower()) or
@@ -70,11 +119,11 @@ def socketIO_warn(self, msg, *attrs):
         raise ValueError("[Certificate Mismatch] "+ msg)
 
 
-""" Override SocketIO library's _transport method used for generating new Transport instance.
-    This is needed because this library opens new instance after invoking disconnect. Ref #1823.
-"""
 @property
 def socketIO_transport(self):
+    """ Override SocketIO library's _transport method used for generating new Transport instance. \n
+        This is needed because this library opens new instance after invoking disconnect. Ref #1823.
+    """
     if self._opened or self._should_stop_waiting():
         return self._transport_instance
     self._engineIO_session = self._get_engineIO_session()
@@ -85,18 +134,18 @@ def socketIO_transport(self):
     return self._transport_instance
 
 
-""" Add property to SocketIO library to check closing status of socketIO object """
 @property
 def socketIO_waiting_for_close(self):
+    """ Add property to SocketIO library to check closing status of socketIO object """
     return self._should_stop_waiting()
 
 
-""" Override SocketIO library's _close method used for closing a Transport instance.
-    This is needed because this library never actually closes the connection.
-    Ref: https://github.com/invisibleroads/socketIO-client/issues/176
-    Ref: https://github.com/invisibleroads/socketIO-client/pull/126
-"""
 def socketIO_close(self):
+    """ Override SocketIO library's _close method used for closing a Transport instance.\n
+        This is needed because this library never actually closes the connection. \n
+        Ref: https://github.com/invisibleroads/socketIO-client/issues/176 \n
+        Ref: https://github.com/invisibleroads/socketIO-client/pull/126
+    """
     self._wants_to_close = True
     try:
         self._heartbeat_thread.halt()
@@ -116,30 +165,30 @@ def socketIO_close(self):
     self._opened = False
 
 
-""" Add close method in transports.XHR_PollingTransport for closing a Transport instance connection.
-    This is needed because this library never actually closes the connection.
-    Ref: https://github.com/invisibleroads/socketIO-client/issues/176
-    Ref: https://github.com/invisibleroads/socketIO-client/pull/126
-"""
 def socketIO_XHR_close(self):
+    """ Add close method in transports.XHR_PollingTransport for closing a Transport instance connection. \n
+        This is needed because this library never actually closes the connection. \n
+        Ref: https://github.com/invisibleroads/socketIO-client/issues/176 \n
+        Ref: https://github.com/invisibleroads/socketIO-client/pull/126
+    """
     pass
 
 
-""" Add close method in transports.WebsocketTransport for closing a Transport instance connection.
-    This is needed because this library never actually closes the connection.
-    Ref: https://github.com/invisibleroads/socketIO-client/issues/176
-    Ref: https://github.com/invisibleroads/socketIO-client/pull/126
-"""
 def socketIO_WS_close(self):
+    """ Add close method in transports.WebsocketTransport for closing a Transport instance connection. \n
+        This is needed because this library never actually closes the connection. \n
+        Ref: https://github.com/invisibleroads/socketIO-client/issues/176 \n
+        Ref: https://github.com/invisibleroads/socketIO-client/pull/126
+    """
     self._connection.close()
 
 
-""" Override SocketIO library's parser._read_packet_length method used for reading packets.
-    This is needed because this library doesn't support Socket.io 2.x
-    Ref: https://github.com/invisibleroads/socketIO-client/compare/master...nexus-devs:master
-    Ref: https://github.com/invisibleroads/socketIO-client/pull/158
-"""
 def socketIO_read_packet_length(content, content_index):
+    """ Override SocketIO library's parser._read_packet_length method used for reading packets. \n
+        This is needed because this library doesn't support Socket.io 2.x \n
+        Ref: https://github.com/invisibleroads/socketIO-client/compare/master...nexus-devs:master \n
+        Ref: https://github.com/invisibleroads/socketIO-client/pull/158
+    """
     start = content_index
     while content.decode()[content_index] != ':':
         content_index += 1
@@ -147,23 +196,23 @@ def socketIO_read_packet_length(content, content_index):
     return content_index, int(packet_length_string)
 
 
-""" Override SocketIO library's parser._read_packet_text method used for reading packets.
-    This is needed because this library doesn't support Socket.io 2.x
-    Ref: https://github.com/invisibleroads/socketIO-client/compare/master...nexus-devs:master
-    Ref: https://github.com/invisibleroads/socketIO-client/pull/158
-"""
 def socketIO_read_packet_text(content, content_index, packet_length):
+    """ Override SocketIO library's parser._read_packet_text method used for reading packets. \n
+        This is needed because this library doesn't support Socket.io 2.x \n
+        Ref: https://github.com/invisibleroads/socketIO-client/compare/master...nexus-devs:master \n
+        Ref: https://github.com/invisibleroads/socketIO-client/pull/158
+    """
     while content.decode()[content_index] == ':':
         content_index += 1
     packet_text = content.decode()[content_index:content_index + packet_length]
     return content_index + packet_length, packet_text.encode()
 
 
-""" Override SocketIO library's transports.WebsocketTransport.__init__ method
-    used for creating websocket connection.
-    This is needed because this library doesn't support passing server certificate
-"""
 def socketIO_WS_init(self, http_session, is_secure, url, engineIO_session=None):
+    """ Override SocketIO library's transports.WebsocketTransport.__init__ method
+        used for creating websocket connection. \n
+        This is needed because this library doesn't support passing server certificate
+    """
     super(WebsocketTransport, self).__init__(
         http_session, is_secure, url, engineIO_session)
     params = dict(http_session.params, **{
@@ -202,10 +251,10 @@ def socketIO_WS_init(self, http_session, is_secure, url, engineIO_session=None):
         raise ConnectionError(e)
 
 
-""" Override SocketIO library's transports.get_response method used for processing
-    XHR-polling response. This is needed because this library doesn't handle NGINX 504 Error.
-"""
 def socketIO_get_response(request, *args, **kw):
+    """ Override SocketIO library's transports.get_response method used for processing
+        XHR-polling response. This is needed because this library doesn't handle NGINX 504 Error.
+    """
     try:
         response = request(*args, stream=True, **kw)
     except requests.exceptions.Timeout as e:
@@ -222,11 +271,11 @@ def socketIO_get_response(request, *args, **kw):
     return response
 
 
-""" Override SocketIO library's transports.prepare_http_session method used for creating
-    XHR-polling request. This is needed to provide extra options like disable hostname
-    verification or provide additional socket options.
-"""
 def socketIO_prepare_http_session(kw):
+    """ Override SocketIO library's transports.prepare_http_session method used for creating
+        XHR-polling request. This is needed to provide extra options like disable hostname
+        verification or provide additional socket options.
+    """
     http_session = prepare_http_session(kw)
     opts = {}
     verify_host = kw.get('assert_hostname', None)
@@ -238,10 +287,10 @@ def socketIO_prepare_http_session(kw):
     return http_session
 
 
-""" Override SocketIO library's wait method used for creating a blocking connection.
-    This is needed because this library doesn't handle empty packages.
-"""
 def socketIO_wait(self, seconds=None, **kw):
+    """ Override SocketIO library's wait method used for creating a blocking connection. \n
+        This is needed because this library doesn't handle empty packages.
+    """
     self._heartbeat_thread.hurry()
     self._heartbeat_thread.setName("socketIO_heartbeat")
     #self._transport.set_timeout(seconds=1)
@@ -277,18 +326,31 @@ def socketIO_wait(self, seconds=None, **kw):
     #self._transport.set_timeout()
 
 
-""" Add a ACK_EVENT listener in SocketIO library's socketIO_client.BaseNamespace class
-    This is needed to free up memory consumed by stored packet, send next packet in queue.
-"""
+def socketIO_send(self, data='', callback=None, **kw):
+    """ Override SocketIO library's send method used for sending eventless data. \n
+        This is needed because this library doesn't pass kwargs to actual emit.
+    """
+    kw['path'] = kw.get('path', '')
+    args = [data]
+    if callback:
+        args.append(callback)
+    self.emit('message', *args, **kw)
+
+
 def socketIO_on_data_ack(self, pack_id, *args):
+    """ Add a ACK_EVENT listener in SocketIO library's socketIO_client.BaseNamespace class \n
+        This is needed to free up memory consumed by stored packet, send next packet in queue.
+    """
     # log.info("Ack'd "+str(pack_id)+"\tLast_Sent: "+self._io.last_packet_sent)
     # Check if ack recieved matches with the packet sent, Only then process the ACK. Also match id_eof with id
     if (self._io.last_packet_sent != str(pack_id)) and (self._io.last_packet_sent.replace("_eof", '') != str(pack_id)): return None
-    if (self._io.activeTimer != None and self._io.activeTimer.isAlive()):
+    if self._io.activeTimer.is_active:
         self._io.activeTimer.cancel()
-        self._io.activeTimer = None
+    # if (self._io.activeTimer != None and self._io.activeTimer.alive):
+    #     self._io.activeTimer.cancel()
+    #     self._io.activeTimer = None
     # else:
-    #     log.error("Timer Fault.\tArg1-"+ str(self._io.activeTimer != None)+"\tArg2-"+str(self._io.activeTimer.isAlive() if self._io.activeTimer != None else False))
+    #     log.error("Timer Fault.\tArg1-"+ str(self._io.activeTimer != None)+"\tArg2-"+str(self._io.activeTimer.is_active))
     idx = pack_id.split('_')
     idx = idx[1] if len(idx) == 2 else None
     if idx == "eof": return None # EOF ACK packets always emit one more ACK. So ignore current one
@@ -303,24 +365,29 @@ def socketIO_on_data_ack(self, pack_id, *args):
 
 
 def socketIO_save_pckt(self, packid, event, *fargs, **fkw):
+    """ Helper function to save packets in db/memory before actually sending them. """
     fargs = (packid,) + fargs
     idx = packid.split('_')
     send_now = not store.has_packet
-    if not ("dnack" in fkw and fkw["dnack"]):
-        store.save_packet(int(idx[0]), (idx[1] if len(idx) == 2 else None), [event, fargs, fkw])
-    if send_now: self.send_pckt(event, *fargs, **fkw)
-    elif not (self.activeTimer != None and self.activeTimer.isAlive()):
-        pckt = store.get_packet(store.next_id)
-        if pckt: self.send_pckt(pckt[0], *pckt[1], **pckt[2])
+    store.save_packet(int(idx[0]), (idx[1] if len(idx) == 2 else None), [event, fargs, fkw])
+    if self.activeTimer.is_inactive:
+        if send_now:
+            self.send_pckt(event, *fargs, **fkw)
+        else:
+            pckt = store.get_packet(store.next_id)
+            if pckt: self.send_pckt(pckt[0], *pckt[1], **pckt[2])
 
 
-""" Override SocketIO library's emit method used for sending data.
-    This is needed because this library doesn't support packet size larger than 100 MB
-"""
 def socketIO_emit(self, event, *args, **kw):
+    """ Override SocketIO library's emit method used for sending data. \n
+        This is needed because this library doesn't support packet size larger than 100 MB
+    """
     pack_id = store.get_id
     if len(args) == 0 or (len(args) > 0 and type(args[0]) == bool):
-        self.save_pckt(pack_id, event, *args, **kw)
+        if kw.get('dnack', False):
+            self.send_pckt(pack_id, event, *args, **kw)
+        else:
+            self.save_pckt(pack_id, event, *args, **kw)
     else: # Check for pagination
         payload = args[0]
         stringify = False
@@ -343,25 +410,18 @@ def socketIO_emit(self, event, *args, **kw):
 
 
 def socketIO_send_pckt(self, event, *args, **kw):
-    # log.info("Sending: "+str(args[0]) + "\tThread Alive: "+str((self.activeTimer != None and self.activeTimer.isAlive())))
-    self.last_packet_sent = str(args[0])
-    if not ("dnack" in kw and kw["dnack"]):
-        self.activeTimer = Timer(PACKET_TIMEOUT, self.send_pckt, (event,) + args, kw)
-        self.activeTimer.setName("packet#"+str(args[0])+"_timeout")
+    """ Helper function to start timer before actually send packets. """
+    pktid = str(args[0])
+    # log.info("Sending: "+ pktid + "\tThread Alive: "+str(self.activeTimer.is_active))
+    if not kw.get('dnack', False):
+        self.last_packet_sent = pktid
+        self.activeTimer = CustomTimer(PACKET_TIMEOUT, self.send_pckt, event, *args, interval=2, name="packet#"+str(args[0])+"_timeout", **kw)
         self.activeTimer.start()
     try:
         self._emit(event, *args, **kw)
-    except:
-        pass
+    except Exception as e:
+        log.debug("Error while sending packet with id:"+pktid+", Error:", e)
     del args
-
-
-def socketIO_send(self, data='', callback=None, **kw):
-    if 'path' not in kw: kw['path'] = ''
-    args = [data]
-    if callback:
-        args.append(callback)
-    self.emit('message', *args, **kw)
 
 
 socketIO_client.parsers._read_packet_length = socketIO_read_packet_length
@@ -384,7 +444,7 @@ socketIO_client.SocketIO._close = socketIO_close
 socketIO_client.SocketIO._transport = socketIO_transport
 socketIO_client.SocketIO.waiting_for_close = socketIO_waiting_for_close
 socketIO_client.SocketIO.wait = socketIO_wait
-socketIO_client.SocketIO.activeTimer = None
+socketIO_client.SocketIO.activeTimer = CustomTimer()
 socketIO_client.SocketIO.last_packet_sent = None
 
 SocketIO = socketIO_client.SocketIO
