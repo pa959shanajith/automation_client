@@ -189,7 +189,7 @@ class Web_Accessibility_Testing:
         result = {} 
         result["status"] = "fail"
         #Add new standards here
-        rules_map = {"A":{'count': 10, 'name': 'A', 'pass': True, 'selected': False, 'tag': 'wcag2a'},"AA":{'count': 0, 'name': 'AA', 'pass': True, 'selected': False, 'tag': 'wcag2aa'},"508":{'count': 0, 'name': 'Section 508', 'pass': True, 'selected': False, 'tag': 'section508'},"Best Practice":{'count': 0, 'name': 'Best-Practice', 'pass': True, 'selected': False, 'tag': 'best-practice'}}
+        rules_map = {"aria":{'count': 10, 'name': 'Aria', 'pass': True, 'selected': False, 'tag': 'cat.aria'},"AAA":{'count': 10, 'name': 'AAA', 'pass': True, 'selected': False, 'tag': 'wcag2aaa'},"A":{'count': 10, 'name': 'A', 'pass': True, 'selected': False, 'tag': 'wcag2a'},"AA":{'count': 0, 'name': 'AA', 'pass': True, 'selected': False, 'tag': 'wcag2aa'},"508":{'count': 0, 'name': 'Section 508', 'pass': True, 'selected': False, 'tag': 'section508'},"Best Practice":{'count': 0, 'name': 'Best-Practice', 'pass': True, 'selected': False, 'tag': 'best-practice'}}
         #Enable standards to be tested
         for i in script_info["accessibility_parameters"]:
             rules_map[i]["selected"] = True
