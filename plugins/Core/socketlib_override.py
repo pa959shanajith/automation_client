@@ -265,7 +265,8 @@ def socketIO_get_response(request, *args, **kw):
         raise ConnectionError('could not negotiate SSL (%s)' % e)
     status_code = response.status_code
     if 200 != status_code:
-        if status_code == 504 and "Avo Assure Error" in response.text: raise ValueError("Avo Assure Server Unavailable")
+        if status_code == 504 and ("Avo Assure Error" in response.text or "Nineteen68 Error" in response.text):
+            raise ValueError("Avo Assure Server Unavailable")
         raise ConnectionError('unexpected status code (%s %s)' % (
             status_code, response.text))
     return response
@@ -420,7 +421,7 @@ def socketIO_send_pckt(self, event, *args, **kw):
     try:
         self._emit(event, *args, **kw)
     except Exception as e:
-        log.debug("Error while sending packet with id:"+pktid+", Error:", e)
+        log.error("Error while sending packet with id:"+pktid+" event:"+event+", Error:", e)
     del args
 
 
