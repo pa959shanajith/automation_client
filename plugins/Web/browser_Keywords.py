@@ -1007,7 +1007,6 @@ class BrowserKeywords():
                 result=webconstants.TEST_RESULT_TRUE
                 output = "Success"
             else:
-                print(local_bk.driver_obj.current_window_handle)
                 local_bk.driver_obj.switch_to.window(local_bk.driver_obj.current_window_handle)
                 status=webconstants.TEST_RESULT_PASS
                 result=webconstants.TEST_RESULT_TRUE
