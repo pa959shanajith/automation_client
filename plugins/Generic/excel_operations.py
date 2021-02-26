@@ -301,7 +301,10 @@ class ExcelFile:
                         col=int(col)
                     except Exception as e:
                         row=int(row)
-                        col=self.convertStringToInt(col)
+                        if col.isalpha():
+                            col=self.convertStringToInt(col)
+                        else:
+                            raise ValueError                     
                     if row>0 and col>0:
                         res,err_msg=self.dict['write_cell_'+file_ext](row,col,value,self.excel_path,self.sheetname,*args)
                         if res:
