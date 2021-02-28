@@ -69,9 +69,11 @@ class Cropandadd():
             def draw_rect(event,x,y,flags,param):
                 global ix,iy,drawing1,constant_image
                 if event == cv2.EVENT_LBUTTONDOWN:
+                    log.debug('Inside draw : Event1 - left button down')
                     drawing1 = True
                     ix,iy = x,y
                     if (flags == 9):
+                        log.debug('Inside draw : Event1 - setting const obj true')
                         constant_image = True
 
                 elif event == cv2.EVENT_MOUSEMOVE:
@@ -83,6 +85,7 @@ class Cropandadd():
                             cv2.rectangle(self.RGB_img,(ix,iy),(x,y),(0,255,0),1)
 
                 elif event == cv2.EVENT_LBUTTONUP:
+                    log.debug('Inside draw : Event3 - left button up')
                     drawing1 = False
                     self.data['scrapetype'] = 'caa'
                     RGB_img_crop = image_orig[iy:y,ix:x]
@@ -90,16 +93,21 @@ class Cropandadd():
                     with open("cropped.png", "rb") as imageFile:
                         RGB_img_crop_im = str(base64.b64encode(imageFile.read()))
                     if(ix!=x and iy!=y):
+                        log.debug('Inside draw : Event3 - if ix/x and iy/y are not equal')
                         if(constant_image):
+                            log.debug('Inside draw : Event3 - if constant obj set custname and tag')
                             custname = 'const_img_object_'+str(ix)+'_'+str(iy)+'_'+str(x)+'_'+str(y)
                             tag = 'constant'
                         else:
+                            log.debug('Inside draw : Event3 - if relative obj set custname and tag')
                             custname = 'img_object_'+str(ix)+'_'+str(iy)+'_'+str(x)+'_'+str(y)
                             tag = 'relative'
                         self.data['view'].append({'custname': custname,'cord':RGB_img_crop_im,'tag':tag,'width':abs(x-ix),'height':abs(y-iy),'top':iy,'left':ix,'xpath':'iris','objectType':''})
                     if(constant_image):
+                        log.debug('Inside draw : Event3 - constant obj - box colour red ')
                         cv2.rectangle(self.RGB_img,(ix,iy),(x,y),(0,0,255),1)
                     else:
+                        log.debug('Inside draw : Event3 - constant obj - box colour green ')
                         cv2.rectangle(self.RGB_img,(ix,iy),(x,y),(0,255,0),1)
                     self.RGB_img_c = np.copy(self.RGB_img)
                     self.RGB_img[(iy+1):(y-1),(ix+1):(x-1)]=image_orig[(iy+1):(y-1),(ix+1):(x-1)]
@@ -113,22 +121,30 @@ class Cropandadd():
             else:
                 cv2.moveWindow('image', width-1,height-1)
             cv2.setWindowProperty('image', cv2.WND_PROP_FULLSCREEN,cv2.WINDOW_FULLSCREEN)
-            flag = False
+
+            if SYSTEM_OS != 'Darwin':
+                SetForegroundWindow(find_window(title='image'))
             while(1):
                 cv2.imshow('image',self.RGB_img)
-                if(not flag):
-                    flag = True
-                    if SYSTEM_OS != 'Darwin':
-                        SetForegroundWindow(find_window(title='image'))
-                k = cv2.waitKey(1) & 0xFF
+                """cv2.waitKey : The waitkey() is a keyword binding function and it only accepts time in milliseconds as an argument.
+                   When you add any time as an argument , then it waits for the specified time and then the program continues.
+                   If o is passed , it waits indefinitely until a key is pressed.
+                   Note: wait key is set to 100 in AvoAssure, this was done as we noted in some machines(slow VDI's/RDP's) setting to
+                   1 milisecond caused the system to stress and scraping periods became unmanageably long.
+                """
+                cv2.waitKey(100)
                 if(controller.terminate_flag):
+                    log.debug('Terminating.....')
                     self.stopflag = True
                     cv2.destroyAllWindows()
+                    log.debug('Terminated')
                 if self.stopflag:
+                    log.debug('Clicked on stop.....')
                     if(os.path.isfile("test.png")):
                         os.remove("test.png")
                     if(os.path.isfile("cropped.png")):
                         os.remove("cropped.png")
+                    log.debug('Clicked on stop completed')
                     break
         except Exception as e:
             log.error("Error occured in capturing iris object, ERR_MSG : " + str(e))
@@ -136,8 +152,10 @@ class Cropandadd():
 
     def stopcropandadd(self):
         try:
+            log.debug('Inside stopcropandadd')
             im = PIL.ImageGrab.grab()
             im.save('out.png')
+            log.debug('out.png saved')
             with open("out.png", "rb") as imageFile:
                 self.data['mirror'] = base64.b64encode(imageFile.read()).decode('UTF-8').strip()
             os.remove('out.png')
