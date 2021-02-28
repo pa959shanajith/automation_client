@@ -422,7 +422,6 @@ class Dispatcher:
                                         absMatch=False  
                                         if input[-1]=='abs':
                                             absMatch=True 
-                                                                                    
                                         webelement=local_Wd.custom_object.getCustomobject(reference_element,input[0],input[1],input[2],teststepproperty.url,absMatch)
                                         local_Wd.log.debug(MSG_CUSTOM_FOUND)
                                         if getObjectFlag:

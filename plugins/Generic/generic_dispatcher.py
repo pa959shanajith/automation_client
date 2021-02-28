@@ -247,7 +247,7 @@ class GenericKeywordDispatcher:
                         var = str(output[0])[1:len(str(output[0]))-1]
                         output[0] = data[var][0]
                         output=';'.join(output)
-                    result= self.generic_dict[keyword](input,output)               
+                    result= self.generic_dict[keyword](input,output)
                 else:
                     result= self.generic_dict[keyword](*message)
             else:
