@@ -86,8 +86,8 @@ class CustomKeyword:
             local_ck.log.error(err_msg)
             logger.print_on_console(err_msg)
 
-    def find_object(self,array_index, ele_type, visible_text, url, ele_index,local_index):
-        return_list=browser_Keywords.local_bk.driver_obj.execute_script(CUSTOM_JS,'', array_index, ele_type, visible_text, ele_index,local_index)
+    def find_object(self,array_index, ele_type, visible_text, url, ele_index,local_index,absMatch):
+        return_list=browser_Keywords.local_bk.driver_obj.execute_script(CUSTOM_JS,'', array_index, ele_type, visible_text, ele_index,local_index,absMatch)
         if return_list[0] == 'null':
             return None
         elif return_list[0] == FOUND:
@@ -107,10 +107,10 @@ class CustomKeyword:
                 self.switch_to_iframe(url,"");
             else:
                 browser_Keywords.local_bk.driver_obj.switch_to.default_content()
-        return self.find_object(return_list[3], ele_type, visible_text, url, ele_index,return_list[2])
+        return self.find_object(return_list[3], ele_type, visible_text, url, ele_index,return_list[2],absMatch)
 
 
-    def getCustomobject(self,reference_ele,ele_type,visible_text,ele_index,url):
+    def getCustomobject(self,reference_ele,ele_type,visible_text,ele_index,url,absMatch):
         custom_element=None
         msg1='Element type is '+str(ele_type)
         coreutilsobj=core_utils.CoreUtils()
@@ -138,7 +138,7 @@ class CustomKeyword:
                     if ele_type in list(self.tagtype.keys()):
                         ele_type=self.tagtype.get(ele_type)
                     array_index=browser_Keywords.local_bk.driver_obj.execute_script(FIND_INDEX_JS,reference_ele)
-                    custom_element=self.find_object(array_index, ele_type, visible_text, url, ele_index,0);
+                    custom_element=self.find_object(array_index, ele_type, visible_text, url, ele_index,0,absMatch);
                     if custom_element is not None:
                         logger.print_on_console(MSG_CUSTOM_FOUND)
                         local_ck.log.info(MSG_CUSTOM_FOUND)

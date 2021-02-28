@@ -419,7 +419,10 @@ class Dispatcher:
                                     webelement=reference_element
                                 elif len(input)>=3:
                                     if (keyword in custom_dict and input[0].lower() in custom_dict[keyword]) or keyword in list(custom_dict_element.values())[0]:
-                                        webelement=local_Wd.custom_object.getCustomobject(reference_element,input[0],input[1],input[2],teststepproperty.url)
+                                        absMatch=False  
+                                        if input[-1]=='abs':
+                                            absMatch=True 
+                                        webelement=local_Wd.custom_object.getCustomobject(reference_element,input[0],input[1],input[2],teststepproperty.url,absMatch)
                                         local_Wd.log.debug(MSG_CUSTOM_FOUND)
                                         if getObjectFlag:
                                             input.pop()
