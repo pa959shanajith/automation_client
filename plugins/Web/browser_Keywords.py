@@ -995,6 +995,31 @@ class BrowserKeywords():
         logger.print_on_console('Window handles size '+str(len(window_handles)))
         return window_handles
 
+    def get_foreground_window(self, *args):
+        status=webconstants.TEST_RESULT_FAIL
+        result=webconstants.TEST_RESULT_FALSE
+        output=OUTPUT_CONSTANT
+        err_msg=None
+        try:
+            if isinstance(local_bk.driver_obj,webdriver.Ie):
+                local_bk.driver_obj.maximize_window()
+                status=webconstants.TEST_RESULT_PASS
+                result=webconstants.TEST_RESULT_TRUE
+                output = "Browser brought to foreground"
+            else:
+                local_bk.driver_obj.switch_to.window(local_bk.driver_obj.current_window_handle)
+                status=webconstants.TEST_RESULT_PASS
+                result=webconstants.TEST_RESULT_TRUE
+                output = "Browser brought to foreground"
+        except Exception as e:
+            err_msg = e
+            local_bk.log.error( err_msg )
+            if err_msg!= None:
+                logger.print_on_console( "Browser unavailable" )
+            else:
+                logger.print_on_console(output)
+        return status, result, output, err_msg
+
 
 class Singleton_DriverUtil():
 
@@ -1009,7 +1034,7 @@ class Singleton_DriverUtil():
                     try:
                         if len (i.window_handles) > 0:
                             d = i
-                    except Exception as e:
+                    except:
                         d = 'stale'
                         break
         elif browserType == '2':
@@ -1018,7 +1043,7 @@ class Singleton_DriverUtil():
                     try:
                         if len (i.window_handles) > 0:
                             d = i
-                    except Exception as e:
+                    except:
                         d = 'stale'
                         break
         elif browserType == '3':
@@ -1030,7 +1055,7 @@ class Singleton_DriverUtil():
                             break
                         else:
                             d = i
-                    except Exception as e:
+                    except:
                         d = 'stale'
                         break
         elif browserType == '6':
@@ -1042,7 +1067,7 @@ class Singleton_DriverUtil():
                             break
                         else:
                             d = i
-                    except Exception as e:
+                    except:
                         d = 'stale'
                         break
         elif browserType == '7':
@@ -1054,7 +1079,7 @@ class Singleton_DriverUtil():
                             break
                         else:
                             d = i
-                    except Exception as e:
+                    except:
                         d = 'stale'
                         break
         elif browserType == '8':
@@ -1066,7 +1091,7 @@ class Singleton_DriverUtil():
                             break
                         else:
                             d = i
-                    except Exception as e:
+                    except:
                         d = 'stale'
                         break
         return d

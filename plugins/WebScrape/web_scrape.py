@@ -22,7 +22,7 @@ visiblity_status=False
 
 class ScrapeWindow(wx.Frame):
 
-    def __init__(self, parent,id, title,browser,socketIO,action,data,irisFlag):
+    def __init__(self, parent,id, title,browser,socketIO,action,data):
         wx.Frame.__init__(self, parent, title=title,
                    pos=(300, 150),  size=(210, 180) ,style=wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER  |wx.MAXIMIZE_BOX|wx.CLOSE_BOX) )
         self.SetBackgroundColour('#e6e7e8')
@@ -40,7 +40,6 @@ class ScrapeWindow(wx.Frame):
         self.window_selected = False
         status = obj.openBrowser(browser)
         self.driver = browserops.driver
-        self.irisFlag = irisFlag
         self.scrape_type = None
         self.invalid_urls = ["about:blank","data:,",""]
         self.invalid_url_msg = "There is no URL in the browser selected or the URL is empty/blank. Please load the webpage and then start performing the desired action."
@@ -86,12 +85,11 @@ class ScrapeWindow(wx.Frame):
                     self.nextbutton.SetToolTip(wx.ToolTip("Select next window/tab"))
                     self.nextbutton.Hide()
 
-                    if(irisFlag):
-                        import cropandadd
-                        global cropandaddobj
-                        cropandaddobj = cropandadd.Cropandadd()
-                        self.cropbutton = wx.ToggleButton(self.panel, label="Start IRIS",pos=(12,108 ), size=(175, 25))
-                        self.cropbutton.Bind(wx.EVT_TOGGLEBUTTON, self.cropandadd)
+                    import cropandadd
+                    global cropandaddobj
+                    cropandaddobj = cropandadd.Cropandadd()
+                    self.cropbutton = wx.ToggleButton(self.panel, label="Start IRIS",pos=(12,108 ), size=(175, 25))
+                    self.cropbutton.Bind(wx.EVT_TOGGLEBUTTON, self.cropandadd)
 
                 elif(self.action == 'compare'):
                     try:
@@ -128,14 +126,12 @@ class ScrapeWindow(wx.Frame):
             self.fullscrapebutton.Disable()
             self.fullscrapedropdown.Disable()
             self.visibilityCheck.Disable()
-            if(self.irisFlag):
-                    self.cropbutton.Disable()
+            self.cropbutton.Disable()
             if len(self.driver.window_handles) > 1 and not self.window_selected:
                 self.fullscrapebutton.Hide()
                 self.visibilityCheck.Hide()
                 self.startbutton.Hide()
-                if(self.irisFlag):
-                    self.cropbutton.Hide()
+                self.cropbutton.Hide()
                 self.fullscrapedropdown.Hide()
                 self.nextbutton.Show()
                 self.resume_scraping_button.SetToolTip(wx.ToolTip("Resume " + self.scrape_type))
@@ -206,16 +202,14 @@ class ScrapeWindow(wx.Frame):
         else:
             self.scrape_type = "fullscrape"
             self.startbutton.Disable()
-            if(self.irisFlag):
-                self.cropbutton.Disable()
+            self.cropbutton.Disable()
 
             logger.print_on_console('Performing fullscrape using option: ',self.scrape_selected_option[0])
             if not isinstance(self.driver,webdriver.Ie) and len(self.driver.window_handles) > 1 and not self.window_selected:
                 self.fullscrapebutton.Hide()
                 self.startbutton.Hide()
                 self.visibilityCheck.Hide()
-                if(self.irisFlag):
-                    self.cropbutton.Hide()
+                self.cropbutton.Hide()
                 self.fullscrapedropdown.Hide()
                 self.nextbutton.Show()
                 self.resume_scraping_button.SetToolTip(wx.ToolTip("Resume " + self.scrape_type))
@@ -307,8 +301,7 @@ class ScrapeWindow(wx.Frame):
             self.perform_clickandadd()
             list(map(lambda button: button.Hide(), selector_window_buttons))
             list(map(lambda button: button.Show(), scrape_window_basic_buttons))
-            if(self.irisFlag):
-                self.cropbutton.Show()
+            self.cropbutton.Show()
             self.vsizer.Layout()
             self.window_selected = True
             self.startbutton.SetValue(True)

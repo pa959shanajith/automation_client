@@ -28,7 +28,7 @@ log = logging.getLogger('scrape_dispatcher.py')
 windownametoscrape = ''
 class ScrapeDispatcher(wx.Frame):
     logger.print_on_console("Enetering inside scrape window")
-    def __init__(self, parent,id, title,filePath,socketIO,irisFlag):
+    def __init__(self, parent,id, title,filePath,socketIO):
         wx.Frame.__init__(self, parent, title=title,
                    pos=(300, 150),  size=(210, 180) ,style = wx.CAPTION|wx.CLIP_CHILDREN )
         self.SetBackgroundColour('#e6e7e8')
@@ -39,7 +39,6 @@ class ScrapeDispatcher(wx.Frame):
         self.utils_obj=utils.Utils()
         self.scrape_obj=oebs_fullscrape.FullScrape()
         self.core_utilsobject = core_utils.CoreUtils()
-        self.irisFlag = irisFlag
         self.scrapeoptions = ['Full', 'Button', 'Textbox', 'Dropdown', 'Radiobutton', 'Checkbox', 'Table', 'List', 'InternalFrame', 'ScrollBar', 'Link', 'Other Tags']
         self.tag_map = {'Full':'full','Button':['push button','toggle button'], 'Textbox':['edit','Edit Box','text','password text'], 'Dropdown':'combo box', 'Radiobutton':'radio button', 'Checkbox':'check box', 'Table':'table', 'List':['list item','list'],'InternalFrame':'internal frame','ScrollBar':'scroll bar', 'Link':['hyperlink','Static'] , 'Other Tags':'element'}
         self.delay_time=["0s","5s","10s","15s","20s","25s"]
@@ -77,12 +76,11 @@ class ScrapeDispatcher(wx.Frame):
             self.scrapeDelaydropdown.SetEditable(False)
             self.scrapeDelaydropdown.SetToolTip(wx.ToolTip( "Set delay time before start of IRIS scraping." ))
 
-            if(irisFlag):
-                import cropandadd
-                global cropandaddobj
-                cropandaddobj = cropandadd.Cropandadd()
-                self.cropbutton = wx.ToggleButton(self.panel, label = "Start IRIS", pos=(12, 108), size = (175, 25))
-                self.cropbutton.Bind(wx.EVT_TOGGLEBUTTON, self.cropandadd)
+            import cropandadd
+            global cropandaddobj
+            cropandaddobj = cropandadd.Cropandadd()
+            self.cropbutton = wx.ToggleButton(self.panel, label = "Start IRIS", pos=(12, 108), size = (175, 25))
+            self.cropbutton.Bind(wx.EVT_TOGGLEBUTTON, self.cropandadd)
             self.Centre()
             style = self.GetWindowStyle()
             self.SetWindowStyle( style|wx.STAY_ON_TOP )
@@ -98,8 +96,7 @@ class ScrapeDispatcher(wx.Frame):
 
         if state == True:
             self.fullscrapebutton.Disable()
-            if(self.irisFlag):
-                self.cropbutton.Disable()
+            self.cropbutton.Disable()
     ##        self.comparebutton.Disable()
 
             event.GetEventObject().SetLabel("Stop ClickAndAdd")
@@ -146,8 +143,7 @@ class ScrapeDispatcher(wx.Frame):
     def fullscrape(self,event):
         logger.print_on_console('Performing full scrape')
         self.startbutton.Disable()
-        if(self.irisFlag):
-            self.cropbutton.Disable()
+        self.cropbutton.Disable()
         scrape_obj=oebs_fullscrape.FullScrape()
         logger.print_on_console(("windowname to scrape : ",windownametoscrape))
         try:

@@ -1700,7 +1700,7 @@ class ProxyConfig_window(wx.Frame):
 def check_update(flag):
     global update_obj
     SERVER_LOC = "https://" + str(configvalues['server_ip']) + ':' + str(configvalues['server_port']) + '/patchupdate/'
-    req_kw_args = ConnectionThread(None).get_ice_session(no_params=True)
+    req_kw_args = core.ConnectionThread(None).get_ice_session(no_params=True)
     req_kw_args.pop('assert_hostname', None)
 
     #------------------------------------------------------------getting server manifest

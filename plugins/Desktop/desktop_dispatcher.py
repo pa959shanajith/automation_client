@@ -77,6 +77,7 @@ class DesktopDispatcher:
         'minimizewindow' : launch_keywords_obj.minimize_window,
         'getpagetitle' : launch_keywords_obj.getPageTitle,
         'closeapplication' : launch_keywords_obj.closeApplication,
+        'getwindowtoforeground' : launch_keywords_obj.get_foreground_window,
         'verifyenabled' : util_keywords_obj.verifyEnabled,
         'verifydisabled' : util_keywords_obj.verifyDisabled,
         'verifyvisible' : util_keywords_obj.verifyVisible,
