@@ -861,6 +861,40 @@ class IRISKeywords():
                     time.sleep(0.25)
                     pyautogui.press('backspace')
                     flag = True
+                elif(args[0][0] == str(4)):
+                    try :
+                        i = int(args[0][1])
+                        if (i != 0 and i > 0 ):
+                            log.debug( 'Clearing text by method : Click element + End + Backspace X Index' )
+                            if ( win32api.GetKeyState(win32con.VK_NUMLOCK) == 1 ):
+                                pyautogui.press('numlock')
+                            pyautogui.click()
+                            pyautogui.press('end')
+                            time.sleep(0.25)
+                            pyautogui.press('backspace', presses = i)
+                            flag = True
+                        elif (i != 0 and i < 0 ):
+                            i = i*-1
+                            log.debug( 'Clearing text by method : Click element + Home(if index is negative) + Shift + Right X Index + Backspace' )
+                            if ( win32api.GetKeyState(win32con.VK_NUMLOCK) == 1 ):
+                                pyautogui.press('numlock')
+                            pyautogui.click()
+                            pyautogui.press('home')
+                            time.sleep(0.25)
+                            pyautogui.keyDown('shift')
+                            time.sleep(0.25)
+                            pyautogui.press('right',presses = i)
+                            time.sleep(0.25)
+                            pyautogui.keyUp('shift')
+                            time.sleep(0.25)
+                            pyautogui.press('backspace')
+                            flag = True
+                        else:
+                            flag = False
+                            err_msg = 'Input Error : Invalid input, index value must not be 0'
+                    except Exception as e:
+                        flag = False
+                        err_msg = 'Input Error : Invalid input'
                 else:
                     flag = False
                     err_msg = 'Invalid option'
