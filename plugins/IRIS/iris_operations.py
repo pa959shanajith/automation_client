@@ -17,6 +17,7 @@ import sys,math
 from uuid import uuid4
 import codecs
 from encryption_utility import AESCipher
+import win32api,win32con
 if SYSTEM_OS != 'Darwin':
     import win32clipboard
     from pyrobot import Robot
@@ -840,6 +841,8 @@ class IRISKeywords():
                     flag = True
                 elif(args[0][0] == str(2) ):
                     log.debug( 'Clearing text by method : Click element + Home + "Shift+End" + Backspace' )
+                    if ( win32api.GetKeyState(win32con.VK_NUMLOCK) == 1 ):
+                        pyautogui.press('numlock')
                     pyautogui.click()
                     pyautogui.press('home')
                     time.sleep(0.25)
@@ -849,6 +852,8 @@ class IRISKeywords():
                     flag = True
                 elif(args[0][0] == str(3) ):
                     log.debug( 'Clearing text by method : Click element + End + "Shift+Home" + Backspace' )
+                    if ( win32api.GetKeyState(win32con.VK_NUMLOCK) == 1 ):
+                        pyautogui.press('numlock')
                     pyautogui.click()
                     pyautogui.press('end')
                     time.sleep(0.25)
