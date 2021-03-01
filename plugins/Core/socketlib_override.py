@@ -131,6 +131,7 @@ def socketIO_transport(self):
     self._connect_namespaces()
     self._opened = True
     self._reset_heartbeat()
+    self._heartbeat_thread.setName("socketIO_heartbeat")
     return self._transport_instance
 
 
@@ -293,7 +294,6 @@ def socketIO_wait(self, seconds=None, **kw):
         This is needed because this library doesn't handle empty packages.
     """
     self._heartbeat_thread.hurry()
-    self._heartbeat_thread.setName("socketIO_heartbeat")
     #self._transport.set_timeout(seconds=1)
     #print(self._transport._connection.gettimeout())
     time.sleep(1)
@@ -321,8 +321,12 @@ def socketIO_wait(self, seconds=None, **kw):
                 namespace._find_packet_callback('disconnect')()
             except PacketError:
                 pass
-        except IndexError:  ## New Change
-            pass            ## New Change
+        except IndexError:
+            pass
+        except Exception as e:
+            log.error("Fatal Error in socketio. Error: " + str(e))
+            log.debug("Errorstack: ", exc_info=True)
+            raise
     self._heartbeat_thread.relax()
     #self._transport.set_timeout()
 
@@ -367,6 +371,7 @@ def socketIO_on_data_ack(self, pack_id, *args):
 
 def socketIO_save_pckt(self, packid, event, *fargs, **fkw):
     """ Helper function to save packets in db/memory before actually sending them. """
+    if fkw.get('dnack', False): return self.send_pckt(packid, event, *fargs, **fkw)
     fargs = (packid,) + fargs
     idx = packid.split('_')
     send_now = not store.has_packet
@@ -385,10 +390,7 @@ def socketIO_emit(self, event, *args, **kw):
     """
     pack_id = store.get_id
     if len(args) == 0 or (len(args) > 0 and type(args[0]) == bool):
-        if kw.get('dnack', False):
-            self.send_pckt(pack_id, event, *args, **kw)
-        else:
-            self.save_pckt(pack_id, event, *args, **kw)
+        self.save_pckt(pack_id, event, *args, **kw)
     else: # Check for pagination
         payload = args[0]
         stringify = False
@@ -397,7 +399,8 @@ def socketIO_emit(self, event, *args, **kw):
             payload = json.dumps(payload)
         size = len(payload)
         # Increasing 45 bytes in check limit (36 bytes for uuid, 2 bytes for separator, 7 bytes for index)
-        if not (size > CHUNK_MAX_LIMIT+45): self.save_pckt(pack_id, event, *args, **kw)
+        if not (size > CHUNK_MAX_LIMIT+45):
+            self.save_pckt(pack_id, event, *args, **kw)
         else: # Pagination begins
             sub_pack_id = str(uuid())
             blocks = int(size/CHUNK_SIZE) + 1
@@ -446,7 +449,7 @@ socketIO_client.SocketIO._transport = socketIO_transport
 socketIO_client.SocketIO.waiting_for_close = socketIO_waiting_for_close
 socketIO_client.SocketIO.wait = socketIO_wait
 socketIO_client.SocketIO.activeTimer = CustomTimer()
-socketIO_client.SocketIO.last_packet_sent = None
+socketIO_client.SocketIO.last_packet_sent = ""
 
 SocketIO = socketIO_client.SocketIO
 BaseNamespace = socketIO_client.BaseNamespace

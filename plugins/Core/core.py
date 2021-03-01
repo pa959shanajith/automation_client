@@ -1406,7 +1406,7 @@ class Main():
                     log.info('Sending socket disconnect request')
                     socketIO.send('unavailableLocalServer', dnack = True)
                 socketIO.disconnect()
-                if socketIO.activeTimer is not None and socketIO.activeTimer.isAlive():
+                if socketIO.activeTimer.is_active:
                     socketIO.activeTimer.cancel()
                 del socketIO
                 socketIO = None
