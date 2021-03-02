@@ -336,16 +336,17 @@ class ClientWindow(wx.Frame):
         controller.kill_process()
 
     def OnTerminate(self, event, state=''):
+        term_only = state != "term_exec"
         stat = self.killChildWindow(True,True,True,True)
         if stat[1]: core.socketIO.emit('scrape','Terminate')
-        if(state=="term_exec"):
+        if term_only:
+            msg = "---------Termination Started-------"
+            if root.gui: benchmark.stop(True)
+        else:
             controller.disconnect_flag=True
             print("")
             msg = "---------Terminating all active operations-------"
             if root.gui: benchmark.stop(False)
-        else:
-            msg = "---------Termination Started-------"
-            if root.gui: benchmark.stop(True)
         logger.print_on_console(msg,color="YELLOW")
         log.info(msg)
         controller.terminate_flag=True
@@ -374,7 +375,7 @@ class ClientWindow(wx.Frame):
             root.testthread.resume(False)
         self.schedule.Enable()
         core.execution_flag = False
-        core.set_ICE_status(one_time_ping = True)
+        core.set_ICE_status(one_time_ping = True, connect=term_only)
 
     def OnClear(self,event):
         self.log.Clear()
