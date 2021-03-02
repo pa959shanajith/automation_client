@@ -553,11 +553,10 @@ class BrowserKeywords():
                     cmd = cmd + 'adb.exe shell am force-stop "com.android.chrome"'
                     op = subprocess.check_output(cmd)
                     driver_obj = None
+                    status=webconstants_MW.TEST_RESULT_PASS
+                    result=webconstants_MW.TEST_RESULT_TRUE
                 else:
-                    driver_obj.close()
-                    driver_obj = None
-                status=webconstants_MW.TEST_RESULT_PASS
-                result=webconstants_MW.TEST_RESULT_TRUE
+                    err_msg='NO_ANDROID_HOME'
 
         except Exception as e:
             err_msg='exception in closing the browser'
