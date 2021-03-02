@@ -390,3 +390,34 @@ class UtilOperations:
         if err_msg!=None:
             logger.print_on_console(err_msg)
         return status,methodoutput,output,err_msg
+
+    def disableAnchorIris(self,*args):
+        """
+        Def : This function sets the global variables 'relativeCoordinates' and 'verifyFlag'
+              defined in ./plugins/IRIS/iris_operation.py to []/ False and 'iris_constant_step' defined
+              to ./plugins/Core/controller.py to -1 if they were set during runtime(basically if iris parent element
+              is already set this keywords will unset the parent).
+        Input : N/A
+        Output : Boolean
+        """
+        status = TEST_RESULT_FAIL
+        result = TEST_RESULT_FALSE
+        output = OUTPUT_CONSTANT
+        err_msg = None
+        try:
+            import iris_operations
+            import controller
+            if ( iris_operations.relativeCoordinates and iris_operations.verifyFlag and controller.iris_constant_step !=-1 ):
+                iris_operations.relativeCoordinates = []
+                iris_operations.verifyFlag = False
+                controller.iris_constant_step = -1
+                status=TEST_RESULT_PASS
+                result=TEST_RESULT_TRUE
+            else:
+                err_msg = 'Unable to find iris anchor element'
+        except Exception as e:
+            err_msg="Error occurred in disableAnchorIris, Err Msg : " + str(e)
+        if(err_msg):
+            log.error( err_msg )
+            logger.print_on_console(err_msg)
+        return status, result, output, err_msg

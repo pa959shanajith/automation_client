@@ -817,8 +817,8 @@ class FileOperationsPDF:
                     log.info('Start string: '+str(start)+' End string: '+str(end))
                     if not start is '':
                         if content.find(start) == -1:
+                            content = None
                             err_msg="Start string not found in the content"
-                            log.error(err_msg)
                         else:
                             startIndex=content.find(start)+len(start)
                     if not end is '':
@@ -839,8 +839,8 @@ class FileOperationsPDF:
                     log.info('Start string: '+str(start))
                     if not start is '':
                         if content.find(start) == -1:
+                            content = None
                             err_msg="Start string not found in the content"
-                            log.error(err_msg)
                         else:
                             startIndex=content.find(start)+len(start)
                     if not(err_msg):
@@ -877,19 +877,13 @@ class FileOperationsPDF:
         #         status=True
              else:
                 err_msg=generic_constants.INVALID_INPUT
-                log.error(err_msg)
 
         except ValueError as e:
             err_msg=generic_constants.INVALID_INPUT
-            log.error(e)
         except IOError as e:
             err_msg=constants.ERROR_CODE_DICT['ERR_FILE_NOT_ACESSIBLE']
-            log.error(e)
         except Exception as e:
             err_msg=generic_constants.ERR_MSG1+'Fetching PDF content'+generic_constants.ERR_MSG2
-            log.error(e)
         log.info('Status is '+str(status))
-        if err_msg!=None:
-            logger.print_on_console(err_msg)
         return status,content,err_msg
 

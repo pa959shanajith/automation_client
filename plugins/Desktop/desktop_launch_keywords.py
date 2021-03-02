@@ -706,23 +706,25 @@ class Launch_Keywords():
                         win32gui.SetForegroundWindow(aut_handle)
                         status = desktop_constants.TEST_RESULT_PASS
                         result = desktop_constants.TEST_RESULT_TRUE
-                        verb = "Success"
+                        verb = "Window with {} window name brought to foreground".format(args[2][0])
                     else:
                         win32gui.BringWindowToTop(aut_handle)
                         win32gui.ShowWindow(aut_handle,5)
                         win32gui.SetForegroundWindow(aut_handle)
                         status = desktop_constants.TEST_RESULT_PASS
                         result = desktop_constants.TEST_RESULT_TRUE
-                        verb = "Success"
+                        verb = "Window with {} window name brought to foreground".format(args[2][0])
                 else:
                     win32gui.BringWindowToTop(aut_handle)
                     win32gui.ShowWindow(aut_handle,1)
                     win32gui.SetForegroundWindow(aut_handle)
                     status = desktop_constants.TEST_RESULT_PASS
                     result = desktop_constants.TEST_RESULT_TRUE
-                    verb = "Success"
+                    verb = "Window with {} window name brought to foreground".format(args[2][0])
         except Exception as e:
             err_msg = e
             log.info( err_msg )
             logger.print_on_console( err_msg )
+        if result == "False":
+            logger.print_on_console("Window name specified is unavailable/does not exist")
         return status, result, verb, err_msg

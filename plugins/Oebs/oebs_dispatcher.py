@@ -118,6 +118,7 @@ class OebsDispatcher:
          try:
             dict={'findwindowandattach':self.utils_obj.find_window_and_attach,
                   'launchapplication':self.utils_obj.launch_application,
+                  'getwindowtoforeground':self.utils_obj.get_foreground_window,
                   'closeapplication':self.utils_obj.close_application,
                   'getobjectforcustom' : self.oebs_keywords.getobjectforcustom,
                   'drop'    : self.oebs_keywords.drop,

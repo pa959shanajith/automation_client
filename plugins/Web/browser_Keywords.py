@@ -1010,16 +1010,19 @@ class BrowserKeywords():
                 local_bk.driver_obj.maximize_window()
                 status=webconstants.TEST_RESULT_PASS
                 result=webconstants.TEST_RESULT_TRUE
-                output = "Success"
+                output = "Browser brought to foreground"
             else:
                 local_bk.driver_obj.switch_to.window(local_bk.driver_obj.current_window_handle)
                 status=webconstants.TEST_RESULT_PASS
                 result=webconstants.TEST_RESULT_TRUE
-                output = "Success"
+                output = "Browser brought to foreground"
         except Exception as e:
             err_msg = e
             local_bk.log.error( err_msg )
-            logger.print_on_console( err_msg )
+            if err_msg!= None:
+                logger.print_on_console( "Browser unavailable" )
+            else:
+                logger.print_on_console(output)
         return status, result, output, err_msg
 
 
