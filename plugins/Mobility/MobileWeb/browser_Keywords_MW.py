@@ -546,8 +546,16 @@ class BrowserKeywords():
                 driver_obj.quit()
                 driver_obj = None
             else:
-                driver_obj.close()
-                driver_obj = None
+                android_home = os.environ['ANDROID_HOME']
+                if android_home is not None:
+                    cmd = android_home + '\\platform-tools\\'
+                    os.chdir(cmd)
+                    cmd = cmd + 'adb.exe shell am force-stop "com.android.chrome"'
+                    op = subprocess.check_output(cmd)
+                    driver_obj = None
+                else:
+                    driver_obj.close()
+                    driver_obj = None
                 status=webconstants_MW.TEST_RESULT_PASS
                 result=webconstants_MW.TEST_RESULT_TRUE
 
