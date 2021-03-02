@@ -33,7 +33,7 @@ class CoreUtils():
                 datalength = len(json.dumps(inputdata))
             except:
                 try:
-                    datalength = str(inputdata)
+                    datalength = len(json.dumps(dict(inputdata)))
                 except:
                     datalength = sys.getsizeof(inputdata)
             log.info('Data size in bytes:')

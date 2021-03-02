@@ -618,7 +618,8 @@ class MainNamespace(BaseNamespace):
             if(responseHeader != None):
                 for key in responseHeader:
                     logger.print_on_console(key,'==========',responseHeader[key])
-                    log.info(key,'==========',responseHeader[key])
+                    log.info(key)
+                    log.info(responseHeader[key])
                     stringHeader = stringHeader + str(key) + ": " + str (responseHeader[key]) + "##"
             responseHeader = stringHeader
             logger.print_on_console('responseHeader after:::',responseHeader)
