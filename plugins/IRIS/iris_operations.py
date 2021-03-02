@@ -496,19 +496,37 @@ def update_dataset(image_data, socketIO):
     flag = False
     err = None
     data = 'fail'
+    DATASET_FOLDER_LIST = None
+    DATASET_FILE_LIST = None
+    delete_flag = False
     try:
         if ( PREDICTION_IMG_DIR != "Disabled" ):
-            DATASETPATH = PREDICTION_IMG_DIR
             if(image_data['type'] not in ['others','unrecognizableobject'] ):
                 mirror = get_byte_mirror(image_data['cord'])
-                filename = DATASETPATH + '/' + str(image_data['type']) + '/' + str(uuid4()).replace("-","") + ".png"
-                if (os.path.exists(DATASETPATH)):
-                    with open(filename,'wb') as f:
+                filename = str(image_data['id']) + ".png"
+                """Check if image is in PREDICTION_IMG_DIR if so then delete it"""
+                DATASET_FOLDER_LIST = os.listdir(PREDICTION_IMG_DIR)
+                for d in DATASET_FOLDER_LIST:
+                    DATASET_FILE_LIST = os.listdir(PREDICTION_IMG_DIR + '/' + str(d) )
+                    for f in DATASET_FILE_LIST:
+                        if ( f == filename ):
+                            log.debug('Similar dataset file found at object folder : ' + str(d) + ', deleting the dataset file ' + str(f))
+                            os.remove(PREDICTION_IMG_DIR + '/' + str(d) + '/' + str(f))
+                            log.debug('Deleted file ' + str(f) + ' from dataset folder ' + str(d))
+                            delete_flag = True
+                            break
+                if not (delete_flag):
+                    log.debug('File ' + str(filename) + 'not found in dataset directory')
+                """check if image is in PREDICTION_IMG_DIR if so then delete it"""
+                log.debug('Proceeding to save file ' + filename + ' to ' + 'dataset folder ' + str(image_data['type']))
+                filepath = PREDICTION_IMG_DIR + '/' + str(image_data['type']) + '/' + filename
+                if (os.path.exists(PREDICTION_IMG_DIR)):
+                    with open(filepath,'wb') as f:
                         f.write(base64.b64decode(mirror))
                     flag = True
                 else:
                     err = "Error occurred in update_dataset, Err_Msg : Dataset folder not found."
-                del mirror, filename # deleting variables
+                del mirror, filepath, filename # deleting variables
             else:
                 """When the selected type is others/unrecognizableobject"""
                 err = "No dataset avaliable for ObjectType : 'Others' "
@@ -516,14 +534,14 @@ def update_dataset(image_data, socketIO):
             err = "Unable to save iris image to object prediction dataset folder, since user does not have sufficient privileges"
     except Exception as e:
         err = "Error while updating dataset."
-        log.error("Error occurred in update_dataset, Err_Msg : ",e)
+        log.error("Error occurred in update_dataset, Err_Msg : " + str(e))
     if (flag == False and err):
         log.debug( err )
         logger.print_on_console( err )
     elif(flag):
         data = 'IRIS object saved succcessfully and added to object type : "' + str(image_data['type']) + '" in training data folder'
         logger.print_on_console( data )
-    del image_data # deleting variables
+    del image_data, flag, err, DATASET_FOLDER_LIST, DATASET_FILE_LIST, delete_flag # deleting variables
     socketIO.emit('scrape',data)
 
 def get_byte_mirror(element_cord):
@@ -785,9 +803,11 @@ class IRISKeywords():
         """
         Discription: Performs a clear text operation(keyboard-backspace) on the IRIS object, if VerifyExistIRIS is provided then uses that(IRIS object) as a parent reference, then finds the element to perform action.
         Input: Options: a. N/A or 0 - Clearing text by default method: Click element + "Ctrl+A" + Backspace
-                        b. 1 - 'Clearing text by method : Double click element + Backspace'
-                        c. 2 - 'Clearing text by method : Click element + Home + "Shift+End" + Backspace'
-                        d. 3 - 'Clearing text by method : Click element + End + "Shift+Home" + Backspace'
+                        b. 1 - Clearing text by method : Double click element + Backspace
+                        c. 2 - Clearing text by method : Click element + Home + "Shift+End" + Backspace
+                        d. 3 - Clearing text by method : Click element + End + "Shift+Home" + Backspace
+                        e. 4 - Clearing text by method if 2nd-input is positive integer : Click element + End + Backspace X 2nd-input
+                             - Clearing text by method if 2nd-input is negative integer : Click element + Home + Shift + Right X 2nd-input + Backspace
         OutPut: Boolean Value
         """
         log.info('Inside cleartextiris and No. of arguments passed are : '+str(len(args)))
