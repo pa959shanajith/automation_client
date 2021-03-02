@@ -497,12 +497,8 @@ def update_dataset(image_data, socketIO):
     err = None
     data = 'fail'
     try:
-        PREDICTION_CONFIG = os.environ["AVO_ASSURE_HOME"]+'/assets/PredictionMT/config.json'
-        if (os.path.exists(PREDICTION_CONFIG)):
-            config_file = open(PREDICTION_CONFIG, "r")
-            configs = json.load(config_file)
-            config_file.close()
-            DATASETPATH = os.environ["AVO_ASSURE_HOME"] +'/'+ configs['image_dir']
+        if ( PREDICTION_IMG_DIR != "Disabled" ):
+            DATASETPATH = PREDICTION_IMG_DIR
             if(image_data['type'] not in ['others','unrecognizableobject'] ):
                 mirror = get_byte_mirror(image_data['cord'])
                 filename = DATASETPATH + '/' + str(image_data['type']) + '/' + str(uuid4()).replace("-","") + ".png"
@@ -517,7 +513,7 @@ def update_dataset(image_data, socketIO):
                 """When the selected type is others/unrecognizableobject"""
                 err = "No dataset avaliable for ObjectType : 'Others' "
         else:
-            err = "Error occurred in update_dataset, Err_Msg : Prediction config.json missing"
+            err = "Unable to save iris image to object prediction dataset folder, since user does not have sufficient privileges"
     except Exception as e:
         err = "Error while updating dataset."
         log.error("Error occurred in update_dataset, Err_Msg : ",e)
