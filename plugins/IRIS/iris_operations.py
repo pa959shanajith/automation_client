@@ -1836,6 +1836,8 @@ class IRISKeywords():
                 err_msg = "Object not found."
                 relativeCoordinates = []
                 verifyFlag = False
+                import controller
+                controller.iris_constant_step = -1
                 log.info('verifyFlag set to False, Parent element unrecognised - all iris objects will be treated as regular IRIS elements.')
             if ( err_msg ):
                 log.info( err_msg )
@@ -1843,6 +1845,8 @@ class IRISKeywords():
         except Exception as e:
             relativeCoordinates = []
             verifyFlag = False
+            import controller
+            controller.iris_constant_step = -1
             log.info('verifyFlag set to Flase, Parent element unrecognised - all iris objects will be treated as regular IRIS elements.')
             err_msg = "Error occurred in VerifyExistsIris, Err_Msg : " + str(e)
             log.error( err_msg )
