@@ -64,7 +64,6 @@ class SAPDispatcher:
         "maximizedialogwindow": launch_keywords_obj.maximize_modal_window,
         "restoredialogwindow": launch_keywords_obj.restore_modal_window,
         "getdialogwindowname": launch_keywords_obj.getWindowName,
-        'getwindowtoforeground' : launch_keywords_obj.get_foreground_window,
         #------------------------------------------------------textbox keywords
         'settext' : editable_text_obj.setText,
         'setsecuretext' : editable_text_obj.setSecureText,
