@@ -138,7 +138,7 @@ class StepDescription:
         def add():
             return "Add the numbers '"+ input+"' and save the value '"+output +"' in '"+ tsp.outputval+"'"
         def evaluate():
-            return "Evaluate Mathematical expression '"+ input+"' and save the result '"+ output +"' in '"+ tsp.outputval+"'"
+            return "Evaluate Mathematical expression '"+ tsp.inputval[0]+"' and save the result '"+ output +"' in '"+ tsp.outputval+"'"
 
         #Compare keywords
         def verifyobjects():
