@@ -80,7 +80,7 @@ class JiraWindow():
                     else:
                         issue_dict = {'project': {'id': project_id},'summary': summary,'description': description,'issuetype': {'name': issue_type},'priority':{'name' : priority},'labels':label}
                     if(issue_type=='Sub-task'):
-                        issue_dict['parent']={'id':parentid}
+                        issue_dict['parent']={'key':parentid}
                     create_issues = jira.create_issue(issue_dict)
                     issue_id = create_issues.key
                     if attachement_path != '' and check == True:
