@@ -772,7 +772,7 @@ class Config_window(wx.Frame):
             self.rbox9.SetSelection(0)
         self.rbox9.SetToolTip(wx.ToolTip("Gives the user an option to bypass TLS certificate verification and/or" +
             " hostname verification of Avo Assure in case of unavailability of a valid certificate." +
-            "\nHigh: Enforce TLS Certificate and Hostname Verification\nMed: Enforce TLS Certificate and" + 
+            "\nHigh: Enforce TLS Certificate and Hostname Verification\nMed: Enforce TLS Certificate and" +
             " Disable Hostname Verification\nLow: Disable TLS Certificate and Hostname Verification"))
 
         self.rbox1 = wx.RadioBox(self.panel1, label = 'Ignore AUT Certificate', choices = lblList,
@@ -908,14 +908,33 @@ class Config_window(wx.Frame):
             self.rbox17.SetSelection(1)
         self.rbox17.SetToolTip(wx.ToolTip("Enables or disables Screen Recording"))
 
-        #Adding GridSizer which will show the radio buttons into grid of 9 rows and 2 colums it can be changed based on the requirements
-        self.gs=wx.GridSizer(9,2,5,5)
+        #adding the radio button for fullscreenshot for scrapping:
+        self.rbox18 = wx.RadioBox(self.panel1, label = "Full Screenshot", choices = lblList,
+            majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
+        if isConfigJson != False and isConfigJson['full_screenshot'].title() == lblList[0]:
+            self.rbox18.SetSelection(0)
+        else:
+            self.rbox18.SetSelection(1)
+        self.rbox18.SetToolTip(wx.ToolTip("Enables or disables Full Screenshot"))
+
+
+        #adding the radio button for disabling popup in browser:
+        self.rbox19 = wx.RadioBox(self.panel1, label = "Close Browser Popup", choices = lblList,
+            majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
+        if isConfigJson != False and isConfigJson['close_browser_popup'].title() == lblList[0]:
+            self.rbox19.SetSelection(0)
+        else:
+            self.rbox19.SetSelection(1)
+        self.rbox19.SetToolTip(wx.ToolTip("Enables or disables popup for Browser"))
+
+        #Adding GridSizer which will show the radio buttons into grid of 10 rows and 2 colums it can be changed based on the requirements
+        self.gs=wx.GridSizer(10,2,5,5)
         self.gs.AddMany([(self.rbox9,0,wx.EXPAND), (self.rbox1,0,wx.EXPAND), (self.rbox2,0,wx.EXPAND),
             (self.rbox5,0,wx.EXPAND), (self.rbox6,0,wx.EXPAND), (self.rbox3,0,wx.EXPAND),
             (self.rbox4,0,wx.EXPAND), (self.rbox8,0,wx.EXPAND), (self.rbox7,0,wx.EXPAND),
             (self.rbox10,0,wx.EXPAND), (self.rbox11,0,wx.EXPAND), (self.rbox12,0,wx.EXPAND),
             (self.rbox13,0,wx.EXPAND), (self.rbox14,0,wx.EXPAND), (self.rbox15,0,wx.EXPAND),
-            (self.rbox16,0,wx.EXPAND), (self.rbox17,0,wx.EXPAND)])
+            (self.rbox16,0,wx.EXPAND), (self.rbox17,0,wx.EXPAND), (self.rbox18,0,wx.EXPAND), (self.rbox19,0,wx.EXPAND)])
 
         #adding  GridSizer to bSizer which is a box sizer
         self.bSizer.Add(self.gs, 1, wx.EXPAND | wx.TOP, 5)
@@ -1012,6 +1031,8 @@ class Config_window(wx.Frame):
         delay_string_in = self.Delay_input.GetValue()
         clear_cache = self.rbox16.GetStringSelection()
         screen_rec = self.rbox17.GetStringSelection()
+        full_screenshot = self.rbox18.GetStringSelection()
+        close_browser_popup = self.rbox19.GetStringSelection()
         if extn_enabled == 'Yes' and headless_mode == 'Yes':
             self.error_msg.SetLabel("Extension Enable must be disabled when Headless Mode is enabled")
             self.error_msg.SetForegroundColour((255,0,0))
@@ -1048,6 +1069,8 @@ class Config_window(wx.Frame):
         data['delay_stringinput']=delay_string_in.strip()
         data['clear_cache']=clear_cache.strip()
         data['screen_rec']=screen_rec.strip()
+        data['full_screenshot']=full_screenshot.strip()
+        data['close_browser_popup']=close_browser_popup.strip()
         config_data=data
         if (data['server_ip']!='' and data['server_port']!='' and data['server_cert']!='' and
             data['chrome_path']!='' and data['queryTimeOut'] not in ['','sec'] and data['logFile_Path']!='' and
@@ -1316,7 +1339,7 @@ class About_window(wx.Frame):
             msg1='Avo Assure ICE '+ str(data['version']) + ' (64-bit)' +' \n'
             msg2='Updated on : '+ str(data['updated_on']) +' \n'
             msg3='For any queries write to us at support@avoautomation.com'+' \n'
-            msg4='© Avo Automation\n'
+            msg4='© Avo Automation\n'   
             #------------------------------------Different co-ordinates for Windows and Mac
             if SYSTEM_OS=='Windows':
                 upload_fields= {

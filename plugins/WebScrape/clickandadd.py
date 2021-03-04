@@ -25,6 +25,7 @@ import logging.config
 import logging
 import os
 import time
+import readconfig
 from selenium import webdriver
 from PIL import Image
 log = logging.getLogger('clickandadd.py')
@@ -143,7 +144,7 @@ class Clickandadd():
                         if temp is not None:
                             if in_iframe and rect is not None:
                                 for element in temp:
-                                    element['top'] = element['top'] + rect['y']                                    
+                                    element['top'] = element['top'] + rect['y']
                                     element['left'] = element['left'] + rect['x']
                             log.debug('Stop ClickAndAdd scrape operation on iframe %s is done', path)
                             tempne_stopclicknadd.extend(temp)
@@ -172,9 +173,13 @@ class Clickandadd():
             log.info('Stop ClickAndAdd scrape operation on frame/iframe pages is completed')
             driver.switch_to.window(currenthandle)
             driver.switch_to_default_content()
-
+            configvalues = readconfig.configvalues
+            full_screenshot = str(configvalues['full_screenshot'])
             if (isinstance(driver,webdriver.Firefox) or isinstance(driver,webdriver.Chrome) or isinstance(driver,webdriver.Edge)):
-                screen = webscrape_utils_obj.fullpage_screenshot(driver, screen_shot_path )
+                if ((str(full_screenshot).lower()) == 'yes'):
+                    screen = webscrape_utils_obj.fullpage_screenshot(driver, screen_shot_path)
+                else:
+                    screen = driver.get_screenshot_as_base64()
             else:
                 screen = driver.get_screenshot_as_base64()
             scrapedin = ''
