@@ -927,7 +927,7 @@ class Config_window(wx.Frame):
             self.rbox19.SetSelection(1)
         self.rbox19.SetToolTip(wx.ToolTip("Enables or disables popup for Browser"))
 
-        #Adding GridSizer which will show the radio buttons into grid of 9 rows and 2 colums it can be changed based on the requirements
+        #Adding GridSizer which will show the radio buttons into grid of 10 rows and 2 colums it can be changed based on the requirements
         self.gs=wx.GridSizer(10,2,5,5)
         self.gs.AddMany([(self.rbox9,0,wx.EXPAND), (self.rbox1,0,wx.EXPAND), (self.rbox2,0,wx.EXPAND),
             (self.rbox5,0,wx.EXPAND), (self.rbox6,0,wx.EXPAND), (self.rbox3,0,wx.EXPAND),
