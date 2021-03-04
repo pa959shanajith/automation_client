@@ -618,7 +618,8 @@ class MainNamespace(BaseNamespace):
             if(responseHeader != None):
                 for key in responseHeader:
                     logger.print_on_console(key,'==========',responseHeader[key])
-                    log.info(key,'==========',responseHeader[key])
+                    log.info(key)
+                    log.info(responseHeader[key])
                     stringHeader = stringHeader + str(key) + ": " + str (responseHeader[key]) + "##"
             responseHeader = stringHeader
             logger.print_on_console('responseHeader after:::',responseHeader)
@@ -795,6 +796,31 @@ class MainNamespace(BaseNamespace):
             constants.SCREENSHOT_PATH="Disabled"
             logger.print_on_console("Screenshot capturing disabled since user does not have sufficient privileges for screenshot folder\n")
             log.info("Screenshot capturing disabled since user does not have sufficient privileges for screenshot folder\n")
+        #----------------------------------------------------------------------Object Prediction Path
+        if args and len(args) >= 3:
+            predictionPath = args[3]
+            if(SYSTEM_OS=='Darwin'):
+                predictionPath = predictionPath["mac"]
+            else:
+                predictionPath = predictionPath["default"]
+            if len(predictionPath) != 0 and os.path.exists(predictionPath):
+                constants.PREDICTION_IMG_DIR = os.path.normpath(predictionPath) + OS_SEP
+                #check if folders exist, if they dont create:
+                check_list = ['button','checkbox','dropdown','textbox','hscroll','vscroll','image','label','listbox','radiobutton','table','tree']
+                for c in check_list:
+                    if (os.path.exists(constants.PREDICTION_IMG_DIR + str(c))):
+                        log.debug( str(c) + ' folder found in object prediction dataset path')
+                    else:
+                        try:
+                            log.debug( 'Creating folder ' + str(c) + ' in object prediction dataset path....')
+                            os.makedirs(constants.PREDICTION_IMG_DIR + str(c))
+                            log.debug( 'Created folder ' + str(c) + ' in object prediction dataset path')
+                        except Exception as e:
+                            log.error( 'Error occured during the creation of ' + str(c) + ' folder in dataset path, ERR_MSG : ' + str(e) )
+            else:
+                constants.PREDICTION_IMG_DIR="Disabled"
+                logger.print_on_console("Object Prediction Manual Training disabled since user does not have sufficient privileges for object prediction dataset folder\n")
+                log.info("Object Prediction Manual Training disabled since user does not have sufficient privileges for object prediction dataset folder\n")
 
     def on_generateFlowGraph(self,*args):
         try:

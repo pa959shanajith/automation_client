@@ -70,7 +70,8 @@ class WebservicesWSDL():
             ##    for methodindex in range(0,len(obt_list_method1)):
             ##       allmethodslist.append(str('SOAP1.2-'+obt_list_method[methodindex]))
             ##    log.info(allmethodslist)
-            log.info("List Of Operations:",allmethodslist)
+            log.info("List Of Operations:")
+            log.info(allmethodslist)
             logger.print_on_console('List Of Operations:::::',allmethodslist)
             return allmethodslist
         except Exception as e:

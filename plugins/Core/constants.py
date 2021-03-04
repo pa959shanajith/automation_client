@@ -513,3 +513,5 @@ if SYSTEM_OS == "Windows":
     EDGE_CHROMIUM_DRIVER_PATH += ".exe"
 
 if (os.path.exists(UPDATER_LOC[:-3] + "py")): UPDATER_LOC = UPDATER_LOC[:-3] + "py"
+
+PREDICTION_IMG_DIR = "Disabled"
