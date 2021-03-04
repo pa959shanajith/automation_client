@@ -262,14 +262,15 @@ class WSkeywords:
                 params=params.split('\n')
                 log.debug('params is split with newlines')
             param_dict={}
+            separator=':' if header else '='
             if header and self.baseReqHeader is not None and isinstance(self.baseReqHeader,dict):
                 param_dict=self.baseReqHeader
             elif self.req_params is not None and isinstance(self.req_params,dict):
                 param_dict=self.req_params
             #to support update of header multiple times
             for x in params:
-                if ':' in x:
-                    index=x.index(':')
+                if separator in x:
+                    index=x.index(separator)
                     param_dict[x[0:index].strip().lower()]=x[index+1:].strip()
             if len(param_dict) !=0:
                 if header:
@@ -337,7 +338,7 @@ class WSkeywords:
                     self.req_params[str(key).strip()]=str(value).strip()
                     log.info('Parameter set with %s : %s',key,value)
                     logger.print_on_console('Parameter set with '+key+' : '+value)
-                elif value.find('##') != -1 or value.find('\n') != -1  :
+                elif value.find('##') != -1 or value.find('\n') != -1 or value.find('=') != -1 :
                     self.buildRequest(value,header=False) 
                     log.info('Request Parameter has been set to :'+str(self.req_params))
                     logger.print_on_console('Request Parameter has been set to :',self.req_params)
