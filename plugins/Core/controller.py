@@ -1134,7 +1134,6 @@ class Controller():
                                 # import script_generator
                                 scenario_name=json_data['suitedetails'][suite_idx-1]["scenarioNames"][sc_idx]
                                 execution_env = {'env':'saucelabs','scenario':scenario_name}
-                                from datetime import datetime
                                 now=datetime.now()
                                 # if not terminate_flag:
                                 #     saucelabs_obj=script_generator.SauceLabs_Operations(scenario_name,str(saucelabs_count))
