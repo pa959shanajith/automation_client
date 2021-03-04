@@ -620,6 +620,8 @@ class UtilWebKeywords:
                         except Exception as e:
                             local_uo.log.debug('Operated using option 2',e)
                             webelement.send_keys(self.keys_info[input1.lower()])
+                        status=TEST_RESULT_PASS
+                        methodoutput=TEST_RESULT_TRUE
                     else:
                         local_uo.log.debug('It is a textbox')
                         #self.generic_sendfucntion_keys(input1.lower(),*args)
@@ -636,7 +638,7 @@ class UtilWebKeywords:
                         result = self.generic_sendfucntion_keys(*input)
                     else:
                         result = self.generic_sendfucntion_keys(input[0],*args)
-                if result[0]!="Fail":
+                if (result is not None) and (result[0]!="Fail"):
                     winhandcheck=browser_Keywords.BrowserKeywords()
                     winhandcheck.update_window_handles()
                     status=TEST_RESULT_PASS
@@ -911,10 +913,6 @@ class UtilWebKeywords:
                 index=int(input[4])
                 eleStatus, webelement1=self.get_table_cell(webelement, row_number, col_number, tag, index)
                 webelement=webelement1
-            else:
-                err_msg = 'Input Error: Invalid number of inputs'
-                logger.print_on_console(err_msg)
-                local_uo.log.error(err_msg)
                 
             if(eleStatus or len(input)==1):
                 if webelement != None and webelement !='':
@@ -937,6 +935,10 @@ class UtilWebKeywords:
                         err_msg = 'Failed to fetch the attribute value.'
                         logger.print_on_console(err_msg)
                         local_uo.log.error(err_msg)
+            else:
+                err_msg = 'Input Error: Invalid number of inputs'
+                logger.print_on_console(err_msg)
+                local_uo.log.error(err_msg)
         except Exception as e:
             err_msg = 'Error occured while fetching attribute value'
             logger.print_on_console(err_msg)
@@ -961,10 +963,6 @@ class UtilWebKeywords:
                 index=int(input[5])
                 eleStatus, webelement1=self.get_table_cell(webelement, row_number, col_number, tag, index)
                 webelement=webelement1
-            else:
-                err_msg = 'Input Error: Invalid number of inputs'
-                logger.print_on_console(err_msg)
-                local_uo.log.error(err_msg)
 
             if(eleStatus or len(input)<=2):
                 if webelement != None and webelement !='':
@@ -977,7 +975,7 @@ class UtilWebKeywords:
                             original_attr = browser_Keywords.local_bk.driver_obj.execute_script("return arguments[0].getAttribute('required')",webelement)
                         if original_attr != None and original_attr !='':
                             local_uo.log.info(original_attr)
-                            if input[1] != '':
+                            if len(input)==2 and input[1] != '':
                                 result = input[1]
                                 if original_attr == result:
                                     local_uo.log.info('Attribute exists and values matched')
@@ -1005,6 +1003,10 @@ class UtilWebKeywords:
                     err_msg = 'Web element not found'
                     logger.print_on_console(err_msg)
                     local_uo.log.error(err_msg)
+            else:
+                err_msg = 'Input Error: Invalid number of inputs'
+                logger.print_on_console(err_msg)
+                local_uo.log.error(err_msg)
         except NoSuchAttributeException as ex:
             err_msg = 'Attribute does not exixts'
             logger.print_on_console(err_msg)
