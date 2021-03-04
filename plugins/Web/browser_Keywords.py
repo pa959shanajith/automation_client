@@ -112,6 +112,7 @@ class BrowserKeywords():
                             win_name=local_bk.driver_obj.title+' — Mozilla Firefox'
                             if(win32gui.FindWindow(None,win_name)!=0):
                                 handle=win32gui.FindWindow(None,win_name)
+                                win32gui.ShowWindow(handle,3)
                                 win32gui.SetForegroundWindow(handle)
                         except:
                             pass 
