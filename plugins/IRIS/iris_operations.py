@@ -842,7 +842,7 @@ class IRISKeywords():
                 log.info('IRIS element recognised as a non-relative element')
                 res, width, height = gotoobject(element)
             if(len(res) > 0):
-                pythoncom.CoInitialize()
+                if SYSTEM_OS != 'Darwin': pythoncom.CoInitialize()
                 if (args[0][0] == None or args[0][0] == '' or args[0][0] == str(0)):
                     log.debug( 'Clearing text by default method: Click element + "Ctrl+A" + Backspace' )
                     pyautogui.click()
@@ -858,8 +858,9 @@ class IRISKeywords():
                     flag = True
                 elif(args[0][0] == str(2) ):
                     log.debug( 'Clearing text by method : Click element + Home + "Shift+End" + Backspace' )
-                    if ( win32api.GetKeyState(win32con.VK_NUMLOCK) == 1 ):
-                        pyautogui.press('numlock')
+                    if ( SYSTEM_OS != 'Darwin' ):
+                        if ( win32api.GetKeyState(win32con.VK_NUMLOCK) == 1 ):
+                            pyautogui.press('numlock')
                     pyautogui.click()
                     pyautogui.press('home')
                     time.sleep(0.25)
@@ -869,8 +870,9 @@ class IRISKeywords():
                     flag = True
                 elif(args[0][0] == str(3) ):
                     log.debug( 'Clearing text by method : Click element + End + "Shift+Home" + Backspace' )
-                    if ( win32api.GetKeyState(win32con.VK_NUMLOCK) == 1 ):
-                        pyautogui.press('numlock')
+                    if ( SYSTEM_OS != 'Darwin' ):
+                        if ( win32api.GetKeyState(win32con.VK_NUMLOCK) == 1 ):
+                            pyautogui.press('numlock')
                     pyautogui.click()
                     pyautogui.press('end')
                     time.sleep(0.25)
@@ -883,8 +885,9 @@ class IRISKeywords():
                         i = int(args[0][1])
                         if (i != 0 and i > 0 ):
                             log.debug( 'Clearing text by method : Click element + End + Backspace X Index' )
-                            if ( win32api.GetKeyState(win32con.VK_NUMLOCK) == 1 ):
-                                pyautogui.press('numlock')
+                            if ( SYSTEM_OS != 'Darwin' ):
+                                if ( win32api.GetKeyState(win32con.VK_NUMLOCK) == 1 ):
+                                    pyautogui.press('numlock')
                             pyautogui.click()
                             pyautogui.press('end')
                             time.sleep(0.25)
@@ -893,8 +896,9 @@ class IRISKeywords():
                         elif (i != 0 and i < 0 ):
                             i = i*-1
                             log.debug( 'Clearing text by method : Click element + Home(if index is negative) + Shift + Right X Index + Backspace' )
-                            if ( win32api.GetKeyState(win32con.VK_NUMLOCK) == 1 ):
-                                pyautogui.press('numlock')
+                            if ( SYSTEM_OS != 'Darwin' ):
+                                if ( win32api.GetKeyState(win32con.VK_NUMLOCK) == 1 ):
+                                    pyautogui.press('numlock')
                             pyautogui.click()
                             pyautogui.press('home')
                             time.sleep(0.25)

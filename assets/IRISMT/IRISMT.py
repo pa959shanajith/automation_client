@@ -20,6 +20,15 @@ AVO_ASSURE_HOME = os.path.normpath(str(os.getcwd())) + '/'
 LOC_7z = AVO_ASSURE_HOME + "Lib/7zip/7z.exe"
 
 '''
+    Setting Tesseract-OCR to environment
+'''
+try:
+    os.environ['PATH'] = AVO_ASSURE_HOME + '/Lib/Tesseract-OCR/tesseract.exe'
+    os.environ['PATH'] = AVO_ASSURE_HOME + '/Lib/Tesseract-OCR'
+except Exception as e:
+    print('ERROR occurred while setting path, please set path manually, paths to set in user env-variable :[AVO_ASSURE_HOME + /Lib/Tesseract-OCR/tesseract.exe, AVO_ASSURE_HOME + /Lib/Tesseract-OCR]')
+
+'''
     Config.json is accessed and stored in a variable to later access all the configuration values
 '''
 config_path = AVO_ASSURE_HOME + "assets/IRISMT/config.json"
