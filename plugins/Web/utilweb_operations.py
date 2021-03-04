@@ -620,6 +620,8 @@ class UtilWebKeywords:
                         except Exception as e:
                             local_uo.log.debug('Operated using option 2',e)
                             webelement.send_keys(self.keys_info[input1.lower()])
+                        status=TEST_RESULT_PASS
+                        methodoutput=TEST_RESULT_TRUE
                     else:
                         local_uo.log.debug('It is a textbox')
                         #self.generic_sendfucntion_keys(input1.lower(),*args)
