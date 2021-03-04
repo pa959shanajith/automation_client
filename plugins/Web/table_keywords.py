@@ -673,7 +673,7 @@ class TableOperationKeywords():
             if visibleFlag==True:
                 try:
                     local_tk.log.debug('reading the inputs')
-                    if (webElement.find_element_by_xpath('.//ancestor::lightning-datatable') != None and len(input_val) > 1):
+                    if (len(webElement.find_elements_by_xpath('.//ancestor::lightning-datatable')) >0) and (len(input_val) > 1):
                         row_number=int(input_val[0])
                         col_number=int(input_val[1])
                         row_count=self.getRowCountJs(webElement)

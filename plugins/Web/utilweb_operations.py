@@ -620,6 +620,8 @@ class UtilWebKeywords:
                         except Exception as e:
                             local_uo.log.debug('Operated using option 2',e)
                             webelement.send_keys(self.keys_info[input1.lower()])
+                        status=TEST_RESULT_PASS
+                        methodoutput=TEST_RESULT_TRUE
                     else:
                         local_uo.log.debug('It is a textbox')
                         #self.generic_sendfucntion_keys(input1.lower(),*args)
@@ -636,7 +638,7 @@ class UtilWebKeywords:
                         result = self.generic_sendfucntion_keys(*input)
                     else:
                         result = self.generic_sendfucntion_keys(input[0],*args)
-                if result[0]!="Fail":
+                if (result is not None) and (result[0]!="Fail"):
                     winhandcheck=browser_Keywords.BrowserKeywords()
                     winhandcheck.update_window_handles()
                     status=TEST_RESULT_PASS
