@@ -17,12 +17,13 @@ import sys,math
 from uuid import uuid4
 import codecs
 from encryption_utility import AESCipher
-import win32api,win32con
 if SYSTEM_OS != 'Darwin':
     import win32clipboard
     from pyrobot import Robot
     import pythoncom
     import pywinauto
+    import win32api
+    import win32con
 vertical = []
 horizontal = []
 relativeCoordinates = []
