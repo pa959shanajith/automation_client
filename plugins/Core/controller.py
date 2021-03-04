@@ -948,9 +948,9 @@ class Controller():
         qc_url=''
         qc_password=''
         qc_username=''
-        zephyr_accNo=''
-        zephyr_secKey=''
-        zephyr_acKey=''
+        zephyr_password=''
+        zephyr_username=''
+        zephyr_url=''
         con = Controller()
         obj = handler.Handler()
         status=COMPLETED
@@ -1057,17 +1057,16 @@ class Controller():
                                 qtest_suite=qc_sceanrio_data['qtestsuite']
                                 qtest_suiteid=qc_sceanrio_data['qtestsuiteid']
                             # if('integrationType' in qc_creds and qc_creds['integrationType'] == 'Zephyr'):
-                            if(qc_creds["zephyr"]["accountid"] != "" and len(scenario["qcdetails"]) != 0):
-                                zephyr_acKey=qc_creds["zephyr"]["accesskey"]
-                                zephyr_secKey=qc_creds["zephyr"]["secretkey"]
-                                zephyr_accNo=qc_creds["zephyr"]["accountid"]
+                            if(qc_creds["zephyr"]["url"] != "" and len(scenario["qcdetails"]) != 0):
+                                zephyr_url=qc_creds["zephyr"]["url"]
+                                zephyr_username=qc_creds["zephyr"]["username"]
+                                zephyr_password=qc_creds["zephyr"]["password"]
                                 zephyr_sceanrio_data=scenario['qcdetails'][integ]
                                 integ += 1
-                                zephyr_cycleid=zephyr_sceanrio_data['cycleid']
+                                zephyr_releaseid=zephyr_sceanrio_data['releaseid']
                                 zephyr_projectid=zephyr_sceanrio_data['projectid']
-                                zephy_versionid=zephyr_sceanrio_data['versionid']
+                                zephyr_treeid=zephyr_sceanrio_data['treeid']
                                 zephy_testid=zephyr_sceanrio_data['testid']
-                                zephy_issueid=zephyr_sceanrio_data['issueid']
 
                             #Iterating through each test case in the scenario
                             for testcase in [eval(scenario[scenario_id])]:
@@ -1365,28 +1364,26 @@ class Controller():
                                     log.error('Error in Updating qTest details '+str(e))
                                     logger.print_on_console('Error in Updating qTest details')
 
-                            # if (integration_type=="Zephyr" and zephyr_accNo!='' and zephyr_secKey!='' and  zephyr_acKey!=''):
-                            if len(scenario['qcdetails'])!=0 and qc_creds['zephyr']['accountid'] != '':
+                            # if (integration_type=="Zephyr" and zephyr_password!='' and zephyr_username!='' and  zephyr_url!=''):
+                            if len(scenario['qcdetails'])!=0 and qc_creds['zephyr']['url'] != '':
                                 zephyr_status_over=report_json[0]
                                 try:
                                     zephyr_status = {}
                                     zephyr_status['zephyraction']='zephyrupdate'
-                                    zephyr_status['cycleId']=zephyr_cycleid
-                                    zephyr_status['testId']=zephy_testid
-                                    zephyr_status['issueId']=zephy_issueid
+                                    zephyr_status['releaseid']=zephyr_releaseid
+                                    zephyr_status['testid']=zephy_testid
                                     zephyr_status['projectId']=zephyr_projectid
-                                    zephyr_status['versionId']=zephy_versionid
-                                    zephyr_status['zephyr_accNo']=zephyr_accNo
-                                    zephyr_status['zephyr_acKey']=zephyr_acKey
-                                    zephyr_status['zephyr_secKey']=zephyr_secKey
+                                    zephyr_status['treeid']=zephyr_treeid
+                                    zephyr_status['zephyr_accNo']=zephyr_password
+                                    zephyr_status['zephyr_acKey']=zephyr_url
+                                    zephyr_status['zephyr_secKey']=zephyr_username
                                     zephyr_update_status=zephyr_status_over['overallstatus']
-                                    zephyr_status['status']={}
                                     if(zephyr_update_status.lower()=='pass'):
-                                        zephyr_status['status']['id']='1'
+                                        zephyr_status['status']='1'
                                     elif(zephyr_update_status.lower()=='fail'):
-                                        zephyr_status['status']['id']='2'
+                                        zephyr_status['status']='2'
                                     elif(zephyr_update_status.lower()=='terminate'):
-                                        zephyr_status['status']['id']='5'
+                                        zephyr_status['status']='11'
                                     logger.print_on_console('****Updating Zephyr Details****')
                                     if zephyrObject is not None:
                                         zephry_update_status = zephyrObject.update_zephyr_test_details(zephyr_status)

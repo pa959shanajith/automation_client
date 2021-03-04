@@ -246,6 +246,7 @@ ERROR_CODE_DICT = {
                     'ERR_ELEMENT_EXISTS':'Element exists.',
                     'ERR_GET_COLUMN_COUNT_EXCEPTION':'Exception occured in getColumnCount.',
                     'ERR_ROW_COLUMN':'Row number and Column nunber shoud be greater than 0.',
+                    'ERR_ROW_COL_OUT_OF_RANGE':'Row number and column number should be within range',
                     'ERR_SAFARI_EXCEPTION':'This action cannot be performed in safari for encoded elements.',
                     'ERR_SET_FOCUS_EXCEPTION':'Exception occurred in setFocus.',
                     'ERR_ELEMENT_IS_NOT_READONLY':'Element is not readonly.',
