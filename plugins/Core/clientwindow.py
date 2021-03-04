@@ -908,7 +908,7 @@ class Config_window(wx.Frame):
             self.rbox17.SetSelection(1)
         self.rbox17.SetToolTip(wx.ToolTip("Enables or disables Screen Recording"))
 
-        #adding the fullscreenshot for scrapping:
+        #adding the radio button for fullscreenshot for scrapping:
         self.rbox18 = wx.RadioBox(self.panel1, label = "Full Screenshot", choices = lblList,
             majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
         if isConfigJson != False and isConfigJson['full_screenshot'].title() == lblList[0]:
@@ -918,7 +918,7 @@ class Config_window(wx.Frame):
         self.rbox18.SetToolTip(wx.ToolTip("Enables or disables Full Screenshot"))
 
 
-        #adding the fullscreenshot for scrapping:
+        #adding the radio button for disabling popup in browser:
         self.rbox19 = wx.RadioBox(self.panel1, label = "Close Browser Popup", choices = lblList,
             majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
         if isConfigJson != False and isConfigJson['close_browser_popup'].title() == lblList[0]:
