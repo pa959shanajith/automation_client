@@ -731,7 +731,7 @@ class BrowserKeywords():
         err_msg=None
         configvalue=readconfig.configvalues
         try:
-            if local_bk.driver_obj != None and isinstance(local_bk.driver_obj,webdriver.Ie) or isinstance(local_bk.driver_obj,webdriver.Edge):
+            if local_bk.driver_obj != None and isinstance(local_bk.driver_obj,webdriver.Ie) or local_bk.driver_obj.name=='MicrosoftEdge':
                 if((str(configvalue['bit_64']).lower())=='yes' and isinstance(local_bk.driver_obj,webdriver.Ie)):
                     import subprocess
                     command = ['RunDll32.exe', 'InetCpl.cpl,ClearMyTracksByProcess', '2']
@@ -759,14 +759,19 @@ class BrowserKeywords():
                         local_bk.log.error('No Cookies found')
                         err_msg = 'No Cookies found'
             #clear cache for chrome driver.
-            elif local_bk.driver_obj != None and isinstance(local_bk.driver_obj,webdriver.Chrome):
+            elif local_bk.driver_obj != None:
+                if isinstance(local_bk.driver_obj,webdriver.Chrome):
                     local_bk.driver_obj.get('chrome://settings/clearBrowserData')
                     time.sleep(2)
                     local_bk.driver_obj.execute_script('return document.querySelector("body > settings-ui").shadowRoot.querySelector("#container").querySelector("#main").shadowRoot.querySelector("settings-basic-page").shadowRoot.querySelector("settings-privacy-page").shadowRoot.querySelector("settings-clear-browsing-data-dialog").shadowRoot.querySelector("#clearBrowsingDataDialog").querySelector("#clearBrowsingDataConfirm").click();')
-                    logger.print_on_console('Cleared cache')
-                    local_bk.log.info('Cleared Cache')
-                    status=webconstants.TEST_RESULT_PASS
-                    result=webconstants.TEST_RESULT_TRUE
+                elif local_bk.driver_obj.name=='msedge':
+                    local_bk.driver_obj.get('edge://settings/clearBrowserData')
+                    time.sleep(2)
+                    local_bk.driver_obj.execute_script('return document.getElementById("clear-now").click();')
+                logger.print_on_console('Cleared cache')
+                local_bk.log.info('Cleared Cache')
+                status=webconstants.TEST_RESULT_PASS
+                result=webconstants.TEST_RESULT_TRUE
             else:
                 drv={ '2': 'Firefox', '3': 'Internet Explorer', '6': 'Safari', '7': 'Edge Legacy', '8': 'Edge Chromium'}
                 err_msg = "This function is not available for "+drv[self.browser_num]+'.'
