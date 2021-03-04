@@ -114,7 +114,7 @@ class BrowserKeywords():
                                 handle=win32gui.FindWindow(None,win_name)
                                 win32gui.SetForegroundWindow(handle)
                         except:
-                            pass 
+                            pass
                 else:
                     #instantiate new browser and add it to the map
                     local_bk.driver_obj = obj.getBrowser(self.browser_num)
@@ -1112,6 +1112,7 @@ class Singleton_DriverUtil():
         logger.print_on_console( 'BROWSER NUM: ',str(browser_num))
         configvalues = readconfig.configvalues
         headless_mode = str(configvalues['headless_mode'])=='Yes'
+        close_browser_popup = configvalues['close_browser_popup']
         if (browser_num == '1'):
             try:
                 chrome_path = configvalues['chrome_path']
@@ -1135,6 +1136,11 @@ class Singleton_DriverUtil():
                         choptions.binary_location=str(chrome_path)
                     if ((str(chrome_profile).lower()) != 'default'):
                         choptions.add_argument("user-data-dir="+chrome_profile)
+                    if ((str(close_browser_popup).lower()) == 'yes'):
+                        prefs = {}
+                        prefs["credentials_enable_service"] = False
+                        prefs["profile.password_manager_enabled"] = False
+                        choptions.add_experimental_option("prefs", prefs)
 
                     driver = webdriver.Chrome(executable_path=exec_path,chrome_options=choptions)
                     # driver.navigate().refresh()
@@ -1163,6 +1169,8 @@ class Singleton_DriverUtil():
                 firefox_options.set_preference("useAutomationExtension", False)
                 if headless_mode:
                     firefox_options.add_argument('--headless')
+                if ((str(close_browser_popup).lower()) == 'yes'):
+                        firefox_options.set_preference("credentials_enable_service", False)
                 exec_path = webconstants.GECKODRIVER_PATH
                 if(core.firefoxFlag == True):
                     if str(configvalues['firefox_path']).lower()!="default":
