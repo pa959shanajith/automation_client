@@ -342,7 +342,12 @@ class Dispatcher:
         keyword = teststepproperty.name
         keyword = keyword.lower()
         if self.action == DEBUG and browser_Keywords.driver_pre != None:
-            browser_Keywords.local_bk.driver_obj=browser_Keywords.driver_pre
+            browser_Keywords.local_bk.driver_obj = browser_Keywords.driver_pre
+            driver_util = browser_Keywords.Singleton_DriverUtil()
+            v = driver_util.check_if_driver_exists_in_map(teststepproperty.browser_type[0])
+            if v and v != 'stale':
+                browser_Keywords.local_bk.driver_obj = v                       
+                browser_Keywords.driver_pre = v
         driver = browser_Keywords.local_bk.driver_obj
         self.wxObject=wxObject
         self.thread=mythread
@@ -502,8 +507,6 @@ class Dispatcher:
                 browsername = BROWSER_NAME_MAP[browser_Keywords.local_bk.driver_obj.name.strip()]
             if self.action == DEBUG and keyword != 'openbrowser':
                 req_browsername = BROWSER_NAME.get(int(teststepproperty.browser_type[0]), 'N/A')
-                # v = local_Wd.driver_util.check_if_driver_exists_in_map(teststepproperty.browser_type[0])
-                # if not v or v == 'stale':
                 if req_browsername != browsername:
                     err_msg = 'Requested browser not Active, please open browser'
                     logger.print_on_console(err_msg)
