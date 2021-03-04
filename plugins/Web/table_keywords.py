@@ -998,14 +998,14 @@ class TableOperationKeywords():
                                   childindex = int(childindex)
                                   if tag=='button':
                                        local_tk.log.debug('clicking on button')
-                                       if( (tagName==('input') and tagType==('button')) or tagType==('submit') or tagType==('reset') or tagType==('file')):
-                                          if index==childindex:
-                                            eleStatus =True
-                                          else:
-                                            if counter==index:
-                                               index =childindex
-                                               eleStatus =True
-                                            else:
+                                       if( ((tagName==('input') or tagName==("button"))and tagType==('button')) or tagType==('submit') or tagType==('reset') or tagType==('file')):
+                                           if index==childindex:
+                                             eleStatus =True
+                                           else:
+                                             if counter==index:
+                                                index =childindex
+                                                eleStatus =True
+                                             else:
                                                 counter+=1
                                   elif tag=='image':
                                       local_tk.log.debug('clicking on image')
@@ -1224,7 +1224,7 @@ class TableOperationKeywords():
                                     childindex = int(childindex)
                                     if tag=='button':
                                         local_tk.log.debug('double clicking on button')
-                                        if( (tagName==('input') and tagType==('button')) or tagType==('submit') or tagType==('reset') or tagType==('file')):
+                                        if( ((tagName==('input')or tagName==('button')) and tagType==('button')) or tagType==('submit') or tagType==('reset') or tagType==('file')):
                                             if index==childindex:
                                                 eleStatus =True
                                             else:
