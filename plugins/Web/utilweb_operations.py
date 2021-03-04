@@ -374,7 +374,42 @@ class UtilWebKeywords:
         err_msg=None
         local_uo.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
-            if(webelement is not None and len(args[0]) == 2):
+            if len(webelement.find_elements_by_xpath('.//ancestor::lightning-datatable')) >0:
+                from table_keywords import TableOperationKeywords
+                tableops = TableOperationKeywords()
+                row_num=int(args[0][0])
+                col_num=int(args[0][1])
+                row_count=tableops.getRowCountJs(webelement)
+                col_count=tableops.getColoumnCountJs(webelement)
+                if row_num-1>row_count or col_num-1>col_count:
+                    local_tk.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                    err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                    logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                else:
+                    remoteWebElement=tableops.javascriptExecutor(webelement,row_num-1,col_num-1)
+                    child_ele=[]
+                    child_ele=remoteWebElement.find_elements_by_xpath('.//a')
+                    if(len(child_ele)==0):
+                        child_ele=remoteWebElement.find_elements_by_xpath('.//input')
+                        if(len(child_ele)==0):
+                            child_ele=remoteWebElement.find_elements_by_xpath('.//button')
+                            if(len(child_ele)==0):
+                                child_ele = remoteWebElement.find_elements_by_xpath('.//lightning-base-formatted-text')
+                                if(len(child_ele)==0):
+                                    child_ele = remoteWebElement.find_elements_by_xpath('.//lightning-formatted-date-time')
+                                    if(len(child_ele)==0):
+                                        child_ele = remoteWebElement.find_elements_by_xpath('.//lightning-formatted-number')
+                                        if(len(child_ele)==0):
+                                            child_ele = remoteWebElement.find_elements_by_xpath('.//lightning-formatted-email')
+                                            if(len(child_ele)==0):
+                                                child_ele = remoteWebElement.find_elements_by_xpath('.//lightning-formatted-phone')
+                                                if(len(child_ele)==0):
+                                                    child_ele = remoteWebElement.find_elements_by_xpath('.//lightning-formatted-url')
+                                                    if(len(child_ele)==0):
+                                                        child_ele = remoteWebElement.find_elements_by_xpath('.//lightning-formatted-location')
+                if(len(child_ele)>0):
+                    webelement=child_ele[0]
+            elif(webelement is not None and len(args[0]) == 2):
                 row = int(args[0][0])-1
                 col = int(args[0][1])-1
                 from table_keywords import TableOperationKeywords
@@ -386,7 +421,6 @@ class UtilWebKeywords:
                     cell=browser_Keywords.local_bk.driver_obj.find_element_by_xpath(xpath)
                 if(cell!=None):
                     webelement=cell
-
             elif(webelement is not None and len(args[0]) > 2):
                 row = int(args[0][0])-1
                 col = int(args[0][1])-1
@@ -705,10 +739,42 @@ class UtilWebKeywords:
                     tableops = TableOperationKeywords()
                     cell=tableops.javascriptExecutor(webelement,row_num,col_num)
                     element_list=cell.find_elements_by_xpath('.//*')
-                    if len(list(element_list))>0:
+                    if len(webelement.find_elements_by_xpath('.//ancestor::lightning-datatable')) >0:
+                        row_num=int(input[0])
+                        col_num=int(input[1])
+                        row_count=tableops.getRowCountJs(webelement)
+                        col_count=tableops.getColoumnCountJs(webelement)
+                        if row_num-1>row_count or col_num-1>col_count:
+                            local_tk.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                            err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                            logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                        else:
+                            remoteWebElement=tableops.javascriptExecutor(webelement,row_num-1,col_num-1)
+                            child_ele=[]
+                            child_ele=remoteWebElement.find_elements_by_xpath('.//a')
+                            if(len(child_ele)==0):
+                                child_ele=remoteWebElement.find_elements_by_xpath('.//input')
+                                if(len(child_ele)==0):
+                                    child_ele=remoteWebElement.find_elements_by_xpath('.//button')
+                                    if(len(child_ele)==0):
+                                        child_ele = remoteWebElement.find_elements_by_xpath('.//lightning-base-formatted-text')
+                                        if(len(child_ele)==0):
+                                            child_ele = remoteWebElement.find_elements_by_xpath('.//lightning-formatted-date-time')
+                                            if(len(child_ele)==0):
+                                                child_ele = remoteWebElement.find_elements_by_xpath('.//lightning-formatted-number')
+                                                if(len(child_ele)==0):
+                                                    child_ele = remoteWebElement.find_elements_by_xpath('.//lightning-formatted-email')
+                                                    if(len(child_ele)==0):
+                                                        child_ele = remoteWebElement.find_elements_by_xpath('.//lightning-formatted-phone')
+                                                        if(len(child_ele)==0):
+                                                            child_ele = remoteWebElement.find_elements_by_xpath('.//lightning-formatted-url')
+                                                            if(len(child_ele)==0):
+                                                                child_ele = remoteWebElement.find_elements_by_xpath('.//lightning-formatted-location')
+                        if(len(child_ele)>0):
+                            cell=child_ele[0]
+                    elif len(list(element_list))>0:
                         xpath=tableops.getElemntXpath(element_list[0])
                         cell=browser_Keywords.local_bk.driver_obj.find_element_by_xpath(xpath)
-
                     if(cell!=None):
                         local_uo.log.debug('checking for element enabled')
                         webelement=cell

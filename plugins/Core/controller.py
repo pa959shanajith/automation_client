@@ -1134,6 +1134,7 @@ class Controller():
                                 # import script_generator
                                 scenario_name=json_data['suitedetails'][suite_idx-1]["scenarioNames"][sc_idx]
                                 execution_env = {'env':'saucelabs','scenario':scenario_name}
+                                now=datetime.now()
                                 # if not terminate_flag:
                                 #     saucelabs_obj=script_generator.SauceLabs_Operations(scenario_name,str(saucelabs_count))
                                 #     status=saucelabs_obj.complie_TC(tsplist,scenario_name,browser,str(saucelabs_count),execute_result_data,socketIO)
@@ -1192,6 +1193,25 @@ class Controller():
                                 if len(accessibility_reports) > 0:
                                     execute_result_data["accessibility_reports"] = accessibility_reports
                                 execute_result_data['report_type'] = report_type
+                                if execution_env['env'] == 'saucelabs':
+                                    import web_keywords
+                                    self.obj = web_keywords.Sauce_Config()
+                                    self.obj.get_sauceconf()
+                                    sc = self.obj.get_sauceclient()
+                                    j = self.obj.get_saucejobs(sc)
+                                    all_jobs=j.get_jobs(start=int(now.timestamp()),full=True)
+                                    time.sleep(5)
+                                    import constants
+                                    if constants.SCREENSHOT_PATH  not in ['screenshot_path', 'Disabled']:
+                                        path = constants.SCREENSHOT_PATH+json_data['suitedetails'][0]['projectname']+os.sep+json_data['suitedetails'][0]['releaseid']+os.sep+json_data['suitedetails'][0]['cyclename']+os.sep+datetime.now().strftime("%Y-%m-%d")+os.sep
+                                        if not os.path.exists(path):
+                                            os.makedirs(path)
+                                        file_name = datetime.now().strftime("%Y%m%d%H%M%S")
+                                        video_path = path+"ScreenRecording_"+file_name+".mp4"
+                                        
+                                    for i in range(0,len(all_jobs)):
+                                        file_creations_status=j.get_job_asset_content(all_jobs[i]['id'],file_name,path)
+                                    execute_result_data['reportData']['overallstatus'][0]['video']=video_path
                                 socketIO.emit('result_executeTestSuite', execute_result_data)
                                 obj.clearList(con)
                                 sc_idx += 1
