@@ -622,13 +622,18 @@ class BrowserKeywords():
                         break
                 count = count - 2
                 if isinstance(local_bk.driver_obj,webdriver.Ie):
-                    import win32com.client
-                    wmi=win32com.client.GetObject('winmgmts:')
-                    proc=wmi.ExecQuery('select * from Win32_Process where Name="IEDriverServer64.exe"')
-                    if len(proc)>0:
-                        for i in proc:
-                            os.system("TASKKILL /F /T /PID " + str(i.ProcessId))
-                            time.sleep(5)
+                    if (empty_ie_window_handle!=True) and (local_bk.webdriver_list[driver_instance].capabilities['browserName'] == 'internet explorer'):
+                        pid=local_bk.webdriver_list[driver_instance].iedriver.process.pid
+                        os.system("TASKKILL /F /T /PID " + str(pid))
+                        time.sleep(5)
+                        local_bk.driver_obj = None
+                    # import win32com.client
+                    # wmi=win32com.client.GetObject('winmgmts:')
+                    # proc=wmi.ExecQuery('select * from Win32_Process where Name="IEDriverServer64.exe"')
+                    # if len(proc)>0:
+                    #     for i in proc:
+                    #         os.system("TASKKILL /F /T /PID " + str(i.ProcessId))
+                    #         time.sleep(5)
                 else:
                     if(empty_ie_window_handle!=True):
                         local_bk.webdriver_list[driver_instance].quit()
