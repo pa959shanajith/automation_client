@@ -690,6 +690,12 @@ class TextboxKeywords:
                     else:
                         check_flag=False
                         err_msg=self._index_zero()
+                if webelement.tag_name[0:9] == 'lightning':
+                    text=webelement.text
+                    if(text!=None and text!=''):
+                        status=TEST_RESULT_PASS
+                        methodoutput=TEST_RESULT_TRUE  
+                        check_flag=False
                 if check_flag==True:
                     text=self.__get_text(webelement)
                     if text is None:
@@ -861,6 +867,12 @@ class TextboxKeywords:
                     else:
                         check_flag=False
                         err_msg=self._index_zero()
+                if webelement.tag_name[0:9] == 'lightning':
+                    text=webelement.text
+                    if(text==input):
+                        status=TEST_RESULT_PASS
+                        methodoutput=TEST_RESULT_TRUE  
+                        check_flag=False
                 if check_flag==True:
                     text=self.__get_text(webelement)
                     input=input[0]
