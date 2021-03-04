@@ -636,7 +636,7 @@ class UtilWebKeywords:
                         result = self.generic_sendfucntion_keys(*input)
                     else:
                         result = self.generic_sendfucntion_keys(input[0],*args)
-                if result[0]!="Fail":
+                if (result is not None) and (result[0]!="Fail"):
                     winhandcheck=browser_Keywords.BrowserKeywords()
                     winhandcheck.update_window_handles()
                     status=TEST_RESULT_PASS
