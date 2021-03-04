@@ -289,7 +289,7 @@ class MainNamespace(BaseNamespace):
                         core_utils.get_all_the_imports('QTest')
                         import QTestController
                         qtestObject = QTestController.QTestWindow()
-                if(exec_data["integration"]["zephyr"]["accountid"] != ""):
+                if(exec_data["integration"]["zephyr"]["url"] != ""):
                     if(zephyrObject == None):
                         core_utils.get_all_the_imports('Zephyr')
                         import ZephyrController
