@@ -611,6 +611,7 @@ class TableOperationKeywords():
                                     methodoutput=TEST_RESULT_TRUE
                                     local_tk.log.info('Got the result : %s',str(tooltip))
                                     logger.print_on_console('Got the result : ',str(tooltip))
+                                    break
                                 else:
                                     tooltip=None
                                     err_msg = 'No cell tool tip present for the cell'
@@ -673,7 +674,7 @@ class TableOperationKeywords():
             if visibleFlag==True:
                 try:
                     local_tk.log.debug('reading the inputs')
-                    if (webElement.find_element_by_xpath('.//ancestor::lightning-datatable') != None and len(input_val) > 1):
+                    if (len(webElement.find_elements_by_xpath('.//ancestor::lightning-datatable')) >0) and (len(input_val) > 1):
                         row_number=int(input_val[0])
                         col_number=int(input_val[1])
                         row_count=self.getRowCountJs(webElement)
@@ -693,17 +694,18 @@ class TableOperationKeywords():
                                     expected_value=input_val[2].strip()
                                     coreutilsobj=core_utils.CoreUtils()
                                     expected_value=coreutilsobj.get_UTF_8(expected_value)
-                                if(verifytooltip == expected_value):
-                                    local_tk.log.info('Got the result : %s', str(verifytooltip))
-                                    logger.print_on_console('Got the result : ',str(verifytooltip))
-                                    status=TEST_RESULT_PASS
-                                    methodoutput=TEST_RESULT_TRUE
-                                else:
-                                    local_tk.log.info(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
-                                    err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
-                                    logger.print_on_console(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
-                                    logger.print_on_console('Actual value is : ',str(verifytooltip))
-                                    logger.print_on_console('Expected value is : ',str(expected_value))
+                                    break
+                            if(verifytooltip == expected_value):
+                                local_tk.log.info('Got the result : %s', str(verifytooltip))
+                                logger.print_on_console('Got the result : ',str(verifytooltip))
+                                status=TEST_RESULT_PASS
+                                methodoutput=TEST_RESULT_TRUE
+                            else:
+                                local_tk.log.info(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
+                                err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
+                                logger.print_on_console(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
+                                logger.print_on_console('Actual value is : ',str(verifytooltip))
+                                logger.print_on_console('Expected value is : ',str(expected_value))
                     elif(len(input_val) > 1):
                         row_number=int(input_val[0])
                         col_number=int(input_val[1])
@@ -998,14 +1000,14 @@ class TableOperationKeywords():
                                   childindex = int(childindex)
                                   if tag=='button':
                                        local_tk.log.debug('clicking on button')
-                                       if( (tagName==('input') and tagType==('button')) or tagType==('submit') or tagType==('reset') or tagType==('file')):
-                                          if index==childindex:
-                                            eleStatus =True
-                                          else:
-                                            if counter==index:
-                                               index =childindex
-                                               eleStatus =True
-                                            else:
+                                       if( ((tagName==('input') or tagName==("button"))and tagType==('button')) or tagType==('submit') or tagType==('reset') or tagType==('file')):
+                                           if index==childindex:
+                                             eleStatus =True
+                                           else:
+                                             if counter==index:
+                                                index =childindex
+                                                eleStatus =True
+                                             else:
                                                 counter+=1
                                   elif tag=='image':
                                       local_tk.log.debug('clicking on image')
@@ -1224,7 +1226,7 @@ class TableOperationKeywords():
                                     childindex = int(childindex)
                                     if tag=='button':
                                         local_tk.log.debug('double clicking on button')
-                                        if( (tagName==('input') and tagType==('button')) or tagType==('submit') or tagType==('reset') or tagType==('file')):
+                                        if( ((tagName==('input')or tagName==('button')) and tagType==('button')) or tagType==('submit') or tagType==('reset') or tagType==('file')):
                                             if index==childindex:
                                                 eleStatus =True
                                             else:

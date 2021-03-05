@@ -92,7 +92,15 @@ class DropdownKeywords():
                                 logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                                 local_ddl.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                                 err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-
+                    elif webelement.tag_name == 'lightning-combobox':
+                        dropdown_ele=webelement.find_element_by_xpath('.//input[@role="combobox"]')
+                        dropdown_ele.click()
+                        ele_id=dropdown_ele.get_attribute('aria-controls')
+                        ele=webelement.find_element_by_xpath('.//div[@id="'+ele_id+'"]')
+                        ele_lists=ele.find_elements_by_xpath('.//lightning-base-combobox-item')
+                        ele_lists[(int(input[0])-1)].click()
+                        status=webconstants.TEST_RESULT_PASS
+                        result=webconstants.TEST_RESULT_TRUE
                     else:
                         if (self.util.is_visible(webelement) and self.__check_visibility_from_config()):
                             # performing selenium code
@@ -196,6 +204,17 @@ class DropdownKeywords():
                 except Exception as e:
                     local_ddl.log.error(e)
                     logger.print_on_console(e)
+            elif webelement.tag_name == 'lightning-combobox':
+                dropdown_ele=webelement.find_element_by_xpath('.//input[@role="combobox"]')
+                dropdown_ele.click()
+                ele_id=dropdown_ele.get_attribute('aria-controls')
+                ele=webelement.find_element_by_xpath('.//div[@id="'+ele_id+'"]')
+                ele_lists=ele.find_elements_by_xpath('.//lightning-base-combobox-item')
+                output=str(len(ele_lists))
+                logger.print_on_console('Result obtained is: ',output)
+                dropdown_ele.click()
+                status=webconstants.TEST_RESULT_PASS
+                result=webconstants.TEST_RESULT_TRUE
             else:
                 if self.util.is_visible(webelement):
                     # performing selenium code
@@ -253,6 +272,16 @@ class DropdownKeywords():
                     if len(input)==5:
                         dropVal=input[2]
                         webelement=self.radioKeywordsObj.getActualElement(webelement,input)
+            if webelement.tag_name == 'lightning-combobox':
+                dropdown_ele=webelement.find_element_by_xpath('.//input[@role="combobox"]')
+                dropdown_ele.click()
+                ele_id=dropdown_ele.get_attribute('aria-controls')
+                ele=webelement.find_element_by_xpath('.//div[@id="'+ele_id+'"]')
+                ele_lists=ele.find_elements_by_xpath('.//lightning-base-combobox-item//span[text()="'+input[0]+'"]')
+                if len(ele_lists)>0:
+                    ele_lists[0].click()
+                status=webconstants.TEST_RESULT_PASS
+                result=webconstants.TEST_RESULT_TRUE
             if ((webelement.is_enabled())):
                 if not (self.util.is_visible(webelement)) and self.__check_visibility_from_config():
                     #performing js code

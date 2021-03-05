@@ -304,14 +304,15 @@ class ExcelFile:
                         if col.isalpha():
                             col=self.convertStringToInt(col)
                         else:
-                            raise ValueError                     
-                    if row>0 and col>0:
+                            raise ValueError
+                    if 0<row<=1048576 and 0<col<=16384:                     
+                    # if row>0 and col>0:
                         res,err_msg=self.dict['write_cell_'+file_ext](row,col,value,self.excel_path,self.sheetname,*args)
                         if res:
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
                     else:
-                        err_msg=ERROR_CODE_DICT["ERR_ROW_COLUMN"]
+                        err_msg=ERROR_CODE_DICT["ERR_ROW_COL_OUT_OF_RANGE"]
             else:
                 err_msg=generic_constants.FILE_PATH_NOT_SET
         except ValueError as e:

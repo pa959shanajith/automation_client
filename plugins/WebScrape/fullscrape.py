@@ -20,6 +20,7 @@ import domconstants
 import logging
 import os
 import time
+import readconfig
 from selenium import webdriver
 log = logging.getLogger('fullscrape.py')
 currenthandle = ''
@@ -142,8 +143,13 @@ class Fullscrape():
             log.info('json operations dumps and loads are performed on the return data')
             scrape_time = time.clock() - start_time
             log.info("Time taken in fullscrape: %s seconds",str(scrape_time))
+            configvalues = readconfig.configvalues
+            full_screenshot = str(configvalues['full_screenshot'])
             if (isinstance(driver,webdriver.Firefox) or isinstance(driver,webdriver.Chrome) or isinstance(driver,webdriver.Edge)):
-                screen = webscrape_utils_obj.fullpage_screenshot(driver, screen_shot_path )
+                if ((str(full_screenshot).lower()) == 'yes'):
+                    screen = webscrape_utils_obj.fullpage_screenshot(driver, screen_shot_path)
+                else:
+                    screen = driver.get_screenshot_as_base64()
             else:
                 screen = driver.get_screenshot_as_base64()
             scrapedin = ''

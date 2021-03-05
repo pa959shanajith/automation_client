@@ -247,7 +247,7 @@ class TextboxKeywords:
                         row_count=self.tblobj.getRowCountJs(webelement)
                         col_count=self.tblobj.getColoumnCountJs(webelement)
                         input = inp_list
-                        if obj_type=="textbox" and index_val>=0:
+                        if (obj_type=="textbox" or obj_type=="input") and index_val>=0:
                             if row_num>row_count or col_num>col_count:
                                 check_flag=False
                                 err_msg=self._invalid_input()
@@ -440,7 +440,7 @@ class TextboxKeywords:
                         row_count=self.tblobj.getRowCountJs(webelement)
                         col_count=self.tblobj.getColoumnCountJs(webelement)
                         input = inp_list
-                        if obj_type=="textbox" and index_val>=0:
+                        if (obj_type=="textbox" or obj_type=="input") and index_val>=0:
                             if row_num>row_count or col_num>col_count:
                                 check_flag=False
                                 err_msg=self._invalid_input()
@@ -668,7 +668,7 @@ class TextboxKeywords:
                         index_val=int(input[3])-1
                     row_count=self.tblobj.getRowCountJs(webelement)
                     col_count=self.tblobj.getColoumnCountJs(webelement)
-                    if obj_type=="textbox" and index_val>=0:
+                    if ( obj_type=="textbox" or obj_type=="input") and index_val>=0:
                         if row_num>row_count or col_num>col_count:
                             check_flag=False
                             err_msg=self._invalid_input()
@@ -690,6 +690,12 @@ class TextboxKeywords:
                     else:
                         check_flag=False
                         err_msg=self._index_zero()
+                if webelement.tag_name[0:9] == 'lightning':
+                    text=webelement.text
+                    if(text!=None and text!=''):
+                        status=TEST_RESULT_PASS
+                        methodoutput=TEST_RESULT_TRUE  
+                        check_flag=False
                 if check_flag==True:
                     text=self.__get_text(webelement)
                     if text is None:
@@ -839,7 +845,7 @@ class TextboxKeywords:
                     row_count=self.tblobj.getRowCountJs(webelement)
                     col_count=self.tblobj.getColoumnCountJs(webelement)
                     input = inp_list
-                    if obj_type=="textbox" and index_val>=0:
+                    if (obj_type=="textbox" or obj_type=="input") and index_val>=0:
                         if row_num>row_count or col_num>col_count:
                             check_flag=False
                             err_msg=self._invalid_input()
@@ -861,6 +867,12 @@ class TextboxKeywords:
                     else:
                         check_flag=False
                         err_msg=self._index_zero()
+                if webelement.tag_name[0:9] == 'lightning':
+                    text=webelement.text
+                    if(text==input):
+                        status=TEST_RESULT_PASS
+                        methodoutput=TEST_RESULT_TRUE  
+                        check_flag=False
                 if check_flag==True:
                     text=self.__get_text(webelement)
                     input=input[0]
@@ -1007,7 +1019,7 @@ class TextboxKeywords:
                             index_val=int(input[3])-1
                         row_count=self.tblobj.getRowCountJs(webelement)
                         col_count=self.tblobj.getColoumnCountJs(webelement)
-                        if obj_type=="textbox" and index_val>=0:
+                        if ( obj_type=="textbox" or obj_type=="input") and index_val>=0:
                             if row_num>row_count or col_num>col_count:
                                 check_flag=False
                                 err_msg=self._invalid_input()
@@ -1522,7 +1534,7 @@ class TextboxKeywords:
                         row_count=self.tblobj.getRowCountJs(webelement)
                         col_count=self.tblobj.getColoumnCountJs(webelement)
                         input = inp_list
-                        if obj_type=="textbox" and index_val>=0:
+                        if (obj_type=="textbox"or obj_type=="input" )and index_val>=0:
                             if row_num>row_count or col_num>col_count:
                                 check_flag=False
                                 err_msg=self._invalid_input()
@@ -1713,7 +1725,7 @@ class TextboxKeywords:
                         row_count=self.tblobj.getRowCountJs(webelement)
                         col_count=self.tblobj.getColoumnCountJs(webelement)
                         input = inp_list
-                        if obj_type=="textbox" and index_val>=0:
+                        if (obj_type=="textbox" or obj_type=="input") and index_val>=0:
                             if row_num>row_count or col_num>col_count:
                                 check_flag=False
                                 err_msg=self._invalid_input()
