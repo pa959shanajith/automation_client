@@ -361,17 +361,17 @@ class Dispatcher:
             'selectradiobutton': ['radio'],
             'selectcheckbox': ['checkbox'],
             'unselectcheckbox': ['checkbox'],
-            'selectvaluebyindex':['dropdown','listbox'],
-            'selectvaluebytext': ['dropdown','listbox'],
-            'getallvalues':['dropdown','listbox'],
-            'verifyallvalues': ['dropdown','listbox'],
+            'selectvaluebyindex':['dropdown','listbox','select'],
+            'selectvaluebytext': ['dropdown','listbox','select'],
+            'getallvalues':['dropdown','listbox','select'],
+            'verifyallvalues': ['dropdown','listbox','select'],
             'settext': ['textbox','textarea','password','number','email','url'],
             'sendvalue':['textbox','textarea','password','number','email','url'],
             'gettext': ['textbox','textarea','password','number','email','url'],
             'setsecuretext':['textbox','password'],
             'sendsecurevalue':['textbox','password'],
-            'getattributevalue':['radio','checkbox','dropdown','listbox','textbox','textarea','password','number','email','url','grid'],
-            'verifyattribute':['radio','checkbox','dropdown','listbox','textbox','textarea','password','number','email','url','grid']
+            'getattributevalue':['radio','checkbox','dropdown','select','listbox','textbox','textarea','password','number','email','url','grid'],
+            'verifyattribute':['radio','checkbox','dropdown','select','listbox','textbox','textarea','password','number','email','url','grid']
         }
         custom_dict_element={'element':['getobjectcount','getobject','clickelement','doubleclick','rightclick','getelementtext','verifyelementtext','drag', 'drop','gettooltiptext','verifytooltiptext','verifyexists', 'verifydoesnotexists', 'verifyhidden','verifyvisible', 'switchtotab','switchtowindow','setfocus','sendfunctionkeys',
             'tab','waitforelementvisible','mousehover','press','verifyenabled','verifydisabled','verifyreadonly','getattributevalue','verifyattribute','getrowcount','getcolumncount','getcellvalue','verifycellvalue','getcelltooltip','verifycelltooltip','cellclick','getrownumbytext','getcolnumbytext','getinnertable','selectbyabsolutevalue','horizontalscroll','verticalscroll']}
