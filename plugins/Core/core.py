@@ -1597,14 +1597,18 @@ def check_browser():
                 log.error(e)
             global chromeFlag,firefoxFlag,edgeFlag,chromiumFlag, edgeFlagComp
             logger.print_on_console('Browser compatibility check started')
+
+            #checking browser for chrome
             p = subprocess.Popen('"' + CHROME_DRIVER_PATH + '" --version', stdout=subprocess.PIPE, bufsize=1, shell=True)
             a = p.stdout.readline()
             a = a.decode('utf-8')[13:17]
             choptions1 = webdriver.ChromeOptions()
             if str(configvalues['chrome_path']).lower()!="default":
                 choptions1.binary_location=str(configvalues['chrome_path'])
-            choptions1.add_argument('--headless')
-            driver = webdriver.Chrome(chrome_options=choptions1, executable_path=CHROME_DRIVER_PATH)
+            choptions1.headless = True
+            if configvalues["chrome_debugport"] != "0":
+                choptions1.add_argument("--remote-debugging-port="+configvalues["chrome_debugport"])
+            driver = webdriver.Chrome(options=choptions1, executable_path=CHROME_DRIVER_PATH)
             # Check for the chrome 75 version.
             # As the key value of 'version' is changed from 'version' to 'browserVersion'
             browser_ver=''
@@ -1629,21 +1633,19 @@ def check_browser():
             logger.print_on_console("Error in checking chrome version")
             log.error("Error in checking chrome version")
             log.error(e,exc_info=True)
+
+        #checking browser for firefox
         try:
             p = subprocess.Popen('"' + GECKODRIVER_PATH + '" --version', stdout=subprocess.PIPE, bufsize=1, shell=True)
             a = p.stdout.readline()
             a = a.decode('utf-8')[12:16]
-            caps=webdriver.DesiredCapabilities.FIREFOX
-            caps['marionette'] = True
-            from selenium.webdriver.firefox.options import Options
-            options = Options()
-            options.add_argument('--headless')
-            if str(configvalues['firefox_path']).lower()!="default":
+            firefox_options = webdriver.FirefoxOptions()
+            firefox_options.headless = True
+            if str(configvalues['firefox_path']).lower() != "default":
                 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
-                binary = FirefoxBinary(str(configvalues['firefox_path']))
-                driver = webdriver.Firefox(capabilities=caps,firefox_options=options,firefox_binary=binary, executable_path=GECKODRIVER_PATH)
-            else:
-                driver = webdriver.Firefox(capabilities=caps,firefox_options=options, executable_path=GECKODRIVER_PATH)
+                firefox_options.binary = FirefoxBinary(str(configvalues['firefox_path']))
+            log_path = AVO_ASSURE_HOME + OS_SEP + "output" + OS_SEP +  "geckodriver.log"
+            driver = webdriver.Firefox(options=firefox_options, executable_path=GECKODRIVER_PATH, service_log_path=log_path)
             browser_ver = float(driver.capabilities['browserVersion'].encode('utf-8')[:4])
             try:
                 driver.close()
@@ -1661,6 +1663,7 @@ def check_browser():
             logger.print_on_console("Error in checking Firefox version")
             log.error("Error in checking Firefox version")
             log.error(e,exc_info=True)
+
         #Checking browser for microsoft edge
         try:
             if('Windows-10' in platform.platform()):
@@ -1697,13 +1700,16 @@ def check_browser():
 
         #checking browser for microsoft edge(chromium based)
         try:
-            from selenium.webdriver.edge.options import Options
-            options = Options()
-            options.use_chromium = True
-            caps =  options.to_capabilities()
             p = subprocess.Popen('"' + EDGE_CHROMIUM_DRIVER_PATH + '" --version', stdout=subprocess.PIPE, bufsize=1,cwd=DRIVERS_PATH,shell=True)
             a = p.stdout.readline()
             a = a.decode('utf-8')[13:17]
+            core_utils.get_all_the_imports('Web')
+            import edge_chromium_options
+            msoptions = webdriver.EdgeChromiumOptions()
+            msoptions.headless = True
+            if configvalues["edgechromium_debugport"] != "0":
+                msoptions.add_argument("--remote-debugging-port="+configvalues["edgechromium_debugport"])
+            caps = msoptions.to_capabilities()
             if SYSTEM_OS == 'Darwin': #MAC check for edge chromium
                 caps['platform'] = 'MAC'
             driver = webdriver.Edge(capabilities=caps, executable_path=EDGE_CHROMIUM_DRIVER_PATH)

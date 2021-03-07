@@ -9,6 +9,7 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 from selenium import webdriver
+import edge_chromium_options
 from collections import OrderedDict
 import logger
 import webconstants
@@ -1133,24 +1134,25 @@ class Singleton_DriverUtil():
                     if headless_mode:
                         WINDOW_SIZE = "1350,650"
                         choptions.add_argument("--window-size=%s" % WINDOW_SIZE)
-                    if headless_mode: choptions.add_argument('--headless')
+                        choptions.headless = True
                     if configvalues['extn_enabled'].lower()=='yes' and os.path.exists(webconstants.EXTENSION_PATH):
                         choptions.add_extension(webconstants.EXTENSION_PATH)
                     else:
                         choptions.add_argument('--disable-extensions')
-                    if ((str(chrome_path).lower()) != 'default'):
-                        choptions.binary_location=str(chrome_path)
-                    if ((str(chrome_profile).lower()) != 'default'):
+                    if str(chrome_path).lower() != 'default':
+                        choptions.binary_location = str(chrome_path)
+                    if str(chrome_profile).lower() != 'default':
                         choptions.add_argument("user-data-dir="+chrome_profile)
-                    if ((str(close_browser_popup).lower()) == 'yes'):
+                    if str(close_browser_popup).lower() == 'yes':
                         prefs = {}
                         prefs["credentials_enable_service"] = False
                         prefs["profile.password_manager_enabled"] = False
                         choptions.add_experimental_option("prefs", prefs)
+                    if configvalues["chrome_debugport"] != "0":
+                        choptions.add_argument("--remote-debugging-port="+configvalues["chrome_debugport"])
 
-                    driver = webdriver.Chrome(executable_path=exec_path,chrome_options=choptions)
+                    driver = webdriver.Chrome(executable_path=exec_path, options=choptions)
                     # driver.navigate().refresh()
-                    ##driver = webdriver.Chrome(desired_capabilities= choptions.to_capabilities(), executable_path = exec_path)
                     controller.process_ids.append(driver.service.process.pid)
                     drivermap.append(driver)
                     driver.maximize_window()
@@ -1168,23 +1170,19 @@ class Singleton_DriverUtil():
 
         elif(browser_num == '2'):
             try:
-                caps=webdriver.DesiredCapabilities.FIREFOX
-                caps['marionette'] = True
-                from selenium.webdriver.firefox.options import Options
-                firefox_options = Options()
-                firefox_options.set_preference("useAutomationExtension", False)
-                if headless_mode:
-                    firefox_options.add_argument('--headless')
-                if ((str(close_browser_popup).lower()) == 'yes'):
-                        firefox_options.set_preference("credentials_enable_service", False)
                 exec_path = webconstants.GECKODRIVER_PATH
-                if(core.firefoxFlag == True):
-                    if str(configvalues['firefox_path']).lower()!="default":
+                if core.firefoxFlag:
+                    firefox_options = webdriver.FirefoxOptions()
+                    firefox_options.set_preference("useAutomationExtension", False)
+                    if headless_mode:
+                        firefox_options.headless = True
+                    if str(close_browser_popup).lower() == 'yes':
+                        firefox_options.set_preference("credentials_enable_service", False)
+                    if str(configvalues['firefox_path']).lower() != "default":
                         from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
-                        binary = FirefoxBinary(str(configvalues['firefox_path']))
-                        driver = webdriver.Firefox(capabilities=caps, firefox_binary=binary, executable_path=exec_path,options=firefox_options)
-                    else:
-                        driver = webdriver.Firefox(capabilities=caps, executable_path=exec_path,options=firefox_options)
+                        firefox_options.binary = FirefoxBinary(str(configvalues['firefox_path']))
+                    log_path = AVO_ASSURE_HOME + OS_SEP + "output" + OS_SEP +  "geckodriver.log"
+                    driver = webdriver.Firefox(executable_path=exec_path, options=firefox_options, service_log_path=log_path)
                     # driver.navigate().refresh()
                     controller.process_ids.append(driver.service.process.pid)
                     drivermap.append(driver)
@@ -1298,19 +1296,38 @@ class Singleton_DriverUtil():
         elif(browser_num == '8'):
             try:
                 if core.chromiumFlag:
-                    from selenium.webdriver.edge.options import Options
-                    options = Options()
-                    options.use_chromium = True
-                    caps1 = options.to_capabilities()
+                    msoptions = webdriver.EdgeChromiumOptions()
+                    msoptions.add_argument('start-maximized')
+                    msoptions.add_experimental_option('useAutomationExtension', False)
+                    msoptions.add_experimental_option("excludeSwitches",["enable-automation"])
+                    if headless_mode:
+                        WINDOW_SIZE = "1350,650"
+                        msoptions.add_argument("--window-size=%s" % WINDOW_SIZE)
+                        msoptions.headless = True
+                    # if configvalues['extn_enabled'].lower()=='yes' and os.path.exists(webconstants.EXTENSION_PATH):
+                    #     msoptions.add_extension(webconstants.EXTENSION_PATH)
+                    # else:
+                    #     msoptions.add_argument('--disable-extensions')
+                    msoptions.add_argument('--disable-extensions')
+                    if str(close_browser_popup).lower() == 'yes':
+                        prefs = {}
+                        prefs["credentials_enable_service"] = False
+                        prefs["profile.password_manager_enabled"] = False
+                        msoptions.add_experimental_option("prefs", prefs)
+                    if configvalues["edgechromium_debugport"] != "0":
+                        msoptions.add_argument("--remote-debugging-port="+configvalues["edgechromium_debugport"])
+                    caps = msoptions.to_capabilities()
                     chromium_path = webconstants.EDGE_CHROMIUM_DRIVER_PATH
                     if SYSTEM_OS == "Darwin":
-                        caps1['platform'] = 'MAC'
-                    driver = webdriver.Edge(capabilities=caps1,executable_path=chromium_path)
+                        caps['platform'] = 'MAC'
+
+                    driver = webdriver.Edge(capabilities=caps,executable_path=chromium_path)
                     controller.process_ids.append(driver.edge_service.process.pid)
                     drivermap.append(driver)
                     driver.maximize_window()
-                    logger.print_on_console('Edge Chromium browser started')
-                    local_bk.log.info('Edge Chromium browser started')
+                    msg = ('Headless ' if headless_mode else '') + 'Edge Chromium browser started'
+                    logger.print_on_console(msg)
+                    local_bk.log.info(msg)
                 else:
                     logger.print_on_console('Edge Chromium version is not supported')
                     local_bk.log.info('Edge Chromium version is not supported')
