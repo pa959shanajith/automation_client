@@ -1148,6 +1148,8 @@ class Singleton_DriverUtil():
                         prefs["credentials_enable_service"] = False
                         prefs["profile.password_manager_enabled"] = False
                         choptions.add_experimental_option("prefs", prefs)
+                    if configvalues["chrome_debugport"] != "0":
+                        choptions.add_argument("--remote-debugging-port="+configvalues["chrome_debugport"])
 
                     driver = webdriver.Chrome(executable_path=exec_path, options=choptions)
                     # driver.navigate().refresh()
@@ -1312,10 +1314,13 @@ class Singleton_DriverUtil():
                         prefs["credentials_enable_service"] = False
                         prefs["profile.password_manager_enabled"] = False
                         msoptions.add_experimental_option("prefs", prefs)
+                    if configvalues["edgechromium_debugport"] != "0":
+                        msoptions.add_argument("--remote-debugging-port="+configvalues["edgechromium_debugport"])
                     caps = msoptions.to_capabilities()
                     chromium_path = webconstants.EDGE_CHROMIUM_DRIVER_PATH
                     if SYSTEM_OS == "Darwin":
                         caps['platform'] = 'MAC'
+
                     driver = webdriver.Edge(capabilities=caps,executable_path=chromium_path)
                     controller.process_ids.append(driver.edge_service.process.pid)
                     drivermap.append(driver)
