@@ -342,6 +342,8 @@ class IRISMT(wx.Frame):
             for path in paths:
                 if not self.FONTS_DIR:
                     self.FONTS_DIR = os.path.dirname(path)
+                elif self.FONTS_DIR != os.path.dirname(path):
+                    self.FONTS_DIR = os.path.dirname(path)
                 fontname = self.getName(ttLib.TTFont(path))
                 fontlist += fontname+";"
             self.fontlist = fontlist.strip(";")
@@ -540,9 +542,11 @@ class IRISMT(wx.Frame):
                         --output_dir {TRAININGFILE_DIR} \
                         --fontlist {FONTS}'
 
-
+            F_DIR = None
+            if(' ' in self.FONTS_DIR ):
+                F_DIR = '"'+self.FONTS_DIR+'"'
             CMD_TRAIN = BASE_CMD_TRAIN.format(TRAININGTOOL_DIR = self.TRAININGTOOL_DIR,
-                                    FONTS_DIR = self.FONTS_DIR,
+                                    FONTS_DIR = F_DIR,
                                     LANG = self.LANG,
                                     LANGDATA_DIR = self.LANGDATA_DIR,
                                     TESSDATA_DIR = self.TESSDATA_DIR,
