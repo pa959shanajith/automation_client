@@ -510,7 +510,7 @@ class UtilWebKeywords:
                                    eleStatus =True
                                 else:
                                     counter+=1
-                    elif tag=='link':
+                    elif tag=='link' or tag=='a':
                         if(tagName==('a')):
                             if index==childindex:
                                 eleStatus =True
