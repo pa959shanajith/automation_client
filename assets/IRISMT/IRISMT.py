@@ -542,9 +542,9 @@ class IRISMT(wx.Frame):
                         --output_dir {TRAININGFILE_DIR} \
                         --fontlist {FONTS}'
 
-            F_DIR = None
-            if(' ' in self.FONTS_DIR ):
-                F_DIR = '"'+self.FONTS_DIR+'"'
+            F_DIR = self.FONTS_DIR
+            if ' ' in F_DIR:
+                F_DIR = '"'+F_DIR+'"'
             CMD_TRAIN = BASE_CMD_TRAIN.format(TRAININGTOOL_DIR = self.TRAININGTOOL_DIR,
                                     FONTS_DIR = F_DIR,
                                     LANG = self.LANG,
