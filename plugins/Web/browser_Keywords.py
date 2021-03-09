@@ -1299,7 +1299,7 @@ class Singleton_DriverUtil():
                     msoptions = webdriver.EdgeChromiumOptions()
                     msoptions.add_argument('start-maximized')
                     msoptions.add_experimental_option('useAutomationExtension', False)
-                    msoptions.add_experimental_option("excludeSwitches",["enable-automation"])
+                    # msoptions.add_experimental_option("excludeSwitches",["enable-automation"])
                     if headless_mode:
                         WINDOW_SIZE = "1350,650"
                         msoptions.add_argument("--window-size=%s" % WINDOW_SIZE)
