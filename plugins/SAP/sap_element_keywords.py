@@ -343,7 +343,7 @@ class ElementKeywords():
                         elem.SetFocus()
                         sendfnt = SendFunctionKeys()
                         sendfnt.sendfunction_keys("F4")
-                        d1,d2,error,d3 = self.lk.getErrorMessage()
+                        d1,d2,error,d3 = self.lk.getStatusBarMessage()
                         if ( error == "No input help is available" or error == "No error message" or error == "" ):
                             err_msg = 'No input help is available'
                         else:
