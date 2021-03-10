@@ -761,15 +761,19 @@ class BrowserKeywords():
                         local_bk.log.error('No Cookies found')
                         err_msg = 'No Cookies found'
             #clear cache for chrome driver.
-            elif local_bk.driver_obj != None:
-                if isinstance(local_bk.driver_obj,webdriver.Chrome):
-                    local_bk.driver_obj.get('chrome://settings/clearBrowserData')
-                    time.sleep(2)
-                    local_bk.driver_obj.execute_script('return document.querySelector("body > settings-ui").shadowRoot.querySelector("#container").querySelector("#main").shadowRoot.querySelector("settings-basic-page").shadowRoot.querySelector("settings-privacy-page").shadowRoot.querySelector("settings-clear-browsing-data-dialog").shadowRoot.querySelector("#clearBrowsingDataDialog").querySelector("#clearBrowsingDataConfirm").click();')
-                elif local_bk.driver_obj.name=='msedge':
-                    local_bk.driver_obj.get('edge://settings/clearBrowserData')
-                    time.sleep(2)
-                    local_bk.driver_obj.execute_script('return document.getElementById("clear-now").click();')
+            elif local_bk.driver_obj != None and isinstance(local_bk.driver_obj,webdriver.Chrome):
+                local_bk.driver_obj.get('chrome://settings/clearBrowserData')
+                time.sleep(2)
+                local_bk.driver_obj.execute_script('return document.querySelector("body > settings-ui").shadowRoot.querySelector("#container").querySelector("#main").shadowRoot.querySelector("settings-basic-page").shadowRoot.querySelector("settings-privacy-page").shadowRoot.querySelector("settings-clear-browsing-data-dialog").shadowRoot.querySelector("#clearBrowsingDataDialog").querySelector("#clearBrowsingDataConfirm").click();')
+                logger.print_on_console('Cleared cache')
+                local_bk.log.info('Cleared Cache')
+                status=webconstants.TEST_RESULT_PASS
+                result=webconstants.TEST_RESULT_TRUE
+            #clear cache for chromium driver.
+            elif local_bk.driver_obj != None and local_bk.driver_obj.name=='msedge':
+                local_bk.driver_obj.get('edge://settings/clearBrowserData')
+                time.sleep(2)
+                local_bk.driver_obj.execute_script('return document.getElementById("clear-now").click();')
                 logger.print_on_console('Cleared cache')
                 local_bk.log.info('Cleared Cache')
                 status=webconstants.TEST_RESULT_PASS
