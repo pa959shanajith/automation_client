@@ -1373,9 +1373,9 @@ class Controller():
                                     zephyr_status['testid']=zephy_testid
                                     zephyr_status['projectId']=zephyr_projectid
                                     zephyr_status['treeid']=zephyr_treeid
-                                    zephyr_status['zephyr_accNo']=zephyr_password
-                                    zephyr_status['zephyr_acKey']=zephyr_url
-                                    zephyr_status['zephyr_secKey']=zephyr_username
+                                    zephyr_status['zephyr_password']=zephyr_password
+                                    zephyr_status['zephyr_url']=zephyr_url
+                                    zephyr_status['zephyr_username']=zephyr_username
                                     zephyr_update_status=zephyr_status_over['overallstatus']
                                     if(zephyr_update_status.lower()=='pass'):
                                         zephyr_status['status']='1'

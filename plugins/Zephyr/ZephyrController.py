@@ -130,6 +130,12 @@ class ZephyrWindow():
     def update_zephyr_test_details(self,data):
         status = False
         try:
+            if(self.zephyrURL == None) :
+                zephyrLoginLoad = {}
+                zephyrLoginLoad["zephyrUserName"] = data['zephyr_username']
+                zephyrLoginLoad["zephyrPassword"] = data['zephyr_password']
+                zephyrLoginLoad["zephyrURL"] = data['zephyr_url']
+                self.login(zephyrLoginLoad)
             # get schedule
             cyclephaseid = data["treeid"]
             releaseid = data["releaseid"]
