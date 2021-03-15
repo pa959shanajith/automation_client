@@ -344,14 +344,23 @@ class IRISMT(wx.Frame):
                     self.FONTS_DIR = os.path.dirname(path)
                 elif self.FONTS_DIR != os.path.dirname(path):
                     self.FONTS_DIR = os.path.dirname(path)
-                fontname = self.getName(ttLib.TTFont(path))
-                fontlist += fontname+";"
+                try:
+                    fontname = None
+                    fontname = self.getName(ttLib.TTFont(path))
+                except Exception as e:
+                    self.print_log("File '" + str(path[path.rindex('\\')+1:]) + "' is an invalid font file.")
+                    log.debug("File '" + str(path[path.rindex('\\')+1:]) + "' is an invalid font file, ERR_MSG: " +str(e))
+                if(fontname) : fontlist += fontname+";"
             self.fontlist = fontlist.strip(";")
             # self.FONTS = '"'+self.fontlist.replace(';', '" "')+'"'
             self.FONTS = self.fontlist.split(";")
             self.fontselect_txtfield.SetValue(self.fontlist)
-            self.print_log("Data Selected: " + str(self.FONTS))
-            log.debug("Data Selected: "+ str(self.FONTS))
+            if (len(self.FONTS)>0 and self.FONTS[0]!= ''):
+                self.print_log("Data Selected: " + str(self.FONTS))
+                log.debug("Data Selected: "+ str(self.FONTS))
+            else:
+                self.print_log("Unable to select data.")
+                log.debug("Unable to select data.")
         dialog.Destroy()
 
     '''
