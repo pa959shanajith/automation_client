@@ -516,8 +516,8 @@ class IRISMT(wx.Frame):
         self.flow_flag = 1
         # self.msg.ShowMessage("Data Trained Successfully!")
         self.print_log("-----Data Trained Successfully-----")
-
-
+        #clearing the traning-data selection textbox
+        self.fontselect_txtfield.Clear()
 
     '''
         Definition : this method generates the required .lstmf files / training files
