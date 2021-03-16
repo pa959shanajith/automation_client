@@ -1629,7 +1629,7 @@ def kill_process():
                 # This kills all instances of safari browser even if it is not opened by Avo Assure.
                 # Issue when Avo Assure is opened in Safari browser
             for id in process_ids:
-                os.system("kilall -9 " + id)
+                os.system("killall -9 " + str(id))
             # os.system("killall -9 safaridriver")
             # os.system("killall -9 node_appium")
             # os.system("killall -9 xcodebuild")
