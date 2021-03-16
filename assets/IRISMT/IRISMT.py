@@ -234,6 +234,8 @@ class IRISMT(wx.Frame):
                 self.print_log("------Rollback Successful------")
                 if len(self.all_versions) == 1 and str(self.all_versions[0]) == str(self.current_version):
                     if self.rollback_btn.IsShown():
+                        log.debug("Removing model_backup.7z")
+                        if(os.path.exists(self.rollback_dir)): os.remove(self.rollback_dir)
                         log.debug("Hiding rollback options")
                         self.train_btn.SetPosition((135, 80))
                         self.revert_btn.SetPosition((245, 80))
