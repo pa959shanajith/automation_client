@@ -1614,6 +1614,8 @@ def kill_process():
 
         try:
             import browser_Keywords
+            for driver in browser_Keywords.drivermap:
+                driver.quit()
             del browser_Keywords.drivermap[:]
             if hasattr(browser_Keywords.local_bk, 'driver_obj'):
                 if (browser_Keywords.local_bk.driver_obj):
@@ -1622,22 +1624,23 @@ def kill_process():
                 if (browser_Keywords.local_bk.pid_set):
                     del browser_Keywords.local_bk.pid_set[:]
         except Exception as e:
-            log.error(e)
-
-        try:
-            # os.system("killall -9 Safari")
-                # This kills all instances of safari browser even if it is not opened by Avo Assure.
-                # Issue when Avo Assure is opened in Safari browser
-            for id in process_ids:
-                os.system("killall -9 " + str(id))
-            # os.system("killall -9 safaridriver")
-            # os.system("killall -9 node_appium")
-            # os.system("killall -9 xcodebuild")
-            # os.system("killall -9 chromedriver")
-            # os.system("killall -9 geckodriver")
-        except Exception as e:
             logger.print_on_console('Exception in stopping server')
             log.error(e)
+
+        # try:
+        #     # os.system("killall -9 Safari")
+        #         # This kills all instances of safari browser even if it is not opened by Avo Assure.
+        #         # Issue when Avo Assure is opened in Safari browser
+        #     for id in process_ids:
+        #         os.system("killall -9 " + str(id))
+        #     # os.system("killall -9 safaridriver")
+        #     # os.system("killall -9 node_appium")
+        #     # os.system("killall -9 xcodebuild")
+        #     # os.system("killall -9 chromedriver")
+        #     # os.system("killall -9 geckodriver")
+        # except Exception as e:
+        #     logger.print_on_console('Exception in stopping server')
+        #     log.error(e)
         log.info('Stale processes killed')
         logger.print_on_console('Stale processes killed')
     else:
