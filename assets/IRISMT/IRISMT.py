@@ -117,11 +117,15 @@ class IRISMT(wx.Frame):
         self.rollback_btn.Bind(wx.EVT_BUTTON, self.rollback)
         self.rollback_btn.Hide()        # initialized as hidden
 
-
         # version list combobox
         choices = self.all_versions
+        if len(choices) == 1 and str(choices[0]) == str(self.current_version):
+            self.revert_btn.Disable()
+        else:
+            self.revert_btn.Enable()
         self.version_list = wx.ComboBox(self.panel, pos = (245, 81), size = (100, 25), choices=choices, style=wx.CB_READONLY | wx.CB_DROPDOWN)
         self.version_list.SetSelection(self.all_versions.index(self.current_version))
+        self.version_list.Bind(wx.EVT_COMBOBOX, self.combo_opt)
         self.version_list.Hide()    # initialized as hidden same as rollback
 
 
@@ -228,6 +232,14 @@ class IRISMT(wx.Frame):
                 self.print_log("Model Extracted")
                 log.info("Model Extracted. Rollback successful")
                 self.print_log("------Rollback Successful------")
+                if len(self.all_versions) == 1 and str(self.all_versions[0]) == str(self.current_version):
+                    if self.rollback_btn.IsShown():
+                        log.debug("Hiding rollback options")
+                        self.train_btn.SetPosition((135, 80))
+                        self.revert_btn.SetPosition((245, 80))
+                        self.version_list.Hide()
+                        self.rollback_btn.Hide()
+                        self.revert_btn.Disable()
             except Exception as err:
                 self.comm_obj.percentageIncri(self.msg,100,"Rollback Failed")
 
@@ -279,8 +291,20 @@ class IRISMT(wx.Frame):
             self.revert_btn.SetPosition((135, 80))
             self.version_list.Show()
             self.rollback_btn.Show()
+            self.rollback_btn.Disable()
 
-
+    def combo_opt(self, event):
+        """
+        Definition : Enables/Disables Rollback button on option selection in the combo_box.
+                     Rollback button is disabled when combo_box value is the same as current version
+        Inputs: event object when when combo_box items are selected
+        """
+        combo_box_item_index = self.version_list.GetSelection()
+        combo_box_item_value=self.version_list.GetString(combo_box_item_index)
+        if (str(self.current_version) != str(combo_box_item_value)):
+            self.rollback_btn.Enable()
+        else:
+            self.rollback_btn.Disable()
 
     """
         Definition: Converts the line endings of auto generated training_file.txt's
@@ -379,8 +403,8 @@ class IRISMT(wx.Frame):
 
                 self.current_version = version
                 self.all_versions = configs["all_versions"]
-                self.print_log("Current Version: "+str(self.current_version))
-                log.debug("Current Version Changed to: "+self.current_version)
+                self.print_log("Downgraded to version: "+str(self.current_version))
+                log.debug("Current Version downgraded to: "+self.current_version)
         except Exception as err:
             self.print_log("Failed to write changes to config.json")
             log.error("Failed to write changes to config.json"+str(err))
@@ -410,8 +434,8 @@ class IRISMT(wx.Frame):
                 # current version of IRISMT is updated
                 self.current_version = curr_version
                 self.all_versions = configs["all_versions"]
-                self.print_log("Current Version: "+str(self.current_version))
-                log.debug("Current Version Changed to: "+self.current_version)
+                self.print_log("Upgraded to version: "+str(self.current_version))
+                log.debug("Current Version upgraded to: "+self.current_version)
         except Exception as err:
             self.print_log("Failed to write changes in config.json")
             log.error("Failed to write changes in config.json")
@@ -527,6 +551,7 @@ class IRISMT(wx.Frame):
         self.print_log("-----Data Trained Successfully-----")
         #clearing the traning-data selection textbox
         self.fontselect_txtfield.Clear()
+        self.revert_btn.Enable()
 
     '''
         Definition : this method generates the required .lstmf files / training files
