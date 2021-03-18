@@ -92,7 +92,7 @@ class DropdownKeywords():
                                 logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                                 local_ddl.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                                 err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                    elif webelement.tag_name == 'lightning-combobox':
+                    elif webelement.tag_name in ['lightning-combobox','lightning-grouped-combobox']:
                         dropdown_ele=webelement.find_element_by_xpath('.//input[@role="combobox"]')
                         dropdown_ele.click()
                         ele_id=dropdown_ele.get_attribute('aria-controls')
@@ -204,7 +204,7 @@ class DropdownKeywords():
                 except Exception as e:
                     local_ddl.log.error(e)
                     logger.print_on_console(e)
-            elif webelement.tag_name == 'lightning-combobox':
+            elif webelement.tag_name in ['lightning-combobox','lightning-grouped-combobox']:
                 dropdown_ele=webelement.find_element_by_xpath('.//input[@role="combobox"]')
                 dropdown_ele.click()
                 ele_id=dropdown_ele.get_attribute('aria-controls')
@@ -272,7 +272,7 @@ class DropdownKeywords():
                     if len(input)==5:
                         dropVal=input[2]
                         webelement=self.radioKeywordsObj.getActualElement(webelement,input)
-            if webelement.tag_name == 'lightning-combobox':
+            elif webelement.tag_name in ['lightning-combobox','lightning-grouped-combobox']:
                 dropdown_ele=webelement.find_element_by_xpath('.//input[@role="combobox"]')
                 dropdown_ele.click()
                 ele_id=dropdown_ele.get_attribute('aria-controls')
