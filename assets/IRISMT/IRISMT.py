@@ -222,6 +222,8 @@ class IRISMT(wx.Frame):
                 log.info("Renaming the extracted model")
                 os.rename(self.active_model+'_'+rollback_ver, self.active_model)
                 self.comm_obj.percentageIncri(self.msg,90,"Rolling Back...")
+                log.info("Deleting selected model from backup")
+                self.delete_from_model_backup(rollback_index)
                 log.info("Updating config file")
                 self.downgrade_version(rollback_ver, rollback_index)
                 log.info("Updating combo box")
@@ -242,6 +244,8 @@ class IRISMT(wx.Frame):
                         self.version_list.Hide()
                         self.rollback_btn.Hide()
                         self.revert_btn.Disable()
+                if str(self.current_version) == str(self.version_list.GetString(self.version_list.GetSelection())) :
+                    self.rollback_btn.Disable()
             except Exception as err:
                 self.comm_obj.percentageIncri(self.msg,100,"Rollback Failed")
 
@@ -411,6 +415,21 @@ class IRISMT(wx.Frame):
             self.print_log("Failed to write changes to config.json")
             log.error("Failed to write changes to config.json"+str(err))
 
+    def delete_from_model_backup(self,index):
+        """
+        Definition : deletes selected versions from model_backup.7z
+        input: index of current selected iten in self.version list
+        references: inside rollback method
+        """
+        try:
+            versions_to_del = configs["all_versions"][index:]
+            log.debug("Deleting versions from manifest.json: "+str(versions_to_del))
+            for v in versions_to_del:
+                delete_model = r'{loc_7z} d {zipfile} {file} -r -y'.format(loc_7z = LOC_7z, zipfile = self.rollback_dir, file = str("eng.traineddata_"+v))
+                subprocess.call(delete_model, shell=True)
+        except Exception as err:
+            self.print_log("Failed to delete files from model_backup.7z")
+            log.error("Failed to delete files from model_backup.7z, ERR_MSG : "+str(err))
 
     '''
         Definition : Upgrades the version info in the config.json file
