@@ -538,11 +538,13 @@ class IRISMT(wx.Frame):
         self.backup_current_model()
 
         failed_fonts = []
+        partly_success_flag = False
         for font in self.FONTS:
             self.comm_obj.percentageIncri(self.msg,10,"Generating Training Files for "+str(font)+"...")
             failed_flag, failed_font = self.generate_training_files(str("\""+font+"\""))
             if failed_flag:
                 failed_fonts.append(failed_font)
+                partly_success_flag = True
 
         if len(failed_fonts) == len(self.FONTS):
             self.flow_flag = 0
@@ -569,7 +571,8 @@ class IRISMT(wx.Frame):
         self.comm_obj.percentageIncri(self.msg,100,"Finished Training!")
         self.flow_flag = 1
         # self.msg.ShowMessage("Data Trained Successfully!")
-        self.print_log("-----Data Trained Successfully-----")
+        if not partly_success_flag: self.print_log("----- Trained Successfully -----")
+        else: self.print_log("----- Training completed with errors -----")
         #clearing the traning-data selection textbox
         self.fontselect_txtfield.Clear()
         self.revert_btn.Enable()
