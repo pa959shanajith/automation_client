@@ -76,6 +76,20 @@ class IRISMT(wx.Frame):
         self.current_version = configs["current_version"]
         self.active_model = AVO_ASSURE_HOME + configs["active_model"]
         self.rollback_dir = AVO_ASSURE_HOME + configs["rollback_dir"]
+        try:
+            if(configs["all_versions_traindata"]):
+                self.all_versions_traindata = configs["all_versions_traindata"]
+        except Exception as e:
+            log.debug("all_versions_traindata not found creating a new variable")
+            try:
+                with open(config_path, "w") as outfile:
+                    configs.update({"all_versions_traindata":{"5.0.0":"Base Datasets"}})
+                    # new data is saved to config file
+                    str_ = json.dumps(configs, indent=4, sort_keys=True, separators=(',', ': '), ensure_ascii=False)
+                    outfile.write(str(str_))
+                self.all_versions_traindata = configs["all_versions_traindata"]
+            except Exception as e:
+                log.debug("Error occurred while creating 'all_versions_traindata' in config.json")
 
         log.debug("All value initialized")
 
@@ -226,6 +240,7 @@ class IRISMT(wx.Frame):
                 self.delete_from_model_backup(rollback_index)
                 log.info("Updating config file")
                 self.downgrade_version(rollback_ver, rollback_index)
+                self.downgrade_dataset_version()
                 log.info("Updating combo box")
                 self.reset_dropdown()
                 self.comm_obj.percentageIncri(self.msg,100,"Rolling Back...")
@@ -415,6 +430,28 @@ class IRISMT(wx.Frame):
             self.print_log("Failed to write changes to config.json")
             log.error("Failed to write changes to config.json"+str(err))
 
+    def downgrade_dataset_version(self):
+        """
+        Definition : saves all_versions_traindata changes to the config json file after any rollback operation is performed
+        input: N/A
+        references: inside rollback method
+        """
+        try:
+            new_dict = {}
+            with open(config_path, "w") as outfile:
+                all_versions = configs["all_versions"]
+                avt = configs["all_versions_traindata"]
+                for v in all_versions:
+                    new_dict.update({str(v):avt[str(v)]})
+                # new data is saved to config file
+                configs["all_versions_traindata"] = new_dict
+                str_ = json.dumps(configs, indent=4, sort_keys=True, separators=(',', ': '), ensure_ascii=False)
+                outfile.write(str(str_))
+            del new_dict
+        except Exception as e:
+            self.print_log("Error occurred in downgrade_dataset_version. Failed to write changes in config.json")
+            log.error("Error occurred in downgrade_dataset_version. Failed to write changes in config.json, ERR_MSG: " + str(e))
+
     def delete_from_model_backup(self,index):
         """
         Definition : deletes selected versions from model_backup.7z
@@ -461,7 +498,33 @@ class IRISMT(wx.Frame):
             self.print_log("Failed to write changes in config.json")
             log.error("Failed to write changes in config.json")
 
-
+    def upgrade_dataset_version(self,failed_fonts):
+        """
+        Definition : Upgrades the all_versions_traindata info in the config.json file
+        Inputs: List of failed fonts
+        References: inside start_training method
+        """
+        try:
+            pass_list = []
+            failed_fonts_new = []
+            #filtering pass fonts
+            for ff in failed_fonts:
+                if ff[0] == '"' and ff[len(ff)-1] == '"':
+                    failed_fonts_new.append(ff[1:len(ff)-1])
+            for f in self.FONTS:
+                if f not in failed_fonts_new:
+                    pass_list.append(f)
+            log.debug("Writing changes to config.json")
+            with open(config_path, "w") as outfile:
+                key = str(self.current_version)
+                value = ', '.join(pass_list)
+                configs["all_versions_traindata"].update({key:value})
+                # new data is saved to config file
+                str_ = json.dumps(configs, indent=4, sort_keys=True, separators=(',', ': '), ensure_ascii=False)
+                outfile.write(str(str_))
+        except Exception as e:
+            self.print_log("Error occurred in upgrade_dataset_version. Failed to write changes in config.json")
+            log.error("Error occurred in upgrade_dataset_version. Failed to write changes in config.json, ERR_MSG: " + str(e))
 
     # def get_previous_version(self):
     #     try:
@@ -562,9 +625,11 @@ class IRISMT(wx.Frame):
             self.remove_temporary_files()
             self.flow_flag = 1
             self.print_log("-"*20+"Training Failed"+"-"*20)
+            self.fontselect_txtfield.Clear()
             return
         self.comm_obj.percentageIncri(self.msg,90,"Saving Changes in Config Files...")
         self.upgrade_version()
+        self.upgrade_dataset_version(failed_fonts)
         self.reset_dropdown()
         self.comm_obj.percentageIncri(self.msg,95,"Removing Temporary Files...")
         self.remove_temporary_files()
