@@ -624,14 +624,14 @@ class Dispatcher:
                     screen_details=mythread.json_data['suitedetails'][0]
                     if configvalues['screenShot_Flag'].lower() == 'fail':
                         if result[0].lower() == 'fail':
-                            file_path = screen_shot_obj.captureScreenshot(screen_details)
-                            if headless_mode:
-                                driver.save_screenshot(file_path[2])
+                            file_path = screen_shot_obj.captureScreenshot(screen_details,web=True)
+                            # if headless_mode:
+                            driver.save_screenshot(file_path[2])
                             result.append(file_path[2])
                     elif configvalues['screenShot_Flag'].lower() == 'all':
-                        file_path = screen_shot_obj.captureScreenshot(screen_details)
-                        if headless_mode:
-                            driver.save_screenshot(file_path[2])
+                        file_path = screen_shot_obj.captureScreenshot(screen_details,web=True)
+                        # if headless_mode:
+                        driver.save_screenshot(file_path[2])
                         result.append(file_path[2])
         except TypeError as e:
             local_Wd.log.error(e,exc_info=True)
