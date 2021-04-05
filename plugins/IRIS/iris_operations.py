@@ -807,8 +807,8 @@ class IRISKeywords():
                         b. 1 - Clearing text by method : Double click element + Backspace
                         c. 2 - Clearing text by method : Click element + Home + "Shift+End" + Backspace
                         d. 3 - Clearing text by method : Click element + End + "Shift+Home" + Backspace
-                        e. 4 - Clearing text by method if 2nd-input is positive integer : Click element + End + Backspace X 2nd-input
-                             - Clearing text by method if 2nd-input is negative integer : Click element + Home + Shift + Right X 2nd-input + Backspace
+                        e. 4 - Clearing text by method if 2nd-input is negative integer : Click element + End + Backspace X 2nd-input
+                             - Clearing text by method if 2nd-input is positive integer : Click element + Home + Shift + Right X 2nd-input + Backspace
         OutPut: Boolean Value
         """
         log.info('Inside cleartextiris and No. of arguments passed are : '+str(len(args)))
@@ -883,7 +883,8 @@ class IRISKeywords():
                 elif(args[0][0] == str(4)):
                     try :
                         i = int(args[0][1])
-                        if (i != 0 and i > 0 ):
+                        if (i != 0 and i < 0 ):
+                            i = i*-1
                             log.debug( 'Clearing text by method : Click element + End + Backspace X Index' )
                             if ( SYSTEM_OS != 'Darwin' ):
                                 if ( win32api.GetKeyState(win32con.VK_NUMLOCK) == 1 ):
@@ -893,8 +894,7 @@ class IRISKeywords():
                             time.sleep(0.25)
                             pyautogui.press('backspace', presses = i)
                             flag = True
-                        elif (i != 0 and i < 0 ):
-                            i = i*-1
+                        elif (i != 0 and i > 0 ):
                             log.debug( 'Clearing text by method : Click element + Home(if index is negative) + Shift + Right X Index + Backspace' )
                             if ( SYSTEM_OS != 'Darwin' ):
                                 if ( win32api.GetKeyState(win32con.VK_NUMLOCK) == 1 ):
