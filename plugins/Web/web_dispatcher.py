@@ -624,12 +624,12 @@ class Dispatcher:
                     screen_details=mythread.json_data['suitedetails'][0]
                     if configvalues['screenShot_Flag'].lower() == 'fail':
                         if result[0].lower() == 'fail':
-                            file_path = screen_shot_obj.captureScreenshot(screen_details)
+                            file_path = screen_shot_obj.captureScreenshot(screen_details,web=False)
                             if headless_mode:
                                 driver.save_screenshot(file_path[2])
                             result.append(file_path[2])
                     elif configvalues['screenShot_Flag'].lower() == 'all':
-                        file_path = screen_shot_obj.captureScreenshot(screen_details)
+                        file_path = screen_shot_obj.captureScreenshot(screen_details,web=False)
                         if headless_mode:
                             driver.save_screenshot(file_path[2])
                         result.append(file_path[2])
