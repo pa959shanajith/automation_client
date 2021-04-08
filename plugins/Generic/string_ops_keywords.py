@@ -268,11 +268,11 @@ class StringOperation:
             logger.print_on_console(err_msg)
         return status,result,output,err_msg
 
-    def find(self, actual_string,to_find):
+    def find(self, input):
         """
         def : find
         purpose : to find if string conatins another string
-        param  : string , string
+        param  : string , string, wildcard option(if required)
         return : integers or list of integers
         """
         status=generic_constants.TEST_RESULT_FAIL
@@ -280,25 +280,57 @@ class StringOperation:
         err_msg=None
         output=OUTPUT_CONSTANT
         position=[]
+        wildcard_find = False
+        actual_string = input[0]
+        to_find = input[1]
+        to_find_d = to_find
+        wildcard_option = input[2].lower() if(len(input) == 3) else ""
+        if (wildcard_option != "" and wildcard_option == 'yes'):
+            wildcard_find = True
         try:
             if not (actual_string is None or actual_string is ''):
                 if not (to_find is None or to_find is ''):
-                    coreutilsobj=core_utils.CoreUtils()
-                    actual_string=coreutilsobj.get_UTF_8(actual_string)
-                    actual_string=unidecode(actual_string)
-                    to_find=coreutilsobj.get_UTF_8(to_find)
-                    #output_val = actual_string.find(to_find)
-                    position = [i+1 for i in range(len(actual_string)) if actual_string.startswith(to_find, i)]
-                    output_val = len(position)
-                    if len(position) == 1: position=position[0]
-                    if(output_val == 0):
-                        logger.print_on_console('The Original String is:',actual_string ,' and ' , actual_string , ' does not Contain ', to_find )
+                    if (wildcard_find == True):
+                        to_find = to_find.replace('?','.')
+                        to_find = to_find.replace('*','.+')
+                        import re
+                        pattern = re.compile(r"{}".format(to_find))
+                        match = pattern.search(actual_string)
+                        if match:
+                            to_find = to_find.split('.')
+                            position = [i+1 for i in range(len(actual_string)) if actual_string.startswith(to_find[0], i)]
+                            output_val = len(position)
+                            if len(position) == 1: position=position[0]
+                            if(output_val == 0):
+                                logger.print_on_console('The Original String is ',actual_string ,' and ' , actual_string , ' does not Contain ', to_find_d )
+                            else:
+                                log.info('Result : ')
+                                log.info(output_val)
+                                status=generic_constants.TEST_RESULT_PASS
+                                result=generic_constants.TEST_RESULT_TRUE
+                                output=position
+                        else:
+                            output='false'
+                            logger.print_on_console('The Original String is ',actual_string ,' and ' , actual_string , ' does not Contain ', to_find_d )      
                     else:
-                        log.info('Result : ')
-                        log.info(output_val)
-                        status=generic_constants.TEST_RESULT_PASS
-                        result=generic_constants.TEST_RESULT_TRUE
-                        output=position
+                        if not (to_find is None or to_find is ''):
+                            coreutilsobj=core_utils.CoreUtils()
+                            actual_string=coreutilsobj.get_UTF_8(actual_string)
+                            actual_string=unidecode(actual_string)
+                            to_find=coreutilsobj.get_UTF_8(to_find)
+                            #output_val = actual_string.find(to_find)
+                            position = [i+1 for i in range(len(actual_string)) if actual_string.startswith(to_find, i)]
+                            output_val = len(position)
+                            if len(position) == 1: position=position[0]
+                            if(output_val == 0):
+                                logger.print_on_console('The Original String is:',actual_string ,' and ' , actual_string , ' does not Contain ', to_find )
+                                output='false'
+                            else:
+                                log.info('Result : ')
+                                log.info(output_val)
+                                status=generic_constants.TEST_RESULT_PASS
+                                result=generic_constants.TEST_RESULT_TRUE
+                                output=position
             else:
                 #log.error(INVALID_INPUT)
                 err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']

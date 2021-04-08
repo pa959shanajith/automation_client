@@ -9,6 +9,7 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 from generic_constants import *
+from encryption_utility import AESCipher
 from constants import *
 import logger
 if SYSTEM_OS != 'Darwin':
@@ -179,3 +180,27 @@ class SendFunctionKeys:
                     string_input='type'
             value=value
         return value,string_input
+
+    def sendsecurefunction_keys(self,input):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_res=OUTPUT_CONSTANT
+        try:
+            if input!="":
+                encryption_obj = AESCipher()
+                input = encryption_obj.decrypt(input)
+                log.debug('sending the keys in input')
+                configvalues = readconfig.readConfig().readJson()
+                if input is not None:
+                    self.type(input, float(configvalues['delay_stringinput']))
+                    status=TEST_RESULT_PASS
+                    methodoutput=TEST_RESULT_TRUE
+            else:
+                err_msg = 'input value is empty'        
+        except Exception as e:
+            log.error(e)
+            logger.print_on_console(e)
+        if err_msg!=None:
+            logger.print_on_console(err_msg)
+        return status,methodoutput,output_res,err_msg

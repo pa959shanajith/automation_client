@@ -129,6 +129,7 @@ class GenericKeywordDispatcher:
             'wait':local_generic.generic_delay.wait,
             'pause':local_generic.generic_delay.pause,
             'sendfunctionkeys':local_generic.generic_sendkeys.sendfunction_keys,
+            'sendsecurefunctionkeys':local_generic.generic_sendkeys.sendsecurefunction_keys,
             'getblockcount' : local_generic.xml_oper.get_block_count,
             'gettagvalue' : local_generic.xml_oper.get_tag_value,
             'getblockvalue' : local_generic.xml_oper.get_block_value,
@@ -249,7 +250,10 @@ class GenericKeywordDispatcher:
                         output=';'.join(output)
                     result= self.generic_dict[keyword](input,output)
                 else:
-                    result= self.generic_dict[keyword](*message)
+                    if keyword == 'find':
+                        result= self.generic_dict[keyword](message)
+                    else:
+                        result= self.generic_dict[keyword](*message)
             else:
                 err_msg=generic_constants.INVALID_KEYWORD
                 result[3]=err_msg

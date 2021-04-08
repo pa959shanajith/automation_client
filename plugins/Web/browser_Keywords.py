@@ -684,6 +684,7 @@ class BrowserKeywords():
         status=webconstants.TEST_RESULT_FAIL
         result=webconstants.TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
+        window_num_flag = False
         ## Issue #190 Driver control won't switch back to parent window
         err_msg=None
         try:
@@ -701,6 +702,22 @@ class BrowserKeywords():
                             local_bk.log.info('Sub window closed')
                         except Exception as e:
                             err_msg=self.__web_driver_exception(e)
+                elif (inp != ''):
+                    inp = int(inp)
+                    if inp < len(local_bk.all_handles):
+                        try:
+                            window_num_flag = True
+                            local_bk.driver_obj.switch_to.window(local_bk.all_handles[inp])
+                            local_bk.driver_obj.close()
+                            local_bk.all_handles=local_bk.all_handles[0:-1]
+                            logger.print_on_console('Specified Sub window closed')
+                            local_bk.log.info('Specified Sub windows closed')
+                        except Exception as e:
+                            err_msg=self.__web_driver_exception(e)
+                    else:
+                        err_msg = 'provide valid window number'
+                        logger.print_on_console(err_msg)
+                        local_bk.log.error(err_msg)
                 else:
                     try:
                         local_bk.driver_obj.switch_to.window(local_bk.all_handles[-1])
@@ -712,10 +729,17 @@ class BrowserKeywords():
                         err_msg=self.__web_driver_exception(e)
 
                 if(len(local_bk.all_handles) >= 1):
-                    local_bk.driver_obj.switch_to.window(local_bk.all_handles[-1])
-                    self.update_recent_handle(local_bk.all_handles[-1])
-                    status=webconstants.TEST_RESULT_PASS
-                    result=webconstants.TEST_RESULT_TRUE
+                    if (inp != '' and inp != 'ALL'):
+                        if (window_num_flag == True):
+                            local_bk.driver_obj.switch_to.window(local_bk.all_handles[inp-1])
+                            self.update_recent_handle(local_bk.all_handles[inp-1])
+                            status=webconstants.TEST_RESULT_PASS
+                            result=webconstants.TEST_RESULT_TRUE
+                    else:
+                        local_bk.driver_obj.switch_to.window(local_bk.all_handles[-1])
+                        self.update_recent_handle(local_bk.all_handles[-1])
+                        status=webconstants.TEST_RESULT_PASS
+                        result=webconstants.TEST_RESULT_TRUE
             else:
                 err_msg = 'No sub windows to close'
                 logger.print_on_console(err_msg)

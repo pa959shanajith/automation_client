@@ -162,6 +162,7 @@ class Dispatcher:
             'mousehover':local_Wd.util_object.mouse_hover,
             'tab':local_Wd.util_object.tab,
             'sendfunctionkeys':local_Wd.util_object.sendfunction_keys,
+            'sendsecurefunctionkeys':local_Wd.util_object.sendsecurefunction_keys,
             'rightclick':local_Wd.util_object.rightclick,
             'mouseclick':local_Wd.util_object.mouse_click,
             'verifywebimages':local_Wd.util_object.verify_web_images,
