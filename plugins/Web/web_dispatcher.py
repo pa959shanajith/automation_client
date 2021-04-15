@@ -361,17 +361,17 @@ class Dispatcher:
             'selectradiobutton': ['radio'],
             'selectcheckbox': ['checkbox'],
             'unselectcheckbox': ['checkbox'],
-            'selectvaluebyindex':['dropdown','listbox'],
-            'selectvaluebytext': ['dropdown','listbox'],
-            'getallvalues':['dropdown','listbox'],
-            'verifyallvalues': ['dropdown','listbox'],
+            'selectvaluebyindex':['dropdown','listbox','select'],
+            'selectvaluebytext': ['dropdown','listbox','select'],
+            'getallvalues':['dropdown','listbox','select'],
+            'verifyallvalues': ['dropdown','listbox','select'],
             'settext': ['textbox','textarea','password','number','email','url'],
             'sendvalue':['textbox','textarea','password','number','email','url'],
             'gettext': ['textbox','textarea','password','number','email','url'],
             'setsecuretext':['textbox','password'],
             'sendsecurevalue':['textbox','password'],
-            'getattributevalue':['radio','checkbox','dropdown','listbox','textbox','textarea','password','number','email','url','grid'],
-            'verifyattribute':['radio','checkbox','dropdown','listbox','textbox','textarea','password','number','email','url','grid']
+            'getattributevalue':['radio','checkbox','dropdown','select','listbox','textbox','textarea','password','number','email','url','grid'],
+            'verifyattribute':['radio','checkbox','dropdown','select','listbox','textbox','textarea','password','number','email','url','grid']
         }
         custom_dict_element={'element':['getobjectcount','getobject','clickelement','doubleclick','rightclick','getelementtext','verifyelementtext','drag', 'drop','gettooltiptext','verifytooltiptext','verifyexists', 'verifydoesnotexists', 'verifyhidden','verifyvisible', 'switchtotab','switchtowindow','setfocus','sendfunctionkeys',
             'tab','waitforelementvisible','mousehover','press','verifyenabled','verifydisabled','verifyreadonly','getattributevalue','verifyattribute','getrowcount','getcolumncount','getcellvalue','verifycellvalue','getcelltooltip','verifycelltooltip','cellclick','getrownumbytext','getcolnumbytext','getinnertable','selectbyabsolutevalue','horizontalscroll','verticalscroll']}
@@ -624,12 +624,12 @@ class Dispatcher:
                     screen_details=mythread.json_data['suitedetails'][0]
                     if configvalues['screenShot_Flag'].lower() == 'fail':
                         if result[0].lower() == 'fail':
-                            file_path = screen_shot_obj.captureScreenshot(screen_details)
+                            file_path = screen_shot_obj.captureScreenshot(screen_details,web=False)
                             if headless_mode:
                                 driver.save_screenshot(file_path[2])
                             result.append(file_path[2])
                     elif configvalues['screenShot_Flag'].lower() == 'all':
-                        file_path = screen_shot_obj.captureScreenshot(screen_details)
+                        file_path = screen_shot_obj.captureScreenshot(screen_details,web=False)
                         if headless_mode:
                             driver.save_screenshot(file_path[2])
                         result.append(file_path[2])

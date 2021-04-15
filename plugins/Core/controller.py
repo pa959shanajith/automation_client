@@ -787,7 +787,7 @@ class Controller():
                     index = i
                     i = self.methodinvocation(i,execution_env)
                     #Check wether accessibility testing has to be executed
-                    if (index + 1 >= len(tsplist) or (tsplist[index].testscript_name != tsplist[index + 1].testscript_name and screen_testcase_map[tsplist[index].testscript_name]['screenid'] != screen_testcase_map[tsplist[index + 1].testscript_name]['screenid'])) and accessibility_testing : 
+                    if accessibility_testing and (index + 1 >= len(tsplist) or (tsplist[index].testscript_name != tsplist[index + 1].testscript_name and screen_testcase_map[tsplist[index].testscript_name]['screenid'] != screen_testcase_map[tsplist[index + 1].testscript_name]['screenid'])): 
                         if local_cont.accessibility_testing_obj is None: self.__load_web()
                         import browser_Keywords
                         script_info =  screen_testcase_map[tsplist[index].testscript_name]
@@ -1373,9 +1373,9 @@ class Controller():
                                     zephyr_status['testid']=zephy_testid
                                     zephyr_status['projectId']=zephyr_projectid
                                     zephyr_status['treeid']=zephyr_treeid
-                                    zephyr_status['zephyr_accNo']=zephyr_password
-                                    zephyr_status['zephyr_acKey']=zephyr_url
-                                    zephyr_status['zephyr_secKey']=zephyr_username
+                                    zephyr_status['zephyr_password']=zephyr_password
+                                    zephyr_status['zephyr_url']=zephyr_url
+                                    zephyr_status['zephyr_username']=zephyr_username
                                     zephyr_update_status=zephyr_status_over['overallstatus']
                                     if(zephyr_update_status.lower()=='pass'):
                                         zephyr_status['status']='1'
@@ -1614,6 +1614,8 @@ def kill_process():
 
         try:
             import browser_Keywords
+            for driver in browser_Keywords.drivermap:
+                driver.quit()
             del browser_Keywords.drivermap[:]
             if hasattr(browser_Keywords.local_bk, 'driver_obj'):
                 if (browser_Keywords.local_bk.driver_obj):
@@ -1622,22 +1624,23 @@ def kill_process():
                 if (browser_Keywords.local_bk.pid_set):
                     del browser_Keywords.local_bk.pid_set[:]
         except Exception as e:
-            log.error(e)
-
-        try:
-            # os.system("killall -9 Safari")
-                # This kills all instances of safari browser even if it is not opened by Avo Assure.
-                # Issue when Avo Assure is opened in Safari browser
-            for id in process_ids:
-                os.system("kilall -9 " + id)
-            # os.system("killall -9 safaridriver")
-            # os.system("killall -9 node_appium")
-            # os.system("killall -9 xcodebuild")
-            # os.system("killall -9 chromedriver")
-            # os.system("killall -9 geckodriver")
-        except Exception as e:
             logger.print_on_console('Exception in stopping server')
             log.error(e)
+
+        # try:
+        #     # os.system("killall -9 Safari")
+        #         # This kills all instances of safari browser even if it is not opened by Avo Assure.
+        #         # Issue when Avo Assure is opened in Safari browser
+        #     for id in process_ids:
+        #         os.system("killall -9 " + str(id))
+        #     # os.system("killall -9 safaridriver")
+        #     # os.system("killall -9 node_appium")
+        #     # os.system("killall -9 xcodebuild")
+        #     # os.system("killall -9 chromedriver")
+        #     # os.system("killall -9 geckodriver")
+        # except Exception as e:
+        #     logger.print_on_console('Exception in stopping server')
+        #     log.error(e)
         log.info('Stale processes killed')
         logger.print_on_console('Stale processes killed')
     else:

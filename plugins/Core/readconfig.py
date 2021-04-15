@@ -29,9 +29,10 @@ class readConfig():
         "chrome_path":"", "chrome_profile":"","bit_64":"", "logFile_Path":"", "screenShot_Flag":"",
         "queryTimeOut":"", "timeOut":"", "stepExecutionWait":"", "displayVariableTimeOut":"",
         "httpStatusCode":"", "delay":"", "ignoreVisibilityCheck":"", "exception_flag":"",
-        "server_cert":"", "enableSecurityCheck":"","browser_check":"","tls_security":"","highlight_check":"","firefox_path":"",
-        "prediction_for_iris_objects":"","hide_soft_key":"","connection_timeout":"","extn_enabled":"","headless_mode":"","update_check":"",
-        "delay_stringinput":"","clear_cache":"","screen_rec":"","full_screenshot":"","close_browser_popup":""}
+        "server_cert":"", "enableSecurityCheck":"","browser_check":"","tls_security":"","highlight_check":"",
+        "firefox_path":"", "prediction_for_iris_objects":"","hide_soft_key":"","connection_timeout":"","extn_enabled":"",
+        "headless_mode":"","update_check":"", "delay_stringinput":"","clear_cache":"","screen_rec":"","full_screenshot":"",
+        "close_browser_popup":"", "chrome_debugport":"", "edgechromium_debugport": ""}
         if os.path.isfile(self.config_path)==True:
             try:
                 conf = open(self.config_path, 'r')
@@ -70,6 +71,8 @@ class readConfig():
                 configvalues['screen_rec']=params['screen_rec']
                 configvalues['full_screenshot']=params['full_screenshot']
                 configvalues['close_browser_popup']=params['close_browser_popup']
+                configvalues['chrome_debugport']=params['chrome_debugport']
+                configvalues['edgechromium_debugport']=params['edgechromium_debugport']
             except Exception as e:
                 configvalues['errorflag']=e
         else:

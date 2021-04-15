@@ -443,7 +443,7 @@ class UtilWebKeywords:
                     childindex=lastElement[lastElement.find("[")+1:lastElement.find("]")]
                     childindex = int(childindex)
                     if tag=='button':
-                       if( (tagName==('input') and tagType==('button')) or tagType==('submit') or tagType==('reset') or tagType==('file')):
+                       if( ((tagName==('input') or tagName==('button')) and tagType==('button')) or tagType==('submit') or tagType==('reset') or tagType==('file')):
                           if index==childindex:
                             eleStatus =True
                           else:
@@ -510,7 +510,7 @@ class UtilWebKeywords:
                                    eleStatus =True
                                 else:
                                     counter+=1
-                    elif tag=='link':
+                    elif tag=='link' or tag=='a':
                         if(tagName==('a')):
                             if index==childindex:
                                 eleStatus =True

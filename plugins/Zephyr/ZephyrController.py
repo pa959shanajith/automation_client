@@ -119,7 +119,7 @@ class ZephyrWindow():
                 # Fetch testcases
                 if JsonObject["resultSize"] != 0:
                     results = JsonObject["results"]
-                    res = [{'id':i['testcase']['id'],'name':i['testcase']['name']} for i in results]
+                    res = [{'id':i['testcase']['id'],'name':i['testcase']['name'],'cyclePhaseId': i['rts']['cyclePhaseId']} for i in results if 'rts' in i]
         except Exception as eproject:
             err_msg = 'Error while fetching testcases from Zephyr'
             log.error(err_msg)
@@ -130,6 +130,12 @@ class ZephyrWindow():
     def update_zephyr_test_details(self,data):
         status = False
         try:
+            if(self.zephyrURL == None) :
+                zephyrLoginLoad = {}
+                zephyrLoginLoad["zephyrUserName"] = data['zephyr_username']
+                zephyrLoginLoad["zephyrPassword"] = data['zephyr_password']
+                zephyrLoginLoad["zephyrURL"] = data['zephyr_url']
+                self.login(zephyrLoginLoad)
             # get schedule
             cyclephaseid = data["treeid"]
             releaseid = data["releaseid"]

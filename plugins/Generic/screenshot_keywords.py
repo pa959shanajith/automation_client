@@ -24,7 +24,7 @@ import logging
 
 log = logging.getLogger('screenshot_keywords.py')
 class Screenshot():
-    def captureScreenshot(self,*args):
+    def captureScreenshot(self,*args,web=False):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -68,8 +68,9 @@ class Screenshot():
             else:
                 log.debug('screenshot captured')
                 logger.print_on_console('Screenshot captured')
-                img=ImageGrab.grab()
-                img.save(filePath+'.png')
+                if not(web):
+                    img=ImageGrab.grab()
+                    img.save(filePath+'.png')
                 status=TEST_RESULT_PASS
                 methodoutput=TEST_RESULT_TRUE
         except Exception as e:

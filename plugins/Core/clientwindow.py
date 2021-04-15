@@ -514,7 +514,7 @@ class Config_window(wx.Frame):
         #------------------------------------Different co-ordinates for Windows and Mac
         if SYSTEM_OS=='Windows':
             config_fields= {
-            "Frame":[(300, 150),(470,640)],
+            "Frame":[(300, 150),(470,670)],
             "S_address":[(12,12),(85, 25),(110,8),(140,-1)],
             "S_port": [(270,12),(70, 25),(340,8), (105,-1)],
             "Chrm_path":[(12,42),(80, 25),(110,38), (300,-1),(415,38),(30, -1)],
@@ -529,13 +529,16 @@ class Config_window(wx.Frame):
             "Disp_var":[(235,222),(135, 25),(375,218), (70,-1)],
             "C_Timeout" :[(12,252),(120, 25),(135,248), (70,-1)],
             "Delay_Stringinput":[(235,252),(130, 25),(375,248), (70,-1)],
-            "err_text":[(50,525),(350, 25)],
-            "Save":[(100,550), (100, 28)],
-            "Close":[(250,550), (100, 28)]
+            "Chrm_port":[(12,282),(120, 25),(135,278), (70,-1)],
+            "Edgechrm_port":[(215,282),(150, 25),(375,278), (70,-1)],
+            "panel1":[(10,320),(100,30),(440,195),(8, 345)],
+            "err_text":[(50,555),(350, 25)],
+            "Save":[(100,580), (100, 28)],
+            "Close":[(250,580), (100, 28)]
             }
         else:
             config_fields={
-            "Frame":[(300, 150),(600,640)],
+            "Frame":[(300, 150),(600,670)],
             "S_address":[(12,12),(90,25),(116,8),(140,-1)],
             "S_port": [(352,12),(70,25),(430,8), (105,-1)],
             "Chrm_path":[(12,42),(80,25),(116,38),(382,-1),(504,38),(30, -1)],
@@ -550,9 +553,12 @@ class Config_window(wx.Frame):
             "Disp_var":[(288,222),(140, 25),(448,218),(85,-1)],
             "C_Timeout" :[(12,252),(120, 25),(180,248), (80,-1)],
             "Delay_Stringinput":[(288,252),(140, 25),(448,248), (85,-1)],
-            "err_text":[(85,525),(350, 25)],
-            "Save":[(130,550),(100, 28)],
-            "Close":[(370,550),(120, 28)]
+            "Chrm_port":[(12,282),(140, 25),(180,278), (85,-1)],
+            "Edgechrm_port":[(235,282),(140, 25),(448,278), (85,-1)],
+            "panel1":[(10,320),(100,30),(440,195),(8, 345)],
+            "err_text":[(85,555),(350, 25)],
+            "Save":[(130,580),(100, 28)],
+            "Close":[(370,580),(120, 28)]
             }
         wx.Frame.__init__(self, parent, title=title,
             pos=config_fields["Frame"][0], size=config_fields["Frame"][1],style = wx.CAPTION|wx.CLIP_CHILDREN)
@@ -564,7 +570,7 @@ class Config_window(wx.Frame):
         self.panel = wx.Panel(self)
 
         #This is the panel which will have scrolling panel and which will contain the radiobuttons
-        self.panel1 = wx.lib.scrolledpanel.ScrolledPanel(self.panel,-1,size=(440,195), pos=(8,315))
+        self.panel1 = wx.lib.scrolledpanel.ScrolledPanel(self.panel,-1,size=config_fields["panel1"][2], pos=config_fields["panel1"][3])
         self.panel1.SetupScrolling()
 
         self.sev_add=wx.StaticText(self.panel, label="Server Address", pos=config_fields["S_address"][0],size=config_fields["S_address"][1], style=0, name="")
@@ -702,7 +708,23 @@ class Config_window(wx.Frame):
         else:
             self.Delay_input.SetValue("0.005")
 
-        self.config_param=wx.StaticText(self.panel,label="Config Parameters",pos=(10,290),size=(100,30), style=0, name="")
+        #Chrome Remote Debugging port input
+        self.ch_debugport=wx.StaticText(self.panel, label="Chrome Debug Port", pos=config_fields["Chrm_port"][0],size=config_fields["Chrm_port"][1], style=0, name="")
+        self.chrome_port=wx.TextCtrl(self.panel, pos=config_fields["Chrm_port"][2], size=config_fields["Chrm_port"][3])
+        if isConfigJson!=False and isConfigJson['chrome_debugport'].isnumeric():
+            self.chrome_port.SetValue(isConfigJson['chrome_debugport'])
+        else:
+            self.chrome_port.SetValue("0")
+
+        #Edge Chromium Remote Debugging port input
+        self.edgech_debugport=wx.StaticText(self.panel, label="Edge Chromium Debug Port", pos=config_fields["Edgechrm_port"][0],size=config_fields["Edgechrm_port"][1], style=0, name="")
+        self.edgechromium_port=wx.TextCtrl(self.panel, pos=config_fields["Edgechrm_port"][2], size=config_fields["Edgechrm_port"][3])
+        if isConfigJson!=False and isConfigJson['edgechromium_debugport'].isnumeric():
+            self.edgechromium_port.SetValue(isConfigJson['edgechromium_debugport'])
+        else:
+            self.edgechromium_port.SetValue("0")
+
+        self.config_param=wx.StaticText(self.panel,label="Config Parameters",pos=config_fields["panel1"][0],size=config_fields["panel1"][1], style=0, name="")
         font = wx.Font(9, wx.DEFAULT, wx.NORMAL, wx.NORMAL)
         self.config_param.SetFont(font)
 
@@ -713,16 +735,19 @@ class Config_window(wx.Frame):
         self.ch_profile.SetToolTip(wx.ToolTip("Chrome profile path or default"))
         self.ff_path.SetToolTip(wx.ToolTip("Firefox installation path or default"))
         self.log_fpath.SetToolTip(wx.ToolTip(" ICE Log file path"))
+        self.sev_cert.SetToolTip(wx.ToolTip("Server certificate file path or default"))
         self.qu_timeout.SetToolTip(wx.ToolTip("Timeout for database queries"))
         self.timeOut.SetToolTip(wx.ToolTip("Timeout for waitForElementVisible[in seconds]"))
         self.delayText.SetToolTip(wx.ToolTip("Delay to switch between browser tabs[seconds]"))
-        self.delay_stringinput.SetToolTip(wx.ToolTip("Character input delay for sendFunctionKeys"))
         self.stepExecWait.SetToolTip(wx.ToolTip("Delay between each step[in seconds]"))
         self.dispVarTimeOut.SetToolTip(wx.ToolTip("displayVariable popup duration[in seconds]"))
-        self.sev_cert.SetToolTip(wx.ToolTip("Server certificate file path or default"))
         self.connection_timeout.SetToolTip(wx.ToolTip("Timeout from server [in hours 0 or >8]"))
+        self.delay_stringinput.SetToolTip(wx.ToolTip("Character input delay for sendFunctionKeys"))
+        self.ch_debugport.SetToolTip(wx.ToolTip("Chrome Debugging Port (0 for default, max value 65535)"))
+        self.edgech_debugport.SetToolTip(wx.ToolTip("Edge Chromium Debugging Port (0 for default, max value 65535)"))
 
         ## Binding placeholders and restricting textareas to just numeric characters
+        self.server_port.Bind(wx.EVT_CHAR, self.handle_keypress)
         self.disp_var_timeout.Bind(wx.EVT_SET_FOCUS,self.toggle1_generic)
         self.disp_var_timeout.Bind(wx.EVT_KILL_FOCUS,self.toggle2_generic)
         self.disp_var_timeout.Bind(wx.EVT_CHAR, self.handle_keypress)
@@ -750,6 +775,8 @@ class Config_window(wx.Frame):
         self.conn_timeout.Bind(wx.EVT_SET_FOCUS,self.toggle1_generic)
         self.conn_timeout.Bind(wx.EVT_KILL_FOCUS,self.toggle2_generic)
         self.conn_timeout.Bind(wx.EVT_CHAR, self.handle_keypress)
+        self.chrome_port.Bind(wx.EVT_CHAR, self.handle_keypress)
+        self.edgechromium_port.Bind(wx.EVT_CHAR, self.handle_keypress)
 
         lblList = ['Yes', 'No']
         lblList2 = ['64-bit', '32-bit']
@@ -1033,6 +1060,8 @@ class Config_window(wx.Frame):
         screen_rec = self.rbox17.GetStringSelection()
         full_screenshot = self.rbox18.GetStringSelection()
         close_browser_popup = self.rbox19.GetStringSelection()
+        chrome_debugport = self.chrome_port.GetValue()
+        edgechromium_debugport = self.edgechromium_port.GetValue()
         if extn_enabled == 'Yes' and headless_mode == 'Yes':
             self.error_msg.SetLabel("Extension Enable must be disabled when Headless Mode is enabled")
             self.error_msg.SetForegroundColour((255,0,0))
@@ -1071,12 +1100,15 @@ class Config_window(wx.Frame):
         data['screen_rec']=screen_rec.strip()
         data['full_screenshot']=full_screenshot.strip()
         data['close_browser_popup']=close_browser_popup.strip()
+        data['chrome_debugport']=chrome_debugport
+        data['edgechromium_debugport']=edgechromium_debugport
         config_data=data
         if (data['server_ip']!='' and data['server_port']!='' and data['server_cert']!='' and
             data['chrome_path']!='' and data['queryTimeOut'] not in ['','sec'] and data['logFile_Path']!='' and
             data['delay'] not in ['','sec'] and data['timeOut'] not in ['','sec'] and data['stepExecutionWait'] not in ['','sec'] and
             data['displayVariableTimeOut'] not in ['','sec'] and data['delay_stringinput'] not in ['','sec'] and
-            data['firefox_path']!='' and data['connection_timeout'] not in ['','0 or >=8 hrs']):
+            data['firefox_path']!='' and data['connection_timeout'] not in ['','0 or >=8 hrs'] and
+            data['chrome_debugport']!='' and data['edgechromium_debugport']!=''):
             #---------------------------------------resetting the static texts
             self.error_msg.SetLabel("")
             self.sev_add.SetLabel('Server Address')
@@ -1103,6 +1135,10 @@ class Config_window(wx.Frame):
             self.dispVarTimeOut.SetForegroundColour((0,0,0))
             self.connection_timeout.SetLabel('Connection Timeout')
             self.connection_timeout.SetForegroundColour((0,0,0))
+            self.ch_debugport.SetLabel('Chrome Debug Port')
+            self.ch_debugport.SetForegroundColour((0,0,0))
+            self.edgech_debugport.SetLabel('Edge Chromium Debug Port')
+            self.edgech_debugport.SetForegroundColour((0,0,0))
             #---------------------------------------creating the file in specified path
             try:
                 f = open(data['logFile_Path'], "a+")
@@ -1119,12 +1155,25 @@ class Config_window(wx.Frame):
                 (os.path.isfile(data['server_cert'])==True or str(data['server_cert']).strip()=='default') and
                 (os.path.isfile(data['firefox_path'])==True or str(data['firefox_path']).strip()=='default') and
                 os.path.isfile(data['logFile_Path'])==True):
-                if int(data['connection_timeout'])in range(1, 8):
+                if int(data['connection_timeout']) in range(1, 8):
                     self.error_msg.SetLabel("Connection Timeout must be greater than or equal to 8")
                     self.error_msg.SetForegroundColour((255,0,0))
                     self.connection_timeout.SetForegroundColour((255,0,0))
                 else:
-                    self.jsonCreater(config_data)
+                    config_valid = True
+                    if int(data['chrome_debugport']) > 65535:
+                        self.ch_debugport.SetLabel('Chrome Debug Port^')
+                        self.ch_debugport.SetForegroundColour((255,0,0))
+                        config_valid = False
+                    if int(data['edgechromium_debugport']) > 65535:
+                        self.edgech_debugport.SetLabel('Edge Chromium Debug Port^')
+                        self.edgech_debugport.SetForegroundColour((255,0,0))
+                        config_valid = False
+                    if config_valid:
+                        self.jsonCreater(config_data)
+                    else:
+                        self.error_msg.SetLabel("Marked fields '^' contains invalid values, Data not saved")
+                        self.error_msg.SetForegroundColour((255,0,0))
             else:
                 self.error_msg.SetLabel("Marked fields '^' contain invalid path, Data not saved")
                 self.error_msg.SetForegroundColour((0,0,255))
@@ -1138,14 +1187,14 @@ class Config_window(wx.Frame):
                 if os.path.isfile(data['chrome_path'])==True or str(data['chrome_path']).strip()=='default':
                     self.ch_path.SetLabel('Chrome Path')
                     self.ch_path.SetForegroundColour((0,0,0))
-                elif  os.path.isfile(data['chrome_path'])!=True:
+                elif os.path.isfile(data['chrome_path'])!=True:
                     self.ch_path.SetLabel('Chrome Path^')
                     self.ch_path.SetForegroundColour((0,0,255))
 
                 if os.path.isfile(data['firefox_path'])==True or str(data['firefox_path']).strip()=='default':
                     self.ff_path.SetLabel('Firefox Path')
                     self.ff_path.SetForegroundColour((0,0,0))
-                elif  os.path.isfile(data['firefox_path'])!=True:
+                elif os.path.isfile(data['firefox_path'])!=True:
                     self.ff_path.SetLabel('Firefox Path^')
                     self.ff_path.SetForegroundColour((0,0,255))
 
@@ -1236,6 +1285,18 @@ class Config_window(wx.Frame):
             else:
                 self.connection_timeout.SetLabel('Connection Timeout')
                 self.connection_timeout.SetForegroundColour((0,0,0))
+            if data['chrome_debugport']=='':
+                self.ch_debugport.SetLabel('Chrome Debug Port*')
+                self.ch_debugport.SetForegroundColour((255,0,0))
+            else:
+                self.ch_debugport.SetLabel('Chrome Debug Port')
+                self.ch_debugport.SetForegroundColour((0,0,0))
+            if data['edgechromium_debugport']=='':
+                self.edgech_debugport.SetLabel('Edge Chromium Debug Port*')
+                self.edgech_debugport.SetForegroundColour((255,0,0))
+            else:
+                self.edgech_debugport.SetLabel('Edge Chromium Debug Port')
+                self.edgech_debugport.SetForegroundColour((0,0,0))
 
     """jsonCreater saves the data in json form, location of file to be saved must be defined. This method will overwrite the existing .json file"""
     def jsonCreater(self,data):
