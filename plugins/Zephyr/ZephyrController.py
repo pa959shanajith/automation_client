@@ -120,25 +120,12 @@ class ZephyrWindow():
                 if JsonObject["resultSize"] != 0:
                     results = JsonObject["results"]
                     res = [{'id':i['testcase']['id'],'name':i['testcase']['name'],'cyclePhaseId': i['rts']['cyclePhaseId']} for i in results if 'rts' in i]
-                    # req_id = []
-                    # requirement_details={}
-                    # requirement_list=[] 
+                    # Fetch requirement details of testcases
                     for i in range(len(results)):
                         if 'rts' in results[i]:
-                            # if len(i['testcase']['requirementIds']) != 0:
                             req_id = results[i]['testcase']['requirementIds']
                             requirement_details = self.get_requirement_details(req_id)
-                            res[i]['reqDetails'] = requirement_details
-                        # req_details_copy = requirement_details.copy()
-                        # requirement_list.append(req_details_copy)
-                        # else:
-                        #     requirement_details = {}
-                        #     requirement_list.append(requirement_details)
-                    # res['reqDetails'] = requirement_details
-                    # if len(res) == len(requirement_list):
-                    #     for i in range(len(res)):
-                    #         req_details = requirement_list[i]
-                    #         res[i].update(req_details)
+                            res[i]['reqdetails'] = requirement_details
         except Exception as eproject:
             err_msg = 'Error while fetching testcases from Zephyr'
             log.error(err_msg)
@@ -187,8 +174,6 @@ class ZephyrWindow():
         res = []
         requirement_list = {}
         try:
-            # get all testcases
-            # treeid = filePath["treeId"]
             if len(requirementid) >=1:
                 for i in requirementid:
                     relative_path = "/requirement/"+str(i)
@@ -198,7 +183,7 @@ class ZephyrWindow():
                         # Fetch requirement details
                         if JsonObject != 0:
                             results = JsonObject
-                            requirement_list = {'reqId':results['id'],'reqName':results['name'],'reqDescription': results['details'],'reqCreationDate' : results['reqCreationDate']}
+                            requirement_list = {'reqid':results['id'],'reqname':results['name'],'reqdescription': results['details'],'reqcreationdate' : results['reqCreationDate']}
                             req_details_copy = requirement_list.copy()
                             res.append(req_details_copy)
         except Exception as eproject:
