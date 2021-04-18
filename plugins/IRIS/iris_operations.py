@@ -2240,3 +2240,116 @@ class IRISKeywords():
             logger.print_on_console("Error occurred in getStatusIris")
         del element, args, img, res, elem_coordinates, const_coordintes, elements, height, width, originalImage, relativeImage, matchFlag, flg # deleting variables
         return status, result, value, err_msg
+
+    def scrolliris(self,element,*args):
+        """
+        Discription: Performs a scroll operation on the vertical/horizontal scroll element.
+        Input: <scroll option>;<index>;<type>
+                scroll option : up, down, right and left
+                index : positive integer
+                type : type of scroll function 0(default) - clicks on the scroll button of up/down/right/left. 1 - clicks in the middle of the scroll bar then uses sendkeys to traverse in direction of option
+        OutPut: Boolean Value
+        """
+        log.info('Inside scrolliris and No. of arguments passed are : '+str(len(args)))
+        status = TEST_RESULT_FAIL
+        result = TEST_RESULT_FALSE
+        err_msg = None
+        value = OUTPUT_CONSTANT
+        img = None
+        res = None
+        elem_coordinates = None
+        const_coordintes = None
+        elements = []
+        width = None
+        height = None
+        flg = False
+        try:
+            img = None
+            if(len(args) == 3 and args[2]!='' and verifyFlag ):
+                log.info('IRIS element recognised as a relative element')
+                elem_coordinates = element['coordinates']
+                const_coordintes = args[2]['coordinates']
+                elements = [(const_coordintes[0],const_coordintes[1]),
+                        (const_coordintes[2],const_coordintes[3]),
+                        (elem_coordinates[0], elem_coordinates[1]),
+                        (elem_coordinates[2], elem_coordinates[3])]
+                img, res = find_relative_image(elements, relativeCoordinates)
+                log.info( 'Relative image co-ordinates : ' + str(res) )
+                width = res[2] - res[0]
+                height = res[3] - res[1]
+                log.info( "Element co-ordinates after finding relative image are : " + str(res) )
+            else:
+                res, width, height = gotoobject(element)
+                if(res): img = get_byte_mirror(element['cord'])
+            if( len(res) > 0 ):
+                if ( SYSTEM_OS != 'Darwin' ):
+                    #Disabling num and scroll lock
+                    if ( win32api.GetKeyState(win32con.VK_NUMLOCK) == 1 ):
+                        pyautogui.press('numlock')
+                    if ( win32api.GetKeyState(win32con.VK_SCROLL) == 1 ):
+                        pyautogui.press('scrolllock')
+                opt = args[0][0] #up/down/right/left - only
+                if( len(args[0])==3 ) : type = args[0][2]
+                else : type = str(0)
+                if type == str(0):
+                    """clicks i number of times on the left,right,up and down scroll-buttons"""
+                    try:
+                        index = int(args[0][1]) #+ve integer only
+                        if ( index > 0 ):
+                            if SYSTEM_OS != 'Darwin': pythoncom.CoInitialize()
+                            if ( str(opt).lower() == 'up' ):
+                                pyautogui.click(x = res[0]+ int(width/2), y = res[1] + 6 ,clicks = index, duration = 0.3)
+                                flg = True
+                            elif ( str(opt).lower() == 'down' ):
+                                pyautogui.click(x = res[0]+ int(width/2), y = res[1] + int(height) - 6 ,clicks = index, duration = 0.3)
+                                flg = True
+                            elif ( str(opt).lower() == 'right' ):
+                                pyautogui.click(x = res[0]+ int(width)-6, y = res[1] + int(height/2),clicks = index, duration = 0.3)
+                                flg = True
+                            elif ( str(opt).lower() == 'left' ):
+                                pyautogui.click(x = res[0]+ 6, y = res[1] + int(height/2),clicks = index, duration = 0.3)
+                                flg = True
+                            else:
+                                err_msg = 'Input Error : Invalid input, scroll option must be up|down|right|left only'
+                        else:
+                            err_msg = 'Input Error : Invalid input, index value must greater than 0'
+                    except:
+                        err_msg = 'Input Error : Invalid input, index must be an integer'
+                elif type == str(1):
+                    """clicks in the center of the scroll then uses sendkeys i number of times to move up,down,right and left"""
+                    try:
+                        if ( index > 0 ):
+                            if SYSTEM_OS != 'Darwin': pythoncom.CoInitialize()
+                            pyautogui.click(x = res[0]+ int(width/2), y = res[1] + int(height/2),clicks = 2, duration = 0.3)
+                            if ( str(opt).lower() == 'up' ):
+                                pyautogui.press('up', presses = index)
+                                flg = True
+                            elif ( str(opt).lower() == 'down' ):
+                                pyautogui.press('down', presses = index)
+                                flg = True
+                            elif ( str(opt).lower() == 'right' ):
+                                pyautogui.press('right', presses = index)
+                                flg = True
+                            elif ( str(opt).lower() == 'left' ):
+                                pyautogui.press('left', presses = index)
+                                flg = True
+                            else:
+                                err_msg = 'Input Error : Invalid input, scroll option must be up|down|right|left only'
+                        else:
+                            err_msg = 'Input Error : Invalid input, index value must greater than 0'
+                    except:
+                        err_msg = 'Input Error : Invalid input, index must be an integer'
+                else:
+                    err_msg = 'Input Error : Invalid input, invalid type'
+            if ( flg ) :
+                status= TEST_RESULT_PASS
+                result = TEST_RESULT_TRUE
+            if ( err_msg ):
+                log.info( err_msg )
+                logger.print_on_console( err_msg )
+        except Exception as e:
+            err_msg = "Error occurred in getstatusiris, Err_Msg : " + str(e)
+            log.error(err_msg)
+            logger.print_on_console("Error occurred in scrollIris")
+        del element, args, img, res, elem_coordinates, const_coordintes, elements, height, width,flg # deleting variables
+        return status, result, value, err_msg

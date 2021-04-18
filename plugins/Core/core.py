@@ -27,6 +27,7 @@ import requests
 import io
 import handler
 import update_module
+import shutil
 from icetoken import ICEToken
 import benchmark
 try:
@@ -806,7 +807,7 @@ class MainNamespace(BaseNamespace):
             if len(predictionPath) != 0 and os.path.exists(predictionPath):
                 constants.PREDICTION_IMG_DIR = os.path.normpath(predictionPath) + OS_SEP
                 #check if folders exist, if they dont create:
-                check_list = ['button','checkbox','dropdown','textbox','hscroll','vscroll','image','label','listbox','radiobutton','table','tree']
+                check_list = ['button','checkbox','dropdown','textbox','scroll','image','label','listbox','radiobutton','table','tree']
                 for c in check_list:
                     if (os.path.exists(constants.PREDICTION_IMG_DIR + str(c))):
                         log.debug( str(c) + ' folder found in object prediction dataset path')
@@ -817,6 +818,23 @@ class MainNamespace(BaseNamespace):
                             log.debug( 'Created folder ' + str(c) + ' in object prediction dataset path')
                         except Exception as e:
                             log.error( 'Error occured during the creation of ' + str(c) + ' folder in dataset path, ERR_MSG : ' + str(e) )
+                #check if'hscroll','vscroll' folders exist, if so move contents to scroll and delete hscroll and vscroll
+                if (os.path.exists(constants.PREDICTION_IMG_DIR + 'hscroll')):
+                    try:
+                        file_names = os.listdir(constants.PREDICTION_IMG_DIR + 'hscroll')
+                        for file_name in file_names:
+                            shutil.move(os.path.join(constants.PREDICTION_IMG_DIR + 'hscroll', file_name), constants.PREDICTION_IMG_DIR + 'scroll')
+                        os.rmdir(constants.PREDICTION_IMG_DIR + 'hscroll')
+                    except Exception as e:
+                        log.error( 'Unable to delete hscroll dir' )
+                if (os.path.exists(constants.PREDICTION_IMG_DIR + 'vscroll')):
+                    try:
+                        file_names = os.listdir(constants.PREDICTION_IMG_DIR + 'vscroll')
+                        for file_name in file_names:
+                            shutil.move(os.path.join(constants.PREDICTION_IMG_DIR + 'vscroll', file_name), constants.PREDICTION_IMG_DIR + 'scroll')
+                        os.rmdir(constants.PREDICTION_IMG_DIR + 'vscroll')
+                    except Exception as e:
+                        log.error( 'Unable to delete hscroll dir' )
             else:
                 constants.PREDICTION_IMG_DIR="Disabled"
                 logger.print_on_console("Object Prediction Manual Training disabled since user does not have sufficient privileges for object prediction dataset folder\n")

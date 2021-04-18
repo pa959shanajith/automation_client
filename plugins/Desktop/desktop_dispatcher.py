@@ -160,7 +160,8 @@ class DesktopDispatcher:
         'doubleclickcelliris' : iris_object.doubleclickcelliris,
         'rightclickcelliris' : iris_object.rightclickcelliris,
         'mousehovercelliris' : iris_object.mousehovercelliris,
-        'getstatusiris' : iris_object.getstatusiris
+        'getstatusiris' : iris_object.getstatusiris,
+        'scrolliris':iris_object.scrolliris
     }
 
 
