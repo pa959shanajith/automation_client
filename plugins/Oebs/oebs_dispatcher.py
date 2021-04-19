@@ -219,7 +219,10 @@ class OebsDispatcher:
                   'rightclickcelliris':self.iris_object.rightclickcelliris,
                   'mousehovercelliris':self.iris_object.mousehovercelliris,
                   'getstatusiris':self.iris_object.getstatusiris,
-                  'scrolliris':iris_object.scrolliris
+                  'scrollupiris':iris_object.scrollupiris,
+                  'scrolldowniris':iris_object.scrolldowniris,
+                  'scrollleftiris':iris_object.scrollleftiris,
+                  'scrollrightiris':iris_object.scrollrightiris
                 }
 
             keyword=keyword.lower()
