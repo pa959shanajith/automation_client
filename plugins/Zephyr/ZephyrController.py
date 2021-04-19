@@ -120,6 +120,12 @@ class ZephyrWindow():
                 if JsonObject["resultSize"] != 0:
                     results = JsonObject["results"]
                     res = [{'id':i['testcase']['id'],'name':i['testcase']['name'],'cyclePhaseId': i['rts']['cyclePhaseId']} for i in results if 'rts' in i]
+                    # Fetch requirement details of testcases
+                    for i in range(len(results)):
+                        if 'rts' in results[i]:
+                            req_id = results[i]['testcase']['requirementIds']
+                            requirement_details = self.get_requirement_details(req_id)
+                            res[i]['reqdetails'] = requirement_details
         except Exception as eproject:
             err_msg = 'Error while fetching testcases from Zephyr'
             log.error(err_msg)
@@ -163,3 +169,26 @@ class ZephyrWindow():
             logger.print_on_console(err_msg)
             log.error(e, exc_info=True)
         return status
+
+    def get_requirement_details(self,requirementid):
+        res = []
+        requirement_list = {}
+        try:
+            if len(requirementid) >=1:
+                for i in requirementid:
+                    relative_path = "/requirement/"+str(i)
+                    respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, verify=False,proxies=readconfig.proxies)
+                    if respon.status_code == 200:
+                        JsonObject = respon.json()
+                        # Fetch requirement details
+                        if JsonObject != 0:
+                            results = JsonObject
+                            requirement_list = {'reqid':results['id'],'reqname':results['name'],'reqdescription': results['details'],'reqcreationdate' : results['reqCreationDate']}
+                            req_details_copy = requirement_list.copy()
+                            res.append(req_details_copy)
+        except Exception as eproject:
+            err_msg = 'Error while fetching requirement details from Zephyr'
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
+            log.error(eproject, exc_info=True)
+        return res
