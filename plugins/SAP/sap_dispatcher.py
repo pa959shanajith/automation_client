@@ -292,11 +292,13 @@ class SAPDispatcher:
                             wnd = wnd.Text + '/'
                             self.launch_keywords_obj.setWindowToForeground(wnd)
                         if ( teststepproperty.custom_flag ):
-                            result = self.sap_dict[keyword](objectname, input, output, teststepproperty.parent_xpath)
+                            if (keyword.lower() == 'getstatusiris') : result = self.sap_dict[keyword](objectname, input, output, teststepproperty.parent_xpath, teststepproperty.objectname.split(';')[-2])
+                            else : result = self.sap_dict[keyword](objectname, input, output, teststepproperty.parent_xpath)
                         elif ( teststepproperty.objectname.split(';')[-1] == 'constant' and keyword.lower() == 'verifyexistsiris' ):
                             result = self.sap_dict[keyword](objectname, input, output, 'constant')
                         else:
-                            result = self.sap_dict[keyword](objectname, input, output)
+                            if (keyword.lower() == 'getstatusiris') : result = self.sap_dict[keyword](objectname, input, output, teststepproperty.objectname.split(';')[-2])
+                            else : result = self.sap_dict[keyword](objectname, input, output)
                     else:
                         result = self.sap_dict[keyword](objectname, input, output)
                 if ( not (sap_constants.ELEMENT_FOUND) and self.exception_flag ):

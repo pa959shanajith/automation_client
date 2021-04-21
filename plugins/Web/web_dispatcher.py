@@ -581,11 +581,13 @@ class Dispatcher:
                         result= self.web_dict[keyword](webelement,input)
                     elif teststepproperty.cord!='' and teststepproperty.cord!=None:
                         if teststepproperty.custom_flag:
-                            result = self.web_dict[keyword](webelement,input,output,teststepproperty.parent_xpath)
+                            if (keyword.lower() == 'getstatusiris') : result = self.web_dict[keyword](webelement,input,output,teststepproperty.parent_xpath,teststepproperty.objectname.split(';')[-2])
+                            else : result = self.web_dict[keyword](webelement,input,output,teststepproperty.parent_xpath)
                         elif (teststepproperty.objectname.split(';')[-1] == 'constant' and keyword.lower() == 'verifyexistsiris'):
                             result = self.web_dict[keyword](webelement,input,output,'constant')
                         else:
-                            result = self.web_dict[keyword](webelement,input,output)
+                            if (keyword.lower() == 'getstatusiris') : result = self.web_dict[keyword](webelement,input,output,teststepproperty.objectname.split(';')[-2])
+                            else : result = self.web_dict[keyword](webelement,input,output)
                     else:
                         result= self.web_dict[keyword](webelement,input)
                     ## To terminate debug/execution if requested browser is not available in the system (Defect #846)

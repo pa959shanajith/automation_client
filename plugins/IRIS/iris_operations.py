@@ -1916,7 +1916,7 @@ class IRISKeywords():
             verifyFlag = False
             import controller
             controller.iris_constant_step = -1
-            log.info('verifyFlag set to Flase, Parent element unrecognised - all iris objects will be treated as regular IRIS elements.')
+            log.info('verifyFlag set to False, Parent element unrecognised - all iris objects will be treated as regular IRIS elements.')
             err_msg = "Error occurred in VerifyExistsIris, Err_Msg : " + str(e)
             log.error( err_msg )
             logger.print_on_console( "Error occurred in VerifyExistsIris" )
@@ -2182,9 +2182,10 @@ class IRISKeywords():
         elements = []
         width = None
         height = None
+        stat = None
         try:
             img = None
-            if(len(args) == 3 and args[2]!='' and verifyFlag ):
+            if(len(args) == 4 and args[2]!='' and verifyFlag ):
                 log.info('IRIS element recognised as a relative element')
                 elem_coordinates = element['coordinates']
                 const_coordintes = args[2]['coordinates']
@@ -2198,11 +2199,13 @@ class IRISKeywords():
                 height = res[3] - res[1]
                 pyautogui.moveTo(res[0]+ int(width/2),res[1] + int(height/2))
                 log.info( "Element co-ordinates after finding relative image are : " + str(res) )
+                stat = args[3] # value from dropdown (checked/unchecked) in Edit IRIS object
             else:
                 log.info('IRIS element recognised as a non-relative element')
                 logger.print_on_console("Warning!: Parent element not detected, will lead to inconsistant results")
                 res, width, height = gotoobject(element)
                 if(res): img = get_byte_mirror(element['cord'])
+                stat = args[2] # value from dropdown (checked/unchecked) in Edit IRIS object
             if( len(res) > 0 ):
                 #1.get original image
                 originalImg = get_byte_mirror(element['cord'])
@@ -2218,12 +2221,13 @@ class IRISKeywords():
                 #3. subtract target image with the original image
                 flg = False
                 matchFlag = image_match(originalImage,relativeImage)
-                if (args[0][0] == str(0)):
+                if( args[0][0] ): stat = args[0][0]
+                if (stat == str(0)):
                     #unchecked
                     if matchFlag: val = 'unchecked'
                     else: val = 'checked'
                     flg = True
-                elif(args[0][0] == str(1)):
+                elif(stat == str(1)):
                     #checked
                     if matchFlag: val = 'checked'
                     else: val = 'unchecked'
@@ -2253,8 +2257,8 @@ class IRISKeywords():
     def scrollupiris(self,element,*args):
         """
         Discription: Performs a scroll up operation on the scroll element.
-        Input:  <index>;<type(optional)>
-                index : positive integer
+        Input:  <count>;<type(optional)>
+                count : positive integer
                 type : type of scroll function 0(default) - clicks on the scroll button of up/down/right/left. 1 - clicks in the middle of the scroll bar then uses sendkeys to traverse in direction of option
         OutPut: Boolean Value
         """
@@ -2330,8 +2334,8 @@ class IRISKeywords():
     def scrolldowniris(self,element,*args):
         """
         Discription: Performs a scroll down operation on the scroll element.
-        Input:  <index>;<type(optional)>
-                index : positive integer
+        Input:  <count>;<type(optional)>
+                count : positive integer
                 type : type of scroll function 0(default) - clicks on the scroll button of up/down/right/left. 1 - clicks in the middle of the scroll bar then uses sendkeys to traverse in direction of option
         OutPut: Boolean Value
         """
@@ -2407,8 +2411,8 @@ class IRISKeywords():
     def scrollleftiris(self,element,*args):
         """
         Discription: Performs a scroll left operation on the scroll element.
-        Input:  <index>;<type(optional)>
-                index : positive integer
+        Input:  <count>;<type(optional)>
+                count : positive integer
                 type : type of scroll function 0(default) - clicks on the scroll button of up/down/right/left. 1 - clicks in the middle of the scroll bar then uses sendkeys to traverse in direction of option
         OutPut: Boolean Value
         """
@@ -2484,8 +2488,8 @@ class IRISKeywords():
     def scrollrightiris(self,element,*args):
         """
         Discription: Performs a scroll right operation on the scroll element.
-        Input:  <index>;<type(optional)>
-                index : positive integer
+        Input:  <count>;<type(optional)>
+                count : positive integer
                 type : type of scroll function 0(default) - clicks on the scroll button of up/down/right/left. 1 - clicks in the middle of the scroll bar then uses sendkeys to traverse in direction of option
         OutPut: Boolean Value
         """

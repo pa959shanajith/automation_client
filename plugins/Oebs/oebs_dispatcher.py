@@ -232,11 +232,13 @@ class OebsDispatcher:
                     coord = [obj_props[2],obj_props[3],obj_props[4],obj_props[5]]
                     ele = {'cord': tsp.cord, 'coordinates': coord}
                     if ( tsp.custom_flag ):
-                        result = dict[keyword](ele, input, output, tsp.parent_xpath)
+                        if (keyword.lower() == 'getstatusiris') : result = dict[keyword](ele, input, output, tsp.parent_xpath, tsp.objectname.split(';')[-2])
+                        else : result = dict[keyword](ele, input, output, tsp.parent_xpath)
                     elif ( tsp.objectname.split(';')[-1] == 'constant' and keyword.lower() == 'verifyexistsiris' ):
                         result = dict[keyword](ele, input, output, 'constant')
                     else:
-                        result = dict[keyword](ele, input, output)
+                        if (keyword.lower() == 'getstatusiris') : result = dict[keyword](ele, input, output, tsp.objectname.split(';')[-2])
+                        else : result = dict[keyword](ele, input, output)
                 else:
                     result=dict[keyword](*message)
                 if keyword == 'findwindowandattach':
