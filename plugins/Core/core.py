@@ -818,23 +818,18 @@ class MainNamespace(BaseNamespace):
                             log.debug( 'Created folder ' + str(c) + ' in object prediction dataset path')
                         except Exception as e:
                             log.error( 'Error occured during the creation of ' + str(c) + ' folder in dataset path, ERR_MSG : ' + str(e) )
+                #below code is redundant once all CBU's move to AvoAssure_3.2 & upwards
                 #check if'hscroll','vscroll' folders exist, if so move contents to scroll and delete hscroll and vscroll
-                if (os.path.exists(constants.PREDICTION_IMG_DIR + 'hscroll')):
-                    try:
-                        file_names = os.listdir(constants.PREDICTION_IMG_DIR + 'hscroll')
-                        for file_name in file_names:
-                            shutil.move(os.path.join(constants.PREDICTION_IMG_DIR + 'hscroll', file_name), constants.PREDICTION_IMG_DIR + 'scroll')
-                        os.rmdir(constants.PREDICTION_IMG_DIR + 'hscroll')
-                    except Exception as e:
-                        log.error( 'Unable to delete hscroll dir' )
-                if (os.path.exists(constants.PREDICTION_IMG_DIR + 'vscroll')):
-                    try:
-                        file_names = os.listdir(constants.PREDICTION_IMG_DIR + 'vscroll')
-                        for file_name in file_names:
-                            shutil.move(os.path.join(constants.PREDICTION_IMG_DIR + 'vscroll', file_name), constants.PREDICTION_IMG_DIR + 'scroll')
-                        os.rmdir(constants.PREDICTION_IMG_DIR + 'vscroll')
-                    except Exception as e:
-                        log.error( 'Unable to delete hscroll dir' )
+                for s in ['hscroll','vscroll']:
+                    if (os.path.exists(constants.PREDICTION_IMG_DIR + s)):
+                        try:
+                            file_names = os.listdir(constants.PREDICTION_IMG_DIR + s)
+                            for file_name in file_names:
+                                try: shutil.move(os.path.join(constants.PREDICTION_IMG_DIR + s, file_name), constants.PREDICTION_IMG_DIR + 'scroll')
+                                except: log.debug( file_name + '" already exists, in destination path.')
+                            shutil.rmtree(constants.PREDICTION_IMG_DIR + s)
+                        except :
+                            log.error( 'Unable to delete '+ s +' dir' )
             else:
                 constants.PREDICTION_IMG_DIR="Disabled"
                 logger.print_on_console("Object Prediction Manual Training disabled since user does not have sufficient privileges for object prediction dataset folder\n")

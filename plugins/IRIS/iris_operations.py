@@ -569,6 +569,23 @@ def get_byte_mirror(element_cord):
     del byte_mirror, b64
     return img
 
+def disablelocks(opt=0):
+    """
+    Def: Disables key locks according to option
+    Input : option(integer; default to 0)
+    Output : N/A
+    Method Referenced in : cleartextiris, scrollupiris, scrolldowniris, scrollleftiris, scrollrightiris
+    """
+    if( opt == 0 ):
+        #Disabling num lock
+        if ( SYSTEM_OS != 'Darwin' ):
+            if ( win32api.GetKeyState(win32con.VK_NUMLOCK) == 1 ): pyautogui.press('numlock')
+    elif( opt == 1 ):
+        #Disabling num and scroll lock
+        if ( SYSTEM_OS != 'Darwin' ):
+            if ( win32api.GetKeyState(win32con.VK_NUMLOCK) == 1 ): pyautogui.press('numlock')
+            if ( win32api.GetKeyState(win32con.VK_SCROLL) == 1 ): pyautogui.press('scrolllock')
+
 class IRISKeywords():
     def __init__(self):
         self.dragIrisPos = {'x':'','y':''}
@@ -858,9 +875,7 @@ class IRISKeywords():
                     flag = True
                 elif(args[0][0] == str(2) ):
                     log.debug( 'Clearing text by method : Click element + Home + "Shift+End" + Backspace' )
-                    if ( SYSTEM_OS != 'Darwin' ):
-                        if ( win32api.GetKeyState(win32con.VK_NUMLOCK) == 1 ):
-                            pyautogui.press('numlock')
+                    disablelocks(0)
                     pyautogui.click()
                     pyautogui.press('home')
                     time.sleep(0.25)
@@ -870,9 +885,7 @@ class IRISKeywords():
                     flag = True
                 elif(args[0][0] == str(3) ):
                     log.debug( 'Clearing text by method : Click element + End + "Shift+Home" + Backspace' )
-                    if ( SYSTEM_OS != 'Darwin' ):
-                        if ( win32api.GetKeyState(win32con.VK_NUMLOCK) == 1 ):
-                            pyautogui.press('numlock')
+                    disablelocks(0)
                     pyautogui.click()
                     pyautogui.press('end')
                     time.sleep(0.25)
@@ -886,9 +899,7 @@ class IRISKeywords():
                         if (i != 0 and i < 0 ):
                             i = i*-1
                             log.debug( 'Clearing text by method : Click element + End + Backspace X Index' )
-                            if ( SYSTEM_OS != 'Darwin' ):
-                                if ( win32api.GetKeyState(win32con.VK_NUMLOCK) == 1 ):
-                                    pyautogui.press('numlock')
+                            disablelocks(0)
                             pyautogui.click()
                             pyautogui.press('end')
                             time.sleep(0.25)
@@ -896,9 +907,7 @@ class IRISKeywords():
                             flag = True
                         elif (i != 0 and i > 0 ):
                             log.debug( 'Clearing text by method : Click element + Home(if index is negative) + Shift + Right X Index + Backspace' )
-                            if ( SYSTEM_OS != 'Darwin' ):
-                                if ( win32api.GetKeyState(win32con.VK_NUMLOCK) == 1 ):
-                                    pyautogui.press('numlock')
+                            disablelocks(0)
                             pyautogui.click()
                             pyautogui.press('home')
                             time.sleep(0.25)
@@ -2278,15 +2287,12 @@ class IRISKeywords():
                 height = res[3] - res[1]
                 log.info( "Element co-ordinates after finding relative image are : " + str(res) )
             else:
+                log.info('IRIS element recognised as a non-relative element')
+                logger.print_on_console("Warning!: Parent element not detected, will lead to inconsistant results")
                 res, width, height = gotoobject(element)
                 if(res): img = get_byte_mirror(element['cord'])
             if( len(res) > 0 ):
-                if ( SYSTEM_OS != 'Darwin' ):
-                    #Disabling num and scroll lock
-                    if ( win32api.GetKeyState(win32con.VK_NUMLOCK) == 1 ):
-                        pyautogui.press('numlock')
-                    if ( win32api.GetKeyState(win32con.VK_SCROLL) == 1 ):
-                        pyautogui.press('scrolllock')
+                disablelocks(1)
                 if( len(args[0])==2 ) : type = args[0][1]
                 else : type = str(0)
                 try:
@@ -2358,15 +2364,12 @@ class IRISKeywords():
                 height = res[3] - res[1]
                 log.info( "Element co-ordinates after finding relative image are : " + str(res) )
             else:
+                log.info('IRIS element recognised as a non-relative element')
+                logger.print_on_console("Warning!: Parent element not detected, will lead to inconsistant results")
                 res, width, height = gotoobject(element)
                 if(res): img = get_byte_mirror(element['cord'])
             if( len(res) > 0 ):
-                if ( SYSTEM_OS != 'Darwin' ):
-                    #Disabling num and scroll lock
-                    if ( win32api.GetKeyState(win32con.VK_NUMLOCK) == 1 ):
-                        pyautogui.press('numlock')
-                    if ( win32api.GetKeyState(win32con.VK_SCROLL) == 1 ):
-                        pyautogui.press('scrolllock')
+                disablelocks(1)
                 if( len(args[0])==2 ) : type = args[0][1]
                 else : type = str(0)
                 try:
@@ -2438,15 +2441,12 @@ class IRISKeywords():
                 height = res[3] - res[1]
                 log.info( "Element co-ordinates after finding relative image are : " + str(res) )
             else:
+                log.info('IRIS element recognised as a non-relative element')
+                logger.print_on_console("Warning!: Parent element not detected, will lead to inconsistant results")
                 res, width, height = gotoobject(element)
                 if(res): img = get_byte_mirror(element['cord'])
             if( len(res) > 0 ):
-                if ( SYSTEM_OS != 'Darwin' ):
-                    #Disabling num and scroll lock
-                    if ( win32api.GetKeyState(win32con.VK_NUMLOCK) == 1 ):
-                        pyautogui.press('numlock')
-                    if ( win32api.GetKeyState(win32con.VK_SCROLL) == 1 ):
-                        pyautogui.press('scrolllock')
+                disablelocks(1)
                 if( len(args[0])==2 ) : type = args[0][1]
                 else : type = str(0)
                 try:
@@ -2518,15 +2518,12 @@ class IRISKeywords():
                 height = res[3] - res[1]
                 log.info( "Element co-ordinates after finding relative image are : " + str(res) )
             else:
+                log.info('IRIS element recognised as a non-relative element')
+                logger.print_on_console("Warning!: Parent element not detected, will lead to inconsistant results")
                 res, width, height = gotoobject(element)
                 if(res): img = get_byte_mirror(element['cord'])
             if( len(res) > 0 ):
-                if ( SYSTEM_OS != 'Darwin' ):
-                    #Disabling num and scroll lock
-                    if ( win32api.GetKeyState(win32con.VK_NUMLOCK) == 1 ):
-                        pyautogui.press('numlock')
-                    if ( win32api.GetKeyState(win32con.VK_SCROLL) == 1 ):
-                        pyautogui.press('scrolllock')
+                disablelocks(1)
                 if( len(args[0])==2 ) : type = args[0][1]
                 else : type = str(0)
                 try:
