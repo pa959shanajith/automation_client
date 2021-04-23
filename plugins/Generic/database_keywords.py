@@ -680,6 +680,19 @@ class DatabaseOperation():
                 os.environ["PATH"] += os.pathsep + path
                 host = str(ip)+":"+str(port)+"/"+dbName
                 self.cnxn = cx_Oracle.connect(userName, password, host, encoding="UTF-8")
+            elif dbtype == 7:
+                import jaydebeapi
+                if os.getenv('JAVA_HOME'):
+                    jar_path = os.path.normpath(os.environ["AVO_ASSURE_HOME"] + "/Lib/DB/jtds-1.3.1.jar")
+                    self.cnxn = jaydebeapi.connect('net.sourceforge.jtds.jdbc.Driver', 'jdbc:jtds:sybase://%s:%s/%s' % (ip, port, dbName), [userName, password], jar_path)
+                else:
+                    jdk_path = os.path.normpath('C:/Program Files/Java/jdk1.8.0_181')
+                    if os.path.exists(jdk_path):
+                        os.environ['JAVA_HOME']=jdk_path
+                        jar_path = os.path.normpath(os.environ["AVO_ASSURE_HOME"] + "/Lib/DB/jtds-1.3.1.jar")
+                        self.cnxn = jaydebeapi.connect('net.sourceforge.jtds.jdbc.Driver', 'jdbc:jtds:sybase://%s:%s/%s' % (ip, port, dbName), [userName, password], jar_path)
+                    else:
+                        return None
             else:
                 self.cnxn = pyodbc.connect('driver=%s;SERVER=%s;PORT=%s;DATABASE=%s;UID=%s;PWD=%s' % ( dbNumber[dbtype], ip, port, dbName, userName ,password ) )
             return self.cnxn
