@@ -2303,17 +2303,20 @@ class IRISKeywords():
                     index = int(args[0][0])
                     if ( index > 0 ):
                         if SYSTEM_OS != 'Darwin': pythoncom.CoInitialize()
-                        if type == str(0):
-                            """clicks i number of times on the right scroll-button"""
-                            pyautogui.click(x = res[0]+ int(width/2), y = res[1] + 6 ,clicks = index, duration = 0.3)
-                            flg = True
-                        elif type == str(1):
-                            """clicks in the center of the scroll then uses sendkeys i number of times to move right"""
-                            pyautogui.click(x = res[0]+ int(width/2), y = res[1] + int(height/2),clicks = 2, duration = 0.3)
-                            pyautogui.press('up', presses = index)
-                            flg = True
+                        if( int(height) > int(width) ):
+                            if type == str(0):
+                                """clicks i number of times on the right scroll-button"""
+                                pyautogui.click(x = res[0]+ int(width/2), y = res[1] + 6 ,clicks = index, duration = 0.3)
+                                flg = True
+                            elif type == str(1):
+                                """clicks in the center of the scroll then uses sendkeys i number of times to move right"""
+                                pyautogui.click(x = res[0]+ int(width/2), y = res[1] + int(height/2),clicks = 2, duration = 0.3)
+                                pyautogui.press('up', presses = index)
+                                flg = True
+                            else:
+                                err_msg = 'Input Error : Invalid input, invalid type'
                         else:
-                            err_msg = 'Input Error : Invalid input, invalid type'
+                            err_msg = 'Horizontal scroll element detected, keyword scrollupiris not supported for horizontal scroll bar'
                     else:
                         err_msg = 'Input Error : Invalid input, index value must greater than 0'
                 except:
@@ -2380,17 +2383,20 @@ class IRISKeywords():
                     index = int(args[0][0])
                     if ( index > 0 ):
                         if SYSTEM_OS != 'Darwin': pythoncom.CoInitialize()
-                        if type == str(0):
-                            """clicks i number of times on the right scroll-button"""
-                            pyautogui.click(x = res[0]+ int(width/2), y = res[1] + int(height) - 6 ,clicks = index, duration = 0.3)
-                            flg = True
-                        elif type == str(1):
-                            """clicks in the center of the scroll then uses sendkeys i number of times to move right"""
-                            pyautogui.click(x = res[0]+ int(width/2), y = res[1] + int(height/2),clicks = 2, duration = 0.3)
-                            pyautogui.press('down', presses = index)
-                            flg = True
+                        if( int(height) > int(width) ):
+                            if type == str(0):
+                                """clicks i number of times on the right scroll-button"""
+                                pyautogui.click(x = res[0]+ int(width/2), y = res[1] + int(height) - 6 ,clicks = index, duration = 0.3)
+                                flg = True
+                            elif type == str(1):
+                                """clicks in the center of the scroll then uses sendkeys i number of times to move right"""
+                                pyautogui.click(x = res[0]+ int(width/2), y = res[1] + int(height/2),clicks = 2, duration = 0.3)
+                                pyautogui.press('down', presses = index)
+                                flg = True
+                            else:
+                                err_msg = 'Input Error : Invalid input, invalid type'
                         else:
-                            err_msg = 'Input Error : Invalid input, invalid type'
+                            err_msg = 'Horizontal scroll element detected, keyword scrolldowniris not supported for scroll bar type horizontal'
                     else:
                         err_msg = 'Input Error : Invalid input, index value must greater than 0'
                 except:
@@ -2457,17 +2463,20 @@ class IRISKeywords():
                     index = int(args[0][0])
                     if ( index > 0 ):
                         if SYSTEM_OS != 'Darwin': pythoncom.CoInitialize()
-                        if type == str(0):
-                            """clicks i number of times on the right scroll-button"""
-                            pyautogui.click(x = res[0]+ 6, y = res[1] + int(height/2),clicks = index, duration = 0.3)
-                            flg = True
-                        elif type == str(1):
-                            """clicks in the center of the scroll then uses sendkeys i number of times to move right"""
-                            pyautogui.click(x = res[0]+ int(width/2), y = res[1] + int(height/2),clicks = 2, duration = 0.3)
-                            pyautogui.press('left', presses = index)
-                            flg = True
+                        if( int(height) < int(width) ):
+                            if type == str(0):
+                                """clicks i number of times on the right scroll-button"""
+                                pyautogui.click(x = res[0]+ 6, y = res[1] + int(height/2),clicks = index, duration = 0.3)
+                                flg = True
+                            elif type == str(1):
+                                """clicks in the center of the scroll then uses sendkeys i number of times to move right"""
+                                pyautogui.click(x = res[0]+ int(width/2), y = res[1] + int(height/2),clicks = 2, duration = 0.3)
+                                pyautogui.press('left', presses = index)
+                                flg = True
+                            else:
+                                err_msg = 'Input Error : Invalid input, invalid type'
                         else:
-                            err_msg = 'Input Error : Invalid input, invalid type'
+                            err_msg = 'Vertical scroll element detected, keyword scrollleftiris not supported for scroll bar type vertical'
                     else:
                         err_msg = 'Input Error : Invalid input, index value must greater than 0'
                 except:
@@ -2534,17 +2543,20 @@ class IRISKeywords():
                     index = int(args[0][0])
                     if ( index > 0 ):
                         if SYSTEM_OS != 'Darwin': pythoncom.CoInitialize()
-                        if type == str(0):
-                            """clicks i number of times on the right scroll-button"""
-                            pyautogui.click(x = res[0]+ int(width)-6, y = res[1] + int(height/2),clicks = index, duration = 0.3)
-                            flg = True
-                        elif type == str(1):
-                            """clicks in the center of the scroll then uses sendkeys i number of times to move right"""
-                            pyautogui.click(x = res[0]+ int(width/2), y = res[1] + int(height/2),clicks = 2, duration = 0.3)
-                            pyautogui.press('right', presses = index)
-                            flg = True
+                        if( int(height) < int(width) ):
+                            if type == str(0):
+                                """clicks i number of times on the right scroll-button"""
+                                pyautogui.click(x = res[0]+ int(width)-6, y = res[1] + int(height/2),clicks = index, duration = 0.3)
+                                flg = True
+                            elif type == str(1):
+                                """clicks in the center of the scroll then uses sendkeys i number of times to move right"""
+                                pyautogui.click(x = res[0]+ int(width/2), y = res[1] + int(height/2),clicks = 2, duration = 0.3)
+                                pyautogui.press('right', presses = index)
+                                flg = True
+                            else:
+                                err_msg = 'Input Error : Invalid input, invalid type'
                         else:
-                            err_msg = 'Input Error : Invalid input, invalid type'
+                            err_msg = 'Vertical scroll element detected, keyword scrollrightiris not supported for scroll bar type vertical'
                     else:
                         err_msg = 'Input Error : Invalid input, index value must greater than 0'
                 except:
