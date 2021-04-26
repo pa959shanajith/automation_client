@@ -26,6 +26,8 @@ import logging
 import dynamic_variable_handler
 try:
     import pyodbc
+    import jaydebeapi
+    import jpype
 except:
     pass
 
@@ -50,6 +52,10 @@ class DatabaseOperation():
         elif etype in [pyodbc.DataError, pyodbc.ProgrammingError, pyodbc.NotSupportedError]:
             if hasattr(e, 'args') and len(e.args) > 1: ae = e.args[1].split(';')[0]
             err_msg = ERROR_CODE_DICT["ERR_DB_QUERY"]
+        elif etype == jpype._jvmfinder.JVMNotFoundException:
+            if hasattr(e, 'args'):
+                ae = e.args[0].split('.')[2].strip()
+            err_msg = ERROR_CODE_DICT['ERR_JAVA_NOT_FOUND']
         else:
             err_msg = ERROR_CODE_DICT['ERR_DB_OPS']
         logger.print_on_console(err_msg) 
@@ -680,19 +686,9 @@ class DatabaseOperation():
                 os.environ["PATH"] += os.pathsep + path
                 host = str(ip)+":"+str(port)+"/"+dbName
                 self.cnxn = cx_Oracle.connect(userName, password, host, encoding="UTF-8")
-            elif dbtype == 7:
-                import jaydebeapi
-                if os.getenv('JAVA_HOME'):
-                    jar_path = os.path.normpath(os.environ["AVO_ASSURE_HOME"] + "/Lib/DB/jtds-1.3.1.jar")
-                    self.cnxn = jaydebeapi.connect('net.sourceforge.jtds.jdbc.Driver', 'jdbc:jtds:sybase://%s:%s/%s' % (ip, port, dbName), [userName, password], jar_path)
-                else:
-                    jdk_path = os.path.normpath('C:/Program Files/Java/jdk1.8.0_181')
-                    if os.path.exists(jdk_path):
-                        os.environ['JAVA_HOME']=jdk_path
-                        jar_path = os.path.normpath(os.environ["AVO_ASSURE_HOME"] + "/Lib/DB/jtds-1.3.1.jar")
-                        self.cnxn = jaydebeapi.connect('net.sourceforge.jtds.jdbc.Driver', 'jdbc:jtds:sybase://%s:%s/%s' % (ip, port, dbName), [userName, password], jar_path)
-                    else:
-                        return None
+            elif dbtype == 7:             
+                jar_path = os.path.normpath(os.environ["AVO_ASSURE_HOME"] + "/Lib/DB/jtds-1.3.1.jar")
+                self.cnxn = jaydebeapi.connect('net.sourceforge.jtds.jdbc.Driver', 'jdbc:jtds:sybase://%s:%s/%s' % (ip, port, dbName), [userName, password], jar_path)
             else:
                 self.cnxn = pyodbc.connect('driver=%s;SERVER=%s;PORT=%s;DATABASE=%s;UID=%s;PWD=%s' % ( dbNumber[dbtype], ip, port, dbName, userName ,password ) )
             return self.cnxn
