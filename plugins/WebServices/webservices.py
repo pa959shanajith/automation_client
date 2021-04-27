@@ -51,7 +51,7 @@ class WSkeywords:
         self.baseEndPointURL=''
         self.baseOperation=''
         self.baseMethod=''
-        self.baseReqHeader= ''
+        self.baseReqHeader= 'AvoAssure/'+os.environ['AVO_ASSURE_VERSION']
         self.baseReqBody=''
         self.baseResHeader = None
         self.baseResBody=None
