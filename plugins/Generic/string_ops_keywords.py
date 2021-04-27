@@ -285,7 +285,7 @@ class StringOperation:
         to_find = input[1]
         to_find_d = to_find
         wildcard_option = input[2].lower() if(len(input) == 3) else ""
-        if (wildcard_option != "" and wildcard_option == 'yes'):
+        if (wildcard_option != "" and wildcard_option == 'wildcard'):
             tf_single_count=to_find.count('?')
             tf_mul_count=to_find.count('*')
             if tf_single_count>=1 or tf_mul_count>=1:
@@ -294,10 +294,10 @@ class StringOperation:
             if not (actual_string is None or actual_string is ''):
                 if not (to_find is None or to_find is ''):
                     if (wildcard_find == True):
-                        #call find_wildcard function
                         if len(to_find)-1<= len(actual_string):
                             position=self.find_wildcard(actual_string,to_find)
                             position=list(set(position))
+                            position.sort()
                             output_val = len(position)
                             if len(position) == 1: position=position[0]
                             if(output_val == 0):
@@ -667,10 +667,8 @@ class StringOperation:
         if first_wc == "?" or first_wc == "*":
             if len(to_find)<= len(actual_string):
                 if tf_single_count==len(to_find)-1:
-                    # actual_string_list.append(actual_string)
                     wildcard_search=True
                 elif tf_single_count==1 or tf_mul_count==1:
-                    # actual_string_list.append(actual_string)
                     wildcard_search=True
                 else:
                     for i in range(len(actual_string)):
@@ -693,15 +691,11 @@ class StringOperation:
                 logger.print_on_console('The Original String is ',actual_string ,' and ' , actual_string , ' does not Contain ', to_find)
         elif last_wc == "?" or last_wc == "*":
             if len(tf_split[0])>1:
-                pos = [i+1 for i in range(len(actual_string)) if actual_string.startswith(tf_split[0], i)]
-                position.extend(pos)
-                # wildcard_search=True
+                wildcard_search=True
             else:
                 if tf_single_count!=1 and tf_single_count>0:
-                    # actual_string_list.append(actual_string)
                     wildcard_search=True
                 elif tf_mul_count!=1 and tf_mul_count>0:
-                    # actual_string_list.append(actual_string)
                     wildcard_search=True
                 else:
                     for i in range(len(actual_string)):
@@ -722,12 +716,10 @@ class StringOperation:
                     string_search=True
         else:
             if len(tf_split[0])>1:
-                # actual_string_list.append(actual_string)
                 wildcard_search=True
             else:
                 tf_string="".join(tf_split)
                 if (tf_single_count!=1 and tf_single_count>0) and mix_char==False:
-                    # actual_string_list.append(actual_string)
                     wildcard_search=True
                 elif (tf_mul_count!=1 and tf_mul_count>0) and mix_char==False:
                     if len(tf_split)==tf_split.count(tf_split[0]):
@@ -749,10 +741,8 @@ class StringOperation:
                                 break
                         string_search=True
                     else:
-                        # actual_string_list.append(actual_string)
                         wildcard_search=True
                 elif (tf_single_count==1 and mix_char==False):
-                    # actual_string_list.append(actual_string)
                     wildcard_search=True
                 elif (tf_mul_count==1 and mix_char==False):
                     for i in range(len(actual_string)):
@@ -844,6 +834,8 @@ class StringOperation:
                             else:
                                 break
                         string_search=True
+                    elif len(tf_split)==tf_split.count(tf_split[0]):
+                        wildcard_search=True
                     else:
                         for j in range(len(find_string_list)):
                             if j<len(find_string_list) and find_string_list[j]==0:
@@ -857,9 +849,8 @@ class StringOperation:
                             else:
                                 break
                         string_search=True
-        # logger.print_on_console(actual_string_list)
         if wildcard_search==True:
-            to_find_d=to_find
+            to_find_d = to_find
             to_find = to_find.replace('?','.')
             to_find = to_find.replace('*','.+')
             if to_find.count('.')>0:
