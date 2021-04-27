@@ -178,10 +178,7 @@ class BrowserKeywords():
                     local_bk.log.warn("A window or tab was closed manually from the browser!")
                 if local_bk.parent_handle is not None:
                     self.update_recent_handle(local_bk.parent_handle)
-                    cwh=local_bk.driver_obj.current_window_handle
-                    cwh_in=local_bk.all_handles.index(cwh)
-                    local_bk.all_handles.insert(cwh_in+1,local_bk.parent_handle)
-                    # local_bk.all_handles.append(local_bk.parent_handle)
+                    local_bk.all_handles.append(local_bk.parent_handle)
                 elif len(local_bk.all_handles) > 0:
                     driver_handles = local_bk.driver_obj.window_handles
                     switch_to_handle = None
@@ -692,6 +689,8 @@ class BrowserKeywords():
         result=webconstants.TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         window_num_flag = False
+        switch_window_flag = False
+        handles_index=[]
         inp=None
         ## Issue #190 Driver control won't switch back to parent window
         err_msg=None
@@ -707,43 +706,51 @@ class BrowserKeywords():
             if len(local_bk.all_handles) > 1:
                 if(inp == 'all'):
                     cur_handle=local_bk.driver_obj.current_window_handle
-                    rem_handles=[]
+                    remove_handles=[]
                     try:
                         for i in local_bk.all_handles:
                             if i!=cur_handle:
                                 local_bk.driver_obj.switch_to.window(i)
                                 local_bk.driver_obj.close()
-                                rem_handles.append(i)
-                        for j in rem_handles:
+                                remove_handles.append(i)
+                        for j in remove_handles:
                             local_bk.all_handles.remove(j)
                         logger.print_on_console('Sub window closed')
                         local_bk.log.info('Sub window closed')
                     except Exception as e:
                         err_msg=self.__web_driver_exception(e)
                 elif window_num_flag == True:
-                    rem_handles=[]
+                    remove_handles=[]
                     try:
                         if len(inp_list)<len(local_bk.all_handles):
                             for i in inp_list:
                                 inp = int(i)
                                 inp = inp-1
                                 if inp<len(local_bk.all_handles):
-                                    window_num_flag = True
-                                    win_h=local_bk.all_handles[inp]
-                                    local_bk.driver_obj.switch_to.window(local_bk.all_handles[inp])
-                                    local_bk.driver_obj.close()
-                                    rem_handles.append(win_h)  
-                                    local_bk.log.info('subwindow '+str(i)+' is closed')
-                                    logger.print_on_console('subwindow '+str(i)+' is closed')
+                                    if not(inp==-1 or i==0):
+                                        window_num_flag = True
+                                        win_h=local_bk.all_handles[inp]
+                                        local_bk.driver_obj.switch_to.window(local_bk.all_handles[inp])
+                                        local_bk.driver_obj.close()
+                                        remove_handles.append(win_h) 
+                                        handles_index.append(inp)
+                                        local_bk.log.info('subwindow '+str(i)+' is closed')
+                                        logger.print_on_console('subwindow '+str(i)+' is closed')
+                                    else:
+                                        local_bk.log.error(webconstants.INVALID_INPUT)
+                                        logger.print_on_console(webconstants.INVALID_INPUT)
+                                        err_msg = webconstants.INVALID_INPUT
+                                        switch_window_flag = False
                                 else:
                                     err_msg = 'One or more window handle not found'
-                                    inp_list.remove(i)
                                     logger.print_on_console(err_msg)
                                     local_bk.log.error(err_msg) 
                                     local_bk.log.info('window handle ' +str(i)+' is not found ')
-                            if len(rem_handles)>=1:
-                                for j in rem_handles:   
+                                    switch_window_flag = False
+                            if len(remove_handles)>=1:
+                                for j in remove_handles:   
                                     local_bk.all_handles.remove(j)
+                                switch_window_flag = True
                         else:
                             window_num_flag = False
                     except Exception as e:
@@ -763,9 +770,8 @@ class BrowserKeywords():
                         err_msg=self.__web_driver_exception(e)
 
                 if(len(local_bk.all_handles) >= 1):
-                    if (window_num_flag == True):
-                        recent_handle_index=int(inp_list[-1])
-                        recent_handle_index=recent_handle_index-1
+                    if (window_num_flag == True and switch_window_flag==True):
+                        recent_handle_index = handles_index[-1]
                         local_bk.driver_obj.switch_to.window(local_bk.all_handles[recent_handle_index-1])
                         self.update_recent_handle(local_bk.all_handles[recent_handle_index-1])
                         status=webconstants.TEST_RESULT_PASS
