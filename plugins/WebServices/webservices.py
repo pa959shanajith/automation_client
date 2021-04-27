@@ -491,6 +491,7 @@ class WSkeywords:
                         req_body=json.dumps(self.baseReqBody)
                 else:
                     req_body=self.baseReqBody
+                self.baseReqHeader['User-Agent']='yooo/3.2.0'
                 response = requests.post(self.baseEndPointURL, data = req_body, headers=self.baseReqHeader, cookies=self.req_cookies, proxies=self.proxies, cert=self.client_cert, verify=self.server_cert, auth=self.req_auth, params=self.req_params)
 
                 if response != None and response != False:
@@ -1238,6 +1239,15 @@ class WSkeywords:
         return decrypted_data
 
 
+    # def get(self,d, keys):
+    #     for key in keys:
+    #         d = d[key]
+    #     return d
+
+    # def set(self,d, keys, value):
+    #     d = get(d, keys[:-1])
+    #     d[keys[-1]] = value
+
     def set_key_value(self,json_obj,base_key,cur_key,input_key,new_value):
         try:
             for k,v in json_obj.items():
@@ -1245,26 +1255,24 @@ class WSkeywords:
                     if base_key!="": base_key+='/'+k
                     else : base_key=k
                     if base_key==input_key:
-                        print(v)
+                        log.debug(v)
                         json_obj[k]=new_value
-                        return json_obj
-                    json_obj=self.set_key_value(v,base_key,k,input_key,new_value)
+                        break
+                    self.set_key_value(v,base_key,k,input_key,new_value)
                     base_key=base_key[0:-len(k)-1]
 
                 elif isinstance(v,list):
                     for v1 in range(len(v)):
                         base_key+=k+"["+str(v1)+"]"
                         if base_key==input_key:
-                            print(v)
+                            log.debug(v)
                             json_obj[k]=new_value
-                            return json_obj
-                        json_obj=self.set_key_value(v[v1],base_key,k,input_key,new_value)
+                            break
+                        self.set_key_value(v[v1],base_key,k,input_key,new_value)
                 else:
                     if base_key+'/'+k==input_key:
-                        print(v)
+                        log.debug(v)
                         json_obj[k]=new_value
-                        return json_obj
-
             base_key=base_key[0:-len(cur_key)]
         except Exception as e:
             log.error(e)
