@@ -240,10 +240,12 @@ def socketIO_WS_init(self, http_session, is_secure, url, engineIO_session=None):
         kw['sslopt']['cert_reqs'] = ssl.CERT_REQUIRED
         if not isinstance(http_session.verify, bool): kw['sslopt']['ca_certs'] = http_session.verify
         if http_session.cert:  # Specify certificate path on disk
-            if isinstance(http_session.cert, six.string_types):
-                kw['ca_certs'] = http_session.cert
-            else:
-                kw['ca_certs'] = http_session.cert[0]
+            if isinstance(http_session.cert, tuple):
+                kw['sslopt'] = {
+                    'certfile': http_session.cert[0],
+                    'keyfile': http_session.cert[1]}
+            elif http_session.cert:
+                kw['sslopt']['certfile'] = http_session.cert
     else:  # Do not verify the SSL certificate
         kw['sslopt']['cert_reqs'] = ssl.CERT_NONE
     try:

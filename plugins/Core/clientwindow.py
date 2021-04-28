@@ -193,17 +193,21 @@ class ClientWindow(wx.Frame):
         global pdfgentool
         id = event.GetId()
         if id == 100:     # When user selects INFO level
-            logger.print_on_console( '--Logger level : INFO selected--')
-            log.info('--Logger level : INFO selected--')
             logging.getLogger().setLevel(logging.INFO)
             for handler in logging.root.handlers[:]:
                     handler.setLevel(logging.INFO)
+            logging.getLogger('socketio.client').setLevel(logging.WARN)
+            logging.getLogger('engineio.client').setLevel(logging.WARN)
+            logger.print_on_console( '--Logger level : INFO selected--')
+            log.info('--Logger level : INFO selected--')
         elif id == 101:    # When user selects DEBUG level
-            logger.print_on_console( '--Logger level : DEBUG selected--')
-            log.info('--Logger level : DEBUG selected--')
             logging.getLogger().setLevel(logging.DEBUG)
             for handler in logging.root.handlers[:]:
                 handler.setLevel(logging.DEBUG)
+            logging.getLogger('socketio.client').setLevel(logging.DEBUG)
+            logging.getLogger('engineio.client').setLevel(logging.DEBUG)
+            logger.print_on_console( '--Logger level : DEBUG selected--')
+            log.info('--Logger level : DEBUG selected--')
         elif id ==102:     # When user selects ERROR level
             logger.print_on_console( '--Logger level : ERROR selected--')
             log.info( '--Logger level : ERROR selected--')
@@ -379,9 +383,7 @@ class ClientWindow(wx.Frame):
 
     def OnClear(self,event):
         self.log.Clear()
-        print('********************************************************************************************************')
-        print('============================================ '+self.appName+' ============================================')
-        print('********************************************************************************************************')
+        root.print_banner()
 
     def OnNodeConnect(self,event):
         try:
@@ -393,10 +395,7 @@ class ClientWindow(wx.Frame):
                 self.OnTerminate(event,"term_exec")
                 root.connection(name)
                 if self.connectbutton.GetName() != "register":
-                    self.connectbutton.SetBitmapLabel(self.connect_img)
-                    self.connectbutton.SetName('connect')
-                    self.connectbutton.SetToolTip(wx.ToolTip("Connect to Avo Assure Server"))
-                    self.connectbutton.Enable()
+                    self.enable_connect()
                 self.schedule.SetValue(False)
                 self.schedule.Disable()
                 self.rollbackItem.Enable(False)
@@ -408,10 +407,24 @@ class ClientWindow(wx.Frame):
             self.connectbutton.Enable()
             self.rbox.Disable()
 
-    def enable_register(self, enable_button = True):
+    def enable_connect(self, enable_button = True, repaint_title = True):
+        self.connectbutton.SetBitmapLabel(self.connect_img)
+        self.connectbutton.SetName('connect')
+        self.connectbutton.SetToolTip(wx.ToolTip("Connect to Avo Assure Server"))
+        if repaint_title: self.SetTitle(self.appName)
+        if enable_button: self.connectbutton.Enable()
+
+    def enable_disconnect(self, enable_button = True):
+        self.connectbutton.SetBitmapLabel(self.disconnect_img)
+        self.connectbutton.SetName('disconnect')
+        self.connectbutton.SetToolTip(wx.ToolTip("Disconnect from Avo Assure Server"))
+        if enable_button: self.connectbutton.Enable()
+
+    def enable_register(self, enable_button = True, repaint_title = True):
         self.connectbutton.SetBitmapLabel(self.register_img)
         self.connectbutton.SetName("register")
         self.connectbutton.SetToolTip(wx.ToolTip("Register ICE with Avo Assure Server"))
+        if repaint_title: self.SetTitle(self.appName)
         if enable_button: self.connectbutton.Enable()
 
     def killChildWindow(self, debug=False, scrape=False, display=False, pdf=False,register=False):

@@ -29,11 +29,8 @@ import handler
 import update_module
 from icetoken import ICEToken
 import benchmark
-try:
-    from socketlib_override import SocketIO, BaseNamespace, socketIO_prepare_http_session as prepare_http_session
-except ImportError:
-    from socketIO_client import SocketIO, BaseNamespace, prepare_http_session
-requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
+from socketiolib import SocketIO, BaseNamespace, prepare_http_session
+
 log = logging.getLogger('core.py')
 root = None
 cw = None
@@ -113,6 +110,7 @@ class MainNamespace(BaseNamespace):
                     logger.print_on_console(msg)
                     log.info(msg)
                     if root.gui:
+                        cw.SetTitle(root.name + " (" + root.ice_token["icename"] + ")")
                         cw.schedule.Enable()
                         cw.cancelbutton.Enable()
                         cw.terminatebutton.Enable()
@@ -169,9 +167,7 @@ class MainNamespace(BaseNamespace):
                             allow_connect = True
                             plugins_list = response['plugins']
                             if root.gui:
-                                cw.connectbutton.SetBitmapLabel(cw.disconnect_img)
-                                cw.connectbutton.SetName("disconnect")
-                                cw.connectbutton.SetToolTip(wx.ToolTip("Disconnect from Avo Assure Server"))
+                                cw.enable_disconnect()
                             controller.disconnect_flag=False
                         else:
                             if 'err_msg' in response: err_res = response['err_msg']
@@ -248,20 +244,17 @@ class MainNamespace(BaseNamespace):
                     logger.print_on_console('Highlight result: '+str(res))
                 if appType==APPTYPE_DESKTOP_JAVA.lower():
                     if(not args[0].startswith('iris')):
-                        #con =controller.Controller()
                         core_utils.get_all_the_imports('Oebs')
                         import utils
                         light =utils.Utils()
                         res = light.highlight(args[0],args[1])
                         logger.print_on_console('Highlight result: '+str(res))
                 elif appType==APPTYPE_DESKTOP.lower():
-                    #con =controller.Controller()
                     core_utils.get_all_the_imports('Desktop')
                     import desktop_highlight
                     highlightObj=desktop_highlight.highLight()
                     highlightObj.highLiht_element(args[0],args[1])
                 elif appType==APPTYPE_SAP.lower():
-                    #con =controller.Controller()
                     core_utils.get_all_the_imports('SAP')
                     import sap_highlight
                     highlightObj=sap_highlight.highLight()
@@ -278,7 +271,6 @@ class MainNamespace(BaseNamespace):
             exec_data = args[0]
             batch_id = exec_data["batchId"]
             if("integration" in exec_data):
-                # integrationType = exec_data["qccredentials"]["integrationType"]
                 if(exec_data["integration"]["alm"]["url"] != ""):
                     if(qcObject == None):
                         core_utils.get_all_the_imports('Qc')
@@ -451,7 +443,6 @@ class MainNamespace(BaseNamespace):
             if check_execution_lic("scrape"): return None
             elif bool(cw.scrapewindow): return None
             global browsername
-            #con = controller.Controller()
             if str(args[0]).endswith('apk'):
                 browsername = args[0]+";"+args[1]
             elif str(args[4])=='ios':
@@ -462,7 +453,6 @@ class MainNamespace(BaseNamespace):
             elif str(args[0]).endswith('ipa'):
                 browsername = args[0] + ";" + args[2] + ";" + args[3]+";" + args[4]
             """
-            #con =controller.Controller()
             if SYSTEM_OS=='Darwin':
                 core_utils.get_all_the_imports('Mobility/MobileApp')
             else:
@@ -484,7 +474,6 @@ class MainNamespace(BaseNamespace):
             if check_execution_lic("scrape"): return None
             elif bool(cw.scrapewindow): return None
             global mobileWebScrapeObj,mobileWebScrapeFlag,action,data
-            #con = controller.Controller()
             global browsername
             browsername = args[0]+";"+args[1]
             args = list(args)
@@ -527,7 +516,6 @@ class MainNamespace(BaseNamespace):
             global pdfScrapeObj,pdfScrapeFlag
             global browsername
             browsername = args[0]
-            #con =controller.Controller()
             core_utils.get_all_the_imports('PDF')
             import pdf_scrape_dispatcher
             pdfScrapeObj=pdf_scrape_dispatcher
@@ -569,7 +557,6 @@ class MainNamespace(BaseNamespace):
         try:
             if check_execution_lic("result_wsdl_listOfOperation"): return None
             global socketIO
-            #contrlr = controller.Controller()
             core_utils.get_all_the_imports('WebServices')
             import wsdlgenerator
             wsdlurl = str(args[0])
@@ -591,7 +578,6 @@ class MainNamespace(BaseNamespace):
             serverCerificate_pass=None
             auth_uname=None
             auth_pass=None
-            #contrlr = controller.Controller()
             core_utils.get_all_the_imports('WebServices')
             import wsdlgenerator
             wsgen_inputs=eval(str(args[0]))
@@ -738,15 +724,13 @@ class MainNamespace(BaseNamespace):
 
     def on_webCrawlerGo(self,*args):
         try:
-            #con = controller.Controller()
             core_utils.get_all_the_imports('WebOcular')
             import webocular
             wobj = webocular.Webocular()
-            # logger.print_on_console("length is ",len(args))
             args=list(args)
             global socketIO
             # Currently there are 5 arguments.
-            #args[0] is URL, args[1] is level, args[2] is agent, args[3] is proxy,args[4] is searchData
+            # args[0] is URL, args[1] is level, args[2] is agent, args[3] is proxy,args[4] is searchData
             # wobj.runCrawler(args[0],args[1],args[2],args[3],socketIO,root)
             wobj.runCrawler(socketIO,root,*args)
 
@@ -759,7 +743,6 @@ class MainNamespace(BaseNamespace):
 
     def on_jiralogin(self,*args):
         try:
-            #con = controller.Controller()
             core_utils.get_all_the_imports('Jira')
             import jiracontroller
             obj = jiracontroller.JiraWindow()
@@ -825,7 +808,6 @@ class MainNamespace(BaseNamespace):
     def on_generateFlowGraph(self,*args):
         try:
             global socketIO
-            #con = controller.Controller()
             core_utils.get_all_the_imports('AutomatedPathGenerator')
             import apg
             fg = apg.AutomatedPathGenerator(socketIO)
@@ -841,7 +823,6 @@ class MainNamespace(BaseNamespace):
     def on_apgOpenFileInEditor(self, *args):
         try:
             global socketIO
-            #con = controller.Controller()
             core_utils.get_all_the_imports('AutomatedPathGenerator')
             import apg
             fg = apg.AutomatedPathGenerator(socketIO)
@@ -857,7 +838,6 @@ class MainNamespace(BaseNamespace):
     def on_runDeadcodeIdentifier(self, *args):
         try:
             global socketIO
-            #con = controller.Controller()
             core_utils.get_all_the_imports('AutomatedPathGenerator')
             from generateAST import DeadcodeIdentifier
             dci = DeadcodeIdentifier()
@@ -889,15 +869,22 @@ class MainNamespace(BaseNamespace):
             logger.print_on_console(err_msg)
             log.error(e,exc_info=True)
 
+    def on_connect_error(self, *args):
+        """ Connection related errors are passed here
+        """
+        # print(args)
+        # print(socketIO.eio.hidden_error)
+        pass
+
     def on_disconnect(self, *args):
         if not allow_connect: return
         log.info('Disconnect triggered')
         stop_ping_thread()
-        if (socketIO is not None) and (not socketIO.waiting_for_close):
+        if socketIO is not None:
             ice_das_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
                 'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
             root.icesession['connect_time'] = str(datetime.now())
-            socketIO._http_session.params['icesession'] = core_utils_obj.wrap(json.dumps(root.icesession), ice_das_key)
+            socketIO.eio.http.params['icesession'] = core_utils_obj.wrap(json.dumps(root.icesession), ice_das_key)
             if root.gui:
                 if not bool(cw): return
                 cw.schedule.Disable()
@@ -912,8 +899,7 @@ class MainNamespace(BaseNamespace):
                 log.error(msg)
         if root.ice_token:
             if not bool(cw): return
-            cw.connectbutton.SetBitmapLabel(cw.connect_img)
-            cw.connectbutton.SetName('connect')
+            cw.enable_connect(enable_button = False, repaint_title = False)
 
     def on_irisOperations(self, *args):
         try:
@@ -951,7 +937,11 @@ class ConnectionThread(threading.Thread):
             if os.path.exists(server_cert) == False:
                 server_cert = CERTIFICATE_PATH + OS_SEP +'server.crt'
         client_cert = (CERTIFICATE_PATH + OS_SEP + 'client.crt', CERTIFICATE_PATH + OS_SEP + 'client.key')
-        args = {"cert": client_cert, "proxies": proxies}
+        args = {
+            "cert": client_cert,
+            "proxies": proxies,
+            "headers": {'User-Agent': 'AvoAssure/' + os.getenv('AVO_ASSURE_VERSION', '3.0.0')}
+        }
         if server_cert != "default": args["verify"] = server_cert
         if tls_security != "High": args['assert_hostname'] = False
         if no_params:
@@ -988,31 +978,38 @@ class ConnectionThread(threading.Thread):
             logger.print_on_console(msg)
             log.error(msg)
             root.ice_token = None
-            if root.gui: cw.enable_register()
+            if root.gui: wx.CallAfter(cw.enable_register)
             return False
         global socketIO, allow_connect
         allow_connect = False
         err = None
         err_msg = "Error in Server Connection"
-        server_port = int(configvalues['server_port'])
-        server_IP = 'https://' + configvalues['server_ip']
+        server_url = 'https://' + configvalues['server_ip'] + ':' + configvalues['server_port']
         try:
             kw_args = self.get_ice_session()
-            socketIO = SocketIO(server_IP, server_port, MainNamespace, **kw_args)
+            kw = {
+                'request_timeout': 10,
+                'http_session': prepare_http_session(kw_args),
+                'ssl_verify': kw_args.get('verify', True)
+            }
+            socketIO = SocketIO(**kw)
+            socketIO.register_namespace(MainNamespace())
+            socketIO.connect(server_url)
             root.socketIO = socketIO
-            socketIO.wait()
-        except ValueError as e:
-            err, err_msg, _ = _process_ssl_errors(e)
+            # socketIO.wait()
         except Exception as e:
             err = e
-            if 'certificate' in str(e):
+            if socketIO is not None and socketIO.eio.hidden_error:
+                err = e = socketIO.eio.hidden_error
+                socketIO.eio.hidden_error = None
+            if 'certificate' in str(e) or 'SSLError' in str(e):
                 err, err_msg, _ = _process_ssl_errors(e)
             else:
                 logger.print_on_console(err_msg)
         if err:
             log.error(err_msg)
-            log.error(err, exc_info=True)
-            if root.gui: cw.connectbutton.Enable()
+            log.error(err)
+            if root.gui: wx.CallAfter(cw.connectbutton.Enable)
 
 
 class TestThread(threading.Thread):
@@ -1189,16 +1186,13 @@ class Main():
             log.error(e)
 
         log.info('Started')
+        self.print_banner()
         requests_log = logging.getLogger("requests")
         requests_log.setLevel(logging.CRITICAL)
 
         '''Following two lines set 'CRITICAL' log level for selenium, uncomment these to not log entries from selenium if current log level is < CRITICAL'''
         # selenium_log = logging.getLogger("selenium")
         # selenium_log.setLevel(logging.CRITICAL)
-
-        print('********************************************************************************************************')
-        print('============================================ '+appName+' ============================================')
-        print('********************************************************************************************************')
 
         if self.gui:
             if logfilename_error_flag or is_config_invalid or is_config_missing:
@@ -1293,7 +1287,7 @@ class Main():
                 logger.print_on_console(err_msg)
         if err:
             log.error(err_msg)
-            log.error(err, exc_info=True)
+            log.error(err)
             if self.gui: self.cw.enable_register()
             else: self._wants_to_close = True
 
@@ -1343,9 +1337,7 @@ class Main():
                             clientwindow.configvalues = configvalues
                             if self.gui:
                                 cw.EnableAll()
-                                cw.connectbutton.SetBitmapLabel(cw.connect_img)
-                                cw.connectbutton.SetName('connect')
-                                cw.connectbutton.SetToolTip(wx.ToolTip("Connect to Avo Assure Server"))
+                                cw.enable_connect()
                             msg='ICE "'+data["icename"]+'" registered successfully with Avo Assure'
                             logger.print_on_console(msg)
                             log.info(msg)
@@ -1393,6 +1385,7 @@ class Main():
                 conn.close()
                 self.socketthread = ConnectionThread(mode)
                 self.socketthread.start()
+                self.socketthread.join()
             else:
                 self.killSocket(True)
                 log.info('Disconnected from Avo Assure server')
@@ -1430,10 +1423,11 @@ class Main():
             if socketIO is not None:
                 if disconn:
                     log.info('Sending socket disconnect request')
-                    socketIO.send('unavailableLocalServer', dnack = True)
+                    socketIO.send('unavailableLocalServer')
+                    # socketIO.send('unavailableLocalServer', dnack = True)
                 socketIO.disconnect()
-                if socketIO.activeTimer.is_active:
-                    socketIO.activeTimer.cancel()
+                # if socketIO.activeTimer.is_active:
+                #     socketIO.activeTimer.cancel()
                 del socketIO
                 socketIO = None
                 self.socketthread.join()
@@ -1544,7 +1538,6 @@ class Main():
                 browser_names = {'1': 'Chrome', '2': 'Firefox', '3': 'Internet Explorer', '6': 'Safari', '7': 'Edge Legacy', '8': 'Edge Chromium'}
                 if browsername in browsernumbers:
                     logger.print_on_console('Browser Name : '+browser_names[browsername])
-                    #con = controller.Controller()
                     core_utils.get_all_the_imports('Web')
                     core_utils.get_all_the_imports('WebScrape')
                     sys.coinit_flags = 2
@@ -1570,6 +1563,10 @@ class Main():
         except Exception as e:
             log.error(e,exc_info=True)
 
+    def print_banner(self):
+        print('********************************************************************************************************')
+        print('============================================ '+self.name+' ============================================')
+        print('********************************************************************************************************')
 
 def check_browser():
     global browsercheckFlag

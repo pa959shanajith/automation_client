@@ -4,7 +4,7 @@ import logging
 import argparse
 import platform
 log = logging.getLogger('Avo_Assure')
-ice_ver = '3.0'
+ice_ver = '3.0.0'
 
 try:
     cfile = os.path.abspath(__file__)
@@ -57,7 +57,7 @@ if sys.platform == 'win32':
     from ctypes import windll
     host_os = platform.platform()
     if 'Windows-10' in host_os or 'Windows-8.1' in host_os:
-        windll.shcore.SetProcessDpiAwareness(0)
+        windll.shcore.SetProcessDpiAwareness(2)
     import msvcrt
     __builtins__open = __builtins__.open
     def __open_inheritance_hack(*args, **kwargs):
