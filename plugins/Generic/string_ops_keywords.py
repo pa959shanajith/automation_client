@@ -285,11 +285,12 @@ class StringOperation:
         to_find = input[1]
         to_find_d = to_find
         wildcard_option = input[2].lower() if(len(input) == 3) else ""
-        if (wildcard_option != "" and wildcard_option == 'wildcard'):
-            tf_single_count=to_find.count('?')
-            tf_mul_count=to_find.count('*')
-            if tf_single_count>=1 or tf_mul_count>=1:
-                wildcard_find = True
+        if (wildcard_option != ""):
+            if (wildcard_option == 'wildcard'):
+                tf_single_count=to_find.count('?')
+                tf_mul_count=to_find.count('*')
+                if tf_single_count>=1 or tf_mul_count>=1:
+                    wildcard_find = True
         try:
             if not (actual_string is None or actual_string is ''):
                 if not (to_find is None or to_find is ''):
@@ -312,7 +313,7 @@ class StringOperation:
                         else:
                             output='false'
                             logger.print_on_console('The Original String is ',actual_string ,' and ' , actual_string , ' does not Contain ', to_find_d )      
-                    else:
+                    elif wildcard_option == "":
                         if not (to_find is None or to_find is ''):
                             coreutilsobj=core_utils.CoreUtils()
                             actual_string=coreutilsobj.get_UTF_8(actual_string)
@@ -331,6 +332,9 @@ class StringOperation:
                                 status=generic_constants.TEST_RESULT_PASS
                                 result=generic_constants.TEST_RESULT_TRUE
                                 output=position
+                    else:
+                        output='false'
+                        err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
             else:
                 #log.error(INVALID_INPUT)
                 err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
@@ -698,22 +702,25 @@ class StringOperation:
                 elif tf_mul_count!=1 and tf_mul_count>0:
                     wildcard_search=True
                 else:
-                    for i in range(len(actual_string)):
-                        if i == 0 and actual_string[i]==tf_split[0]:
-                            find_string_list.append(i)
-                        elif actual_string[i]==tf_split[0]:
-                            find_string_list.append(i+1)
-                    for j in range(len(find_string_list)):
-                        if j<len(find_string_list) and find_string_list[j]==0:
-                            a_spl=actual_string[find_string_list[j]:]
-                            actual_string_list.append(a_spl)
-                        elif j<len(find_string_list):
-                            f_i=find_string_list[j]-1
-                            a_spl=actual_string[f_i:]
-                            actual_string_list.append(a_spl)
-                        else:
-                            break
-                    string_search=True
+                    if actual_string.find(tf_split[0])==len(actual_string)-1:
+                        wildcard_search=True
+                    else:
+                        for i in range(len(actual_string)):
+                            if i == 0 and actual_string[i]==tf_split[0]:
+                                find_string_list.append(i)
+                            elif actual_string[i]==tf_split[0]:
+                                find_string_list.append(i+1)
+                        for j in range(len(find_string_list)):
+                            if j<len(find_string_list) and find_string_list[j]==0:
+                                a_spl=actual_string[find_string_list[j]:]
+                                actual_string_list.append(a_spl)
+                            elif j<len(find_string_list):
+                                f_i=find_string_list[j]-1
+                                a_spl=actual_string[f_i:]
+                                actual_string_list.append(a_spl)
+                            else:
+                                break
+                        string_search=True
         else:
             if len(tf_split[0])>1:
                 wildcard_search=True
@@ -740,6 +747,30 @@ class StringOperation:
                             else:
                                 break
                         string_search=True
+                    elif (tf_split.count(tf_split[0])>1 and tf_split[0]!=tf_split[-1]):
+                        first_char_count = tf_split.count(tf_split[0])
+                        to_find_lc_index = actual_string.find(tf_split[-1])
+                        for i in range(len(actual_string)):
+                            if i == 0 and actual_string[i]==tf_split[0]:
+                                find_string_list.append(i)
+                            elif actual_string[i]==tf_split[0]:
+                                find_string_list.append(i+1)
+                        for j in range(len(find_string_list)):
+                            if j<len(find_string_list) and find_string_list[j]==0:
+                                tfli=to_find_lc_index+1
+                                a_spl=actual_string[find_string_list[j]:tfli]
+                                actual_string_list.append(a_spl)
+                            elif j<len(find_string_list):
+                                tfli=to_find_lc_index+1
+                                f_i=find_string_list[j]-1
+                                a_spl=actual_string[f_i:tfli]
+                                actual_string_list.append(a_spl)
+                            else:
+                                break
+                        for item in actual_string_list[:]:
+                            if not(item.count(tf_split[0])>=first_char_count):
+                                actual_string_list.remove(item)
+                        string_search=True     
                     else:
                         wildcard_search=True
                 elif (tf_single_count==1 and mix_char==False):
