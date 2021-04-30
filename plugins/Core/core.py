@@ -1666,7 +1666,10 @@ def check_browser():
 
         #Checking browser for microsoft edge
         try:
-            if('Windows-10' in platform.platform()):
+            enable_edge_check = str(os.getenv('__ICE_ALLOW_EDGE_LEGACY', False)).lower() != 'false'
+            if not enable_edge_check:
+                logger.print_on_console("WARNING!! : MS Edge Legacy is not supported")
+            elif('Windows-10' in platform.platform()):
                 import psutil
                 edgeFlagComp = "MicrosoftEdge.exe" not in [p.name() for p in psutil.process_iter()]
                 if edgeFlagComp:
@@ -1688,7 +1691,7 @@ def check_browser():
                             if str(browser_ver) >= v[0] or str(browser_ver) <= v[1]:
                                 edgeFlag = True
                     if edgeFlag == False:
-                        logger.print_on_console('WARNING!! : Edge Legacy version ',str(browser_ver),' is not supported.')
+                        logger.print_on_console('WARNING!! : MS Edge Legacy version ',str(browser_ver),' is not supported.')
                 else:
                     logger.print_on_console("WARNING!! : To perform MS Edge Legacy check, all instances of MS Edge legacy should be closed. Close the instances and restart ICE again")
             else:
