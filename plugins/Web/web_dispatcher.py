@@ -606,7 +606,7 @@ class Dispatcher:
                         local_Wd.webelement_map[output]=result[2]
                     elif keyword not in [OPEN_BROWSER,CLOSE_BROWSER,GET_POPUP_TEXT,VERIFY_POPUP_TEXT]:
                         if configvalues['httpStatusCode'].lower() == 'yes':
-                            if result[0].lower() == 'fail':
+                            if (result[0].lower() == 'fail' and keyword.lower() != 'switchtowindow'):
                                 res,_=self.check_url_error_code()
                                 if res:
                                     result=TERMINATE

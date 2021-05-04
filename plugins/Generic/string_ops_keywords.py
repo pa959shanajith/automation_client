@@ -646,7 +646,7 @@ class StringOperation:
     def find_wildcard(self,actual_string,to_find):
         """
         def : find_wildcard
-        purpose : finds the to_find in the actualstring
+        purpose : finds the to_find with wildcard in the actualstring
         param  : actual_string, to_find
         return : postion of where the string is found
         """
@@ -660,7 +660,6 @@ class StringOperation:
         mix_char=False
         first_wc=to_find[0]
         last_wc=to_find[-1]
-        import re
         tf_split=re.split(r'[?*]',to_find)
         tf_single_count=to_find.count('?')
         tf_mul_count=to_find.count('*')
@@ -880,23 +879,28 @@ class StringOperation:
                             else:
                                 break
                         string_search=True
+                    for a in actual_string_list[:]:
+                        to_find = to_find.replace('?','.')
+                        to_find = to_find.replace('*','.+')
+                        pattern = re.compile(r"{}".format(to_find))
+                        match = pattern.search(a)
+                        if (match==None):
+                            actual_string_list.remove(a)
         if wildcard_search==True:
             to_find_d = to_find
             to_find = to_find.replace('?','.')
             to_find = to_find.replace('*','.+')
             if to_find.count('.')>0:
                 if to_find != '':
-                    import re
                     pattern = re.compile(r"{}".format(to_find))
                     match = pattern.search(actual_string)
                     if match:
                         pos = [i+1 for i in range(len(actual_string)) if actual_string.startswith(match.group(), i)]
                         position.extend(pos)
         elif string_search==True:
-            for to_find in actual_string_list:
-                if to_find != '':
-                    import re
-                    pattern = re.compile(r"{}".format(to_find))
+            for z in actual_string_list:
+                if z != '':
+                    pattern = re.compile(r"{}".format(z))
                     match = pattern.search(actual_string)
                     if match:
                         pos = [i+1 for i in range(len(actual_string)) if actual_string.startswith(match.group(), i)]
