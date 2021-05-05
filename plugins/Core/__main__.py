@@ -24,7 +24,6 @@ parser.add_argument('--connect', action='store_true', help='Establish a connecti
 args = parser.parse_args()
 if args.AVO_ASSURE_HOME and not os.path.exists(args.AVO_ASSURE_HOME+os.sep+'/plugins'):
     parser.error("Invalid path provided for AVO_ASSURE_HOME")
-os.environ["AVO_ASSURE_HOME"] = args.AVO_ASSURE_HOME
 if args.connect and args.register:
     parser.error("Register operation cannot be used with connect operation")
 if not (args.register or args.connect) and (args.host or args.token):
@@ -42,6 +41,9 @@ if args.register or args.connect:
             except: parser.error("Invalid Token provided for register operation")
         if args.host is None:
             print("No value provided for host. Reading values from configuration file")
+
+os.environ["AVO_ASSURE_HOME"] = args.AVO_ASSURE_HOME
+os.environ["ICE_CLEAR_STORAGE"] = "True"
 
 import constants
 import readconfig

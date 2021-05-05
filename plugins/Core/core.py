@@ -946,10 +946,7 @@ class ConnectionThread(threading.Thread):
         if tls_security != "High": args['assert_hostname'] = False
         if no_params:
             return args
-        key='USERNAME'
-        if key not in os.environ:
-            key='USER'
-        username = str(os.environ[key]).lower()
+        username = str(os.getenv('USERNAME', os.getenv('USER', 'N/A'))).lower()
         root.ice_token["hostname"] = socket.gethostname()
         root.icesession = {
             'ice_id': str(uuid.uuid4()),
@@ -1423,8 +1420,7 @@ class Main():
             if socketIO is not None:
                 if disconn:
                     log.info('Sending socket disconnect request')
-                    socketIO.send('unavailableLocalServer')
-                    # socketIO.send('unavailableLocalServer', dnack = True)
+                    socketIO.send('unavailableLocalServer', dnack = True)
                 socketIO.disconnect()
                 # if socketIO.activeTimer.is_active:
                 #     socketIO.activeTimer.cancel()
