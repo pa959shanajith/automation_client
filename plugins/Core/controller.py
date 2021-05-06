@@ -1552,6 +1552,7 @@ class Controller():
                 thread_name = "test_thread_browser" + str(browsers_data[i])
                 th[i] = threading.Thread(target = self.invoke_execution, name = thread_name, args = (mythread,jsondata_dict[i],socketIO,wxObject,configvalues,qc_soc,qtest_soc,zephyr_soc,aws_mode))
                 self.seperate_log(th[i], browsers_data[i]) #function that creates different logs for each browser
+                if SYSTEM_OS =='Linux': time.sleep(0.5)
                 th[i].start()
             for i in th:
                 th[i].join()
