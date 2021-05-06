@@ -17,7 +17,7 @@ import sys,math
 from uuid import uuid4
 import codecs
 from encryption_utility import AESCipher
-if SYSTEM_OS != 'Darwin':
+if SYSTEM_OS == 'Windows' :
     import win32clipboard
     from pyrobot import Robot
     import pythoncom
@@ -618,7 +618,7 @@ class IRISKeywords():
                 log.info('IRIS element recognised as a non-relative element')
                 res, width, height = gotoobject(element)
             if( len(res) > 0 ):
-                if SYSTEM_OS != 'Darwin': pythoncom.CoInitialize()
+                if SYSTEM_OS == 'Windows': pythoncom.CoInitialize()
                 log.info('Performing clickiris')
                 pyautogui.click()
                 log.info('clickiris performed')
@@ -672,7 +672,7 @@ class IRISKeywords():
                 log.info('IRIS element recognised as a non-relative element')
                 res, width, height = gotoobject(element)
             if(len(res)>0):
-                if SYSTEM_OS != 'Darwin': pythoncom.CoInitialize()
+                if SYSTEM_OS == 'Windows': pythoncom.CoInitialize()
                 log.info('Performing doubleClick')
                 pyautogui.doubleClick()
                 log.info('doubleClick performed')
@@ -722,7 +722,7 @@ class IRISKeywords():
                 log.info('IRIS element recognised as a non-relative element')
                 res, width, height = gotoobject(element)
             if(len(res)>0):
-                if SYSTEM_OS != 'Darwin': pythoncom.CoInitialize()
+                if SYSTEM_OS == 'Windows': pythoncom.CoInitialize()
                 log.info('Performing rightClick')
                 pyautogui.rightClick()
                 log.info('rightClick performed')
@@ -776,7 +776,7 @@ class IRISKeywords():
                 log.info('IRIS element recognised as a non-relative element')
                 res, width, height = gotoobject(element)
             if(len(res)>0):
-                if SYSTEM_OS != 'Darwin':
+                if SYSTEM_OS == 'Windows':
                     pythoncom.CoInitialize()
                     pyautogui.click()
                     robot = Robot()
@@ -842,7 +842,7 @@ class IRISKeywords():
                 log.info('IRIS element recognised as a non-relative element')
                 res, width, height = gotoobject(element)
             if(len(res) > 0):
-                if SYSTEM_OS != 'Darwin': pythoncom.CoInitialize()
+                if SYSTEM_OS == 'Windows': pythoncom.CoInitialize()
                 if (args[0][0] == None or args[0][0] == '' or args[0][0] == str(0)):
                     log.debug( 'Clearing text by default method: Click element + "Ctrl+A" + Backspace' )
                     pyautogui.click()
@@ -858,7 +858,7 @@ class IRISKeywords():
                     flag = True
                 elif(args[0][0] == str(2) ):
                     log.debug( 'Clearing text by method : Click element + Home + "Shift+End" + Backspace' )
-                    if ( SYSTEM_OS != 'Darwin' ):
+                    if ( SYSTEM_OS == 'Windows' ):
                         if ( win32api.GetKeyState(win32con.VK_NUMLOCK) == 1 ):
                             pyautogui.press('numlock')
                     pyautogui.click()
@@ -870,7 +870,7 @@ class IRISKeywords():
                     flag = True
                 elif(args[0][0] == str(3) ):
                     log.debug( 'Clearing text by method : Click element + End + "Shift+Home" + Backspace' )
-                    if ( SYSTEM_OS != 'Darwin' ):
+                    if ( SYSTEM_OS == 'Windows' ):
                         if ( win32api.GetKeyState(win32con.VK_NUMLOCK) == 1 ):
                             pyautogui.press('numlock')
                     pyautogui.click()
@@ -885,7 +885,7 @@ class IRISKeywords():
                         i = int(args[0][1])
                         if (i != 0 and i > 0 ):
                             log.debug( 'Clearing text by method : Click element + End + Backspace X Index' )
-                            if ( SYSTEM_OS != 'Darwin' ):
+                            if ( SYSTEM_OS == 'Windows' ):
                                 if ( win32api.GetKeyState(win32con.VK_NUMLOCK) == 1 ):
                                     pyautogui.press('numlock')
                             pyautogui.click()
@@ -896,7 +896,7 @@ class IRISKeywords():
                         elif (i != 0 and i < 0 ):
                             i = i*-1
                             log.debug( 'Clearing text by method : Click element + Home(if index is negative) + Shift + Right X Index + Backspace' )
-                            if ( SYSTEM_OS != 'Darwin' ):
+                            if ( SYSTEM_OS == 'Windows' ):
                                 if ( win32api.GetKeyState(win32con.VK_NUMLOCK) == 1 ):
                                     pyautogui.press('numlock')
                             pyautogui.click()
@@ -973,7 +973,7 @@ class IRISKeywords():
             if( len(res) > 0 ):
                 encryption_obj = AESCipher()
                 input_val_temp = encryption_obj.decrypt( args[0][0] )
-                if SYSTEM_OS != 'Darwin':
+                if SYSTEM_OS == 'Windows':
                     pythoncom.CoInitialize()
                     pyautogui.click()
                     time.sleep(1)
@@ -1051,7 +1051,7 @@ class IRISKeywords():
                     image = cv2.imread("cropped.png")
                     text = ''
                     if(len(args[0]) >= 1 and args[0][0].lower().strip() == 'select'):
-                        if ( SYSTEM_OS != 'Darwin' ):
+                        if ( SYSTEM_OS == 'Windows' ):
                             win32clipboard.OpenClipboard()
                             win32clipboard.EmptyClipboard()
                             win32clipboard.CloseClipboard()
@@ -1436,7 +1436,7 @@ class IRISKeywords():
                     #--------------------------------------------------------equal in distance
                     pyautogui.moveTo(res[0]+ int(X), res[1]+ int(Y))
                     if(text):
-                        if SYSTEM_OS != 'Darwin':
+                        if SYSTEM_OS == 'Windows':
                             pythoncom.CoInitialize()
                             pyautogui.click()
                             robot = Robot()
@@ -1590,7 +1590,7 @@ class IRISKeywords():
                     except:pass
                     #--------------------------------------------------------equal in distance
                     pyautogui.moveTo(res[0]+ int(X), res[1]+ int(Y))
-                    if SYSTEM_OS != 'Darwin': pythoncom.CoInitialize()
+                    if SYSTEM_OS == 'Windows': pythoncom.CoInitialize()
                     log.info('Performing clickcelliris')
                     pyautogui.click()
                     log.info('clickcelliris performed')
@@ -1668,7 +1668,7 @@ class IRISKeywords():
                     except:pass
                     #--------------------------------------------------------equal in distance
                     pyautogui.moveTo(res[0]+ int(X), res[1]+ int(Y))
-                    if SYSTEM_OS != 'Darwin': pythoncom.CoInitialize()
+                    if SYSTEM_OS == 'Windows': pythoncom.CoInitialize()
                     log.info('Performing doubleClickCell')
                     pyautogui.doubleClick()
                     log.info('doubleClickCell performed')
@@ -1746,7 +1746,7 @@ class IRISKeywords():
                     except:pass
                     #--------------------------------------------------------equal in distance
                     pyautogui.moveTo(res[0]+ int(X), res[1]+ int(Y))
-                    if SYSTEM_OS != 'Darwin': pythoncom.CoInitialize()
+                    if SYSTEM_OS == 'Windows': pythoncom.CoInitialize()
                     log.info('Performing rightClickCell')
                     pyautogui.rightClick()
                     log.info('rightClickCell performed')
@@ -1823,7 +1823,7 @@ class IRISKeywords():
                             Y = (height_ele*(row-1)) + (height_ele/2)
                     except:pass
                     #--------------------------------------------------------equal in distance
-                    if SYSTEM_OS != 'Darwin': pythoncom.CoInitialize()
+                    if SYSTEM_OS == 'Windows': pythoncom.CoInitialize()
                     log.info('Performing mouseHoverCell')
                     pyautogui.moveTo(res[0]+ int(X), res[1]+ int(Y))
                     log.info('mouseHoverCell performed')

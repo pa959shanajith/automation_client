@@ -13,11 +13,11 @@ import controller
 import readconfig
 from constants import *
 import label_image
-if SYSTEM_OS != 'Darwin':
+if SYSTEM_OS == 'Windows':
     import screeninfo
     from pywinauto.findwindows import find_window
     from pywinauto.win32functions import SetForegroundWindow
-else:
+elif SYSTEM_OS=='Darwin':
     from AppKit import NSScreen
 
 drawing1 = False
@@ -46,12 +46,16 @@ class Cropandadd():
             im = PIL.ImageGrab.grab()
             im.save('test.png')
             image_orig = cv2.imread("test.png")
-            if SYSTEM_OS != 'Darwin':
+            if SYSTEM_OS == 'Windows':
                 screen = screeninfo.get_monitors()[0]
-            else:
+            elif SYSTEM_OS == 'Darwin':
                 width = int(NSScreen.mainScreen().frame().size.width)
                 height = int(NSScreen.mainScreen().frame().size.height)
-            screen = screeninfo.get_monitors()[0]
+            else:
+                import wx
+                app=wx.App(False)
+                width,height=wx.GetDisplaySize()
+            #screen = screeninfo.get_monitors()[0]
             overlay = image_orig.copy()
             output = image_orig.copy()
             cv2.rectangle(overlay, (0, 0), im.size,(220,220,220), -1)
@@ -116,13 +120,13 @@ class Cropandadd():
 
             cv2.namedWindow('image',cv2.WND_PROP_FULLSCREEN)
             cv2.setMouseCallback('image',draw_rect)
-            if SYSTEM_OS != 'Darwin':
+            if SYSTEM_OS == 'Windows':
                 cv2.moveWindow('image', screen.x - 1, screen.y - 1)
             else:
                 cv2.moveWindow('image', width-1,height-1)
             cv2.setWindowProperty('image', cv2.WND_PROP_FULLSCREEN,cv2.WINDOW_FULLSCREEN)
 
-            if SYSTEM_OS != 'Darwin':
+            if SYSTEM_OS == 'Windows':
                 SetForegroundWindow(find_window(title='image'))
             while(1):
                 cv2.imshow('image',self.RGB_img)
