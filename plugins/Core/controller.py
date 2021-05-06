@@ -1643,6 +1643,29 @@ def kill_process():
         #     log.error(e)
         log.info('Stale processes killed')
         logger.print_on_console('Stale processes killed')
+    elif SYSTEM_OS == 'Linux':
+        log.info("killing stale process in linux")
+        try:
+            import browser_Keywords
+            if browser_Keywords.linux_drivermap != []:
+                for brwdriver in browser_Keywords.linux_drivermap:
+                    brwdriver.quit()
+                del browser_Keywords.linux_drivermap[:]
+            for driver in browser_Keywords.drivermap:
+                driver.quit()
+            del browser_Keywords.drivermap[:]
+            if hasattr(browser_Keywords.local_bk, 'driver_obj'):
+                if (browser_Keywords.local_bk.driver_obj):
+                    browser_Keywords.local_bk.driver_obj = None
+            if hasattr(browser_Keywords.local_bk, 'pid_set'):
+                if (browser_Keywords.local_bk.pid_set):
+                    del browser_Keywords.local_bk.pid_set[:]
+        except Exception as e:
+            logger.print_on_console('Unable to kill stale process')
+            log.error(e)
+        log.info('Stale process Killed')
+        logger.print_on_console('Stale process killed')
+
     else:
         tries = {}
         while(len(process_ids) > 0):
