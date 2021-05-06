@@ -15,7 +15,7 @@ import webconstants
 import time
 from selenium import webdriver
 from constants import SYSTEM_OS
-if SYSTEM_OS!='Darwin':
+if SYSTEM_OS != 'Darwin' and SYSTEM_OS != 'Linux':
     from pyrobot import Robot, Keys
 import browser_Keywords
 import logging
@@ -76,7 +76,7 @@ class ButtonLinkKeyword():
                             status = webconstants.TEST_RESULT_PASS
                             methodoutput = webconstants.TEST_RESULT_TRUE
 
-                    elif SYSTEM_OS == 'Darwin':
+                    elif SYSTEM_OS == 'Darwin' or SYSTEM_OS == 'Linux':
                         try:
                             clickinfo = browser_Keywords.local_bk.driver_obj.execute_script(webconstants.CLICK_JAVASCRIPT,webelement)
                             local_blk.log.info('Click operation performed using javascript click')

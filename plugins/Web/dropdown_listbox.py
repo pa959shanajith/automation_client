@@ -137,7 +137,7 @@ class DropdownKeywords():
                                             if (input_val == i):
                                                 if (isinstance(browser_Keywords.local_bk.driver_obj, webdriver.Firefox)):
                                                     iList[i].click()
-                                                elif SYSTEM_OS == 'Darwin':
+                                                elif SYSTEM_OS == 'Darwin' or SYSTEM_OS =='Linux':
                                                     scroll = """arguments[0].scrollIntoView()"""
                                                     browser_Keywords.local_bk.driver_obj.execute_script(scroll, webelement)
                                                     jstext = """for (var j = 0; j < arguments[1].length; j++) {for (var i = 0; i < arguments[0].length; i++) {if ( i == arguments[1][j]) {arguments[0][i].selected = true;}}}"""
@@ -417,7 +417,7 @@ class DropdownKeywords():
                                             err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                                         if (flag):
                                             import platform
-                                            if SYSTEM_OS == 'Darwin':
+                                            if SYSTEM_OS == 'Darwin' or SYSTEM_OS == 'Linux':
                                                 input_list = [inp_val]
                                                 scroll = """arguments[0].scrollIntoView()"""
                                                 browser_Keywords.local_bk.driver_obj.execute_script(scroll, webelement)
@@ -1054,7 +1054,7 @@ class DropdownKeywords():
                                     local_ddl.log.info('iListSize is')
                                     local_ddl.log.info(iListSize)
                                     flag = False
-                                    if SYSTEM_OS == 'Darwin':
+                                    if SYSTEM_OS == 'Darwin' or SYSTEM_OS=='Linux':
                                         input_list = [input]
                                         scroll = """arguments[0].scrollIntoView()"""
                                         browser_Keywords.local_bk.driver_obj.execute_script(scroll, webelement)
@@ -1258,7 +1258,7 @@ class DropdownKeywords():
                                 select = Select(webelement)
                                 iList = select.options
                                 iListSize = len(iList)
-                                if SYSTEM_OS == 'Darwin':
+                                if SYSTEM_OS == 'Darwin' or SYSTEM_OS=='Linux':
                                     jscount = 0
                                     scroll = """arguments[0].scrollIntoView()"""
                                     browser_Keywords.local_bk.driver_obj.execute_script(scroll, webelement)
@@ -1445,7 +1445,7 @@ class DropdownKeywords():
                             select = Select(webelement)
                             iList = select.options
                             iListSize = len(iList)
-                            if SYSTEM_OS=='Darwin':
+                            if SYSTEM_OS=='Darwin' or SYSTEM_OS=='Linux':
                                 size=0
                                 scroll = """arguments[0].scrollIntoView()"""
                                 browser_Keywords.local_bk.driver_obj.execute_script(scroll, webelement)
@@ -1697,7 +1697,7 @@ class DropdownKeywords():
                         local_ddl.log.info(ERROR_CODE_DICT['MSG_OBJECT_DISPLAYED'])
                         try:
                             select = Select(webelement)
-                            if SYSTEM_OS == 'Darwin':
+                            if SYSTEM_OS == 'Darwin' or SYSTEM_OS=='Linux':
                                 scroll = """arguments[0].scrollIntoView()"""
                                 browser_Keywords.local_bk.driver_obj.execute_script(scroll, webelement)
                                 jsdeselect = """for (var i = 0; i < arguments[0].length; i++) {arguments[0][i].selected = false;}"""

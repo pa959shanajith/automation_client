@@ -310,7 +310,7 @@ class FileOperations:
                             workbook.save(file2)
 
                     elif((input_ext=='.xlsx' and extension=='.xls') or (input_ext=='.xls' and extension=='.xlsx')):
-                        if SYSTEM_OS != 'Darwin':
+                        if SYSTEM_OS != 'Darwin' and SYSTEM_OS != 'Linux':
                             import win32com.client
                             excel = win32com.client.gencache.EnsureDispatch('Excel.Application')
                             wb = excel.Workbooks.Open(source_path)
@@ -324,7 +324,7 @@ class FileOperations:
                             err_msg = 'File conversion support is not given for ' + str(input_ext) + ' to ' + str(extension) + ' in Mac OS'
 
                     elif((input_ext=='.docx' or input_ext=='.doc') and (extension=='.pdf' or extension=='.docx' or extension=='.doc')):
-                        if SYSTEM_OS != 'Darwin':
+                        if SYSTEM_OS != 'Darwin' and SYSTEM_OS != 'Linux':
                             import win32com.client
                             word = win32com.client.Dispatch('Word.Application')
                             doc = word.Documents.Open(source_path)
@@ -948,7 +948,7 @@ class FileOperations:
         try:
             input_path=coreutilsobj.get_UTF_8(input_path)
             content=coreutilsobj.get_UTF_8(content)
-            if SYSTEM_OS != 'Darwin':
+            if SYSTEM_OS != 'Darwin' and SYSTEM_OS != 'Linux':
                 import win32com.client
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
@@ -1149,34 +1149,53 @@ class FileOperations:
                     log.info('File has been saved')
                 else:
                 """
-                #Get the focus on Windows Dialog box by pressing 'alt+d'
-                obj.press_multiple_keys(['alt','d'],1)      ##added timer after every step
-                time.sleep(1)
+                if SYSTEM_OS=='Linux':
+                    obj.press_multiple_keys(['alt','d'],1)
+                    time.sleep(1)
+                    # create the path incluiding the file name for linux
+                    if folder_path[-1]=='/':
+                        full_path=foler_path+file_path
+                    else:
+                        full_path=folder_path+'/'+file_path
+                    import pyautogui as pag
+                    pag.hotkey('ctrl','a')
+                    pag.hotkey('backspace')
+                    obj.type(full_path,delay_stringinput)
+                    time.sleep(1)
+                    obj.execute_key('enter',1)
+                    time.sleep(2)
+                    status=TEST_RESULT_PASS
+                    methodoutput=TEST_RESULT_TRUE
+                    log.info('File has been saved')
+                else:
 
-                #Enter the folder path
-                obj.type(folder_path,delay_stringinput)
-                time.sleep(1)
-                #Press 'Enter' key
-                obj.execute_key('enter',1)
-                time.sleep(1)
-                #Press 'tab' key to get the focus on 'search tab'
-                obj.execute_key('tab',1)
-                time.sleep(1)
-                #Press 'alt+n' key to create a new file
-                obj.press_multiple_keys(['alt','n'],1)
-                time.sleep(1)
-                #Enter the file name
-                obj.type(file_path,delay_stringinput)
-                time.sleep(1)
-                #Press 'Enter' key
-                obj.execute_key('enter',1)
-                time.sleep(2)
-                #Press 'alt+y' key in case if the file is already existing
-                obj.press_multiple_keys(['alt','y'],1)   #added alt+y sendfunction key for automating overwrite process if the file is already existed.
+                    #Get the focus on Windows Dialog box by pressing 'alt+d'
+                    obj.press_multiple_keys(['alt','d'],1)      ##added timer after every step
+                    time.sleep(1)
+                    #Enter the folder path
+                    obj.type(folder_path,delay_stringinput)
+                    time.sleep(1)
+                    #Press 'Enter' key
+                    obj.execute_key('enter',1)
+                    time.sleep(1)
+                    #Press 'tab' key to get the focus on 'search tab'
+                    obj.execute_key('tab',1)
+                    time.sleep(1)
+                    #Press 'alt+n' key to create a new file
+                    obj.press_multiple_keys(['alt','n'],1)
+                    time.sleep(1)
+                    #Enter the file name
+                    obj.type(file_path,delay_stringinput)
+                    time.sleep(1)
+                    #Press 'Enter' key
+                    obj.execute_key('enter',1)
+                    time.sleep(2)
+                    #Press 'alt+y' key in case if the file is already existing
+                    obj.press_multiple_keys(['alt','y'],1)   #added alt+y sendfunction key for automating overwrite process if the file is already existed.
 
-                status=TEST_RESULT_PASS
-                methodoutput=TEST_RESULT_TRUE
-                log.info('File has been saved')
+                    status=TEST_RESULT_PASS
+                    methodoutput=TEST_RESULT_TRUE
+                    log.info('File has been saved')
             else:
                 err_msg='Invalid file path'
                 time.sleep(1)

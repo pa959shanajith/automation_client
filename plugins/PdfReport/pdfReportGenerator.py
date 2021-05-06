@@ -10,12 +10,16 @@
 #-------------------------------------------------------------------------------
 
 import os
+import platform
 from pdfkitlib_override import pdfkit
 from generatepdf import GeneratePDFReport
 from generatepdf_batch import GeneratePDFReportBatch
 
 pdfkit_conf = None
-wkhtmltopdf_path = os.environ["AVO_ASSURE_HOME"] + "/Lib/wkhtmltox/bin/wkhtmltopdf.exe"
+if platform.system() == 'Windows':
+    wkhtmltopdf_path = os.environ["AVO_ASSURE_HOME"] + "/Lib/wkhtmltox/bin/wkhtmltopdf.exe"
+else:
+    wkhtmltopdf_path = os.environ["AVO_ASSURE_HOME"] + "/lib/wkhtmltox/bin/wkhtmltopdf"
 if os.path.exists(wkhtmltopdf_path):
     pdfkit_conf = pdfkit.configuration(wkhtmltopdf=wkhtmltopdf_path)
 else:
