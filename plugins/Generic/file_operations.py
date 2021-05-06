@@ -310,7 +310,7 @@ class FileOperations:
                             workbook.save(file2)
 
                     elif((input_ext=='.xlsx' and extension=='.xls') or (input_ext=='.xls' and extension=='.xlsx')):
-                        if SYSTEM_OS != 'Darwin' and SYSTEM_OS != 'Linux':
+                        if SYSTEM_OS == 'Windows':
                             import win32com.client
                             excel = win32com.client.gencache.EnsureDispatch('Excel.Application')
                             wb = excel.Workbooks.Open(source_path)
@@ -324,7 +324,7 @@ class FileOperations:
                             err_msg = 'File conversion support is not given for ' + str(input_ext) + ' to ' + str(extension) + ' in Mac OS'
 
                     elif((input_ext=='.docx' or input_ext=='.doc') and (extension=='.pdf' or extension=='.docx' or extension=='.doc')):
-                        if SYSTEM_OS != 'Darwin' and SYSTEM_OS != 'Linux':
+                        if SYSTEM_OS == 'Windows':
                             import win32com.client
                             word = win32com.client.Dispatch('Word.Application')
                             doc = word.Documents.Open(source_path)
@@ -948,7 +948,7 @@ class FileOperations:
         try:
             input_path=coreutilsobj.get_UTF_8(input_path)
             content=coreutilsobj.get_UTF_8(content)
-            if SYSTEM_OS != 'Darwin' and SYSTEM_OS != 'Linux':
+            if SYSTEM_OS == 'Windows':
                 import win32com.client
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE

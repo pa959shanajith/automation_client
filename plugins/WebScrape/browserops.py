@@ -18,7 +18,7 @@ import time
 import xml.etree.ElementTree as ET
 import domconstants
 from constants import SYSTEM_OS
-if SYSTEM_OS != 'Darwin' and SYSTEM_OS != 'Linux':
+if SYSTEM_OS == 'Windows':
     import utils_sc
     import win32gui
     import win32api

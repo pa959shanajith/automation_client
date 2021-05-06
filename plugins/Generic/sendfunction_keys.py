@@ -11,7 +11,7 @@
 from generic_constants import *
 from constants import *
 import logger
-if SYSTEM_OS != 'Darwin' and SYSTEM_OS != 'Linux':
+if SYSTEM_OS == 'Windows':
     from pyrobot import Robot
 import pyautogui
 import subprocess

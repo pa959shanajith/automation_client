@@ -19,7 +19,7 @@ from constants import *
 import logging
 import core
 import platform
-if SYSTEM_OS != 'Darwin' and SYSTEM_OS != 'Linux':
+if SYSTEM_OS == 'Windows':
     import win32gui
     import win32api
     import utils_web
@@ -128,7 +128,7 @@ class BrowserKeywords():
             if(local_bk.driver_obj == None):
                 result = TERMINATE
             else:
-                if SYSTEM_OS != 'Darwin' and SYSTEM_OS != 'Linux':
+                if SYSTEM_OS == 'Winodows':
                     utilobject = utils_web.Utils()
                     pid = None
                     if (self.browser_num == '1'):
@@ -868,7 +868,7 @@ class BrowserKeywords():
             local_bk.recent_handles.append(h)
 
     def update_pid_set(self,enableSecurityFlag):
-        if SYSTEM_OS != 'Darwin' and SYSTEM_OS != 'Linux':
+        if SYSTEM_OS == 'Windows':
             utilobject = utils_web.Utils()
             pid = None
             if (self.browser_num == '1'):

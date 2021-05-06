@@ -18,7 +18,7 @@ from utils_web import Utils
 import webconstants
 from webconstants import *
 from constants import SYSTEM_OS
-if SYSTEM_OS!='Darwin' and SYSTEM_OS !='Linux':
+if SYSTEM_OS == 'Windows' :
     from pyrobot import Robot
     import win32gui
     import pyrobot
