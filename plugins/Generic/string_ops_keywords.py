@@ -831,7 +831,6 @@ class StringOperation:
                                                 actual_string_list.append(a_spl)
                                             elif j<len(find_string_list):
                                                 f_i=find_string_list[j]-1
-                                                # if j!=len(find_string_list)-1:
                                                 a_spl=actual_string[f_i:to_find_list[i]]
                                                 actual_string_list.append(a_spl)
                                             else:
@@ -894,7 +893,6 @@ class StringOperation:
                             if (match==None):
                                 actual_string_list.remove(a)
             if wildcard_search==True:
-                to_find_d = to_find
                 to_find = to_find.replace('?','.')
                 to_find = to_find.replace('*','.+')
                 if to_find.count('.')>0:
@@ -913,10 +911,7 @@ class StringOperation:
                             pos = [i+1 for i in range(len(actual_string)) if actual_string.startswith(match.group(), i)]
                             position.extend(pos)
                             continue
-                        else:
-                            logger.print_on_console('The Original String is ',actual_string ,' and ' , actual_string , ' does not Contain ', to_find_d)
             elif last_wildcard_search==True:
-                to_find_d=to_find
                 to_find = to_find.replace('?','.')
                 to_find = to_find.replace('*','.+')
                 if to_find.count('.')>0:

@@ -722,6 +722,8 @@ class BrowserKeywords():
                 elif window_num_flag == True:
                     remove_handles=[]
                     try:
+                        cur_handle=local_bk.driver_obj.current_window_handle
+                        cwh_index=local_bk.all_handles.index(cur_handle)
                         if len(inp_list)<len(local_bk.all_handles):
                             for i in inp_list:
                                 inp = int(i)
@@ -733,7 +735,6 @@ class BrowserKeywords():
                                         local_bk.driver_obj.switch_to.window(local_bk.all_handles[inp])
                                         local_bk.driver_obj.close()
                                         remove_handles.append(win_h) 
-                                        handles_index.append(inp)
                                         local_bk.log.info('subwindow '+str(i)+' is closed')
                                         logger.print_on_console('subwindow '+str(i)+' is closed')
                                     else:
@@ -761,6 +762,8 @@ class BrowserKeywords():
                     err_msg = webconstants.INVALID_INPUT
                 else:
                     try:
+                        cur_handle=local_bk.driver_obj.current_window_handle
+                        cwh_index=local_bk.all_handles.index(cur_handle)
                         local_bk.driver_obj.switch_to.window(local_bk.all_handles[-1])
                         local_bk.driver_obj.close()
                         local_bk.all_handles=local_bk.all_handles[0:-1]
@@ -770,23 +773,55 @@ class BrowserKeywords():
                         err_msg=self.__web_driver_exception(e)
 
                 if(len(local_bk.all_handles) >= 1):
-                    if (window_num_flag == True and switch_window_flag==True):
-                        recent_handle_index = handles_index[-1]
-                        if recent_handle_index < len(local_bk.all_handles):
-                            local_bk.driver_obj.switch_to.window(local_bk.all_handles[recent_handle_index-1])
-                            self.update_recent_handle(local_bk.all_handles[recent_handle_index-1])
+                    if (window_num_flag == True and switch_window_flag==True):                       
+                        if not(cur_handle in local_bk.all_handles):
+                            if len(inp_list)>1: 
+                                if cwh_index > len(local_bk.all_handles):
+                                    local_bk.driver_obj.switch_to.window(local_bk.all_handles[-1])
+                                    self.update_recent_handle(local_bk.all_handles[-1])
+                                    status=webconstants.TEST_RESULT_PASS
+                                    result=webconstants.TEST_RESULT_TRUE
+                                elif cwh_index < len(local_bk.all_handles):
+                                    prev_window=cwh_index-len(inp_list)
+                                    local_bk.driver_obj.switch_to.window(local_bk.all_handles[prev_window])
+                                    self.update_recent_handle(local_bk.all_handles[prev_window])
+                                    status=webconstants.TEST_RESULT_PASS
+                                    result=webconstants.TEST_RESULT_TRUE
+                            else:
+                                if cwh_index==0:
+                                    prev_window=cwh_index
+                                    local_bk.driver_obj.switch_to.window(local_bk.all_handles[prev_window])
+                                    self.update_recent_handle(local_bk.all_handles[prev_window])
+                                    status=webconstants.TEST_RESULT_PASS
+                                    result=webconstants.TEST_RESULT_TRUE
+                                else: 
+                                    prev_window=cwh_index-1
+                                    local_bk.driver_obj.switch_to.window(local_bk.all_handles[prev_window])
+                                    self.update_recent_handle(local_bk.all_handles[prev_window])
+                                    status=webconstants.TEST_RESULT_PASS
+                                    result=webconstants.TEST_RESULT_TRUE
+                        else:
+                            local_bk.driver_obj.switch_to.window(cur_handle)
+                            self.update_recent_handle(cur_handle)
                             status=webconstants.TEST_RESULT_PASS
                             result=webconstants.TEST_RESULT_TRUE
-                        else:
+                    elif (inp == 'all' or inp == ''):
+                        if inp == '':
+                            if cwh_index == len(local_bk.all_handles):
+                                local_bk.driver_obj.switch_to.window(local_bk.all_handles[-1])
+                                self.update_recent_handle(local_bk.all_handles[-1])
+                                status=webconstants.TEST_RESULT_PASS
+                                result=webconstants.TEST_RESULT_TRUE
+                            else:
+                                local_bk.driver_obj.switch_to.window(cur_handle)
+                                self.update_recent_handle(cur_handle)
+                                status=webconstants.TEST_RESULT_PASS
+                                result=webconstants.TEST_RESULT_TRUE
+                        else:        
                             local_bk.driver_obj.switch_to.window(local_bk.all_handles[-1])
                             self.update_recent_handle(local_bk.all_handles[-1])
                             status=webconstants.TEST_RESULT_PASS
                             result=webconstants.TEST_RESULT_TRUE
-                    elif (inp == 'all' or inp == ''):
-                        local_bk.driver_obj.switch_to.window(local_bk.all_handles[-1])
-                        self.update_recent_handle(local_bk.all_handles[-1])
-                        status=webconstants.TEST_RESULT_PASS
-                        result=webconstants.TEST_RESULT_TRUE
             else:
                 err_msg = 'No sub windows to close'
                 logger.print_on_console(err_msg)
