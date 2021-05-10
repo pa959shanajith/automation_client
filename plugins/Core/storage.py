@@ -32,14 +32,9 @@ class AbstractStorage(object):
         self.q = queue.Queue()
         self.q.Empty = queue.Empty
         self.lock = Lock()
-        self._repopulate()
 
     def _get_counter(self, start=1):
         return itertools.count(start)
-
-    def _repopulate(self):
-        """Repopulates the queue with the packets available in storage """
-        pass
 
     @property
     def id(self):
@@ -211,7 +206,7 @@ class SQLite(AbstractStorage):
         self.db = None
         db_path = os.path.join(os.getenv("AVO_ASSURE_HOME"), 'assets',
             'packets.db')
-        rm_db = os.getenv("ICE_CLEAR_STORAGE", "") and os.path.isfile(db_path)
+        rm_db = os.getenv("ICE_CLEAR_STORAGE", "")=="True" and os.path.isfile(db_path)
         if rm_db: os.remove(db_path)
         self.mutex = Lock()
         self.conn = sqlite3.connect(db_path, check_same_thread=False)
@@ -219,6 +214,7 @@ class SQLite(AbstractStorage):
         self.write("CREATE TABLE IF NOT EXISTS packets (packetid integer, "
             "chunkid text, packet text)")
         if not rm_db: Timer(5, self._compact_db).start()
+        self._repopulate()
 
     def __del__(self):
         if bool(self.db):
@@ -242,13 +238,17 @@ class SQLite(AbstractStorage):
                 if data and len(data) > 0: resp = data[0]
         return resp
 
-
     def _repopulate(self):
         """Repopulates the queue with the packets available in storage """
         try:
-            last_pcktid = self.read("SELECT packetid from packets",
-                return_cursor=True).fetchall()[-1:]
-            if len(last_pcktid) != 0: self._packet_id = last_pcktid[0][0] + 1
+            packets = self.read("SELECT packetid, chunkid from packets",
+                return_cursor=True).fetchall()
+            for pkt in packets:
+                self.q.put((str(pkt[0]), pkt[1]), block=False)
+            if len(packets) > 0:
+                last_pcktid = int(packets[-1][0])
+                self._counter = self._get_counter(last_pcktid + 1)
+                self._packet_id = last_pcktid
         except Exception as e:
             log.info("Error while restoring packet queue from storage. "
                 "Error: %s", e)
