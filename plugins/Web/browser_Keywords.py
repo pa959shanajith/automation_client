@@ -1123,6 +1123,7 @@ class Singleton_DriverUtil():
         logger.print_on_console( 'BROWSER NUM: ',str(browser_num))
         configvalues = readconfig.configvalues
         headless_mode = str(configvalues['headless_mode'])=='Yes'
+        use_custom_debugport = str(configvalues["use_custom_debugport"].lower()) == "yes"
         close_browser_popup = configvalues['close_browser_popup']
         if (browser_num == '1'):
             try:
@@ -1152,8 +1153,8 @@ class Singleton_DriverUtil():
                         prefs["credentials_enable_service"] = False
                         prefs["profile.password_manager_enabled"] = False
                         choptions.add_experimental_option("prefs", prefs)
-                    if configvalues["chrome_debugport"] != "0":
-                        choptions.add_argument("--remote-debugging-port="+configvalues["chrome_debugport"])
+                    if use_custom_debugport:
+                        choptions.add_argument("--remote-debugging-port="+core_utils.find_open_port())
 
                     driver = webdriver.Chrome(executable_path=exec_path, options=choptions)
                     # driver.navigate().refresh()
@@ -1318,8 +1319,8 @@ class Singleton_DriverUtil():
                         prefs["credentials_enable_service"] = False
                         prefs["profile.password_manager_enabled"] = False
                         msoptions.add_experimental_option("prefs", prefs)
-                    if configvalues["edgechromium_debugport"] != "0":
-                        msoptions.add_argument("--remote-debugging-port="+configvalues["edgechromium_debugport"])
+                    if use_custom_debugport:
+                        msoptions.add_argument("--remote-debugging-port="+core_utils.find_open_port())
                     caps = msoptions.to_capabilities()
                     chromium_path = webconstants.EDGE_CHROMIUM_DRIVER_PATH
                     if SYSTEM_OS == "Darwin":

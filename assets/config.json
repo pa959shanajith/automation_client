@@ -33,5 +33,6 @@
     "stepExecutionWait": "1",
     "timeOut": "1",
     "tls_security": "High",
-    "update_check": "No"
+    "update_check": "No",
+    "use_custom_debugport": "No"
 }

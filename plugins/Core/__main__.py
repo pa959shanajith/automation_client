@@ -4,7 +4,7 @@ import logging
 import argparse
 import platform
 log = logging.getLogger('Avo_Assure')
-ice_ver = '3.0'
+ice_ver = '3.0.0'
 
 try:
     cfile = os.path.abspath(__file__)
@@ -12,7 +12,7 @@ try:
         import json
         ice_ver = json.load(m)["version"]
 except: pass
-os.environ['AVO_ASSURE_VERSION'] = ice_ver
+
 parser = argparse.ArgumentParser(description="Avo Assure ICE Platform")
 parser.add_argument('-n', '--AVO_ASSURE_HOME', required=True, type=str, help='A Required path to Avo Assure root location')
 parser.add_argument('-v', '--version', action='version', version=('Avo Assure ICE '+ice_ver), help='Show Avo Assure ICE version information')
@@ -24,7 +24,6 @@ parser.add_argument('--connect', action='store_true', help='Establish a connecti
 args = parser.parse_args()
 if args.AVO_ASSURE_HOME and not os.path.exists(args.AVO_ASSURE_HOME+os.sep+'/plugins'):
     parser.error("Invalid path provided for AVO_ASSURE_HOME")
-os.environ["AVO_ASSURE_HOME"] = args.AVO_ASSURE_HOME
 if args.connect and args.register:
     parser.error("Register operation cannot be used with connect operation")
 if not (args.register or args.connect) and (args.host or args.token):
@@ -43,6 +42,10 @@ if args.register or args.connect:
         if args.host is None:
             print("No value provided for host. Reading values from configuration file")
 
+os.environ["AVO_ASSURE_HOME"] = args.AVO_ASSURE_HOME
+os.environ['AVO_ASSURE_VERSION'] = ice_ver
+os.environ["ICE_CLEAR_STORAGE"] = os.getenv("ICE_CLEAR_STORAGE", "True")
+
 import constants
 import readconfig
 configvalues = readconfig.readConfig().readJson()
@@ -57,7 +60,7 @@ if sys.platform == 'win32':
     from ctypes import windll
     host_os = platform.platform()
     if 'Windows-10' in host_os or 'Windows-8.1' in host_os:
-        windll.shcore.SetProcessDpiAwareness(0)
+        windll.shcore.SetProcessDpiAwareness(2)
     import msvcrt
     __builtins__open = __builtins__.open
     def __open_inheritance_hack(*args, **kwargs):
