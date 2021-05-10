@@ -146,6 +146,7 @@ class GenericKeywordDispatcher:
             'verifyvalues':local_generic.util_operation_obj.verify_values,
             'getindexcount':local_generic.util_operation_obj.getIndexCount,
             'disableanchoriris':local_generic.util_operation_obj.disableAnchorIris,
+            'getkeystatus':local_generic.util_operation_obj.getKeyStatus,
             'writewordfile': local_generic.generic_word.writeWordFile,
             'readworddoc': local_generic.generic_word.readWorddoc,
             'readallcheckbox': local_generic.generic_word.readallcheckbox,
