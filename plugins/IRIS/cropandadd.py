@@ -88,7 +88,8 @@ class Cropandadd():
                     log.debug('Inside draw : Event3 - left button up')
                     drawing1 = False
                     self.data['scrapetype'] = 'caa'
-                    RGB_img_crop = image_orig[iy:y,ix:x]
+                    if (iy > y and ix > x) : RGB_img_crop = image_orig[y:iy,x:ix]
+                    else : RGB_img_crop = image_orig[iy:y,ix:x]
                     cv2.imwrite("cropped.png", RGB_img_crop)
                     with open("cropped.png", "rb") as imageFile:
                         RGB_img_crop_im = str(base64.b64encode(imageFile.read()))
@@ -102,7 +103,8 @@ class Cropandadd():
                             log.debug('Inside draw : Event3 - if relative obj set custname and tag')
                             custname = 'img_object_'+str(ix)+'_'+str(iy)+'_'+str(x)+'_'+str(y)
                             tag = 'relative'
-                        self.data['view'].append({'custname': custname,'cord':RGB_img_crop_im,'tag':tag,'width':abs(x-ix),'height':abs(y-iy),'top':iy,'left':ix,'xpath':'iris','objectType':''})
+                        if (iy > y and ix > x) : self.data['view'].append({'custname': custname,'cord':RGB_img_crop_im,'tag':tag,'width':abs(ix-x),'height':abs(iy-y),'top':y,'left':x,'xpath':'iris','objectType':''})
+                        else : self.data['view'].append({'custname': custname,'cord':RGB_img_crop_im,'tag':tag,'width':abs(x-ix),'height':abs(y-iy),'top':iy,'left':ix,'xpath':'iris','objectType':''})
                     if(constant_image):
                         log.debug('Inside draw : Event3 - constant obj - box colour red ')
                         cv2.rectangle(self.RGB_img,(ix,iy),(x,y),(0,0,255),1)

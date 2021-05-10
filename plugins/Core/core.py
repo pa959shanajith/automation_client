@@ -27,6 +27,7 @@ import requests
 import io
 import handler
 import update_module
+import shutil
 from icetoken import ICEToken
 import benchmark
 from socketiolib import SocketIO, BaseNamespace, prepare_http_session
@@ -789,7 +790,7 @@ class MainNamespace(BaseNamespace):
             if len(predictionPath) != 0 and os.path.exists(predictionPath):
                 constants.PREDICTION_IMG_DIR = os.path.normpath(predictionPath) + OS_SEP
                 #check if folders exist, if they dont create:
-                check_list = ['button','checkbox','dropdown','textbox','hscroll','vscroll','image','label','listbox','radiobutton','table','tree']
+                check_list = ['button','checkbox','dropdown','textbox','scroll','image','label','listbox','radiobutton','table','tree']
                 for c in check_list:
                     if (os.path.exists(constants.PREDICTION_IMG_DIR + str(c))):
                         log.debug( str(c) + ' folder found in object prediction dataset path')
@@ -800,6 +801,18 @@ class MainNamespace(BaseNamespace):
                             log.debug( 'Created folder ' + str(c) + ' in object prediction dataset path')
                         except Exception as e:
                             log.error( 'Error occured during the creation of ' + str(c) + ' folder in dataset path, ERR_MSG : ' + str(e) )
+                #below code is redundant once all CBU's move to AvoAssure_3.2 & upwards
+                #check if'hscroll','vscroll' folders exist, if so move contents to scroll and delete hscroll and vscroll
+                for s in ['hscroll','vscroll']:
+                    if (os.path.exists(constants.PREDICTION_IMG_DIR + s)):
+                        try:
+                            file_names = os.listdir(constants.PREDICTION_IMG_DIR + s)
+                            for file_name in file_names:
+                                try: shutil.move(os.path.join(constants.PREDICTION_IMG_DIR + s, file_name), constants.PREDICTION_IMG_DIR + 'scroll')
+                                except: log.debug( file_name + '" already exists, in destination path.')
+                            shutil.rmtree(constants.PREDICTION_IMG_DIR + s)
+                        except :
+                            log.error( 'Unable to delete '+ s +' dir' )
             else:
                 constants.PREDICTION_IMG_DIR="Disabled"
                 logger.print_on_console("Object Prediction Manual Training disabled since user does not have sufficient privileges for object prediction dataset folder\n")
@@ -1657,7 +1670,10 @@ def check_browser():
 
         #Checking browser for microsoft edge
         try:
-            if('Windows-10' in platform.platform()):
+            enable_edge_check = str(os.getenv('__ICE_ALLOW_EDGE_LEGACY', False)).lower() != 'false'
+            if not enable_edge_check:
+                logger.print_on_console("WARNING!! : MS Edge Legacy is not supported")
+            elif('Windows-10' in platform.platform()):
                 import psutil
                 edgeFlagComp = "MicrosoftEdge.exe" not in [p.name() for p in psutil.process_iter()]
                 if edgeFlagComp:
@@ -1679,7 +1695,7 @@ def check_browser():
                             if str(browser_ver) >= v[0] or str(browser_ver) <= v[1]:
                                 edgeFlag = True
                     if edgeFlag == False:
-                        logger.print_on_console('WARNING!! : Edge Legacy version ',str(browser_ver),' is not supported.')
+                        logger.print_on_console('WARNING!! : MS Edge Legacy version ',str(browser_ver),' is not supported.')
                 else:
                     logger.print_on_console("WARNING!! : To perform MS Edge Legacy check, all instances of MS Edge legacy should be closed. Close the instances and restart ICE again")
             else:

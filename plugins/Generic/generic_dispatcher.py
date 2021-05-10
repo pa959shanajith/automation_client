@@ -146,6 +146,7 @@ class GenericKeywordDispatcher:
             'verifyvalues':local_generic.util_operation_obj.verify_values,
             'getindexcount':local_generic.util_operation_obj.getIndexCount,
             'disableanchoriris':local_generic.util_operation_obj.disableAnchorIris,
+            'getkeystatus':local_generic.util_operation_obj.getKeyStatus,
             'writewordfile': local_generic.generic_word.writeWordFile,
             'readworddoc': local_generic.generic_word.readWorddoc,
             'readallcheckbox': local_generic.generic_word.readallcheckbox,
@@ -197,6 +198,8 @@ class GenericKeywordDispatcher:
                         output=tsp.outputval.split(';')
                     #Changes for defect #983 - to resolve values of static and dynamic variables in output for this particular keyword
                     if(keyword == "exportdata" or keyword=="secureexportdata") and (len(output)>1):
+                        #comment the below code for Azure Issue #22199
+                        '''
                         if tsp.outputval.find(';')!=-1:
                             i = (tsp.outputval).index(';')
                             tsp.outputval = tsp.outputval[i+1:]
@@ -206,7 +209,8 @@ class GenericKeywordDispatcher:
                             con = controller.Controller()
                             dynamic_var_handler_obj=dynamic_variable_handler.DynamicVariables()
                             output[0] = dynamic_var_handler_obj.replace_dynamic_variable(output[0],keyword,con)
-                        elif str(output[0]).startswith("|") and str(output[0]).endswith("|"):
+                        '''
+                        if str(output[0]).startswith("|") and str(output[0]).endswith("|"):
                             import handler
                             import controller
                             con = controller.Controller()

@@ -296,6 +296,7 @@ ERROR_CODE_DICT = {
                     "ERR_DB_OPS": "Error with database operation",
                     "ERR_DB_QUERY": "Error with database query",
                     "ERR_FILE_WRITE": "Error writing to file",
+                    "ERR_JAVA_NOT_FOUND": "JAVA_HOME environment variable is not set"
                 }
 
 STOP='stop'

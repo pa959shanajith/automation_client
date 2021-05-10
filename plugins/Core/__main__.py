@@ -12,7 +12,7 @@ try:
         import json
         ice_ver = json.load(m)["version"]
 except: pass
-
+os.environ['AVO_ASSURE_VERSION'] = ice_ver
 parser = argparse.ArgumentParser(description="Avo Assure ICE Platform")
 parser.add_argument('-n', '--AVO_ASSURE_HOME', required=True, type=str, help='A Required path to Avo Assure root location')
 parser.add_argument('-v', '--version', action='version', version=('Avo Assure ICE '+ice_ver), help='Show Avo Assure ICE version information')

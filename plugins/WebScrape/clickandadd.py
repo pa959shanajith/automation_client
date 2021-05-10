@@ -76,7 +76,7 @@ class Clickandadd():
 
             """Method to perform Start ClickAndAdd on iframes (and frames) recursively"""
             def callback_scrape_start_cna_iframes(myipath):
-                for iframes in (list(range(len(driver.find_elements_by_tag_name(domconstants.IFRAME))))):
+                for iframes in range(len(driver.find_elements_by_tag_name(domconstants.IFRAME))):
                     path = myipath + str(iframes) + 'i' + '/'
                     if webscrape_utils_obj.switchtoframe_webscrape(driver, currenthandle, path):
                         log.debug('switched to iframe/frame %s', path)
@@ -89,7 +89,7 @@ class Clickandadd():
 
             """Method to perform Start ClickAndAdd on frames (and iframes) recursively"""
             def callback_scrape_start_cna_frames(myipath):
-                for frames in (list(range(len(driver.find_elements_by_tag_name(domconstants.FRAME))))):
+                for frames in range(len(driver.find_elements_by_tag_name(domconstants.FRAME))):
                     path = myipath + str(frames) + 'f' + '/'
                     if webscrape_utils_obj.switchtoframe_webscrape(driver, currenthandle, path):
                         log.debug('switched to iframe/frame %s', path)
@@ -132,11 +132,14 @@ class Clickandadd():
 
             """Method to perform Stop ClickAndAdd on iframes (and frames) recursively"""
             def callback_scrape_stop_cna_iframes(myipath, tempne_stopclicknadd):
-                for iframes in (list(range(len(driver.find_elements_by_tag_name(domconstants.IFRAME))))):
+                if_list = driver.find_elements_by_tag_name(domconstants.IFRAME)
+                rect_list = []
+                for iframes in if_list:
+                    if iframes is not None:
+                        rect_list.append(iframes.rect)
+                for iframes in range(len(if_list)):
                     path = myipath + str(iframes) + 'i' + '/'
-                    rect = None
-                    if iframes < len(driver.find_elements_by_tag_name(domconstants.IFRAME)):
-                        rect = driver.find_elements_by_tag_name(domconstants.IFRAME)[iframes].rect
+                    rect = rect_list[iframes]
                     if webscrape_utils_obj.switchtoframe_webscrape(driver, currenthandle, path):
                         in_iframe = driver.execute_script(webscrape_utils_obj.javascript_in_iframe)
                         log.debug('switched to iframe/frame %s', path)
@@ -155,7 +158,7 @@ class Clickandadd():
 
             """Method to perform Stop ClickAndAdd on frames (and iframes) recursively"""
             def callback_scrape_stop_cna_frames(myipath, tempne_stopclicknadd):
-                for frames in (list(range(len(driver.find_elements_by_tag_name(domconstants.FRAME))))):
+                for frames in range(len(driver.find_elements_by_tag_name(domconstants.FRAME))):
                     path = myipath + str(frames) + 'f' + '/'
                     if webscrape_utils_obj.switchtoframe_webscrape(driver, currenthandle, path):
                         log.debug('switched to iframe/frame %s', path)
