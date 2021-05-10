@@ -1420,10 +1420,8 @@ class Main():
             if socketIO is not None:
                 if disconn:
                     log.info('Sending socket disconnect request')
-                    socketIO.send('unavailableLocalServer', dnack = True)
-                socketIO.disconnect()
-                # if socketIO.activeTimer.is_active:
-                #     socketIO.activeTimer.cancel()
+                    socketIO.send('unavailableLocalServer', dnack=True)
+                socketIO.safe_disconnect()
                 del socketIO
                 socketIO = None
                 self.socketthread.join()
