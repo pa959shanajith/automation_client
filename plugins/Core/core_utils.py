@@ -147,4 +147,5 @@ def find_open_port():
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
             res = sock.connect_ex(('localhost', port))
             if res == 10061:
-                return port
+                log.debug("Remote debugging port seleted is %s", port)
+                return str(port)

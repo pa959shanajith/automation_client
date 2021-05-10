@@ -1610,8 +1610,8 @@ def check_browser():
             if str(configvalues['chrome_path']).lower()!="default":
                 choptions1.binary_location=str(configvalues['chrome_path'])
             choptions1.headless = True
-            if configvalues["chrome_debugport"] != "0":
-                choptions1.add_argument("--remote-debugging-port="+configvalues["chrome_debugport"])
+            if configvalues["use_custom_debugport"].lower() == "yes":
+                choptions1.add_argument("--remote-debugging-port="+core_utils.find_open_port())
             driver = webdriver.Chrome(options=choptions1, executable_path=CHROME_DRIVER_PATH)
             # Check for the chrome 75 version.
             # As the key value of 'version' is changed from 'version' to 'browserVersion'
@@ -1714,8 +1714,8 @@ def check_browser():
             import edge_chromium_options
             msoptions = webdriver.EdgeChromiumOptions()
             msoptions.headless = True
-            if configvalues["edgechromium_debugport"] != "0":
-                msoptions.add_argument("--remote-debugging-port="+configvalues["edgechromium_debugport"])
+            if configvalues["use_custom_debugport"].lower() == "yes":
+                msoptions.add_argument("--remote-debugging-port="+core_utils.find_open_port())
             caps = msoptions.to_capabilities()
             if SYSTEM_OS == 'Darwin': #MAC check for edge chromium
                 caps['platform'] = 'MAC'
