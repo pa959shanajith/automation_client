@@ -12,7 +12,6 @@ import desktop_scraping
 from pywinauto.application import Application
 import pywinauto
 import wx
-from socketIO_client import SocketIO,BaseNamespace
 import desktop_launch_keywords
 desktop_scraping_obj = desktop_scraping.Scrape()
 import os

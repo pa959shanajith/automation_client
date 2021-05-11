@@ -12,7 +12,6 @@ from mobile_app_constants import *
 from constants import *
 import android_scrapping
 import wx
-from socketIO_client import SocketIO,BaseNamespace
 import os, time, sys
 import logger
 import logging
