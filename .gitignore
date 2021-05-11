@@ -12,3 +12,4 @@ Lib/*
 libs/*
 logs/*
 output/*
+assets/packets.db

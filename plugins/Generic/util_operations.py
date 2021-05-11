@@ -19,7 +19,10 @@ from constants import *
 import core_utils
 import logging
 import ast
-
+if SYSTEM_OS != 'Darwin':
+    import win32api,win32con
+if SYSTEM_OS == 'Darwin':
+    import subprocess
 
 log = logging.getLogger('util_operations.py')
 class UtilOperations:
@@ -417,6 +420,70 @@ class UtilOperations:
                 err_msg = 'Unable to find iris anchor element'
         except Exception as e:
             err_msg="Error occurred in disableAnchorIris, Err Msg : " + str(e)
+        if(err_msg):
+            log.error( err_msg )
+            logger.print_on_console(err_msg)
+        return status, result, output, err_msg
+
+    def getKeyStatus(self,*args):
+        """
+        Def : This function return the boolean value of NUM LOCK, CAPS LOCK and SCROLL LOCK
+        Input : Input text(only allowed text: num/caps/scroll)
+        Output : On/Off
+        """
+        status = TEST_RESULT_FAIL
+        result = TEST_RESULT_FALSE
+        output = OUTPUT_CONSTANT
+        err_msg = None
+        try:
+            if SYSTEM_OS != 'Darwin':
+                #windows
+                if str(args[0]).lower() == 'num':
+                    if win32api.GetKeyState(win32con.VK_NUMLOCK) : output = True
+                    else: output = False
+                elif str(args[0]).lower() == 'caps':
+                    if win32api.GetKeyState(win32con.VK_CAPITAL) : output = True
+                    else: output = False
+                elif str(args[0]).lower() == 'scroll':
+                    if win32api.GetKeyState(win32con.VK_SCROLL) : output = True
+                    else: output = False
+                else:
+                    err_msg = 'Please specify a valid toggle key (caps/ num/ scroll)'
+                    output = 'null'
+            else:
+                #mac-os
+                #x=subprocess.check_output('xset q | grep LED', shell=True)[65]
+                #if x==48 or x==50:
+                    #caps = False
+                    #if x == 48:
+                        #num = False
+                    #else:
+                        #num = True
+                #elif x==49 or x==51:
+                    #caps = True
+                    #if x == 49:
+                        #num = False
+                    #else:
+                        #num = True
+                if str(args[0]).lower() == 'num':
+                    numStatus = subprocess.getoutput("xset q | grep Caps | tr -s ' ' | cut -d ' ' -f 9")
+                    if numStatus == 'on': output = True
+                    elif numStatus == 'off': output = False
+                elif str(args[0]).lower() == 'caps':
+                    capsStatus = subprocess.getoutput("xset q | grep Caps | tr -s ' ' | cut -d ' ' -f 5")
+                    if capsStatus == 'on': output = True
+                    elif capsStatus == 'off' : output = False
+                elif str(args[0]).lower() == 'scroll':
+                    scrollStatus = subprocess.getoutput("xset q | grep Caps | tr -s ' ' | cut -d ' ' -f 13")
+                    if scrollStatus == 'on': output = True
+                    elif scrollStatus == 'off' : output = False
+                else:
+                    err_msg = 'Please specify valid a toggle key (caps/ num/ scroll)'
+                    output = 'null'
+            status=TEST_RESULT_PASS
+            result=TEST_RESULT_TRUE
+        except Exception as e:
+            err_msg="Error occurred in getKeyStatus, Err Msg : " + str(e)
         if(err_msg):
             log.error( err_msg )
             logger.print_on_console(err_msg)

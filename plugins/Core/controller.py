@@ -474,9 +474,9 @@ class Controller():
                 inpval.append(string[index+1:len(string)])
             elif string != '':
                 inpval.append(string)
-            if keyword.lower() not in [CREATE_DYN_VARIABLE]:
+            if keyword.lower() != CREATE_DYN_VARIABLE:
                 inpval[0]=self.dynamic_var_handler_obj.replace_dynamic_variable(inpval[0],keyword,self)
-            if len(inpval)>1 and keyword.lower() in [COPY_VALUE,MODIFY_VALUE]:
+            if len(inpval)>1 and keyword.lower() in [COPY_VALUE,MODIFY_VALUE,CREATE_DYN_VARIABLE]:
                 exch = keyword.lower() == COPY_VALUE
                 inpval[1]=self.dynamic_var_handler_obj.replace_dynamic_variable(inpval[1],'',self,no_exch_val=exch)
         else:
@@ -584,7 +584,7 @@ class Controller():
                 logger.print_on_console('Result obtained is: ',result[2])
             elif result:
                 logger.print_on_console('Result obtained is: ',result[1])
-        if tsp.apptype.lower()=='generic' and (tsp.name.lower()=='savetoclipboard' or tsp.name.lower()=='getfromclipboard'):
+        if tsp.apptype.lower()=='generic' and (tsp.name.lower()=='savetoclipboard' or tsp.name.lower()=='getfromclipboard' or tsp.name.lower() == 'getkeystatus'):
             if result[2]!='9cc33d6fe25973868b30f4439f09901a':
                 logger.print_on_console('Result obtained is: ',result[2])
             elif result:
@@ -787,7 +787,7 @@ class Controller():
                     index = i
                     i = self.methodinvocation(i,execution_env)
                     #Check wether accessibility testing has to be executed
-                    if accessibility_testing and (index + 1 >= len(tsplist) or (tsplist[index].testscript_name != tsplist[index + 1].testscript_name and screen_testcase_map[tsplist[index].testscript_name]['screenid'] != screen_testcase_map[tsplist[index + 1].testscript_name]['screenid'])): 
+                    if accessibility_testing and (index + 1 >= len(tsplist) or (tsplist[index].testscript_name != tsplist[index + 1].testscript_name and screen_testcase_map[tsplist[index].testscript_name]['screenid'] != screen_testcase_map[tsplist[index + 1].testscript_name]['screenid'])):
                         if local_cont.accessibility_testing_obj is None: self.__load_web()
                         import browser_Keywords
                         script_info =  screen_testcase_map[tsplist[index].testscript_name]
@@ -1208,7 +1208,7 @@ class Controller():
                                             os.makedirs(path)
                                         file_name = datetime.now().strftime("%Y%m%d%H%M%S")
                                         video_path = path+"ScreenRecording_"+file_name+".mp4"
-                                        
+
                                     for i in range(0,len(all_jobs)):
                                         file_creations_status=j.get_job_asset_content(all_jobs[i]['id'],file_name,path)
                                     execute_result_data['reportData']['overallstatus'][0]['video']=video_path
@@ -1689,7 +1689,7 @@ def kill_process():
             # for p in wmi.InstancesOf('win32_process'):
             #     if p.pid in process_ids:
             #         os.system("TASKKILL /F /T /IM " + p.pid)
-        
+
 
         try:
             import browser_Keywords_MW

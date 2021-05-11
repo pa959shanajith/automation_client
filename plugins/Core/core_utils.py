@@ -15,6 +15,8 @@ import logging
 log = logging.getLogger("core_utils.py")
 import os
 import json
+import socket
+import random
 import codecs
 from Crypto.Cipher import AES
 path_added = []
@@ -138,3 +140,12 @@ def get_all_the_imports(plugin_path):
         for d in dirs:
             p = path + os.sep + d
             sys.path.append(p)
+
+def find_open_port():
+    while True:
+        port = 30000 + int(random.random()*10000) + int(random.random()*10000)
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+            res = sock.connect_ex(('localhost', port))
+            if res == 10061:
+                log.debug("Remote debugging port seleted is %s", port)
+                return str(port)
