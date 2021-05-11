@@ -77,7 +77,7 @@ class ICEToken():
         token_folder=None
         if sys.platform=="win32":
             token_folder=os.getenv("LOCALAPPDATA")+os.sep+"AvoAssure"
-        elif sys.platform.lower()=="darwin" or sys.platform.lower():
+        elif sys.platform.lower()=="darwin" or sys.platform.lower()=='linux':
             token_folder=os.environ['HOME']+os.sep+".Local"+os.sep+"AvoAssure"
         else:
             print(sys.platform+" platform yet to be supported")
