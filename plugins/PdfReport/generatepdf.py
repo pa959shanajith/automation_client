@@ -44,12 +44,14 @@ class WatchThread(threading.Thread):
             pdfkit.from_file(template_path, dest_file+'.pdf', options=opts, configuration=pdfkit_conf)
             try:
                 try:
-                    os.remove(target+"\\"+dest_file+'.pdf')
+                    # bug 18156: checking this condition to avoid deletion of generated pdf file when target is path equal to AVO_ASSURE_HOME
+                    if target != os.environ['AVO_ASSURE_HOME'] : os.remove(target+"\\"+dest_file+'.pdf')
                 except:
                     pass
-                shutil.move(os.getcwd()+"\\"+dest_file+'.pdf', target)
+                if target != os.environ['AVO_ASSURE_HOME']: shutil.move(os.getcwd()+"\\"+dest_file+'.pdf', target)
                 wx.MessageBox('PDF Created Successfully', 'Success', wx.OK | wx.ICON_INFORMATION)
                 logger.print_on_console("PDF Created Successfully")
+                self.wxObj.Raise()
             except Exception as e:
                 emsg='PDF Created Successfully! But failed to move pdf. Please collect it from here: '+os.getcwd()
                 wx.MessageBox(emsg, 'Access Denied (Requires admin previlege)', wx.OK | wx.ICON_ERROR)
