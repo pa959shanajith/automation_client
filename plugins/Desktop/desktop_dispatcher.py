@@ -64,6 +64,7 @@ class DesktopDispatcher:
         'gettext' : editable_text_obj.get_text,
         'cleartext' : editable_text_obj.clear_text,
         'verifytext' :  editable_text_obj.verify_text,
+        'sendsecurefunctionkeys' :  editable_text_obj.sendsecurefunction_keys,
         'verifyelementexists' : element_keywords_obj.verify_element_exists,
         'verifyelementdoesnotexists' : element_keywords_obj.verify_element_doesNot_exists,
         'clickelement' : element_keywords_obj.click_element,
@@ -205,7 +206,8 @@ class DesktopDispatcher:
         "verifyallvalues" : ['select'],
         "getallvalues" : ['select','list'],
         "selecttreenode" : ['tree'],
-        "getnodenamebyindex" : ['tree']
+        "getnodenamebyindex" : ['tree'],
+        "sendsecurefunctionkeys" : ['input']
     }
 
     get_ele_type = {
