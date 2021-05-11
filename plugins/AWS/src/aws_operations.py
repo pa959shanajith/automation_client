@@ -371,7 +371,6 @@ class AWS_Operations:
 
 
     def run_aws_android_tests(self):
-        result = False
         result=[]
         try:
             if not(self.terminateFlag):
