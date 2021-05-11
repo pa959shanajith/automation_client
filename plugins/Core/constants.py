@@ -283,6 +283,7 @@ ERROR_CODE_DICT = {
                     'ERR_SCREENSHOT_PATH':'Screenshot not captured - User does not have sufficient privileges for screenshot folder\n',
                     #Excel error messages
                     'ERR_ROW_NUMBER':'Invalid row number',
+                    'ERR_COL_NUMBER':'Invalid column number',
                     "ERR_ROW_DOESN'T_EXIST": "Row doesn't exist",
                     "ERR_COL_DOESN'T_EXIST": "Column doesn't exist",
                     'ERR_FILE_FORMAT': 'The specified file is not Excel file\n',
