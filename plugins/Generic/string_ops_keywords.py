@@ -708,7 +708,7 @@ class StringOperation:
                     elif tf_mul_count!=1 and tf_mul_count>0:
                         wildcard_search=True
                     else:
-                        if actual_string.find(tf_split[0])==len(actual_string)-1:
+                        if actual_string.find(tf_split[0])==len(actual_string)-1 and tf_single_count==1:
                             wildcard_search=True
                         else:
                             for i in range(len(actual_string)):
