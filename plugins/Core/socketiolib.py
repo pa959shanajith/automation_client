@@ -417,9 +417,10 @@ class SocketIO(socketio.Client):
 
         # Check for pagination
         stringify = False
+        payload = data
         if type(data) in [dict, list, tuple]:
             stringify = True
-            payload = json.dumps(data)
+            payload = json.dumps(payload)
         payload_size = len(payload)
 
         # Increasing 45 bytes in check limit (36 bytes for uuid,
