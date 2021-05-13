@@ -20,7 +20,6 @@ import base64
 import json
 import time
 from constants import *
-from socketIO_client import SocketIO,BaseNamespace
 import core_utils
 visiblity_status = False
 

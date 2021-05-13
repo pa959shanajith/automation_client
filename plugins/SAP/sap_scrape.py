@@ -10,7 +10,6 @@
 #-------------------------------------------------------------------------------
 import sap_scraping
 import wx
-from socketIO_client import SocketIO,BaseNamespace
 import sap_launch_keywords
 sap_scraping_obj = sap_scraping.Scrape()
 import os

@@ -6,7 +6,6 @@ import browser_Keywords_MW
 import clickandadd_MW
 import fullscrape_MW
 from constants import SYSTEM_OS
-from socketIO_client import SocketIO,BaseNamespace
 from selenium.common.exceptions import NoSuchWindowException
 import time
 from webscrape_utils_MW import WebScrape_Utils  
