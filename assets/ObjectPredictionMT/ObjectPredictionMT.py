@@ -136,7 +136,7 @@ LOC_7z = AVO_ASSURE_HOME + "Lib/7zip/7z.exe"
 '''
     Config.json is accessed and stored in a variable to later access all the configuration values
 '''
-config_path = AVO_ASSURE_HOME + "assets/PredictionMT/config.json"
+config_path = AVO_ASSURE_HOME + "assets/ObjectPredictionMT/config.json"
 config_file = open(config_path, "r")
 configs = json.load(config_file)
 config_file.close()

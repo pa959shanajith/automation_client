@@ -76,6 +76,20 @@ class IRISMT(wx.Frame):
         self.current_version = configs["current_version"]
         self.active_model = AVO_ASSURE_HOME + configs["active_model"]
         self.rollback_dir = AVO_ASSURE_HOME + configs["rollback_dir"]
+        try:
+            if(configs["all_versions_traindata"]):
+                self.all_versions_traindata = configs["all_versions_traindata"]
+        except Exception as e:
+            log.debug("all_versions_traindata not found creating a new variable")
+            try:
+                with open(config_path, "w") as outfile:
+                    configs.update({"all_versions_traindata":{"5.0.0":"Base Datasets"}})
+                    # new data is saved to config file
+                    str_ = json.dumps(configs, indent=4, sort_keys=True, separators=(',', ': '), ensure_ascii=False)
+                    outfile.write(str(str_))
+                self.all_versions_traindata = configs["all_versions_traindata"]
+            except Exception as e:
+                log.debug("Error occurred while creating 'all_versions_traindata' in config.json")
 
         log.debug("All value initialized")
 
@@ -117,11 +131,15 @@ class IRISMT(wx.Frame):
         self.rollback_btn.Bind(wx.EVT_BUTTON, self.rollback)
         self.rollback_btn.Hide()        # initialized as hidden
 
-
         # version list combobox
         choices = self.all_versions
+        if len(choices) == 1 and str(choices[0]) == str(self.current_version):
+            self.revert_btn.Disable()
+        else:
+            self.revert_btn.Enable()
         self.version_list = wx.ComboBox(self.panel, pos = (245, 81), size = (100, 25), choices=choices, style=wx.CB_READONLY | wx.CB_DROPDOWN)
         self.version_list.SetSelection(self.all_versions.index(self.current_version))
+        self.version_list.Bind(wx.EVT_COMBOBOX, self.combo_opt)
         self.version_list.Hide()    # initialized as hidden same as rollback
 
 
@@ -218,8 +236,11 @@ class IRISMT(wx.Frame):
                 log.info("Renaming the extracted model")
                 os.rename(self.active_model+'_'+rollback_ver, self.active_model)
                 self.comm_obj.percentageIncri(self.msg,90,"Rolling Back...")
+                log.info("Deleting selected model from backup")
+                self.delete_from_model_backup(rollback_index)
                 log.info("Updating config file")
                 self.downgrade_version(rollback_ver, rollback_index)
+                self.downgrade_dataset_version()
                 log.info("Updating combo box")
                 self.reset_dropdown()
                 self.comm_obj.percentageIncri(self.msg,100,"Rolling Back...")
@@ -228,6 +249,18 @@ class IRISMT(wx.Frame):
                 self.print_log("Model Extracted")
                 log.info("Model Extracted. Rollback successful")
                 self.print_log("------Rollback Successful------")
+                if len(self.all_versions) == 1 and str(self.all_versions[0]) == str(self.current_version):
+                    if self.rollback_btn.IsShown():
+                        log.debug("Removing model_backup.7z")
+                        if(os.path.exists(self.rollback_dir)): os.remove(self.rollback_dir)
+                        log.debug("Hiding rollback options")
+                        self.train_btn.SetPosition((135, 80))
+                        self.revert_btn.SetPosition((245, 80))
+                        self.version_list.Hide()
+                        self.rollback_btn.Hide()
+                        self.revert_btn.Disable()
+                if str(self.current_version) == str(self.version_list.GetString(self.version_list.GetSelection())) :
+                    self.rollback_btn.Disable()
             except Exception as err:
                 self.comm_obj.percentageIncri(self.msg,100,"Rollback Failed")
 
@@ -279,8 +312,20 @@ class IRISMT(wx.Frame):
             self.revert_btn.SetPosition((135, 80))
             self.version_list.Show()
             self.rollback_btn.Show()
+            self.rollback_btn.Disable()
 
-
+    def combo_opt(self, event):
+        """
+        Definition : Enables/Disables Rollback button on option selection in the combo_box.
+                     Rollback button is disabled when combo_box value is the same as current version
+        Inputs: event object when when combo_box items are selected
+        """
+        combo_box_item_index = self.version_list.GetSelection()
+        combo_box_item_value=self.version_list.GetString(combo_box_item_index)
+        if (str(self.current_version) != str(combo_box_item_value)):
+            self.rollback_btn.Enable()
+        else:
+            self.rollback_btn.Disable()
 
     """
         Definition: Converts the line endings of auto generated training_file.txt's
@@ -344,14 +389,23 @@ class IRISMT(wx.Frame):
                     self.FONTS_DIR = os.path.dirname(path)
                 elif self.FONTS_DIR != os.path.dirname(path):
                     self.FONTS_DIR = os.path.dirname(path)
-                fontname = self.getName(ttLib.TTFont(path))
-                fontlist += fontname+";"
+                try:
+                    fontname = None
+                    fontname = self.getName(ttLib.TTFont(path))
+                except Exception as e:
+                    self.print_log("File '" + str(path[path.rindex('\\')+1:]) + "' is an invalid font file.")
+                    log.debug("File '" + str(path[path.rindex('\\')+1:]) + "' is an invalid font file, ERR_MSG: " +str(e))
+                if(fontname) : fontlist += fontname+";"
             self.fontlist = fontlist.strip(";")
             # self.FONTS = '"'+self.fontlist.replace(';', '" "')+'"'
             self.FONTS = self.fontlist.split(";")
             self.fontselect_txtfield.SetValue(self.fontlist)
-            self.print_log("Data Selected: " + str(self.FONTS))
-            log.debug("Data Selected: "+ str(self.FONTS))
+            if (len(self.FONTS)>0 and self.FONTS[0]!= ''):
+                self.print_log("Data Selected: " + str(self.FONTS))
+                log.debug("Data Selected: "+ str(self.FONTS))
+            else:
+                self.print_log("Unable to select data.")
+                log.debug("Unable to select data.")
         dialog.Destroy()
 
     '''
@@ -370,12 +424,49 @@ class IRISMT(wx.Frame):
 
                 self.current_version = version
                 self.all_versions = configs["all_versions"]
-                self.print_log("Current Version: "+str(self.current_version))
-                log.debug("Current Version Changed to: "+self.current_version)
+                self.print_log("Downgraded to version: "+str(self.current_version))
+                log.debug("Current Version downgraded to: "+self.current_version)
         except Exception as err:
             self.print_log("Failed to write changes to config.json")
             log.error("Failed to write changes to config.json"+str(err))
 
+    def downgrade_dataset_version(self):
+        """
+        Definition : saves all_versions_traindata changes to the config json file after any rollback operation is performed
+        input: N/A
+        references: inside rollback method
+        """
+        try:
+            new_dict = {}
+            with open(config_path, "w") as outfile:
+                all_versions = configs["all_versions"]
+                avt = configs["all_versions_traindata"]
+                for v in all_versions:
+                    new_dict.update({str(v):avt[str(v)]})
+                # new data is saved to config file
+                configs["all_versions_traindata"] = new_dict
+                str_ = json.dumps(configs, indent=4, sort_keys=True, separators=(',', ': '), ensure_ascii=False)
+                outfile.write(str(str_))
+            del new_dict
+        except Exception as e:
+            self.print_log("Error occurred in downgrade_dataset_version. Failed to write changes in config.json")
+            log.error("Error occurred in downgrade_dataset_version. Failed to write changes in config.json, ERR_MSG: " + str(e))
+
+    def delete_from_model_backup(self,index):
+        """
+        Definition : deletes selected versions from model_backup.7z
+        input: index of current selected iten in self.version list
+        references: inside rollback method
+        """
+        try:
+            versions_to_del = configs["all_versions"][index:]
+            log.debug("Deleting versions from manifest.json: "+str(versions_to_del))
+            for v in versions_to_del:
+                delete_model = r'{loc_7z} d {zipfile} {file} -r -y'.format(loc_7z = LOC_7z, zipfile = self.rollback_dir, file = str("eng.traineddata_"+v))
+                subprocess.call(delete_model, shell=True)
+        except Exception as err:
+            self.print_log("Failed to delete files from model_backup.7z")
+            log.error("Failed to delete files from model_backup.7z, ERR_MSG : "+str(err))
 
     '''
         Definition : Upgrades the version info in the config.json file
@@ -401,13 +492,39 @@ class IRISMT(wx.Frame):
                 # current version of IRISMT is updated
                 self.current_version = curr_version
                 self.all_versions = configs["all_versions"]
-                self.print_log("Current Version: "+str(self.current_version))
-                log.debug("Current Version Changed to: "+self.current_version)
+                self.print_log("Upgraded to version: "+str(self.current_version))
+                log.debug("Current Version upgraded to: "+self.current_version)
         except Exception as err:
             self.print_log("Failed to write changes in config.json")
             log.error("Failed to write changes in config.json")
 
-
+    def upgrade_dataset_version(self,failed_fonts):
+        """
+        Definition : Upgrades the all_versions_traindata info in the config.json file
+        Inputs: List of failed fonts
+        References: inside start_training method
+        """
+        try:
+            pass_list = []
+            failed_fonts_new = []
+            #filtering pass fonts
+            for ff in failed_fonts:
+                if ff[0] == '"' and ff[len(ff)-1] == '"':
+                    failed_fonts_new.append(ff[1:len(ff)-1])
+            for f in self.FONTS:
+                if f not in failed_fonts_new:
+                    pass_list.append(f)
+            log.debug("Writing changes to config.json")
+            with open(config_path, "w") as outfile:
+                key = str(self.current_version)
+                value = ', '.join(pass_list)
+                configs["all_versions_traindata"].update({key:value})
+                # new data is saved to config file
+                str_ = json.dumps(configs, indent=4, sort_keys=True, separators=(',', ': '), ensure_ascii=False)
+                outfile.write(str(str_))
+        except Exception as e:
+            self.print_log("Error occurred in upgrade_dataset_version. Failed to write changes in config.json")
+            log.error("Error occurred in upgrade_dataset_version. Failed to write changes in config.json, ERR_MSG: " + str(e))
 
     # def get_previous_version(self):
     #     try:
@@ -484,11 +601,13 @@ class IRISMT(wx.Frame):
         self.backup_current_model()
 
         failed_fonts = []
+        partly_success_flag = False
         for font in self.FONTS:
             self.comm_obj.percentageIncri(self.msg,10,"Generating Training Files for "+str(font)+"...")
             failed_flag, failed_font = self.generate_training_files(str("\""+font+"\""))
             if failed_flag:
                 failed_fonts.append(failed_font)
+                partly_success_flag = True
 
         if len(failed_fonts) == len(self.FONTS):
             self.flow_flag = 0
@@ -506,18 +625,22 @@ class IRISMT(wx.Frame):
             self.remove_temporary_files()
             self.flow_flag = 1
             self.print_log("-"*20+"Training Failed"+"-"*20)
+            self.fontselect_txtfield.Clear()
             return
         self.comm_obj.percentageIncri(self.msg,90,"Saving Changes in Config Files...")
         self.upgrade_version()
+        self.upgrade_dataset_version(failed_fonts)
         self.reset_dropdown()
         self.comm_obj.percentageIncri(self.msg,95,"Removing Temporary Files...")
         self.remove_temporary_files()
         self.comm_obj.percentageIncri(self.msg,100,"Finished Training!")
         self.flow_flag = 1
         # self.msg.ShowMessage("Data Trained Successfully!")
-        self.print_log("-----Data Trained Successfully-----")
-
-
+        if not partly_success_flag: self.print_log("----- Trained Successfully -----")
+        else: self.print_log("----- Training completed with errors -----")
+        #clearing the traning-data selection textbox
+        self.fontselect_txtfield.Clear()
+        self.revert_btn.Enable()
 
     '''
         Definition : this method generates the required .lstmf files / training files

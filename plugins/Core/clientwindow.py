@@ -201,17 +201,21 @@ class ClientWindow(wx.Frame):
         global pdfgentool
         id = event.GetId()
         if id == 100:     # When user selects INFO level
-            logger.print_on_console( '--Logger level : INFO selected--')
-            log.info('--Logger level : INFO selected--')
             logging.getLogger().setLevel(logging.INFO)
             for handler in logging.root.handlers[:]:
                     handler.setLevel(logging.INFO)
+            logging.getLogger('socketio.client').setLevel(logging.WARN)
+            logging.getLogger('engineio.client').setLevel(logging.WARN)
+            logger.print_on_console( '--Logger level : INFO selected--')
+            log.info('--Logger level : INFO selected--')
         elif id == 101:    # When user selects DEBUG level
-            logger.print_on_console( '--Logger level : DEBUG selected--')
-            log.info('--Logger level : DEBUG selected--')
             logging.getLogger().setLevel(logging.DEBUG)
             for handler in logging.root.handlers[:]:
                 handler.setLevel(logging.DEBUG)
+            logging.getLogger('socketio.client').setLevel(logging.DEBUG)
+            logging.getLogger('engineio.client').setLevel(logging.DEBUG)
+            logger.print_on_console( '--Logger level : DEBUG selected--')
+            log.info('--Logger level : DEBUG selected--')
         elif id ==102:     # When user selects ERROR level
             logger.print_on_console( '--Logger level : ERROR selected--')
             log.info( '--Logger level : ERROR selected--')
@@ -387,9 +391,7 @@ class ClientWindow(wx.Frame):
 
     def OnClear(self,event):
         self.log.Clear()
-        print('********************************************************************************************************')
-        print('============================================ '+self.appName+' ============================================')
-        print('********************************************************************************************************')
+        root.print_banner()
 
     def OnNodeConnect(self,event):
         try:
@@ -401,10 +403,7 @@ class ClientWindow(wx.Frame):
                 self.OnTerminate(event,"term_exec")
                 root.connection(name)
                 if self.connectbutton.GetName() != "register":
-                    self.connectbutton.SetBitmapLabel(self.connect_img)
-                    self.connectbutton.SetName('connect')
-                    self.connectbutton.SetToolTip(wx.ToolTip("Connect to Avo Assure Server"))
-                    self.connectbutton.Enable()
+                    self.enable_connect()
                 self.schedule.SetValue(False)
                 self.schedule.Disable()
                 self.rollbackItem.Enable(False)
@@ -416,10 +415,24 @@ class ClientWindow(wx.Frame):
             self.connectbutton.Enable()
             self.rbox.Disable()
 
-    def enable_register(self, enable_button = True):
+    def enable_connect(self, enable_button = True, repaint_title = True):
+        self.connectbutton.SetBitmapLabel(self.connect_img)
+        self.connectbutton.SetName('connect')
+        self.connectbutton.SetToolTip(wx.ToolTip("Connect to Avo Assure Server"))
+        if repaint_title: self.SetTitle(self.appName)
+        if enable_button: self.connectbutton.Enable()
+
+    def enable_disconnect(self, enable_button = True):
+        self.connectbutton.SetBitmapLabel(self.disconnect_img)
+        self.connectbutton.SetName('disconnect')
+        self.connectbutton.SetToolTip(wx.ToolTip("Disconnect from Avo Assure Server"))
+        if enable_button: self.connectbutton.Enable()
+
+    def enable_register(self, enable_button = True, repaint_title = True):
         self.connectbutton.SetBitmapLabel(self.register_img)
         self.connectbutton.SetName("register")
         self.connectbutton.SetToolTip(wx.ToolTip("Register ICE with Avo Assure Server"))
+        if repaint_title: self.SetTitle(self.appName)
         if enable_button: self.connectbutton.Enable()
 
     def killChildWindow(self, debug=False, scrape=False, display=False, pdf=False,register=False):
@@ -537,12 +550,10 @@ class Config_window(wx.Frame):
             "Disp_var":[(235,222),(135, 25),(375,218), (70,-1)],
             "C_Timeout" :[(12,252),(120, 25),(135,248), (70,-1)],
             "Delay_Stringinput":[(235,252),(130, 25),(375,248), (70,-1)],
-            "Chrm_port":[(12,282),(120, 25),(135,278), (70,-1)],
-            "Edgechrm_port":[(215,282),(150, 25),(375,278), (70,-1)],
-            "panel1":[(10,320),(100,30),(440,195),(8, 345)],
-            "err_text":[(50,555),(350, 25)],
-            "Save":[(100,580), (100, 28)],
-            "Close":[(250,580), (100, 28)]
+            "panel1":[(10,290),(100,30),(440,195),(8, 315)],
+            "err_text":[(50,525),(350, 25)],
+            "Save":[(100,550), (100, 28)],
+            "Close":[(250,550), (100, 28)]
             }
         else:
             config_fields={
@@ -561,12 +572,10 @@ class Config_window(wx.Frame):
             "Disp_var":[(288,222),(140, 25),(448,218),(85,-1)],
             "C_Timeout" :[(12,252),(120, 25),(180,248), (80,-1)],
             "Delay_Stringinput":[(288,252),(140, 25),(448,248), (85,-1)],
-            "Chrm_port":[(12,282),(140, 25),(180,278), (85,-1)],
-            "Edgechrm_port":[(235,282),(140, 25),(448,278), (85,-1)],
-            "panel1":[(10,320),(100,30),(440,195),(8, 345)],
-            "err_text":[(85,555),(350, 25)],
-            "Save":[(130,580),(100, 28)],
-            "Close":[(370,580),(120, 28)]
+            "panel1":[(10,290),(100,30),(440,195),(8, 315)],
+            "err_text":[(85,525),(350, 25)],
+            "Save":[(130,550),(100, 28)],
+            "Close":[(370,550),(120, 28)]
             }
         wx.Frame.__init__(self, parent, title=title,
             pos=config_fields["Frame"][0], size=config_fields["Frame"][1],style = wx.CAPTION|wx.CLIP_CHILDREN)
@@ -716,22 +725,6 @@ class Config_window(wx.Frame):
         else:
             self.Delay_input.SetValue("0.005")
 
-        #Chrome Remote Debugging port input
-        self.ch_debugport=wx.StaticText(self.panel, label="Chrome Debug Port", pos=config_fields["Chrm_port"][0],size=config_fields["Chrm_port"][1], style=0, name="")
-        self.chrome_port=wx.TextCtrl(self.panel, pos=config_fields["Chrm_port"][2], size=config_fields["Chrm_port"][3])
-        if isConfigJson!=False and isConfigJson['chrome_debugport'].isnumeric():
-            self.chrome_port.SetValue(isConfigJson['chrome_debugport'])
-        else:
-            self.chrome_port.SetValue("0")
-
-        #Edge Chromium Remote Debugging port input
-        self.edgech_debugport=wx.StaticText(self.panel, label="Edge Chromium Debug Port", pos=config_fields["Edgechrm_port"][0],size=config_fields["Edgechrm_port"][1], style=0, name="")
-        self.edgechromium_port=wx.TextCtrl(self.panel, pos=config_fields["Edgechrm_port"][2], size=config_fields["Edgechrm_port"][3])
-        if isConfigJson!=False and isConfigJson['edgechromium_debugport'].isnumeric():
-            self.edgechromium_port.SetValue(isConfigJson['edgechromium_debugport'])
-        else:
-            self.edgechromium_port.SetValue("0")
-
         self.config_param=wx.StaticText(self.panel,label="Config Parameters",pos=config_fields["panel1"][0],size=config_fields["panel1"][1], style=0, name="")
         font = wx.Font(9, wx.DEFAULT, wx.NORMAL, wx.NORMAL)
         self.config_param.SetFont(font)
@@ -751,8 +744,6 @@ class Config_window(wx.Frame):
         self.dispVarTimeOut.SetToolTip(wx.ToolTip("displayVariable popup duration[in seconds]"))
         self.connection_timeout.SetToolTip(wx.ToolTip("Timeout from server [in hours 0 or >8]"))
         self.delay_stringinput.SetToolTip(wx.ToolTip("Character input delay for sendFunctionKeys"))
-        self.ch_debugport.SetToolTip(wx.ToolTip("Chrome Debugging Port (0 for default, max value 65535)"))
-        self.edgech_debugport.SetToolTip(wx.ToolTip("Edge Chromium Debugging Port (0 for default, max value 65535)"))
 
         ## Binding placeholders and restricting textareas to just numeric characters
         self.server_port.Bind(wx.EVT_CHAR, self.handle_keypress)
@@ -783,8 +774,6 @@ class Config_window(wx.Frame):
         self.conn_timeout.Bind(wx.EVT_SET_FOCUS,self.toggle1_generic)
         self.conn_timeout.Bind(wx.EVT_KILL_FOCUS,self.toggle2_generic)
         self.conn_timeout.Bind(wx.EVT_CHAR, self.handle_keypress)
-        self.chrome_port.Bind(wx.EVT_CHAR, self.handle_keypress)
-        self.edgechromium_port.Bind(wx.EVT_CHAR, self.handle_keypress)
 
         lblList = ['Yes', 'No']
         lblList2 = ['64-bit', '32-bit']
@@ -962,6 +951,16 @@ class Config_window(wx.Frame):
             self.rbox19.SetSelection(1)
         self.rbox19.SetToolTip(wx.ToolTip("Enables or disables popup for Browser"))
 
+        # Adding the radio button for enabling use of remote debugging port for browsers.
+        # This is needed for DevToolsActivePort file doesn't exist error
+        self.rbox20 = wx.RadioBox(self.panel1, label = "Use Custom Debug Port", choices = lblList,
+            majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
+        if isConfigJson != False and isConfigJson['use_custom_debugport'].title() == lblList[0]:
+            self.rbox20.SetSelection(0)
+        else:
+            self.rbox20.SetSelection(1)
+        self.rbox20.SetToolTip(wx.ToolTip("Enables or disables use of remote debugging port for browsers"))
+
         #Adding GridSizer which will show the radio buttons into grid of 10 rows and 2 colums it can be changed based on the requirements
         self.gs=wx.GridSizer(10,2,5,5)
         self.gs.AddMany([(self.rbox9,0,wx.EXPAND), (self.rbox1,0,wx.EXPAND), (self.rbox2,0,wx.EXPAND),
@@ -969,7 +968,8 @@ class Config_window(wx.Frame):
             (self.rbox4,0,wx.EXPAND), (self.rbox8,0,wx.EXPAND), (self.rbox7,0,wx.EXPAND),
             (self.rbox10,0,wx.EXPAND), (self.rbox11,0,wx.EXPAND), (self.rbox12,0,wx.EXPAND),
             (self.rbox13,0,wx.EXPAND), (self.rbox14,0,wx.EXPAND), (self.rbox15,0,wx.EXPAND),
-            (self.rbox16,0,wx.EXPAND), (self.rbox17,0,wx.EXPAND), (self.rbox18,0,wx.EXPAND), (self.rbox19,0,wx.EXPAND)])
+            (self.rbox16,0,wx.EXPAND), (self.rbox17,0,wx.EXPAND), (self.rbox18,0,wx.EXPAND),
+            (self.rbox19,0,wx.EXPAND), (self.rbox20,0,wx.EXPAND)])
 
         #adding  GridSizer to bSizer which is a box sizer
         self.bSizer.Add(self.gs, 1, wx.EXPAND | wx.TOP, 5)
@@ -1068,8 +1068,7 @@ class Config_window(wx.Frame):
         screen_rec = self.rbox17.GetStringSelection()
         full_screenshot = self.rbox18.GetStringSelection()
         close_browser_popup = self.rbox19.GetStringSelection()
-        chrome_debugport = self.chrome_port.GetValue()
-        edgechromium_debugport = self.edgechromium_port.GetValue()
+        use_custom_debugport = self.rbox20.GetStringSelection()
         if extn_enabled == 'Yes' and headless_mode == 'Yes':
             self.error_msg.SetLabel("Extension Enable must be disabled when Headless Mode is enabled")
             self.error_msg.SetForegroundColour((255,0,0))
@@ -1108,15 +1107,13 @@ class Config_window(wx.Frame):
         data['screen_rec']=screen_rec.strip()
         data['full_screenshot']=full_screenshot.strip()
         data['close_browser_popup']=close_browser_popup.strip()
-        data['chrome_debugport']=chrome_debugport
-        data['edgechromium_debugport']=edgechromium_debugport
+        data['use_custom_debugport']=use_custom_debugport.strip()
         config_data=data
         if (data['server_ip']!='' and data['server_port']!='' and data['server_cert']!='' and
             data['chrome_path']!='' and data['queryTimeOut'] not in ['','sec'] and data['logFile_Path']!='' and
             data['delay'] not in ['','sec'] and data['timeOut'] not in ['','sec'] and data['stepExecutionWait'] not in ['','sec'] and
             data['displayVariableTimeOut'] not in ['','sec'] and data['delay_stringinput'] not in ['','sec'] and
-            data['firefox_path']!='' and data['connection_timeout'] not in ['','0 or >=8 hrs'] and
-            data['chrome_debugport']!='' and data['edgechromium_debugport']!=''):
+            data['firefox_path']!='' and data['connection_timeout'] not in ['','0 or >=8 hrs']):
             #---------------------------------------resetting the static texts
             self.error_msg.SetLabel("")
             self.sev_add.SetLabel('Server Address')
@@ -1143,10 +1140,6 @@ class Config_window(wx.Frame):
             self.dispVarTimeOut.SetForegroundColour((0,0,0))
             self.connection_timeout.SetLabel('Connection Timeout')
             self.connection_timeout.SetForegroundColour((0,0,0))
-            self.ch_debugport.SetLabel('Chrome Debug Port')
-            self.ch_debugport.SetForegroundColour((0,0,0))
-            self.edgech_debugport.SetLabel('Edge Chromium Debug Port')
-            self.edgech_debugport.SetForegroundColour((0,0,0))
             #---------------------------------------creating the file in specified path
             try:
                 f = open(data['logFile_Path'], "a+")
@@ -1168,20 +1161,7 @@ class Config_window(wx.Frame):
                     self.error_msg.SetForegroundColour((255,0,0))
                     self.connection_timeout.SetForegroundColour((255,0,0))
                 else:
-                    config_valid = True
-                    if int(data['chrome_debugport']) > 65535:
-                        self.ch_debugport.SetLabel('Chrome Debug Port^')
-                        self.ch_debugport.SetForegroundColour((255,0,0))
-                        config_valid = False
-                    if int(data['edgechromium_debugport']) > 65535:
-                        self.edgech_debugport.SetLabel('Edge Chromium Debug Port^')
-                        self.edgech_debugport.SetForegroundColour((255,0,0))
-                        config_valid = False
-                    if config_valid:
-                        self.jsonCreater(config_data)
-                    else:
-                        self.error_msg.SetLabel("Marked fields '^' contains invalid values, Data not saved")
-                        self.error_msg.SetForegroundColour((255,0,0))
+                    self.jsonCreater(config_data)
             else:
                 self.error_msg.SetLabel("Marked fields '^' contain invalid path, Data not saved")
                 self.error_msg.SetForegroundColour((0,0,255))
@@ -1293,18 +1273,6 @@ class Config_window(wx.Frame):
             else:
                 self.connection_timeout.SetLabel('Connection Timeout')
                 self.connection_timeout.SetForegroundColour((0,0,0))
-            if data['chrome_debugport']=='':
-                self.ch_debugport.SetLabel('Chrome Debug Port*')
-                self.ch_debugport.SetForegroundColour((255,0,0))
-            else:
-                self.ch_debugport.SetLabel('Chrome Debug Port')
-                self.ch_debugport.SetForegroundColour((0,0,0))
-            if data['edgechromium_debugport']=='':
-                self.edgech_debugport.SetLabel('Edge Chromium Debug Port*')
-                self.edgech_debugport.SetForegroundColour((255,0,0))
-            else:
-                self.edgech_debugport.SetLabel('Edge Chromium Debug Port')
-                self.edgech_debugport.SetForegroundColour((0,0,0))
 
     """jsonCreater saves the data in json form, location of file to be saved must be defined. This method will overwrite the existing .json file"""
     def jsonCreater(self,data):
@@ -1440,7 +1408,7 @@ class About_window(wx.Frame):
             self.Show()
         except Exception as e:
             logger.print_on_console("Error occured in About")
-            log.error("Error occured in About ,Err msg : " + str(e))
+            log.error("Error occured in About, Err msg : " + str(e))
 
 
     def get_client_manifest(self):

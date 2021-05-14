@@ -476,9 +476,9 @@ class Controller():
                 inpval.append(string[index+1:len(string)])
             elif string != '':
                 inpval.append(string)
-            if keyword.lower() not in [CREATE_DYN_VARIABLE]:
+            if keyword.lower() != CREATE_DYN_VARIABLE:
                 inpval[0]=self.dynamic_var_handler_obj.replace_dynamic_variable(inpval[0],keyword,self)
-            if len(inpval)>1 and keyword.lower() in [COPY_VALUE,MODIFY_VALUE]:
+            if len(inpval)>1 and keyword.lower() in [COPY_VALUE,MODIFY_VALUE,CREATE_DYN_VARIABLE]:
                 exch = keyword.lower() == COPY_VALUE
                 inpval[1]=self.dynamic_var_handler_obj.replace_dynamic_variable(inpval[1],'',self,no_exch_val=exch)
         else:
@@ -586,7 +586,7 @@ class Controller():
                 logger.print_on_console('Result obtained is: ',result[2])
             elif result:
                 logger.print_on_console('Result obtained is: ',result[1])
-        if tsp.apptype.lower()=='generic' and (tsp.name.lower()=='savetoclipboard' or tsp.name.lower()=='getfromclipboard'):
+        if tsp.apptype.lower()=='generic' and (tsp.name.lower()=='savetoclipboard' or tsp.name.lower()=='getfromclipboard' or tsp.name.lower() == 'getkeystatus'):
             if result[2]!='9cc33d6fe25973868b30f4439f09901a':
                 logger.print_on_console('Result obtained is: ',result[2])
             elif result:
@@ -1086,6 +1086,15 @@ class Controller():
             log.info('---------------------------------------------------------------------')
             print('=======================================================================================================')
             do_not_execute = False
+            exc_pass = True
+            base_execute_data = {
+                'batchId': batch_id,
+                'executionId': execution_ids[suite_idx-1],
+                'testsuiteId': suite_id
+            }
+            socketIO.emit("return_status_executeTestSuite", dict({"status": "started",
+                'startTime': datetime.now().strftime(TIME_FORMAT)}, **base_execute_data))
+            execute_result_data = dict({'scenarioId': None, 'reportData': None}, **base_execute_data)
             #Check for the disabled scenario
             if not (do_not_execute):
                 if aws_mode:
@@ -1108,13 +1117,7 @@ class Controller():
                         con.wx_object=wxObject
                         handler.local_handler.tspList=[]
                         accessibility_reports = []
-                        execute_result_data = {
-                            'testsuiteId': suite_id,
-                            'scenarioId': scenario_id,
-                            'batchId': batch_id,
-                            'executionId': execution_ids[suite_idx-1],
-                            'reportData': None
-                        }
+                        execute_result_data['scenarioId'] = scenario_id
                         #condition check for scenario execution and reporting for condition check
                         if not(condition_check_flag):
                              #check for terminate flag before printing loggers
@@ -1297,7 +1300,7 @@ class Controller():
                                             os.makedirs(path)
                                         file_name = datetime.now().strftime("%Y%m%d%H%M%S")
                                         video_path = path+"ScreenRecording_"+file_name+".mp4"
-                                        
+
                                     for i in range(0,len(all_jobs)):
                                         file_creations_status=j.get_job_asset_content(all_jobs[i]['id'],file_name,path)
                                     execute_result_data['reportData']['overallstatus'][0]['video']=video_path
@@ -1306,16 +1309,15 @@ class Controller():
                                 sc_idx += 1
                                 #logic for condition check
                                 report_json=con.reporting_obj.report_json[OVERALLSTATUS]
-
                                 #Check is made to fix issue #401
-                                if len(report_json)>0:
-                                    overall_status=report_json[0][OVERALLSTATUS]
-                                    if(condition_check_value==1):
-                                        if(overall_status==TEST_RESULT_PASS):
-                                            continue
-                                        else:
-                                            condition_check_flag = True
-                                            logger.print_on_console('Condition Check: Terminated by program ')
+                                overall_status=report_json[0][OVERALLSTATUS] if len(report_json)>0 else TEST_RESULT_FAIL
+                                if overall_status != TEST_RESULT_PASS: exc_pass = False
+                                if(condition_check_value==1):
+                                    if(overall_status==TEST_RESULT_PASS):
+                                        continue
+                                    else:
+                                        condition_check_flag = True
+                                        logger.print_on_console('Condition Check: Terminated by program ')
                             elif (True in testcase_empty_flag):
                                 logger.print_on_console( '***Saving report of Scenario' ,str(sc_idx + 1),'***')
                                 log.info( '***Saving report of Scenario' +str(sc_idx + 1)+'***')
@@ -1330,6 +1332,7 @@ class Controller():
                                 socketIO.emit('result_executeTestSuite', execute_result_data)
                                 obj.clearList(con)
                                 sc_idx += 1
+                                exc_pass = False
                                 report_json=con.reporting_obj.report_json_condition_check_testcase_empty[OVERALLSTATUS]
                             # if integration_type!="qTest" and integration_type!="Zephyr" and len(scenario['qcdetails'])==10 and (qc_url!='' and qc_password!='' and  qc_username!=''):
                             if  len(scenario['qcdetails'])!=0 and qc_creds['alm']['url'] != '':
@@ -1451,7 +1454,6 @@ class Controller():
                                 except Exception as e:
                                     log.error('Error in Updating qTest details '+str(e))
                                     logger.print_on_console('Error in Updating qTest details')
-
                             # if (integration_type=="Zephyr" and zephyr_password!='' and zephyr_username!='' and  zephyr_url!=''):
                             if len(scenario['qcdetails'])!=0 and qc_creds['zephyr']['url'] != '':
                                 zephyr_status_over=report_json[0]
@@ -1498,6 +1500,7 @@ class Controller():
                             socketIO.emit('result_executeTestSuite', execute_result_data)
                             obj.clearList(con)
                             sc_idx += 1
+                            exc_pass = False
                             #logic for condition check
                             report_json=con.reporting_obj.report_json[OVERALLSTATUS]
                         time.sleep(1)
@@ -1505,11 +1508,15 @@ class Controller():
                 tc_obj.make_zip(pytest_files)
                 execution_status,step_results=self.aws_obj.run_aws_android_tests()
                 self.aws_report(aws_tsp,aws_scenario,step_results,suite_idx,execute_result_data,con.reporting_obj,json_data,socketIO)
+                if con.reporting_obj.overallstatus != 'Pass': exc_pass = False
                 if not(execution_status):
                     status=TERMINATE
             log.info('---------------------------------------------------------------------')
             print('=======================================================================================================')
             log.info('***SUITE '+ str(suite_idx) +' EXECUTION COMPLETED***')
+            if status == TERMINATE: exc_pass = False
+            socketIO.emit("return_status_executeTestSuite", dict({"status": "finished", "executionStatus": exc_pass,
+                "endTime": datetime.now().strftime(TIME_FORMAT)}, **base_execute_data))
             #clearing dynamic variables at the end of execution to support dynamic variable at the scenario level
             obj.clear_dyn_variables()
             logger.print_on_console('***SUITE ', str(suite_idx) ,' EXECUTION COMPLETED***')
@@ -1754,7 +1761,7 @@ def kill_process():
             # for p in wmi.InstancesOf('win32_process'):
             #     if p.pid in process_ids:
             #         os.system("TASKKILL /F /T /IM " + p.pid)
-        
+
 
         try:
             import browser_Keywords_MW

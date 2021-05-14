@@ -12,7 +12,6 @@ import desktop_scraping
 from pywinauto.application import Application
 import pywinauto
 import wx
-from socketIO_client import SocketIO,BaseNamespace
 import desktop_launch_keywords
 desktop_scraping_obj = desktop_scraping.Scrape()
 import os
@@ -112,7 +111,7 @@ class ScrapeWindow(wx.Frame):
                     time.sleep(1)
                     self.Close()
             elif ( verify_pname == 'fail' ):
-                self.socketIO.emit('scrape', 'Fail')
+                self.socketIO.emit('scrape', 'wrongWindowName')
                 logger.print_on_console( 'Wrong Window Name, Please check the Window Name and provide valid one' )
                 self.Hide()
                 time.sleep(1)

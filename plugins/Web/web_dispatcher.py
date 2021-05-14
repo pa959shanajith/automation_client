@@ -55,7 +55,7 @@ class Dispatcher:
         local_Wd.statict_text_object = static_text_keywords.StaticTextKeywords()
         local_Wd.custom_object=custom_keyword.CustomKeyword()
         # local_Wd.driver_util = browser_Keywords.Singleton_DriverUtil()
-        
+
         local_Wd.browser_obj_sl = web_keywords.Browser_Keywords()
         local_Wd.browser_popup_obj_sl = web_keywords.Browser_Popup_Keywords()
         local_Wd.button_link_obj_sl = web_keywords.Button_link_Keywords()
@@ -213,7 +213,11 @@ class Dispatcher:
             'doubleclickcelliris':iris_object.doubleclickcelliris,
             'rightclickcelliris':iris_object.rightclickcelliris,
             'mousehovercelliris':iris_object.mousehovercelliris,
-            'getstatusiris':iris_object.getstatusiris
+            'getstatusiris':iris_object.getstatusiris,
+            'scrollupiris':iris_object.scrollupiris,
+            'scrolldowniris':iris_object.scrolldowniris,
+            'scrollleftiris':iris_object.scrollleftiris,
+            'scrollrightiris':iris_object.scrollrightiris
         }
 
         self.sauce_web_dict = {
@@ -347,7 +351,7 @@ class Dispatcher:
             driver_util = browser_Keywords.Singleton_DriverUtil()
             v = driver_util.check_if_driver_exists_in_map(teststepproperty.browser_type[0])
             if v and v != 'stale':
-                browser_Keywords.local_bk.driver_obj = v                       
+                browser_Keywords.local_bk.driver_obj = v
                 browser_Keywords.driver_pre = v
         driver = browser_Keywords.local_bk.driver_obj
         self.wxObject=wxObject
@@ -425,9 +429,9 @@ class Dispatcher:
                                     webelement=reference_element
                                 elif len(input)>=3:
                                     if (keyword in custom_dict and input[0].lower() in custom_dict[keyword]) or keyword in list(custom_dict_element.values())[0]:
-                                        absMatch=False  
+                                        absMatch=False
                                         if input[-1]=='abs':
-                                            absMatch=True 
+                                            absMatch=True
                                         webelement=local_Wd.custom_object.getCustomobject(reference_element,input[0],input[1],input[2],teststepproperty.url,absMatch)
                                         local_Wd.log.debug(MSG_CUSTOM_FOUND)
                                         if getObjectFlag:
@@ -521,8 +525,8 @@ class Dispatcher:
                 reporting_obj.browser_version=browser_info.get('version')
                 if(reporting_obj.browser_version == '' or reporting_obj.browser_version == None):
                     reporting_obj.browser_version= browser_info['browserVersion']
-            if execution_env['env'] == 'saucelabs' and teststepproperty.name in list(self.sauce_web_dict.keys()):  
-                if teststepproperty.custname=='@Browser' or teststepproperty.custname=='@BrowserPopUp': 
+            if execution_env['env'] == 'saucelabs' and teststepproperty.name in list(self.sauce_web_dict.keys()):
+                if teststepproperty.custname=='@Browser' or teststepproperty.custname=='@BrowserPopUp':
                     if(teststepproperty.name=="openBrowser"):
                         browser=teststepproperty.inputval[0]
                         self.browsers_sl[browser]["platform"]=self.sauce_conf["platform"]
@@ -578,11 +582,13 @@ class Dispatcher:
                         result= self.web_dict[keyword](webelement,input)
                     elif teststepproperty.cord!='' and teststepproperty.cord!=None:
                         if teststepproperty.custom_flag:
-                            result = self.web_dict[keyword](webelement,input,output,teststepproperty.parent_xpath)
+                            if (keyword.lower() == 'getstatusiris') : result = self.web_dict[keyword](webelement,input,output,teststepproperty.parent_xpath,teststepproperty.objectname.split(';')[-2])
+                            else : result = self.web_dict[keyword](webelement,input,output,teststepproperty.parent_xpath)
                         elif (teststepproperty.objectname.split(';')[-1] == 'constant' and keyword.lower() == 'verifyexistsiris'):
                             result = self.web_dict[keyword](webelement,input,output,'constant')
                         else:
-                            result = self.web_dict[keyword](webelement,input,output)
+                            if (keyword.lower() == 'getstatusiris') : result = self.web_dict[keyword](webelement,input,output,teststepproperty.objectname.split(';')[-2])
+                            else : result = self.web_dict[keyword](webelement,input,output)
                     else:
                         result= self.web_dict[keyword](webelement,input)
                     ## To terminate debug/execution if requested browser is not available in the system (Defect #846)

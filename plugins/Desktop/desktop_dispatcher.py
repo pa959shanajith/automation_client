@@ -161,7 +161,11 @@ class DesktopDispatcher:
         'doubleclickcelliris' : iris_object.doubleclickcelliris,
         'rightclickcelliris' : iris_object.rightclickcelliris,
         'mousehovercelliris' : iris_object.mousehovercelliris,
-        'getstatusiris' : iris_object.getstatusiris
+        'getstatusiris' : iris_object.getstatusiris,
+        'scrollupiris':iris_object.scrollupiris,
+        'scrolldowniris':iris_object.scrolldowniris,
+        'scrollleftiris':iris_object.scrollleftiris,
+        'scrollrightiris':iris_object.scrollrightiris
     }
 
 
@@ -268,11 +272,13 @@ class DesktopDispatcher:
                         coord = [obj_props[2],obj_props[3],obj_props[4],obj_props[5]]
                         ele = {'cord': teststepproperty.cord, 'coordinates': coord}
                         if ( teststepproperty.custom_flag ):
-                            result = self.desktop_dict[keyword](ele, input, output, teststepproperty.parent_xpath)
+                            if (keyword.lower() == 'getstatusiris') : result = self.desktop_dict[keyword](ele, input, output, teststepproperty.parent_xpath, teststepproperty.objectname.split(';')[-2])
+                            else : result = self.desktop_dict[keyword](ele, input, output, teststepproperty.parent_xpath)
                         elif ( teststepproperty.objectname.split(';')[-1] == 'constant' and keyword.lower() == 'verifyexistsiris' ):
                             result = self.desktop_dict[keyword](ele, input, output, 'constant')
                         else:
-                            result = self.desktop_dict[keyword](ele, input, output)
+                            if (keyword.lower() == 'getstatusiris') : result = self.desktop_dict[keyword](ele, input, output, teststepproperty.objectname.split(';')[-2])
+                            else : result = self.desktop_dict[keyword](ele, input, output)
                     else:
                         if ( objectname != '' ):
                             ele = self.get_desktop_element(objectname, url)

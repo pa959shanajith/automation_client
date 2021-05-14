@@ -21,7 +21,6 @@ import json
 import time
 from constants import *
 import constants
-from socketIO_client import SocketIO,BaseNamespace
 import core_utils
 from pdf_ops import PDFOperations
 import pdf_constants
