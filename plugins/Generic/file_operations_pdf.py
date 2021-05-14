@@ -121,8 +121,8 @@ class FileOperationsPDF:
                             pdf1 = open(filePathA, 'rb')  
                             pdf2 = open(filePathB, 'rb')  
                             #creating a pdf reader object via PYPDF2 for text comparison 
-                            pdfReader1 = PyPDF2.PdfFileReader(pdf1)  
-                            pdfReader2 = PyPDF2.PdfFileReader(pdf2) 
+                            pdfReader1 = PyPDF2.PdfFileReader(pdf1, overwriteWarnings=False)
+                            pdfReader2 = PyPDF2.PdfFileReader(pdf2, overwriteWarnings=False)
                             #opening documents via fitz for image comparison 
                             doc1 = fitz.open(filePathA)
                             doc2 = fitz.open(filePathB)
@@ -850,7 +850,7 @@ class FileOperationsPDF:
                         status=True
         # try:
         #         log.debug('Get the content of pdf file: '+str(input_path)+','+str(pagenumber))
-        #         reader=PdfFileReader(open(input_path,'rb'))
+        #         reader=PdfFileReader(open(input_path,'rb'), overwriteWarnings=False)
         #         pagenumber=int(pagenumber)-1
         #         if pagenumber<reader.getNumPages():
         #         page=reader.getPage(pagenumber)

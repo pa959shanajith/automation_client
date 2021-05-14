@@ -13,6 +13,7 @@ import logging
 import constants
 import json
 import os
+from urllib.parse import quote_plus as encodeURL
 configvalues = None
 proxies = None
 log = logging.getLogger('readconfig.py')
@@ -78,13 +79,21 @@ class readConfig():
             configvalues['configmissing']=os.path.isfile(self.config_path)
         return configvalues
 
+
 class readProxyConfig():
 
     def __init__(self):
         self.proxy_path = constants.PROXY_PATH
 
-    def readJson(self):
-        global proxies
+    def readRawJson(self):
+        proxyobj = None
+        def unwrap(enc):
+            import base64
+            from Crypto.Cipher import AES
+            unpad = lambda s : s[0:-ord(s[-1])]
+            enc = base64.b64decode(enc)
+            cipher = AES.new(b'\x74\x68\x69\x73\x49\x73\x41\x53\x65\x63\x72\x65\x74\x4b\x65\x79', AES.MODE_ECB)
+            return unpad(cipher.decrypt(enc).decode('utf-8'))
         if os.path.isfile(self.proxy_path)==True:
             try:
                 conf = open(self.proxy_path, 'r')
@@ -94,27 +103,27 @@ class readProxyConfig():
                     scheme = 'http'
                     if proxy['url'][0:7] == "http://":
                         proxy['url'] = proxy['url'][7:]
-                    elif proxy['url'][0:9] == "https://":
+                    elif proxy['url'][0:8] == "https://":
                         scheme = 'https'
                         proxy['url'] = proxy['url'][8:]
-                    proxy['password'] = self.unwrap(proxy['password'])
-                    proxy_url = scheme + "://" + proxy['username']+":"+proxy['password']+"@"+proxy['url']
-                    proxies = {
-                        "http": proxy_url,
-                        "https": proxy_url
-                    }
+                    proxy['scheme'] = scheme
+                    proxy['password'] = encodeURL(unwrap(proxy['password']))
+                    proxyobj = proxy
                 elif 'enabled' in proxy and proxy['enabled'] == 'Disabled':
-                    proxies = {}
-                else:
-                    proxies = None
+                    proxyobj = {}
             except Exception as e:
                 log.error(e,exc_info=True)
-        return proxies
+        return proxyobj
 
-    def unwrap(self, enc):
-        import base64
-        from Crypto.Cipher import AES
-        unpad = lambda s : s[0:-ord(s[-1])]
-        enc = base64.b64decode(enc)
-        cipher = AES.new(b'\x74\x68\x69\x73\x49\x73\x41\x53\x65\x63\x72\x65\x74\x4b\x65\x79', AES.MODE_ECB)
-        return unpad(cipher.decrypt(enc).decode('utf-8'))
+    def readJson(self):
+        global proxies
+        proxy = self.readRawJson()
+        if proxy:
+            proxy_url = proxy['scheme'] + "://" + encodeURL(proxy['username'])+":"+proxy['password']+"@"+proxy['url']
+            proxies = {
+                "http": proxy_url,
+                "https": proxy_url
+            }
+        else:
+            proxies = proxy
+        return proxies

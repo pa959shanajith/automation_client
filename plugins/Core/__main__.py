@@ -44,7 +44,7 @@ if args.register or args.connect:
 
 os.environ["AVO_ASSURE_HOME"] = args.AVO_ASSURE_HOME
 os.environ['AVO_ASSURE_VERSION'] = ice_ver
-os.environ["ICE_CLEAR_STORAGE"] = os.getenv("ICE_CLEAR_STORAGE", "True")
+os.environ["ICE_CLEAR_STORAGE"] = os.getenv("ICE_CLEAR_STORAGE", "False")
 
 import constants
 import readconfig

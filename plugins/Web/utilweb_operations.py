@@ -673,8 +673,6 @@ class UtilWebKeywords:
                     else:
                         result = self.generic_sendfucntion_keys(input[0],*args)
                 if (result is not None) and (result[0]!="Fail"):
-                    winhandcheck=browser_Keywords.BrowserKeywords()
-                    winhandcheck.update_window_handles()
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE     
         except ElementNotInteractableException as ex:
