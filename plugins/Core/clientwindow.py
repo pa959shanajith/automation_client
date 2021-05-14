@@ -179,9 +179,17 @@ class ClientWindow(wx.Frame):
         self.Centre()
         self.Show()
 
-    """ Allows only integer values + directional keys """
+    """ Allows only integer values, range of values(input e.g:- 1-10) + directional keys """
     def handle_keypress(self, event):
-        if chr(event.GetKeyCode()) in '0123456789\x08\x09ĺĽĻļĹĸŷŸŹźŻž\x7f': event.Skip()
+        self.demo=event.EventObject
+        prev_input=self.demo.Value
+        cur_input=chr(event.GetKeyCode())
+        val=prev_input+cur_input
+        if prev_input!='':
+            if val.count('-')<=1:
+                if chr(event.GetKeyCode()) in '0123456789-\x08\x09ĺĽĻļĹĸŷŸŹźŻž\x7f': event.Skip()
+        elif prev_input=='':
+            if chr(event.GetKeyCode()) in '0123456789\x08\x09ĺĽĻļĹĸŷŸŹźŻž\x7f': event.Skip()
 
     """
     Menu Items:
