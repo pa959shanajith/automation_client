@@ -143,6 +143,7 @@ class Handler():
         testcase_empty_flag = []
         empty_testcase_names=[]
         browser_type=[]
+        datatables=[]
         extract_path = None
         if(data_param_path is not None and data_param_path != ''):
             data_param_path_temp = str(data_param_path)
@@ -190,8 +191,10 @@ class Handler():
                 browser_type=json_data['browsertype']
             elif 'browserType' in json_data:
                 browser_type=json_data['browserType']
+            if 'datatables' in json_data:
+                datatables=json_data['datatables']
         flag=self.create_list(script,testcasename_list,extract_path,appType)
-        return flag,browser_type,len(script),testcase_empty_flag,empty_testcase_names
+        return flag,browser_type,len(script),datatables,testcase_empty_flag,empty_testcase_names
 
 
     def parse_json_execute(self,test_data):
