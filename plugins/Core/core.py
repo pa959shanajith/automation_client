@@ -1069,7 +1069,8 @@ class TestThread(threading.Thread):
                         self.cw.breakpoint.Enable()
                         try:
                             runfrom_step=self.cw.breakpoint.GetValue()
-                            runfrom_step=int(runfrom_step)
+                            if "-" not in runfrom_step:
+                                runfrom_step=int(runfrom_step)
                         except Exception as e:
                             runfrom_step=0
             if self.main.gui:

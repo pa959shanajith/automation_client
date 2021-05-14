@@ -98,6 +98,8 @@ class Controller():
         self.exception_flag=None
         local_cont.i = 0
         self.execution_mode = None
+        self.runfromstep_range_flag=False
+        self.runfrom_step_range_input=[]
         self.__load_generic()
 
     def __load_generic(self):
@@ -346,7 +348,7 @@ class Controller():
         keyword_flag=True
         ignore_stat=False
         inpval=[]
-        start_time = datetime.now()
+        start_time = datetime.now()      
         #Check for 'terminate_flag' before execution
         if not(terminate_flag):
             #Check for 'pause_flag' before executionee
@@ -775,56 +777,114 @@ class Controller():
         global pause_flag
         if local_cont.generic_dispatcher_obj is not None and local_cont.generic_dispatcher_obj.action is None:
             local_cont.generic_dispatcher_obj.action=action
-        while (i < len(tsplist)):
-            #Check for 'terminate_flag' before execution
-            if not(terminate_flag):
-                #Check for 'pause_flag' before execution
-                if pause_flag:
-                    self.pause_execution()
-                self.last_tc_num=last_tc_num
-                self.debugfrom_step=debugfrom_step
-                try:
-                    index = i
-                    i = self.methodinvocation(i,execution_env)
-                    #Check wether accessibility testing has to be executed
-                    if accessibility_testing and (index + 1 >= len(tsplist) or (tsplist[index].testscript_name != tsplist[index + 1].testscript_name and screen_testcase_map[tsplist[index].testscript_name]['screenid'] != screen_testcase_map[tsplist[index + 1].testscript_name]['screenid'])): 
-                        if local_cont.accessibility_testing_obj is None: self.__load_web()
-                        import browser_Keywords
-                        script_info =  screen_testcase_map[tsplist[index].testscript_name]
-                        #Check if browser is present or not
-                        if hasattr(browser_Keywords.local_bk, 'driver_obj') and browser_Keywords.local_bk.driver_obj is not None and len(script_info['accessibility_parameters']) > 0:
-                            acc_result = local_cont.accessibility_testing_obj.runCrawler(browser_Keywords.local_bk.driver_obj, script_info, screen_testcase_map["executionid"])
-                            #Check if accessibility Testing was successful
-                            if acc_result and acc_result["status"] != "fail":
-                                accessibility_reports.append(acc_result)
-                    if i == TERMINATE:
-                        #Changing the overallstatus of the report_obj to Terminate - (Sushma)
-                        self.reporting_obj.overallstatus=TERMINATE
-                        status_percentage[TERMINATE]+=1
-                        status_percentage["total"]+=1
-                        logger.print_on_console('Terminating the execution',color="YELLOW")
-                        status=i
+        #Check for 'run from step' with range as input
+        if (self.runfromstep_range_flag):
+            last_step_val=int(self.runfrom_step_range_input[-1])
+            while (i < len(tsplist)):
+                #Check for 'terminate_flag' before execution
+                if not(terminate_flag):
+                    #check to Run till the ending range of run from step
+                    if (i<(last_step_val)):
+                        #Check for 'pause_flag' before execution
+                        if pause_flag:
+                            self.pause_execution()
+                        self.last_tc_num=last_tc_num
+                        self.debugfrom_step=debugfrom_step
+                        try:
+                            index = i
+                            i = self.methodinvocation(i,execution_env)
+                            #Check wether accessibility testing has to be executed
+                            if accessibility_testing and (index + 1 >= len(tsplist) or (tsplist[index].testscript_name != tsplist[index + 1].testscript_name and screen_testcase_map[tsplist[index].testscript_name]['screenid'] != screen_testcase_map[tsplist[index + 1].testscript_name]['screenid'])): 
+                                if local_cont.accessibility_testing_obj is None: self.__load_web()
+                                import browser_Keywords
+                                script_info =  screen_testcase_map[tsplist[index].testscript_name]
+                                #Check if browser is present or not
+                                if hasattr(browser_Keywords.local_bk, 'driver_obj') and browser_Keywords.local_bk.driver_obj is not None and len(script_info['accessibility_parameters']) > 0:
+                                    acc_result = local_cont.accessibility_testing_obj.runCrawler(browser_Keywords.local_bk.driver_obj, script_info, screen_testcase_map["executionid"])
+                                    #Check if accessibility Testing was successful
+                                    if acc_result and acc_result["status"] != "fail":
+                                        accessibility_reports.append(acc_result)
+                            if i == TERMINATE:
+                                #Changing the overallstatus of the report_obj to Terminate - (Sushma)
+                                self.reporting_obj.overallstatus=TERMINATE
+                                status_percentage[TERMINATE]+=1
+                                status_percentage["total"]+=1
+                                logger.print_on_console('Terminating the execution',color="YELLOW")
+                                status=i
+                                break
+                            ## Issue #160
+                            elif i==STOP:
+                                log.info('Encountered STOP keyword')
+                                break
+                            elif i==JUMP_TO:
+                                i=self.jumpto_previousindex[-1]
+                                if len(self.jumpto_previousindex)>0 and len(self.counter)>0:
+                                    self.jumpto_previousindex.pop()
+                                    self.counter.pop()
+                        except Exception as e:
+                            log.error(e,exc_info=True)
+                            logger.print_on_console("Error encountered during Execution")
+                            status=False
+                            i=i+1
+                    else:
                         break
-                    ## Issue #160
-                    elif i==STOP:
-                        log.info('Encountered STOP keyword')
-                        break
-                    elif i==JUMP_TO:
-                        i=self.jumpto_previousindex[-1]
-                        if len(self.jumpto_previousindex)>0 and len(self.counter)>0:
-                            self.jumpto_previousindex.pop()
-                            self.counter.pop()
-                except Exception as e:
-                    log.error(e,exc_info=True)
-                    logger.print_on_console("Error encountered during Execution")
-                    status=False
-                    i=i+1
-            else:
-                logger.print_on_console('Terminating the execution',color="YELLOW")
-                #Changing the overallstatus of the report_obj to Terminate - (Sushma)
-                self.reporting_obj.overallstatus=TERMINATE
-                status=TERMINATE
-                break
+                else:
+                    logger.print_on_console('Terminating the execution',color="YELLOW")
+                    #Changing the overallstatus of the report_obj to Terminate - (Sushma)
+                    self.reporting_obj.overallstatus=TERMINATE
+                    status=TERMINATE
+                    break
+        else:
+            while (i < len(tsplist)):
+                #Check for 'terminate_flag' before execution
+                if not(terminate_flag):
+                    #Check for 'pause_flag' before execution
+                    if pause_flag:
+                        self.pause_execution()
+                    self.last_tc_num=last_tc_num
+                    self.debugfrom_step=debugfrom_step
+                    try:
+                        index = i
+                        i = self.methodinvocation(i,execution_env)
+                        #Check wether accessibility testing has to be executed
+                        if accessibility_testing and (index + 1 >= len(tsplist) or (tsplist[index].testscript_name != tsplist[index + 1].testscript_name and screen_testcase_map[tsplist[index].testscript_name]['screenid'] != screen_testcase_map[tsplist[index + 1].testscript_name]['screenid'])): 
+                            if local_cont.accessibility_testing_obj is None: self.__load_web()
+                            import browser_Keywords
+                            script_info =  screen_testcase_map[tsplist[index].testscript_name]
+                            #Check if browser is present or not
+                            if hasattr(browser_Keywords.local_bk, 'driver_obj') and browser_Keywords.local_bk.driver_obj is not None and len(script_info['accessibility_parameters']) > 0:
+                                acc_result = local_cont.accessibility_testing_obj.runCrawler(browser_Keywords.local_bk.driver_obj, script_info, screen_testcase_map["executionid"])
+                                #Check if accessibility Testing was successful
+                                if acc_result and acc_result["status"] != "fail":
+                                    accessibility_reports.append(acc_result)
+                        if i == TERMINATE:
+                            #Changing the overallstatus of the report_obj to Terminate - (Sushma)
+                            self.reporting_obj.overallstatus=TERMINATE
+                            status_percentage[TERMINATE]+=1
+                            status_percentage["total"]+=1
+                            logger.print_on_console('Terminating the execution',color="YELLOW")
+                            status=i
+                            break
+                        ## Issue #160
+                        elif i==STOP:
+                            log.info('Encountered STOP keyword')
+                            break
+                        elif i==JUMP_TO:
+                            i=self.jumpto_previousindex[-1]
+                            if len(self.jumpto_previousindex)>0 and len(self.counter)>0:
+                                self.jumpto_previousindex.pop()
+                                self.counter.pop()
+                    except Exception as e:
+                        log.error(e,exc_info=True)
+                        logger.print_on_console("Error encountered during Execution")
+                        status=False
+                        i=i+1
+                else:
+                    logger.print_on_console('Terminating the execution',color="YELLOW")
+                    #Changing the overallstatus of the report_obj to Terminate - (Sushma)
+                    self.reporting_obj.overallstatus=TERMINATE
+                    status=TERMINATE
+                    break
         self.scenario_end_time=datetime.now()
         end_time_string=self.scenario_end_time.strftime(TIME_FORMAT)
         logger.print_on_console('Scenario Execution end time is : '+end_time_string)
@@ -893,6 +953,21 @@ class Controller():
     def invoke_debug(self,mythread,runfrom_step,json_data):
         status=COMPLETED
         obj = handler.Handler()
+        normal_debug=False
+        if type(runfrom_step) != int:
+            import re
+            pattern = re.compile(r"[0-9]+-[0-9]+")
+            match = pattern.search(runfrom_step)
+            if match:
+                self.runfromstep_range_flag=True
+                self.runfrom_step_range_input=runfrom_step.split('-')
+                first_step_val=int(self.runfrom_step_range_input[0])
+                last_step_val=int(self.runfrom_step_range_input[-1])
+            else:
+                logger.print_on_console( 'Invalid step number!! Please provide valid input for run from step \n' )
+                log.info('Invalid step number!! Please provide valid input for run from step')
+        else:
+            normal_debug=True
         self.action=DEBUG
         handler.local_handler.tspList=[]
         scenario=[json_data]
@@ -912,13 +987,27 @@ class Controller():
                     if tsplist[k].name.lower() == 'openbrowser' and (IGNORE_THIS_STEP not in tsplist[k].inputval[0].split(';')):
                         tsplist[k].inputval = browser_type
         if flag:
-            if runfrom_step > 0 and runfrom_step <= tsplist[len(tsplist)-1].stepnum:
-                self.conthread=mythread
-                execution_env = {'env':'default'}
-                status,_,_ = self.executor(tsplist,DEBUG,last_tc_num,runfrom_step,mythread,execution_env, accessibility_testing = False)
-            else:
-                logger.print_on_console( 'Invalid step number!! Please provide run from step number from 1 to ',tsplist[len(tsplist)-1].stepnum,'\n')
-                log.info('Invalid step number!! Please provide run from step number')
+            if self.runfromstep_range_flag:
+                starting_val_end_range = (first_step_val)+1
+                if (first_step_val) > 0 and (first_step_val) <= (tsplist[len(tsplist)-1].stepnum):
+                    if (last_step_val) > (first_step_val) and (last_step_val) <= (tsplist[len(tsplist)-1].stepnum):
+                        self.conthread=mythread
+                        execution_env = {'env':'default'}
+                        status,_,_ = self.executor(tsplist,DEBUG,last_tc_num,first_step_val,mythread,execution_env, accessibility_testing = False)
+                    else:
+                        logger.print_on_console( 'Invalid step number!! Please provide ending range for run from step between ' +str(starting_val_end_range)+ ' to ',tsplist[len(tsplist)-1].stepnum,'\n')
+                        log.info('Invalid step number!! Please provide run from step number')
+                else:
+                    logger.print_on_console( 'Invalid step number!! Please provide starting range for run from step between 1 to ',tsplist[len(tsplist)-1].stepnum,'\n')
+                    log.info('Invalid step number!! Please provide run from step number')
+            elif normal_debug==True:
+                if runfrom_step > 0 and runfrom_step <= tsplist[len(tsplist)-1].stepnum:
+                    self.conthread=mythread
+                    execution_env = {'env':'default'}
+                    status,_,_ = self.executor(tsplist,DEBUG,last_tc_num,runfrom_step,mythread,execution_env, accessibility_testing = False)
+                else:
+                    logger.print_on_console( 'Invalid step number!! Please provide run from step number from 1 to ',tsplist[len(tsplist)-1].stepnum,'\n')
+                    log.info('Invalid step number!! Please provide run from step number')
         else:
             logger.print_on_console('Invalid script')
         temp={}
