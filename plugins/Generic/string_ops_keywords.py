@@ -670,7 +670,28 @@ class StringOperation:
                 mix_char=True
             elif '?' in  to_find and '*' in to_find:
                 mix_char=True
-            if first_wc == "?" or first_wc == "*":
+            if first_wc in ['?','*'] and last_wc in ['?','*']:
+                if (len(to_find)-1 == tf_single_count) or (len(to_find)-1 == tf_mul_count):
+                    if to_find[0] == '?' and to_find[-1] == '?':
+                        to_find=to_find[1:-1]
+                        to_find_lc_index = actual_string.find(to_find)
+                        if (to_find_lc_index<len(actual_string)-1 and actual_string[to_find_lc_index+1]!=''):
+                            position=[1]
+                    else:
+                        to_find=to_find[1:-1]
+                        position=[1]
+                else:
+                    if to_find[-1]=="?":
+                        to_find=to_find[1:-1]
+                        to_find_lc_index = actual_string.find(to_find)
+                        if (to_find_lc_index<len(actual_string)-1 and actual_string[to_find_lc_index+1]!=''):
+                            position=[1]
+                    elif to_find[0]=="?":
+                        to_find=to_find[1:-1]
+                        to_find_lc_index = actual_string.find(to_find)
+                        if (to_find_lc_index<=len(actual_string)-1 and actual_string[to_find_lc_index-1]!=''):
+                            position=[1]
+            elif first_wc == "?" or first_wc == "*":
                 if len(to_find)<= len(actual_string):
                     if tf_single_count==len(to_find)-1:
                         wildcard_search=True
