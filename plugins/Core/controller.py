@@ -44,6 +44,7 @@ log = logging.getLogger("controller.py")
 status_percentage = {TEST_RESULT_PASS:0,TEST_RESULT_FAIL:0,TERMINATE:0,"total":0}
 process_ids = []
 screen_testcase_map= {}
+module_stop = False
 class ThreadLogFilter(logging.Filter):
     """
     This filter only show log entries for specified thread name
@@ -232,7 +233,7 @@ class Controller():
             logger.print_on_console('Error loading System plugin')
             log.error(e,exc_info=True)
 
-
+           
     def __load_aws(self):
         try:
             core_utils.get_all_the_imports('AWS/src')
@@ -598,7 +599,7 @@ class Controller():
             self.dynamic_var_handler_obj.store_dynamic_value(output[1],result[1],tsp.name)
 
     def keywordinvocation(self,index,inpval,*args):
-        global socket_object,iris_constant_step,status_percentage
+        global socket_object, iris_constant_step, status_percentage, module_stop
         configvalues = self.configvalues
         try:
             time.sleep(float(configvalues['stepExecutionWait']))
@@ -756,9 +757,27 @@ class Controller():
             logger.print_on_console(keyword+' executed and the status is '+self.keyword_status+'\n',**kwargs)
             log.info(keyword+' executed and the status is '+self.keyword_status+'\n')
             #Checking for stop keyword
-            if teststepproperty.name.lower()==STOP:
+            if teststepproperty.name.lower() == STOP and self.status == 'Pass':
                 ## Issue #160
-                index=STOP
+                # index = STOP
+                if self.action.lower() == 'debug':
+                    index = STOP
+                else:
+                    if teststepproperty.inputval[0] == 'testcase':
+                        prev_index = index
+                        index -= 1
+                        teststepproperty_name = teststepproperty.testscript_name
+                        for i in range(index, len(handler.local_handler.tspList)):
+                            if teststepproperty_name != handler.local_handler.tspList[i].testscript_name:
+                                index = handler.local_handler.tspList[i].index
+                                break
+                        if (index + 1) == prev_index:
+                            index = STOP
+                    elif teststepproperty.inputval[0] == 'module':
+                        module_stop = True
+                        index = STOP
+                    else:
+                        index = STOP
             return index,result
         else:
             return index,TERMINATE
@@ -944,7 +963,7 @@ class Controller():
         return status
 
     def invoke_execution(self,mythread,json_data,socketIO,wxObject,configvalues,qcObject,qtestObject,zephyrObject,aws_mode):
-        global terminate_flag,status_percentage,saucelabs_count,screen_testcase_map
+        global terminate_flag, status_percentage, saucelabs_count, screen_testcase_map, module_stop
         qc_url=''
         qc_password=''
         qc_username=''
@@ -1397,6 +1416,7 @@ class Controller():
                                 except Exception as e:
                                     log.error('Error in Updating Zephyr details '+str(e))
                                     logger.print_on_console('Error in Updating Zephyr details')
+                            if module_stop:break
                         else:
                             logger.print_on_console( '***Saving report of Scenario' ,str(sc_idx + 1),'***')
                             log.info( '***Saving report of Scenario' +str(sc_idx + 1)+'***')

@@ -379,7 +379,7 @@ class ExcelFile:
         return status,methodoutput,output,err_msg
 
 
-    def get_rowcount(self,col_number=None,*args):
+    def get_rowcount(self,col_number=None):
         """
         def : get_rowcount
         purpose : calls the respective method to get the number of rows of excel
@@ -399,7 +399,7 @@ class ExcelFile:
                     info_msg=generic_constants.INPUT_IS+self.excel_path+' '+(self.sheetname or '')
                     logger.print_on_console(info_msg)
                     log.info(info_msg)
-                    res,row_count,err_msg=self.dict['get_rowcount_'+file_ext](self.excel_path,self.sheetname,col_number,*args)
+                    res,row_count,err_msg=self.dict['get_rowcount_'+file_ext](self.excel_path,self.sheetname,col_number)
                     logger.print_on_console('Row count is:'+str(row_count))
                     if res:
                         status=TEST_RESULT_PASS
@@ -415,7 +415,7 @@ class ExcelFile:
         return status,methodoutput,row_count,err_msg
 
 
-    def get_colcount(self,row_number=None,*args):
+    def get_colcount(self,row_number=None):
         """
         def : get_colcount
         purpose : calls the respective method to get the number of columns of excel
@@ -435,7 +435,7 @@ class ExcelFile:
                     info_msg=generic_constants.INPUT_IS+self.excel_path+' '+(self.sheetname or '')
                     logger.print_on_console(info_msg)
                     log.info(info_msg)
-                    res,col_count,err_msg=self.dict['get_colcount_'+file_ext](self.excel_path,self.sheetname,row_number,*args)
+                    res,col_count,err_msg=self.dict['get_colcount_'+file_ext](self.excel_path,self.sheetname,row_number)
                     logger.print_on_console('Column count is:'+str(col_count))
                     if res:
                         status=TEST_RESULT_PASS
@@ -951,7 +951,7 @@ class ExcelXLS:
         return status,err_msg
 
 
-    def get_rowcount_xls(self,excel_path,sheetname,column_number,*args):
+    def get_rowcount_xls(self,excel_path,sheetname,column_number):
         """
         def : get_rowcount_xls
         purpose : get the number of rows of .xls excel file set by the user
@@ -989,7 +989,7 @@ class ExcelXLS:
         return status,row_count,err_msg
 
 
-    def get_colcount_xls(self,excel_path,sheetname,row_number,*args):
+    def get_colcount_xls(self,excel_path,sheetname,row_number):
         """
         def : get_colcount_xls
         purpose : get the number of columns of .xls excel file set by the user
@@ -1495,7 +1495,7 @@ class ExcelXLSX:
         return status,err_msg
 
 
-    def get_rowcount_xlsx(self,excel_path,sheetname,col_number,*args):
+    def get_rowcount_xlsx(self,excel_path,sheetname,col_number):
         """
         def : get_rowcount_xlsx
         purpose : get the number of rows of .xlsx excel file set by the user
@@ -1541,7 +1541,7 @@ class ExcelXLSX:
         return status,row_count,err_msg
 
 
-    def get_colcount_xlsx(self,excel_path,sheetname,row_number,*args):
+    def get_colcount_xlsx(self,excel_path,sheetname,row_number):
         """
         def : get_colcount_xls
         purpose : get the number of columns of .xls excel file set by the user
