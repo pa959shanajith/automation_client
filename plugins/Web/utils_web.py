@@ -12,7 +12,7 @@ import os
 import sys
 import logging
 from constants import SYSTEM_OS
-if SYSTEM_OS=='Windows':
+if SYSTEM_OS=='Windows' :
     from pyrobot import Robot
     import win32gui
     import win32gui
@@ -24,8 +24,9 @@ local_uw = threading.local()
 class Utils:
 
     def __init__(self):
-        self.robot=Robot()
-        self.rect=''
+        if SYSTEM_OS =='Windows':
+            self.robot=Robot()
+            self.rect=''
         local_uw.log = logging.getLogger('utils_web.py')
 
     def slide(self,a,b,speed=0):
@@ -57,6 +58,36 @@ class Utils:
                 y += Tspeed
             self.mouse_move(x,y)
 
+    def slide_linux(self,a,b,speed=0):
+        from time import sleep
+        while True:
+            if speed == 'slow':
+                sleep(0.005)
+                Tspeed = 2
+            if speed == 'fast':
+                sleep(0.001)
+                Tspeed = 5
+            if speed == 0:
+                sleep(0.001)
+                Tspeed = 3
+            position=self.getpos_linux()
+            x = position[0]
+            y = position[1]
+            if abs(x-a) < 5:
+                if abs(y-b) < 5:
+                    break
+
+            if a < x:
+                x -= Tspeed
+            if a > x:
+                x += Tspeed
+            if b < y:
+                y -= Tspeed
+            if b > y:
+                y += Tspeed
+            import pyautogui as pag
+            pag.moveTo(x,y)
+
     def mouse_move(self,x,y):
         local_uw.log.debug('Moving the mouse to')
         local_uw.log.debug(x)
@@ -77,6 +108,13 @@ class Utils:
     def getpos(self):
         local_uw.log.debug('Getting the mouse position')
         point=self.robot.get_mouse_pos()
+        local_uw.log.debug(point)
+        return point[0],point[1]
+
+    def getpos_linux(self):
+        local_uw.log.debug('Getting the mouse position')
+        import pyautogui as pag
+        point=pag.position()
         local_uw.log.debug(point)
         return point[0],point[1]
 

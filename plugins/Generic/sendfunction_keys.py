@@ -11,7 +11,7 @@
 from generic_constants import *
 from constants import *
 import logger
-if SYSTEM_OS != 'Darwin':
+if SYSTEM_OS == 'Windows':
     from pyrobot import Robot
 import pyautogui
 import subprocess
@@ -116,7 +116,7 @@ class SendFunctionKeys:
 
     def execute_key(self,key,count):
         log.debug('press and release the key', key)
-        if SYSTEM_OS == "Darwin":
+        if SYSTEM_OS == "Darwin" or SYSTEM_OS == 'Linux':
             for x in range(count):
                 pyautogui.press(key)
         else:
@@ -133,7 +133,7 @@ class SendFunctionKeys:
 
     def type(self,input,delay_stringinput=None):
         try:
-            if SYSTEM_OS == "Darwin":
+            if SYSTEM_OS == "Darwin" or SYSTEM_OS == 'Linux':
                 pyautogui.typewrite(str(input))
             else:
                 if delay_stringinput is None: delay_stringinput = 0.005
@@ -146,7 +146,7 @@ class SendFunctionKeys:
 
     def press_key(self,key):
         log.debug('pressing  the key', key)
-        if SYSTEM_OS == "Darwin":
+        if SYSTEM_OS == "Darwin" or SYSTEM_OS == 'Linux':
             pyautogui.keyDown(key)
         else:
             robot=Robot()
@@ -154,7 +154,7 @@ class SendFunctionKeys:
 
     def release_key(self,key):
         log.debug('releasing  the key', key)
-        if SYSTEM_OS == "Darwin":
+        if SYSTEM_OS == "Darwin" or SYSTEM_OS == 'Linux':
             pyautogui.keyUp(key)
         else:
             robot=Robot()
