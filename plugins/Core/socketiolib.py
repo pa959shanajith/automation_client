@@ -417,24 +417,25 @@ class SocketIO(socketio.Client):
 
         # Check for pagination
         stringify = False
+        payload = data
         if type(data) in [dict, list, tuple]:
             stringify = True
-            data = json.dumps(data)
-        data_size = len(data)
+            payload = json.dumps(payload)
+        payload_size = len(payload)
 
         # Increasing 45 bytes in check limit (36 bytes for uuid,
         #   2 bytes for separator, 7 bytes for index)
-        if not (data_size > CHUNK_MAX_SIZE+45):
+        if not (payload_size > CHUNK_MAX_SIZE+45):
             return store.save(pktid, None, [event, nsp, (pktid, data)])
 
         # Pagination begins
         sub_pack_id = str(uuid())
-        blocks = int(data_size/CHUNK_SIZE) + 1
-        pckt = (';'.join([sub_pack_id,str(data_size),str(blocks),str(stringify)]))
+        blocks = int(payload_size/CHUNK_SIZE) + 1
+        pckt = (';'.join([sub_pack_id,str(payload_size),str(blocks),str(stringify)]))
         store.save(pktid, PAGINATE_INDEX, [event, nsp, (pktid+'_'+PAGINATE_INDEX, pckt)])
         for i in range(blocks):
             ci = str(i+1)
-            pckt = (sub_pack_id+';'+data[CHUNK_SIZE*i : CHUNK_SIZE*(i+1)])
+            pckt = (sub_pack_id+';'+payload[CHUNK_SIZE*i : CHUNK_SIZE*(i+1)])
             store.save(pktid, ci, [event, nsp, (pktid+'_'+ci, pckt)])
         store.save(pktid, "eof", [event, nsp, (pktid+"_eof", sub_pack_id)])
         del data
