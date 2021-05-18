@@ -10,6 +10,7 @@
 #-------------------------------------------------------------------------------
 import logger
 import os
+from selenium import webdriver
 from utils_web import Utils
 from utilweb_operations import UtilWebKeywords
 from button_link_keyword import ButtonLinkKeyword
@@ -197,7 +198,6 @@ class ElementKeywords:
                         size=webelement.size
                         local_eo.log.info('location is :')
                         local_eo.log.info(location)
-                        from selenium import webdriver
                         if isinstance(browser_Keywords.local_bk.driver_obj,webdriver.Firefox):
                             yoffset=browser_Keywords.local_bk.driver_obj.execute_script(MOUSE_HOVER_FF)
                             obj.mouse_move(int(location.get('x')+9),int(location.get('y')+yoffset))
@@ -217,7 +217,6 @@ class ElementKeywords:
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
                     else:
-                        from selenium import webdriver
                         import pyautogui as pag
                         if webelement.is_displayed():
                             location=webelement.location
@@ -228,18 +227,14 @@ class ElementKeywords:
                         local_eo.log.info(location)
                         if isinstance(browser_Keywords.local_bk.driver_obj,webdriver.Firefox):
                             yoffset=browser_Keywords.local_bk.driver_obj.execute_script(MOUSE_HOVER_FF)
-                            #obj.mouse_move(int(location.get('x')+9),int(location.get('y')+yoffset))
                             pag.moveTo(int(location.get('x')+9),int(location.get('y')+yoffset))
-                            
                         else:
-
                             height=int(size.get('height')/2)
                             width=int(size.get('width')/2)
                             local_eo.log.info(width)
                             local_eo.log.info(height)
                             pag.moveTo(int(location.get('x')),int(location.get('y')+height))
                         time.sleep(0.5)
-                        #pag.dragTo(int(location.get('x')),int(location.get('y')),button='left')
                         pag.mouseDown(button='left')
                         local_eo.log.info(STATUS_METHODOUTPUT_UPDATE)
                         status=TEST_RESULT_PASS
@@ -282,9 +277,7 @@ class ElementKeywords:
                             time.sleep(time1)
                         else:
                             time.sleep(0.5)
-                        from selenium import webdriver
                         if isinstance(browser_Keywords.local_bk.driver_obj,webdriver.Firefox):
-
                             yoffset=browser_Keywords.local_bk.driver_obj.execute_script(MOUSE_HOVER_FF)
                             obj.slide(int(location.get('x')+9),int(location.get('y')+yoffset), 0)
                         else:
@@ -321,31 +314,26 @@ class ElementKeywords:
                             time.sleep(time1)
                         else:
                             time.sleep(0.5)
-                        from selenium import webdriver
                         obj=Utils()
                         import pyautogui as pag
                         if isinstance(browser_Keywords.local_bk.driver_obj, webdriver.Firefox):
                             yoffset=browser_Keywords.local_bk.driver_obj.execute_script(MOUSE_HOVER_FF)
                             obj.slide_linux(int(location.get('x')+9),int(location.get('y')+yoffset), 0)
                         else:
-                            #obj.slide_linux(int(location.x),int(location.y),"slow")
                             height=int(size.get('height')/2)
                             width=int(size.get('width')/2)
                             local_eo.log.info(width)
                             local_eo.log.info(height)
                             obj.slide_linux(int(location.get('x')),int(location.get('y')+height), 0)
-
                         if(args[0][0]!=''):
                             time1=float(args[0][0])
                             time.sleep(time1)
                         else:
                             time.sleep(0.5)
-                        
                         pag.mouseUp(button='left')
                         local_eo.log.info(STATUS_METHODOUTPUT_UPDATE)
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
-
                 else:
                     local_eo.log.error(ERR_DISABLED_OBJECT)
                     err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']

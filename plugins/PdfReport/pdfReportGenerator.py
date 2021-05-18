@@ -16,7 +16,7 @@ from generatepdf import GeneratePDFReport
 from generatepdf_batch import GeneratePDFReportBatch
 
 pdfkit_conf = None
-wkhtmltopdf_path = os.environ["AVO_ASSURE_HOME"] + "/lib/wkhtmltox/bin/wkhtmltopdf"
+wkhtmltopdf_path = os.path.normpath(os.environ["AVO_ASSURE_HOME"] + "/lib/wkhtmltox/bin/wkhtmltopdf")
 if platform.system() == 'Windows': wkhtmltopdf_path+=".exe"
 if os.path.exists(wkhtmltopdf_path):
     pdfkit_conf = pdfkit.configuration(wkhtmltopdf=wkhtmltopdf_path)

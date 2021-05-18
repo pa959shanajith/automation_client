@@ -1168,7 +1168,6 @@ class FileOperations:
                     methodoutput=TEST_RESULT_TRUE
                     log.info('File has been saved')
                 else:
-
                     #Get the focus on Windows Dialog box by pressing 'alt+d'
                     obj.press_multiple_keys(['alt','d'],1)      ##added timer after every step
                     time.sleep(1)

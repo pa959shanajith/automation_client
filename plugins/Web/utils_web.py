@@ -110,6 +110,7 @@ class Utils:
         point=self.robot.get_mouse_pos()
         local_uw.log.debug(point)
         return point[0],point[1]
+
     def getpos_linux(self):
         local_uw.log.debug('Getting the mouse position')
         import pyautogui as pag
