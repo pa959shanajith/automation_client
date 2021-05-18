@@ -18,7 +18,7 @@ from utils_web import Utils
 import webconstants
 from webconstants import *
 from constants import SYSTEM_OS
-if SYSTEM_OS!='Darwin':
+if SYSTEM_OS == 'Windows' :
     from pyrobot import Robot
     import win32gui
     import pyrobot
@@ -527,7 +527,7 @@ class UtilWebKeywords:
                         webelement = cellChild
                         break
             if webelement is not None:
-                if SYSTEM_OS == 'Darwin':
+                if SYSTEM_OS == 'Darwin' or SYSTEM_OS == 'Linux':
                     obj = Utils()
                     if isinstance(browser_Keywords.driver_obj, webdriver.Firefox):
                         javascript = "return window.mozInnerScreenY"
@@ -781,43 +781,57 @@ class UtilWebKeywords:
                         if cell.is_enabled():
                             ele_coordinates=cell.location
                             local_uo.log.debug(ele_coordinates)
-                            hwnd=win32gui.GetForegroundWindow()
-                            local_uo.log.debug('Handle found ')
-                            local_uo.log.debug(hwnd)
-                            if isinstance(browser_Keywords.local_bk.driver_obj,webdriver.Firefox):
-                                info_msg='Firefox browser'
-                                local_uo.log.info(info_msg)
-                                javascript = "return window.mozInnerScreenY"
-                                value=browser_Keywords.local_bk.driver_obj.execute_script(javascript)
-                                local_uo.log.debug(value)
-                                offset=int(value)
-                                robot=pyrobot.Robot()
-                                robot.set_mouse_pos(int(ele_coordinates.get('x')+9),int(ele_coordinates.get('y')+offset-5))
-                                local_uo.log.debug('Setting the mouse position')
-                                robot.mouse_down('left')
-                                local_uo.log.debug('Mouse click performed')
-                                robot.mouse_up('left')
-                                local_uo.log.debug('Mouse release performed')
-                                status=TEST_RESULT_PASS
-                                methodoutput=TEST_RESULT_TRUE
+                            if SYSTEM_OS == 'Windows' :
+                                hwnd=win32gui.GetForegroundWindow()
+                                local_uo.log.debug('Handle found ')
+                                local_uo.log.debug(hwnd)
+                                if isinstance(browser_Keywords.local_bk.driver_obj,webdriver.Firefox):
+                                    info_msg='Firefox browser'
+                                    local_uo.log.info(info_msg)
+                                    javascript = "return window.mozInnerScreenY"
+                                    value=browser_Keywords.local_bk.driver_obj.execute_script(javascript)
+                                    local_uo.log.debug(value)
+                                    offset=int(value)
+                                    robot=pyrobot.Robot()
+                                    robot.set_mouse_pos(int(ele_coordinates.get('x')+9),int(ele_coordinates.get('y')+offset-5))
+                                    local_uo.log.debug('Setting the mouse position')
+                                    robot.mouse_down('left')
+                                    local_uo.log.debug('Mouse click performed')
+                                    robot.mouse_up('left')
+                                    local_uo.log.debug('Mouse release performed')
+                                    status=TEST_RESULT_PASS
+                                    methodoutput=TEST_RESULT_TRUE
 
+                                else:
+                                    utils=Utils()
+                                    utils.enumwindows()
+                                    local_uo.log.debug("UTIL WIND")
+                                    rect=utils.rect
+                                    robot=pyrobot.Robot()
+                                    local_uo.log.debug('Setting the mouse position')
+                                    local_uo.log.debug('before loc')
+                                    location=utils.get_element_location(webelement)
+                                    local_uo.log.debug(location)
+                                    robot.set_mouse_pos(int(location.get('x'))+9,int(location.get('y')+rect[1]+6))
+                                    local_uo.log.debug('after loc')
+                                    robot.mouse_down('left')
+                                    local_uo.log.debug('button press')
+                                    robot.mouse_up('left')
+                                    status=TEST_RESULT_PASS
+                                    methodoutput = TEST_RESULT_TRUE
+                            # linux implementation for click
                             else:
-                                utils=Utils()
-                                utils.enumwindows()
-                                local_uo.log.debug("UTIL WIND")
-                                rect=utils.rect
-                                robot=pyrobot.Robot()
-                                local_uo.log.debug('Setting the mouse position')
-                                local_uo.log.debug('before loc')
-                                location=utils.get_element_location(webelement)
-                                local_uo.log.debug(location)
-                                robot.set_mouse_pos(int(location.get('x'))+9,int(location.get('y')+rect[1]+6))
-                                local_uo.log.debug('after loc')
-                                robot.mouse_down('left')
-                                local_uo.log.debug('button press')
-                                robot.mouse_up('left')
-                                status=TEST_RESULT_PASS
-                                methodoutput=TEST_RESULT_TRUE
+                                local_uo.log.debug('Performing mouse click on linux')
+                                import pyautogui as pag
+                                if isinstance(browser_Keywords.local_bk.driver_obj, webdriver.Firefox):
+                                    javascript = "return window.mozInnerScreenY"
+                                    value = browser_Keywords.local_bk.driver_obj.execute_script(javascript)
+                                    offset = int(value)
+                                    pag.click(x=int(ele_coordinates.get('x') + 9), y=int(ele_coordinates.get('y') + offset - 5))
+                                else:
+                                    utils = Utils()
+                                    location = utils.get_element_location(webelement)
+                                    pag.click(x=int(location.get('x')), y=int(location.get('y')+10))
 
         except Exception as e:
             err_msg=self.__web_driver_exception(e)

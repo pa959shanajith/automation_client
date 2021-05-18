@@ -3,6 +3,7 @@ from pdfkitlib_override import pdfkit
 import logger
 import logging
 import re
+SEP = os.sep
 log = logging.getLogger('generatepdf.py')
 template_path = os.environ["AVO_ASSURE_HOME"] + "/plugins/PdfReport/template.html"
 report_path = os.environ["AVO_ASSURE_HOME"] + "/plugins/PdfReport/report.json"
@@ -23,7 +24,7 @@ class WatchThread(threading.Thread):
         dest_file = self.dst
         log.debug(str(source)+", "+str(target))
         log.debug(str(source)+", "+os.getcwd())
-        filename = source.split('\\')[-1]
+        filename=source.split(SEP)[-1]
         log.debug("source: "+filename)
         '''
         with open(source) as f:
@@ -44,22 +45,22 @@ class WatchThread(threading.Thread):
             pdfkit.from_file(template_path, dest_file+'.pdf', options=opts, configuration=pdfkit_conf)
             try:
                 try:
-                    os.remove(target+"\\"+dest_file+'.pdf')
+                    os.remove(target+SEP+dest_file+'.pdf')
                 except:
                     pass
-                shutil.move(os.getcwd()+"\\"+dest_file+'.pdf', target)
-                wx.MessageBox('PDF Created Successfully', 'Success', wx.OK | wx.ICON_INFORMATION)
+                shutil.move(os.getcwd()+SEP+dest_file+'.pdf', target)
+                wx.CallAfter(wx.MessageBox, 'PDF Created Successfully', 'Success', wx.OK | wx.ICON_INFORMATION)
                 logger.print_on_console("PDF Created Successfully")
             except Exception as e:
                 emsg='PDF Created Successfully! But failed to move pdf. Please collect it from here: '+os.getcwd()
-                wx.MessageBox(emsg, 'Access Denied (Requires admin previlege)', wx.OK | wx.ICON_ERROR)
+                wx.CallAfter(wx.MessageBox, emsg, 'Access Denied (Requires admin previlege)', wx.OK | wx.ICON_ERROR)
                 logger.print_on_console(emsg)
                 log.error(emsg)
                 log.error(e)
         except Exception as e:
-            log.error(e)
-        self.wxObj.l4.SetLabel(" ")
-        self.wxObj.setEnable()
+            log.error(e,exc_info=True)
+        wx.CallAfter(self.wxObj.l4.SetLabel, " ")
+        wx.CallAfter(self.wxObj.setEnable)
 
 
 class GeneratePDFReport(wx.Frame):

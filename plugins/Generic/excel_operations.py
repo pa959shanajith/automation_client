@@ -33,7 +33,7 @@ import platform
 if SYSTEM_OS == "Windows":
     import win32com.client
     import win32api
-if SYSTEM_OS == 'Darwin':
+if SYSTEM_OS == 'Darwin' or SYSTEM_OS =='Linux':
     import pandas
     from pandas import ExcelWriter
 
@@ -582,7 +582,7 @@ class ExcelXLS:
             log.error(e)
             err_msg='Error writing to excel cell of .xls file'
         workbook.save(input_path)
-        if flag and status:
+        if SYSTEM_OS == 'Windows' and flag and status:
             self.excel_obj.open_and_save_file(input_path)
         return status,err_msg
 
@@ -683,7 +683,7 @@ class ExcelXLS:
                 else:
                     err_msg=ERROR_CODE_DICT["ERR_ROW_DOESN'T_EXIST"]
                 writer.save()
-            else:
+            elif SYSTEM_OS == 'Windows':
                 excelobj= object_creator()
                 excel=excelobj.excel_object()
                 excel.DisplayAlerts = False
@@ -710,6 +710,16 @@ class ExcelXLS:
                             err_msg=ERROR_CODE_DICT["ERR_ROW_DOESN'T_EXIST"]
                 else:
                     err_msg='Excel is Read only'
+            else:
+                writer = pandas.ExcelWriter(excel_path)
+                excel_data = pandas.read_excel(excel_path,header=None)
+                if row<=len(excel_data.index):
+                    excel_data = excel_data.drop(excel_data.index[[row - 1]])
+                    excel_data.to_excel(writer, sheetname, index=False,header=False)
+                    writer.save()
+                    status=True    
+                else:
+                    err_msg=ERROR_CODE_DICT["ERR_ROW_DOESN'T_EXIST"]
         except Exception as e:
             err_msg='Error occured in deleting row of excel file'
             log.error(e)
@@ -1215,7 +1225,7 @@ class ExcelXLSX:
             err_msg='Error writing to excel cell of .xlsx file'
             # logger.print_on_console(err_msg)
         book.save(input_path)
-        if flag and status:
+        if SYSTEM_OS == 'Windows' and flag and status:
             self.excel_obj.open_and_save_file(input_path)
         return status,err_msg
 

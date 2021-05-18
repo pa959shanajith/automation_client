@@ -19,7 +19,7 @@ from constants import *
 import logging
 import core
 import platform
-if SYSTEM_OS != 'Darwin':
+if SYSTEM_OS == 'Windows':
     import win32gui
     import win32api
     import utils_web
@@ -33,6 +33,7 @@ import time
 from sendfunction_keys import SendFunctionKeys as SF
 driver_pre = None
 drivermap = []
+linux_drivermap=[]
 local_bk = threading.local()
 
 #New Thread to navigate to given url for the keyword 'naviagteWithAut'
@@ -71,7 +72,7 @@ class BrowserKeywords():
         return err_msg
 
     def openBrowser(self,webelement,browser_num,*args):
-        global local_bk, driver_pre, drivermap
+        global local_bk, driver_pre, drivermap,linux_drivermap
         status=webconstants.TEST_RESULT_FAIL
         result=webconstants.TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -123,10 +124,11 @@ class BrowserKeywords():
             elif browser_num[-1] == EXECUTE:
                 local_bk.driver_obj=obj.getBrowser(self.browser_num)
                 del drivermap[:]
+                linux_drivermap.append(local_bk.driver_obj)
             if(local_bk.driver_obj == None):
                 result = TERMINATE
             else:
-                if SYSTEM_OS!='Darwin':
+                if SYSTEM_OS == 'Winodows':
                     utilobject = utils_web.Utils()
                     pid = None
                     if (self.browser_num == '1'):
@@ -866,7 +868,7 @@ class BrowserKeywords():
             local_bk.recent_handles.append(h)
 
     def update_pid_set(self,enableSecurityFlag):
-        if SYSTEM_OS!='Darwin':
+        if SYSTEM_OS == 'Windows':
             utilobject = utils_web.Utils()
             pid = None
             if (self.browser_num == '1'):
