@@ -676,7 +676,7 @@ class StringOperation:
                         to_find=to_find[1:-1]
                         to_find_lc_index = actual_string.find(to_find)
                         if (to_find_lc_index<len(actual_string)-1 and actual_string[to_find_lc_index+1]!=''):
-                            position=[1]
+                            position=[to_find_lc_index]
                     else:
                         to_find=to_find[1:-1]
                         position=[1]
@@ -690,7 +690,7 @@ class StringOperation:
                         to_find=to_find[1:-1]
                         to_find_lc_index = actual_string.find(to_find)
                         if (to_find_lc_index<=len(actual_string)-1 and actual_string[to_find_lc_index-1]!=''):
-                            position=[1]
+                            position=[to_find_lc_index]
             elif first_wc == "?" or first_wc == "*":
                 if len(to_find)<= len(actual_string):
                     if tf_single_count==len(to_find)-1:
