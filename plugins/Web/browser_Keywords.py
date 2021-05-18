@@ -1014,19 +1014,74 @@ class BrowserKeywords():
     def get_foreground_window(self, *args):
         status=webconstants.TEST_RESULT_FAIL
         result=webconstants.TEST_RESULT_FALSE
-        output=OUTPUT_CONSTANT
+        output=None
         err_msg=None
+        flag_firefox = False
         try:
-            if isinstance(local_bk.driver_obj,webdriver.Ie):
-                local_bk.driver_obj.maximize_window()
-                status=webconstants.TEST_RESULT_PASS
-                result=webconstants.TEST_RESULT_TRUE
-                output = "Browser brought to foreground"
-            else:
-                local_bk.driver_obj.switch_to.window(local_bk.driver_obj.current_window_handle)
-                status=webconstants.TEST_RESULT_PASS
-                result=webconstants.TEST_RESULT_TRUE
-                output = "Browser brought to foreground"
+            if SYSTEM_OS != 'Darwin':
+                if (self.browser_num == '1'):
+                    p = psutil.Process(local_bk.driver_obj.service.process.pid)
+                    pidchrome = p.children()[-1]
+                    pid = pidchrome.pid
+                elif(self.browser_num == '2'):
+                    if(isinstance(local_bk.driver_obj,webdriver.Firefox)):
+                        try:
+                            win_name=local_bk.driver_obj.title+' — Mozilla Firefox'
+                            if(win32gui.FindWindow(None,win_name)!=0):
+                                handle=win32gui.FindWindow(None,win_name)
+                                win32gui.ShowWindow(handle,3)
+                                win32gui.SetForegroundWindow(handle)
+                                flag_firefox = True
+                                status=webconstants.TEST_RESULT_PASS
+                                result=webconstants.TEST_RESULT_TRUE
+                                output = "Browser brought to foreground"
+                        except:
+                            local_bk.log.info("Unable to bring the window to foreground using the title")
+                    if flag_firefox!=True:
+                        try:
+                            pid = local_bk.driver_obj.binary.process.pid
+                        except Exception as e:
+                            p = psutil.Process(local_bk.driver_obj.service.process.pid)
+                            pidfirefox = p.children()[0]
+                            pid = pidfirefox.pid
+                elif(self.browser_num == '3'):
+                    p = psutil.Process(local_bk.driver_obj.iedriver.process.pid)
+                    pidie = p.children()[-1]
+                    pid = pidie.pid
+                elif(self.browser_num == '7'):
+                    try:
+                        win_name=local_bk.driver_obj.title
+                        
+                        if(win32gui.FindWindow(None,win_name)!=0):
+                            handle=win32gui.FindWindow(None,win_name)
+                            local_bk.driver_obj.minimize_window()
+                            local_bk.driver_obj.maximize_window()
+                            win32gui.BringWindowToTop(handle)
+                            win32gui.ShowWindow(handle,3)
+                            win32gui.SetForegroundWindow(handle)
+                            status=webconstants.TEST_RESULT_PASS
+                            result=webconstants.TEST_RESULT_TRUE
+                            output = "Browser brought to foreground"
+                    except:
+                        local_bk.log.info("Unable to bring the window to foreground using the title")
+                elif (self.browser_num == '8'):
+                    p = psutil.Process(local_bk.driver_obj.edge_service.process.pid)
+                    pidchromium = p.children()[-1]
+                    pid = pidchromium.pid
+                elif (self.browser_num == '6'):
+                    logger.print_on_console("This feature not support on {} platform".format(SYSTEM_OS))
+                    local_bk.log.info("This feature not Supported")
+                    
+                if flag_firefox!=True:
+                    utilobject = utils_web.Utils()
+                    utilobject.bring_Window_Front(pid)
+                    status=webconstants.TEST_RESULT_PASS
+                    result=webconstants.TEST_RESULT_TRUE
+                    output = "Browser brought to foreground"
+            elif SYSTEM_OS == 'Darwin':
+                if (self.browser_num == '6'):
+                    local_bk.log.info("This feature not implemented")
+                pass
         except Exception as e:
             err_msg = e
             local_bk.log.error( err_msg )
@@ -1035,7 +1090,6 @@ class BrowserKeywords():
             else:
                 logger.print_on_console(output)
         return status, result, output, err_msg
-
 
 class Singleton_DriverUtil():
 
