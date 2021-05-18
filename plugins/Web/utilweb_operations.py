@@ -564,14 +564,13 @@ class UtilWebKeywords:
                         methodoutput=TEST_RESULT_TRUE
                     else:
                         obj=Utils()
-                        #Scroll happens only if webelement is not displayed on screen.
                         if 'version' in  browser_Keywords.local_bk.driver_obj.capabilities.keys():
                             browser_ver = browser_Keywords.local_bk.driver_obj.capabilities['version']
                         elif 'browserVersion' in  browser_Keywords.local_bk.driver_obj.capabilities.keys():
                             browser_ver = browser_Keywords.local_bk.driver_obj.capabilities['browserVersion']
-                        window_height = browser_Keywords.local_bk.driver_obj.get_window_size()['height']
-                        element_height = webelement.location.get('y')
-                        if webelement.is_displayed() and isinstance(browser_Keywords.local_bk.driver_obj,webdriver.Chrome) and element_height<window_height and element_height>0:
+                        #Scroll happens only if webelement is not displayed on screen.
+                        inView =  browser_Keywords.local_bk.driver_obj.execute_script(MOUSEHOVER_INVIEW,webelement)
+                        if inView:
                             location=webelement.location
                         else:
                             location=obj.get_element_location(webelement)
