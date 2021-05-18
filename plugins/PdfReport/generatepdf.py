@@ -20,7 +20,7 @@ class WatchThread(threading.Thread):
 
     def run(self):
         source = self.src
-        target = self.tgt
+        target = os.path.normpath(self.tgt)
         dest_file = self.dst
         log.debug(str(source)+", "+str(target))
         log.debug(str(source)+", "+os.getcwd())
@@ -44,13 +44,15 @@ class WatchThread(threading.Thread):
             if log.getEffectiveLevel() == logging.DEBUG: opts = {}
             pdfkit.from_file(template_path, dest_file+'.pdf', options=opts, configuration=pdfkit_conf)
             try:
-                try:
-                    os.remove(target+SEP+dest_file+'.pdf')
-                except:
-                    pass
-                shutil.move(os.getcwd()+SEP+dest_file+'.pdf', target)
-                wx.CallAfter(wx.MessageBox, 'PDF Created Successfully', 'Success', wx.OK | wx.ICON_INFORMATION)
+
+                # bug 18156: checking this condition to avoid deletion of generated pdf file when target is path equal to AVO_ASSURE_HOME
+                if target != os.environ['AVO_ASSURE_HOME']:
+                    try: os.remove(target+SEP+dest_file+'.pdf')
+                    except: pass
+                    shutil.move(os.getcwd()+SEP+dest_file+'.pdf', target)
                 logger.print_on_console("PDF Created Successfully")
+                wx.CallAfter(wx.MessageBox, 'PDF Created Successfully', 'Success', wx.OK | wx.ICON_INFORMATION)
+                wx.CallAfter(self.wxObj.Raise)
             except Exception as e:
                 emsg='PDF Created Successfully! But failed to move pdf. Please collect it from here: '+os.getcwd()
                 wx.CallAfter(wx.MessageBox, emsg, 'Access Denied (Requires admin previlege)', wx.OK | wx.ICON_ERROR)
