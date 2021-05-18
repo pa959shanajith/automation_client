@@ -33,7 +33,7 @@ import platform
 if SYSTEM_OS == "Windows":
     import win32com.client
     import win32api
-if SYSTEM_OS == 'Darwin':
+if SYSTEM_OS == 'Darwin' or SYSTEM_OS =='Linux':
     import pandas
     from pandas import ExcelWriter
 
@@ -379,7 +379,7 @@ class ExcelFile:
         return status,methodoutput,output,err_msg
 
 
-    def get_rowcount(self,*args):
+    def get_rowcount(self,col_number=None):
         """
         def : get_rowcount
         purpose : calls the respective method to get the number of rows of excel
@@ -399,7 +399,7 @@ class ExcelFile:
                     info_msg=generic_constants.INPUT_IS+self.excel_path+' '+(self.sheetname or '')
                     logger.print_on_console(info_msg)
                     log.info(info_msg)
-                    res,row_count,err_msg=self.dict['get_rowcount_'+file_ext](self.excel_path,self.sheetname,*args)
+                    res,row_count,err_msg=self.dict['get_rowcount_'+file_ext](self.excel_path,self.sheetname,col_number)
                     logger.print_on_console('Row count is:'+str(row_count))
                     if res:
                         status=TEST_RESULT_PASS
@@ -415,7 +415,7 @@ class ExcelFile:
         return status,methodoutput,row_count,err_msg
 
 
-    def get_colcount(self,*args):
+    def get_colcount(self,row_number=None):
         """
         def : get_colcount
         purpose : calls the respective method to get the number of columns of excel
@@ -435,7 +435,7 @@ class ExcelFile:
                     info_msg=generic_constants.INPUT_IS+self.excel_path+' '+(self.sheetname or '')
                     logger.print_on_console(info_msg)
                     log.info(info_msg)
-                    res,col_count,err_msg=self.dict['get_colcount_'+file_ext](self.excel_path,self.sheetname,*args)
+                    res,col_count,err_msg=self.dict['get_colcount_'+file_ext](self.excel_path,self.sheetname,row_number)
                     logger.print_on_console('Column count is:'+str(col_count))
                     if res:
                         status=TEST_RESULT_PASS
@@ -582,7 +582,7 @@ class ExcelXLS:
             log.error(e)
             err_msg='Error writing to excel cell of .xls file'
         workbook.save(input_path)
-        if flag and status:
+        if SYSTEM_OS == 'Windows' and flag and status:
             self.excel_obj.open_and_save_file(input_path)
         return status,err_msg
 
@@ -683,7 +683,7 @@ class ExcelXLS:
                 else:
                     err_msg=ERROR_CODE_DICT["ERR_ROW_DOESN'T_EXIST"]
                 writer.save()
-            else:
+            elif SYSTEM_OS == 'Windows':
                 excelobj= object_creator()
                 excel=excelobj.excel_object()
                 excel.DisplayAlerts = False
@@ -710,6 +710,16 @@ class ExcelXLS:
                             err_msg=ERROR_CODE_DICT["ERR_ROW_DOESN'T_EXIST"]
                 else:
                     err_msg='Excel is Read only'
+            else:
+                writer = pandas.ExcelWriter(excel_path)
+                excel_data = pandas.read_excel(excel_path,header=None)
+                if row<=len(excel_data.index):
+                    excel_data = excel_data.drop(excel_data.index[[row - 1]])
+                    excel_data.to_excel(writer, sheetname, index=False,header=False)
+                    writer.save()
+                    status=True    
+                else:
+                    err_msg=ERROR_CODE_DICT["ERR_ROW_DOESN'T_EXIST"]
         except Exception as e:
             err_msg='Error occured in deleting row of excel file'
             log.error(e)
@@ -951,7 +961,7 @@ class ExcelXLS:
         return status,err_msg
 
 
-    def get_rowcount_xls(self,excel_path,sheetname,*args):
+    def get_rowcount_xls(self,excel_path,sheetname,column_number):
         """
         def : get_rowcount_xls
         purpose : get the number of rows of .xls excel file set by the user
@@ -965,9 +975,23 @@ class ExcelXLS:
         try:
             log.debug('Fetching row count of '+generic_constants.INPUT_IS+excel_path+' '+sheetname)
             book = open_workbook(excel_path)
-            sheet=book.sheet_by_name(sheetname)
-            row_count=sheet.nrows
-            status=True
+            sheet = book.sheet_by_name(sheetname)
+            if column_number == None or column_number == '':
+                row_count=sheet.nrows
+                status = True
+            else:
+                column_number = int(column_number) - 1
+                if column_number < sheet.ncols:
+                    row_count = len(sheet.col(column_number))
+                    for i in reversed(sheet.col(column_number)):
+                        if i.value == '': row_count -= 1
+                        else: break
+                else: row_count=0
+                status = True
+        except ValueError as e:
+            err_msg = ERROR_CODE_DICT['ERR_COL_NUMBER']
+            log.error(e)
+            logger.print_on_console(err_msg)
         except Exception as e:
             err_msg='Error getting the row count of .xls file'
             log.error(e)
@@ -975,7 +999,7 @@ class ExcelXLS:
         return status,row_count,err_msg
 
 
-    def get_colcount_xls(self,excel_path,sheetname,*args):
+    def get_colcount_xls(self,excel_path,sheetname,row_number):
         """
         def : get_colcount_xls
         purpose : get the number of columns of .xls excel file set by the user
@@ -989,9 +1013,24 @@ class ExcelXLS:
         log.debug('Fetching col count of '+generic_constants.INPUT_IS+excel_path+' '+sheetname)
         try:
             book = open_workbook(excel_path)
-            sheet=book.sheet_by_name(sheetname)
-            col_count=sheet.ncols
-            status=True
+            sheet = book.sheet_by_name(sheetname)
+            if row_number == '' or row_number == None:
+                col_count=sheet.ncols
+                status = True
+            else:
+                row_number = int(row_number) - 1
+                if row_number < sheet.nrows:     
+                    col_count = len(sheet.row(row_number))
+                    for j in reversed(sheet.row(row_number)):
+                        if j.value == '': col_count -= 1
+                        else: break
+                else: col_count=0        
+                status = True
+        except ValueError as e:
+            err_msg = ERROR_CODE_DICT['ERR_ROW_NUMBER']
+            log.error(e)
+            logger.print_on_console(err_msg)
+
         except Exception as e:
             err_msg='Error getting the col count of .xls file'
             log.error(e)
@@ -1215,7 +1254,7 @@ class ExcelXLSX:
             err_msg='Error writing to excel cell of .xlsx file'
             # logger.print_on_console(err_msg)
         book.save(input_path)
-        if flag and status:
+        if SYSTEM_OS == 'Windows' and flag and status:
             self.excel_obj.open_and_save_file(input_path)
         return status,err_msg
 
@@ -1226,7 +1265,13 @@ class ExcelXLSX:
             return val.strftime(self.date_formats[fmt])
         return None
 
-
+    def __convertStringToInt(self,col):
+        num=0
+        import string
+        for c in col:
+            if c in string.ascii_letters:
+                num = num * 26 + (ord(c.upper()) - ord('A')) + 1
+        return num
     def get_linenumber_xlsx(self,input_path,sheetname,content):
         """
         def : get_linenumber_xlsx
@@ -1460,7 +1505,7 @@ class ExcelXLSX:
         return status,err_msg
 
 
-    def get_rowcount_xlsx(self,excel_path,sheetname,*args):
+    def get_rowcount_xlsx(self,excel_path,sheetname,col_number):
         """
         def : get_rowcount_xlsx
         purpose : get the number of rows of .xlsx excel file set by the user
@@ -1470,16 +1515,35 @@ class ExcelXLSX:
         """
         status=False
         row_count=None
-        err_msg=None
+        err_msg = None
+        
         try:
             log.debug('Fetching row count of '+generic_constants.INPUT_IS+excel_path+' '+sheetname)
             book=openpyxl.load_workbook(excel_path)
-            sheet=book.get_sheet_by_name(sheetname)
-            if(sheet.max_row==1 and sheet.max_column==1 and sheet.cell(1,1).value is None):
-                row_count=0
+            sheet = book.get_sheet_by_name(sheetname)       
+            if col_number == None or col_number=='':
+                if(sheet.max_row==1 and sheet.max_column==1 and sheet.cell(1,1).value is None):
+                    row_count=0
+                else:
+                    row_count=sheet.max_row
+                    status = True
             else:
-                row_count=sheet.max_row
-                status=True
+                # when we need to return the row count of a speific column 
+                col_number=int(col_number)
+                if 1 <= col_number <= 16384:
+                    try:
+                        col = openpyxl.utils.get_column_letter(col_number)
+                        row_count = max(i.row for i in sheet[col] if i.value is not None)
+                    except ValueError:
+                        row_count = 0
+                    status=True    
+                else:
+                    err_msg = ERROR_CODE_DICT["ERR_COL_DOESN'T_EXIST"]
+        except ValueError as e:
+            err_msg = ERROR_CODE_DICT["ERR_COL_NUMBER"]
+            log.error(e)
+            logger.print_on_console(err_msg)
+            
         except Exception as e:
             err_msg='Error getting the row count of .xlsx file'
             log.error(e)
@@ -1487,7 +1551,7 @@ class ExcelXLSX:
         return status,row_count,err_msg
 
 
-    def get_colcount_xlsx(self,excel_path,sheetname,*args):
+    def get_colcount_xlsx(self,excel_path,sheetname,row_number):
         """
         def : get_colcount_xls
         purpose : get the number of columns of .xls excel file set by the user
@@ -1497,16 +1561,32 @@ class ExcelXLSX:
         """
         status=False
         col_count=None
-        err_msg=None
+        err_msg = None
+        
         try:
             log.debug('Fetching col count of '+generic_constants.INPUT_IS+excel_path+' '+sheetname)
             book=openpyxl.load_workbook(excel_path)
             sheet=book.get_sheet_by_name(sheetname)
-            if(sheet.max_row==1 and sheet.max_column==1 and sheet.cell(1,1).value is None):
-                col_count=0
+            if row_number == None or row_number=='':
+                if(sheet.max_row==1 and sheet.max_column==1 and sheet.cell(1,1).value is None):
+                    col_count=0
+                else:
+                    col_count=sheet.max_column
+                    status = True
             else:
-                col_count=sheet.max_column
-                status=True
+                row_number=int(row_number)
+                if 1<= row_number <=1048576:
+                    try:
+                        col_count = max(self.__convertStringToInt(i.column) for i in sheet[row_number] if i.value is not None)
+                    except ValueError:
+                        col_count = 0
+                    status=True
+                else:
+                    err_msg = ERROR_CODE_DICT["ERR_ROW_DOESN'T_EXIST"]
+        except ValueError as e:
+            err_msg = ERROR_CODE_DICT["ERR_ROW_NUMBER"]
+            log.error(e)
+            logger.print_on_console(err_msg)
         except Exception as e:
             err_msg='Error getting the col count of .xlsx file'
             log.error(e)

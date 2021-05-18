@@ -56,12 +56,21 @@ class DatabaseOperation():
             if hasattr(e, 'args'):
                 ae = e.args[0].split('.')[2].strip()
             err_msg = ERROR_CODE_DICT['ERR_JAVA_NOT_FOUND']
+        ##to handle mdb files exception     
+        elif etype == pyodbc.Error:
+            if hasattr(e, 'args') and len(e.args) > 1: ae = e.args[1].split(';')[-1]
+            if ('password' in str(ae)):
+                err_msg=generic_constants.INVALID_INPUT
+            elif('file' in str(ae)):
+                err_msg="Invalid DB file."
+            else:
+                err_msg = ERROR_CODE_DICT['ERR_DB_OPS']
         else:
             err_msg = ERROR_CODE_DICT['ERR_DB_OPS']
         logger.print_on_console(err_msg) 
         log.error(err_msg)
         if ae is not None:
-            logger.print_on_console(ae) 
+            # logger.print_on_console(ae) 
             log.error(ae)
             err_msg = ae
         log.error(e)
@@ -138,15 +147,25 @@ class DatabaseOperation():
         try:
             cnxn = self.connection(dbtype, ip , port , dbName, userName , password)
             if cnxn is not None:
-                details.append(ip)
-                details.append(port)
-                details.append(userName)
-                details.append(password)
-                details.append(dbName)
-                details.append(query)
-                details.append(dbtype)
-                status=generic_constants.TEST_RESULT_PASS
-                result=generic_constants.TEST_RESULT_TRUE
+                cursor=cnxn.cursor()
+                ##added to check if getalltables is not used with any other dbtype
+                if (query.lower() =='getalltables' and dbtype!='3'):
+                    err_msg = ERROR_CODE_DICT["ERR_DB_QUERY"]
+                    logger.print_on_console(err_msg)
+                    log.error(err_msg)
+                else:
+                    if query.lower() !='getalltables':
+                        ##added to check if given query is valid
+                        cursor.execute(query)
+                    details.append(ip)
+                    details.append(port)
+                    details.append(userName)
+                    details.append(password)
+                    details.append(dbName)
+                    details.append(query)
+                    details.append(dbtype)
+                    status=generic_constants.TEST_RESULT_PASS
+                    result=generic_constants.TEST_RESULT_TRUE
         except Exception as e:
             err_msg = self.processException(e)
         finally:
@@ -163,18 +182,30 @@ class DatabaseOperation():
                 if cnxn is not None:
                     import re
                     data = re.findall(r'\[([^]]*)\]',input_val[7])
-                    row = data[0]
-                    col = data[1]
-                    row = int(row)
-                    col = int(col)
-                    row_no = row - 1
-                    col_no = col - 1
-                    cursor = cnxn.cursor()
-                    cursor.execute(input_val[5])
-                    rows = cursor.fetchall()
-                    value = rows[row_no][col_no]
-                    ##if condition added to fix issue:304-Generic : getData keyword:  Actual data  is not getting stored in dynamic variable instead "null" is stored.
-                    ##changes done by jayashree.r
+                    ##if condition added to resolve invalid input in displaydynamicvariable when more then two indexes were entered
+                    if(len(data)==2):
+                        row = data[0]
+                        col = data[1]
+                        row = int(row)
+                        col = int(col)
+                        row_no = row - 1
+                        col_no = col - 1
+                        cursor = cnxn.cursor()
+                        ##fetching table names
+                        if (input_val[5].lower()=='getalltables'):
+                            rows=[]
+                            tables=[]
+                            for table in list(cursor.tables()):
+                                if table[3]=='TABLE':
+                                    tables.append(table[2])
+                            rows.append(tables)
+                            value = rows[col_no][row_no]
+                        else:
+                            cursor.execute(input_val[5])
+                            rows = cursor.fetchall()
+                            value = rows[row_no][col_no]
+                        ##if condition added to fix issue:304-Generic : getData keyword:  Actual data  is not getting stored in dynamic variable instead "null" is stored.
+                        ##changes done by jayashree.r
                     if value == None:
                         value = 'None'
                     log.info('Value obtained :')
@@ -233,10 +264,10 @@ class DatabaseOperation():
                 cursor.execute(query)
                 rows = cursor.fetchall()
                 columns = [column[0] for column in cursor.description]
-                verify = os.path.isfile(file_path)
+                verify = os.path.isfile(inp_file)
                 if (verify == True):
                     ext = self.get_ext(file_path)
-                    if (ext == '.xls' or ext == '.xlsx'):
+                    if (ext == '.xls'):
                         work_book = xlwt.Workbook(encoding="utf-8")
                         work_sheet = work_book.add_sheet(generic_constants.DATABASE_SHEET)
                         i=0
@@ -315,6 +346,72 @@ class DatabaseOperation():
                         else:
                             status=generic_constants.TEST_RESULT_FAIL
                             result=generic_constants.TEST_RESULT_FALSE
+                    ## added to resolve file compare issue with data fetched from exportdata keyword
+                    elif (ext =='.xlsx'):
+                        #Creating the New File.
+                        work_book = openpyxl.Workbook()
+                        #adding the New Sheet.
+                        index_sheet = 0
+                        work_book.create_sheet(index=index_sheet, title=generic_constants.DATABASE_SHEET)
+                        i=1
+                        j=1
+                        work_sheet = work_book[generic_constants.DATABASE_SHEET]
+                        for x in columns:
+                            work_sheet.cell(row=i, column=j).value = x
+                            j=j+1
+                            try:
+                                max_col_width = 2.4
+                                adjusted_width = (len(str(x)) + 2) * 1.2
+                                if adjusted_width > max_col_width:
+                                    max_col_width=adjusted_width
+                                work_sheet.column_dimensions[get_column_letter(j)].width = max_col_width
+                            except Exception as e:
+                                log.info("Setting the dimensions for the column: {}".format(e))
+                        try:
+                            del x,columns,j,i,max_col_width,adjusted_width
+                        except Exception as e :
+                            log.error('some error : {}'.format(e))
+                        k=2
+                        for row in rows:
+                            l=1
+                            for y in row:
+                                try:
+                                    work_sheet.cell(row=k, column=l).value = y   
+                                except Exception as e:
+                                    if 'character' in str(e):
+                                        i = str(e).index('character')
+                                        err_new=str(e)[:i+len('character')]
+                                        if err_new==generic_constants.UNICODE_ERR:
+                                            newrow=[]
+                                            for ele in row:
+                                                if type(ele) == str:
+                                                    ele = ele.encode('utf-8')
+                                                    newrow.append(ele)
+                                                else:
+                                                    newrow.append(ele)
+                                            del ele
+                                        row = tuple(newrow)
+                                        work_sheet.cell(row=k, column=l).value = y
+                                l+=1
+                                try:
+                                    max_col_width = 2.4
+                                    adjusted_width = (len(str(y)) + 2) * 1.2
+                                    if adjusted_width > max_col_width:
+                                        max_col_width=adjusted_width
+                                    work_sheet.column_dimensions[get_column_letter(l)].width = max_col_width
+                                except Exception as e:
+                                    log.info("Setting the dimensions for the rows: {}".format(e))
+                            k+=1
+                        work_book.save(file_path)
+                        obj = file_operations.FileOperations()
+                        output = obj.compare_content(file_path,generic_constants.DATABASE_SHEET,inp_file,inp_sheet)
+                        if output[1] == "True":
+                            status=generic_constants.TEST_RESULT_PASS
+                            result=generic_constants.TEST_RESULT_TRUE
+                        else:
+                            status=generic_constants.TEST_RESULT_FAIL
+                            result=generic_constants.TEST_RESULT_FALSE
+
                     else:
                         err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                         logger.print_on_console(err_msg)
@@ -369,7 +466,7 @@ class DatabaseOperation():
                 except Exception as e:
                     err_msg = "Invalid Query"
                     log.error(err_msg)
-                    logger.print_on_console(err_msg)    
+                    # logger.print_on_console(err_msg)    
                 rows = cursor.fetchall()
                 columns = [column[0] for column in cursor.description]
                 ##logic for output col reading
@@ -396,6 +493,7 @@ class DatabaseOperation():
                         inp_sheet=args[1]
                     else:
                         fields=args[0]
+                        inp_sheet=None
                 ext = self.get_ext(fields)
                 if (ext == '.xls'):
                     verify = os.path.isfile(fields)
@@ -418,7 +516,7 @@ class DatabaseOperation():
                                 log.debug(fields)
                             except Exception as e:
                                 err_msg = ERROR_CODE_DICT["ERR_FILE_WRITE"]
-                                logger.print_on_console(err_msg)
+                                # logger.print_on_console(err_msg)
                                 log.error(err_msg)
                                 log.error(e)
                         else:
@@ -441,7 +539,7 @@ class DatabaseOperation():
                                 work_book.set_active_sheet(index_sheet)
                             except Exception as e:
                                 err_msg = ERROR_CODE_DICT["ERR_FILE_WRITE"]
-                                logger.print_on_console(err_msg)
+                                # logger.print_on_console(err_msg)
                                 log.error(err_msg)
                                 log.error(e)
                         i=0
@@ -484,8 +582,9 @@ class DatabaseOperation():
                         logger.print_on_console(err_msg)
                         log.error(err_msg)
                         log.error(e)
-                    status=generic_constants.TEST_RESULT_PASS
-                    result=generic_constants.TEST_RESULT_TRUE
+                    if err_msg == None:
+                        status=generic_constants.TEST_RESULT_PASS
+                        result=generic_constants.TEST_RESULT_TRUE
 
                 elif(ext == '.xlsx'):
                     verify = os.path.isfile(fields)
@@ -512,7 +611,7 @@ class DatabaseOperation():
                                 log.debug(fields)
                             except Exception as e:
                                 err_msg = ERROR_CODE_DICT["ERR_FILE_WRITE"]
-                                logger.print_on_console(err_msg)
+                                # logger.print_on_console(err_msg)
                                 log.error(err_msg)
                                 log.error(e)
                         else:
@@ -534,7 +633,7 @@ class DatabaseOperation():
 
                             except Exception as e:
                                 err_msg = ERROR_CODE_DICT["ERR_FILE_WRITE"]
-                                logger.print_on_console(err_msg)
+                                # logger.print_on_console(err_msg)
                                 log.error(err_msg)
                                 log.error(e)
                         i=1
@@ -601,8 +700,9 @@ class DatabaseOperation():
                         logger.print_on_console(err_msg)
                         log.error(err_msg)
                         log.error(e)
-                    status=generic_constants.TEST_RESULT_PASS
-                    result=generic_constants.TEST_RESULT_TRUE
+                    if err_msg == None:
+                        status=generic_constants.TEST_RESULT_PASS
+                        result=generic_constants.TEST_RESULT_TRUE
 
                 elif(ext == '.csv'): #Code changed to write csv files
                     path = fields
@@ -640,8 +740,8 @@ class DatabaseOperation():
         finally:
             if cursor is not None: cursor.close()
             if cnxn is not None: cnxn.close()
-        if err_msg!=None:
-            logger.print_on_console(err_msg)
+        # if err_msg!=None:
+        #     logger.print_on_console(err_msg)
         return status,result,verb,err_msg
 
     def secureExportData(self, ip , port , userName , password, dbName, query, dbtype,*args):
@@ -673,27 +773,46 @@ class DatabaseOperation():
         """
         dbNumber = {4:'{SQL Server}',5:'{Microsoft ODBC for Oracle}'}#,2:'{IBM DB2 ODBC DRIVER}'}
         err_msg=None
-        try:
-            dbtype= int(dbtype)
-            if dbtype == 2:
-                import ibm_db
-                cnxn = ibm_db.connect('database=%s;hostname=%s;port=%s;protocol=TCPIP;uid=%s;pwd=%s'%(dbName,ip,port,userName,password), '', '')
-                import ibm_db_dbi
-                self.cnxn = ibm_db_dbi.Connection(cnxn)
-            elif dbtype == 6:
-                import cx_Oracle
-                path = os.path.normpath(os.environ["AVO_ASSURE_HOME"] + "/Lib/instantclient")
-                os.environ["PATH"] += os.pathsep + path
-                host = str(ip)+":"+str(port)+"/"+dbName
-                self.cnxn = cx_Oracle.connect(userName, password, host, encoding="UTF-8")
-            elif dbtype == 7:             
-                jar_path = os.path.normpath(os.environ["AVO_ASSURE_HOME"] + "/Lib/DB/jtds-1.3.1.jar")
-                self.cnxn = jaydebeapi.connect('net.sourceforge.jtds.jdbc.Driver', 'jdbc:jtds:sybase://%s:%s/%s' % (ip, port, dbName), [userName, password], jar_path)
-            else:
-                self.cnxn = pyodbc.connect('driver=%s;SERVER=%s;PORT=%s;DATABASE=%s;UID=%s;PWD=%s' % ( dbNumber[dbtype], ip, port, dbName, userName ,password ) )
-            return self.cnxn
-        except Exception as e:
-            self.processException(e)
+        if not(dbtype == ''): 
+            try:
+                dbtype= int(dbtype)
+                if dbtype == 2:
+                    import ibm_db
+                    cnxn = ibm_db.connect('database=%s;hostname=%s;port=%s;protocol=TCPIP;uid=%s;pwd=%s'%(dbName,ip,port,userName,password), '', '')
+                    import ibm_db_dbi
+                    self.cnxn = ibm_db_dbi.Connection(cnxn)
+                elif dbtype == 6:
+                    import cx_Oracle
+                    path = os.path.normpath(os.environ["AVO_ASSURE_HOME"] + "/Lib/instantclient")
+                    os.environ["PATH"] += os.pathsep + path
+                    host = str(ip)+":"+str(port)+"/"+dbName
+                    self.cnxn = cx_Oracle.connect(userName, password, host, encoding="UTF-8")
+                elif dbtype == 7:             
+                    jar_path = os.path.normpath(os.environ["AVO_ASSURE_HOME"] + "/Lib/DB/jtds-1.3.1.jar")
+                    self.cnxn = jaydebeapi.connect('net.sourceforge.jtds.jdbc.Driver', 'jdbc:jtds:sybase://%s:%s/%s' % (ip, port, dbName), [userName, password], jar_path)    
+                ##added to connect with mdb files mdb files using pyodbc 
+                elif dbtype == 3:
+                    if(userName == '' and port == '' and dbName == ''):
+                        filename, file_ext=os.path.splitext(ip)
+                        if file_ext in ['.mdb','.accdb']:
+                            self.cnxn = pyodbc.connect('driver={Microsoft Access Driver (*.mdb, *.accdb)};PORT=%s;DATABASE=%s;UID=%s;PWD=%s;DBQ=%s' % ( port, dbName, userName ,password,ip ) )
+                        else:
+                            err_msg=generic_constants.INVALID_FILE_FORMAT
+                            logger.print_on_console(err_msg)
+                            log.error(err_msg)
+                    else:
+                        err_msg=generic_constants.INVALID_INPUT
+                        logger.print_on_console(err_msg)
+                        log.error(err_msg)
+                else:
+                    self.cnxn = pyodbc.connect('driver=%s;SERVER=%s;PORT=%s;DATABASE=%s;UID=%s;PWD=%s' % ( dbNumber[dbtype], ip, port, dbName, userName ,password ) )
+                return self.cnxn
+            except Exception as e:
+                self.processException(e)
+        else:
+            err_msg=generic_constants.INVALID_INPUT
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
         return None
 
     def get_ext(self,input_path):

@@ -77,4 +77,5 @@ def to_pdf_override(self, path=None):
                           '%s ' %(' '.join(args)),e)
 
 
-pdfkit.PDFKit.to_pdf = to_pdf_override
+if sys.platform == "win32":
+    pdfkit.PDFKit.to_pdf = to_pdf_override

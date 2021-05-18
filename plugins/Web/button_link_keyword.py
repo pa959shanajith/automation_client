@@ -15,7 +15,7 @@ import webconstants
 import time
 from selenium import webdriver
 from constants import SYSTEM_OS
-if SYSTEM_OS!='Darwin':
+if SYSTEM_OS == 'Windows' :
     from pyrobot import Robot, Keys
 import browser_Keywords
 import logging
@@ -76,7 +76,7 @@ class ButtonLinkKeyword():
                             status = webconstants.TEST_RESULT_PASS
                             methodoutput = webconstants.TEST_RESULT_TRUE
 
-                    elif SYSTEM_OS == 'Darwin':
+                    elif SYSTEM_OS == 'Darwin' or SYSTEM_OS == 'Linux':
                         try:
                             clickinfo = browser_Keywords.local_bk.driver_obj.execute_script(webconstants.CLICK_JAVASCRIPT,webelement)
                             local_blk.log.info('Click operation performed using javascript click')
@@ -494,7 +494,7 @@ class ButtonLinkKeyword():
                             status = webconstants.TEST_RESULT_PASS
                         else:
                             err_msg=ERROR_CODE_DICT['ERR_IIO_EXCEPTION']
-                    elif SYSTEM_OS != 'Darwin' and isinstance(browser_Keywords.local_bk.driver_obj,webdriver.Firefox):
+                    elif SYSTEM_OS == 'Windows' and isinstance(browser_Keywords.local_bk.driver_obj,webdriver.Firefox):
                         local_blk.log.debug('Mozilla Firefox Instance')
                         clickinfo = browser_Keywords.local_bk.driver_obj.execute_script(webconstants.CLICK_JAVASCRIPT,webelement)
                         local_blk.log.info('upload_file click info')
