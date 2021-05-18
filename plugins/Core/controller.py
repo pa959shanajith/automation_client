@@ -1579,6 +1579,7 @@ class Controller():
                 thread_name = "test_thread_browser" + str(browsers_data[i])
                 th[i] = threading.Thread(target = self.invoke_execution, name = thread_name, args = (mythread,jsondata_dict[i],socketIO,wxObject,configvalues,qc_soc,qtest_soc,zephyr_soc,aws_mode))
                 self.seperate_log(th[i], browsers_data[i]) #function that creates different logs for each browser
+                if SYSTEM_OS =='Linux': time.sleep(0.5)
                 th[i].start()
             for i in th:
                 th[i].join()
@@ -1670,6 +1671,29 @@ def kill_process():
         #     log.error(e)
         log.info('Stale processes killed')
         logger.print_on_console('Stale processes killed')
+    elif SYSTEM_OS == 'Linux':
+        log.info("killing stale process in linux")
+        try:
+            import browser_Keywords
+            if browser_Keywords.linux_drivermap != []:
+                for brwdriver in browser_Keywords.linux_drivermap:
+                    brwdriver.quit()
+                del browser_Keywords.linux_drivermap[:]
+            for driver in browser_Keywords.drivermap:
+                driver.quit()
+            del browser_Keywords.drivermap[:]
+            if hasattr(browser_Keywords.local_bk, 'driver_obj'):
+                if (browser_Keywords.local_bk.driver_obj):
+                    browser_Keywords.local_bk.driver_obj = None
+            if hasattr(browser_Keywords.local_bk, 'pid_set'):
+                if (browser_Keywords.local_bk.pid_set):
+                    del browser_Keywords.local_bk.pid_set[:]
+        except Exception as e:
+            logger.print_on_console('Unable to kill stale process')
+            log.error(e)
+        log.info('Stale process Killed')
+        logger.print_on_console('Stale process killed')
+
     else:
         tries = {}
         while(len(process_ids) > 0):

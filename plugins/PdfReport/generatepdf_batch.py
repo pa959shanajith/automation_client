@@ -5,7 +5,7 @@ import logging
 log = logging.getLogger('generatepdf_batch.py')
 template_path = os.environ["AVO_ASSURE_HOME"] + "/plugins/PdfReport/template.html"
 report_path = os.environ["AVO_ASSURE_HOME"] + "/plugins/PdfReport/report.json"
-
+SEP = os.sep
 class WatchThread(threading.Thread):
     def __init__(self, wxObj, source, target):
         threading.Thread.__init__(self)
@@ -69,10 +69,10 @@ class WatchThread(threading.Thread):
                     pdfkit.from_file(template_path, file_name+'.pdf', options=opts, configuration=pdfkit_conf)
                     try:
                         try:
-                            os.remove(target+"\\"+file_name+'.pdf')
+                            os.remove(target+SEP+file_name+'.pdf')
                         except:
                             pass
-                        shutil.move(os.getcwd()+"\\"+file_name+'.pdf', target)
+                        shutil.move(os.getcwd()+SEP+file_name+'.pdf', target)
                         logger.print_on_console(file_name+".pdf Created Successfully")
                     except Exception as e:
                         emsg = file_name+".pdf Created Successfully. Fail to move "+os.getcwd()+"\\"+file_name+'.pdf'+" to "+ target
@@ -81,8 +81,8 @@ class WatchThread(threading.Thread):
                         log.error(e)
                 except Exception as e:
                     log.error(e)
-            self.wxObj.l4.SetLabel("Reports generated successfully")
-            self.wxObj.btn.SetLabel("Start")
+            wx.CallAfter(self.wxObj.l4.SetLabel,"Reports generated successfully")
+            wx.CallAfter(self.wxObj.btn.SetLabel,"Start")
             self.wxObj.watchThread.keep_running = False
             self.wxObj.watchThread= None
             self.wxObj.started = False
