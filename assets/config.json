@@ -1,7 +1,6 @@
 {
     "bit_64": "Yes",
     "browser_check": "Yes",
-    "chrome_debugport": "0",
     "chrome_path": "default",
     "chrome_profile": "default",
     "clear_cache": "No",
@@ -9,8 +8,8 @@
     "connection_timeout": "0",
     "delay": "0.3",
     "delay_stringinput": "1",
+    "disable_screen_timeout": "No",
     "displayVariableTimeOut": "1",
-    "edgechromium_debugport": "0",
     "enableSecurityCheck": "No",
     "exception_flag": "false",
     "extn_enabled": "No",

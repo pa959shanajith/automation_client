@@ -1523,6 +1523,10 @@ class Controller():
         self.clear_data()
         wxObject = root_obj.cw
         socket_object = socketIO
+        configvalues = self.configvalues
+        dis_sys_screenoff = str(configvalues['disable_screen_timeout']).lower()
+        import ctypes, os
+        is_admin = ctypes.windll.shell32.IsUserAnAdmin()
         #Logic to make sure that logic of usage of existing driver is not applicable to execution
         if local_cont.web_dispatcher_obj != None:
             local_cont.web_dispatcher_obj.action=action
@@ -1530,6 +1534,11 @@ class Controller():
             aws_mode = len(args)>0 and args[0]
             self.execution_mode = json_data['exec_mode'].lower()
             kill_process()
+            if dis_sys_screenoff == 'yes' and is_admin:
+                import subprocess
+                # command = []
+                # proc = subprocess.run(command)
+                logger.print_on_console("Commands to run just before execution starts")
             if self.execution_mode == SERIAL:
                 status=self.invoke_execution(mythread,json_data,socketIO,wxObject,self.configvalues,qc_soc,qtest_soc,zephyr_soc,aws_mode)
             elif self.execution_mode == PARALLEL:
@@ -1541,6 +1550,8 @@ class Controller():
             status=self.invoke_debug(mythread,runfrom_step,json_data)
         if status != TERMINATE:
             status=COMPLETED
+        if dis_sys_screenoff == 'yes' and action==EXECUTE and is_admin:
+            logger.print_on_console("reset Command to run after execution ends")
         return status
 
     def invoke_parralel_exe(self,mythread,json_data,socketIO,wxObject,configvalues,qc_soc,qtest_soc,zephyr_soc,aws_mode):

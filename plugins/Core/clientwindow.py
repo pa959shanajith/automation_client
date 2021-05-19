@@ -953,15 +953,35 @@ class Config_window(wx.Frame):
             self.rbox20.SetSelection(1)
         self.rbox20.SetToolTip(wx.ToolTip("Enables or disables use of remote debugging port for browsers"))
 
+        self.rbox21 = wx.RadioBox(self.panel1, label = "Disable Screen Timeout", choices = lblList,
+            majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
+        import ctypes, os
+        is_admin = ctypes.windll.shell32.IsUserAnAdmin()
+        logger.print_on_console(is_admin)
+        log.info("o for normal user and 1 for admin user")
+        log.info(is_admin)
+        if isConfigJson!=False:
+            if is_admin:
+                dis_sys_screenoff = isConfigJson['disable_screen_timeout'].title()
+                if dis_sys_screenoff == lblList[0]:
+                    self.rbox21.SetSelection(0)
+                elif dis_sys_screenoff == lblList[1]:
+                    self.rbox21.SetSelection(1)
+            else:
+                self.rbox21.SetSelection(1)
+        else:
+            self.rbox21.SetSelection(1)           
+        self.rbox21.SetToolTip(wx.ToolTip("Enables or Disables automatic screen lock during execution when ICE is run as admin."))
+
         #Adding GridSizer which will show the radio buttons into grid of 10 rows and 2 colums it can be changed based on the requirements
-        self.gs=wx.GridSizer(10,2,5,5)
+        self.gs=wx.GridSizer(11,2,5,5)
         self.gs.AddMany([(self.rbox9,0,wx.EXPAND), (self.rbox1,0,wx.EXPAND), (self.rbox2,0,wx.EXPAND),
             (self.rbox5,0,wx.EXPAND), (self.rbox6,0,wx.EXPAND), (self.rbox3,0,wx.EXPAND),
             (self.rbox4,0,wx.EXPAND), (self.rbox8,0,wx.EXPAND), (self.rbox7,0,wx.EXPAND),
             (self.rbox10,0,wx.EXPAND), (self.rbox11,0,wx.EXPAND), (self.rbox12,0,wx.EXPAND),
             (self.rbox13,0,wx.EXPAND), (self.rbox14,0,wx.EXPAND), (self.rbox15,0,wx.EXPAND),
             (self.rbox16,0,wx.EXPAND), (self.rbox17,0,wx.EXPAND), (self.rbox18,0,wx.EXPAND),
-            (self.rbox19,0,wx.EXPAND), (self.rbox20,0,wx.EXPAND)])
+            (self.rbox19,0,wx.EXPAND), (self.rbox20,0,wx.EXPAND), (self.rbox21,0,wx.EXPAND)])
 
         #adding  GridSizer to bSizer which is a box sizer
         self.bSizer.Add(self.gs, 1, wx.EXPAND | wx.TOP, 5)
@@ -984,6 +1004,9 @@ class Config_window(wx.Frame):
             self.server_cert.Enable(False)
             self.server_cert_btn.Enable(False)
             self.rbox9.Enable(False)
+        
+        if not(is_admin):
+            self.rbox21.Enable(False)
 
         self.Centre()
         wx.Frame(self.panel)
@@ -1061,6 +1084,7 @@ class Config_window(wx.Frame):
         full_screenshot = self.rbox18.GetStringSelection()
         close_browser_popup = self.rbox19.GetStringSelection()
         use_custom_debugport = self.rbox20.GetStringSelection()
+        disable_screen_timeout = self.rbox21.GetStringSelection()
         if extn_enabled == 'Yes' and headless_mode == 'Yes':
             self.error_msg.SetLabel("Extension Enable must be disabled when Headless Mode is enabled")
             self.error_msg.SetForegroundColour((255,0,0))
@@ -1100,6 +1124,7 @@ class Config_window(wx.Frame):
         data['full_screenshot']=full_screenshot.strip()
         data['close_browser_popup']=close_browser_popup.strip()
         data['use_custom_debugport']=use_custom_debugport.strip()
+        data['disable_screen_timeout']=disable_screen_timeout.strip()       
         config_data=data
         if (data['server_ip']!='' and data['server_port']!='' and data['server_cert']!='' and
             data['chrome_path']!='' and data['queryTimeOut'] not in ['','sec'] and data['logFile_Path']!='' and
