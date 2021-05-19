@@ -18,7 +18,7 @@
 import time
 import datetime
 import os
-# import sys
+import sys
 # from colorama import Fore, Style, init as init_colorama
 from inspect import getframeinfo, stack
 
@@ -26,8 +26,11 @@ def print_on_console(message,*args, **kwargs):
     try:
         ts = time.time()
         sttime = datetime.datetime.fromtimestamp(ts).strftime('%y-%m-%d %H:%M:%S')
-        caller = getframeinfo(stack()[1][0])
+        caller = getframeinfo(sys._getframe(-1))
         filename=os.path.basename(caller.filename)[0:-3]
+        if filename == 'logger':
+            caller = getframeinfo(sys._getframe(1))
+            filename=os.path.basename(caller.filename)[0:-3]
 
         resultant=''
         style1=''
