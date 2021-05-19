@@ -1286,9 +1286,9 @@ class UtilWebKeywords:
                             eleStatus =True
                         else:
                             counter+=1
-        if eleStatus==True:
-            webelement1=cellChild
-            break
+            if eleStatus==True:
+                webelement1=cellChild
+                break
         return eleStatus, webelement1
 
     def sendsecurefunction_keys(self,webelement,input,*args):
