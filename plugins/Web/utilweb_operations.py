@@ -19,7 +19,7 @@ from utils_web import Utils
 import webconstants
 from webconstants import *
 from constants import SYSTEM_OS
-if SYSTEM_OS!='Darwin':
+if SYSTEM_OS == 'Windows' :
     from pyrobot import Robot
     import win32gui
     import pyrobot
@@ -546,7 +546,7 @@ class UtilWebKeywords:
                         webelement = cellChild
                         break
             if webelement is not None:
-                if SYSTEM_OS == 'Darwin':
+                if SYSTEM_OS == 'Darwin' or SYSTEM_OS == 'Linux':
                     obj = Utils()
                     if isinstance(browser_Keywords.driver_obj, webdriver.Firefox):
                         javascript = "return window.mozInnerScreenY"
@@ -583,14 +583,13 @@ class UtilWebKeywords:
                         methodoutput=TEST_RESULT_TRUE
                     else:
                         obj=Utils()
-                        #Scroll happens only if webelement is not displayed on screen.
                         if 'version' in  browser_Keywords.local_bk.driver_obj.capabilities.keys():
                             browser_ver = browser_Keywords.local_bk.driver_obj.capabilities['version']
                         elif 'browserVersion' in  browser_Keywords.local_bk.driver_obj.capabilities.keys():
                             browser_ver = browser_Keywords.local_bk.driver_obj.capabilities['browserVersion']
-                        window_height = browser_Keywords.local_bk.driver_obj.get_window_size()['height']
-                        element_height = webelement.location.get('y')
-                        if webelement.is_displayed() and isinstance(browser_Keywords.local_bk.driver_obj,webdriver.Chrome) and element_height<window_height and element_height>0:
+                        #Scroll happens only if webelement is not displayed on screen.
+                        inView =  browser_Keywords.local_bk.driver_obj.execute_script(MOUSEHOVER_INVIEW,webelement)
+                        if inView:
                             location=webelement.location
                         else:
                             location=obj.get_element_location(webelement)
@@ -692,8 +691,6 @@ class UtilWebKeywords:
                     else:
                         result = self.generic_sendfucntion_keys(input[0],*args)
                 if (result is not None) and (result[0]!="Fail"):
-                    winhandcheck=browser_Keywords.BrowserKeywords()
-                    winhandcheck.update_window_handles()
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE     
         except ElementNotInteractableException as ex:
@@ -800,43 +797,57 @@ class UtilWebKeywords:
                         if cell.is_enabled():
                             ele_coordinates=cell.location
                             local_uo.log.debug(ele_coordinates)
-                            hwnd=win32gui.GetForegroundWindow()
-                            local_uo.log.debug('Handle found ')
-                            local_uo.log.debug(hwnd)
-                            if isinstance(browser_Keywords.local_bk.driver_obj,webdriver.Firefox):
-                                info_msg='Firefox browser'
-                                local_uo.log.info(info_msg)
-                                javascript = "return window.mozInnerScreenY"
-                                value=browser_Keywords.local_bk.driver_obj.execute_script(javascript)
-                                local_uo.log.debug(value)
-                                offset=int(value)
-                                robot=pyrobot.Robot()
-                                robot.set_mouse_pos(int(ele_coordinates.get('x')+9),int(ele_coordinates.get('y')+offset-5))
-                                local_uo.log.debug('Setting the mouse position')
-                                robot.mouse_down('left')
-                                local_uo.log.debug('Mouse click performed')
-                                robot.mouse_up('left')
-                                local_uo.log.debug('Mouse release performed')
-                                status=TEST_RESULT_PASS
-                                methodoutput=TEST_RESULT_TRUE
+                            if SYSTEM_OS == 'Windows' :
+                                hwnd=win32gui.GetForegroundWindow()
+                                local_uo.log.debug('Handle found ')
+                                local_uo.log.debug(hwnd)
+                                if isinstance(browser_Keywords.local_bk.driver_obj,webdriver.Firefox):
+                                    info_msg='Firefox browser'
+                                    local_uo.log.info(info_msg)
+                                    javascript = "return window.mozInnerScreenY"
+                                    value=browser_Keywords.local_bk.driver_obj.execute_script(javascript)
+                                    local_uo.log.debug(value)
+                                    offset=int(value)
+                                    robot=pyrobot.Robot()
+                                    robot.set_mouse_pos(int(ele_coordinates.get('x')+9),int(ele_coordinates.get('y')+offset-5))
+                                    local_uo.log.debug('Setting the mouse position')
+                                    robot.mouse_down('left')
+                                    local_uo.log.debug('Mouse click performed')
+                                    robot.mouse_up('left')
+                                    local_uo.log.debug('Mouse release performed')
+                                    status=TEST_RESULT_PASS
+                                    methodoutput=TEST_RESULT_TRUE
 
+                                else:
+                                    utils=Utils()
+                                    utils.enumwindows()
+                                    local_uo.log.debug("UTIL WIND")
+                                    rect=utils.rect
+                                    robot=pyrobot.Robot()
+                                    local_uo.log.debug('Setting the mouse position')
+                                    local_uo.log.debug('before loc')
+                                    location=utils.get_element_location(webelement)
+                                    local_uo.log.debug(location)
+                                    robot.set_mouse_pos(int(location.get('x'))+9,int(location.get('y')+rect[1]+6))
+                                    local_uo.log.debug('after loc')
+                                    robot.mouse_down('left')
+                                    local_uo.log.debug('button press')
+                                    robot.mouse_up('left')
+                                    status=TEST_RESULT_PASS
+                                    methodoutput = TEST_RESULT_TRUE
+                            # linux implementation for click
                             else:
-                                utils=Utils()
-                                utils.enumwindows()
-                                local_uo.log.debug("UTIL WIND")
-                                rect=utils.rect
-                                robot=pyrobot.Robot()
-                                local_uo.log.debug('Setting the mouse position')
-                                local_uo.log.debug('before loc')
-                                location=utils.get_element_location(webelement)
-                                local_uo.log.debug(location)
-                                robot.set_mouse_pos(int(location.get('x'))+9,int(location.get('y')+rect[1]+6))
-                                local_uo.log.debug('after loc')
-                                robot.mouse_down('left')
-                                local_uo.log.debug('button press')
-                                robot.mouse_up('left')
-                                status=TEST_RESULT_PASS
-                                methodoutput=TEST_RESULT_TRUE
+                                local_uo.log.debug('Performing mouse click on linux')
+                                import pyautogui as pag
+                                if isinstance(browser_Keywords.local_bk.driver_obj, webdriver.Firefox):
+                                    javascript = "return window.mozInnerScreenY"
+                                    value = browser_Keywords.local_bk.driver_obj.execute_script(javascript)
+                                    offset = int(value)
+                                    pag.click(x=int(ele_coordinates.get('x') + 9), y=int(ele_coordinates.get('y') + offset - 5))
+                                else:
+                                    utils = Utils()
+                                    location = utils.get_element_location(webelement)
+                                    pag.click(x=int(location.get('x')), y=int(location.get('y')+10))
 
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
@@ -986,20 +997,48 @@ class UtilWebKeywords:
         methodoutput=TEST_RESULT_FALSE
         err_msg=None
         output=None
-        attr_name=input[0]
         eleStatus=False
+        index=0
         local_uo.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
-            if(len(input)==5 and input[3]!='' and input[4]!=''):
-                webelement1=None
-                row_number=int(input[1])-1
-                col_number=int(input[2])-1
-                tag=input[3].lower()
-                index=int(input[4])
-                eleStatus, webelement1=self.get_table_cell(webelement, row_number, col_number, tag, index)
-                webelement=webelement1
+            if webelement != None and webelement !='' and webelement.tag_name.lower()=='table':
+                if input[2]:
+                    if(len(input)==5 and all(v for v in input) and (not input[2]=='tr')):
+                        attr_name=input[4]
+                        webelement1=None
+                        row_number=int(input[0])-1
+                        col_number=int(input[1])-1
+                        tag=input[2].lower()
+                        if input[3]: index=int(input[3])
+                        eleStatus, webelement1=self.get_table_cell(webelement, row_number, col_number, tag, index)
+                        webelement=webelement1
+                    elif(input[2]=='tr'): #fetch the attribute value of tr (index is needed)
+                        if not(input[4]):
+                            err_msg = 'Input Error: Please enter attribute name'
+                            logger.print_on_console(err_msg)
+                            local_uo.log.error(err_msg)
+                        elif input[3]:
+                            attr_name=input[4]
+                            index=int(input[3])-1
+                            tablerow_js='var targetTable = arguments[0]; var index = arguments[1]; var rowCount = targetTable.rows; return rowCount[index];'
+                            webelement = browser_Keywords.local_bk.driver_obj.execute_script(tablerow_js,webelement,index)
+                            eleStatus=True
+                        else: 
+                            err_msg = 'Input Error: Missing index'
+                            logger.print_on_console(err_msg)
+                            local_uo.log.error(err_msg)
+                elif(len(input)==5 and (not all(i for i in input[:-1]))): #checking attribute value of table itself
+                    attr_name=input[4]
+                    eleStatus=True
+                elif(len(input)==5 and (not input[2])):
+                    err_msg = 'Input Error: Please specify valid object type'
+                    logger.print_on_console(err_msg)
+                    local_uo.log.error(err_msg)
+            elif(len(input)==1):
+                attr_name=input[0]
+                eleStatus=True
                 
-            if(eleStatus or len(input)==1):
+            if(eleStatus):
                 if webelement != None and webelement !='':
                     local_uo.log.info(INPUT_IS)
                     local_uo.log.info(input)
@@ -1037,22 +1076,50 @@ class UtilWebKeywords:
         eleStatus=False
         original_attr=None
         output=OUTPUT_CONSTANT
-        attr_name=input[0]
         local_uo.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
-            if(len(input)==6 and (input[4]!='' and input[5]!='')):
-                webelement1=None
-                row_number=int(input[2])-1
-                col_number=int(input[3])-1
-                tag=input[4].lower()
-                index=int(input[5])
-                eleStatus, webelement1=self.get_table_cell(webelement, row_number, col_number, tag, index)
-                webelement=webelement1
+            if webelement != None and webelement !='' and webelement.tag_name.lower()=='table':
+                if input[2]:
+                    if((len(input)==5 or len(input)==6) and all(v for v in input) and (not input[2]=='tr')):
+                        attr_name=input[4]
+                        webelement1=None
+                        row_number=int(input[0])-1
+                        col_number=int(input[1])-1
+                        tag=input[2].lower()
+                        if input[3]: index=int(input[3])
+                        eleStatus, webelement1=self.get_table_cell(webelement, row_number, col_number, tag, index)
+                        webelement=webelement1
+                    elif(input[2]=='tr'): #fetch the attribute value of tr (index is needed)
+                        if not(input[4]):
+                            err_msg = 'Input Error: Please enter attribute name'
+                            logger.print_on_console(err_msg)
+                            local_uo.log.error(err_msg)
+                        elif input[3]:
+                            attr_name=input[4]
+                            index=int(input[3])-1
+                            tablerow_js='var targetTable = arguments[0]; var index = arguments[1]; var rowCount = targetTable.rows; return rowCount[index];'
+                            webelement = browser_Keywords.local_bk.driver_obj.execute_script(tablerow_js,webelement,index)
+                            eleStatus=True
+                        else: 
+                            err_msg = 'Input Error: Please specify index'
+                            logger.print_on_console(err_msg)
+                            local_uo.log.error(err_msg)
+                elif((len(input)==5 or len(input)==6) and (not all(ip for ip in input[0:4]))): #checking attribute value of table itself
+                    attr_name=input[4]
+                    eleStatus=True
+                elif((len(input)==5 or len(input)==6) and (not input[2])):
+                    err_msg = 'Input Error: Please specify valid object type'
+                    logger.print_on_console(err_msg)
+                    local_uo.log.error(err_msg)
+            elif(len(input)==1 or len(input)==2):
+                attr_name=input[0]
+                eleStatus=True
 
-            if(eleStatus or len(input)<=2):
+            if(eleStatus):
                 if webelement != None and webelement !='':
                     local_uo.log.info(INPUT_IS)
                     local_uo.log.info(input)
+                    result=None
                     if attr_name:
                         if attr_name != 'required':
                             original_attr = webelement.get_attribute(attr_name)
@@ -1060,8 +1127,9 @@ class UtilWebKeywords:
                             original_attr = browser_Keywords.local_bk.driver_obj.execute_script("return arguments[0].getAttribute('required')",webelement)
                         if original_attr != None and original_attr !='':
                             local_uo.log.info(original_attr)
-                            if len(input)==2 and input[1] != '':
-                                result = input[1]
+                            if len(input)==6: result = input[5]
+                            if len(input)==2: result = input[1]
+                            if result:
                                 if original_attr == result:
                                     local_uo.log.info('Attribute exists and values matched')
                                     logger.print_on_console('Attribute exists and values matched')
@@ -1081,7 +1149,7 @@ class UtilWebKeywords:
                             logger.print_on_console(err_msg)
                             local_uo.log.error(err_msg)
                     else:
-                        err_msg = 'Input is empty.'
+                        err_msg = 'Attribute name is empty.'
                         logger.print_on_console(err_msg)
                         local_uo.log.error(err_msg)
                 else:
@@ -1096,6 +1164,10 @@ class UtilWebKeywords:
             err_msg = 'Attribute does not exixts'
             logger.print_on_console(err_msg)
             local_uo.log.error(ex)
+        except ValueError as ex1:
+            err_msg = 'Input Error: Please verify inputs'
+            logger.print_on_console(err_msg)
+            local_uo.log.error(ex1)
         except Exception as e:
             err_msg = 'Error occured while verifying attribute'
             logger.print_on_console(err_msg)
@@ -1109,6 +1181,10 @@ class UtilWebKeywords:
         from table_keywords import TableOperationKeywords
         tableops = TableOperationKeywords()
         cell=tableops.javascriptExecutor(webelement,row_number,col_number)
+        if(tag=='tablecell' or tag=='td'): 
+            eleStatus=True
+            webelement1=cell
+            return eleStatus,webelement1
         element_list=cell.find_elements_by_xpath('.//*')
         if len(element_list)==0:
             element_list.append(cell)
@@ -1170,7 +1246,7 @@ class UtilWebKeywords:
                             eleStatus =True
                         else:
                             counter+=1
-            elif tag=='radiobutton':
+            elif tag=='radiobutton' or tag=='radio':
                 if (tagName==('input') and tagType==('radio')):
                     if index==childindex:
                         eleStatus =True
@@ -1190,7 +1266,7 @@ class UtilWebKeywords:
                             eleStatus =True
                         else:
                             counter+=1
-            elif tag=='link':
+            elif tag=='link' or tag=='a':
                 if(tagName==('a')):
                     if index==childindex:
                         eleStatus =True
@@ -1212,6 +1288,7 @@ class UtilWebKeywords:
                             counter+=1
         if eleStatus==True:
             webelement1=cellChild
+            break
         return eleStatus, webelement1
 
     def sendsecurefunction_keys(self,webelement,input,*args):

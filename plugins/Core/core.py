@@ -1390,8 +1390,17 @@ class Main():
                     return None
                 # ICE is registered
                 ip = configvalues['server_ip']
-                port = int(configvalues['server_port'])
-                conn = http.client.HTTPConnection(ip,port)
+                port = configvalues['server_port']
+                conn = http.client.HTTPConnection(ip,int(port))
+                if proxies:
+                    proxy = readconfig.readProxyConfig().readRawJson()
+                    proxy_url = proxy['url'].split(':')
+                    proxy_port = 80 if proxy['scheme'] == 'http' else 443
+                    if len(proxy_url) > 1:
+                        proxy_url, proxy_port = proxy_url
+                    auth_hash = base64.b64encode((proxy['username']+":"+proxy['password']).encode('utf-8')).decode("utf-8")
+                    conn = http.client.HTTPSConnection(proxy_url, port=proxy_port)
+                    conn.set_tunnel((ip+':'+port), headers={"Proxy-Authorization": f"Basic {auth_hash}"})
                 conn.connect()
                 conn.close()
                 self.socketthread = ConnectionThread(mode)

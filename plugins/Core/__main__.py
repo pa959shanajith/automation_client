@@ -42,9 +42,9 @@ if args.register or args.connect:
         if args.host is None:
             print("No value provided for host. Reading values from configuration file")
 
-os.environ["AVO_ASSURE_HOME"] = args.AVO_ASSURE_HOME
+os.environ["AVO_ASSURE_HOME"] = os.path.normpath(args.AVO_ASSURE_HOME)
 os.environ['AVO_ASSURE_VERSION'] = ice_ver
-os.environ["ICE_CLEAR_STORAGE"] = os.getenv("ICE_CLEAR_STORAGE", "True")
+os.environ["ICE_CLEAR_STORAGE"] = os.getenv("ICE_CLEAR_STORAGE", "False")
 
 import constants
 import readconfig

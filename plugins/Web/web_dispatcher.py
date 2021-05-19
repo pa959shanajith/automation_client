@@ -14,7 +14,6 @@ import popup_keywords
 import browser_Keywords
 import radio_checkbox_operations
 import table_keywords
-import utilweb_operations
 import element_operations
 import textbox_operations
 import dropdown_listbox
@@ -518,7 +517,14 @@ class Dispatcher:
                     local_Wd.log.error(err_msg)
                     result[3] = "Requested Browser not Available"
                     return result
-            window_ops_list=['click','press','doubleclick','rightclick','uploadfile','acceptpopup','dismisspopup','selectradiobutton','selectcheckbox','unselectcheckbox','cellclick','clickelement','drag','drop','settext','sendvalue','cleartext','setsecuretext','sendsecurevalue','selectvaluebyindex','selectvaluebytext','selectallvalues','selectmultiplevaluesbyindexes','selectmultiplevaluesbytext','verifyvaluesexists','deselectall','setfocus','mousehover','tab','sendfunctionkeys','rightclick','mouseclick','openbrowser','navigatetourl','refresh','closebrowser','closesubwindows','switchtowindow','clearcache','navigatewithauthenticate']
+            window_ops_list=['click','press','doubleclick','rightclick','uploadfile','acceptpopup',
+                'dismisspopup','selectradiobutton','selectcheckbox','unselectcheckbox','cellclick',
+                'clickelement','drag','drop','settext','sendvalue','cleartext','setsecuretext',
+                'sendsecurevalue','selectvaluebyindex','selectvaluebytext','selectallvalues',
+                'selectmultiplevaluesbyindexes','selectmultiplevaluesbytext','verifyvaluesexists',
+                'deselectall','setfocus','mousehover','tab','sendfunctionkeys','rightclick',
+                'mouseclick','openbrowser','navigatetourl','refresh','closebrowser','closesubwindows',
+                'switchtowindow','clearcache','navigatewithauthenticate','sendfunctionkeys']
             if browser_Keywords.local_bk.driver_obj is not None:
                 browser_info=browser_Keywords.local_bk.driver_obj.capabilities
                 reporting_obj.browser_type=browsername
