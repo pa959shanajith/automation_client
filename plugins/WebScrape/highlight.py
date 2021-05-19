@@ -35,7 +35,7 @@ class Highlight():
         try:
             status = domconstants.STATUS_FAIL
             log.info('Inside perform_highlight method')
-
+            apply_status = remove_status = False
             # Find the current handle
             self.currenthandle = clickandadd.currenthandle
             if self.currenthandle is '' or self.currenthandle is None:
@@ -96,7 +96,8 @@ class Highlight():
                     extra_style = extra_style + "outline: none"
 
                 # Now remove the Avo Assure highlight style and apply original style
-                remove_status = self.apply_style(webElement,str(original_style) + extra_style, 0)
+                if apply_status:
+                    remove_status = self.apply_style(webElement,str(original_style) + extra_style, 0)
                 if apply_status and remove_status:
                     log.info('element highlighted successfully')
                     status = domconstants.STATUS_SUCCESS
@@ -128,8 +129,13 @@ class Highlight():
                 self.driver.execute_script("arguments[0].setAttribute('style', arguments[1]);",
                                            element, style)
                 log.info('Applied color to the element in chrome/firefox browser .....')
+            browserlogs = self.driver.get_log("browser")
+            if browserlogs and len(browserlogs) > 0 and browserlogs[0]['level'] == 'SEVERE':
+                logger.print_on_console('Content Security Policy directive restriction')
+                applystylestatus = False
+            else:
+                applystylestatus = True
             time.sleep(sec)
-            applystylestatus = True
         except Exception as e:
             log.error(e)
         return applystylestatus

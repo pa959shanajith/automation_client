@@ -73,6 +73,9 @@ class Clickandadd():
             log.info('Performing the start click and add operation on default/outer page')
             driver.execute_script(webscrape_utils_obj.javascript_clicknadd, driver.current_url,browser)
             log.info('start click and add operation on default/outer page done')
+            browserlogs = driver.get_log("browser")
+            if browserlogs and len(browserlogs) > 0 and browserlogs[0]['level'] == 'SEVERE':
+                logger.print_on_console('Content Security Policy directive restriction, element highlighting not possible.')
 
             """Method to perform Start ClickAndAdd on iframes (and frames) recursively"""
             def callback_scrape_start_cna_iframes(myipath):
