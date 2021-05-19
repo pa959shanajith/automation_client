@@ -254,10 +254,7 @@ class GenericKeywordDispatcher:
                         output=';'.join(output)
                     result= self.generic_dict[keyword](input,output)
                 else:
-                    if keyword == 'find':
-                        result= self.generic_dict[keyword](message)
-                    else:
-                        result= self.generic_dict[keyword](*message)
+                    result= self.generic_dict[keyword](*message)
             else:
                 err_msg=generic_constants.INVALID_KEYWORD
                 result[3]=err_msg

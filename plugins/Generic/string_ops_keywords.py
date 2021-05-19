@@ -268,11 +268,11 @@ class StringOperation:
             logger.print_on_console(err_msg)
         return status,result,output,err_msg
 
-    def find(self, input):
+    def find(self, actual_string,to_find):
         """
         def : find
         purpose : to find if string conatins another string
-        param  : string , string, wildcard option(if required)
+        param  : string , string
         return : integers or list of integers
         """
         status=generic_constants.TEST_RESULT_FAIL
@@ -280,61 +280,26 @@ class StringOperation:
         err_msg=None
         output=OUTPUT_CONSTANT
         position=[]
-        wildcard_find = False
-        actual_string = input[0]
-        to_find = input[1]
-        to_find_d = to_find
-        wildcard_option = input[2].lower() if(len(input) == 3) else ""
-        if (wildcard_option != ""):
-            if (wildcard_option == 'wildcard'):
-                tf_single_count=to_find.count('?')
-                tf_mul_count=to_find.count('*')
-                if tf_single_count>=1 or tf_mul_count>=1:
-                    wildcard_find = True
         try:
             if not (actual_string is None or actual_string is ''):
                 if not (to_find is None or to_find is ''):
-                    if (wildcard_find == True):
-                        if len(to_find)-1<= len(actual_string):
-                            position=self.find_wildcard(actual_string,to_find)
-                            position=list(set(position))
-                            position.sort()
-                            output_val = len(position)
-                            if len(position) == 1: position=position[0]
-                            if(output_val == 0):
-                                output='false'
-                                logger.print_on_console('The Original String is ',actual_string ,' and ' , actual_string , ' does not Contain ', to_find_d )
-                            else:
-                                log.info('Result : ')
-                                log.info(output_val)
-                                status=generic_constants.TEST_RESULT_PASS
-                                result=generic_constants.TEST_RESULT_TRUE
-                                output=position
-                        else:
-                            output='false'
-                            logger.print_on_console('The Original String is ',actual_string ,' and ' , actual_string , ' does not Contain ', to_find_d )      
-                    elif wildcard_option == "":
-                        if not (to_find is None or to_find is ''):
-                            coreutilsobj=core_utils.CoreUtils()
-                            actual_string=coreutilsobj.get_UTF_8(actual_string)
-                            actual_string=unidecode(actual_string)
-                            to_find=coreutilsobj.get_UTF_8(to_find)
-                            #output_val = actual_string.find(to_find)
-                            position = [i+1 for i in range(len(actual_string)) if actual_string.startswith(to_find, i)]
-                            output_val = len(position)
-                            if len(position) == 1: position=position[0]
-                            if(output_val == 0):
-                                logger.print_on_console('The Original String is:',actual_string ,' and ' , actual_string , ' does not Contain ', to_find )
-                                output='false'
-                            else:
-                                log.info('Result : ')
-                                log.info(output_val)
-                                status=generic_constants.TEST_RESULT_PASS
-                                result=generic_constants.TEST_RESULT_TRUE
-                                output=position
-                    else:
+                    coreutilsobj=core_utils.CoreUtils()
+                    actual_string=coreutilsobj.get_UTF_8(actual_string)
+                    actual_string=unidecode(actual_string)
+                    to_find=coreutilsobj.get_UTF_8(to_find)
+                    #output_val = actual_string.find(to_find)
+                    position = [i+1 for i in range(len(actual_string)) if actual_string.startswith(to_find, i)]
+                    output_val = len(position)
+                    if len(position) == 1: position=position[0]
+                    if(output_val == 0):
+                        logger.print_on_console('The Original String is:',actual_string ,' and ' , actual_string , ' does not Contain ', to_find )
                         output='false'
-                        err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                    else:
+                        log.info('Result : ')
+                        log.info(output_val)
+                        status=generic_constants.TEST_RESULT_PASS
+                        result=generic_constants.TEST_RESULT_TRUE
+                        output=position
             else:
                 #log.error(INVALID_INPUT)
                 err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
@@ -642,311 +607,3 @@ class StringOperation:
             log.error(e)
             logger.print_on_console(err_msg)
         return status,result,output,err_msg
-
-    def find_wildcard(self,actual_string,to_find):
-        """
-        def : find_wildcard
-        purpose : finds the to_find with wildcard in the actualstring
-        param  : actual_string, to_find
-        return : postion of where the string is found
-        """
-        pos=[]
-        position=[]
-        actual_string_list=[]
-        find_string_list=[]
-        to_find_list=[]
-        wildcard_search=False
-        string_search=False
-        mix_char=False
-        last_wildcard_search=False
-        first_wc=to_find[0]
-        last_wc=to_find[-1]
-        try:
-            import re
-            tf_split=re.split(r'[?*]',to_find)
-            tf_single_count=to_find.count('?')
-            tf_mul_count=to_find.count('*')
-            if tf_single_count>=1 and tf_mul_count>=1:
-                mix_char=True
-            elif '?' in  to_find and '*' in to_find:
-                mix_char=True
-            if first_wc in ['?','*'] and last_wc in ['?','*']:
-                if (len(to_find)-1 == tf_single_count) or (len(to_find)-1 == tf_mul_count):
-                    if to_find[0] == '?' and to_find[-1] == '?':
-                        to_find=to_find[1:-1]
-                        to_find_lc_index = actual_string.find(to_find)
-                        if (to_find_lc_index<len(actual_string)-1 and actual_string[to_find_lc_index+1]!=''):
-                            position=[to_find_lc_index]
-                    else:
-                        to_find=to_find[1:-1]
-                        position=[1]
-                else:
-                    if to_find[-1]=="?":
-                        to_find=to_find[1:-1]
-                        to_find_lc_index = actual_string.find(to_find)
-                        if (to_find_lc_index<len(actual_string)-1 and actual_string[to_find_lc_index+1]!=''):
-                            position=[1]
-                    elif to_find[0]=="?":
-                        to_find=to_find[1:-1]
-                        to_find_lc_index = actual_string.find(to_find)
-                        if (to_find_lc_index<=len(actual_string)-1 and actual_string[to_find_lc_index-1]!=''):
-                            position=[to_find_lc_index]
-            elif first_wc == "?" or first_wc == "*":
-                if len(to_find)<= len(actual_string):
-                    if tf_single_count==len(to_find)-1:
-                        wildcard_search=True
-                    elif tf_single_count==1 or tf_mul_count==1:
-                        wildcard_search=True
-                    else:
-                        for i in range(len(actual_string)):
-                            if i == 0 and actual_string[i]==tf_split[-1]:
-                                find_string_list.append(i)
-                            elif actual_string[i]==tf_split[-1]:
-                                find_string_list.append(i+1)
-                        for j in range(len(find_string_list)):
-                            if j<len(find_string_list) and find_string_list[j]==0:
-                                a_spl=actual_string[:find_string_list[j]]
-                                actual_string_list.append(a_spl)
-                            elif j<len(find_string_list):
-                                f_i=find_string_list[j]-1
-                                a_spl=actual_string[:f_i]
-                                actual_string_list.append(a_spl)
-                            else:
-                                break
-                        string_search=True         
-                else:
-                    logger.print_on_console('The Original String is ',actual_string ,' and ' , actual_string , ' does not Contain ', to_find)
-            elif last_wc == "?" or last_wc == "*":
-                if len(tf_split[0])>1:
-                    if last_wc=="*":
-                        pos = [i+1 for i in range(len(actual_string)) if actual_string.startswith(tf_split[0], i)]
-                        position.extend(pos)
-                    else:
-                        last_wildcard_search=True
-                else:
-                    if tf_single_count!=1 and tf_single_count>0:
-                        wildcard_search=True
-                    elif tf_mul_count!=1 and tf_mul_count>0:
-                        wildcard_search=True
-                    else:
-                        if actual_string.find(tf_split[0])==len(actual_string)-1 and tf_single_count==1:
-                            wildcard_search=True
-                        else:
-                            for i in range(len(actual_string)):
-                                if i == 0 and actual_string[i]==tf_split[0]:
-                                    find_string_list.append(i)
-                                elif actual_string[i]==tf_split[0]:
-                                    find_string_list.append(i+1)
-                            for j in range(len(find_string_list)):
-                                if j<len(find_string_list) and find_string_list[j]==0:
-                                    a_spl=actual_string[find_string_list[j]:]
-                                    actual_string_list.append(a_spl)
-                                elif j<len(find_string_list):
-                                    f_i=find_string_list[j]-1
-                                    a_spl=actual_string[f_i:]
-                                    actual_string_list.append(a_spl)
-                                else:
-                                    break
-                            string_search=True
-            else:
-                if len(tf_split[0])>1:
-                    wildcard_search=True
-                else:
-                    tf_string="".join(tf_split)
-                    if (tf_single_count!=1 and tf_single_count>0) and mix_char==False:
-                        wildcard_search=True
-                    elif (tf_mul_count!=1 and tf_mul_count>0) and mix_char==False:
-                        if len(tf_split)==tf_split.count(tf_split[0]):
-                            for i in range(len(actual_string)):
-                                if i == 0 and actual_string[i]==tf_split[0]:
-                                    find_string_list.append(i)
-                                elif actual_string[i]==tf_split[0]:
-                                    find_string_list.append(i+1)
-                            for j in range(len(find_string_list)):
-                                if j<len(find_string_list)-2 and find_string_list[j]==0:
-                                    a_spl=actual_string[find_string_list[j]:find_string_list[j+2]]
-                                    actual_string_list.append(a_spl)
-                                elif j<len(find_string_list)-2:
-                                    f_i=find_string_list[j]-1
-                                    if j!=len(find_string_list)-1:
-                                        a_spl=actual_string[f_i:find_string_list[j+2]]
-                                        actual_string_list.append(a_spl)
-                                else:
-                                    break
-                            string_search=True
-                        elif (tf_split.count(tf_split[0])>1 and tf_split[0]!=tf_split[-1]):
-                            first_char_count = tf_split.count(tf_split[0])
-                            to_find_lc_index = actual_string.find(tf_split[-1])
-                            for i in range(len(actual_string)):
-                                if i == 0 and actual_string[i]==tf_split[0]:
-                                    find_string_list.append(i)
-                                elif actual_string[i]==tf_split[0]:
-                                    find_string_list.append(i+1)
-                            for j in range(len(find_string_list)):
-                                if j<len(find_string_list) and find_string_list[j]==0:
-                                    tfli=to_find_lc_index+1
-                                    a_spl=actual_string[find_string_list[j]:tfli]
-                                    actual_string_list.append(a_spl)
-                                elif j<len(find_string_list):
-                                    tfli=to_find_lc_index+1
-                                    f_i=find_string_list[j]-1
-                                    a_spl=actual_string[f_i:tfli]
-                                    actual_string_list.append(a_spl)
-                                else:
-                                    break
-                            for item in actual_string_list[:]:
-                                if not(item.count(tf_split[0])>=first_char_count):
-                                    actual_string_list.remove(item)
-                            string_search=True     
-                        else:
-                            wildcard_search=True
-                    elif (tf_single_count==1 and mix_char==False):
-                        wildcard_search=True
-                    elif (tf_mul_count==1 and mix_char==False):
-                        for i in range(len(actual_string)):
-                            if i == 0 and actual_string[i]==tf_split[0]:
-                                find_string_list.append(i)
-                            elif actual_string[i]==tf_split[0]:
-                                find_string_list.append(i+1)
-                        if tf_split[0]!=tf_split[-1]:
-                            to_find_lc_index = actual_string.find(tf_split[-1])
-                            if (tf_string == actual_string):
-                                for j in range(len(find_string_list)):
-                                    if j<len(find_string_list) and find_string_list[j]==0:
-                                        tfli=to_find_lc_index+1
-                                        a_spl=actual_string[find_string_list[j]:tfli]
-                                        actual_string_list.append(a_spl)
-                                    elif j<len(find_string_list):
-                                        tfli=to_find_lc_index+1
-                                        f_i=find_string_list[j]-1
-                                        a_spl=actual_string[f_i:tfli]
-                                        actual_string_list.append(a_spl)
-                                    else:
-                                        break
-                                string_search=True
-                            elif (to_find_lc_index<len(actual_string)-1 and actual_string[to_find_lc_index]==actual_string[to_find_lc_index+1]):
-                                for j in range(len(find_string_list)):
-                                    if j<len(find_string_list) and find_string_list[j]==0:
-                                        tfli=to_find_lc_index+1
-                                        a_spl=actual_string[find_string_list[j]:tfli]
-                                        actual_string_list.append(a_spl)
-                                    elif j<len(find_string_list):
-                                        tfli=to_find_lc_index+1
-                                        f_i=find_string_list[j]-1
-                                        a_spl=actual_string[f_i:tfli]
-                                        actual_string_list.append(a_spl)
-                                    else:
-                                        break
-                                string_search=True
-                            else:
-                                for i in range(len(actual_string)):
-                                    if i == 0 and actual_string[i]==tf_split[-1]:
-                                        to_find_list.append(i)
-                                    elif actual_string[i]==tf_split[-1]:
-                                        to_find_list.append(i+1)
-                                for i in range(len(to_find_list)):
-                                    for j in range(len(find_string_list)):
-                                        if i<=j:
-                                            if j<len(find_string_list) and find_string_list[j]==0:
-                                                a_spl=actual_string[find_string_list[j]:to_find_list[i]]
-                                                actual_string_list.append(a_spl)
-                                            elif j<len(find_string_list):
-                                                f_i=find_string_list[j]-1
-                                                a_spl=actual_string[f_i:to_find_list[i]]
-                                                actual_string_list.append(a_spl)
-                                            else:
-                                                break
-                                string_search=True
-                        else:
-                            for j in range(len(find_string_list)):
-                                if j<len(find_string_list) and find_string_list[j]==0:
-                                    a_spl=actual_string[find_string_list[j]:find_string_list[j+1]]
-                                    actual_string_list.append(a_spl)
-                                elif j<len(find_string_list):
-                                    f_i=find_string_list[j]-1
-                                    if j!=len(find_string_list)-1:
-                                        a_spl=actual_string[f_i:find_string_list[j+1]]
-                                        actual_string_list.append(a_spl)
-                                else:
-                                    break
-                            string_search=True
-                    elif mix_char:
-                        for i in range(len(actual_string)):
-                            if i == 0 and actual_string[i]==tf_split[0]:
-                                find_string_list.append(i)
-                            elif actual_string[i]==tf_split[0]:
-                                find_string_list.append(i+1)
-                        if tf_split[0]!=tf_split[-1]:
-                            to_find_lc_index = actual_string.find(tf_split[-1])
-                            for j in range(len(find_string_list)):
-                                if j<len(find_string_list) and find_string_list[j]==0:
-                                    tfli=to_find_lc_index+1
-                                    a_spl=actual_string[find_string_list[j]:]
-                                    actual_string_list.append(a_spl)
-                                elif j<len(find_string_list):
-                                    tfli=to_find_lc_index+1
-                                    f_i=find_string_list[j]-1
-                                    a_spl=actual_string[f_i:]
-                                    actual_string_list.append(a_spl)
-                                else:
-                                    break
-                            string_search=True
-                        elif len(tf_split)==tf_split.count(tf_split[0]):
-                            wildcard_search=True
-                        else:
-                            for j in range(len(find_string_list)):
-                                if j<len(find_string_list) and find_string_list[j]==0:
-                                    a_spl=actual_string[find_string_list[j]:find_string_list[j+1]]
-                                    actual_string_list.append(a_spl)
-                                elif j<len(find_string_list):
-                                    f_i=find_string_list[j]-1
-                                    if j!=len(find_string_list)-1:
-                                        a_spl=actual_string[f_i:find_string_list[j+1]]
-                                        actual_string_list.append(a_spl)
-                                else:
-                                    break
-                            string_search=True
-                        for a in actual_string_list[:]:
-                            to_find = to_find.replace('?','.')
-                            to_find = to_find.replace('*','.+')
-                            pattern = re.compile(r"\b{}".format(to_find))
-                            match = pattern.search(a)
-                            if (match==None):
-                                actual_string_list.remove(a)
-            if wildcard_search==True:
-                to_find = to_find.replace('?','.')
-                to_find = to_find.replace('*','.+')
-                if to_find.count('.')>0:
-                    if to_find != '':
-                        pattern = re.compile(r"{}".format(to_find))
-                        match = pattern.search(actual_string)
-                        if match:
-                            pos = [i+1 for i in range(len(actual_string)) if actual_string.startswith(match.group(), i)]
-                            position.extend(pos)
-            elif string_search==True:
-                for z in actual_string_list:
-                    if z != '':
-                        pattern = re.compile(r"{}".format(z))
-                        match = pattern.search(actual_string)
-                        if match:
-                            pos = [i+1 for i in range(len(actual_string)) if actual_string.startswith(match.group(), i)]
-                            position.extend(pos)
-                            continue
-            elif last_wildcard_search==True:
-                to_find = to_find.replace('?','.')
-                to_find = to_find.replace('*','.+')
-                if to_find.count('.')>0:
-                    if to_find != '':
-                        pattern = re.compile(r"{}".format(to_find))
-                        match = pattern.findall(actual_string)
-                        if match:
-                            for m in match:
-                                pos = [i+1 for i in range(len(actual_string)) if actual_string.startswith(m, i)]
-                                position.extend(pos)
-        except Exception as e:
-            err_msg="Error occured in wildcard find"
-            log.error(err_msg)
-            log.error(e)
-            logger.print_on_console(err_msg)
-        return position
-                
