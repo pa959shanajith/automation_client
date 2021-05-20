@@ -295,6 +295,7 @@ class TextboxKeywords:
                                 if input.isalpha() and webelement.get_attribute('type') == 'number':
                                     # can't enter alphabets into numeric input field
                                     err_msg = ERROR_CODE_DICT['ERR_INPUT_TYPE_MISMATCH']
+                                    logger.print_on_console(err_msg)
                                 else:
                                     status=TEST_RESULT_PASS
                                     methodoutput = TEST_RESULT_TRUE
@@ -310,8 +311,6 @@ class TextboxKeywords:
 
             except Exception as e:
                 err_msg=self.__web_driver_exception(e)
-            if err_msg != None:
-                logger.print_on_console(err_msg)
         return status,methodoutput,output,err_msg
 
     def send_value(self,webelement,input,*args):
