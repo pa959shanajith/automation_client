@@ -44,7 +44,6 @@ log = logging.getLogger("controller.py")
 status_percentage = {TEST_RESULT_PASS:0,TEST_RESULT_FAIL:0,TERMINATE:0,"total":0}
 process_ids = []
 screen_testcase_map= {}
-module_stop = False
 class ThreadLogFilter(logging.Filter):
     """
     This filter only show log entries for specified thread name
@@ -74,6 +73,7 @@ class Controller():
         local_cont.accessibility_testing_obj = None
         local_cont.generic_dispatcher_obj = None
         local_cont.test_case_number = 0
+        local_cont.module_stop=False
         self.action=None
         core_utils.get_all_the_imports(CORE)
         self.cur_dir= os.getcwd()
@@ -599,7 +599,7 @@ class Controller():
             self.dynamic_var_handler_obj.store_dynamic_value(output[1],result[1],tsp.name)
 
     def keywordinvocation(self,index,inpval,*args):
-        global socket_object, iris_constant_step, status_percentage, module_stop
+        global socket_object, iris_constant_step, status_percentage
         configvalues = self.configvalues
         try:
             time.sleep(float(configvalues['stepExecutionWait']))
@@ -757,6 +757,14 @@ class Controller():
             logger.print_on_console(keyword+' executed and the status is '+self.keyword_status+'\n',**kwargs)
             log.info(keyword+' executed and the status is '+self.keyword_status+'\n')
             #Checking for stop keyword
+            # CR #22650 stop keyword enhancement
+            # 1. when input is 'testcase' stop the current testcase execution and jump to next teststep of next testcase.
+            #    1.a :  assign index to prev_index and reduce the index value as its incremented already
+            #    1.b : Find the starting index of next testcase and assign it to index by checking testcase_name
+            #    1.b : if index+1 hasnt changed implies that there are no further testcase in that scenario. so make index= STOP
+            # 2. when input is 'module' stop the current module and move to next module if its batch execution.
+            #   2.a : set module_stop=True. which asks to stop looping through the scenarios of the current module and move to next module if present
+            # 3. when input is 'scenario' assign STOP to index and stop the sceanrio execution and move to next scenario if present
             if teststepproperty.name.lower() == STOP and self.status == 'Pass':
                 ## Issue #160
                 # index = STOP
@@ -774,7 +782,7 @@ class Controller():
                         if (index + 1) == prev_index:
                             index = STOP
                     elif teststepproperty.inputval[0] == 'module':
-                        module_stop = True
+                        local_cont.module_stop = True
                         index = STOP
                     else:
                         index = STOP
@@ -963,7 +971,7 @@ class Controller():
         return status
 
     def invoke_execution(self,mythread,json_data,socketIO,wxObject,configvalues,qcObject,qtestObject,zephyrObject,aws_mode):
-        global terminate_flag, status_percentage, saucelabs_count, screen_testcase_map, module_stop
+        global terminate_flag, status_percentage, saucelabs_count, screen_testcase_map
         qc_url=''
         qc_password=''
         qc_username=''
@@ -1006,7 +1014,8 @@ class Controller():
         #Iterate through the suites-list
         for suite,suite_id,suite_id_data in zip(suite_details,suiteId_list,suite_data):
             #EXECUTION GOES HERE
-            flag=True
+            flag = True
+            local_cont.module_stop = False
             if terminate_flag:
                 status=TERMINATE
             log.info('---------------------------------------------------------------------')
@@ -1031,6 +1040,7 @@ class Controller():
                     pytest_files=[]
                  #Logic to Execute each suite for each of the browser
                 for browser in browser_type[suite_id]:
+                    local_cont.module_stop = False
                     sc_idx = 0
                     condition_check_flag = False
                     #Logic to iterate through each scenario in the suite
@@ -1416,7 +1426,8 @@ class Controller():
                                 except Exception as e:
                                     log.error('Error in Updating Zephyr details '+str(e))
                                     logger.print_on_console('Error in Updating Zephyr details')
-                            if module_stop:break
+                            if local_cont.module_stop:
+                                break
                         else:
                             logger.print_on_console( '***Saving report of Scenario' ,str(sc_idx + 1),'***')
                             log.info( '***Saving report of Scenario' +str(sc_idx + 1)+'***')
