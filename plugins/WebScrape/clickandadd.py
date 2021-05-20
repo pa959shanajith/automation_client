@@ -76,6 +76,7 @@ class Clickandadd():
             browserlogs = driver.get_log("browser")
             if browserlogs and len(browserlogs) > 0 and browserlogs[0]['level'] == 'SEVERE' and 'Refused to apply inline style' in browserlogs[0]['message'] :
                 logger.print_on_console('Content Security Policy directive restriction, element highlighting not possible.')
+                log.error(browserlogs[0]['message'])
 
             """Method to perform Start ClickAndAdd on iframes (and frames) recursively"""
             def callback_scrape_start_cna_iframes(myipath):
