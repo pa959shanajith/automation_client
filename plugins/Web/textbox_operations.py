@@ -290,9 +290,14 @@ class TextboxKeywords:
                                 else:
                                     webelement.clear()
                                 local_to.log.debug('Setting the text')
-                                browser_Keywords.local_bk.driver_obj.execute_script(SET_TEXT_SCRIPT,webelement,input)
-                                status=TEST_RESULT_PASS
-                                methodoutput=TEST_RESULT_TRUE
+                                browser_Keywords.local_bk.driver_obj.execute_script(SET_TEXT_SCRIPT, webelement, input)
+                                # text = browser_Keywords.local_bk.driver_obj.execute_script("return document.getElementById(arguments[0]).value", webelement)
+                                if input.isalpha() and webelement.get_attribute('type') == 'number':
+                                    # can't enter alphabets into numeric input field
+                                    err_msg = ERROR_CODE_DICT['ERR_INPUT_TYPE_MISMATCH']
+                                else:
+                                    status=TEST_RESULT_PASS
+                                    methodoutput = TEST_RESULT_TRUE
                             else:
                                 err_msg=self.__read_only()
                 else:
@@ -305,7 +310,8 @@ class TextboxKeywords:
 
             except Exception as e:
                 err_msg=self.__web_driver_exception(e)
-
+            if err_msg != None:
+                logger.print_on_console(err_msg)
         return status,methodoutput,output,err_msg
 
     def send_value(self,webelement,input,*args):
