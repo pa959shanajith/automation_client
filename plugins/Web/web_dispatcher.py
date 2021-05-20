@@ -524,7 +524,7 @@ class Dispatcher:
                 'selectmultiplevaluesbyindexes','selectmultiplevaluesbytext','verifyvaluesexists',
                 'deselectall','setfocus','mousehover','tab','sendfunctionkeys','rightclick',
                 'mouseclick','openbrowser','navigatetourl','refresh','closebrowser','closesubwindows',
-                'switchtowindow','clearcache','navigatewithauthenticate','sendfunctionkeys']
+                'switchtowindow','clearcache','navigatewithauthenticate','sendsecurefunctionkeys']
             if browser_Keywords.local_bk.driver_obj is not None:
                 browser_info=browser_Keywords.local_bk.driver_obj.capabilities
                 reporting_obj.browser_type=browsername

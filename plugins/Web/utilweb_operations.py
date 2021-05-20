@@ -1037,7 +1037,7 @@ class UtilWebKeywords:
             elif(len(input)==1):
                 attr_name=input[0]
                 eleStatus=True
-                
+
             if(eleStatus):
                 if webelement != None and webelement !='':
                     local_uo.log.info(INPUT_IS)

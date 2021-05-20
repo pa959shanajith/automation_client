@@ -132,6 +132,7 @@ class MainNamespace(BaseNamespace):
                         msg='Execution only Mode enabled'
                         logger.print_on_console(msg)
                         log.info(msg)
+                    socketIO.timer.resume()
                     conn_time = float(configvalues['connection_timeout'])
                     if (not (connection_Timer != None and connection_Timer.isAlive())
                      and (conn_time >= 8)):
