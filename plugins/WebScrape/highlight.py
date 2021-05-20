@@ -130,7 +130,7 @@ class Highlight():
                                            element, style)
                 log.info('Applied color to the element in chrome/firefox browser .....')
             browserlogs = self.driver.get_log("browser")
-            if browserlogs and len(browserlogs) > 0 and browserlogs[0]['level'] == 'SEVERE':
+            if browserlogs and len(browserlogs) > 0 and browserlogs[0]['level'] == 'SEVERE' and 'Refused to apply inline style' in browserlogs[0]['message'] :
                 logger.print_on_console('Content Security Policy directive restriction')
                 applystylestatus = False
             else:
