@@ -293,6 +293,7 @@ class StringOperation:
                     if len(position) == 1: position=position[0]
                     if(output_val == 0):
                         logger.print_on_console('The Original String is:',actual_string ,' and ' , actual_string , ' does not Contain ', to_find )
+                        output='false'
                     else:
                         log.info('Result : ')
                         log.info(output_val)

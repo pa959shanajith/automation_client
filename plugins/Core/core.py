@@ -132,6 +132,7 @@ class MainNamespace(BaseNamespace):
                         msg='Execution only Mode enabled'
                         logger.print_on_console(msg)
                         log.info(msg)
+                    socketIO.timer.resume()
                     conn_time = float(configvalues['connection_timeout'])
                     if (not (connection_Timer != None and connection_Timer.isAlive())
                      and (conn_time >= 8)):
@@ -1076,7 +1077,8 @@ class TestThread(threading.Thread):
                         self.cw.breakpoint.Enable()
                         try:
                             runfrom_step=self.cw.breakpoint.GetValue()
-                            runfrom_step=int(runfrom_step)
+                            if "-" not in runfrom_step:
+                                runfrom_step=int(runfrom_step)
                         except Exception as e:
                             runfrom_step=0
             if self.main.gui:

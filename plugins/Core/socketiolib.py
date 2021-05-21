@@ -69,6 +69,7 @@ class CustomTimer(threading.Thread):
         self.args = args
         self.kwargs = kwargs
         self.terminate = threading.Event()
+        self.awake = threading.Event()
 
     @property
     def is_cancelled(self):
@@ -85,8 +86,12 @@ class CustomTimer(threading.Thread):
     def cancel(self):
         self.terminate.set()
 
+    def resume(self):
+        self.awake.set()
+
     def run(self):
-        while not self.terminate.is_set() and self.timeleft > 0:
+        while (not self.terminate.is_set() and self.timeleft > 0 and 
+          not self.awake.is_set()):
             if self.timeleft < self.chunk:
                 self.terminate.wait(self.timeleft)
             else:

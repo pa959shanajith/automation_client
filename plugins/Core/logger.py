@@ -26,11 +26,15 @@ def print_on_console(message,*args, **kwargs):
     try:
         ts = time.time()
         sttime = datetime.datetime.fromtimestamp(ts).strftime('%y-%m-%d %H:%M:%S')
-        caller = getframeinfo(sys._getframe(-1))
-        filename=os.path.basename(caller.filename)[0:-3]
-        if filename == 'logger':
-            caller = getframeinfo(sys._getframe(1))
+        try:
+            caller = getframeinfo(sys._getframe(-1))
             filename=os.path.basename(caller.filename)[0:-3]
+            if filename == 'logger':
+                caller = getframeinfo(sys._getframe(1))
+                filename=os.path.basename(caller.filename)[0:-3]
+            filename = filename + ':'+str(caller.lineno) +' '
+        except ValueError:
+            filename = ''
 
         resultant=''
         style1=''
@@ -40,7 +44,7 @@ def print_on_console(message,*args, **kwargs):
             if isinstance(values,bytes): values=values.decode('utf-8')
             elif not isinstance(values,str): values=str(values)
             resultant+=values
-        msg_part_1 = sttime + ':  CONSOLE: ' +filename + ':'+str(caller.lineno) +' '
+        msg_part_1 = sttime + ':  CONSOLE: ' + filename
         msg_part_2 = message + resultant
         # if 'color' in kwargs:
         #     if os.environ["ice_mode"] == "gui":

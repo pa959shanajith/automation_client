@@ -161,6 +161,7 @@ class Dispatcher:
             'mousehover':local_Wd.util_object.mouse_hover,
             'tab':local_Wd.util_object.tab,
             'sendfunctionkeys':local_Wd.util_object.sendfunction_keys,
+            'sendsecurefunctionkeys':local_Wd.util_object.sendsecurefunction_keys,
             'rightclick':local_Wd.util_object.rightclick,
             'mouseclick':local_Wd.util_object.mouse_click,
             'verifywebimages':local_Wd.util_object.verify_web_images,
@@ -376,7 +377,7 @@ class Dispatcher:
             'getattributevalue':['radio','checkbox','dropdown','select','listbox','textbox','textarea','password','number','email','url','grid'],
             'verifyattribute':['radio','checkbox','dropdown','select','listbox','textbox','textarea','password','number','email','url','grid']
         }
-        custom_dict_element={'element':['getobjectcount','getobject','clickelement','doubleclick','rightclick','getelementtext','verifyelementtext','drag', 'drop','gettooltiptext','verifytooltiptext','verifyexists', 'verifydoesnotexists', 'verifyhidden','verifyvisible', 'switchtotab','switchtowindow','setfocus','sendfunctionkeys',
+        custom_dict_element={'element':['getobjectcount','getobject','clickelement','doubleclick','rightclick','getelementtext','verifyelementtext','drag', 'drop','gettooltiptext','verifytooltiptext','verifyexists', 'verifydoesnotexists', 'verifyhidden','verifyvisible', 'switchtotab','switchtowindow','setfocus','sendfunctionkeys', 'sendsecurefunctionkeys',
             'tab','waitforelementvisible','mousehover','press','verifyenabled','verifydisabled','verifyreadonly','getattributevalue','verifyattribute','getrowcount','getcolumncount','getcellvalue','verifycellvalue','getcelltooltip','verifycelltooltip','cellclick','getrownumbytext','getcolnumbytext','getinnertable','selectbyabsolutevalue','horizontalscroll','verticalscroll']}
 
         result=[TEST_RESULT_FAIL,TEST_RESULT_FALSE,OUTPUT_CONSTANT,err_msg]
@@ -523,7 +524,7 @@ class Dispatcher:
                 'selectmultiplevaluesbyindexes','selectmultiplevaluesbytext','verifyvaluesexists',
                 'deselectall','setfocus','mousehover','tab','sendfunctionkeys','rightclick',
                 'mouseclick','openbrowser','navigatetourl','refresh','closebrowser','closesubwindows',
-                'switchtowindow','clearcache','navigatewithauthenticate','sendfunctionkeys']
+                'switchtowindow','clearcache','navigatewithauthenticate','sendsecurefunctionkeys']
             if browser_Keywords.local_bk.driver_obj is not None:
                 browser_info=browser_Keywords.local_bk.driver_obj.capabilities
                 reporting_obj.browser_type=browsername
