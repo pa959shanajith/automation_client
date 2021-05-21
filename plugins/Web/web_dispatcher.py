@@ -672,6 +672,9 @@ class Dispatcher:
                     response=requests.get(urls[0],verify=False,proxies=readconfig.proxies)
                     status_code=response.status_code
                     local_Wd.log.info(status_code)
+                    if status_code == 403:
+                        import urllib.request
+                        status_code=(urllib.request.urlopen(urls[0]).getcode())
                     if status_code in STATUS_CODE_DICT:
                         value=STATUS_CODE_DICT[status_code]
                         logger.print_on_console('Error code ',status_code,' : ',value)

@@ -1150,6 +1150,10 @@ class TableOperationKeywords():
                 local_tk.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                 err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                 logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+            if eleStatus!=True:
+                local_tk.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
             return status,methodoutput,output_val,err_msg
 ##
 ##            return status,methodoutput,output_val,err_msg
