@@ -78,7 +78,7 @@ class Browser_Keywords:
         err_msg=None
         output_val=OUTPUT_CONSTANT
         global driver
-        browser={'browserName': "chrome",'sauce:options':{'name':scenario}}
+        # browser={'browserName': "chrome",'sauce:options':{'name':scenario}}
         driver = webdriver.Remote(command_executor=url, desired_capabilities=browser)
         status=TEST_RESULT_PASS
         methodoutput=TEST_RESULT_TRUE

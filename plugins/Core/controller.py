@@ -1197,6 +1197,7 @@ class Controller():
                                     execute_result_data["accessibility_reports"] = accessibility_reports
                                 execute_result_data['report_type'] = report_type
                                 if execution_env['env'] == 'saucelabs':
+                                    browser_num={'1':'googlechrome','2':'firefox','3':'iexplore','7':'microsoftedge','8':'microsoftedge'}
                                     import web_keywords
                                     self.obj = web_keywords.Sauce_Config()
                                     self.obj.get_sauceconf()
@@ -1211,9 +1212,9 @@ class Controller():
                                             os.makedirs(path)
                                         file_name = datetime.now().strftime("%Y%m%d%H%M%S")
                                         video_path = path+"ScreenRecording_"+file_name+".mp4"
-
                                     for i in range(0,len(all_jobs)):
-                                        file_creations_status=j.get_job_asset_content(all_jobs[i]['id'],file_name,path)
+                                        if(all_jobs[i]['browser']==browser_num[browser]):
+                                            file_creations_status=j.get_job_asset_content(all_jobs[i]['id'],file_name,path)
                                     execute_result_data['reportData']['overallstatus'][0]['video']=video_path
                                 socketIO.emit('result_executeTestSuite', execute_result_data)
                                 obj.clearList(con)
@@ -1552,6 +1553,9 @@ class Controller():
             log1 = logging.getLogger("controller.py") #Disable loggers from imported modules
             if(log1.handlers):
                 log1.handlers.clear()
+            if len(browsers_data)>2 and json_data['exec_env'].lower() =='saucelabs':
+                logger.print_on_console('Warning! Execution in saucelabs can happen in 2 browsers parallely')
+                browsers_data=browsers_data
             for i in range (len(browsers_data)):
                 jsondata_dict[i] = copy.deepcopy(json_data)
                 for j in range(len(jsondata_dict[i]['suitedetails'])):

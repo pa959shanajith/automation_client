@@ -529,6 +529,9 @@ class Dispatcher:
                     if(teststepproperty.name=="openBrowser"):
                         browser=teststepproperty.inputval[0]
                         self.browsers_sl[browser]["platform"]=self.sauce_conf["platform"]
+                        if browser in ['7','8'] and self.sauce_conf["platform"]!='Windows 10':
+                            logger.print_on_console('Microsoft Edge browser is supported only in Windows 10')
+                            return 'Terminate'
                         self.browsers_sl[browser]["sauce:options"].update({"name":teststepproperty.testscript_name})
                         self.browsers_sl[browser]["sauce:options"].update({"idleTimeout":90})
                         result = self.sauce_web_dict[teststepproperty.name](self.sauce_conf['remote_url'],self.browsers_sl[browser],execution_env['scenario'])
