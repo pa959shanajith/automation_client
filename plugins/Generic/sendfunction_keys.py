@@ -9,9 +9,10 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 from generic_constants import *
+from encryption_utility import AESCipher
 from constants import *
 import logger
-if SYSTEM_OS != 'Darwin':
+if SYSTEM_OS == 'Windows':
     from pyrobot import Robot
 import pyautogui
 import subprocess
@@ -24,55 +25,13 @@ log = logging.getLogger('sendfunction_keys.py')
 class SendFunctionKeys:
 
     def sendfunction_keys(self,input,*args):
-
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         err_msg=None
         output_res=OUTPUT_CONSTANT
 
-        '''For bringing the browser to foreground'''
-        try:
-            import browser_Keywords
-            import selenium
-            if SYSTEM_OS == "Darwin":
-                try:
-                    pids = browser_Keywords.pid_set
-                    if (len(pids) > 0):
-                        pid = pids.pop()
-                        apple_script = """osascript<<EOF
-                        tell application "System Events"
-                        set frontmost of every process whose unix id is """+pid+""" to true
-                        end tell
-                        EOF"""
-                        subprocess.Popen(apple_script, shell=True)
-                except Exception as e:
-                    log.error("Failed to bring window to foreground")
-            else:
-                import win32gui,win32api,win32process
-                pids = browser_Keywords.local_bk.pid_set
-                if(len(pids)>0):
-                    pid = pids[-1]
-                    toplist, winlist = [], []
-                    def enum_cb(hwnd, results):
-                        winlist.append((hwnd, win32gui.GetWindowText(hwnd)))
-                    win32gui.EnumWindows(enum_cb, toplist)
-                    app = [(hwnd, title) for hwnd, title in winlist if ((("Chrome" in title) or ("Firefox" in title) or ("Edge" in title) or ("Explorer" in title)) and (win32process.GetWindowThreadProcessId(hwnd)[1] == pid))]
-                    if(len(app)==1):
-                        app = app[0]
-                        handle = app[0]
-                        foreThread = win32process.GetWindowThreadProcessId(win32gui.GetForegroundWindow())
-                        appThread = win32api.GetCurrentThreadId()
-                        if( foreThread != appThread ):
-                            win32process.AttachThreadInput(foreThread[0], appThread, True)
-                            win32gui.BringWindowToTop(handle)
-                            win32gui.ShowWindow(handle,5)
-                            win32process.AttachThreadInput(foreThread[0], appThread, False)
-                        else:
-                            win32gui.BringWindowToTop(handle)
-                            win32gui.ShowWindow(handle,5)
-                    time.sleep(1)
-        except Exception as e:
-            log.error("Error in sendfunction_keys : ",e)
+        # For bringing the browser to foreground
+        self.bring_to_foreground()
         try:
             log.debug('reading the inputs')
             input=str(input)
@@ -114,9 +73,52 @@ class SendFunctionKeys:
             logger.print_on_console(err_msg)
         return status,methodoutput,output_res,err_msg
 
+    def bring_to_foreground(self):
+        try:
+            import browser_Keywords
+            if SYSTEM_OS == "Darwin":
+                try:
+                    pids = browser_Keywords.pid_set
+                    if (len(pids) > 0):
+                        pid = pids.pop()
+                        apple_script = """osascript<<EOF
+                        tell application "System Events"
+                        set frontmost of every process whose unix id is """+pid+""" to true
+                        end tell
+                        EOF"""
+                        subprocess.Popen(apple_script, shell=True)
+                except Exception as e:
+                    log.error("Failed to bring window to foreground")
+            else:
+                import win32gui,win32api,win32process
+                pids = browser_Keywords.local_bk.pid_set
+                if(len(pids)>0):
+                    pid = pids[-1]
+                    toplist, winlist = [], []
+                    def enum_cb(hwnd, results):
+                        winlist.append((hwnd, win32gui.GetWindowText(hwnd)))
+                    win32gui.EnumWindows(enum_cb, toplist)
+                    app = [(hwnd, title) for hwnd, title in winlist if ((("Chrome" in title) or ("Firefox" in title) or ("Edge" in title) or ("Explorer" in title)) and (win32process.GetWindowThreadProcessId(hwnd)[1] == pid))]
+                    if(len(app)==1):
+                        app = app[0]
+                        handle = app[0]
+                        foreThread = win32process.GetWindowThreadProcessId(win32gui.GetForegroundWindow())
+                        appThread = win32api.GetCurrentThreadId()
+                        if( foreThread != appThread ):
+                            win32process.AttachThreadInput(foreThread[0], appThread, True)
+                            win32gui.BringWindowToTop(handle)
+                            win32gui.ShowWindow(handle,5)
+                            win32process.AttachThreadInput(foreThread[0], appThread, False)
+                        else:
+                            win32gui.BringWindowToTop(handle)
+                            win32gui.ShowWindow(handle,5)
+                    time.sleep(1)
+        except Exception as e:
+            log.error("Error in sendfunction_keys : ",e)
+
     def execute_key(self,key,count):
         log.debug('press and release the key', key)
-        if SYSTEM_OS == "Darwin":
+        if SYSTEM_OS == "Darwin" or SYSTEM_OS == 'Linux':
             for x in range(count):
                 pyautogui.press(key)
         else:
@@ -133,7 +135,7 @@ class SendFunctionKeys:
 
     def type(self,input,delay_stringinput=None):
         try:
-            if SYSTEM_OS == "Darwin":
+            if SYSTEM_OS == "Darwin" or SYSTEM_OS == 'Linux':
                 pyautogui.typewrite(str(input))
             else:
                 if delay_stringinput is None: delay_stringinput = 0.005
@@ -146,7 +148,7 @@ class SendFunctionKeys:
 
     def press_key(self,key):
         log.debug('pressing  the key', key)
-        if SYSTEM_OS == "Darwin":
+        if SYSTEM_OS == "Darwin" or SYSTEM_OS == 'Linux':
             pyautogui.keyDown(key)
         else:
             robot=Robot()
@@ -154,7 +156,7 @@ class SendFunctionKeys:
 
     def release_key(self,key):
         log.debug('releasing  the key', key)
-        if SYSTEM_OS == "Darwin":
+        if SYSTEM_OS == "Darwin" or SYSTEM_OS == 'Linux':
             pyautogui.keyUp(key)
         else:
             robot=Robot()
@@ -179,3 +181,33 @@ class SendFunctionKeys:
                     string_input='type'
             value=value
         return value,string_input
+
+    def sendsecurefunction_keys(self,input):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output_res=OUTPUT_CONSTANT
+
+        # For bringing the browser to foreground
+        self.bring_to_foreground()
+        try:
+            log.debug('reading the inputs')
+            input=str(input)
+            if not (input is None or input is '' or input == 'None'):
+                encryption_obj = AESCipher()
+                input = encryption_obj.decrypt(input)
+                log.debug('sending the keys in input')
+                configvalues = readconfig.readConfig().readJson()
+                if input is not None:
+                    self.type(input, float(configvalues['delay_stringinput']))
+                    status=TEST_RESULT_PASS
+                    methodoutput=TEST_RESULT_TRUE
+            else:
+                log.debug('Invalid input')
+                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+        except Exception as e:
+            log.error(e)
+            logger.print_on_console(e)
+        if err_msg!=None:
+            logger.print_on_console(err_msg)
+        return status,methodoutput,output_res,err_msg

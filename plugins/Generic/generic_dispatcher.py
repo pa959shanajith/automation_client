@@ -129,6 +129,7 @@ class GenericKeywordDispatcher:
             'wait':local_generic.generic_delay.wait,
             'pause':local_generic.generic_delay.pause,
             'sendfunctionkeys':local_generic.generic_sendkeys.sendfunction_keys,
+            'sendsecurefunctionkeys':local_generic.generic_sendkeys.sendsecurefunction_keys,
             'getblockcount' : local_generic.xml_oper.get_block_count,
             'gettagvalue' : local_generic.xml_oper.get_tag_value,
             'getblockvalue' : local_generic.xml_oper.get_block_value,
@@ -179,6 +180,7 @@ class GenericKeywordDispatcher:
          logger.print_on_console('Keyword is '+keyword)
          keyword=keyword.lower()
          err_msg=None
+         dataflag=False                  #flag for database operation keyword to resolve invalid input issue
          result=[constants.TEST_RESULT_FAIL,constants.TEST_RESULT_FALSE,constants.OUTPUT_CONSTANT,err_msg]
          try:
             if keyword in list(self.generic_dict.keys()):
@@ -196,6 +198,8 @@ class GenericKeywordDispatcher:
                     output=[tsp.outputval]
                     if ';' in tsp.outputval:
                         output=tsp.outputval.split(';')
+                    if(keyword == "exportdata" or keyword=="secureexportdata" or keyword == "getdata" or keyword=="securegetdata") and len(message)>7:
+                        dataflag=True
                     #Changes for defect #983 - to resolve values of static and dynamic variables in output for this particular keyword
                     if(keyword == "exportdata" or keyword=="secureexportdata") and (len(output)>1):
                         #comment the below code for Azure Issue #22199
@@ -252,6 +256,9 @@ class GenericKeywordDispatcher:
                         output[0] = data[var][0]
                         output=';'.join(output)
                     result= self.generic_dict[keyword](input,output)
+                elif(dataflag):
+                    err_msg=generic_constants.INVALID_INPUT
+                    result[3]=err_msg
                 else:
                     result= self.generic_dict[keyword](*message)
             else:

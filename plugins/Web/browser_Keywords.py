@@ -19,7 +19,7 @@ from constants import *
 import logging
 import core
 import platform
-if SYSTEM_OS != 'Darwin':
+if SYSTEM_OS == 'Windows':
     import win32gui
     import win32api
     import utils_web
@@ -33,6 +33,7 @@ import time
 from sendfunction_keys import SendFunctionKeys as SF
 driver_pre = None
 drivermap = []
+linux_drivermap=[]
 local_bk = threading.local()
 
 #New Thread to navigate to given url for the keyword 'naviagteWithAut'
@@ -71,7 +72,7 @@ class BrowserKeywords():
         return err_msg
 
     def openBrowser(self,webelement,browser_num,*args):
-        global local_bk, driver_pre, drivermap
+        global local_bk, driver_pre, drivermap,linux_drivermap
         status=webconstants.TEST_RESULT_FAIL
         result=webconstants.TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -123,10 +124,11 @@ class BrowserKeywords():
             elif browser_num[-1] == EXECUTE:
                 local_bk.driver_obj=obj.getBrowser(self.browser_num)
                 del drivermap[:]
+                linux_drivermap.append(local_bk.driver_obj)
             if(local_bk.driver_obj == None):
                 result = TERMINATE
             else:
-                if SYSTEM_OS!='Darwin':
+                if SYSTEM_OS == 'Winodows':
                     utilobject = utils_web.Utils()
                     pid = None
                     if (self.browser_num == '1'):
@@ -242,12 +244,16 @@ class BrowserKeywords():
         output=OUTPUT_CONSTANT
         err_msg=None
         try:
+            cwh=local_bk.driver_obj.current_window_handle
+            cwh_in=local_bk.all_handles.index(cwh)
             local_bk.driver_obj.execute_script("window.open('');")
             handles = local_bk.driver_obj.window_handles
             local_bk.driver_obj.switch_to.window(handles[-1])
             h=local_bk.driver_obj.current_window_handle
-            local_bk.all_handles.append(h)
-            local_bk.recent_handles.append(h)
+            local_bk.all_handles.insert(cwh_in+1,h)
+            local_bk.recent_handles.insert(cwh_in+1,h)
+            # local_bk.all_handles.append(h)
+            # local_bk.recent_handles.append(h)
             if isinstance(local_bk.driver_obj,webdriver.Ie):
                 local_bk.driver_obj.maximize_window()
             status=webconstants.TEST_RESULT_PASS
@@ -684,25 +690,82 @@ class BrowserKeywords():
         status=webconstants.TEST_RESULT_FAIL
         result=webconstants.TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
+        window_num_flag = False
+        switch_window_flag = False
+        handles_index=[]
+        inp=None
         ## Issue #190 Driver control won't switch back to parent window
         err_msg=None
         try:
             if (len(args) > 1):
-                inp = args[1]
-                inp = str(inp[0])
+                if (len(args[1]) == 1 and not(args[1][0].strip().isdigit())):
+                    inp = args[1]
+                    inp = str(inp[0])
+                    inp = inp.lower()
+                else:
+                    window_num_flag = True
+                    inp_list=args[1]
             if len(local_bk.all_handles) > 1:
-                if(inp == 'ALL'):
-                    while local_bk.all_handles[-1]!=local_bk.parent_handle:
-                        try:
-                            local_bk.driver_obj.switch_to.window(local_bk.all_handles[-1])
-                            local_bk.driver_obj.close()
-                            local_bk.all_handles=local_bk.all_handles[0:-1]
-                            logger.print_on_console('Sub window closed')
-                            local_bk.log.info('Sub window closed')
-                        except Exception as e:
-                            err_msg=self.__web_driver_exception(e)
+                if(inp == 'all'):
+                    cur_handle=local_bk.driver_obj.current_window_handle
+                    remove_handles=[]
+                    try:
+                        for i in local_bk.all_handles:
+                            if i!=cur_handle:
+                                local_bk.driver_obj.switch_to.window(i)
+                                local_bk.driver_obj.close()
+                                remove_handles.append(i)
+                        for j in remove_handles:
+                            local_bk.all_handles.remove(j)
+                        logger.print_on_console('Sub window closed')
+                        local_bk.log.info('Sub window closed')
+                    except Exception as e:
+                        err_msg=self.__web_driver_exception(e)
+                elif window_num_flag == True:
+                    remove_handles=[]
+                    try:
+                        cur_handle=local_bk.driver_obj.current_window_handle
+                        cwh_index=local_bk.all_handles.index(cur_handle)
+                        if len(inp_list)<len(local_bk.all_handles):
+                            for i in inp_list:
+                                inp = int(i)
+                                inp = inp-1
+                                if inp<len(local_bk.all_handles):
+                                    if not(inp==-1 or i==0):
+                                        window_num_flag = True
+                                        win_h=local_bk.all_handles[inp]
+                                        local_bk.driver_obj.switch_to.window(local_bk.all_handles[inp])
+                                        local_bk.driver_obj.close()
+                                        remove_handles.append(win_h) 
+                                        local_bk.log.info('subwindow '+str(i)+' is closed')
+                                        logger.print_on_console('subwindow '+str(i)+' is closed')
+                                    else:
+                                        local_bk.log.error(webconstants.INVALID_INPUT)
+                                        logger.print_on_console(webconstants.INVALID_INPUT)
+                                        err_msg = webconstants.INVALID_INPUT
+                                        switch_window_flag = False
+                                else:
+                                    err_msg = 'One or more window handle not found'
+                                    logger.print_on_console(err_msg)
+                                    local_bk.log.error(err_msg) 
+                                    local_bk.log.info('window handle ' +str(i)+' is not found ')
+                                    switch_window_flag = False
+                            if len(remove_handles)>=1:
+                                for j in remove_handles:   
+                                    local_bk.all_handles.remove(j)
+                                switch_window_flag = True
+                        else:
+                            window_num_flag = False
+                    except Exception as e:
+                        err_msg=self.__web_driver_exception(e)
+                elif not (window_num_flag==True or inp == 'all' or inp == ''):
+                    local_bk.log.error(webconstants.INVALID_INPUT)
+                    logger.print_on_console(webconstants.INVALID_INPUT)
+                    err_msg = webconstants.INVALID_INPUT
                 else:
                     try:
+                        cur_handle=local_bk.driver_obj.current_window_handle
+                        cwh_index=local_bk.all_handles.index(cur_handle)
                         local_bk.driver_obj.switch_to.window(local_bk.all_handles[-1])
                         local_bk.driver_obj.close()
                         local_bk.all_handles=local_bk.all_handles[0:-1]
@@ -712,10 +775,55 @@ class BrowserKeywords():
                         err_msg=self.__web_driver_exception(e)
 
                 if(len(local_bk.all_handles) >= 1):
-                    local_bk.driver_obj.switch_to.window(local_bk.all_handles[-1])
-                    self.update_recent_handle(local_bk.all_handles[-1])
-                    status=webconstants.TEST_RESULT_PASS
-                    result=webconstants.TEST_RESULT_TRUE
+                    if (window_num_flag == True and switch_window_flag==True):                       
+                        if not(cur_handle in local_bk.all_handles):
+                            if len(inp_list)>1: 
+                                if cwh_index > len(local_bk.all_handles):
+                                    local_bk.driver_obj.switch_to.window(local_bk.all_handles[-1])
+                                    self.update_recent_handle(local_bk.all_handles[-1])
+                                    status=webconstants.TEST_RESULT_PASS
+                                    result=webconstants.TEST_RESULT_TRUE
+                                elif cwh_index < len(local_bk.all_handles):
+                                    prev_window=cwh_index-len(inp_list)
+                                    local_bk.driver_obj.switch_to.window(local_bk.all_handles[prev_window])
+                                    self.update_recent_handle(local_bk.all_handles[prev_window])
+                                    status=webconstants.TEST_RESULT_PASS
+                                    result=webconstants.TEST_RESULT_TRUE
+                            else:
+                                if cwh_index==0:
+                                    prev_window=cwh_index
+                                    local_bk.driver_obj.switch_to.window(local_bk.all_handles[prev_window])
+                                    self.update_recent_handle(local_bk.all_handles[prev_window])
+                                    status=webconstants.TEST_RESULT_PASS
+                                    result=webconstants.TEST_RESULT_TRUE
+                                else: 
+                                    prev_window=cwh_index-1
+                                    local_bk.driver_obj.switch_to.window(local_bk.all_handles[prev_window])
+                                    self.update_recent_handle(local_bk.all_handles[prev_window])
+                                    status=webconstants.TEST_RESULT_PASS
+                                    result=webconstants.TEST_RESULT_TRUE
+                        else:
+                            local_bk.driver_obj.switch_to.window(cur_handle)
+                            self.update_recent_handle(cur_handle)
+                            status=webconstants.TEST_RESULT_PASS
+                            result=webconstants.TEST_RESULT_TRUE
+                    elif (inp == 'all' or inp == ''):
+                        if inp == '':
+                            if cwh_index == len(local_bk.all_handles):
+                                local_bk.driver_obj.switch_to.window(local_bk.all_handles[-1])
+                                self.update_recent_handle(local_bk.all_handles[-1])
+                                status=webconstants.TEST_RESULT_PASS
+                                result=webconstants.TEST_RESULT_TRUE
+                            else:
+                                local_bk.driver_obj.switch_to.window(cur_handle)
+                                self.update_recent_handle(cur_handle)
+                                status=webconstants.TEST_RESULT_PASS
+                                result=webconstants.TEST_RESULT_TRUE
+                        else:        
+                            local_bk.driver_obj.switch_to.window(local_bk.all_handles[-1])
+                            self.update_recent_handle(local_bk.all_handles[-1])
+                            status=webconstants.TEST_RESULT_PASS
+                            result=webconstants.TEST_RESULT_TRUE
             else:
                 err_msg = 'No sub windows to close'
                 logger.print_on_console(err_msg)
@@ -876,7 +984,7 @@ class BrowserKeywords():
             local_bk.recent_handles.append(h)
 
     def update_pid_set(self,enableSecurityFlag):
-        if SYSTEM_OS!='Darwin':
+        if SYSTEM_OS == 'Windows':
             utilobject = utils_web.Utils()
             pid = None
             if (self.browser_num == '1'):
@@ -1024,19 +1132,74 @@ class BrowserKeywords():
     def get_foreground_window(self, *args):
         status=webconstants.TEST_RESULT_FAIL
         result=webconstants.TEST_RESULT_FALSE
-        output=OUTPUT_CONSTANT
+        output=None
         err_msg=None
+        flag_firefox = False
         try:
-            if isinstance(local_bk.driver_obj,webdriver.Ie):
-                local_bk.driver_obj.maximize_window()
-                status=webconstants.TEST_RESULT_PASS
-                result=webconstants.TEST_RESULT_TRUE
-                output = "Browser brought to foreground"
-            else:
-                local_bk.driver_obj.switch_to.window(local_bk.driver_obj.current_window_handle)
-                status=webconstants.TEST_RESULT_PASS
-                result=webconstants.TEST_RESULT_TRUE
-                output = "Browser brought to foreground"
+            if SYSTEM_OS != 'Darwin':
+                if (self.browser_num == '1'):
+                    p = psutil.Process(local_bk.driver_obj.service.process.pid)
+                    pidchrome = p.children()[-1]
+                    pid = pidchrome.pid
+                elif(self.browser_num == '2'):
+                    if(isinstance(local_bk.driver_obj,webdriver.Firefox)):
+                        try:
+                            win_name=local_bk.driver_obj.title+' — Mozilla Firefox'
+                            if(win32gui.FindWindow(None,win_name)!=0):
+                                handle=win32gui.FindWindow(None,win_name)
+                                win32gui.ShowWindow(handle,3)
+                                win32gui.SetForegroundWindow(handle)
+                                flag_firefox = True
+                                status=webconstants.TEST_RESULT_PASS
+                                result=webconstants.TEST_RESULT_TRUE
+                                output = "Browser brought to foreground"
+                        except:
+                            local_bk.log.info("Unable to bring the window to foreground using the title")
+                    if flag_firefox!=True:
+                        try:
+                            pid = local_bk.driver_obj.binary.process.pid
+                        except Exception as e:
+                            p = psutil.Process(local_bk.driver_obj.service.process.pid)
+                            pidfirefox = p.children()[0]
+                            pid = pidfirefox.pid
+                elif(self.browser_num == '3'):
+                    p = psutil.Process(local_bk.driver_obj.iedriver.process.pid)
+                    pidie = p.children()[-1]
+                    pid = pidie.pid
+                elif(self.browser_num == '7'):
+                    try:
+                        win_name=local_bk.driver_obj.title
+                        
+                        if(win32gui.FindWindow(None,win_name)!=0):
+                            handle=win32gui.FindWindow(None,win_name)
+                            local_bk.driver_obj.minimize_window()
+                            local_bk.driver_obj.maximize_window()
+                            win32gui.BringWindowToTop(handle)
+                            win32gui.ShowWindow(handle,3)
+                            win32gui.SetForegroundWindow(handle)
+                            status=webconstants.TEST_RESULT_PASS
+                            result=webconstants.TEST_RESULT_TRUE
+                            output = "Browser brought to foreground"
+                    except:
+                        local_bk.log.info("Unable to bring the window to foreground using the title")
+                elif (self.browser_num == '8'):
+                    p = psutil.Process(local_bk.driver_obj.edge_service.process.pid)
+                    pidchromium = p.children()[-1]
+                    pid = pidchromium.pid
+                elif (self.browser_num == '6'):
+                    logger.print_on_console("This feature not support on {} platform".format(SYSTEM_OS))
+                    local_bk.log.info("This feature not Supported")
+                    
+                if flag_firefox!=True:
+                    utilobject = utils_web.Utils()
+                    utilobject.bring_Window_Front(pid)
+                    status=webconstants.TEST_RESULT_PASS
+                    result=webconstants.TEST_RESULT_TRUE
+                    output = "Browser brought to foreground"
+            elif SYSTEM_OS == 'Darwin':
+                if (self.browser_num == '6'):
+                    local_bk.log.info("This feature not implemented")
+                pass
         except Exception as e:
             err_msg = e
             local_bk.log.error( err_msg )
@@ -1045,7 +1208,6 @@ class BrowserKeywords():
             else:
                 logger.print_on_console(output)
         return status, result, output, err_msg
-
 
 class Singleton_DriverUtil():
 

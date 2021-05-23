@@ -22,6 +22,7 @@ import jumpBy
 from teststepproperty import TestStepProperty
 import handler
 import os,sys
+import re
 import logger
 import json
 from constants import *
@@ -73,6 +74,7 @@ class Controller():
         local_cont.accessibility_testing_obj = None
         local_cont.generic_dispatcher_obj = None
         local_cont.test_case_number = 0
+        local_cont.module_stop=False
         self.action=None
         core_utils.get_all_the_imports(CORE)
         self.cur_dir= os.getcwd()
@@ -98,6 +100,7 @@ class Controller():
         self.exception_flag=None
         local_cont.i = 0
         self.execution_mode = None
+        self.runfrom_step_range_input=[]
         self.__load_generic()
 
     def __load_generic(self):
@@ -232,7 +235,7 @@ class Controller():
             logger.print_on_console('Error loading System plugin')
             log.error(e,exc_info=True)
 
-
+           
     def __load_aws(self):
         try:
             core_utils.get_all_the_imports('AWS/src')
@@ -346,7 +349,7 @@ class Controller():
         keyword_flag=True
         ignore_stat=False
         inpval=[]
-        start_time = datetime.now()
+        start_time = datetime.now()      
         #Check for 'terminate_flag' before execution
         if not(terminate_flag):
             #Check for 'pause_flag' before executionee
@@ -598,7 +601,7 @@ class Controller():
             self.dynamic_var_handler_obj.store_dynamic_value(output[1],result[1],tsp.name)
 
     def keywordinvocation(self,index,inpval,*args):
-        global socket_object,iris_constant_step,status_percentage
+        global socket_object, iris_constant_step, status_percentage
         configvalues = self.configvalues
         try:
             time.sleep(float(configvalues['stepExecutionWait']))
@@ -756,9 +759,35 @@ class Controller():
             logger.print_on_console(keyword+' executed and the status is '+self.keyword_status+'\n',**kwargs)
             log.info(keyword+' executed and the status is '+self.keyword_status+'\n')
             #Checking for stop keyword
-            if teststepproperty.name.lower()==STOP:
+            # CR #22650 stop keyword enhancement
+            # 1. when input is 'testcase' stop the current testcase execution and jump to next teststep of next testcase.
+            #    1.a :  assign index to prev_index and reduce the index value as its incremented already
+            #    1.b : Find the starting index of next testcase and assign it to index by checking testcase_name
+            #    1.b : if index+1 hasnt changed implies that there are no further testcase in that scenario. so make index= STOP
+            # 2. when input is 'module' stop the current module and move to next module if its batch execution.
+            #   2.a : set module_stop=True. which asks to stop looping through the scenarios of the current module and move to next module if present
+            # 3. when input is 'scenario' assign STOP to index and stop the sceanrio execution and move to next scenario if present
+            if teststepproperty.name.lower() == STOP and self.status == 'Pass':
                 ## Issue #160
-                index=STOP
+                # index = STOP
+                if self.action.lower() == 'debug':
+                    index = STOP
+                else:
+                    if teststepproperty.inputval[0] == 'testcase':
+                        prev_index = index
+                        index -= 1
+                        teststepproperty_name = teststepproperty.testscript_name
+                        for i in range(index, len(handler.local_handler.tspList)):
+                            if teststepproperty_name != handler.local_handler.tspList[i].testscript_name:
+                                index = handler.local_handler.tspList[i].index
+                                break
+                        if (index + 1) == prev_index:
+                            index = STOP
+                    elif teststepproperty.inputval[0] == 'module':
+                        local_cont.module_stop = True
+                        index = STOP
+                    else:
+                        index = STOP
             return index,result
         else:
             return index,TERMINATE
@@ -775,9 +804,15 @@ class Controller():
         global pause_flag
         if local_cont.generic_dispatcher_obj is not None and local_cont.generic_dispatcher_obj.action is None:
             local_cont.generic_dispatcher_obj.action=action
+        #Check for 'run from step' with range as input
+        last_step_val = len(tsplist)
+        if self.runfrom_step_range_input:
+            last_step_val=self.runfrom_step_range_input[-1]
         while (i < len(tsplist)):
             #Check for 'terminate_flag' before execution
             if not(terminate_flag):
+                #check to Run till the ending range of run from step
+                if i >= last_step_val: break
                 #Check for 'pause_flag' before execution
                 if pause_flag:
                     self.pause_execution()
@@ -911,14 +946,38 @@ class Controller():
                     tsplist[k].browser_type = browser_type
                     if tsplist[k].name.lower() == 'openbrowser' and (IGNORE_THIS_STEP not in tsplist[k].inputval[0].split(';')):
                         tsplist[k].inputval = browser_type
+        start_debug=False
+        if type(runfrom_step) != int:
+            pattern = re.compile(r"[0-9]+-[0-9]+")
+            match = pattern.search(runfrom_step)
+            if match:
+                self.runfrom_step_range_input = [int(sno) for sno in runfrom_step.split('-')]
+                first_step_val, last_step_val = self.runfrom_step_range_input
+                starting_val_end_range = first_step_val + 1
+                if first_step_val > 0 and first_step_val <= tsplist[-1].stepnum:
+                    if last_step_val > first_step_val and last_step_val <= tsplist[-1].stepnum:
+                        runfrom_step = first_step_val
+                        start_debug = True
+                    else:
+                        logger.print_on_console('Invalid step number!! Please provide ending range for run from step between ',starting_val_end_range,' to ',tsplist[-1].stepnum,'\n')
+                        log.info('Invalid step number!! Please provide run from step number')
+                else:
+                    logger.print_on_console('Invalid step number!! Please provide starting range for run from step between 1 to ',tsplist[-1].stepnum,'\n')
+                    log.info('Invalid step number!! Please provide run from step number')
+            else:
+                logger.print_on_console('Invalid step number!! Please provide valid input for run from step \n' )
+                log.info('Invalid step number!! Please provide valid input for run from step')
+        else:
+            if runfrom_step > 0 and runfrom_step <= tsplist[-1].stepnum:
+                start_debug = True
+            else:
+                logger.print_on_console('Invalid step number!! Please provide run from step number between 1 to ',tsplist[-1].stepnum,'\n')
+                log.info('Invalid step number!! Please provide run from step number')
         if flag:
-            if runfrom_step > 0 and runfrom_step <= tsplist[len(tsplist)-1].stepnum:
+            if start_debug:
                 self.conthread=mythread
                 execution_env = {'env':'default'}
                 status,_,_ = self.executor(tsplist,DEBUG,last_tc_num,runfrom_step,mythread,execution_env, accessibility_testing = False)
-            else:
-                logger.print_on_console( 'Invalid step number!! Please provide run from step number from 1 to ',tsplist[len(tsplist)-1].stepnum,'\n')
-                log.info('Invalid step number!! Please provide run from step number')
         else:
             logger.print_on_console('Invalid script')
         temp={}
@@ -944,7 +1003,7 @@ class Controller():
         return status
 
     def invoke_execution(self,mythread,json_data,socketIO,wxObject,configvalues,qcObject,qtestObject,zephyrObject,aws_mode):
-        global terminate_flag,status_percentage,saucelabs_count,screen_testcase_map
+        global terminate_flag, status_percentage, saucelabs_count, screen_testcase_map
         qc_url=''
         qc_password=''
         qc_username=''
@@ -987,7 +1046,8 @@ class Controller():
         #Iterate through the suites-list
         for suite,suite_id,suite_id_data in zip(suite_details,suiteId_list,suite_data):
             #EXECUTION GOES HERE
-            flag=True
+            flag = True
+            local_cont.module_stop = False
             if terminate_flag:
                 status=TERMINATE
             log.info('---------------------------------------------------------------------')
@@ -1012,6 +1072,7 @@ class Controller():
                     pytest_files=[]
                  #Logic to Execute each suite for each of the browser
                 for browser in browser_type[suite_id]:
+                    local_cont.module_stop = False
                     sc_idx = 0
                     condition_check_flag = False
                     #Logic to iterate through each scenario in the suite
@@ -1398,6 +1459,8 @@ class Controller():
                                 except Exception as e:
                                     log.error('Error in Updating Zephyr details '+str(e))
                                     logger.print_on_console('Error in Updating Zephyr details')
+                            if local_cont.module_stop:
+                                break
                         else:
                             logger.print_on_console( '***Saving report of Scenario' ,str(sc_idx + 1),'***')
                             log.info( '***Saving report of Scenario' +str(sc_idx + 1)+'***')
@@ -1563,6 +1626,7 @@ class Controller():
                 thread_name = "test_thread_browser" + str(browsers_data[i])
                 th[i] = threading.Thread(target = self.invoke_execution, name = thread_name, args = (mythread,jsondata_dict[i],socketIO,wxObject,configvalues,qc_soc,qtest_soc,zephyr_soc,aws_mode))
                 self.seperate_log(th[i], browsers_data[i]) #function that creates different logs for each browser
+                if SYSTEM_OS =='Linux': time.sleep(0.5)
                 th[i].start()
             for i in th:
                 th[i].join()
@@ -1654,6 +1718,29 @@ def kill_process():
         #     log.error(e)
         log.info('Stale processes killed')
         logger.print_on_console('Stale processes killed')
+    elif SYSTEM_OS == 'Linux':
+        log.info("killing stale process in linux")
+        try:
+            import browser_Keywords
+            if browser_Keywords.linux_drivermap != []:
+                for brwdriver in browser_Keywords.linux_drivermap:
+                    brwdriver.quit()
+                del browser_Keywords.linux_drivermap[:]
+            for driver in browser_Keywords.drivermap:
+                driver.quit()
+            del browser_Keywords.drivermap[:]
+            if hasattr(browser_Keywords.local_bk, 'driver_obj'):
+                if (browser_Keywords.local_bk.driver_obj):
+                    browser_Keywords.local_bk.driver_obj = None
+            if hasattr(browser_Keywords.local_bk, 'pid_set'):
+                if (browser_Keywords.local_bk.pid_set):
+                    del browser_Keywords.local_bk.pid_set[:]
+        except Exception as e:
+            logger.print_on_console('Unable to kill stale process')
+            log.error(e)
+        log.info('Stale process Killed')
+        logger.print_on_console('Stale process killed')
+
     else:
         tries = {}
         while(len(process_ids) > 0):
