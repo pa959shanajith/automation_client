@@ -779,13 +779,15 @@ class BrowserKeywords():
                 status=webconstants.TEST_RESULT_PASS
                 result=webconstants.TEST_RESULT_TRUE
             elif local_bk.driver_obj != None and isinstance(local_bk.driver_obj,webdriver.Firefox):
-                driver.get('about:preferences#privacy')
+                local_bk.driver_obj.get('about:preferences#privacy')
                 time.sleep(2)
-                driver.find_element_by_css_selector('#clearSiteDataButton').click()
+                local_bk.driver_obj.find_element_by_css_selector('#clearSiteDataButton').click()
                 time.sleep(2)
-                driver.execute_script("document.getElementsByTagName('browser')[0].contentWindow.document.getElementsByTagName('dialog')[0].shadowRoot.children[3].children[2].click()")
+                local_bk.driver_obj.execute_script("document.getElementsByTagName('browser')[0].contentWindow.document.getElementsByTagName('dialog')[0].shadowRoot.children[3].children[2].click()")
                 time.sleep(2)
-                driver.switch_to.alert.accept()
+                local_bk.driver_obj.switch_to.alert.accept()
+                status=webconstants.TEST_RESULT_PASS
+                result=webconstants.TEST_RESULT_TRUE
             else:
                 drv={'3': 'Internet Explorer', '6': 'Safari', '7': 'Edge Legacy', '8': 'Edge Chromium'}
                 err_msg = "This function is not available for "+drv[self.browser_num]+'.'
