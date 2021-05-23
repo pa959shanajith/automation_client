@@ -326,7 +326,9 @@ class TableOperationKeywords():
                                                         if(len(child_ele)==0):
                                                             child_ele = remoteWebElement.find_elements_by_xpath('.//lightning-formatted-location')
                                 if(len(child_ele)>0):
-                                    cellVal=child_ele[0].text                            
+                                    cellVal=child_ele[0].text
+                                elif(len(child_ele)==0):
+                                    cellVal=remoteWebElement.text                      
                                 cellVal = cellVal.strip()
                                 local_tk.log.info('Got the result : %s',str(cellVal))
                                 logger.print_on_console('Cell value is : ',str(cellVal))
