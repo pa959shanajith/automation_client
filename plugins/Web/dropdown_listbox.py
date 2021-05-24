@@ -51,11 +51,14 @@ class DropdownKeywords():
         try:
             if webelement is not None:
                 local_ddl.log.info('Recieved web element from the web dispatcher')
-                if webelement.tag_name=='table':
+                if webelement.tag_name=='table' and int(input[3]) >= 1 and int(input[4]) >= 1:
                         webelement=self.radioKeywordsObj.getActualElement(webelement,input)
                         index = input[4]
-
-                if ((webelement.is_enabled())):
+                elif webelement.tag_name=='table' and (int(input[3]) <= 0 or int(input[3]) <= 0):
+                    err_msg = ERROR_CODE_DICT['INVALID_TABLE_INDEX']
+                    logger.print_on_console(err_msg)
+                    local_ddl.log.info(err_msg)
+                if not err_msg and webelement.is_enabled():
                     if not (self.util.is_visible(webelement)) and self.__check_visibility_from_config():
                         # performing js code
                         local_ddl.log.debug('element is invisible, performing js code')
@@ -160,7 +163,7 @@ class DropdownKeywords():
                             logger.print_on_console('Element is not displayed')
                             local_ddl.log.info(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
 
-                else:
+                elif not err_msg:
                     err_msg = ERROR_CODE_DICT['ERR_OBJECT_DISABLED']
                     local_ddl.log.info(err_msg)
 
@@ -268,10 +271,14 @@ class DropdownKeywords():
         verb = OUTPUT_CONSTANT
         err_msg=None
         if webelement is not None:
-            if webelement.tag_name=='table':
-                    if len(input)==5:
-                        dropVal=input[2]
-                        webelement=self.radioKeywordsObj.getActualElement(webelement,input)
+            if webelement.tag_name=='table' and int(input[3]) >= 1:
+                if len(input)==5:
+                    dropVal=input[2]
+                    webelement=self.radioKeywordsObj.getActualElement(webelement,input)
+            elif webelement.tag_name=='table' and int(input[3]) <= 0:
+                err_msg = ERROR_CODE_DICT['INVALID_TABLE_INDEX']
+                logger.print_on_console(err_msg)
+                local_ddl.log.info(err_msg)
             elif webelement.tag_name in ['lightning-combobox','lightning-grouped-combobox']:
                 dropdown_ele=webelement.find_element_by_xpath('.//input[@role="combobox"]')
                 dropdown_ele.click()
@@ -282,7 +289,7 @@ class DropdownKeywords():
                     ele_lists[0].click()
                 status=webconstants.TEST_RESULT_PASS
                 result=webconstants.TEST_RESULT_TRUE
-            if ((webelement.is_enabled())):
+            if not err_msg and webelement.is_enabled():
                 if not (self.util.is_visible(webelement)) and self.__check_visibility_from_config():
                     #performing js code
                     local_ddl.log.debug('element is invisible, performing js code')
@@ -454,7 +461,7 @@ class DropdownKeywords():
                         logger.print_on_console('Element is not displayed')
                         local_ddl.log.info(ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED'])
                         err_msg = ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED']
-            else:
+            elif not err_msg:
                 err_msg = 'Element is not enabled '
                 logger.print_on_console(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
                 local_ddl.log.info(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
@@ -1154,9 +1161,13 @@ class DropdownKeywords():
                     logger.print_on_console(e)
             else:
                 try:
-                    if webelement.tag_name == 'table':
+                    if webelement.tag_name == 'table' and int(input[3]) >= 1:
                         if ((webelement.is_enabled())):
                             webelement = self.radioKeywordsObj.getActualElement(webelement, input)
+                        elif int(input[3]) <= 0:
+                            err_msg = 'Invalid Input: Index input cannot be 0 for table'
+                            logger.print_on_console(ERROR_CODE_DICT['INVALID_TABLE_INDEX'])
+                            local_ddl.log.info(ERROR_CODE_DICT['INVALID_TABLE_INDEX'])
                         else:
                             err_msg = 'Element is not enabled '
                             logger.print_on_console(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])

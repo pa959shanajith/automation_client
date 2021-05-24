@@ -186,6 +186,7 @@ ERROR_CODE_DICT = {
                     'ERR_STRING_INDEX_OUT_OF_BOUNDS_EXCEPTION': 'Input Error: Invalid number of inputs.',
                     'ERR_INPUT_EXCEEDS': 'The input provided exceeds the number of windows open',
                     'ERR_WEB_DRIVER_EXCEPTION': 'Error occurred with browser',
+                    'INVALID_TABLE_INDEX': 'Invalid Input: Index input cannot be 0 for table',
                     'CLICKABLE_EXCEPTION': 'File type input Element is not Clickable, use uploadFile keyword instead.',
                     'PRESSABLE_EXCEPTION': 'File type input Element is not Pressable, use uploadFile keyword instead.',
                     'ERR_NO_SUCH_WINDOW_EXCEPTION': "Requested web page can't be found.",
