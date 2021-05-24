@@ -190,6 +190,7 @@ ERROR_CODE_DICT = {
                     'CLICKABLE_EXCEPTION': 'File type input Element is not Clickable, use uploadFile keyword instead.',
                     'PRESSABLE_EXCEPTION': 'File type input Element is not Pressable, use uploadFile keyword instead.',
                     'ERR_NO_SUCH_WINDOW_EXCEPTION': "Requested web page can't be found.",
+                    'ERR_SHORTCUT': 'CTRL + S shortcut not supported by IE for PDF webpages, use CTRL + SHIFT + S.',
                     'ERR_UNHANDELED_ALERT_EXCEPTION': 'Error occurred due to unexpected alert.',
                     'ERR_INVALID_SELECTOR_EXCEPTION': 'Object Not Found.',
                     'ERR_ELEMENT_NOT_VISIBLE_EXCEPTION': 'Object is hidden.',

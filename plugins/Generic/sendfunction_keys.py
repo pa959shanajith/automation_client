@@ -29,13 +29,18 @@ class SendFunctionKeys:
         methodoutput=TEST_RESULT_FALSE
         err_msg=None
         output_res=OUTPUT_CONSTANT
-
+         
         # For bringing the browser to foreground
         self.bring_to_foreground()
         try:
+            from browser_Keywords import driver_pre
+            if driver_pre.name == 'internet explorer' and input and input == 'Ctrl+S':
+                err_msg = ERROR_CODE_DICT['ERR_SHORTCUT']
+                log.debug(err_msg)
+
             log.debug('reading the inputs')
             input=str(input)
-            if not(input is None or input is '' or input == 'None'):
+            if not(input is None or input is '' or input == 'None') and not err_msg:
                 count=self.get_args(args)
                 if count[1] == 'type':
                     log.debug('sending the keys in input')
@@ -62,7 +67,7 @@ class SendFunctionKeys:
                             log.error(e)
                             log.debug('Invalid input')
                             err_msg = "Function key '{}' is not recognized.".format(input)
-            else:
+            elif not err_msg:
                 log.debug('Invalid input')
                 err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
 
