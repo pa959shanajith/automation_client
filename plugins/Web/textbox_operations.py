@@ -290,9 +290,17 @@ class TextboxKeywords:
                                 else:
                                     webelement.clear()
                                 local_to.log.debug('Setting the text')
-                                browser_Keywords.local_bk.driver_obj.execute_script(SET_TEXT_SCRIPT,webelement,input)
-                                status=TEST_RESULT_PASS
-                                methodoutput=TEST_RESULT_TRUE
+                                browser_Keywords.local_bk.driver_obj.execute_script(SET_TEXT_SCRIPT, webelement, input)
+                                # Bug #19221. To check if value is set or not.
+                                value = browser_Keywords.local_bk.driver_obj.execute_script('return arguments[0].value', webelement)
+                                if value == input:
+                                    # implies that the value has been set in the textbox
+                                    status = TEST_RESULT_PASS
+                                    methodouput = TEST_RESULT_TRUE
+                                else:
+                                    if webelement.get_attribute('type') == 'number':
+                                        err_msg = ERROR_CODE_DICT['ERR_INPUT_TYPE_MISMATCH']
+                                        logger.print_on_console(err_msg)
                             else:
                                 err_msg=self.__read_only()
                 else:
@@ -305,7 +313,6 @@ class TextboxKeywords:
 
             except Exception as e:
                 err_msg=self.__web_driver_exception(e)
-
         return status,methodoutput,output,err_msg
 
     def send_value(self,webelement,input,*args):

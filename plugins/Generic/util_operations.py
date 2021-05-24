@@ -327,16 +327,32 @@ class UtilOperations:
             err_msg=INPUT_ERROR
         return status,methodoutput,output,err_msg
 
-    def stop(self,*args):
-        status=TEST_RESULT_PASS
-        methodoutput=TEST_RESULT_TRUE
-        err_msg=None
-        log.info('Execution Stopped')
-        logger.print_on_console('Execution Stopped')
-        log.debug('Execution Stopped')
-        import handler
-        output=len(handler.local_handler.tspList)
-        return status,methodoutput,output,err_msg
+    def stop(self,stop_type=None):
+        status = TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FALSE
+        output = OUTPUT_CONSTANT
+        err_msg = None
+        if stop_type == None or stop_type == '':
+            status = TEST_RESULT_PASS
+            methodoutput = TEST_RESULT_TRUE
+            log.info('Execution Stopped')
+            logger.print_on_console('Execution Stopped')
+            log.debug('Execution Stopped')
+            import handler
+            output = len(handler.local_handler.tspList)
+        elif stop_type.lower() in ['module', 'scenario', 'testcase']:
+            status = TEST_RESULT_PASS
+            methodoutput = TEST_RESULT_TRUE
+            log.info('Execution Stopped')
+            logger.print_on_console('Execution Stopped')
+            log.debug('Execution Stopped')
+            import handler
+            output = len(handler.local_handler.tspList)
+        else:
+            err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
+        return status, methodoutput, output, err_msg
 
     def getIndexCount(self,variable):
         try:

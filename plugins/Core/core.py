@@ -132,6 +132,7 @@ class MainNamespace(BaseNamespace):
                         msg='Execution only Mode enabled'
                         logger.print_on_console(msg)
                         log.info(msg)
+                    socketIO.timer.resume()
                     conn_time = float(configvalues['connection_timeout'])
                     if (not (connection_Timer != None and connection_Timer.isAlive())
                      and (conn_time >= 8)):
@@ -1076,7 +1077,8 @@ class TestThread(threading.Thread):
                         self.cw.breakpoint.Enable()
                         try:
                             runfrom_step=self.cw.breakpoint.GetValue()
-                            runfrom_step=int(runfrom_step)
+                            if "-" not in runfrom_step:
+                                runfrom_step=int(runfrom_step)
                         except Exception as e:
                             runfrom_step=0
             if self.main.gui:
@@ -1389,8 +1391,17 @@ class Main():
                     return None
                 # ICE is registered
                 ip = configvalues['server_ip']
-                port = int(configvalues['server_port'])
-                conn = http.client.HTTPConnection(ip,port)
+                port = configvalues['server_port']
+                conn = http.client.HTTPConnection(ip,int(port))
+                if proxies:
+                    proxy = readconfig.readProxyConfig().readRawJson()
+                    proxy_url = proxy['url'].split(':')
+                    proxy_port = 80 if proxy['scheme'] == 'http' else 443
+                    if len(proxy_url) > 1:
+                        proxy_url, proxy_port = proxy_url
+                    auth_hash = base64.b64encode((proxy['username']+":"+proxy['password']).encode('utf-8')).decode("utf-8")
+                    conn = http.client.HTTPSConnection(proxy_url, port=proxy_port)
+                    conn.set_tunnel((ip+':'+port), headers={"Proxy-Authorization": f"Basic {auth_hash}"})
                 conn.connect()
                 conn.close()
                 self.socketthread = ConnectionThread(mode)

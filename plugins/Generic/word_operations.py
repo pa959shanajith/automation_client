@@ -14,7 +14,7 @@ import logging
 log = logging.getLogger('word_operations.py')
 import logger
 import platform
-if SYSTEM_OS != 'Darwin':
+if SYSTEM_OS == 'Windows':
     import fitz
 
 class WordFile():

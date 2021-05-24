@@ -255,6 +255,58 @@ class Text_Box:
         desktop_constants.ELEMENT_FOUND = status
         return status
 
+    def sendsecurefunction_keys(self, element, parent, input_val, *args):
+        if ( len(input_val) > 1 ):
+            text = input_val[3]
+        else:
+            text = input_val[0]
+        status = desktop_constants.TEST_RESULT_FAIL
+        result = desktop_constants.TEST_RESULT_FALSE
+        log.debug( 'Got window name after launching application' )
+        log.debug( desktop_launch_keywords.window_name )
+        log.info( STATUS_METHODOUTPUT_LOCALVARIABLES )
+        verb = OUTPUT_CONSTANT
+        err_msg = None
+        try:
+            if ( desktop_launch_keywords.window_name ):
+                log.info( 'Recieved element from the desktop dispatcher' )
+                dektop_element = element
+                check = self.verify_parent(element, parent)
+                log.debug( 'Parent of element while scraping' )
+                log.debug( parent )
+                log.debug( 'Parent check status' )
+                log.debug( check )
+                if ( check ):
+                    log.info( 'Parent matched' )
+                    if ( element.is_enabled() ):
+                        self.clear_text(element, parent)
+                        log.info( 'Element state is enabled' )
+                        from desktop_util_keywords import Util_Keywords
+                        obj=Util_Keywords()
+                        res=obj.setFocus(element, parent, *args)
+                        log.info( "focused on text box" )
+                        if res:
+                            from sendfunction_keys import SendFunctionKeys
+                            obj=SendFunctionKeys()
+                            result=obj.sendsecurefunction_keys(text)
+                            if result[0]!="Fail":
+                                status = desktop_constants.TEST_RESULT_PASS
+                                result = desktop_constants.TEST_RESULT_TRUE
+                                log.info( STATUS_METHODOUTPUT_UPDATE )
+                    else:
+                        err_msg = 'Element state does not allow to perform the operation'
+                else:
+                   err_msg = 'Element not present on the page where operation is trying to be performed'
+            if ( err_msg ):
+                log.info( err_msg )
+                logger.print_on_console( err_msg )
+        except Exception as exception:
+            err_msg = desktop_constants.ERROR_MSG + ' : ' + str(exception)
+            log.error( err_msg )
+            logger.print_on_console( err_msg )
+        log.info( RETURN_RESULT )
+        return status, result, verb, err_msg
+
 class CursorPositionCorrection:
     """When using sendkeys or type keys, we have observed that the mouse cursor moves from the current position very haphazardly. This class aims to rectify this type of anomaly"""
     def _init_():

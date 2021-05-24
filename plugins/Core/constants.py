@@ -258,6 +258,7 @@ ERROR_CODE_DICT = {
                     'ERR_NO_ACCESS_TO_FOLDER':'Invalid input: No access to folder or folder doesnot exists.',
                     'ERR_CONNECTION_FAILED':'Unable to establish connection to DB',
                     'ERR_VALUES_DOESNOT_MATCH':'Values does not match',
+                    'ERR_INPUT_TYPE_MISMATCH': 'Cannot set text to a numerical textbox',
                     #controller messages
                     'ERR_ENDIF_TERMINATE_EXECUTION': ' Execution Terminated : End if/Endfor is missing',
                     'ERR_INVALID_TESTCASE':'Execution Terminated : Jump to test case name not present',
@@ -283,6 +284,7 @@ ERROR_CODE_DICT = {
                     'ERR_SCREENSHOT_PATH':'Screenshot not captured - User does not have sufficient privileges for screenshot folder\n',
                     #Excel error messages
                     'ERR_ROW_NUMBER':'Invalid row number',
+                    'ERR_COL_NUMBER':'Invalid column number',
                     "ERR_ROW_DOESN'T_EXIST": "Row doesn't exist",
                     "ERR_COL_DOESN'T_EXIST": "Column doesn't exist",
                     'ERR_FILE_FORMAT': 'The specified file is not Excel file\n',

@@ -940,6 +940,8 @@ class StepDescription:
             return 'Verify ' + "'"+input + "'"+' is the text in the '+ "'" + tsp.custname + "'"+ '.'
         def setsecuretext():
             return 'Enter secure text ' +"'"+input + "'"+ ' in the  ' + "'" + tsp.custname + "'"+ '.'
+        def sendsecurefunctionkeys():
+            return 'Enter secure text ' +"'"+input + "'"+ ' in  ' + "'" + tsp.custname + "'"+ '.'
 
         #Element keywords(7 keywords)
         def getelementtext():
@@ -1298,6 +1300,8 @@ class StepDescription:
             return 'Enter secure text ' +"'"+input+"'"+ ' in the  ' + "'" + tsp.custname + "'"
         def sendsecurevalue():
             return 'Enter secure value ' +"'"+input+"'"+ ' in the  ' + "'" + tsp.custname + "'"
+        def sendsecurefunctionkeys():
+            return 'Enter secure text ' +"'"+input+"'"+ ' in the  ' + "'" + tsp.custname + "'"
         def iossendkey():
             return 'Press '+"'"+input+"'"+" Key"
 
