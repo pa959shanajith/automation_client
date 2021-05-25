@@ -50,6 +50,7 @@ class readConfig():
                 configvalues['screenShot_Flag']=params['screenShot_Flag']
                 configvalues['queryTimeOut']=params['queryTimeOut']
                 configvalues['timeOut']=params['timeOut']
+                configvalues['globalWaitTimeOut']=params['globalWaitTimeOut']
                 configvalues['stepExecutionWait']=params['stepExecutionWait']
                 configvalues['displayVariableTimeOut'] = params['displayVariableTimeOut']
                 configvalues['httpStatusCode']=params['httpStatusCode']

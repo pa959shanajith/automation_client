@@ -192,6 +192,23 @@ class MobileDispatcher:
                 elif keyword==WAIT_FOR_ELEMENT_EXISTS:
                     result=self.mob_dict[keyword](objectname,input)
                 else:
+                    configobj = readconfig.readConfig()
+                    configvalues = configobj.readJson()
+                    globalWait_to= configvalues['globalWaitTimeOut']
+                    if globalWait_to>0:
+                        start_time = time.time()
+                        while True:
+                            element, xpath=self.getMobileElement(android_scrapping.driver,objectname)
+                            later=time.time()
+                            if int(later-start_time)>=int(globalWait_to):
+                                msg='globalWaitTimeOut exceeded'
+                                logger.print_on_console(msg)
+                                log.error(msg)
+                                break
+                            if element is not None:
+                                logger.print_on_console('globalWaitTimeOut completed successfully')
+                                log.info('globalWaitTimeOut completed successfully')
+                                break
                     element, xpath=self.getMobileElement(android_scrapping.driver,objectname)
                     result=self.mob_dict[keyword](element,input,xpath)
             else:
