@@ -38,6 +38,7 @@ class QcWindow():
     def login(self,filePath):
         res = "invalidcredentials"
         try:
+            flag=True
             user_name=filePath["qcUsername"]
             pass_word=filePath["qcPassword"]
             self.Qc_Url=filePath["qcURL"]
@@ -48,13 +49,20 @@ class QcWindow():
                 cookieName = resp.headers.get('Set-Cookie')
                 LWSSO_COOKIE_KEY = cookieName[cookieName.index("=") + 1: cookieName.index(";")]
                 self.cookies = {'LWSSO_COOKIE_KEY': LWSSO_COOKIE_KEY}
-
-            qcSessionEndPoint = self.Qc_Url + "/rest/site-session"    
-            response = requests.post(qcSessionEndPoint, headers=self.headers, cookies=self.cookies,proxies=readconfig.proxies)
-            if response.status_code == 200 | response.status_code == 201:
-                cookieName = response.headers.get('Set-Cookie').split(",")[1]
-                QCSession = cookieName[cookieName.index("=") + 1: cookieName.index(";")]
-                self.cookies['QCSession'] = QCSession
+            else:
+                self.headers = {"Content-Type": "application/json"}
+                login_url = self.Qc_Url + '/rest/oauth2/login'
+                payload={"clientId":user_name,"secret":pass_word}
+                resp = requests.post(login_url,  headers=self.headers,data=json.dumps(payload),proxies=readconfig.proxies)
+                self.cookies=resp.cookies
+                flag=False
+            if flag:
+                qcSessionEndPoint = self.Qc_Url + "/rest/site-session"
+                response = requests.post(qcSessionEndPoint, headers=self.headers, cookies=self.cookies,proxies=readconfig.proxies)
+                if response.status_code == 200 | response.status_code == 201:
+                    cookieName = response.headers.get('Set-Cookie').split(",")[1]
+                    QCSession = cookieName[cookieName.index("=") + 1: cookieName.index(";")]
+                    self.cookies['QCSession'] = QCSession
         
             #fetching domains
             domain_dict={}
@@ -151,10 +159,14 @@ class QcWindow():
                 k1 = y1["Entities"]["Entity"] #contains all the folder names
                 for f in k1:
                     l = f["Fields"]["Field"]
+                    folder = fid = None
                     for n in l:
                         if n["@Name"] == "name":
                             folder = str(n["Value"])
-                            folder_list.append({"foldername": folder, "folderpath": testsetpath + "\\" + folder})
+                        if n["@Name"] == "id":
+                            fid = str(n["Value"])
+                        if folder != None and fid != None:
+                            folder_list.append({"foldername": folder, "folderpath": testsetpath + "\\" + folder,"folderid": fid})
 
             #fetching testsets
             payload = {"query": "{parent-id[" + parentID + "]}", "fields": "id,name"}
