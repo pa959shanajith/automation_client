@@ -87,6 +87,9 @@ class Controller():
         self.scenario_ellapsed_time=''
         self.reporting_obj=reporting.Reporting()
         self.conthread=None
+        self.active_scheme=""
+        self.change_power_option=""
+        self.powerscheme_location=""
         self.counter=[]
         self.jumpto_previousindex=[]
         self.verify_exists=False
@@ -1545,34 +1548,108 @@ class Controller():
         socket_object = socketIO
         configvalues = self.configvalues
         dis_sys_screenoff = str(configvalues['disable_screen_timeout']).lower()
-        import ctypes, os
-        is_admin = ctypes.windll.shell32.IsUserAnAdmin()
-        #Logic to make sure that logic of usage of existing driver is not applicable to execution
-        if local_cont.web_dispatcher_obj != None:
-            local_cont.web_dispatcher_obj.action=action
-        if action==EXECUTE:
-            aws_mode = len(args)>0 and args[0]
-            self.execution_mode = json_data['exec_mode'].lower()
-            kill_process()
-            if dis_sys_screenoff == 'yes' and is_admin:
-                import subprocess
-                # command = []
-                # proc = subprocess.run(command)
-                logger.print_on_console("Commands to run just before execution starts")
-            if self.execution_mode == SERIAL:
-                status=self.invoke_execution(mythread,json_data,socketIO,wxObject,self.configvalues,qc_soc,qtest_soc,zephyr_soc,aws_mode)
-            elif self.execution_mode == PARALLEL:
-                status = self.invoke_parralel_exe(mythread,json_data,socketIO,wxObject,self.configvalues,qc_soc,qtest_soc,zephyr_soc,aws_mode)
-        elif action==DEBUG:
-            self.debug_choice=wxObject.choice
-            self.debug_mode=debug_mode
-            self.wx_object=wxObject
-            status=self.invoke_debug(mythread,runfrom_step,json_data)
-        if status != TERMINATE:
-            status=COMPLETED
-        if dis_sys_screenoff == 'yes' and action==EXECUTE and is_admin:
-            logger.print_on_console("reset Command to run after execution ends")
+        try:
+            import ctypes
+            is_admin = ctypes.windll.shell32.IsUserAnAdmin()
+            #Logic to make sure that logic of usage of existing driver is not applicable to execution
+            logger.print_on_console(action)
+            if local_cont.web_dispatcher_obj != None:
+                local_cont.web_dispatcher_obj.action=action
+            if action==EXECUTE:
+                aws_mode = len(args)>0 and args[0]
+                self.execution_mode = json_data['exec_mode'].lower()
+                kill_process()
+                if dis_sys_screenoff == 'yes' and is_admin and SYSTEM_OS == 'Windows':
+                    #self.disable_screen_timeout()
+                    logger.print_on_console("disable screen timeout before execution starts")
+                if self.execution_mode == SERIAL:
+                    status=self.invoke_execution(mythread,json_data,socketIO,wxObject,self.configvalues,qc_soc,qtest_soc,zephyr_soc,aws_mode)
+                elif self.execution_mode == PARALLEL:
+                    status = self.invoke_parralel_exe(mythread,json_data,socketIO,wxObject,self.configvalues,qc_soc,qtest_soc,zephyr_soc,aws_mode)
+            elif action==DEBUG:
+                self.debug_choice=wxObject.choice
+                self.debug_mode=debug_mode
+                self.wx_object=wxObject
+                status=self.invoke_debug(mythread,runfrom_step,json_data)
+            if status != TERMINATE:
+                status=COMPLETED
+            if dis_sys_screenoff == 'yes' and action==EXECUTE and is_admin and SYSTEM_OS == 'Windows':
+                #self.reset_screen_timeout()
+                logger.print_on_console("reset screen timeout after execution ends")
+        except Exception as e:
+            logger.print_on_console("Exception in Invoke Controller")
+            log.error("Exception in Invoke Controller. Error: " + str(e))
         return status
+
+    def disable_screen_timeout(self):
+        import subprocess
+        import re
+        try:
+            msg="Disable screen timeout process started"
+            log.info(msg)
+            log.debug(msg)
+            poweroptions_list=[]
+            get_active_scheme_cmd = "powercfg -getactivescheme"
+            power_cfg_active = subprocess.Popen(get_active_scheme_cmd, shell=True, stdout=subprocess.PIPE)
+            power_active_scheme = power_cfg_active.stdout.read()
+            power_active_scheme = power_active_scheme.decode()
+            pattern = "GUID: [a-z,A-Z,0-9]*-?[a-z,A-Z,0-9]*-?[a-z,A-Z,0-9]*-?[a-z,A-Z,0-9]*-?[a-z,A-Z,0-9]*"
+            result = re.findall(pattern, power_active_scheme)
+            for i in result:
+                temp = []
+                temp = i.split(" ")
+                if temp[-1] and len(temp[-1])==36:
+                    self.active_scheme=temp[-1]
+            powercgf_list_cmd = "powercfg -list"
+            power_cfg_list = subprocess.Popen(powercgf_list_cmd, shell=True, stdout=subprocess.PIPE)
+            power_scheme_list = power_cfg_list.stdout.read()
+            power_scheme_list = power_scheme_list.decode()
+            pattern = "GUID: [a-z,A-Z,0-9]*-?[a-z,A-Z,0-9]*-?[a-z,A-Z,0-9]*-?[a-z,A-Z,0-9]*-?[a-z,A-Z,0-9]*"
+            result1 = re.findall(pattern, power_scheme_list)
+            for i in result1:
+                temp1 = []
+                temp1 = i.split(" ")
+                if temp1[-1] and len(temp1[-1])==36:
+                    poweroptions_list.append(temp1[-1])
+            for j in poweroptions_list:
+                if j!=self.active_scheme:
+                    self.change_power_option=i
+                    break
+            self.powerscheme_location=os.environ['AVO_ASSURE_HOME']+os.sep+'assets'+os.sep+'active_scheme.pow'
+            export_cmd="powercfg -export "+self.powerscheme_location+" "+self.active_scheme
+            subprocess.call(export_cmd, shell=True)
+            ## powercfg_commands = ["powercfg /change standby-timeout-ac 0", "powercfg /change standby-timeout-dc 0", "powercfg /change monitor-timeout-ac 0", "powercfg /change monitor-timeout-dc 0", "powercfg /change hibernate-timeout-ac 0", "powercfg /change hibernate-timeout-dc 0"]
+            ## for command in powercfg_commands:
+            ##     subprocess.call(command, shell=True)
+            msg1="Disable screen timeout process completed"
+            log.info(msg1)
+            log.debug(msg1)
+        except Exception as e:
+            logger.print_on_console("Exception in reset screen timeout")
+            log.error("Exception in reset screen timeout. Error: " + str(e))
+
+    def reset_screen_timeout(self):
+        import subprocess
+        import os
+        try:
+            msg="reset screen timeout process started"
+            log.info(msg)
+            log.debug(msg)
+            setactive_cmd="powercfg -setactive "+self.change_power_option
+            subprocess.call(setactive_cmd, shell=True)
+            deleteactive_cmd="powercfg -delete "+self.active_scheme
+            subprocess.call(deleteactive_cmd, shell=True)
+            import_cmd="powercfg -import "+self.powerscheme_location+" "+self.active_scheme
+            subprocess.call(import_cmd, shell=True)
+            os.remove(self.powerscheme_location)
+            setactive_cmd="powercfg -setactive "+self.active_scheme
+            subprocess.call(setactive_cmd, shell=True)
+            msg1="reset screen timeout process completed"
+            log.info(msg1)
+            log.debug(msg1)
+        except Exception as e:
+            logger.print_on_console("Exception in reset screen timeout")
+            log.error("Exception in reset screen timeout. Error: " + str(e))
 
     def invoke_parralel_exe(self,mythread,json_data,socketIO,wxObject,configvalues,qc_soc,qtest_soc,zephyr_soc,aws_mode):
         try:
