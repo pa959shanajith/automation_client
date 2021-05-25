@@ -51,10 +51,10 @@ class DropdownKeywords():
         try:
             if webelement is not None:
                 local_ddl.log.info('Recieved web element from the web dispatcher')
-                if webelement.tag_name=='table' and int(input[3]) >= 1 and int(input[4]) >= 1:
+                if webelement.tag_name=='table' and int(input[3]) >= 1:
                         webelement=self.radioKeywordsObj.getActualElement(webelement,input)
                         index = input[4]
-                elif webelement.tag_name=='table' and (int(input[3]) <= 0 or int(input[3]) <= 0):
+                elif webelement.tag_name=='table' and int(input[3]) <= 0:
                     err_msg = ERROR_CODE_DICT['INVALID_TABLE_INDEX']
                     logger.print_on_console(err_msg)
                     local_ddl.log.info(err_msg)
