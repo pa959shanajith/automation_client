@@ -10,6 +10,7 @@
 #-------------------------------------------------------------------------------
 
 from selenium import webdriver
+from encryption_utility import AESCipher
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import *
 import logger
@@ -42,7 +43,25 @@ class UtilWebKeywords:
         self.keys_info={}
         self.__create_keyinfo_dict()
         self.__load_Image_processingobj()
+        self.tblobj = table_keywords.TableOperationKeywords()
 
+    def _invalid_input(self):
+        err_msg=ERROR_CODE_DICT['ERR_INVALID_INPUT']
+        local_uo.log.info(err_msg)
+        logger.print_on_console(err_msg)
+        return err_msg
+
+    def _invalid_index(self):
+        err_msg=("list index out of range")
+        local_uo.log.info(err_msg)
+        logger.print_on_console(err_msg)
+        return err_msg
+
+    def _index_zero(self):
+        err_msg = (" index starts from 1")
+        local_uo.log.info(err_msg)
+        logger.print_on_console(err_msg)
+        return err_msg
 
     def __create_keyinfo_dict(self):
          self.keys_info['null']=Keys.NULL
@@ -1018,7 +1037,7 @@ class UtilWebKeywords:
             elif(len(input)==1):
                 attr_name=input[0]
                 eleStatus=True
-                
+
             if(eleStatus):
                 if webelement != None and webelement !='':
                     local_uo.log.info(INPUT_IS)
@@ -1271,3 +1290,67 @@ class UtilWebKeywords:
                 webelement1=cellChild
                 break
         return eleStatus, webelement1
+
+    def sendsecurefunction_keys(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        check_flag=True
+        output=OUTPUT_CONSTANT
+        input_val = input[0]
+        if webelement is not None:
+            try:
+                if webelement.is_enabled():
+                    if webelement.tag_name == 'table':
+                        if len(input)==5:
+                            row_num=int(input[0])
+                            col_num=int(input[1])
+                            obj_type=input[2].lower()
+                            index_val=int(input[3])-1
+                            inp_list=[]
+                            inp_list.append(input[4])
+                            local_uo.log.info(input)
+                        row_count=self.tblobj.getRowCountJs(webelement)
+                        col_count=self.tblobj.getColoumnCountJs(webelement)
+                        input = inp_list
+                        if (obj_type=="textbox" or obj_type=="input") and index_val>=0:
+                            if row_num>row_count or col_num>col_count:
+                                check_flag=False
+                                err_msg=self._invalid_input()
+                            else:
+                                cell=self.tblobj.javascriptExecutor(webelement,row_num-1,col_num-1)
+                                txt_box=cell.find_elements_by_tag_name('input')
+                                if len(txt_box)>0:
+                                    if index_val >= len(txt_box):
+                                        check_flag=False
+                                        err_msg=self._invalid_index()
+                                    else:
+                                        webelement = txt_box[index_val]
+                                else:
+                                    check_flag=False
+                                    err_msg=self._invalid_input()
+                        elif obj_type!= "textbox":
+                            check_flag=False
+                            err_msg=self._invalid_input()
+                        else:
+                            check_flag=False
+                            err_msg=self._index_zero()
+                    if check_flag==True:
+                        local_uo.log.debug(WEB_ELEMENT_ENABLED)
+                        if input_val!="":
+                            input_val = input[0]
+                            self.__setfocus(webelement)
+                            from sendfunction_keys import SendFunctionKeys
+                            obj=SendFunctionKeys()
+                            result=obj.sendsecurefunction_keys(input_val,*args)
+                            if result[0]!="Fail":
+                                status=TEST_RESULT_PASS
+                                methodoutput=TEST_RESULT_TRUE
+                        else:
+                            err_msg = 'input value is empty'
+                            logger.print_on_console(err_msg)
+                            local_uo.log.error(err_msg)      
+            except Exception as e:
+                log.error("Error in sendsecurefunction_keys")
+                err_msg=self.__web_driver_exception(e)              
+        return status,methodoutput,output,err_msg
