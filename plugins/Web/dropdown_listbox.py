@@ -1742,7 +1742,7 @@ class DropdownKeywords():
         err_msg=None
         if webelement is not None:
             if len(input)==5:
-                if webelement.tag_name=='table':
+                if webelement.tag_name=='table' and int(input[3]) >= 1: 
                     dropVal=input[2]
                     row_num=int(input[0])-1
                     col_num=int(input[1])-1
@@ -1789,6 +1789,10 @@ class DropdownKeywords():
                     except Exception as e:
                         local_ddl.log.error(e)
                         logger.print_on_console(e)
+                else:
+                    err_msg = ERROR_CODE_DICT['INVALID_TABLE_INDEX']
+                    logger.print_on_console(err_msg)
+                    local_ddl.log.info(err_msg)
             elif (len(input) == 1):
                 if(webelement.is_enabled()):
                     if input[0] != '':

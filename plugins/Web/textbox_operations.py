@@ -66,7 +66,7 @@ class TextboxKeywords:
         return err_msg
 
     def _index_zero(self):
-        err_msg = (" index starts from 1")
+        err_msg = ERROR_CODE_DICT['INVALID_TABLE_INDEX']
         local_to.log.info(err_msg)
         logger.print_on_console(err_msg)
         return err_msg
@@ -236,7 +236,9 @@ class TextboxKeywords:
                                     local_rco.log.error(err_msg)
                                     logger.print_on_console(err_msg)
                     if webelement.tag_name == 'table':
-                        if len(input)==5:
+                        if len(input) == 5 and int(input[3]) <= 0:
+                            err_msg = self._index_zero()
+                        elif len(input)==5:
                             row_num=int(input[0])
                             col_num=int(input[1])
                             obj_type=input[2].lower()
@@ -244,32 +246,31 @@ class TextboxKeywords:
                             inp_list=[]
                             inp_list.append(input[4])
                             local_to.log.info(input)
-                        row_count=self.tblobj.getRowCountJs(webelement)
-                        col_count=self.tblobj.getColoumnCountJs(webelement)
-                        input = inp_list
-                        if (obj_type=="textbox" or obj_type=="input") and index_val>=0:
-                            if row_num>row_count or col_num>col_count:
-                                check_flag=False
-                                err_msg=self._invalid_input()
-                            else:
-                                cell=self.tblobj.javascriptExecutor(webelement,row_num-1,col_num-1)
-                                txt_box=cell.find_elements_by_tag_name('input')
-                                if len(txt_box)>0:
-                                    if index_val >= len(txt_box):
-                                        check_flag= False
-                                        err_msg=self._invalid_index()
-                                    else:
-                                        webelement = txt_box[index_val]
-                                else:
+                            input = inp_list
+                            row_count=self.tblobj.getRowCountJs(webelement)
+                            col_count=self.tblobj.getColoumnCountJs(webelement)
+                            if (obj_type=="textbox" or obj_type=="input") and index_val>=0:
+                                if row_num>row_count or col_num>col_count:
                                     check_flag=False
                                     err_msg=self._invalid_input()
-                        elif obj_type!= "textbox":
-                            check_flag=False
-                            err_msg=self._invalid_input()
+                                else:
+                                    cell=self.tblobj.javascriptExecutor(webelement,row_num-1,col_num-1)
+                                    txt_box=cell.find_elements_by_tag_name('input')
+                                    if len(txt_box)>0:
+                                        if index_val >= len(txt_box):
+                                            check_flag= False
+                                            err_msg=self._invalid_index()
+                                        else:
+                                            webelement = txt_box[index_val]
+                                    else:
+                                        check_flag=False
+                                        err_msg=self._invalid_input()
+                            elif obj_type!= "textbox":
+                                check_flag=False
+                                err_msg=self._invalid_input()
                         else:
-                            check_flag=False
-                            err_msg=self._index_zero()
-                    if check_flag==True:
+                            err_msg = self._invalid_input()
+                    if check_flag==True and not err_msg:
                         local_to.log.debug(WEB_ELEMENT_ENABLED)
                         utilobj=UtilWebKeywords()
                         is_visble=utilobj.is_visible(webelement)
@@ -436,7 +437,9 @@ class TextboxKeywords:
                                     local_rco.log.error(err_msg)
                                     logger.print_on_console(err_msg)
                     if webelement.tag_name == 'table':
-                        if len(input)==5:
+                        if len(input) == 5 and int(input[3]) <= 0:
+                            err_msg = self._index_zero()
+                        elif len(input)==5:
                             row_num=int(input[0])
                             col_num=int(input[1])
                             obj_type=input[2].lower()
@@ -444,32 +447,31 @@ class TextboxKeywords:
                             inp_list=[]
                             inp_list.append(input[4])
                             local_to.log.info(input)
-                        row_count=self.tblobj.getRowCountJs(webelement)
-                        col_count=self.tblobj.getColoumnCountJs(webelement)
-                        input = inp_list
-                        if (obj_type=="textbox" or obj_type=="input") and index_val>=0:
-                            if row_num>row_count or col_num>col_count:
-                                check_flag=False
-                                err_msg=self._invalid_input()
-                            else:
-                                cell=self.tblobj.javascriptExecutor(webelement,row_num-1,col_num-1)
-                                txt_box=cell.find_elements_by_tag_name('input')
-                                if len(txt_box)>0:
-                                    if index_val >= len(txt_box):
-                                        check_flag=False
-                                        err_msg=self._invalid_index()
-                                    else:
-                                        webelement = txt_box[index_val]
-                                else:
+                            input = inp_list
+                            row_count=self.tblobj.getRowCountJs(webelement)
+                            col_count=self.tblobj.getColoumnCountJs(webelement)
+                            if (obj_type=="textbox" or obj_type=="input") and not err_msg:
+                                if row_num>row_count or col_num>col_count:
                                     check_flag=False
                                     err_msg=self._invalid_input()
-                        elif obj_type!= "textbox":
-                            check_flag=False
-                            err_msg=self._invalid_input()
+                                else:
+                                    cell=self.tblobj.javascriptExecutor(webelement,row_num-1,col_num-1)
+                                    txt_box=cell.find_elements_by_tag_name('input')
+                                    if len(txt_box)>0:
+                                        if index_val >= len(txt_box):
+                                            check_flag=False
+                                            err_msg=self._invalid_index()
+                                        else:
+                                            webelement = txt_box[index_val]
+                                    else:
+                                        check_flag=False
+                                        err_msg=self._invalid_input()
+                            elif obj_type!= "textbox" and not err_msg:
+                                check_flag=False
+                                err_msg=self._invalid_input()
                         else:
-                            check_flag=False
-                            err_msg=self._index_zero()
-                    if check_flag==True:
+                            err_msg = self._invalid_input()
+                    if check_flag==True and not err_msg:
                         local_to.log.debug(WEB_ELEMENT_ENABLED)
                         utilobj=UtilWebKeywords()
                         isvisble=utilobj.is_visible(webelement)
@@ -667,43 +669,47 @@ class TextboxKeywords:
                                 err_msg='Object not found: Textbox not found inside the cell'
                                 local_rco.log.error(err_msg)
                                 logger.print_on_console(err_msg)
-                if webelement.tag_name == 'table':
-                    if len(input)==4:
+                elif webelement.tag_name == 'table':
+                    if len(input) == 4 and int(input[3]) <= 0:
+                        err_msg = self._index_zero()
+                    elif len(input)==4:
                         row_num=int(input[0])
                         col_num=int(input[1])
                         obj_type=input[2].lower()
                         index_val=int(input[3])-1
-                    row_count=self.tblobj.getRowCountJs(webelement)
-                    col_count=self.tblobj.getColoumnCountJs(webelement)
-                    if ( obj_type=="textbox" or obj_type=="input") and index_val>=0:
-                        if row_num>row_count or col_num>col_count:
+                        row_count=self.tblobj.getRowCountJs(webelement)
+                        col_count=self.tblobj.getColoumnCountJs(webelement)
+                        if ( obj_type=="textbox" or obj_type=="input") and index_val>=0:
+                            if row_num>row_count or col_num>col_count:
+                                check_flag=False
+                                err_msg=self._invalid_input()
+                            else:
+                                cell=self.tblobj.javascriptExecutor(webelement,row_num-1,col_num-1)
+                                txt_box=cell.find_elements_by_tag_name('input')
+                                if len(txt_box)>0:
+                                    if index_val >= len(txt_box):
+                                        check_flag=False
+                                        err_msg=self._invalid_index()
+                                    else:
+                                        webelement = txt_box[index_val]
+                                else:
+                                    check_flag=False
+                                    err_msg=self._invalid_input()
+                        elif obj_type!= "textbox":
                             check_flag=False
                             err_msg=self._invalid_input()
                         else:
-                            cell=self.tblobj.javascriptExecutor(webelement,row_num-1,col_num-1)
-                            txt_box=cell.find_elements_by_tag_name('input')
-                            if len(txt_box)>0:
-                                if index_val >= len(txt_box):
-                                    check_flag=False
-                                    err_msg=self._invalid_index()
-                                else:
-                                    webelement = txt_box[index_val]
-                            else:
-                                check_flag=False
-                                err_msg=self._invalid_input()
-                    elif obj_type!= "textbox":
-                        check_flag=False
-                        err_msg=self._invalid_input()
+                            check_flag=False
+                            err_msg=self._index_zero()
                     else:
-                        check_flag=False
-                        err_msg=self._index_zero()
+                        err_msg = self._invalid_input()
                 if webelement.tag_name[0:9] == 'lightning':
                     text=webelement.text
                     if(text!=None and text!=''):
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE  
                         check_flag=False
-                if check_flag==True:
+                if check_flag==True and not err_msg:
                     text=self.__get_text(webelement)
                     if text is None:
                         err_msg=self._noneGetText()
@@ -841,7 +847,9 @@ class TextboxKeywords:
                                 local_rco.log.error(err_msg)
                                 logger.print_on_console(err_msg)
                 if webelement.tag_name == 'table':
-                    if len(input)==5:
+                    if len(input) == 5 and int(input[3]) <= 0:
+                        err_msg = self._index_zero()
+                    elif len(input)==5:
                         row_num=int(input[0])
                         col_num=int(input[1])
                         obj_type=input[2].lower()
@@ -849,38 +857,40 @@ class TextboxKeywords:
                         inp_list=[]
                         inp_list.append(input[4])
                         local_to.log.info(input)
-                    row_count=self.tblobj.getRowCountJs(webelement)
-                    col_count=self.tblobj.getColoumnCountJs(webelement)
-                    input = inp_list
-                    if (obj_type=="textbox" or obj_type=="input") and index_val>=0:
-                        if row_num>row_count or col_num>col_count:
+                        row_count=self.tblobj.getRowCountJs(webelement)
+                        col_count=self.tblobj.getColoumnCountJs(webelement)
+                        input = inp_list
+                        if (obj_type=="textbox" or obj_type=="input") and index_val>=0:
+                            if row_num>row_count or col_num>col_count:
+                                check_flag=False
+                                err_msg=self._invalid_input()
+                            else:
+                                cell=self.tblobj.javascriptExecutor(webelement,row_num-1,col_num-1)
+                                txt_box=cell.find_elements_by_tag_name('input')
+                                if len(txt_box)>0:
+                                    if index_val >= len(txt_box):
+                                        check_flag=False
+                                        err_msg=self._invalid_index()
+                                    else:
+                                        webelement = txt_box[index_val]
+                                else:
+                                    check_flag=False
+                                    err_msg=self._invalid_input()
+                        elif obj_type!= "textbox":
                             check_flag=False
                             err_msg=self._invalid_input()
                         else:
-                            cell=self.tblobj.javascriptExecutor(webelement,row_num-1,col_num-1)
-                            txt_box=cell.find_elements_by_tag_name('input')
-                            if len(txt_box)>0:
-                                if index_val >= len(txt_box):
-                                    check_flag=False
-                                    err_msg=self._invalid_index()
-                                else:
-                                    webelement = txt_box[index_val]
-                            else:
-                                check_flag=False
-                                err_msg=self._invalid_input()
-                    elif obj_type!= "textbox":
-                        check_flag=False
-                        err_msg=self._invalid_input()
+                            check_flag=False
+                            err_msg=self._index_zero()
                     else:
-                        check_flag=False
-                        err_msg=self._index_zero()
+                        err_msg = self._invalid_input()
                 if webelement.tag_name[0:9] == 'lightning':
                     text=webelement.text
                     if(text==input):
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE  
                         check_flag=False
-                if check_flag==True:
+                if check_flag==True and not err_msg:
                     text=self.__get_text(webelement)
                     input=input[0]
                     coreutilsobj=core_utils.CoreUtils()
@@ -1019,36 +1029,40 @@ class TextboxKeywords:
                                     local_rco.log.error(err_msg)
                                     logger.print_on_console(err_msg)
                     if webelement.tag_name == 'table':
-                        if len(input)==4:
+                        if len(input) == 4 and int(input[3]) <= 0:
+                            self._index_zero()
+                        elif len(input)==4:
                             row_num=int(input[0])
                             col_num=int(input[1])
                             obj_type=input[2].lower()
                             index_val=int(input[3])-1
-                        row_count=self.tblobj.getRowCountJs(webelement)
-                        col_count=self.tblobj.getColoumnCountJs(webelement)
-                        if ( obj_type=="textbox" or obj_type=="input") and index_val>=0:
-                            if row_num>row_count or col_num>col_count:
+                            row_count=self.tblobj.getRowCountJs(webelement)
+                            col_count=self.tblobj.getColoumnCountJs(webelement)
+                            if ( obj_type=="textbox" or obj_type=="input") and index_val>=0:
+                                if row_num>row_count or col_num>col_count:
+                                    check_flag=False
+                                    err_msg=self._invalid_input()
+                                else:
+                                    cell=self.tblobj.javascriptExecutor(webelement,row_num-1,col_num-1)
+                                    txt_box=cell.find_elements_by_tag_name('input')
+                                    if len(txt_box)>0:
+                                        if index_val >= len(txt_box):
+                                            check_flag=False
+                                            err_msg=self._invalid_index()
+                                        else:
+                                            webelement = txt_box[index_val]
+                                    else:
+                                        check_flag=False
+                                        err_msg=self._invalid_input()
+                            elif obj_type!= "textbox":
                                 check_flag=False
                                 err_msg=self._invalid_input()
                             else:
-                                cell=self.tblobj.javascriptExecutor(webelement,row_num-1,col_num-1)
-                                txt_box=cell.find_elements_by_tag_name('input')
-                                if len(txt_box)>0:
-                                    if index_val >= len(txt_box):
-                                        check_flag=False
-                                        err_msg=self._invalid_index()
-                                    else:
-                                        webelement = txt_box[index_val]
-                                else:
-                                    check_flag=False
-                                    err_msg=self._invalid_input()
-                        elif obj_type!= "textbox":
-                            check_flag=False
-                            err_msg=self._invalid_input()
+                                check_flag=False
+                                err_msg=self._index_zero()
                         else:
-                            check_flag=False
-                            err_msg=self._index_zero()
-                    if check_flag==True:
+                            err_msg = self._invalid_input()
+                    if check_flag==True and not err_msg:
                         local_to.log.debug(WEB_ELEMENT_ENABLED)
                         readonly_value=webelement.get_attribute("readonly")
                         if not(readonly_value is not None and readonly_value.lower() =='true' or readonly_value is ''):
@@ -1188,36 +1202,40 @@ class TextboxKeywords:
                                 local_rco.log.error(err_msg)
                                 logger.print_on_console(err_msg)
                 if webelement.tag_name == 'table':
-                    if len(input)==4:
+                    if len(input) == 4 and int(input[3]) <= 0:
+                        err_msg = self._index_zero()
+                    elif len(input)==4:
                         row_num=int(input[0])
                         col_num=int(input[1])
                         obj_type=input[2].lower()
                         index_val=int(input[3])-1
-                    row_count=self.tblobj.getRowCountJs(webelement)
-                    col_count=self.tblobj.getColoumnCountJs(webelement)
-                    if obj_type=="textbox" and index_val>=0:
-                        if row_num>row_count or col_num>col_count:
+                        row_count=self.tblobj.getRowCountJs(webelement)
+                        col_count=self.tblobj.getColoumnCountJs(webelement)
+                        if obj_type=="textbox" and index_val>=0:
+                            if row_num>row_count or col_num>col_count:
+                                check_flag=False
+                                err_msg=self._invalid_input()
+                            else:
+                                cell=self.tblobj.javascriptExecutor(webelement,row_num-1,col_num-1)
+                                txt_box=cell.find_elements_by_tag_name('input')
+                                if len(txt_box)>0:
+                                    if index_val >= len(txt_box):
+                                        check_flag=False
+                                        err_msg=self._invalid_index()
+                                    else:
+                                        webelement = txt_box[index_val]
+                                else:
+                                    check_flag=False
+                                    err_msg=self._invalid_input()
+                        elif obj_type!= "textbox":
                             check_flag=False
                             err_msg=self._invalid_input()
                         else:
-                            cell=self.tblobj.javascriptExecutor(webelement,row_num-1,col_num-1)
-                            txt_box=cell.find_elements_by_tag_name('input')
-                            if len(txt_box)>0:
-                                if index_val >= len(txt_box):
-                                    check_flag=False
-                                    err_msg=self._invalid_index()
-                                else:
-                                    webelement = txt_box[index_val]
-                            else:
-                                check_flag=False
-                                err_msg=self._invalid_input()
-                    elif obj_type!= "textbox":
-                        check_flag=False
-                        err_msg=self._invalid_input()
+                            check_flag=False
+                            err_msg=self._index_zero() 
                     else:
-                        check_flag=False
-                        err_msg=self._index_zero()             
-                if check_flag==True:
+                        err_msg = self._invalid_input()            
+                if check_flag==True and not err_msg:
                     length = self.__gettexbox_length(webelement)
                     if length is not None:
                         status=TEST_RESULT_PASS
@@ -1349,7 +1367,9 @@ class TextboxKeywords:
                                 local_rco.log.error(err_msg)
                                 logger.print_on_console(err_msg)
                 if webelement.tag_name == 'table':
-                    if len(input)==5:
+                    if len(input) == 5 and int(input[3]) <= 0:
+                        self._index_zero()
+                    elif len(input)==5:
                         row_num=int(input[0])
                         col_num=int(input[1])
                         obj_type=input[2].lower()
@@ -1357,32 +1377,34 @@ class TextboxKeywords:
                         inp_list=[]
                         inp_list.append(input[4])
                         local_to.log.info(input)
-                    row_count=self.tblobj.getRowCountJs(webelement)
-                    col_count=self.tblobj.getColoumnCountJs(webelement)
-                    input = inp_list
-                    if obj_type=="textbox" and index_val>=0:
-                        if row_num>row_count or col_num>col_count:
+                        row_count=self.tblobj.getRowCountJs(webelement)
+                        col_count=self.tblobj.getColoumnCountJs(webelement)
+                        input = inp_list
+                        if obj_type=="textbox" and index_val>=0:
+                            if row_num>row_count or col_num>col_count:
+                                check_flag=False
+                                err_msg=self._invalid_input()
+                            else:
+                                cell=self.tblobj.javascriptExecutor(webelement,row_num-1,col_num-1)
+                                txt_box=cell.find_elements_by_tag_name('input')
+                                if len(txt_box)>0:
+                                    if index_val >= len(txt_box):
+                                        check_flag=False
+                                        err_msg=self._invalid_index()
+                                    else:
+                                        webelement = txt_box[index_val]
+                                else:
+                                    check_flag=False
+                                    err_msg=self._invalid_input()
+                        elif obj_type!= "textbox":
                             check_flag=False
                             err_msg=self._invalid_input()
                         else:
-                            cell=self.tblobj.javascriptExecutor(webelement,row_num-1,col_num-1)
-                            txt_box=cell.find_elements_by_tag_name('input')
-                            if len(txt_box)>0:
-                                if index_val >= len(txt_box):
-                                    check_flag=False
-                                    err_msg=self._invalid_index()
-                                else:
-                                    webelement = txt_box[index_val]
-                            else:
-                                check_flag=False
-                                err_msg=self._invalid_input()
-                    elif obj_type!= "textbox":
-                        check_flag=False
-                        err_msg=self._invalid_input()
+                            check_flag=False
+                            err_msg=self._index_zero()   
                     else:
-                        check_flag=False
-                        err_msg=self._index_zero()            
-                if check_flag==True:
+                        err_msg = self._invalid_input()         
+                if check_flag==True and not err_msg:
                     length = self.__gettexbox_length(webelement)
                     input=input[0]
                     logger.print_on_console(INPUT_IS+str(input))
@@ -1530,7 +1552,9 @@ class TextboxKeywords:
                                     local_rco.log.error(err_msg)
                                     logger.print_on_console(err_msg)
                     if webelement.tag_name == 'table':
-                        if len(input)==5:
+                        if len(input) == 4 and int(input[3]) <= 0:
+                            err_msg = self._index_zero() 
+                        elif len(input)==5:
                             row_num=int(input[0])
                             col_num=int(input[1])
                             obj_type=input[2].lower()
@@ -1538,32 +1562,34 @@ class TextboxKeywords:
                             inp_list=[]
                             inp_list.append(input[4])
                             local_to.log.info(input)
-                        row_count=self.tblobj.getRowCountJs(webelement)
-                        col_count=self.tblobj.getColoumnCountJs(webelement)
-                        input = inp_list
-                        if (obj_type=="textbox"or obj_type=="input" )and index_val>=0:
-                            if row_num>row_count or col_num>col_count:
+                            row_count=self.tblobj.getRowCountJs(webelement)
+                            col_count=self.tblobj.getColoumnCountJs(webelement)
+                            input = inp_list
+                            if (obj_type=="textbox"or obj_type=="input" )and index_val>=0:
+                                if row_num>row_count or col_num>col_count:
+                                    check_flag=False
+                                    err_msg=self._invalid_input()
+                                else:
+                                    cell=self.tblobj.javascriptExecutor(webelement,row_num-1,col_num-1)
+                                    txt_box=cell.find_elements_by_tag_name('input')
+                                    if len(txt_box)>0:
+                                        if index_val >= len(txt_box):
+                                            check_flag=False
+                                            err_msg=self._invalid_index()
+                                        else:
+                                            webelement = txt_box[index_val]
+                                    else:
+                                        check_flag=False
+                                        err_msg=self._invalid_input()
+                            elif obj_type!="textbox":
                                 check_flag=False
                                 err_msg=self._invalid_input()
                             else:
-                                cell=self.tblobj.javascriptExecutor(webelement,row_num-1,col_num-1)
-                                txt_box=cell.find_elements_by_tag_name('input')
-                                if len(txt_box)>0:
-                                    if index_val >= len(txt_box):
-                                        check_flag=False
-                                        err_msg=self._invalid_index()
-                                    else:
-                                        webelement = txt_box[index_val]
-                                else:
-                                    check_flag=False
-                                    err_msg=self._invalid_input()
-                        elif obj_type!="textbox":
-                            check_flag=False
-                            err_msg=self._invalid_input()
+                                check_flag=False
+                                err_msg=self._index_zero()
                         else:
-                            check_flag=False
-                            err_msg=self._index_zero()
-                    if check_flag==True:
+                            err_msg = self._invalid_input()
+                    if check_flag==True and not err_msg:
                         local_to.log.debug(WEB_ELEMENT_ENABLED)
                         utilobj=UtilWebKeywords()
                         is_visble=utilobj.is_visible(webelement)
@@ -1721,7 +1747,9 @@ class TextboxKeywords:
                                     local_rco.log.error(err_msg)
                                     logger.print_on_console(err_msg)
                     if webelement.tag_name == 'table':
-                        if len(input)==5:
+                        if len(input) == 5 and int(input[3]) <= 0:
+                            err_msg = self._index_zero()
+                        elif len(input)==5:
                             row_num=int(input[0])
                             col_num=int(input[1])
                             obj_type=input[2].lower()
@@ -1729,32 +1757,34 @@ class TextboxKeywords:
                             inp_list=[]
                             inp_list.append(input[4])
                             local_to.log.info(input)
-                        row_count=self.tblobj.getRowCountJs(webelement)
-                        col_count=self.tblobj.getColoumnCountJs(webelement)
-                        input = inp_list
-                        if (obj_type=="textbox" or obj_type=="input") and index_val>=0:
-                            if row_num>row_count or col_num>col_count:
+                            row_count=self.tblobj.getRowCountJs(webelement)
+                            col_count=self.tblobj.getColoumnCountJs(webelement)
+                            input = inp_list
+                            if (obj_type=="textbox" or obj_type=="input") and index_val>=0:
+                                if row_num>row_count or col_num>col_count:
+                                    check_flag=False
+                                    err_msg=self._invalid_input()
+                                else:
+                                    cell=self.tblobj.javascriptExecutor(webelement,row_num-1,col_num-1)
+                                    txt_box=cell.find_elements_by_tag_name('input')
+                                    if len(txt_box)>0:
+                                        if index_val >= len(txt_box):
+                                            check_flag=False
+                                            err_msg=self._invalid_index()
+                                        else:
+                                            webelement = txt_box[index_val]
+                                    else:
+                                        check_flag=False
+                                        err_msg=self._invalid_input()
+                            elif obj_type!="textbox":
                                 check_flag=False
                                 err_msg=self._invalid_input()
                             else:
-                                cell=self.tblobj.javascriptExecutor(webelement,row_num-1,col_num-1)
-                                txt_box=cell.find_elements_by_tag_name('input')
-                                if len(txt_box)>0:
-                                    if index_val >= len(txt_box):
-                                        check_flag=False
-                                        err_msg=self._invalid_index()
-                                    else:
-                                        webelement = txt_box[index_val]
-                                else:
-                                    check_flag=False
-                                    err_msg=self._invalid_input()
-                        elif obj_type!="textbox":
-                            check_flag=False
-                            err_msg=self._invalid_input()
+                                check_flag=False
+                                err_msg=self._index_zero()
                         else:
-                            check_flag=False
-                            err_msg=self._index_zero()
-                    if check_flag==True:
+                            err_msg = self._invalid_input()
+                    if check_flag==True and not err_msg:
                         local_to.log.debug(WEB_ELEMENT_ENABLED)
                         utilobj=UtilWebKeywords()
                         isvisble=utilobj.is_visible(webelement)

@@ -58,7 +58,7 @@ class UtilWebKeywords:
         return err_msg
 
     def _index_zero(self):
-        err_msg = (" index starts from 1")
+        err_msg = ERROR_CODE_DICT['INVALID_TABLE_INDEX']
         local_uo.log.info(err_msg)
         logger.print_on_console(err_msg)
         return err_msg
@@ -1002,7 +1002,9 @@ class UtilWebKeywords:
         local_uo.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if webelement != None and webelement !='' and webelement.tag_name.lower()=='table':
-                if len(input) >= 3:
+                if len(input) >= 4 and int(input[3]) <= 0:
+                    err_msg = self._index_zero()
+                elif input[2]:
                     if(len(input)==5 and all(v for v in input) and (not input[2]=='tr')):
                         attr_name=input[4]
                         webelement1=None
@@ -1010,7 +1012,7 @@ class UtilWebKeywords:
                         col_number=int(input[1])-1
                         tag=input[2].lower()
                         if input[3]: index=int(input[3])
-                        eleStatus, webelement1, err_msg = self.get_table_cell(webelement, row_number, col_number, tag, index)
+                        eleStatus, webelement1 = self.get_table_cell(webelement, row_number, col_number, tag, index)
                         webelement=webelement1
                     elif(input[2]=='tr'): #fetch the attribute value of tr (index is needed)
                         if not(input[4]):
@@ -1038,7 +1040,7 @@ class UtilWebKeywords:
                     err_msg = 'Input Error: Please specify valid object type'
                     logger.print_on_console(err_msg)
                     local_uo.log.error(err_msg)
-            elif(len(input)==1):
+            elif(len(input)==1) and not err_msg:
                 attr_name=input[0]
                 eleStatus=True
 
@@ -1083,7 +1085,9 @@ class UtilWebKeywords:
         local_uo.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if webelement != None and webelement !='' and webelement.tag_name.lower()=='table':
-                if len(input) >= 3:
+                if len(input) >= 4 and int(input[3]) <= 0:
+                    err_msg = self._index_zero()
+                elif input[2]:
                     if((len(input)==5 or len(input)==6) and all(v for v in input) and (not input[2]=='tr')):
                         attr_name=input[4]
                         webelement1=None
@@ -1091,7 +1095,7 @@ class UtilWebKeywords:
                         col_number=int(input[1])-1
                         tag=input[2].lower()
                         if input[3]: index=int(input[3])
-                        eleStatus, webelement1, err_msg = self.get_table_cell(webelement, row_number, col_number, tag, index)
+                        eleStatus, webelement1 = self.get_table_cell(webelement, row_number, col_number, tag, index)
                         webelement=webelement1
                     elif(input[2]=='tr'): #fetch the attribute value of tr (index is needed)
                         if not(input[4]):
@@ -1119,7 +1123,7 @@ class UtilWebKeywords:
                     err_msg = 'Input Error: Please specify valid object type'
                     logger.print_on_console(err_msg)
                     local_uo.log.error(err_msg)
-            elif(len(input)==1 or len(input)==2):
+            elif(len(input)==1 or len(input)==2) and not err_msg:
                 attr_name=input[0]
                 eleStatus=True
 
@@ -1185,10 +1189,6 @@ class UtilWebKeywords:
     def get_table_cell(self,webelement, row_number, col_number, tag, index):
         eleStatus=False
         webelement1=None
-        if index <= 0:
-            logger.print_on_console(ERROR_CODE_DICT['INVALID_TABLE_INDEX'])
-            local_uo.log.error(ERROR_CODE_DICT['INVALID_TABLE_INDEX'])
-            return eleStatus, webelement1 , ERROR_CODE_DICT['INVALID_TABLE_INDEX']
         counter = 1
         from table_keywords import TableOperationKeywords
         tableops = TableOperationKeywords()
@@ -1301,7 +1301,7 @@ class UtilWebKeywords:
             if eleStatus==True:
                 webelement1=cellChild
                 break
-        return eleStatus, webelement1, None
+        return eleStatus, webelement1
 
     def sendsecurefunction_keys(self,webelement,input,*args):
             status=TEST_RESULT_FAIL
