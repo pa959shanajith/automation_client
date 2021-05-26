@@ -1498,6 +1498,7 @@ class FileOperations:
         sheetname2 = None
         output_feild = None
         sheet_exist=[]
+        input_filed_set = False
         log.debug('Comparing content cell by cell of .xls files ')
         try:
             if (len(input_val)==5):
@@ -1509,6 +1510,17 @@ class FileOperations:
                     logger.print_on_console("Selective Option Set to True")
                     opt = True
                     log.info("Selective option set True")
+                input_filed_set = True
+            elif (len(input_val)==4):
+                input_path1 = input_val[0]
+                sheetname1 = input_val[1]
+                input_path2 = input_val[2]
+                sheetname2 = input_val[3]
+                input_filed_set = True
+            else:
+                input_filed_set = False
+
+            if input_filed_set:
 
                 if(str(args[0].split(";")[0]).startswith("{") and str(args[0].split(";")[0]).endswith("}")):
                     out_path = self.DV.get_dynamic_value(args[0].split(";")[0])
@@ -1588,7 +1600,7 @@ class FileOperations:
                         log.error('some error : {}'.format(e))
                     if( output_feild ):
 
-                        if( os.path.exists(output_feild) or os.path.exists(os.path.dirname(output_feild)) ):
+                        if( os.path.exists(output_feild):
 
                             logger.print_on_console( "Writing the output of cellByCellCompare to file ")
                             flg, err_msg = self.write_result_file(output_feild, collect_content, 'CellByCellCompare_Result')
