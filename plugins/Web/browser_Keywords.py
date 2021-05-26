@@ -1132,8 +1132,9 @@ class BrowserKeywords():
     def get_foreground_window(self, *args):
         status=webconstants.TEST_RESULT_FAIL
         result=webconstants.TEST_RESULT_FALSE
-        output=None
+        output = OUTPUT_CONSTANT
         err_msg=None
+        verb = None 
         flag_firefox = False
         try:
             if SYSTEM_OS != 'Darwin':
@@ -1152,7 +1153,7 @@ class BrowserKeywords():
                                 flag_firefox = True
                                 status=webconstants.TEST_RESULT_PASS
                                 result=webconstants.TEST_RESULT_TRUE
-                                output = "Browser brought to foreground"
+                                verb = "Browser brought to foreground"
                         except:
                             local_bk.log.info("Unable to bring the window to foreground using the title")
                     if flag_firefox!=True:
@@ -1179,7 +1180,7 @@ class BrowserKeywords():
                             win32gui.SetForegroundWindow(handle)
                             status=webconstants.TEST_RESULT_PASS
                             result=webconstants.TEST_RESULT_TRUE
-                            output = "Browser brought to foreground"
+                            verb = "Browser brought to foreground"
                     except:
                         local_bk.log.info("Unable to bring the window to foreground using the title")
                 elif (self.browser_num == '8'):
@@ -1195,7 +1196,7 @@ class BrowserKeywords():
                     utilobject.bring_Window_Front(pid)
                     status=webconstants.TEST_RESULT_PASS
                     result=webconstants.TEST_RESULT_TRUE
-                    output = "Browser brought to foreground"
+                    verb = "Browser brought to foreground"
             elif SYSTEM_OS == 'Darwin':
                 if (self.browser_num == '6'):
                     local_bk.log.info("This feature not implemented")
@@ -1207,7 +1208,7 @@ class BrowserKeywords():
                 logger.print_on_console( "Browser unavailable" )
             else:
                 logger.print_on_console(output)
-        return status, result, output, err_msg
+        return status, result, output, verb, err_msg
 
 class Singleton_DriverUtil():
 
