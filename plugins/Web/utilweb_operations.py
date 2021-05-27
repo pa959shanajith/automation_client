@@ -144,6 +144,15 @@ class UtilWebKeywords:
         local_uo.log.debug('Visibility is '+str(flag))
         return flag
 
+    def is_inView(self,webelement):
+        flag = False
+        local_uo.log.debug('Checking whether the element is in view')
+        try:
+            flag = browser_Keywords.local_bk.driver_obj.execute_script(INVIEW,webelement)
+        except Exception as e:
+            self.__web_driver_exception(e)
+        local_uo.log.debug('In View is '+str(flag))
+        return flag
 
     def is_enabled(self,webelement):
         local_uo.log.debug('Checking the enability of element')
@@ -588,8 +597,7 @@ class UtilWebKeywords:
                         elif 'browserVersion' in  browser_Keywords.local_bk.driver_obj.capabilities.keys():
                             browser_ver = browser_Keywords.local_bk.driver_obj.capabilities['browserVersion']
                         #Scroll happens only if webelement is not displayed on screen.
-                        inView =  browser_Keywords.local_bk.driver_obj.execute_script(MOUSEHOVER_INVIEW,webelement)
-                        if inView:
+                        if self.is_inView(webelement):
                             location=webelement.location
                         else:
                             location=obj.get_element_location(webelement)
