@@ -1208,7 +1208,8 @@ class BrowserKeywords():
                 logger.print_on_console( "Browser unavailable" )
             else:
                 logger.print_on_console(output)
-        return status, result, output, verb, err_msg
+        logger.print_on_console(verb)
+        return status, result, output, err_msg
 
 class Singleton_DriverUtil():
 
