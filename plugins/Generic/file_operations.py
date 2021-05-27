@@ -1601,7 +1601,7 @@ class FileOperations:
                         log.error('some error : {}'.format(e))
                     if( output_feild ):
 
-                        if( os.path.exists(output_feild):
+                        if os.path.exists(output_feild):
 
                             logger.print_on_console( "Writing the output of cellByCellCompare to file ")
                             flg, err_msg = self.write_result_file(output_feild, collect_content, 'CellByCellCompare_Result')
