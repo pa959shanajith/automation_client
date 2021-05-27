@@ -3,6 +3,7 @@ filename=""
 import logging
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select
+from selenium import webdriver
 from selenium.webdriver.common.action_chains import ActionChains
 from timeit import default_timer as timer
 from datetime import timedelta
@@ -77,8 +78,7 @@ class Browser_Keywords:
         err_msg=None
         output_val=OUTPUT_CONSTANT
         global driver
-        from selenium import webdriver
-        browser={'browserName': "chrome",'sauce:options':{'name':scenario}}
+        # browser={'browserName': "chrome",'sauce:options':{'name':scenario}}
         driver = webdriver.Remote(command_executor=url, desired_capabilities=browser)
         status=TEST_RESULT_PASS
         methodoutput=TEST_RESULT_TRUE
@@ -322,8 +322,8 @@ class Browser_Popup_Keywords():
         output_val=OUTPUT_CONSTANT
         text=input[0]
         input=text
-        popup_text = driver.switch_to.alert.accept()
-        outpuiut='True' if popup_text==input else 'False'
+        popup_text = driver.switch_to.alert.text
+        output_val='True' if popup_text==input else 'False'
         status=TEST_RESULT_PASS if output_val == 'True' else 'Fail'
         methodoutput=TEST_RESULT_TRUE
         return status,methodoutput,output_val,err_msg 
@@ -396,9 +396,9 @@ class Dropdown_Keywords():
         methodoutput=TEST_RESULT_FALSE
         err_msg=None
         output_val=OUTPUT_CONSTANT
-        input=input[0]
         select = Select(webelement)
         for i in range(0,len(select.options)):
+            input=select.options[i].text
             None if select.options[i].is_selected() else select.select_by_visible_text(input)
         status=TEST_RESULT_PASS
         methodoutput=TEST_RESULT_TRUE
@@ -420,13 +420,9 @@ class Dropdown_Keywords():
         methodoutput=TEST_RESULT_FALSE
         err_msg=None
         output_val=OUTPUT_CONSTANT
-        inputval=[]
-        for i in input:
-            inputval.append(i[1:-1])
-        input=str(inputval)
         for i in input:
             input1=i
-            driver.execute_script('arguments[0].selectedIndex=arguments[1]',webelement,int(input1)-1)
+            driver.execute_script('arguments[0].options[arguments[1]].selected=true',webelement,int(input1)-1)
         status=TEST_RESULT_PASS
         methodoutput=TEST_RESULT_TRUE
         return status,methodoutput,output_val,err_msg
@@ -436,10 +432,6 @@ class Dropdown_Keywords():
         methodoutput=TEST_RESULT_FALSE
         err_msg=None
         output_val=OUTPUT_CONSTANT
-        inputval=[]
-        for i in input:
-            inputval.append(i[1:-1])
-        input=str(inputval)
         total=driver.execute_script('return arguments[0].childElementCount', webelement)
         output_val=[]
         for inputindex in input:
@@ -458,14 +450,18 @@ class Dropdown_Keywords():
         opt_len = len(option_len)
         inp_val_len = len(input)
         temp=[]
+        count=0
         [temp.append(select.options[x].text.strip()) for x in range(0,opt_len)]
         for y in range(0,inp_val_len):
             input_temp = input[y].strip()
             if (input_temp in temp):
                 count+=1
-                output_val = 'True'
             else:
-                output_val='False'
+                break
+        if count == inp_val_len:
+            output_val = 'True'
+        else:
+            output_val = 'False'
         status=TEST_RESULT_PASS if output_val == 'True' else 'Fail'
         methodoutput=TEST_RESULT_TRUE
         return status,methodoutput,output_val,err_msg
@@ -477,7 +473,7 @@ class Dropdown_Keywords():
         output_val=OUTPUT_CONSTANT
         input=input[0]
         select = Select(webelement)
-        select.select_by_value(input)
+        select.select_by_visible_text(input)
         status=TEST_RESULT_PASS
         methodoutput=TEST_RESULT_TRUE
         return status,methodoutput,output_val,err_msg
@@ -500,10 +496,6 @@ class Dropdown_Keywords():
         err_msg=None
         output_val=OUTPUT_CONSTANT
         select = Select(webelement)
-        inputval=[]
-        for i in input:
-            inputval.append(i[1:-1])
-        input=str(inputval)
         for i in input:
             input1=i
             select.select_by_visible_text(input1)
@@ -533,7 +525,7 @@ class Dropdown_Keywords():
         select = Select(webelement)
         iList = select.options
         iListSize = len(iList)
-        output_val='True' if iListSize == input else 'False'
+        output_val='True' if iListSize == int(input) else 'False'
         status=TEST_RESULT_PASS if output_val == 'True' else 'Fail'
         methodoutput=TEST_RESULT_TRUE
         return status,methodoutput,output_val,err_msg
@@ -543,9 +535,10 @@ class Dropdown_Keywords():
         methodoutput=TEST_RESULT_FALSE
         err_msg=None
         output_val=OUTPUT_CONSTANT
-        input_val=input
-        input=input_val[0]
         select = Select(webelement)
+        if '[' in input[0]:
+            input=input[0][2:-2]
+        else: input=input[0]
         first_value = select.first_selected_option.text
         output_val='True' if first_value == input else 'False'
         status=TEST_RESULT_PASS if output_val == 'True' else 'Fail'
@@ -557,13 +550,16 @@ class Dropdown_Keywords():
         methodoutput=TEST_RESULT_FALSE
         err_msg=None
         output_val=OUTPUT_CONSTANT
-        input_val=input[0].split(",")
-        input=input_val[0]
+        import json
+        temp=input[0]
+        temp=temp.replace("\'",'\"')
+        temp=json.loads(temp)
+        all_value=[]
         select = Select(webelement)
-        all_value = select.all_selected_options
-        temp=input_val[0]
+        opt_len = len(select.all_selected_options)
+        for x in range(0,opt_len): all_value.append(select.all_selected_options[x].text)
         import copy
-        temp1=copy.deepcopy(temp)
+        temp1=copy.deepcopy(all_value)
         for i in range(0,len(temp)):
             if temp[i] in all_value:
                 temp1.remove(temp[i])
@@ -592,7 +588,7 @@ class Dropdown_Keywords():
         err_msg=None
         output_val=OUTPUT_CONSTANT
         select = Select(webelement)
-        opt_len = len(select.options)
+        opt_len = len(select.all_selected_options)
         temp=[]
         for x in range(0,opt_len): temp.append(select.all_selected_options[x].text)
         output_val=temp
@@ -605,7 +601,6 @@ class Dropdown_Keywords():
         methodoutput=TEST_RESULT_FALSE
         err_msg=None
         output_val=OUTPUT_CONSTANT
-        input=input[0]
         select = Select(webelement)
         opt_len = len(select.options)
         temp=[]
@@ -674,7 +669,7 @@ class Element_Keywords:
         methodoutput=TEST_RESULT_FALSE
         err_msg=None
         output_val=OUTPUT_CONSTANT
-        webdriver.ActionChains(driver).move_to_element(webelement).double_click(webelement.perform())
+        webdriver.ActionChains(driver).move_to_element(webelement).double_click(webelement).perform()
         status=TEST_RESULT_PASS
         methodoutput=TEST_RESULT_TRUE
         return status,methodoutput,output_val,err_msg
@@ -684,7 +679,7 @@ class Element_Keywords:
         methodoutput=TEST_RESULT_FALSE
         err_msg=None
         output_val=OUTPUT_CONSTANT
-        webdriver.ActionChains(driver).move_to_element(webelement).context_click(webelement.perform())
+        webdriver.ActionChains(driver).move_to_element(webelement).context_click(webelement).perform()
         status=TEST_RESULT_PASS
         methodoutput=TEST_RESULT_TRUE
         return status,methodoutput,output_val,err_msg
@@ -720,7 +715,7 @@ class Element_Keywords:
         methodoutput=TEST_RESULT_FALSE
         err_msg=None
         output_val=OUTPUT_CONSTANT
-        webdriver.ActionChains(driver).move_to_element(webelement.perform())
+        webdriver.ActionChains(driver).move_to_element(webelement).perform()
         status=TEST_RESULT_PASS
         methodoutput=TEST_RESULT_TRUE
         return status,methodoutput,output_val,err_msg
@@ -850,9 +845,12 @@ class Radio_checkbox_Keywords():
         methodoutput=TEST_RESULT_FALSE
         err_msg=None
         output_val=OUTPUT_CONSTANT
-        webelement.click()
-        status=TEST_RESULT_PASS
-        methodoutput=TEST_RESULT_TRUE
+        if webelement.is_selected():
+            err_msg=ERROR_CODE_DICT['ERR_OBJECTSELECTED']
+        else:
+            webelement.click()
+            status=TEST_RESULT_PASS
+            methodoutput=TEST_RESULT_TRUE
         return status,methodoutput,output_val,err_msg
 
     def unselectCheckbox(self,webelement,input,*args):
@@ -985,7 +983,10 @@ class Table_Keywords():
         col=input[1]
         if len(input)==2:
             remoteele=driver.execute_script('var temp = fun(arguments[0], arguments[2], arguments[1]); return temp;  function fun(table, x, y) {     var m = [],         row, cell, xx, tx, ty, xxx, yyy;     for (yyy = 0; yyy < table.rows.length; yyy++) {         row = table.rows[yyy];         for (xxx = 0; xxx < row.cells.length; xxx++) {             cell = row.cells[xxx];             xx = xxx;             for (; m[yyy] && m[yyy][xx]; ++xx) {}             for (tx = xx; tx < xx + cell.colSpan; ++tx) {                 for (ty = yyy; ty < yyy + cell.rowSpan; ++ty) {                     if (!m[ty]) m[ty] = [];                     m[ty][tx] = true;                 }             }             if (xx <= x && x < xx + cell.colSpan && yyy <= y && y < yyy + cell.rowSpan) return cell;         }     }     return null; };',webelement,int(row)-1,int(col)-1)
-            remoteele.find_elements_by_xpath('.//*')[0].click()
+            if len(remoteele.find_elements_by_xpath('.//*')) > 0:
+                remoteele.find_elements_by_xpath('.//*')[0].click()
+            else:
+                remoteele.click()
         elif len(input)>2:
             input=input[3]
             remoteele=driver.execute_script('var temp = fun(arguments[0], arguments[2], arguments[1]); return temp;  function fun(table, x, y) {     var m = [],         row, cell, xx, tx, ty, xxx, yyy;     for (yyy = 0; yyy < table.rows.length; yyy++) {         row = table.rows[yyy];         for (xxx = 0; xxx < row.cells.length; xxx++) {             cell = row.cells[xxx];             xx = xxx;             for (; m[yyy] && m[yyy][xx]; ++xx) {}             for (tx = xx; tx < xx + cell.colSpan; ++tx) {                 for (ty = yyy; ty < yyy + cell.rowSpan; ++ty) {                     if (!m[ty]) m[ty] = [];                     m[ty][tx] = true;                 }             }             if (xx <= x && x < xx + cell.colSpan && yyy <= y && y < yyy + cell.rowSpan) return cell;         }     }     return null; };',webelement,int(row)-1,int(col)-1)
@@ -1013,8 +1014,8 @@ class Table_Keywords():
 class Textbox_Keywords():
 
     def __init__(self):
+        self.key = b'\x74\x68\x69\x73\x49\x73\x41\x53\x65\x63\x72\x65\x74\x4b\x65\x79'
         pass
-        # self.key = b'\x74\x68\x69\x73\x49\x73\x41\x53\x65\x63\x72\x65\x74\x4b\x65\x79'
 
     def clearText(self,webelement,input,*args):
         status=TEST_RESULT_FAIL
@@ -1129,6 +1130,64 @@ class Util_Keywords():
 
     def __init__(self):
         self.action=None
+        self.keys_info={}
+        pass
+
+    def _createKeysInfoDict(self):
+        self.keys_info['null']=Keys.NULL
+        self.keys_info['cancel']=Keys.CANCEL
+        self.keys_info['help']=Keys.HELP
+        self.keys_info['backspace']=Keys.BACKSPACE
+        self.keys_info['tab']=Keys.TAB
+        self.keys_info['clear']=Keys.CLEAR
+        self.keys_info['return']=Keys.RETURN
+        self.keys_info['enter']=Keys.ENTER
+        self.keys_info['control']=Keys.CONTROL
+        self.keys_info['ctrl']=Keys.CONTROL
+        self.keys_info['alt']=Keys.ALT
+        self.keys_info['pause']=Keys.PAUSE
+        self.keys_info['escape']=Keys.ESCAPE
+        self.keys_info['space']=Keys.SPACE
+        self.keys_info['pageup']=Keys.PAGE_UP
+        self.keys_info['pagedown']=Keys.PAGE_DOWN
+        self.keys_info['end']=Keys.END
+        self.keys_info['home']=Keys.HOME
+        self.keys_info['leftarrow']=Keys.LEFT
+        self.keys_info['rightarrow']=Keys.RIGHT
+        self.keys_info['uparrow']=Keys.UP
+        self.keys_info['downarrow']=Keys.DOWN
+        self.keys_info['insert']=Keys.INSERT
+        self.keys_info['delete']=Keys.DELETE
+        self.keys_info['semicolon']=Keys.SEMICOLON
+        self.keys_info['equals']=Keys.EQUALS
+        self.keys_info['numpad0']=Keys.NUMPAD0
+        self.keys_info['numpad1']=Keys.NUMPAD1
+        self.keys_info['numpad2']=Keys.NUMPAD2
+        self.keys_info['numpad3']=Keys.NUMPAD3
+        self.keys_info['numpad4']=Keys.NUMPAD4
+        self.keys_info['numpad5']=Keys.NUMPAD5
+        self.keys_info['numpad6']=Keys.NUMPAD6
+        self.keys_info['numpad7']=Keys.NUMPAD7
+        self.keys_info['numpad8']=Keys.NUMPAD8
+        self.keys_info['numpad9']=Keys.NUMPAD9
+        self.keys_info['f1']=Keys.F1
+        self.keys_info['f2']=Keys.F2
+        self.keys_info['f3']=Keys.F3
+        self.keys_info['f4']=Keys.F4
+        self.keys_info['f5']=Keys.F5
+        self.keys_info['f6']=Keys.F6
+        self.keys_info['f7']=Keys.F7
+        self.keys_info['f8']=Keys.F8
+        self.keys_info['f9']=Keys.F9
+        self.keys_info['f10']=Keys.F10
+        self.keys_info['f11']=Keys.F11
+        self.keys_info['f12']=Keys.F12
+        self.keys_info['multiply']=Keys.MULTIPLY
+        self.keys_info['add']=Keys.ADD
+        self.keys_info['subtract']=Keys.SUBTRACT
+        self.keys_info['divide']=Keys.DIVIDE
+        self.keys_info['separator']=Keys.SEPARATOR
+        self.keys_info['decimal']=Keys.DECIMAL
         pass
 
     def tab(self,webelement,input,*args):
@@ -1142,12 +1201,20 @@ class Util_Keywords():
         return status,methodoutput,output_val,err_msg
 
     def sendFunctionKeys(self,webelement,input,*args):
+        self._createKeysInfoDict()
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         err_msg=None
         output_val=OUTPUT_CONSTANT
-        input=input[0]
-        webelement.send_keys(input)
+        input1=input[0]
+        if input1.lower() in self.keys_info:
+            digits = [int(i)for i in input if i.isdigit()]
+            try:
+                webelement.send_keys(self.keys_info[input1.lower()]*digits[0])
+            except Exception as e:
+                webelement.send_keys(self.keys_info[input1.lower()])
+        else:
+            webelement.send_keys(input)
         status=TEST_RESULT_PASS
         methodoutput=TEST_RESULT_TRUE
         return status,methodoutput,output_val,err_msg

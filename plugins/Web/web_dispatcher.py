@@ -536,17 +536,22 @@ class Dispatcher:
                     if(teststepproperty.name=="openBrowser"):
                         browser=teststepproperty.inputval[0]
                         self.browsers_sl[browser]["platform"]=self.sauce_conf["platform"]
+                        if browser in ['7','8'] and self.sauce_conf["platform"]!='Windows 10':
+                            logger.print_on_console('Microsoft Edge browser is supported only in Windows 10')
+                            return 'Terminate'
                         self.browsers_sl[browser]["sauce:options"].update({"name":teststepproperty.testscript_name})
-                        self.browsers_sl[browser]["sauce:options"].update({"idleTimeout":25})
+                        self.browsers_sl[browser]["sauce:options"].update({"idleTimeout":90})
                         result = self.sauce_web_dict[teststepproperty.name](self.sauce_conf['remote_url'],self.browsers_sl[browser],execution_env['scenario'])
                         driver = web_keywords.driver
                         browser_Keywords.local_bk.driver_obj = web_keywords.driver
+                        find_browser_info(reporting_obj,mythread)
                     else:
                         result = self.sauce_web_dict[teststepproperty.name](input)
                 elif teststepproperty.name in self.sauce_web_dict:
                     xpath=teststepproperty.objectname.split(';')[0]
                     if(teststepproperty.name=="waitForElementVisible"):
                         input=xpath
+                    driver.switch_to.default_content()
                     webelement=send_webelement_to_keyword(web_keywords.driver,objectname,url)
                     result = self.sauce_web_dict[teststepproperty.name](webelement,input)
                 else:
