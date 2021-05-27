@@ -58,7 +58,7 @@ class UtilWebKeywords:
         return err_msg
 
     def _index_zero(self):
-        err_msg = (" index starts from 1")
+        err_msg = ERROR_CODE_DICT['INVALID_TABLE_INDEX']
         local_uo.log.info(err_msg)
         logger.print_on_console(err_msg)
         return err_msg
@@ -1002,7 +1002,9 @@ class UtilWebKeywords:
         local_uo.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if webelement != None and webelement !='' and webelement.tag_name.lower()=='table':
-                if input[2]:
+                if len(input) >= 4 and int(input[3]) <= 0:
+                    err_msg = self._index_zero()
+                elif input[2]:
                     if(len(input)==5 and all(v for v in input) and (not input[2]=='tr')):
                         attr_name=input[4]
                         webelement1=None
@@ -1010,19 +1012,23 @@ class UtilWebKeywords:
                         col_number=int(input[1])-1
                         tag=input[2].lower()
                         if input[3]: index=int(input[3])
-                        eleStatus, webelement1=self.get_table_cell(webelement, row_number, col_number, tag, index)
+                        eleStatus, webelement1 = self.get_table_cell(webelement, row_number, col_number, tag, index)
                         webelement=webelement1
                     elif(input[2]=='tr'): #fetch the attribute value of tr (index is needed)
                         if not(input[4]):
                             err_msg = 'Input Error: Please enter attribute name'
                             logger.print_on_console(err_msg)
                             local_uo.log.error(err_msg)
-                        elif input[3]:
+                        elif input[3] and int(input[3]) >= 1:
                             attr_name=input[4]
                             index=int(input[3])-1
                             tablerow_js='var targetTable = arguments[0]; var index = arguments[1]; var rowCount = targetTable.rows; return rowCount[index];'
                             webelement = browser_Keywords.local_bk.driver_obj.execute_script(tablerow_js,webelement,index)
                             eleStatus=True
+                        elif input[3] and int(input[3]) <= 0:
+                            err_msg = 'Invalid Input: Index input cannot be 0 for table'
+                            logger.print_on_console(err_msg)
+                            local_uo.log.error(err_msg)
                         else: 
                             err_msg = 'Input Error: Missing index'
                             logger.print_on_console(err_msg)
@@ -1034,7 +1040,7 @@ class UtilWebKeywords:
                     err_msg = 'Input Error: Please specify valid object type'
                     logger.print_on_console(err_msg)
                     local_uo.log.error(err_msg)
-            elif(len(input)==1):
+            elif(len(input)==1) and not err_msg:
                 attr_name=input[0]
                 eleStatus=True
 
@@ -1059,7 +1065,7 @@ class UtilWebKeywords:
                         err_msg = 'Failed to fetch the attribute value.'
                         logger.print_on_console(err_msg)
                         local_uo.log.error(err_msg)
-            else:
+            elif not err_msg:
                 err_msg = 'Input Error: Invalid number of inputs'
                 logger.print_on_console(err_msg)
                 local_uo.log.error(err_msg)
@@ -1079,7 +1085,9 @@ class UtilWebKeywords:
         local_uo.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if webelement != None and webelement !='' and webelement.tag_name.lower()=='table':
-                if input[2]:
+                if len(input) >= 4 and int(input[3]) <= 0:
+                    err_msg = self._index_zero()
+                elif input[2]:
                     if((len(input)==5 or len(input)==6) and all(v for v in input) and (not input[2]=='tr')):
                         attr_name=input[4]
                         webelement1=None
@@ -1087,19 +1095,23 @@ class UtilWebKeywords:
                         col_number=int(input[1])-1
                         tag=input[2].lower()
                         if input[3]: index=int(input[3])
-                        eleStatus, webelement1=self.get_table_cell(webelement, row_number, col_number, tag, index)
+                        eleStatus, webelement1 = self.get_table_cell(webelement, row_number, col_number, tag, index)
                         webelement=webelement1
                     elif(input[2]=='tr'): #fetch the attribute value of tr (index is needed)
                         if not(input[4]):
                             err_msg = 'Input Error: Please enter attribute name'
                             logger.print_on_console(err_msg)
                             local_uo.log.error(err_msg)
-                        elif input[3]:
+                        elif input[3] and int(input[3]) >= 1:
                             attr_name=input[4]
                             index=int(input[3])-1
                             tablerow_js='var targetTable = arguments[0]; var index = arguments[1]; var rowCount = targetTable.rows; return rowCount[index];'
                             webelement = browser_Keywords.local_bk.driver_obj.execute_script(tablerow_js,webelement,index)
                             eleStatus=True
+                        elif input[3] and int(input[3]) <= 0:
+                            err_msg = 'Invalid Input: Index input cannot be 0 for table'
+                            logger.print_on_console(err_msg)
+                            local_uo.log.error(err_msg)
                         else: 
                             err_msg = 'Input Error: Please specify index'
                             logger.print_on_console(err_msg)
@@ -1111,7 +1123,7 @@ class UtilWebKeywords:
                     err_msg = 'Input Error: Please specify valid object type'
                     logger.print_on_console(err_msg)
                     local_uo.log.error(err_msg)
-            elif(len(input)==1 or len(input)==2):
+            elif(len(input)==1 or len(input)==2) and not err_msg:
                 attr_name=input[0]
                 eleStatus=True
 
@@ -1156,7 +1168,7 @@ class UtilWebKeywords:
                     err_msg = 'Web element not found'
                     logger.print_on_console(err_msg)
                     local_uo.log.error(err_msg)
-            else:
+            elif not err_msg:
                 err_msg = 'Input Error: Invalid number of inputs'
                 logger.print_on_console(err_msg)
                 local_uo.log.error(err_msg)
@@ -1292,65 +1304,66 @@ class UtilWebKeywords:
         return eleStatus, webelement1
 
     def sendsecurefunction_keys(self,webelement,input,*args):
-        status=TEST_RESULT_FAIL
-        methodoutput=TEST_RESULT_FALSE
-        err_msg=None
-        check_flag=True
-        output=OUTPUT_CONSTANT
-        input_val = input[0]
-        if webelement is not None:
-            try:
-                if webelement.is_enabled():
-                    if webelement.tag_name == 'table':
-                        if len(input)==5:
-                            row_num=int(input[0])
-                            col_num=int(input[1])
-                            obj_type=input[2].lower()
-                            index_val=int(input[3])-1
-                            inp_list=[]
-                            inp_list.append(input[4])
-                            local_uo.log.info(input)
-                        row_count=self.tblobj.getRowCountJs(webelement)
-                        col_count=self.tblobj.getColoumnCountJs(webelement)
-                        input = inp_list
-                        if (obj_type=="textbox" or obj_type=="input") and index_val>=0:
-                            if row_num>row_count or col_num>col_count:
+            status=TEST_RESULT_FAIL
+            methodoutput=TEST_RESULT_FALSE
+            err_msg=None
+            check_flag=True
+            output=OUTPUT_CONSTANT
+            input_val = input[0]
+            if webelement is not None:
+                try:
+                    if webelement.is_enabled():
+                        if webelement.tag_name == 'table':
+                            if len(input)==5:
+                                row_num=int(input[0])
+                                col_num=int(input[1])
+                                obj_type=input[2].lower()
+                                index_val=int(input[3])-1
+                                inp_list=[]
+                                inp_list.append(input[4])
+                                local_uo.log.info(input)
+                            row_count=self.tblobj.getRowCountJs(webelement)
+                            col_count=self.tblobj.getColoumnCountJs(webelement)
+                            input = inp_list
+                            if (obj_type=="textbox" or obj_type=="input") and index_val>=0:
+                                if row_num>row_count or col_num>col_count:
+                                    check_flag=False
+                                    err_msg=self._invalid_input()
+                                else:
+                                    cell=self.tblobj.javascriptExecutor(webelement,row_num-1,col_num-1)
+                                    txt_box=cell.find_elements_by_tag_name('input')
+                                    if len(txt_box)>0:
+                                        if index_val >= len(txt_box):
+                                            check_flag=False
+                                            err_msg=self._invalid_index()
+                                        else:
+                                            webelement = txt_box[index_val]
+                                    else:
+                                        check_flag=False
+                                        err_msg=self._invalid_input()
+                            elif obj_type!= "textbox":
                                 check_flag=False
                                 err_msg=self._invalid_input()
                             else:
-                                cell=self.tblobj.javascriptExecutor(webelement,row_num-1,col_num-1)
-                                txt_box=cell.find_elements_by_tag_name('input')
-                                if len(txt_box)>0:
-                                    if index_val >= len(txt_box):
-                                        check_flag=False
-                                        err_msg=self._invalid_index()
-                                    else:
-                                        webelement = txt_box[index_val]
-                                else:
-                                    check_flag=False
-                                    err_msg=self._invalid_input()
-                        elif obj_type!= "textbox":
-                            check_flag=False
-                            err_msg=self._invalid_input()
-                        else:
-                            check_flag=False
-                            err_msg=self._index_zero()
-                    if check_flag==True:
-                        local_uo.log.debug(WEB_ELEMENT_ENABLED)
-                        if input_val!="":
-                            input_val = input[0]
-                            self.__setfocus(webelement)
-                            from sendfunction_keys import SendFunctionKeys
-                            obj=SendFunctionKeys()
-                            result=obj.sendsecurefunction_keys(input_val,*args)
-                            if result[0]!="Fail":
-                                status=TEST_RESULT_PASS
-                                methodoutput=TEST_RESULT_TRUE
-                        else:
-                            err_msg = 'input value is empty'
-                            logger.print_on_console(err_msg)
-                            local_uo.log.error(err_msg)      
-            except Exception as e:
-                log.error("Error in sendsecurefunction_keys")
-                err_msg=self.__web_driver_exception(e)              
-        return status,methodoutput,output,err_msg
+                                check_flag=False
+                                err_msg=self._index_zero()
+                        if check_flag==True:
+                            local_uo.log.debug(WEB_ELEMENT_ENABLED)
+                            if input_val!="":
+                                input_val = input[0]
+                                self.__setfocus(webelement)
+                                from sendfunction_keys import SendFunctionKeys
+                                obj=SendFunctionKeys()
+                                result=obj.sendsecurefunction_keys(input_val,*args)
+                                if result[0]!="Fail":
+                                    status=TEST_RESULT_PASS
+                                    methodoutput=TEST_RESULT_TRUE
+                            else:
+                                err_msg = 'input value is empty'
+                                logger.print_on_console(err_msg)
+                                local_uo.log.error(err_msg)      
+                except Exception as e:
+                    log.error("Error in sendsecurefunction_keys")
+                    err_msg=self.__web_driver_exception(e)              
+            return status,methodoutput,output,err_msg
+            

@@ -326,7 +326,9 @@ class TableOperationKeywords():
                                                         if(len(child_ele)==0):
                                                             child_ele = remoteWebElement.find_elements_by_xpath('.//lightning-formatted-location')
                                 if(len(child_ele)>0):
-                                    cellVal=child_ele[0].text                            
+                                    cellVal=child_ele[0].text
+                                elif(len(child_ele)==0):
+                                    cellVal=remoteWebElement.text                      
                                 cellVal = cellVal.strip()
                                 local_tk.log.info('Got the result : %s',str(cellVal))
                                 logger.print_on_console('Cell value is : ',str(cellVal))
@@ -972,7 +974,7 @@ class TableOperationKeywords():
                                 local_tk.log.error(e)
                                 logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
                                 err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
-                        elif len(input_arr)>2:
+                        elif len(input_arr)>2 and self.checkInputs(input_arr):
                             local_tk.log.info('click on an element inside a cell')
                             #logger.print_on_console('click on an element inside a cell')
                             row_number=int(input_arr[0])-1
@@ -1137,6 +1139,10 @@ class TableOperationKeywords():
                                              local_tk.log.error(e)
                                              logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
                                              err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                        else:
+                            logger.print_on_console(ERROR_CODE_DICT['INVALID_TABLE_INDEX'])
+                            err_msg = ERROR_CODE_DICT['INVALID_TABLE_INDEX']
+
                     except Exception as e:
                         local_tk.log.error(e)
                         logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
@@ -1198,7 +1204,7 @@ class TableOperationKeywords():
                                     local_tk.log.error(e)
                                     logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
                                     err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
-                            elif len(input_arr)>2:
+                            elif len(input_arr)>2 and self.checkInputs(input_arr):
                                 local_tk.log.info('doubleclick on an element inside a cell')
                                 #logger.print_on_console('doubleclick on an element inside a cell')
                                 row_number=int(input_arr[0])-1
@@ -1339,6 +1345,9 @@ class TableOperationKeywords():
                                                 local_tk.log.error(e)
                                                 logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
                                                 err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                            else:
+                                logger.print_on_console(ERROR_CODE_DICT['INVALID_TABLE_INDEX'])
+                                err_msg = ERROR_CODE_DICT['INVALID_TABLE_INDEX']
                     except Exception as e:
                         local_tk.log.error(e)
                         logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
@@ -1896,3 +1905,9 @@ class TableOperationKeywords():
                 err_msg = ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
                 logger.print_on_console(ERROR_CODE_DICT['ERR_HIDDEN_OBJECT'])
             return status,methodoutput,output_val,err_msg
+
+        def checkInputs(self, inputs):
+            if len(inputs) == 4:
+                if int(inputs[3]) <= 0:
+                    return False
+            return True

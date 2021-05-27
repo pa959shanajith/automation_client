@@ -886,8 +886,18 @@ class BrowserKeywords():
                 local_bk.log.info('Cleared Cache')
                 status=webconstants.TEST_RESULT_PASS
                 result=webconstants.TEST_RESULT_TRUE
+            elif local_bk.driver_obj != None and isinstance(local_bk.driver_obj,webdriver.Firefox):
+                local_bk.driver_obj.get('about:preferences#privacy')
+                time.sleep(2)
+                local_bk.driver_obj.find_element_by_css_selector('#clearSiteDataButton').click()
+                time.sleep(2)
+                local_bk.driver_obj.execute_script("document.getElementsByTagName('browser')[0].contentWindow.document.getElementsByTagName('dialog')[0].shadowRoot.children[3].children[2].click()")
+                time.sleep(2)
+                local_bk.driver_obj.switch_to.alert.accept()
+                status=webconstants.TEST_RESULT_PASS
+                result=webconstants.TEST_RESULT_TRUE
             else:
-                drv={ '2': 'Firefox', '3': 'Internet Explorer', '6': 'Safari', '7': 'Edge Legacy', '8': 'Edge Chromium'}
+                drv={'3': 'Internet Explorer', '6': 'Safari', '7': 'Edge Legacy', '8': 'Edge Chromium'}
                 err_msg = "This function is not available for "+drv[self.browser_num]+'.'
                 logger.print_on_console(err_msg)
                 local_bk.log.error(err_msg)
