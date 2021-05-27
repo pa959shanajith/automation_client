@@ -1660,6 +1660,8 @@ class DropdownKeywords():
                                     local_ddl.log.info(STATUS_METHODOUTPUT_UPDATE)
                                 else:
                                     logger.print_on_console('Inputs does not match')
+                                    local_ddl.log.info(ERROR_CODE_DICT['ERR_INPUT_MISS_MATCH'])
+                                    err_msg = ERROR_CODE_DICT['ERR_INPUT_MISS_MATCH']
                             else:
                                 logger.print_on_console('Element is not displayed')
                                 local_ddl.log.info(ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED'])
