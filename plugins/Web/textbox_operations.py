@@ -22,6 +22,7 @@ import core_utils
 import readconfig
 import threading
 import table_keywords
+from utils_web import Utils
 local_to = threading.local()
 
 class TextboxKeywords:
@@ -273,6 +274,7 @@ class TextboxKeywords:
                     if check_flag==True and not err_msg:
                         local_to.log.debug(WEB_ELEMENT_ENABLED)
                         utilobj=UtilWebKeywords()
+                        obj=Utils()
                         is_visble=utilobj.is_visible(webelement)
                         input=input[0]
                         coreutilsobj=core_utils.CoreUtils()
@@ -289,6 +291,8 @@ class TextboxKeywords:
                                 if not(is_visble) and self.__check_visibility_from_config():
                                     self.clear_text(webelement)
                                 else:
+                                    if not utilobj.is_inView(webelement):
+                                        obj.get_element_location(webelement)
                                     webelement.clear()
                                 local_to.log.debug('Setting the text')
                                 browser_Keywords.local_bk.driver_obj.execute_script(SET_TEXT_SCRIPT, webelement, input)
