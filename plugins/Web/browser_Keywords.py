@@ -30,6 +30,7 @@ import psutil
 import readconfig
 import core_utils
 import time
+import fileinput
 from sendfunction_keys import SendFunctionKeys as SF
 driver_pre = None
 drivermap = []
@@ -1284,6 +1285,11 @@ class Singleton_DriverUtil():
                         break
         return d
 
+    def modify_file_as_text(self,text_file_path, text_to_search, replacement_text):
+        with fileinput.FileInput(text_file_path, inplace=True, backup='.bak') as file:
+            for line in file:
+                print(line.replace(text_to_search, replacement_text), end='')
+
     def getBrowser(self,browser_num):
         import controller
         global local_bk, drivermap
@@ -1319,7 +1325,15 @@ class Singleton_DriverUtil():
                     if str(chrome_path).lower() != 'default':
                         choptions.binary_location = str(chrome_path)
                     if str(chrome_profile).lower() != 'default':
-                        choptions.add_argument("user-data-dir="+chrome_profile)
+                        # Don't use the default directory and create profiles for automation inside it,
+                        # Create a separate directory for new automation profiles
+                        choptions.add_argument("--user-data-dir="+os.path.dirname(chrome_profile))
+                        choptions.add_argument("--profile-directory="+os.path.basename(chrome_profile))
+                        try:
+                            #To remove restore pages popup when chrome starts(* this may change with future chrome versions)
+                            self.modify_file_as_text(chrome_profile+ '\\Preferences', '"exit_type":"Crashed"', '"exit_type":"Normal"')
+                        except Exception as ex:
+                            local_bk.log.error(ex,exc_info=True)
                     if str(close_browser_popup).lower() == 'yes':
                         prefs = {}
                         prefs["credentials_enable_service"] = False
