@@ -290,7 +290,8 @@ class FileOperations:
 
                     elif(input_ext=='.csv' and extension=='.xlsx'):
                         workbook = openpyxl.Workbook()
-                        worksheet = workbook.create_sheet(index=0, title='Sheet1')
+                        workbook.active.title = file1.split('.')[0]
+                        worksheet = workbook.active
                         with open(source_path, 'rt', encoding='utf8') as f:
                             reader = csv.reader(f)
                             for r, row in enumerate(reader):
@@ -303,7 +304,7 @@ class FileOperations:
                         with open(source_path, 'rt') as f:
                             reader = csv.reader(f)
                             workbook = xlwt.Workbook()
-                            sheet = workbook.add_sheet("Sheet 1")
+                            sheet = workbook.add_sheet(file1.split('.')[0])
                             for rowi, row in enumerate(reader):
                                 for coli, value in enumerate(row):
                                     sheet.write(rowi,coli,value)
@@ -345,12 +346,15 @@ class FileOperations:
 
                     elif(extension=='.zip'):
                         zipf = zipfile.ZipFile(file2, 'w', zipfile.ZIP_DEFLATED)
-                        for root, dirs, files in os.walk(source_path):
-                            for f in files:
-                                if(filename==f):
-                                    continue
-                                else:
-                                    zipf.write(os.path.join(root, f))
+                        if(input_ext):
+                            zipf.write(source_path, file1)
+                        else:
+                            for root, dirs, files in os.walk(source_path):
+                                for f in files:
+                                    if(filename==f):
+                                        continue
+                                    else:
+                                        zipf.write(os.path.join(root, f))
                         zipf.close()
 
                     elif(input_ext=='.zip'):
@@ -393,6 +397,8 @@ class FileOperations:
             if(extension.strip() == ''): extension='null'
             if(opt.strip() == ''): opt=0
             if( source_path and destination_path ):
+                source_path=os.path.normpath(source_path)
+                destination_path=os.path.normpath(destination_path)
                 try:
                     if( os.path.splitext(source_path)[1] and not os.path.splitext(destination_path)[1] ):
                         #file ops
