@@ -1592,19 +1592,20 @@ class Controller():
         wxObject = root_obj.cw
         socket_object = socketIO
         configvalues = self.configvalues
-        dis_sys_screenoff = str(configvalues['disable_screen_timeout']).lower()
+        dis_sys_screenoff = str(configvalues['disable_screen_timeout']).lower() == 'yes'
+        reset_sys_screenoff = False
         try:
-            is_admin=self.core_utilsobject.check_isadmin()
+            is_admin = core_utils.check_isadmin()
             #Logic to make sure that logic of usage of existing driver is not applicable to execution
-            logger.print_on_console(action)
             if local_cont.web_dispatcher_obj != None:
                 local_cont.web_dispatcher_obj.action=action
             if action==EXECUTE:
                 aws_mode = len(args)>0 and args[0]
                 self.execution_mode = json_data['exec_mode'].lower()
                 kill_process()
-                if dis_sys_screenoff == 'yes' and is_admin and SYSTEM_OS == 'Windows':
+                if dis_sys_screenoff and is_admin and SYSTEM_OS == 'Windows':
                     self.disable_screen_timeout()
+                    reset_sys_screenoff = True
                 if self.execution_mode == SERIAL:
                     status=self.invoke_execution(mythread,json_data,socketIO,wxObject,self.configvalues,qc_soc,qtest_soc,zephyr_soc,aws_mode)
                 elif self.execution_mode == PARALLEL:
@@ -1616,11 +1617,12 @@ class Controller():
                 status=self.invoke_debug(mythread,runfrom_step,json_data)
             if status != TERMINATE:
                 status=COMPLETED
-        except Exception as e:
+        except:
             logger.print_on_console("Exception in Invoke Controller")
-            log.error("Exception in Invoke Controller. Error: " + str(e))
+            log.error("Exception in Invoke Controller", exc_info=True)
+            status = TERMINATE
         finally:
-            if dis_sys_screenoff == 'yes' and action==EXECUTE and is_admin and SYSTEM_OS == 'Windows':
+            if reset_sys_screenoff:
                 self.reset_screen_timeout()
         return status
 

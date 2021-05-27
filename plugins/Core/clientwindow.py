@@ -959,8 +959,7 @@ class Config_window(wx.Frame):
 
         self.rbox21 = wx.RadioBox(self.panel1, label = "Disable Screen Timeout", choices = lblList,
             majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
-        core_utilsobject=core_utils.CoreUtils()
-        is_admin=core_utilsobject.check_isadmin()
+        is_admin = core_utils.check_isadmin()
         if isConfigJson!=False:
             if is_admin:
                 log.info("ICE is run as admin")
