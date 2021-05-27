@@ -18,6 +18,7 @@ import json
 import socket
 import random
 import codecs
+from constants import *
 from Crypto.Cipher import AES
 path_added = []
 
@@ -130,6 +131,13 @@ class CoreUtils():
                     break
         mac = str(mac).replace('-',':')
         return str(mac).strip()
+
+def check_isadmin(self):
+    is_admin = 0
+    if SYSTEM_OS == 'Windows':
+        import ctypes
+        is_admin = ctypes.windll.shell32.IsUserAnAdmin() == 1
+    return is_admin
 
 def get_all_the_imports(plugin_path):
     if plugin_path in path_added: return True
