@@ -1327,8 +1327,8 @@ class Singleton_DriverUtil():
                     if str(chrome_profile).lower() != 'default':
                         # Don't use the default directory and create profiles for automation inside it,
                         # Create a separate directory for new automation profiles
-                        choptions.add_argument("--user-data-dir="+(os.sep).join(chrome_profile.split(os.sep)[:-1]))
-                        choptions.add_argument("--profile-directory="+chrome_profile.split(os.sep)[-1])
+                        choptions.add_argument("--user-data-dir="+os.path.dirname(chrome_profile))
+                        choptions.add_argument("--profile-directory="+os.path.basename(chrome_profile))
                         try:
                             #To remove restore pages popup when chrome starts(* this may change with future chrome versions)
                             self.modify_file_as_text(chrome_profile+ '\\Preferences', '"exit_type":"Crashed"', '"exit_type":"Normal"')
