@@ -571,9 +571,15 @@ class Dispatcher:
                         webelement=send_webelement_to_keyword(driver,objectname,url)
                         objectname=local_Wd.custom_object.getElementXPath(webelement)
                     if url !=  '' and local_Wd.custom_object.is_int(url):
-                        local_Wd.log.debug('Encountered iframe/frame url')
-                        local_Wd.custom_object.switch_to_iframe(url,driver.current_window_handle)
-                        driver = browser_Keywords.local_bk.driver_obj
+                        try:
+                            local_Wd.log.debug('Encountered iframe/frame url')
+                            local_Wd.custom_object.switch_to_iframe(url,driver.current_window_handle)
+                            driver = browser_Keywords.local_bk.driver_obj
+                        except Exception as e:
+                            local_Wd.log.error(e,exc_info=True)
+                            err_msg='Control failed to switch to frame/iframe'
+                            result[3]=err_msg
+                        if(err_msg): return result
                     identifiers = objectname.split(';')
                     input=identifiers[0]
 
@@ -657,6 +663,10 @@ class Dispatcher:
             result=list(result)
             result[3]=err_msg
             result[2]=None
+        except KeyError as e:
+            local_Wd.log.error(e,exc_info=True)
+            err_msg=WEB_ELEMENT_NOT_FOUND
+            result[3]=err_msg
         except Exception as e:
             local_Wd.log.error(e,exc_info=True)
             # logger.print_on_console('Exception at dispatcher')
