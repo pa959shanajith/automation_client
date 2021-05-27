@@ -959,22 +959,18 @@ class Config_window(wx.Frame):
 
         self.rbox21 = wx.RadioBox(self.panel1, label = "Disable Screen Timeout", choices = lblList,
             majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
-        import ctypes
-        is_admin = ctypes.windll.shell32.IsUserAnAdmin()
+        core_utilsobject=core_utils.CoreUtils()
+        is_admin=core_utilsobject.check_isadmin()
         if isConfigJson!=False:
             if is_admin:
-                msg="ICE is run as admin"
-                log.info(msg)
-                log.debug(msg)
+                log.info("ICE is run as admin")
                 dis_sys_screenoff = isConfigJson['disable_screen_timeout'].title()
                 if dis_sys_screenoff == lblList[0]:
                     self.rbox21.SetSelection(0)
                 elif dis_sys_screenoff == lblList[1]:
                     self.rbox21.SetSelection(1)
             else:
-                msg="ICE is run as normal"
-                log.info(msg)
-                log.debug(msg)
+                log.info("ICE is run as normal")
                 self.rbox21.SetSelection(1)
         else:
             self.rbox21.SetSelection(1)           

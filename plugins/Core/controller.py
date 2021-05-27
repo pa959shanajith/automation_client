@@ -23,6 +23,7 @@ from teststepproperty import TestStepProperty
 import handler
 import os,sys
 import re
+import subprocess
 import logger
 import json
 from constants import *
@@ -1593,8 +1594,7 @@ class Controller():
         configvalues = self.configvalues
         dis_sys_screenoff = str(configvalues['disable_screen_timeout']).lower()
         try:
-            import ctypes
-            is_admin = ctypes.windll.shell32.IsUserAnAdmin()
+            is_admin=self.core_utilsobject.check_isadmin()
             #Logic to make sure that logic of usage of existing driver is not applicable to execution
             logger.print_on_console(action)
             if local_cont.web_dispatcher_obj != None:
@@ -1616,20 +1616,17 @@ class Controller():
                 status=self.invoke_debug(mythread,runfrom_step,json_data)
             if status != TERMINATE:
                 status=COMPLETED
-            if dis_sys_screenoff == 'yes' and action==EXECUTE and is_admin and SYSTEM_OS == 'Windows':
-                self.reset_screen_timeout()
         except Exception as e:
             logger.print_on_console("Exception in Invoke Controller")
             log.error("Exception in Invoke Controller. Error: " + str(e))
+        finally:
+            if dis_sys_screenoff == 'yes' and action==EXECUTE and is_admin and SYSTEM_OS == 'Windows':
+                self.reset_screen_timeout()
         return status
 
     def disable_screen_timeout(self):
-        import subprocess
-        import re
         try:
-            msg="Disable screen timeout process started"
-            log.info(msg)
-            log.debug(msg)
+            log.info("Disable screen timeout process started")
             poweroptions_list=[]
             get_active_scheme_cmd = "powercfg -getactivescheme"
             power_cfg_active = subprocess.Popen(get_active_scheme_cmd, shell=True, stdout=subprocess.PIPE)
@@ -1638,7 +1635,6 @@ class Controller():
             pattern = "GUID: [a-z,A-Z,0-9]*-?[a-z,A-Z,0-9]*-?[a-z,A-Z,0-9]*-?[a-z,A-Z,0-9]*-?[a-z,A-Z,0-9]*"
             result = re.findall(pattern, power_active_scheme)
             for i in result:
-                temp = []
                 temp = i.split(" ")
                 if temp[-1] and len(temp[-1])==36:
                     self.active_scheme=temp[-1]
@@ -1649,7 +1645,6 @@ class Controller():
             pattern = "GUID: [a-z,A-Z,0-9]*-?[a-z,A-Z,0-9]*-?[a-z,A-Z,0-9]*-?[a-z,A-Z,0-9]*-?[a-z,A-Z,0-9]*"
             result1 = re.findall(pattern, power_scheme_list)
             for i in result1:
-                temp1 = []
                 temp1 = i.split(" ")
                 if temp1[-1] and len(temp1[-1])==36:
                     poweroptions_list.append(temp1[-1])
@@ -1663,20 +1658,15 @@ class Controller():
             powercfg_commands = ["powercfg /change standby-timeout-ac 0", "powercfg /change standby-timeout-dc 0", "powercfg /change monitor-timeout-ac 0", "powercfg /change monitor-timeout-dc 0", "powercfg /change hibernate-timeout-ac 0", "powercfg /change hibernate-timeout-dc 0"]
             for command in powercfg_commands:
                 subprocess.call(command, shell=True)
-            msg1="Disable screen timeout process completed"
-            log.info(msg1)
-            log.debug(msg1)
+            log.info("Disable screen timeout process completed")
         except Exception as e:
             logger.print_on_console("Exception in reset screen timeout")
             log.error("Exception in reset screen timeout. Error: " + str(e))
 
     def reset_screen_timeout(self):
-        import subprocess
         import os
         try:
-            msg="reset screen timeout process started"
-            log.info(msg)
-            log.debug(msg)
+            log.info("reset screen timeout process started")
             setactive_cmd="powercfg -setactive "+self.change_power_option
             subprocess.call(setactive_cmd, shell=True)
             deleteactive_cmd="powercfg -delete "+self.active_scheme
@@ -1686,9 +1676,7 @@ class Controller():
             os.remove(self.powerscheme_location)
             setactive_cmd="powercfg -setactive "+self.active_scheme
             subprocess.call(setactive_cmd, shell=True)
-            msg1="reset screen timeout process completed"
-            log.info(msg1)
-            log.debug(msg1)
+            log.info("reset screen timeout process completed")
         except Exception as e:
             logger.print_on_console("Exception in reset screen timeout")
             log.error("Exception in reset screen timeout. Error: " + str(e))
