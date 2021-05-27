@@ -962,13 +962,13 @@ class Config_window(wx.Frame):
         import ctypes
         is_admin = ctypes.windll.shell32.IsUserAnAdmin()
         if is_admin:
-            # logger.print_on_console("ICE is run as admin")
-            log.debug(is_admin)
-            log.info("ICE is run as admin")
+            msg="ICE is run as admin"
+            log.info(msg)
+            log.debug(msg)
         else:
-            # logger.print_on_console("ICE is run as normal")
-            log.debug(is_admin)
-            log.info("ICE is run as normal")
+            msg1="ICE is run as normal"
+            log.info(msg1)
+            log.debug(msg1)
         if isConfigJson!=False:
             if is_admin:
                 dis_sys_screenoff = isConfigJson['disable_screen_timeout'].title()

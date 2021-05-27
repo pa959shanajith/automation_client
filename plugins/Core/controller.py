@@ -1603,8 +1603,7 @@ class Controller():
                 self.execution_mode = json_data['exec_mode'].lower()
                 kill_process()
                 if dis_sys_screenoff == 'yes' and is_admin and SYSTEM_OS == 'Windows':
-                    #self.disable_screen_timeout()
-                    logger.print_on_console("disable screen timeout before execution starts")
+                    self.disable_screen_timeout()
                 if self.execution_mode == SERIAL:
                     status=self.invoke_execution(mythread,json_data,socketIO,wxObject,self.configvalues,qc_soc,qtest_soc,zephyr_soc,aws_mode)
                 elif self.execution_mode == PARALLEL:
@@ -1617,8 +1616,7 @@ class Controller():
             if status != TERMINATE:
                 status=COMPLETED
             if dis_sys_screenoff == 'yes' and action==EXECUTE and is_admin and SYSTEM_OS == 'Windows':
-                #self.reset_screen_timeout()
-                logger.print_on_console("reset screen timeout after execution ends")
+                self.reset_screen_timeout()
         except Exception as e:
             logger.print_on_console("Exception in Invoke Controller")
             log.error("Exception in Invoke Controller. Error: " + str(e))
@@ -1661,9 +1659,9 @@ class Controller():
             self.powerscheme_location=os.environ['AVO_ASSURE_HOME']+os.sep+'assets'+os.sep+'active_scheme.pow'
             export_cmd="powercfg -export "+self.powerscheme_location+" "+self.active_scheme
             subprocess.call(export_cmd, shell=True)
-            ## powercfg_commands = ["powercfg /change standby-timeout-ac 0", "powercfg /change standby-timeout-dc 0", "powercfg /change monitor-timeout-ac 0", "powercfg /change monitor-timeout-dc 0", "powercfg /change hibernate-timeout-ac 0", "powercfg /change hibernate-timeout-dc 0"]
-            ## for command in powercfg_commands:
-            ##     subprocess.call(command, shell=True)
+            powercfg_commands = ["powercfg /change standby-timeout-ac 0", "powercfg /change standby-timeout-dc 0", "powercfg /change monitor-timeout-ac 0", "powercfg /change monitor-timeout-dc 0", "powercfg /change hibernate-timeout-ac 0", "powercfg /change hibernate-timeout-dc 0"]
+            for command in powercfg_commands:
+                subprocess.call(command, shell=True)
             msg1="Disable screen timeout process completed"
             log.info(msg1)
             log.debug(msg1)
