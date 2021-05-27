@@ -961,22 +961,20 @@ class Config_window(wx.Frame):
             majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
         import ctypes
         is_admin = ctypes.windll.shell32.IsUserAnAdmin()
-        if is_admin:
-            msg="ICE is run as admin"
-            log.info(msg)
-            log.debug(msg)
-        else:
-            msg1="ICE is run as normal"
-            log.info(msg1)
-            log.debug(msg1)
         if isConfigJson!=False:
             if is_admin:
+                msg="ICE is run as admin"
+                log.info(msg)
+                log.debug(msg)
                 dis_sys_screenoff = isConfigJson['disable_screen_timeout'].title()
                 if dis_sys_screenoff == lblList[0]:
                     self.rbox21.SetSelection(0)
                 elif dis_sys_screenoff == lblList[1]:
                     self.rbox21.SetSelection(1)
             else:
+                msg="ICE is run as normal"
+                log.info(msg)
+                log.debug(msg)
                 self.rbox21.SetSelection(1)
         else:
             self.rbox21.SetSelection(1)           
