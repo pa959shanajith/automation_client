@@ -999,13 +999,14 @@ class UtilWebKeywords:
         output=None
         eleStatus=False
         index=0
+        css_flag=True if input[-1]=='css' else False
         local_uo.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if webelement != None and webelement !='' and webelement.tag_name.lower()=='table':
                 if len(input) >= 4 and int(input[3]) <= 0:
                     err_msg = self._index_zero()
                 elif input[2]:
-                    if(len(input)==5 and all(v for v in input) and (not input[2]=='tr')):
+                    if((len(input) == 5 or (css_flag and len(input) == 6)) and all(v for v in input) and (not input[2] == 'tr')):
                         attr_name=input[4]
                         webelement1=None
                         row_number=int(input[0])-1
@@ -1033,34 +1034,78 @@ class UtilWebKeywords:
                             err_msg = 'Input Error: Missing index'
                             logger.print_on_console(err_msg)
                             local_uo.log.error(err_msg)
-                elif(len(input)==5 and (not all(i for i in input[:-1]))): #checking attribute value of table itself
+                # checking attribute value of table itself
+                elif((len(input) == 5 or (css_flag and len(input) == 6)) and (not all(i for i in input[:-1]))):
                     attr_name=input[4]
                     eleStatus=True
-                elif(len(input)==5 and (not input[2])):
+                elif((len(input) == 5 or (css_flag and len(input) == 6)) and (not input[2])):
                     err_msg = 'Input Error: Please specify valid object type'
                     logger.print_on_console(err_msg)
                     local_uo.log.error(err_msg)
             elif(len(input)==1) and not err_msg:
                 attr_name=input[0]
                 eleStatus=True
-
-            if(eleStatus):
+            elif css_flag and (len(input) == 2) and not err_msg:
+                attr_name = input[0]
+                eleStatus=True
+            if(eleStatus): 
                 if webelement != None and webelement !='':
                     local_uo.log.info(INPUT_IS)
                     local_uo.log.info(input)
                     if attr_name:
-                        if attr_name != 'required':
-                            output = webelement.get_attribute(attr_name)
+                        if not css_flag:
+                            if attr_name != 'required':
+                                output = webelement.get_attribute(attr_name)
+                            else:
+                                output = browser_Keywords.local_bk.driver_obj.execute_script("return arguments[0].getAttribute('required')", webelement)
+                            if output != None and output != '':
+                                logger.print_on_console('Output: ', output)
+                                status = TEST_RESULT_PASS
+                                methodoutput = TEST_RESULT_TRUE
+                            else:
+                                err_msg = 'Attribute does not exists'
+                                logger.print_on_console(err_msg)
+                                local_uo.log.error(err_msg)
                         else:
-                            output = browser_Keywords.local_bk.driver_obj.execute_script("return arguments[0].getAttribute('required')",webelement)
-                        if output != None and output !='':
-                            logger.print_on_console('Output: ',output)
-                            status = TEST_RESULT_PASS
-                            methodoutput = TEST_RESULT_TRUE
-                        else:
-                            err_msg = 'Attribute does not exists'
-                            logger.print_on_console(err_msg)
-                            local_uo.log.error(err_msg)
+                            props={'border' : ['border-top','border-right', 'border-bottom','border-left'],
+                            'margin' : ['margin-top', 'margin-right','margin-bottom', 'margin-left'],
+                            'padding' : ['padding-top', 'padding-right','padding-bottom', 'padding-left']}
+                            value = webelement.value_of_css_property(attr_name)
+                            if value == '' and attr_name in ['padding', 'margin', 'border', 'border-top', 'border-right', 'border-bottom', 'border-left']:
+                                if isinstance(browser_Keywords.local_bk.driver_obj, webdriver.Firefox):
+                                    err_msg = 'Please find attribute value using either of ('
+                                    if attr_name=='padding' or attr_name=='margin' or attr_name=='border':  
+                                        for i in props[attr_name]:
+                                            newValue = webelement.value_of_css_property(i)
+                                            if newValue != '':
+                                                err_msg+=' '
+                                                err_msg += i
+                                        err_msg+=')'
+                                        logger.print_on_console(err_msg)
+                                        local_uo.log.error(err_msg)
+                                    elif attr_name in ['border-top', 'border-right', 'border-bottom', 'border-left']:
+                                        finalValue=''
+                                        for j in ['-width','-style','-color']:
+                                            attr = attr_name + j
+                                            val = webelement.value_of_css_property(attr)
+                                            if val != '':
+                                                finalValue += val
+                                        if finalValue:
+                                            value = finalValue
+                                        else:
+                                            err_msg = "No such CSS attribute present in the element"
+                                else:
+                                    err_msg="No such CSS attribute present in the element"
+                            elif value != '':
+                                # show output
+                                output = value
+                                logger.print_on_console('Output: ', output)
+                                status = TEST_RESULT_PASS
+                                methodoutput = TEST_RESULT_TRUE                               
+                            else:
+                                err_msg = 'Attribute does not exists'
+                                logger.print_on_console(err_msg)
+                                local_uo.log.error(err_msg)
                     else:
                         err_msg = 'Failed to fetch the attribute value.'
                         logger.print_on_console(err_msg)
@@ -1083,12 +1128,13 @@ class UtilWebKeywords:
         original_attr=None
         output=OUTPUT_CONSTANT
         local_uo.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        css_flag = True if input[-1] == 'css' else False
         try:
             if webelement != None and webelement !='' and webelement.tag_name.lower()=='table':
                 if len(input) >= 4 and int(input[3]) <= 0:
                     err_msg = self._index_zero()
                 elif input[2]:
-                    if((len(input)==5 or len(input)==6) and all(v for v in input) and (not input[2]=='tr')):
+                    if((len(input)==5 or len(input)==6 or (css_flag and (len(input)==6 or len(input)==7))) and all(v for v in input) and (not input[2]=='tr')):
                         attr_name=input[4]
                         webelement1=None
                         row_number=int(input[0])-1
@@ -1116,50 +1162,107 @@ class UtilWebKeywords:
                             err_msg = 'Input Error: Please specify index'
                             logger.print_on_console(err_msg)
                             local_uo.log.error(err_msg)
-                elif((len(input)==5 or len(input)==6) and (not all(ip for ip in input[0:4]))): #checking attribute value of table itself
+                elif((len(input)==5 or len(input)==6 or (css_flag and (len(input)==6 or len((input)==7)) )) and (not all(ip for ip in input[0:4]))): #checking attribute value of table itself
                     attr_name=input[4]
                     eleStatus=True
-                elif((len(input)==5 or len(input)==6) and (not input[2])):
+                elif((len(input)==5 or len(input)==6 or (css_flag and (len(input)==6 or len(input)==7))) and (not input[2])):
                     err_msg = 'Input Error: Please specify valid object type'
                     logger.print_on_console(err_msg)
                     local_uo.log.error(err_msg)
             elif(len(input)==1 or len(input)==2) and not err_msg:
                 attr_name=input[0]
                 eleStatus=True
-
+            elif css_flag and (len(input) == 1 or len(input) == 2) and not err_msg:
+                attr_name = input[0]
+                eleStatus = True          
             if(eleStatus):
                 if webelement != None and webelement !='':
                     local_uo.log.info(INPUT_IS)
                     local_uo.log.info(input)
                     result=None
                     if attr_name:
-                        if attr_name != 'required':
-                            original_attr = webelement.get_attribute(attr_name)
-                        else:
-                            original_attr = browser_Keywords.local_bk.driver_obj.execute_script("return arguments[0].getAttribute('required')",webelement)
-                        if original_attr != None and original_attr !='':
-                            local_uo.log.info(original_attr)
-                            if len(input)==6: result = input[5]
-                            if len(input)==2: result = input[1]
-                            if result:
-                                if original_attr == result:
-                                    local_uo.log.info('Attribute exists and values matched')
-                                    logger.print_on_console('Attribute exists and values matched')
+                        if not css_flag:
+                            if attr_name != 'required':
+                                original_attr = webelement.get_attribute(attr_name)
+                            else:
+                                original_attr = browser_Keywords.local_bk.driver_obj.execute_script("return arguments[0].getAttribute('required')",webelement)
+                            if original_attr != None and original_attr !='':
+                                local_uo.log.info(original_attr)
+                                if len(input)==6: result = input[5]
+                                if len(input)==2: result = input[1]
+                                if result:
+                                    if original_attr == result:
+                                        local_uo.log.info('Attribute exists and values matched')
+                                        logger.print_on_console('Attribute exists and values matched')
+                                        status = TEST_RESULT_PASS
+                                        methodoutput = TEST_RESULT_TRUE
+                                    else:
+                                        err_msg = 'Attribute values does not match'
+                                        logger.print_on_console(err_msg)
+                                        local_uo.log.error(err_msg)
+                                else:
+                                    local_uo.log.info('Attribute exists')
+                                    logger.print_on_console('Attribute exists')
                                     status = TEST_RESULT_PASS
                                     methodoutput = TEST_RESULT_TRUE
-                                else:
-                                    err_msg = 'Attribute values does not match'
-                                    logger.print_on_console(err_msg)
-                                    local_uo.log.error(err_msg)
                             else:
-                                local_uo.log.info('Attribute exists')
-                                logger.print_on_console('Attribute exists')
-                                status = TEST_RESULT_PASS
-                                methodoutput = TEST_RESULT_TRUE
-                        else:
-                            err_msg = 'Attribute does not exixts'
-                            logger.print_on_console(err_msg)
-                            local_uo.log.error(err_msg)
+                                err_msg = 'Attribute does not exixts'
+                                logger.print_on_console(err_msg)
+                                local_uo.log.error(err_msg)
+                        elif css_flag:
+                            props = {'border': ['border-top', 'border-right', 'border-bottom', 'border-left'],
+                                     'margin': ['margin-top', 'margin-right', 'margin-bottom', 'margin-left'],
+                                     'padding': ['padding-top', 'padding-right', 'padding-bottom', 'padding-left']}
+                            value = webelement.value_of_css_property(attr_name)
+                            if value == '' and attr_name in ['padding', 'margin', 'border', 'border-top', 'border-right', 'border-bottom', 'border-left']:
+                                if isinstance(browser_Keywords.local_bk.driver_obj, webdriver.Firefox):
+                                    err_msg = 'Please find attribute value using either of ('
+                                    if attr_name == 'padding' or attr_name == 'margin' or attr_name == 'border':
+                                        for i in props[attr_name]:
+                                            newValue = webelement.value_of_css_property(
+                                                i)
+                                            if newValue != '':
+                                                err_msg += ' '
+                                                err_msg += i
+                                        err_msg += ')'
+                                        logger.print_on_console(err_msg)
+                                        local_uo.log.error(err_msg)
+                                    elif attr_name in ['border-top', 'border-right', 'border-bottom', 'border-left']:
+                                        finalValue = ''
+                                        for j in ['-width', '-style', '-color']:
+                                            attr = attr_name + j
+                                            val = webelement.value_of_css_property(attr)
+                                            if val != '':
+                                                finalValue += val
+                                        if finalValue:
+                                            value = finalValue
+                                        else:
+                                            err_msg = "No such CSS attribute present in the element"
+                                else:
+                                    err_msg = "No such CSS attribute present in the element"
+                            elif value != '':
+                                # show output
+                                if len(input) == 7: result = input[5]
+                                if len(input) == 3: result = input[1]
+                                if result:
+                                    if value == result:
+                                        local_uo.log.info('Attribute exists and values matched')
+                                        logger.print_on_console('Attribute exists and values matched')
+                                        status = TEST_RESULT_PASS
+                                        methodoutput = TEST_RESULT_TRUE
+                                    else:
+                                        err_msg = 'Attribute values does not match'
+                                        logger.print_on_console(err_msg)
+                                        local_uo.log.error(err_msg)
+                                else:
+                                    local_uo.log.info('Attribute exists')
+                                    logger.print_on_console('Attribute exists')
+                                    status = TEST_RESULT_PASS
+                                    methodoutput = TEST_RESULT_TRUE
+                            else:
+                                err_msg = 'Attribute does not exists'
+                                logger.print_on_console(err_msg)
+                                local_uo.log.error(err_msg)
                     else:
                         err_msg = 'Attribute name is empty.'
                         logger.print_on_console(err_msg)
