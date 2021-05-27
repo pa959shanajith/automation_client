@@ -1499,6 +1499,7 @@ class FileOperations:
         output_feild = None
         sheet_exist=[]
         input_filed_set = False
+        dyn_var_opt = False
         log.debug('Comparing content cell by cell of .xls files ')
         try:
             if (len(input_val)==5):
@@ -1524,7 +1525,7 @@ class FileOperations:
 
                 if(str(args[0].split(";")[0]).startswith("{") and str(args[0].split(";")[0]).endswith("}")):
                     out_path = self.DV.get_dynamic_value(args[0].split(";")[0])
-
+                    dyn_var_opt = True
                     if ( out_path ):
                         output_feild = out_path
                         log.info("Choosen the dynamic file path")
@@ -1639,7 +1640,7 @@ class FileOperations:
                     else:
                         log.debug("Output file not provided")
                         if (collect_content) :
-                            if opt==True:
+                            if opt==True or dyn_var_opt:
                                 comp_flg=True
                                 if len(collect_content)!=0:
                                     for each_key in collect_content.keys():
@@ -1732,6 +1733,7 @@ class FileOperations:
             log.debug('reading the inputs')
             flag1=False
             flag2=False
+            dyn_var_opt = False
             filepath1=input[0]
             filepath2=input[3]
             sheetname1=input[1]
@@ -2184,9 +2186,12 @@ class FileOperations:
                             output='False'
                             res1[j].append(output)
                         j+=1
-
+                        
             if(str(args[0].split(";")[0]).startswith("{") and str(args[0].split(";")[0]).endswith("}")):
                 out_path = self.DV.get_dynamic_value(args[0].split(";")[0])
+                dyn_var_opt = True
+                status = TEST_RESULT_PASS
+                methodoutput = TEST_RESULT_TRUE
                 if(out_path):
                     output_feild = out_path
             else:
@@ -2268,7 +2273,7 @@ class FileOperations:
                         methodoutput = TEST_RESULT_TRUE
                 else:
                     err_msg = 'Warning! : Invalid file extension(Supports only .xlsx, .xls, .txt, .csv).'
-            else:
+            elif not dyn_var_opt:
                 err_msg='Output field is empty'
                 log.error(err_msg)
                 logger.print_on_console(err_msg)

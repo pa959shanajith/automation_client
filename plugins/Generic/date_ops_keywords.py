@@ -449,8 +449,8 @@ class DateOperation:
         """
         status=generic_constants.TEST_RESULT_FAIL
         result=generic_constants.TEST_RESULT_FALSE
-        verb = None
         err_msg = None
+        output = OUTPUT_CONSTANT
         try:
             if not (input_from is None or input_from is ''):
 #                try:
@@ -500,7 +500,7 @@ class DateOperation:
             log.error(e)
         if err_msg!=None:
             logger.print_on_console(err_msg)
-        return status,result,verb,err_msg
+        return status, result, output, err_msg
 
     def validate(self,input):
         try:
