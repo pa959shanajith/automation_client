@@ -201,5 +201,5 @@ REQUEST_URL_TIMEOUT=40
 """tuple of file extensions to ignore downloading entire body i.e. file"""
 IGNORE_FILE_EXTENSIONS = ('.pdf','.docx','.zip','.dmg')
 
-# Mousehover check whether element is in viewport
-MOUSEHOVER_INVIEW = """ var rect = arguments[0].getBoundingClientRect(); var windowHeight = (window.innerHeight || document.documentElement.clientHeight); var windowWidth = (window.innerWidth || document.documentElement.clientWidth); return ((rect.left >= 0) && (rect.top >= 0) && ((rect.left + rect.width) <= windowWidth) && ((rect.top + rect.height) <= windowHeight));"""
+# check whether element is in viewport
+INVIEW = """ var rect = arguments[0].getBoundingClientRect(); var windowHeight = (window.innerHeight || document.documentElement.clientHeight); var windowWidth = (window.innerWidth || document.documentElement.clientWidth); return ((rect.left >= 0) && (rect.top >= 0) && ((rect.left + rect.width) <= windowWidth) && ((rect.top + rect.height) <= windowHeight));"""

@@ -480,8 +480,12 @@ class RadioCheckboxKeywords():
         if webelement is not None:
             try:
                 if webelement.tag_name=='table':
-                    if len(input)==4:
+                    if len(input)==4 and int(input[3]) >= 1:
                         webelement=self.getActualElement(webelement,input)
+                    elif len(input) == 4 and int(input[3]) <= 0:
+                        err_msg = ERROR_CODE_DICT['INVALID_TABLE_INDEX']
+                        local_rco.log.error(ERROR_CODE_DICT['INVALID_TABLE_INDEX'])
+                        logger.print_on_console(ERROR_CODE_DICT['INVALID_TABLE_INDEX'])
                     elif len(input)==3:
                         temp_status=self.__fetch_status_array(webelement,input)
                         status=temp_status[0]

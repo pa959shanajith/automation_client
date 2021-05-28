@@ -290,7 +290,8 @@ class FileOperations:
 
                     elif(input_ext=='.csv' and extension=='.xlsx'):
                         workbook = openpyxl.Workbook()
-                        worksheet = workbook.create_sheet(index=0, title='Sheet1')
+                        workbook.active.title = file1.split('.')[0]
+                        worksheet = workbook.active
                         with open(source_path, 'rt', encoding='utf8') as f:
                             reader = csv.reader(f)
                             for r, row in enumerate(reader):
@@ -303,7 +304,7 @@ class FileOperations:
                         with open(source_path, 'rt') as f:
                             reader = csv.reader(f)
                             workbook = xlwt.Workbook()
-                            sheet = workbook.add_sheet("Sheet 1")
+                            sheet = workbook.add_sheet(file1.split('.')[0])
                             for rowi, row in enumerate(reader):
                                 for coli, value in enumerate(row):
                                     sheet.write(rowi,coli,value)
@@ -345,12 +346,15 @@ class FileOperations:
 
                     elif(extension=='.zip'):
                         zipf = zipfile.ZipFile(file2, 'w', zipfile.ZIP_DEFLATED)
-                        for root, dirs, files in os.walk(source_path):
-                            for f in files:
-                                if(filename==f):
-                                    continue
-                                else:
-                                    zipf.write(os.path.join(root, f))
+                        if(input_ext):
+                            zipf.write(source_path, file1)
+                        else:
+                            for root, dirs, files in os.walk(source_path):
+                                for f in files:
+                                    if(filename==f):
+                                        continue
+                                    else:
+                                        zipf.write(os.path.join(root, f))
                         zipf.close()
 
                     elif(input_ext=='.zip'):
@@ -393,6 +397,8 @@ class FileOperations:
             if(extension.strip() == ''): extension='null'
             if(opt.strip() == ''): opt=0
             if( source_path and destination_path ):
+                source_path=os.path.normpath(source_path)
+                destination_path=os.path.normpath(destination_path)
                 try:
                     if( os.path.splitext(source_path)[1] and not os.path.splitext(destination_path)[1] ):
                         #file ops
@@ -1498,6 +1504,8 @@ class FileOperations:
         sheetname2 = None
         output_feild = None
         sheet_exist=[]
+        input_filed_set = False
+        dyn_var_opt = False
         log.debug('Comparing content cell by cell of .xls files ')
         try:
             if (len(input_val)==5):
@@ -1509,10 +1517,21 @@ class FileOperations:
                     logger.print_on_console("Selective Option Set to True")
                     opt = True
                     log.info("Selective option set True")
+                input_filed_set = True
+            elif (len(input_val)==4):
+                input_path1 = input_val[0]
+                sheetname1 = input_val[1]
+                input_path2 = input_val[2]
+                sheetname2 = input_val[3]
+                input_filed_set = True
+            else:
+                input_filed_set = False
+
+            if input_filed_set:
 
                 if(str(args[0].split(";")[0]).startswith("{") and str(args[0].split(";")[0]).endswith("}")):
                     out_path = self.DV.get_dynamic_value(args[0].split(";")[0])
-
+                    dyn_var_opt = True
                     if ( out_path ):
                         output_feild = out_path
                         log.info("Choosen the dynamic file path")
@@ -1588,7 +1607,7 @@ class FileOperations:
                         log.error('some error : {}'.format(e))
                     if( output_feild ):
 
-                        if( os.path.exists(output_feild) or os.path.exists(os.path.dirname(output_feild)) ):
+                        if os.path.exists(output_feild):
 
                             logger.print_on_console( "Writing the output of cellByCellCompare to file ")
                             flg, err_msg = self.write_result_file(output_feild, collect_content, 'CellByCellCompare_Result')
@@ -1627,7 +1646,7 @@ class FileOperations:
                     else:
                         log.debug("Output file not provided")
                         if (collect_content) :
-                            if opt==True:
+                            if opt==True or dyn_var_opt:
                                 comp_flg=True
                                 if len(collect_content)!=0:
                                     for each_key in collect_content.keys():
@@ -1720,6 +1739,7 @@ class FileOperations:
             log.debug('reading the inputs')
             flag1=False
             flag2=False
+            dyn_var_opt = False
             filepath1=input[0]
             filepath2=input[3]
             sheetname1=input[1]
@@ -2172,9 +2192,12 @@ class FileOperations:
                             output='False'
                             res1[j].append(output)
                         j+=1
-
+                        
             if(str(args[0].split(";")[0]).startswith("{") and str(args[0].split(";")[0]).endswith("}")):
                 out_path = self.DV.get_dynamic_value(args[0].split(";")[0])
+                dyn_var_opt = True
+                status = TEST_RESULT_PASS
+                methodoutput = TEST_RESULT_TRUE
                 if(out_path):
                     output_feild = out_path
             else:
@@ -2256,7 +2279,7 @@ class FileOperations:
                         methodoutput = TEST_RESULT_TRUE
                 else:
                     err_msg = 'Warning! : Invalid file extension(Supports only .xlsx, .xls, .txt, .csv).'
-            else:
+            elif not dyn_var_opt:
                 err_msg='Output field is empty'
                 log.error(err_msg)
                 logger.print_on_console(err_msg)

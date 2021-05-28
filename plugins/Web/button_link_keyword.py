@@ -17,6 +17,7 @@ from selenium import webdriver
 from constants import SYSTEM_OS
 if SYSTEM_OS == 'Windows' :
     from pyrobot import Robot, Keys
+    import win32process
 import browser_Keywords
 import logging
 from constants import *
@@ -25,6 +26,7 @@ import threading
 from string_ops_keywords import *
 from utilweb_operations import *
 import pyautogui
+import psutil
 local_blk = threading.local()
 ##text_javascript = """function stext_content(f) {     var sfirstText = '';     var stextdisplay = '';     for (var z = 0; z < f.childNodes.length; z++) {         var scurNode = f.childNodes[z];         swhitespace = /^\s*$/;         if (scurNode.nodeName === '#text' && !(swhitespace.test(scurNode.nodeValue))) {             sfirstText = scurNode.nodeValue;             stextdisplay = stextdisplay + sfirstText;         }     }     return (stextdisplay); }; return stext_content(arguments[0])"""
 class ButtonLinkKeyword():
@@ -499,13 +501,13 @@ class ButtonLinkKeyword():
                         clickinfo = browser_Keywords.local_bk.driver_obj.execute_script(webconstants.CLICK_JAVASCRIPT,webelement)
                         local_blk.log.info('upload_file click info')
                         local_blk.log.info(clickinfo)
-                        filestatus = self.__upload_operation(inputfile)
+                        filestatus = self.__upload_operation(inputfile,inputs)
                         local_blk.log.info(STATUS_METHODOUTPUT_UPDATE)
                         status = webconstants.TEST_RESULT_PASS
                         methodoutput = webconstants.TEST_RESULT_TRUE
                     else:
                         if self.__click_for_file_upload(browser_Keywords.local_bk.driver_obj,webelement):
-                            filestatus =self.__upload_operation(inputfile)
+                            filestatus =self.__upload_operation(inputfile,inputs)
                             local_blk.log.info(STATUS_METHODOUTPUT_UPDATE)
                             status = webconstants.TEST_RESULT_PASS
                             methodoutput = webconstants.TEST_RESULT_TRUE
@@ -520,7 +522,51 @@ class ButtonLinkKeyword():
         local_blk.log.info(RETURN_RESULT)
         return status,methodoutput,output,err_msg
 
-    def __upload_operation(self,inputfile):
+    def get_ppid_browser(self):
+        ppid=None
+        browser_name = browser_Keywords.local_bk.driver_obj.capabilities.get('browserName')
+        platform_name = browser_Keywords.local_bk.driver_obj.capabilities.get('platformName')
+        try:
+            if platform_name != 'Darwin':
+                if (browser_name == 'chrome'):
+                    ppid = browser_Keywords.local_bk.driver_obj.service.process.pid
+                elif(browser_name == 'firefox'):
+                    if hasattr(browser_Keywords.local_bk.driver_obj, 'binary'):
+                        ppid = browser_Keywords.local_bk.driver_obj.binary.process.pid
+                    else:
+                        ppid = browser_Keywords.local_bk.driver_obj.service.process.pid
+                elif(browser_name == 'internet explorer'):
+                    ppid = browser_Keywords.local_bk.driver_obj.iedriver.process.pid
+                elif(browser_name == 'edge legacy') or (browser_name == 'edge chromium'):
+                    ppid = browser_Keywords.local_bk.driver_obj.edge_service.process.pid
+        except Exception as e:
+            local_blk.log.debug("Problem while getting the ppid: {}".format(e))
+        
+        return ppid
+
+    def check_fileDialogOpen(self):
+        hwnds = []
+        ppid = self.get_ppid_browser()
+        if ppid == None:
+            return False
+        def winEnumHandler(hwnd, hwnd_list):
+            if win32gui.IsWindowVisible(hwnd) and win32gui.GetWindowText(hwnd) == "Open":
+                hwnd_list.append(hwnd)
+        win32gui.EnumWindows(winEnumHandler, hwnds)
+        pids = [win32process.GetWindowThreadProcessId(h)[1] for h in hwnds]
+        ppids = [psutil.Process(p).parent().ppid() for p in pids]
+        return ppid in ppids
+
+    def upload_time_func(self,tries=10, time_sleep=0.5):
+        while tries > 0:
+            if self.check_fileDialogOpen():
+                local_blk.log.info("Window Found and returning the true")
+                return True
+            time.sleep(time_sleep)
+            tries -= 1
+        return False
+
+    def __upload_operation(self,inputfile,args):
         status = False
         try:
             local_blk.log.debug('using Robot class to perform keyboard operation')
@@ -528,42 +574,28 @@ class ButtonLinkKeyword():
             time.sleep(1)
             #self.__set_clipboard_data(inputfile)
             robot.sleep(1)
-            #robot.key_press(Keys.alt)
-            '''
-
-            robot.key_press(Keys.n)
-            robot.sleep(1)
-            robot.key_release(Keys.n)
-            robot.key_release(Keys.alt)
-            robot.sleep(1)
-            '''
-            pyautogui.PAUSE = 1
-            pyautogui.keyDown('alt')
-            pyautogui.keyDown('n')
-            pyautogui.PAUSE = 1
-            pyautogui.keyUp('alt')
-            pyautogui.keyUp('n')
-            pyautogui.PAUSE = 1
-
-            
-            #copy_text=r'{}'.format(self.copy_text[2])
-            #print (copy_text)
-            #robot.type_string(inputfile)
-            pyautogui.typewrite(inputfile, interval=0.25)
-            pyautogui.PAUSE = 1
-            #pyautogui.PAUSE = 1
-            pyautogui.keyDown('ctrl')
-            pyautogui.keyDown('a')
-            pyautogui.PAUSE = 1
-            pyautogui.keyUp('ctrl')
-            pyautogui.keyUp('a')
-            pyautogui.PAUSE = 1
-            pyautogui.typewrite(inputfile, interval=0.25)
-            pyautogui.keyDown('enter')
-            pyautogui.PAUSE = 1
-            pyautogui.keyUp('enter')
-            pyautogui.PAUSE = 1
-            status = True
+            maxTries = 10
+            time_sleep = 0.5
+            if len(args) > 2:
+                maxTries = int(int(args[2]) / time_sleep) + 1
+            result_call = self.upload_time_func(maxTries, time_sleep)
+            if result_call!=False:
+                pyautogui.PAUSE = 1
+                pyautogui.keyDown('alt')
+                pyautogui.keyDown('n')
+                pyautogui.PAUSE = 1
+                pyautogui.keyUp('alt')
+                pyautogui.keyUp('n')
+                pyautogui.PAUSE = 1
+                pyautogui.typewrite(inputfile, interval=0.25)
+                pyautogui.PAUSE = 1
+                pyautogui.keyDown('enter')
+                pyautogui.PAUSE = 1
+                pyautogui.keyUp('enter')
+                pyautogui.PAUSE = 1
+                status = True
+            else:
+                status = False
         except Exception as e:
             logger.print_on_console(EXCEPTION_OCCURED,e)
             local_blk.log.error(EXCEPTION_OCCURED)
@@ -592,7 +624,7 @@ class ButtonLinkKeyword():
         try:
             if isinstance(browser_Keywords.local_bk.driver_obj,webdriver.Ie):
                 try:
-                    logger.print_on_console("new setting apply")
+                    local_blk.log.info("IE: Click operation performed using mousehover and keydown")
                     UW=UtilWebKeywords()
                     browser_Keywords.local_bk.driver_obj.execute_script(webconstants.FOUCS_ELE,webelement)
                     UW.mouse_hover(webelement,(1,))
@@ -601,8 +633,6 @@ class ButtonLinkKeyword():
                     #pyautogui.press('enter')
                     pyautogui.PAUSE = 1
                     pyautogui.keyUp('enter')
-
-                    logger.print_on_console("end new setting apply")
                 except:
                     local_blk.log.debug('Going to perform click operation')
                     clickinfo = browser_Keywords.local_bk.driver_obj.execute_script(webconstants.CLICK_JAVASCRIPT,webelement)
@@ -613,7 +643,7 @@ class ButtonLinkKeyword():
                 status = True
             else:
                 try:
-                    logger.print_on_console("new setting apply")
+                    local_blk.log.info("Click operation performed using mousehover and keydown")
                     UW=UtilWebKeywords()
                     browser_Keywords.local_bk.driver_obj.execute_script(webconstants.FOUCS_ELE,webelement)
                     UW.mouse_hover(webelement,(1,))
@@ -623,7 +653,6 @@ class ButtonLinkKeyword():
                     pyautogui.PAUSE = 1
                     pyautogui.keyUp('enter')
 
-                    logger.print_on_console("end new setting apply")
                 except:
                     local_blk.log.debug('Going to perform click operation')
                     webelement.click()

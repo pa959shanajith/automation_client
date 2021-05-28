@@ -8,6 +8,7 @@
     "connection_timeout": "0",
     "delay": "0.3",
     "delay_stringinput": "1",
+    "disable_screen_timeout": "No",
     "displayVariableTimeOut": "1",
     "enableSecurityCheck": "No",
     "exception_flag": "false",
