@@ -574,14 +574,16 @@ class Dispatcher:
                                 from selenium.common.exceptions import TimeoutException
                                 from selenium.webdriver.common.by import By
                                 element_present = EC.presence_of_element_located((By.XPATH, objectname))
-                                local_Wd.log.info('starting globalWaitTimeOut')
+                                local_Wd.log.info('starting Global Wait TimeOut')
                                 WebDriverWait(browser_Keywords.local_bk.driver_obj, globalWait_to).until(element_present)
-                                local_Wd.log.info('globalWaitTimeOut completed successfully')
-                                logger.print_on_console('globalWaitTimeOut completed successfully')
+                                msg='Global Wait TimeOut completed successfully'
+                                local_Wd.log.info(msg)
+                                logger.print_on_console(msg)
                         except TimeoutException as e:
-                            logger.print_on_console('globalWaitTimeOut exceeded')
+                            msg1='Global Wait TimeOut exceeded'
+                            logger.print_on_console(msg1)
+                            local_Wd.log.error(msg1)
                             local_Wd.log.error(e)
-                            # logger.print_on_console(e)
                         except Exception as e:
                             local_Wd.log.error(e)
                             logger.print_on_console(e)

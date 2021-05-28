@@ -201,13 +201,14 @@ class MobileDispatcher:
                             element, xpath=self.getMobileElement(android_scrapping.driver,objectname)
                             later=time.time()
                             if int(later-start_time)>=int(globalWait_to):
-                                msg='globalWaitTimeOut exceeded'
+                                msg='Global Wait TimeOut exceeded'
                                 logger.print_on_console(msg)
                                 log.error(msg)
                                 break
                             if element is not None:
-                                logger.print_on_console('globalWaitTimeOut completed successfully')
-                                log.info('globalWaitTimeOut completed successfully')
+                                msg1="Global Wait TimeOut completed successfully"
+                                logger.print_on_console(msg1)
+                                log.info(msg1)
                                 break
                     element, xpath=self.getMobileElement(android_scrapping.driver,objectname)
                     result=self.mob_dict[keyword](element,input,xpath)
