@@ -132,7 +132,7 @@ class CoreUtils():
         mac = str(mac).replace('-',':')
         return str(mac).strip()
 
-def check_isadmin(self):
+def check_isadmin():
     is_admin = 0
     if SYSTEM_OS == 'Windows':
         import ctypes
