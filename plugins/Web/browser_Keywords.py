@@ -111,7 +111,7 @@ class BrowserKeywords():
                     #driver exist in map, get it
                     local_bk.driver_obj = d
                     #  Bug 18160- Firefox browser does not come to foreground
-                    if(isinstance(local_bk.driver_obj, webdriver.Firefox)):
+                    if(SYSTEM_OS=='Windows' and isinstance(local_bk.driver_obj, webdriver.Firefox)):
                         try:
                             mozPid = local_bk.driver_obj.desired_capabilities['moz:processID']
                             mozApp = Application().connect(process=mozPid)
