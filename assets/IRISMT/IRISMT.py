@@ -626,7 +626,13 @@ class IRISMT(wx.Frame):
             self.flow_flag = 1
             self.print_log("-"*20+"Training Failed"+"-"*20)
             self.fontselect_txtfield.Clear()
+            log.info("Deleting backups")
+            if self.current_version == "5.0.0" and os.path.exists(AVO_ASSURE_HOME+'assets/IRISMT/model_backup.7z'): os.remove(AVO_ASSURE_HOME+'assets/IRISMT/model_backup.7z')
+            else:
+                delete_cmd = r'{loc_7z} d {zipfile} {files} -r'.format(loc_7z=LOC_7z, zipfile=self.rollback_dir, files="eng.traineddata_"+self.current_version)
+                subprocess.call(delete_cmd, shell=True)
             return
+
         self.comm_obj.percentageIncri(self.msg,90,"Saving Changes in Config Files...")
         self.upgrade_version()
         self.upgrade_dataset_version(failed_fonts)
