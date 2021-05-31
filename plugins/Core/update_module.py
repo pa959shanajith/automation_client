@@ -104,8 +104,34 @@ class Update_Rollback:
 
     def fetch_current_value(self):
         """Returns the latest production version available"""
+        flg = False
         keys = list(self.data_tags.keys())
-        keys.sort(key=lambda s:list(map(int, s.split('.'))))
+        #check if any of the keys has rc in the value
+        for k in keys:
+            if 'rc' in k :
+                flg = True
+                break
+        if (flg):
+            """For Release Candidate(rc) package expression, Eg : 3.3.0-rc.1[first integer - major version, second integer - minor version, third integer - delta package, fourth part - release candidate number]"""
+            newkeys = []
+            for i in keys:
+                newkeys.append(i.replace("-rc.","."))
+            keys = newkeys
+
+            keys.sort(key=lambda s:list(map(int, s.split('.'))))
+
+            newkeys = []
+            for i in keys:
+                c = i.count('.')
+                if c == 3:
+                    newkeys.append(i[0:i.rindex('.')]+'-rc.'+i[i.rindex('.')+1:])
+                else:
+                    newkeys.append(i)
+            keys = newkeys
+            del newkeys
+        else:
+            """For regular package expression, Eg : 3.3.0[first integer - major version, second integer - minor version, third integer - delta package]"""
+            keys.sort(key=lambda s:list(map(int, s.split('.'))))
         if (len(keys)>0):return keys[-1]
         else: return 'N/A'
 

@@ -354,7 +354,9 @@ class FileOperations:
                                     if(filename==f):
                                         continue
                                     else:
-                                        zipf.write(os.path.join(root, f))
+                                        zip_path1 = os.path.join(source_path, '..')
+                                        zip_path2 = os.path.join(root, f)
+                                        zipf.write(zip_path2, os.path.relpath(zip_path2, zip_path1))
                         zipf.close()
 
                     elif(input_ext=='.zip'):
