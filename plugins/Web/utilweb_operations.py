@@ -1075,6 +1075,7 @@ class UtilWebKeywords:
                                 logger.print_on_console(err_msg)
                                 local_uo.log.error(err_msg)
                         else:
+                            childSearchFlag=False
                             props={'border' : ['border-top','border-right', 'border-bottom','border-left'],
                             'margin' : ['margin-top', 'margin-right','margin-bottom', 'margin-left'],
                             'padding' : ['padding-top', 'padding-right','padding-bottom', 'padding-left']}
@@ -1089,7 +1090,8 @@ class UtilWebKeywords:
                                         newValue = webelement.value_of_css_property(i)
                                         if newValue != '':
                                             err_msg+=' '
-                                            err_msg += i
+                                            err_msg+=i
+                                        childSearchFlag=True
                                     err_msg+=')'
                                     logger.print_on_console(err_msg)
                                     local_uo.log.error(err_msg)
@@ -1109,7 +1111,7 @@ class UtilWebKeywords:
                                 logger.print_on_console('Output: ', output)
                                 status = TEST_RESULT_PASS
                                 methodoutput = TEST_RESULT_TRUE                               
-                            else:
+                            elif not childSearchFlag:
                                 err_msg = 'CSS property does not exists'
                                 logger.print_on_console(err_msg)
                                 local_uo.log.error(err_msg)
@@ -1217,6 +1219,7 @@ class UtilWebKeywords:
                                 logger.print_on_console(err_msg)
                                 local_uo.log.error(err_msg)
                         elif css_flag:
+                            childSearchFlag=False
                             props = {'border': ['border-top', 'border-right', 'border-bottom', 'border-left'],
                                      'margin': ['margin-top', 'margin-right', 'margin-bottom', 'margin-left'],
                                      'padding': ['padding-top', 'padding-right', 'padding-bottom', 'padding-left']}
@@ -1232,6 +1235,7 @@ class UtilWebKeywords:
                                         if newValue != '':
                                             err_msg += ' '
                                             err_msg += i
+                                        childSearchFlag=True
                                     err_msg += ')'
                                     logger.print_on_console(err_msg)
                                     local_uo.log.error(err_msg)
@@ -1242,12 +1246,11 @@ class UtilWebKeywords:
                                         val = webelement.value_of_css_property(attr)
                                         if val != '':
                                             finalValue += val
+                                            finalValue+=' '
                                     if finalValue:
                                         value = finalValue
                                     else:
                                         err_msg = "No such CSS attribute present in the element"
-                                # else:
-                                #     err_msg = "No such CSS attribute present in the element"
                             elif value != '':
                                 # show output
                                 if len(input) == 7: result = input[5]
@@ -1267,7 +1270,7 @@ class UtilWebKeywords:
                                     logger.print_on_console('CSS property exists')
                                     status = TEST_RESULT_PASS
                                     methodoutput = TEST_RESULT_TRUE
-                            else:
+                            elif not childSearchFlag:
                                 err_msg = 'CSS property does not exists'
                                 logger.print_on_console(err_msg)
                                 local_uo.log.error(err_msg)
