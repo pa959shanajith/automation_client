@@ -1051,6 +1051,7 @@ class TestThread(threading.Thread):
 
     #should just resume the thread
     def resume(self,debug_mode):
+        if self.con == '': return
         if not(debug_mode):
             self.con.debug_mode=False
         self.con.resume_execution()
