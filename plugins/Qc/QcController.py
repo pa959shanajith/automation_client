@@ -45,7 +45,9 @@ class QcWindow():
             self.headers = {'cache-control': "no-cache"}
             login_url = self.Qc_Url + '/authentication-point/authenticate'
             resp = requests.post(login_url, auth=HTTPBasicAuth(user_name, pass_word),  headers=self.headers,proxies=readconfig.proxies)
-            if resp.status_code == 200:
+            if resp.status_code == 500 or resp.status_code == 503 :
+                res = "serverdown"
+            else if resp.status_code == 200:
                 cookieName = resp.headers.get('Set-Cookie')
                 LWSSO_COOKIE_KEY = cookieName[cookieName.index("=") + 1: cookieName.index(";")]
                 self.cookies = {'LWSSO_COOKIE_KEY': LWSSO_COOKIE_KEY}
