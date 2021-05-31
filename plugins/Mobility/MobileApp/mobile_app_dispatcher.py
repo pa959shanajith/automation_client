@@ -192,8 +192,24 @@ class MobileDispatcher:
                 elif keyword==WAIT_FOR_ELEMENT_EXISTS:
                     result=self.mob_dict[keyword](objectname,input)
                 else:
-                    element, xpath=self.getMobileElement(android_scrapping.driver,objectname)
-                    result=self.mob_dict[keyword](element,input,xpath)
+                    globalWait_to = int(readconfig.configvalues['globalWaitTimeOut'])
+                    if globalWait_to>0:
+                        element = xpath = None
+                        globalWait_to_delay = 0.25
+                        for _ in range(int(globalWait_to/globalWait_to_delay)+1):
+                            element, xpath=self.getMobileElement(android_scrapping.driver,objectname)
+                            if element is not None:
+                                break
+                            time.sleep(globalWait_to_delay)
+                        if element is not None:
+                            msg1="Element found. Global Wait Timeout completed"
+                        else:
+                            msg1="Element not found. Global Wait Timeout exceeded"
+                        logger.print_on_console(msg1)
+                        log.info(msg1)
+                    else:
+                        element, xpath=self.getMobileElement(android_scrapping.driver,objectname)
+                        result=self.mob_dict[keyword](element,input,xpath)
             else:
                 err_msg=INVALID_KEYWORD
                 result[3]=err_msg
