@@ -1072,38 +1072,37 @@ class UtilWebKeywords:
                             'padding' : ['padding-top', 'padding-right','padding-bottom', 'padding-left']}
                             value = webelement.value_of_css_property(attr_name)
                             if value == '' and attr_name in ['padding', 'margin', 'border', 'border-top', 'border-right', 'border-bottom', 'border-left']:
-                                if isinstance(browser_Keywords.local_bk.driver_obj, webdriver.Firefox):
-                                    err_msg = 'Please find attribute value using either of ('
-                                    if attr_name=='padding' or attr_name=='margin' or attr_name=='border':  
-                                        for i in props[attr_name]:
-                                            newValue = webelement.value_of_css_property(i)
-                                            if newValue != '':
-                                                err_msg+=' '
-                                                err_msg += i
-                                        err_msg+=')'
-                                        logger.print_on_console(err_msg)
-                                        local_uo.log.error(err_msg)
-                                    elif attr_name in ['border-top', 'border-right', 'border-bottom', 'border-left']:
-                                        finalValue=''
-                                        for j in ['-width','-style','-color']:
-                                            attr = attr_name + j
-                                            val = webelement.value_of_css_property(attr)
-                                            if val != '':
-                                                finalValue += val
-                                        if finalValue:
-                                            value = finalValue
-                                        else:
-                                            err_msg = "No such CSS attribute present in the element"
-                                else:
-                                    err_msg="No such CSS attribute present in the element"
-                            elif value != '':
+                                # if isinstance(browser_Keywords.local_bk.driver_obj, webdriver.Firefox):
+                                err_msg = 'Please find attribute value using either of ('                       
+                                if attr_name == 'border' and isinstance(browser_Keywords.local_bk.driver_obj, webdriver.Firefox):
+                                    err_msg += 'border-top border-right border-bottom border-left'
+                                if attr_name=='padding' or attr_name=='margin' or attr_name=='border' :  
+                                    for i in props[attr_name]:
+                                        newValue = webelement.value_of_css_property(i)
+                                        if newValue != '':
+                                            err_msg+=' '
+                                            err_msg += i
+                                    err_msg+=')'
+                                    logger.print_on_console(err_msg)
+                                    local_uo.log.error(err_msg)
+                                elif attr_name in ['border-top', 'border-right', 'border-bottom', 'border-left']:
+                                    finalValue=''
+                                    for j in ['-width','-style','-color']:
+                                        attr = attr_name + j
+                                        val = webelement.value_of_css_property(attr)
+                                        if val != '':
+                                            finalValue += val
+                                            finalValue+=' '
+                                    if finalValue:
+                                        value = finalValue
+                            if value != '':
                                 # show output
                                 output = value
                                 logger.print_on_console('Output: ', output)
                                 status = TEST_RESULT_PASS
                                 methodoutput = TEST_RESULT_TRUE                               
                             else:
-                                err_msg = 'Attribute does not exists'
+                                err_msg = 'CSS property does not exists'
                                 logger.print_on_console(err_msg)
                                 local_uo.log.error(err_msg)
                     else:
@@ -1172,7 +1171,7 @@ class UtilWebKeywords:
             elif(len(input)==1 or len(input)==2) and not err_msg:
                 attr_name=input[0]
                 eleStatus=True
-            elif css_flag and (len(input) == 1 or len(input) == 2) and not err_msg:
+            elif css_flag and (len(input) == 2 or len(input) == 3) and not err_msg:
                 attr_name = input[0]
                 eleStatus = True          
             if(eleStatus):
@@ -1215,52 +1214,53 @@ class UtilWebKeywords:
                                      'padding': ['padding-top', 'padding-right', 'padding-bottom', 'padding-left']}
                             value = webelement.value_of_css_property(attr_name)
                             if value == '' and attr_name in ['padding', 'margin', 'border', 'border-top', 'border-right', 'border-bottom', 'border-left']:
-                                if isinstance(browser_Keywords.local_bk.driver_obj, webdriver.Firefox):
-                                    err_msg = 'Please find attribute value using either of ('
-                                    if attr_name == 'padding' or attr_name == 'margin' or attr_name == 'border':
-                                        for i in props[attr_name]:
-                                            newValue = webelement.value_of_css_property(
-                                                i)
-                                            if newValue != '':
-                                                err_msg += ' '
-                                                err_msg += i
-                                        err_msg += ')'
-                                        logger.print_on_console(err_msg)
-                                        local_uo.log.error(err_msg)
-                                    elif attr_name in ['border-top', 'border-right', 'border-bottom', 'border-left']:
-                                        finalValue = ''
-                                        for j in ['-width', '-style', '-color']:
-                                            attr = attr_name + j
-                                            val = webelement.value_of_css_property(attr)
-                                            if val != '':
-                                                finalValue += val
-                                        if finalValue:
-                                            value = finalValue
-                                        else:
-                                            err_msg = "No such CSS attribute present in the element"
-                                else:
-                                    err_msg = "No such CSS attribute present in the element"
+                                # if isinstance(browser_Keywords.local_bk.driver_obj, webdriver.Firefox):
+                                err_msg = 'Please find attribute value using either of ('
+                                if attr_name == 'border' and isinstance(browser_Keywords.local_bk.driver_obj, webdriver.Firefox):
+                                    err_msg += 'border-top border-right border-bottom border-left'
+                                if attr_name == 'padding' or attr_name == 'margin' or attr_name == 'border':
+                                    for i in props[attr_name]:
+                                        newValue = webelement.value_of_css_property(i)
+                                        if newValue != '':
+                                            err_msg += ' '
+                                            err_msg += i
+                                    err_msg += ')'
+                                    logger.print_on_console(err_msg)
+                                    local_uo.log.error(err_msg)
+                                elif attr_name in ['border-top', 'border-right', 'border-bottom', 'border-left']:
+                                    finalValue = ''
+                                    for j in ['-width', '-style', '-color']:
+                                        attr = attr_name + j
+                                        val = webelement.value_of_css_property(attr)
+                                        if val != '':
+                                            finalValue += val
+                                    if finalValue:
+                                        value = finalValue
+                                    else:
+                                        err_msg = "No such CSS attribute present in the element"
+                                # else:
+                                #     err_msg = "No such CSS attribute present in the element"
                             elif value != '':
                                 # show output
                                 if len(input) == 7: result = input[5]
                                 if len(input) == 3: result = input[1]
                                 if result:
                                     if value == result:
-                                        local_uo.log.info('Attribute exists and values matched')
-                                        logger.print_on_console('Attribute exists and values matched')
+                                        local_uo.log.info('CSS property exists and values matched')
+                                        logger.print_on_console('CSS property exists and values matched')
                                         status = TEST_RESULT_PASS
                                         methodoutput = TEST_RESULT_TRUE
                                     else:
-                                        err_msg = 'Attribute values does not match'
+                                        err_msg = 'CSS property values does not match'
                                         logger.print_on_console(err_msg)
                                         local_uo.log.error(err_msg)
                                 else:
-                                    local_uo.log.info('Attribute exists')
-                                    logger.print_on_console('Attribute exists')
+                                    local_uo.log.info('CSS property exists')
+                                    logger.print_on_console('CSS property exists')
                                     status = TEST_RESULT_PASS
                                     methodoutput = TEST_RESULT_TRUE
                             else:
-                                err_msg = 'Attribute does not exists'
+                                err_msg = 'CSS property does not exists'
                                 logger.print_on_console(err_msg)
                                 local_uo.log.error(err_msg)
                     else:
