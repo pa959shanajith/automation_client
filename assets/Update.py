@@ -240,6 +240,25 @@ class Updater:
             """
             NVL = []
             new_dict={}
+
+            def replaceF1(NVL):
+                """Replacing '-rc.' with '.' in each list item  - why are we doing this -  packaging(version),distutils.version(LooseVersion and StrictVersion) is inconsistant with python 3.7.X """
+                newNVL = []
+                for i in NVL:
+                    newNVL.append(i.replace("-rc.","."))
+                return newNVL
+
+            def replaceF2(NVL):
+                """Replacing  the 3rd '.' with '-rc.' in each list item - why are we doing this - to refer to correct downloading package """
+                newNVL = []
+                for i in NVL:
+                    c = i.count('.')
+                    if c == 3:
+                        newNVL.append(i[0:i.rindex('.')]+'-rc.'+i[i.rindex('.')+1:])
+                    else:
+                        newNVL.append(i)
+                return newNVL
+
             for i in self.vers_aval:
                 #1.get both current version list and newer version list
                 if ( float(self.vers_aval[i][0]) >= float(list(self.ver_client.values())[0][0]) ):
@@ -249,7 +268,17 @@ class Updater:
                 else:
                     print ('=>older prod version')
 
-            NVL.sort(key=lambda s:list(map(int, s.split('.'))),reverse=True) # sort list in order
+            #check if rc in list
+            flg = False
+            for i in NVL:
+                if 'rc' in str(i):
+                    flg = True
+                    break
+            if (flg):
+                NVL = replaceF1(NVL)
+                NVL.sort(key=lambda s:list(map(int, s.split('.'))),reverse=True)
+                NVL = replaceF2(NVL)
+            else: NVL.sort(key=lambda s:list(map(int, s.split('.'))),reverse=True) # sort list in order
 
             #get from after current client version and excludes older versions
             nNVL=[]
@@ -269,7 +298,11 @@ class Updater:
             if not (new_version_list):
                 new_version_list=nNVL[:]
 
-            new_version_list.sort(key=lambda s:list(map(int, s.split('.')))) # sort list in order
+            if (flg):
+                new_version_list = replaceF1(new_version_list)
+                new_version_list.sort(key=lambda s:list(map(int, s.split('.')))) # sort list in order
+                new_version_list = replaceF2(new_version_list)
+            else: new_version_list.sort(key=lambda s:list(map(int, s.split('.')))) # sort list in order
             print ( '=>Number of changes that happened since then ( lastest delta changes ) : ', str(new_version_list)  )
             log.info( 'Number of changes that happened since then ( lastest delta changes ) : ' + str(new_version_list) )
         except Exception as e:
@@ -358,7 +391,7 @@ class Updater:
         """get to portable 7z and open the cmd #2.EXTRACT TO DESTINATION"""
         try:
             log.debug( 'Inside extract_files function' )
-            extract_command = r'"{}" x "{}" -o"{}" -y'.format( self.loc_7z, temp_file_path, self.extraction_loc )
+            extract_command = r'"{}" x "{}" -o"{}" -y'.format( self.loc_7z, temp_file_path, os.path.dirname(self.extraction_loc) )
             subprocess.call(extract_command, shell = True )
             print( '=>Completed extraction of package at :', self.temp_location )
             log.info( 'Completed extraction of package at : ' + str(self.temp_location) )

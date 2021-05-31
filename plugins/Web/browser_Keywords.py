@@ -110,15 +110,23 @@ class BrowserKeywords():
                 elif d != None:
                     #driver exist in map, get it
                     local_bk.driver_obj = d
-                    if(isinstance(local_bk.driver_obj,webdriver.Firefox)):
+                    #  Bug 18160- Firefox browser does not come to foreground
+                    if(SYSTEM_OS=='Windows' and isinstance(local_bk.driver_obj, webdriver.Firefox)):
                         try:
-                            win_name=local_bk.driver_obj.title+' — Mozilla Firefox'
-                            if(win32gui.FindWindow(None,win_name)!=0):
-                                handle=win32gui.FindWindow(None,win_name)
-                                win32gui.ShowWindow(handle,3)
-                                win32gui.SetForegroundWindow(handle)
-                        except:
-                            pass
+                            mozPid = local_bk.driver_obj.desired_capabilities['moz:processID']
+                            mozApp = Application().connect(process=mozPid)
+                            # check if firefox is minimized (iconic)
+                            if (win32gui.IsIconic(mozApp.top_window().handle)):
+                                win_name = local_bk.driver_obj.title+' — Mozilla Firefox'
+                                if(win32gui.FindWindow(None, win_name) != 0):
+                                    handle = win32gui.FindWindow(None, win_name)
+                                    win32gui.ShowWindow(handle, win32con.SW_MAXIMIZE)
+                                    win32gui.SetForegroundWindow(handle)
+                                    # win32gui.ShowWindow(mozApp.top_window().handle, win32con.SW_MAXIMIZE)
+                            else:
+                                mozApp.top_window().set_focus()
+                        except Exception as e:
+                            local_bk.log.error(e)
                 else:
                     #instantiate new browser and add it to the map
                     local_bk.driver_obj = obj.getBrowser(self.browser_num)
@@ -129,7 +137,7 @@ class BrowserKeywords():
             if(local_bk.driver_obj == None):
                 result = TERMINATE
             else:
-                if SYSTEM_OS == 'Winodows':
+                if SYSTEM_OS == 'Windows':
                     utilobject = utils_web.Utils()
                     pid = None
                     if (self.browser_num == '1'):
