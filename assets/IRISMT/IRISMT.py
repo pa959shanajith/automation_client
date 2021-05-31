@@ -577,6 +577,7 @@ class IRISMT(wx.Frame):
         Input: event object from the train button
     '''
     def start_training(self, event):
+        start_time = datetime.datetime.now()
         if self.current_version == "5.0.0":
             # if current version is 5.0.0, tesseract contains int model in the tessdata but we need float model so we fetchit from tessdata/best
             self.TRAINEDDATA_DIR = AVO_ASSURE_HOME + configs["traineddata_dir"]
@@ -631,6 +632,7 @@ class IRISMT(wx.Frame):
             else:
                 delete_cmd = r'{loc_7z} d {zipfile} {files} -r'.format(loc_7z=LOC_7z, zipfile=self.rollback_dir, files="eng.traineddata_"+self.current_version)
                 subprocess.call(delete_cmd, shell=True)
+            self.print_log('Time elapsed: '+ str(time.process_time()-start_time))
             return
 
         self.comm_obj.percentageIncri(self.msg,90,"Saving Changes in Config Files...")
@@ -647,6 +649,9 @@ class IRISMT(wx.Frame):
         #clearing the traning-data selection textbox
         self.fontselect_txtfield.Clear()
         self.revert_btn.Enable()
+        end_time = datetime.datetime.now()
+        log.info('Time elapsed: '+ str(end_time - start_time))
+        self.print_log('Time elapsed: '+ str(end_time - start_time))
 
     '''
         Definition : this method generates the required .lstmf files / training files
