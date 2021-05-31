@@ -112,7 +112,7 @@ class Update_Rollback:
                 flg = True
                 break
         if (flg):
-            """For release-cycle package expression, Eg : 3.3.0-rc.1[first integer - major version, second integer - minor version, third integer - delta package, fourth part - release cycle number]"""
+            """For Release Candidate(rc) package expression, Eg : 3.3.0-rc.1[first integer - major version, second integer - minor version, third integer - delta package, fourth part - release candidate number]"""
             newkeys = []
             for i in keys:
                 newkeys.append(i.replace("-rc.","."))

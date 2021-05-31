@@ -391,7 +391,7 @@ class Updater:
         """get to portable 7z and open the cmd #2.EXTRACT TO DESTINATION"""
         try:
             log.debug( 'Inside extract_files function' )
-            extract_command = r'"{}" x "{}" -o"{}" -y'.format( self.loc_7z, temp_file_path, self.extraction_loc[:self.extraction_loc.rindex('\\')] )
+            extract_command = r'"{}" x "{}" -o"{}" -y'.format( self.loc_7z, temp_file_path, os.path.dirname(self.extraction_loc) )
             subprocess.call(extract_command, shell = True )
             print( '=>Completed extraction of package at :', self.temp_location )
             log.info( 'Completed extraction of package at : ' + str(self.temp_location) )
