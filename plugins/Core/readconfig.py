@@ -33,7 +33,7 @@ class readConfig():
         "server_cert":"", "enableSecurityCheck":"","browser_check":"","tls_security":"","highlight_check":"",
         "firefox_path":"", "prediction_for_iris_objects":"","hide_soft_key":"","connection_timeout":"","extn_enabled":"",
         "headless_mode":"","update_check":"", "delay_stringinput":"","clear_cache":"","screen_rec":"","full_screenshot":"",
-        "close_browser_popup":"", "use_custom_debugport":"","disable_screen_timeout":""}
+        "close_browser_popup":"", "use_custom_debugport":"","disable_screen_timeout":"","globalWaitTimeOut":""}
         if os.path.isfile(self.config_path)==True:
             try:
                 conf = open(self.config_path, 'r')
