@@ -688,8 +688,8 @@ class IRISMT(wx.Frame):
         except Exception as err:
             failed_flag = 1
             failed_font = FONT
-            log.error("Failed to generate Training Files for "+FONT)
-            self.print_log("Failed to generated Training Files for " +FONT)
+            log.error("Failed to generate Training Files for '"+FONT+"' .Font-file metadata mismatch, ERR_MSG: "+str(err) )
+            self.print_log("Failed to generate Training Files for '"+FONT+"' .Font-file metadata mismatch, please try with a different font file")
 
         return failed_flag, FONT
 
