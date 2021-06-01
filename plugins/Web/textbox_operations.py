@@ -1556,7 +1556,7 @@ class TextboxKeywords:
                                     local_rco.log.error(err_msg)
                                     logger.print_on_console(err_msg)
                     if webelement.tag_name == 'table':
-                        if len(input) == 4 and int(input[3]) <= 0:
+                        if len(input) == 5 and int(input[3]) <= 0:
                             err_msg = self._index_zero() 
                         elif len(input)==5:
                             row_num=int(input[0])
