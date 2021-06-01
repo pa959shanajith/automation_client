@@ -962,12 +962,12 @@ class Controller():
                 if first_step_val > 0 and first_step_val <= tsplist[-1].stepnum:
                     if last_step_val > first_step_val and last_step_val <= tsplist[-1].stepnum:
                         testcase_details=testcase[0]['testcase']
-                        no_of_steps=last_step_val-first_step_val
-                        no_of_steps=no_of_steps+1
+                        no_of_steps=(last_step_val-first_step_val)+1
                         comment_step_count=0
                         tdlist=testcase_details[first_step_val-1:last_step_val]
                         for i in tdlist:
-                            if i['outputVal'] == '##':
+                            outputArray=i['outputVal'].split(';')
+                            if (len(outputArray)>=1 and  '##' == outputArray[-1]):
                                 comment_step_count=comment_step_count+1
                         if comment_step_count<no_of_steps:
                             runfrom_step = first_step_val             
