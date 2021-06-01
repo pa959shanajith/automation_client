@@ -1426,7 +1426,7 @@ def main(_):
 
 if __name__ == '__main__':
   #----------------------------------------------------------------------------------------------
-  image_dir = AVO_ASSURE_HOME + configs["image_dir"]
+  image_dir = configs["image_dir"]
   active_model = AVO_ASSURE_HOME + configs["active_model"]
   output_labels = AVO_ASSURE_HOME + configs["output_labels"]
   how_many_training_steps = configs["how_many_training_steps"]
