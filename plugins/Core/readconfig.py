@@ -33,7 +33,7 @@ class readConfig():
         "server_cert":"", "enableSecurityCheck":"","browser_check":"","tls_security":"","highlight_check":"",
         "firefox_path":"", "prediction_for_iris_objects":"","hide_soft_key":"","connection_timeout":"","extn_enabled":"",
         "headless_mode":"","update_check":"", "delay_stringinput":"","clear_cache":"","screen_rec":"","full_screenshot":"",
-        "close_browser_popup":"", "use_custom_debugport":""}
+        "close_browser_popup":"", "use_custom_debugport":"","disable_screen_timeout":"","globalWaitTimeOut":""}
         if os.path.isfile(self.config_path)==True:
             try:
                 conf = open(self.config_path, 'r')
@@ -50,6 +50,7 @@ class readConfig():
                 configvalues['screenShot_Flag']=params['screenShot_Flag']
                 configvalues['queryTimeOut']=params['queryTimeOut']
                 configvalues['timeOut']=params['timeOut']
+                configvalues['globalWaitTimeOut']=params['globalWaitTimeOut']
                 configvalues['stepExecutionWait']=params['stepExecutionWait']
                 configvalues['displayVariableTimeOut'] = params['displayVariableTimeOut']
                 configvalues['httpStatusCode']=params['httpStatusCode']
@@ -73,6 +74,7 @@ class readConfig():
                 configvalues['full_screenshot']=params['full_screenshot']
                 configvalues['close_browser_popup']=params['close_browser_popup']
                 configvalues['use_custom_debugport']=params['use_custom_debugport']
+                configvalues['disable_screen_timeout']=params['disable_screen_timeout']
             except Exception as e:
                 configvalues['errorflag']=e
         else:

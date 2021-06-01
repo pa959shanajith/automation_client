@@ -36,6 +36,10 @@ import threading
 import wx
 import iris_operations
 import web_keywords
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.common.by import By
 
 local_Wd = threading.local()
 
@@ -536,17 +540,22 @@ class Dispatcher:
                     if(teststepproperty.name=="openBrowser"):
                         browser=teststepproperty.inputval[0]
                         self.browsers_sl[browser]["platform"]=self.sauce_conf["platform"]
+                        if browser in ['7','8'] and self.sauce_conf["platform"]!='Windows 10':
+                            logger.print_on_console('Microsoft Edge browser is supported only in Windows 10')
+                            return 'Terminate'
                         self.browsers_sl[browser]["sauce:options"].update({"name":teststepproperty.testscript_name})
-                        self.browsers_sl[browser]["sauce:options"].update({"idleTimeout":25})
+                        self.browsers_sl[browser]["sauce:options"].update({"idleTimeout":90})
                         result = self.sauce_web_dict[teststepproperty.name](self.sauce_conf['remote_url'],self.browsers_sl[browser],execution_env['scenario'])
                         driver = web_keywords.driver
                         browser_Keywords.local_bk.driver_obj = web_keywords.driver
+                        find_browser_info(reporting_obj,mythread)
                     else:
                         result = self.sauce_web_dict[teststepproperty.name](input)
                 elif teststepproperty.name in self.sauce_web_dict:
                     xpath=teststepproperty.objectname.split(';')[0]
                     if(teststepproperty.name=="waitForElementVisible"):
                         input=xpath
+                    driver.switch_to.default_content()
                     webelement=send_webelement_to_keyword(web_keywords.driver,objectname,url)
                     result = self.sauce_web_dict[teststepproperty.name](webelement,input)
                 else:
@@ -555,9 +564,29 @@ class Dispatcher:
             elif execution_env['env'] == 'default' and keyword in list(self.web_dict.keys()):
                 flag=False
                 #Finding the webelement for NON_WEBELEMENT_KEYWORDS
-                if keyword not in NON_WEBELEMENT_KEYWORDS:
+                if (keyword not in NON_WEBELEMENT_KEYWORDS) and (teststepproperty.name!="waitForElementVisible"):
                     flag=True
                     webelement=send_webelement_to_keyword(driver,objectname,url)
+                    globalWait_to=int(configvalues['globalWaitTimeOut'])
+                    if globalWait_to > 0 and webelement is None:
+                        try:
+                            identifiers = objectname.split(';')
+                            objectname=identifiers[0]
+                            if objectname is not None:
+                                element_present = EC.presence_of_element_located((By.XPATH, objectname))
+                                local_Wd.log.info('starting Global Wait TimeOut')
+                                WebDriverWait(browser_Keywords.local_bk.driver_obj, globalWait_to).until(element_present)
+                                msg='Element Found. Global Wait Timeout completed'
+                                local_Wd.log.info(msg)
+                                logger.print_on_console(msg)
+                                webelement=send_webelement_to_keyword(driver,objectname,url)
+                        except TimeoutException as e:
+                            msg1='Element not Found. Global Wait Timeout executed'
+                            logger.print_on_console(msg1)
+                            local_Wd.log.error(msg1)
+                            local_Wd.log.error(e)
+                        except Exception as e:
+                            local_Wd.log.error(e)
                     if webelement == None and self.exception_flag:
                         result=TERMINATE
 
@@ -566,9 +595,15 @@ class Dispatcher:
                         webelement=send_webelement_to_keyword(driver,objectname,url)
                         objectname=local_Wd.custom_object.getElementXPath(webelement)
                     if url !=  '' and local_Wd.custom_object.is_int(url):
-                        local_Wd.log.debug('Encountered iframe/frame url')
-                        local_Wd.custom_object.switch_to_iframe(url,driver.current_window_handle)
-                        driver = browser_Keywords.local_bk.driver_obj
+                        try:
+                            local_Wd.log.debug('Encountered iframe/frame url')
+                            local_Wd.custom_object.switch_to_iframe(url,driver.current_window_handle)
+                            driver = browser_Keywords.local_bk.driver_obj
+                        except Exception as e:
+                            local_Wd.log.error(e,exc_info=True)
+                            err_msg='Control failed to switch to frame/iframe'
+                            result[3]=err_msg
+                        if(err_msg): return result
                     identifiers = objectname.split(';')
                     input=identifiers[0]
 
@@ -652,6 +687,10 @@ class Dispatcher:
             result=list(result)
             result[3]=err_msg
             result[2]=None
+        except KeyError as e:
+            local_Wd.log.error(e,exc_info=True)
+            err_msg=WEB_ELEMENT_NOT_FOUND
+            result[3]=err_msg
         except Exception as e:
             local_Wd.log.error(e,exc_info=True)
             # logger.print_on_console('Exception at dispatcher')
@@ -669,7 +708,8 @@ class Dispatcher:
             try:
                 urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', browser_Keywords.local_bk.driver_obj.current_url)
                 if urls != []:
-                    response=requests.get(urls[0],verify=False,proxies=readconfig.proxies)
+                    headers = {'User-Agent': 'AvoAssure/' + os.getenv('AVO_ASSURE_VERSION')}
+                    response=requests.get(urls[0], headers=headers, verify=False, proxies=readconfig.proxies)
                     status_code=response.status_code
                     local_Wd.log.info(status_code)
                     if status_code in STATUS_CODE_DICT:

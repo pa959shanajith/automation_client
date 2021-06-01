@@ -30,6 +30,7 @@ import psutil
 import readconfig
 import core_utils
 import time
+import fileinput
 from sendfunction_keys import SendFunctionKeys as SF
 driver_pre = None
 drivermap = []
@@ -109,15 +110,23 @@ class BrowserKeywords():
                 elif d != None:
                     #driver exist in map, get it
                     local_bk.driver_obj = d
-                    if(isinstance(local_bk.driver_obj,webdriver.Firefox)):
+                    #  Bug 18160- Firefox browser does not come to foreground
+                    if(SYSTEM_OS=='Windows' and isinstance(local_bk.driver_obj, webdriver.Firefox)):
                         try:
-                            win_name=local_bk.driver_obj.title+' — Mozilla Firefox'
-                            if(win32gui.FindWindow(None,win_name)!=0):
-                                handle=win32gui.FindWindow(None,win_name)
-                                win32gui.ShowWindow(handle,3)
-                                win32gui.SetForegroundWindow(handle)
-                        except:
-                            pass
+                            mozPid = local_bk.driver_obj.desired_capabilities['moz:processID']
+                            mozApp = Application().connect(process=mozPid)
+                            # check if firefox is minimized (iconic)
+                            if (win32gui.IsIconic(mozApp.top_window().handle)):
+                                win_name = local_bk.driver_obj.title+' — Mozilla Firefox'
+                                if(win32gui.FindWindow(None, win_name) != 0):
+                                    handle = win32gui.FindWindow(None, win_name)
+                                    win32gui.ShowWindow(handle, win32con.SW_MAXIMIZE)
+                                    win32gui.SetForegroundWindow(handle)
+                                    # win32gui.ShowWindow(mozApp.top_window().handle, win32con.SW_MAXIMIZE)
+                            else:
+                                mozApp.top_window().set_focus()
+                        except Exception as e:
+                            local_bk.log.error(e)
                 else:
                     #instantiate new browser and add it to the map
                     local_bk.driver_obj = obj.getBrowser(self.browser_num)
@@ -128,7 +137,7 @@ class BrowserKeywords():
             if(local_bk.driver_obj == None):
                 result = TERMINATE
             else:
-                if SYSTEM_OS == 'Winodows':
+                if SYSTEM_OS == 'Windows':
                     utilobject = utils_web.Utils()
                     pid = None
                     if (self.browser_num == '1'):
@@ -886,8 +895,18 @@ class BrowserKeywords():
                 local_bk.log.info('Cleared Cache')
                 status=webconstants.TEST_RESULT_PASS
                 result=webconstants.TEST_RESULT_TRUE
+            elif local_bk.driver_obj != None and isinstance(local_bk.driver_obj,webdriver.Firefox):
+                local_bk.driver_obj.get('about:preferences#privacy')
+                time.sleep(2)
+                local_bk.driver_obj.find_element_by_css_selector('#clearSiteDataButton').click()
+                time.sleep(2)
+                local_bk.driver_obj.execute_script("document.getElementsByTagName('browser')[0].contentWindow.document.getElementsByTagName('dialog')[0].shadowRoot.children[3].children[2].click()")
+                time.sleep(2)
+                local_bk.driver_obj.switch_to.alert.accept()
+                status=webconstants.TEST_RESULT_PASS
+                result=webconstants.TEST_RESULT_TRUE
             else:
-                drv={ '2': 'Firefox', '3': 'Internet Explorer', '6': 'Safari', '7': 'Edge Legacy', '8': 'Edge Chromium'}
+                drv={'3': 'Internet Explorer', '6': 'Safari', '7': 'Edge Legacy', '8': 'Edge Chromium'}
                 err_msg = "This function is not available for "+drv[self.browser_num]+'.'
                 logger.print_on_console(err_msg)
                 local_bk.log.error(err_msg)
@@ -1122,8 +1141,9 @@ class BrowserKeywords():
     def get_foreground_window(self, *args):
         status=webconstants.TEST_RESULT_FAIL
         result=webconstants.TEST_RESULT_FALSE
-        output=None
-        err_msg=None
+        output=OUTPUT_CONSTANT
+        err_msg=None        
+        verb = None 
         flag_firefox = False
         try:
             if SYSTEM_OS != 'Darwin':
@@ -1169,7 +1189,7 @@ class BrowserKeywords():
                             win32gui.SetForegroundWindow(handle)
                             status=webconstants.TEST_RESULT_PASS
                             result=webconstants.TEST_RESULT_TRUE
-                            output = "Browser brought to foreground"
+                            verb = "Browser brought to foreground"
                     except:
                         local_bk.log.info("Unable to bring the window to foreground using the title")
                 elif (self.browser_num == '8'):
@@ -1185,7 +1205,7 @@ class BrowserKeywords():
                     utilobject.bring_Window_Front(pid)
                     status=webconstants.TEST_RESULT_PASS
                     result=webconstants.TEST_RESULT_TRUE
-                    output = "Browser brought to foreground"
+                    verb = "Browser brought to foreground"
             elif SYSTEM_OS == 'Darwin':
                 if (self.browser_num == '6'):
                     local_bk.log.info("This feature not implemented")
@@ -1196,9 +1216,9 @@ class BrowserKeywords():
             if err_msg!= None:
                 logger.print_on_console( "Browser unavailable" )
             else:
-                logger.print_on_console(output)
+                logger.print_on_console(verb)
+        logger.print_on_console(verb)
         return status, result, output, err_msg
-
 class Singleton_DriverUtil():
 
     def check_if_driver_exists_in_map(self,browserType):
@@ -1274,6 +1294,11 @@ class Singleton_DriverUtil():
                         break
         return d
 
+    def modify_file_as_text(self,text_file_path, text_to_search, replacement_text):
+        with fileinput.FileInput(text_file_path, inplace=True, backup='.bak') as file:
+            for line in file:
+                print(line.replace(text_to_search, replacement_text), end='')
+
     def getBrowser(self,browser_num):
         import controller
         global local_bk, drivermap
@@ -1309,7 +1334,15 @@ class Singleton_DriverUtil():
                     if str(chrome_path).lower() != 'default':
                         choptions.binary_location = str(chrome_path)
                     if str(chrome_profile).lower() != 'default':
-                        choptions.add_argument("user-data-dir="+chrome_profile)
+                        # Don't use the default directory and create profiles for automation inside it,
+                        # Create a separate directory for new automation profiles
+                        choptions.add_argument("--user-data-dir="+os.path.dirname(chrome_profile))
+                        choptions.add_argument("--profile-directory="+os.path.basename(chrome_profile))
+                        try:
+                            #To remove restore pages popup when chrome starts(* this may change with future chrome versions)
+                            self.modify_file_as_text(chrome_profile+ '\\Preferences', '"exit_type":"Crashed"', '"exit_type":"Normal"')
+                        except Exception as ex:
+                            local_bk.log.error(ex,exc_info=True)
                     if str(close_browser_popup).lower() == 'yes':
                         prefs = {}
                         prefs["credentials_enable_service"] = False
