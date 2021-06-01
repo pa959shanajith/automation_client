@@ -815,8 +815,9 @@ class Controller():
         while (i < len(tsplist)):
             #Check for 'terminate_flag' before execution
             if not(terminate_flag):
-                #checks if the current step num is greater than ending range of run from step, to Run till the ending range of run from step
-                if tsplist[i].stepnum > last_step_val: break
+                if self.runfrom_step_range_input:
+                    #checks if the current step num is greater than ending range of run from step, to Run till the ending range of run from step
+                    if tsplist[i].stepnum > last_step_val: break
                 #Check for 'pause_flag' before execution
                 if pause_flag:
                     self.pause_execution()
