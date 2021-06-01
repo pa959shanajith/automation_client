@@ -363,9 +363,9 @@ class Dispatcher:
                     if globalWait_to > 0 and webelement is None:
                         try:
                             identifiers = objectname.split(';')
-                            objectname=identifiers[0]
-                            if objectname is not None:
-                                element_present = EC.presence_of_element_located((By.XPATH, objectname))
+                            obj_name=identifiers[0]
+                            if obj_name is not None:
+                                element_present = EC.presence_of_element_located((By.XPATH, obj_name))
                                 log.info('starting Global Wait TimeOut')
                                 WebDriverWait(browser_Keywords_MW.driver_obj, globalWait_to).until(element_present)
                                 msg='Element Found. Global Wait Timeout completed'
