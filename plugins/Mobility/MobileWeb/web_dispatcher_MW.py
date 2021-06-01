@@ -362,7 +362,6 @@ class Dispatcher:
                     globalWait_to=int(configvalues['globalWaitTimeOut'])
                     if globalWait_to > 0 and webelement is None:
                         try:
-                            import browser_Keywords_MW
                             identifiers = objectname.split(';')
                             objectname=identifiers[0]
                             if objectname is not None:
