@@ -543,10 +543,11 @@ class Config_window(wx.Frame):
             "Timeout":[(190,192),(50, 25),(250,188), (70,-1)],
             "Delay":[(333,192),(40, 25),(375,188), (70,-1)],
             "Step_exec":[(12,222),(110, 25),(135,218),(70,-1)],
+            "global_waittimeout":[(12,282),(120, 25),(135,278),(70,-1)],
             "Disp_var":[(235,222),(135, 25),(375,218), (70,-1)],
             "C_Timeout" :[(12,252),(120, 25),(135,248), (70,-1)],
             "Delay_Stringinput":[(235,252),(130, 25),(375,248), (70,-1)],
-            "panel1":[(10,290),(100,30),(440,195),(8, 315)],
+            "panel1":[(10,310),(100,30),(440,195),(8, 335)],
             "err_text":[(50,525),(350, 25)],
             "Save":[(100,550), (100, 28)],
             "Close":[(250,550), (100, 28)]
@@ -565,10 +566,11 @@ class Config_window(wx.Frame):
             "Timeout":[(225,192),(50, 25),(290,188),(80,-1)],
             "Delay":[(404,192),(40, 25),(448,188), (85,-1)],
             "Step_exec":[(12,222),(120, 25),(142,218),(80,-1)],
+            "global_waittimeout":[(12,282),(120, 25),(180,278),(80,-1)],
             "Disp_var":[(288,222),(140, 25),(448,218),(85,-1)],
             "C_Timeout" :[(12,252),(120, 25),(180,248), (80,-1)],
             "Delay_Stringinput":[(288,252),(140, 25),(448,248), (85,-1)],
-            "panel1":[(10,290),(100,30),(440,195),(8, 315)],
+            "panel1":[(10,310),(100,30),(440,195),(8, 335)],
             "err_text":[(85,525),(350, 25)],
             "Save":[(130,550),(100, 28)],
             "Close":[(370,550),(120, 28)]
@@ -671,6 +673,17 @@ class Config_window(wx.Frame):
         else:
             self.time_out.SetValue("1")
 
+        self.globalWait_TimeOut=wx.StaticText(self.panel, label="Global Wait Time Out", pos=config_fields["global_waittimeout"][0],size=config_fields["global_waittimeout"][1], style=0, name="")
+        self.globalWait_TO=wx.TextCtrl(self.panel, pos=config_fields["global_waittimeout"][2], size=config_fields["global_waittimeout"][3])
+        if isConfigJson['globalWaitTimeOut']=="":
+            self.globalWait_TO.SetValue("sec")
+            self.globalWait_TO.SetFont(font_italic)
+            self.globalWait_TO.SetForegroundColour('#848484')
+        elif isConfigJson!=False:
+            self.globalWait_TO.SetValue(isConfigJson['globalWaitTimeOut'])
+        else:
+            self.globalWait_TO.SetValue("0")
+
         self.delayText=wx.StaticText(self.panel, label="Delay", pos=config_fields["Delay"][0],size=config_fields["Delay"][1], style=0, name="")
         self.delay=wx.TextCtrl(self.panel, pos=config_fields["Delay"][2], size=config_fields["Delay"][3])
         if isConfigJson['delay']=="":
@@ -740,6 +753,7 @@ class Config_window(wx.Frame):
         self.dispVarTimeOut.SetToolTip(wx.ToolTip("displayVariable popup duration[in seconds]"))
         self.connection_timeout.SetToolTip(wx.ToolTip("Timeout from server [in hours 0 or >8]"))
         self.delay_stringinput.SetToolTip(wx.ToolTip("Character input delay for sendFunctionKeys"))
+        self.globalWait_TimeOut.SetToolTip(wx.ToolTip("Timeout to wait for all objects to visible in AUT [in seconds]"))
 
         ## Binding placeholders and restricting textareas to just numeric characters
         self.server_port.Bind(wx.EVT_CHAR, self.handle_keypress)
@@ -754,6 +768,10 @@ class Config_window(wx.Frame):
         self.time_out.Bind(wx.EVT_SET_FOCUS,self.toggle1_generic)
         self.time_out.Bind(wx.EVT_KILL_FOCUS,self.toggle2_generic)
         self.time_out.Bind(wx.EVT_CHAR, self.handle_keypress)
+
+        self.globalWait_TO.Bind(wx.EVT_SET_FOCUS,self.toggle1_generic)
+        self.globalWait_TO.Bind(wx.EVT_KILL_FOCUS,self.toggle2_generic)
+        self.globalWait_TO.Bind(wx.EVT_CHAR, self.handle_keypress)
 
         self.delay.Bind(wx.EVT_SET_FOCUS,self.toggle1_generic)
         self.delay.Bind(wx.EVT_KILL_FOCUS,self.toggle2_generic)
@@ -1067,6 +1085,7 @@ class Config_window(wx.Frame):
         logFile_Path=self.log_file_path.GetValue()
         queryTimeOut=self.query_timeout.GetValue()
         time_out=self.time_out.GetValue()
+        globalWait_TO=self.globalWait_TO.GetValue()
         delay=self.delay.GetValue()
         stepExecutionWait=self.step_exe_wait.GetValue()
         displayVariableTimeOut=self.disp_var_timeout.GetValue()
@@ -1103,6 +1122,7 @@ class Config_window(wx.Frame):
         data['screenShot_Flag'] = screenShot_Flag.strip()
         data['queryTimeOut'] = queryTimeOut.strip()
         data['timeOut'] = time_out.strip()
+        data['globalWaitTimeOut'] = globalWait_TO.strip()
         data['stepExecutionWait'] = stepExecutionWait.strip()
         data['displayVariableTimeOut'] = displayVariableTimeOut.strip()
         data['httpStatusCode'] = httpStatusCode.strip()
@@ -1152,6 +1172,8 @@ class Config_window(wx.Frame):
             self.delayText.SetLabel('Delay')
             self.delayText.SetForegroundColour((0,0,0))
             self.timeOut.SetLabel('Time Out')
+            self.globalWait_TimeOut.SetLabel('Global wait Time Out')
+            self.globalWait_TimeOut.SetForegroundColour((0,0,0))
             self.timeOut.SetForegroundColour((0,0,0))
             self.stepExecWait.SetLabel('Step Execution Wait')
             self.stepExecWait.SetForegroundColour((0,0,0))
@@ -1274,6 +1296,12 @@ class Config_window(wx.Frame):
             else:
                 self.timeOut.SetLabel('Time Out')
                 self.timeOut.SetForegroundColour((0,0,0))
+            if data['globalWaitTimeOut']=="sec":
+                self.globalWait_TimeOut.SetLabel('Time Out*')
+                self.globalWait_TimeOut.SetForegroundColour((255,0,0))
+            else:
+                self.globalWait_TimeOut.SetLabel('Time Out')
+                self.globalWait_TimeOut.SetForegroundColour((0,0,0))
             if data['stepExecutionWait']=="sec":
                 self.stepExecWait.SetLabel('Step Execution Wait*')
                 self.stepExecWait.SetForegroundColour((255,0,0))

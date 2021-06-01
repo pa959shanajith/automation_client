@@ -15,6 +15,7 @@
     "extn_enabled": "No",
     "firefox_path": "default",
     "full_screenshot": "Yes",
+    "globalWaitTimeOut": "0",
     "headless_mode": "No",
     "hide_soft_key": "Yes",
     "highlight_check": "No",
