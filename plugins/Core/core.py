@@ -102,54 +102,6 @@ class MainNamespace(BaseNamespace):
         kill_conn = False
         try:
             if(str(args[0]) == 'connected'):
-                if allow_connect:
-                    dnd_mode = cw.schedule.GetValue() if root.gui else False
-                    msg = ("Do Not Disturb" if dnd_mode else "Normal") + " Mode: Connection to the Avo Assure Server established"
-                    logger.print_on_console(msg)
-                    log.info(msg)
-                    msg = "ICE Name: " + root.ice_token["icename"]
-                    logger.print_on_console(msg)
-                    log.info(msg)
-                    if root.gui:
-                        cw.SetTitle(root.name + " (" + root.ice_token["icename"] + ")")
-                        cw.schedule.Enable()
-                        cw.cancelbutton.Enable()
-                        cw.terminatebutton.Enable()
-                        cw.clearbutton.Enable()
-                        cw.rollbackItem.Enable(True)
-                        cw.updateItem.Enable(True)
-                        cw.rbox.Enable()
-                    if browsercheckFlag == False:
-                        check_browser()
-                    #if updatecheckFlag == False and root.gui:
-                    if updatecheckFlag == False:
-                        msg='Checking for client package updates'
-                        logger.print_on_console(msg)
-                        log.info(msg)
-                        check_PatchUpdate()
-                        #updatecheckFlag = clientwindow.check_update(True)
-                    if executionOnly:
-                        msg='Execution only Mode enabled'
-                        logger.print_on_console(msg)
-                        log.info(msg)
-                    socketIO.timer.resume()
-                    conn_time = float(configvalues['connection_timeout'])
-                    if (not (connection_Timer != None and connection_Timer.isAlive())
-                     and (conn_time >= 8)):
-                        log.info("Connection Timeout timer Started")
-                        connection_Timer = threading.Timer(conn_time*60*60, root.closeConnection)
-                        connection_Timer.start()
-                else: kill_conn = True
-
-            elif(str(args[0]) == 'schedulingEnabled'):
-                logger.print_on_console('Do Not Disturb Mode Enabled')
-                log.info('Do Not Disturb Mode Enabled')
-
-            elif(str(args[0]) == 'schedulingDisabled'):
-                logger.print_on_console('Do Not Disturb Mode Disabled')
-                log.info('Do Not Disturb Mode Disabled')
-
-            elif(str(args[0]) == 'checkConnection'):
                 err_res = None
                 enable_reregister = False
                 try:
@@ -194,6 +146,53 @@ class MainNamespace(BaseNamespace):
                     else:
                         logger.print_on_console("ICE is not registered with Avo Assure. Try Again")
                 if root.gui: cw.connectbutton.Enable()
+
+                if allow_connect:
+                    dnd_mode = cw.schedule.GetValue() if root.gui else False
+                    msg = ("Do Not Disturb" if dnd_mode else "Normal") + " Mode: Connection to the Avo Assure Server established"
+                    logger.print_on_console(msg)
+                    log.info(msg)
+                    msg = "ICE Name: " + root.ice_token["icename"]
+                    logger.print_on_console(msg)
+                    log.info(msg)
+                    if root.gui:
+                        cw.SetTitle(root.name + " (" + root.ice_token["icename"] + ")")
+                        cw.schedule.Enable()
+                        cw.cancelbutton.Enable()
+                        cw.terminatebutton.Enable()
+                        cw.clearbutton.Enable()
+                        cw.rollbackItem.Enable(True)
+                        cw.updateItem.Enable(True)
+                        cw.rbox.Enable()
+                    if browsercheckFlag == False:
+                        check_browser()
+                    #if updatecheckFlag == False and root.gui:
+                    if updatecheckFlag == False:
+                        msg='Checking for client package updates'
+                        logger.print_on_console(msg)
+                        log.info(msg)
+                        check_PatchUpdate()
+                        #updatecheckFlag = clientwindow.check_update(True)
+                    if executionOnly:
+                        msg='Execution only Mode enabled'
+                        logger.print_on_console(msg)
+                        log.info(msg)
+                    socketIO.timer.resume()
+                    socketIO.emit('getconstants', '', dnack=True)
+                    conn_time = float(configvalues['connection_timeout'])
+                    if (not (connection_Timer != None and connection_Timer.isAlive())
+                     and (conn_time >= 8)):
+                        log.info("Connection Timeout timer Started")
+                        connection_Timer = threading.Timer(conn_time*60*60, root.closeConnection)
+                        connection_Timer.start()
+
+            elif(str(args[0]) == 'schedulingEnabled'):
+                logger.print_on_console('Do Not Disturb Mode Enabled')
+                log.info('Do Not Disturb Mode Enabled')
+
+            elif(str(args[0]) == 'schedulingDisabled'):
+                logger.print_on_console('Do Not Disturb Mode Disabled')
+                log.info('Do Not Disturb Mode Disabled')
 
             elif(str(args[0]) == 'fail'):
                 fail_msg = "Fail"

@@ -1428,7 +1428,9 @@ class UtilWebKeywords:
                 try:
                     if webelement.is_enabled():
                         if webelement.tag_name == 'table':
-                            if len(input)==5:
+                            if len(input) == 5 and int(input[3]) <= 0:
+                                err_msg = self._index_zero()
+                            elif len(input)==5:
                                 row_num=int(input[0])
                                 col_num=int(input[1])
                                 obj_type=input[2].lower()
@@ -1436,32 +1438,32 @@ class UtilWebKeywords:
                                 inp_list=[]
                                 inp_list.append(input[4])
                                 local_uo.log.info(input)
-                            row_count=self.tblobj.getRowCountJs(webelement)
-                            col_count=self.tblobj.getColoumnCountJs(webelement)
-                            input = inp_list
-                            if (obj_type=="textbox" or obj_type=="input") and index_val>=0:
-                                if row_num>row_count or col_num>col_count:
+                                row_count=self.tblobj.getRowCountJs(webelement)
+                                col_count=self.tblobj.getColoumnCountJs(webelement)
+                                input = inp_list
+                                if (obj_type=="textbox" or obj_type=="input") and index_val>=0:
+                                    if row_num>row_count or col_num>col_count:
+                                        check_flag=False
+                                        err_msg=self._invalid_input()
+                                    else:
+                                        cell=self.tblobj.javascriptExecutor(webelement,row_num-1,col_num-1)
+                                        txt_box=cell.find_elements_by_tag_name('input')
+                                        if len(txt_box)>0:
+                                            if index_val >= len(txt_box):
+                                                check_flag=False
+                                                err_msg=self._invalid_index()
+                                            else:
+                                                webelement = txt_box[index_val]
+                                        else:
+                                            check_flag=False
+                                            err_msg=self._invalid_input()
+                                elif obj_type!= "textbox":
                                     check_flag=False
                                     err_msg=self._invalid_input()
                                 else:
-                                    cell=self.tblobj.javascriptExecutor(webelement,row_num-1,col_num-1)
-                                    txt_box=cell.find_elements_by_tag_name('input')
-                                    if len(txt_box)>0:
-                                        if index_val >= len(txt_box):
-                                            check_flag=False
-                                            err_msg=self._invalid_index()
-                                        else:
-                                            webelement = txt_box[index_val]
-                                    else:
-                                        check_flag=False
-                                        err_msg=self._invalid_input()
-                            elif obj_type!= "textbox":
-                                check_flag=False
-                                err_msg=self._invalid_input()
-                            else:
-                                check_flag=False
-                                err_msg=self._index_zero()
-                        if check_flag==True:
+                                    check_flag=False
+                                    err_msg=self._index_zero()
+                        if check_flag==True and not err_msg:
                             local_uo.log.debug(WEB_ELEMENT_ENABLED)
                             if input_val!="":
                                 input_val = input[0]
