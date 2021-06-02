@@ -580,8 +580,13 @@ class UtilWebKeywords:
                         status = TEST_RESULT_PASS
                         methodoutput = TEST_RESULT_TRUE
                 else:
+                    obj=Utils()
                     location=webelement.location
                     if isinstance(browser_Keywords.local_bk.driver_obj,webdriver.Firefox):
+                        #Scroll happens only if webelement is not displayed on screen.
+                        if not self.is_inView(webelement):
+                            browser_Keywords.local_bk.driver_obj.execute_script("arguments[0].scrollIntoView(true);", webelement)
+                            location=obj.get_element_location(webelement)
                         javascript = "return window.mozInnerScreenY"
                         value=browser_Keywords.local_bk.driver_obj.execute_script(javascript)
                         offset=int(value)
@@ -591,20 +596,12 @@ class UtilWebKeywords:
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
                     else:
-                        obj=Utils()
-                        if 'version' in  browser_Keywords.local_bk.driver_obj.capabilities.keys():
-                            browser_ver = browser_Keywords.local_bk.driver_obj.capabilities['version']
-                        elif 'browserVersion' in  browser_Keywords.local_bk.driver_obj.capabilities.keys():
-                            browser_ver = browser_Keywords.local_bk.driver_obj.capabilities['browserVersion']
                         #Scroll happens only if webelement is not displayed on screen.
-                        if self.is_inView(webelement):
-                            location=webelement.location
-                        else:
+                        if not self.is_inView(webelement):
+                            browser_Keywords.local_bk.driver_obj.execute_script("arguments[0].scrollIntoView(true);", webelement)
                             location=obj.get_element_location(webelement)
-                        obj.enumwindows()
-                        rect=obj.rect
-                        robot=pyrobot.Robot()
-                        obj.mouse_move(int(location.get('x'))+9,int(location.get('y')+rect[1]+6))
+                        offset = browser_Keywords.local_bk.driver_obj.execute_script("return window.outerHeight - window.innerHeight;")
+                        obj.mouse_move(int(location.get('x'))+9,int(location.get('y')+offset))
                         local_uo.log.debug('hover performed')
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
