@@ -1153,6 +1153,7 @@ class Controller():
                             for testcase in [eval(scenario[scenario_id])]:
                                 #For every unique screen in list of test cases, store screen data
                                 for step in testcase:
+                                    step['apptype'] = scenario['apptype']
                                     screen_testcase_map[step['testcasename']] = {}
                                     screen_testcase_map[step['testcasename']]["screenname"] = step['screenname']
                                     screen_testcase_map[step['testcasename']]["screenid"] = step['screenid']
@@ -1503,6 +1504,18 @@ class Controller():
                 if con.reporting_obj.overallstatus != 'Pass': exc_pass = False
                 if not(execution_status):
                     status=TERMINATE
+            temp={}
+            if (handler.local_handler.awsKeywords):
+                for k,v in handler.local_handler.awsKeywords.items():
+                    if list(v) != []:
+                        temp[k]=list(v)
+                handler.local_handler.awsKeywords=temp
+                if (handler.local_handler.awsKeywords):
+                    logger.print_on_console("***Following Testcases are not AWS Compatible because of the following keywords :***")
+                    log.info("***Following Testcases are not AWS Compatible because of the following keywords :***")
+                    for k,v in handler.local_handler.awsKeywords.items():
+                        logger.print_on_console(k,':',list(v))
+                        log.info(k+':'+str(list(v)))
             log.info('---------------------------------------------------------------------')
             print('=======================================================================================================')
             log.info('***SUITE '+ str(suite_idx) +' EXECUTION COMPLETED***')
