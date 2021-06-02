@@ -1297,7 +1297,7 @@ class Singleton_DriverUtil():
     def modify_file_as_text(self,text_file_path, text_to_search, replacement_text):
         with fileinput.FileInput(text_file_path, inplace=True, backup='.bak') as file:
             for line in file:
-                print(line.replace(text_to_search, replacement_text), end='')
+                line.replace(text_to_search, replacement_text)
 
     def getBrowser(self,browser_num):
         import controller

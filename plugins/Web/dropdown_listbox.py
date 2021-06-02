@@ -1122,15 +1122,19 @@ class DropdownKeywords():
                 try:
                     # performing js code
                     local_ddl.log.debug('element is invisible, performing js code')
-                    if webelement.tag_name=='table':
+                    if webelement.tag_name=='table' and int(input[3]) >= 1:
                         if ((webelement.is_enabled())):
                             webelement=self.radioKeywordsObj.getActualElement(webelement,input)
                         else:
                             err_msg = 'Element is not enabled '
                             logger.print_on_console(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
                             local_ddl.log.info(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
+                    elif webelement.tag_name=='table': 
+                        err_msg = 'Invalid Input: Index input cannot be 0 for table'
+                        logger.print_on_console(ERROR_CODE_DICT['INVALID_TABLE_INDEX'])
+                        local_ddl.log.info(ERROR_CODE_DICT['INVALID_TABLE_INDEX'])
                     selectedvalues = []
-                    if browser_Keywords.local_bk.driver_obj is not None and isinstance(browser_Keywords.local_bk.driver_obj,webdriver.Ie):
+                    if browser_Keywords.local_bk.driver_obj is not None and isinstance(browser_Keywords.local_bk.driver_obj,webdriver.Ie) and not err_msg:
                         count = browser_Keywords.local_bk.driver_obj.execute_script("""return arguments[0].childElementCount""", webelement)
                         for i in range(count):
                             if browser_Keywords.local_bk.driver_obj.execute_script(
@@ -1140,7 +1144,7 @@ class DropdownKeywords():
                                 if input[0] == "1":
                                     value = value.strip()
                                 selectedvalues.append(value)
-                    else:
+                    elif not err_msg:
                         optionlist = browser_Keywords.local_bk.driver_obj.execute_script(
                             """return arguments[0].selectedOptions""", webelement)
                         for element in optionlist:
@@ -1148,14 +1152,15 @@ class DropdownKeywords():
                             if input[0] == "1":
                                 value = value.strip()
                             selectedvalues.append(value)
-                    if len(selectedvalues) == 1:
-                        output = selectedvalues[0]
-                    else:
-                        output = selectedvalues
-                    logger.print_on_console('Result obtained is: ',output)
-                    status = webconstants.TEST_RESULT_PASS
-                    result=webconstants.TEST_RESULT_TRUE
-                    local_ddl.log.info(STATUS_METHODOUTPUT_UPDATE)
+                    if not err_msg:
+                        if len(selectedvalues) == 1:
+                            output = selectedvalues[0]
+                        else:
+                            output = selectedvalues
+                        logger.print_on_console('Result obtained is: ',output)
+                        status = webconstants.TEST_RESULT_PASS
+                        result=webconstants.TEST_RESULT_TRUE
+                        local_ddl.log.info(STATUS_METHODOUTPUT_UPDATE)
                 except Exception as e:
                     local_ddl.log.error(e)
                     logger.print_on_console(e)
@@ -1164,15 +1169,15 @@ class DropdownKeywords():
                     if webelement.tag_name == 'table' and int(input[3]) >= 1:
                         if ((webelement.is_enabled())):
                             webelement = self.radioKeywordsObj.getActualElement(webelement, input)
-                        elif int(input[3]) <= 0:
-                            err_msg = 'Invalid Input: Index input cannot be 0 for table'
-                            logger.print_on_console(ERROR_CODE_DICT['INVALID_TABLE_INDEX'])
-                            local_ddl.log.info(ERROR_CODE_DICT['INVALID_TABLE_INDEX'])
                         else:
                             err_msg = 'Element is not enabled '
                             logger.print_on_console(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
                             local_ddl.log.info(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
-                    if self.util.is_visible(webelement):
+                    elif webelement.tag_name == 'table' and int(input[3]) <= 0:
+                            err_msg = 'Invalid Input: Index input cannot be 0 for table'
+                            logger.print_on_console(ERROR_CODE_DICT['INVALID_TABLE_INDEX'])
+                            local_ddl.log.info(ERROR_CODE_DICT['INVALID_TABLE_INDEX'])
+                    if webelement and self.util.is_visible(webelement) and not err_msg:
                         # performing selenium code
                         local_ddl.log.debug('element is visible, performing selenium code')
                         local_ddl.log.info(ERROR_CODE_DICT['MSG_OBJECT_DISPLAYED'])
@@ -1196,11 +1201,12 @@ class DropdownKeywords():
                         status = webconstants.TEST_RESULT_PASS
                         result = webconstants.TEST_RESULT_TRUE
                         local_ddl.log.info(STATUS_METHODOUTPUT_UPDATE)
-                    else:
+                    elif not err_msg:
                         logger.print_on_console('Element is not displayed')
                         local_ddl.log.info(ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED'])
                         err_msg = ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED']
                 except Exception as e:
+                    err_msg = "Invalid Error: Select not provided/found in input"
                     local_ddl.log.error(e)
                     logger.print_on_console(e)
             ##else:
