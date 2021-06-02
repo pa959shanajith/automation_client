@@ -97,8 +97,9 @@ class Message(wx.Frame):
 
     def ShowMessage(self,warning=None):
         if (warning=='rollback'): dlg = wx.MessageBox("Avo Assure ICE rolled back successfully. Click 'OK' start ICE.", 'Info',wx.OK | wx.ICON_INFORMATION)
-        elif (warning) : dlg = wx.MessageBox("Avo Assure ICE updated with warnings. Click 'OK' start ICE.", 'Info',wx.OK | wx.ICON_INFORMATION)
-        else : dlg = wx.MessageBox("Avo Assure ICE updated successfully. Click 'OK' start ICE.", 'Info',wx.OK | wx.ICON_INFORMATION)
+        elif (warning and 'Error!: unable to add files to backup' in warning) : dlg = wx.MessageBox("Avo Assure ICE failed to update due to files being used by another process. Click 'OK' to start ICE.", 'Error',wx.OK | wx.ICON_EXCLAMATION)
+        elif (warning) : dlg = wx.MessageBox("Avo Assure ICE updated with warnings. Click 'OK' to start ICE.", 'Info',wx.OK | wx.ICON_INFORMATION)
+        else : dlg = wx.MessageBox("Avo Assure ICE updated successfully. Click 'OK' to start ICE.", 'Info',wx.OK | wx.ICON_INFORMATION)
         if (dlg == 4 ):
             self.Close()
 
@@ -180,31 +181,60 @@ class Updater:
                           4.Adds Avo Assure (plugins) folder to AvoAssureICE_backup.7z
                           5.Adds about_manifest.json to AvoAssureICE_backup.7z"""
         try:
+            err_msg = None
             log.debug( 'Inside create_backup function' )
             #--------------------------------------------check if Update folder exists
             if ( os.path.exists(self.extraction_loc + "\\assets\\AvoAssureICE_backup.7z") ):
-                log.debug( 'AvoAssureICE_backup.7z already exists, removing AvoAssureICE_backup.7z' )
-                os.remove(self.extraction_loc + "\\assets\\AvoAssureICE_backup.7z")
-                log.debug( 'AvoAssureICE_backup.7z removed succefully' )
+                #rename AvoAssureICE_backup.7z -> AvoAssureICE_backup_temp.7z
+                os.rename(str(self.extraction_loc + "\\assets\\AvoAssureICE_backup.7z"), str(self.extraction_loc + "\\assets\\AvoAssureICE_backup_temp.7z"))
+                log.debug( 'AvoAssureICE_backup.7z already exists, and renaming AvoAssureICE_backup.7z' )
                 time.sleep(1)
             print ( '=>Creating new Avo Assure ICE backup instance' )
             store_loc = self.extraction_loc+"\\assets\\AvoAssureICE_backup.7z"
             source_ice = self.extraction_loc +'\\plugins'
             source_client_manifest = self.extraction_loc +'\\assets\\about_manifest.json'
+
+            """Adding plugins folder to archive"""
             log.debug( 'Adding ' + source_ice + " to archive" )
             archive_command = r'"{}" a "{}" "{}"'.format(self.loc_7z, store_loc, source_ice)
-            subprocess.call(archive_command, shell=True)
-            log.debug( 'Success : Added ' + source_ice + " to archive" )
+            sp1 = subprocess.Popen(archive_command, stderr = subprocess.STDOUT, stdout = subprocess.PIPE)
+            out = sp1.communicate()[0].decode('utf-8')
+            if ( "The process cannot access the file because it is being used by another process" in out ):
+                err_msg = 'Error!: unable to add files to backup. Backup-process failed as it cannot access the files in '+ str(source_ice) + ' as the files are being used by a different process'
+                log.error( err_msg )
+            else:
+                log.debug( 'Success : Added ' + source_ice + " to archive" )
+
+            """Adding about_manifest file to archive"""
             log.debug( 'Adding '+source_client_manifest+ " to archive" )
             archive_command = r'"{}" a "{}" "{}"'.format(self.loc_7z, store_loc, source_client_manifest)
-            subprocess.call(archive_command, shell=True)
-            log.debug( 'Success : Added ' + source_client_manifest + " to archive" )
-            log.debug( 'Successfully created backup of Avo Assure ICE' )
+            sp1 = subprocess.Popen(archive_command, stderr = subprocess.STDOUT, stdout = subprocess.PIPE)
+            out = sp1.communicate()[0].decode('utf-8')
+            if ( "The process cannot access the file because it is being used by another process" in out ):
+                err_msg = 'Error!: unable to add files to backup. Backup-process failed as it cannot access '+ str(source_client_manifest) + ' as this file is being used by a different process'
+                log.error( err_msg )
+            else:
+                log.debug( 'Success : Added ' + source_client_manifest + " to archive" )
+            if (err_msg):
+                #if files are open first remove the current AvoAssureICE_backup
+                if ( os.path.exists(self.extraction_loc + "\\assets\\AvoAssureICE_backup.7z") ):
+                    log.debug( 'AvoAssureICE_backup.7z already exists, removing AvoAssureICE_backup.7z' )
+                    os.remove(self.extraction_loc + "\\assets\\AvoAssureICE_backup.7z")
+                    log.debug( 'AvoAssureICE_backup.7z removed succefully' )
+                    time.sleep(1)
+                #rename AvoAssureICE_backup_temp.7z -> AvoAssureICE_backup.7z
+                os.rename(str(self.extraction_loc + "\\assets\\AvoAssureICE_backup_temp.7z"), str(self.extraction_loc + "\\assets\\AvoAssureICE_backup.7z"))
+            else:
+                if ( os.path.exists(self.extraction_loc + "\\assets\\AvoAssureICE_backup_temp.7z") ):
+                    os.remove(self.extraction_loc + "\\assets\\AvoAssureICE_backup_temp.7z")
+                log.debug( 'Successfully created backup of Avo Assure ICE' )
         except Exception as e:
+            err_msg = "Error!: unable to add files to backup"
             print ( "Error occurred in create_backup : ", e )
             log.error( "Error occurred in create_backup : " + str(e) )
             import traceback
             traceback.print_exc()
+        return err_msg
 
     def end_point_builder(self,new_version_list):
         """Builds the end point url of the file to download"""
@@ -597,35 +627,46 @@ def main():
             obj.assignment(json.loads(sys.argv[2].replace("'",'\"')[1:-1]), json.loads(sys.argv[3].replace("'", '\"')[1:-1]), sys.argv[4], sys.argv[5], sys.argv[6])#---------------------------------->2.Assign Values
             comm_obj.percentageIncri(msg,25,"Updating...")
             comm_obj.percentageIncri(msg,30,"Creating backup.")
-            obj.create_backup()#---------------------------------->3.Create backup 'AvoAssureICE_backup' into Rollback folder
-            comm_obj.percentageIncri(msg,35,"Backup created.")
-            comm_obj.percentageIncri(msg,40,"Updating...")
-            comm_obj.percentageIncri(msg,45,"Verifying latest files.")
-            new_version_list = obj.get_update_files()#---------------------------------->4.Get latest files to update
-            comm_obj.percentageIncri(msg,50,"Latest files verified.")
-            comm_obj.percentageIncri(msg,55,"Updating...")
-            comm_obj.percentageIncri(msg,60,"Retrieving the latest files.")
-            end_point_list = obj.end_point_builder(new_version_list)#---------------------------------->5.Create endpoint url list for the files to download
-            comm_obj.percentageIncri(msg,70,"Latest files retrieved.")
-            comm_obj.percentageIncri(msg,75,"Updating...")
-            comm_obj.percentageIncri(msg,80,"Downloading and extracting files")
-            warning_msg = obj.download_files(end_point_list)#---------------------------------->6.From the endpoint url list a.download the file, b.extract file into Avo Assure ICE and c.delete the downloaded  7z file
-            if ( warning_msg ):
-                comm_obj.percentageIncri(msg,85,warning_msg)
-                time.sleep(2)
-                comm_obj.percentageIncri(msg,87,"Error occurred while updating to latest patch")
-                comm_obj.percentageIncri(msg,90,"Updating...")
-                comm_obj.percentageIncri(msg,95,"Updated to latest available patch.")
-                comm_obj.percentageIncri(msg,100,"Updated...")
-                msg.destoryProgress()
-                msg.ShowMessage(warning_msg)
+            err_msg = obj.create_backup()#---------------------------------->3.Create backup 'AvoAssureICE_backup' into Rollback folder
+            if( not err_msg ):
+                comm_obj.percentageIncri(msg,35,"Backup created.")
+                comm_obj.percentageIncri(msg,40,"Updating...")
+                comm_obj.percentageIncri(msg,45,"Verifying latest files.")
+                new_version_list = obj.get_update_files()#---------------------------------->4.Get latest files to update
+                comm_obj.percentageIncri(msg,50,"Latest files verified.")
+                comm_obj.percentageIncri(msg,55,"Updating...")
+                comm_obj.percentageIncri(msg,60,"Retrieving the latest files.")
+                end_point_list = obj.end_point_builder(new_version_list)#---------------------------------->5.Create endpoint url list for the files to download
+                comm_obj.percentageIncri(msg,70,"Latest files retrieved.")
+                comm_obj.percentageIncri(msg,75,"Updating...")
+                comm_obj.percentageIncri(msg,80,"Downloading and extracting files")
+                warning_msg = obj.download_files(end_point_list)#---------------------------------->6.From the endpoint url list a.download the file, b.extract file into Avo Assure ICE and c.delete the downloaded  7z file
+                if ( warning_msg ):
+                    comm_obj.percentageIncri(msg,85,warning_msg)
+                    time.sleep(2)
+                    comm_obj.percentageIncri(msg,87,"Error occurred while updating to latest patch")
+                    comm_obj.percentageIncri(msg,90,"Updating...")
+                    comm_obj.percentageIncri(msg,95,"Updated to latest available patch.")
+                    comm_obj.percentageIncri(msg,100,"Updated...")
+                    msg.destoryProgress()
+                    msg.ShowMessage(warning_msg)
+                else:
+                    comm_obj.percentageIncri(msg,85,"Files downloaded and extracted")
+                    comm_obj.percentageIncri(msg,90,"Updating...")
+                    comm_obj.percentageIncri(msg,95,"Successfully Updated!")
+                    comm_obj.percentageIncri(msg,100,"Updated...")
+                    msg.destoryProgress()
+                    msg.ShowMessage()
             else:
-                comm_obj.percentageIncri(msg,85,"Files downloaded and extracted")
-                comm_obj.percentageIncri(msg,90,"Updating...")
-                comm_obj.percentageIncri(msg,95,"Successfully Updated!")
-                comm_obj.percentageIncri(msg,100,"Updated...")
+                comm_obj.percentageIncri(msg,50,err_msg)
+                time.sleep(2)
+                comm_obj.percentageIncri(msg,60,"Error occurred while creating backup")
+                comm_obj.percentageIncri(msg,70,"Unable to update to latest available patch.")
+                comm_obj.percentageIncri(msg,85,"Please ensure that files in Avo Assure are not being used by another process.")
+                comm_obj.percentageIncri(msg,100,"Updated Failed!")
                 msg.destoryProgress()
-                msg.ShowMessage()
+                msg.ShowMessage(err_msg)
+
             comm_obj.restartICE(sys.argv[5])#---------------------------------->7.Restart ICE
 
         elif ( sys.argv[1] == 'ROLLBACK' ):
