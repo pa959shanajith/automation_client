@@ -1046,6 +1046,7 @@ class TestThread(threading.Thread):
         self.json_data = json_data
         self.debug_mode = False if not(self.cw) else self.cw.debug_mode
         self.aws_mode = aws_mode
+        self.test_status = 'pass'
         self.start()    # start the thread
 
     #should just resume the thread
@@ -1125,7 +1126,8 @@ class TestThread(threading.Thread):
                 else:
                     socketIO.emit('result_debugTestCaseWS',status)
             elif self.action==EXECUTE:
-                result = {"status":status, "batchId": batch_id}
+                if status != COMPLETED and status != TERMINATE: self.test_status = 'fail'
+                result = {"status":status, "batchId": batch_id, "testStatus": self.test_status}
                 if controller.manual_terminate_flag: result["userTerminated"] = True
                 socketIO.emit('result_executeTestSuite', result)
         except Exception as e:
@@ -1136,7 +1138,7 @@ class TestThread(threading.Thread):
                     self.cw.killChildWindow(debug=True)
                     socketIO.emit('result_debugTestCase',status)
                 elif self.action==EXECUTE:
-                    result = {"status":status, "batchId": batch_id}
+                    result = {"status":status, "batchId": batch_id, "testStatus": 'fail'}
                     if controller.manual_terminate_flag: result["userTerminated"] = True
                     socketIO.emit('result_executeTestSuite', result)
         if closeActiveConnection:
