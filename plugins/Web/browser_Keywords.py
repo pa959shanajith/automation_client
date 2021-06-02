@@ -253,18 +253,19 @@ class BrowserKeywords():
         output=OUTPUT_CONSTANT
         err_msg=None
         try:
-            cwh=local_bk.driver_obj.current_window_handle
-            cwh_in=local_bk.all_handles.index(cwh)
-            local_bk.driver_obj.execute_script("window.open('');")
-            handles = local_bk.driver_obj.window_handles
-            local_bk.driver_obj.switch_to.window(handles[-1])
-            h=local_bk.driver_obj.current_window_handle
-            local_bk.all_handles.insert(cwh_in+1,h)
-            local_bk.recent_handles.insert(cwh_in+1,h)
+            if isinstance(local_bk.driver_obj,webdriver.Ie):
+                logger.print_on_console("OpenNewTab Keyword is not supported in IE")
+            else:
+                cwh=local_bk.driver_obj.current_window_handle
+                cwh_in=local_bk.all_handles.index(cwh)
+                local_bk.driver_obj.execute_script("window.open('');")
+                handles = local_bk.driver_obj.window_handles
+                local_bk.driver_obj.switch_to.window(handles[-1])
+                h=local_bk.driver_obj.current_window_handle
+                local_bk.all_handles.insert(cwh_in+1,h)
+                local_bk.recent_handles.insert(cwh_in+1,h)
             # local_bk.all_handles.append(h)
             # local_bk.recent_handles.append(h)
-            if isinstance(local_bk.driver_obj,webdriver.Ie):
-                local_bk.driver_obj.maximize_window()
             status=webconstants.TEST_RESULT_PASS
             result=webconstants.TEST_RESULT_TRUE
         except Exception as e:

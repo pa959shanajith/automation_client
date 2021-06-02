@@ -122,9 +122,9 @@ class QcWindow():
             log.error(eproject, exc_info=True)
         return res
 
-    def get_folder_parent_id(self, URL, folderName):
+    def get_folder_parent_id(self, URL, folderName,folderId):
         parentID = 0
-        payload = {"query": "{name['" + folderName + "']}", "fields": "parent-id"}
+        payload = {"query": "{name['" + folderName + "'];id['" + str(folderId) + "']}", "fields": "parent-id"}
         try:
             response = requests.get(URL, params=payload, headers=self.headers, cookies=self.cookies,proxies=readconfig.proxies)
             o = xmltodict.parse(response.content)
@@ -146,10 +146,11 @@ class QcWindow():
             almDomain = filePath["domain"]
             almProject = filePath["project"]
             folderName = testsetpath.split("\\")[-1]
+            folderId= filePath["folderid"]
             midPoint = "/rest/domains/" + almDomain + "/projects/" + almProject 
             URL = self.Qc_Url + midPoint + "/" + "test-set-folders"
             URL_for_testsets = self.Qc_Url + midPoint + "/" + "test-sets"
-            parentID = self.get_folder_parent_id(URL, folderName)
+            parentID = self.get_folder_parent_id(URL, folderName, folderId)
             payload1 = {"query": "{parent-id[" + parentID + "]}", "fields": "id,name"}
             response1 = requests.get(URL, params=payload1, headers=self.headers, cookies=self.cookies,proxies=readconfig.proxies)
             o1 = xmltodict.parse(response1.content)
@@ -189,7 +190,7 @@ class QcWindow():
                             test_name = str(t["Value"])
                         elif t["@Name"] == "id" :
                             test_id = str(t["Value"])
-                    tests_list.append({'testset': test_name, 'testsetid': test_id, 'testsetpath': testsetpath})
+                    tests_list.append({'testset': test_name, 'testsetid': test_id, 'testsetpath': testsetpath, 'folderid': parentID})
             res = [{"testfolder": folder_list, "TestSet": tests_list}]
         except Exception as e:
             err_msg = 'Error while fetching testsets from ALM'
@@ -205,13 +206,14 @@ class QcWindow():
             test_set_name=filePath["testset"]
             almDomain=filePath["domain"]
             almProject=filePath["project"]
+            folderId= filePath["folderid"]
             response = ""
             midPoint = "/rest/domains/" + almDomain + "/projects/" + almProject 
             URL = self.Qc_Url + midPoint + "/" + "test-set-folders"
             URL_for_testsets = self.Qc_Url + midPoint + "/" + "test-sets"
             URL_for_testcases = self.Qc_Url + midPoint + "/" + "test-instances"
             folderName = testsetpath.split("\\")[-1]
-            parentID = self.get_folder_parent_id(URL, folderName)
+            parentID = self.get_folder_parent_id(URL, folderName, folderId)
             #fetching testsets
             payload = {"query": "{parent-id[" + parentID + "]}", "fields": "id,name"}
             res1 = requests.get(URL_for_testsets, params=payload, headers=self.headers, cookies=self.cookies,proxies=readconfig.proxies)
@@ -270,6 +272,7 @@ class QcWindow():
             almProject = data['qc_project']
             tsFolder = data['qc_folder']
             tsList = data['qc_tsList']
+            folderid = data['qc_folderid'] 
             testrunname = data['qc_testrunname']
             for indexTest in range(len(tsFolder)):
                 midPoint = "/rest/domains/" + almDomain + "/projects/" + almProject 
@@ -277,7 +280,8 @@ class QcWindow():
                 URL_for_testsets = self.Qc_Url + midPoint + "/" + "test-sets"
                 URL_for_testcases = self.Qc_Url + midPoint + "/" + "test-instances"
                 folderName = tsFolder[indexTest].split("\\")[-1]
-                parentID = self.get_folder_parent_id(URL, folderName)
+                folderId = folderid[indexTest] 
+                parentID = self.get_folder_parent_id(URL, folderName, folderId)
                 #fetching testset id
                 payload = {"query": "{parent-id[" + str(parentID) + "]}", "fields": "id,name"}
                 res1 = requests.get(URL_for_testsets, params=payload, headers=self.headers, cookies=self.cookies,proxies=readconfig.proxies)
