@@ -869,13 +869,14 @@ def save_graph_to_file(graph_file_name, module_spec, class_count):
 
 
 def prepare_file_system():
-  # Set up the directory we'll write summaries to for TensorBoard
-  if tf.gfile.Exists(FLAGS.summaries_dir):
-    tf.gfile.DeleteRecursively(FLAGS.summaries_dir)
-  tf.gfile.MakeDirs(FLAGS.summaries_dir)
-  if FLAGS.intermediate_store_frequency > 0:
-    ensure_dir_exists(FLAGS.intermediate_output_graphs_dir)
-  return
+    # Set up the directory we'll write summaries to for TensorBoard
+    if tf.gfile.Exists(FLAGS.summaries_dir):
+        try: tf.gfile.DeleteRecursively(FLAGS.summaries_dir)
+        except: pass
+    tf.gfile.MakeDirs(FLAGS.summaries_dir)
+    if FLAGS.intermediate_store_frequency > 0:
+        ensure_dir_exists(FLAGS.intermediate_output_graphs_dir)
+    return
 
 
 def add_jpeg_decoding(module_spec):
@@ -1011,7 +1012,7 @@ class CreateWindow(wx.Frame):
         '''
             All the widget elements are defined and initialized here
         '''
-        wx.Frame.__init__(self, parent=None, title="Prediction MT", pos=(300, 150),  size=(500, 250),style=wx.DEFAULT_FRAME_STYLE & ~ (wx.MAXIMIZE_BOX))
+        wx.Frame.__init__(self, parent=None, title="Object Prediction MT", pos=(300, 150),  size=(500, 250),style=wx.DEFAULT_FRAME_STYLE & ~ (wx.MAXIMIZE_BOX))
         self.SetBackgroundColour('#e6e7e8')
 
         self.panel = wx.Panel(self)
@@ -1029,11 +1030,15 @@ class CreateWindow(wx.Frame):
         self.rollback_btn.Bind(wx.EVT_BUTTON, self.rollback)
         self.rollback_btn.Hide()        # initialized as hidden
 
-
-        # version list combobox
         choices = self.all_versions
+        if len(choices) == 1 and str(choices[0]) == str(self.current_version):
+            self.revert_btn.Disable()
+        else:
+            self.revert_btn.Enable()
+        # version list combobox
         self.version_list = wx.ComboBox(self.panel, pos = (245, 30), size = (100, 25), choices=choices, style=wx.CB_READONLY | wx.CB_DROPDOWN)
         self.version_list.SetSelection(self.all_versions.index(self.current_version))
+        self.version_list.Bind(wx.EVT_COMBOBOX, self.combo_opt)
         self.version_list.Hide()    # initialized as hidden same as rollback
 
 
@@ -1065,6 +1070,7 @@ class CreateWindow(wx.Frame):
 
 
     def start_training(self, event):
+          start_time = datetime.now()
           self.print_log("Training started...")
           self.msg.StartThread(self.msg.showProgress)
           self.comm_obj.percentageIncri(self.msg,5,"Backing Up Current Data...")
@@ -1262,6 +1268,10 @@ class CreateWindow(wx.Frame):
               export_model(module_spec, class_count, FLAGS.saved_model_dir)
             self.comm_obj.percentageIncri(self.msg,100,"Training Completed")
             self.print_log("-----Data Trained Successfully-----")
+            self.revert_btn.Enable()
+            end_time = datetime.now()
+            #log.info('Time elapsed: '+ str(end_time - start_time))
+            self.print_log('Time elapsed: '+ str(end_time - start_time))
 
     def backup_current_model(self):
         try:
@@ -1339,8 +1349,27 @@ class CreateWindow(wx.Frame):
             self.revert_btn.SetPosition((135, 30))
             self.version_list.Show()
             self.rollback_btn.Show()
+            self.rollback_btn.Disable()
+
+    def combo_opt(self, event):
+        """
+        Definition : Enables/Disables Rollback button on option selection in the combo_box.
+                     Rollback button is disabled when combo_box value is the same as current version
+        Inputs: event object when when combo_box items are selected
+        """
+        combo_box_item_index = self.version_list.GetSelection()
+        combo_box_item_value=self.version_list.GetString(combo_box_item_index)
+        if (str(self.current_version) != str(combo_box_item_value)):
+            self.rollback_btn.Enable()
+        else:
+            self.rollback_btn.Disable()
 
     def downgrade_version(self, version, index):
+        """
+        Definition : saves changes to the config json file after any rollback operation is performed
+        input: receives the version and the index value of version in the list
+        references: inside rollback method
+        """
         try:
             #log.debug("Writing changes in config.json")
             with open(config_path, "w") as outfile:
@@ -1358,6 +1387,11 @@ class CreateWindow(wx.Frame):
             #log.error("Failed to write changes to config.json"+str(err))
 
     def delete_backups(self, index):
+        """
+        Definition: During rollback, deletes all the versions newer than the selected version
+        input: takes the index of version that is being rolled backed
+        reference: rollback() method
+        """
         if not os.path.exists(self.rollback_dir):
             #log.info("Rollback file doesn't exist, cannot delete backups")
             return
@@ -1370,6 +1404,22 @@ class CreateWindow(wx.Frame):
         except Exception as err:
             #log.error("Error occured while deleting backups: "+str(err))
             self.print_log("Error Occured in deleting backups")
+
+    def delete_from_model_backup(self,index):
+        """
+        Definition : deletes selected versions from model_backup.7z
+        input: index of current selected iten in self.version list
+        references: inside rollback method
+        """
+        try:
+            versions_to_del = configs["all_versions"][index:]
+            #log.debug("Deleting versions from manifest.json: "+str(versions_to_del))
+            for v in versions_to_del:
+                delete_model = r'{loc_7z} d {zipfile} {file} -r -y'.format(loc_7z = LOC_7z, zipfile = self.rollback_dir, file = str("retrained_graph_"+v+".pb"))
+                subprocess.call(delete_model, shell=True)
+        except Exception as err:
+            self.print_log("Failed to delete files from model_backup.7z")
+            #log.error("Failed to delete files from model_backup.7z, ERR_MSG : "+str(err))
 
     def rollback(self, event):
         self.print_log("Extracting Model...")
@@ -1393,6 +1443,8 @@ class CreateWindow(wx.Frame):
                 #log.info("Renaming the extracted model")
                 os.rename(active_model+'_'+rollback_ver+'.pb', self.active_model)
                 self.comm_obj.percentageIncri(self.msg,90,"Rolling Back...")
+                #log.info("Deleting selected model from backup")
+                self.delete_from_model_backup(rollback_index)
                 #log.info("Updating config file")
                 self.downgrade_version(rollback_ver, rollback_index)
                 #log.info("Updating combo box")
@@ -1403,6 +1455,18 @@ class CreateWindow(wx.Frame):
                 self.print_log("Model Extracted")
                 #log.info("Model Extracted. Rollback successful")
                 self.print_log("------Rollback Successful------")
+                if len(self.all_versions) == 1 and str(self.all_versions[0]) == str(self.current_version):
+                    if self.rollback_btn.IsShown():
+                        #log.debug("Removing model_backup.7z")
+                        if(os.path.exists(self.rollback_dir)): os.remove(self.rollback_dir)
+                        #log.debug("Hiding rollback options")
+                        self.train_btn.SetPosition((135, 30))
+                        self.revert_btn.SetPosition((245, 30))
+                        self.version_list.Hide()
+                        self.rollback_btn.Hide()
+                        self.revert_btn.Disable()
+                if str(self.current_version) == str(self.version_list.GetString(self.version_list.GetSelection())) :
+                    self.rollback_btn.Disable()
             except Exception as err:
                 self.comm_obj.percentageIncri(self.msg,100,"Rollback Failed")
                 # self.msg.ShowMessage("Rolled back Failed!")
