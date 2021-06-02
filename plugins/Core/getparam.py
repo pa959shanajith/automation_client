@@ -176,7 +176,7 @@ class GetParam():
             elif filepath.split("/")[0] == "avoassure":
                 """datatable check goes here"""
                 key = filepath.split("/")[1]
-                dt = [item for item in datatables if item.get(key) != -1]
+                dt = [item for item in datatables if item.get(key) != None]
                 if len(dt) != 0:
                     log.info('Datatable exists')
                     columnNamesList = list(dt[0].get(filepath.split("/")[1])[0].keys())
@@ -198,7 +198,6 @@ class GetParam():
             return status
         except Exception as e:
             log.error(e)
-
             logger.print_on_console(e)
 
     def readcsvfile(self,fileinfo):
@@ -375,16 +374,19 @@ class GetParam():
     def readDatatable(self,fileinfo,datatables):
         """
         def : readDatatable
-        purpose : To read the content of the datatable and store it in dictionary
+        purpose : To read the content of the datatable(format: [{'col1':'row1'},{'col1':'row2'}]) 
+            and store it in dictionary
         param input : input contains Datatable name and filters (optional)
-        return : Returns dictionary
+        return : Returns dictionary (format: {'col1':['row1','row2']})
         """
         try:
             sdata = dict()
             filepath = fileinfo[0]
-            key = filepath.split("/")[1]
-            dt = [item for item in datatables if item.get(key) != -1]
-            datatable = dt[0].get(key)
+            #fetch current datatable from list of datatable
+            currentdt = filepath.split("/")[1]
+            dt = [item for item in datatables if item.get(currentdt) != None]
+            datatable = dt[0].get(currentdt)
+            #format datatable into dictionary
             sdata = dict.fromkeys(datatable[0].keys())
             for col in sdata:
                 sdata[col] = []
@@ -394,7 +396,6 @@ class GetParam():
             return data
         except Exception as e:
             log.error(e)
-
             logger.print_on_console(e)
 
 

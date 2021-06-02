@@ -995,9 +995,6 @@ class Controller():
                 self.conthread=mythread
                 execution_env = {'env':'default'}
                 status,_,_ = self.executor(tsplist,DEBUG,last_tc_num,runfrom_step,mythread,execution_env,datatables=datatables, accessibility_testing = False)
-            else:
-                logger.print_on_console( 'Invalid step number!! Please provide run from step number from 1 to ',tsplist[len(tsplist)-1].stepnum,'\n')
-                log.info('Invalid step number!! Please provide run from step number')
         else:
             logger.print_on_console('Invalid script')
         temp={}
