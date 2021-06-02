@@ -360,6 +360,8 @@ SCENARIO_NAME='scenarioName'
 
 RELEASE_NAME='releaseName'
 
+VERSION_NAME='versionname'
+
 TERMINATED_BY='terminatedBy'
 
 USER_TERMINATED='user'
