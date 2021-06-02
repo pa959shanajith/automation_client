@@ -98,6 +98,7 @@ class UtilWebKeywords:
         try:
             from verify_file_images import VerifyFileImages
             self.verify_image_obj=VerifyFileImages()
+        except ImportError: pass
         except Exception as e:
             log.error(e)
 

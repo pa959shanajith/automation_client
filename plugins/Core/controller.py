@@ -1159,7 +1159,7 @@ class Controller():
                             #check for temrinate flag before parsing tsp list
                             if terminate_flag:
                                 break
-                            flag,_,last_tc_num,testcase_empty_flag,empty_testcase_names=obj.parse_json(testcase,dataparam_path_value)
+                            flag,_,last_tc_num,datatables,testcase_empty_flag,empty_testcase_names=obj.parse_json(testcase,dataparam_path_value)
                             if flag == False:
                                 break
                             print('\n')
@@ -1243,74 +1243,65 @@ class Controller():
                                 record_flag = str(configvalues['screen_rec']).lower()
                                 #start screen recording
                                 if (record_flag=='yes') and self.execution_mode == SERIAL and json_data['apptype'] == 'Web': video_path = recorder_obj.record_execution(json_data['suitedetails'][0])
-                                status,status_percentage,accessibility_reports = con.executor(tsplist,EXECUTE,last_tc_num,1,con.conthread,execution_env,video_path, accessibility_testing = True)
+                                status,status_percentage,accessibility_reports = con.executor(tsplist,EXECUTE,last_tc_num,1,con.conthread,execution_env,video_path,datatables=datatables,accessibility_testing = True)
                                 #end video
                                 if (record_flag=='yes') and self.execution_mode == SERIAL and json_data['apptype'] == 'Web': recorder_obj.rec_status = False
                                 print('=======================================================================================================')
                                 logger.print_on_console( '***Scenario' ,str(sc_idx + 1) ,' execution completed***')
                                 print('=======================================================================================================')
-                                log.info('***Scenario '  + str(sc_idx + 1)+ ' execution started***')
-                            # if('integrationType' not in qc_creds and len(scenario)==2 and len(scenario['qcdetails'])==10):
-
-                            # if('integrationType' in qc_creds and qc_creds['integrationType'] == 'ALM'):
-                            integ = 0
-                            if(qc_creds["alm"]["url"] != "" and len(scenario["qcdetails"]) != 0):
-                                qc_username=qc_creds['alm']['username']
-                                qc_password=qc_creds['alm']['password']
-                                qc_url=qc_creds['alm']['url']
-                                qc_sceanrio_data=scenario['qcdetails'][integ]
-                                integ += 1
-                            # if('integrationType' in qc_creds and qc_creds['integrationType'] == 'qTest'):
-                            if(qc_creds["qtest"]["url"] != "" and len(scenario["qcdetails"]) != 0):
-                                qtest_username=qc_creds["qtest"]["username"]
-                                qtest_password=qc_creds["qtest"]["password"]
-                                qtest_url=qc_creds["qtest"]["url"]
-                                qtest_stepsup=qc_creds["qtest"]["qteststeps"]
-                                qc_sceanrio_data=scenario['qcdetails'][integ]
-                                integ += 1
-                                qtest_project=qc_sceanrio_data['qtestproject']
-                                qtest_projectid=qc_sceanrio_data['qtestprojectid']
-                                qtest_suite=qc_sceanrio_data['qtestsuite']
-                                qtest_suiteid=qc_sceanrio_data['qtestsuiteid']
-                            # if('integrationType' in qc_creds and qc_creds['integrationType'] == 'Zephyr'):
-                            if(qc_creds["zephyr"]["url"] != "" and len(scenario["qcdetails"]) != 0):
-                                zephyr_url=qc_creds["zephyr"]["url"]
-                                zephyr_username=qc_creds["zephyr"]["username"]
-                                zephyr_password=qc_creds["zephyr"]["password"]
-                                zephyr_sceanrio_data=scenario['qcdetails'][integ]
-                                integ += 1
-                                zephyr_releaseid=zephyr_sceanrio_data['releaseid']
-                                zephyr_projectid=zephyr_sceanrio_data['projectid']
-                                zephyr_treeid=zephyr_sceanrio_data['treeid']
-                                zephy_testid=zephyr_sceanrio_data['testid']
-
-                            #Iterating through each test case in the scenario
-                            for testcase in [eval(scenario[scenario_id])]:
-                                #For every unique screen in list of test cases, store screen data
-                                for step in testcase:
-                                    step['apptype'] = scenario['apptype']
-                                    screen_testcase_map[step['testcasename']] = {}
-                                    screen_testcase_map[step['testcasename']]["screenname"] = step['screenname']
-                                    screen_testcase_map[step['testcasename']]["screenid"] = step['screenid']
-                                    screen_testcase_map[step['testcasename']]["cycleid"] = suite['cycleid']
-                                    screen_testcase_map["executionid"] = execute_result_data['executionId']
-                                    screen_testcase_map[step['testcasename']]['accessibility_parameters'] = accessibility_parameters
-                                #check for temrinate flag before parsing tsp list
-                                if terminate_flag:
-                                    break
-                                flag,_,last_tc_num,datatables,testcase_empty_flag,empty_testcase_names=obj.parse_json(testcase,dataparam_path_value)
-                                if flag == False:
-                                    break
-                                print('\n')
-                                if (True in testcase_empty_flag):
-                                    if(condition_check_value==1):
-                                        condition_check_flag = True
-                                        logger.print_on_console('Condition Check: Terminated by program ')
-                                    info_msg=str("Scenario cannot be executed, since the following testcases are empty: "+','.join(empty_testcase_names))
-                                    logger.print_on_console(info_msg)
-                                    log.info(info_msg)
-                                    status = TERMINATE
-                                    execute_flag=False
+                                tsplistLen = len(tsplist)
+                                del con.tsp_list
+                                del tsplist
+                        if execute_flag:
+                            #Saving the report for the scenario
+                            logger.print_on_console( '***Saving report of Scenario' ,str(sc_idx  + 1 ),'***')
+                            log.info( '***Saving report of Scenario' +str(sc_idx + 1)+'***')
+                            os.chdir(self.cur_dir)
+                            filename='Scenario'+str(count + 1)+'.json'
+                            count+=1
+                            #check if user has manually terminated during execution, then check if the teststep data and overallstatus is [] if so poputale default values in teststep data and overallstatus
+                            if terminate_flag:
+                                if con.reporting_obj.report_json[ROWS]==[] and con.reporting_obj.report_json[OVERALLSTATUS]==[]:
+                                    con.reporting_obj.add_to_reporting_obj()
+                            status_percentage["s_index"]=suite_idx-1
+                            status_percentage["index"]=sc_idx
+                            con.reporting_obj.user_termination=manual_terminate_flag
+                            con.reporting_obj.save_report_json(filename,json_data,status_percentage)
+                            execute_result_data["reportData"] = con.reporting_obj.report_json
+                            if len(accessibility_reports) > 0:
+                                execute_result_data["accessibility_reports"] = accessibility_reports
+                            execute_result_data['report_type'] = report_type
+                            if execution_env['env'] == 'saucelabs':
+                                browser_num={'1':'googlechrome','2':'firefox','3':'iexplore','7':'microsoftedge','8':'microsoftedge'}
+                                import web_keywords
+                                self.obj = web_keywords.Sauce_Config()
+                                self.obj.get_sauceconf()
+                                sc = self.obj.get_sauceclient()
+                                j = self.obj.get_saucejobs(sc)
+                                all_jobs=j.get_jobs(start=int(now.timestamp()),full=True)
+                                time.sleep(5)
+                                import constants
+                                if constants.SCREENSHOT_PATH  not in ['screenshot_path', 'Disabled']:
+                                    path = constants.SCREENSHOT_PATH+json_data['suitedetails'][0]['projectname']+os.sep+json_data['suitedetails'][0]['releaseid']+os.sep+json_data['suitedetails'][0]['cyclename']+os.sep+datetime.now().strftime("%Y-%m-%d")+os.sep
+                                    if not os.path.exists(path):
+                                        os.makedirs(path)
+                                    file_name = datetime.now().strftime("%Y%m%d%H%M%S")
+                                    video_path = path+"ScreenRecording_"+file_name+".mp4"
+                                for i in range(0,len(all_jobs)):
+                                    if(all_jobs[i]['browser']==browser_num[browser]):
+                                        file_creations_status=j.get_job_asset_content(all_jobs[i]['id'],file_name,path)
+                                execute_result_data['reportData']['overallstatus'][0]['video']=video_path
+                            socketIO.emit('result_executeTestSuite', execute_result_data)
+                            obj.clearList(con)
+                            sc_idx += 1
+                            #logic for condition check
+                            report_json=con.reporting_obj.report_json[OVERALLSTATUS]
+                            #Check is made to fix issue #401
+                            overall_status=report_json[0][OVERALLSTATUS] if len(report_json)>0 else TEST_RESULT_FAIL
+                            if overall_status != TEST_RESULT_PASS: exc_pass = False
+                            if(condition_check_value==1):
+                                if(overall_status==TEST_RESULT_PASS):
+                                    continue
                                 else:
                                     condition_check_flag = True
                                     logger.print_on_console('Condition Check: Terminated by program ')
@@ -1345,109 +1336,26 @@ class Controller():
                                 elif(str(qc_update_status).lower()=='fail'):
                                     qc_update_status='Failed'
                                 else:
-                                    terminate_flag=True
-                                    msg='***Scenario'+str(sc_idx+ 1)+': '+scenario_name+' is Terminated ***'
-                                    logger.print_on_console(msg)
-                                    log.info(msg)
-                                    tsplist=[]
-                                sc_idx+=1
-                                execute_flag=False
-                            execution_env = json_data.get('exec_env', 'default').lower()
-                            if execution_env == 'saucelabs':
-                                # self.__load_web()
-                                # import script_generator
-                                scenario_name=json_data['suitedetails'][suite_idx-1]["scenarioNames"][sc_idx]
-                                execution_env = {'env':'saucelabs','scenario':scenario_name}
-                                now=datetime.now()
-                                # if not terminate_flag:
-                                #     saucelabs_obj=script_generator.SauceLabs_Operations(scenario_name,str(saucelabs_count))
-                                #     status=saucelabs_obj.complie_TC(tsplist,scenario_name,browser,str(saucelabs_count),execute_result_data,socketIO)
-                                # if status==TERMINATE:
-                                #     terminate_flag=True
-                                #     msg='***Scenario'+str(sc_idx+ 1)+': '+scenario_name+' is Terminated ***'
-                                #     logger.print_on_console(msg)
-                                # else:
-                                #     print('=======================================================================================================')
-                                #     logger.print_on_console( '***Scenario' ,str(sc_idx + 1) ,' execution completed***')
-                                #     print('=======================================================================================================')
-                                # saucelabs_count += 1
-                                # sc_idx += 1
-                                # execute_flag=False
-                            else:
-                                execution_env = {'env':'default'}
-                            if flag and execute_flag :
-                                #check for temrinate flag before execution
-                                tsplist = obj.read_step()
-                                if not(terminate_flag):
-                                    con.action=EXECUTE
-                                    con.conthread=mythread
-                                    con.tsp_list=tsplist
-                                    local_cont.test_case_number=0
-                                    #create a video path
-                                    video_path = ''
-                                    recorder_obj = recording.Recorder()
-                                    record_flag = str(configvalues['screen_rec']).lower()
-                                    #start screen recording
-                                    if (record_flag=='yes') and self.execution_mode == SERIAL and json_data['apptype'] == 'Web': video_path = recorder_obj.record_execution(json_data['suitedetails'][0])
-                                    status,status_percentage,accessibility_reports = con.executor(tsplist,EXECUTE,last_tc_num,1,con.conthread,execution_env,video_path,datatables=datatables, accessibility_testing = True)
-                                    #end video
-                                    if (record_flag=='yes') and self.execution_mode == SERIAL and json_data['apptype'] == 'Web': recorder_obj.rec_status = False
-                                    print('=======================================================================================================')
-                                    logger.print_on_console( '***Scenario' ,str(sc_idx + 1) ,' execution completed***')
-                                    print('=======================================================================================================')
-                                    tsplistLen = len(tsplist)
-                                    del con.tsp_list
-                                    del tsplist
-                            if execute_flag:
-                                #Saving the report for the scenario
-                                logger.print_on_console( '***Saving report of Scenario' ,str(sc_idx  + 1 ),'***')
-                                log.info( '***Saving report of Scenario' +str(sc_idx + 1)+'***')
-                                os.chdir(self.cur_dir)
-                                filename='Scenario'+str(count + 1)+'.json'
-                                count+=1
-                                #check if user has manually terminated during execution, then check if the teststep data and overallstatus is [] if so poputale default values in teststep data and overallstatus
-                                if terminate_flag:
-                                    if con.reporting_obj.report_json[ROWS]==[] and con.reporting_obj.report_json[OVERALLSTATUS]==[]:
-                                        con.reporting_obj.add_to_reporting_obj()
-                                status_percentage["s_index"]=suite_idx-1
-                                status_percentage["index"]=sc_idx
-                                con.reporting_obj.user_termination=manual_terminate_flag
-                                con.reporting_obj.save_report_json(filename,json_data,status_percentage)
-                                execute_result_data["reportData"] = con.reporting_obj.report_json
-                                if len(accessibility_reports) > 0:
-                                    execute_result_data["accessibility_reports"] = accessibility_reports
-                                execute_result_data['report_type'] = report_type
-                                if execution_env['env'] == 'saucelabs':
-                                    browser_num={'1':'googlechrome','2':'firefox','3':'iexplore','7':'microsoftedge','8':'microsoftedge'}
-                                    import web_keywords
-                                    self.obj = web_keywords.Sauce_Config()
-                                    self.obj.get_sauceconf()
-                                    sc = self.obj.get_sauceclient()
-                                    j = self.obj.get_saucejobs(sc)
-                                    all_jobs=j.get_jobs(start=int(now.timestamp()),full=True)
-                                    time.sleep(5)
-                                    import constants
-                                    if constants.SCREENSHOT_PATH  not in ['screenshot_path', 'Disabled']:
-                                        path = constants.SCREENSHOT_PATH+json_data['suitedetails'][0]['projectname']+os.sep+json_data['suitedetails'][0]['releaseid']+os.sep+json_data['suitedetails'][0]['cyclename']+os.sep+datetime.now().strftime("%Y-%m-%d")+os.sep
-                                        if not os.path.exists(path):
-                                            os.makedirs(path)
-                                        file_name = datetime.now().strftime("%Y%m%d%H%M%S")
-                                        video_path = path+"ScreenRecording_"+file_name+".mp4"
-                                    for i in range(0,len(all_jobs)):
-                                        if(all_jobs[i]['browser']==browser_num[browser]):
-                                            file_creations_status=j.get_job_asset_content(all_jobs[i]['id'],file_name,path)
-                                    execute_result_data['reportData']['overallstatus'][0]['video']=video_path
-                                socketIO.emit('result_executeTestSuite', execute_result_data)
-                                obj.clearList(con)
-                                sc_idx += 1
-                                #logic for condition check
-                                report_json=con.reporting_obj.report_json[OVERALLSTATUS]
-                                #Check is made to fix issue #401
-                                overall_status=report_json[0][OVERALLSTATUS] if len(report_json)>0 else TEST_RESULT_FAIL
-                                if overall_status != TEST_RESULT_PASS: exc_pass = False
-                                if(condition_check_value==1):
-                                    if(overall_status==TEST_RESULT_PASS):
-                                        continue
+                                    qc_update_status='Not Completed'
+                                try:
+                                    qc_status = {}
+                                    qc_status['qcaction']='qcupdate'
+                                    qc_status['qcurl']=qc_url
+                                    qc_status['qcusername']=qc_username
+                                    qc_status['qcpassword']=qc_password
+                                    qc_status['qc_domain']=qc_domain
+                                    qc_status['qc_project']=qc_project
+                                    qc_status['qc_folder']=qc_folder
+                                    qc_status['qc_tsList']=qc_tsList
+                                    qc_status['qc_testrunname']=qc_testrunname
+                                    qc_status['qc_update_status'] = qc_update_status
+                                    logger.print_on_console('****Updating QCDetails****')
+                                    if qcObject is not None:
+                                        qc_status_updated = qcObject.update_qc_details(qc_status)
+                                        if qc_status_updated:
+                                            logger.print_on_console('****Updated QCDetails****')
+                                        else:
+                                            logger.print_on_console('****Failed to Update QCDetails****')
                                     else:
                                         logger.print_on_console('****Failed to Update QCDetails****')
                                 except Exception as e:
