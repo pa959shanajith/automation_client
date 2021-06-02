@@ -330,7 +330,7 @@ class Controller():
             while self.conthread.paused:
                 self.conthread.pause_cond.wait()
 
-    def methodinvocation(self,index,execution_env,*args):
+    def methodinvocation(self,index,execution_env,datatables=[],*args):
         global pause_flag
         result=(TEST_RESULT_FAIL,TEST_RESULT_FALSE,OUTPUT_CONSTANT,None)
 		#COmapring breakpoint with the step number of tsp instead of index - (Sushma)
@@ -418,7 +418,7 @@ class Controller():
                             elif tsp != None and isinstance(tsp,for_step.For):
                                 index = tsp.invokeFor(inpval,self.reporting_obj)
                             elif tsp != None and isinstance(tsp,getparam.GetParam):
-                                index = tsp.performdataparam(inpval,self,self.reporting_obj,execution_env)
+                                index = tsp.performdataparam(inpval,self,self.reporting_obj,execution_env,datatables)
                             elif tsp != None and isinstance(tsp,jumpBy.JumpBy):
                                 index = tsp.invoke_jumpby(inpval,self.reporting_obj)
                             elif tsp != None and isinstance(tsp,jumpTo.JumpTo):
@@ -796,7 +796,7 @@ class Controller():
         else:
             return index,TERMINATE
 
-    def executor(self,tsplist,action,last_tc_num,debugfrom_step,mythread,execution_env,*args, accessibility_testing = False):
+    def executor(self,tsplist,action,last_tc_num,debugfrom_step,mythread,execution_env,*args,datatables=[], accessibility_testing = False):
         global status_percentage, screen_testcase_map
         status_percentage = {TEST_RESULT_PASS:0,TEST_RESULT_FAIL:0,TERMINATE:0,"total":0}
         i=0
@@ -825,7 +825,7 @@ class Controller():
                 self.debugfrom_step=debugfrom_step
                 try:
                     index = i
-                    i = self.methodinvocation(i,execution_env)
+                    i = self.methodinvocation(i,execution_env,datatables)
                     #Check wether accessibility testing has to be executed
                     if accessibility_testing and (index + 1 >= len(tsplist) or (tsplist[index].testscript_name != tsplist[index + 1].testscript_name and screen_testcase_map[tsplist[index].testscript_name]['screenid'] != screen_testcase_map[tsplist[index + 1].testscript_name]['screenid'])):
                         if local_cont.accessibility_testing_obj is None: self.__load_web()
@@ -941,7 +941,7 @@ class Controller():
         logger.print_on_console('***DEBUG STARTED***')
         print('=======================================================================================================')
         for testcase in scenario:
-            flag,browser_type,last_tc_num,_,_=obj.parse_json(testcase)
+            flag,browser_type,last_tc_num,datatables,_,_=obj.parse_json(testcase)
             if flag == False:
                 break
             print('\n')
@@ -994,7 +994,7 @@ class Controller():
             if start_debug:
                 self.conthread=mythread
                 execution_env = {'env':'default'}
-                status,_,_ = self.executor(tsplist,DEBUG,last_tc_num,runfrom_step,mythread,execution_env, accessibility_testing = False)
+                status,_,_ = self.executor(tsplist,DEBUG,last_tc_num,runfrom_step,mythread,execution_env,datatables=datatables, accessibility_testing = False)
         else:
             logger.print_on_console('Invalid script')
         temp={}
@@ -1159,7 +1159,7 @@ class Controller():
                             #check for temrinate flag before parsing tsp list
                             if terminate_flag:
                                 break
-                            flag,_,last_tc_num,testcase_empty_flag,empty_testcase_names=obj.parse_json(testcase,dataparam_path_value)
+                            flag,_,last_tc_num,datatables,testcase_empty_flag,empty_testcase_names=obj.parse_json(testcase,dataparam_path_value)
                             if flag == False:
                                 break
                             print('\n')
@@ -1243,7 +1243,7 @@ class Controller():
                                 record_flag = str(configvalues['screen_rec']).lower()
                                 #start screen recording
                                 if (record_flag=='yes') and self.execution_mode == SERIAL and json_data['apptype'] == 'Web': video_path = recorder_obj.record_execution(json_data['suitedetails'][0])
-                                status,status_percentage,accessibility_reports = con.executor(tsplist,EXECUTE,last_tc_num,1,con.conthread,execution_env,video_path, accessibility_testing = True)
+                                status,status_percentage,accessibility_reports = con.executor(tsplist,EXECUTE,last_tc_num,1,con.conthread,execution_env,video_path,datatables=datatables,accessibility_testing = True)
                                 #end video
                                 if (record_flag=='yes') and self.execution_mode == SERIAL and json_data['apptype'] == 'Web': recorder_obj.rec_status = False
                                 print('=======================================================================================================')

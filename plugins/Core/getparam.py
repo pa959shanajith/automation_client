@@ -62,7 +62,7 @@ class GetParam():
         log.info('Step: '+str(self.index)+' '+self.name+' '+str(self.inputval)+' '+self.testscript_name+' '+str(self.info_dict))
 
 
-    def getparam(self,input):
+    def getparam(self,input,datatables):
         """
         def : getParam
         purpose : to check input file for the Data Parameterization is valid or not
@@ -73,7 +73,6 @@ class GetParam():
         status = TEST_RESULT_FAIL
         try:
             """Logic to find the input file is valid or not"""
-##            fileinfo = input.split(';')
             fileinfo = input
             filepath = fileinfo[0]
             #need to check dynamic variable for filepath
@@ -88,19 +87,19 @@ class GetParam():
                     sheetname = fileinfo[1]
                     log.debug('Retrieved file name and sheetname ')
                     if os.access(filepath, os.R_OK):
-##                        log.info('File is accesible')
-##                        logger.print_on_console('File is accesible')
+                        # log.info('File is accesible')
+                        # logger.print_on_console('File is accesible')
                         wb = open_workbook(filepath)
                         log.info('Work Book object is created')
                         log.debug('Going to iterate through the sheets present in the work book')
                         for s in wb.sheets():
                             if s.name == sheetname:
                                 log.info('Input sheet name matched with the actual sheet name')
-##                                logger.print_on_console('Input sheet name matched with the actual sheet name')
-##                                logger.print_on_console('Expected: ',s.name)
+                                # logger.print_on_console('Input sheet name matched with the actual sheet name')
+                                # logger.print_on_console('Expected: ',s.name)
                                 log.info('Expected:')
                                 log.info(s.name)
-##                                logger.print_on_console('Actual: ',sheetname)
+                                # logger.print_on_console('Actual: ',sheetname)
                                 log.info('Actual:')
                                 log.info(sheetname)
                                 for col in range(s.ncols):
@@ -114,7 +113,7 @@ class GetParam():
                                 log.info('Comparing the length of the columnNamesList and columnNamesSet ')
                                 if len(columnNamesList) == len(columnNamesSet):
                                     log.info(sheetname + ' contains unique column names, continue..')
-##                                    logger.print_on_console(sheetname + ' contains unique column names, continue..')
+                                    # logger.print_on_console(sheetname + ' contains unique column names, continue..')
                                     log.info(STATUS_METHODOUTPUT_UPDATE)
                                     status = TEST_RESULT_PASS
                                 else:
@@ -173,12 +172,36 @@ class GetParam():
                 else:
                     log.info('File is not accesible')
                     logger.print_on_console('File is not accesible')
+            elif filepath.split("/")[0] == "avoassure":
+                """datatable check goes here"""
+                key = filepath.split("/")[1]
+                dt = None
+                for item in datatables:
+                    if item.get(key) != None:
+                        dt = item.get(key)
+                        break
+                if dt:
+                    log.info('Datatable exists')
+                    columnNamesList = list(dt[0].keys())
+                    log.info('Store the data into the set to remove the duplicate column names')
+                    columnNamesSet = set(columnNamesList)
+                    log.info('Comparing the length of the columnNamesList and columnNamesSet ')
+                    if len(columnNamesList) == len(columnNamesSet):
+                        log.info(filepath + ' contains unique column names, continue..')
+                        logger.print_on_console(filepath + ' contains unique column names, continue..')
+                        log.info(STATUS_METHODOUTPUT_UPDATE)
+                        status = TEST_RESULT_PASS
+                    else:
+                        log.info(filepath + ' contains duplicate column names')
+                        logger.print_on_console(filepath + ' contains duplicate column names')
+                else:
+                    log.info('Datatable does not exist')
+                    logger.print_on_console('Datatable does not exist')
 
             return status
         except Exception as e:
-            log.error(e)
-
-            logger.print_on_console(e)
+            log.error(e,exc_info=True)
+            logger.print_on_console("Error occured in getparam")
 
     def readcsvfile(self,fileinfo):
         """
@@ -249,7 +272,7 @@ class GetParam():
             log.info('Returning the output dictionary')
             return myDict
         except Exception as e:
-            log.error(e)
+            log.error(e,exc_info=True)
             logger.print_on_console("Error while reading CSV file")
 
     def xmlTreeReader(self,xroot,sdata):
@@ -306,9 +329,8 @@ class GetParam():
                 log.info('Returning the output dictionary')
                 return sdata
         except Exception as e:
-            log.error(e)
-
-            logger.print_on_console(e)
+            log.error(e,exc_info=True)
+            logger.print_on_console("Error while reading xml data")
 
 
     def readxlsandxlsxfile(self,fileinfo):
@@ -347,14 +369,38 @@ class GetParam():
             data = ast.literal_eval(json.dumps(sdata))
             return data
         except Exception as e:
-            log.error(e)
+            log.error(e,exc_info=True)
+            logger.print_on_console("Error while reading excel data")
 
-            logger.print_on_console(e)
+    def readDatatable(self,fileinfo,datatables):
+        """
+        def : readDatatable
+        purpose : To read the content of the datatable(format: [{'col1':'row1'},{'col1':'row2'}]) 
+            and store it in dictionary
+        param input : input contains Datatable name and filters (optional)
+        return : Returns dictionary (format: {'col1':['row1','row2']})
+        """
+        try:
+            filepath = fileinfo[0]
+            #fetch current datatable from list of datatable
+            currentdt = filepath.split("/")[1]
+            for item in datatables:
+                if item.get(currentdt) != None:
+                    datatable = item.get(currentdt)
+                    break
+            #format datatable into dictionary
+            sdata = dict.fromkeys(datatable[0].keys())
+            for col in sdata:
+                sdata[col] = []
+                for dt in datatable:
+                    sdata[col].append(dt[col])
+            return sdata
+        except Exception as e:
+            log.error(e,exc_info=True)
+            logger.print_on_console("Error while reading datatable")
 
 
-
-
-    def getexternaldatalist(self,input):
+    def getexternaldatalist(self,input,datatables):
         """
         def : getexternaldatalist
         purpose : make calls to perticular file reading methods based on the file type
@@ -367,7 +413,7 @@ class GetParam():
             fileinfo = input
             #check for dynamic variables for fileinfo
             filepath = fileinfo[0]
-            getparamres = self.getparam(input)
+            getparamres = self.getparam(input,datatables)
             log.info( 'Get Param Result :'+ str(getparamres) )
             logger.print_on_console( 'Get Param Result :',getparamres )
             if getparamres == TEST_RESULT_PASS:
@@ -378,32 +424,36 @@ class GetParam():
                 if file_extension[1:].lower() == FILE_TYPE_XLS or file_extension[1:].lower() == FILE_TYPE_XLSX:
                     log.debug( "Type is Excel")
                     """Excel .xls file check goes here"""
-                    externalDataList = self.readxlsandxlsxfile(fileinfo);
+                    externalDataList = self.readxlsandxlsxfile(fileinfo)
                 elif file_extension[1:].lower() == FILE_TYPE_CSV:
                     log.debug( "Type is .csv")
                     """CSV .csv file check goes here"""
-                    externalDataList = self.readcsvfile(fileinfo);
+                    externalDataList = self.readcsvfile(fileinfo)
                 elif file_extension[1:].lower() == FILE_TYPE_XML:
                     log.debug( "Type is .xml")
                     """XML .xml file check goes here"""
-                    externalDataList = self.readxmlfile(fileinfo);
+                    externalDataList = self.readxmlfile(fileinfo)
+                elif filepath.split("/")[0] == "avoassure":
+                    log.debug( "Type is datatable")
+                    """Datatable check goes here"""
+                    externalDataList = self.readDatatable(fileinfo,datatables)
                 return externalDataList
             else:
                 log.error( 'Invalid file! Please provide valid file name and/or sheet name')
                 logger.print_on_console(  'Invalid file! Please provide valid file name and/or sheet name')
                 return getparamres
         except Exception as e:
-            log.error(e)
+            log.error(e,exc_info=True)
             logger.print_on_console('Error while reading file')
 
-    def invokegetparam(self,input):
+    def invokegetparam(self,input,datatables):
         """
         def : invokegetparam
         purpose : make calls to getexternaldatalist
         param input : input contains File name, Sheet name(Mandatory) and filters (optional)
         return : Returns dictionary
         """
-        data =  self.getexternaldatalist(input)
+        data =  self.getexternaldatalist(input,datatables)
 
         return data
 
@@ -482,8 +532,8 @@ class GetParam():
                                 resultinput = resultinput.replace(variable,temp)
                                 inputlistwithval.insert(i,resultinput)
         except Exception as e:
-            log.error(e)
-            logger.print_on_console(e)
+            log.error(e,exc_info=True)
+            logger.print_on_console("Error while retrieving the value of static variable")
         return inputlistwithval
 
     def checkforstaticvariable(self,statvariable):
@@ -533,7 +583,7 @@ class GetParam():
         reporting_obj.generate_report_step(self,'',step_description,'3.00',False)
         #Reporting part ends
 
-    def performdataparam(self,input,con,reporting_obj,execution_env):
+    def performdataparam(self,input,con,reporting_obj,execution_env,datatables):
         try:
 
             endlopnum = list(self.info_dict[0].keys())[0]
@@ -554,11 +604,11 @@ class GetParam():
 
 
 
-            if self.getparam(input) == TEST_RESULT_PASS :
+            if self.getparam(input,datatables) == TEST_RESULT_PASS :
                 step_description='Parameterization method executed and status is Pass'
                 fileinfo = input
                 filepath = fileinfo[0]
-                data = self.invokegetparam(input)
+                data = self.invokegetparam(input,datatables)
                 startRow = None
                 endRow =None
                 filter = None
@@ -677,7 +727,7 @@ class GetParam():
                                     iterations = len(list(data.values())[0])
                                     while (paramindex < endlopnum):
                                         input = self.retrievestaticvariable(data,paramindex,i-1)
-                                        paramindex =con.methodinvocation(paramindex,execution_env,input)
+                                        paramindex =con.methodinvocation(paramindex,execution_env,datatables,input)
                                         if paramindex in [TERMINATE,BREAK_POINT,STOP]:
                                             return paramindex
                                     log.info( '***Data Param: Iteration ' + str(k) + ' completed***\n\n')
@@ -795,10 +845,10 @@ class GetParam():
                     logger.print_on_console( '***Data Parameterization completed***')
                     return_value=paramindex
             else:
-                log.error( 'Data parameterization failed : Wrong file name/ Sheet name given')
-                log.error( 'Wrong file name/ Sheet name given, Please check and provide valid one')
-                logger.print_on_console( 'Data parameterization failed : Wrong file name/ Sheet name given')
-                logger.print_on_console('Wrong file name/ Sheet name given, Please check and provide valid one')
+                log.error( 'Data parameterization failed : Wrong datatable name/ file name/ Sheet name given')
+                log.error( 'Wrong datatable name/ file name/ Sheet name given, Please check and provide valid one')
+                logger.print_on_console( 'Data parameterization failed : Wrong datatable name/ file name/ Sheet name given')
+                logger.print_on_console('Wrong datatable name/ file name/ Sheet name given, Please check and provide valid one')
                 #Reporting part
                 step_description='Data Parameterization failed'
                 self.add_report_step_getparam(reporting_obj,step_description)
