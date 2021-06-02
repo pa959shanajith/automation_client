@@ -268,7 +268,7 @@ class StringOperation:
             logger.print_on_console(err_msg)
         return status,result,output,err_msg
 
-    def find(self, input,*args):
+    def find(self, actual_string,to_find,*args):
         """
         def : find
         purpose : to find if string conatins another string
@@ -281,10 +281,7 @@ class StringOperation:
         output=OUTPUT_CONSTANT
         position=[]
         wildcard_find = False
-        actual_string = input
-        to_find = args[0]
-        to_find_d = to_find
-        wildcard_option = args[1].lower() if(len(args) == 2) else ""
+        wildcard_option = args[0].lower() if(len(args) == 1) else ""
         if (wildcard_option != ""):
             if (wildcard_option == 'wildcard'):
                 if '?' in to_find or "*" in to_find:
@@ -301,7 +298,7 @@ class StringOperation:
                             output_val = len(position)
                             if(output_val == 0):
                                 output='false'
-                                logger.print_on_console('The Original String is ',actual_string ,' and ' , actual_string , ' does not Contain ', to_find_d )
+                                logger.print_on_console('The Original String is ',actual_string ,' and ' , actual_string , ' does not Contain ', to_find )
                             else:
                                 log.info('Result : ')
                                 log.info(output_val)
@@ -310,7 +307,7 @@ class StringOperation:
                                 output=position
                         else:
                             output='false'
-                            logger.print_on_console('The Original String is ',actual_string ,' and ' , actual_string , ' does not Contain ', to_find_d )      
+                            logger.print_on_console('The Original String is ',actual_string ,' and ' , actual_string , ' does not Contain ', to_find )      
                     elif wildcard_option == "":
                         coreutilsobj=core_utils.CoreUtils()
                         actual_string=coreutilsobj.get_UTF_8(actual_string)
