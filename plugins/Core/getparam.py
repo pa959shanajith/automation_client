@@ -176,10 +176,14 @@ class GetParam():
             elif filepath.split("/")[0] == "avoassure":
                 """datatable check goes here"""
                 key = filepath.split("/")[1]
-                dt = [item for item in datatables if item.get(key) != None]
-                if len(dt) != 0:
+                dt = None
+                for item in datatables:
+                    if item.get(key) != None:
+                        dt = item.get(key)
+                        break
+                if dt:
                     log.info('Datatable exists')
-                    columnNamesList = list(dt[0].get(filepath.split("/")[1])[0].keys())
+                    columnNamesList = list(dt[0].keys())
                     log.info('Store the data into the set to remove the duplicate column names')
                     columnNamesSet = set(columnNamesList)
                     log.info('Comparing the length of the columnNamesList and columnNamesSet ')
