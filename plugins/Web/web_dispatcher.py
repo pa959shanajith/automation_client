@@ -670,15 +670,18 @@ class Dispatcher:
                 if result != TERMINATE:
                     result=list(result)
                     screen_details=mythread.json_data['suitedetails'][0]
+                    sauceFlag=False
+                    if execution_env['env'] == 'saucelabs':
+                        sauceFlag=True
                     if configvalues['screenShot_Flag'].lower() == 'fail':
                         if result[0].lower() == 'fail':
                             file_path = screen_shot_obj.captureScreenshot(screen_details,web=False)
-                            if headless_mode:
+                            if headless_mode or sauceFlag:
                                 driver.save_screenshot(file_path[2])
                             result.append(file_path[2])
                     elif configvalues['screenShot_Flag'].lower() == 'all':
                         file_path = screen_shot_obj.captureScreenshot(screen_details,web=False)
-                        if headless_mode:
+                        if headless_mode or sauceFlag:
                             driver.save_screenshot(file_path[2])
                         result.append(file_path[2])
         except TypeError as e:
