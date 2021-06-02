@@ -268,7 +268,7 @@ class StringOperation:
             logger.print_on_console(err_msg)
         return status,result,output,err_msg
 
-    def find(self, actual_string,to_find):
+    def find(self, input,*args):
         """
         def : find
         purpose : to find if string conatins another string
@@ -280,26 +280,58 @@ class StringOperation:
         err_msg=None
         output=OUTPUT_CONSTANT
         position=[]
+        wildcard_find = False
+        actual_string = input
+        to_find = args[0]
+        to_find_d = to_find
+        wildcard_option = args[1].lower() if(len(args) == 2) else ""
+        if (wildcard_option != ""):
+            if (wildcard_option == 'wildcard'):
+                if '?' in to_find or "*" in to_find:
+                    wildcard_find = True
         try:
             if not (actual_string is None or actual_string is ''):
                 if not (to_find is None or to_find is ''):
-                    coreutilsobj=core_utils.CoreUtils()
-                    actual_string=coreutilsobj.get_UTF_8(actual_string)
-                    actual_string=unidecode(actual_string)
-                    to_find=coreutilsobj.get_UTF_8(to_find)
-                    #output_val = actual_string.find(to_find)
-                    position = [i+1 for i in range(len(actual_string)) if actual_string.startswith(to_find, i)]
-                    output_val = len(position)
-                    if len(position) == 1: position=position[0]
-                    if(output_val == 0):
-                        logger.print_on_console('The Original String is:',actual_string ,' and ' , actual_string , ' does not Contain ', to_find )
-                        output='false'
+                    if (wildcard_find == True):
+                        if len(to_find) <= len(actual_string):
+                            position=self.find_wildcard(actual_string,to_find)
+                            position=list(set(position))
+                            position.sort()
+                            position=position[:1]
+                            output_val = len(position)
+                            if(output_val == 0):
+                                output='false'
+                                logger.print_on_console('The Original String is ',actual_string ,' and ' , actual_string , ' does not Contain ', to_find_d )
+                            else:
+                                log.info('Result : ')
+                                log.info(output_val)
+                                status=generic_constants.TEST_RESULT_PASS
+                                result=generic_constants.TEST_RESULT_TRUE
+                                output=position
+                        else:
+                            output='false'
+                            logger.print_on_console('The Original String is ',actual_string ,' and ' , actual_string , ' does not Contain ', to_find_d )      
+                    elif wildcard_option == "":
+                        coreutilsobj=core_utils.CoreUtils()
+                        actual_string=coreutilsobj.get_UTF_8(actual_string)
+                        actual_string=unidecode(actual_string)
+                        to_find=coreutilsobj.get_UTF_8(to_find)
+                        #output_val = actual_string.find(to_find)
+                        position = [i+1 for i in range(len(actual_string)) if actual_string.startswith(to_find, i)]
+                        output_val = len(position)
+                        if len(position) == 1: position=position[0]
+                        if(output_val == 0):
+                            logger.print_on_console('The Original String is:',actual_string ,' and ' , actual_string , ' does not Contain ', to_find )
+                            output='false'
+                        else:
+                            log.info('Result : ')
+                            log.info(output_val)
+                            status=generic_constants.TEST_RESULT_PASS
+                            result=generic_constants.TEST_RESULT_TRUE
+                            output=position
                     else:
-                        log.info('Result : ')
-                        log.info(output_val)
-                        status=generic_constants.TEST_RESULT_PASS
-                        result=generic_constants.TEST_RESULT_TRUE
-                        output=position
+                        output='false'
+                        err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
             else:
                 #log.error(INVALID_INPUT)
                 err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
@@ -607,3 +639,30 @@ class StringOperation:
             log.error(e)
             logger.print_on_console(err_msg)
         return status,result,output,err_msg
+
+    def find_wildcard(self,actual_string,to_find):
+        """
+        def : find_wildcard
+        purpose : finds the to_find with wildcard in the actualstring
+        param  : actual_string, to_find
+        return : postion of where the string is found
+        """
+        pos=[]
+        position=[]
+        try:
+            log.debug("inside find wildcard")
+            to_find = to_find.replace('?','.')
+            to_find = to_find.replace('*','.*')
+            if to_find.count('.')>0 and to_find != '':
+                pattern = re.compile(r"{}".format(to_find))
+                match = pattern.findall(actual_string)
+                if match:
+                    for m in match:
+                        pos = [i+1 for i in range(len(actual_string)) if actual_string.startswith(m, i)]
+                        position.extend(pos)
+        except Exception as e:
+            err_msg="Error occured in find wildcard"
+            log.error(err_msg)
+            log.error(e)
+            logger.print_on_console(err_msg)
+        return position
