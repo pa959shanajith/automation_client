@@ -1002,11 +1002,10 @@ class Controller():
             for k,v in handler.local_handler.awsKeywords.items():
                 if list(v) != []:
                     temp[k]=list(v)
-            handler.local_handler.awsKeywords=temp
-            if (handler.local_handler.awsKeywords):
+            if (temp):
                 logger.print_on_console("***Following Testcases are not AWS Compatible because of the following keywords :***")
                 log.info("***Following Testcases are not AWS Compatible because of the following keywords :***")
-                for k,v in handler.local_handler.awsKeywords.items():
+                for k,v in temp.items():
                     logger.print_on_console(k,':',list(v))
                     log.info(k+':'+str(list(v)))
         print('=======================================================================================================')
@@ -1509,11 +1508,10 @@ class Controller():
                 for k,v in handler.local_handler.awsKeywords.items():
                     if list(v) != []:
                         temp[k]=list(v)
-                handler.local_handler.awsKeywords=temp
-                if (handler.local_handler.awsKeywords):
+                if (temp):
                     logger.print_on_console("***Following Testcases are not AWS Compatible because of the following keywords :***")
                     log.info("***Following Testcases are not AWS Compatible because of the following keywords :***")
-                    for k,v in handler.local_handler.awsKeywords.items():
+                    for k,v in temp.items():
                         logger.print_on_console(k,':',list(v))
                         log.info(k+':'+str(list(v)))
             log.info('---------------------------------------------------------------------')
