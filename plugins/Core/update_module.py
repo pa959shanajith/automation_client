@@ -97,7 +97,31 @@ class Update_Rollback:
                     data_value.append(data_from_server['iceversion'][v][sv]['sha256'])
                     self.data_tags.update( {data_key : data_value} )
             self.check_flag = True
-            if (list(self.client_tag.keys())[0] >= self.fetch_current_value()):self.update_flag = False
+
+            #client version from clinet manifest
+            client_version = list(self.client_tag.keys())[0]
+            if 'rc' in str(client_version):
+                client_version = client_version.replace("-rc.",".") # converting '-rc.' ->'.' for easier comparison
+
+            #latest client version from server manifest
+            server_version = self.fetch_current_value()
+            if 'rc' in str(server_version):
+                server_version = server_version.replace("-rc.",".") # converting '-rc.' ->'.' for easier comparison
+
+            def compare(v1,v2):
+                v1 = [int(v) for v in v1.split(".")]
+                v2 = [int(v) for v in v2.split(".")]
+                for i in range(max(len(v1),len(v2))):
+                    vs1 = v1[i] if i< len(v1) else 0
+                    vs2 = v2[i] if i< len(v2) else 0
+                    if vs1 > vs2:
+                        return 1
+                    elif vs1 < vs2:
+                        return -1
+                return 0
+
+            compare_res = compare(client_version,server_version)
+            if ( compare_res == 1 or compare_res == 0 ):self.update_flag = False
             else:self.update_flag = True
         except Exception as e:
             log.error( "Error in update_check : " + str(e),exc_info=True)

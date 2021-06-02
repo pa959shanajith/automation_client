@@ -1002,11 +1002,10 @@ class Controller():
             for k,v in handler.local_handler.awsKeywords.items():
                 if list(v) != []:
                     temp[k]=list(v)
-            handler.local_handler.awsKeywords=temp
-            if (handler.local_handler.awsKeywords):
+            if (temp):
                 logger.print_on_console("***Following Testcases are not AWS Compatible because of the following keywords :***")
                 log.info("***Following Testcases are not AWS Compatible because of the following keywords :***")
-                for k,v in handler.local_handler.awsKeywords.items():
+                for k,v in temp.items():
                     logger.print_on_console(k,':',list(v))
                     log.info(k+':'+str(list(v)))
         print('=======================================================================================================')
@@ -1506,11 +1505,10 @@ class Controller():
                 for k,v in handler.local_handler.awsKeywords.items():
                     if list(v) != []:
                         temp[k]=list(v)
-                handler.local_handler.awsKeywords=temp
-                if (handler.local_handler.awsKeywords):
+                if (temp):
                     logger.print_on_console("***Following Testcases are not AWS Compatible because of the following keywords :***")
                     log.info("***Following Testcases are not AWS Compatible because of the following keywords :***")
-                    for k,v in handler.local_handler.awsKeywords.items():
+                    for k,v in temp.items():
                         logger.print_on_console(k,':',list(v))
                         log.info(k+':'+str(list(v)))
             log.info('---------------------------------------------------------------------')
@@ -1722,9 +1720,19 @@ class Controller():
             log1 = logging.getLogger("controller.py") #Disable loggers from imported modules
             if(log1.handlers):
                 log1.handlers.clear()
-            if len(browsers_data)>2 and json_data['exec_env'].lower() =='saucelabs':
-                logger.print_on_console('Warning! Execution in saucelabs can happen in 2 browsers parallely')
-                browsers_data=browsers_data
+            if json_data['exec_env'].lower() =='saucelabs':
+                import web_keywords
+                import sauceclient
+                s=web_keywords.Sauce_Config()
+                s.get_sauceconf()
+                sc=s.get_sauceclient()
+                a=sauceclient.Account(sc)
+                maxlength=a.get_concurrency()['concurrency']['ancestor']['allowed']['overall']
+                curlength=a.get_concurrency()['concurrency']['ancestor']['current']['overall']
+                browserlength=maxlength-curlength
+                if len(browsers_data) > browserlength:
+                    browsers_data=browsers_data[:browserlength]
+                    logger.print_on_console('Available Instance for Execution is ' + str(browserlength) + " browsers")
             for i in range (len(browsers_data)):
                 jsondata_dict[i] = copy.deepcopy(json_data)
                 for j in range(len(jsondata_dict[i]['suitedetails'])):

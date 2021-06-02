@@ -46,11 +46,8 @@ class StringOperation:
                         output = output+char.lower()
                     else:
                         output=output+char
-    ##                logger.print_on_console('Result : ',output)
                 coreutilsobj=core_utils.CoreUtils()
                 output=coreutilsobj.get_UTF_8(output)
-##                output = input.lower()
-##                logger.print_on_console('Result : ',output)
                 log.info('Result : ')
                 log.info(output)
                 status=generic_constants.TEST_RESULT_PASS
@@ -88,7 +85,6 @@ class StringOperation:
                         output = output+char.upper()
                     else:
                         output=output+char
-##                logger.print_on_console('Result : ',output)
                 coreutilsobj=core_utils.CoreUtils()
                 output=coreutilsobj.get_UTF_8(output)
                 log.info('Result : ')
@@ -119,7 +115,6 @@ class StringOperation:
         try:
             if not (input is None or input is ''):
                 output = input.strip()
-##                logger.print_on_console('Result : ',output)
                 log.info('Result : ')
                 log.info(output)
                 status=generic_constants.TEST_RESULT_PASS
@@ -153,7 +148,6 @@ class StringOperation:
                     actual_string=coreutilsobj.get_UTF_8(actual_string)
                     index_toint = int(index)
                     output = actual_string[:index_toint]
-##                    logger.print_on_console('Result : ',output)
                     output=coreutilsobj.get_UTF_8(output)
                     log.info('Result : ')
                     log.info(output)
@@ -189,7 +183,6 @@ class StringOperation:
                     if index_toint > 0:
                         actual_string=coreutilsobj.get_UTF_8(actual_string)
                         output = actual_string[-index_toint:]
-##                        logger.print_on_console('Result : ',output)
                         output=coreutilsobj.get_UTF_8(output)
                         log.info('Result : ')
                         log.info(output)
@@ -289,7 +282,7 @@ class StringOperation:
         try:
             if not (actual_string is None or actual_string is ''):
                 if not (to_find is None or to_find is ''):
-                    if (wildcard_find == True):
+                    if wildcard_find:
                         if len(to_find) <= len(actual_string):
                             position=self.find_wildcard(actual_string,to_find)
                             position=list(set(position))
@@ -298,7 +291,9 @@ class StringOperation:
                             output_val = len(position)
                             if(output_val == 0):
                                 output='false'
-                                logger.print_on_console('The Original String is ',actual_string ,' and ' , actual_string , ' does not Contain ', to_find )
+                                out_msg = 'The Original String is '+actual_string+' and '+actual_string+' does not contain '+to_find
+                                logger.print_on_console(out_msg)
+                                log.info(out_msg)
                             else:
                                 log.info('Result : ')
                                 log.info(output_val)
@@ -307,7 +302,9 @@ class StringOperation:
                                 output=position
                         else:
                             output='false'
-                            logger.print_on_console('The Original String is ',actual_string ,' and ' , actual_string , ' does not Contain ', to_find )      
+                            out_msg = 'The Original String is '+actual_string+' and '+actual_string+' does not contain '+to_find
+                            logger.print_on_console(out_msg)
+                            log.info(out_msg)
                     elif wildcard_option == "":
                         coreutilsobj=core_utils.CoreUtils()
                         actual_string=coreutilsobj.get_UTF_8(actual_string)
@@ -318,7 +315,9 @@ class StringOperation:
                         output_val = len(position)
                         if len(position) == 1: position=position[0]
                         if(output_val == 0):
-                            logger.print_on_console('The Original String is:',actual_string ,' and ' , actual_string , ' does not Contain ', to_find )
+                            out_msg = 'The Original String is '+actual_string+' and '+actual_string+' does not contain '+to_find
+                            logger.print_on_console(out_msg)
+                            log.info(out_msg)
                             output='false'
                         else:
                             log.info('Result : ')
@@ -335,9 +334,12 @@ class StringOperation:
                 #logger.print_on_console(INVALID_INPUT)
         except Exception as e:
             log.error(e)
-            logger.print_on_console(e)
+            err_msg = "Error in find keyword"
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
         if err_msg!=None:
             logger.print_on_console(err_msg)
+            log.error(err_msg)
         return status,result,output,err_msg
 
     def replace(self, actual_string, to_be_replaced , value ):

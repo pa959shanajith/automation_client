@@ -69,7 +69,10 @@ class Clickandadd():
                         currenthandle = eachdriverhand
                         break
 
-            driver.switch_to.window(currenthandle)
+            if currenthandle in driver.window_handles:
+                driver.switch_to.window(currenthandle)
+            else:
+                driver.switch_to.window(driver.current_window_handle)
             log.info('Performing the start click and add operation on default/outer page')
             driver.execute_script(webscrape_utils_obj.javascript_clicknadd, driver.current_url,browser)
             log.info('start click and add operation on default/outer page done')

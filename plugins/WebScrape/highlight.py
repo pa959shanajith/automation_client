@@ -53,7 +53,10 @@ class Highlight():
 
             # Switch to current handle and further to outer page
             if self.currenthandle != None or self.currenthandle != '':
-                self.driver.switch_to.window(self.currenthandle)
+                if self.currenthandle in self.driver.window_handles:
+                    self.driver.switch_to.window(self.currenthandle)
+                else:
+                    self.driver.switch_to.window(self.driver.current_window_handle)
             self.driver.switch_to.default_content()
 
             # XPath and URL decryption logic implemented
