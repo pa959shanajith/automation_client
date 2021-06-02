@@ -1315,7 +1315,7 @@ class Singleton_DriverUtil():
         if (browser_num == '1'):
             try:
                 chrome_path = configvalues['chrome_path']
-                chrome_profile=configvalues["chrome_profile"]
+                chrome_profile=os.path.normpath(configvalues["chrome_profile"])
                 exec_path = webconstants.CHROME_DRIVER_PATH
                 # flag1 = self.chrome_version(driver)
                 if core.chromeFlag:
