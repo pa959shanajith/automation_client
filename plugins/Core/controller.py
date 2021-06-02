@@ -815,8 +815,9 @@ class Controller():
         while (i < len(tsplist)):
             #Check for 'terminate_flag' before execution
             if not(terminate_flag):
-                #check to Run till the ending range of run from step
-                if i >= last_step_val: break
+                if self.runfrom_step_range_input:
+                    #checks if the current step num is greater than ending range of run from step, to Run till the ending range of run from step
+                    if tsplist[i].stepnum > last_step_val: break
                 #Check for 'pause_flag' before execution
                 if pause_flag:
                     self.pause_execution()
@@ -960,8 +961,20 @@ class Controller():
                 starting_val_end_range = first_step_val + 1
                 if first_step_val > 0 and first_step_val <= tsplist[-1].stepnum:
                     if last_step_val > first_step_val and last_step_val <= tsplist[-1].stepnum:
-                        runfrom_step = first_step_val
-                        start_debug = True
+                        testcase_details=testcase[0]['testcase']
+                        no_of_steps=(last_step_val-first_step_val)+1
+                        comment_step_count=0
+                        tdlist=testcase_details[first_step_val-1:last_step_val]
+                        for i in tdlist:
+                            outputArray=i['outputVal'].split(';')
+                            if (len(outputArray)>=1 and  '##' == outputArray[-1]):
+                                comment_step_count=comment_step_count+1
+                        if comment_step_count<no_of_steps:
+                            runfrom_step = first_step_val             
+                            start_debug = True
+                        else:
+                            status=TERMINATE
+                            log.info('Steps are commented in the testcase for the given input for run from step')
                     else:
                         logger.print_on_console('Invalid step number!! Please provide ending range for run from step between ',starting_val_end_range,' to ',tsplist[-1].stepnum,'\n')
                         log.info('Invalid step number!! Please provide run from step number')
@@ -1143,6 +1156,7 @@ class Controller():
                             for testcase in [eval(scenario[scenario_id])]:
                                 #For every unique screen in list of test cases, store screen data
                                 for step in testcase:
+                                    step['apptype'] = scenario['apptype']
                                     screen_testcase_map[step['testcasename']] = {}
                                     screen_testcase_map[step['testcasename']]["screenname"] = step['screenname']
                                     screen_testcase_map[step['testcasename']]["screenid"] = step['screenid']
@@ -1493,6 +1507,18 @@ class Controller():
                 if con.reporting_obj.overallstatus != 'Pass': exc_pass = False
                 if not(execution_status):
                     status=TERMINATE
+            temp={}
+            if (handler.local_handler.awsKeywords):
+                for k,v in handler.local_handler.awsKeywords.items():
+                    if list(v) != []:
+                        temp[k]=list(v)
+                handler.local_handler.awsKeywords=temp
+                if (handler.local_handler.awsKeywords):
+                    logger.print_on_console("***Following Testcases are not AWS Compatible because of the following keywords :***")
+                    log.info("***Following Testcases are not AWS Compatible because of the following keywords :***")
+                    for k,v in handler.local_handler.awsKeywords.items():
+                        logger.print_on_console(k,':',list(v))
+                        log.info(k+':'+str(list(v)))
             log.info('---------------------------------------------------------------------')
             print('=======================================================================================================')
             log.info('***SUITE '+ str(suite_idx) +' EXECUTION COMPLETED***')

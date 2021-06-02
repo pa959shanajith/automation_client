@@ -222,6 +222,8 @@ class Handler():
             qc_creds=new_obj['integration']
             if 'reportType' in new_obj: report_type = new_obj['reportType']
             for json_data,suite_id in zip(suite_details,suiteId_list):
+                for i in json_data[suite_id]:
+                    i["apptype"] = new_obj['apptype']
                 suite_data.append(json_data[suite_id])
                 if 'scenarioIds' in json_data:
                     scenarioIds[suite_id]=json_data['scenarioIds']

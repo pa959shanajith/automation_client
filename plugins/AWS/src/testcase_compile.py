@@ -133,7 +133,7 @@ def scenario(driver):
                 f.write("\n\ttime.sleep(2)")
                 f.write("\n\t"+"result="+generic_keywords[t.name.lower()]+"(*"+str(t.inputval[0].split(';'))+")")
             else:
-                logger.print_on_console (t.name,' is not supported')
+                # logger.print_on_console (t.name,' is not supported')
                 log.error(t.name+' is not supported')
                 compile_status=False
                 continue
