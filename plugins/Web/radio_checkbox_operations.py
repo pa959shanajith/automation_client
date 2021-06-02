@@ -177,6 +177,7 @@ class RadioCheckboxKeywords():
                             elif self.utilobj.is_visible(webelement):
                                 # performing selenium code
                                 local_rco.log.debug('element is visible, performing selenium code')
+                                browser_Keywords.local_bk.driver_obj.execute_script("arguments[0].scrollIntoView({behavior: 'auto', block: 'center', inline: 'center'});", webelement)
                                 webelement.click()
                                 status=TEST_RESULT_PASS
                                 methodoutput=TEST_RESULT_TRUE
@@ -316,6 +317,7 @@ class RadioCheckboxKeywords():
                             elif self.utilobj.is_visible(webelement):
                                 # performing selenium code
                                 local_rco.log.debug('element is visible, performing selenium code')
+                                browser_Keywords.local_bk.driver_obj.execute_script("arguments[0].scrollIntoView({behavior: 'auto', block: 'center', inline: 'center'});", webelement)
                                 webelement.click()
                                 status=TEST_RESULT_PASS
                                 methodoutput=TEST_RESULT_TRUE
@@ -455,6 +457,7 @@ class RadioCheckboxKeywords():
                             if self.utilobj.is_visible(webelement):
                                 # performing selenium code
                                 local_rco.log.debug('element is visible, performing selenium code')
+                                browser_Keywords.local_bk.driver_obj.execute_script("arguments[0].scrollIntoView({behavior: 'auto', block: 'center', inline: 'center'});", webelement)
                                 webelement.click()
                                 status=TEST_RESULT_PASS
                                 methodoutput=TEST_RESULT_TRUE
