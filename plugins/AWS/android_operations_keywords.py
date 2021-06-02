@@ -704,10 +704,10 @@ class MobileOpeartions():
                         ##webelement.send_keys('0')
                         location=webelement.location
                         size=webelement.size
-                        start_x=location['x']
-                        start_y=location['y'] + (size['height']/2)
-                        end_x=location['x']
-                        end_y=location['y'] + (size['height']/2)
+                        start_x=int(location['x'])
+                        start_y=int(location['y'] + (size['height']/2))
+                        end_x=int(location['x'])
+                        end_y=int(location['y'] + (size['height']/2))
                         
                         driver.swipe(start_x,start_y,end_x,end_y,3000)
                         status=TEST_RESULT_PASS
@@ -769,10 +769,10 @@ class MobileOpeartions():
                        log.debug('performing the action')
                        location=webelement.location
                        size=webelement.size
-                       start_x=location['x']
-                       start_y=location['y'] + (size['height']/2)
-                       end_x=location['x'] + (size['width'])
-                       end_y=start_y
+                       start_x=int(location['x'])
+                       start_y=int(location['y'] + (size['height']/2))
+                       end_x=int(location['x'] + (size['width']))
+                       end_y=int(start_y)
                        
                        driver.swipe(start_x,start_y,end_x,end_y,3000)
                        status=TEST_RESULT_PASS
