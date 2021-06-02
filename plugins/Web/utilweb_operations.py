@@ -1423,10 +1423,20 @@ class UtilWebKeywords:
                                 logger.print_on_console(err_msg)
                                 local_uo.log.error(err_msg)      
                 except Exception as e:
-                    log.error("Error in sendsecurefunction_keys")
+                    local_uo.log.error("Error in sendsecurefunction_keys")
                     err_msg=self.__web_driver_exception(e)              
-            return status, methodoutput, output, err_msg          
-       
+            return status,methodoutput,output,err_msg
+            
+
+    def check_user_activation(self, browserlogs):
+        if browserlogs and len(browserlogs) > 0:
+            for i in browserlogs:
+                if i['level'] == 'WARNING' and 'File chooser dialog can only be shown with a user activation' in i['message']:
+                    local_uo.log.error(i['message'])
+                    return False
+        return True
+
+
     # function used in get_attribute_value and verify_attribute to fetch the css property of an element 
     def fetchcss(self, webelement, attr_name):
         childSearchFlag=False
