@@ -1007,14 +1007,17 @@ class UtilWebKeywords:
         output=None
         eleStatus=False
         index=0
-        css_flag=True if input[-1]=='css' else False
+        css_flag = False
+        if input[-1].lower() == 'css':
+            css_flag = True
+            input.pop()
         local_uo.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if webelement != None and webelement !='' and webelement.tag_name.lower()=='table':
                 if len(input) >= 4 and int(input[3]) <= 0:
                     err_msg = self._index_zero()
                 elif input[2]:
-                    if((len(input) == 5 or (css_flag and len(input) == 6)) and all(v for v in input) and (not input[2] == 'tr')):
+                    if(len(input) == 5 and all(v for v in input) and (not input[2] == 'tr')):
                         attr_name=input[4]
                         webelement1=None
                         row_number=int(input[0])-1
@@ -1043,19 +1046,19 @@ class UtilWebKeywords:
                             logger.print_on_console(err_msg)
                             local_uo.log.error(err_msg)
                 # checking attribute value of table itself
-                elif((len(input) == 5 or (css_flag and len(input) == 6)) and (not all(i for i in input[:-1]))):
+                elif(len(input) == 5 and (not all(i for i in input[:-1]))):
                     attr_name=input[4]
                     eleStatus=True
-                elif((len(input) == 5 or (css_flag and len(input) == 6)) and (not input[2])):
+                elif(len(input) == 5 and (not input[2])):
                     err_msg = 'Input Error: Please specify valid object type'
                     logger.print_on_console(err_msg)
                     local_uo.log.error(err_msg)
             elif(len(input)==1) and not err_msg:
                 attr_name=input[0]
                 eleStatus=True
-            elif css_flag and (len(input) == 2) and not err_msg:
-                attr_name = input[0]
-                eleStatus=True
+            # elif css_flag and (len(input) == 2) and not err_msg:
+            #     attr_name = input[0]
+            #     eleStatus=True
             if(eleStatus): 
                 if webelement != None and webelement !='':
                     local_uo.log.info(INPUT_IS)
@@ -1075,36 +1078,7 @@ class UtilWebKeywords:
                                 logger.print_on_console(err_msg)
                                 local_uo.log.error(err_msg)
                         else:
-                            childSearchFlag=False
-                            props={'border' : ['border-top','border-right', 'border-bottom','border-left'],
-                            'margin' : ['margin-top', 'margin-right','margin-bottom', 'margin-left'],
-                            'padding' : ['padding-top', 'padding-right','padding-bottom', 'padding-left']}
-                            value = webelement.value_of_css_property(attr_name)
-                            if value == '' and attr_name in ['padding', 'margin', 'border', 'border-top', 'border-right', 'border-bottom', 'border-left']:
-                                # if isinstance(browser_Keywords.local_bk.driver_obj, webdriver.Firefox):
-                                err_msg = 'Please find attribute value using either of ('                       
-                                if attr_name == 'border' and isinstance(browser_Keywords.local_bk.driver_obj, webdriver.Firefox):
-                                    err_msg += 'border-top border-right border-bottom border-left'
-                                if attr_name=='padding' or attr_name=='margin' or attr_name=='border' :  
-                                    for i in props[attr_name]:
-                                        newValue = webelement.value_of_css_property(i)
-                                        if newValue != '':
-                                            err_msg+=' '
-                                            err_msg+=i
-                                        childSearchFlag=True
-                                    err_msg+=')'
-                                    logger.print_on_console(err_msg)
-                                    local_uo.log.error(err_msg)
-                                elif attr_name in ['border-top', 'border-right', 'border-bottom', 'border-left']:
-                                    finalValue=''
-                                    for j in ['-width','-style','-color']:
-                                        attr = attr_name + j
-                                        val = webelement.value_of_css_property(attr)
-                                        if val != '':
-                                            finalValue += val
-                                            finalValue+=' '
-                                    if finalValue:
-                                        value = finalValue
+                            value,childSearchFlag = self.fetchcss(webelement, attr_name)
                             if value != '':
                                 # show output
                                 output = value
@@ -1137,13 +1111,16 @@ class UtilWebKeywords:
         original_attr=None
         output=OUTPUT_CONSTANT
         local_uo.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
-        css_flag = True if input[-1] == 'css' else False
+        css_flag = False
+        if input[-1].lower() == 'css':
+            css_flag = True
+            input.pop()
         try:
             if webelement != None and webelement !='' and webelement.tag_name.lower()=='table':
                 if len(input) >= 4 and int(input[3]) <= 0:
                     err_msg = self._index_zero()
                 elif input[2]:
-                    if((len(input)==5 or len(input)==6 or (css_flag and (len(input)==6 or len(input)==7))) and all(v for v in input) and (not input[2]=='tr')):
+                    if((len(input)==5 or len(input)==6) and all(v for v in input) and (not input[2]=='tr')):
                         attr_name=input[4]
                         webelement1=None
                         row_number=int(input[0])-1
@@ -1171,19 +1148,19 @@ class UtilWebKeywords:
                             err_msg = 'Input Error: Please specify index'
                             logger.print_on_console(err_msg)
                             local_uo.log.error(err_msg)
-                elif((len(input)==5 or len(input)==6 or (css_flag and (len(input)==6 or len((input)==7)) )) and (not all(ip for ip in input[0:4]))): #checking attribute value of table itself
+                elif((len(input)==5 or len(input)==6 ) and (not all(ip for ip in input[0:4]))): #checking attribute value of table itself
                     attr_name=input[4]
                     eleStatus=True
-                elif((len(input)==5 or len(input)==6 or (css_flag and (len(input)==6 or len(input)==7))) and (not input[2])):
+                elif((len(input)==5 or len(input)==6 ) and (not input[2])):
                     err_msg = 'Input Error: Please specify valid object type'
                     logger.print_on_console(err_msg)
                     local_uo.log.error(err_msg)
             elif(len(input)==1 or len(input)==2) and not err_msg:
                 attr_name=input[0]
                 eleStatus=True
-            elif css_flag and (len(input) == 2 or len(input) == 3) and not err_msg:
-                attr_name = input[0]
-                eleStatus = True          
+            # elif css_flag and (len(input) == 2 or len(input) == 3) and not err_msg:
+            #     attr_name = input[0]
+            #     eleStatus = True          
             if(eleStatus):
                 if webelement != None and webelement !='':
                     local_uo.log.info(INPUT_IS)
@@ -1219,39 +1196,9 @@ class UtilWebKeywords:
                                 logger.print_on_console(err_msg)
                                 local_uo.log.error(err_msg)
                         elif css_flag:
-                            childSearchFlag=False
-                            props = {'border': ['border-top', 'border-right', 'border-bottom', 'border-left'],
-                                     'margin': ['margin-top', 'margin-right', 'margin-bottom', 'margin-left'],
-                                     'padding': ['padding-top', 'padding-right', 'padding-bottom', 'padding-left']}
-                            value = webelement.value_of_css_property(attr_name)
-                            if value == '' and attr_name in ['padding', 'margin', 'border', 'border-top', 'border-right', 'border-bottom', 'border-left']:
-                                # if isinstance(browser_Keywords.local_bk.driver_obj, webdriver.Firefox):
-                                err_msg = 'Please find attribute value using either of ('
-                                if attr_name == 'border' and isinstance(browser_Keywords.local_bk.driver_obj, webdriver.Firefox):
-                                    err_msg += 'border-top border-right border-bottom border-left'
-                                if attr_name == 'padding' or attr_name == 'margin' or attr_name == 'border':
-                                    for i in props[attr_name]:
-                                        newValue = webelement.value_of_css_property(i)
-                                        if newValue != '':
-                                            err_msg += ' '
-                                            err_msg += i
-                                        childSearchFlag=True
-                                    err_msg += ')'
-                                    logger.print_on_console(err_msg)
-                                    local_uo.log.error(err_msg)
-                                elif attr_name in ['border-top', 'border-right', 'border-bottom', 'border-left']:
-                                    finalValue = ''
-                                    for j in ['-width', '-style', '-color']:
-                                        attr = attr_name + j
-                                        val = webelement.value_of_css_property(attr)
-                                        if val != '':
-                                            finalValue += val
-                                            finalValue+=' '
-                                    if finalValue:
-                                        value = finalValue
-                                    else:
-                                        err_msg = "No such CSS attribute present in the element"
-                            elif value != '':
+                            # childSearchFlag = False
+                            value,childSearchFlag=self.fetchcss(webelement,attr_name)   
+                            if value != '':
                                 # show output
                                 if len(input) == 7: result = input[5]
                                 if len(input) == 3: result = input[1]
@@ -1481,5 +1428,38 @@ class UtilWebKeywords:
                 except Exception as e:
                     log.error("Error in sendsecurefunction_keys")
                     err_msg=self.__web_driver_exception(e)              
-            return status,methodoutput,output,err_msg
-            
+            return status, methodoutput, output, err_msg          
+       
+    # function used in get_attribute_value and verify_attribute to fetch the css property of an element 
+    def fetchcss(self, webelement, attr_name):
+        childSearchFlag=False
+        props = {'border': ['border-top', 'border-right', 'border-bottom', 'border-left'],
+                 'margin': ['margin-top', 'margin-right', 'margin-bottom', 'margin-left'],
+                 'padding': ['padding-top', 'padding-right', 'padding-bottom', 'padding-left']}
+        value = webelement.value_of_css_property(attr_name)
+        if value == '' and attr_name in ['padding', 'margin', 'border', 'border-top', 'border-right', 'border-bottom', 'border-left']:
+            # if isinstance(browser_Keywords.local_bk.driver_obj, webdriver.Firefox):
+            err_msg = 'Please find attribute value using either of ('
+            if attr_name == 'border' and isinstance(browser_Keywords.local_bk.driver_obj, webdriver.Firefox):
+                err_msg += 'border-top border-right border-bottom border-left'
+            if attr_name in list(props.keys()):  
+                for i in props[attr_name]:
+                    newValue = webelement.value_of_css_property(i)
+                    if newValue != '':
+                        err_msg += ' '
+                        err_msg += i
+                        childSearchFlag = True
+                err_msg += ')'
+                logger.print_on_console(err_msg)
+                local_uo.log.error(err_msg)
+            elif attr_name in ['border-top', 'border-right', 'border-bottom', 'border-left']:
+                finalValue = ''
+                for j in ['-width', '-style', '-color']:
+                    attr = attr_name + j
+                    val = webelement.value_of_css_property(attr)
+                    if val != '':
+                        finalValue += val
+                        finalValue += ' '
+                if finalValue:
+                    value = finalValue
+        return value, childSearchFlag
