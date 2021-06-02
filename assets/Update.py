@@ -197,7 +197,7 @@ class Updater:
             """Adding plugins folder to archive"""
             log.debug( 'Adding ' + source_ice + " to archive" )
             archive_command = r'"{}" a "{}" "{}"'.format(self.loc_7z, store_loc, source_ice)
-            sp1 = subprocess.Popen(archive_command, stderr = subprocess.STDOUT, stdout = subprocess.PIPE)
+            sp1 = subprocess.Popen(archive_command, stderr = subprocess.PIPE, stdout = subprocess.PIPE, stdin=subprocess.PIPE)
             out = sp1.communicate()[0].decode('utf-8')
             if ( "The process cannot access the file because it is being used by another process" in out ):
                 err_msg = 'Error!: unable to add files to backup. Backup-process failed as it cannot access the files in '+ str(source_ice) + ' as the files are being used by a different process'
@@ -208,7 +208,7 @@ class Updater:
             """Adding about_manifest file to archive"""
             log.debug( 'Adding '+source_client_manifest+ " to archive" )
             archive_command = r'"{}" a "{}" "{}"'.format(self.loc_7z, store_loc, source_client_manifest)
-            sp1 = subprocess.Popen(archive_command, stderr = subprocess.STDOUT, stdout = subprocess.PIPE)
+            sp1 = subprocess.Popen(archive_command, stderr = subprocess.PIPE, stdout = subprocess.PIPE, stdin=subprocess.PIPE)
             out = sp1.communicate()[0].decode('utf-8')
             if ( "The process cannot access the file because it is being used by another process" in out ):
                 err_msg = 'Error!: unable to add files to backup. Backup-process failed as it cannot access '+ str(source_client_manifest) + ' as this file is being used by a different process'
