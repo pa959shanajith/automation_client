@@ -197,8 +197,8 @@ class GetParam():
 
             return status
         except Exception as e:
-            log.error(e)
-            logger.print_on_console(e)
+            log.error(e,exc_info=True)
+            logger.print_on_console("Error while getting datatable")
 
     def readcsvfile(self,fileinfo):
         """
@@ -269,7 +269,7 @@ class GetParam():
             log.info('Returning the output dictionary')
             return myDict
         except Exception as e:
-            log.error(e)
+            log.error(e,exc_info=True)
             logger.print_on_console("Error while reading CSV file")
 
     def xmlTreeReader(self,xroot,sdata):
@@ -326,9 +326,8 @@ class GetParam():
                 log.info('Returning the output dictionary')
                 return sdata
         except Exception as e:
-            log.error(e)
-
-            logger.print_on_console(e)
+            log.error(e,exc_info=True)
+            logger.print_on_console("Error while reading xml data")
 
 
     def readxlsandxlsxfile(self,fileinfo):
@@ -367,9 +366,8 @@ class GetParam():
             data = ast.literal_eval(json.dumps(sdata))
             return data
         except Exception as e:
-            log.error(e)
-
-            logger.print_on_console(e)
+            log.error(e,exc_info=True)
+            logger.print_on_console("Error while reading excel data")
 
     def readDatatable(self,fileinfo,datatables):
         """
@@ -380,26 +378,23 @@ class GetParam():
         return : Returns dictionary (format: {'col1':['row1','row2']})
         """
         try:
-            sdata = dict()
             filepath = fileinfo[0]
             #fetch current datatable from list of datatable
             currentdt = filepath.split("/")[1]
-            dt = [item for item in datatables if item.get(currentdt) != None]
-            datatable = dt[0].get(currentdt)
+            for item in datatables:
+                if item.get(currentdt) != None:
+                    datatable = item.get(currentdt)
+                    break
             #format datatable into dictionary
             sdata = dict.fromkeys(datatable[0].keys())
             for col in sdata:
                 sdata[col] = []
                 for dt in datatable:
                     sdata[col].append(dt[col])
-            data = ast.literal_eval(json.dumps(sdata))
-            return data
+            return sdata
         except Exception as e:
-            log.error(e)
-            logger.print_on_console(e)
-
-
-
+            log.error(e,exc_info=True)
+            logger.print_on_console("Error while reading datatable")
 
 
     def getexternaldatalist(self,input,datatables):
@@ -445,7 +440,7 @@ class GetParam():
                 logger.print_on_console(  'Invalid file! Please provide valid file name and/or sheet name')
                 return getparamres
         except Exception as e:
-            log.error(e)
+            log.error(e,exc_info=True)
             logger.print_on_console('Error while reading file')
 
     def invokegetparam(self,input,datatables):
@@ -534,8 +529,8 @@ class GetParam():
                                 resultinput = resultinput.replace(variable,temp)
                                 inputlistwithval.insert(i,resultinput)
         except Exception as e:
-            log.error(e)
-            logger.print_on_console(e)
+            log.error(e,exc_info=True)
+            logger.print_on_console("Error while retrieving the value of static variable")
         return inputlistwithval
 
     def checkforstaticvariable(self,statvariable):
