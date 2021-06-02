@@ -859,29 +859,28 @@ class Dispatcher:
                 o.debug_object(inputs,self.wxObject,self.thread,driver)
                 attributes=driver.execute_script("return JSON.parse(window.localStorage.attributes)")
                 new_ele_type=driver.execute_script("return window.localStorage.element").lower()
-                tagname = identifiers[4].split("[")[0]
-                # typemap={'btn': 'button',
-                #         'chkbox': 'checkbox',
-                #         'elmnt': 'elmnt',
-                #         'img': 'img',
-                #         'lst': 'list',
-                #         'radiobtn': 'radiobutton',
-                #         'select': 'select',
-                #         'tbl': 'table',
-                #         'txtbox': 'input',
-                #         'lnk':'a'
-                # }
-                if (tagname!=new_ele_type):
+                typemap={'btn': 'button',
+                        'chkbox': 'checkbox',
+                        'elmnt': 'elmnt',
+                        'img': 'img',
+                        'lst': 'list',
+                        'radiobtn': 'radiobutton',
+                        'select': 'select',
+                        'tbl': 'table',
+                        'txtbox': 'input',
+                        'lnk':'a'
+                }
+                if (typemap[tagname]!=new_ele_type):
                     flag=False
                 if(flag==False):
                     o = pause_display_operation.PauseAndDisplay()
-                    inputs1={'custtype':tagname,'newtype':new_ele_type}
+                    inputs1={'custtype':typemap[tagname],'newtype':new_ele_type}
                     o.debug_error(inputs1,self.wxObject,self.thread)
                 ele='//*'
                 a=[]
                 combo=''
                 for k,v in list(attributes.items()):
-                    if k != 'style':
+                    if k in ['id','class','name','type']:
                         ele=ele+'[@'+k+'="'+v+'"]'
                         a.append('[@'+k+'="'+v+'"]')
                 tempwebElement=driver.find_elements_by_xpath(ele)
