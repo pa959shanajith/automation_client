@@ -484,7 +484,7 @@ class ButtonLinkKeyword():
         try:
             filepath = inputs[0]
             filename = inputs[1]
-            inputfile = filepath + os.sep + filename
+            inputfile = os.path.join(filepath, filename)
             if webelement != None:
                 local_blk.log.info('Recieved web element from the web dispatcher')
                 local_blk.log.debug(webelement)
@@ -503,14 +503,16 @@ class ButtonLinkKeyword():
                         local_blk.log.info(clickinfo)
                         filestatus = self.__upload_operation(inputfile,inputs)
                         local_blk.log.info(STATUS_METHODOUTPUT_UPDATE)
-                        status = webconstants.TEST_RESULT_PASS
-                        methodoutput = webconstants.TEST_RESULT_TRUE
+                        if filestatus:
+                            status = webconstants.TEST_RESULT_PASS
+                            methodoutput = webconstants.TEST_RESULT_TRUE
                     else:
                         if self.__click_for_file_upload(browser_Keywords.local_bk.driver_obj,webelement):
                             filestatus =self.__upload_operation(inputfile,inputs)
                             local_blk.log.info(STATUS_METHODOUTPUT_UPDATE)
-                            status = webconstants.TEST_RESULT_PASS
-                            methodoutput = webconstants.TEST_RESULT_TRUE
+                            if filestatus:
+                                status = webconstants.TEST_RESULT_PASS
+                                methodoutput = webconstants.TEST_RESULT_TRUE
                 else:
                     err_msg = WEB_ELEMENT_DISABLED
         except Exception as e:
@@ -575,7 +577,7 @@ class ButtonLinkKeyword():
             #self.__set_clipboard_data(inputfile)
             robot.sleep(1)
             maxTries = 10
-            time_sleep = 0.5
+            time_sleep = 1.0
             if len(args) > 2:
                 maxTries = int(int(args[2]) / time_sleep) + 1
             result_call = self.upload_time_func(maxTries, time_sleep)
