@@ -1073,7 +1073,6 @@ class Controller():
             logger.print_on_console('***SUITE ', str(suite_idx) ,' EXECUTION STARTED***')
             log.info('---------------------------------------------------------------------')
             print('=======================================================================================================')
-            do_not_execute = False
             exc_pass = True
             base_execute_data = {
                 'batchId': batch_id,
@@ -1083,36 +1082,173 @@ class Controller():
             socketIO.emit("return_status_executeTestSuite", dict({"status": "started",
                 'startTime': datetime.now().strftime(TIME_FORMAT)}, **base_execute_data))
             execute_result_data = dict({'scenarioId': None, 'reportData': None}, **base_execute_data)
-            #Check for the disabled scenario
-            if not (do_not_execute):
-                if aws_mode:
-                    pytest_files=[]
-                 #Logic to Execute each suite for each of the browser
-                for browser in browser_type[suite_id]:
-                    local_cont.module_stop = False
-                    sc_idx = 0
-                    condition_check_flag = False
-                    #Logic to iterate through each scenario in the suite
-                    for scenario,scenario_id,condition_check_value,dataparam_path_value in zip(suite_id_data,scenarioIds[suite_id],condition_check[suite_id],dataparam_path[suite_id]):
-                        execute_flag=True
-                        #check if accessibility parameters are present if not initialize empty array
-                        if "accessibilityMap" in suite and scenario_id in suite['accessibilityMap']:
-                            accessibility_parameters = suite['accessibilityMap'][scenario_id]
+            if aws_mode:
+                pytest_files=[]
+                #Logic to Execute each suite for each of the browser
+            for browser in browser_type[suite_id]:
+                local_cont.module_stop = False
+                sc_idx = 0
+                condition_check_flag = False
+                #Logic to iterate through each scenario in the suite
+                for scenario,scenario_id,condition_check_value,dataparam_path_value in zip(suite_id_data,scenarioIds[suite_id],condition_check[suite_id],dataparam_path[suite_id]):
+                    execute_flag=True
+                    #check if accessibility parameters are present if not initialize empty array
+                    if "accessibilityMap" in suite and scenario_id in suite['accessibilityMap']:
+                        accessibility_parameters = suite['accessibilityMap'][scenario_id]
+                    else:
+                        accessibility_parameters = []
+                    con.reporting_obj=reporting.Reporting()
+                    con.configvalues=configvalues
+                    con.exception_flag=self.exception_flag
+                    con.wx_object=wxObject
+                    handler.local_handler.tspList=[]
+                    accessibility_reports = []
+                    execute_result_data['scenarioId'] = scenario_id
+                    #condition check for scenario execution and reporting for condition check
+                    if not(condition_check_flag):
+                            #check for terminate flag before printing loggers
+                        if not(terminate_flag):
+                            print('=======================================================================================================')
+                            logger.print_on_console( '***Scenario ' ,str(sc_idx + 1) ,' execution started***')
+                            print('=======================================================================================================')
+                            log.info('***Scenario '  + str(sc_idx + 1)+ ' execution started***')
+                        # if('integrationType' not in qc_creds and len(scenario)==2 and len(scenario['qcdetails'])==10):
+
+                        # if('integrationType' in qc_creds and qc_creds['integrationType'] == 'ALM'):
+                        integ = 0
+                        if(qc_creds["alm"]["url"] != "" and len(scenario["qcdetails"]) != 0):
+                            qc_username=qc_creds['alm']['username']
+                            qc_password=qc_creds['alm']['password']
+                            qc_url=qc_creds['alm']['url']
+                            qc_sceanrio_data=scenario['qcdetails'][integ]
+                            integ += 1
+                        # if('integrationType' in qc_creds and qc_creds['integrationType'] == 'qTest'):
+                        if(qc_creds["qtest"]["url"] != "" and len(scenario["qcdetails"]) != 0):
+                            qtest_username=qc_creds["qtest"]["username"]
+                            qtest_password=qc_creds["qtest"]["password"]
+                            qtest_url=qc_creds["qtest"]["url"]
+                            qtest_stepsup=qc_creds["qtest"]["qteststeps"]
+                            qc_sceanrio_data=scenario['qcdetails'][integ]
+                            integ += 1
+                            qtest_project=qc_sceanrio_data['qtestproject']
+                            qtest_projectid=qc_sceanrio_data['qtestprojectid']
+                            qtest_suite=qc_sceanrio_data['qtestsuite']
+                            qtest_suiteid=qc_sceanrio_data['qtestsuiteid']
+                        # if('integrationType' in qc_creds and qc_creds['integrationType'] == 'Zephyr'):
+                        if(qc_creds["zephyr"]["url"] != "" and len(scenario["qcdetails"]) != 0):
+                            zephyr_url=qc_creds["zephyr"]["url"]
+                            zephyr_username=qc_creds["zephyr"]["username"]
+                            zephyr_password=qc_creds["zephyr"]["password"]
+                            zephyr_sceanrio_data=scenario['qcdetails'][integ]
+                            integ += 1
+                            zephyr_releaseid=zephyr_sceanrio_data['releaseid']
+                            zephyr_projectid=zephyr_sceanrio_data['projectid']
+                            zephyr_treeid=zephyr_sceanrio_data['treeid']
+                            zephy_testid=zephyr_sceanrio_data['testid']
+
+                        #Iterating through each test case in the scenario
+                        for testcase in [eval(scenario[scenario_id])]:
+                            #For every unique screen in list of test cases, store screen data
+                            for step in testcase:
+                                step['apptype'] = scenario['apptype']
+                                screen_testcase_map[step['testcasename']] = {}
+                                screen_testcase_map[step['testcasename']]["screenname"] = step['screenname']
+                                screen_testcase_map[step['testcasename']]["screenid"] = step['screenid']
+                                screen_testcase_map[step['testcasename']]["cycleid"] = suite['cycleid']
+                                screen_testcase_map["executionid"] = execute_result_data['executionId']
+                                screen_testcase_map[step['testcasename']]['accessibility_parameters'] = accessibility_parameters
+                            #check for temrinate flag before parsing tsp list
+                            if terminate_flag:
+                                break
+                            flag,_,last_tc_num,testcase_empty_flag,empty_testcase_names=obj.parse_json(testcase,dataparam_path_value)
+                            if flag == False:
+                                break
+                            print('\n')
+                            if (True in testcase_empty_flag):
+                                if(condition_check_value==1):
+                                    condition_check_flag = True
+                                    logger.print_on_console('Condition Check: Terminated by program ')
+                                info_msg=str("Scenario cannot be executed, since the following testcases are empty: "+','.join(empty_testcase_names))
+                                logger.print_on_console(info_msg)
+                                log.info(info_msg)
+                                status = TERMINATE
+                                execute_flag=False
+                            else:
+                                tsplist = handler.local_handler.tspList
+                                if aws_mode:
+                                    aws_tsp.append(tsplist)
+                                if len(tsplist)==0:
+                                    continue
+                                if not(aws_mode):
+                                    for k in range(len(tsplist)):
+                                        if tsplist[k].name.lower() == 'openbrowser' and tsplist[k].apptype.lower()=='web' and (IGNORE_THIS_STEP not in tsplist[k].inputval[0].split(';')):
+                                            tsplist[k].inputval = [browser]
+                        if aws_mode:
+                            compile_status=False
+                            scen_id=scenario_id.split('"')
+                            aws_scenario=aws_scenario+scen_id
+                            scenario_name=json_data['suitedetails'][suite_idx-1]["scenarioNames"][sc_idx]
+                            if not terminate_flag:
+                                compile_status,pytest_file=tc_obj.compile_tc(tsplist,sc_idx+1,scenario_name)
+                            if compile_status:
+                                pytest_files.append(pytest_file)
+                                msg='***Scenario'+str(sc_idx + 1)+': '+scenario_name+' Compiled for AWS Execution***'
+                                print(line_separator)
+                                logger.print_on_console(msg)
+                                print(line_separator)
+                                log.info(line_separator)
+                                log.info(msg)
+                                log.info(line_separator)
+                            else:
+                                terminate_flag=True
+                                msg='***Scenario'+str(sc_idx+ 1)+': '+scenario_name+' is Terminated ***'
+                                logger.print_on_console(msg)
+                                log.info(msg)
+                                tsplist=[]
+                            sc_idx+=1
+                            execute_flag=False
+                        execution_env = json_data.get('exec_env', 'default').lower()
+                        if execution_env == 'saucelabs':
+                            # self.__load_web()
+                            # import script_generator
+                            scenario_name=json_data['suitedetails'][suite_idx-1]["scenarioNames"][sc_idx]
+                            execution_env = {'env':'saucelabs','scenario':scenario_name}
+                            now=datetime.now()
+                            # if not terminate_flag:
+                            #     saucelabs_obj=script_generator.SauceLabs_Operations(scenario_name,str(saucelabs_count))
+                            #     status=saucelabs_obj.complie_TC(tsplist,scenario_name,browser,str(saucelabs_count),execute_result_data,socketIO)
+                            # if status==TERMINATE:
+                            #     terminate_flag=True
+                            #     msg='***Scenario'+str(sc_idx+ 1)+': '+scenario_name+' is Terminated ***'
+                            #     logger.print_on_console(msg)
+                            # else:
+                            #     print('=======================================================================================================')
+                            #     logger.print_on_console( '***Scenario' ,str(sc_idx + 1) ,' execution completed***')
+                            #     print('=======================================================================================================')
+                            # saucelabs_count += 1
+                            # sc_idx += 1
+                            # execute_flag=False
                         else:
-                            accessibility_parameters = []
-                        con.reporting_obj=reporting.Reporting()
-                        con.configvalues=configvalues
-                        con.exception_flag=self.exception_flag
-                        con.wx_object=wxObject
-                        handler.local_handler.tspList=[]
-                        accessibility_reports = []
-                        execute_result_data['scenarioId'] = scenario_id
-                        #condition check for scenario execution and reporting for condition check
-                        if not(condition_check_flag):
-                             #check for terminate flag before printing loggers
+                            execution_env = {'env':'default'}
+                        if flag and execute_flag :
+                            #check for temrinate flag before execution
+                            tsplist = obj.read_step()
                             if not(terminate_flag):
+                                con.action=EXECUTE
+                                con.conthread=mythread
+                                con.tsp_list=tsplist
+                                local_cont.test_case_number=0
+                                #create a video path
+                                video_path = ''
+                                recorder_obj = recording.Recorder()
+                                record_flag = str(configvalues['screen_rec']).lower()
+                                #start screen recording
+                                if (record_flag=='yes') and self.execution_mode == SERIAL and json_data['apptype'] == 'Web': video_path = recorder_obj.record_execution(json_data['suitedetails'][0])
+                                status,status_percentage,accessibility_reports = con.executor(tsplist,EXECUTE,last_tc_num,1,con.conthread,execution_env,video_path, accessibility_testing = True)
+                                #end video
+                                if (record_flag=='yes') and self.execution_mode == SERIAL and json_data['apptype'] == 'Web': recorder_obj.rec_status = False
                                 print('=======================================================================================================')
-                                logger.print_on_console( '***Scenario ' ,str(sc_idx + 1) ,' execution started***')
+                                logger.print_on_console( '***Scenario' ,str(sc_idx + 1) ,' execution completed***')
                                 print('=======================================================================================================')
                                 log.info('***Scenario '  + str(sc_idx + 1)+ ' execution started***')
                             # if('integrationType' not in qc_creds and len(scenario)==2 and len(scenario['qcdetails'])==10):
@@ -1177,31 +1313,38 @@ class Controller():
                                     status = TERMINATE
                                     execute_flag=False
                                 else:
-                                    tsplist = handler.local_handler.tspList
-                                    if aws_mode:
-                                        aws_tsp.append(tsplist)
-                                    if len(tsplist)==0:
-                                        continue
-                                    if not(aws_mode):
-                                        for k in range(len(tsplist)):
-                                            if tsplist[k].name.lower() == 'openbrowser' and tsplist[k].apptype.lower()=='web' and (IGNORE_THIS_STEP not in tsplist[k].inputval[0].split(';')):
-                                                tsplist[k].inputval = [browser]
-                            if aws_mode:
-                                compile_status=False
-                                scen_id=scenario_id.split('"')
-                                aws_scenario=aws_scenario+scen_id
-                                scenario_name=json_data['suitedetails'][suite_idx-1]["scenarioNames"][sc_idx]
-                                if not terminate_flag:
-                                    compile_status,pytest_file=tc_obj.compile_tc(tsplist,sc_idx+1,scenario_name)
-                                if compile_status:
-                                    pytest_files.append(pytest_file)
-                                    msg='***Scenario'+str(sc_idx + 1)+': '+scenario_name+' Compiled for AWS Execution***'
-                                    print(line_separator)
-                                    logger.print_on_console(msg)
-                                    print(line_separator)
-                                    log.info(line_separator)
-                                    log.info(msg)
-                                    log.info(line_separator)
+                                    condition_check_flag = True
+                                    logger.print_on_console('Condition Check: Terminated by program ')
+                        elif (True in testcase_empty_flag):
+                            logger.print_on_console( '***Saving report of Scenario' ,str(sc_idx + 1),'***')
+                            log.info( '***Saving report of Scenario' +str(sc_idx + 1)+'***')
+                            os.chdir(self.cur_dir)
+                            filename='Scenario'+str(count + 1)+'.json'
+                            count+=1
+                            status_percentage["s_index"]=suite_idx-1
+                            status_percentage["index"]=sc_idx
+                            con.reporting_obj.user_termination=manual_terminate_flag
+                            con.reporting_obj.save_report_json_conditioncheck_testcase_empty(filename,info_msg,json_data,status_percentage)
+                            execute_result_data["reportData"] = con.reporting_obj.report_json_condition_check_testcase_empty
+                            socketIO.emit('result_executeTestSuite', execute_result_data)
+                            obj.clearList(con)
+                            sc_idx += 1
+                            exc_pass = False
+                            report_json=con.reporting_obj.report_json_condition_check_testcase_empty[OVERALLSTATUS]
+                        # if integration_type!="qTest" and integration_type!="Zephyr" and len(scenario['qcdetails'])==10 and (qc_url!='' and qc_password!='' and  qc_username!=''):
+                        if  len(scenario['qcdetails'])!=0 and qc_creds['alm']['url'] != '':
+                            if type(qc_sceanrio_data) is not list:
+                                qc_domain=qc_sceanrio_data['qcdomain']
+                                qc_project=qc_sceanrio_data['qcproject']
+                                qc_folder=qc_sceanrio_data['qcfolderpath']
+                                qc_tsList=qc_sceanrio_data['qctestset']
+                                qc_testrunname=qc_sceanrio_data['qctestcase']
+                                qc_status_over=report_json[0]
+                                qc_update_status=qc_status_over['overallstatus']
+                                if(str(qc_update_status).lower()=='pass'):
+                                    qc_update_status='Passed'
+                                elif(str(qc_update_status).lower()=='fail'):
+                                    qc_update_status='Failed'
                                 else:
                                     terminate_flag=True
                                     msg='***Scenario'+str(sc_idx+ 1)+': '+scenario_name+' is Terminated ***'
@@ -1307,32 +1450,16 @@ class Controller():
                                     if(overall_status==TEST_RESULT_PASS):
                                         continue
                                     else:
-                                        condition_check_flag = True
-                                        logger.print_on_console('Condition Check: Terminated by program ')
-                            elif (True in testcase_empty_flag):
-                                logger.print_on_console( '***Saving report of Scenario' ,str(sc_idx + 1),'***')
-                                log.info( '***Saving report of Scenario' +str(sc_idx + 1)+'***')
-                                os.chdir(self.cur_dir)
-                                filename='Scenario'+str(count + 1)+'.json'
-                                count+=1
-                                status_percentage["s_index"]=suite_idx-1
-                                status_percentage["index"]=sc_idx
-                                con.reporting_obj.user_termination=manual_terminate_flag
-                                con.reporting_obj.save_report_json_conditioncheck_testcase_empty(filename,info_msg,json_data,status_percentage)
-                                execute_result_data["reportData"] = con.reporting_obj.report_json_condition_check_testcase_empty
-                                socketIO.emit('result_executeTestSuite', execute_result_data)
-                                obj.clearList(con)
-                                sc_idx += 1
-                                exc_pass = False
-                                report_json=con.reporting_obj.report_json_condition_check_testcase_empty[OVERALLSTATUS]
-                            # if integration_type!="qTest" and integration_type!="Zephyr" and len(scenario['qcdetails'])==10 and (qc_url!='' and qc_password!='' and  qc_username!=''):
-                            if  len(scenario['qcdetails'])!=0 and qc_creds['alm']['url'] != '':
-                                if type(qc_sceanrio_data) is not list:
-                                    qc_domain=qc_sceanrio_data['qcdomain']
-                                    qc_project=qc_sceanrio_data['qcproject']
-                                    qc_folder=qc_sceanrio_data['qcfolderpath']
-                                    qc_tsList=qc_sceanrio_data['qctestset']
-                                    qc_testrunname=qc_sceanrio_data['qctestcase']
+                                        logger.print_on_console('****Failed to Update QCDetails****')
+                                except Exception as e:
+                                    logger.print_on_console('Error in Updating Qc details')
+                            else:
+                                for i in range(len(qc_sceanrio_data)):
+                                    qc_domain=qc_sceanrio_data[i]['qcdomain']
+                                    qc_project=qc_sceanrio_data[i]['qcproject']
+                                    qc_folder=qc_sceanrio_data[i]['qcfolderpath']
+                                    qc_tsList=qc_sceanrio_data[i]['qctestset']
+                                    qc_testrunname=qc_sceanrio_data[i]['qctestcase']
                                     qc_status_over=report_json[0]
                                     qc_update_status=qc_status_over['overallstatus']
                                     if(str(qc_update_status).lower()=='pass'):
@@ -1364,139 +1491,101 @@ class Controller():
                                             logger.print_on_console('****Failed to Update QCDetails****')
                                     except Exception as e:
                                         logger.print_on_console('Error in Updating Qc details')
-                                else:
-                                    for i in range(len(qc_sceanrio_data)):
-                                        qc_domain=qc_sceanrio_data[i]['qcdomain']
-                                        qc_project=qc_sceanrio_data[i]['qcproject']
-                                        qc_folder=qc_sceanrio_data[i]['qcfolderpath']
-                                        qc_tsList=qc_sceanrio_data[i]['qctestset']
-                                        qc_testrunname=qc_sceanrio_data[i]['qctestcase']
-                                        qc_status_over=report_json[0]
-                                        qc_update_status=qc_status_over['overallstatus']
-                                        if(str(qc_update_status).lower()=='pass'):
-                                            qc_update_status='Passed'
-                                        elif(str(qc_update_status).lower()=='fail'):
-                                            qc_update_status='Failed'
+                        # if (integration_type=="qTest" and qc_url!='' and qc_password!='' and  qc_username!=''):
+                        if len(scenario['qcdetails'])!=0 and qc_creds['qtest']['url'] != '':
+                            qtest_status_over=report_json[0]
+                            try:
+                                qtest_status = {}
+                                qtest_status['qtestaction']='qtestupdate'
+                                qtest_status['qtest_project']=qtest_project
+                                qtest_status['qtest_projectid']=qtest_projectid
+                                qtest_status['qtest_suite']=qtest_suite
+                                qtest_status['qtest_suiteid']=qtest_suiteid
+                                qtest_status['user']=qtest_username
+                                qtest_status['qtest_status_over'] = qtest_status_over
+                                qtest_status['qtest_stepsup']=qtest_stepsup
+                                qtest_status['qtesturl']=qtest_url
+                                qtest_status['qtestusername']=qtest_username
+                                qtest_status['qtestpassword']=qtest_password
+                                qtest_status['steps']=[]
+                                for i in con.reporting_obj.report_json['rows']:
+                                    if 'Keyword' in i and i['Keyword'] == 'TestCase Name':
+                                        pass
+                                    elif 'Step' in i and i['Step'] == 'Terminated':
+                                        pass
+                                    else:
+                                        if(i['status'].lower()=='pass'):
+                                            qtest_status['steps'].append(601)
+                                        elif(i['status'].lower()=='fail'):
+                                            qtest_status['steps'].append(602)
+                                        elif(i['status'].lower()=='terminate'):
+                                            qtest_status['steps'].append(603)
                                         else:
-                                            qc_update_status='Not Completed'
-                                        try:
-                                            qc_status = {}
-                                            qc_status['qcaction']='qcupdate'
-                                            qc_status['qcurl']=qc_url
-                                            qc_status['qcusername']=qc_username
-                                            qc_status['qcpassword']=qc_password
-                                            qc_status['qc_domain']=qc_domain
-                                            qc_status['qc_project']=qc_project
-                                            qc_status['qc_folder']=qc_folder
-                                            qc_status['qc_tsList']=qc_tsList
-                                            qc_status['qc_testrunname']=qc_testrunname
-                                            qc_status['qc_update_status'] = qc_update_status
-                                            logger.print_on_console('****Updating QCDetails****')
-                                            if qcObject is not None:
-                                                qc_status_updated = qcObject.update_qc_details(qc_status)
-                                                if qc_status_updated:
-                                                    logger.print_on_console('****Updated QCDetails****')
-                                                else:
-                                                    logger.print_on_console('****Failed to Update QCDetails****')
-                                            else:
-                                                logger.print_on_console('****Failed to Update QCDetails****')
-                                        except Exception as e:
-                                            logger.print_on_console('Error in Updating Qc details')
-                            # if (integration_type=="qTest" and qc_url!='' and qc_password!='' and  qc_username!=''):
-                            if len(scenario['qcdetails'])!=0 and qc_creds['qtest']['url'] != '':
-                                qtest_status_over=report_json[0]
-                                try:
-                                    qtest_status = {}
-                                    qtest_status['qtestaction']='qtestupdate'
-                                    qtest_status['qtest_project']=qtest_project
-                                    qtest_status['qtest_projectid']=qtest_projectid
-                                    qtest_status['qtest_suite']=qtest_suite
-                                    qtest_status['qtest_suiteid']=qtest_suiteid
-                                    qtest_status['user']=qtest_username
-                                    qtest_status['qtest_status_over'] = qtest_status_over
-                                    qtest_status['qtest_stepsup']=qtest_stepsup
-                                    qtest_status['qtesturl']=qtest_url
-                                    qtest_status['qtestusername']=qtest_username
-                                    qtest_status['qtestpassword']=qtest_password
-                                    qtest_status['steps']=[]
-                                    for i in con.reporting_obj.report_json['rows']:
-                                        if 'Keyword' in i and i['Keyword'] == 'TestCase Name':
-                                            pass
-                                        elif 'Step' in i and i['Step'] == 'Terminated':
-                                            pass
-                                        else:
-                                            if(i['status'].lower()=='pass'):
-                                                qtest_status['steps'].append(601)
-                                            elif(i['status'].lower()=='fail'):
-                                                qtest_status['steps'].append(602)
-                                            elif(i['status'].lower()=='terminate'):
-                                                qtest_status['steps'].append(603)
-                                            else:
-                                                tsplistLen -= 1
-                                    logger.print_on_console('****Updating qTest Details****')
-                                    if qtestObject is not None:
-                                        qtest_status_updated = qtestObject.update_qtest_run_details(qtest_status,tsplistLen)
-                                        if qtest_status_updated:
-                                            logger.print_on_console('****Updated qTest Details****')
-                                        else:
-                                            logger.print_on_console('****Failed to Update qTest Details****')
+                                            tsplistLen -= 1
+                                logger.print_on_console('****Updating qTest Details****')
+                                if qtestObject is not None:
+                                    qtest_status_updated = qtestObject.update_qtest_run_details(qtest_status,tsplistLen)
+                                    if qtest_status_updated:
+                                        logger.print_on_console('****Updated qTest Details****')
                                     else:
                                         logger.print_on_console('****Failed to Update qTest Details****')
-                                except Exception as e:
-                                    log.error('Error in Updating qTest details '+str(e))
-                                    logger.print_on_console('Error in Updating qTest details')
-                            # if (integration_type=="Zephyr" and zephyr_password!='' and zephyr_username!='' and  zephyr_url!=''):
-                            if len(scenario['qcdetails'])!=0 and qc_creds['zephyr']['url'] != '':
-                                zephyr_status_over=report_json[0]
-                                try:
-                                    zephyr_status = {}
-                                    zephyr_status['zephyraction']='zephyrupdate'
-                                    zephyr_status['releaseid']=zephyr_releaseid
-                                    zephyr_status['testid']=zephy_testid
-                                    zephyr_status['projectId']=zephyr_projectid
-                                    zephyr_status['treeid']=zephyr_treeid
-                                    zephyr_status['zephyr_password']=zephyr_password
-                                    zephyr_status['zephyr_url']=zephyr_url
-                                    zephyr_status['zephyr_username']=zephyr_username
-                                    zephyr_update_status=zephyr_status_over['overallstatus']
-                                    if(zephyr_update_status.lower()=='pass'):
-                                        zephyr_status['status']='1'
-                                    elif(zephyr_update_status.lower()=='fail'):
-                                        zephyr_status['status']='2'
-                                    elif(zephyr_update_status.lower()=='terminate'):
-                                        zephyr_status['status']='11'
-                                    logger.print_on_console('****Updating Zephyr Details****')
-                                    if zephyrObject is not None:
-                                        zephry_update_status = zephyrObject.update_zephyr_test_details(zephyr_status)
-                                        if zephry_update_status:
-                                            logger.print_on_console('****Updated Zephyr Details****')
-                                        else:
-                                            logger.print_on_console('****Failed to Update Zephyr Details****')
+                                else:
+                                    logger.print_on_console('****Failed to Update qTest Details****')
+                            except Exception as e:
+                                log.error('Error in Updating qTest details '+str(e))
+                                logger.print_on_console('Error in Updating qTest details')
+                        # if (integration_type=="Zephyr" and zephyr_password!='' and zephyr_username!='' and  zephyr_url!=''):
+                        if len(scenario['qcdetails'])!=0 and qc_creds['zephyr']['url'] != '':
+                            zephyr_status_over=report_json[0]
+                            try:
+                                zephyr_status = {}
+                                zephyr_status['zephyraction']='zephyrupdate'
+                                zephyr_status['releaseid']=zephyr_releaseid
+                                zephyr_status['testid']=zephy_testid
+                                zephyr_status['projectId']=zephyr_projectid
+                                zephyr_status['treeid']=zephyr_treeid
+                                zephyr_status['zephyr_password']=zephyr_password
+                                zephyr_status['zephyr_url']=zephyr_url
+                                zephyr_status['zephyr_username']=zephyr_username
+                                zephyr_update_status=zephyr_status_over['overallstatus']
+                                if(zephyr_update_status.lower()=='pass'):
+                                    zephyr_status['status']='1'
+                                elif(zephyr_update_status.lower()=='fail'):
+                                    zephyr_status['status']='2'
+                                elif(zephyr_update_status.lower()=='terminate'):
+                                    zephyr_status['status']='11'
+                                logger.print_on_console('****Updating Zephyr Details****')
+                                if zephyrObject is not None:
+                                    zephry_update_status = zephyrObject.update_zephyr_test_details(zephyr_status)
+                                    if zephry_update_status:
+                                        logger.print_on_console('****Updated Zephyr Details****')
                                     else:
                                         logger.print_on_console('****Failed to Update Zephyr Details****')
-                                except Exception as e:
-                                    log.error('Error in Updating Zephyr details '+str(e))
-                                    logger.print_on_console('Error in Updating Zephyr details')
-                            if local_cont.module_stop:
-                                break
-                        else:
-                            logger.print_on_console( '***Saving report of Scenario' ,str(sc_idx + 1),'***')
-                            log.info( '***Saving report of Scenario' +str(sc_idx + 1)+'***')
-                            os.chdir(self.cur_dir)
-                            filename='Scenario'+str(count + 1)+'.json'
-                            count+=1
-                            status_percentage["s_index"]=suite_idx-1
-                            status_percentage["index"]=sc_idx
-                            con.reporting_obj.user_termination=manual_terminate_flag
-                            con.reporting_obj.save_report_json_conditioncheck(filename,json_data,status_percentage)
-                            execute_result_data["reportData"] = con.reporting_obj.report_json_condition_check
-                            socketIO.emit('result_executeTestSuite', execute_result_data)
-                            obj.clearList(con)
-                            sc_idx += 1
-                            exc_pass = False
-                            #logic for condition check
-                            report_json=con.reporting_obj.report_json[OVERALLSTATUS]
-                        time.sleep(1)
+                                else:
+                                    logger.print_on_console('****Failed to Update Zephyr Details****')
+                            except Exception as e:
+                                log.error('Error in Updating Zephyr details '+str(e))
+                                logger.print_on_console('Error in Updating Zephyr details')
+                        if local_cont.module_stop:
+                            break
+                    else:
+                        logger.print_on_console( '***Saving report of Scenario' ,str(sc_idx + 1),'***')
+                        log.info( '***Saving report of Scenario' +str(sc_idx + 1)+'***')
+                        os.chdir(self.cur_dir)
+                        filename='Scenario'+str(count + 1)+'.json'
+                        count+=1
+                        status_percentage["s_index"]=suite_idx-1
+                        status_percentage["index"]=sc_idx
+                        con.reporting_obj.user_termination=manual_terminate_flag
+                        con.reporting_obj.save_report_json_conditioncheck(filename,json_data,status_percentage)
+                        execute_result_data["reportData"] = con.reporting_obj.report_json_condition_check
+                        socketIO.emit('result_executeTestSuite', execute_result_data)
+                        obj.clearList(con)
+                        sc_idx += 1
+                        exc_pass = False
+                        #logic for condition check
+                        report_json=con.reporting_obj.report_json[OVERALLSTATUS]
+                    time.sleep(1)
             if aws_mode and not terminate_flag:
                 tc_obj.make_zip(pytest_files)
                 execution_status,step_results=self.aws_obj.run_aws_android_tests()
@@ -1522,6 +1611,13 @@ class Controller():
             if status == TERMINATE: exc_pass = False
             socketIO.emit("return_status_executeTestSuite", dict({"status": "finished", "executionStatus": exc_pass,
                 "endTime": datetime.now().strftime(TIME_FORMAT)}, **base_execute_data))
+            if not exc_pass: 
+                if status == TERMINATE and manual_terminate_flag:
+                    mythread.test_status = 'userTerminate'
+                elif status == TERMINATE:
+                    mythread.test_status = 'programTerminate'
+                else: 
+                    mythread.test_status = 'fail'
             #clearing dynamic variables at the end of execution to support dynamic variable at the scenario level
             obj.clear_dyn_variables()
             logger.print_on_console('***SUITE ', str(suite_idx) ,' EXECUTION COMPLETED***')
