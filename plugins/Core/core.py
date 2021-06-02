@@ -1126,7 +1126,7 @@ class TestThread(threading.Thread):
                 else:
                     socketIO.emit('result_debugTestCaseWS',status)
             elif self.action==EXECUTE:
-                if status != COMPLETED and status != TERMINATE: self.test_status = 'fail'
+                if self.test_status == 'pass' and status != COMPLETED: self.test_status = 'fail'
                 result = {"status":status, "batchId": batch_id, "testStatus": self.test_status}
                 if controller.manual_terminate_flag: result["userTerminated"] = True
                 socketIO.emit('result_executeTestSuite', result)
