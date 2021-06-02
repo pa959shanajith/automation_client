@@ -531,6 +531,9 @@ class TextboxKeywords:
     def __get_text(self,webelement):
         text=''
         #get the text using selenium in-built method
+        if webelement.tag_name == 'option':
+            text = webelement.get_attribute('innerText')
+            return text
         text=webelement.get_attribute('value')
         if text is None or text == '':
             if webelement.tag_name != "input":

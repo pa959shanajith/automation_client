@@ -87,7 +87,8 @@ class ElementKeywords:
                     local_eo.log.info(STATUS_METHODOUTPUT_UPDATE)
                 else:
                     if(util.is_visible(webelement)):
-                        text=self.__getelement_text(webelement)
+                        text = webelement.get_attribute('innerText')
+                        # text=self.__getelement_text(webelement)
                         logger.print_on_console('Element text: ',text)
                         local_eo.log.info('Element text: ')
                         local_eo.log.info(text)
@@ -120,7 +121,8 @@ class ElementKeywords:
                     if not(util.is_visible(webelement)) and configvalues['ignoreVisibilityCheck'].strip().lower() == "yes":
                         text = browser_Keywords.local_bk.driver_obj.execute_script("""return arguments[0].innerText""",webelement)
                     else:
-                        text=self.__getelement_text(webelement)
+                        text = webelement.get_attribute('innerText')
+                        # text=self.__getelement_text(webelement)
                     if text==input:
                        logger.print_on_console('Element Text matched')
                        local_eo.log.info('Element Text matched')
