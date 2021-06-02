@@ -117,13 +117,23 @@ class ButtonLinkKeyword():
                                 # browser_Keywords.local_bk.driver_obj.execute_script(Js,webelement,x_coord,y_coord)
                             else:
                                 clickinfo = browser_Keywords.local_bk.driver_obj.execute_script(webconstants.CLICK_JAVASCRIPT,webelement)
-                                status = webconstants.TEST_RESULT_PASS
-                                methodoutput = webconstants.TEST_RESULT_TRUE
-                                local_blk.log.info('Click operation performed using javascript click')
-                                local_blk.log.info(STATUS_METHODOUTPUT_UPDATE)
+                                uw = UtilWebKeywords()
+                                log_status = uw.check_user_activation(browser_Keywords.local_bk.driver_obj.get_log('browser'))
+                                if log_status:
+                                    status = webconstants.TEST_RESULT_PASS
+                                    methodoutput = webconstants.TEST_RESULT_TRUE
+                                    local_blk.log.info('Click operation performed using javascript click')
+                                    local_blk.log.info(STATUS_METHODOUTPUT_UPDATE)
+                                else:
+                                    local_blk.log.error('Javascript click  error occured, Trying to click using selenium')
+                                    webelement.click()
+                                    local_blk.log.info('Click operation performed using selenium click')
+                                    local_blk.log.info(STATUS_METHODOUTPUT_UPDATE)
+                                    status = webconstants.TEST_RESULT_PASS
+                                    methodoutput = webconstants.TEST_RESULT_TRUE
                         except Exception as e:
                             # local_blk.log.info('Click operation performed using javascript click')
-                            # local_blk.log.error('selenium click  error occured, Trying to click using Javascript')
+                            local_blk.log.error('Javascript click  error occured, Trying to click using selenium')
                             webelement.click()
                             local_blk.log.info('Click operation performed using selenium click')
                             local_blk.log.info(STATUS_METHODOUTPUT_UPDATE)

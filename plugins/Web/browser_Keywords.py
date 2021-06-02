@@ -253,18 +253,21 @@ class BrowserKeywords():
         output=OUTPUT_CONSTANT
         err_msg=None
         try:
-            cwh=local_bk.driver_obj.current_window_handle
-            cwh_in=local_bk.all_handles.index(cwh)
-            local_bk.driver_obj.execute_script("window.open('');")
-            handles = local_bk.driver_obj.window_handles
-            local_bk.driver_obj.switch_to.window(handles[-1])
-            h=local_bk.driver_obj.current_window_handle
-            local_bk.all_handles.insert(cwh_in+1,h)
-            local_bk.recent_handles.insert(cwh_in+1,h)
+            if isinstance(local_bk.driver_obj,webdriver.Ie):
+                err_msg = "OpenNewTab Keyword is not supported in IE"
+                logger.print_on_console(err_msg)
+                local_bk.log.warn(err_msg)
+            else:
+                cwh=local_bk.driver_obj.current_window_handle
+                cwh_in=local_bk.all_handles.index(cwh)
+                local_bk.driver_obj.execute_script("window.open('');")
+                handles = local_bk.driver_obj.window_handles
+                local_bk.driver_obj.switch_to.window(handles[-1])
+                h=local_bk.driver_obj.current_window_handle
+                local_bk.all_handles.insert(cwh_in+1,h)
+                local_bk.recent_handles.insert(cwh_in+1,h)
             # local_bk.all_handles.append(h)
             # local_bk.recent_handles.append(h)
-            if isinstance(local_bk.driver_obj,webdriver.Ie):
-                local_bk.driver_obj.maximize_window()
             status=webconstants.TEST_RESULT_PASS
             result=webconstants.TEST_RESULT_TRUE
         except Exception as e:
@@ -1297,7 +1300,7 @@ class Singleton_DriverUtil():
     def modify_file_as_text(self,text_file_path, text_to_search, replacement_text):
         with fileinput.FileInput(text_file_path, inplace=True, backup='.bak') as file:
             for line in file:
-                print(line.replace(text_to_search, replacement_text), end='')
+                line.replace(text_to_search, replacement_text)
 
     def getBrowser(self,browser_num):
         import controller
