@@ -73,7 +73,6 @@ class GetParam():
         status = TEST_RESULT_FAIL
         try:
             """Logic to find the input file is valid or not"""
-##            fileinfo = input.split(';')
             fileinfo = input
             filepath = fileinfo[0]
             #need to check dynamic variable for filepath
@@ -88,19 +87,19 @@ class GetParam():
                     sheetname = fileinfo[1]
                     log.debug('Retrieved file name and sheetname ')
                     if os.access(filepath, os.R_OK):
-##                        log.info('File is accesible')
-##                        logger.print_on_console('File is accesible')
+                        # log.info('File is accesible')
+                        # logger.print_on_console('File is accesible')
                         wb = open_workbook(filepath)
                         log.info('Work Book object is created')
                         log.debug('Going to iterate through the sheets present in the work book')
                         for s in wb.sheets():
                             if s.name == sheetname:
                                 log.info('Input sheet name matched with the actual sheet name')
-##                                logger.print_on_console('Input sheet name matched with the actual sheet name')
-##                                logger.print_on_console('Expected: ',s.name)
+                                # logger.print_on_console('Input sheet name matched with the actual sheet name')
+                                # logger.print_on_console('Expected: ',s.name)
                                 log.info('Expected:')
                                 log.info(s.name)
-##                                logger.print_on_console('Actual: ',sheetname)
+                                # logger.print_on_console('Actual: ',sheetname)
                                 log.info('Actual:')
                                 log.info(sheetname)
                                 for col in range(s.ncols):
@@ -114,7 +113,7 @@ class GetParam():
                                 log.info('Comparing the length of the columnNamesList and columnNamesSet ')
                                 if len(columnNamesList) == len(columnNamesSet):
                                     log.info(sheetname + ' contains unique column names, continue..')
-##                                    logger.print_on_console(sheetname + ' contains unique column names, continue..')
+                                    # logger.print_on_console(sheetname + ' contains unique column names, continue..')
                                     log.info(STATUS_METHODOUTPUT_UPDATE)
                                     status = TEST_RESULT_PASS
                                 else:
@@ -202,7 +201,7 @@ class GetParam():
             return status
         except Exception as e:
             log.error(e,exc_info=True)
-            logger.print_on_console("Error while getting datatable")
+            logger.print_on_console("Error occured in getparam")
 
     def readcsvfile(self,fileinfo):
         """
