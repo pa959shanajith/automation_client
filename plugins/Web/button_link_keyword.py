@@ -577,9 +577,9 @@ class ButtonLinkKeyword():
             #self.__set_clipboard_data(inputfile)
             robot.sleep(1)
             maxTries = 10
-            time_sleep = 1.0
+            time_sleep = 0.5
             if len(args) > 2:
-                maxTries = int(int(args[2]) / time_sleep) + 1
+                maxTries = int(int(args[2]) / time_sleep)
             result_call = self.upload_time_func(maxTries, time_sleep)
             if result_call!=False:
                 pyautogui.PAUSE = 1
