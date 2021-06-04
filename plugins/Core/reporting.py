@@ -132,15 +132,16 @@ class Reporting:
         """
         if self.overallstatus==TERMINATE:
             self.add_termination_step()
-        self.start_time=str(start_time)
-        self.end_time=str(end_time)
-        self.ellapsed_time=str(ellapsed_time)
-        getTym = self.end_time.split(".")[0]
-        getDat = getTym.split(" ")[0].split("-")
-        self.date = getDat[1] + "/" + getDat[2] + "/" + getDat[0]
-        self.time = getTym.split(" ")[1]
+        self.start_time= start_time.strftime(r"%Y-%m-%d %H:%M:%S")
+        self.end_time=end_time.strftime(r"%Y-%m-%d %H:%M:%S")
+        els_time=str(ellapsed_time).split('.')[0]
+        self.ellapsed_time=els_time
+        # getTym = self.end_time.split(".")[0]
+        self.date = self.end_time.split(" ")[0]
+        # self.date = getDat[1] + "/" + getDat[2] + "/" + getDat[0]
+        self.time = self.end_time.split(" ")[1]
         obj={}
-        obj[ELLAPSED_TIME]=self.ellapsed_time
+        obj[ELLAPSED_TIME]="~"+self.ellapsed_time
         obj[END_TIME]=self.end_time
         obj[BROWSER_VERSION]=self.browser_version
         obj[START_TIME]=self.start_time
@@ -159,15 +160,17 @@ class Reporting:
             """
             start_time = datetime.now()
             end_time = datetime.now()
-            self.ellapsed_time = str(end_time - start_time)
-            self.start_time=str(start_time)
-            self.end_time=str(end_time)
-            getTym = self.end_time.split(".")[0]
-            getDat = getTym.split(" ")[0].split("-")
-            self.date = getDat[1] + "/" + getDat[2] + "/" + getDat[0]
-            self.time = getTym.split(" ")[1]
+            els_time = str(end_time - start_time)
+            els_time = els_time.split('.')[0]
+            self.ellapsed_time = els_time
+            self.start_time= start_time.strftime(r"%Y-%m-%d %H:%M:%S")
+            self.end_time=end_time.strftime(r"%Y-%m-%d %H:%M:%S")
+            # getTym = self.end_time.split(".")[0]
+            self.date = self.end_time.split(" ")[0]
+            # self.date = getDat[0] + "-" + getDat[1] + "-" + getDat[2]
+            self.time = self.end_time.split(" ")[1]
             obj={}
-            obj[ELLAPSED_TIME]=self.ellapsed_time
+            obj[ELLAPSED_TIME]="~"+self.ellapsed_time
             obj[END_TIME]=self.end_time
             obj[BROWSER_VERSION]=self.browser_version
             obj[START_TIME]=self.start_time
@@ -186,15 +189,17 @@ class Reporting:
             """
             start_time = datetime.now()
             end_time = datetime.now()
-            self.ellapsed_time = str(end_time - start_time)
-            self.start_time=str(start_time)
-            self.end_time=str(end_time)
-            getTym = self.end_time.split(".")[0]
-            getDat = getTym.split(" ")[0].split("-")
-            self.date = getDat[1] + "/" + getDat[2] + "/" + getDat[0]
-            self.time = getTym.split(" ")[1]
+            els_time = str(end_time - start_time)
+            els_time = els_time.split('.')[0]
+            self.ellapsed_time =els_time
+            self.start_time= start_time.strftime(r"%Y-%m-%d %H:%M:%S")
+            self.end_time=end_time.strftime(r"%Y-%m-%d %H:%M:%S")
+            # getTym = self.end_time.split(".")[0]
+            self.date = self.end_time.split(" ")[0]
+            # self.date = getDat[0] + "-" + getDat[1] + "/" + getDat[2]
+            self.time = self.end_time.split(" ")[1]
             obj={}
-            obj[ELLAPSED_TIME]=self.ellapsed_time
+            obj[ELLAPSED_TIME]="~"+self.ellapsed_time
             obj[END_TIME]=self.end_time
             obj[BROWSER_VERSION]=self.browser_version
             obj[START_TIME]=self.start_time
@@ -533,7 +538,7 @@ class Reporting:
         """
         overallstatus_array=[]
         overallstatus_obj={}
-        overallstatus_obj[ELLAPSED_TIME]=str(datetime.now() - datetime.now())
+        overallstatus_obj[ELLAPSED_TIME]="~"+str(datetime.now() - datetime.now())
         overallstatus_obj[END_TIME]= datetime.now().strftime(TIME_FORMAT)
         overallstatus_obj[BROWSER_VERSION]='N/A'
         overallstatus_obj[START_TIME]=datetime.now().strftime(TIME_FORMAT)
