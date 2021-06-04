@@ -262,7 +262,17 @@ class TextboxKeywords:
                                             check_flag= False
                                             err_msg=self._invalid_index()
                                         else:
-                                            webelement = txt_box[index_val]
+                                        #checking for type of input tag
+                                        #allowed list contains types on which action can be performed 
+                                        #not included types are :
+                                        #button(submit,reset,button,radio),checkbox,week,month,color,hidden,password,image,range,time
+                                            tag_type=txt_box[index_val].get_attribute('type').lower()
+                                            allowed=['url','text','tel','search','number','email','password']
+                                            if tag_type in allowed:
+                                                webelement = txt_box[index_val]
+                                            else:
+                                                check_flag = False
+                                                err_msg = self._invalid_input()
                                     else:
                                         check_flag=False
                                         err_msg=self._invalid_input()
@@ -466,7 +476,13 @@ class TextboxKeywords:
                                             check_flag=False
                                             err_msg=self._invalid_index()
                                         else:
-                                            webelement = txt_box[index_val]
+                                            tag_type = txt_box[index_val].get_attribute('type')
+                                            allowed=['url','text','tel','search','number','email','password']
+                                            if tag_type in allowed:
+                                                webelement = txt_box[index_val]
+                                            else:
+                                                check_flag = False
+                                                err_msg = self._invalid_input()
                                     else:
                                         check_flag=False
                                         err_msg=self._invalid_input()
@@ -698,7 +714,17 @@ class TextboxKeywords:
                                         check_flag=False
                                         err_msg=self._invalid_index()
                                     else:
-                                        webelement = txt_box[index_val]
+                                        #checking for type of input tag
+                                        #allowed list contains types on which action can be performed
+                                        #not included types are :
+                                        #button(submit,reset,button,radio),checkbox,week,month,color,hidden,password,image,range,time
+                                        tag_type = txt_box[index_val].get_attribute('type').lower()
+                                        allowed=['url','text','tel','search','number','email']
+                                        if tag_type in allowed:
+                                            webelement = txt_box[index_val]
+                                        else:
+                                            check_flag = False
+                                            err_msg = self._invalid_input()
                                 else:
                                     check_flag=False
                                     err_msg=self._invalid_input()
@@ -879,7 +905,17 @@ class TextboxKeywords:
                                         check_flag=False
                                         err_msg=self._invalid_index()
                                     else:
-                                        webelement = txt_box[index_val]
+                                        #checking for type of input tag
+                                        #allowed list contains types on which action can be performed
+                                        #not included types are :
+                                        #button(submit,reset,button,radio),checkbox,week,month,color,hidden,password,image,range,time
+                                        tag_type = txt_box[index_val].get_attribute('type')
+                                        allowed=['url','text','tel','search','number','email']
+                                        if tag_type in allowed:
+                                            webelement = txt_box[index_val]
+                                        else:
+                                            check_flag = False
+                                            err_msg = self._invalid_input()
                                 else:
                                     check_flag=False
                                     err_msg=self._invalid_input()
@@ -1057,7 +1093,17 @@ class TextboxKeywords:
                                             check_flag=False
                                             err_msg=self._invalid_index()
                                         else:
-                                            webelement = txt_box[index_val]
+                                        #checking for type of input tag
+                                        #allowed list contains types on which action can be performed
+                                        #not included types are :
+                                        #button(submit,reset,button,radio),file,checkbox,week,month,color,hidden,image,range,time
+                                            tag_type = txt_box[index_val].get_attribute('type')
+                                            allowed=['password','url','text','tel','search','number','email']
+                                            if tag_type in allowed:
+                                                webelement = txt_box[index_val]
+                                            else:
+                                                check_flag = False
+                                                err_msg = self._invalid_input()
                                     else:
                                         check_flag=False
                                         err_msg=self._invalid_input()
@@ -1239,7 +1285,7 @@ class TextboxKeywords:
                             err_msg=self._invalid_input()
                         else:
                             check_flag=False
-                            err_msg=self._index_zero() 
+                            err_msg=self._index_zero()             
                     else:
                         err_msg = self._invalid_input()            
                 if check_flag==True and not err_msg:
@@ -1408,7 +1454,7 @@ class TextboxKeywords:
                             err_msg=self._invalid_input()
                         else:
                             check_flag=False
-                            err_msg=self._index_zero()   
+                            err_msg=self._index_zero()            
                     else:
                         err_msg = self._invalid_input()         
                 if check_flag==True and not err_msg:
@@ -1584,7 +1630,13 @@ class TextboxKeywords:
                                             check_flag=False
                                             err_msg=self._invalid_index()
                                         else:
-                                            webelement = txt_box[index_val]
+                                            tag_type = txt_box[index_val].get_attribute('type')
+                                            allowed=['url','text','tel','search','number','email','password']
+                                            if tag_type in allowed:
+                                                webelement = txt_box[index_val]
+                                            else:
+                                                check_flag = False
+                                                err_msg = self._invalid_input()
                                     else:
                                         check_flag=False
                                         err_msg=self._invalid_input()
@@ -1594,7 +1646,7 @@ class TextboxKeywords:
                             else:
                                 check_flag=False
                                 err_msg=self._index_zero()
-                        else:
+                    else:
                             err_msg = self._invalid_input()
                     if check_flag==True and not err_msg:
                         local_to.log.debug(WEB_ELEMENT_ENABLED)
