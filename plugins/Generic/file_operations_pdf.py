@@ -28,7 +28,12 @@ import imutils
 import fitz
 import re
 import copy
+import time
+from PIL import Image
 log = logging.getLogger('file_operations_pdf.py')
+from pytesseract import pytesseract
+TESSERACT_PATH = os.environ["AVO_ASSURE_HOME"] + '/Lib/Tesseract-OCR'
+TESSERACT_PATH_EXISTS = os.path.isdir(TESSERACT_PATH)
 
 class FileOperationsPDF:
     def __init__(self):
@@ -848,6 +853,62 @@ class FileOperationsPDF:
                         log.info('Content after Start string is ')
                         log.info(content)
                         status=True
+                if args[-1] in ['image','all']:
+                    logger.print_on_console( "Retreving Text of all images within .pdf file. Please wait..." )
+                    #for i in range(len(doc)):
+                    log.debug( 'Image count : ' + str(len(doc.getPageImageList(pagenumber))) + ' on page : ' + str(pagenumber+1) )
+                    if(TESSERACT_PATH_EXISTS):
+                        output_res = []
+                        img_count = 0
+                        for img in doc.getPageImageList(pagenumber):
+                            img_count = img_count + 1
+                            xref = img[0]
+                            pix = fitz.Pixmap(doc, xref)
+                            pix.writePNG("p%s-%s.png" % (pagenumber, xref))
+                            image = cv2.imread(str("p%s-%s.png" % (pagenumber, xref)),1)
+                            rez_image = cv2.resize(image,(0,0),fx=5,fy=5)
+                            gray_img = cv2.cvtColor(rez_image, cv2.COLOR_BGR2GRAY)
+                            filter_img = cv2.medianBlur(gray_img, 5)
+                            thresh_img = cv2.threshold(filter_img, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
+                            filename = str(int(time.time()))+".png"
+                            cv2.imwrite(filename, thresh_img)
+                            try:
+                                #---------------------------------------------------------------taking Tessaract path for respective OS
+                                if constants.SYSTEM_OS != 'Darwin':
+                                    pytesseract.tesseract_cmd = TESSERACT_PATH + '/tesseract'
+                                    os.environ["TESSDATA_PREFIX"] = TESSERACT_PATH + '/tessdata'
+                                else:
+                                    pytesseract.tesseract_cmd = TESSERACT_PATH + '/bin/tesseract'
+                                    os.environ["TESSDATA_PREFIX"] = TESSERACT_PATH + '/share/tessdata'
+                                #--------------------------------------------------------------e-taking Tessaract path for respective OS
+                                text = pytesseract.image_to_string(Image.open(filename))
+                            except Exception as e:
+                                log.error(e, exc_info= True)
+                                log.info('WARNING!: error occured in get_ocr, ERR_MSG : ' + str(e))
+                                if(TESSERACT_PATH_EXISTS) :
+                                    log.info('pytessaract is not pointing to TESSERACT_PATH, adding TESSERACT_PATH to path')
+                                    pytesseract.tesseract_cmd = TESSERACT_PATH + '/tesseract.exe'
+                                    text = pytesseract.image_to_string(Image.open(filename))
+                            os.remove(filename)
+
+                            del image, rez_image, gray_img, filter_img, thresh_img, filename
+                            os.remove(str("p%s-%s.png" % (pagenumber, xref)))#del image
+                            txt = None
+                            if( text ):
+                                txt = 'Page : ' + str(pagenumber+1) + ' Line No. : ' + str(xref+1) + ' Image Text : ' + text
+                            else:
+                                txt = 'Page : ' + str(pagenumber+1) + ' Line No. : ' + str(xref+1) + ' Image Text : Unable to read image text.'
+                            output_res.append(txt)
+                        log.debug( 'Total image count of the PDF file : ' + str(img_count) )
+                        if( output_res ):
+                            if args[-1] == 'image':
+                                content = output_res
+                            else:
+                                text_content = content
+                                del content
+                                content = [text_content , output_res]
+                        else:
+                            err_msg = 'No images found in the PDF file'
         # try:
         #         log.debug('Get the content of pdf file: '+str(input_path)+','+str(pagenumber))
         #         reader=PdfFileReader(open(input_path,'rb'), overwriteWarnings=False)
