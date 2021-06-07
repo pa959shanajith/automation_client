@@ -1198,8 +1198,8 @@ class UtilWebKeywords:
                             value,childSearchFlag=self.fetchcss(webelement,attr_name)   
                             if value != '':
                                 # show output
-                                if len(input) == 7: result = input[5]
-                                if len(input) == 3: result = input[1]
+                                if len(input) == 6: result = input[5]
+                                if len(input) == 2: result = input[1]
                                 if result:
                                     if value == result:
                                         local_uo.log.info('CSS property exists and values matched')
@@ -1207,7 +1207,7 @@ class UtilWebKeywords:
                                         status = TEST_RESULT_PASS
                                         methodoutput = TEST_RESULT_TRUE
                                     else:
-                                        err_msg = 'CSS property values does not match'
+                                        err_msg = 'CSS property exists but values didn\'t matched'
                                         logger.print_on_console(err_msg)
                                         local_uo.log.error(err_msg)
                                 else:
