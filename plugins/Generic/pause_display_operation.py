@@ -100,7 +100,7 @@ class Display(wx.Frame):
         self.done.start()
 
     def OnOk(self, *event):
-        if self.done is not None and self.done.isAlive():
+        if self.done is not None and self.done.is_alive():
             self.done.cancel()
         if (self != None) and (bool(self) != False):
             self.resume_execution()

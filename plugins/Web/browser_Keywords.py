@@ -254,7 +254,7 @@ class BrowserKeywords():
         err_msg=None
         try:
             if isinstance(local_bk.driver_obj,webdriver.Ie):
-                err_msg = "OpenNewTab Keyword is not supported in IE"
+                err_msg = "openNewTab Keyword is not supported in IE"
                 logger.print_on_console(err_msg)
                 local_bk.log.warn(err_msg)
             else:
@@ -266,10 +266,10 @@ class BrowserKeywords():
                 h=local_bk.driver_obj.current_window_handle
                 local_bk.all_handles.insert(cwh_in+1,h)
                 local_bk.recent_handles.insert(cwh_in+1,h)
-            # local_bk.all_handles.append(h)
-            # local_bk.recent_handles.append(h)
-            status=webconstants.TEST_RESULT_PASS
-            result=webconstants.TEST_RESULT_TRUE
+                # local_bk.all_handles.append(h)
+                # local_bk.recent_handles.append(h)
+                status=webconstants.TEST_RESULT_PASS
+                result=webconstants.TEST_RESULT_TRUE
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
         return status,result,output,err_msg
