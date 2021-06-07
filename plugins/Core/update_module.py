@@ -13,6 +13,7 @@ import json
 import os
 import logger
 import logging
+import subprocess
 from distutils.version import LooseVersion, StrictVersion
 log = logging.getLogger('update_module.py')
 
@@ -195,7 +196,8 @@ class Update_Rollback:
                 msg += "py"
             else: msg += "exe"
             log.debug(msg + ' : ' + update_cmd)
-            os.system(update_cmd)
+            #os.system(update_cmd)
+            subprocess.run(update_cmd, shell = True)
         except Exception as e:
             log.error( "Error in download_and_run_updater : " + str(e) )
 
@@ -209,6 +211,7 @@ class Update_Rollback:
                 msg += "py"
             else: msg += "exe"
             log.debug(msg + ' : ' + update_cmd)
-            os.system(update_cmd)
+            #os.system(update_cmd)
+            subprocess.run(update_cmd, shell = True)
         except Exception as e:
             log.error( "Error in run_rollback : " + str(e) )
