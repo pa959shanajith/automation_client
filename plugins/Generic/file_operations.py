@@ -1538,10 +1538,10 @@ class FileOperations:
                         try:
                             if os.path.exists(out_path):
                                 output_feild = out_path
+                            log.info("Choosen the dynamic file path")
                         except Exception as e:
-                            log.debug("Os path didn't existed ,setting to default")
+                            log.debug("File out path is not valid, setting to default")
                             output_feild = None
-                        log.info("Choosen the dynamic file path")
                         #logger.print_on_console("Choosen the dynamic file path")
                 else:
                     output_feild = args[0].split(";")[0]
@@ -1613,10 +1613,7 @@ class FileOperations:
                     except Exception as e :
                         log.error('some error : {}'.format(e))
                     if( output_feild ):
-                        #print('output_feild',output_feild)
-                        #print('type',type(output_feild))
                         if os.path.exists(output_feild):
-
                             logger.print_on_console( "Writing the output of cellByCellCompare to file ")
                             flg, err_msg = self.write_result_file(output_feild, collect_content, 'CellByCellCompare_Result')
                         else:
