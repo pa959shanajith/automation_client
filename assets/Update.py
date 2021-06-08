@@ -585,25 +585,25 @@ class common_functions:
             log.debug( 'Inside restartICE function' )
             #---------------------------------file and folders to delete
             try:
-                loc1 = AVOASSUREICE_LOC[:AVOASSUREICE_LOC.rindex('\\')] +"\\run.bat.lock"
+                loc1 = os.path.dirname(AVOASSUREICE_LOC) + os.sep + 'run.bat.lock'
                 if os.path.exists(loc1): os.unlink(loc1)
             except Exception as e:
                 print ( "=>Error occurred in restartICE unable to delete 'run.bat.lock' ERR_MSG: ", e )
                 log.error( "Error occurred in restartICE unable to delete 'run.bat.lock' ERR_MSG: " + str(e) )
             try:
-                loc2 = AVOASSUREICE_LOC[:AVOASSUREICE_LOC.rindex('\\')] +"\\releasenotesCore.log"
+                loc2 = os.path.dirname(AVOASSUREICE_LOC) + os.sep +"releasenotesCore.log"
                 if os.path.exists(loc2): os.remove(loc2)
             except Exception as e:
                 print ( "=>Error occurred in restartICE unable to delete 'releasenotesCore.log' ERR_MSG: ", e )
                 log.error( "Error occurred in restartICE unable to delete 'releasenotesCore.log' ERR_MSG: " + str(e) )
             try:
-                loc3 = AVOASSUREICE_LOC[:AVOASSUREICE_LOC.rindex('\\')] +"\\versionnoCore.txt"
+                loc3 = os.path.dirname(AVOASSUREICE_LOC) + os.sep +"versionnoCore.txt"
                 if os.path.exists(loc3): os.remove(loc3)
             except Exception as e:
                 print ( "=>Error occurred in restartICE unable to delete 'versionnoCore.txt' ERR_MSG: ", e )
                 log.error( "Error occurred in restartICE unable to delete 'versionnoCore.txt' ERR_MSG: " + str(e) )
             #---------------------------------file and folders to delete
-            loc = AVOASSUREICE_LOC[:AVOASSUREICE_LOC.rindex('\\')] +"\\run.bat"
+            loc = os.path.dirname(AVOASSUREICE_LOC) + os.sep +"run.bat"
             subprocess.Popen(loc,cwd=os.path.dirname(loc), creationflags=subprocess.CREATE_NEW_CONSOLE)
             log.debug( 'Restarted ICE.' )
         except Exception as e:
