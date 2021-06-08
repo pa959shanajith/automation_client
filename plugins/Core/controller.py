@@ -1679,12 +1679,7 @@ class Controller():
                 temp1 = i.split(" ")
                 if temp1[-1] and len(temp1[-1])==36:
                     poweroptions_list.append(temp1[-1])
-            if len(poweroptions_list)>1:
-                for j in poweroptions_list:
-                    if j!=self.active_scheme:
-                        self.change_power_option=j
-                        break
-            elif len(poweroptions_list)==1:
+            if len(poweroptions_list)==1:
                 duplicate_cmd="powercfg -duplicatescheme "+self.active_scheme
                 subprocess.call(duplicate_cmd, shell=True)
                 powercgf_list_cmd = "powercfg -list"
@@ -1698,11 +1693,11 @@ class Controller():
                     temp2 = x.split(" ")
                     if temp2[-1] and len(temp2[-1])==36:
                         poweroptions_list.append(temp2[-1])
-                for y in poweroptions_list:
-                    if y!=self.active_scheme:
-                        self.change_power_option=y
-                        break
                 self.one_power_option=True
+            for j in poweroptions_list:
+                if j!=self.active_scheme:
+                    self.change_power_option=j
+                    break
             self.powerscheme_location=os.environ['AVO_ASSURE_HOME']+os.sep+'assets'+os.sep+'active_scheme.pow'
             export_cmd="powercfg -export "+self.powerscheme_location+" "+self.active_scheme
             subprocess.call(export_cmd, shell=True)
