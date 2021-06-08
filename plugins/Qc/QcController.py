@@ -12,6 +12,7 @@
 import json
 import os
 from requests.auth import HTTPBasicAuth
+from requests.exceptions import ConnectionError
 import requests
 import logger
 import logging
@@ -37,7 +38,6 @@ class QcWindow():
 
     def login(self,filePath):
         res = "invalidcredentials"
-        connectionRefused = True
         try:
             flag=True
             user_name=filePath["qcUsername"]
@@ -46,7 +46,6 @@ class QcWindow():
             self.headers = {'cache-control': "no-cache"}
             login_url = self.Qc_Url + '/authentication-point/authenticate'
             resp = requests.post(login_url, auth=HTTPBasicAuth(user_name, pass_word),  headers=self.headers,proxies=readconfig.proxies)
-            connectionRefused = False
             if resp.status_code == 500 or resp.status_code == 503 :
                 res = "serverdown"
             if resp.status_code == 200:
@@ -89,9 +88,13 @@ class QcWindow():
                 for dom in DomainList:
                     domain_dict[key].append(str(dom))
             res = json.loads(json.dumps(domain_dict))
+        except ConnectionError as e:
+            res = "notreachable"
+            err_msg='Error while Connecting ALM'
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
+            log.error(e, exc_info=True)
         except Exception as e:
-            if connectionRefused :
-                res = "notreachable"
             err_msg='Error while Login in ALM'
             log.error(err_msg)
             logger.print_on_console(err_msg)
