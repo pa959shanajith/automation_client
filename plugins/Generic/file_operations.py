@@ -1532,11 +1532,16 @@ class FileOperations:
             if input_filed_set:
 
                 if(str(args[0].split(";")[0]).startswith("{") and str(args[0].split(";")[0]).endswith("}")):
-                    out_path = self.DV.get_dynamic_value(args[0].split(";")[0])
+                    out_path=self.DV.get_dynamic_value(args[0].split(";")[0])
                     dyn_var_opt = True
                     if ( out_path ):
-                        output_feild = out_path
-                        log.info("Choosen the dynamic file path")
+                        try:
+                            if os.path.exists(out_path):
+                                output_feild = out_path
+                            log.info("Choosen the dynamic file path")
+                        except Exception as e:
+                            log.debug("File out path is not valid, setting to default")
+                            output_feild = None
                         #logger.print_on_console("Choosen the dynamic file path")
                 else:
                     output_feild = args[0].split(";")[0]
@@ -1596,7 +1601,7 @@ class FileOperations:
                                 collect_content[colnum]=[]
                                 if( opt == True ):
                                     collect_content[colnum].append(desc)
-                                else:
+                                else: 
                                     collect_content[colnum].append(out)
                             else:
                                 if( opt == True ):
@@ -1608,9 +1613,7 @@ class FileOperations:
                     except Exception as e :
                         log.error('some error : {}'.format(e))
                     if( output_feild ):
-
                         if os.path.exists(output_feild):
-
                             logger.print_on_console( "Writing the output of cellByCellCompare to file ")
                             flg, err_msg = self.write_result_file(output_feild, collect_content, 'CellByCellCompare_Result')
                         else:

@@ -197,7 +197,7 @@ class Updater:
             """Adding plugins folder to archive"""
             log.debug( 'Adding ' + source_ice + " to archive" )
             archive_command = r'"{}" a "{}" "{}"'.format(self.loc_7z, store_loc, source_ice)
-            sp1 = subprocess.Popen(archive_command, stderr = subprocess.PIPE, stdout = subprocess.PIPE, stdin=subprocess.PIPE)
+            sp1 = subprocess.Popen(archive_command, stderr = subprocess.PIPE, stdout = subprocess.PIPE, stdin=subprocess.PIPE,shell =True)
             out = sp1.communicate()[0].decode('utf-8')
             if ( "The process cannot access the file because it is being used by another process" in out ):
                 err_msg = 'Error!: unable to add files to backup. Backup-process failed as it cannot access the files in '+ str(source_ice) + ' as the files are being used by a different process'
@@ -208,7 +208,7 @@ class Updater:
             """Adding about_manifest file to archive"""
             log.debug( 'Adding '+source_client_manifest+ " to archive" )
             archive_command = r'"{}" a "{}" "{}"'.format(self.loc_7z, store_loc, source_client_manifest)
-            sp1 = subprocess.Popen(archive_command, stderr = subprocess.PIPE, stdout = subprocess.PIPE, stdin=subprocess.PIPE)
+            sp1 = subprocess.Popen(archive_command, stderr = subprocess.PIPE, stdout = subprocess.PIPE, stdin=subprocess.PIPE,shell =True)
             out = sp1.communicate()[0].decode('utf-8')
             if ( "The process cannot access the file because it is being used by another process" in out ):
                 err_msg = 'Error!: unable to add files to backup. Backup-process failed as it cannot access '+ str(source_client_manifest) + ' as this file is being used by a different process'
@@ -583,7 +583,27 @@ class common_functions:
         """Method to restart ICE"""
         try:
             log.debug( 'Inside restartICE function' )
-            loc = AVOASSUREICE_LOC[:AVOASSUREICE_LOC.rindex('\\')] +"\\run.bat"
+            #---------------------------------file and folders to delete
+            try:
+                loc1 = os.path.dirname(AVOASSUREICE_LOC) + os.sep + 'run.bat.lock'
+                if os.path.exists(loc1): os.unlink(loc1)
+            except Exception as e:
+                print ( "=>Error occurred in restartICE unable to delete 'run.bat.lock' ERR_MSG: ", e )
+                log.error( "Error occurred in restartICE unable to delete 'run.bat.lock' ERR_MSG: " + str(e) )
+            try:
+                loc2 = os.path.dirname(AVOASSUREICE_LOC) + os.sep +"releasenotesCore.log"
+                if os.path.exists(loc2): os.remove(loc2)
+            except Exception as e:
+                print ( "=>Error occurred in restartICE unable to delete 'releasenotesCore.log' ERR_MSG: ", e )
+                log.error( "Error occurred in restartICE unable to delete 'releasenotesCore.log' ERR_MSG: " + str(e) )
+            try:
+                loc3 = os.path.dirname(AVOASSUREICE_LOC) + os.sep +"versionnoCore.txt"
+                if os.path.exists(loc3): os.remove(loc3)
+            except Exception as e:
+                print ( "=>Error occurred in restartICE unable to delete 'versionnoCore.txt' ERR_MSG: ", e )
+                log.error( "Error occurred in restartICE unable to delete 'versionnoCore.txt' ERR_MSG: " + str(e) )
+            #---------------------------------file and folders to delete
+            loc = os.path.dirname(AVOASSUREICE_LOC) + os.sep +"run.bat"
             subprocess.Popen(loc,cwd=os.path.dirname(loc), creationflags=subprocess.CREATE_NEW_CONSOLE)
             log.debug( 'Restarted ICE.' )
         except Exception as e:
