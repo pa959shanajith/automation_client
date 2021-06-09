@@ -902,11 +902,10 @@ class FileOperationsPDF:
                         log.debug( 'Total image count of the PDF file : ' + str(img_count) )
                         if( output_res ):
                             if args[-1] == 'image':
-                                content = output_res
+                                content = '\n'.join(output_res)
                             else:
-                                text_content = content
-                                del content
-                                content = [text_content , output_res]
+                                img_content = '\n'.join(output_res)
+                                content += img_content 
                         else:
                             err_msg = 'No images found in the PDF file'
         # try:
