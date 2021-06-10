@@ -137,8 +137,9 @@ class GeneratePDFReport(wx.Frame):
                     self.l4.SetLabel("Invalid report JSON File")
                     error_flag = True
         except:
-            self.l4.SetLabel("Invalid JSON File")
-            error_flag = True
+            if not error_flag:
+                self.l4.SetLabel("Invalid JSON File")
+                error_flag = True
 
         if error_flag: return False
         self.l4.SetLabel("Processing...")
