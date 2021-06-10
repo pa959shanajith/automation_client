@@ -22,6 +22,7 @@
     "httpStatusCode": "Yes",
     "ignoreVisibilityCheck": "No",
     "ignore_certificate": "Yes",
+    "incognito_private_mode": "No",
     "logFile_Path": "./logs/TestautoV2.log",
     "prediction_for_iris_objects": "No",
     "queryTimeOut": "3",

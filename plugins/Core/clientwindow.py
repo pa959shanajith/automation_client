@@ -993,7 +993,16 @@ class Config_window(wx.Frame):
             self.rbox21.SetSelection(1)           
         self.rbox21.SetToolTip(wx.ToolTip("Enables or Disables automatic screen lock during execution when ICE is run as admin."))
 
-        #Adding GridSizer which will show the radio buttons into grid of 10 rows and 2 colums it can be changed based on the requirements
+        #adding the radio button for opening browser in incognito/private mode:
+        self.rbox22 = wx.RadioBox(self.panel1, label = "Incognito/Private Mode", choices = lblList,
+            majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
+        if isConfigJson != False and isConfigJson['incognito_private_mode'].title() == lblList[0]:
+            self.rbox22.SetSelection(0)
+        else:
+            self.rbox22.SetSelection(1)
+        self.rbox22.SetToolTip(wx.ToolTip("Enables or disables incognito/private mode for Browser"))
+
+        #Adding GridSizer which will show the radio buttons into grid of 11 rows and 2 colums it can be changed based on the requirements
         self.gs=wx.GridSizer(11,2,5,5)
         self.gs.AddMany([(self.rbox9,0,wx.EXPAND), (self.rbox1,0,wx.EXPAND), (self.rbox2,0,wx.EXPAND),
             (self.rbox5,0,wx.EXPAND), (self.rbox6,0,wx.EXPAND), (self.rbox3,0,wx.EXPAND),
@@ -1001,7 +1010,8 @@ class Config_window(wx.Frame):
             (self.rbox10,0,wx.EXPAND), (self.rbox11,0,wx.EXPAND), (self.rbox12,0,wx.EXPAND),
             (self.rbox13,0,wx.EXPAND), (self.rbox14,0,wx.EXPAND), (self.rbox15,0,wx.EXPAND),
             (self.rbox16,0,wx.EXPAND), (self.rbox17,0,wx.EXPAND), (self.rbox18,0,wx.EXPAND),
-            (self.rbox19,0,wx.EXPAND), (self.rbox20,0,wx.EXPAND), (self.rbox21,0,wx.EXPAND)])
+            (self.rbox19,0,wx.EXPAND), (self.rbox20,0,wx.EXPAND), (self.rbox21,0,wx.EXPAND), 
+            (self.rbox22,0,wx.EXPAND)])
 
         #adding  GridSizer to bSizer which is a box sizer
         self.bSizer.Add(self.gs, 1, wx.EXPAND | wx.TOP, 5)
@@ -1106,6 +1116,7 @@ class Config_window(wx.Frame):
         close_browser_popup = self.rbox19.GetStringSelection()
         use_custom_debugport = self.rbox20.GetStringSelection()
         disable_screen_timeout = self.rbox21.GetStringSelection()
+        incognito_private_mode = self.rbox22.GetStringSelection()
         if extn_enabled == 'Yes' and headless_mode == 'Yes':
             self.error_msg.SetLabel("Extension Enable must be disabled when Headless Mode is enabled")
             self.error_msg.SetForegroundColour((255,0,0))
@@ -1146,7 +1157,8 @@ class Config_window(wx.Frame):
         data['full_screenshot']=full_screenshot.strip()
         data['close_browser_popup']=close_browser_popup.strip()
         data['use_custom_debugport']=use_custom_debugport.strip()
-        data['disable_screen_timeout']=disable_screen_timeout.strip()       
+        data['disable_screen_timeout']=disable_screen_timeout.strip()
+        data['incognito_private_mode']=incognito_private_mode.strip()
         config_data=data
         if (data['server_ip']!='' and data['server_port']!='' and data['server_cert']!='' and
             data['chrome_path']!='' and data['queryTimeOut'] not in ['','sec'] and data['logFile_Path']!='' and
