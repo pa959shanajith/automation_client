@@ -181,7 +181,7 @@ class GetParam():
                         dt = item.get(key)
                         break
                 if dt:
-                    log.info('Datatable exists')
+                    log.info('Datatable %s exists'%key)
                     columnNamesList = list(dt[0].keys())
                     log.info('Store the data into the set to remove the duplicate column names')
                     columnNamesSet = set(columnNamesList)
@@ -195,8 +195,8 @@ class GetParam():
                         log.info(filepath + ' contains duplicate column names')
                         logger.print_on_console(filepath + ' contains duplicate column names')
                 else:
-                    log.info('Datatable does not exist')
-                    logger.print_on_console('Datatable does not exist')
+                    log.info('Datatable %s does not exist'%key)
+                    logger.print_on_console('Datatable %s does not exist'%key)
 
             return status
         except Exception as e:
@@ -778,7 +778,7 @@ class GetParam():
                                 iterations = len(list(data.values())[0])
                                 while (paramindex < endlopnum):
                                     input = self.retrievestaticvariable(data,paramindex,filter)
-                                    paramindex =con.methodinvocation(paramindex,execution_env,input)
+                                    paramindex =con.methodinvocation(paramindex,execution_env,datatables,input)
                                     if paramindex in [TERMINATE,BREAK_POINT,STOP]:
                                         return paramindex
                                 log.info( '***Data Param: Iteration '+str(k)+ ' completed***\n\n')
@@ -829,7 +829,7 @@ class GetParam():
                                 logger.print_on_console ('Iterations : ',iterations)
                                 while (paramindex < endlopnum):
                                     input = self.retrievestaticvariable(data,paramindex,i)
-                                    paramindex =con.methodinvocation(paramindex,execution_env,input)
+                                    paramindex =con.methodinvocation(paramindex,execution_env,datatables,input)
                                     if paramindex in [TERMINATE,BREAK_POINT,STOP]:
                                         return paramindex
                                 log.info( '***Data Param: Iteration '+str(k)+ ' completed***\n\n')
