@@ -341,6 +341,8 @@ class Dispatcher:
         self.action=None
         self.wxObject=None
         self.thread=None
+        self.gwto_extension_enable=False
+        self.extension_enable_flag=False
 
     def dispatcher(self,teststepproperty,input,reporting_obj,wxObject,mythread,execution_env):
         objectname = teststepproperty.objectname
@@ -566,27 +568,16 @@ class Dispatcher:
                 #Finding the webelement for NON_WEBELEMENT_KEYWORDS
                 if (keyword not in NON_WEBELEMENT_KEYWORDS) and (teststepproperty.name!="waitForElementVisible"):
                     flag=True
+                    self.gwto_extension_enable=False
+                    self.extension_enable_flag=False
                     webelement=send_webelement_to_keyword(driver,objectname,url)
+                    if self.gwto_extension_enable and (webelement==None or webelement== ''):
+                        webelement=send_webelement_to_keyword(driver,objectname,url)
                     globalWait_to=int(configvalues['globalWaitTimeOut'])
-                    if globalWait_to > 0 and webelement is None:
-                        try:
-                            identifiers = objectname.split(';')
-                            obj_name=identifiers[0]
-                            if obj_name is not None:
-                                element_present = EC.presence_of_element_located((By.XPATH, obj_name))
-                                local_Wd.log.info('starting Global Wait TimeOut')
-                                WebDriverWait(browser_Keywords.local_bk.driver_obj, globalWait_to).until(element_present)
-                                msg='Element Found. Global Wait Timeout completed'
-                                local_Wd.log.info(msg)
-                                logger.print_on_console(msg)
-                                webelement=send_webelement_to_keyword(driver,objectname,url)
-                        except TimeoutException as e:
-                            msg1='Element not Found. Global Wait Timeout executed'
-                            logger.print_on_console(msg1)
-                            local_Wd.log.error(msg1)
-                            local_Wd.log.error(e)
-                        except Exception as e:
-                            local_Wd.log.error(e)
+                    if globalWait_to > 0 and (webelement==None or webelement== '') and not(self.extension_enable_flag):
+                        gwto_status=self.global_wait_timeout(globalWait_to,objectname)
+                        if gwto_status:
+                            webelement=send_webelement_to_keyword(driver,objectname,url)
                     if webelement == None and self.exception_flag:
                         result=TERMINATE
 
@@ -702,6 +693,27 @@ class Dispatcher:
             logger.print_on_console(err_msg)
         return result
 
+    def global_wait_timeout(self, globalWait_to, objectname):
+        status_gwto=False
+        try:
+            identifiers = objectname.split(';')
+            obj_name=identifiers[0]
+            if obj_name is not None:
+                element_present = EC.presence_of_element_located((By.XPATH, obj_name))
+                local_Wd.log.info('starting Global Wait TimeOut')
+                WebDriverWait(browser_Keywords.local_bk.driver_obj, globalWait_to).until(element_present)
+                msg='Element Found. Global Wait Timeout completed'
+                local_Wd.log.info(msg)
+                logger.print_on_console(msg)
+                status_gwto=True
+        except TimeoutException as e:
+            msg1='Element not Found. Global Wait Timeout executed'
+            logger.print_on_console(msg1)
+            local_Wd.log.error(msg1)
+            local_Wd.log.error(e)
+        except Exception as e:
+            local_Wd.log.error(e)
+        return status_gwto
 
     def check_url_error_code(self):
         status=False
@@ -854,60 +866,67 @@ class Dispatcher:
         if((webElement==None or webElement== '') and configvalues['extn_enabled'].lower() == 'yes' and self.action=='debug' and isinstance(driver, webdriver.Chrome)):
             try:
                 flag=True
-                logger.print_on_console('Scrape the Element using extension')
-                import pause_display_operation
-                from itertools import combinations
-                o = pause_display_operation.PauseAndDisplay()
-                inputs={'stepnum':stepnum,'custname':custname}
-                o.debug_object(inputs,self.wxObject,self.thread,driver)
-                attributes=driver.execute_script("return JSON.parse(window.localStorage.attributes)")
-                new_ele_type=driver.execute_script("return window.localStorage.element").lower()
-                typemap={'btn': 'button',
-                        'chkbox': 'checkbox',
-                        'elmnt': 'elmnt',
-                        'img': 'img',
-                        'lst': 'list',
-                        'radiobtn': 'radiobutton',
-                        'select': 'select',
-                        'tbl': 'table',
-                        'txtbox': 'input',
-                        'lnk':'a'
-                }
-                if (typemap[tagname]!=new_ele_type):
-                    flag=False
-                if(flag==False):
+                self.extension_enable_flag=True
+                globalWait_to=int(configvalues['globalWaitTimeOut'])
+                if globalWait_to>0 and not(self.gwto_extension_enable):
+                    gwto_status=self.global_wait_timeout(globalWait_to,objectname)
+                    if gwto_status:
+                        self.gwto_extension_enable=True
+                if not(self.gwto_extension_enable) and (webElement==None or webElement== ''):
+                    logger.print_on_console('Scrape the Element using extension')
+                    import pause_display_operation
+                    from itertools import combinations
                     o = pause_display_operation.PauseAndDisplay()
-                    inputs1={'custtype':typemap[tagname],'newtype':new_ele_type}
-                    o.debug_error(inputs1,self.wxObject,self.thread)
-                ele='//*'
-                a=[]
-                combo=''
-                for k,v in list(attributes.items()):
-                    if k in ['id','class','name','type']:
-                        ele=ele+'[@'+k+'="'+v+'"]'
-                        a.append('[@'+k+'="'+v+'"]')
-                tempwebElement=driver.find_elements_by_xpath(ele)
-                if(len(tempwebElement)==1):
-                    webElement=tempwebElement
-                    identifiers[0]=ele
-                    obj_flag=ele
-                    local_Wd.log.debug('Element has been Captured with all properties')
-                for i in range(len(a),1,-1):
-                    comb=combinations(a,i)
-                    for j in list(comb):
-                        combo="//*"+"".join(j)
-                        tempwebElement=driver.find_elements_by_xpath(combo)
-                        if(len(tempwebElement)==1):
-                            webElement=tempwebElement
-                            identifiers[0]=combo
-                            obj_flag=combo
-                            local_Wd.log.debug('Element has been Captured using some properties')
-                            break
-                    else:
-                        continue
-                    break
-                if(webElement==None):
-                    logger.print_on_console("Webelement not found through extension")
+                    inputs={'stepnum':stepnum,'custname':custname}
+                    o.debug_object(inputs,self.wxObject,self.thread,driver)
+                    attributes=driver.execute_script("return JSON.parse(window.localStorage.attributes)")
+                    new_ele_type=driver.execute_script("return window.localStorage.element").lower()
+                    typemap={'btn': 'button',
+                            'chkbox': 'checkbox',
+                            'elmnt': 'elmnt',
+                            'img': 'img',
+                            'lst': 'list',
+                            'radiobtn': 'radiobutton',
+                            'select': 'select',
+                            'tbl': 'table',
+                            'txtbox': 'input',
+                            'lnk':'a'
+                    }
+                    if (typemap[tagname]!=new_ele_type):
+                        flag=False
+                    if(flag==False):
+                        o = pause_display_operation.PauseAndDisplay()
+                        inputs1={'custtype':typemap[tagname],'newtype':new_ele_type}
+                        o.debug_error(inputs1,self.wxObject,self.thread)
+                    ele='//*'
+                    a=[]
+                    combo=''
+                    for k,v in list(attributes.items()):
+                        if k in ['id','class','name','type']:
+                            ele=ele+'[@'+k+'="'+v+'"]'
+                            a.append('[@'+k+'="'+v+'"]')
+                    tempwebElement=driver.find_elements_by_xpath(ele)
+                    if(len(tempwebElement)==1):
+                        webElement=tempwebElement
+                        identifiers[0]=ele
+                        obj_flag=ele
+                        local_Wd.log.debug('Element has been Captured with all properties')
+                    for i in range(len(a),1,-1):
+                        comb=combinations(a,i)
+                        for j in list(comb):
+                            combo="//*"+"".join(j)
+                            tempwebElement=driver.find_elements_by_xpath(combo)
+                            if(len(tempwebElement)==1):
+                                webElement=tempwebElement
+                                identifiers[0]=combo
+                                obj_flag=combo
+                                local_Wd.log.debug('Element has been Captured using some properties')
+                                break
+                        else:
+                            continue
+                        break
+                    if(webElement==None):
+                        logger.print_on_console("Webelement not found through extension")
             except Exception as e:
                 local_Wd.log.debug(e)
         if isinstance(webElement,list):
