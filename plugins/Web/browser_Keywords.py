@@ -771,7 +771,7 @@ class BrowserKeywords():
                                 local_bk.log.error(err_msg)
                         else:
                             window_num_flag = False
-                            err_msg = "Input has to be one less than the total number of subwindows!"
+                            err_msg = "Input has to be one less than the total number of subwindows(tabs)"
                             logger.print_on_console(err_msg)
                             local_bk.log.error(err_msg)
                     except Exception as e:
