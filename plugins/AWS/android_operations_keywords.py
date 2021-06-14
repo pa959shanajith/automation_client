@@ -771,7 +771,7 @@ class MobileOpeartions():
                        size=webelement.size
                        start_x=int(location['x'])
                        start_y=int(location['y'] + (size['height']/2))
-                       end_x=int(location['x'] + (size['width']))
+                       end_x=int(location['x'] + (size['width'])) - 1
                        end_y=int(start_y)
                        
                        driver.swipe(start_x,start_y,end_x,end_y,3000)
