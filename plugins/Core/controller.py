@@ -92,6 +92,7 @@ class Controller():
         self.active_scheme=""
         self.change_power_option=""
         self.powerscheme_location=""
+        self.one_power_option=False
         self.counter=[]
         self.jumpto_previousindex=[]
         self.verify_exists=False
@@ -1678,9 +1679,24 @@ class Controller():
                 temp1 = i.split(" ")
                 if temp1[-1] and len(temp1[-1])==36:
                     poweroptions_list.append(temp1[-1])
+            if len(poweroptions_list)==1:
+                duplicate_cmd="powercfg -duplicatescheme "+self.active_scheme
+                subprocess.call(duplicate_cmd, shell=True)
+                powercgf_list_cmd = "powercfg -list"
+                power_cfg_list = subprocess.Popen(powercgf_list_cmd, shell=True, stdout=subprocess.PIPE)
+                power_scheme_list = power_cfg_list.stdout.read()
+                power_scheme_list = power_scheme_list.decode()
+                pattern = "GUID: [a-z,A-Z,0-9]*-?[a-z,A-Z,0-9]*-?[a-z,A-Z,0-9]*-?[a-z,A-Z,0-9]*-?[a-z,A-Z,0-9]*"
+                result2 = re.findall(pattern, power_scheme_list)
+                poweroptions_list=[]
+                for x in result2:
+                    temp2 = x.split(" ")
+                    if temp2[-1] and len(temp2[-1])==36:
+                        poweroptions_list.append(temp2[-1])
+                self.one_power_option=True
             for j in poweroptions_list:
                 if j!=self.active_scheme:
-                    self.change_power_option=i
+                    self.change_power_option=j
                     break
             self.powerscheme_location=os.environ['AVO_ASSURE_HOME']+os.sep+'assets'+os.sep+'active_scheme.pow'
             export_cmd="powercfg -export "+self.powerscheme_location+" "+self.active_scheme
@@ -1706,6 +1722,9 @@ class Controller():
             os.remove(self.powerscheme_location)
             setactive_cmd="powercfg -setactive "+self.active_scheme
             subprocess.call(setactive_cmd, shell=True)
+            if self.one_power_option:
+                delete_duplicate_cmd="powercfg -delete "+self.change_power_option
+                subprocess.call(delete_duplicate_cmd, shell=True)
             log.info("reset screen timeout process completed")
         except Exception as e:
             logger.print_on_console("Exception in reset screen timeout")

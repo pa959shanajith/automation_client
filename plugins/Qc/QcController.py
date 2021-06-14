@@ -12,6 +12,7 @@
 import json
 import os
 from requests.auth import HTTPBasicAuth
+from requests.exceptions import ConnectionError
 import requests
 import logger
 import logging
@@ -87,6 +88,12 @@ class QcWindow():
                 for dom in DomainList:
                     domain_dict[key].append(str(dom))
             res = json.loads(json.dumps(domain_dict))
+        except ConnectionError as e:
+            res = "notreachable"
+            err_msg='Error while Connecting ALM'
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
+            log.error(e, exc_info=True)
         except Exception as e:
             err_msg='Error while Login in ALM'
             log.error(err_msg)

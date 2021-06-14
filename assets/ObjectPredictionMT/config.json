@@ -7,7 +7,7 @@
     "how_many_training_steps": "4000",
     "image_dir": "assets/ObjectPredictionMT/TrainingData",
     "logFile_Path": "logs/TestautoV2_predictionmt.log",
-    "output_labels": "Lib/site-packages/prediction/retrained_label.txt",
+    "output_labels": "Lib/site-packages/prediction/retrained_labels.txt",
     "rollback_dir": "assets/ObjectPredictionMT/model_backup.7z",
     "tfhub_module": "https://tfhub.dev/google/imagenet/mobilenet_v1_100_224/feature_vector/3",
     "train_batch_size": "100"
