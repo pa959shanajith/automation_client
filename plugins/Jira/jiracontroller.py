@@ -106,6 +106,7 @@ class JiraWindow():
             socket.emit('issue_id',issue_id)
         elif(issue_id==None and check == False):
             log.debug("Invalid Attachment Path")
+            log.error("Invalid Attachment Path")
             socket.emit('issue_id','Invalid Path')
         else:
             socket.emit('issue_id','Fail')
