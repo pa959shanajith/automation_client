@@ -442,7 +442,7 @@ class Reporting:
                 report_json[OVERALLSTATUS][0][PROJECT_NAME]=json_data["suitedetails"][i["s_index"]]['projectname']
                 report_json[OVERALLSTATUS][0][SCENARIO_NAME]=json_data["suitedetails"][i["s_index"]]['scenarioNames'][i["index"]]
                 report_json[OVERALLSTATUS][0][CYCLE_NAME]=json_data["suitedetails"][i["s_index"]]['cyclename']
-                report_json[OVERALLSTATUS][0][VERSION_NAME]=json_data["versionname"]
+                report_json[OVERALLSTATUS][0][VERSION]=json_data["version"]
                 if i['total']>0:
                     report_json[OVERALLSTATUS][0]["pass"]=str(round(i["Pass"]/i['total']*100,2))
                     report_json[OVERALLSTATUS][0]["fail"]=str(round(i["Fail"]/i['total']*100,2))
@@ -476,7 +476,7 @@ class Reporting:
                 report_json_condition_check[OVERALLSTATUS][0][PROJECT_NAME]=json_data["suitedetails"][i["s_index"]]['projectname']
                 report_json_condition_check[OVERALLSTATUS][0][SCENARIO_NAME]=json_data["suitedetails"][i["s_index"]]['scenarioNames'][i["index"]]
                 report_json_condition_check[OVERALLSTATUS][0][CYCLE_NAME]=json_data["suitedetails"][i["s_index"]]['cyclename']
-                report_json_condition_check[OVERALLSTATUS][0][VERSION_NAME]=json_data["versionname"]
+                report_json_condition_check[OVERALLSTATUS][0][VERSION]=json_data["version"]
                 if i['total']>0:
                     report_json_condition_check[OVERALLSTATUS][0]["pass"]=str(round(i["Pass"]/i['total']*100,2))
                     report_json_condition_check[OVERALLSTATUS][0]["fail"]=str(round(i["Fail"]/i['total']*100,2))
@@ -507,7 +507,7 @@ class Reporting:
                 report_json_condition_check_testcase_empty[OVERALLSTATUS][0][PROJECT_NAME]=json_data["suitedetails"][i["s_index"]]['projectname']
                 report_json_condition_check_testcase_empty[OVERALLSTATUS][0][SCENARIO_NAME]=json_data["suitedetails"][i["s_index"]]['scenarioNames'][i["index"]]
                 report_json_condition_check_testcase_empty[OVERALLSTATUS][0][CYCLE_NAME]=json_data["suitedetails"][i["s_index"]]['cyclename']
-                report_json_condition_check_testcase_empty[OVERALLSTATUS][0][VERSION_NAME]=json_data["versionname"]
+                report_json_condition_check_testcase_empty[OVERALLSTATUS][0][VERSION]=json_data["version"]
                 if i['total']>0:
                     report_json_condition_check_testcase_empty[OVERALLSTATUS][0]["pass"]=str(round(i["Pass"]/i['total']*100,2))
                     report_json_condition_check_testcase_empty[OVERALLSTATUS][0]["fail"]=str(round(i["Fail"]/i['total']*100,2))
