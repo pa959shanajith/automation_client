@@ -132,14 +132,13 @@ class Reporting:
         """
         if self.overallstatus==TERMINATE:
             self.add_termination_step()
-        self.start_time= start_time.strftime(TIME_FORMAT)
-        self.end_time=end_time.strftime(TIME_FORMAT)
-        els_time=str(ellapsed_time).split('.')[0]
-        self.ellapsed_time=els_time
-        # getTym = self.end_time.split(".")[0]
-        self.date = self.end_time.split(" ")[0]
-        # self.date = getDat[1] + "/" + getDat[2] + "/" + getDat[0]
-        self.time = self.end_time.split(" ")[1]
+        self.start_time=str(start_time)
+        self.end_time=str(end_time)
+        self.ellapsed_time=str(ellapsed_time)
+        getTym = self.end_time.split(".")[0]
+        getDat = getTym.split(" ")[0].split("-")
+        self.date = getDat[1] + "/" + getDat[2] + "/" + getDat[0]
+        self.time = getTym.split(" ")[1]
         obj={}
         obj[ELLAPSED_TIME]=self.ellapsed_time
         obj[END_TIME]=self.end_time
@@ -160,15 +159,13 @@ class Reporting:
             """
             start_time = datetime.now()
             end_time = datetime.now()
-            els_time = str(end_time - start_time)
-            els_time = els_time.split('.')[0]
-            self.ellapsed_time = els_time
-            self.start_time= start_time.strftime(TIME_FORMAT)
-            self.end_time=end_time.strftime(TIME_FORMAT)
-            # getTym = self.end_time.split(".")[0]
-            self.date = self.end_time.split(" ")[0]
-            # self.date = getDat[0] + "-" + getDat[1] + "-" + getDat[2]
-            self.time = self.end_time.split(" ")[1]
+            self.ellapsed_time = str(end_time - start_time)
+            self.start_time=str(start_time)
+            self.end_time=str(end_time)
+            getTym = self.end_time.split(".")[0]
+            getDat = getTym.split(" ")[0].split("-")
+            self.date = getDat[1] + "/" + getDat[2] + "/" + getDat[0]
+            self.time = getTym.split(" ")[1]
             obj={}
             obj[ELLAPSED_TIME]=self.ellapsed_time
             obj[END_TIME]=self.end_time
@@ -189,15 +186,13 @@ class Reporting:
             """
             start_time = datetime.now()
             end_time = datetime.now()
-            els_time = str(end_time - start_time)
-            els_time = els_time.split('.')[0]
-            self.ellapsed_time =els_time
-            self.start_time= start_time.strftime(TIME_FORMAT)
-            self.end_time=end_time.strftime(TIME_FORMAT)
-            # getTym = self.end_time.split(".")[0]
-            self.date = self.end_time.split(" ")[0]
-            # self.date = getDat[0] + "-" + getDat[1] + "/" + getDat[2]
-            self.time = self.end_time.split(" ")[1]
+            self.ellapsed_time = str(end_time - start_time)
+            self.start_time=str(start_time)
+            self.end_time=str(end_time)
+            getTym = self.end_time.split(".")[0]
+            getDat = getTym.split(" ")[0].split("-")
+            self.date = getDat[1] + "/" + getDat[2] + "/" + getDat[0]
+            self.time = getTym.split(" ")[1]
             obj={}
             obj[ELLAPSED_TIME]=self.ellapsed_time
             obj[END_TIME]=self.end_time
