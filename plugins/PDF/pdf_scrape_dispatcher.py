@@ -91,7 +91,7 @@ class ScrapeDispatcher(wx.Frame):
                 time.sleep(1)
                 img = pdfV.capture_window()
                 out_path = TEMP_PATH + OS_SEP + 'pdf.png'
-                img.save()
+                img.save(out_path)
                 with open(out_path, "rb") as image_file:
                           encoded_string = base64.b64encode(image_file.read())
                 # d = json.loads(d);
