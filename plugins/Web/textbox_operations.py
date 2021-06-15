@@ -513,6 +513,10 @@ class TextboxKeywords:
                                         obj=SendFunctionKeys()
                                         obj.sendfunction_keys("backspace",*args)
                                     else:
+                                        from selenium.webdriver.common.keys import Keys
+                                        text = self.__get_text(webelement)
+                                        if text and (len(text) > 0):
+                                            webelement.send_keys(Keys.BACK_SPACE * len(text))
                                         webelement.send_keys(input)
                                 status=TEST_RESULT_PASS
                                 methodoutput=TEST_RESULT_TRUE
@@ -1819,6 +1823,10 @@ class TextboxKeywords:
                                         for i in range (0,len(input_val)+1):
                                             browser_Keywords.local_bk.driver_obj.execute_script(SET_TEXT_SCRIPT,webelement,input_val[0:i])
                                     else:
+                                        from selenium.webdriver.common.keys import Keys
+                                        text = self.__get_text(webelement)
+                                        if text and (len(text) > 0):
+                                            webelement.send_keys(Keys.BACK_SPACE * len(text))
                                         webelement.send_keys(input_val)
                                 status=TEST_RESULT_PASS
                                 methodoutput=TEST_RESULT_TRUE
