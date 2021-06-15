@@ -71,7 +71,7 @@ class PDFViewer(sc.SizedFrame):
             hsizer = wx.BoxSizer( wx.HORIZONTAL)
             vsizer = wx.BoxSizer( wx.VERTICAL)
             self.loadbutton = wx.Button(paneCont, wx.ID_ANY, "Load PDF file", wx.DefaultPosition, wx.DefaultSize, 0 )
-            operations = ['Sibling Element','Between Elements', 'PDF Image']
+            operations = ['Sibling Element', 'PDF Image']
             self.combobox = wx.ComboBox(paneCont,wx.ID_ANY,"Select Action",wx.DefaultPosition,wx.DefaultSize,operations ,0)
             size = '4'
 ##            self.startbutton = btn.GenBitmapButton(paneCont,wx.ID_ANY,bitmap=wx.Bitmap("./images/toolbarButton-actionStart.png"),style=wx.NO_BORDER|wx.BU_EXACTFIT)
@@ -229,6 +229,9 @@ class PDFViewer(sc.SizedFrame):
             y2 = self.c2.y/perct_y
             pagewords = pageToFind.getTextWords()
             for i in pagewords:
+                t1 = list(i)
+                t1.append(pageToFind.number)
+                i = tuple(t1)
                 a1 = i[0]
                 a2 = i[2]
                 b1 = i[1]
@@ -396,6 +399,9 @@ class PDFViewer(sc.SizedFrame):
                     global hopIndex
                     global siblingElementArr
                     t = mapOfTextWords[index+hopIndex]
+                    t1 = list(t)
+                    t1.append(pageToFind.number)
+                    t = tuple(t1)
                     if (index+hopIndex > index):
                         siblingElementArr.append(t)
                     else:
@@ -439,6 +445,9 @@ class PDFViewer(sc.SizedFrame):
                     rect_obj = []
 
                     t = mapOfTextWords[index+hopIndex]
+                    t1 = list(t)
+                    t1.append(pageToFind.number)
+                    t = tuple(t1)
                     rect_obj.append(t[0])
                     rect_obj.append(t[2])
                     rect_obj.append(t[1])
