@@ -57,27 +57,49 @@ class XMLOperations():
             return input_string
         return input_string
 
-    def build_dict(self,json_obj):
-     keys={}
-     if isinstance(json_obj,dict):
-      for key,value in list(json_obj.items()):
-         if isinstance(value,dict):
-            keys[key]=value
-            keys.update(self.build_dict(value))
-         elif isinstance(value,list):
-             keys[key]=value
-             log.debug(key,value)
-             val=None
-             if len(value)>0:
-                val=self.build_dict(value[0])
-             if val!=None:
-                keys.update(val)
-         else:
-            keys[key]=value
-
-
-      print ("Keys {}".format(keys))
-      return keys
+    def build_dict(self,keys,json_obj):
+        keys=keys
+        if isinstance(json_obj,dict):
+            for key,value in list(json_obj.items()):
+                if isinstance(value,dict):
+                    if key in keys:
+                        v=keys[key]
+                        if isinstance(v,list):
+                            v.append(value)
+                        else:
+                            keys[key]=[v]
+                            keys[key].append(value)
+                    else:
+                        keys[key]=value
+                    keys.update(self.build_dict(keys,value))
+                elif isinstance(value,list):
+                    if key in keys:
+                        v=keys[key]
+                        if isinstance(v,list):
+                            v.append(value)
+                        else:
+                            keys[key]=[v]
+                            keys[key].append(value)
+                    else:
+                        keys[key]=value
+                    log.debug(key,value)
+                    val=None
+                    if len(value)>0:
+                        for v in value:
+                            val=self.build_dict(keys,v)
+                            if val!=None:
+                                keys.update(val)
+                else:
+                    if key in keys:
+                        v=keys[key]
+                        if isinstance(v,list):
+                            v.append(value)
+                        else:
+                            keys[key]=[v]
+                            keys[key].append(value)
+                    else:
+                        keys[key]=value
+        return keys
 
 
     def get_block_count(self,input_string,input_tag,*args):
@@ -105,10 +127,9 @@ class XMLOperations():
             try:
                 if (type(encoded_inp_string)==bytes):encoded_inp_string = encoded_inp_string.decode('utf8')
                 json_obj=json.loads(encoded_inp_string)
-                print ("Checking the JSON : {}".format(json_obj))
+                log.info("Checking the JSON : {}".format(json_obj))
                 if len(args)>0:
                     block_number=args[0]
-                    print ("BLOCK NUMBER : {}".format(type(block_number)))
             except Exception as e:
                try:
                     json_obj=ast.literal_eval(encoded_inp_string)
@@ -116,16 +137,20 @@ class XMLOperations():
                     log.error(e)
                     exception_json=e
 
-##            print json_obj
+            fetch_value_count=False
             if json_obj != None:
                 #json logic
-                json_obj_dict=self.build_dict(json_obj)
-                print(input_tag)
+                json_obj_dict=self.build_dict({},json_obj)
                 block = input_tag.split('.')
+                if ':' in block[-1]:
+                    key_value=block[-1].split(':')
+                    block[-1]=key_value[0]
+                    key_value=key_value[1]
+                    fetch_value_count=True   
                 number = block_number.split(',')
-                log.info('Json Input:',json_obj_dict)
-                log.info('Block:',block)
-                log.info('Block_Number:',number)
+                log.info('Json Input: %s',json_obj_dict)
+                log.info('Block: %s',block)
+                log.info('Block_Number: %s',number)
                 block_count = 0
                 if len(block)==1:
                     if block[0] in json_obj_dict:
@@ -146,25 +171,29 @@ class XMLOperations():
                         if isinstance(json_obj_dict,dict) and block[i+1] in json_obj_dict:
                             block_count=1
                         elif isinstance(json_obj_dict,list):
-                            if int(number[i+1])-1 != -1:
+                            if int(number[i])-1 != -1:
                                 log.debug('Finding key in given index')
                                 json_obj_dict=json_obj_dict[int(number[i])-1]
                                 if(block[i+1] in json_obj_dict):
                                     block_count=1
+                                    if fetch_value_count and isinstance(json_obj_dict[block[i+1]],list):
+                                        block_count=json_obj_dict[block[i+1]].count(key_value)
                             else:
                                 log.debug('Finding count keys in list')
                                 for j in json_obj_dict:
-                                    if block[i+1] in j:
+                                    if fetch_value_count and block[i+1] in j and key_value == j[block[i+1]]: 
+                                        block_count+=1
+                                    elif not(fetch_value_count) and block[i+1] in j:
                                         block_count+=1
                     except Exception as e:
-                        log.debug(e)
-                        log.debug('Number of index doesnot match number of key blocks')
+                        log.error(e)
+                        log.error('Number of index doesnot match number of key blocks')
                         err_msg=ERR_XML
                 if(block_count>0 and err_msg == None):
                     status = TEST_RESULT_PASS
                     methodoutput = TEST_RESULT_TRUE
-                    log.info("Number of blocks in input Json :", block_count)
-                    logger.print_on_console("Number of blocks in input Json:  ",block_count)
+                    log.info("Number of blocks in input Json : %d", block_count)
+                    logger.print_on_console("Number of blocks in input Json: ",block_count)
 
             else:
                 root = ET.fromstring(encoded_inp_string)
@@ -241,69 +270,9 @@ class XMLOperations():
                 root = ET.fromstring(input_string)
             log.debug('Root object created with input string')
             items=[]
-            ##vishvas.a 17/06/06 Defect #578 ALM
-            #this condition checks if the XML type received is SOAP type
-            #if true then "items" are added using looping
-            #else the regular flow continues
-            # if 'Envelope' in root.tag and root.tag.split('}')[1] == 'Envelope':
-            #     for elem in root.iter():
-            #         tag = elem.tag.split('}')[1]
-            #         if tag == input_tag:
-            #             items.append(elem)
             val=''
             j = JSONOperations()
             status,methodoutput,val,err_msg=j.parsexmltodict(input_string,input_tag,block_number,child_tag,args)
-#             else:
-# ##                items = root.getiterator(str(input_tag))
-#                 items = list(root.getiterator(input_tag))
-#             log.debug(items)
-#             log.debug('Getting children node from the root')
-#             if len(items) > 0:
-#                 log.debug('There are children in the root node, get the total number of children')
-#                 block_count = len(items)
-#                 block_number = int(block_number)
-#                 block = items[block_number-1].getchildren()
-# ##                log.info('Block number: ' + str(block_number))
-#                 log.info('Block number: ')
-#                 log.info(block_number)
-#                 if len(block)==0:
-#                     block=[items[0]]
-#                 list_tag=[]
-#                 for child in block:
-#                     log.info('Iterating child in the block')
-#                     # added condition in 'or' for SOAP types
-# ##                    if child.tag == str(child_tag) or ('}' in child.tag
-# ##                                and child.tag.split('}')[1] == str(child_tag)):
-#                     if child.tag == child_tag or ('}' in child.tag
-#                         and child.tag.split('}')[1] == child_tag):
-#                         log.info('Child matched with the input child tag')
-#                         if len(args)>0:
-#                             attribute=args[0]
-#                             attribute_dict=child.attrib
-#                             if attribute in attribute_dict:
-#                                 tagvalue=attribute_dict[attribute]
-#                                 logger.print_on_console('Tag Attribute : ',attribute, ' Tag Value : ',tagvalue)
-#                                 log.info('Got the child attribute value and stored in tagvalue')
-#                                 log.info(STATUS_METHODOUTPUT_UPDATE)
-#                                 status = TEST_RESULT_PASS
-#                                 methodoutput = TEST_RESULT_TRUE
-#                             else:
-#                                 logger.print_on_console('Invalid attribute key')
-#                                 log.info('Invalid attribute key')
-
-
-#                         else:
-#                             tagvalue =  child.text
-#                             logger.print_on_console('Tag : ',input_tag, ' Tag Value : ',tagvalue)
-#                             log.info('Got the child text value and stored in tagvalue')
-#                             log.info(STATUS_METHODOUTPUT_UPDATE)
-#                             status = TEST_RESULT_PASS
-#                             methodoutput = TEST_RESULT_TRUE
-#                         list_tag.append(tagvalue)
-#                     else:
-#                         invalidinput = True
-#                 if status == TEST_RESULT_FAIL:
-#                     err_msg=INVALID_INPUT + ' Please check the input tag'
         except Exception as e:
             log.error(e)
             if isinstance(e,ValueError):
@@ -316,10 +285,6 @@ class XMLOperations():
             log.error(err_msg)
             logger.print_on_console(err_msg)
         log.info(RETURN_RESULT)
-        # if len(list_tag) <=1:
-        #     tagvalue=list_tag[0]
-        # else:
-        #     tagvalue=list_tag
         if isinstance(val,str):
             tagvalue=val
         return status,methodoutput,tagvalue,err_msg
@@ -359,7 +324,7 @@ class XMLOperations():
 
             if json_obj != None:
                 #json logic
-                json_obj_dict=self.build_dict(json_obj)
+                json_obj_dict=self.build_dict({},json_obj)
                 if(input_tag in json_obj_dict):
                     blockvalue = []
                     json_value=json_obj_dict[input_tag]
