@@ -11,20 +11,16 @@
 import logger
 import logging
 
-import wx
 import sys
 import os
 import fitz
 import wx
 import wx.lib.sized_controls as sc
-from wx.lib.pdfviewer import pdfViewer, pdfButtonPanel
+from pdflib_custom import pdfViewer, pdfButtonPanel
 import wx.lib.buttons as btn
-
+from constants import IMAGES_PATH, TEMP_PATH
 from PIL import ImageGrab
 import win32gui
-
-IMAGES_PATH = os.environ["AVO_ASSURE_HOME"] + "/assets/Images/"
-os.environ["IMAGES_PATH"] = IMAGES_PATH
 
 pageToFind = ''
 hopIndex = 1
@@ -543,5 +539,5 @@ class PDFViewer(sc.SizedFrame):
 ##        win32gui.SetForegroundWindow(handle)
         bbox = win32gui.GetWindowRect(handle)
         img = ImageGrab.grab(bbox)
-        img.save('test.png')
+        img.save(TEMP_PATH + os.sep + 'test.png')
         return img

@@ -44,8 +44,10 @@ class Cropandadd():
             wx_window.Hide()
             time.sleep(1)
             im = PIL.ImageGrab.grab()
-            im.save('test.png')
-            image_orig = cv2.imread("test.png")
+            test_img_path = TEMP_PATH + OS_SEP + "test.png"
+            crop_img_path = TEMP_PATH + OS_SEP + "cropped.png"
+            im.save(test_img_path)
+            image_orig = cv2.imread(test_img_path)
             if SYSTEM_OS == 'Windows':
                 screen = screeninfo.get_monitors()[0]
             elif SYSTEM_OS == 'Darwin':
@@ -61,8 +63,8 @@ class Cropandadd():
             cv2.rectangle(overlay, (0, 0), im.size,(220,220,220), -1)
             alpha=0.4
             cv2.addWeighted(overlay, alpha, output, 1 - alpha,0, output)
-            cv2.imwrite('test.png',output)
-            im1 = Image.open('test.png')
+            cv2.imwrite(test_img_path,output)
+            im1 = Image.open(test_img_path)
             wx_window.Show()
             image = np.array(im1)
             self.RGB_img = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
@@ -94,8 +96,8 @@ class Cropandadd():
                     self.data['scrapetype'] = 'caa'
                     if (iy > y and ix > x) : RGB_img_crop = image_orig[y:iy,x:ix]
                     else : RGB_img_crop = image_orig[iy:y,ix:x]
-                    cv2.imwrite("cropped.png", RGB_img_crop)
-                    with open("cropped.png", "rb") as imageFile:
+                    cv2.imwrite(crop_img_path, RGB_img_crop)
+                    with open(crop_img_path, "rb") as imageFile:
                         RGB_img_crop_im = str(base64.b64encode(imageFile.read()))
                     if(ix!=x and iy!=y):
                         log.debug('Inside draw : Event3 - if ix/x and iy/y are not equal')
@@ -146,10 +148,10 @@ class Cropandadd():
                     log.debug('Terminated')
                 if self.stopflag:
                     log.debug('Clicked on stop.....')
-                    if(os.path.isfile("test.png")):
-                        os.remove("test.png")
-                    if(os.path.isfile("cropped.png")):
-                        os.remove("cropped.png")
+                    if(os.path.isfile(test_img_path)):
+                        os.remove(test_img_path)
+                    if(os.path.isfile(crop_img_path)):
+                        os.remove(crop_img_path)
                     log.debug('Clicked on stop completed')
                     break
         except Exception as e:
@@ -160,11 +162,12 @@ class Cropandadd():
         try:
             log.debug('Inside stopcropandadd')
             im = PIL.ImageGrab.grab()
-            im.save('out.png')
-            log.debug('out.png saved')
-            with open("out.png", "rb") as imageFile:
+            out_path = TEMP_PATH + OS_SEP + "out.png"
+            im.save(out_path)
+            log.debug('out.png saved in '+TEMP_PATH+' folder')
+            with open(out_path, "rb") as imageFile:
                 self.data['mirror'] = base64.b64encode(imageFile.read()).decode('UTF-8').strip()
-            os.remove('out.png')
+            os.remove(out_path)
             with open(os.environ["AVO_ASSURE_HOME"] + '/output/domelements.json', 'w') as outfile:
                 log.info('Opening domelements.json file to write scraped objects')
                 json.dump(self.data, outfile, indent=4, sort_keys=False)

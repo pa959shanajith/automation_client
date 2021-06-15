@@ -83,15 +83,16 @@ class ScrapeDispatcher(wx.Frame):
             res = pdfV.OnStop(event)
             ie = {'view': res}
             scrapeJson =  json.dumps(ie)
-            d = json.loads(scrapeJson);
+            d = json.loads(scrapeJson)
 
             try:
                 self.Iconize(True)
                 #providing 1 sec delay to minimize wx scrape window to hide in screenshot
                 time.sleep(1)
                 img = pdfV.capture_window()
-                img.save('pdf.png')
-                with open("pdf.png", "rb") as image_file:
+                out_path = TEMP_PATH + OS_SEP + 'pdf.png'
+                img.save()
+                with open(out_path, "rb") as image_file:
                           encoded_string = base64.b64encode(image_file.read())
                 # d = json.loads(d);
                 d['mirror'] =encoded_string.decode('UTF-8').strip()
