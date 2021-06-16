@@ -254,6 +254,7 @@ class DatabaseOperation():
         verb = OUTPUT_CONSTANT
         err_msg=None
         cursor=None
+        sheet=None
         try:
             ext = self.get_ext(inp_file)
             if ext == '.xls':
