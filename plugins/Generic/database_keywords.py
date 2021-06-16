@@ -265,7 +265,10 @@ class DatabaseOperation():
                 rows = cursor.fetchall()
                 columns = [column[0] for column in cursor.description]
                 verify = os.path.isfile(inp_file)
-                if (verify == True):
+                if(verify== True and ext in[".xls",".xlsx"]):
+                    book = open_workbook(inp_file)
+                    sheet = book.sheet_by_name(inp_sheet)
+                if (verify == True and (type(sheet)==xlrd.sheet.Sheet or sheet == None)):
                     ext = self.get_ext(file_path)
                     if (ext == '.xls'):
                         work_book = xlwt.Workbook(encoding="utf-8")
@@ -416,8 +419,8 @@ class DatabaseOperation():
                         err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                         logger.print_on_console(err_msg)
                         log.info(err_msg)
-            else:
-                logger.print_on_console(generic_constants.FILE_NOT_EXISTS)
+                else:
+                    logger.print_on_console(generic_constants.FILE_NOT_EXISTS)
         except Exception as e:
             err_msg = self.processException(e)
         finally:
