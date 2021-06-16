@@ -64,8 +64,9 @@ class Cropandadd():
             cv2.rectangle(overlay, (0, 0), (image_orig.shape[1],image_orig.shape[0]),(220,220,220), -1)
             alpha=0.4
             cv2.addWeighted(overlay, alpha, output, 1 - alpha,0, output)
-            cv2.imwrite('test.png',output)
-            im1 = Image.open('test.png')
+            out_path = TEMP_PATH + OS_SEP + 'test.png'
+            cv2.imwrite(out_path,output)
+            im1 = Image.open(out_path)
             wx_window.Show()                # again displays the start/stop iris window
             image = np.array(im1)
             self.RGB_img = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
@@ -148,8 +149,8 @@ class Cropandadd():
                     self.stopflag = True
                     cv2.destroyAllWindows()
                 if self.stopflag:
-                    if(os.path.isfile("test.png")):
-                        os.remove("test.png")
+                    if(os.path.isfile(out_path)):
+                        os.remove(out_path)
                     if(os.path.isfile("cropped.png")):
                         os.remove("cropped.png")
                     break

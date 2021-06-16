@@ -27,6 +27,7 @@ from string_ops_keywords import *
 from utilweb_operations import *
 import pyautogui
 import psutil
+import readconfig
 local_blk = threading.local()
 ##text_javascript = """function stext_content(f) {     var sfirstText = '';     var stextdisplay = '';     for (var z = 0; z < f.childNodes.length; z++) {         var scurNode = f.childNodes[z];         swhitespace = /^\s*$/;         if (scurNode.nodeName === '#text' && !(swhitespace.test(scurNode.nodeValue))) {             sfirstText = scurNode.nodeValue;             stextdisplay = stextdisplay + sfirstText;         }     }     return (stextdisplay); }; return stext_content(arguments[0])"""
 class ButtonLinkKeyword():
@@ -563,7 +564,7 @@ class ButtonLinkKeyword():
         if ppid == None:
             return False
         def winEnumHandler(hwnd, hwnd_list):
-            if win32gui.IsWindowVisible(hwnd) and win32gui.GetWindowText(hwnd) == "Open":
+            if win32gui.IsWindowVisible(hwnd) and win32gui.GetWindowText(hwnd) in ["Open","File Upload"]:
                 hwnd_list.append(hwnd)
         win32gui.EnumWindows(winEnumHandler, hwnds)
         pids = [win32process.GetWindowThreadProcessId(h)[1] for h in hwnds]
@@ -593,6 +594,7 @@ class ButtonLinkKeyword():
                 maxTries = int(int(args[2]) / time_sleep)
             result_call = self.upload_time_func(maxTries, time_sleep)
             if result_call!=False:
+                configvalues = readconfig.configvalues
                 pyautogui.PAUSE = 1
                 pyautogui.keyDown('alt')
                 pyautogui.keyDown('n')
@@ -600,7 +602,7 @@ class ButtonLinkKeyword():
                 pyautogui.keyUp('alt')
                 pyautogui.keyUp('n')
                 pyautogui.PAUSE = 1
-                pyautogui.typewrite(inputfile, interval=0.25)
+                pyautogui.typewrite(inputfile, interval=float(configvalues['delay_stringinput']))
                 pyautogui.PAUSE = 1
                 pyautogui.keyDown('enter')
                 pyautogui.PAUSE = 1
@@ -655,22 +657,10 @@ class ButtonLinkKeyword():
                 local_blk.log.info(STATUS_METHODOUTPUT_UPDATE)
                 status = True
             else:
-                try:
-                    local_blk.log.info("Click operation performed using mousehover and keydown")
-                    UW=UtilWebKeywords()
-                    browser_Keywords.local_bk.driver_obj.execute_script(webconstants.FOUCS_ELE,webelement)
-                    UW.mouse_hover(webelement,(1,))
-                    pyautogui.PAUSE = 1
-                    pyautogui.keyDown('enter')
-                    #pyautogui.press('enter')
-                    pyautogui.PAUSE = 1
-                    pyautogui.keyUp('enter')
-
-                except:
-                    local_blk.log.debug('Going to perform click operation')
-                    webelement.click()
-                    #self.click(webelement)
-                    local_blk.log.info('Click operation performed using selenium click')
+                local_blk.log.debug('Going to perform click operation')
+                webelement.click()
+                #self.click(webelement)
+                local_blk.log.info('Click operation performed using selenium click')
                 status = True
         except Exception as e:
             logger.print_on_console(EXCEPTION_OCCURED,e)

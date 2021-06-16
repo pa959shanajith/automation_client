@@ -75,7 +75,17 @@ class Launch_Keywords():
                         elif ( file_ext == '.exe' ):
                             value = win32api.ShellExecute(0, 'open', filePath, None, directory, 1)
                             time.sleep(3)
-                            if ( int(value) > 32 ):
+                            if ( int(value) > 32):
+                                # Bug #23652
+                                appName = os.path.basename(filePath)
+                                for p in psutil.process_iter():
+                                    try:
+                                        if appName.lower() in p.name().lower():
+                                            appId = p.pid
+                                            app = Application().connect(process=appId)
+                                            app.top_window().set_focus()
+                                    except:
+                                        pass
                                 status = desktop_constants.TEST_RESULT_PASS
                                 result = desktop_constants.TEST_RESULT_TRUE
                                 verb = "Application Launched"

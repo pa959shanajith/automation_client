@@ -360,7 +360,7 @@ SCENARIO_NAME='scenarioName'
 
 RELEASE_NAME='releaseName'
 
-VERSION_NAME='versionname'
+VERSION='version'
 
 TERMINATED_BY='terminatedBy'
 
@@ -520,5 +520,7 @@ if SYSTEM_OS == "Windows":
     EDGE_CHROMIUM_DRIVER_PATH += ".exe"
 
 if (os.path.exists(UPDATER_LOC[:-3] + "py")): UPDATER_LOC = UPDATER_LOC[:-3] + "py"
+
+TEMP_PATH = AVO_ASSURE_HOME + OS_SEP + "output"
 
 PREDICTION_IMG_DIR = "Disabled"
