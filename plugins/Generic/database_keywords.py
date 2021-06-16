@@ -97,7 +97,7 @@ class DatabaseOperation():
             cnxn = self.connection(dbtype, ip , port , dbName, userName , password)
             if cnxn is not None:
                 cursor = cnxn.cursor()
-                statement = ['create','update','insert','CREATE','UPDATE','INSERT']
+                statement = ['create','update','insert','drop','delete','CREATE','UPDATE','INSERT','DROP','DELETE']
                 if any(x in query for x in statement ):
                     log.debug('Inside IF condition')
                     cursor.execute(query)  
