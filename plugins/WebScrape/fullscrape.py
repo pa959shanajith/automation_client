@@ -67,6 +67,9 @@ class Fullscrape():
                         log.info('Got the window which has the focus')
                         currenthandle = eachdriverhand
                         break
+            #Bug 610: Full scrape not working on IE after scraping on other browsers.
+            if(isinstance(driver,webdriver.Ie) and currenthandle not in driver.window_handles and len(driver.window_handles)==1):
+                currenthandle=driver.window_handles[0]
             tempne = []
             log.info('Performing the full scrape operation on default/outer page')
             if scrape_option[0].lower() == 'select a section using xpath':

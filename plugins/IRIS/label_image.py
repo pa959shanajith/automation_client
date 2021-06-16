@@ -95,14 +95,14 @@ class LabelImage():
             prediction_results = {}
 
             labels = load_labels(label_file)
-            file_name = os.environ['AVO_ASSURE_HOME'] + '/test.png'
+            file_name = TEMP_PATH + OS_SEP + 'test.png'
             obj=view
             with tf.Session(graph=graph) as sess:
                 #for obj in view:
                 byte_mirror = base64.b64encode(obj['cord'].encode('utf-8'))
                 b64 = base64.b64decode(byte_mirror)
                 mirror = b64[2:len(b64)-1]
-                with open('test.png','wb') as f:
+                with open(file_name,'wb') as f:
                     f.write(base64.b64decode(mirror))
                 try:
                     t = read_tensor_from_image_file(

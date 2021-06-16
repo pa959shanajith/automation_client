@@ -254,7 +254,7 @@ class BrowserKeywords():
         err_msg=None
         try:
             if isinstance(local_bk.driver_obj,webdriver.Ie):
-                err_msg = "OpenNewTab Keyword is not supported in IE"
+                err_msg = "openNewTab Keyword is not supported in IE"
                 logger.print_on_console(err_msg)
                 local_bk.log.warn(err_msg)
             else:
@@ -266,10 +266,10 @@ class BrowserKeywords():
                 h=local_bk.driver_obj.current_window_handle
                 local_bk.all_handles.insert(cwh_in+1,h)
                 local_bk.recent_handles.insert(cwh_in+1,h)
-            # local_bk.all_handles.append(h)
-            # local_bk.recent_handles.append(h)
-            status=webconstants.TEST_RESULT_PASS
-            result=webconstants.TEST_RESULT_TRUE
+                # local_bk.all_handles.append(h)
+                # local_bk.recent_handles.append(h)
+                status=webconstants.TEST_RESULT_PASS
+                result=webconstants.TEST_RESULT_TRUE
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
         return status,result,output,err_msg
@@ -1315,6 +1315,7 @@ class Singleton_DriverUtil():
         headless_mode = str(configvalues['headless_mode'])=='Yes'
         use_custom_debugport = str(configvalues["use_custom_debugport"].lower()) == "yes"
         close_browser_popup = configvalues['close_browser_popup']
+        incognito_private_mode = configvalues['incognito_private_mode']
         if (browser_num == '1'):
             try:
                 chrome_path = configvalues['chrome_path']
@@ -1351,6 +1352,8 @@ class Singleton_DriverUtil():
                         prefs["credentials_enable_service"] = False
                         prefs["profile.password_manager_enabled"] = False
                         choptions.add_experimental_option("prefs", prefs)
+                    if str(incognito_private_mode).lower() == 'yes':
+                        choptions.add_argument('--incognito')
                     if use_custom_debugport:
                         choptions.add_argument("--remote-debugging-port="+core_utils.find_open_port())
 
@@ -1381,6 +1384,8 @@ class Singleton_DriverUtil():
                         firefox_options.headless = True
                     if str(close_browser_popup).lower() == 'yes':
                         firefox_options.set_preference("credentials_enable_service", False)
+                    if str(incognito_private_mode).lower() == 'yes':
+                        firefox_options.set_preference("browser.privatebrowsing.autostart", True)
                     if str(configvalues['firefox_path']).lower() != "default":
                         from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
                         firefox_options.binary = FirefoxBinary(str(configvalues['firefox_path']))
@@ -1517,6 +1522,8 @@ class Singleton_DriverUtil():
                         prefs["credentials_enable_service"] = False
                         prefs["profile.password_manager_enabled"] = False
                         msoptions.add_experimental_option("prefs", prefs)
+                    if str(incognito_private_mode).lower() == 'yes':
+                        msoptions.add_argument("-inprivate")
                     if use_custom_debugport:
                         msoptions.add_argument("--remote-debugging-port="+core_utils.find_open_port())
                     caps = msoptions.to_capabilities()

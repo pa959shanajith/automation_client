@@ -92,6 +92,7 @@ class Controller():
         self.active_scheme=""
         self.change_power_option=""
         self.powerscheme_location=""
+        self.one_power_option=False
         self.counter=[]
         self.jumpto_previousindex=[]
         self.verify_exists=False
@@ -1115,14 +1116,14 @@ class Controller():
 
                         # if('integrationType' in qc_creds and qc_creds['integrationType'] == 'ALM'):
                         integ = 0
-                        if(qc_creds["alm"]["url"] != "" and len(scenario["qcdetails"]) != 0):
+                        if(qc_creds["alm"]["url"] != "" and len(scenario["qcdetails"]) > integ):
                             qc_username=qc_creds['alm']['username']
                             qc_password=qc_creds['alm']['password']
                             qc_url=qc_creds['alm']['url']
                             qc_sceanrio_data=scenario['qcdetails'][integ]
                             integ += 1
                         # if('integrationType' in qc_creds and qc_creds['integrationType'] == 'qTest'):
-                        if(qc_creds["qtest"]["url"] != "" and len(scenario["qcdetails"]) != 0):
+                        if(qc_creds["qtest"]["url"] != "" and len(scenario["qcdetails"]) > integ):
                             qtest_username=qc_creds["qtest"]["username"]
                             qtest_password=qc_creds["qtest"]["password"]
                             qtest_url=qc_creds["qtest"]["url"]
@@ -1134,7 +1135,7 @@ class Controller():
                             qtest_suite=qc_sceanrio_data['qtestsuite']
                             qtest_suiteid=qc_sceanrio_data['qtestsuiteid']
                         # if('integrationType' in qc_creds and qc_creds['integrationType'] == 'Zephyr'):
-                        if(qc_creds["zephyr"]["url"] != "" and len(scenario["qcdetails"]) != 0):
+                        if(qc_creds["zephyr"]["url"] != "" and len(scenario["qcdetails"]) > integ):
                             zephyr_url=qc_creds["zephyr"]["url"]
                             zephyr_username=qc_creds["zephyr"]["username"]
                             zephyr_password=qc_creds["zephyr"]["password"]
@@ -1321,12 +1322,15 @@ class Controller():
                             sc_idx += 1
                             exc_pass = False
                             report_json=con.reporting_obj.report_json_condition_check_testcase_empty[OVERALLSTATUS]
+                        integ=0 
                         # if integration_type!="qTest" and integration_type!="Zephyr" and len(scenario['qcdetails'])==10 and (qc_url!='' and qc_password!='' and  qc_username!=''):
-                        if  len(scenario['qcdetails'])!=0 and qc_creds['alm']['url'] != '':
+                        if  len(scenario["qcdetails"]) > integ and qc_creds['alm']['url'] != '':
+                            integ += 1
                             if type(qc_sceanrio_data) is not list:
                                 qc_domain=qc_sceanrio_data['qcdomain']
                                 qc_project=qc_sceanrio_data['qcproject']
                                 qc_folder=qc_sceanrio_data['qcfolderpath']
+                                qc_folderid=qc_sceanrio_data[i]['qcfolderid']
                                 qc_tsList=qc_sceanrio_data['qctestset']
                                 qc_testrunname=qc_sceanrio_data['qctestcase']
                                 qc_status_over=report_json[0]
@@ -1346,6 +1350,7 @@ class Controller():
                                     qc_status['qc_domain']=qc_domain
                                     qc_status['qc_project']=qc_project
                                     qc_status['qc_folder']=qc_folder
+                                    qc_status['qc_folderid']=qc_folderid
                                     qc_status['qc_tsList']=qc_tsList
                                     qc_status['qc_testrunname']=qc_testrunname
                                     qc_status['qc_update_status'] = qc_update_status
@@ -1365,6 +1370,7 @@ class Controller():
                                     qc_domain=qc_sceanrio_data[i]['qcdomain']
                                     qc_project=qc_sceanrio_data[i]['qcproject']
                                     qc_folder=qc_sceanrio_data[i]['qcfolderpath']
+                                    qc_folderid=qc_sceanrio_data[i]['qcfolderid']
                                     qc_tsList=qc_sceanrio_data[i]['qctestset']
                                     qc_testrunname=qc_sceanrio_data[i]['qctestcase']
                                     qc_status_over=report_json[0]
@@ -1384,6 +1390,7 @@ class Controller():
                                         qc_status['qc_domain']=qc_domain
                                         qc_status['qc_project']=qc_project
                                         qc_status['qc_folder']=qc_folder
+                                        qc_status['qc_folderid']=qc_folderid
                                         qc_status['qc_tsList']=qc_tsList
                                         qc_status['qc_testrunname']=qc_testrunname
                                         qc_status['qc_update_status'] = qc_update_status
@@ -1399,8 +1406,9 @@ class Controller():
                                     except Exception as e:
                                         logger.print_on_console('Error in Updating Qc details')
                         # if (integration_type=="qTest" and qc_url!='' and qc_password!='' and  qc_username!=''):
-                        if len(scenario['qcdetails'])!=0 and qc_creds['qtest']['url'] != '':
+                        if len(scenario["qcdetails"]) > integ and qc_creds['qtest']['url'] != '':
                             qtest_status_over=report_json[0]
+                            integ += 1
                             try:
                                 qtest_status = {}
                                 qtest_status['qtestaction']='qtestupdate'
@@ -1442,8 +1450,9 @@ class Controller():
                                 log.error('Error in Updating qTest details '+str(e))
                                 logger.print_on_console('Error in Updating qTest details')
                         # if (integration_type=="Zephyr" and zephyr_password!='' and zephyr_username!='' and  zephyr_url!=''):
-                        if len(scenario['qcdetails'])!=0 and qc_creds['zephyr']['url'] != '':
+                        if len(scenario["qcdetails"]) > integ and qc_creds['zephyr']['url'] != '':
                             zephyr_status_over=report_json[0]
+                            integ += 1
                             try:
                                 zephyr_status = {}
                                 zephyr_status['zephyraction']='zephyrupdate'
@@ -1678,9 +1687,24 @@ class Controller():
                 temp1 = i.split(" ")
                 if temp1[-1] and len(temp1[-1])==36:
                     poweroptions_list.append(temp1[-1])
+            if len(poweroptions_list)==1:
+                duplicate_cmd="powercfg -duplicatescheme "+self.active_scheme
+                subprocess.call(duplicate_cmd, shell=True)
+                powercgf_list_cmd = "powercfg -list"
+                power_cfg_list = subprocess.Popen(powercgf_list_cmd, shell=True, stdout=subprocess.PIPE)
+                power_scheme_list = power_cfg_list.stdout.read()
+                power_scheme_list = power_scheme_list.decode()
+                pattern = "GUID: [a-z,A-Z,0-9]*-?[a-z,A-Z,0-9]*-?[a-z,A-Z,0-9]*-?[a-z,A-Z,0-9]*-?[a-z,A-Z,0-9]*"
+                result2 = re.findall(pattern, power_scheme_list)
+                poweroptions_list=[]
+                for x in result2:
+                    temp2 = x.split(" ")
+                    if temp2[-1] and len(temp2[-1])==36:
+                        poweroptions_list.append(temp2[-1])
+                self.one_power_option=True
             for j in poweroptions_list:
                 if j!=self.active_scheme:
-                    self.change_power_option=i
+                    self.change_power_option=j
                     break
             self.powerscheme_location=os.environ['AVO_ASSURE_HOME']+os.sep+'assets'+os.sep+'active_scheme.pow'
             export_cmd="powercfg -export "+self.powerscheme_location+" "+self.active_scheme
@@ -1706,6 +1730,9 @@ class Controller():
             os.remove(self.powerscheme_location)
             setactive_cmd="powercfg -setactive "+self.active_scheme
             subprocess.call(setactive_cmd, shell=True)
+            if self.one_power_option:
+                delete_duplicate_cmd="powercfg -delete "+self.change_power_option
+                subprocess.call(delete_duplicate_cmd, shell=True)
             log.info("reset screen timeout process completed")
         except Exception as e:
             logger.print_on_console("Exception in reset screen timeout")

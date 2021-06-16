@@ -181,22 +181,12 @@ class GetParam():
                         dt = item.get(key)
                         break
                 if dt:
-                    log.info('Datatable exists')
-                    columnNamesList = list(dt[0].keys())
-                    log.info('Store the data into the set to remove the duplicate column names')
-                    columnNamesSet = set(columnNamesList)
-                    log.info('Comparing the length of the columnNamesList and columnNamesSet ')
-                    if len(columnNamesList) == len(columnNamesSet):
-                        log.info(filepath + ' contains unique column names, continue..')
-                        logger.print_on_console(filepath + ' contains unique column names, continue..')
-                        log.info(STATUS_METHODOUTPUT_UPDATE)
-                        status = TEST_RESULT_PASS
-                    else:
-                        log.info(filepath + ' contains duplicate column names')
-                        logger.print_on_console(filepath + ' contains duplicate column names')
+                    log.info('Datatable %s exists'%key)
+                    log.info(STATUS_METHODOUTPUT_UPDATE)
+                    status = TEST_RESULT_PASS
                 else:
-                    log.info('Datatable does not exist')
-                    logger.print_on_console('Datatable does not exist')
+                    log.info('Datatable %s does not exist'%key)
+                    logger.print_on_console('Datatable %s does not exist'%key)
 
             return status
         except Exception as e:
@@ -622,8 +612,8 @@ class GetParam():
                             #start - check for dynamic variable
                             end = filters[1]
                             #end - check for dynamic variable
-                            startRow = int(start);
-                            endRow = int(end);
+                            startRow = int(start)
+                            endRow = int(end)
                             log.info('Data Param start row: ')
                             log.info(startRow)
                             logger.print_on_console('Data Param start row: ',startRow)
@@ -637,8 +627,8 @@ class GetParam():
                             #start - check for dynamic variable
                             end = filters[1]
                             #end - check for dynamic variable
-                            startRow = int(start);
-                            endRow = int(end);
+                            startRow = int(start)
+                            endRow = int(end)
                             log.info('Data Param start row: ')
                             log.info(startRow)
                             logger.print_on_console('Data Param start row: ',startRow)
@@ -659,15 +649,15 @@ class GetParam():
                             #start - check for dynamic variable
                             end = filters[1]
                             #end - check for dynamic variable
-                            startRow = int(start);
-                            endRow = int(end);
+                            startRow = int(start)
+                            endRow = int(end)
                             log.info('Data Param start row: ')
                             log.info(startRow)
                             logger.print_on_console('Data Param start row: ',startRow)
                             log.info('Data Param end row: ')
                             log.info(endRow)
                             logger.print_on_console('Data Param end row: ',endRow)
-                        else:
+                        elif fileinfo[1] != '':
                             filter1 = fileinfo[1]
                             filter = int(filter1)
                             log.info('Data Param  row: ')
@@ -680,16 +670,16 @@ class GetParam():
                             #start - check for dynamic variable
                             end = filters[1]
                             #end - check for dynamic variable
-                            startRow = int(start);
-                            endRow = int(end);
+                            startRow = int(start)
+                            endRow = int(end)
                             log.info('Data Param start row: ')
                             log.info(startRow)
                             logger.print_on_console('Data Param start row: ',startRow)
                             log.info('Data Param end row: ')
                             log.info(endRow)
                             logger.print_on_console('Data Param end row: ',endRow)
-                        else:
-                            filter1 = fileinfo[1]
+                        elif fileinfo[2] != '':
+                            filter1 = fileinfo[2]
                             filter = int(filter1)
                             log.info('Data Param  row: ')
                             log.info(filter)
@@ -778,7 +768,7 @@ class GetParam():
                                 iterations = len(list(data.values())[0])
                                 while (paramindex < endlopnum):
                                     input = self.retrievestaticvariable(data,paramindex,filter)
-                                    paramindex =con.methodinvocation(paramindex,execution_env,input)
+                                    paramindex =con.methodinvocation(paramindex,execution_env,datatables,input)
                                     if paramindex in [TERMINATE,BREAK_POINT,STOP]:
                                         return paramindex
                                 log.info( '***Data Param: Iteration '+str(k)+ ' completed***\n\n')
@@ -829,7 +819,7 @@ class GetParam():
                                 logger.print_on_console ('Iterations : ',iterations)
                                 while (paramindex < endlopnum):
                                     input = self.retrievestaticvariable(data,paramindex,i)
-                                    paramindex =con.methodinvocation(paramindex,execution_env,input)
+                                    paramindex =con.methodinvocation(paramindex,execution_env,datatables,input)
                                     if paramindex in [TERMINATE,BREAK_POINT,STOP]:
                                         return paramindex
                                 log.info( '***Data Param: Iteration '+str(k)+ ' completed***\n\n')
