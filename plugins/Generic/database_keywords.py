@@ -17,6 +17,7 @@ import xlwt
 from xlutils.copy import copy as xl_copy
 import openpyxl
 from openpyxl.utils import get_column_letter
+import xlrd
 from xlrd import open_workbook
 import generic_constants
 import os
@@ -52,10 +53,10 @@ class DatabaseOperation():
         elif etype in [pyodbc.DataError, pyodbc.ProgrammingError, pyodbc.NotSupportedError]:
             if hasattr(e, 'args') and len(e.args) > 1: ae = e.args[1].split(';')[0]
             err_msg = ERROR_CODE_DICT["ERR_DB_QUERY"]
-        elif etype == jpype._jvmfinder.JVMNotFoundException:
-            if hasattr(e, 'args'):
-                ae = e.args[0].split('.')[2].strip()
-            err_msg = ERROR_CODE_DICT['ERR_JAVA_NOT_FOUND']
+        ##22200: Invalid sheet error for verifydata
+        elif etype == xlrd.biffh.XLRDError:
+            err_msg = ERROR_CODE_DICT["ERR_NO_SHEET"]
+
         ##to handle mdb files exception     
         elif etype == pyodbc.Error:
             if hasattr(e, 'args') and len(e.args) > 1: ae = e.args[1].split(';')[-1]
@@ -65,6 +66,10 @@ class DatabaseOperation():
                 err_msg="Invalid DB file."
             else:
                 err_msg = ERROR_CODE_DICT['ERR_DB_OPS']
+        elif etype == jpype._jvmfinder.JVMNotFoundException:
+            if hasattr(e, 'args'):
+                ae = e.args[0].split('.')[2].strip()
+            err_msg = ERROR_CODE_DICT['ERR_JAVA_NOT_FOUND']
         else:
             err_msg = ERROR_CODE_DICT['ERR_DB_OPS']
         logger.print_on_console(err_msg) 
@@ -92,7 +97,7 @@ class DatabaseOperation():
             cnxn = self.connection(dbtype, ip , port , dbName, userName , password)
             if cnxn is not None:
                 cursor = cnxn.cursor()
-                statement = ['create','update','insert','CREATE','UPDATE','INSERT']
+                statement = ['create','update','insert','drop','delete','CREATE','UPDATE','INSERT','DROP','DELETE']
                 if any(x in query for x in statement ):
                     log.debug('Inside IF condition')
                     cursor.execute(query)  
@@ -249,6 +254,7 @@ class DatabaseOperation():
         verb = OUTPUT_CONSTANT
         err_msg=None
         cursor=None
+        sheet=None
         try:
             ext = self.get_ext(inp_file)
             if ext == '.xls':
@@ -265,7 +271,10 @@ class DatabaseOperation():
                 rows = cursor.fetchall()
                 columns = [column[0] for column in cursor.description]
                 verify = os.path.isfile(inp_file)
-                if (verify == True):
+                if(verify== True and ext in[".xls",".xlsx"]):
+                    book = open_workbook(inp_file)
+                    sheet = book.sheet_by_name(inp_sheet)
+                if (verify == True and (type(sheet)==xlrd.sheet.Sheet or sheet == None)):
                     ext = self.get_ext(file_path)
                     if (ext == '.xls'):
                         work_book = xlwt.Workbook(encoding="utf-8")
@@ -416,8 +425,8 @@ class DatabaseOperation():
                         err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                         logger.print_on_console(err_msg)
                         log.info(err_msg)
-            else:
-                logger.print_on_console(generic_constants.FILE_NOT_EXISTS)
+                else:
+                    logger.print_on_console(generic_constants.FILE_NOT_EXISTS)
         except Exception as e:
             err_msg = self.processException(e)
         finally:
