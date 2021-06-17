@@ -132,7 +132,8 @@ class Highlight():
                 self.driver.execute_script("arguments[0].setAttribute('style', arguments[1]);",
                                            element, style)
                 log.info('Applied color to the element in chrome/firefox browser .....')
-            browserlogs = self.driver.get_log("browser")
+            if not(isinstance(self.driver,webdriver.Ie or isinstance(self.driver,webdriver.Firefox))):
+                browserlogs = self.driver.get_log("browser")
             if browserlogs and len(browserlogs) > 0 and browserlogs[0]['level'] == 'SEVERE' and 'Refused to apply inline style' in browserlogs[0]['message'] :
                 logger.print_on_console('Content Security Policy directive restriction')
                 log.error(browserlogs[0]['message'])
