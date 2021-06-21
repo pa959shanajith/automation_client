@@ -1659,6 +1659,8 @@ class DebugWindow(wx.Frame):
         controller.pause_flag=False
         root.testthread.resume(False)
         wxObject.debugwindow = None
+        import pause_display_operation
+        pause_display_operation.dispflag=''
         self.Destroy()
 
     def OnContinue(self, event):
