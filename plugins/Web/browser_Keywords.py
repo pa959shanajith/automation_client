@@ -735,6 +735,7 @@ class BrowserKeywords():
                         err_msg=self.__web_driver_exception(e)
                 elif window_num_flag == True:
                     remove_handles=[]
+                    handles_not_found=[]
                     try:
                         cur_handle=local_bk.driver_obj.current_window_handle
                         cwh_index=local_bk.all_handles.index(cur_handle)
@@ -756,18 +757,23 @@ class BrowserKeywords():
                                         logger.print_on_console(webconstants.INVALID_INPUT)
                                         err_msg = webconstants.INVALID_INPUT
                                         switch_window_flag = False
-                                else:
-                                    err_msg = 'One or more window handle not found'
-                                    logger.print_on_console(err_msg)
-                                    local_bk.log.error(err_msg) 
+                                else: 
                                     local_bk.log.info('window handle ' +str(i)+' is not found ')
+                                    handles_not_found.append(i)
                                     switch_window_flag = False
                             if len(remove_handles)>=1:
                                 for j in remove_handles:   
                                     local_bk.all_handles.remove(j)
                                 switch_window_flag = True
+                            if len(handles_not_found)>=1:
+                                err_msg = 'One or more window handle not found'
+                                logger.print_on_console(err_msg)
+                                local_bk.log.error(err_msg)
                         else:
                             window_num_flag = False
+                            err_msg = "Input has to be one less than the total number of subwindows(tabs)"
+                            logger.print_on_console(err_msg)
+                            local_bk.log.error(err_msg)
                     except Exception as e:
                         err_msg=self.__web_driver_exception(e)
                 elif not (window_num_flag==True or inp == 'all' or inp == ''):

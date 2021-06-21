@@ -106,6 +106,7 @@ class Controller():
         local_cont.i = 0
         self.execution_mode = None
         self.runfrom_step_range_input=[]
+        self.tc_name_list=[]
         self.__load_generic()
 
     def __load_generic(self):
@@ -344,7 +345,7 @@ class Controller():
             logger.print_on_console('***Test case name: '+str(tsp.testscript_name)+'***')
             log.info('***Test case name: '+str(tsp.testscript_name)+'***')
             print('-------------------------------------------------------------------------------------------------------')
-            log.info('---------------------------------------------------------------------')
+            log.info('---------------------------------------------------------------------')    
         #logic to handle step by step debug
         if self.debug_mode and tsp.testcase_num==self.last_tc_num:
             #logic to handle run from setp debug
@@ -818,7 +819,8 @@ class Controller():
             if not(terminate_flag):
                 if self.runfrom_step_range_input:
                     #checks if the current step num is greater than ending range of run from step, to Run till the ending range of run from step
-                    if tsplist[i].stepnum > last_step_val: break
+                    if tsplist[i].testscript_name==self.tc_name_list[-1]:
+                        if tsplist[i].stepnum > last_step_val: break
                 #Check for 'pause_flag' before execution
                 if pause_flag:
                     self.pause_execution()
@@ -953,6 +955,10 @@ class Controller():
                     if tsplist[k].name.lower() == 'openbrowser' and (IGNORE_THIS_STEP not in tsplist[k].inputval[0].split(';')):
                         tsplist[k].inputval = browser_type
         start_debug=False
+        for z in range(len(testcase)):
+            if "testcasename" in testcase[z]:
+                tc_name=testcase[z]["testcasename"]
+                self.tc_name_list.append(tc_name)
         if type(runfrom_step) != int:
             pattern = re.compile(r"[0-9]+-[0-9]+")
             match = pattern.search(runfrom_step)
