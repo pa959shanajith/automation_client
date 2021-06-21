@@ -549,8 +549,8 @@ class Dispatcher:
                         self.browsers_sl[browser]["sauce:options"].update({"name":teststepproperty.testscript_name})
                         self.browsers_sl[browser]["sauce:options"].update({"idleTimeout":90})
                         result = self.sauce_web_dict[teststepproperty.name](self.sauce_conf['remote_url'],self.browsers_sl[browser],execution_env['scenario'])
-                        driver = web_keywords.driver
-                        browser_Keywords.local_bk.driver_obj = web_keywords.driver
+                        driver = web_keywords.local_wk.driver
+                        browser_Keywords.local_bk.driver_obj = web_keywords.local_wk.driver
                         find_browser_info(reporting_obj,mythread)
                     else:
                         result = self.sauce_web_dict[teststepproperty.name](input)
@@ -559,7 +559,7 @@ class Dispatcher:
                     if(teststepproperty.name=="waitForElementVisible"):
                         input=xpath
                     driver.switch_to.default_content()
-                    webelement=send_webelement_to_keyword(web_keywords.driver,objectname,url)
+                    webelement=send_webelement_to_keyword(web_keywords.local_wk.driver,objectname,url)
                     result = self.sauce_web_dict[teststepproperty.name](webelement,input)
                 else:
                     logger.print_on_console(teststepproperty.name+" keyword is not supported in saucelabs execution.")

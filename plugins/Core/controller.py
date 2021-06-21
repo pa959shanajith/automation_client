@@ -1280,6 +1280,7 @@ class Controller():
                             execute_result_data['report_type'] = report_type
                             if execution_env['env'] == 'saucelabs':
                                 browser_num={'1':'googlechrome','2':'firefox','3':'iexplore','7':'microsoftedge','8':'microsoftedge'}
+                                self.__load_web()
                                 import web_keywords
                                 self.obj = web_keywords.Sauce_Config()
                                 self.obj.get_sauceconf()
@@ -1754,6 +1755,7 @@ class Controller():
             if(log1.handlers):
                 log1.handlers.clear()
             if json_data['exec_env'].lower() =='saucelabs':
+                self.__load_web()
                 import web_keywords
                 import sauceclient
                 s=web_keywords.Sauce_Config()
