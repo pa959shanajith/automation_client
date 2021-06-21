@@ -55,7 +55,7 @@ class DatabaseOperation():
             err_msg = ERROR_CODE_DICT["ERR_DB_QUERY"]
         ##22200: Invalid sheet error for verifydata
         elif etype == xlrd.biffh.XLRDError:
-            err_msg = ERROR_CODE_DICT["ERR_NO_SHEET"]
+            err_msg = ERROR_CODE_DICT["ERR_INVALID_SHEET"]
 
         ##to handle mdb files exception     
         elif etype == pyodbc.Error:
