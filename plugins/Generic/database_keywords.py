@@ -100,10 +100,15 @@ class DatabaseOperation():
                 statement = ['create','update','insert','drop','delete','CREATE','UPDATE','INSERT','DROP','DELETE']
                 if any(x in query for x in statement ):
                     log.debug('Inside IF condition')
-                    cursor.execute(query)  
-                    cnxn.commit()
-                    status=generic_constants.TEST_RESULT_PASS
-                    result=generic_constants.TEST_RESULT_TRUE
+                    cursor.execute(query)
+                    chk_var=['update','UPDATE','delete','DELETE']
+                    if(any(x in query for x in chk_var) and cursor.rowcount==0):
+                        status=generic_constants.TEST_RESULT_FAIL
+                        result=generic_constants.TEST_RESULT_FALSE
+                    else:
+                        cnxn.commit()
+                        status=generic_constants.TEST_RESULT_PASS
+                        result=generic_constants.TEST_RESULT_TRUE
                 else:
                     log.debug('Inside else condition')
                     cursor.execute(query)
