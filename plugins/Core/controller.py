@@ -1122,26 +1122,26 @@ class Controller():
 
                         # if('integrationType' in qc_creds and qc_creds['integrationType'] == 'ALM'):
                         integ = 0
-                        if(qc_creds["alm"]["url"] != "" and len(scenario["qcdetails"]) > integ):
+                        if(qc_creds["alm"]["url"] != "" and len(scenario["qcdetails"]) > integ and scenario['qcdetails'][integ][0]["type"] == "ALM"):
                             qc_username=qc_creds['alm']['username']
                             qc_password=qc_creds['alm']['password']
                             qc_url=qc_creds['alm']['url']
                             qc_sceanrio_data=scenario['qcdetails'][integ]
                             integ += 1
                         # if('integrationType' in qc_creds and qc_creds['integrationType'] == 'qTest'):
-                        if(qc_creds["qtest"]["url"] != "" and len(scenario["qcdetails"]) > integ):
+                        if(qc_creds["qtest"]["url"] != "" and len(scenario["qcdetails"]) > integ and scenario['qcdetails'][integ]["type"] == "qTest"):
                             qtest_username=qc_creds["qtest"]["username"]
                             qtest_password=qc_creds["qtest"]["password"]
                             qtest_url=qc_creds["qtest"]["url"]
                             qtest_stepsup=qc_creds["qtest"]["qteststeps"]
-                            qc_sceanrio_data=scenario['qcdetails'][integ]
+                            qtest_sceanrio_data=scenario['qcdetails'][integ]
                             integ += 1
-                            qtest_project=qc_sceanrio_data['qtestproject']
-                            qtest_projectid=qc_sceanrio_data['qtestprojectid']
-                            qtest_suite=qc_sceanrio_data['qtestsuite']
-                            qtest_suiteid=qc_sceanrio_data['qtestsuiteid']
+                            qtest_project=qtest_sceanrio_data['qtestproject']
+                            qtest_projectid=qtest_sceanrio_data['qtestprojectid']
+                            qtest_suite=qtest_sceanrio_data['qtestsuite']
+                            qtest_suiteid=qtest_sceanrio_data['qtestsuiteid']
                         # if('integrationType' in qc_creds and qc_creds['integrationType'] == 'Zephyr'):
-                        if(qc_creds["zephyr"]["url"] != "" and len(scenario["qcdetails"]) > integ):
+                        if(qc_creds["zephyr"]["url"] != "" and len(scenario["qcdetails"]) > integ and scenario['qcdetails'][integ]["type"] == "Zephyr"):
                             zephyr_url=qc_creds["zephyr"]["url"]
                             zephyr_username=qc_creds["zephyr"]["username"]
                             zephyr_password=qc_creds["zephyr"]["password"]
@@ -1330,7 +1330,7 @@ class Controller():
                             report_json=con.reporting_obj.report_json_condition_check_testcase_empty[OVERALLSTATUS]
                         integ=0 
                         # if integration_type!="qTest" and integration_type!="Zephyr" and len(scenario['qcdetails'])==10 and (qc_url!='' and qc_password!='' and  qc_username!=''):
-                        if  len(scenario["qcdetails"]) > integ and qc_creds['alm']['url'] != '':
+                        if  len(scenario["qcdetails"]) > integ and qc_creds['alm']['url'] != '' and scenario['qcdetails'][integ][0]["type"] == "ALM":
                             integ += 1
                             if type(qc_sceanrio_data) is not list:
                                 qc_domain=qc_sceanrio_data['qcdomain']
@@ -1412,7 +1412,7 @@ class Controller():
                                     except Exception as e:
                                         logger.print_on_console('Error in Updating Qc details')
                         # if (integration_type=="qTest" and qc_url!='' and qc_password!='' and  qc_username!=''):
-                        if len(scenario["qcdetails"]) > integ and qc_creds['qtest']['url'] != '':
+                        if len(scenario["qcdetails"]) > integ and qc_creds['qtest']['url'] != '' and scenario['qcdetails'][integ]["type"] == "qTest":
                             qtest_status_over=report_json[0]
                             integ += 1
                             try:
@@ -1456,7 +1456,7 @@ class Controller():
                                 log.error('Error in Updating qTest details '+str(e))
                                 logger.print_on_console('Error in Updating qTest details')
                         # if (integration_type=="Zephyr" and zephyr_password!='' and zephyr_username!='' and  zephyr_url!=''):
-                        if len(scenario["qcdetails"]) > integ and qc_creds['zephyr']['url'] != '':
+                        if len(scenario["qcdetails"]) > integ and qc_creds['zephyr']['url'] != '' and scenario['qcdetails'][integ]["type"] == "Zephyr":
                             zephyr_status_over=report_json[0]
                             integ += 1
                             try:
