@@ -107,7 +107,6 @@ class Controller():
         self.execution_mode = None
         self.runfrom_step_range_input=[]
         self.tc_name_list=[]
-        self.cw=None
         self.__load_generic()
 
     def __load_generic(self):
@@ -1639,7 +1638,6 @@ class Controller():
         global socket_object
         self.conthread=mythread
         self.clear_data()
-        self.cw=args[1]
         wxObject = root_obj.cw
         socket_object = socketIO
         configvalues = self.configvalues

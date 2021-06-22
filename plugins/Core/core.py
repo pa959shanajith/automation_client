@@ -42,9 +42,9 @@ qcObject = None
 qtestObject = None
 zephyrObject = None
 soc=None
-browsercheckFlag=True
+browsercheckFlag=False
 updatecheckFlag=False
-chromeFlag=True
+chromeFlag=False
 edgeFlag=False
 edgeFlagComp=False
 chromiumFlag=False
@@ -1102,7 +1102,7 @@ class TestThread(threading.Thread):
                 logger.print_on_console('This app type is not part of the license.')
                 status=TERMINATE
             else:
-                status = self.con.invoke_controller(self.action,self,self.debug_mode,runfrom_step,self.json_data,self.main,socketIO,qcObject,qtestObject,zephyrObject,self.aws_mode,cw)
+                status = self.con.invoke_controller(self.action,self,self.debug_mode,runfrom_step,self.json_data,self.main,socketIO,qcObject,qtestObject,zephyrObject,self.aws_mode)
 
             logger.print_on_console('Execution status '+status)
 
