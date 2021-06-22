@@ -515,16 +515,24 @@ class ButtonLinkKeyword():
                         local_blk.log.info(clickinfo)
                         filestatus = self.__upload_operation(inputfile,inputs)
                         local_blk.log.info(STATUS_METHODOUTPUT_UPDATE)
-                        if filestatus:
-                            status = webconstants.TEST_RESULT_PASS
-                            methodoutput = webconstants.TEST_RESULT_TRUE
-                    else:
-                        if self.__click_for_file_upload(browser_Keywords.local_bk.driver_obj,webelement):
-                            filestatus =self.__upload_operation(inputfile,inputs)
+                        if os.path.exists(inputfile):
+                            filestatus = self.__upload_operation(inputfile,inputs)
                             local_blk.log.info(STATUS_METHODOUTPUT_UPDATE)
                             if filestatus:
                                 status = webconstants.TEST_RESULT_PASS
                                 methodoutput = webconstants.TEST_RESULT_TRUE
+                        else:
+                            logger.print_on_console("Provided File Doesnot Exists")
+                    else:
+                        if os.path.exists(inputfile):
+                            if self.__click_for_file_upload(browser_Keywords.local_bk.driver_obj,webelement):
+                                filestatus =self.__upload_operation(inputfile,inputs)
+                                local_blk.log.info(STATUS_METHODOUTPUT_UPDATE)
+                                if filestatus:
+                                    status = webconstants.TEST_RESULT_PASS
+                                    methodoutput = webconstants.TEST_RESULT_TRUE
+                        else:
+                            logger.print_on_console("Provided File Doesnot Exists") 
                 else:
                     err_msg = WEB_ELEMENT_DISABLED
         except Exception as e:
@@ -545,13 +553,13 @@ class ButtonLinkKeyword():
                 if (browser_name == 'chrome'):
                     ppid = browser_Keywords.local_bk.driver_obj.service.process.pid
                 elif(browser_name == 'firefox'):
-                    if hasattr(browser_Keywords.local_bk.driver_obj, 'binary'):
+                    try:
                         ppid = browser_Keywords.local_bk.driver_obj.binary.process.pid
-                    else:
+                    except:
                         ppid = browser_Keywords.local_bk.driver_obj.service.process.pid
                 elif(browser_name == 'internet explorer'):
                     ppid = browser_Keywords.local_bk.driver_obj.iedriver.process.pid
-                elif(browser_name == 'edge legacy') or (browser_name == 'edge chromium'):
+                elif(browser_name == 'edge legacy') or (browser_name == 'msedge'):
                     ppid = browser_Keywords.local_bk.driver_obj.edge_service.process.pid
         except Exception as e:
             local_blk.log.debug("Problem while getting the ppid: {}".format(e))
@@ -586,7 +594,6 @@ class ButtonLinkKeyword():
             local_blk.log.debug('using Robot class to perform keyboard operation')
             robot = Robot()
             time.sleep(1)
-            #self.__set_clipboard_data(inputfile)
             robot.sleep(1)
             maxTries = 10
             time_sleep = 0.5
