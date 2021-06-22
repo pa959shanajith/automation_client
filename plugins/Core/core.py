@@ -1108,6 +1108,8 @@ class TestThread(threading.Thread):
 
             if status==TERMINATE:
                 logger.print_on_console('---------Termination Completed-------',color="YELLOW")
+                import pause_display_operation
+                pause_display_operation.dispflag=''
             if self.action==DEBUG:
                 testcasename = handler.local_handler.testcasename
                 self.cw.killChildWindow(debug=True)
