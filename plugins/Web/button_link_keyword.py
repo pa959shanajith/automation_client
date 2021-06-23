@@ -516,8 +516,6 @@ class ButtonLinkKeyword():
                         local_blk.log.info(clickinfo)
                         filestatus = self.__upload_operation(inputfile,inputs)
                         local_blk.log.info(STATUS_METHODOUTPUT_UPDATE)
-                        filestatus = self.__upload_operation(inputfile,inputs)
-                        local_blk.log.info(STATUS_METHODOUTPUT_UPDATE)
                         if filestatus:
                             status = webconstants.TEST_RESULT_PASS
                             methodoutput = webconstants.TEST_RESULT_TRUE
