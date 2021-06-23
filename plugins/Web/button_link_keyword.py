@@ -501,13 +501,14 @@ class ButtonLinkKeyword():
                 local_blk.log.info('Recieved web element from the web dispatcher')
                 local_blk.log.debug(webelement)
                 local_blk.log.debug('Check for the element enable')
-                if webelement.is_enabled():
+                file_exists = os.path.isfile(inputfile)
+                if not file_exists:
+                    err_msg=ERROR_CODE_DICT['ERR_IIO_EXCEPTION']
+                elif webelement.is_enabled():
                     if webelement.tag_name =='input' and webelement.get_attribute('type') == 'file':
-                        if os.path.isfile(inputfile):
-                            webelement.send_keys(inputfile)
-                            status = webconstants.TEST_RESULT_PASS
-                        else:
-                            err_msg=ERROR_CODE_DICT['ERR_IIO_EXCEPTION']
+                        webelement.send_keys(inputfile)
+                        status = webconstants.TEST_RESULT_PASS
+                        methodoutput = webconstants.TEST_RESULT_TRUE
                     elif SYSTEM_OS == 'Windows' and isinstance(browser_Keywords.local_bk.driver_obj,webdriver.Firefox):
                         local_blk.log.debug('Mozilla Firefox Instance')
                         clickinfo = browser_Keywords.local_bk.driver_obj.execute_script(webconstants.CLICK_JAVASCRIPT,webelement)
@@ -515,24 +516,18 @@ class ButtonLinkKeyword():
                         local_blk.log.info(clickinfo)
                         filestatus = self.__upload_operation(inputfile,inputs)
                         local_blk.log.info(STATUS_METHODOUTPUT_UPDATE)
-                        if os.path.exists(inputfile):
-                            filestatus = self.__upload_operation(inputfile,inputs)
+                        filestatus = self.__upload_operation(inputfile,inputs)
+                        local_blk.log.info(STATUS_METHODOUTPUT_UPDATE)
+                        if filestatus:
+                            status = webconstants.TEST_RESULT_PASS
+                            methodoutput = webconstants.TEST_RESULT_TRUE
+                    else:
+                        if self.__click_for_file_upload(browser_Keywords.local_bk.driver_obj,webelement):
+                            filestatus =self.__upload_operation(inputfile,inputs)
                             local_blk.log.info(STATUS_METHODOUTPUT_UPDATE)
                             if filestatus:
                                 status = webconstants.TEST_RESULT_PASS
                                 methodoutput = webconstants.TEST_RESULT_TRUE
-                        else:
-                            logger.print_on_console("Provided File Doesnot Exists")
-                    else:
-                        if os.path.exists(inputfile):
-                            if self.__click_for_file_upload(browser_Keywords.local_bk.driver_obj,webelement):
-                                filestatus =self.__upload_operation(inputfile,inputs)
-                                local_blk.log.info(STATUS_METHODOUTPUT_UPDATE)
-                                if filestatus:
-                                    status = webconstants.TEST_RESULT_PASS
-                                    methodoutput = webconstants.TEST_RESULT_TRUE
-                        else:
-                            logger.print_on_console("Provided File Doesnot Exists") 
                 else:
                     err_msg = WEB_ELEMENT_DISABLED
         except Exception as e:
