@@ -529,8 +529,8 @@ class UtilWebKeywords:
                                    eleStatus =True
                                 else:
                                     counter+=1
-                    elif tag=='textbox':
-                         if (tagName==('input') and (tagType==('text') or tagType==('email') or tagType==('password') or tagType==('range') or tagType==('search') or tagType==('url') or tagType==('button') or tagType==('checkbox') or tagType==('color') or tagType==('date') or tagType==('datetime-local') or tagType==('file') or tagType==('image') or tagType==('month') or tagType==('week') or tagType==('time') or tagType==('number') or tagType==('radio') or tagType==('reset') or tagType==('submit') or tagType==('tel') or tagType==('None')) ):
+                    elif tag=='textbox' or tag=='input':
+                         if (tagName==('input') and (tagType==('text') or tagType==('email') or tagType==('password') or tagType==('search') or tagType==('url') or tagType==('color') or tagType==('date') or tagType==('datetime-local') or tagType==('file') or tagType==('month') or tagType==('week') or tagType==('time') or tagType==('number') or tagType==('tel') or tagType==('None')) ):
                             if index==childindex:
                                 eleStatus =True
                             else:
@@ -550,12 +550,14 @@ class UtilWebKeywords:
                                 else:
                                     counter+=1
                     else:
-                            eleStatus=True
+                            # Commented next line, as because of this, loop was not going into next iteration
+                            # eleStatus=True
+                            continue
 
                     if eleStatus==True:
                         webelement = cellChild
                         break
-            if webelement is not None:
+            if webelement is not None and eleStatus == True:
                 if SYSTEM_OS == 'Darwin' or SYSTEM_OS == 'Linux':
                     obj = Utils()
                     if isinstance(browser_Keywords.driver_obj, webdriver.Firefox):
