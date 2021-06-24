@@ -276,7 +276,7 @@ class TextboxKeywords:
                                     else:
                                         check_flag=False
                                         err_msg=self._invalid_input()
-                            elif obj_type!= "textbox":
+                            elif obj_type!= "textbox" or obj_type!= "input":
                                 check_flag=False
                                 err_msg=self._invalid_input()
                         else:
@@ -486,7 +486,7 @@ class TextboxKeywords:
                                     else:
                                         check_flag=False
                                         err_msg=self._invalid_input()
-                            elif obj_type!= "textbox" and not err_msg:
+                            elif (obj_type!= "textbox" or obj_type!= "input") and not err_msg:
                                 check_flag=False
                                 err_msg=self._invalid_input()
                         else:
@@ -732,7 +732,7 @@ class TextboxKeywords:
                                 else:
                                     check_flag=False
                                     err_msg=self._invalid_input()
-                        elif obj_type!= "textbox":
+                        elif obj_type!= "textbox" or obj_type!= "input":
                             check_flag=False
                             err_msg=self._invalid_input()
                         else:
@@ -923,7 +923,7 @@ class TextboxKeywords:
                                 else:
                                     check_flag=False
                                     err_msg=self._invalid_input()
-                        elif obj_type!= "textbox":
+                        elif obj_type!= "textbox" or obj_type!="input":
                             check_flag=False
                             err_msg=self._invalid_input()
                         else:
@@ -1111,7 +1111,7 @@ class TextboxKeywords:
                                     else:
                                         check_flag=False
                                         err_msg=self._invalid_input()
-                            elif obj_type!= "textbox":
+                            elif obj_type!= "textbox" or obj_type!= "input":
                                 check_flag=False
                                 err_msg=self._invalid_input()
                             else:
@@ -1268,7 +1268,7 @@ class TextboxKeywords:
                         index_val=int(input[3])-1
                         row_count=self.tblobj.getRowCountJs(webelement)
                         col_count=self.tblobj.getColoumnCountJs(webelement)
-                        if obj_type=="textbox" and index_val>=0:
+                        if (obj_type=="textbox" or obj_type=="input") and index_val>=0:
                             if row_num>row_count or col_num>col_count:
                                 check_flag=False
                                 err_msg=self._invalid_input()
@@ -1280,11 +1280,21 @@ class TextboxKeywords:
                                         check_flag=False
                                         err_msg=self._invalid_index()
                                     else:
-                                        webelement = txt_box[index_val]
+                                        #checking for type of input tag
+                                        #allowed list contains types on which action can be performed
+                                        #not included types are :
+                                        #button(submit,reset,button,radio),checkbox,week,month,color,hidden,password,image,range,time
+                                        tag_type = txt_box[index_val].get_attribute('type')
+                                        allowed=['url','text','tel','search','number','email']
+                                        if tag_type in allowed:
+                                            webelement = txt_box[index_val]
+                                        else:
+                                            check_flag = False
+                                            err_msg = self._invalid_input()
                                 else:
                                     check_flag=False
                                     err_msg=self._invalid_input()
-                        elif obj_type!= "textbox":
+                        elif obj_type!= "textbox" or obj_type!="input":
                             check_flag=False
                             err_msg=self._invalid_input()
                         else:
@@ -1437,7 +1447,7 @@ class TextboxKeywords:
                         row_count=self.tblobj.getRowCountJs(webelement)
                         col_count=self.tblobj.getColoumnCountJs(webelement)
                         input = inp_list
-                        if obj_type=="textbox" and index_val>=0:
+                        if (obj_type=="textbox" or obj_type=="input") and index_val>=0:
                             if row_num>row_count or col_num>col_count:
                                 check_flag=False
                                 err_msg=self._invalid_input()
@@ -1449,11 +1459,21 @@ class TextboxKeywords:
                                         check_flag=False
                                         err_msg=self._invalid_index()
                                     else:
-                                        webelement = txt_box[index_val]
+                                        #checking for type of input tag
+                                        #allowed list contains types on which action can be performed
+                                        #not included types are :
+                                        #button(submit,reset,button,radio),checkbox,week,month,color,hidden,password,image,range,time
+                                        tag_type = txt_box[index_val].get_attribute('type')
+                                        allowed=['url','text','tel','search','number','email']
+                                        if tag_type in allowed:
+                                            webelement = txt_box[index_val]
+                                        else:
+                                            check_flag = False
+                                            err_msg = self._invalid_input()
                                 else:
                                     check_flag=False
                                     err_msg=self._invalid_input()
-                        elif obj_type!= "textbox":
+                        elif obj_type!= "textbox" or obj_type!="input":
                             check_flag=False
                             err_msg=self._invalid_input()
                         else:
