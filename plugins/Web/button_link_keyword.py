@@ -501,13 +501,14 @@ class ButtonLinkKeyword():
                 local_blk.log.info('Recieved web element from the web dispatcher')
                 local_blk.log.debug(webelement)
                 local_blk.log.debug('Check for the element enable')
-                if webelement.is_enabled():
+                file_exists = os.path.isfile(inputfile)
+                if not file_exists:
+                    err_msg=ERROR_CODE_DICT['ERR_IIO_EXCEPTION']
+                elif webelement.is_enabled():
                     if webelement.tag_name =='input' and webelement.get_attribute('type') == 'file':
-                        if os.path.isfile(inputfile):
-                            webelement.send_keys(inputfile)
-                            status = webconstants.TEST_RESULT_PASS
-                        else:
-                            err_msg=ERROR_CODE_DICT['ERR_IIO_EXCEPTION']
+                        webelement.send_keys(inputfile)
+                        status = webconstants.TEST_RESULT_PASS
+                        methodoutput = webconstants.TEST_RESULT_TRUE
                     elif SYSTEM_OS == 'Windows' and isinstance(browser_Keywords.local_bk.driver_obj,webdriver.Firefox):
                         local_blk.log.debug('Mozilla Firefox Instance')
                         clickinfo = browser_Keywords.local_bk.driver_obj.execute_script(webconstants.CLICK_JAVASCRIPT,webelement)
@@ -545,13 +546,13 @@ class ButtonLinkKeyword():
                 if (browser_name == 'chrome'):
                     ppid = browser_Keywords.local_bk.driver_obj.service.process.pid
                 elif(browser_name == 'firefox'):
-                    if hasattr(browser_Keywords.local_bk.driver_obj, 'binary'):
+                    try:
                         ppid = browser_Keywords.local_bk.driver_obj.binary.process.pid
-                    else:
+                    except:
                         ppid = browser_Keywords.local_bk.driver_obj.service.process.pid
                 elif(browser_name == 'internet explorer'):
                     ppid = browser_Keywords.local_bk.driver_obj.iedriver.process.pid
-                elif(browser_name == 'edge legacy') or (browser_name == 'edge chromium'):
+                elif(browser_name == 'edge legacy') or (browser_name == 'msedge'):
                     ppid = browser_Keywords.local_bk.driver_obj.edge_service.process.pid
         except Exception as e:
             local_blk.log.debug("Problem while getting the ppid: {}".format(e))
@@ -586,7 +587,6 @@ class ButtonLinkKeyword():
             local_blk.log.debug('using Robot class to perform keyboard operation')
             robot = Robot()
             time.sleep(1)
-            #self.__set_clipboard_data(inputfile)
             robot.sleep(1)
             maxTries = 10
             time_sleep = 0.5
