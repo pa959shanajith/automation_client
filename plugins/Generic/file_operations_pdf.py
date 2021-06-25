@@ -853,7 +853,7 @@ class FileOperationsPDF:
                         log.info('Content after Start string is ')
                         log.info(content)
                         status=True
-                if args[-1] in ['image','all']:
+                if len(args)>2 and args[2] in ['image','all']:
                     logger.print_on_console( "Retreving Text of all images within .pdf file. Please wait..." )
                     #for i in range(len(doc)):
                     log.debug( 'Image count : ' + str(len(doc.getPageImageList(pagenumber))) + ' on page : ' + str(pagenumber+1) )
@@ -901,40 +901,18 @@ class FileOperationsPDF:
                             output_res.append(txt)
                         log.debug( 'Total image count of the PDF file : ' + str(img_count) )
                         if( output_res ):
-                            if args[-1] == 'image':
-                                content = '\n'.join(output_res)
+                            if args[2] == 'image':
+                                content = output_res
                             else:
-                                img_content = '\n'.join(output_res)
-                                content += img_content 
+                                text_content = content
+                                del content
+                                content = [text_content, output_res]
                         else:
                             err_msg = 'No images found in the PDF file'
-        # try:
-        #         log.debug('Get the content of pdf file: '+str(input_path)+','+str(pagenumber))
-        #         reader=PdfFileReader(open(input_path,'rb'), overwriteWarnings=False)
-        #         pagenumber=int(pagenumber)-1
-        #         if pagenumber<reader.getNumPages():
-        #         page=reader.getPage(pagenumber)
-        #         content=page.extractText()
-        #         if len(args)>1 and args[1]=='_internal_verify_content':
-        #             return content
-        #         if len(args) >= 2 and not (args[0] is None and args[1] is None):
-        #             start=args[0].strip()
-        #             end=args[1].strip()
-        #             startIndex=0
-        #             endIndex=len(content)
-        #             log.info('Start string: '+str(start)+' End string: '+str(end))
-        #             if not start is '':
-        #                 startIndex=content.find(start)+len(start)
-        #             if not end is '':
-        #                 endIndex=content.find(end)
-        #             content=content[startIndex:endIndex]
-        #             log.info('Content between Start and End string is ')
-        #         elif len(args)==1:
-        #             with open(args[0],'w') as file:
-        #                 file.write(content)
-        #                 file.close()
-        #         log.info(content)
-        #         status=True
+                elif len(args)>2 and args[2] != 'text':
+                    content = None
+                    status=False
+                    err_msg=generic_constants.INVALID_INPUT
              else:
                 err_msg=generic_constants.INVALID_INPUT
 
