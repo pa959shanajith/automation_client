@@ -799,12 +799,11 @@ class BrowserKeywords():
                                 if cwh_index > len(local_bk.all_handles):
                                     local_bk.driver_obj.switch_to.window(local_bk.all_handles[-1])
                                     self.update_recent_handle(local_bk.all_handles[-1])
-                                    status=webconstants.TEST_RESULT_PASS
-                                    result=webconstants.TEST_RESULT_TRUE
                                 elif cwh_index < len(local_bk.all_handles):
                                     prev_window=cwh_index-len(inp_list)
                                     local_bk.driver_obj.switch_to.window(local_bk.all_handles[prev_window])
                                     self.update_recent_handle(local_bk.all_handles[prev_window])
+                                if len(inp_list) == len(remove_handles):
                                     status=webconstants.TEST_RESULT_PASS
                                     result=webconstants.TEST_RESULT_TRUE
                             else:
@@ -823,8 +822,13 @@ class BrowserKeywords():
                         else:
                             local_bk.driver_obj.switch_to.window(cur_handle)
                             self.update_recent_handle(cur_handle)
-                            status=webconstants.TEST_RESULT_PASS
-                            result=webconstants.TEST_RESULT_TRUE
+                            if len(inp_list)>1:
+                                if len(inp_list) == len(remove_handles):
+                                    status=webconstants.TEST_RESULT_PASS
+                                    result=webconstants.TEST_RESULT_TRUE
+                            else:
+                                status=webconstants.TEST_RESULT_PASS
+                                result=webconstants.TEST_RESULT_TRUE
                     elif (inp == 'all' or inp == ''):
                         if inp == '':
                             if cwh_index == len(local_bk.all_handles):
