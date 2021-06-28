@@ -1194,6 +1194,7 @@ class Controller():
                             scen_id=scenario_id.split('"')
                             aws_scenario=aws_scenario+scen_id
                             scenario_name=json_data['suitedetails'][suite_idx-1]["scenarioNames"][sc_idx]
+                            tsplist = handler.local_handler.tspList
                             if not terminate_flag:
                                 compile_status,pytest_file=tc_obj.compile_tc(tsplist,sc_idx+1,scenario_name)
                             if compile_status:
@@ -1509,10 +1510,31 @@ class Controller():
                         #logic for condition check
                         report_json=con.reporting_obj.report_json[OVERALLSTATUS]
                     time.sleep(1)
-            if aws_mode and not terminate_flag:
+            if aws_mode and not terminate_flag and not(True in testcase_empty_flag):
                 tc_obj.make_zip(pytest_files)
-                execution_status,step_results=self.aws_obj.run_aws_android_tests()
-                self.aws_report(aws_tsp,aws_scenario,step_results,suite_idx,execute_result_data,con.reporting_obj,json_data,socketIO)
+                execution_status,step_results,config_stat=self.aws_obj.run_aws_android_tests()
+                if execution_status and config_stat:
+                    self.aws_report(aws_tsp,aws_scenario,step_results,suite_idx,execute_result_data,con.reporting_obj,json_data,socketIO)
+                else:
+                    logger.print_on_console( '***Saving report of Scenario' ,str(sc_idx + 1),'***')
+                    log.info( '***Saving report of Scenario' +str(sc_idx + 1)+'***')
+                    os.chdir(self.cur_dir)
+                    filename='Scenario'+str(count + 1)+'.json'
+                    count+=1
+                    status_percentage["s_index"]=suite_idx-1
+                    status_percentage["index"]=sc_idx
+                    con.reporting_obj.user_termination=manual_terminate_flag
+                    if not(config_stat):
+                        info_msg=str("Error in Configuring AWS run")
+                    logger.print_on_console(info_msg)
+                    log.info(info_msg)
+                    con.reporting_obj.save_report_json_conditioncheck_testcase_empty(filename,info_msg,json_data,status_percentage)
+                    execute_result_data["reportData"] = con.reporting_obj.report_json_condition_check_testcase_empty
+                    socketIO.emit('result_executeTestSuite', execute_result_data)
+                    obj.clearList(con)
+                    sc_idx += 1
+                    exc_pass = False
+                    report_json=con.reporting_obj.report_json_condition_check_testcase_empty[OVERALLSTATUS]
                 if con.reporting_obj.overallstatus != 'Pass': exc_pass = False
                 if not(execution_status):
                     status=TERMINATE
