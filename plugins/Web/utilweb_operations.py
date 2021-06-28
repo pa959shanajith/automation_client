@@ -403,10 +403,11 @@ class UtilWebKeywords:
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
-        eleStatus = True
+        eleStatus = False
         local_uo.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if len(webelement.find_elements_by_xpath('.//ancestor::lightning-datatable')) >0:
+                eleStatus = True
                 tableops = TableOperationKeywords()
                 row_num=int(args[0][0])
                 col_num=int(args[0][1])
@@ -441,6 +442,7 @@ class UtilWebKeywords:
                 if(len(child_ele)>0):
                     webelement=child_ele[0]
             elif(webelement is not None and len(args[0]) == 2):
+                eleStatus = True
                 row = int(args[0][0])-1
                 col = int(args[0][1])-1
                 tableops = TableOperationKeywords()
@@ -557,7 +559,7 @@ class UtilWebKeywords:
                     if eleStatus==True:
                         webelement = cellChild
                         break
-            if webelement is not None and eleStatus == True:
+            if webelement is not None and eleStatus:
                 if SYSTEM_OS == 'Darwin' or SYSTEM_OS == 'Linux':
                     obj = Utils()
                     if isinstance(browser_Keywords.driver_obj, webdriver.Firefox):
