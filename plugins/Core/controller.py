@@ -241,7 +241,7 @@ class Controller():
             logger.print_on_console('Error loading System plugin')
             log.error(e,exc_info=True)
 
-           
+
     def __load_aws(self):
         try:
             core_utils.get_all_the_imports('AWS/src')
@@ -345,7 +345,7 @@ class Controller():
             logger.print_on_console('***Test case name: '+str(tsp.testscript_name)+'***')
             log.info('***Test case name: '+str(tsp.testscript_name)+'***')
             print('-------------------------------------------------------------------------------------------------------')
-            log.info('---------------------------------------------------------------------')    
+            log.info('---------------------------------------------------------------------')
         #logic to handle step by step debug
         if self.debug_mode and tsp.testcase_num==self.last_tc_num:
             #logic to handle run from setp debug
@@ -355,7 +355,7 @@ class Controller():
         keyword_flag=True
         ignore_stat=False
         inpval=[]
-        start_time = datetime.now()      
+        start_time = datetime.now()
         #Check for 'terminate_flag' before execution
         if not(terminate_flag):
             #Check for 'pause_flag' before executionee
@@ -387,26 +387,26 @@ class Controller():
                         logger.print_on_console('Step Execution start time is : '+start_time_string)
                         log.info('Step Execution start time is : '+start_time_string)
                         index,result = self.keywordinvocation(index,inpval,self.reporting_obj,execution_env,*args)
-                        if tsp.name.lower()=='verifytextiris':
+                        #if tsp.name.lower()=='verifytextiris':
                             #testcase_details_orig=tsp.testcase_details
-                            testcase_details=tsp.testcase_details
-                            if testcase_details=='':
-                                testcase_details={'actualResult_pass':'','testcaseDetails':'','actualResult_fail':''}
-                            elif type(testcase_details)==str:
-                                testcase_details=ast.literal_eval(testcase_details)
-                            new_array=result[2]
-                            if new_array[0]==None:
-                                new_array[0]='null'
-                            if new_array[1]==None:
-                                new_array[1]='null'
-                            if new_array[0]=='':
-                                new_array[0]='  '
-                            if new_array[1]=='':
-                                new_array[1]='  '
-                            testcase_details['testcaseDetails']=new_array[1]
-                            testcase_details['actualResult_pass']=new_array[0]
-                            testcase_details['actualResult_fail']=new_array[0]
-                            tsp.testcase_details=testcase_details
+                            #testcase_details=tsp.testcase_details
+                            #if testcase_details=='':
+                                #testcase_details={'actualResult_pass':'','testcaseDetails':'','actualResult_fail':''}
+                            #elif type(testcase_details)==str:
+                                #testcase_details=ast.literal_eval(testcase_details)
+                            #new_array=result[2]
+                            #if new_array[0]==None:
+                                #new_array[0]='null'
+                            #if new_array[1]==None:
+                                #new_array[1]='null'
+                            #if new_array[0]=='':
+                                #new_array[0]='  '
+                            #if new_array[1]=='':
+                                #new_array[1]='  '
+                            #testcase_details['testcaseDetails']=new_array[1]
+                            #testcase_details['actualResult_pass']=new_array[0]
+                            #testcase_details['actualResult_fail']=new_array[0]
+                            #tsp.testcase_details=testcase_details
 
                     else:
                         keyword_flag=False
@@ -977,7 +977,7 @@ class Controller():
                             if (len(outputArray)>=1 and  '##' == outputArray[-1]):
                                 comment_step_count=comment_step_count+1
                         if comment_step_count<no_of_steps:
-                            runfrom_step = first_step_val             
+                            runfrom_step = first_step_val
                             start_debug = True
                         else:
                             status=TERMINATE
@@ -1329,7 +1329,7 @@ class Controller():
                             sc_idx += 1
                             exc_pass = False
                             report_json=con.reporting_obj.report_json_condition_check_testcase_empty[OVERALLSTATUS]
-                        integ=0 
+                        integ=0
                         # if integration_type!="qTest" and integration_type!="Zephyr" and len(scenario['qcdetails'])==10 and (qc_url!='' and qc_password!='' and  qc_username!=''):
                         if  len(scenario["qcdetails"]) > integ and qc_creds['alm']['url'] != '' and scenario['qcdetails'][integ][0]["type"] == "ALM":
                             integ += 1
@@ -1533,12 +1533,12 @@ class Controller():
             if status == TERMINATE: exc_pass = False
             socketIO.emit("return_status_executeTestSuite", dict({"status": "finished", "executionStatus": exc_pass,
                 "endTime": datetime.now().strftime(TIME_FORMAT)}, **base_execute_data))
-            if not exc_pass: 
+            if not exc_pass:
                 if status == TERMINATE and manual_terminate_flag:
                     mythread.test_status = 'userTerminate'
                 elif status == TERMINATE:
                     mythread.test_status = 'programTerminate'
-                else: 
+                else:
                     mythread.test_status = 'fail'
             #clearing dynamic variables at the end of execution to support dynamic variable at the scenario level
             obj.clear_dyn_variables()
