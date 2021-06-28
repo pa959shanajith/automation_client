@@ -486,6 +486,7 @@ class RadioCheckboxKeywords():
                     if len(input)==4 and int(input[3]) >= 1:
                         webelement=self.getActualElement(webelement,input)
                     elif len(input) == 4 and int(input[3]) <= 0:
+                        status=TEST_RESULT_FAIL
                         err_msg = ERROR_CODE_DICT['INVALID_TABLE_INDEX']
                         local_rco.log.error(ERROR_CODE_DICT['INVALID_TABLE_INDEX'])
                         logger.print_on_console(ERROR_CODE_DICT['INVALID_TABLE_INDEX'])
@@ -689,7 +690,7 @@ class RadioCheckboxKeywords():
                             else:
                                 counter+=1
                     else:
-                        if tag=='dropdown' or tag=='select':
+                        if tag=='dropdown'or tag=='select':
                             if index==childindex:
                                 eleStatus =True
                             else:
@@ -699,7 +700,7 @@ class RadioCheckboxKeywords():
                                 else:
                                     counter+=1
 
-                elif tag.lower()=='checkbox' or tag.lower()=='radio':
+                elif tag.lower()=='checkbox' or tag.lower()=='radio' or tag.lower()=='input':
                     if tagName=='input' and tagType=='radio':
                         if index==childindex:
                             eleStatus =True
