@@ -760,7 +760,6 @@ class TableOperationKeywords():
             methodoutput=TEST_RESULT_FALSE
             err_msg=None
             index = False
-            eleStatus = True
             output_val=OUTPUT_CONSTANT
             local_tk.log.debug('reading the inputs')
             if(len(input_arr) > 1):
@@ -1140,6 +1139,10 @@ class TableOperationKeywords():
                                              local_tk.log.error(e)
                                              logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
                                              err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                            if not eleStatus:
+                                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                                local_tk.log.info(err_msg)
+                                logger.print_on_console(err_msg)
                         else:
                             logger.print_on_console(ERROR_CODE_DICT['INVALID_TABLE_INDEX'])
                             err_msg = ERROR_CODE_DICT['INVALID_TABLE_INDEX']
@@ -1157,10 +1160,7 @@ class TableOperationKeywords():
                 local_tk.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                 err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                 logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-            if not eleStatus:
-                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                local_tk.log.info(err_msg)
-                logger.print_on_console(err_msg)
+            
             return status,methodoutput,output_val,err_msg
 ##
 ##            return status,methodoutput,output_val,err_msg

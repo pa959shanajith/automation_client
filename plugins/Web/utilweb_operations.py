@@ -23,7 +23,6 @@ if SYSTEM_OS == 'Windows' :
     from pyrobot import Robot
     import win32gui
     import pyrobot
-import table_keywords
 import time
 import urllib.request, urllib.parse, urllib.error, io
 import core_utils
@@ -34,6 +33,8 @@ import readconfig
 from  selenium.webdriver.common import action_chains
 from selenium.webdriver.common.action_chains import ActionChains
 import threading
+from table_keywords import *
+
 local_uo = threading.local()
 
 class UtilWebKeywords:
@@ -43,7 +44,7 @@ class UtilWebKeywords:
         self.keys_info={}
         self.__create_keyinfo_dict()
         self.__load_Image_processingobj()
-        self.tblobj = table_keywords.TableOperationKeywords()
+        self.tblobj = TableOperationKeywords()
 
     def _invalid_input(self):
         err_msg=ERROR_CODE_DICT['ERR_INVALID_INPUT']
@@ -401,10 +402,10 @@ class UtilWebKeywords:
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
+        eleStatus = False
         local_uo.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if len(webelement.find_elements_by_xpath('.//ancestor::lightning-datatable')) >0:
-                from table_keywords import TableOperationKeywords
                 tableops = TableOperationKeywords()
                 row_num=int(args[0][0])
                 col_num=int(args[0][1])
@@ -441,7 +442,6 @@ class UtilWebKeywords:
             elif(webelement is not None and len(args[0]) == 2):
                 row = int(args[0][0])-1
                 col = int(args[0][1])-1
-                from table_keywords import TableOperationKeywords
                 tableops = TableOperationKeywords()
                 cell=tableops.javascriptExecutor(webelement,row,col)
                 element_list=cell.find_elements_by_xpath('.//*')
@@ -457,7 +457,6 @@ class UtilWebKeywords:
                 index=int(args[0][3])
                 eleStatus = False
                 counter = 1
-                from table_keywords import TableOperationKeywords
                 tableops = TableOperationKeywords()
                 cell=tableops.javascriptExecutor(webelement,row,col)
                 element_list=cell.find_elements_by_xpath('.//*')
@@ -759,7 +758,6 @@ class UtilWebKeywords:
                 if not(input is None):
                     row_num=int(input[0])-1
                     col_num=int(input[1])-1
-                    from table_keywords import TableOperationKeywords
                     tableops = TableOperationKeywords()
                     cell=tableops.javascriptExecutor(webelement,row_num,col_num)
                     element_list=cell.find_elements_by_xpath('.//*')
@@ -1251,7 +1249,6 @@ class UtilWebKeywords:
         eleStatus=False
         webelement1=None
         counter = 1
-        from table_keywords import TableOperationKeywords
         tableops = TableOperationKeywords()
         cell=tableops.javascriptExecutor(webelement,row_number,col_number)
         if(tag=='tablecell' or tag=='td'): 
