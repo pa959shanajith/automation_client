@@ -709,6 +709,38 @@ class UtilWebKeywords:
             err_msg=self.__web_driver_exception(e)
         return status,methodoutput,output,err_msg
 
+
+    def send_keys(self, webelement, input, *args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        output=OUTPUT_CONSTANT
+        err_msg=None
+        try:
+            if len(input)>0:
+                input1 = input[0].lower()
+                actions = ActionChains(browser_Keywords.local_bk.driver_obj)
+                if len(input)==1:
+                    actions.send_keys(input1)
+                    actions.perform()
+                    status=TEST_RESULT_PASS
+                    methodoutput=TEST_RESULT_TRUE
+                elif input1 in list(self.keys_info.keys()):
+                    digit = int(input[1]) if input[1].isdigit() else 1
+                    try:
+                        actions.send_keys(self.keys_info[input1]*digit)
+                        actions.perform()
+                    except Exception as e:
+                        local_uo.log.debug('Operated using option 2',e)
+                        actions.send_keys(self.keys_info[input1])
+                        actions.perform()
+                    status=TEST_RESULT_PASS
+                    methodoutput=TEST_RESULT_TRUE
+                else:
+                    err_msg = 'Input Error: Invalid Keys used'
+        except Exception as e:
+            err_msg=self.__web_driver_exception(e)
+        return status,methodoutput,output,err_msg
+
     def rightclick(self,webelement,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
