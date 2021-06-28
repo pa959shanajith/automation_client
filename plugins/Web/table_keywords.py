@@ -760,6 +760,7 @@ class TableOperationKeywords():
             methodoutput=TEST_RESULT_FALSE
             err_msg=None
             index = False
+            eleStatus = True
             output_val=OUTPUT_CONSTANT
             local_tk.log.debug('reading the inputs')
             if(len(input_arr) > 1):
