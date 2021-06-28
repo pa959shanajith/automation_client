@@ -387,27 +387,6 @@ class Controller():
                         logger.print_on_console('Step Execution start time is : '+start_time_string)
                         log.info('Step Execution start time is : '+start_time_string)
                         index,result = self.keywordinvocation(index,inpval,self.reporting_obj,execution_env,*args)
-                        #if tsp.name.lower()=='verifytextiris':
-                            #testcase_details_orig=tsp.testcase_details
-                            #testcase_details=tsp.testcase_details
-                            #if testcase_details=='':
-                                #testcase_details={'actualResult_pass':'','testcaseDetails':'','actualResult_fail':''}
-                            #elif type(testcase_details)==str:
-                                #testcase_details=ast.literal_eval(testcase_details)
-                            #new_array=result[2]
-                            #if new_array[0]==None:
-                                #new_array[0]='null'
-                            #if new_array[1]==None:
-                                #new_array[1]='null'
-                            #if new_array[0]=='':
-                                #new_array[0]='  '
-                            #if new_array[1]=='':
-                                #new_array[1]='  '
-                            #testcase_details['testcaseDetails']=new_array[1]
-                            #testcase_details['actualResult_pass']=new_array[0]
-                            #testcase_details['actualResult_fail']=new_array[0]
-                            #tsp.testcase_details=testcase_details
-
                     else:
                         keyword_flag=False
                         start_time = datetime.now()
