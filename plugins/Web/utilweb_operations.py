@@ -33,7 +33,8 @@ import readconfig
 from  selenium.webdriver.common import action_chains
 from selenium.webdriver.common.action_chains import ActionChains
 import threading
-from table_keywords import *
+from table_keywords import TableOperationKeywords, local_tk
+
 
 local_uo = threading.local()
 
@@ -402,7 +403,7 @@ class UtilWebKeywords:
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
-        eleStatus = False
+        eleStatus = True
         local_uo.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if len(webelement.find_elements_by_xpath('.//ancestor::lightning-datatable')) >0:
