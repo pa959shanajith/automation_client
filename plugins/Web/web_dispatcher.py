@@ -623,7 +623,7 @@ class Dispatcher:
                     if keyword==OPEN_BROWSER:
                         input.append(self.action)
                     actual_input=teststepproperty.inputval[0].split(";")
-                    if(keyword.lower() == "sendfunctionkeys"):
+                    if(keyword.lower() in ["sendfunctionkeys","sendkeys"]):
                         input.extend(actual_input)
                     ## Issue #190 Driver control won't switch back to parent window
                     if local_Wd.popup_object.check_if_no_popup_exists():
