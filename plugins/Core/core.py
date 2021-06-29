@@ -1108,6 +1108,8 @@ class TestThread(threading.Thread):
 
             if status==TERMINATE:
                 logger.print_on_console('---------Termination Completed-------',color="YELLOW")
+                import pause_display_operation
+                pause_display_operation.dispflag=''
             if self.action==DEBUG:
                 testcasename = handler.local_handler.testcasename
                 self.cw.killChildWindow(debug=True)
@@ -1550,9 +1552,6 @@ class Main():
             elif pdfScrapeFlag==True:
                 cw.scrapewindow = pdfScrapeObj.ScrapeDispatcher(parent = cw,id = -1, title="Avo Assure - PDF Scrapper",filePath = browsername,socketIO = socketIO)
                 pdfScrapeFlag=False
-            elif debugFlag == True:
-                cw.debugwindow = clientwindow.DebugWindow(parent = cw,id = -1, title="Debugger")
-                debugFlag = False
             else:
                 browsernumbers = ['1','2','3','6','7','8']
                 browser_names = {'1': 'Chrome', '2': 'Firefox', '3': 'Internet Explorer', '6': 'Safari', '7': 'Edge Legacy', '8': 'Edge Chromium'}
@@ -1580,6 +1579,8 @@ class Main():
                     elif flag == 'error':
                         #call debug error logic
                         cw.pausewindow = pause_display_operation.Error(parent = cw,id = -1, title="Avo Assure - Debug Mode",input = inputvalue)
+                    elif flag=="pause_debugmode":
+                        cw.debugwindow = clientwindow.DebugWindow(parent = cw,id = -1, title="Debugger")
         except Exception as e:
             log.error(e,exc_info=True)
 

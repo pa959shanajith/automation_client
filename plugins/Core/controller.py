@@ -326,11 +326,14 @@ class Controller():
     def pause_execution(self):
         logger.print_on_console('=======Pausing=======')
         log.info('=======Pausing=======')
-        self.conthread.paused=True
-        self.conthread.pause_cond.acquire()
-        with self.conthread.pause_cond:
-            while self.conthread.paused:
-                self.conthread.pause_cond.wait()
+        import pause_display_operation
+        o = pause_display_operation.PauseAndDisplay()
+        o.pause_debugmode(self.wx_object,self.conthread)
+        # self.conthread.paused=True
+        # self.conthread.pause_cond.acquire()
+        # with self.conthread.pause_cond:
+        #     while self.conthread.paused:
+        #         self.conthread.pause_cond.wait()
 
     def methodinvocation(self,index,execution_env,datatables=[],*args):
         global pause_flag
@@ -351,7 +354,8 @@ class Controller():
             #logic to handle run from setp debug
             if self.debug_choice=='RunfromStep' and self.debugfrom_step>0 and tsp.stepnum < self.debugfrom_step :
                 return index +1
-            pause_flag=True
+            else:
+                pause_flag=True
         keyword_flag=True
         ignore_stat=False
         inpval=[]
@@ -947,7 +951,9 @@ class Controller():
                 starting_val_end_range = first_step_val + 1
                 if first_step_val > 0 and first_step_val <= tsplist[-1].stepnum:
                     if last_step_val > first_step_val and last_step_val <= tsplist[-1].stepnum:
-                        testcase_details=testcase[0]['testcase']
+                        for t in range(len(testcase)):
+                            if "testcasename" in testcase[t] and testcase[t]["testcasename"] == self.tc_name_list[-1]:
+                                testcase_details=testcase[t]['testcase']
                         no_of_steps=(last_step_val-first_step_val)+1
                         comment_step_count=0
                         tdlist=testcase_details[first_step_val-1:last_step_val]
