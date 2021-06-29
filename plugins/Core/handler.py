@@ -124,6 +124,7 @@ class Handler():
         local_handler.tspIndex = -1
         local_handler.tspList = []
         local_handler.awsKeywords = {}
+        local_handler.paramData={}
 
     def parse_json(self,test_data,data_param_path=None):
         """

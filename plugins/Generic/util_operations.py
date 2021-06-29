@@ -505,3 +505,8 @@ class UtilOperations:
             log.error( err_msg )
             logger.print_on_console(err_msg)
         return status, result, output, err_msg
+    def staticFetch(self,tspIndex,inp):
+        import handler
+        var = inp[1:len(str(inp))-1]
+        path = handler.local_handler.paramData[var][0]
+        return path
