@@ -1465,9 +1465,8 @@ class Main():
                 err_msg="Delaying closing Connection due to active execution."
                 closeActiveConnection = True
             else:
-                self.killSocket()
+                cw.OnNodeConnect(wx.EVT_BUTTON)
                 err_msg="Closing active connection due to timeout."
-                cw.enable_connect()
             logger.print_on_console(err_msg)
             log.info(err_msg)
         except Exception as e:
