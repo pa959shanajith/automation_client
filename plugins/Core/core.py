@@ -1467,6 +1467,7 @@ class Main():
             else:
                 self.killSocket()
                 err_msg="Closing active connection due to timeout."
+                cw.enable_connect()
             logger.print_on_console(err_msg)
             log.info(err_msg)
         except Exception as e:
