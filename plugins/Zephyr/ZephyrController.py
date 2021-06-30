@@ -119,16 +119,17 @@ class ZephyrWindow():
                 # Fetch testcases
                 if JsonObject["resultSize"] != 0:
                     results = JsonObject["results"]
-                    res = [{'id':i['testcase']['id'],'name':i['testcase']['name'],'cyclePhaseId': i['rts']['cyclePhaseId']} for i in results if 'rts' in i]
                     # Fetch requirement details of testcases
-                    for i in range(len(results)):
-                        if 'rts' in results[i]:
-                            req_id = results[i]['testcase']['requirementIds']
-                            testcase_id=results[i]['testcase']['id']
+                    for i in results:
+                        if 'rts' in i:
+                            req_id = i['testcase']['requirementIds']
                             requirement_details = self.get_requirement_details(req_id)
-                            for j in range(len(res)):
-                                if res[j]['id']==testcase_id:
-                                    res[j]['reqdetails'] = requirement_details
+                            res.append({
+                                'id':i['testcase']['id'],
+                                'name':i['testcase']['name'],
+                                'cyclePhaseId': i['rts']['cyclePhaseId'],
+                                'reqdetails': requirement_details
+                            })
         except Exception as eproject:
             err_msg = 'Error while fetching testcases from Zephyr'
             log.error(err_msg)
