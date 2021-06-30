@@ -717,28 +717,37 @@ class UtilWebKeywords:
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
+        text = False
         try:
             if len(input)>0:
-                input1 = input[0].lower()
+                input1 = input[0]
+                digit = 1
+                if len(input)==3 and ((input[2].startswith('|') and input[2].endswith('|')) or (input[2].startswith('{') and input[2].endswith('}'))):
+                    text = True
+                    digit = int(input[1]) if input[1].isdigit() else 1
+                elif len(input)==2 and ((input[1].startswith('|') and input[1].endswith('|')) or (input[1].startswith('{') and input[1].endswith('}'))):
+                    text = True
                 actions = ActionChains(browser_Keywords.local_bk.driver_obj)
-                if len(input)==1:
-                    actions.send_keys(input1)
-                    actions.perform()
+                if text == True:
+                    for i in range(digit):
+                        actions.send_keys(input1)
+                        actions.perform()
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
-                elif input1 in list(self.keys_info.keys()):
-                    digit = int(input[1]) if input[1].isdigit() else 1
+                elif input1.lower() in list(self.keys_info.keys()):
+                    digit = int(input[1]) if len(input)>1 and input[1].isdigit() else 1
                     try:
-                        actions.send_keys(self.keys_info[input1]*digit)
+                        actions.send_keys(self.keys_info[input1.lower()]*digit)
                         actions.perform()
                     except Exception as e:
                         local_uo.log.debug('Operated using option 2',e)
-                        actions.send_keys(self.keys_info[input1])
+                        actions.send_keys(self.keys_info[input1.lower()])
                         actions.perform()
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
                 else:
-                    err_msg = 'Input Error: Invalid Keys used'
+                    err_msg = "Function key '"+input1+"' is not recognized."
+                    logger.print_on_console(err_msg)
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
         return status,methodoutput,output,err_msg

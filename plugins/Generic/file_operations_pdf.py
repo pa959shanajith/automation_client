@@ -895,21 +895,19 @@ class FileOperationsPDF:
                             os.remove(str("p%s-%s.png" % (pagenumber, xref)))#del image
                             txt = None
                             if( text ):
-                                txt = 'Page : ' + str(pagenumber+1) + ' Line No. : ' + str(xref+1) + ' Image Text : ' + text
-                            else:
-                                txt = 'Page : ' + str(pagenumber+1) + ' Line No. : ' + str(xref+1) + ' Image Text : Unable to read image text.'
+                                txt = text
                             output_res.append(txt)
                         log.debug( 'Total image count of the PDF file : ' + str(img_count) )
                         if( output_res ):
                             if args[2] == 'image':
                                 content = output_res
                             else:
-                                text_content = content
+                                text_content = [content]
                                 del content
                                 content = [text_content, output_res]
                         else:
                             err_msg = 'No images found in the PDF file'
-                elif len(args)>2 and args[2] != 'text':
+                elif len(args)>2 and args[2] not in ['text','']:
                     content = None
                     status=False
                     err_msg=generic_constants.INVALID_INPUT
