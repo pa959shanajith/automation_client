@@ -23,6 +23,7 @@ from teststepproperty import TestStepProperty
 import handler
 import os,sys
 import re
+import wx
 import subprocess
 import logger
 import json
@@ -796,9 +797,11 @@ class Controller():
         while (i < len(tsplist)):
             #Check for 'terminate_flag' before execution
             if not(terminate_flag):
-                if self.runfrom_step_range_input:
-                    #checks if the current step num is greater than ending range of run from step, to Run till the ending range of run from step
-                    if tsplist[i].testscript_name==self.tc_name_list[-1]:
+                if tsplist[i].testcase_num == last_tc_num:
+                    if mythread.cw.debugwindow is not None and not mythread.cw.debugwindow.IsShown():
+                        wx.CallAfter(mythread.cw.debugwindow.Show)
+                    if self.runfrom_step_range_input:
+                        #checks if the current step num is greater than ending range of run from step, to Run till the ending range of run from step
                         if tsplist[i].stepnum > last_step_val: break
                 #Check for 'pause_flag' before execution
                 if pause_flag:
@@ -922,6 +925,8 @@ class Controller():
         log.info('***DEBUG STARTED***')
         logger.print_on_console('***DEBUG STARTED***')
         print('=======================================================================================================')
+        if mythread.cw.debugwindow is not None:
+            wx.CallAfter(mythread.cw.debugwindow.Hide)
         for testcase in scenario:
             flag,browser_type,last_tc_num,datatables,_,_=obj.parse_json(testcase)
             if flag == False:
@@ -947,7 +952,7 @@ class Controller():
                 starting_val_end_range = first_step_val + 1
                 if first_step_val > 0 and first_step_val <= tsplist[-1].stepnum:
                     if last_step_val > first_step_val and last_step_val <= tsplist[-1].stepnum:
-                        testcase_details=testcase[0]['testcase']
+                        testcase_details=testcase[-2]['testcase']
                         no_of_steps=(last_step_val-first_step_val)+1
                         comment_step_count=0
                         tdlist=testcase_details[first_step_val-1:last_step_val]
