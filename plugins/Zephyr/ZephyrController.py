@@ -108,7 +108,7 @@ class ZephyrWindow():
         return res
 
     def get_testcases(self,filePath):
-        res = {}
+        res = []
         try:
             # get all testcases
             treeid = filePath["treeId"]
