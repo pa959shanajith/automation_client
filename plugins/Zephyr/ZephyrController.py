@@ -124,8 +124,11 @@ class ZephyrWindow():
                     for i in range(len(results)):
                         if 'rts' in results[i]:
                             req_id = results[i]['testcase']['requirementIds']
+                            testcase_id=results[i]['testcase']['id']
                             requirement_details = self.get_requirement_details(req_id)
-                            res[i]['reqdetails'] = requirement_details
+                            for j in range(len(res)):
+                                if res[j]['id']==testcase_id:
+                                    res[j]['reqdetails'] = requirement_details
         except Exception as eproject:
             err_msg = 'Error while fetching testcases from Zephyr'
             log.error(err_msg)
