@@ -9,7 +9,7 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 import oebs_key_objects
-import utils
+import oebs_utils
 import oebs_fullscrape
 import oebs_api
 from oebs_msg import *
@@ -49,6 +49,14 @@ class Utilities:
         parentindex = identifiers[7]
         parenttag = identifiers[8]
         childtag = identifiers[9]
+        #getting the internal frame name :
+        
+        internal_frame_list = []
+        for each_internal_frame in uniquepath.split('/'):
+            if each_internal_frame.find('internal frame')!=-1:
+                internal_frame_list.append(each_internal_frame.lstrip('internal frame[')[:-1])
+        
+        
         elementObj = acc.getAccessibleContextInfo()
 
         if xpath == '':
@@ -85,20 +93,16 @@ class Utilities:
                 else:
                     path = xpath + '/' + elementObj.role  + '[' + str(elementObj.name.strip()) + ']'
 
-    #    print path
         if path == currentxpathtemp:
             global accessContextParent
-
-            #accessContext = acc
             accessContextParent = acc
-            #print accessContextParent
 
         for index in range(elementObj.childrenCount):
             elementObj = acc.getAccessibleChildFromContext(index)
 
             elementcontext=elementObj.getAccessibleContextInfo()
             if elementcontext.role == 'internal frame':
-                if 'active' in elementcontext.states:
+                if 'active' in elementcontext.states and elementcontext.name.strip() == internal_frame_list[-1]:
                     self.swooptoelement(elementObj,objecttofind,currentxpathtemp,index,path)
                 else:
                     hasinternal=0
@@ -116,13 +120,9 @@ class Utilities:
             else:
                 self.swooptoelement(elementObj,objecttofind,currentxpathtemp,index,path)
 
-
-
-
     def methodtofillmap(self,acc,xpath,i):
         global  accessContext
         curaccinfo = acc.getAccessibleContextInfo()
-       # path = getXpath(acc)
         tagrole = curaccinfo.role
         tagname = ''
         text = curaccinfo.name
@@ -195,9 +195,11 @@ class Utilities:
         oebs_key_objects.xpath = locator
         #Application name is sent from the user
         oebs_key_objects.applicationname = applicationname
-        utils_obj=utils.Utils()
+        utils_obj=oebs_utils.Utils()
         isjavares, hwnd = utils_obj.isjavawindow(oebs_key_objects.applicationname)
         #method enables to move to perticular object and fetches its Context
+        #find the internalframe active :
+        #acc = oebs_api.JABContext(hwnd)
         uniquepath=oebs_key_objects.xpath
         flag = 'false'
         if ';' in uniquepath:
@@ -355,9 +357,6 @@ class Utilities:
         cordinates.append(curaccinfo.height)
         return cordinates
 
-
-
-
     #Method to get the states
 
     def getstate(self,acc,loc,url,i,xpath):
@@ -420,7 +419,6 @@ class Utilities:
                 output=oebs_key_objects.keyword_output[1]
 
         else:
-##            oebs_key_objects.custom_msg.append[:]
             del oebs_key_objects.custom_msg[:]
             oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_FOUND)
             logger.print_on_console(MSG_ELEMENT_NOT_FOUND)
@@ -430,13 +428,11 @@ class Utilities:
 
         if oebs_key_objects.custom_msg != [] and status==TEST_RESULT_FAIL:
             err_msg=oebs_key_objects.custom_msg[0]
-##            logger.print_on_console(err_msg)
 
         if methodoutput==output:
             output=OUTPUT_CONSTANT
 
         clientresp=(status,methodoutput,output,err_msg)
-
 
         global accessContext
         if type(accessContext) != str:
@@ -447,13 +443,10 @@ class Utilities:
         del oebs_key_objects.keyword_input[:]
         del oebs_key_objects.keyword_output[:]
 
-
-
     def menugenerator(self,acc):
         self.menubarelement(acc,0,'')
         global accessContext
         return accessContext
-
 
     def menubarelement(self,acc,index,xpath):
         global accessContext

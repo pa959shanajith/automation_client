@@ -11,8 +11,8 @@
 
 from oebsServer import OebsKeywords
 import oebs_fullscrape
-import oebsclickandadd
-import utils
+# import oebsclickandadd
+import oebs_utils
 import logger
 import logging
 import oebs_constants
@@ -27,9 +27,9 @@ log = logging.getLogger('oebs_dispatcher.py')
 class OebsDispatcher:
 
     oebs_keywords=OebsKeywords()
-    utils_obj=utils.Utils()
+    utils_obj=oebs_utils.Utils()
     scrape_obj=oebs_fullscrape.FullScrape()
-    clickandadd_obj=oebsclickandadd.ClickAndAdd()
+    # clickandadd_obj=oebsclickandadd.ClickAndAdd()
 
     def __init__(self):
         self.exception_flag=''
@@ -218,11 +218,7 @@ class OebsDispatcher:
                   'doubleclickcelliris':self.iris_object.doubleclickcelliris,
                   'rightclickcelliris':self.iris_object.rightclickcelliris,
                   'mousehovercelliris':self.iris_object.mousehovercelliris,
-                  'getstatusiris':self.iris_object.getstatusiris,
-                  'scrollupiris':self.iris_object.scrollupiris,
-                  'scrolldowniris':self.iris_object.scrolldowniris,
-                  'scrollleftiris':self.iris_object.scrollleftiris,
-                  'scrollrightiris':self.iris_object.scrollrightiris
+                  'getstatusiris':self.iris_object.getstatusiris
                 }
 
             keyword=keyword.lower()
@@ -232,13 +228,11 @@ class OebsDispatcher:
                     coord = [obj_props[2],obj_props[3],obj_props[4],obj_props[5]]
                     ele = {'cord': tsp.cord, 'coordinates': coord}
                     if ( tsp.custom_flag ):
-                        if (keyword.lower() == 'getstatusiris') : result = dict[keyword](ele, input, output, tsp.parent_xpath, tsp.objectname.split(';')[-2])
-                        else : result = dict[keyword](ele, input, output, tsp.parent_xpath)
+                        result = dict[keyword](ele, input, output, tsp.parent_xpath)
                     elif ( tsp.objectname.split(';')[-1] == 'constant' and keyword.lower() == 'verifyexistsiris' ):
                         result = dict[keyword](ele, input, output, 'constant')
                     else:
-                        if (keyword.lower() == 'getstatusiris') : result = dict[keyword](ele, input, output, tsp.objectname.split(';')[-2])
-                        else : result = dict[keyword](ele, input, output)
+                        result = dict[keyword](ele, input, output)
                 else:
                     result=dict[keyword](*message)
                 if keyword == 'findwindowandattach':
@@ -266,6 +260,12 @@ class OebsDispatcher:
          except TypeError as e:
             err_msg=constants.ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']
             result[3]=err_msg
+         except RuntimeError as e:
+             log.error(e)
+             if e.args[0] == 'Result 0':
+                 logger.print_on_console('Element Not Found')
+             else:
+                 logger.print_on_console('Exception at dispatcher')
          except Exception as e:
             log.error(e)
             logger.print_on_console('Exception at dispatcher')

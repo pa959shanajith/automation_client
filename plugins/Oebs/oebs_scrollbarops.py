@@ -45,7 +45,7 @@ class ScrollbarOperations:
                             if(width>height):
                                 x_cor = ((x2_cor-height)+x2_cor)/2
                                 y_cor = (y1_cor+y2_cor)/2
-                                oebs_mouseops.MouseOperation('click',x_cor,y_cor)
+                                oebs_mouseops.MouseOperation('click',int(x_cor),int(y_cor))
                                 verifyresponse = MSG_TRUE
                                 keywordresult=MSG_PASS
 
@@ -91,7 +91,7 @@ class ScrollbarOperations:
                             if(width>height):
                                 x_cor = ((x1_cor+height)+x1_cor)/2
                                 y_cor = (y1_cor+y2_cor)/2
-                                oebs_mouseops.MouseOperation('click',x_cor,y_cor)
+                                oebs_mouseops.MouseOperation('click',int(x_cor),int(y_cor))
                                 verifyresponse = MSG_TRUE
                                 keywordresult=MSG_PASS
 
@@ -136,7 +136,7 @@ class ScrollbarOperations:
                             if(height>width):
                                 x_cor = (x1_cor+x2_cor)/2
                                 y_cor = (y1_cor+(y1_cor+width))/2
-                                oebs_mouseops.MouseOperation('click',x_cor,y_cor)
+                                oebs_mouseops.MouseOperation('click',int(x_cor),int(y_cor))
                                 verifyresponse = MSG_TRUE
                                 keywordresult=MSG_PASS
 
@@ -181,7 +181,7 @@ class ScrollbarOperations:
                         if(height>width):
                             x_cor = (x1_cor+x2_cor)/2
                             y_cor = (y2_cor+(y2_cor-width))/2
-                            oebs_mouseops.MouseOperation('click',x_cor,y_cor)
+                            oebs_mouseops.MouseOperation('click',int(x_cor),int(y_cor))
                             verifyresponse = MSG_TRUE
                             keywordresult=MSG_PASS
 

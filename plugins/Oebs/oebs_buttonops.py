@@ -63,7 +63,6 @@ class ButtonOperations:
         oebs_key_objects.keyword_output.append(str(keywordresult))
         oebs_key_objects.keyword_output.append(str(keywordresponse))
 
-
     #Method to verify button name of the given Object/XPATH matches with the User Provided Text
     def verifybuttonname(self,acc):
         del oebs_key_objects.custom_msg[:]
@@ -115,8 +114,6 @@ class ButtonOperations:
         oebs_key_objects.keyword_output.append(str(keywordresult))
         oebs_key_objects.keyword_output.append(str(verifyresponse))
 
-
-
     #Method to perform click operation
     def click(self,acc):
         del oebs_key_objects.custom_msg[:]
@@ -154,7 +151,7 @@ class ButtonOperations:
         self.utilities_obj.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))
         oebs_key_objects.keyword_output.append(str(verifyresponse))
-
+        
     #Method to perform doubleclick operation
     def doubleclick(self,acc):
         del oebs_key_objects.custom_msg[:]
@@ -192,7 +189,6 @@ class ButtonOperations:
         self.utilities_obj.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))
         oebs_key_objects.keyword_output.append(str(verifyresponse))
-
 
     #Method to get link text of the given Object location
     def getlinktext(self,acc):

@@ -50,13 +50,6 @@ MSG_ELEMENT_NON_EDITABLE='Element is not editable'
 MSG_OBJECT_ENABLED='Element is Enabled'
 MSG_TIME_OUT_EXCEPTION='Timeout exception'
 
-
-
-
-
-
-
-
 ## Logging Related Constants FILE NAMES
 FILE_OEBSCLICKANADD='oebsclickandadd'
 FILE_OEBSSERVER = 'oebsServer'

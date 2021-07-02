@@ -45,6 +45,7 @@ class RadioCheckboxOperations:
                     if 'checked' in objstates:
                         log.debug('%s',MSG_OBJECTSELECTED)
                         oebs_key_objects.custom_msg.append(MSG_OBJECTSELECTED)
+                        keywordresult=MSG_PASS
                     else:
                         oebs_mouseops.MouseOperation('click',x_coor,y_coor)
                         time.sleep(2)
@@ -88,6 +89,8 @@ class RadioCheckboxOperations:
                     if 'checked' in objstates:
                         log.debug('%s',MSG_OBJECTSELECTED)
                         oebs_key_objects.custom_msg.append(MSG_OBJECTSELECTED)
+                        verifyresponse = MSG_TRUE
+                        keywordresult=MSG_PASS
                     else:
                         oebs_mouseops.MouseOperation('click',x_coor,y_coor)
                         time.sleep(2)
@@ -153,6 +156,8 @@ class RadioCheckboxOperations:
                             oebs_mouseops.MouseOperation('click',x_coor,y_coor)
                             log.debug('%s',MSG_OBJECTUNSELECTED)
                             oebs_key_objects.custom_msg.append(MSG_OBJECTUNSELECTED)
+                            verifyresponse = MSG_TRUE
+                            keywordresult=MSG_PASS
                         else:
                             log.debug('%s',MSG_OBJECT_READONLY)
                             oebs_key_objects.custom_msg.append(MSG_OBJECT_READONLY)

@@ -17,22 +17,19 @@ import oebs_api
 import win32gui
 import json
 from oebs_msg import *
-
 import logging
 import oebs_mouseops
 import oebs_msg
 import oebs_key_objects
-
 import oebs_textops
 import oebs_serverUtilities
-import utils
-
+import oebs_utils
 from oebs_utilops import UtilOperations
 from oebs_buttonops import ButtonOperations
 from oebs_radiocheckboxops import RadioCheckboxOperations
 from oebs_dropdownlistboxops import DropdownListboxOperations
 from oebs_elementsops import ElementOperations
-from oebsclickandadd import ClickAndAdd
+# from oebsclickandadd import ClickAndAdd
 from oebs_tableops import TableOperations
 from oebs_scrollbarops import ScrollbarOperations
 from oebs_internalframeops import InternalFrameOperations
@@ -43,8 +40,6 @@ k = 0
 cordinates = []
 state = []
 objectDict = {}
-#config file location
-#global values
 accessContext = ''
 debugmode=''
 
@@ -61,21 +56,19 @@ class OebsKeywords:
         self.dropdownlistboxops_obj=DropdownListboxOperations()
 
         self.elementsops_obj=ElementOperations()
-        self.oebsclickandadd_obj=ClickAndAdd()
+        # self.oebsclickandadd_obj=ClickAndAdd()
         self.tableops_obj=TableOperations()
         self.scrollbarops_obj=ScrollbarOperations()
         self.internalframeops_obj=InternalFrameOperations()
-        self.utils_obj=utils.Utils()
-
+        self.utils_obj=oebs_utils.Utils()
 
     def getobjectsize(self,windowname,path):
         self.utils_obj.windowsrun()
-        log.debug('MSG:\nWindows Run Executed.',DEF_GETENTIREOBJECTLIST)
+        log.debug('MSG:\nWindows Run Executed: %s',DEF_GETENTIREOBJECTLIST)
         isjavares, hwnd = self.utils_obj.isjavawindow(windowname)
-        log.debug('FILE: %s, DEF: %s , MSG:\njava window status obtained is :%s',str(isjavares))
+        #log.debug('FILE: %s, DEF: %s , MSG:\njava window status obtained is :%s',str(isjavares))
+        log.debug('MSG:\njava window status obtained is :%s',str(isjavares))
         if (isjavares):
-##            log.debug('MSG:\nThe Scraped Data is:\n %s',DEF_GETENTIREOBJECTLIST)
-##            del self.utilities_obj.cordinates[:]
             del oebs_serverUtilities.cordinates[:]
             result=self.utilities_obj.getsize(path,windowname)
             return result
@@ -153,7 +146,6 @@ class OebsKeywords:
             if str(accessContext) != 'fail':
                 self.txtops_obj.settext(accessContext)
         log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
-
         return self.utilities_obj.clientresponse()
 
     def gettextboxlength(self,applicationname,objectname,keyword,inputs,outputs):
@@ -485,6 +477,7 @@ class OebsKeywords:
         # accessContext object gets value on call of swoopToElement definition
         global accessContext
         log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
+        #print('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
         #self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
         accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
         if (accessContext):
@@ -848,7 +841,7 @@ class OebsKeywords:
         global accessContext
         log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
         accessContext =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
-        #self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
+        self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
         log.debug('MSG:Keyword response : %s',DEF_WAITFORELEMENTVISIBLE,oebs_key_objects.keyword_output)
         return self.utilities_obj.clientresponse()
 
@@ -907,10 +900,10 @@ class OebsKeywords:
         #self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
         accessContext = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
         if (accessContext):
-           self.dropdownlistboxops_obj.getallvalues(accessContext)
            if str(accessContext) != 'fail':
-            log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
-            return self.utilities_obj.clientresponse()
+               self.dropdownlistboxops_obj.getallvalues(accessContext)
+        log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
+        return self.utilities_obj.clientresponse()
 
     #implemented the setsecuretext for the issue #8010-Azure.
     def setsecuretext(self,applicationname,objectname,keyword,inputs,outputs):

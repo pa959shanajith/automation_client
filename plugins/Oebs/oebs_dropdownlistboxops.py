@@ -208,7 +208,7 @@ class DropdownListboxOperations:
             if charinfo.role == 'combo box':
                 #calling getvaluesdropdown def to get all values in dropdown
                     generatedvalues  = self.getvaluesdropdown(acc)
-                    if generatedvalues == inputValues:
+                    if sorted(generatedvalues) == sorted(inputValues):
                         keywordresult=MSG_PASS
                         verifyresponse = MSG_TRUE
             #check for listbox
@@ -344,14 +344,14 @@ class DropdownListboxOperations:
         #global selectedvalue
         contextInfo = acc.getAccessibleContextInfo()
         if contextInfo.role == 'list':
-                        count1 = contextInfo.childrenCount
-                        for num in range(0, count1) :
-                            childacc = acc.getAccessibleChildFromContext(num)
-                            acccontext = childacc.getAccessibleContextInfo()
-                            state = acccontext.role
-                            if state=='label':
-                                value = acccontext.name
-                                selectedvalue.append(str(value))
+            count1 = contextInfo.childrenCount
+            for num in range(0, count1) :
+                childacc = acc.getAccessibleChildFromContext(num)
+                acccontext = childacc.getAccessibleContextInfo()
+                state = acccontext.role
+                if state=='label':
+                    value = acccontext.name
+                    selectedvalue.append(str(value))
         return selectedvalue
 
     #method to verify whether given values are selected in listbox object

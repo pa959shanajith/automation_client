@@ -68,8 +68,7 @@ class ElementOperations:
         self.utilities_obj.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))
         oebs_key_objects.keyword_output.append(str(verifyresponse))
-
-
+        
     #Method to get element Text of the given Object location
     def getelementtext(self,acc):
         del oebs_key_objects.custom_msg[:]
@@ -102,7 +101,8 @@ class ElementOperations:
                     #sets the result to pass
                     keywordresult=MSG_PASS
                     log.debug('Result:%s',elementtext)
-                    keywordresponse = elementtext.encode('utf-8')
+                    #keywordresponse = elementtext.encode('utf-8')
+                    keywordresponse = elementtext
                     oebs_key_objects.custom_msg.append("MSG_RESULT_IS")
                 else:
                     log.debug('%s',MSG_TEXT_NOT_DEFINED)

@@ -93,8 +93,6 @@ class UtilOperations:
                 keywordresult = MSG_FAIL
                 log.debug('%s',keywordresult)
 
-
-
         except Exception as e:
             self.utilities_obj.cleardata()
             log.debug('%s',e)
@@ -125,8 +123,6 @@ class UtilOperations:
 
                 oebs_mouseops.MouseOperation('slide',x_cor,y_cor)
                 oebs_mouseops.MouseOperation('release',x_cor,y_cor)
-
-
 
                 verifyresponse = MSG_TRUE
                 keywordresult = MSG_PASS
@@ -223,7 +219,6 @@ class UtilOperations:
         self.utilities_obj.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))
         oebs_key_objects.keyword_output.append(str(verifyresponse))
-
 
     #Method to check given object is disabled
     def verifydisabled(self,acc):
@@ -334,7 +329,6 @@ class UtilOperations:
         self.utilities_obj.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))
         oebs_key_objects.keyword_output.append(str(verifyresponse))
-
 
     #Method to check given object is verifyreadonly
     def verifyreadonly(self,acc):
@@ -516,7 +510,6 @@ class UtilOperations:
         self.utilities_obj.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))
         oebs_key_objects.keyword_output.append(str(verifyresponse))
-
 
     #Method to verify does not exists
     def verifydoesnotexists(self,acc):

@@ -8,9 +8,9 @@
 # Copyright:   (c) sushma.p 2016
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
-import utils
+import oebs_utils
 import oebs_fullscrape
-import oebsclickandadd
+# import oebsclickandadd
 import logger
 import logging
 import oebs_constants
@@ -21,12 +21,15 @@ import json
 import time
 from constants import *
 import core_utils
+import cropandadd
+import re
+
 visiblity_status = False
+scrape_pop_window = False
 
 log = logging.getLogger('scrape_dispatcher.py')
 windownametoscrape = ''
 class ScrapeDispatcher(wx.Frame):
-    logger.print_on_console("Enetering inside scrape window")
     def __init__(self, parent,id, title,filePath,socketIO):
         wx.Frame.__init__(self, parent, title=title,
                    pos=(300, 150),  size=(210, 180) ,style = wx.CAPTION|wx.CLIP_CHILDREN )
@@ -34,15 +37,16 @@ class ScrapeDispatcher(wx.Frame):
         self.iconpath = os.environ["IMAGES_PATH"] + "/avo.ico"
         self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
         global obj
-        obj = utils.Utils()
-        self.utils_obj=utils.Utils()
+        obj = oebs_utils.Utils()
+        self.utils_obj=oebs_utils.Utils()
         self.scrape_obj=oebs_fullscrape.FullScrape()
         self.core_utilsobject = core_utils.CoreUtils()
-        self.scrapeoptions = ['Full', 'Button', 'Textbox', 'Dropdown', 'Radiobutton', 'Checkbox', 'Table', 'List', 'InternalFrame', 'ScrollBar', 'Link', 'Other Tags']
-        self.tag_map = {'Full':'full','Button':['push button','toggle button'], 'Textbox':['edit','Edit Box','text','password text'], 'Dropdown':'combo box', 'Radiobutton':'radio button', 'Checkbox':'check box', 'Table':'table', 'List':['list item','list'],'InternalFrame':'internal frame','ScrollBar':'scroll bar', 'Link':['hyperlink','Static'] , 'Other Tags':'element'}
+        self.scrapeoptions = ['Full', 'Button', 'Textbox', 'Dropdown', 'Radiobutton', 'Checkbox', 'Table', 'List', 'InternalFrame', 'Frame', 'ScrollBar', 'Link', 'Other Tags']
+        self.tag_map = {'Full':'full','Button':['push button','toggle button'], 'Textbox':['edit','Edit Box','text','password text'], 'Dropdown':'combo box', 'Radiobutton':'radio button', 'Checkbox':'check box', 'Table':'table', 'List':['list item','list'],'InternalFrame':'internal frame','Frame':'frame','ScrollBar':'scroll bar', 'Link':['hyperlink','Static'] , 'Other Tags':'element'}
         self.delay_time=["0s","5s","10s","15s","20s","25s"]
         self.delay_time_map={"0s":0,"5s":5,"10s":10,"15s":15,"20s":20,"25s":25}
         self.parent = parent
+        self.img_path = AVO_ASSURE_HOME + OS_SEP + 'output' + OS_SEP +'oebs_form.png'
         global windownametoscrape
         windownametoscrape = filePath
         self.socketIO = socketIO
@@ -52,7 +56,9 @@ class ScrapeDispatcher(wx.Frame):
 ##        input_val.append(fileLoc)
         input_val.append(windowname)
         input_val.append(10)
-        status = obj.set_to_foreground(windowname)
+        #status = obj.set_to_foreground(windowname)
+        result = obj.find_oebswindow_and_attach(windowname)
+        status = result[0]
         if ( status!=TERMINATE and status ):
             self.panel = wx.Panel(self)
             self.vsizer = wx.BoxSizer(wx.VERTICAL)
@@ -75,7 +81,6 @@ class ScrapeDispatcher(wx.Frame):
             self.scrapeDelaydropdown.SetEditable(False)
             self.scrapeDelaydropdown.SetToolTip(wx.ToolTip( "Set delay time before start of IRIS scraping." ))
 
-            import cropandadd
             global cropandaddobj
             cropandaddobj = cropandadd.Cropandadd()
             self.cropbutton = wx.ToggleButton(self.panel, label = "Start IRIS", pos=(12, 108), size = (175, 25))
@@ -84,14 +89,20 @@ class ScrapeDispatcher(wx.Frame):
             style = self.GetWindowStyle()
             self.SetWindowStyle( style|wx.STAY_ON_TOP )
             wx.Frame(self.panel, style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER)
-            self.Show()
+            scrape_pop_window=self.Show()
         else:
             self.socketIO.emit('scrape','wrongWindowName')
             self.parent.schedule.Enable()
+            self.Close()
+
+        if scrape_pop_window:
+            logger.print_on_console("Entering inside scrape window")
 
     def clickandadd(self,event):
         state = event.GetEventObject().GetValue()
-        clickandadd_obj=oebsclickandadd.ClickAndAdd()
+        #clickandadd_obj=oebsclickandadd.ClickAndAdd()
+        import oebs_start
+        import oebs_click_and_add
 
         if state == True:
             self.fullscrapebutton.Disable()
@@ -99,16 +110,17 @@ class ScrapeDispatcher(wx.Frame):
     ##        self.comparebutton.Disable()
 
             event.GetEventObject().SetLabel("Stop ClickAndAdd")
-            clickandadd_obj.clickandadd(windownametoscrape,'STARTCLICKANDADD')
+            #oebs_start.main(windownametoscrape)
+            oebs_click_and_add.get_core(windownametoscrape)
+            #clickandadd_obj.clickandadd(windownametoscrape,'STARTCLICKANDADD')
     ##            wx.MessageBox('CLICKANDADD: Select the elements using Mouse - Left Click', 'Info',wx.OK | wx.ICON_INFORMATION)
-            logger.print_on_console( 'click and add initiated, select the elements from AUT')
+            logger.print_on_console('select the elements from AUT')
 
         else:
-            d = clickandadd_obj.clickandadd(windownametoscrape,'STOPCLICKANDADD')
+            #d = clickandadd_obj.clickandadd(windownametoscrape,'STOPCLICKANDADD')
+            #d = oebs_start.terminate()
+            d = oebs_click_and_add.terminate_core()
             event.GetEventObject().SetLabel("Start ClickAndAdd")
-
-
-    ##            print desktop_scraping.finalJson
             logger.print_on_console('Stopped click and add')
             logger.print_on_console( 'Scrapped data saved successfully in domelements.json file')
             try:
@@ -116,14 +128,15 @@ class ScrapeDispatcher(wx.Frame):
                 #providing 1 sec delay to minimize wx scrape window to hide in screenshot
                 time.sleep(1)
                 img = self.utils_obj.captureScreenshot(windownametoscrape)
-                img.save('oebs_form.png')
-                with open("oebs_form.png", "rb") as image_file:
+                img.save(self.img_path)
+                with open(self.img_path, "rb") as image_file:
                           encoded_string = base64.b64encode(image_file.read())
 
-                d = json.loads(d);
+                d = json.loads(d)
                 d['mirror'] =encoded_string.decode('UTF-8').strip()
             except Exception as e:
-                logger.print_on_console('Error occured while capturing Screenshot',e)
+                logger.print_on_console('Error occured while capturing Screenshot ',e)
+                log.error('Error occured while capturing Screenshot %s',e)
 
             #10 is the limit of MB set as per Avo Assure standards
             if self.core_utilsobject.getdatasize(str(d),'mb') < 10:
@@ -135,6 +148,10 @@ class ScrapeDispatcher(wx.Frame):
     ##            wx.MessageBox('CLICKANDADD: Scrape completed', 'Info',wx.OK | wx.ICON_INFORMATION)
             self.Close()
             self.parent.schedule.Enable()
+            try:
+                self.Close()
+            except:
+                print("No Frame available")
     ##            event.GetEventObject().SetLabel("Start ClickAndAdd")
             logger.print_on_console('Click and add scrape  completed')
 
@@ -144,7 +161,7 @@ class ScrapeDispatcher(wx.Frame):
         self.startbutton.Disable()
         self.cropbutton.Disable()
         scrape_obj=oebs_fullscrape.FullScrape()
-        logger.print_on_console(("windowname to scrape : ",windownametoscrape))
+        log.info(("windowname to scrape : ",windownametoscrape))
         try:
             d = {}
             d['view'] = self.OnFullscrapeChoice(eval(scrape_obj.getentireobjectlist(windownametoscrape))['view'], self.fullscrapedropdown.GetValue())
@@ -152,13 +169,13 @@ class ScrapeDispatcher(wx.Frame):
             #providing 1 sec delay to minimize wx scrape window to hide in screenshot
             time.sleep(1)
             img = self.utils_obj.captureScreenshot(windownametoscrape)
-            img.save('oebs_form.png')
-            with open("oebs_form.png", "rb") as image_file:
+            img.save(self.img_path)
+            with open(self.img_path, "rb") as image_file:
                       encoded_string = base64.b64encode(image_file.read())
             d['mirror'] =encoded_string.decode('UTF-8').strip()
         except Exception as e:
+            log.error('Error occured while capturing Screenshot %s',e)
             logger.print_on_console('Error occured while capturing Screenshot ',e)
-
         #10 is the limit of MB set as per Avo Assure standards
         if self.core_utilsobject.getdatasize(str(d),'mb') < 10:
             self.socketIO.emit('scrape',d)
@@ -168,7 +185,6 @@ class ScrapeDispatcher(wx.Frame):
         self.parent.schedule.Enable()
         self.Close()
         logger.print_on_console('Full scrape  completed')
-
 
     def scrape_dispatcher(self,keyword,*message):
              logger.print_on_console('Keyword is '+keyword)
@@ -236,21 +252,38 @@ class ScrapeDispatcher(wx.Frame):
                     new_data = scrape_data
                 else:
                     for data in scrape_data:
-                        if ( data['hiddentag'] == str(False )):
+                        if ( visiblity_status and data['hiddentag'] == str(False )):
                             new_data.append(data)
             #for element tag
             elif ( tag_choice == 'element' ):
                 for data in scrape_data:
-                    print(data['hiddentag'])
-                    if ( data['tag'] != tag_choice or data['tag']  not in tag_choice ):
+                    #logger.print_on_console(data['hiddentag'])
+                    tag_values = self.tag_map.values()
+                    items_tag = []
+                    for each_tag in tag_values:
+                        if isinstance(each_tag, list):
+                            for tag_in in each_tag:
+                                items_tag.append(tag_in)
+                        else:
+                            items_tag.append(each_tag)
+                    if ( data['tag'] != tag_choice and data['tag'] not in items_tag ):
                         if ( not visiblity_status ):
                                 new_data.append(data)
                         elif ( visiblity_status and data['hiddentag'] == str(False) ):
                             new_data.append(data)
+
             #for tags which are defined in tag_map
             else:
                 for data in scrape_data:
-                    if ( data['tag'] == tag_choice or data['tag'] in tag_choice ):
+                    match=False
+                    if isinstance(tag_choice, list):
+                        for each_tag in tag_choice:
+                            if data['tag'] == each_tag:
+                                match=True
+                    elif isinstance(tag_choice,str):
+                        if data['tag'] == tag_choice:
+                            match=True
+                    if match:
                         if ( not visiblity_status ):
                             new_data.append(data)
                         elif ( visiblity_status and data['hiddentag'] == str(False) ):
@@ -261,7 +294,7 @@ class ScrapeDispatcher(wx.Frame):
             logger.print_on_console( 'Unable to find objects of type : ' + list(self.tag_map.keys())[list(self.tag_map.values()).index(tag_choice)] )
             log.error( 'Unable to find object_type : ' + list(self.tag_map.keys())[list(self.tag_map.values()).index(tag_choice)] + ' while scraping' )
         else:
-            logger.print_on_console( 'Detected and scraped "' + str(len(new_data)) + '" objects of type : ' + list(self.tag_map.keys())[list(self.tag_map.values()).index(tag_choice)] )
+            log.info( 'Detected and scraped "' + str(len(new_data)) + '" objects of type : ' + list(self.tag_map.keys())[list(self.tag_map.values()).index(tag_choice)] )
         return new_data
 
     def visibility(self, event):

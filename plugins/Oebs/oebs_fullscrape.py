@@ -9,9 +9,7 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 
-##import oebs_key_objects
-##import oebsServer
-import utils
+import oebs_utils
 import logging
 import oebs_api
 from oebs_msg import *
@@ -31,7 +29,7 @@ log = logging.getLogger('oebs_fullscrape.py')
 class FullScrape:
 
     def getentireobjectlist(self,windowname):
-        utils_obj=utils.Utils()
+        utils_obj=oebs_utils.Utils()
         tempne = []
         utils_obj.windowsrun()
         log.debug('MSG:\nWindows Run Executed.',DEF_GETENTIREOBJECTLIST)
@@ -50,7 +48,7 @@ class FullScrape:
             return 'fail'
     #method to find window rectangle for custom objects
     def custom_winrect(self,windowname):
-        utils_obj=utils.Utils()
+        utils_obj=oebs_utils.Utils()
         tempne = []
         utils_obj.windowsrun()
         log.debug('MSG:\nWindows Run Executed.',"custom_winrect")
@@ -63,7 +61,6 @@ class FullScrape:
     #contains full scrape logic
     def acccontext(self,acc, tempne,xpath,i,window):
         curaccinfo = acc.getAccessibleContextInfo()
-       # path = getXpath(acc)
         tagrole = curaccinfo.role
         tagname = curaccinfo.name
         text = curaccinfo.name
@@ -156,7 +153,7 @@ class FullScrape:
         text = str(text)
         text = text.strip()
         #Calculating co ordinates for embedded screenshots
-##            utils_obj=utils.Utils()
+##            utils_obj=oebs_utils.Utils()
 ##            isjavares, hwnd = utils_obj.isjavawindow(window)
 ##            win_rect= win32gui.GetWindowRect(hwnd)
         x1_win = win_rect[0]
@@ -182,6 +179,12 @@ class FullScrape:
         custname = None
         custname = self.postfixCustname(str(curaccinfo.role),text.strip())
         #----------------------------------------custname
+        # if hiddentag:
+        #     left_need = 0
+        #     top_need = 0
+        #     width = 0
+        #     height = 0
+        #     return
         tempne.append({"custname":custname,
                 "tag":curaccinfo.role,
                 "xpath":path + ';' + name.strip() + ';' + str(indexInParent)  + ';' + str(childrencount) + ';'+ str(parentname).strip() + ';' + str(parentxpath) + ';' + str(parentchildcount) + ';' + str(parentindex)+ ';' + str(parenttag)+ ';' + str(curaccinfo.role) + ';' + description,
@@ -214,6 +217,8 @@ class FullScrape:
             custname = custname + "_lst"
         elif(role == 'internal frame'):
             custname = custname + "_internalframe"
+        elif(role == 'frame'):
+            custname = custname + "_frame"
         elif(role == "scroll bar"):
             custname = custname + "_scroll"
         elif(role in ['hyperlink','Static']):
