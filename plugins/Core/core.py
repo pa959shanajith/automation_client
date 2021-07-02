@@ -246,8 +246,8 @@ class MainNamespace(BaseNamespace):
                 if appType==APPTYPE_DESKTOP_JAVA.lower():
                     if(not args[0].startswith('iris')):
                         core_utils.get_all_the_imports('Oebs')
-                        import utils
-                        light =utils.Utils()
+                        import oebs_utils
+                        light = oebs_utils.Utils()
                         res = light.highlight(args[0],args[1])
                         logger.print_on_console('Highlight result: '+str(res))
                 elif appType==APPTYPE_DESKTOP.lower():
