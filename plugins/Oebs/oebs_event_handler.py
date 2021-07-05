@@ -5,7 +5,6 @@
 #Copyright (C) 2007-2017 NV Access Limited, Babbage B.V.
 
 import threading
-import oebs_queue_handler
 import oebs_api2
 import oebs_global_vars
 import winuser

@@ -22,15 +22,11 @@ import oebs_control_types
 import oebs_jab_object
 import oebs_start
 import oebs_click_and_add
-import oebs_core1
-core = oebs_core1.Core()
+
 
 from oebs_xpath_generator import PathGenerator
-path_obj = PathGenerator(window_name=core.window_name)
-log.info("WindowName Recived from core in JABhadler {}".format(core.window_name))
-
 previousMouseEvent , previousCaretEvent  = None , None
-
+path_obj = None
 isRunning=False
 isRecording = False
 
@@ -337,8 +333,6 @@ internalFunctionQueue.__name__="JABHandler.internalFunctionQueue"
 
 def internalQueueFunction(func,*args,**kwargs):
     try:
-        import oebs_core1
-        core = oebs_core1.Core()
         internalFunctionQueue.put_nowait((func,args,kwargs))
         #oebs_start.core.requestPump()
         oebs_click_and_add.get_core().requestPump()
@@ -838,6 +832,8 @@ def isJavaWindow(hwnd):
 
 def initialize():
     global isRunning , isRecording , internalFunctionQueue , path_obj
+    path_obj = PathGenerator(window_name = oebs_click_and_add.core.window_name)
+    log.info("WindowName Recived from core in JABhadler {}".format(oebs_click_and_add.core.window_name))
     if not windowsbridgeDll:
         raise NotImplementedError("dll not available")
     windowsbridgeDll.Windows_run()

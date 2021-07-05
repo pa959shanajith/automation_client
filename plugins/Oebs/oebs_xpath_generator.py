@@ -185,20 +185,6 @@ class PathGenerator():
         custname = self.postfixCustname(str(current_acc_info.role),text.strip())
         #custname
 
-        hwnd = win32gui.FindWindow(None, self.window_name)
-        win_rect= win32gui.GetWindowRect(hwnd)
-
-        #coordinates Calculation
-        x1_win = win_rect[0]
-        y1_win = win_rect[1]
-        x2_win = win_rect[2]
-        y2_win = win_rect[3]
-        width_win = x2_win - x1_win
-        height_win = y2_win - y1_win
-        #width=current_acc_info.width
-        #height=current_acc_info.height
-        left_need = current_acc_info.x - x1_win
-        top_need =  current_acc_info.y - y1_win
 
         self.store_object.append({
             "custname": custname,
@@ -207,7 +193,7 @@ class PathGenerator():
 	        "hiddentag":str(False),
 	        "id":'null',
 	        "text":str(text),
-	        "url":oebs_click_and_add.window_name,
+	        "url":oebs_click_and_add.core.window_name,
 	        "x_coor":current_acc_info.x,
 	        "y_coor":current_acc_info.y,
             "left":left_need,

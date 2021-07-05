@@ -24,6 +24,7 @@ import ctypes
 from ctypes import wintypes
 import os
 import re
+from oebs_constants import ERROR_CODE_DICT
 
 log = logging.getLogger('oebs_utils.py')
 
@@ -99,8 +100,10 @@ class Utils:
                 win32gui.DeleteDC(hdc)
             else:
                 log.info("Window is not in Foreground")
+                logger.print_on_console(ERROR_CODE_DICT['window_not_foreground'])
                 status = False
         except Exception as e:
+            logger.print_on_console(ERROR_CODE_DICT['err_highlight'])
             status=False
             log.error(e)
         
@@ -110,7 +113,7 @@ class Utils:
         logger.print_on_console('windowname is '+windowname)
         log.info('windowname is '+windowname)
         status=False
-        err_msg=None
+        err_msg = None
         self.aut_handle=None
         try:
             import oebs_dispatcher
@@ -131,14 +134,16 @@ class Utils:
                         break
             if not(flag):
                 self.aut_handle=None
+                err_msg = ERROR_CODE_DICT['invalid_window']
+                logger.print_on_console(err_msg)
             if self.aut_handle is not None:
                 oebs_dispatcher.windowname=windowname
                 self.set_to_foreground(windowname)
                 status=True
         except Exception as e:
             log.error(e)
-            logger.print_on_console(e)
-            err_msg=str(e)
+            err_msg = ERROR_CODE_DICT['err_attach_window']
+            logger.print_on_console(err_msg)
         return status,err_msg
 
 
@@ -155,7 +160,8 @@ class Utils:
         return text
 
     def find_javawindow_and_attach(self,windowname,launch_time_out):
-        err_msg=None
+        err_msg = None
+        found = False
         try:
             import time
             logger.print_on_console('windowname is '+windowname)
@@ -173,16 +179,20 @@ class Utils:
                             self.windowHandle=title_matched_windows[0]
                             self.windowname=self.getWindowText(self.windowHandle)
                             oebs_dispatcher.windowname=self.windowname
-
+                            found = True
                             self.set_to_foreground(self.windowname)
                             time.sleep(0.5)
                             logger.print_on_console('Application handle found')
                             break
                         if(self.windowname!=''):
                             break
+            if not found:
+                err_msg = ERROR_CODE_DICT['invalid_window']
+                logger.print_on_console(err_msg)
         except Exception as e:
-            err_msg=str(e)
-            log.error(err_msg)
+            err_msg = ERROR_CODE_DICT['err_attach_window']
+            logger.print_on_console(err_msg)
+            log.error(e)
         return self.windowname,err_msg
 
     def close_application(self,*args):
@@ -195,10 +205,13 @@ class Utils:
                 win32gui.PostMessage(self.aut_handle,win32con.WM_CLOSE,0,0)
                 status=TEST_RESULT_PASS
                 result = TEST_RESULT_TRUE
+            else:
+                err_msg = ERROR_CODE_DICT['invalid_window']
+                logger.print_on_console(err_msg)
         except Exception as e:
             log.error(e)
-            logger.print_on_console(e)
-            err_msg=str(e)
+            err_msg=ERROR_CODE_DICT['invalid_window']
+            logger.print_on_console(err_msg)
         return status,result,output,err_msg
 
     def getProcessWindows(self,windowName):
@@ -278,14 +291,15 @@ class Utils:
                             err_msg=APPLICATION_ERROR_CODES.get(error_code)
                             logger.print_on_console(err_msg)
                         else:
-                            logger.print_on_console('unable to launch the application')
+                            err_msg = ERROR_CODE_DICT['err_launch_app']
+                            logger.print_on_console(err_msg)
             else:
                 logger.print_on_console('The file does not exists')
 
         except Exception as e:
             log.error(e)
-            logger.print_on_console(e)
-            err_msg=str(e)
+            err_msg = ERROR_CODE_DICT['err_launch_app']
+            logger.print_on_console(err_msg)
         return status,methodoutput,output,err_msg
 
     def find_window_and_attach(self,url,objectname,keyword,windowname,*args):
@@ -311,8 +325,6 @@ class Utils:
             log.info('Application handle found')
             log.info('Given windowname is '+windowname)
             return window_handle
-        elif len(title_matched_windows)==0:
-            logger.print_on_console('The given window name is not found')
         return None
 
     def windowsrun(self):

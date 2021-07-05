@@ -111,7 +111,7 @@ class ScrapeDispatcher(wx.Frame):
 
             event.GetEventObject().SetLabel("Stop ClickAndAdd")
             #oebs_start.main(windownametoscrape)
-            oebs_click_and_add.get_core(windownametoscrape)
+            oebs_click_and_add.init_core(windownametoscrape)
             #clickandadd_obj.clickandadd(windownametoscrape,'STARTCLICKANDADD')
     ##            wx.MessageBox('CLICKANDADD: Select the elements using Mouse - Left Click', 'Info',wx.OK | wx.ICON_INFORMATION)
             logger.print_on_console('select the elements from AUT')

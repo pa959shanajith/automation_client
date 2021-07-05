@@ -17,35 +17,35 @@ import oebs_utils
 _pump = None
 _isPumpPending = False
 
-window_name = ''
+window = ''
 
 status = False
 thread = None
 
-# thread event
-exit_event = None
-running_event = None
 
 core = None
 
-def get_core(windowName = ''):
-    global core, window_name
-    window_name = windowName 
-    if not core:
-        try:
-            core = Core(windowName)
-            core.init_scrape_thread()
-            return core
-        except Exception as e:
-            log.debug(e)
+def init_core(windowName = ''):
+    global core, window
+    window = windowName 
+    try:
+        core = Core(windowName)
+        core.init_scrape_thread()
+        return core
+    except Exception as e:
+        log.debug(e)
+    
+def get_core():
+    global core
     return core
 
 
 def terminate_core():
-    global core
+    global core, window
     if core:
         data = core.terminate()
         core = None
+        window = None
         return data
 class Timer(object):
     def __init__(self):
@@ -116,23 +116,14 @@ class Core():
             thread = threading.Thread(target=self.main,args=())
             thread.setDaemon(True)
             thread.start()
-            thread.set_name("OEBS_Scrape_Thread")
+            thread.name = "OEBS_Scrape_Thread"
 
         except Exception as e:
             log.debug(e)
 
     def init_scrape_thread(self):
-        global exit_event
-        global running_event
-        global core
         try:
-            #core = oebs_core1.Core()
-            #exit_event = threading.Event()
-            #running_event = threading.Event()
             self.start_thread()
-            #core.main(windowName)
-            #running_event.wait()
-            #running_event = None
             if self.dll_loaded:
                 if self.res_find_window:
                     return 'Pass',""
@@ -151,6 +142,7 @@ class Core():
 
         except Exception as e:
             log.debug(e)
+            return 'Fail', str(e)
 
     def __init__(self, windowName):
         self.PUMP_MAX_DELAY = 10
@@ -178,8 +170,10 @@ class Core():
             except Exception as e:
                 log.info("Java Access Bridge not available")
                 log.debug(e)
+                return
             except:
                 log.debug('ERR_ACCESS_BRIDGE_INIT_ERROR')
+                return
             # Doing this here is a bit ugly, but we don't want these modules imported
             # at module level, including wx.
             log.info("Initializing core pump")
@@ -216,23 +210,18 @@ class Core():
 
     def terminate(self):
         try:
-            global exit_event
             #added local 
             thread=None
             if self.frame is not None:
                 self.frame.on_exit(frame=self.frame)
             self.app = None
             self.frame = None
-            # wait for the exit event
-            if exit_event:
-                exit_event.wait()
             #To Check the loaded bridgeDll should run after the scrape completed with debug TestCase, Commited the terminate evevent
             oebs_api.terminateEvents()
             data_rec = oebs_api.path_obj.create_file(self.window_name)
 
             if thread:
                 thread = None
-            exit_event = None
             return data_rec
         except Exception as e:
             log.debug(e)

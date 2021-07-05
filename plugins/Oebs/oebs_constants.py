@@ -31,4 +31,13 @@ INVALID_KEYWORD='Invalid keyword'
 
 CUSTOM='@Custom'
 
-INVALID_INPUT = 'Invalid input, Please provide the valid input'
+ERROR_CODE_DICT = {
+    'invalid_input': 'Invalid input, Please provide the valid input',
+    'invalid_window': 'Window Handle not Found',
+    'err_close_window':  'Unable to Close Window',
+    'err_attach_window': 'Unable to Attach to Window',
+    'err_launch_app': 'Unable to Launch Application',
+    'err_highlight': 'Unable to highlight Object',
+    'window_not_foreground': 'Window not in foreground' 
+}
+

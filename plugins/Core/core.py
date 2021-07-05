@@ -248,8 +248,11 @@ class MainNamespace(BaseNamespace):
                         core_utils.get_all_the_imports('Oebs')
                         import oebs_utils
                         light = oebs_utils.Utils()
-                        res = light.highlight(args[0],args[1])
-                        logger.print_on_console('Highlight result: '+str(res))
+                        if args[1] == '' or args[1] == ' ':
+                            logger.print_on_console('Invalid Window Name, Highlighting Failed')
+                        else:
+                            res = light.highlight(args[0],args[1])
+                            logger.print_on_console('Highlight result: '+str(res))
                 elif appType==APPTYPE_DESKTOP.lower():
                     core_utils.get_all_the_imports('Desktop')
                     import desktop_highlight
