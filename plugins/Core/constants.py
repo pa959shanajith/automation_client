@@ -105,6 +105,8 @@ DYNAMIC_KEYWORDS=['createdynvariable','copyvalue','modifyvalue','deletedynvariab
 
 CREATE_DYN_VARIABLE='createdynvariable'
 
+CREATE_CONST_VARIABLE='createconstvariable'
+
 COPY_VALUE='copyvalue'
 
 MODIFY_VALUE='modifyvalue'

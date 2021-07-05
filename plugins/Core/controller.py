@@ -29,6 +29,7 @@ import logger
 import json
 from constants import *
 import dynamic_variable_handler
+import constant_variable_handler
 import reporting
 import core_utils
 import recording
@@ -84,6 +85,7 @@ class Controller():
         self.verify_dict={'web':VERIFY_EXISTS,
         'oebs':VERIFY_VISIBLE,'sap':VERIFY_EXISTS,'desktop':VERIFY_EXISTS,'mobileweb':VERIFY_EXISTS}
         self.dynamic_var_handler_obj=dynamic_variable_handler.DynamicVariables()
+        self.contant_var_handler_obj=constant_variable_handler.ConstantVariables()
         self.status=TEST_RESULT_FAIL
         self.scenario_start_time=''
         self.scenario_end_time=''
@@ -447,12 +449,23 @@ class Controller():
 
     def split_input(self,input,keyword):
         ignore_status = False
+        const_var=False
         inpval = []
         input_list = input[0].split(SEMICOLON)
         if IGNORE_THIS_STEP in input_list:
             ignore_status=True
         if keyword.lower() in [IF,ELSE_IF,EVALUATE]:
             inpval=self.dynamic_var_handler_obj.simplify_expression(input,keyword,self)
+        elif keyword.lower() == CREATE_CONST_VARIABLE:
+            if STATIC_NONE in input[0]:
+                input[0]=input[0].replace(STATIC_NONE,'')
+            string=input[0]
+            index=string.find(';')
+            if index >-1:
+                inpval.append(string[0:index])
+                inpval.append(string[index+1:len(string)])
+            elif string != '':
+                inpval.append(string)
         elif keyword.lower() in DYNAMIC_KEYWORDS:
             if STATIC_NONE in input[0]:
                 input[0]=input[0].replace(STATIC_NONE,'')
@@ -475,8 +488,12 @@ class Controller():
                 if STATIC_NONE in x:
                     x=None
                 else:
-                    #To Handle dynamic variables of DB keywords,controller object is sent to dynamicVariableHandler
-                    x=self.dynamic_var_handler_obj.replace_dynamic_variable(x,keyword,self)
+                    # To Handle dynamic variables of DB keywords,controller object is sent to dynamicVariableHandler
+                    const_var=self.contant_var_handler_obj.check_for_constantvariables(x)
+                    if const_var==TEST_RESULT_TRUE:
+                        x=self.contant_var_handler_obj.get_constant_value(x)
+                    else:
+                        x=self.dynamic_var_handler_obj.replace_dynamic_variable(x,keyword,self)
                 inpval.append(x)
         return inpval,ignore_status
 
