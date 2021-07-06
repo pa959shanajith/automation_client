@@ -189,6 +189,10 @@ class Scrape:
                                     }
                             if ( dict not in view ):#------------to handle duplicate elements from backend
                                 view.append(dict)
+                            #Highlight objects while scraping
+                            import sap_highlight
+                            highlight_obj = sap_highlight.highLight()
+                            highlight_obj.draw_outline(elem)
                             # else:
                             #     log.error("Gui Modal Window identified - not allowed to scrape")
                         except Exception as e:
