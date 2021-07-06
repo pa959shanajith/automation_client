@@ -126,7 +126,7 @@ class EngineIO(EioClient):
             self.http = requests.Session()
         try:
             return self.http.request(method, url, headers=headers, data=body,
-                timeout=timeout, verify=self.ssl_verify)
+                timeout=timeout, verify=self.ssl_verify, proxies=self.http.proxies)
         except requests.exceptions.RequestException as exc:
             self.logger.info('HTTP %s request to %s failed with error %s.',
                 method, url, exc)

@@ -543,33 +543,35 @@ class ButtonLinkKeyword():
         platform_name = browser_Keywords.local_bk.driver_obj.capabilities.get('platformName')
         try:
             if platform_name != 'Darwin':
-                if (browser_name == 'chrome'):
+                if browser_name == 'chrome':
                     ppid = browser_Keywords.local_bk.driver_obj.service.process.pid
-                elif(browser_name == 'firefox'):
+                elif browser_name == 'firefox':
                     try:
                         ppid = browser_Keywords.local_bk.driver_obj.binary.process.pid
                     except:
                         ppid = browser_Keywords.local_bk.driver_obj.service.process.pid
-                elif(browser_name == 'internet explorer'):
+                elif browser_name == 'internet explorer':
                     ppid = browser_Keywords.local_bk.driver_obj.iedriver.process.pid
-                elif(browser_name == 'edge legacy') or (browser_name == 'msedge'):
+                elif browser_name == 'edge legacy' or browser_name == 'msedge':
                     ppid = browser_Keywords.local_bk.driver_obj.edge_service.process.pid
         except Exception as e:
-            local_blk.log.debug("Problem while getting the ppid: {}".format(e))
-        
-        return ppid
+            local_blk.log.debug("Problem while getting the ppid: {}".format(e))        
+        return ppid, browser_name
 
     def check_fileDialogOpen(self):
         hwnds = []
-        ppid = self.get_ppid_browser()
+        ppid, browser_name = self.get_ppid_browser()
         if ppid == None:
             return False
         def winEnumHandler(hwnd, hwnd_list):
-            if win32gui.IsWindowVisible(hwnd) and win32gui.GetWindowText(hwnd) in ["Open","File Upload"]:
+            if win32gui.IsWindowVisible(hwnd) and win32gui.GetWindowText(hwnd) in ["Open","File Upload", "Choose File to Upload"]:
                 hwnd_list.append(hwnd)
         win32gui.EnumWindows(winEnumHandler, hwnds)
         pids = [win32process.GetWindowThreadProcessId(h)[1] for h in hwnds]
-        ppids = [psutil.Process(p).parent().ppid() for p in pids]
+        if browser_name == 'internet explorer':
+            ppids = [psutil.Process(p).ppid() for p in pids]
+        else:
+            ppids = [psutil.Process(p).parent().ppid() for p in pids]
         return ppid in ppids
 
     def upload_time_func(self,tries=10, time_sleep=0.5):

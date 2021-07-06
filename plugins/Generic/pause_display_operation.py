@@ -166,14 +166,6 @@ class PauseAndDisplay:
         wx.PostEvent(wx_object.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wx_object.GetId()))
         self.pause_execution()
 
-    def pause_debugmode(self,wx_object,mythread):
-        global dispinput, dispflag, cont
-        dispinput = input
-        dispflag = 'pause_debugmode'
-        cont = mythread
-        wx.PostEvent(wx_object.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, wx_object.GetId()))
-        self.pause_execution()
-
 class Debug(wx.Frame):
     def __init__(self, parent,id, title, input):
         wx.Frame.__init__(self, parent, title=title,

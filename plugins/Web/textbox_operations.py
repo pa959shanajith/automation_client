@@ -1670,7 +1670,7 @@ class TextboxKeywords:
                             else:
                                 check_flag=False
                                 err_msg=self._index_zero()
-                    else:
+                        else:
                             err_msg = self._invalid_input()
                     if check_flag==True and not err_msg:
                         local_to.log.debug(WEB_ELEMENT_ENABLED)

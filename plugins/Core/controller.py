@@ -23,6 +23,7 @@ from teststepproperty import TestStepProperty
 import handler
 import os,sys
 import re
+import wx
 import subprocess
 import logger
 import json
@@ -326,14 +327,11 @@ class Controller():
     def pause_execution(self):
         logger.print_on_console('=======Pausing=======')
         log.info('=======Pausing=======')
-        import pause_display_operation
-        o = pause_display_operation.PauseAndDisplay()
-        o.pause_debugmode(self.wx_object,self.conthread)
-        # self.conthread.paused=True
-        # self.conthread.pause_cond.acquire()
-        # with self.conthread.pause_cond:
-        #     while self.conthread.paused:
-        #         self.conthread.pause_cond.wait()
+        self.conthread.paused=True
+        self.conthread.pause_cond.acquire()
+        with self.conthread.pause_cond:
+            while self.conthread.paused:
+                self.conthread.pause_cond.wait()
 
     def methodinvocation(self,index,execution_env,datatables=[],*args):
         global pause_flag
@@ -354,8 +352,7 @@ class Controller():
             #logic to handle run from setp debug
             if self.debug_choice=='RunfromStep' and self.debugfrom_step>0 and tsp.stepnum < self.debugfrom_step :
                 return index +1
-            else:
-                pause_flag=True
+            pause_flag=True
         keyword_flag=True
         ignore_stat=False
         inpval=[]
@@ -800,9 +797,11 @@ class Controller():
         while (i < len(tsplist)):
             #Check for 'terminate_flag' before execution
             if not(terminate_flag):
-                if self.runfrom_step_range_input:
-                    #checks if the current step num is greater than ending range of run from step, to Run till the ending range of run from step
-                    if tsplist[i].testscript_name==self.tc_name_list[-1]:
+                if tsplist[i].testcase_num == last_tc_num:
+                    if mythread.cw.debugwindow is not None and not mythread.cw.debugwindow.IsShown():
+                        wx.CallAfter(mythread.cw.debugwindow.Show)
+                    if self.runfrom_step_range_input:
+                        #checks if the current step num is greater than ending range of run from step, to Run till the ending range of run from step
                         if tsplist[i].stepnum > last_step_val: break
                 #Check for 'pause_flag' before execution
                 if pause_flag:
@@ -926,6 +925,8 @@ class Controller():
         log.info('***DEBUG STARTED***')
         logger.print_on_console('***DEBUG STARTED***')
         print('=======================================================================================================')
+        if mythread.cw.debugwindow is not None:
+            wx.CallAfter(mythread.cw.debugwindow.Hide)
         for testcase in scenario:
             flag,browser_type,last_tc_num,datatables,_,_=obj.parse_json(testcase)
             if flag == False:
@@ -951,9 +952,7 @@ class Controller():
                 starting_val_end_range = first_step_val + 1
                 if first_step_val > 0 and first_step_val <= tsplist[-1].stepnum:
                     if last_step_val > first_step_val and last_step_val <= tsplist[-1].stepnum:
-                        for t in range(len(testcase)):
-                            if "testcasename" in testcase[t] and testcase[t]["testcasename"] == self.tc_name_list[-1]:
-                                testcase_details=testcase[t]['testcase']
+                        testcase_details=testcase[-2]['testcase']
                         no_of_steps=(last_step_val-first_step_val)+1
                         comment_step_count=0
                         tdlist=testcase_details[first_step_val-1:last_step_val]
@@ -1653,7 +1652,7 @@ class Controller():
             if action==EXECUTE:
                 aws_mode = len(args)>0 and args[0]
                 self.execution_mode = json_data['exec_mode'].lower()
-                kill_process()
+                if configvalues['kill_stale'].lower() == 'yes': kill_process()
                 if dis_sys_screenoff and is_admin and SYSTEM_OS == 'Windows':
                     self.disable_screen_timeout()
                     reset_sys_screenoff = True
