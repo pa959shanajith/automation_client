@@ -15,7 +15,7 @@ import win32con
 import win32api
 import oebsServer
 import oebs_api
-from oebs_msg import *
+from oebs_constants import *
 import logger
 import logging
 import json
@@ -24,7 +24,6 @@ import ctypes
 from ctypes import wintypes
 import os
 import re
-from oebs_constants import ERROR_CODE_DICT
 
 log = logging.getLogger('oebs_utils.py')
 

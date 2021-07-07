@@ -12,7 +12,7 @@
 import oebs_utils
 import logging
 import oebs_api
-from oebs_msg import *
+from oebs_constants import *
 import ast
 import json
 import re

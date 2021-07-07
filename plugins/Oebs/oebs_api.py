@@ -20,7 +20,6 @@ import oebs_api2
 import oebs_event_handler
 import oebs_control_types
 import oebs_jab_object
-import oebs_start
 import oebs_click_and_add
 
 
@@ -334,7 +333,6 @@ internalFunctionQueue.__name__="JABHandler.internalFunctionQueue"
 def internalQueueFunction(func,*args,**kwargs):
     try:
         internalFunctionQueue.put_nowait((func,args,kwargs))
-        #oebs_start.core.requestPump()
         oebs_click_and_add.get_core().requestPump()
     except Exception as e:
         log.info("error at internal queue {}".format(e))

@@ -8,12 +8,13 @@
 # Copyright:   (c) sushma.p 2016
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
-from oebs_msg import *
+from oebs_constants import *
 import oebs_key_objects
 import oebs_serverUtilities
 import logging
 import oebs_mouseops
 import time
+import logger
 
 log = logging.getLogger('oebs_scrollbarops.py')
 
@@ -52,13 +53,17 @@ class ScrollbarOperations:
                     else:
                         log.debug('Invalid Input',MSG_INVALID_INPUT)
                         oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
-
+                        logger.print_on_console(MSG_INVALID_INPUT)
             else:
                 log.debug('Object Disabled',MSG_DISABLED_OBJECT)
+                logger.print_on_console(MSG_DISABLED_OBJECT)
                 oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
 
         except Exception as e:
             self.utilities_obj.cleardata()
+            err_msg = ERROR_CODE_DICT['err_right']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('%s',e)
             log.debug('Status: %s',keywordresult)
         log.debug('Status: %s',keywordresult)
@@ -98,13 +103,16 @@ class ScrollbarOperations:
                     else:
                         log.debug('Invalid Input',MSG_INVALID_INPUT)
                         oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
-
+                        logger.print_on_console(MSG_INVALID_INPUT)
             else:
                 log.debug('Object Disabled',MSG_DISABLED_OBJECT)
                 oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
-
+                logger.print_on_console(MSG_DISABLED_OBJECT)
         except Exception as e:
             self.utilities_obj.cleardata()
+            err_msg = ERROR_CODE_DICT['err_left']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('%s',e)
             log.debug('Status: %s',keywordresult)
         log.debug('Status: %s',keywordresult)
@@ -143,13 +151,16 @@ class ScrollbarOperations:
                     else:
                         log.debug('Invalid Input',MSG_INVALID_INPUT)
                         oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
-
+                        logger.print_on_console(MSG_INVALID_INPUT)
             else:
                 log.debug('Object Disabled',MSG_DISABLED_OBJECT)
                 oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
-
+                logger.print_on_console(MSG_DISABLED_OBJECT)
         except Exception as e:
             self.utilities_obj.cleardata()
+            err_msg = ERROR_CODE_DICT['err_up']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('%s',e)
             log.debug('Status: %s',keywordresult)
         log.debug('Status: %s',keywordresult)
@@ -188,13 +199,16 @@ class ScrollbarOperations:
                 else:
                     log.debug('Invalid Input',MSG_INVALID_INPUT)
                     oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
-
+                    logger.print_on_console(MSG_INVALID_INPUT)
             else:
                 log.debug('Object Disabled',MSG_DISABLED_OBJECT)
                 oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
-
+                logger.print_on_console(MSG_DISABLED_OBJECT)
         except Exception as e:
             self.utilities_obj.cleardata()
+            err_msg = ERROR_CODE_DICT['err_down']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('%s',e)
             log.debug('Status: %s',keywordresult)
         log.debug('Status: %s',keywordresult)

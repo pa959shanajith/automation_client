@@ -18,7 +18,6 @@ import logging
 import oebs_constants
 windowname=None
 import constants
-import oebs_msg
 import screenshot_keywords
 import readconfig
 import iris_operations
@@ -238,7 +237,7 @@ class OebsDispatcher:
                 if keyword == 'findwindowandattach':
                     if result[0] == "Fail":
                         result=constants.TERMINATE
-                if not(oebs_msg.ELEMENT_FOUND) and self.exception_flag:
+                if not(oebs_constants.ELEMENT_FOUND) and self.exception_flag:
                     result=constants.TERMINATE
             else:
                 err_msg=constants.INVALID_KEYWORD

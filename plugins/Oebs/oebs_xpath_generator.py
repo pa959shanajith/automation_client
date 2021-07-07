@@ -7,7 +7,6 @@ import time
 import ast
 import win32gui
 import win32api
-import oebs_start
 import oebs_click_and_add
 import os
 log=logging.getLogger('oebs_xpath_generator.py')
@@ -77,7 +76,6 @@ class PathGenerator():
 
         #(To Check the Co-ordination)
         #--------------------------
-        #hwnd = win32gui.FindWindow(None, oebs_start.window_name)
         hwnd = win32gui.FindWindow(None, oebs_click_and_add.core.window_name)
         win_rect= win32gui.GetWindowRect(hwnd)
 
@@ -203,24 +201,6 @@ class PathGenerator():
             "keyboardshortcut":str(keyboard_shortcut),
             "value":''
         })
-
-        # self.store_object.append({
-        #     "custname": custname,
-        #     "tag":current_acc_info.role,
-	    #     "xpath":path,
-	    #     "hiddentag":str(False),
-	    #     "id":'null',
-	    #     "text":str(text),
-	    #     "url":oebs_start.window_name,
-	    #     "x_coor":current_acc_info.x,
-	    #     "y_coor":current_acc_info.y,
-        #     "left":left_need,
-        #     "top":top_need,
-	    #     "width":current_acc_info.width,
-	    #     "height":current_acc_info.height,
-        #     "keyboardshortcut":str(keyboard_shortcut),
-        #     "value":''
-        # })
 
         self.previous_path , self.path  = path_to_check , ''
         self.path_generator_free = True

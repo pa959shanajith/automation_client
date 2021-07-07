@@ -101,7 +101,6 @@ class ScrapeDispatcher(wx.Frame):
     def clickandadd(self,event):
         state = event.GetEventObject().GetValue()
         #clickandadd_obj=oebsclickandadd.ClickAndAdd()
-        import oebs_start
         import oebs_click_and_add
 
         if state == True:
@@ -110,7 +109,6 @@ class ScrapeDispatcher(wx.Frame):
     ##        self.comparebutton.Disable()
 
             event.GetEventObject().SetLabel("Stop ClickAndAdd")
-            #oebs_start.main(windownametoscrape)
             oebs_click_and_add.init_core(windownametoscrape)
             #clickandadd_obj.clickandadd(windownametoscrape,'STARTCLICKANDADD')
     ##            wx.MessageBox('CLICKANDADD: Select the elements using Mouse - Left Click', 'Info',wx.OK | wx.ICON_INFORMATION)
@@ -118,7 +116,6 @@ class ScrapeDispatcher(wx.Frame):
 
         else:
             #d = clickandadd_obj.clickandadd(windownametoscrape,'STOPCLICKANDADD')
-            #d = oebs_start.terminate()
             d = oebs_click_and_add.terminate_core()
             event.GetEventObject().SetLabel("Start ClickAndAdd")
             logger.print_on_console('Stopped click and add')

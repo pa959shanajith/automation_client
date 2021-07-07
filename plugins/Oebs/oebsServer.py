@@ -16,10 +16,9 @@ import glob
 import oebs_api
 import win32gui
 import json
-from oebs_msg import *
+from oebs_constants import *
 import logging
 import oebs_mouseops
-import oebs_msg
 import oebs_key_objects
 import oebs_textops
 import oebs_serverUtilities

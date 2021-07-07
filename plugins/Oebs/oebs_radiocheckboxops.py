@@ -15,7 +15,8 @@ import logging
 import oebs_serverUtilities
 from oebs_utilops import UtilOperations
 import time
-from oebs_msg import *
+from oebs_constants import *
+import logger
 
 log = logging.getLogger('oebs_radiocheckboxops.py')
 
@@ -53,12 +54,17 @@ class RadioCheckboxOperations:
                         keywordresult=MSG_PASS
                 else:
                    log.debug('MSG:%s',MSG_DISABLED_OBJECT)
+                   logger.print_on_console(MSG_DISABLED_OBJECT)
                    oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
             else:
                 log.debug('MSG:%s',MSG_ELEMENT_NOT_VISIBLE)
+                logger.print_on_console(MSG_ELEMENT_NOT_VISIBLE)
                 oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_VISIBLE)
         except Exception as e:
             self.utilities_obj.cleardata()
+            err_msg = ERROR_CODE_DICT['err_select_radiobutton']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('%s',e)
             log.debug('Status %s',keywordresult)
         log.debug('Result %s',verifyresponse)
@@ -104,12 +110,17 @@ class RadioCheckboxOperations:
                             oebs_key_objects.custom_msg.append(MSG_OBJECT_READONLY)
                 else:
                     log.debug('%s',MSG_DISABLED_OBJECT)
+                    logger.print_on_console(MSG_DISABLED_OBJECT)
                     oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
             else:
                 log.debug('MSG:%s',MSG_ELEMENT_NOT_VISIBLE)
+                logger.print_on_console(MSG_ELEMENT_NOT_VISIBLE)
                 oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_VISIBLE)
         except Exception as e:
             self.utilities_obj.cleardata()
+            err_msg = ERROR_CODE_DICT['err_select_checkbox']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('%s',e)
             log.debug('Status %s',keywordresult)
         log.debug('Result %s',verifyresponse)
@@ -163,12 +174,17 @@ class RadioCheckboxOperations:
                             oebs_key_objects.custom_msg.append(MSG_OBJECT_READONLY)
                 else:
                     log.debug('Object is disabled',MSG_DISABLED_OBJECT)
+                    logger.print_on_console(MSG_DISABLED_OBJECT)
                     oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
             else:
                 log.debug('MSG:%s',MSG_ELEMENT_NOT_VISIBLE)
+                logger.print_on_console(MSG_ELEMENT_NOT_VISIBLE)
                 oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_VISIBLE)
         except Exception as e:
             self.utilities_obj.cleardata()
+            err_msg = ERROR_CODE_DICT['err_unselect_checkbox']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('%s',e)
             log.debug('Status %s',keywordresult)
         log.debug('Result %s',verifyresponse)
@@ -220,6 +236,9 @@ class RadioCheckboxOperations:
                     oebs_key_objects.custom_msg.append("MSG_RESULT_IS")
         except Exception as e:
             self.utilities_obj.cleardata()
+            err_msg = ERROR_CODE_DICT['err_get_status']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('%s',e)
             log.debug('Result %s',keywordresponse)
         log.debug('Status %s',keywordresult)
