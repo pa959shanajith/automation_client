@@ -31,6 +31,7 @@ import readconfig
 import core_utils
 import time
 import fileinput
+import glob
 from sendfunction_keys import SendFunctionKeys as SF
 driver_pre = None
 drivermap = []
@@ -1337,12 +1338,17 @@ class Singleton_DriverUtil():
                     choptions.add_argument('start-maximized')
                     choptions.add_experimental_option('useAutomationExtension', False)
                     choptions.add_experimental_option("excludeSwitches",["enable-automation"])
+                    extns=glob.glob(webconstants.assets_path+os.sep+"*.crx")
                     if headless_mode:
                         WINDOW_SIZE = "1350,650"
                         choptions.add_argument("--window-size=%s" % WINDOW_SIZE)
                         choptions.headless = True
                     if configvalues['extn_enabled'].lower()=='yes' and os.path.exists(webconstants.EXTENSION_PATH):
                         choptions.add_extension(webconstants.EXTENSION_PATH)
+                    if len(extns) > 1:
+                        for i in extns:
+                            if i != webconstants.EXTENSION_PATH:
+                                choptions.add_extension(i)
                     else:
                         choptions.add_argument('--disable-extensions')
                     if str(chrome_path).lower() != 'default':
