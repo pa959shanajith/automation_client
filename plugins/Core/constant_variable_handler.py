@@ -13,13 +13,8 @@ import logger
 from collections import OrderedDict
 from constants import *
 import re
-import core_utils
 import logging
-import ast
-import math
 import threading
-import json
-import controller
 local_constant = threading.local()
 
 class ConstantVariables:
@@ -32,8 +27,9 @@ class ConstantVariables:
         #checks whether the given variable is constant or not
         status = TEST_RESULT_FALSE
         if outputval != None and outputval != '':
-            if '_' in outputval and '_' in outputval:
-                var_list=re.findall(r"\_(.*?)\_",outputval)
+            if '_' in outputval[0] and '_' in outputval[-1]:
+                # var_list=re.findall(r"\_(.*?)\_",outputval)
+                var_list=re.findall(r"_(.*)_",outputval)
                 if len(var_list)>0:
                     status = TEST_RESULT_TRUE
         return status
@@ -41,7 +37,6 @@ class ConstantVariables:
     #To get the value of given constant variable
     def get_constant_value(self,variable):
         #returns the value of the constant variable if it exists otherwise returns None
-
         value=None
         if variable in local_constant.constant_variable_map:
             value=local_constant.constant_variable_map.get(variable)

@@ -237,6 +237,7 @@ ERROR_CODE_DICT = {
                     'ERR_XML_INVALID': 'Invalid XML format.',
                     'ERR_DYNVAR': 'Variable does not Exist.',
                     'ERR_DYNVAR_ALREADY_EXISTS': 'Variable already exists',
+                    'ERR_CONSVAR_ALREADY_EXISTS': 'Constant Variable already exists',
                     'ERR_XML_TAGNAMES': "XML file doesn't contain tag names.",
                     'MSG_EXTERNAL_DATALIST_STATICVARIABLE': 'Invalid Input:No externalData List exists for static variable.',
                     'ERR_CAPTURE_SCREENSHOT':'Unable to capture the screenshots.',

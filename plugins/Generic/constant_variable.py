@@ -11,11 +11,9 @@
 import logger
 from constants import *
 import constant_variable_handler
-
 from constants import *
 import logging
 import core_utils
-
 
 log = logging.getLogger('constant_variable.py')
 
@@ -52,7 +50,7 @@ class ConstantVariables:
                         log.info(value)
                         logger.print_on_console('Variable created is ',str(variable),' = ',str(value))
                     else:
-                        err_msg=ERROR_CODE_DICT['ERR_DYNVAR_ALREADY_EXISTS']
+                        err_msg=ERROR_CODE_DICT['ERR_CONSVAR_ALREADY_EXISTS']
                         log.error(err_msg)
                         logger.print_on_console(err_msg)
             else:

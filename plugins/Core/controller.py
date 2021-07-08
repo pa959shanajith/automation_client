@@ -110,6 +110,7 @@ class Controller():
         self.execution_mode = None
         self.runfrom_step_range_input=[]
         self.tc_name_list=[]
+        self.constant_var_exists=False
         self.__load_generic()
 
     def __load_generic(self):
@@ -466,6 +467,15 @@ class Controller():
                 inpval.append(string[index+1:len(string)])
             elif string != '':
                 inpval.append(string)
+            #createConstVariable ex: _a_;{a}
+            const_var=self.contant_var_handler_obj.check_for_constantvariables(inpval[1])
+            if const_var!=TEST_RESULT_TRUE:
+                #check if the inputval[1] is constant variable or not,
+                #createConstVariable ex: _a_;{a}
+                inpval[1]=self.dynamic_var_handler_obj.replace_dynamic_variable(inpval[1],'',self)
+            else:
+                #createConstVariable ex: _a_;_b_  (_b_ is already created)
+                inpval[1]=self.contant_var_handler_obj.get_constant_value(inpval[1])
         elif keyword.lower() in DYNAMIC_KEYWORDS:
             if STATIC_NONE in input[0]:
                 input[0]=input[0].replace(STATIC_NONE,'')
@@ -477,9 +487,17 @@ class Controller():
             elif string != '':
                 inpval.append(string)
             if keyword.lower() != CREATE_DYN_VARIABLE:
-                inpval[0]=self.dynamic_var_handler_obj.replace_dynamic_variable(inpval[0],keyword,self)
+                const_var=self.contant_var_handler_obj.check_for_constantvariables(inpval[0])
+                #check if the inputval[0] is constant variable or not,
+                #ex: COPY_VALUE->_a_;{a}
+                if const_var!=TEST_RESULT_TRUE:
+                    inpval[0]=self.dynamic_var_handler_obj.replace_dynamic_variable(inpval[0],keyword,self)
             if len(inpval)>1 and keyword.lower() in [COPY_VALUE,MODIFY_VALUE,CREATE_DYN_VARIABLE]:
                 exch = keyword.lower() == COPY_VALUE
+                const_var=self.contant_var_handler_obj.check_for_constantvariables(inpval[1])
+                if const_var==TEST_RESULT_TRUE:
+                    #to get the value of constantVarible,
+                    inpval[1]=self.contant_var_handler_obj.get_constant_value(inpval[1])
                 inpval[1]=self.dynamic_var_handler_obj.replace_dynamic_variable(inpval[1],'',self,no_exch_val=exch)
         else:
             if keyword.lower() in WS_KEYWORDS or keyword.lower() == 'navigatetourl':
@@ -490,7 +508,9 @@ class Controller():
                 else:
                     # To Handle dynamic variables of DB keywords,controller object is sent to dynamicVariableHandler
                     const_var=self.contant_var_handler_obj.check_for_constantvariables(x)
+                    #to get the value of constantVariable, ex:displayVariableValue
                     if const_var==TEST_RESULT_TRUE:
+                        #ex:displayVariableValue _a_
                         x=self.contant_var_handler_obj.get_constant_value(x)
                     else:
                         x=self.dynamic_var_handler_obj.replace_dynamic_variable(x,keyword,self)
@@ -599,12 +619,23 @@ class Controller():
             keyword_response=result[1]
             result = result[:1] + (result[2],) + result[2:]
         if len(output)>0 and output[0] != '':
-            self.dynamic_var_handler_obj.store_dynamic_value(output[0],keyword_response,tsp.name)
+            const_var=self.contant_var_handler_obj.check_for_constantvariables(output[0])
+            #checks if the output variable is a constant variable or not  
+            if const_var==TEST_RESULT_TRUE:
+                if output[0] in constant_variable_handler.local_constant.constant_variable_map:
+                    #checks if the output variable(constant variable) is assigned with a value
+                    self.constant_var_exists=True
+                    err_msg="Error: Constant variable cannot be modified!"
+                    logger.print_on_console(err_msg)
+                    log.debug(err_msg)
+            else:
+                self.dynamic_var_handler_obj.store_dynamic_value(output[0],keyword_response,tsp.name)
         if len(output)>1:
             self.dynamic_var_handler_obj.store_dynamic_value(output[1],result[1],tsp.name)
 
     def keywordinvocation(self,index,inpval,*args):
         global socket_object, iris_constant_step, status_percentage
+        self.constant_var_exists=False
         configvalues = self.configvalues
         try:
             time.sleep(float(configvalues['stepExecutionWait']))
@@ -673,6 +704,9 @@ class Controller():
 
                     if local_cont.generic_dispatcher_obj == None:
                         self.__load_generic()
+                    if teststepproperty.name in ["exportData","cellByCellCompare"] and self.contant_var_handler_obj.check_for_constantvariables(teststepproperty.outputval)==TEST_RESULT_TRUE:
+                        #keyword that supports filepath in output(_a_ contains filepath)
+                        teststepproperty.outputval=self.contant_var_handler_obj.get_constant_value(teststepproperty.outputval)
                     result = self.invokegenerickeyword(teststepproperty,local_cont.generic_dispatcher_obj,inpval)
 
                 elif teststepproperty.apptype.lower() == APPTYPE_SYSTEM:
@@ -746,6 +780,12 @@ class Controller():
             self.keyword_status=TEST_RESULT_FAIL
             if result!=TERMINATE:
                 self.store_result(result,teststepproperty)
+                if self.constant_var_exists:
+                    #if the output variable(constant variable) is assigned with a value and still constantVariable is used in output
+                    temp_re=list(result)
+                    temp_re[0]=TEST_RESULT_FAIL
+                    temp_re[1]=TEST_RESULT_FALSE
+                    result=tuple(temp_re)
                 self.status=result[0]
                 index+=1
                 self.keyword_status=self.status

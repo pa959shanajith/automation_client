@@ -231,6 +231,10 @@ class StepDescription:
         def stop():
             return "Stop the Execution"
 
+        #constant variable keyword
+        def createconstvariable():
+            return "Create a variable '"+str(inputval[0])+"' with value '"+ str(inputval[1]) + "'"
+
         #Generic-XML
         def getblockcount():
             return "Get the Block Count of XML and save the value '" + output+ "' in '" + tsp.outputval + "'"
