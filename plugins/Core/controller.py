@@ -1709,7 +1709,7 @@ class Controller():
             if action==EXECUTE:
                 aws_mode = len(args)>0 and args[0]
                 self.execution_mode = json_data['exec_mode'].lower()
-                kill_process()
+                if configvalues['kill_stale'].lower() == 'yes': kill_process()
                 if dis_sys_screenoff and is_admin and SYSTEM_OS == 'Windows':
                     self.disable_screen_timeout()
                     reset_sys_screenoff = True
