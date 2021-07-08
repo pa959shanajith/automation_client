@@ -45,7 +45,7 @@ PHANTOM_DRIVER_PATH =  drivers_path + os.sep + 'phantomjs.exe'
 
 GECKODRIVER_PATH =  drivers_path + os.sep + 'geckodriver'
 
-EXTENSION_PATH = assets_path + os.sep + 'extension.crx'
+EXTENSION_PATH = assets_path + os.sep + 'AvoAssure.crx'
 
 if SYSTEM_OS == "Windows":
     CHROME_DRIVER_PATH += ".exe"
