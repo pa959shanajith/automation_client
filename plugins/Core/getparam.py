@@ -701,7 +701,7 @@ class GetParam():
                         self.add_report_step_getparam(reporting_obj,step_description)
                         step_description='Start Loop'
                         self.add_report_step_getparam(reporting_obj,step_description)
-                        endLimit = min(endRow, len(data)+1)
+                        endLimit = min(endRow, len(list(data.values())[0])+1)
                         #Reporting part ends
                         for i in range(startRow-1,endLimit):
                             if self.name.lower()==GETPARAM:
