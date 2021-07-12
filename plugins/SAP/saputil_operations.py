@@ -115,7 +115,7 @@ class SapUtilKeywords:
                 highligh_obj = sap_highlight.highLight()
                 elem = ses.FindById(id)
                 if ( elem ):
-                    highligh_obj.draw_outline(elem,'yellow')
+                    highligh_obj.draw_outline(elem)
                     status = sap_constants.TEST_RESULT_PASS
                     result = sap_constants.TEST_RESULT_TRUE
                 else:
