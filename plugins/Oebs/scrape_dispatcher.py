@@ -21,6 +21,7 @@ import json
 import time
 from constants import *
 import core_utils
+import threading
 import cropandadd
 import re
 
@@ -98,6 +99,8 @@ class ScrapeDispatcher(wx.Frame):
         if scrape_pop_window:
             logger.print_on_console("Entering inside scrape window")
 
+
+    
     def clickandadd(self,event):
         state = event.GetEventObject().GetValue()
         #clickandadd_obj=oebsclickandadd.ClickAndAdd()
@@ -116,25 +119,28 @@ class ScrapeDispatcher(wx.Frame):
 
         else:
             #d = clickandadd_obj.clickandadd(windownametoscrape,'STOPCLICKANDADD')
-            d = oebs_click_and_add.terminate_core()
+            d, err = oebs_click_and_add.terminate_core()
             event.GetEventObject().SetLabel("Start ClickAndAdd")
             logger.print_on_console('Stopped click and add')
             logger.print_on_console( 'Scrapped data saved successfully in domelements.json file')
-            try:
-                self.Iconize(True)
-                #providing 1 sec delay to minimize wx scrape window to hide in screenshot
-                time.sleep(1)
-                img = self.utils_obj.captureScreenshot(windownametoscrape)
-                img.save(self.img_path)
-                with open(self.img_path, "rb") as image_file:
-                          encoded_string = base64.b64encode(image_file.read())
+            if d and d != '' and d != '{"view": []}':
+                try:
+                    self.Iconize(True)
+                    #providing 1 sec delay to minimize wx scrape window to hide in screenshot
+                    time.sleep(1)
+                    img = self.utils_obj.captureScreenshot(windownametoscrape)
+                    img.save(self.img_path)
+                    with open(self.img_path, "rb") as image_file:
+                            encoded_string = base64.b64encode(image_file.read())
 
-                d = json.loads(d)
-                d['mirror'] =encoded_string.decode('UTF-8').strip()
-            except Exception as e:
-                logger.print_on_console('Error occured while capturing Screenshot ',e)
-                log.error('Error occured while capturing Screenshot %s',e)
-
+                    d = json.loads(d)
+                    d['mirror'] =encoded_string.decode('UTF-8').strip()
+                except Exception as e:
+                    logger.print_on_console('Error occured while capturing Screenshot ',e)
+                    log.error('Error occured while capturing Screenshot %s',e)
+            else:
+                logger.print_on_console(err)
+                log.debug(err)
             #10 is the limit of MB set as per Avo Assure standards
             if self.core_utilsobject.getdatasize(str(d),'mb') < 10:
                 self.socketIO.emit('scrape',d)

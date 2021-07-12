@@ -13,16 +13,12 @@ import wx
 import re
 import win32process
 import oebs_utils
-
+from oebs_constants import *
+import logger
 _pump = None
 _isPumpPending = False
-
 window = ''
-
 status = False
-thread = None
-
-
 core = None
 
 def init_core(windowName = ''):
@@ -30,10 +26,11 @@ def init_core(windowName = ''):
     window = windowName 
     try:
         core = Core(windowName)
-        core.init_scrape_thread()
-        return core
+        core.init_scrape()
     except Exception as e:
         log.debug(e)
+        log.error(ERROR_CODE_DICT['err_init_core'])
+        logger.print_on_console(ERROR_CODE_DICT['err_click_add'])
     
 def get_core():
     global core
@@ -41,12 +38,21 @@ def get_core():
 
 
 def terminate_core():
-    global core, window
+    global core, window, exit_event, data
+    data, err = '', ERROR_CODE_DICT['err_click_add']
     if core:
-        data = core.terminate()
+        try:
+            oebs_api.terminateEvents()
+            if oebs_api.path_obj:
+                data = oebs_api.path_obj.create_file(core.window_name)
+                err = None
+        except Exception as e:
+            log.error(err)
+            log.debug(e)
         core = None
         window = None
-        return data
+    return data, err
+
 class Timer(object):
     def __init__(self):
         self.status = False
@@ -96,62 +102,24 @@ class NonReEntrantTimer(Timer):
         finally:
             self._inNotify = False
 
-class Frame(wx.Frame):
-    def __init__(self):
-        wx.Frame.__init__(self, None, title="OEBS")
-        self.Show(False)
-
-    def on_exit(self,frame,event=None):
-        wx.CallAfter(self.Destroy)
-        #global frame
-        if frame is not None:
-            wx.CallAfter(frame.Destroy)
-            frame = None
-
 class Core():
      
-    def start_thread(self):
-        global thread
-        try:
-            thread = threading.Thread(target=self.main,args=())
-            thread.setDaemon(True)
-            thread.start()
-            thread.name = "OEBS_Scrape_Thread"
-
-        except Exception as e:
-            log.debug(e)
-
-    def init_scrape_thread(self):
-        try:
-            self.start_thread()
-            if self.dll_loaded:
-                if self.res_find_window:
-                    return 'Pass',""
-                else:
-                    try:
-                        self.terminate()
-                    except Exception as e:
-                        log.debug(e)
-                    return 'Fail','Unable to find the application'
+    def init_scrape(self):
+        self.main()
+        if self.dll_loaded:
+            if self.res_find_window:
+                return 'Pass',""
             else:
-                try:
-                    self.terminate()
-                except Exception as e:
-                    log.debug(e)
-                return 'Fail','Unable to load the dll'
-
-        except Exception as e:
-            log.debug(e)
-            return 'Fail', str(e)
-
+                raise Exception(ERROR_CODE_DICT['err_res_window'])
+        raise Exception(ERROR_CODE_DICT['err_load_dll'])
+        
     def __init__(self, windowName):
         self.PUMP_MAX_DELAY = 10
         self.mainThreadId = None
         self.window_name = windowName
-        self.app = None
-        self.frame = None
         self.res_find_window = False
         self.dll_loaded = False
+
 
     def find_window_and_attach(self,windowname='',*args):
         res,err_msg = oebs_utils.Utils().find_oebswindow_and_attach(windowname=windowname)
@@ -160,19 +128,16 @@ class Core():
     def main(self,):
         try:
             self.mainThreadId = _thread.get_ident()
-            self.app = wx.App()
-            self.frame = Frame()
-            self.app.SetAssertMode(wx.APP_ASSERT_SUPPRESS)
             try:
                 oebs_api.initialize()
                 self.dll_loaded = True
                 log.info("initializing Java Access Bridge support")
             except Exception as e:
-                log.info("Java Access Bridge not available")
+                log.error(ERROR_CODE_DICT['err_jab'])
                 log.debug(e)
                 return
             except:
-                log.debug('ERR_ACCESS_BRIDGE_INIT_ERROR')
+                log.error(ERROR_CODE_DICT['err_jab_base'])
                 return
             # Doing this here is a bit ugly, but we don't want these modules imported
             # at module level, including wx.
@@ -195,45 +160,14 @@ class Core():
             _pump = CorePump()
 
             self.requestPump()
-
             if self.dll_loaded:
                 self.res_find_window = self.find_window_and_attach(windowname=self.window_name)
-            # in wx self.app loop
-            log.info("OEBS initialized")
-            self.app.MainLoop()
 
         except Exception as e:
             log.debug(e)
+            log.error(ERROR_CODE_DICT['err_run_dll'])
 
-    def get_window_name(self):
-        return self.window_name
 
-    def terminate(self):
-        try:
-            #added local 
-            thread=None
-            if self.frame is not None:
-                self.frame.on_exit(frame=self.frame)
-            self.app = None
-            self.frame = None
-            #To Check the loaded bridgeDll should run after the scrape completed with debug TestCase, Commited the terminate evevent
-            oebs_api.terminateEvents()
-            data_rec = oebs_api.path_obj.create_file(self.window_name)
-
-            if thread:
-                thread = None
-            return data_rec
-        except Exception as e:
-            log.debug(e)
-
-    def _terminate(self,module, name=None):
-        if name is None:
-            name = module.__name__
-        log.debug("Terminating %s" % name)
-        try:
-            module.terminate()
-        except:
-            log.debug("Error terminating %s" % name)
 
     def requestPump(self):
         """Request a core pump.

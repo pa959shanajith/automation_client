@@ -103,7 +103,14 @@ ERROR_CODE_DICT = {
     'err_verify_not_exists': 'Unable to verify if object does not exist',
     'err_right_click': 'Unable to perform right click',
     'err_switch_frame': 'Unable to switch to frame',
-    'err_send_function': 'Unable to perform send function keys' 
+    'err_send_function': 'Unable to perform send function keys',
+    'err_init_core': 'Unable to intialise core',
+    'err_click_add': 'Error occurred during click and add', 
+    'err_res_window': 'Unable to attach to window',
+    'err_load_dll': 'Unable to load DLL',
+    'err_jab': 'Java Access Bridge not available',
+    'err_jab_base': 'Base exception occured while Running DLL',
+    'err_run_dll': 'Error occurred while trying to run DLL'
 }
 
 
