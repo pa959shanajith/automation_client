@@ -134,7 +134,7 @@ class highLight():
             log.error( sap_constants.ERROR_HIGHLIGHT )
             logger.print_on_console( sap_constants.ERROR_HIGHLIGHT )
 
-    def draw_outline(self, elem, colour='green', thickness = 2, fill = 1, rect = None):
+    def draw_outline(self, elem, colour='red', thickness = 2, fill = 1, rect = None):
         """
         Draw an outline around the window.
 
