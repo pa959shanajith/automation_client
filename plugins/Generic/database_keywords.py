@@ -25,6 +25,7 @@ import logger
 from encryption_utility import AESCipher
 import logging
 import dynamic_variable_handler
+import constant_variable_handler
 try:
     import pyodbc
     import jaydebeapi
@@ -40,6 +41,7 @@ class DatabaseOperation():
 
     def __init__(self):
         self.DV = dynamic_variable_handler.DynamicVariables()
+        self.CV = constant_variable_handler.ConstantVariables()
 
     def processException(self, e):
         etype = type(e)
@@ -491,6 +493,18 @@ class DatabaseOperation():
                         args=args
                 if (args[0].startswith("{")):
                     inp_path = self.DV.get_dynamic_value(args[0])
+                    if inp_path!=None:
+                        if len(inp_path.split(';'))>1:
+                            fields=inp_path.split(";")[0]
+                            inp_sheet=inp_path.split(";")[1]
+                        else:
+                            fields=inp_path.split(";")[0]
+                            inp_sheet=None
+                    else:
+                        fields = None
+                        inp_sheet=None
+                elif (args[0].startswith("_")) and (args[0].endswith("_")):
+                    inp_path = self.CV.get_constant_value(args[0])
                     if inp_path!=None:
                         if len(inp_path.split(';'))>1:
                             fields=inp_path.split(";")[0]

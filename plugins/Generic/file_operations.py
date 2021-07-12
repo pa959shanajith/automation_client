@@ -33,6 +33,7 @@ from xlrd import open_workbook
 import shutil
 import pathlib
 import dynamic_variable_handler
+import constant_variable_handler
 import logging
 from itertools import islice
 import re
@@ -54,6 +55,7 @@ class FileOperations:
         self.csv_obj=excel_operations.ExcelCSV()
         self.convert=excel_operations.ExcelFile()
         self.DV = dynamic_variable_handler.DynamicVariables()
+        self.CV = constant_variable_handler.ConstantVariables()
 
         """Mapping of keywords to its respective methods"""
         self.dict={'.txt_write_to_file':self.txt.write_to_file,
@@ -1508,6 +1510,7 @@ class FileOperations:
         sheet_exist=[]
         input_filed_set = False
         dyn_var_opt = False
+        con_var_opt = False
         log.debug('Comparing content cell by cell of .xls files ')
         try:
             if (len(input_val)==5):
@@ -1543,6 +1546,19 @@ class FileOperations:
                             log.debug("File out path is not valid, setting to default")
                             output_feild = None
                         #logger.print_on_console("Choosen the dynamic file path")
+                elif((args[0]).startswith("_") and (args[0]).endswith("_")):
+                    out_path=self.CV.get_constant_value(args[0])
+                    con_var_opt = True
+                    if ( out_path ):
+                        try:
+                            if os.path.exists(out_path):
+                                output_feild = out_path
+                            else:
+                                output_feild = out_path.split(";")[0]
+                            log.info("Choosen the constant file path")
+                        except Exception as e:
+                            log.debug("File out path is not valid, setting to default")
+                            output_feild = None
                 else:
                     output_feild = args[0].split(";")[0]
                     log.info("Choosen the direct file path")
@@ -1651,7 +1667,7 @@ class FileOperations:
                     else:
                         log.debug("Output file not provided")
                         if (collect_content) :
-                            if opt==True or dyn_var_opt:
+                            if opt==True or dyn_var_opt or con_var_opt:
                                 comp_flg=True
                                 if len(collect_content)!=0:
                                     for each_key in collect_content.keys():

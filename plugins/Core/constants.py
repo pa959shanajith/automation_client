@@ -528,3 +528,5 @@ if (os.path.exists(UPDATER_LOC[:-3] + "py")): UPDATER_LOC = UPDATER_LOC[:-3] + "
 TEMP_PATH = AVO_ASSURE_HOME + OS_SEP + "output"
 
 PREDICTION_IMG_DIR = "Disabled"
+
+FILEPATH_OUTPUT_FIELD_KEYWORDS=["exportData","cellByCellCompare"]

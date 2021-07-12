@@ -624,10 +624,14 @@ class Controller():
             if const_var==TEST_RESULT_TRUE:
                 if output[0] in constant_variable_handler.local_constant.constant_variable_map:
                     #checks if the output variable(constant variable) is assigned with a value
-                    self.constant_var_exists=True
-                    err_msg="Error: Constant variable cannot be modified!"
-                    logger.print_on_console(err_msg)
-                    log.debug(err_msg)
+                    if tsp.name not in FILEPATH_OUTPUT_FIELD_KEYWORDS:
+                        self.constant_var_exists=True
+                        err_msg="Error: Constant variable cannot be modified!"
+                        logger.print_on_console(err_msg)
+                        log.debug(err_msg)
+                else:
+                    #in the current step if _a_ is used in output and _a_ is not created, then _a_ should be created and the response of the keyword should be written to _a_
+                    self.contant_var_handler_obj.store_constant_value(output[0],keyword_response)
             else:
                 self.dynamic_var_handler_obj.store_dynamic_value(output[0],keyword_response,tsp.name)
         if len(output)>1:
@@ -704,9 +708,6 @@ class Controller():
 
                     if local_cont.generic_dispatcher_obj == None:
                         self.__load_generic()
-                    if teststepproperty.name in ["exportData","cellByCellCompare"] and self.contant_var_handler_obj.check_for_constantvariables(teststepproperty.outputval)==TEST_RESULT_TRUE:
-                        #keyword that supports filepath in output(_a_ contains filepath)
-                        teststepproperty.outputval=self.contant_var_handler_obj.get_constant_value(teststepproperty.outputval)
                     result = self.invokegenerickeyword(teststepproperty,local_cont.generic_dispatcher_obj,inpval)
 
                 elif teststepproperty.apptype.lower() == APPTYPE_SYSTEM:
