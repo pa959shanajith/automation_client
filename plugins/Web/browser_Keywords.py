@@ -1327,6 +1327,8 @@ class Singleton_DriverUtil():
         use_custom_debugport = str(configvalues["use_custom_debugport"].lower()) == "yes"
         close_browser_popup = configvalues['close_browser_popup']
         incognito_private_mode = configvalues['incognito_private_mode']
+        extension_path = configvalues['chrome_extnpath']
+        extn_flag=False
         if (browser_num == '1'):
             try:
                 chrome_path = configvalues['chrome_path']
@@ -1338,17 +1340,26 @@ class Singleton_DriverUtil():
                     choptions.add_argument('start-maximized')
                     choptions.add_experimental_option('useAutomationExtension', False)
                     choptions.add_experimental_option("excludeSwitches",["enable-automation"])
-                    extns=glob.glob(webconstants.assets_path+os.sep+"*.crx")
+                    extns=glob.glob(webconstants.EXTENSIONS_PATH+os.sep+"*.crx")
                     if headless_mode:
                         WINDOW_SIZE = "1350,650"
                         choptions.add_argument("--window-size=%s" % WINDOW_SIZE)
                         choptions.headless = True
-                    if configvalues['extn_enabled'].lower()=='yes' and os.path.exists(webconstants.EXTENSION_PATH):
-                        choptions.add_extension(webconstants.EXTENSION_PATH)
+                    if configvalues['extn_enabled'].lower()=='yes' and os.path.exists(webconstants.AVO_EXTENSION_PATH):
+                        choptions.add_extension(webconstants.AVO_EXTENSION_PATH)
+                    if extension_path.lower() != 'default':
+                        extn=extension_path.split(";")
+                        for i in extn:
+                            if os.path.isfile(i):
+                                if os.path.splitext(i)[-1].lower()=='.crx':
+                                    extns.append(i)
+                            elif os.path.isdir(i):
+                                [extns.append(i) for i in glob.glob(i+os.sep+"*.crx")]
                     if len(extns) > 1:
                         for i in extns:
-                            if i != webconstants.EXTENSION_PATH:
-                                choptions.add_extension(i)
+                            if i != webconstants.AVO_EXTENSION_PATH:
+                            choptions.add_extension(i)
+                                extn_flag=True
                     else:
                         choptions.add_argument('--disable-extensions')
                     if str(chrome_path).lower() != 'default':

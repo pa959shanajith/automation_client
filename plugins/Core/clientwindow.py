@@ -536,21 +536,22 @@ class Config_window(wx.Frame):
             "S_port": [(270,12),(70, 25),(340,8), (105,-1)],
             "Chrm_path":[(12,42),(80, 25),(110,38), (300,-1),(415,38),(30, -1)],
             "Chrm_profile":[(12,72),(80, 25),(110,68), (300,-1),(415,68),(30, -1)],
-            "Ffox_path":[(12,102),(80, 25),(110,98), (300,-1),(415,98),(30, -1)],
-            "Log_path":[(12,132),(80, 25),(110,128), (300,-1),(415,128),(30, -1)],
-            "S_cert":[(12,162),(95, 25),(110,158),(300,-1),(415,158),(30, -1)],
-            "Q_timeout":[(12,192),(85, 25),(110,188), (70,-1)],
-            "Timeout":[(190,192),(50, 25),(250,188), (70,-1)],
-            "Delay":[(333,192),(40, 25),(375,188), (70,-1)],
-            "Step_exec":[(12,222),(110, 25),(135,218),(70,-1)],
-            "global_waittimeout":[(12,282),(120, 25),(135,278),(70,-1)],
-            "Disp_var":[(235,222),(135, 25),(375,218), (70,-1)],
-            "C_Timeout" :[(12,252),(120, 25),(135,248), (70,-1)],
-            "Delay_Stringinput":[(235,252),(130, 25),(375,248), (70,-1)],
-            "panel1":[(10,310),(100,30),(440,195),(8, 335)],
-            "err_text":[(50,525),(350, 25)],
-            "Save":[(100,550), (100, 28)],
-            "Close":[(250,550), (100, 28)]
+            "Chrm_extn_path":[(12,102),(80, 25),(110,98), (300,-1),(415,98),(30, -1)],
+            "Ffox_path":[(12,132),(80, 25),(110,128), (300,-1),(415,128),(30, -1)],
+            "Log_path":[(12,162),(80, 25),(110,158), (300,-1),(415,158),(30, -1)],
+            "S_cert":[(12,192),(95, 25),(110,188),(300,-1),(415,188),(30, -1)],
+            "Q_timeout":[(12,222),(85, 25),(110,218), (70,-1)],
+            "Timeout":[(190,222),(50, 25),(250,218), (70,-1)],
+            "Delay":[(333,222),(40, 25),(375,218), (70,-1)],
+            "Step_exec":[(12,252),(110, 25),(135,248),(70,-1)],
+            "global_waittimeout":[(12,312),(120, 25),(135,308),(70,-1)],
+            "Disp_var":[(235,252),(135, 25),(375,248), (70,-1)],
+            "C_Timeout" :[(12,282),(120, 25),(135,278), (70,-1)],
+            "Delay_Stringinput":[(235,282),(130, 25),(375,278), (70,-1)],
+            "panel1":[(10,340),(100,30),(440,215),(8, 335)],
+            "err_text":[(50,555),(350, 25)],
+            "Save":[(100,580), (100, 28)],
+            "Close":[(250,580), (100, 28)]
             }
         else:
             config_fields={
@@ -617,6 +618,15 @@ class Config_window(wx.Frame):
             self.chrome_profile.SetValue(isConfigJson['chrome_profile'])
         else:
             self.chrome_profile.SetValue('default')
+
+        self.ch_extn_path=wx.StaticText(self.panel, label="Chrome Extn", pos=config_fields["Chrm_extn_path"][0],size=config_fields["Chrm_extn_path"][1], style=0, name="")
+        self.chrome_extnpath=wx.TextCtrl(self.panel, pos=config_fields["Chrm_extn_path"][2], size=config_fields["Chrm_extn_path"][3])
+        self.chrome_extnpath_btn=wx.Button(self.panel, label="+", pos=config_fields["Chrm_extn_path"][4], size=config_fields["Chrm_extn_path"][5])
+        self.chrome_extnpath_btn.Bind(wx.EVT_BUTTON, self.fileBrowser_chextnpath)
+        if isConfigJson!=False:
+            self.chrome_extnpath.SetValue(isConfigJson['chrome_extnpath'])
+        else:
+            self.chrome_extnpath.SetValue('default')  
 
         if isConfigJson['clear_cache'] == 'Yes':
             self.chrome_profile.SetValue('default')
@@ -754,6 +764,7 @@ class Config_window(wx.Frame):
         self.connection_timeout.SetToolTip(wx.ToolTip("Timeout from server [in hours 0 or >8]"))
         self.delay_stringinput.SetToolTip(wx.ToolTip("Character input delay for sendFunctionKeys"))
         self.globalWait_TimeOut.SetToolTip(wx.ToolTip("Timeout to wait for all objects to visible in AUT [in seconds]"))
+        self.ch_extn_path.SetToolTip(wx.ToolTip("Chrome extension path or default"))
 
         ## Binding placeholders and restricting textareas to just numeric characters
         self.server_port.Bind(wx.EVT_CHAR, self.handle_keypress)
@@ -1099,6 +1110,7 @@ class Config_window(wx.Frame):
         server_port=self.server_port.GetValue()
         chrome_path=self.chrome_path.GetValue()
         chrome_profile=self.chrome_profile.GetValue()
+        chrome_extnpath=self.chrome_extnpath.GetValue()
         firefox_path=self.firefox_path.GetValue()
         logFile_Path=self.log_file_path.GetValue()
         queryTimeOut=self.query_timeout.GetValue()
@@ -1136,6 +1148,7 @@ class Config_window(wx.Frame):
         data['ignore_certificate'] = ignore_certificate.strip()
         data['chrome_path'] = chrome_path.strip() if chrome_path.strip().lower()!='default' else 'default'
         data['chrome_profile'] = chrome_profile.strip() if chrome_profile.strip().lower()!='default' else 'default'
+        data['chrome_extnpath'] = chrome_extnpath.strip() if chrome_extnpath.strip().lower()!='default' else 'default'
         data['firefox_path'] = firefox_path.strip() if firefox_path.strip().lower()!='default' else 'default'
         data['bit_64'] = 'Yes' if bit_64.strip()=='64-bit' else 'No'
         data['logFile_Path'] = logFile_Path.strip()
@@ -1174,7 +1187,8 @@ class Config_window(wx.Frame):
             data['chrome_path']!='' and data['queryTimeOut'] not in ['','sec'] and data['logFile_Path']!='' and
             data['delay'] not in ['','sec'] and data['timeOut'] not in ['','sec'] and data['stepExecutionWait'] not in ['','sec'] and
             data['displayVariableTimeOut'] not in ['','sec'] and data['delay_stringinput'] not in ['','sec'] and
-            data['firefox_path']!='' and data['connection_timeout'] not in ['','0 or >=8 hrs']):
+            data['firefox_path']!='' and data['connection_timeout'] not in ['','0 or >=8 hrs'] and data['chrome_profile']!='' and
+            data['chrome_extnpath']!=''):
             #---------------------------------------resetting the static texts
             self.error_msg.SetLabel("")
             self.sev_add.SetLabel('Server Address')
@@ -1191,6 +1205,10 @@ class Config_window(wx.Frame):
             self.ch_path.SetForegroundColour((0,0,0))
             self.ff_path.SetLabel('Firefox Path')
             self.ff_path.SetForegroundColour((0,0,0))
+            self.ch_profile.SetLabel('Chrome Profile')
+            self.ch_profile.SetForegroundColour((0,0,0))
+            self.ch_extn_path.SetLabel('Chrome Extn')
+            self.ch_extn_path.SetForegroundColour((0,0,0))
             self.delayText.SetLabel('Delay')
             self.delayText.SetForegroundColour((0,0,0))
             self.timeOut.SetLabel('Time Out')
@@ -1306,6 +1324,18 @@ class Config_window(wx.Frame):
             else:
                 self.ff_path.SetLabel('Firefox Path')
                 self.ff_path.SetForegroundColour((0,0,0))
+            if data['chrome_profile']=='':
+                self.ch_profile.SetLabel('Chrome Profile*')
+                self.ch_profile.SetForegroundColour((255,0,0))
+            else:
+                self.ch_profile.SetLabel('Chrome Profile')
+                self.ch_profile.SetForegroundColour((0,0,0))
+            if data['chrome_extnpath']=='':
+                self.ch_extn_path.SetLabel('Chrome Extn*')
+                self.ch_extn_path.SetForegroundColour((255,0,0))
+            else:
+                self.ch_extn_path.SetLabel('Chrome Extn')
+                self.ch_extn_path.SetForegroundColour((0,0,0))
             if data['delay']=="sec":
                 self.delayText.SetLabel('Delay*')
                 self.delayText.SetForegroundColour((255,0,0))
@@ -1385,6 +1415,19 @@ class Config_window(wx.Frame):
             path = dlg.GetPath()
             self.chrome_profile.SetValue(path)
         dlg.Destroy()
+
+    def fileBrowser_chextnpath(self,event):
+        dlg = wx.DirDialog(self, message="Choose a folder ...",defaultPath=AVO_ASSURE_HOME, style=wx.DD_DEFAULT_STYLE | wx.DD_NEW_DIR_BUTTON)
+        if dlg.ShowModal() == wx.ID_OK:
+            new_path = dlg.GetPath()
+            old_path=self.chrome_extnpath.GetValue()
+            if old_path == 'default':
+                path=new_path
+            else:
+                path=old_path+';'+new_path
+            self.chrome_extnpath.SetValue(path)
+        dlg.Destroy()
+
     """This method open a file selector dialog , from where file path can be set """
     def fileBrowser_ffpath(self,event):
         dlg = wx.FileDialog(self, message="Choose a file ...",defaultDir=AVO_ASSURE_HOME,defaultFile="", wildcard="Firefox executable (*firefox.exe)|*firefox.exe|" \

@@ -1,6 +1,6 @@
 {
     "bit_64": "Yes",
-    "browser_check": "Yes",
+    "chrome_extnpath": "default",
     "chrome_path": "default",
     "chrome_profile": "default",
     "clear_cache": "No",
