@@ -159,19 +159,8 @@ class RadioCheckboxOperations:
                             verifyresponse = MSG_TRUE
                             keywordresult=MSG_PASS
                     else:
-                        oebs_mouseops.MouseOperation('click',x_coor,y_coor)
-                        time.sleep(2)
-                        curaccinfo = acc.getAccessibleContextInfo()
-                        objstates = curaccinfo.states
-                        if 'checked' in objstates:
-                            oebs_mouseops.MouseOperation('click',x_coor,y_coor)
-                            log.debug('%s',MSG_OBJECTUNSELECTED)
-                            oebs_key_objects.custom_msg.append(MSG_OBJECTUNSELECTED)
-                            verifyresponse = MSG_TRUE
-                            keywordresult=MSG_PASS
-                        else:
-                            log.debug('%s',MSG_OBJECT_READONLY)
-                            oebs_key_objects.custom_msg.append(MSG_OBJECT_READONLY)
+                        verifyresponse = MSG_TRUE
+                        keywordresult=MSG_PASS
                 else:
                     log.debug('Object is disabled',MSG_DISABLED_OBJECT)
                     logger.print_on_console(MSG_DISABLED_OBJECT)
