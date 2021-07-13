@@ -332,6 +332,8 @@ class DropdownListboxOperations:
                 if 'selected' in state:
                        value = acccontext.name
                        selectedvalue.append(str(value))
+        if len(selectedvalue) == 1:
+            return selectedvalue[0]
         return selectedvalue
 
     #Method to get count for dropdown
@@ -434,7 +436,7 @@ class DropdownListboxOperations:
             #gets the entire context information
             curaccinfo = acc.getAccessibleContextInfo()
             log.debug('Received Object Context',DEF_GETMULTIPLEVALUESBYINDEXES)
-            if 'multiselectable' in curaccinfo.states:
+            if curaccinfo.role == 'list' and 'enabled' in curaccinfo.states:
                 valueslength = len(oebs_key_objects.keyword_input)
                 if valueslength >=  1:
                     output_list=[]
@@ -811,20 +813,25 @@ class DropdownListboxOperations:
             for index in range(int(children)):
                 getAcceess=acc.removeAccessibleSelectionFromContext(index)
 
-            if len(oebs_key_objects.keyword_input) > 0:
-                for index in range(len(oebs_key_objects.keyword_input)):
-                    if (oebs_key_objects.keyword_input[index] != None) and (oebs_key_objects.keyword_input[index] != ''):
-                        childrennames.append(oebs_key_objects.keyword_input[index])
-                    if(int(childrennames[index]) < int(contextinfo.childrenCount)):
-                        acc.addAccessibleSelectionFromContext(int(childrennames[index]))
-                        verifyresponse=MSG_TRUE
-                        keywordresult=MSG_PASS
-                    else:
-                        log.debug('%s',MSG_INVALID_INPUT)
-                        logger.print_on_console(MSG_INVALID_INPUT)
-                        verifyresponse = MSG_FALSE
-                        keywordresult=MSG_FAIL
-                        break
+            if len(oebs_key_objects.keyword_input) > 0 and contextinfo.role == 'list':
+                if (len(oebs_key_objects.keyword_input) > 1 and 'multiselectable' in contextinfo.states) or len(oebs_key_objects.keyword_input) == 1:
+                    for index in range(len(oebs_key_objects.keyword_input)):
+                        if (oebs_key_objects.keyword_input[index] != None) and (oebs_key_objects.keyword_input[index] != ''):
+                            childrennames.append(oebs_key_objects.keyword_input[index])
+                        if(int(childrennames[index]) < int(contextinfo.childrenCount)):
+                            acc.addAccessibleSelectionFromContext(int(childrennames[index]))
+                            verifyresponse=MSG_TRUE
+                            keywordresult=MSG_PASS
+                        else:
+                            log.debug('%s',MSG_INVALID_INPUT)
+                            logger.print_on_console(MSG_INVALID_INPUT)
+                            verifyresponse = MSG_FALSE
+                            keywordresult=MSG_FAIL
+                            break
+                else:
+                    oebs_key_objects.custom_msg.append(MSG_SINGLESELECTION_LIST)
+                    logger.print_on_console(MSG_SINGLESELECTION_LIST)
+                    keywordresult=MSG_FAIL
             else:
                 log.debug('%s',MSG_INVALID_INPUT)
                 oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
@@ -1059,16 +1066,24 @@ class DropdownListboxOperations:
                     childrennames.append(oebs_key_objects.keyword_input[index])
             childrenselected=0
             if len(childrennames) != 0 :
-                for index in range(children):
-                    childacc = acc.getAccessibleChildFromContext(int(index))
-                    childcontext = childacc.getAccessibleContextInfo()
-                    fetchedname = childcontext.name
-                    if fetchedname in childrennames:
-                        acc.addAccessibleSelectionFromContext(index)
-                        childrenselected = childrenselected + 1
-                if childrenselected == len(childrennames):
-                    keywordresult = MSG_PASS
-                    verifyresponse = MSG_TRUE
+                if (len(childrennames) > 1 and 'multiselectable' in currinfo.states) or len(childrennames) == 1:
+                    for index in range(children):
+                        childacc = acc.getAccessibleChildFromContext(int(index))
+                        childcontext = childacc.getAccessibleContextInfo()
+                        fetchedname = childcontext.name
+                        if fetchedname in childrennames:
+                            acc.addAccessibleSelectionFromContext(index)
+                            childrenselected = childrenselected + 1
+                    if childrenselected == len(childrennames):
+                        keywordresult = MSG_PASS
+                        verifyresponse = MSG_TRUE
+                    else:
+                        logger.print_on_console(ERROR_CODE_DICT['err_multi_select'])
+                        keywordresult=MSG_FAIL
+                else:
+                    oebs_key_objects.custom_msg.append(MSG_SINGLESELECTION_LIST)
+                    logger.print_on_console(MSG_SINGLESELECTION_LIST)
+                    keywordresult=MSG_FAIL
             else:
                 log.debug('%s',MSG_INVALID_NOOF_INPUT)
                 oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)

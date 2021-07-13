@@ -43,6 +43,12 @@ class ButtonOperations:
             if charinfo.accessibleAction == 1:
                 if (charinfo.name != None and charinfo.name != ''):
                     buttonName = charinfo.name
+                    if 'alt' in buttonName:
+                        buttonName=buttonName.split("alt",1)[0].strip()
+                    elif 'ALT' in buttonName:
+                        splitval=buttonName.split("ALT",1)[0].strip()
+                    else:
+                        splitval=buttonName.strip()
                     log.debug('%s %s',MSG_RESULT_IS,buttonName)
                     keywordresult=MSG_PASS
                     keywordresponse = buttonName
