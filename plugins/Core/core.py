@@ -70,7 +70,7 @@ connection_Timer = None
 status_ping_thread = None
 update_obj = None
 termination_inprogress = False
-core_utils_obj = core_utils.CoreUtils()
+core_utils_obj = core_utils.CoreUtils() 
 
 
 def _process_ssl_errors(e):
@@ -98,7 +98,7 @@ def _process_ssl_errors(e):
 
 class MainNamespace(BaseNamespace):
     def on_message(self, *args):
-        global action,cw,browsername,desktopScrapeFlag,allow_connect,connection_Timer,updatecheckFlag,executionOnly
+        global action,cw,browsername,desktopScrapeFlag,allow_connect,connection_Timer,updatecheckFlag,executionOnly,termination_inprogress
         kill_conn = False
         try:
             if(str(args[0]) == 'connected'):
@@ -165,6 +165,7 @@ class MainNamespace(BaseNamespace):
                         cw.updateItem.Enable(True)
                         cw.rbox.Enable()
                     if browsercheckFlag == False:
+                        termination_inprogress= True
                         check_browser()
                     #if updatecheckFlag == False and root.gui:
                     if updatecheckFlag == False:
@@ -306,7 +307,11 @@ class MainNamespace(BaseNamespace):
             log.error(e,exc_info=True)
 
     def on_debugTestCase(self, *args):
-        global cw
+        global cw 
+        while True: #fix for Issue no 25356
+            global browsercheckFlag
+            if browsercheckFlag == True:
+                break
         try:
             if check_execution_lic("result_debugTestCase"): return None
             exec_data = args[0]
@@ -1589,7 +1594,7 @@ class Main():
         print('********************************************************************************************************')
 
 def check_browser():
-    global browsercheckFlag
+    global browsercheckFlag,termination_inprogress
     try:
         try:
             try:
@@ -1763,8 +1768,9 @@ def check_browser():
         log.debug(e)
         browsercheckFlag = False
     finally:
+        termination_inprogress = False 
         logger.print_on_console('Browser compatibility check completed')
-    return browsercheckFlag
+    return browsercheckFlag 
 
 def check_PatchUpdate():
     try:
