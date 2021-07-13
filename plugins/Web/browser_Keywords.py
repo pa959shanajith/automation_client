@@ -1543,6 +1543,21 @@ class Singleton_DriverUtil():
                     #     msoptions.add_extension(webconstants.EXTENSION_PATH)
                     # else:
                     #     msoptions.add_argument('--disable-extensions')
+                    extension_path = configvalues['chrome_extnpath']
+                    extns=glob.glob(webconstants.EXTENSIONS_PATH+os.sep+"*.crx")
+                    if extension_path.lower() != 'default':
+                        extn=extension_path.split(";")
+                        for i in extn:
+                            if os.path.isfile(i):
+                                if os.path.splitext(i)[-1].lower()=='.crx':
+                                    extns.append(i)
+                            elif os.path.isdir(i):
+                                [extns.append(i) for i in glob.glob(i+os.sep+"*.crx")]
+                    if len(extns) > 1:
+                        for i in extns:
+                            if i != webconstants.AVO_EXTENSION_PATH:
+                                msoptions.add_extension(os.path.abspath(i))
+                    else:
                     msoptions.add_argument('--disable-extensions')
                     if str(close_browser_popup).lower() == 'yes':
                         prefs = {}
