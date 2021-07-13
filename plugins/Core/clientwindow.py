@@ -765,7 +765,7 @@ class Config_window(wx.Frame):
         self.connection_timeout.SetToolTip(wx.ToolTip("Timeout from server [in hours 0 or >8]"))
         self.delay_stringinput.SetToolTip(wx.ToolTip("Character input delay for sendFunctionKeys"))
         self.globalWait_TimeOut.SetToolTip(wx.ToolTip("Timeout to wait for all objects to visible in AUT [in seconds]"))
-        self.ch_extn_path.SetToolTip(wx.ToolTip("Chrome extension path or default"))
+        self.ch_extn_path.SetToolTip(wx.ToolTip("Chrome/Chromium extension path or default"))
 
         ## Binding placeholders and restricting textareas to just numeric characters
         self.server_port.Bind(wx.EVT_CHAR, self.handle_keypress)
