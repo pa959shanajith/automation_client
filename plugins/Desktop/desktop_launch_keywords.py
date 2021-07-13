@@ -153,9 +153,9 @@ class Launch_Keywords():
                 foreground = win32gui.GetForegroundWindow()
                 #------------------------------------------------------------------------Calc
                 try:
-                    rect2 = win32gui.GetWindowRect(parent)
-                    rect1 = win32gui.GetWindowRect(hwnd)
-                    if ( parent > 0 ):
+                    if (parent > 0):
+                        rect2 = win32gui.GetWindowRect(parent)
+                        rect1 = win32gui.GetWindowRect(hwnd)
                         pheight = int(rect2[3]) - int(rect2[1])
                         pwidth = int(rect2[2]) - int(rect2[0])
                         mheight = int(rect1[3]) - int(rect1[1])
@@ -313,7 +313,15 @@ class Launch_Keywords():
             except Exception as e:
                 log.error( desktop_constants.ERROR_MSG + ' : ' + str(e) )
                 logger.print_on_console( desktop_constants.ERROR_MSG + ' : ' + str(e) )
-        win32gui.EnumWindows(foreach_window, None)
+        try:
+            win32gui.EnumWindows(foreach_window, None)
+        except Exception as e:
+            if int(e.winerror) == 0:
+                pass
+            else:
+                log.error(desktop_constants.ERROR_MSG + ' : ' + str(e))
+                logger.print_on_console(desktop_constants.ERROR_MSG + ' : ' + str(e))
+                
 
         return i
 
