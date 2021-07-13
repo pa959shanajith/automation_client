@@ -1558,7 +1558,7 @@ class Singleton_DriverUtil():
                             if i != webconstants.AVO_EXTENSION_PATH:
                                 msoptions.add_extension(os.path.abspath(i))
                     else:
-                    msoptions.add_argument('--disable-extensions')
+                        msoptions.add_argument('--disable-extensions')
                     if str(close_browser_popup).lower() == 'yes':
                         prefs = {}
                         prefs["credentials_enable_service"] = False
