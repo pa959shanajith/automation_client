@@ -1358,7 +1358,7 @@ class Singleton_DriverUtil():
                     if len(extns) > 1:
                         for i in extns:
                             if i != webconstants.AVO_EXTENSION_PATH:
-                            choptions.add_extension(i)
+                                choptions.add_extension(os.path.abspath(i))
                                 extn_flag=True
                     else:
                         choptions.add_argument('--disable-extensions')
