@@ -19,7 +19,6 @@ import logging
 import logger
 import oebs_serverUtilities
 from oebs_utilops import UtilOperations
-from constants import *
 
 log = logging.getLogger('oebs_buttonops.py')
 
@@ -148,12 +147,16 @@ class ButtonOperations:
             #Visibility check for scrollbar
             if(self.utilops_obj.getObjectVisibility(acc,x_coor,y_coor)):
                 #check for object enabled
-                if 'enabled' in objstates:
+                if 'enabled' in objstates and 'showing' in objstates:
                     log.debug('Click Happens on :%s , %s',x_coor,y_coor)
                     oebs_mouseops.MouseOperation('click',x_coor,y_coor)
                     log.debug('Click Successful',DEF_CLICK)
                     verifyresponse = MSG_TRUE
                     keywordresult=MSG_PASS
+                elif 'enabled' in objstates and 'showing' not in objstates:
+                    log.debug('Object Disabled', ERROR_CODE_DICT['err_visibility_click'])
+                    logger.print_on_console(ERROR_CODE_DICT['err_visibility_click'])
+                    oebs_key_objects.custom_msg.append(ERROR_CODE_DICT['err_visibility_click'])     
                 else:
                     log.debug('Object Disabled',MSG_DISABLED_OBJECT)
                     logger.print_on_console(MSG_DISABLED_OBJECT)
@@ -191,12 +194,16 @@ class ButtonOperations:
             #Visibility check for scrollbar
             if(self.utilops_obj.getObjectVisibility(acc,x_coor,y_coor)):
                 #check for object enabled
-                if 'enabled' in objstates:
+                if 'enabled' in objstates and 'showing' in objstates:
                     log.debug('Double Click Happens on :%s , %s',x_coor,y_coor)
                     oebs_mouseops.MouseOperation('doubleClick',x_coor,y_coor)
                     log.debug('Double Click Successful',DEF_DOUBLECLICK)
                     verifyresponse = MSG_TRUE
                     keywordresult=MSG_PASS
+                elif 'enabled' in objstates and 'showing' not in objstates:
+                    log.debug('Object Disabled', ERROR_CODE_DICT['err_visibility_click'])
+                    logger.print_on_console(ERROR_CODE_DICT['err_visibility_click'])
+                    oebs_key_objects.custom_msg.append(ERROR_CODE_DICT['err_visibility_click'])  
                 else:
                     log.debug('Object Disabled',MSG_DISABLED_OBJECT)
                     logger.print_on_console(MSG_DISABLED_OBJECT)

@@ -415,8 +415,12 @@ class Utilities:
                 status=TEST_RESULT_PASS
                 methodoutput=TEST_RESULT_TRUE
                 output=oebs_key_objects.keyword_output[1]
-            else:
+            elif len(oebs_key_objects.keyword_output) > 1:
                 output=oebs_key_objects.keyword_output[1]
+            else:
+                err_msg = ERROR_CODE_DICT['err_window_find']
+                logger.print_on_console(err_msg)
+                log.error(err_msg)
 
         else:
             del oebs_key_objects.custom_msg[:]

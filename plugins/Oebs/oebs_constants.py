@@ -111,7 +111,9 @@ ERROR_CODE_DICT = {
     'err_jab': 'Java Access Bridge not available',
     'err_jab_base': 'Base exception occured while Running DLL',
     'err_run_dll': 'Error occurred while trying to run DLL',
-    'err_multi_select': 'Unable to find element in list'
+    'err_multi_select': 'Unable to find element in list',
+    'err_visibility_click': 'Unable to click, object not present in screen',
+    'err_window_find': 'Unable to find window, containing object'
 }
 
 
