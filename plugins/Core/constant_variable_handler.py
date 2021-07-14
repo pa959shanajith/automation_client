@@ -40,7 +40,26 @@ class ConstantVariables:
             value=local_constant.constant_variable_map.get(variable)
         return value
 
+    #To Store the output from keyword as an array if it is multiple values
+    def store_as_array(self,variable,value):
+        variable=variable[0:len(variable)-1]
+        if len(value)>0 and not(isinstance(value[0],list)):
+            for i in range(len(value)):
+                local_constant.constant_variable_map[variable+'['+str(i)+']_']=value[i]
+        else:
+            for i in range(len(value)):
+                for j in range(len(value[i])):
+                    local_constant.constant_variable_map[variable+'['+str(i)+']['+str(j)+']_']=value[i][j]
+
     #To Store the output from keyword
-    def store_constant_value(self,output_var,output_value):
+    def store_constant_value(self,output_var,output_value,keyword):
         if self.check_for_constantvariables(output_var)==TEST_RESULT_TRUE:
+            if isinstance(output_value,list):
+                if not(keyword.lower() in DATABASE_KEYWORDS):
+                    local_constant.constant_variable_map[output_var]=output_value
+                    self.store_as_array(output_var,output_value)
+                else:
+                    output_value.append(output_var)
+                    local_constant.constant_variable_map[DB_VAR]=output_value
+            else:
                 local_constant.constant_variable_map[output_var]=output_value

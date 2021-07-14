@@ -631,7 +631,7 @@ class Controller():
                         log.debug(err_msg)
                 else:
                     #in the current step if _a_ is used in output and _a_ is not created, then _a_ should be created and the response of the keyword should be written to _a_
-                    self.contant_var_handler_obj.store_constant_value(output[0],keyword_response)
+                    self.contant_var_handler_obj.store_constant_value(output[0],keyword_response,tsp.name)
             else:
                 self.dynamic_var_handler_obj.store_dynamic_value(output[0],keyword_response,tsp.name)
         if len(output)>1:

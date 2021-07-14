@@ -1546,7 +1546,7 @@ class FileOperations:
                             log.debug("File out path is not valid, setting to default")
                             output_feild = None
                         #logger.print_on_console("Choosen the dynamic file path")
-                elif((args[0]).startswith("_") and (args[0]).endswith("_")):
+                elif(str(args[0].split(";")[0]).startswith("_") and str(args[0].split(";")[0]).endswith("_")):
                     out_path=self.CV.get_constant_value(args[0])
                     con_var_opt = True
                     if ( out_path ):
@@ -1761,6 +1761,7 @@ class FileOperations:
             flag1=False
             flag2=False
             dyn_var_opt = False
+            con_var_opt = False
             filepath1=input[0]
             filepath2=input[3]
             sheetname1=input[1]
@@ -2221,6 +2222,13 @@ class FileOperations:
                 methodoutput = TEST_RESULT_TRUE
                 if(out_path):
                     output_feild = out_path
+            elif(str(args[0].split(";")[0]).startswith("_") and str(args[0].split(";")[0]).endswith("_")):
+                out_path=self.CV.get_constant_value(args[0])
+                con_var_opt = True
+                status = TEST_RESULT_PASS
+                methodoutput = TEST_RESULT_TRUE
+                if(out_path):
+                    output_feild = out_path
             else:
                 output_feild = args[0].split(";")[0]
             if(output_feild):
@@ -2300,7 +2308,7 @@ class FileOperations:
                         methodoutput = TEST_RESULT_TRUE
                 else:
                     err_msg = 'Warning! : Invalid file extension(Supports only .xlsx, .xls, .txt, .csv).'
-            elif not dyn_var_opt:
+            elif not dyn_var_opt or not con_var_opt:
                 err_msg='Output field is empty'
                 log.error(err_msg)
                 logger.print_on_console(err_msg)

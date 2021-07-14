@@ -141,7 +141,7 @@ class DynamicVariables:
                     #checks if the variable is constant variable ex: _a_
                     if variable not in constant_variable_handler.local_constant.constant_variable_map:
                         #checks if the constant variable exists or not
-                        self.const_var_obj.store_constant_value(variable,value)
+                        self.const_var_obj.store_constant_value(variable,value,"copyvalue")
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
                         log.debug('Variable copied is ' + str(variable) + ' = ' + str(value))
