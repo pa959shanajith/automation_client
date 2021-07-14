@@ -5,6 +5,8 @@ drivers_path = os.path.join(os.environ["AVO_ASSURE_HOME"], "lib", "Drivers")
 
 assets_path = os.environ["AVO_ASSURE_HOME"] + os.sep + "assets"
 
+EXTENSIONS_PATH = os.environ["AVO_ASSURE_HOME"] + os.sep + "extension"
+
 GET_XPATH_JS="""function getElementXPath(elt) {var path = "";for (; elt && elt.nodeType == 1; elt = elt.parentNode){idx = getElementIdx(elt);xname = elt.tagName;if (idx >= 1){xname += "[" + idx + "]";}path = "/" + xname + path;}return path;}function getElementIdx(elt){var count = 1;for (var sib = elt.previousSibling; sib ; sib = sib.previousSibling){if(sib.nodeType == 1 && sib.tagName == elt.tagName){count++;}}return count;}return getElementXPath(arguments[0]).toLowerCase();"""
 
 CLICK_JAVASCRIPT = """var evType; element=arguments[0]; if (document.createEvent) {     evType = 'Click executed through part-1';     var evt = document.createEvent('MouseEvents');     evt.initMouseEvent('click', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);   	setTimeout(function() {     	element.dispatchEvent(evt)    }, 100); } else {     evType = 'Click executed through part-2';   	setTimeout(function() {     element.click();   	}, 100); } return (evType);"""
@@ -45,7 +47,7 @@ PHANTOM_DRIVER_PATH =  drivers_path + os.sep + 'phantomjs.exe'
 
 GECKODRIVER_PATH =  drivers_path + os.sep + 'geckodriver'
 
-EXTENSION_PATH = assets_path + os.sep + 'extension.crx'
+AVO_EXTENSION_PATH = assets_path + os.sep + 'AvoAssure.crx'
 
 if SYSTEM_OS == "Windows":
     CHROME_DRIVER_PATH += ".exe"
