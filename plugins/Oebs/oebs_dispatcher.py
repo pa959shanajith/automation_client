@@ -16,7 +16,6 @@ import oebs_utils
 import logger
 import logging
 import oebs_constants
-windowname=None
 import constants
 import screenshot_keywords
 import readconfig
@@ -34,6 +33,7 @@ class OebsDispatcher:
         self.exception_flag=''
         self.action = None
         self.iris_object = iris_operations.IRISKeywords()
+        self.windowname = None
 
 
     custom_dict={
@@ -62,7 +62,7 @@ class OebsDispatcher:
 
     def clear_oebs_window_name(self):
         log.info('Clearing the window name')
-        windowname=None
+        self.windowname=None
 
     def print_error(self,err_msg):
         err_msg1=constants.ERROR_CODE_DICT[err_msg]
@@ -84,7 +84,7 @@ class OebsDispatcher:
                 if ele_type in self.get_ele_type:
                     ele_type=self.get_ele_type[ele_type]
                 if (keyword in self.custom_dict and ele_type in self.custom_dict[keyword]) or keyword in list(self.custom_dict_element.values())[0]:
-                    custom_oebs_element=self.oebs_keywords.getobjectforcustom(windowname,parent_xpath,ele_type,input[2])
+                    custom_oebs_element=self.oebs_keywords.getobjectforcustom(self.windowname,parent_xpath,ele_type,input[2])
                     log.info('custom_oebs_element')
                     log.info(custom_oebs_element)
                     if custom_oebs_element != '':
@@ -101,7 +101,7 @@ class OebsDispatcher:
             else:
                  self.print_error('ERR_CUSTOM_NOTFOUND')
                  self.print_error('ERR_PRECONDITION_NOTMET')
-        message=[windowname,objectname,tsp.name,input,tsp.outputval]
+        message=[self.windowname,objectname,tsp.name,input,tsp.outputval]
         return message
 
     def dispatcher(self,tsp,input,mythread,*message):
@@ -110,8 +110,9 @@ class OebsDispatcher:
          err_msg=None
          output = tsp.outputval
          result=[constants.TEST_RESULT_FAIL,constants.TEST_RESULT_FALSE,constants.OUTPUT_CONSTANT,err_msg]
-         if windowname is not None and tsp.name.lower()!='findwindowandattach':
-            self.utils_obj.set_to_foreground(windowname)
+         self.windowname = tsp.url
+         if self.windowname is not None and tsp.name.lower()!='findwindowandattach':
+            self.utils_obj.set_to_foreground(self.windowname)
          message=self.assign_url_objectname(tsp,input)
 
          try:

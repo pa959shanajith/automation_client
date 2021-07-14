@@ -115,8 +115,6 @@ class Utils:
         err_msg = None
         self.aut_handle=None
         try:
-            import oebs_dispatcher
-            oebs_dispatcher.windowname=None
             import time
             load_timeout=1
             if len(args)>0:
@@ -136,7 +134,6 @@ class Utils:
                 err_msg = ERROR_CODE_DICT['invalid_window']
                 logger.print_on_console(err_msg)
             if self.aut_handle is not None:
-                oebs_dispatcher.windowname=windowname
                 self.set_to_foreground(windowname)
                 status=True
         except Exception as e:
@@ -166,7 +163,6 @@ class Utils:
             logger.print_on_console('windowname is '+windowname)
             status=False
             if not(windowname is None and windowname is ''):
-                import oebs_dispatcher
                 start_time = time.time()
                 while True:
                         if int(time.time() - start_time) == launch_time_out:
@@ -177,7 +173,6 @@ class Utils:
                         elif len(title_matched_windows)==1:
                             self.windowHandle=title_matched_windows[0]
                             self.windowname=self.getWindowText(self.windowHandle)
-                            oebs_dispatcher.windowname=self.windowname
                             found = True
                             self.set_to_foreground(self.windowname)
                             time.sleep(0.5)
@@ -219,7 +214,7 @@ class Utils:
         GetWindowText = ctypes.windll.user32.GetWindowTextW
         GetWindowTextLength = ctypes.windll.user32.GetWindowTextLengthW
         IsWindowVisible = ctypes.windll.user32.IsWindowVisible
-
+        
         handles = []
         def foreach_window(hwnd, lParam):
             if IsWindowVisible(hwnd):
