@@ -113,7 +113,8 @@ ERROR_CODE_DICT = {
     'err_run_dll': 'Error occurred while trying to run DLL',
     'err_multi_select': 'Unable to find element in list',
     'err_visibility_click': 'Unable to click, object not present in screen',
-    'err_window_find': 'Unable to find window, containing object'
+    'err_window_find': 'Unable to find window, containing object',
+    'err_object_highlight': 'Object not found, unable to highlight'
 }
 
 

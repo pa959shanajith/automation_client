@@ -81,35 +81,39 @@ class Utils:
     def highlight(self,objectname,windowname):
         status=True
         try:
-            logger.print_on_console('Highlighting in progress')
             self.set_to_foreground(windowname)
             acc = self.utils_obj.object_generator(windowname, objectname, 'highlight', [], '')
             if not acc or (acc and str(acc) == 'fail'):
-                logger.print_on_console(ERROR_CODE_DICT['err_highlight'])
+                logger.print_on_console(ERROR_CODE_DICT['err_object_highlight'])
                 status = False
             else:
+                logger.print_on_console('Highlighting in progress')
                 charinfo = acc.getAccessibleContextInfo()
                 obj=oebsServer.OebsKeywords()
                 size=obj.getobjectsize(windowname,objectname)
-                rgn1=win32gui.CreateRectRgnIndirect((size[0] + 1, size[1] + 1,
-                                    size[0] + size[2] - 1, size[1] + size[3] - 1))
-                rgn2=win32gui.CreateRectRgnIndirect((size[0] + 4, size[1] + 4,
-                                    size[0] + size[2] - 4, size[1] + size[3] - 4))
-                isjavares, hwnd = self.isjavawindow(windowname)
-                if win32gui.IsWindowVisible(hwnd) and win32gui.GetWindowText(win32gui.GetForegroundWindow()) == windowname:
-
-                    hdc=win32gui.CreateDC("DISPLAY", None, None)
-                    brush=win32gui.GetSysColorBrush(13)
-                    win32gui.CombineRgn(rgn1,rgn1,rgn2,3)
-                    win32gui.FillRgn(hdc,rgn1,brush)
-                    win32gui.DeleteObject(brush)
-                    win32gui.DeleteObject(rgn1)
-                    win32gui.DeleteObject(rgn2)
-                    win32gui.DeleteDC(hdc)
-                else:
-                    log.info("Window is not in Foreground")
-                    logger.print_on_console(ERROR_CODE_DICT['window_not_foreground'])
+                if -1 in size:
+                    logger.print_on_console(ERROR_CODE_DICT['err_object_highlight'])
                     status = False
+                else:
+                    rgn1=win32gui.CreateRectRgnIndirect((size[0] + 1, size[1] + 1,
+                                        size[0] + size[2] - 1, size[1] + size[3] - 1))
+                    rgn2=win32gui.CreateRectRgnIndirect((size[0] + 4, size[1] + 4,
+                                        size[0] + size[2] - 4, size[1] + size[3] - 4))
+                    isjavares, hwnd = self.isjavawindow(windowname)
+                    if win32gui.IsWindowVisible(hwnd) and win32gui.GetWindowText(win32gui.GetForegroundWindow()) == windowname:
+
+                        hdc=win32gui.CreateDC("DISPLAY", None, None)
+                        brush=win32gui.GetSysColorBrush(13)
+                        win32gui.CombineRgn(rgn1,rgn1,rgn2,3)
+                        win32gui.FillRgn(hdc,rgn1,brush)
+                        win32gui.DeleteObject(brush)
+                        win32gui.DeleteObject(rgn1)
+                        win32gui.DeleteObject(rgn2)
+                        win32gui.DeleteDC(hdc)
+                    else:
+                        log.info("Window is not in Foreground")
+                        logger.print_on_console(ERROR_CODE_DICT['window_not_foreground'])
+                        status = False
         except Exception as e:
             logger.print_on_console(ERROR_CODE_DICT['err_highlight'])
             status=False
