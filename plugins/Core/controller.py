@@ -85,7 +85,7 @@ class Controller():
         self.verify_dict={'web':VERIFY_EXISTS,
         'oebs':VERIFY_VISIBLE,'sap':VERIFY_EXISTS,'desktop':VERIFY_EXISTS,'mobileweb':VERIFY_EXISTS}
         self.dynamic_var_handler_obj=dynamic_variable_handler.DynamicVariables()
-        self.contant_var_handler_obj=constant_variable_handler.ConstantVariables()
+        self.constant_var_handler_obj=constant_variable_handler.ConstantVariables()
         self.status=TEST_RESULT_FAIL
         self.scenario_start_time=''
         self.scenario_end_time=''
@@ -468,14 +468,14 @@ class Controller():
             elif string != '':
                 inpval.append(string)
             #createConstVariable ex: _a_;{a}
-            const_var=self.contant_var_handler_obj.check_for_constantvariables(inpval[1])
+            const_var=self.constant_var_handler_obj.check_for_constantvariables(inpval[1])
             if const_var!=TEST_RESULT_TRUE:
                 #check if the inputval[1] is constant variable or not,
                 #createConstVariable ex: _a_;{a}
                 inpval[1]=self.dynamic_var_handler_obj.replace_dynamic_variable(inpval[1],'',self)
             else:
                 #createConstVariable ex: _a_;_b_  (_b_ is already created)
-                inpval[1]=self.contant_var_handler_obj.get_constant_value(inpval[1])
+                inpval[1]=self.constant_var_handler_obj.get_constant_value(inpval[1])
         elif keyword.lower() in DYNAMIC_KEYWORDS:
             if STATIC_NONE in input[0]:
                 input[0]=input[0].replace(STATIC_NONE,'')
@@ -487,17 +487,17 @@ class Controller():
             elif string != '':
                 inpval.append(string)
             if keyword.lower() != CREATE_DYN_VARIABLE:
-                const_var=self.contant_var_handler_obj.check_for_constantvariables(inpval[0])
+                const_var=self.constant_var_handler_obj.check_for_constantvariables(inpval[0])
                 #check if the inputval[0] is constant variable or not,
                 #ex: COPY_VALUE->_a_;{a}
                 if const_var!=TEST_RESULT_TRUE:
                     inpval[0]=self.dynamic_var_handler_obj.replace_dynamic_variable(inpval[0],keyword,self)
             if len(inpval)>1 and keyword.lower() in [COPY_VALUE,MODIFY_VALUE,CREATE_DYN_VARIABLE]:
                 exch = keyword.lower() == COPY_VALUE
-                const_var=self.contant_var_handler_obj.check_for_constantvariables(inpval[1])
+                const_var=self.constant_var_handler_obj.check_for_constantvariables(inpval[1])
                 if const_var==TEST_RESULT_TRUE:
                     #to get the value of constantVarible,
-                    inpval[1]=self.contant_var_handler_obj.get_constant_value(inpval[1])
+                    inpval[1]=self.constant_var_handler_obj.get_constant_value(inpval[1])
                 inpval[1]=self.dynamic_var_handler_obj.replace_dynamic_variable(inpval[1],'',self,no_exch_val=exch)
         else:
             if keyword.lower() in WS_KEYWORDS or keyword.lower() == 'navigatetourl':
@@ -507,11 +507,11 @@ class Controller():
                     x=None
                 else:
                     # To Handle dynamic variables of DB keywords,controller object is sent to dynamicVariableHandler
-                    const_var=self.contant_var_handler_obj.check_for_constantvariables(x)
+                    const_var=self.constant_var_handler_obj.check_for_constantvariables(x)
                     #to get the value of constantVariable, ex:displayVariableValue
                     if const_var==TEST_RESULT_TRUE:
                         #ex:displayVariableValue _a_
-                        x=self.contant_var_handler_obj.get_constant_value(x)
+                        x=self.constant_var_handler_obj.get_constant_value(x)
                     else:
                         x=self.dynamic_var_handler_obj.replace_dynamic_variable(x,keyword,self)
                 inpval.append(x)
@@ -619,7 +619,7 @@ class Controller():
             keyword_response=result[1]
             result = result[:1] + (result[2],) + result[2:]
         if len(output)>0 and output[0] != '':
-            const_var=self.contant_var_handler_obj.check_for_constantvariables(output[0])
+            const_var=self.constant_var_handler_obj.check_for_constantvariables(output[0])
             #checks if the output variable is a constant variable or not  
             if const_var==TEST_RESULT_TRUE:
                 if output[0] in constant_variable_handler.local_constant.constant_variable_map:
@@ -631,7 +631,7 @@ class Controller():
                         log.debug(err_msg)
                 else:
                     #in the current step if _a_ is used in output and _a_ is not created, then _a_ should be created and the response of the keyword should be written to _a_
-                    self.contant_var_handler_obj.store_constant_value(output[0],keyword_response,tsp.name)
+                    self.constant_var_handler_obj.store_constant_value(output[0],keyword_response,tsp.name)
             else:
                 self.dynamic_var_handler_obj.store_dynamic_value(output[0],keyword_response,tsp.name)
         if len(output)>1:
