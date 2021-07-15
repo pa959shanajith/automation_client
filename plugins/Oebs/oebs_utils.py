@@ -91,7 +91,7 @@ class Utils:
                 charinfo = acc.getAccessibleContextInfo()
                 obj=oebsServer.OebsKeywords()
                 size=obj.getobjectsize(windowname,objectname)
-                if -1 in size:
+                if -1 in size or 'showing' not in charinfo.states:
                     logger.print_on_console(ERROR_CODE_DICT['err_object_highlight'])
                     status = False
                 else:
