@@ -37,7 +37,9 @@ log = logging.getLogger('oebs_serverUtilities.py')
 class Utilities:
 
     #Method to swoop till the element at the given Object location
-    def swooptoelement(self,acc,objecttofind,currentxpathtemp,index,xpath):
+    def swooptoelement(self,a,objecttofind,currentxpathtemp,i,p):
+        queue = []
+        queue.append((p,a,i))
         identifiers = objecttofind.split(';')
         uniquepath = identifiers[0]
         name = identifiers[1]
@@ -56,69 +58,75 @@ class Utilities:
             if each_internal_frame.find('internal frame')!=-1:
                 internal_frame_list.append(each_internal_frame.lstrip('internal frame[')[:-1])
         
-        
-        elementObj = acc.getAccessibleContextInfo()
+        while len(queue) > 0:
+            xpath, acc, index = queue.pop(0)
+            elementObj = acc.getAccessibleContextInfo()
 
-        if xpath == '':
-             if len(elementObj.name.strip()) == 0:
-                if 'internal frame' in elementObj.role or 'frame' in elementObj.role:
-                    path = elementObj.role
-                elif 'panel' in elementObj.role:
-                    path = elementObj.role + '[' + str(index) + ']'
-                else:
-                    path = elementObj.role + '[' + str(index) + ']'
-
-             else:
-                if 'internal frame' in elementObj.role or 'frame' in elementObj.role:
-                    path = elementObj.role
-                elif 'panel' in elementObj.role:
-                    path = elementObj.role + '[' + str(index) + ']'
-                else:
-                    path = elementObj.role + '[' + str(elementObj.name.strip()) + ']'
-
-        else:
-            if len(elementObj.name.strip()) == 0:
-                if 'internal frame' in elementObj.role:
-                    path = xpath + '/' + elementObj.role
-                elif 'panel' in elementObj.role:
-                    path = xpath + '/' + elementObj.role + '[' + str(index) + ']'
-                else:
-                    path = xpath + '/' + elementObj.role  + '[' + str(index) + ']'
-
-            else:
-                if 'internal frame' in elementObj.role:
-                    path = xpath + '/' + elementObj.role
-                elif 'panel' in elementObj.role:
-                    path = xpath + '/' + elementObj.role + '[' + str(index) + ']'
-                else:
-                    path = xpath + '/' + elementObj.role  + '[' + str(elementObj.name.strip()) + ']'
-
-        if path == currentxpathtemp:
-            global accessContextParent
-            accessContextParent = acc
-
-        for index in range(elementObj.childrenCount):
-            elementObj = acc.getAccessibleChildFromContext(index)
-
-            elementcontext=elementObj.getAccessibleContextInfo()
-            if elementcontext.role == 'internal frame':
-                if 'active' in elementcontext.states and elementcontext.name.strip() == internal_frame_list[-1]:
-                    self.swooptoelement(elementObj,objecttofind,currentxpathtemp,index,path)
-                else:
-                    hasinternal=0
-                    children=elementcontext.childrenCount
-                    for childrencount in range(int(children)):
-                        childobj=elementObj.getAccessibleChildFromContext(childrencount)
-                        childrencontext=childobj.getAccessibleContextInfo()
-                        if 'internal frame' in childrencontext.role:
-                            hasinternal=1
-                            break
-                    if hasinternal ==1:
-                        self.swooptoelement(elementObj,objecttofind,currentxpathtemp,index,path)
+            if xpath == '':
+                if len(elementObj.name.strip()) == 0:
+                    if 'internal frame' in elementObj.role or 'frame' in elementObj.role:
+                        path = elementObj.role
+                    elif 'panel' in elementObj.role:
+                        path = elementObj.role + '[' + str(index) + ']'
                     else:
-                        index = index + 1
+                        path = elementObj.role + '[' + str(index) + ']'
+
+                else:
+                    if 'internal frame' in elementObj.role or 'frame' in elementObj.role:
+                        path = elementObj.role
+                    elif 'panel' in elementObj.role:
+                        path = elementObj.role + '[' + str(index) + ']'
+                    else:
+                        path = elementObj.role + '[' + str(elementObj.name.strip()) + ']'
+
             else:
-                self.swooptoelement(elementObj,objecttofind,currentxpathtemp,index,path)
+                if len(elementObj.name.strip()) == 0:
+                    if 'internal frame' in elementObj.role:
+                        path = xpath + '/' + elementObj.role
+                    elif 'panel' in elementObj.role:
+                        path = xpath + '/' + elementObj.role + '[' + str(index) + ']'
+                    else:
+                        path = xpath + '/' + elementObj.role  + '[' + str(index) + ']'
+
+                else:
+                    if 'internal frame' in elementObj.role:
+                        path = xpath + '/' + elementObj.role
+                    elif 'panel' in elementObj.role:
+                        path = xpath + '/' + elementObj.role + '[' + str(index) + ']'
+                    else:
+                        path = xpath + '/' + elementObj.role  + '[' + str(elementObj.name.strip()) + ']'
+
+            if path == currentxpathtemp:
+                global accessContextParent
+                accessContextParent = acc
+                return
+
+            curr = currentxpathtemp.split('/')
+            p = path.split('/')
+            index = len(p) - 1
+            if curr[index] == p[index]:
+                for index in range(elementObj.childrenCount):
+                    elementObj = acc.getAccessibleChildFromContext(index)
+
+                    elementcontext=elementObj.getAccessibleContextInfo()
+                    if elementcontext.role == 'internal frame':
+                        if 'showing' in elementcontext.states:
+                            queue.append((path, elementObj, index))
+                        else:
+                            hasinternal=0
+                            children=elementcontext.childrenCount
+                            for childrencount in range(int(children)):
+                                childobj=elementObj.getAccessibleChildFromContext(childrencount)
+                                childrencontext=childobj.getAccessibleContextInfo()
+                                if 'internal frame' in childrencontext.role:
+                                    hasinternal=1
+                                    break
+                            if hasinternal ==1:
+                                queue.append((path, elementObj, index))
+                            else:
+                                index = index + 1
+                    else:
+                        queue.append((path, elementObj, index))     
 
     def methodtofillmap(self,acc,xpath,i):
         global  accessContext
