@@ -103,22 +103,17 @@ class ScrapeDispatcher(wx.Frame):
     
     def clickandadd(self,event):
         state = event.GetEventObject().GetValue()
-        #clickandadd_obj=oebsclickandadd.ClickAndAdd()
         import oebs_click_and_add
 
         if state == True:
             self.fullscrapebutton.Disable()
             self.cropbutton.Disable()
-    ##        self.comparebutton.Disable()
 
             event.GetEventObject().SetLabel("Stop ClickAndAdd")
             oebs_click_and_add.init_core(windownametoscrape)
-            #clickandadd_obj.clickandadd(windownametoscrape,'STARTCLICKANDADD')
-    ##            wx.MessageBox('CLICKANDADD: Select the elements using Mouse - Left Click', 'Info',wx.OK | wx.ICON_INFORMATION)
             logger.print_on_console('select the elements from AUT')
 
         else:
-            #d = clickandadd_obj.clickandadd(windownametoscrape,'STOPCLICKANDADD')
             d, err = oebs_click_and_add.terminate_core()
             event.GetEventObject().SetLabel("Start ClickAndAdd")
             logger.print_on_console('Stopped click and add')
@@ -148,14 +143,12 @@ class ScrapeDispatcher(wx.Frame):
                 logger.print_on_console('Scraped data exceeds max. Limit.')
                 self.socketIO.emit('scrape','Response Body exceeds max. Limit.')
 
-    ##            wx.MessageBox('CLICKANDADD: Scrape completed', 'Info',wx.OK | wx.ICON_INFORMATION)
             self.Close()
             self.parent.schedule.Enable()
             try:
                 self.Close()
             except:
                 print("No Frame available")
-    ##            event.GetEventObject().SetLabel("Start ClickAndAdd")
             logger.print_on_console('Click and add scrape  completed')
 
 

@@ -88,8 +88,8 @@ class PathGenerator():
         height_win = y2_win - y1_win
         #width=current_acc_info.width
         #height=current_acc_info.height
-        left_need = current_acc_info.x - x1_win
-        top_need =  current_acc_info.y - y1_win
+        left_need = current_acc_info.x
+        top_need =  current_acc_info.y 
         point=win32gui.GetCursorPos()
         #-----------------------
 

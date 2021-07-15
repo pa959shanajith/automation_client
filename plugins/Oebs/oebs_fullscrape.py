@@ -168,8 +168,8 @@ class FullScrape:
         width=curaccinfo.width
         height=curaccinfo.height
 
-        left_need = x_coor - x1_win
-        top_need =  y_coor - y1_win
+        left_need = x_coor 
+        top_need =  y_coor 
 
         if len(text) == 0:
             text = tagname
