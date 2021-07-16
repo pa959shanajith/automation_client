@@ -13,6 +13,7 @@ import oebs_utils
 import oebs_fullscrape
 import oebs_api
 from oebs_constants import *
+import oebs_click_and_add
 import ast
 import json
 import re
@@ -37,8 +38,9 @@ log = logging.getLogger('oebs_serverUtilities.py')
 class Utilities:
 
     #Method to swoop till the element at the given Object location
-    def swooptoelement(self,a,objecttofind,currentxpathtemp,i,p):
+    def swooptoelement(self,a,objecttofind,currentxpathtemp,i,p,windowname):
         queue = []
+        active_parent = False
         queue.append((p,a,i))
         identifiers = objecttofind.split(';')
         uniquepath = identifiers[0]
@@ -99,12 +101,14 @@ class Utilities:
             if path == currentxpathtemp:
                 global accessContextParent
                 accessContextParent = acc
-                return
+                return active_parent
 
             curr = currentxpathtemp.split('/')
             p = path.split('/')
             index = len(p) - 1
             if curr[index] == p[index]:
+                if 'active' in elementObj.states and windowname != elementObj.name:
+                    active_parent = True
                 for index in range(elementObj.childrenCount):
                     elementObj = acc.getAccessibleChildFromContext(index)
 
@@ -198,6 +202,7 @@ class Utilities:
         global accessContext
         global ELEMENT_FOUND
         ELEMENT_FOUND=False
+        active_parent = None
         #OBJECTLOCATION for the object is sent from the user
         del oebs_key_objects.keyword_input[:]
         oebs_key_objects.xpath = locator
@@ -223,7 +228,9 @@ class Utilities:
             for i in range(len(newlist2)):
                 parentxpathtemp=parentxpathtemp.replace(newlist2[i],'frame')
 
-            self.swooptoelement(oebs_api.JABContext(hwnd),oebs_key_objects.xpath,parentxpathtemp,0,'')
+            active_parent = self.swooptoelement(oebs_api.JABContext(hwnd),oebs_key_objects.xpath,parentxpathtemp,0,'', applicationname)
+            if active_parent is None:
+                active_parent = False
             self.methodtofillmap(oebs_api.JABContext(hwnd),'',0)
 
             identifiers = oebs_key_objects.xpath.split(';')
@@ -258,7 +265,7 @@ class Utilities:
                     xpathneeded=xpathneeded.replace(newlist2[i],'frame')
                 if(accessContextParent):
                     accessContextParent.releaseJavaObject()
-                self.swooptoelement(oebs_api.JABContext(hwnd),oebs_key_objects.xpath,xpathneeded,0,'')
+                self.swooptoelement(oebs_api.JABContext(hwnd),oebs_key_objects.xpath,xpathneeded,0,'', applicationname)
                 accessContext=accessContextParent
                 flag='true'
 
@@ -343,10 +350,10 @@ class Utilities:
 
         if flag == 'true' :
              ELEMENT_FOUND=True
-             return accessContext
+             return accessContext, active_parent
         else :
             ELEMENT_FOUND=False
-            return 'fail'
+            return 'fail', active_parent
 
     def getsize(self,xpath,windowname):
         #object is identified using normal object identification
