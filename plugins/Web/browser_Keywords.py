@@ -1386,6 +1386,15 @@ class Singleton_DriverUtil():
 
                     driver = webdriver.Chrome(executable_path=exec_path, options=choptions)
                     # driver.navigate().refresh()
+                    if extn_flag == True:
+                        time.sleep(3)
+                        if len(driver.window_handles)>1:
+                            handles=driver.window_handles
+                            for i in handles:
+                                driver.switch_to.window(i)
+                                if driver.current_url != "data:,":
+                                    driver.close()
+                                    driver.switch_to.window(driver.window_handles[-1])
                     controller.process_ids.append(driver.service.process.pid)
                     drivermap.append(driver)
                     driver.maximize_window()
