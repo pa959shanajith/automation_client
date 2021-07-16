@@ -102,7 +102,7 @@ class OebsKeywords:
         global accessContext
         log.debug('MSG: applicationname:%s , objectname:%s , keyword: %s , inputs:%s , outputs: %s',applicationname,objectname,keyword,inputs,outputs)
         #self.elementsops_obj.waitforelementvisible(applicationname,objectname,keyword,inputs,outputs)
-        accessContext, active_parent = self.utilities_obj.object_generator(applicationname, objectname, keyword, inputs, outputs)
+        accessContext, active_parent = self.utilities_obj.object_generator_test(applicationname, objectname, keyword, inputs, outputs)
         if (accessContext):
             if str(accessContext) != 'fail':
                 if active_parent:

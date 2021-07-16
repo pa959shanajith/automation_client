@@ -350,10 +350,168 @@ class Utilities:
 
         if flag == 'true' :
              ELEMENT_FOUND=True
-             return accessContext, active_parent
+             return accessContext
         else :
             ELEMENT_FOUND=False
-            return 'fail', active_parent
+            return 'fail'
+
+    def object_generator_test(self,applicationname,locator,keyword,inputs,outputs):
+            global accessContext
+            global ELEMENT_FOUND
+            ELEMENT_FOUND=False
+            active_parent = None
+            #OBJECTLOCATION for the object is sent from the user
+            del oebs_key_objects.keyword_input[:]
+            oebs_key_objects.xpath = locator
+            #Application name is sent from the user
+            oebs_key_objects.applicationname = applicationname
+            utils_obj=oebs_utils.Utils()
+            isjavares, hwnd = utils_obj.isjavawindow(oebs_key_objects.applicationname)
+            #method enables to move to perticular object and fetches its Contexts
+            uniquepath=oebs_key_objects.xpath
+            flag = 'false'
+            if ';' in uniquepath:
+                requiredxpath = uniquepath.split(';')
+                parentxpathtemp = ''
+                parentxpathtemp = requiredxpath[5]
+
+                regularexp = re.compile('(frame(.*?|\s)*[\]]+)')
+                newxpath = regularexp.findall(parentxpathtemp)
+
+                newlist2=[]
+                for i in range(len(newxpath)):
+                    newlist2.append(newxpath[i][0])
+
+                for i in range(len(newlist2)):
+                    parentxpathtemp=parentxpathtemp.replace(newlist2[i],'frame')
+
+                active_parent = self.swooptoelement(oebs_api.JABContext(hwnd),oebs_key_objects.xpath,parentxpathtemp,0,'', applicationname)
+                if active_parent is None:
+                    active_parent = False
+                self.methodtofillmap(oebs_api.JABContext(hwnd),'',0)
+
+                identifiers = oebs_key_objects.xpath.split(';')
+                uniquepath = identifiers[0]
+                name = identifiers[1]
+                indexinParent = identifiers[2]
+                childrencount = identifiers[3]
+                parentname = identifiers[4]
+                parxpath = identifiers[5]
+                parentchildcount = identifiers[6]
+                parentindex = identifiers[7]
+                parenttag = identifiers[8]
+                childtag = identifiers[9]
+                description=''
+                try:
+                    description=identifiers[10]
+                except Exception:
+                    description=''
+                global accessContextParent
+                retacc = accessContextParent
+                keytocompare=name+';'+description
+                if(keytocompare in objectDictWithNameDesc):
+                    xpathneeded=objectDictWithNameDesc.get(keytocompare)
+                    regularexp = re.compile('(frame(.*?|\s)*[\]]+)')
+                    newxpath = regularexp.findall(xpathneeded)
+
+                    newlist2=[]
+                    for i in range(len(newxpath)):
+                        newlist2.append(newxpath[i][0])
+
+                    for i in range(len(newlist2)):
+                        xpathneeded=xpathneeded.replace(newlist2[i],'frame')
+                    if(accessContextParent):
+                        accessContextParent.releaseJavaObject()
+                    self.swooptoelement(oebs_api.JABContext(hwnd),oebs_key_objects.xpath,xpathneeded,0,'', applicationname)
+                    accessContext=accessContextParent
+                    flag='true'
+
+                elif (accessContextParent):
+                    tema = retacc.getAccessibleContextInfo()
+                    if retacc is not None:
+                        parentInfo = retacc.getAccessibleContextInfo()
+                        accarrname = []
+                        accarrdesc = []
+
+                        for index in range(parentInfo.childrenCount):
+                            elementObj = retacc.getAccessibleChildFromContext(index)
+                            childInfo = elementObj.getAccessibleContextInfo()
+                            if len(childInfo.name) > 0 :
+                                if ((name == str(childInfo.name).strip()) and (childtag == str(childInfo.role))):
+                                    accessContext = elementObj
+                                    accarrname.append(elementObj)
+
+                        if(len(accarrname) > 1 or len(accarrname) == 0):
+                            for index in range(parentInfo.childrenCount):
+                                elementObj = retacc.getAccessibleChildFromContext(index)
+                                childInfo = elementObj.getAccessibleContextInfo()
+                                if len(description) != 0 and len(childInfo.description) > 0:
+                                    if (description == str(childInfo.description).strip() and childtag == str(childInfo.role)):
+                                        accessContext=elementObj
+                                        accarrdesc.append(elementObj)
+
+                            if(len(accarrdesc) > 1 or len(accarrdesc) == 0):
+                                if( int(parentchildcount) < int(parentInfo.childrenCount)):
+                                    for index in range(parentInfo.childrenCount):
+                                        elementObj = retacc.getAccessibleChildFromContext(index)
+                                        childInfo = elementObj.getAccessibleContextInfo()
+                                        if('focused' in childInfo.states):
+                                            firstelecontext=retacc.getAccessibleChildFromContext(0)
+                                            firsteleinfo=firstelecontext.getAccessibleContextInfo()
+                                            if((firsteleinfo.role == 'text') and (firsteleinfo.childrenCount == 1)):
+                                                firstelechildcontext=firstelecontext.getAccessibleChildFromContext(0)
+                                                firstelechildinfo=firstelechildcontext.getAccessibleContextInfo()
+                                                if(firstelechildinfo.role == 'push button'):
+                                                    indexinParent=int(indexinParent)+1
+                                                    for index in range(parentInfo.childrenCount):
+                                                        elementObj = retacc.getAccessibleChildFromContext(index)
+                                                        childInfo = elementObj.getAccessibleContextInfo()
+                                                        if(str(indexinParent) == str(childInfo.indexInParent).strip() and childtag == str(childInfo.role)):
+                                                            accessContext=elementObj
+                                                            flag = 'true'
+                                                            break
+                                        elif(not('internal frame' in parentxpathtemp)):
+                                            for index in range(parentInfo.childrenCount):
+                                                elementObj = retacc.getAccessibleChildFromContext(index)
+                                                childInfo = elementObj.getAccessibleContextInfo()
+                                                if(str(indexinParent) == str(childInfo.indexInParent).strip() and childtag == str(childInfo.role)):
+                                                    accessContext=elementObj
+                                                    flag = 'true'
+                                                    break
+                                else:
+                                    for index in range(parentInfo.childrenCount):
+                                        elementObj = retacc.getAccessibleChildFromContext(index)
+                                        childInfo = elementObj.getAccessibleContextInfo()
+                                        if(str(indexinParent) == str(childInfo.indexInParent).strip() and childtag == str(childInfo.role)):
+                                            accessContext=elementObj
+                                            flag = 'true'
+                                            break
+                            else:
+                                accessContext = accarrdesc[0]
+                                flag = 'true'
+                        else:
+                            accessContext = accarrname[0]
+                            flag = 'true'
+
+
+            #keyword is sent from the user
+            oebs_key_objects.keyword = keyword
+            #input sent from the user
+            inputs = ast.literal_eval(str(inputs))
+            inputs = [n for n in inputs]
+
+            for index in range(len(inputs)):
+                oebs_key_objects.keyword_input.append(inputs[index])
+            #output thats to be sent from the server to client
+            oebs_key_objects.keyword_output = outputs.split(';')
+
+            if flag == 'true' :
+                ELEMENT_FOUND=True
+                return accessContext, active_parent
+            else :
+                ELEMENT_FOUND=False
+                return 'fail', active_parent
+
 
     def getsize(self,xpath,windowname):
         #object is identified using normal object identification
