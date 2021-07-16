@@ -110,7 +110,7 @@ class Utilities:
 
                     elementcontext=elementObj.getAccessibleContextInfo()
                     if elementcontext.role == 'internal frame':
-                        if 'showing' in elementcontext.states:
+                        if 'active' in elementcontext.states:
                             queue.append((path, elementObj, index))
                         else:
                             hasinternal=0
