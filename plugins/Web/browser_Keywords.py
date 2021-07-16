@@ -1354,7 +1354,7 @@ class Singleton_DriverUtil():
                                 if os.path.splitext(i)[-1].lower()=='.crx':
                                     extns.append(i)
                             elif os.path.isdir(i):
-                                [extns.append(i) for i in glob.glob(i+os.sep+"*.crx")]
+                                [extns.append(j) for j in glob.glob(i+os.sep+"*.crx")]
                     if len(extns) > 1:
                         for i in extns:
                             if i != webconstants.AVO_EXTENSION_PATH:
