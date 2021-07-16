@@ -620,7 +620,7 @@ class Config_window(wx.Frame):
         else:
             self.chrome_profile.SetValue('default')
 
-        self.ch_extn_path=wx.StaticText(self.panel, label="Chrome Extn", pos=config_fields["Chrm_extn_path"][0],size=config_fields["Chrm_extn_path"][1], style=0, name="")
+        self.ch_extn_path=wx.StaticText(self.panel, label="Extension Path", pos=config_fields["Chrm_extn_path"][0],size=config_fields["Chrm_extn_path"][1], style=0, name="")
         self.chrome_extnpath=wx.TextCtrl(self.panel, pos=config_fields["Chrm_extn_path"][2], size=config_fields["Chrm_extn_path"][3])
         self.chrome_extnpath_btn=wx.Button(self.panel, label="+", pos=config_fields["Chrm_extn_path"][4], size=config_fields["Chrm_extn_path"][5])
         self.chrome_extnpath_btn.Bind(wx.EVT_BUTTON, self.fileBrowser_chextnpath)
