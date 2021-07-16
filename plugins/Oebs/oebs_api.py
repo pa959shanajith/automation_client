@@ -830,7 +830,7 @@ def isJavaWindow(hwnd):
 def initialize():
     global isRunning , isRecording , internalFunctionQueue , path_obj
     path_obj = PathGenerator(window_name = oebs_click_and_add.core.window_name)
-    log.info("WindowName Recived from core in JABhadler " + oebs_click_and_add.get_core().window_name)
+    log.info("Windowname received from core in JABhadler " + oebs_click_and_add.get_core().window_name)
     if not windowsbridgeDll:
         raise NotImplementedError("dll not available")
     windowsbridgeDll.Windows_run()

@@ -162,10 +162,9 @@ class Core():
             self.requestPump()
             if self.dll_loaded:
                 self.res_find_window, err = self.find_window_and_attach(windowname=self.window_name)
-
-            if err and err != '':
-                log.error(err)
-                logger.print_on_console(ERROR_CODE_DICT['err_attach_window'])
+                if err and err != '':
+                    log.error(err)
+                    logger.print_on_console(ERROR_CODE_DICT['err_attach_window'])
 
         except Exception as e:
             log.debug(e)
