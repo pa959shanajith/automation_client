@@ -11,7 +11,6 @@
 
 from oebsServer import OebsKeywords
 import oebs_fullscrape
-# import oebsclickandadd
 import oebs_utils
 import logger
 import logging
@@ -27,7 +26,6 @@ class OebsDispatcher:
     oebs_keywords=OebsKeywords()
     utils_obj=oebs_utils.Utils()
     scrape_obj=oebs_fullscrape.FullScrape()
-    # clickandadd_obj=oebsclickandadd.ClickAndAdd()
 
     def __init__(self):
         self.exception_flag=''
@@ -218,7 +216,11 @@ class OebsDispatcher:
                   'doubleclickcelliris':self.iris_object.doubleclickcelliris,
                   'rightclickcelliris':self.iris_object.rightclickcelliris,
                   'mousehovercelliris':self.iris_object.mousehovercelliris,
-                  'getstatusiris':self.iris_object.getstatusiris
+                  'getstatusiris':self.iris_object.getstatusiris,
+                  'scrollupiris':self.iris_object.scrollupiris,
+                  'scrolldowniris':self.iris_object.scrolldowniris,
+                  'scrollleftiris':self.iris_object.scrollleftiris,
+                  'scrollrightiris':self.iris_object.scrollrightiris
                 }
 
             keyword=keyword.lower()
@@ -228,11 +230,13 @@ class OebsDispatcher:
                     coord = [obj_props[2],obj_props[3],obj_props[4],obj_props[5]]
                     ele = {'cord': tsp.cord, 'coordinates': coord}
                     if ( tsp.custom_flag ):
-                        result = dict[keyword](ele, input, output, tsp.parent_xpath)
+                        if (keyword.lower() == 'getstatusiris') : result = dict[keyword](ele, input, output, tsp.parent_xpath, tsp.objectname.split(';')[-2])
+                        else : result = dict[keyword](ele, input, output, tsp.parent_xpath)
                     elif ( tsp.objectname.split(';')[-1] == 'constant' and keyword.lower() == 'verifyexistsiris' ):
                         result = dict[keyword](ele, input, output, 'constant')
                     else:
-                        result = dict[keyword](ele, input, output)
+                        if (keyword.lower() == 'getstatusiris') : result = dict[keyword](ele, input, output, tsp.objectname.split(';')[-2])
+                        else : result = dict[keyword](ele, input, output)
                 else:
                     result=dict[keyword](*message)
                 if keyword == 'findwindowandattach':

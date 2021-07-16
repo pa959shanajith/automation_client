@@ -297,7 +297,6 @@ if windowsbridgeDll:
     _fixBridgeFunc(BOOL,'requestFocus',c_long,JOBJECT64,errcheck=True)
     _fixBridgeFunc(BOOL,'setCaretPosition',c_long,JOBJECT64,c_int,errcheck=True)
     _fixBridgeFunc(BOOL,'getCaretLocation',c_long,JOBJECT64,POINTER(AccessibleTextRectInfo),jint,errcheck=True)
-    _fixBridgeFunc(BOOL,'getAccessibleActions',c_long,JOBJECT64,POINTER(AccessibleActions),errcheck=True)
     _fixBridgeFunc(BOOL,'doAccessibleActions',c_long,JOBJECT64,POINTER(AccessibleActionsToDo),POINTER(jint),errcheck=True)
     _fixBridgeFunc(BOOL,'getAccessibleTableInfo',c_long,JOBJECT64,POINTER(AccessibleTableInfo))
     _fixBridgeFunc(BOOL,'getAccessibleTableCellInfo',c_long,AccessibleTable,jint,jint,POINTER(AccessibleTableCellInfo),errcheck=True)
@@ -831,7 +830,7 @@ def isJavaWindow(hwnd):
 def initialize():
     global isRunning , isRecording , internalFunctionQueue , path_obj
     path_obj = PathGenerator(window_name = oebs_click_and_add.core.window_name)
-    log.info("WindowName Recived from core in JABhadler {}".format(oebs_click_and_add.core.window_name))
+    log.info("WindowName Recived from core in JABhadler " + oebs_click_and_add.get_core().window_name)
     if not windowsbridgeDll:
         raise NotImplementedError("dll not available")
     windowsbridgeDll.Windows_run()

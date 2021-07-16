@@ -28,7 +28,6 @@ from oebs_buttonops import ButtonOperations
 from oebs_radiocheckboxops import RadioCheckboxOperations
 from oebs_dropdownlistboxops import DropdownListboxOperations
 from oebs_elementsops import ElementOperations
-# from oebsclickandadd import ClickAndAdd
 from oebs_tableops import TableOperations
 from oebs_scrollbarops import ScrollbarOperations
 from oebs_internalframeops import InternalFrameOperations
@@ -55,7 +54,6 @@ class OebsKeywords:
         self.dropdownlistboxops_obj=DropdownListboxOperations()
 
         self.elementsops_obj=ElementOperations()
-        # self.oebsclickandadd_obj=ClickAndAdd()
         self.tableops_obj=TableOperations()
         self.scrollbarops_obj=ScrollbarOperations()
         self.internalframeops_obj=InternalFrameOperations()

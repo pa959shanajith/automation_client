@@ -1,7 +1,6 @@
 import ctypes
 import re
 import oebs_event_handler
-import oebs_key_labels
 import oebs_api
 import oebs_control_types
 
@@ -249,11 +248,11 @@ class JAB(object):
 			keyList=[]
 			# We assume alt  if there are no modifiers at all and its not a menu item as this is clearly a nmonic
 			if (binding.modifiers&oebs_api.ACCESSIBLE_ALT_KEYSTROKE) or (not binding.modifiers and self.role!=oebs_control_types.ROLE_MENUITEM):
-				keyList.append(oebs_key_labels.localizedKeyLabels['alt'])
+				keyList.append(oebs_control_types.localizedKeyLabels['alt'])
 			if binding.modifiers&oebs_api.ACCESSIBLE_CONTROL_KEYSTROKE:
-				keyList.append(oebs_key_labels.localizedKeyLabels['control'])
+				keyList.append(oebs_control_types.localizedKeyLabels['control'])
 			if binding.modifiers&oebs_api.ACCESSIBLE_SHIFT_KEYSTROKE:
-				keyList.append(oebs_key_labels.localizedKeyLabels['shift'])
+				keyList.append(oebs_control_types.localizedKeyLabels['shift'])
 			keyList.append(binding.character)
 		shortcutsList.append("+".join(keyList))
 		return ", ".join(shortcutsList)

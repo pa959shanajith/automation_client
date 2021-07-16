@@ -205,9 +205,7 @@ class Utilities:
         oebs_key_objects.applicationname = applicationname
         utils_obj=oebs_utils.Utils()
         isjavares, hwnd = utils_obj.isjavawindow(oebs_key_objects.applicationname)
-        #method enables to move to perticular object and fetches its Context
-        #find the internalframe active :
-        #acc = oebs_api.JABContext(hwnd)
+        #method enables to move to perticular object and fetches its Contexts
         uniquepath=oebs_key_objects.xpath
         flag = 'false'
         if ';' in uniquepath:

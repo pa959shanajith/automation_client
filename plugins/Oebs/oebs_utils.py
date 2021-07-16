@@ -1,10 +1,10 @@
 #-------------------------------------------------------------------------------
-# Name:        utils.py
+# Name:        oebs_utils.py
 # Purpose:
 #
-# Author:      sushma.p
+# Author:      sushma.p, divyansh.singh
 #
-# Created:     26-10-2016
+# Created:     16-07-2021
 # Copyright:   (c) sushma.p 2016
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
@@ -335,7 +335,6 @@ class Utils:
         return None
 
     def windowsrun(self):
-        log.debug('FILE: %s , DEF: %s',)
         return (oebs_api.windowsbridgeDll.Windows_run())
 
     #Confirm open window is a java window

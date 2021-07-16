@@ -6,7 +6,6 @@
 
 import threading
 import oebs_api2
-import oebs_global_vars
 import winuser
 import inspect
 import logging
@@ -160,7 +159,7 @@ def doPreGainFocus(obj,sleepMode=False):
 	oldFocus=oebs_api2.getFocusObject()
 	oldTreeInterceptor=oldFocus.treeInterceptor if oldFocus else None
 	oebs_api2.setFocusObject(obj)
-	if oebs_global_vars.focusDifferenceLevel<=1:
+	if oebs_api2.focusDifferenceLevel<=1:
 		newForeground=oebs_api2.getDesktopObject().objectInForeground()
 		if not newForeground:
 			log.debug("Can not get real foreground, resorting to focus ancestors")
@@ -173,7 +172,7 @@ def doPreGainFocus(obj,sleepMode=False):
 		executeEvent('foreground',newForeground)
 	if sleepMode: return True
 	#Fire focus entered events for all new ancestors of the focus if this is a gainFocus event
-	for parent in oebs_global_vars.focusAncestors[oebs_global_vars.focusDifferenceLevel:]:
+	for parent in oebs_api2.focusAncestors[oebs_api2.focusDifferenceLevel:]:
 		executeEvent("focusEntered",parent)
 	if obj.treeInterceptor is not oldTreeInterceptor:
 		if hasattr(oldTreeInterceptor,"event_treeInterceptor_loseFocus"):

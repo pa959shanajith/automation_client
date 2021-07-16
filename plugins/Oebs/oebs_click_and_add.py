@@ -122,8 +122,8 @@ class Core():
 
 
     def find_window_and_attach(self,windowname='',*args):
-        res,err_msg = oebs_utils.Utils().find_oebswindow_and_attach(windowname=windowname)
-        return res
+        res, err_msg = oebs_utils.Utils().find_oebswindow_and_attach(windowname=windowname)
+        return res, err_msg
 
     def main(self,):
         try:
@@ -161,7 +161,11 @@ class Core():
 
             self.requestPump()
             if self.dll_loaded:
-                self.res_find_window = self.find_window_and_attach(windowname=self.window_name)
+                self.res_find_window, err = self.find_window_and_attach(windowname=self.window_name)
+
+            if err and err != '':
+                log.error(err)
+                logger.print_on_console(ERROR_CODE_DICT['err_attach_window'])
 
         except Exception as e:
             log.debug(e)
