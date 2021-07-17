@@ -134,7 +134,7 @@ class highLight():
             log.error( sap_constants.ERROR_HIGHLIGHT )
             logger.print_on_console( sap_constants.ERROR_HIGHLIGHT )
 
-    def draw_outline(self, elem, colour='green', thickness = 2, fill = 1, rect = None):
+    def draw_outline(self, elem):
         """
         Draw an outline around the window.
 
@@ -145,27 +145,31 @@ class highLight():
         * **rect** the coordinates of the rectangle to draw (defaults to
           the rectangle of the control)
         """
+        rect = None
+        colour='red'
+        thickness = 4
+        fill = 1 #default BS_NULL
         colours = {"green": 0x00ff00,"blue": 0xff0000,"red": 0x0000ff,'yellow':0x00aaff}
 
         # if it's a known colour
         if colour in colours : colour = colours[colour]
 
-        if rect is None:
-            h=elem.__getattr__("Height")
-            w=elem.__getattr__("Width")
-            l=elem.__getattr__("ScreenLeft")
-            t=elem.__getattr__("ScreenTop")
-            r=l+w
-            b=t+h
-            rect={
-                'left' : l,
-                'top' : t,
-                'right' : r,
-                'bottom' : b
-            }
+        # if rect is None:
+        h=elem.__getattr__("Height")
+        w=elem.__getattr__("Width")
+        l=elem.__getattr__("ScreenLeft")
+        t=elem.__getattr__("ScreenTop")
+        r=l+w
+        b=t+h
+        rect={
+            'left' : l,
+            'top' : t,
+            'right' : r,
+            'bottom' : b
+        }
 
         # create the pen(outline)
-        pen_handle = ctypes.windll.gdi32.CreatePen( 0 , thickness, colour )
+        pen_handle = ctypes.windll.gdi32.CreatePen(0, thickness, colour)
 
         # create the brush (inside)
         brush = LOGBRUSH()
@@ -182,6 +186,7 @@ class highLight():
 
         # draw the rectangle to the DC
         ctypes.windll.gdi32.Rectangle( dc, rect['left'], rect['top'], rect['right'], rect['bottom'] )
+        time.sleep(0.5)
 
         # Delete the brush and pen we created
         ctypes.windll.gdi32.DeleteObject(brush_handle)

@@ -1054,7 +1054,7 @@ class UtilWebKeywords:
         local_uo.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if webelement != None and webelement !='' and webelement.tag_name.lower()=='table':
-                if len(input) >= 4 and int(input[3]) <= 0:
+                if len(input) >= 4 and input[3] and int(input[3]) <= 0:
                     err_msg = self._index_zero()
                 elif input[2]:
                     if(len(input) == 5 and all(v for v in input) and (not input[2] == 'tr')):
@@ -1157,7 +1157,7 @@ class UtilWebKeywords:
             input.pop()
         try:
             if webelement != None and webelement !='' and webelement.tag_name.lower()=='table':
-                if len(input) >= 4 and int(input[3]) <= 0:
+                if len(input) >= 4 and input[3] and int(input[3]) <= 0:
                     err_msg = self._index_zero()
                 elif input[2]:
                     if((len(input)==5 or len(input)==6) and all(v for v in input) and (not input[2]=='tr')):

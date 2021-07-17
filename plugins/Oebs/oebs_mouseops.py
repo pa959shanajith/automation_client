@@ -3,7 +3,7 @@ from ctypes.wintypes import *
 from time import sleep
 import win32ui
 import win32gui
-from oebs_msg import *
+from oebs_constants import *
 
 
 # START SENDINPUT TYPE DECLARATIONS
