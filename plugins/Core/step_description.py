@@ -959,7 +959,7 @@ class StepDescription:
         def press():
             return 'Press the ' +"'" + tsp.custname + "'"
 
-        #Button Keywords(7 keywords)
+        #Button Keywords(5 keywords)
         def click():
             return 'Click on ' +"'" + tsp.custname + "'."
         def doubleclick():
@@ -970,11 +970,6 @@ class StepDescription:
             return 'Get button name of '+"'"+tsp.custname + "'" +' and save the value ' +"'"+output+"'"+' in '+"'" + tsp_outputval+ "'."
         def rightclick():
             return 'Right click on '+"'" + tsp.custname + "'."
-        #link Keywords(2 keywords but not in use)
-        def getlinktext():
-            return 'Get the value present in ' + "'" + tsp.custname + "'" +' and save the value '+"'"+ output+"'"+' in '+ tsp_outputval+"."
-        def verifylinktext():
-            return 'Verify if the value is present in ' + "'" + tsp.custname + "'."
 
         #Util Keywords( 7 keywords)
         def setfocus():
