@@ -10,8 +10,8 @@
 #-------------------------------------------------------------------------------
 
 import oebs_api
-import oebs_msg
-from oebs_msg import *
+from oebs_constants import *
+import logger
 import oebs_key_objects
 import oebsServer
 import oebs_serverUtilities
@@ -57,15 +57,20 @@ class InternalFrameOperations:
                         keywordresult=MSG_PASS
                     else:
                         log.debug('Object Disabled',MSG_DISABLED_OBJECT)
+                        logger.print_on_console(MSG_DISABLED_OBJECT)
                         oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
 
 
             else:
                 log.debug('Object Disabled',MSG_DISABLED_OBJECT)
+                logger.print_on_console(MSG_DISABLED_OBJECT)
                 oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
 
         except Exception as e:
             self.utilities_obj.cleardata()
+            err_msg = ERROR_CODE_DICT['err_close_frame']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('%s',e)
             log.debug('Status: %s',keywordresult)
         log.debug('Status: %s',keywordresult)
@@ -96,13 +101,18 @@ class InternalFrameOperations:
                         keywordresult=MSG_PASS
                     else:
                         log.debug('Object Disabled',MSG_DISABLED_OBJECT)
+                        logger.print_on_console(MSG_DISABLED_OBJECT)
                         oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
             else:
                 log.debug('Object Disabled',MSG_DISABLED_OBJECT)
+                logger.print_on_console(MSG_DISABLED_OBJECT)
                 oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
 
         except Exception as e:
             self.utilities_obj.cleardata()
+            err_msg = ERROR_CODE_DICT['err_toggle_maxamize']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('%s',e)
             log.debug('Status: %s',keywordresult)
         log.debug('Status: %s',keywordresult)
@@ -138,6 +148,7 @@ class InternalFrameOperations:
                             keywordresult=MSG_PASS
                         else:
                             log.debug('Object Disabled',MSG_DISABLED_OBJECT)
+                            logger.print_on_console(MSG_DISABLED_OBJECT)
                             oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
 
                 else:
@@ -152,14 +163,19 @@ class InternalFrameOperations:
                             keywordresult=MSG_PASS
                         else:
                             log.debug('Object Disabled',MSG_DISABLED_OBJECT)
+                            logger.print_on_console(MSG_DISABLED_OBJECT)
                             oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
 
             else:
                 log.debug('Object Disabled',MSG_DISABLED_OBJECT)
+                logger.print_on_console(MSG_DISABLED_OBJECT)
                 oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
 
         except Exception as e:
             self.utilities_obj.cleardata()
+            err_msg = ERROR_CODE_DICT['err_toggle_minimize']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('%s',e)
             log.debug('Status: %s',keywordresult)
         log.debug('Status: %s',keywordresult)

@@ -8,12 +8,13 @@
 # Copyright:   (c) sushma.p 2016
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
-from oebs_msg import *
+from oebs_constants import *
 import oebs_key_objects
 import oebs_serverUtilities
 import logging
 import oebs_mouseops
 import time
+import logger
 
 log = logging.getLogger('oebs_scrollbarops.py')
 
@@ -45,20 +46,24 @@ class ScrollbarOperations:
                             if(width>height):
                                 x_cor = ((x2_cor-height)+x2_cor)/2
                                 y_cor = (y1_cor+y2_cor)/2
-                                oebs_mouseops.MouseOperation('click',x_cor,y_cor)
+                                oebs_mouseops.MouseOperation('click',int(x_cor),int(y_cor))
                                 verifyresponse = MSG_TRUE
                                 keywordresult=MSG_PASS
 
                     else:
                         log.debug('Invalid Input',MSG_INVALID_INPUT)
                         oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
-
+                        logger.print_on_console(MSG_INVALID_INPUT)
             else:
                 log.debug('Object Disabled',MSG_DISABLED_OBJECT)
+                logger.print_on_console(MSG_DISABLED_OBJECT)
                 oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
 
         except Exception as e:
             self.utilities_obj.cleardata()
+            err_msg = ERROR_CODE_DICT['err_right']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('%s',e)
             log.debug('Status: %s',keywordresult)
         log.debug('Status: %s',keywordresult)
@@ -91,20 +96,23 @@ class ScrollbarOperations:
                             if(width>height):
                                 x_cor = ((x1_cor+height)+x1_cor)/2
                                 y_cor = (y1_cor+y2_cor)/2
-                                oebs_mouseops.MouseOperation('click',x_cor,y_cor)
+                                oebs_mouseops.MouseOperation('click',int(x_cor),int(y_cor))
                                 verifyresponse = MSG_TRUE
                                 keywordresult=MSG_PASS
 
                     else:
                         log.debug('Invalid Input',MSG_INVALID_INPUT)
                         oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
-
+                        logger.print_on_console(MSG_INVALID_INPUT)
             else:
                 log.debug('Object Disabled',MSG_DISABLED_OBJECT)
                 oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
-
+                logger.print_on_console(MSG_DISABLED_OBJECT)
         except Exception as e:
             self.utilities_obj.cleardata()
+            err_msg = ERROR_CODE_DICT['err_left']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('%s',e)
             log.debug('Status: %s',keywordresult)
         log.debug('Status: %s',keywordresult)
@@ -136,20 +144,23 @@ class ScrollbarOperations:
                             if(height>width):
                                 x_cor = (x1_cor+x2_cor)/2
                                 y_cor = (y1_cor+(y1_cor+width))/2
-                                oebs_mouseops.MouseOperation('click',x_cor,y_cor)
+                                oebs_mouseops.MouseOperation('click',int(x_cor),int(y_cor))
                                 verifyresponse = MSG_TRUE
                                 keywordresult=MSG_PASS
 
                     else:
                         log.debug('Invalid Input',MSG_INVALID_INPUT)
                         oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
-
+                        logger.print_on_console(MSG_INVALID_INPUT)
             else:
                 log.debug('Object Disabled',MSG_DISABLED_OBJECT)
                 oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
-
+                logger.print_on_console(MSG_DISABLED_OBJECT)
         except Exception as e:
             self.utilities_obj.cleardata()
+            err_msg = ERROR_CODE_DICT['err_up']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('%s',e)
             log.debug('Status: %s',keywordresult)
         log.debug('Status: %s',keywordresult)
@@ -181,20 +192,23 @@ class ScrollbarOperations:
                         if(height>width):
                             x_cor = (x1_cor+x2_cor)/2
                             y_cor = (y2_cor+(y2_cor-width))/2
-                            oebs_mouseops.MouseOperation('click',x_cor,y_cor)
+                            oebs_mouseops.MouseOperation('click',int(x_cor),int(y_cor))
                             verifyresponse = MSG_TRUE
                             keywordresult=MSG_PASS
 
                 else:
                     log.debug('Invalid Input',MSG_INVALID_INPUT)
                     oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
-
+                    logger.print_on_console(MSG_INVALID_INPUT)
             else:
                 log.debug('Object Disabled',MSG_DISABLED_OBJECT)
                 oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
-
+                logger.print_on_console(MSG_DISABLED_OBJECT)
         except Exception as e:
             self.utilities_obj.cleardata()
+            err_msg = ERROR_CODE_DICT['err_down']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('%s',e)
             log.debug('Status: %s',keywordresult)
         log.debug('Status: %s',keywordresult)

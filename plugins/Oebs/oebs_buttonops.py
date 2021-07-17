@@ -11,15 +11,14 @@
 
 
 import oebs_api
-from oebs_msg import *
-import oebs_msg
+from oebs_constants import *
 import oebs_mouseops
 import oebs_key_objects
 import oebsServer
 import logging
+import logger
 import oebs_serverUtilities
 from oebs_utilops import UtilOperations
-from constants import *
 
 log = logging.getLogger('oebs_buttonops.py')
 
@@ -43,17 +42,28 @@ class ButtonOperations:
             if charinfo.accessibleAction == 1:
                 if (charinfo.name != None and charinfo.name != ''):
                     buttonName = charinfo.name
+                    if 'alt' in buttonName:
+                        buttonName=buttonName.split("alt",1)[0].strip()
+                    elif 'ALT' in buttonName:
+                        splitval=buttonName.split("ALT",1)[0].strip()
+                    else:
+                        splitval=buttonName.strip()
                     log.debug('%s %s',MSG_RESULT_IS,buttonName)
                     keywordresult=MSG_PASS
                     keywordresponse = buttonName
                     oebs_key_objects.custom_msg.append(str(MSG_RESULT_IS + keywordresponse))
                 else:
                     log.debug('%s',MSG_NAME_NOT_DEFINED)
+                    logger.print_on_console(MSG_NAME_NOT_DEFINED)
                     oebs_key_objects.custom_msg.append(MSG_NAME_NOT_DEFINED)
             else:
                 log.debug('%s',MSG_INVALID_OBJECT)
+                logger.print_on_console(MSG_INVALID_OBJECT)
                 oebs_key_objects.custom_msg.append(MSG_INVALID_OBJECT)
         except Exception as e:
+            err_msg = ERROR_CODE_DICT['err_get_button_name']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             self.utilities_obj.cleardata()
             log.debug('%s',e)
         log.debug('Result %s',keywordresponse)
@@ -62,7 +72,6 @@ class ButtonOperations:
         self.utilities_obj.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))
         oebs_key_objects.keyword_output.append(str(keywordresponse))
-
 
     #Method to verify button name of the given Object/XPATH matches with the User Provided Text
     def verifybuttonname(self,acc):
@@ -95,18 +104,25 @@ class ButtonOperations:
                             keywordresult=MSG_PASS
                         else:
                             log.debug('Button names mismatched',DEF_VERIFYBUTTONNAME)
+                            logger.print_on_console(DEF_VERIFYBUTTONNAME)
                             oebs_key_objects.custom_msg.append(str('Button names mismatched. Expected:' + nameVerify + ' ; Actual:'+buttonname))
                     else:
                         log.debug('%s',MSG_NAME_NOT_DEFINED)
+                        logger.print_on_console(MSG_NAME_NOT_DEFINED)
                         oebs_key_objects.custom_msg.append(MSG_NAME_NOT_DEFINED)
                 else:
                     log.debug('MSG:%s',MSG_INVALID_INPUT)
+                    logger.print_on_console(MSG_INVALID_INPUT)
                     oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
             else:
                 log.debug('MSG:%s',MSG_INVALID_OBJECT)
+                logger.print_on_console(MSG_INVALID_OBJECT)
                 oebs_key_objects.custom_msg.append(MSG_INVALID_OBJECT)
         except Exception as e:
             self.utilities_obj.cleardata()
+            err_msg = ERROR_CODE_DICT['err_verify_button']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('%s',e)
             log.debug('Result %s',keywordresult)
         log.debug('Status %s',str(verifyresponse))
@@ -114,8 +130,6 @@ class ButtonOperations:
         self.utilities_obj.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))
         oebs_key_objects.keyword_output.append(str(verifyresponse))
-
-
 
     #Method to perform click operation
     def click(self,acc):
@@ -133,20 +147,29 @@ class ButtonOperations:
             #Visibility check for scrollbar
             if(self.utilops_obj.getObjectVisibility(acc,x_coor,y_coor)):
                 #check for object enabled
-                if 'enabled' in objstates:
+                if 'enabled' in objstates and 'showing' in objstates:
                     log.debug('Click Happens on :%s , %s',x_coor,y_coor)
                     oebs_mouseops.MouseOperation('click',x_coor,y_coor)
                     log.debug('Click Successful',DEF_CLICK)
                     verifyresponse = MSG_TRUE
                     keywordresult=MSG_PASS
+                elif 'enabled' in objstates and 'showing' not in objstates:
+                    log.debug('Object Disabled', ERROR_CODE_DICT['err_visibility_click'])
+                    logger.print_on_console(ERROR_CODE_DICT['err_visibility_click'])
+                    oebs_key_objects.custom_msg.append(ERROR_CODE_DICT['err_visibility_click'])     
                 else:
                     log.debug('Object Disabled',MSG_DISABLED_OBJECT)
+                    logger.print_on_console(MSG_DISABLED_OBJECT)
                     oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
             else:
                 log.debug('MSG:%s',MSG_ELEMENT_NOT_VISIBLE)
+                logger.print_on_console(MSG_ELEMENT_NOT_VISIBLE)
                 oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_VISIBLE)
         except Exception as e:
             self.utilities_obj.cleardata()
+            err_msg = ERROR_CODE_DICT['err_click']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('%s',e)
             log.debug('Status: %s',keywordresult)
         log.debug('Status: %s',keywordresult)
@@ -154,7 +177,7 @@ class ButtonOperations:
         self.utilities_obj.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))
         oebs_key_objects.keyword_output.append(str(verifyresponse))
-
+        
     #Method to perform doubleclick operation
     def doubleclick(self,acc):
         del oebs_key_objects.custom_msg[:]
@@ -171,20 +194,29 @@ class ButtonOperations:
             #Visibility check for scrollbar
             if(self.utilops_obj.getObjectVisibility(acc,x_coor,y_coor)):
                 #check for object enabled
-                if 'enabled' in objstates:
+                if 'enabled' in objstates and 'showing' in objstates:
                     log.debug('Double Click Happens on :%s , %s',x_coor,y_coor)
                     oebs_mouseops.MouseOperation('doubleClick',x_coor,y_coor)
                     log.debug('Double Click Successful',DEF_DOUBLECLICK)
                     verifyresponse = MSG_TRUE
                     keywordresult=MSG_PASS
+                elif 'enabled' in objstates and 'showing' not in objstates:
+                    log.debug('Object Disabled', ERROR_CODE_DICT['err_visibility_click'])
+                    logger.print_on_console(ERROR_CODE_DICT['err_visibility_click'])
+                    oebs_key_objects.custom_msg.append(ERROR_CODE_DICT['err_visibility_click'])  
                 else:
                     log.debug('Object Disabled',MSG_DISABLED_OBJECT)
+                    logger.print_on_console(MSG_DISABLED_OBJECT)
                     oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
             else:
                 log.debug('MSG:%s',MSG_ELEMENT_NOT_VISIBLE)
+                logger.print_on_console(MSG_ELEMENT_NOT_VISIBLE)
                 oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_VISIBLE)
         except Exception as e:
             self.utilities_obj.cleardata()
+            err_msg = ERROR_CODE_DICT['err_double_click']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('%s',e)
             log.debug('Status %s',keywordresult)
         log.debug('Status %s',keywordresult)
@@ -192,7 +224,6 @@ class ButtonOperations:
         self.utilities_obj.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))
         oebs_key_objects.keyword_output.append(str(verifyresponse))
-
 
     #Method to get link text of the given Object location
     def getlinktext(self,acc):
@@ -222,8 +253,13 @@ class ButtonOperations:
                 log.debug('Result:%s',linktext)
                 keywordresponse = linktext
                 oebs_key_objects.custom_msg.append(str(MSG_RESULT_IS + keywordresponse))
+            else:
+                logger.print_on_console(ERROR_CODE_DICT['err_object']) 
         except Exception as e:
             self.utilities_obj.cleardata()
+            err_msg = ERROR_CODE_DICT['err_get_link_text']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('%s',e)
             log.debug('Status %s',keywordresult)
         log.debug('Status %s',keywordresult)
@@ -261,6 +297,7 @@ class ButtonOperations:
                             oebs_key_objects.custom_msg.append(str('Link names mismatched. Expected:' + linktext + " Obtained:"+verificationtext))
                 else:
                     log.debug('%s',MSG_INVALID_INPUT)
+                    logger.print_on_console(MSG_INVALID_INPUT)
                     oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
             elif(curaccinfo.role == 'push button'):
                 linktext = curaccinfo.name
@@ -276,8 +313,17 @@ class ButtonOperations:
                         else:
                             log.debug('Verification result: %s',verifyresponse)
                             oebs_key_objects.custom_msg.append(str('Link names mismatched. Expected:' + linktext + " Obtained:"+verificationtext))
+                else:
+                    log.debug('%s',MSG_INVALID_INPUT)
+                    logger.print_on_console(MSG_INVALID_INPUT)
+                    oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
+            else:
+                logger.print_on_console(ERROR_CODE_DICT['err_object'])
         except Exception as e:
             self.utilities_obj.cleardata()
+            err_msg = ERROR_CODE_DICT['err_verify_link_text']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('%s',e)
             log.debug('Status %s',keywordresult)
         log.debug('Status %s',keywordresult)
