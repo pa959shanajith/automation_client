@@ -21,12 +21,14 @@ import os
 import string
 import random
 import dynamic_variable_handler
+import constant_variable_handler
 import logging
 log = logging.getLogger('file_operations_xml.py')
 
 class FileOperationsXml:
     def __init__(self):
         self.DV = dynamic_variable_handler.DynamicVariables()
+        self.CV = constant_variable_handler.ConstantVariables()
         pass
 #------------------------------------------keywords---------------------------------------------
     def getXmlBlockData(self,input_val,*args):
@@ -50,6 +52,9 @@ class FileOperationsXml:
             if ( args[0] ) :
                 if(str(args[0].split(";")[0]).startswith("{") and str(args[0].split(";")[0]).endswith("}")):
                     out_path = self.DV.get_dynamic_value(args[0].split(";")[0])
+                    if ( out_path ): output_path = out_path
+                elif (str(args[0].split(";")[0]).startswith("_") and str(args[0].split(";")[0]).endswith("_")):
+                    out_path = self.CV.get_constant_value(args[0].split(";")[0])
                     if ( out_path ): output_path = out_path
                 else:
                     output_path = args[0].split(";")[0]
@@ -129,6 +134,9 @@ class FileOperationsXml:
             if ( args[0] ) :
                 if(str(args[0].split(";")[0]).startswith("{") and str(args[0].split(";")[0]).endswith("}")):
                     out_path = self.DV.get_dynamic_value(args[0].split(";")[0])
+                    if ( out_path ): output_path = out_path
+                elif (str(args[0].split(";")[0]).startswith("_") and str(args[0].split(";")[0]).endswith("_")):
+                    out_path = self.CV.get_constant_value(args[0].split(";")[0])
                     if ( out_path ): output_path = out_path
                 else:
                     output_path = args[0].split(";")[0]
@@ -256,6 +264,9 @@ class FileOperationsXml:
                 if(str(args[0].split(";")[0]).startswith("{") and str(args[0].split(";")[0]).endswith("}")):
                     out_path = self.DV.get_dynamic_value(args[0].split(";")[0])
                     if ( out_path ): output_path = out_path
+                elif (str(args[0].split(";")[0]).startswith("_") and str(args[0].split(";")[0]).endswith("_")):
+                    out_path = self.CV.get_constant_value(args[0].split(";")[0])
+                    if ( out_path ): output_path = out_path
                 else:
                     output_path = args[0].split(";")[0]
             if( len(input_val) >= 4 ):
@@ -374,6 +385,9 @@ class FileOperationsXml:
                         if(str(args[0].split(";")[0]).startswith("{") and str(args[0].split(";")[0]).endswith("}")):
                             out_path = self.DV.get_dynamic_value(args[0].split(";")[0])
                             if ( out_path ): output_path = out_path
+                        elif (str(args[0].split(";")[0]).startswith("_") and str(args[0].split(";")[0]).endswith("_")):
+                            out_path = self.CV.get_constant_value(args[0].split(";")[0])
+                            if ( out_path ): output_path = out_path
                         else:
                             output_path = args[0].split(";")[0]
                     if ( len(input_val) == 3 and (input_val[2] != None or input_val[2] != '' )) : res_opt = input_val[2].strip().lower()
@@ -446,6 +460,9 @@ class FileOperationsXml:
                     if(str(args[0].split(";")[0]).startswith("{") and str(args[0].split(";")[0]).endswith("}")):
                         out_path = self.DV.get_dynamic_value(args[0].split(";")[0])
                         if ( out_path ): output_path = out_path
+                    elif (str(args[0].split(";")[0]).startswith("_") and str(args[0].split(";")[0]).endswith("_")):
+                        out_path = self.CV.get_constant_value(args[0].split(";")[0])
+                        if ( out_path ): output_path = out_path
                     else:
                         output_path = args[0].split(";")[0]
                 if (str(iv2).lower() == 'json'):
@@ -509,6 +526,9 @@ class FileOperationsXml:
                 if ( args[0] ) :
                     if(str(args[0].split(";")[0]).startswith("{") and str(args[0].split(";")[0]).endswith("}")):
                         out_path = self.DV.get_dynamic_value(args[0].split(";")[0])
+                        if ( out_path ): output_path = out_path
+                    elif (str(args[0].split(";")[0]).startswith("_") and str(args[0].split(";")[0]).endswith("_")):
+                        out_path = self.CV.get_constant_value(args[0].split(";")[0])
                         if ( out_path ): output_path = out_path
                     else:
                         output_path = args[0].split(";")[0]
