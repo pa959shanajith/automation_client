@@ -1524,6 +1524,7 @@ class ExcelXLSX:
             if col_number == None or col_number=='':
                 if(sheet.max_row==1 and sheet.max_column==1 and sheet.cell(1,1).value is None):
                     row_count=0
+                    status = True
                 else:
                     row_count=sheet.max_row
                     status = True
@@ -1570,6 +1571,7 @@ class ExcelXLSX:
             if row_number == None or row_number=='':
                 if(sheet.max_row==1 and sheet.max_column==1 and sheet.cell(1,1).value is None):
                     col_count=0
+                    status = True
                 else:
                     col_count=sheet.max_column
                     status = True
