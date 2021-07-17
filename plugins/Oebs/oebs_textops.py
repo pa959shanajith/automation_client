@@ -374,9 +374,9 @@ class TextOperations:
         del oebs_key_objects.custom_msg[:]
         #sets the keywordresult to FAIL
         keywordresult=MSG_FAIL
+        #sets the verifyresponse to FALSE
+        verifyresponse = MSG_FALSE
         try:
-            #sets the verifyresponse to FALSE
-            verifyresponse = MSG_FALSE
             #gets the entire context information
             curaccinfo = acc.getAccessibleContextInfo()
             log.debug('Received Object Context',DEF_VERIFYTEXT)
@@ -528,7 +528,7 @@ class TextOperations:
                         oebs_key_objects.custom_msg.append(MSG_OBJECT_READONLY)
             else:
                 log.debug('MSG:%s',MSG_DISABLED_OBJECT)
-                logger.print_on_console(err_msg)
+                logger.print_on_console(MSG_DISABLED_OBJECT)
                 oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
         except Exception as e:
             self.utilities_obj.cleardata()

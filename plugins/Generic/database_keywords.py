@@ -235,6 +235,7 @@ class DatabaseOperation():
         err_msg=None
         details = []
         cnxn=None
+        cursor=None
         try:
             cnxn = self.connection(dbtype, ip , port , dbName, userName , password, args)
             if cnxn is not None:
