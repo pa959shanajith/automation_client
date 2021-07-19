@@ -117,6 +117,7 @@ ERROR_CODE_DICT = {
     "err_visibility_click": "Unable to click, object not present in screen",
     "err_window_find": "Unable to find active window, containing object",
     "err_object_highlight": "Object not found, unable to highlight",
+    "invalid_input_scroll": "Invalid input, Please provide number of entries to scroll"
 }
 
 
