@@ -416,6 +416,11 @@ class JABContext(object):
         windowsbridgeDll.getAccessibleTextInfo(self.vmID,self.accContext,byref(textInfo),x,y)
         return textInfo
 
+    def requestFocus(self):
+        textInfo=AccessibleTextInfo()
+        windowsbridgeDll.requestFocus(self.vmID,self.accContext)
+        return textInfo
+
     def getAccessibleTextItems(self,index):
         textItemsInfo=AccessibleTextItemsInfo()
         windowsbridgeDll.getAccessibleTextItems(self.vmID,self.accContext,byref(textItemsInfo),index)

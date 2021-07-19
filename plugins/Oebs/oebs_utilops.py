@@ -46,6 +46,7 @@ class UtilOperations:
             if(self.getObjectVisibility(acc,x_coor,y_coor)):
                 if ('showing' or 'focusable') in curaccinfo.states:
                     oebs_mouseops.MouseOperation('move',x_coor,y_coor)
+                    acc.requestFocus()
                     keywordresponse = MSG_TRUE
                     keywordresult=MSG_PASS
                     log.debug('%s %s',MSG_RESULT_IS,keywordresult)
