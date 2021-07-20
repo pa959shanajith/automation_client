@@ -136,7 +136,7 @@ class DatabaseOperation():
             row=[query,res]
         elif q_type=='set':
             val=query.split(',')
-            if len(val)>2:
+            if len(val)>=2:
                 cnxn.set(val[0],val[1])
         
 
@@ -157,10 +157,11 @@ class DatabaseOperation():
             if cnxn is not None:
                 dbtype=int(dbtype)
                 ## execute query in cassandra
-                if dbtype == 15:
+                if dbtype == 11:
                     cnxn.execute(query)
                     status=generic_constants.TEST_RESULT_PASS
                     result=generic_constants.TEST_RESULT_TRUE
+                    cnxn=cnxn.shutdown()
                 ## execute query in mongo
                 elif dbtype == 9:
                     db=cnxn[dbName]
@@ -238,10 +239,11 @@ class DatabaseOperation():
             if cnxn is not None:
                 dbtype=int(dbtype)
                 ## execute query in cassandra 
-                if dbtype == 15: 
-                    cursor.execute(query)
+                if dbtype == 11: 
+                    cnxn.execute(query)
                     status=generic_constants.TEST_RESULT_PASS
                     result=generic_constants.TEST_RESULT_TRUE
+                    cnxn=cnxn.shutdown()
                 ## execute query in mongo
                 elif dbtype == 9:
                     db=cnxn[dbName]
@@ -372,19 +374,24 @@ class DatabaseOperation():
             if cnxn is not None:
                 dbtype=int(dbtype)
                 ## execute query in cassandra
-                if dbtype == 15: 
+                if dbtype == 11: 
                     from cassandra.query import dict_factory
-                    cursor.row_factory = dict_factory
-                    json_rows = cursor.execute(query)
-                    columns = [k for k,v in json_rows[0].items()]
-                    columns=tuple(columns)
+                    import uuid
+                    cnxn.row_factory = dict_factory
+                    query_res = cnxn.execute(query)
+                    columns = tuple(query_res.column_names)
+                    json_rows = query_res.current_rows
                     rows=[]
                     for i in json_rows:
                         row=[]
                         for k,v in i.items():
-                            row.append(v)
+                            if isinstance(v,uuid.UUID):
+                                row.append(str(v))
+                            else:
+                                row.append(v)
                         row=tuple(row)
                         rows.append(row)
+                    cnxn=cnxn.shutdown()
                 ## execute query in mongo
                 elif dbtype == 9:
                     db=cnxn[dbName]
@@ -601,19 +608,24 @@ class DatabaseOperation():
             if cnxn is not None:
                 dbtype=int(dbtype)
                 ## execute query in cassandra
-                if dbtype == 15: 
+                if dbtype == 11: 
                     from cassandra.query import dict_factory
-                    cursor.row_factory = dict_factory
-                    json_rows = cursor.execute(query)
-                    columns = [k for k,v in json_rows[0].items()]
-                    columns=tuple(columns)
+                    import uuid
+                    cnxn.row_factory = dict_factory
+                    query_res = cnxn.execute(query)
+                    columns = tuple(query_res.column_names)
+                    json_rows = query_res.current_rows
                     rows=[]
                     for i in json_rows:
                         row=[]
                         for k,v in i.items():
-                            row.append(v)
+                            if isinstance(v,uuid.UUID):
+                                row.append(str(v))
+                            else:
+                                row.append(v)
                         row=tuple(row)
                         rows.append(row)
+                    cnxn=cnxn.shutdown()
                 ## execute query in mongo
                 elif dbtype == 9:
                     db=cnxn[dbName]
@@ -639,10 +651,10 @@ class DatabaseOperation():
                 ##logic for output col reading
                 if type(args) is tuple:
                     if str(args).startswith("(("):
-                        args=args[-2]
+                        args=args[0]
                     else:
                         args=args
-                if (args[-2].startswith("{")):
+                if (args[0].startswith("{")):
                     inp_path = self.DV.get_dynamic_value(args[0])
                     if inp_path!=None:
                         if len(inp_path.split(';'))>1:
@@ -981,8 +993,10 @@ class DatabaseOperation():
                     import redis
                     self.cnxn = redis.StrictRedis(host=ip,port=int(port),password=password,db=int(dbName))
                 elif dbtype == 11:
-                    import Sybase
-                    self.cnxn = Sybase.connect(ip,userName,password,dbName)
+                    from cassandra.cluster import Cluster
+                    from cassandra.auth import PlainTextAuthProvider
+                    self.cnxn = Cluster([ip],port=port,auth_provider=PlainTextAuthProvider(username=userName, password=password)).connect()
+                    self.cnxn.set_keyspace(dbName)
                 elif dbtype == 12:
                     import sqlite3
                     self.cnxn = sqlite3.connect(ip)
@@ -991,11 +1005,7 @@ class DatabaseOperation():
                     self.cnxn = snowflake.connector.connect(user=userName,password=password,account=args[0],warehouse=args[1],database=dbName,schema=args[2])
                 elif dbtype == 14:
                     import psycopg2
-                    self.cnxn = psycopg2.connect([ip],port=port,user=userName,password=password,database=dbName)
-                elif dbtype == 15:
-                    from cassandra.cluster import Cluster
-                    from cassandra.auth import PlainTextAuthProvider
-                    self.cnxn = Cluster(host=ip,port=port,auth_provider=PlainTextAuthProvider(username=userName, password=password)).connect()
+                    self.cnxn = psycopg2.connect(host=ip,port=port,user=userName,password=password,database=dbName)
                 else:
                     self.cnxn = pyodbc.connect('driver=%s;SERVER=%s;PORT=%s;DATABASE=%s;UID=%s;PWD=%s' % ( dbNumber[dbtype], ip, port, dbName, userName ,password ) )
                 return self.cnxn
