@@ -244,16 +244,13 @@ class ElementOperations:
             delay=int(configvalues['timeOut'])
             while(mousestate == 65543):
                 mousestate=oebs_mouseops.GetCursorInfo('state')
-            wait = True
             start_time = time.time()
             logger.print_on_console("Waiting for element to be visible")
-            while wait:
+            while True:
                 acc =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
                 if acc and acc != "fail":
-                    wait = False
                     break
                 if time.time() - start_time >= delay:
-                    wait = False
                     break
                 time.sleep(0.25)
             if(acc and acc != 'fail'):
