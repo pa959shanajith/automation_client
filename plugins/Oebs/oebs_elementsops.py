@@ -19,6 +19,7 @@ import logging
 import logger
 import winuser
 import win32api
+import readconfig
 from oebs_utilops import UtilOperations
 
 log = logging.getLogger('oebs_elementsops.py')
@@ -234,14 +235,27 @@ class ElementOperations:
         #sets the keywordResult to FAIL
         keywordresult = MSG_FAIL
         verifyresponse = MSG_FALSE
+        configvalues = readconfig.configvalues
         try:
             #gets the entire context information
             log.debug('Received Object Context',DEF_WAITFORELEMENTVISIBLE)
             #geting mouse state
             mousestate=oebs_mouseops.GetCursorInfo('state')
+            delay=int(configvalues['timeOut'])
             while(mousestate == 65543):
                 mousestate=oebs_mouseops.GetCursorInfo('state')
-            acc =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
+            wait = True
+            start_time = time.time()
+            logger.print_on_console("Waiting for element to be visible")
+            while wait:
+                acc =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
+                if acc and acc != "fail":
+                    wait = False
+                    break
+                if time.time() - start_time >= delay:
+                    wait = False
+                    break
+                time.sleep(0.25)
             if(acc and acc != 'fail'):
                 charinfo = acc.getAccessibleContextInfo()
                 objstates = charinfo.states
