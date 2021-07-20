@@ -242,7 +242,7 @@ class ElementOperations:
             while(mousestate == 65543):
                 mousestate=oebs_mouseops.GetCursorInfo('state')
             acc =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
-            if(acc):
+            if(acc and acc != 'fail'):
                 charinfo = acc.getAccessibleContextInfo()
                 objstates = charinfo.states
                 #check for object visible
