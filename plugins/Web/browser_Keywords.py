@@ -1355,12 +1355,12 @@ class Singleton_DriverUtil():
                                     extns.append(i)
                             elif os.path.isdir(i):
                                 [extns.append(j) for j in glob.glob(i+os.sep+"*.crx")]
-                    if len(extns) > 1:
+                    if len(extns) > 0:
                         for i in extns:
                             if i != webconstants.AVO_EXTENSION_PATH:
                                 choptions.add_extension(os.path.abspath(i))
                                 extn_flag=True
-                    else:
+                    if extn_flag== False and configvalues['extn_enabled'].lower()=='no':
                         choptions.add_argument('--disable-extensions')
                     if str(chrome_path).lower() != 'default':
                         choptions.binary_location = str(chrome_path)
