@@ -231,7 +231,7 @@ class DropdownListboxOperations:
             elif charinfo.role == 'list':
                 #calling getvalueslist def to get all values in list
                 listvalues = self.getvalueslist(acc)
-                if listvalues == inputValues:
+                if len(inputValues) > 0 and str(listvalues) == inputValues[0]:
                         keywordresult=MSG_PASS
                         verifyresponse =MSG_TRUE
             else:

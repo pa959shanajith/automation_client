@@ -28,6 +28,7 @@ class ScrollbarOperations:
      	#sets the keywordResult to FAIL
         keywordresult = MSG_FAIL
         verifyresponse = MSG_FALSE
+        err_msg = None
         try:
             #gets the entire context information
             charinfo = acc.getAccessibleContextInfo()
@@ -39,8 +40,12 @@ class ScrollbarOperations:
             height = charinfo.height
             x2_cor = x1_cor+width
             y2_cor = y1_cor+height
+            if len(oebs_key_objects.keyword_input) == 0 or oebs_key_objects.keyword_input[0]=='' or oebs_key_objects.keyword_input[0]==None:
+                err_msg = ERROR_CODE_DICT['invalid_input_scroll']
+                log.info(err_msg)
+                logger.print_on_console(err_msg)
             numofoperation = int(oebs_key_objects.keyword_input[0])
-            if 'enabled' in objstates:
+            if 'enabled' in objstates and not err_msg:
                     if(numofoperation > 0):
                         for i in range(numofoperation):
                             if(width>height):
@@ -54,7 +59,7 @@ class ScrollbarOperations:
                         log.debug('Invalid Input',MSG_INVALID_INPUT)
                         oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
                         logger.print_on_console(MSG_INVALID_INPUT)
-            else:
+            elif not err_msg:
                 log.debug('Object Disabled',MSG_DISABLED_OBJECT)
                 logger.print_on_console(MSG_DISABLED_OBJECT)
                 oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
@@ -78,6 +83,7 @@ class ScrollbarOperations:
      	#sets the keywordResult to FAIL
         keywordresult = MSG_FAIL
         verifyresponse = MSG_FALSE
+        err_msg = None
         try:
             #gets the entire context information
             charinfo = acc.getAccessibleContextInfo()
@@ -89,8 +95,12 @@ class ScrollbarOperations:
             height = charinfo.height
             x2_cor = x1_cor+width
             y2_cor = y1_cor+height
+            if len(oebs_key_objects.keyword_input) == 0 or oebs_key_objects.keyword_input[0]=='' or oebs_key_objects.keyword_input[0]==None:
+                err_msg = ERROR_CODE_DICT['invalid_input_scroll']
+                log.info(err_msg)
+                logger.print_on_console(err_msg)
             numofoperation = int(oebs_key_objects.keyword_input[0])
-            if 'enabled' in objstates:
+            if 'enabled' in objstates and not err_msg:
                     if(numofoperation > 0):
                         for i in range(numofoperation):
                             if(width>height):
@@ -104,7 +114,7 @@ class ScrollbarOperations:
                         log.debug('Invalid Input',MSG_INVALID_INPUT)
                         oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
                         logger.print_on_console(MSG_INVALID_INPUT)
-            else:
+            elif not err_msg:
                 log.debug('Object Disabled',MSG_DISABLED_OBJECT)
                 oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
                 logger.print_on_console(MSG_DISABLED_OBJECT)
@@ -126,6 +136,7 @@ class ScrollbarOperations:
      	#sets the keywordResult to FAIL
         keywordresult = MSG_FAIL
         verifyresponse = MSG_FALSE
+        err_msg = None
         try:
             #gets the entire context information
             charinfo = acc.getAccessibleContextInfo()
@@ -137,8 +148,13 @@ class ScrollbarOperations:
             height = charinfo.height
             x2_cor = x1_cor+width
             y2_cor = y1_cor+height
+            if len(oebs_key_objects.keyword_input) == 0 or oebs_key_objects.keyword_input[0]=='' or oebs_key_objects.keyword_input[0]==None:
+                err_msg = ERROR_CODE_DICT['invalid_input_scroll']
+                log.info(err_msg)
+                logger.print_on_console(err_msg)
+            
             numofoperation = int(oebs_key_objects.keyword_input[0])
-            if 'enabled' in objstates:
+            if 'enabled' in objstates and not err_msg:
                     if(numofoperation > 0):
                         for i in range(numofoperation):
                             if(height>width):
@@ -152,7 +168,7 @@ class ScrollbarOperations:
                         log.debug('Invalid Input',MSG_INVALID_INPUT)
                         oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
                         logger.print_on_console(MSG_INVALID_INPUT)
-            else:
+            elif not err_msg:
                 log.debug('Object Disabled',MSG_DISABLED_OBJECT)
                 oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
                 logger.print_on_console(MSG_DISABLED_OBJECT)
@@ -174,6 +190,7 @@ class ScrollbarOperations:
      	#sets the keywordResult to FAIL
         keywordresult = MSG_FAIL
         verifyresponse = MSG_FALSE
+        err_msg = None
         try:
             #gets the entire context information
             charinfo = acc.getAccessibleContextInfo()
@@ -185,8 +202,13 @@ class ScrollbarOperations:
             height = charinfo.height
             x2_cor = x1_cor+width
             y2_cor = y1_cor+height
+            if len(oebs_key_objects.keyword_input) == 0 or oebs_key_objects.keyword_input[0]=='' or oebs_key_objects.keyword_input[0]==None:
+                err_msg = ERROR_CODE_DICT['invalid_input_scroll']
+                log.info(err_msg)
+                logger.print_on_console(err_msg)
+            
             numofoperation = int(oebs_key_objects.keyword_input[0])
-            if 'enabled' in objstates:
+            if 'enabled' in objstates and not err_msg:
                 if(numofoperation > 0):
                     for i in range(numofoperation):
                         if(height>width):
@@ -200,7 +222,7 @@ class ScrollbarOperations:
                     log.debug('Invalid Input',MSG_INVALID_INPUT)
                     oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
                     logger.print_on_console(MSG_INVALID_INPUT)
-            else:
+            elif not err_msg:
                 log.debug('Object Disabled',MSG_DISABLED_OBJECT)
                 oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
                 logger.print_on_console(MSG_DISABLED_OBJECT)

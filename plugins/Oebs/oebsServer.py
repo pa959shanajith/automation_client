@@ -738,6 +738,7 @@ class OebsKeywords:
         #input sent from the user
         inputs = ast.literal_eval(str(inputs))
         inputs = [n for n in inputs]
+        oebs_key_objects.keyword_input = []
         for index in range(len(inputs)):
             oebs_key_objects.keyword_input.append(inputs[index])
     #output thats to be sent from the server to client
