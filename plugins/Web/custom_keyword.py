@@ -17,6 +17,8 @@ from selenium.common.exceptions import *
 import core_utils
 import logging
 import threading
+import time
+import readconfig
 local_ck = threading.local()
 
 class CustomKeyword:
@@ -52,6 +54,7 @@ class CustomKeyword:
 
 
     def switch_to_iframe(self,url,window_handle):
+        configvalues = readconfig.configvalues
         try:
             if url.find('frame') != -1 or url.find('iframe') != -1:
                 browser_Keywords.local_bk.driver_obj.switch_to.frame(browser_Keywords.local_bk.driver_obj.find_elements_by_xpath(url)[0])
@@ -59,8 +62,8 @@ class CustomKeyword:
                 logger.print_on_console(log_msg)
                 local_ck.log.info(log_msg)
             else:
-                input_url=url.replace("f", "-frame");
-                input_url=url.replace("i", "-iframe");
+                input_url=url.replace("f", "-frame")
+                input_url=url.replace("i", "-iframe")
                 curr_window_handle=browser_Keywords.local_bk.driver_obj.current_window_handle
                 if window_handle !='':
                     curr_window_handle=window_handle
@@ -77,12 +80,17 @@ class CustomKeyword:
                         logger.print_on_console('It is '+frame_iframe)
                         if j=='':
                             continue
+                        delay=int(configvalues['timeOut'])
+                        start = time.time()
+                        # fix for issue #4336
+                        while delay and not (len(browser_Keywords.local_bk.driver_obj.find_elements_by_tag_name(frame_iframe))>=int(j)) and time.time() - start < delay:
+                            continue
                         browser_Keywords.local_bk.driver_obj.switch_to.frame(browser_Keywords.local_bk.driver_obj.find_elements_by_tag_name(frame_iframe)[int(j)])
                 log_msg='Control switched to frame/iframe '+input_url
                 logger.print_on_console(log_msg)
                 local_ck.log.info(log_msg)
         except WebDriverException as e:
-            err_msg='Control failed to switched to frame/iframe '+input_url
+            err_msg='Control failed to switch to frame/iframe '+input_url
             local_ck.log.error(err_msg)
             logger.print_on_console(err_msg)
 
