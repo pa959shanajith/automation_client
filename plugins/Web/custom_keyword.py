@@ -53,7 +53,7 @@ class CustomKeyword:
         local_ck.log.debug('curr_window_handle')
 
 
-    def switch_to_iframe(self,url,window_handle):
+    def switch_to_iframe(self,url,window_handle,flag=False):
         configvalues = readconfig.configvalues
         try:
             if url.find('frame') != -1 or url.find('iframe') != -1:
@@ -80,11 +80,12 @@ class CustomKeyword:
                         logger.print_on_console('It is '+frame_iframe)
                         if j=='':
                             continue
-                        delay=int(configvalues['timeOut'])
-                        start = time.time()
-                        # fix for issue #4336
-                        while delay and not (len(browser_Keywords.local_bk.driver_obj.find_elements_by_tag_name(frame_iframe))>=int(j)) and time.time() - start < delay:
-                            continue
+                        if flag:
+                            delay=int(configvalues['timeOut'])
+                            start = time.time()
+                            # fix for issue #4336
+                            while delay and not (len(browser_Keywords.local_bk.driver_obj.find_elements_by_tag_name(frame_iframe))>=int(j)) and time.time() - start < delay:
+                                continue
                         browser_Keywords.local_bk.driver_obj.switch_to.frame(browser_Keywords.local_bk.driver_obj.find_elements_by_tag_name(frame_iframe)[int(j)])
                 log_msg='Control switched to frame/iframe '+input_url
                 logger.print_on_console(log_msg)
