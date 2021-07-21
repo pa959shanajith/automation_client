@@ -117,6 +117,10 @@ ERROR_CODE_DICT = {
     "err_visibility_click": "Unable to click, object not present in screen",
     "err_window_find": "Unable to find active window, containing object",
     "err_object_highlight": "Object not found, unable to highlight",
+    "invalid_input_scroll": "Invalid input, Please provide number of entries to scroll",
+    "err_minimize": "Unable to minimize window",
+    "err_maximize": "Unable to maximize window",
+    "err_close": "Unable to close window"
 }
 
 
@@ -154,7 +158,7 @@ MSG_NAME_NOT_DEFINED = "Name not Defined."
 MSG_CLICK_SUCCESSFUL = "Clicked Successfully."
 MSG_ELEMENT_NOT_FOUND = "Element Not Found"
 MSG_ELEMENT_EXIST = "Element Exists."
-MSG_ELEMENT_NOT_EXISTS = "Element doesn not Exists"
+MSG_ELEMENT_NOT_EXISTS = "Element does not Exists"
 MSG_SINGLESELECTION_LIST = "This operation not supported on SingleSelection list"
 MSG_OBJECT_EDITABLE = "Object is editable."
 MSG_OBJECT_SELECTABLE = "Object is selectable."
