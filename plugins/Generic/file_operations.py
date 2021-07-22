@@ -1547,7 +1547,7 @@ class FileOperations:
                             output_feild = None
                         #logger.print_on_console("Choosen the dynamic file path")
                 elif(str(args[0].split(";")[0]).startswith("_") and str(args[0].split(";")[0]).endswith("_")):
-                    out_path=self.CV.get_constant_value(args[0])
+                    out_path=self.CV.get_constant_value(args[0].split(";")[0])
                     con_var_opt = True
                     if ( out_path ):
                         try:
@@ -2236,9 +2236,9 @@ class FileOperations:
                 sheet='selectiveCellCompare'
                 result=os.path.isfile(output_feild)
 
-                logger.print_on_console( "Writing the output of selectiveCellCompare to file ")
                 msg='Output file has old entries! Erasing old data to store incoming result.'
                 if status_get_ext and file_extension is not None and file_extension in generic_constants.SELECTIVE_CELL_FILE_TYPES:
+                    logger.print_on_console( "Writing the output of selectiveCellCompare to file ")
                     if(file_extension=='.xlsx'):
                         if result==True:
                             wb=openpyxl.load_workbook(output_feild)

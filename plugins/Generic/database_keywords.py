@@ -669,7 +669,7 @@ class DatabaseOperation():
                     else:
                         fields = None
                         inp_sheet=None
-                elif (args[-2].startswith("_")) and (args[-2].endswith("_")):
+                elif (args[0].startswith("_")) and (args[0].endswith("_")):
                     inp_path = self.CV.get_constant_value(args[0])
                     if inp_path!=None:
                         if len(inp_path.split(';'))>1:
