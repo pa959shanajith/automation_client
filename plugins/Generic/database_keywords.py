@@ -139,7 +139,7 @@ class DatabaseOperation():
         elif q_type=='set':
             val=query.split(',')
             if len(val)>=2:
-                val[1]=','.join(b[1:])
+                val[1]=','.join(val[1:])
                 cnxn.set(val[0],val[1])
         
 
