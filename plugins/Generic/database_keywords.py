@@ -250,6 +250,8 @@ class DatabaseOperation():
             cnxn = self.connection(dbtype, ip , port , dbName, userName , password, args)
             if cnxn is not None:
                 dbtype=int(dbtype)
+                if dbtype == 13:
+                    res.append((args[0],args[1]))
                 ## execute query in cassandra 
                 if dbtype == 11: 
                     cnxn.execute(query)
@@ -298,7 +300,7 @@ class DatabaseOperation():
         cursor = None
         if(len(input_val)>= 8):
             try:
-                cnxn = self.connection(input_val[6], input_val[0] , input_val[1] , input_val[4], input_val[2] , input_val[3])
+                cnxn = self.connection(input_val[6], input_val[0] , input_val[1] , input_val[4], input_val[2] , input_val[3],input_val[7])
                 dbtype=int(input_val[6])
                 if cnxn is not None:
                     import re
@@ -688,6 +690,8 @@ class DatabaseOperation():
                     rows = cursor.fetchall()
                     columns = [column[0] for column in cursor.description]
                 ##logic for output col reading
+                if dbtype == 13:
+                    args=args[2:]
                 if type(args) is tuple:
                     if str(args).startswith("(("):
                         args=args[0]
@@ -1053,7 +1057,7 @@ class DatabaseOperation():
                     self.cnxn = sqlite3.connect(ip)
                 elif dbtype == 13:
                     import snowflake.connector
-                    self.cnxn = snowflake.connector.connect(user=userName,password=password,account=args[0],warehouse=args[1],database=dbName,schema=args[2])
+                    self.cnxn = snowflake.connector.connect(user=userName,password=password,account=ip,warehouse=args[0][0],database=dbName,schema=args[0][1])
                 elif dbtype == 14:
                     import psycopg2
                     self.cnxn = psycopg2.connect(host=ip,port=port,user=userName,password=password,database=dbName)
