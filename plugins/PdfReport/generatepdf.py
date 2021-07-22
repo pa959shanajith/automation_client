@@ -130,6 +130,9 @@ class GeneratePDFReport(wx.Frame):
         elif re.search(r'[<>:"/\\|?*]',dest_file) is not None:
             self.l4.SetLabel("File name can't contain following characters: \\ / < | : ? * > \"")
             error_flag=True
+        elif re.sub(r'[^a-zA-Z0-9]', '', dest_file) == '':
+            self.l4.SetLabel("File name must contain atleast one alphanumeric character!")
+            error_flag=True
         try:
             with open(source, 'rb') as read_file:
                 json_data = json.load(read_file)
