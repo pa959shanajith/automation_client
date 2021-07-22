@@ -457,7 +457,7 @@ class Controller():
             ignore_status=True
         if keyword.lower() in [IF,ELSE_IF,EVALUATE]:
             inpval=self.dynamic_var_handler_obj.simplify_expression(input,keyword,self)
-        elif keyword.lower() == CREATE_CONST_VARIABLE:
+        elif keyword.lower() in CONSTANT_KEYWORDS:
             if STATIC_NONE in input[0]:
                 input[0]=input[0].replace(STATIC_NONE,'')
             string=input[0]
@@ -467,15 +467,16 @@ class Controller():
                 inpval.append(string[index+1:len(string)])
             elif string != '':
                 inpval.append(string)
-            #createConstVariable ex: _a_;{a}
-            const_var=self.constant_var_handler_obj.check_for_constantvariables(inpval[1])
-            if const_var!=TEST_RESULT_TRUE:
-                #check if the inputval[1] is constant variable or not,
+            if keyword.lower() == CREATE_CONST_VARIABLE and len(inpval)>1:
                 #createConstVariable ex: _a_;{a}
-                inpval[1]=self.dynamic_var_handler_obj.replace_dynamic_variable(inpval[1],'',self)
-            else:
-                #createConstVariable ex: _a_;_b_  (_b_ is already created)
-                inpval[1]=self.constant_var_handler_obj.get_constant_value(inpval[1])
+                const_var=self.constant_var_handler_obj.check_for_constantvariables(inpval[1])            
+                if const_var!=TEST_RESULT_TRUE:
+                    #check if the inputval[1] is constant variable or not,
+                    #createConstVariable ex: _a_;{a}
+                    inpval[1]=self.dynamic_var_handler_obj.replace_dynamic_variable(inpval[1],'',self)
+                else:
+                    #createConstVariable ex: _a_;_b_  (_b_ is already created)
+                    inpval[1]=self.constant_var_handler_obj.get_constant_value(inpval[1])
         elif keyword.lower() in DYNAMIC_KEYWORDS:
             if STATIC_NONE in input[0]:
                 input[0]=input[0].replace(STATIC_NONE,'')
@@ -624,7 +625,15 @@ class Controller():
             if const_var==TEST_RESULT_TRUE:
                 if output[0] in constant_variable_handler.local_constant.constant_variable_map:
                     #checks if the output variable(constant variable) is assigned with a value
-                    if tsp.name not in FILEPATH_OUTPUT_FIELD_KEYWORDS:
+                    if tsp.name in FILEPATH_OUTPUT_FIELD_KEYWORDS:
+                        cosnt_val=constant_variable_handler.local_constant.constant_variable_map[output[0]]
+                        file_path = cosnt_val.split(";")[0] 
+                        if not(os.path.exists(file_path)):
+                            self.constant_var_exists=True
+                            err_msg="Error: Constant variable cannot be modified!"
+                            logger.print_on_console(err_msg)
+                            log.debug(err_msg)
+                    else:
                         self.constant_var_exists=True
                         err_msg="Error: Constant variable cannot be modified!"
                         logger.print_on_console(err_msg)
@@ -1065,6 +1074,8 @@ class Controller():
         obj.clearList(self)
         #clearing dynamic variables at the end of execution to support dynamic variable at the scenario level
         obj.clear_dyn_variables()
+        #clearing dynamic variables at the end of execution to support constant variable at the scenario level
+        obj.clear_const_variables()
         return status
 
     def invoke_execution(self,mythread,json_data,socketIO,wxObject,configvalues,qcObject,qtestObject,zephyrObject,aws_mode):
@@ -1606,6 +1617,8 @@ class Controller():
                     mythread.test_status = 'fail'
             #clearing dynamic variables at the end of execution to support dynamic variable at the scenario level
             obj.clear_dyn_variables()
+            #clearing dynamic variables at the end of execution to support constant variable at the scenario level
+            obj.clear_const_variables()
             logger.print_on_console('***SUITE ', str(suite_idx) ,' EXECUTION COMPLETED***')
             log.info('---------------------------------------------------------------------')
             print('=======================================================================================================')

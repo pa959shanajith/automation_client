@@ -234,6 +234,8 @@ class StepDescription:
         #constant variable keyword
         def createconstvariable():
             return "Create a variable '"+str(inputval[0])+"' with value '"+ str(inputval[1]) + "'"
+        def deleteconstvariable():
+            return ("Delete constant variable "+str(inputval)).replace('[','').replace(']','')
 
         #Generic-XML
         def getblockcount():

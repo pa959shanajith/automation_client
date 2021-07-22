@@ -103,6 +103,8 @@ VERIFY_VISIBLE='verifyvisible'
 
 DYNAMIC_KEYWORDS=['createdynvariable','copyvalue','modifyvalue','deletedynvariable']
 
+CONSTANT_KEYWORDS=['createconstvariable','deleteconstvariable']
+
 CREATE_DYN_VARIABLE='createdynvariable'
 
 CREATE_CONST_VARIABLE='createconstvariable'
@@ -235,7 +237,8 @@ ERROR_CODE_DICT = {
                     'ERR_GETPARAM_EXCEL': "Excel sheet doesn't contain column names.",
                     'ERR_GETPARAM_UNIQUECOLUMN': 'Excel sheet should contain Unique Column names',
                     'ERR_XML_INVALID': 'Invalid XML format.',
-                    'ERR_DYNVAR': 'Variable does not Exist.',
+                    'ERR_DYNVAR': 'Variable does not exist.',
+                    'ERR_CONVAR': 'Constant Variable does not exist.',
                     'ERR_DYNVAR_ALREADY_EXISTS': 'Variable already exists',
                     'ERR_CONSVAR_ALREADY_EXISTS': 'Constant Variable already exists',
                     'ERR_XML_TAGNAMES': "XML file doesn't contain tag names.",
