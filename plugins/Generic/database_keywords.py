@@ -139,6 +139,7 @@ class DatabaseOperation():
         elif q_type=='set':
             val=query.split(',')
             if len(val)>=2:
+                val[1]=','.join(b[1:])
                 cnxn.set(val[0],val[1])
         
 
@@ -235,6 +236,14 @@ class DatabaseOperation():
         value = None
         err_msg=None
         details = []
+        res=[]
+        res.append(ip)
+        res.append(port)
+        res.append(userName)
+        res.append(password)
+        res.append(dbName)
+        res.append(query)
+        res.append(dbtype) 
         cnxn=None
         cursor=None
         try:
@@ -252,12 +261,15 @@ class DatabaseOperation():
                     db=cnxn[dbName]
                     if len(args)>=2:
                         self.coll=db[args[0]]
-                        self.mongoquery(query,args[1])
+                        rows,columns=self.mongoquery(query,args[1])
                         status=generic_constants.TEST_RESULT_PASS
                         result=generic_constants.TEST_RESULT_TRUE
+                        res.append(args[0])
+                        res.append(args[1])
                 ## execute query in redis
                 elif dbtype == 10:
-                    self.redisquery(cnxn,query,args[0])
+                    rows,columns=self.redisquery(cnxn,query,args[0])
+                    res.append(args[0])
                     status=generic_constants.TEST_RESULT_PASS
                     result=generic_constants.TEST_RESULT_TRUE
                 ##added to check if getalltables is not used with any other dbtype
@@ -273,13 +285,7 @@ class DatabaseOperation():
                             cursor.execute(query)
                             status=generic_constants.TEST_RESULT_PASS
                             result=generic_constants.TEST_RESULT_TRUE
-                details.append(ip)
-                details.append(port)
-                details.append(userName)
-                details.append(password)
-                details.append(dbName)
-                details.append(query)
-                details.append(dbtype)  
+                details=res
         except Exception as e:
             err_msg = self.processException(e)
         finally:
@@ -290,12 +296,13 @@ class DatabaseOperation():
     def fetchData(self,input_val,*args):
         value = None
         cursor = None
-        if(len(input_val)== 8):
+        if(len(input_val)>= 8):
             try:
                 cnxn = self.connection(input_val[6], input_val[0] , input_val[1] , input_val[4], input_val[2] , input_val[3])
+                dbtype=int(input_val[6])
                 if cnxn is not None:
                     import re
-                    data = re.findall(r'\[([^]]*)\]',input_val[7])
+                    data = re.findall(r'\[([^]]*)\]',input_val[-1])
                     ##if condition added to resolve invalid input in displaydynamicvariable when more then two indexes were entered
                     if(len(data)==2):
                         row = data[0]
@@ -304,20 +311,50 @@ class DatabaseOperation():
                         col = int(col)
                         row_no = row - 1
                         col_no = col - 1
-                        cursor = cnxn.cursor()
-                        ##fetching table names
-                        if (input_val[5].lower()=='getalltables'):
+                        if dbtype == 11: 
+                            from cassandra.query import dict_factory
+                            import uuid
+                            cnxn.row_factory = dict_factory
+                            query_res = cnxn.execute(input_val[5])
+                            columns = tuple(query_res.column_names)
+                            json_rows = query_res.current_rows
                             rows=[]
-                            tables=[]
-                            for table in list(cursor.tables()):
-                                if table[3]=='TABLE':
-                                    tables.append(table[2])
-                            rows.append(tables)
-                            value = rows[col_no][row_no]
+                            for i in json_rows:
+                                row=[]
+                                for k,v in i.items():
+                                    if isinstance(v,uuid.UUID):
+                                        row.append(str(v))
+                                    else:
+                                        row.append(v)
+                                row=tuple(row)
+                                rows.append(row)
+                            value=rows
+                            cnxn=cnxn.shutdown()
+                        ## execute query in mongo
+                        elif dbtype == 9:
+                            db=cnxn[input_val[4]]
+                            self.coll=db[input_val[7]]
+                            rows,columns=self.mongoquery(input_val[5],input_val[8])
+                            value=rows
+                        ## execute query in redis
+                        elif dbtype == 10:
+                            rows,columns=self.redisquery(cnxn,input_val[5],input_val[7])
+                            value=rows
                         else:
-                            cursor.execute(input_val[5])
-                            rows = cursor.fetchall()
-                            value = rows[row_no][col_no]
+                            cursor = cnxn.cursor()
+                            ##fetching table names
+                            if (input_val[5].lower()=='getalltables'):
+                                rows=[]
+                                tables=[]
+                                for table in list(cursor.tables()):
+                                    if table[3]=='TABLE':
+                                        tables.append(table[2])
+                                rows.append(tables)
+                                value = rows[col_no][row_no]
+                            else:
+                                cursor.execute(input_val[5])
+                                rows = cursor.fetchall()
+                        value = rows[row_no][col_no]
                         ##if condition added to fix issue:304-Generic : getData keyword:  Actual data  is not getting stored in dynamic variable instead "null" is stored.
                         ##changes done by jayashree.r
                     if value == None:
@@ -403,8 +440,7 @@ class DatabaseOperation():
                         rows,columns=self.mongoquery(query,args[1])
                 ## execute query in redis
                 elif dbtype == 10:
-                    if len(args)>=2:
-                        rows,columns=self.redisquery(cnxn,query,args[0])
+                    rows,columns=self.redisquery(cnxn,query,args[0])
                 else: 
                     cursor = cnxn.cursor()
                     cursor.execute(query)
