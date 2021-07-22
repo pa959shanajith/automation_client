@@ -168,7 +168,7 @@ class GenericKeywordDispatcher:
             'findfilepath': local_generic.generic_file.find_file_path,
             'selectivecellcompare': local_generic.generic_file.selective_cell_compare,
             'createconstvariable':local_generic.const_var_obj.create_constant_variable,
-            'deleteconstvariable':local_generic.const_var_obj.delete_const_variable,
+            'deleteconstvariable':local_generic.const_var_obj.delete_const_variable
             }
 	#Call to fetch data in database keywords
     def fetch_data(self,input):
