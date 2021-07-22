@@ -1540,6 +1540,7 @@ class Singleton_DriverUtil():
         elif(browser_num == '8'):
             try:
                 if core.chromiumFlag:
+                    extn_flag= False
                     msoptions = webdriver.EdgeChromiumOptions()
                     msoptions.add_argument('start-maximized')
                     msoptions.add_experimental_option('useAutomationExtension', False)
@@ -1561,13 +1562,14 @@ class Singleton_DriverUtil():
                                 if os.path.splitext(i)[-1].lower()=='.crx':
                                     extns.append(i)
                             elif os.path.isdir(i):
-                                [extns.append(i) for i in glob.glob(i+os.sep+"*.crx")]
-                    if len(extns) > 1:
+                                [extns.append(j) for j in glob.glob(i+os.sep+"*.crx")]
+                    if len(extns) > 0:
                         for i in extns:
                             if i != webconstants.AVO_EXTENSION_PATH:
-                                msoptions.add_extension(os.path.abspath(i))
-                    else:
-                        msoptions.add_argument('--disable-extensions')
+                                choptions.add_extension(os.path.abspath(i))
+                                extn_flag=True
+                    if extn_flag== False:
+                        choptions.add_argument('--disable-extensions')
                     if str(close_browser_popup).lower() == 'yes':
                         prefs = {}
                         prefs["credentials_enable_service"] = False
