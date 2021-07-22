@@ -1566,10 +1566,10 @@ class Singleton_DriverUtil():
                     if len(extns) > 0:
                         for i in extns:
                             if i != webconstants.AVO_EXTENSION_PATH:
-                                choptions.add_extension(os.path.abspath(i))
+                                msoptions.add_extension(os.path.abspath(i))
                                 extn_flag=True
                     if extn_flag== False:
-                        choptions.add_argument('--disable-extensions')
+                        msoptions.add_argument('--disable-extensions')
                     if str(close_browser_popup).lower() == 'yes':
                         prefs = {}
                         prefs["credentials_enable_service"] = False
@@ -1588,6 +1588,15 @@ class Singleton_DriverUtil():
                     controller.process_ids.append(driver.edge_service.process.pid)
                     drivermap.append(driver)
                     driver.maximize_window()
+                    if extn_flag == True:
+                        time.sleep(3)
+                        handles=driver.window_handles
+                        main_handle=driver.current_window_handle
+                        for i in handles:
+                            driver.switch_to.window(i)
+                            if driver.current_window_handle != main_handle:
+                                driver.close()
+                                driver.switch_to.window(driver.window_handles[-1])
                     msg = ('Headless ' if headless_mode else '') + 'Edge Chromium browser started'
                     logger.print_on_console(msg)
                     local_bk.log.info(msg)
