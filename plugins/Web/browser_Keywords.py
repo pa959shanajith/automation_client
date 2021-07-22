@@ -1540,6 +1540,7 @@ class Singleton_DriverUtil():
         elif(browser_num == '8'):
             try:
                 if core.chromiumFlag:
+                    extn_flag= False
                     msoptions = webdriver.EdgeChromiumOptions()
                     msoptions.add_argument('start-maximized')
                     msoptions.add_experimental_option('useAutomationExtension', False)
@@ -1561,12 +1562,13 @@ class Singleton_DriverUtil():
                                 if os.path.splitext(i)[-1].lower()=='.crx':
                                     extns.append(i)
                             elif os.path.isdir(i):
-                                [extns.append(i) for i in glob.glob(i+os.sep+"*.crx")]
-                    if len(extns) > 1:
+                                [extns.append(j) for j in glob.glob(i+os.sep+"*.crx")]
+                    if len(extns) > 0:
                         for i in extns:
                             if i != webconstants.AVO_EXTENSION_PATH:
                                 msoptions.add_extension(os.path.abspath(i))
-                    else:
+                                extn_flag=True
+                    if extn_flag== False:
                         msoptions.add_argument('--disable-extensions')
                     if str(close_browser_popup).lower() == 'yes':
                         prefs = {}
@@ -1586,6 +1588,15 @@ class Singleton_DriverUtil():
                     controller.process_ids.append(driver.edge_service.process.pid)
                     drivermap.append(driver)
                     driver.maximize_window()
+                    if extn_flag == True:
+                        time.sleep(3)
+                        handles=driver.window_handles
+                        main_handle=driver.current_window_handle
+                        for i in handles:
+                            driver.switch_to.window(i)
+                            if driver.current_window_handle != main_handle:
+                                driver.close()
+                                driver.switch_to.window(driver.window_handles[-1])
                     msg = ('Headless ' if headless_mode else '') + 'Edge Chromium browser started'
                     logger.print_on_console(msg)
                     local_bk.log.info(msg)
