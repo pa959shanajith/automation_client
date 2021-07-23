@@ -1824,7 +1824,6 @@ def kill_process():
     import tempfile
     import psutil
     import os,shutil
-    import browser_Keywords
     if SYSTEM_OS == 'Darwin':
         try:
             import browser_Keywords_MW
@@ -1844,6 +1843,7 @@ def kill_process():
             log.error(e)
 
         try:
+            import browser_Keywords
             for driver in browser_Keywords.drivermap:
                 driver.quit()
             del browser_Keywords.drivermap[:]
@@ -1898,6 +1898,7 @@ def kill_process():
 
     else:
         try:
+            import browser_Keywords
             for driver in browser_Keywords.drivermap:
                 driver.quit()
             del browser_Keywords.drivermap[:]
