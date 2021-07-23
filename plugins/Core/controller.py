@@ -1824,6 +1824,7 @@ def kill_process():
     import tempfile
     import psutil
     import os,shutil
+    import browser_Keywords
     if SYSTEM_OS == 'Darwin':
         try:
             import browser_Keywords_MW
@@ -1843,7 +1844,6 @@ def kill_process():
             log.error(e)
 
         try:
-            import browser_Keywords
             for driver in browser_Keywords.drivermap:
                 driver.quit()
             del browser_Keywords.drivermap[:]
@@ -1897,6 +1897,19 @@ def kill_process():
         logger.print_on_console('Stale process killed')
 
     else:
+        try:
+            for driver in browser_Keywords.drivermap:
+                driver.quit()
+            del browser_Keywords.drivermap[:]
+            if hasattr(browser_Keywords.local_bk, 'driver_obj'):
+                if (browser_Keywords.local_bk.driver_obj):
+                    browser_Keywords.local_bk.driver_obj = None
+            if hasattr(browser_Keywords.local_bk, 'pid_set'):
+                if (browser_Keywords.local_bk.pid_set):
+                    del browser_Keywords.local_bk.pid_set[:]
+        except Exception as e:
+            logger.print_on_console('Exception in stopping server')
+            log.error(e)
         tries = {}
         while(len(process_ids) > 0):
             try:
