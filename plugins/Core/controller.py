@@ -1909,7 +1909,6 @@ def kill_process():
                 if (browser_Keywords.local_bk.pid_set):
                     del browser_Keywords.local_bk.pid_set[:]
         except Exception as e:
-            logger.print_on_console('Exception in stopping server')
             log.error(e)
         tries = {}
         while(len(process_ids) > 0):
