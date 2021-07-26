@@ -2,8 +2,7 @@ from ctypes import *
 from ctypes.wintypes import *
 from time import sleep
 import win32ui
-import oebs_constants
-from oebs_msg import *
+from oebs_constants import *
 
 class KeywordOperations:
     # CONSTANTS

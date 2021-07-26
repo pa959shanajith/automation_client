@@ -18,6 +18,7 @@ import os
 import string
 import random
 import dynamic_variable_handler
+import constant_variable_handler
 import logging
 import PyPDF2
 import difflib
@@ -38,6 +39,7 @@ TESSERACT_PATH_EXISTS = os.path.isdir(TESSERACT_PATH)
 class FileOperationsPDF:
     def __init__(self):
         self.DV = dynamic_variable_handler.DynamicVariables()
+        self.CV = constant_variable_handler.ConstantVariables()
         pass
 
     def verify_content(self,input_path,pagenumber,content):
@@ -99,6 +101,13 @@ class FileOperationsPDF:
                             output_path = path_temp
                         else:     
                             out_path = self.DV.get_dynamic_value(args.split(";")[0])
+                            if ( out_path ): output_path = out_path
+                    elif str(args.split(";")[0]).startswith("_") and str(args.split(";")[0]).endswith("_"):
+                        path_temp = args.split(";")[0].replace("_","").replace("_","")
+                        if os.path.exists(path_temp):
+                            output_path = path_temp
+                        else:     
+                            out_path = self.CV.get_constant_value(args.split(";")[0])
                             if ( out_path ): output_path = out_path
                     else:
                         output_path = args.split(";")[0]
@@ -579,6 +588,13 @@ class FileOperationsPDF:
                             output_path = path_temp
                         else:     
                             out_path = self.DV.get_dynamic_value(args.split(";")[0])
+                            if ( out_path ): output_path = out_path
+                    elif str(args.split(";")[0]).startswith("_") and str(args.split(";")[0]).endswith("_"):
+                        path_temp = args.split(";")[0].replace("_","").replace("_","")
+                        if os.path.exists(path_temp):
+                            output_path = path_temp
+                        else:     
+                            out_path = self.CV.get_constant_value(args.split(";")[0])
                             if ( out_path ): output_path = out_path
                     else:
                         output_path = args.split(";")[0]

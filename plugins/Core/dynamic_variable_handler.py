@@ -12,6 +12,7 @@
 import logger
 from collections import OrderedDict
 from constants import *
+import constant_variable_handler
 import re
 import core_utils
 ##dynamic_variable_map=OrderedDict()
@@ -27,6 +28,7 @@ local_dynamic = threading.local()
 class DynamicVariables:
     def __init__(self):
         local_dynamic.dynamic_variable_map=OrderedDict()
+        self.const_var_obj=constant_variable_handler.ConstantVariables()
         local_dynamic.log = logging.getLogger('dynamic_variable_handler.py')
 
 	#TO ftech the value form Data base
@@ -294,6 +296,10 @@ class DynamicVariables:
                         continue
                     if exp[i][0]=='{' and exp[i][-1]=='}':
                         inp_err_list[i]=exp[i]=self.replace_dynamic_variable(exp[i],keyword,con_obj)
+                        if exp[i] is None:
+                            exp[i]='null'
+                    if exp[i][0]=='_' and exp[i][-1]=='_':
+                        inp_err_list[i]=exp[i]=self.const_var_obj.get_constant_value(exp[i])
                         if exp[i] is None:
                             exp[i]='null'
                     inf_val = False

@@ -11,7 +11,7 @@
 import logger
 from constants import *
 import dynamic_variable_handler
-
+import constant_variable_handler
 from constants import *
 import logging
 import core_utils
@@ -23,6 +23,7 @@ class DynamicVariables:
 
     def __init__(self):
         self.dyn_obj=dynamic_variable_handler.DynamicVariables()
+        self.const_var_obj=constant_variable_handler.ConstantVariables()
         dynamic_variable_handler.local_dynamic.dynamic_variable_map['{newline}']='\n'
         dynamic_variable_handler.local_dynamic.dynamic_variable_map['{tab}']='\t'
 
@@ -101,6 +102,9 @@ class DynamicVariables:
                         logger.print_on_console('Variable modified: Old value ',str(variable),' = ',str(oldvalue),' New value ',str(variable),' = ',str(value))
                     else:
                         err_msg=ERROR_CODE_DICT['ERR_DYNVAR']
+                elif self.const_var_obj.check_for_constantvariables(variable)==TEST_RESULT_TRUE:
+                    #checks if the variable is constant varaible ex: _a_;{b}
+                    err_msg="Invalid input! Constant variable cannot be modified"
                 else:
                    err_msg=INVALID_INPUT
             else:
@@ -133,6 +137,17 @@ class DynamicVariables:
                     methodoutput=TEST_RESULT_TRUE
                     log.debug('Variable copied is ' + str(variable) + ' = ' + str(value))
                     logger.print_on_console('Variable copied is ',str(variable),' = ',str(value))
+                elif self.const_var_obj.check_for_constantvariables(variable)==TEST_RESULT_TRUE:
+                    #checks if the variable is constant variable ex: _a_
+                    if variable not in constant_variable_handler.local_constant.constant_variable_map:
+                        #checks if the constant variable exists or not
+                        self.const_var_obj.store_constant_value(variable,value,"copyvalue")
+                        status=TEST_RESULT_PASS
+                        methodoutput=TEST_RESULT_TRUE
+                        log.debug('Variable copied is ' + str(variable) + ' = ' + str(value))
+                        logger.print_on_console('Variable copied is ',str(variable),' = ',str(value))
+                    else:
+                        err_msg="Invalid input! Constant variable cannot be modified"
                 else:
                    err_msg=INVALID_INPUT
             else:
