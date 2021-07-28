@@ -875,7 +875,7 @@ class Dispatcher:
                 local_Wd.log.error(err_msg)
         configvalues = readconfig.configvalues
         if((webElement==None or webElement== '') and configvalues['extn_enabled'].lower() == 'yes' and self.action=='debug' and isinstance(driver, webdriver.Chrome)):
-            if not(simple_debug_gwto):
+            if not(simple_debug_gwto) and (int(configvalues['globalWaitTimeOut']))>0:
                 simple_debug_gwto=True
                 if isinstance(webElement,list):
                     webElement=webElement[0]
