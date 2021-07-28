@@ -299,7 +299,7 @@ class StringOperation:
                                 log.info(output_val)
                                 status=generic_constants.TEST_RESULT_PASS
                                 result=generic_constants.TEST_RESULT_TRUE
-                                output=position
+                                output=position if len(position)>1 else position[0]
                         else:
                             output='false'
                             out_msg = 'The Original String is '+actual_string+' and '+actual_string+' does not contain '+to_find
