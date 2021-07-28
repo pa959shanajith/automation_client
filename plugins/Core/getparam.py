@@ -691,7 +691,14 @@ class GetParam():
                         logger.print_on_console( '***Invalid filter, Provide valid start row and end row value***')
                         return_value =TERMINATE
                     else:
-                        endLimit = min(endRow, len(list(data.values())[0])+1)
+                        numRows = 0
+                        if(len(data.values()) == 0 or len(list(data.values())[0]) == 0):
+                            log.info('Empty Data. Please provide valid data')
+                            logger.print_on_console( '***Empty Data. Please provide valid data***')
+                            paramindex = TERMINATE 
+                        elif(len(data.values()) > 0):
+                            numRows = len(list(data.values())[0])+1
+                        endLimit = min(endRow, numRows)
                         if endLimit < endRow:
                             log.info("Data Param end row value is greater than the number of rows")
                             logger.print_on_console("Data Param end row value is greater than the number of rows")
