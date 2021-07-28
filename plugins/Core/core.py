@@ -70,6 +70,7 @@ connection_Timer = None
 status_ping_thread = None
 update_obj = None
 termination_inprogress = False
+browsercheck_inprogress = False
 core_utils_obj = core_utils.CoreUtils() 
 
 
@@ -98,7 +99,7 @@ def _process_ssl_errors(e):
 
 class MainNamespace(BaseNamespace):
     def on_message(self, *args):
-        global action,cw,browsername,desktopScrapeFlag,allow_connect,connection_Timer,updatecheckFlag,executionOnly,termination_inprogress
+        global action,cw,browsername,desktopScrapeFlag,allow_connect,connection_Timer,updatecheckFlag,executionOnly
         kill_conn = False
         try:
             if(str(args[0]) == 'connected'):
@@ -165,7 +166,6 @@ class MainNamespace(BaseNamespace):
                         cw.updateItem.Enable(True)
                         cw.rbox.Enable()
                     if browsercheckFlag == False:
-                        termination_inprogress= True
                         check_browser()
                     #if updatecheckFlag == False and root.gui:
                     if updatecheckFlag == False:
@@ -274,6 +274,7 @@ class MainNamespace(BaseNamespace):
 
     def on_executeTestSuite(self, *args):
         global cw, execution_flag, qcObject, qtestObject, zephyrObject
+        wait_until_browsercheck()
         try:
             exec_data = args[0]
             batch_id = exec_data["batchId"]
@@ -297,7 +298,7 @@ class MainNamespace(BaseNamespace):
             if len(args)>0 and args[0]['apptype']=='MobileApp':
                 if args[0]['suitedetails'][0]['browserType'][0]=='2':
                     aws_mode = True
-            if(not execution_flag):
+            if not execution_flag:
                 socketIO.emit('return_status_executeTestSuite', {'status': 'success', 'batchId': batch_id})
                 root.testthread = TestThread(root, EXECUTE, exec_data, aws_mode)
             else:
@@ -313,12 +314,9 @@ class MainNamespace(BaseNamespace):
 
     def on_debugTestCase(self, *args):
         global cw 
-        while True: #fix for Issue no 25356
-            global browsercheckFlag
-            if browsercheckFlag == True:
-                break
         try:
             if check_execution_lic("result_debugTestCase"): return None
+            wait_until_browsercheck()
             exec_data = args[0]
             root.testthread = TestThread(root, DEBUG, exec_data, False)
             cw.choice=cw.rbox.GetStringSelection()
@@ -1539,6 +1537,7 @@ class Main():
             global mobileScrapeFlag,mobileWebScrapeFlag,desktopScrapeFlag, pdfScrapeFlag
             global sapScrapeFlag,debugFlag,browsername,action,oebsScrapeFlag
             global socketIO,data
+            wait_until_browsercheck()
             cw.schedule.Disable()
             core_utils.get_all_the_imports('IRIS')
             if mobileScrapeFlag==True:
@@ -1599,7 +1598,8 @@ class Main():
         print('********************************************************************************************************')
 
 def check_browser():
-    global browsercheckFlag,termination_inprogress
+    global browsercheckFlag, browsercheck_inprogress
+    browsercheck_inprogress = True
     try:
         try:
             try:
@@ -1773,9 +1773,18 @@ def check_browser():
         log.debug(e)
         browsercheckFlag = False
     finally:
-        termination_inprogress = False 
         logger.print_on_console('Browser compatibility check completed')
+        browsercheck_inprogress = False
     return browsercheckFlag 
+
+def wait_until_browsercheck():
+    if browsercheck_inprogress:
+        info_msg = "Waiting until Browser Compatibility check is completed"
+        logger.print_on_console(info_msg)
+        log.info(info_msg)
+    while True:
+        if browsercheck_inprogress: time.sleep(1)
+        else: break
 
 def check_PatchUpdate():
     try:
