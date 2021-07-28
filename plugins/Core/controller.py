@@ -826,7 +826,7 @@ class Controller():
                 if self.action.lower() == 'debug':
                     index = STOP
                 else:
-                    if teststepproperty.inputval[0] == 'testcase':
+                    if teststepproperty.inputval[0].lower() == 'testcase':
                         prev_index = index
                         index -= 1
                         teststepproperty_name = teststepproperty.testscript_name
@@ -836,7 +836,7 @@ class Controller():
                                 break
                         if (index + 1) == prev_index:
                             index = STOP
-                    elif teststepproperty.inputval[0] == 'module':
+                    elif teststepproperty.inputval[0].lower() == 'module':
                         local_cont.module_stop = True
                         index = STOP
                     else:
