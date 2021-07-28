@@ -57,8 +57,6 @@ class DesktopDispatcher:
         'verifybuttonname' : button_link_keywords_obj.verify_button_name,
         'getbuttonname' : button_link_keywords_obj.get_button_name,
         'rightclick' : button_link_keywords_obj.right_click,
-        'getlinktext' : button_link_keywords_obj.get_link_text,
-        'verifylinktext' : button_link_keywords_obj.verify_link_text,
         'settext' : editable_text_obj.set_text,
         'setsecuretext' : editable_text_obj.set_secure_text,
         'gettext' : editable_text_obj.get_text,

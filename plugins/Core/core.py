@@ -247,10 +247,15 @@ class MainNamespace(BaseNamespace):
                 if appType==APPTYPE_DESKTOP_JAVA.lower():
                     if(not args[0].startswith('iris')):
                         core_utils.get_all_the_imports('Oebs')
-                        import utils
-                        light =utils.Utils()
-                        res = light.highlight(args[0],args[1])
-                        logger.print_on_console('Highlight result: '+str(res))
+                        import oebs_utils
+                        light = oebs_utils.Utils()
+                        if args[1] == '' or args[1] == ' ':
+                            err_msg = 'Invalid Window Name, Highlighting Failed'
+                            log.error(err_msg)
+                            logger.print_on_console(err_msg)
+                        else:
+                            res = light.highlight(args[0],args[1])
+                            logger.print_on_console('Highlight result: '+str(res))
                 elif appType==APPTYPE_DESKTOP.lower():
                     core_utils.get_all_the_imports('Desktop')
                     import desktop_highlight
@@ -549,8 +554,8 @@ class MainNamespace(BaseNamespace):
                 global browsername, oebsScrapeObj, oebsScrapeFlag
                 browsername = args[0]
                 core_utils.get_all_the_imports('Oebs')
-                import scrape_dispatcher
-                oebsScrapeObj=scrape_dispatcher
+                import oebs_scrape_dispatcher
+                oebsScrapeObj=oebs_scrape_dispatcher
                 oebsScrapeFlag=True
                 wx.PostEvent(cw.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, cw.GetId()))
         except Exception as e:

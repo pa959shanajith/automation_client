@@ -9,11 +9,12 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 
-from oebs_msg import *
+from oebs_constants import *
 import oebs_key_objects
 import oebs_serverUtilities
 import time
 import logging
+import logger
 import oebs_mouseops
 from oebs_utilops import UtilOperations
 from oebs_keyboardops import KeywordOperations
@@ -57,6 +58,7 @@ class DropdownListboxOperations:
                 keywordresult = MSG_PASS
             else:
                 log.debug('%s',MSG_INVALID_INPUT)
+                logger.print_on_console(MSG_INVALID_INPUT)
                 oebs_key_objects.custom_msg.append(MSG_INVALID_OBJECT)
             outputsize = len(selectedvalue)
             for i in range(outputsize):
@@ -79,6 +81,9 @@ class DropdownListboxOperations:
                     oebs_key_objects.custom_msg.append("MSG_RESULT_IS")
         except Exception as e:
             self.utilities_obj.cleardata()
+            err_msg = ERROR_CODE_DICT['err_get_selected']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('%s',e)
             log.debug('Status %s',keywordresult)
         log.debug('Status %s',keywordresult)
@@ -119,10 +124,14 @@ class DropdownListboxOperations:
             else:
                 log.debug('%s',MSG_INVALID_OBJECT)
                 oebs_key_objects.custom_msg.append(MSG_INVALID_OBJECT)
+                logger.print_on_console(MSG_INVALID_OBJECT)
             if keywordresult == MSG_FAIL:
                 oebs_key_objects.custom_msg.append(MSG_VERIFYFAIL)
         except Exception as e:
             self.utilities_obj.cleardata()
+            err_msg = ERROR_CODE_DICT['err_verify_selected']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('%s',e)
             log.debug('Status %s',keywordresult)
         log.debug('Status %s',keywordresult)
@@ -152,6 +161,9 @@ class DropdownListboxOperations:
         except Exception as e:
             self.utilities_obj.cleardata()
             log.debug('%s',e)
+            err_msg = ERROR_CODE_DICT['err_get_count']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('Status %s',keywordresult)
         log.debug('Status %s',keywordresult)
         # response is sent to the client
@@ -177,12 +189,16 @@ class DropdownListboxOperations:
                     verifyresponse = MSG_TRUE
                 else:
                     log.debug('%s',MSG_INVALID_INPUT)
+                    logger.print_on_console(MSG_INVALID_INPUT)
                     oebs_key_objects.custom_msg.append(MSG_VERIFYFAIL)
             else:
                 log.debug('MSG:%s',MSG_INVALID_NOOF_INPUT)
                 oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
         except Exception as e:
             self.utilities_obj.cleardata()
+            err_msg = ERROR_CODE_DICT['err_verify_count']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('%s',e)
             log.debug('Status %s',keywordresult)
         log.debug('Status %s',keywordresult)
@@ -208,24 +224,29 @@ class DropdownListboxOperations:
             if charinfo.role == 'combo box':
                 #calling getvaluesdropdown def to get all values in dropdown
                     generatedvalues  = self.getvaluesdropdown(acc)
-                    if generatedvalues == inputValues:
+                    if sorted(generatedvalues) == sorted(inputValues):
                         keywordresult=MSG_PASS
                         verifyresponse = MSG_TRUE
             #check for listbox
             elif charinfo.role == 'list':
                 #calling getvalueslist def to get all values in list
                 listvalues = self.getvalueslist(acc)
-                if listvalues == inputValues:
+                if len(inputValues) > 0 and str(listvalues) == inputValues[0]:
                         keywordresult=MSG_PASS
                         verifyresponse =MSG_TRUE
             else:
                 log.debug('%s',MSG_INVALID_OBJECT)
                 oebs_key_objects.custom_msg.append(MSG_INVALID_OBJECT)
+                logger.print_on_console(MSG_INVALID_OBJECT)
             if keywordresult == MSG_FAIL:
                 oebs_key_objects.custom_msg.append(MSG_VERIFYFAIL)
+                logger.print_on_console(MSG_VERIFYFAIL)
         except Exception as e:
             self.utilities_obj.cleardata()
             log.debug('%s',e)
+            err_msg = ERROR_CODE_DICT['err_verify_all_values']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('Status %s',keywordresult)
         log.debug('Status %s',keywordresult)
         # response is sent to the client
@@ -266,7 +287,7 @@ class DropdownListboxOperations:
                     inputlength = len(inputValues)
                     for i in range(0,inputlength):
                         if inputValues[i] in listvalues:
-                            flag+=1;
+                            flag+=1
                             keywordresult=MSG_PASS
                             verifyresponse = MSG_TRUE
 
@@ -280,11 +301,16 @@ class DropdownListboxOperations:
                     log.debug('%s',MSG_INVALID_INPUT)
                 if keywordresult == MSG_FAIL:
                     oebs_key_objects.custom_msg.append(MSG_VERIFYFAIL)
+                    logger.print_on_console(MSG_VERIFYFAIL)
             else:
                 oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
+                logger.print_on_console(MSG_INVALID_INPUT)
         except Exception as e:
             self.utilities_obj.cleardata()
             log.debug('%s',e)
+            err_msg = ERROR_CODE_DICT['err_verify_values_exist']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('Status %s',keywordresult)
         log.debug('Status %s',keywordresult)
         # response is sent to the client
@@ -306,6 +332,8 @@ class DropdownListboxOperations:
                 if 'selected' in state:
                        value = acccontext.name
                        selectedvalue.append(str(value))
+        if len(selectedvalue) == 1:
+            return selectedvalue[0]
         return selectedvalue
 
     #Method to get count for dropdown
@@ -344,14 +372,14 @@ class DropdownListboxOperations:
         #global selectedvalue
         contextInfo = acc.getAccessibleContextInfo()
         if contextInfo.role == 'list':
-                        count1 = contextInfo.childrenCount
-                        for num in range(0, count1) :
-                            childacc = acc.getAccessibleChildFromContext(num)
-                            acccontext = childacc.getAccessibleContextInfo()
-                            state = acccontext.role
-                            if state=='label':
-                                value = acccontext.name
-                                selectedvalue.append(str(value))
+            count1 = contextInfo.childrenCount
+            for num in range(0, count1) :
+                childacc = acc.getAccessibleChildFromContext(num)
+                acccontext = childacc.getAccessibleContextInfo()
+                state = acccontext.role
+                if state=='label':
+                    value = acccontext.name
+                    selectedvalue.append(str(value))
         return selectedvalue
 
     #method to verify whether given values are selected in listbox object
@@ -381,9 +409,13 @@ class DropdownListboxOperations:
                     verifyresponse = MSG_FALSE
                 if keywordresult == MSG_FAIL:
                     oebs_key_objects.custom_msg.append(MSG_VERIFYFAIL)
+                    logger.print_on_console(MSG_VERIFYFAIL)
         except Exception as e:
             self.utilities_obj.cleardata()
             log.debug('%s',e)
+            err_msg = ERROR_CODE_DICT['err_verify_selected_values']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('Status %s',keywordresult)
         log.debug('Status %s',keywordresult)
         # response is sent to the client
@@ -404,7 +436,7 @@ class DropdownListboxOperations:
             #gets the entire context information
             curaccinfo = acc.getAccessibleContextInfo()
             log.debug('Received Object Context',DEF_GETMULTIPLEVALUESBYINDEXES)
-            if 'multiselectable' in curaccinfo.states:
+            if curaccinfo.role == 'list' and 'enabled' in curaccinfo.states:
                 valueslength = len(oebs_key_objects.keyword_input)
                 if valueslength >=  1:
                     output_list=[]
@@ -427,9 +459,13 @@ class DropdownListboxOperations:
                     oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
             else:
                 log.debug('Not a List',DEF_GETMULTIPLEVALUESBYINDEXES)
+                logger.print_on_console(ERROR_CODE_DICT['err_object'])
                 oebs_key_objects.custom_msg.append('Not a List.')
         except Exception as e:
             self.utilities_obj.cleardata()
+            err_msg = ERROR_CODE_DICT['err_get_multiple_index']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('%s',DEF_GETMULTIPLEVALUESBYINDEXES,e)
             log.debug('Status %s',DEF_GETMULTIPLEVALUESBYINDEXES,keywordresult)
         log.debug('Status %s',DEF_GETMULTIPLEVALUESBYINDEXES,keywordresult)
@@ -511,6 +547,7 @@ class DropdownListboxOperations:
                                     else:
                                         keywordresult = MSG_PASS
                                         verifyresponse = MSG_TRUE
+                                        logger.print_on_console(MSG_INVALID_NOOF_INPUT)
                                         log.debug('%s',MSG_INVALID_NOOF_INPUT)
                                     log.debug('Value is selected')
                                 #combo box is revert back with below code
@@ -524,6 +561,7 @@ class DropdownListboxOperations:
                                     verifyresponse = MSG_TRUE
                                 else:
                                     oebs_key_objects.custom_msg.append(MSG_OBJECT_READONLY)
+                                    logger.print_on_console(MSG_OBJECT_READONLY)
                                     keywordresult = MSG_FAIL
                                     verifyresponse = MSG_FALSE
                             else:
@@ -582,21 +620,29 @@ class DropdownListboxOperations:
                                     else:
                                         keywordresult = MSG_PASS
                                         verifyresponse = MSG_TRUE
+                                        logger.print_on_console(MSG_INVALID_NOOF_INPUT)
                                         log.debug('%s',MSG_INVALID_NOOF_INPUT)
                                 else:
                                     log.debug('MSG:%s',MSG_ELEMENT_NOT_VISIBLE)
+                                    logger.print_on_console(MSG_ELEMENT_NOT_VISIBLE)
                                     oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_VISIBLE)
                     else:
                         log.debug('%s',MSG_INVALID_NOOF_INPUT)
+                        logger.print_on_console(MSG_INVALID_INPUT)
                         oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
                 else:
                     log.debug('%s',MSG_INVALID_INPUT)
+                    logger.print_on_console(MSG_INVALID_INPUT)
                     oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
             else:
                 log.debug('%s',MSG_INVALID_NOOF_INPUT)
+                logger.print_on_console(MSG_INVALID_NOOF_INPUT)
                 oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
         except Exception as e:
             self.utilities_obj.cleardata()
+            err_msg = ERROR_CODE_DICT['err_select_value_index']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('%s',e)
             log.debug('Status %s',keywordresult)
         log.debug('Status %s',keywordresult)
@@ -621,6 +667,7 @@ class DropdownListboxOperations:
                 if(int(oebs_key_objects.keyword_input[0]) > listcontxtInfo.childrenCount or int(oebs_key_objects.keyword_input[0]) < 0):
                     log.debug('%s',MSG_INVALID_INPUT)
                     oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
+                    logger.print_on_console(MSG_INVALID_INPUT)
                 else:
                     childinfo=accinfo.getAccessibleChildFromContext(int(oebs_key_objects.keyword_input[0]))
                     childcontxt=childinfo.getAccessibleContextInfo()
@@ -628,9 +675,13 @@ class DropdownListboxOperations:
                     keywordresponse=childcontxt.name
             else:
                 log.debug('%s',MSG_INVALID_INPUT)
+                logger.print_on_console(MSG_INVALID_INPUT)
                 oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
         except Exception as e:
             self.utilities_obj.cleardata()
+            err_msg = ERROR_CODE_DICT['err_get_value_index']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('%s',e)
             log.debug('Status %s',keywordresult)
         log.debug('Status %s',keywordresult)
@@ -669,10 +720,15 @@ class DropdownListboxOperations:
             else:
                 log.debug('%s',MSG_INVALID_OBJECT)
                 oebs_key_objects.custom_msg.append(MSG_INVALID_OBJECT)
+                logger.print_on_console(MSG_INVALID_OBJECT)
             if keywordresult == MSG_FAIL:
                 oebs_key_objects.custom_msg.append(MSG_VERIFYFAIL)
+                logger.print_on_console(MSG_VERIFYFAIL)
         except Exception as e:
             self.utilities_obj.cleardata()
+            err_msg = ERROR_CODE_DICT['err_get_all_values']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('%s',e)
             log.debug('Status %s',keywordresult)
         log.debug('Status %s',keywordresult)
@@ -695,8 +751,12 @@ class DropdownListboxOperations:
                 keywordresult=MSG_PASS
             else:
                 oebs_key_objects.custom_msg.append(MSG_SINGLESELECTION_LIST)
+                logger.print_on_console(MSG_SINGLESELECTION_LIST)
         except Exception as e:
             self.utilities_obj.cleardata()
+            err_msg = ERROR_CODE_DICT['err_select_all_values']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('%s',e)
             log.debug('Status %s',keywordresult)
         log.debug('Status %s',keywordresult)
@@ -723,8 +783,12 @@ class DropdownListboxOperations:
                 keywordresult=MSG_PASS
             else:
                 oebs_key_objects.custom_msg.append(MSG_SINGLESELECTION_LIST)
+                logger.print_on_console(MSG_SINGLESELECTION_LIST)
         except Exception as e:
             self.utilities_obj.cleardata()
+            err_msg = ERROR_CODE_DICT['err_deselect_all']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('%s',e)
             log.debug('Status %s',keywordresult)
         log.debug('Status %s',keywordresult)
@@ -749,24 +813,34 @@ class DropdownListboxOperations:
             for index in range(int(children)):
                 getAcceess=acc.removeAccessibleSelectionFromContext(index)
 
-            if len(oebs_key_objects.keyword_input) > 0:
-                for index in range(len(oebs_key_objects.keyword_input)):
-                    if (oebs_key_objects.keyword_input[index] != None) and (oebs_key_objects.keyword_input[index] != ''):
-                        childrennames.append(oebs_key_objects.keyword_input[index])
-                    if(int(childrennames[index]) < int(contextinfo.childrenCount)):
-                        acc.addAccessibleSelectionFromContext(int(childrennames[index]))
-                        verifyresponse=MSG_TRUE
-                        keywordresult=MSG_PASS
-                    else:
-                        log.debug('%s',MSG_INVALID_INPUT)
-                        verifyresponse = MSG_FALSE
-                        keywordresult=MSG_FAIL
-                        break
+            if len(oebs_key_objects.keyword_input) > 0 and contextinfo.role == 'list':
+                if (len(oebs_key_objects.keyword_input) > 1 and 'multiselectable' in contextinfo.states) or len(oebs_key_objects.keyword_input) == 1:
+                    for index in range(len(oebs_key_objects.keyword_input)):
+                        if (oebs_key_objects.keyword_input[index] != None) and (oebs_key_objects.keyword_input[index] != ''):
+                            childrennames.append(oebs_key_objects.keyword_input[index])
+                        if(int(childrennames[index]) < int(contextinfo.childrenCount)):
+                            acc.addAccessibleSelectionFromContext(int(childrennames[index]))
+                            verifyresponse=MSG_TRUE
+                            keywordresult=MSG_PASS
+                        else:
+                            log.debug('%s',MSG_INVALID_INPUT)
+                            logger.print_on_console(MSG_INVALID_INPUT)
+                            verifyresponse = MSG_FALSE
+                            keywordresult=MSG_FAIL
+                            break
+                else:
+                    oebs_key_objects.custom_msg.append(MSG_SINGLESELECTION_LIST)
+                    logger.print_on_console(MSG_SINGLESELECTION_LIST)
+                    keywordresult=MSG_FAIL
             else:
                 log.debug('%s',MSG_INVALID_INPUT)
                 oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
+                logger.print_on_console(MSG_INVALID_INPUT)
         except Exception as e:
             self.utilities_obj.cleardata()
+            err_msg = ERROR_CODE_DICT['err_select_multiple_values']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('%s',e)
             log.debug('Status %s',keywordresult)
         log.debug('Status %s',keywordresult)
@@ -862,10 +936,12 @@ class DropdownListboxOperations:
                                 verifyresponse = MSG_TRUE
                             else:
                                 oebs_key_objects.custom_msg.append(MSG_OBJECT_READONLY)
+                                logger.print_on_console(MSG_OBJECT_READONLY)
                                 keywordresult = MSG_FAIL
                                 verifyresponse = MSG_FALSE
                         else:
                                 log.debug('MSG:%s',MSG_ELEMENT_NOT_VISIBLE)
+                                logger.print_on_console(MSG_ELEMENT_NOT_VISIBLE)
                                 oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_VISIBLE)
                     else:
                         if currinfo.accessibleAction == 1:
@@ -936,21 +1012,29 @@ class DropdownListboxOperations:
                                     else:
                                         keywordresult = MSG_PASS
                                         verifyresponse = MSG_TRUE
+                                        logger.print_on_console(MSG_INVALID_NOOF_INPUT)
                                         log.debug('%s',MSG_INVALID_NOOF_INPUT)
                                 else:
                                     log.debug('Value Does not exist',DEF_SELECTVALUEBYTEXT)
+                                    logger.print_on_console(MSG_INVALID_INPUT)
                                     oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
                             else:
                                 log.debug('MSG:%s',MSG_ELEMENT_NOT_VISIBLE)
+                                logger.print_on_console(MSG_ELEMENT_NOT_VISIBLE)
                                 oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_VISIBLE)
                 else:
                     log.debug('%s',MSG_INVALID_INPUT)
+                    logger.print_on_console(MSG_INVALID_NOOF_INPUT)
                     oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
             else:
                 log.debug('%s',MSG_INVALID_NOOF_INPUT)
+                logger.print_on_console(MSG_INVALID_NOOF_INPUT)
                 oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
         except Exception as e:
             self.utilities_obj.cleardata()
+            err_msg = ERROR_CODE_DICT['err_select_value_text']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('%s',e)
             log.debug('Status %s',keywordresult)
         log.debug('Status %s',keywordresult)
@@ -982,21 +1066,33 @@ class DropdownListboxOperations:
                     childrennames.append(oebs_key_objects.keyword_input[index])
             childrenselected=0
             if len(childrennames) != 0 :
-                for index in range(children):
-                    childacc = acc.getAccessibleChildFromContext(int(index))
-                    childcontext = childacc.getAccessibleContextInfo()
-                    fetchedname = childcontext.name
-                    if fetchedname in childrennames:
-                        acc.addAccessibleSelectionFromContext(index)
-                        childrenselected = childrenselected + 1
-                if childrenselected == len(childrennames):
-                    keywordresult = MSG_PASS
-                    verifyresponse = MSG_TRUE
+                if (len(childrennames) > 1 and 'multiselectable' in currinfo.states) or len(childrennames) == 1:
+                    for index in range(children):
+                        childacc = acc.getAccessibleChildFromContext(int(index))
+                        childcontext = childacc.getAccessibleContextInfo()
+                        fetchedname = childcontext.name
+                        if fetchedname in childrennames:
+                            acc.addAccessibleSelectionFromContext(index)
+                            childrenselected = childrenselected + 1
+                    if childrenselected == len(childrennames):
+                        keywordresult = MSG_PASS
+                        verifyresponse = MSG_TRUE
+                    else:
+                        logger.print_on_console(ERROR_CODE_DICT['err_multi_select'])
+                        keywordresult=MSG_FAIL
+                else:
+                    oebs_key_objects.custom_msg.append(MSG_SINGLESELECTION_LIST)
+                    logger.print_on_console(MSG_SINGLESELECTION_LIST)
+                    keywordresult=MSG_FAIL
             else:
                 log.debug('%s',MSG_INVALID_NOOF_INPUT)
                 oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
+                logger.print_on_console(MSG_INVALID_INPUT)
         except Exception as e:
             self.utilities_obj.cleardata()
+            err_msg = ERROR_CODE_DICT['err_select_multiple_value_text']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('%s',e)
             log.debug('Status %s',keywordresult)
         log.debug('Status %s',keywordresult)

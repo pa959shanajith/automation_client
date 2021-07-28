@@ -9,7 +9,7 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 
-from oebs_msg import *
+from oebs_constants import *
 import logging
 import oebs_key_objects
 import winuser
@@ -21,6 +21,7 @@ import oebs_serverUtilities
 from oebs_utilops import UtilOperations
 import time
 import pythoncom
+import logger
 from encryption_utility import AESCipher
 pythoncom.CoInitialize()
 shell = win32com.client.Dispatch("WScript.Shell")
@@ -61,12 +62,17 @@ class TextOperations:
                     oebs_key_objects.custom_msg.append("MSG_RESULT_IS")
                 else:
                     log.debug('MSG:%s',MSG_DISABLED_OBJECT)
+                    logger.print_on_console(MSG_DISABLED_OBJECT)
                     oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
             else:
                 log.debug('%s',MSG_INVALID_OBJECT)
+                logger.print_on_console(MSG_INVALID_OBJECT)
                 oebs_key_objects.custom_msg.append(MSG_INVALID_OBJECT)
         except Exception as e:
             self.utilities_obj.cleardata()
+            err_msg = ERROR_CODE_DICT['err_get_text']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('%s',e)
             log.debug('Status %s',keywordresult)
         log.debug('Status %s',keywordresult)
@@ -178,26 +184,33 @@ class TextOperations:
                                             keywordresponse=MSG_TRUE
                                     else:
                                         log.debug('MSG:%s',MSG_ELEMENT_NON_EDITABLE)
+                                        logger.print_on_console(MSG_ELEMENT_NON_EDITABLE)
                                         oebs_key_objects.custom_msg.append(MSG_ELEMENT_NON_EDITABLE)
-
                                 else:
                                     log.debug('MSG:%s',MSG_OBJECT_READONLY)
+                                    logger.print_on_console(MSG_OBJECT_READONLY)
                                     oebs_key_objects.custom_msg.append(MSG_OBJECT_READONLY)
                             else:
                                 log.debug('MSG:%s',MSG_ELEMENT_NOT_VISIBLE)
+                                logger.print_on_console(MSG_ELEMENT_NOT_VISIBLE)
                                 oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_VISIBLE)
                         else:
                             log.debug('MSG:%s',MSG_INVALID_INPUT)
+                            logger.print_on_console(MSG_INVALID_INPUT)
                             oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
                     else:
                         log.debug('MSG:%s',MSG_INVALID_NOOF_INPUT)
+                        logger.print_on_console(MSG_INVALID_INPUT)
                         oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
             else:
                 log.debug('MSG:%s',MSG_DISABLED_OBJECT)
+                logger.print_on_console(MSG_DISABLED_OBJECT)
                 oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
         except Exception as e:
             self.utilities_obj.cleardata()
-            log.error('%s',e)
+            err_msg = ERROR_CODE_DICT['err_set_text']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('Status %s',keywordresult)
             oebs_key_objects.custom_msg=[]
             oebs_key_objects.custom_msg.append(str(e))
@@ -247,15 +260,19 @@ class TextOperations:
                                         keywordresponse=MSG_TRUE
                                 else:
                                     log.debug('MSG:%s',MSG_INVALID_INPUT)
+                                    logger.print_on_console(MSG_INVALID_INPUT)
                                     oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
                             else:
                                 log.debug('MSG:%s',MSG_INVALID_INPUT)
+                                logger.print_on_console(MSG_INVALID_INPUT)
                                 oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
                         else:
                             log.debug('MSG:%s',MSG_INVALID_OBJECT)
+                            logger.print_on_console(MSG_INVALID_OBJECT)
                             oebs_key_objects.custom_msg.append(MSG_INVALID_OBJECT)
                     else:
                         log.debug('MSG:%s',MSG_OBJECT_READONLY)
+                        logger.print_on_console(MSG_OBJECT_READONLY)
                         oebs_key_objects.custom_msg.append(MSG_OBJECT_READONLY)
                 else:
                     #gets the entire context information
@@ -320,22 +337,29 @@ class TextOperations:
 
                                 else:
                                     log.debug('MSG:%s',MSG_OBJECT_READONLY)
+                                    logger.print_on_console(MSG_OBJECT_READONLY)
                                     oebs_key_objects.custom_msg.append(MSG_OBJECT_READONLY)
                             else:
                                 log.debug('MSG:%s',MSG_ELEMENT_NOT_VISIBLE)
+                                logger.print_on_console(MSG_ELEMENT_NOT_VISIBLE)
                                 oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_VISIBLE)
                         else:
                             log.debug('MSG:%s',MSG_INVALID_INPUT)
+                            logger.print_on_console(MSG_INVALID_INPUT)
                             oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
                     else:
                         log.debug('MSG:%s',MSG_INVALID_NOOF_INPUT)
+                        logger.print_on_console(MSG_INVALID_INPUT)
                         oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
             else:
                 log.debug('MSG:%s',MSG_DISABLED_OBJECT)
+                logger.print_on_console(MSG_DISABLED_OBJECT)
                 oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
         except Exception as e:
             self.utilities_obj.cleardata()
-            log.error('%s',e)
+            err_msg = ERROR_CODE_DICT['err_set_secure_text']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('Status %s',keywordresult)
             oebs_key_objects.custom_msg=[]
             oebs_key_objects.custom_msg.append(str(e))
@@ -350,9 +374,9 @@ class TextOperations:
         del oebs_key_objects.custom_msg[:]
         #sets the keywordresult to FAIL
         keywordresult=MSG_FAIL
+        #sets the verifyresponse to FALSE
+        verifyresponse = MSG_FALSE
         try:
-            #sets the verifyresponse to FALSE
-            verifyresponse = MSG_FALSE
             #gets the entire context information
             curaccinfo = acc.getAccessibleContextInfo()
             log.debug('Received Object Context',DEF_VERIFYTEXT)
@@ -377,15 +401,21 @@ class TextOperations:
                             oebs_key_objects.custom_msg.append(str('Text verification failed \'' + fetchedText + '\' not equal to \''+textVerify+"\'."))
                     else:
                         log.debug('MSG:%s',MSG_INVALID_INPUT)
+                        logger.print_on_console(MSG_INVALID_INPUT)
                         oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
                 else:
                     log.debug('MSG:%s',MSG_INVALID_NOOF_INPUT)
+                    logger.print_on_console(MSG_INVALID_INPUT)
                     oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
             else:
                 log.debug('MSG:%s',MSG_INVALID_OBJECT)
+                logger.print_on_console(MSG_INVALID_OBJECT)
                 oebs_key_objects.custom_msg.append(MSG_INVALID_OBJECT)
         except Exception as e:
             self.utilities_obj.cleardata()
+            err_msg = ERROR_CODE_DICT['err_verify_text']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('%s',e)
             log.debug('Status %s',keywordresult)
         log.debug('Status %s',keywordresult)
@@ -428,9 +458,11 @@ class TextOperations:
                                 log.debug('MSG:%s',MSG_TEXTBOX_CLEARED)
                         else:
                             log.debug('MSG:%s',MSG_INVALID_OBJECT)
+                            logger.print_on_console(MSG_INVALID_OBJECT)
                             oebs_key_objects.custom_msg.append(MSG_INVALID_OBJECT)
                     else:
                         log.debug('MSG:%s',MSG_OBJECT_READONLY)
+                        logger.print_on_console(MSG_OBJECT_READONLY)
                         oebs_key_objects.custom_msg.append(MSG_OBJECT_READONLY)
                 else:
                     if 'editable' in curaccinfo.states:
@@ -479,22 +511,30 @@ class TextOperations:
                                             keywordresult=MSG_PASS
                                             verifyresponse=MSG_TRUE
                                         else:
-                                            log.debug('MSG:%s',MSG_ELEMENT_NOT_VISIBLE)
+                                            log.debug('MSG:%s',MSG_ELEMENT_NOT_FOCUSABLE)
+                                            logger.print_on_console(MSG_ELEMENT_NOT_FOCUSABLE)
                                             oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_FOCUSABLE)
                                 else:
                                     log.debug('MSG:%s',MSG_ELEMENT_NON_EDITABLE)
+                                    logger.print_on_console(MSG_ELEMENT_NON_EDITABLE)
                                     oebs_key_objects.custom_msg.append(MSG_ELEMENT_NON_EDITABLE)
                             else:
                                 log.debug('MSG:%s',MSG_ELEMENT_NOT_VISIBLE)
+                                logger.print_on_console(MSG_ELEMENT_NOT_VISIBLE)
                                 oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_VISIBLE)
                     else:
                         log.debug('MSG:%s',MSG_OBJECT_READONLY)
+                        logger.print_on_console(MSG_OBJECT_READONLY)
                         oebs_key_objects.custom_msg.append(MSG_OBJECT_READONLY)
             else:
                 log.debug('MSG:%s',MSG_DISABLED_OBJECT)
+                logger.print_on_console(MSG_DISABLED_OBJECT)
                 oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
         except Exception as e:
             self.utilities_obj.cleardata()
+            err_msg = ERROR_CODE_DICT['err_clear_text']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('%s',e)
             log.debug('Status %s',keywordresult)
         log.debug('Status %s',keywordresult)

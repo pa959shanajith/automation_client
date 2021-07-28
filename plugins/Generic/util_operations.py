@@ -72,6 +72,7 @@ class UtilOperations:
         fmt_type=None
         output=None
         err_msg=None
+        casted_flag=False
         log.info('Input is '+input+' type to be converted is '+to_type)
         logger.print_on_console('Input is '+input+' type to be converted is '+to_type)
         if not (input is None or input is '' or to_type is None or to_type is ''):
@@ -82,6 +83,7 @@ class UtilOperations:
                 if to_type=='string':
                     log.debug('converting into string')
                     output=input
+                    casted_flag=True
                 elif to_type=='int':
                     log.debug('converting into int')
                     input=self.check_input(input)
@@ -90,6 +92,7 @@ class UtilOperations:
                         output=round(output)
                     else:
                         output=int(output)
+                    casted_flag = True
                 elif to_type=='float':
                     log.debug('converting into float')
                     input=self.check_input(input)
@@ -106,6 +109,7 @@ class UtilOperations:
                             output=temp_var
                             break
                     output=float(output)
+                    casted_flag = True
                 elif to_type=='double':
                     log.debug('converting into double')
                     input=self.check_input(input)
@@ -122,6 +126,7 @@ class UtilOperations:
                             output=temp_var
                             break
                     output=float(output)
+                    casted_flag = True
                 elif to_type=='date':
                     #Supported date formats are
                     log.debug('converting into date format')
@@ -149,7 +154,7 @@ class UtilOperations:
                                     deltaDays = datetime.timedelta(days=int(float(input))-2)
                                     date_output = (tempDate + deltaDays )
                                     output= date_output.strftime(fmt_type)
-
+                            casted_flag=True
                         else:
                             log.error('Invalid date format')
                             logger.print_on_console('Invalid date format')
@@ -157,11 +162,11 @@ class UtilOperations:
                     log.error('Please provide valid data type for conversion ')
                     logger.print_on_console('Please provide valid data type for conversion ')
 
-
-                methodoutput=TEST_RESULT_TRUE
-                status=TEST_RESULT_PASS
-                log.info('Result is %s',output)
-                logger.print_on_console('Result is ',output)
+                if casted_flag:
+                    methodoutput=TEST_RESULT_TRUE
+                    status=TEST_RESULT_PASS
+                    log.info('Result is %s',output)
+                    logger.print_on_console('Result is ',output)
 
             except Exception as e:
                 log.error(e)

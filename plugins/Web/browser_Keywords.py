@@ -31,6 +31,7 @@ import readconfig
 import core_utils
 import time
 import fileinput
+import glob
 from sendfunction_keys import SendFunctionKeys as SF
 driver_pre = None
 drivermap = []
@@ -1326,6 +1327,8 @@ class Singleton_DriverUtil():
         use_custom_debugport = str(configvalues["use_custom_debugport"].lower()) == "yes"
         close_browser_popup = configvalues['close_browser_popup']
         incognito_private_mode = configvalues['incognito_private_mode']
+        extension_path = configvalues['chrome_extnpath']
+        extn_flag=False
         if (browser_num == '1'):
             try:
                 chrome_path = configvalues['chrome_path']
@@ -1337,13 +1340,27 @@ class Singleton_DriverUtil():
                     choptions.add_argument('start-maximized')
                     choptions.add_experimental_option('useAutomationExtension', False)
                     choptions.add_experimental_option("excludeSwitches",["enable-automation"])
+                    extns=glob.glob(webconstants.EXTENSIONS_PATH+os.sep+"*.crx")
                     if headless_mode:
                         WINDOW_SIZE = "1350,650"
                         choptions.add_argument("--window-size=%s" % WINDOW_SIZE)
                         choptions.headless = True
-                    if configvalues['extn_enabled'].lower()=='yes' and os.path.exists(webconstants.EXTENSION_PATH):
-                        choptions.add_extension(webconstants.EXTENSION_PATH)
-                    else:
+                    if configvalues['extn_enabled'].lower()=='yes' and os.path.exists(webconstants.AVO_EXTENSION_PATH):
+                        choptions.add_extension(webconstants.AVO_EXTENSION_PATH)
+                    if extension_path.lower() != 'default':
+                        extn=extension_path.split(";")
+                        for i in extn:
+                            if os.path.isfile(i):
+                                if os.path.splitext(i)[-1].lower()=='.crx':
+                                    extns.append(i)
+                            elif os.path.isdir(i):
+                                [extns.append(j) for j in glob.glob(i+os.sep+"*.crx")]
+                    if len(extns) > 0:
+                        for i in extns:
+                            if i != webconstants.AVO_EXTENSION_PATH:
+                                choptions.add_extension(os.path.abspath(i))
+                                extn_flag=True
+                    if extn_flag== False and configvalues['extn_enabled'].lower()=='no':
                         choptions.add_argument('--disable-extensions')
                     if str(chrome_path).lower() != 'default':
                         choptions.binary_location = str(chrome_path)
@@ -1369,6 +1386,15 @@ class Singleton_DriverUtil():
 
                     driver = webdriver.Chrome(executable_path=exec_path, options=choptions)
                     # driver.navigate().refresh()
+                    if extn_flag == True:
+                        time.sleep(3)
+                        handles=driver.window_handles
+                        main_handle=driver.current_window_handle
+                        for i in handles:
+                            driver.switch_to.window(i)
+                            if driver.current_window_handle != main_handle:
+                                driver.close()
+                                driver.switch_to.window(driver.window_handles[-1])
                     controller.process_ids.append(driver.service.process.pid)
                     drivermap.append(driver)
                     driver.maximize_window()
@@ -1514,6 +1540,7 @@ class Singleton_DriverUtil():
         elif(browser_num == '8'):
             try:
                 if core.chromiumFlag:
+                    extn_flag= False
                     msoptions = webdriver.EdgeChromiumOptions()
                     msoptions.add_argument('start-maximized')
                     msoptions.add_experimental_option('useAutomationExtension', False)
@@ -1526,7 +1553,23 @@ class Singleton_DriverUtil():
                     #     msoptions.add_extension(webconstants.EXTENSION_PATH)
                     # else:
                     #     msoptions.add_argument('--disable-extensions')
-                    msoptions.add_argument('--disable-extensions')
+                    extension_path = configvalues['chrome_extnpath']
+                    extns=glob.glob(webconstants.EXTENSIONS_PATH+os.sep+"*.crx")
+                    if extension_path.lower() != 'default':
+                        extn=extension_path.split(";")
+                        for i in extn:
+                            if os.path.isfile(i):
+                                if os.path.splitext(i)[-1].lower()=='.crx':
+                                    extns.append(i)
+                            elif os.path.isdir(i):
+                                [extns.append(j) for j in glob.glob(i+os.sep+"*.crx")]
+                    if len(extns) > 0:
+                        for i in extns:
+                            if i != webconstants.AVO_EXTENSION_PATH:
+                                msoptions.add_extension(os.path.abspath(i))
+                                extn_flag=True
+                    if extn_flag== False:
+                        msoptions.add_argument('--disable-extensions')
                     if str(close_browser_popup).lower() == 'yes':
                         prefs = {}
                         prefs["credentials_enable_service"] = False
@@ -1545,6 +1588,15 @@ class Singleton_DriverUtil():
                     controller.process_ids.append(driver.edge_service.process.pid)
                     drivermap.append(driver)
                     driver.maximize_window()
+                    if extn_flag == True:
+                        time.sleep(3)
+                        handles=driver.window_handles
+                        main_handle=driver.current_window_handle
+                        for i in handles:
+                            driver.switch_to.window(i)
+                            if driver.current_window_handle != main_handle:
+                                driver.close()
+                                driver.switch_to.window(driver.window_handles[-1])
                     msg = ('Headless ' if headless_mode else '') + 'Edge Chromium browser started'
                     logger.print_on_console(msg)
                     local_bk.log.info(msg)
