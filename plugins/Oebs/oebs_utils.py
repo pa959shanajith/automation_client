@@ -95,6 +95,7 @@ class Utils:
                 logger.print_on_console(ERROR_CODE_DICT['err_object_highlight'])
                 status = False
             else:
+                acc.requestFocus()
                 logger.print_on_console('Highlighting in progress')
                 charinfo = acc.getAccessibleContextInfo()
                 obj=oebsServer.OebsKeywords()
