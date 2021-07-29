@@ -25,6 +25,8 @@ from ctypes import wintypes
 import os
 import re
 import oebs_serverUtilities
+import win32com
+import pythoncom
 
 log = logging.getLogger('oebs_utils.py')
 
@@ -73,10 +75,16 @@ class Utils:
     def bring_to_top(self,aut_handle,value):
         try:
             win32gui.BringWindowToTop(aut_handle)
-            win32gui.ShowWindow(aut_handle,value)
+            pythoncom.CoInitialize()
+            win32gui.ShowWindow(aut_handle, win32con.SW_MAXIMIZE)
+            shell = win32com.client.Dispatch("WScript.Shell")
+            shell.SendKeys('%')
             win32gui.SetForegroundWindow(aut_handle)
         except Exception as e:
-            log.error(e)
+            err_msg = ERROR_CODE_DICT['err_foreground']
+            log.error(err_msg)
+            log.debug(e)
+            logger.print_on_console(err_msg)
 
     def highlight(self,objectname,windowname):
         status=True

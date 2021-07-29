@@ -92,6 +92,8 @@ class Utilities:
 
                 else:
                     if 'internal frame' in elementObj.role:
+                        if elementObj.name not in internal_frame_list:
+                            continue
                         path = xpath + '/' + elementObj.role
                     elif 'panel' in elementObj.role:
                         path = xpath + '/' + elementObj.role + '[' + str(index) + ']'

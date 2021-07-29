@@ -151,6 +151,7 @@ class ScrapeDispatcher(wx.Frame):
 
     def fullscrape(self,event):
         logger.print_on_console('Performing full scrape')
+        global visiblity_status
         self.startbutton.Disable()
         self.cropbutton.Disable()
         scrape_obj=oebs_fullscrape.FullScrape()
@@ -177,6 +178,7 @@ class ScrapeDispatcher(wx.Frame):
             self.socketIO.emit('scrape','Response Body exceeds max. Limit.')
         self.parent.schedule.Enable()
         self.Close()
+        visiblity_status = False
         logger.print_on_console('Full scrape  completed')
 
     def scrape_dispatcher(self,keyword,*message):
