@@ -134,7 +134,10 @@ class PathGenerator():
         except Exception as e:
             log.debug(e)
 
-        parent_xpath = xpath.rsplit('/',1)[0]
+        parent_xpath = xpath.rsplit('//',1)[0]
+        parent_xpath = parent_xpath.replace('//','/')
+        xpath = xpath.replace('//','/')
+
         path = xpath + ';' +  str(name) + ';' + str(obj._get_indexInParent()) + ';' + str(obj._get_childCount()) + ';' + str(parent_acc._get_name()).strip() + ';' + str(parent_xpath) + ';' + str(parent_acc._get_childCount()) + ';' + str(parent_acc._get_indexInParent()) + ';' + str(parent_acc.role) + ';' + str(current_acc_info.role) + ';' + str(obj._get_description())
 
         path_to_check = xpath + ';' +  str(name) + ';' + str(obj._get_indexInParent()) + ';' + str(current_acc_info.role)
@@ -222,12 +225,12 @@ class PathGenerator():
                         self.path  = current_acc_info.role + '[' + str(current_acc_info.name.strip()) + ']'
             else:
                 if len(current_acc_info.name.strip()) == 0:
-                    self.path = self.path + '/' + current_acc_info.role  + '[' + str(j) + ']'
+                    self.path = self.path + '//' + current_acc_info.role  + '[' + str(j) + ']'
                 else:
                     if 'panel' in current_acc_info.role:
-                        self.path = self.path + '/' + current_acc_info.role  + '[' + str(j) + ']'
+                        self.path = self.path + '//' + current_acc_info.role  + '[' + str(j) + ']'
                     else:
-                        self.path = self.path + '/' + current_acc_info.role  + '[' + str(current_acc_info.name.strip()) + ']' 
+                        self.path = self.path + '//' + current_acc_info.role  + '[' + str(current_acc_info.name.strip()) + ']' 
         if obj._get_object_depth() != 0:
             # calls same function with parent obj until it reaches top i.e object depth == 0
             parent_acc = obj._get_parent()
@@ -245,12 +248,12 @@ class PathGenerator():
                         self.path  = current_acc_info.role + '[' + str(current_acc_info.name.strip()) + ']'
             else:
                 if len(current_acc_info.name.strip()) == 0:
-                    self.path = self.path + '/' + current_acc_info.role  + '[' + str(j) + ']'
+                    self.path = self.path + '//' + current_acc_info.role  + '[' + str(j) + ']'
                 else:
                     if 'panel' in current_acc_info.role:
-                        self.path = self.path + '/' + current_acc_info.role  + '[' + str(j) + ']'
+                        self.path = self.path + '//' + current_acc_info.role  + '[' + str(j) + ']'
                     else:
-                        self.path = self.path + '/' + current_acc_info.role  + '[' + str(current_acc_info.name.strip()) + ']'
+                        self.path = self.path + '//' + current_acc_info.role  + '[' + str(current_acc_info.name.strip()) + ']'
         
             if 'showing' in current_acc_info.states:
                 size = str(current_acc_info.x)+','+str(current_acc_info.y)+','+str(current_acc_info.width)+','+str(current_acc_info.height)

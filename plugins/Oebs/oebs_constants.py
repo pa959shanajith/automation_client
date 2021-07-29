@@ -120,7 +120,8 @@ ERROR_CODE_DICT = {
     "invalid_input_scroll": "Invalid input, Please provide number of entries to scroll",
     "err_minimize": "Unable to minimize window",
     "err_maximize": "Unable to maximize window",
-    "err_close": "Unable to close window"
+    "err_close": "Unable to close window",
+    "err_foreground": "Unable to bring window to foreground"
 }
 
 

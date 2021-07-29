@@ -92,6 +92,8 @@ class Utilities:
 
                 else:
                     if 'internal frame' in elementObj.role:
+                        if elementObj.name.strip() not in internal_frame_list:
+                            continue
                         path = xpath + '/' + elementObj.role
                     elif 'panel' in elementObj.role:
                         path = xpath + '/' + elementObj.role + '[' + str(index) + ']'
@@ -106,7 +108,7 @@ class Utilities:
             curr = currentxpathtemp.split('/')
             p = path.split('/')
             index = len(p) - 1
-            if curr[index] == p[index]:
+            if len(curr) > index and curr[index] == p[index]:
                 if 'active' in elementObj.states and windowname != elementObj.name:
                     active_parent = True
                 for index in range(elementObj.childrenCount):
@@ -131,7 +133,7 @@ class Utilities:
                                 index = index + 1
                     else:
                         queue.append((path, elementObj, index))     
-
+    
     def methodtofillmap(self,acc,xpath,i):
         global  accessContext
         curaccinfo = acc.getAccessibleContextInfo()
