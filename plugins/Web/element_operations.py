@@ -442,14 +442,10 @@ class ElementKeywords:
                 methodoutput=TEST_RESULT_TRUE
         except TimeoutException as e:
             logger.print_on_console('Delay timeout exceeded')
-            local_eo.log.error(e)
-
-            logger.print_on_console(e)
+            local_eo.log.error(e,exc_info=True)
             err_msg='Delay timeout exceeded'
         except Exception as e:
-            local_eo.log.error(e)
-
-            logger.print_on_console(e)
+            local_eo.log.error(e,exc_info=True)
             err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         return status,methodoutput,output,err_msg
 
