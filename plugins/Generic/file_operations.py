@@ -1770,8 +1770,13 @@ class FileOperations:
             range2=input[5].split(':')
             res1={}
             output_feild = None
-            extension1=os.path.splitext(filepath1)[1]
-            extension2=os.path.splitext(filepath2)[1]
+            extension1=os.path.splitext(filepath1)[1] if(filepath1 !=None) else None
+            extension2=os.path.splitext(filepath2)[1] if(filepath2 !=None) else None
+            if (extension1==None or extension2==None):
+                err_msg=ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                log.error(err_msg)
+                logger.print_on_console(err_msg)
+                return status,methodoutput,res1,err_msg
             if(len(input)>6):
                 case=input[6]
             else:
