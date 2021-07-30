@@ -399,7 +399,7 @@ class FileOperations:
         output_res = OUTPUT_CONSTANT
         try:
             if(extension.strip() == ''): extension='null'
-            if(opt.strip() == ''): opt=0
+            if(not(isinstance(opt, int)) and opt.strip() == ''): opt=0
             if( source_path and destination_path ):
                 source_path=os.path.normpath(source_path)
                 destination_path=os.path.normpath(destination_path)
@@ -538,7 +538,7 @@ class FileOperations:
         output_res = OUTPUT_CONSTANT
         try:
             if(extension.strip() == ''): extension='null'
-            if(opt.strip() == ''): opt=0
+            if(not(isinstance(opt,int)) and opt.strip() == ''): opt=0
             if( source_path and destination_path ):
                 try:
                     if( os.path.splitext(source_path)[1] and not os.path.splitext(destination_path)[1] ):
