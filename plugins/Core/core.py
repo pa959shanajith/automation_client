@@ -70,7 +70,8 @@ connection_Timer = None
 status_ping_thread = None
 update_obj = None
 termination_inprogress = False
-core_utils_obj = core_utils.CoreUtils()
+browsercheck_inprogress = False
+core_utils_obj = core_utils.CoreUtils() 
 
 
 def _process_ssl_errors(e):
@@ -226,6 +227,7 @@ class MainNamespace(BaseNamespace):
         try:
             appType=args[2]
             appType=appType.lower()
+            wait_until_browsercheck()
             headless_mode = str(configvalues['headless_mode'])=='Yes'
             if headless_mode:
                 logger.print_on_console('Object cannot be highlighted in headless mode')
@@ -273,6 +275,7 @@ class MainNamespace(BaseNamespace):
 
     def on_executeTestSuite(self, *args):
         global cw, execution_flag, qcObject, qtestObject, zephyrObject
+        wait_until_browsercheck()
         try:
             exec_data = args[0]
             batch_id = exec_data["batchId"]
@@ -296,7 +299,7 @@ class MainNamespace(BaseNamespace):
             if len(args)>0 and args[0]['apptype']=='MobileApp':
                 if args[0]['suitedetails'][0]['browserType'][0]=='2':
                     aws_mode = True
-            if(not execution_flag):
+            if not execution_flag:
                 socketIO.emit('return_status_executeTestSuite', {'status': 'success', 'batchId': batch_id})
                 root.testthread = TestThread(root, EXECUTE, exec_data, aws_mode)
             else:
@@ -311,9 +314,10 @@ class MainNamespace(BaseNamespace):
             log.error(e,exc_info=True)
 
     def on_debugTestCase(self, *args):
-        global cw
+        global cw, debugFlag
         try:
             if check_execution_lic("result_debugTestCase"): return None
+            wait_until_browsercheck()
             exec_data = args[0]
             root.testthread = TestThread(root, DEBUG, exec_data, False)
             cw.choice=cw.rbox.GetStringSelection()
@@ -323,7 +327,6 @@ class MainNamespace(BaseNamespace):
             cw.debug_mode=False
             cw.breakpoint.Disable()
             if cw.choice in ['Stepwise','RunfromStep']:
-                global debugFlag
                 debugFlag = True
                 wx.PostEvent(cw.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, cw.GetId()))
         except Exception as e:
@@ -334,9 +337,10 @@ class MainNamespace(BaseNamespace):
 
     def on_webscrape(self,*args):
         try:
-            global action,cw,browsername,desktopScrapeFlag,data,socketIO
+            global action,cw,browsername,desktopScrapeFlag,data
             if check_execution_lic("scrape"): return None
             elif bool(cw.scrapewindow): return None
+            wait_until_browsercheck()
             args = list(args)
             d = args[0]
             action = d['action']
@@ -396,7 +400,8 @@ class MainNamespace(BaseNamespace):
         try:
             if check_execution_lic("scrape"): return None
             elif bool(cw.scrapewindow): return None
-            global action, socketIO
+            wait_until_browsercheck()
+            global action
             core_utils.get_all_the_imports('IRIS')
             d = list(args)[0]
             if (type(d)==dict): action = d['action']
@@ -422,7 +427,8 @@ class MainNamespace(BaseNamespace):
         try:
             if check_execution_lic("scrape"): return None
             elif bool(cw.scrapewindow): return None
-            global action, socketIO
+            wait_until_browsercheck()
+            global action
             core_utils.get_all_the_imports('IRIS')
             d = list(args)[0]
             if (type(d)==dict): action = d['action']
@@ -448,6 +454,7 @@ class MainNamespace(BaseNamespace):
         try:
             if check_execution_lic("scrape"): return None
             elif bool(cw.scrapewindow): return None
+            wait_until_browsercheck()
             global browsername
             if str(args[0]).endswith('apk'):
                 browsername = args[0]+";"+args[1]
@@ -479,6 +486,7 @@ class MainNamespace(BaseNamespace):
         try:
             if check_execution_lic("scrape"): return None
             elif bool(cw.scrapewindow): return None
+            wait_until_browsercheck()
             global mobileWebScrapeObj,mobileWebScrapeFlag,action,data
             global browsername
             browsername = args[0]+";"+args[1]
@@ -518,7 +526,8 @@ class MainNamespace(BaseNamespace):
         try:
             if check_execution_lic("scrape"): return None
             elif bool(cw.scrapewindow): return None
-            logger.print_on_console(" Entering inside PDF scrape")
+            wait_until_browsercheck()
+            logger.print_on_console("Entering inside PDF scrape")
             global pdfScrapeObj,pdfScrapeFlag
             global browsername
             browsername = args[0]
@@ -537,7 +546,8 @@ class MainNamespace(BaseNamespace):
         try:
             if check_execution_lic("scrape"): return None
             elif bool(cw.scrapewindow): return None
-            global action, socketIO
+            wait_until_browsercheck()
+            global action
             core_utils.get_all_the_imports('IRIS')
             d = list(args)[0]
             if (type(d)==dict): action = d['action']
@@ -562,7 +572,7 @@ class MainNamespace(BaseNamespace):
     def on_wsdl_listOfOperation(self, *args):
         try:
             if check_execution_lic("result_wsdl_listOfOperation"): return None
-            global socketIO
+            wait_until_browsercheck()
             core_utils.get_all_the_imports('WebServices')
             import wsdlgenerator
             wsdlurl = str(args[0])
@@ -579,7 +589,7 @@ class MainNamespace(BaseNamespace):
 
     def on_wsdl_ServiceGenerator(self, *args):
         try:
-            global socketIO
+            wait_until_browsercheck()
             serverCertificate=None
             serverCerificate_pass=None
             auth_uname=None
@@ -632,11 +642,11 @@ class MainNamespace(BaseNamespace):
         global qcObject
         err_msg = None
         try:
-            if(qcObject == None):
+            wait_until_browsercheck()
+            if qcObject is None:
                 core_utils.get_all_the_imports('Qc')
                 import QcController
                 qcObject = QcController.QcWindow()
-
             qcdata = args[0]
             response = qcObject.qc_dict[qcdata.pop('qcaction')](qcdata)
             socketIO.emit('qcresponse', response)
@@ -655,11 +665,11 @@ class MainNamespace(BaseNamespace):
         global qtestObject
         err_msg = None
         try:
-            if(qtestObject == None):
+            wait_until_browsercheck()
+            if qtestObject is None:
                 core_utils.get_all_the_imports('QTest')
                 import QTestController
                 qtestObject = QTestController.QTestWindow()
-
             qcdata = args[0]
             response = qtestObject.qc_dict[qcdata.pop('qcaction')](qcdata)
             socketIO.emit('qcresponse', response)
@@ -678,11 +688,11 @@ class MainNamespace(BaseNamespace):
         global zephyrObject
         err_msg = None
         try:
-            if(zephyrObject == None):
+            wait_until_browsercheck()
+            if zephyrObject is None:
                 core_utils.get_all_the_imports('Zephyr')
                 import ZephyrController
                 zephyrObject = ZephyrController.ZephyrWindow()
-
             zephyrdata = args[0]
             response = zephyrObject.zephyr_dict[zephyrdata.pop('zephyraction')](zephyrdata)
             socketIO.emit('qcresponse', response)
@@ -699,7 +709,7 @@ class MainNamespace(BaseNamespace):
 
     def on_render_screenshot(self,*args):
         try:
-            global socketIO
+            wait_until_browsercheck()
             filepath = args[0]
             data_URIs=[]
             msg = "Request recieved for processing screenshots for report"
@@ -730,16 +740,15 @@ class MainNamespace(BaseNamespace):
 
     def on_webCrawlerGo(self,*args):
         try:
+            wait_until_browsercheck()
             core_utils.get_all_the_imports('WebOcular')
             import webocular
             wobj = webocular.Webocular()
             args=list(args)
-            global socketIO
             # Currently there are 5 arguments.
             # args[0] is URL, args[1] is level, args[2] is agent, args[3] is proxy,args[4] is searchData
             # wobj.runCrawler(args[0],args[1],args[2],args[3],socketIO,root)
             wobj.runCrawler(socketIO,root,*args)
-
         except Exception as e:
             socketIO.emit('result_web_crawler_finished','{"progress" : "fail"}')
             err_msg='Error while Crawling'
@@ -749,10 +758,10 @@ class MainNamespace(BaseNamespace):
 
     def on_jiralogin(self,*args):
         try:
+            wait_until_browsercheck()
             core_utils.get_all_the_imports('Jira')
             import jiracontroller
             obj = jiracontroller.JiraWindow()
-            global socketIO
             if args[0] == JIRA_ACTION_1:
                 data = args[1]
                 obj.getAllAutoDetails(data,socketIO)
@@ -766,7 +775,6 @@ class MainNamespace(BaseNamespace):
             log.error(e,exc_info=True)
 
     def on_update_screenshot_path(self,*args):
-        global socketIO
         if root.gui: benchmark.init(args[1], socketIO)
         intv = 120000
         if args and len(args) >= 2:
@@ -825,7 +833,7 @@ class MainNamespace(BaseNamespace):
 
     def on_generateFlowGraph(self,*args):
         try:
-            global socketIO
+            wait_until_browsercheck()
             core_utils.get_all_the_imports('AutomatedPathGenerator')
             import apg
             fg = apg.AutomatedPathGenerator(socketIO)
@@ -840,7 +848,7 @@ class MainNamespace(BaseNamespace):
 
     def on_apgOpenFileInEditor(self, *args):
         try:
-            global socketIO
+            wait_until_browsercheck()
             core_utils.get_all_the_imports('AutomatedPathGenerator')
             import apg
             fg = apg.AutomatedPathGenerator(socketIO)
@@ -855,7 +863,7 @@ class MainNamespace(BaseNamespace):
 
     def on_runDeadcodeIdentifier(self, *args):
         try:
-            global socketIO
+            wait_until_browsercheck()
             core_utils.get_all_the_imports('AutomatedPathGenerator')
             from generateAST import DeadcodeIdentifier
             dci = DeadcodeIdentifier()
@@ -921,7 +929,7 @@ class MainNamespace(BaseNamespace):
 
     def on_irisOperations(self, *args):
         try:
-            global socketIO
+            wait_until_browsercheck()
             core_utils.get_all_the_imports('IRIS')
             import iris_operations
             if(args[1]=='updateDataset'):
@@ -1534,6 +1542,7 @@ class Main():
             global mobileScrapeFlag,mobileWebScrapeFlag,desktopScrapeFlag, pdfScrapeFlag
             global sapScrapeFlag,debugFlag,browsername,action,oebsScrapeFlag
             global socketIO,data
+            wait_until_browsercheck()
             cw.schedule.Disable()
             core_utils.get_all_the_imports('IRIS')
             if mobileScrapeFlag==True:
@@ -1594,7 +1603,8 @@ class Main():
         print('********************************************************************************************************')
 
 def check_browser():
-    global browsercheckFlag
+    global browsercheckFlag, browsercheck_inprogress
+    browsercheck_inprogress = True
     try:
         try:
             try:
@@ -1769,7 +1779,17 @@ def check_browser():
         browsercheckFlag = False
     finally:
         logger.print_on_console('Browser compatibility check completed')
-    return browsercheckFlag
+        browsercheck_inprogress = False
+    return browsercheckFlag 
+
+def wait_until_browsercheck():
+    if browsercheck_inprogress:
+        info_msg = "Waiting until Browser Compatibility check is completed"
+        logger.print_on_console(info_msg)
+        log.info(info_msg)
+    while True:
+        if browsercheck_inprogress: time.sleep(1)
+        else: break
 
 def check_PatchUpdate():
     try:
