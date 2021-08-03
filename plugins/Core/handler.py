@@ -525,12 +525,14 @@ class Handler():
                 if(apptype.lower() == constants.APPTYPE_WEB or apptype.lower() == constants.APPTYPE_MOBILE ):
                     try:
                         if len(url.strip())!=0:
-                            url=self.utils_obj.scrape_unwrap(url)
+                            url_dec=self.utils_obj.scrape_unwrap(url)
+                            if url is not None: url = url_dec
                         if(objectname.strip() != '' and not(objectname.startswith('@'))):
                             xpath_string=objectname.split(';')
                             left_part=self.utils_obj.scrape_unwrap(xpath_string[0])
                             right_part=self.utils_obj.scrape_unwrap(xpath_string[2])
-                            objectname = left_part+';'+xpath_string[1]+';'+right_part
+                            if left_part is not None and right_part is not None:
+                                objectname = left_part+';'+xpath_string[1]+';'+right_part
                     except Exception as e:
                         local_handler.log.error(e)
                 tsp_step=TestStepProperty(keyword,index,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo,i,remark,testcase_details,cord,original_device_height,original_device_width)
@@ -677,3 +679,7 @@ class Handler():
     def clear_dyn_variables(self):
         import dynamic_variable_handler
         dynamic_variable_handler.local_dynamic.dynamic_variable_map.clear()
+
+    def clear_const_variables(self):
+        import constant_variable_handler
+        constant_variable_handler.local_constant.constant_variable_map.clear()

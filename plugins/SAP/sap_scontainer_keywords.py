@@ -390,7 +390,7 @@ class SContainer_Keywords():
                         pywinauto.mouse.move(coords=(int(x), int(y)))
                     except Exception as e:
                         err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
-                    highligh_obj.draw_outline(elem,'yellow')
+                    highligh_obj.draw_outline(elem)
                     elem.SetFocus()
                     status = sap_constants.TEST_RESULT_PASS
                     result = sap_constants.TEST_RESULT_TRUE

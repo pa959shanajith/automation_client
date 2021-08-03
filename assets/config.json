@@ -1,6 +1,7 @@
 {
     "bit_64": "Yes",
     "browser_check": "Yes",
+    "chrome_extnpath": "default",
     "chrome_path": "default",
     "chrome_profile": "default",
     "clear_cache": "No",
@@ -22,6 +23,8 @@
     "httpStatusCode": "Yes",
     "ignoreVisibilityCheck": "No",
     "ignore_certificate": "Yes",
+    "incognito_private_mode": "No",
+    "kill_stale": "Yes",
     "logFile_Path": "./logs/TestautoV2.log",
     "prediction_for_iris_objects": "No",
     "queryTimeOut": "3",

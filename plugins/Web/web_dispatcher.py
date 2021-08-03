@@ -186,6 +186,7 @@ class Dispatcher:
             'closebrowser':local_Wd.browser_object.closeBrowser,
             'closesubwindows':local_Wd.browser_object.closeSubWindows,
             'switchtowindow':local_Wd.browser_object.switch_to_window,
+            'sendkeys':local_Wd.util_object.send_keys,
             'verifytextexists':local_Wd.statict_text_object.verify_text_exists,
             'verifypagetitle':local_Wd.browser_object.verify_page_title,
             'clearcache':local_Wd.browser_object.clear_cache,
@@ -343,6 +344,9 @@ class Dispatcher:
         self.thread=None
 
     def dispatcher(self,teststepproperty,input,reporting_obj,wxObject,mythread,execution_env):
+        global simple_debug_gwto, status_gwto
+        status_gwto =False
+        simple_debug_gwto=False
         objectname = teststepproperty.objectname
         output = teststepproperty.outputval
         objectname = objectname.strip()
@@ -546,8 +550,8 @@ class Dispatcher:
                         self.browsers_sl[browser]["sauce:options"].update({"name":teststepproperty.testscript_name})
                         self.browsers_sl[browser]["sauce:options"].update({"idleTimeout":90})
                         result = self.sauce_web_dict[teststepproperty.name](self.sauce_conf['remote_url'],self.browsers_sl[browser],execution_env['scenario'])
-                        driver = web_keywords.driver
-                        browser_Keywords.local_bk.driver_obj = web_keywords.driver
+                        driver = web_keywords.local_wk.driver
+                        browser_Keywords.local_bk.driver_obj = web_keywords.local_wk.driver
                         find_browser_info(reporting_obj,mythread)
                     else:
                         result = self.sauce_web_dict[teststepproperty.name](input)
@@ -556,7 +560,7 @@ class Dispatcher:
                     if(teststepproperty.name=="waitForElementVisible"):
                         input=xpath
                     driver.switch_to.default_content()
-                    webelement=send_webelement_to_keyword(web_keywords.driver,objectname,url)
+                    webelement=send_webelement_to_keyword(web_keywords.local_wk.driver,objectname,url)
                     result = self.sauce_web_dict[teststepproperty.name](webelement,input)
                 else:
                     logger.print_on_console(teststepproperty.name+" keyword is not supported in saucelabs execution.")
@@ -571,20 +575,27 @@ class Dispatcher:
                     if globalWait_to > 0 and webelement is None:
                         try:
                             identifiers = objectname.split(';')
-                            obj_name=identifiers[0]
-                            if obj_name is not None:
-                                element_present = EC.presence_of_element_located((By.XPATH, obj_name))
-                                local_Wd.log.info('starting Global Wait TimeOut')
-                                WebDriverWait(browser_Keywords.local_bk.driver_obj, globalWait_to).until(element_present)
+                            ele_th={}
+                            obj_type={0:By.XPATH,1:By.ID,2:By.XPATH,3:By.NAME,5:By.CLASS_NAME,11:By.CSS_SELECTOR}
+                            for i in range(0,len(identifiers)):
+                                obj_name=identifiers[i]
+                                if  i in obj_type.keys() and not(obj_name in [None,'null']):
+                                    element_present=EC.presence_of_element_located((obj_type[i], obj_name))
+                                    ele_th[i]=threading.Thread(target = self.find_ele, name=i, args = (i,globalWait_to,browser_Keywords.local_bk.driver_obj,element_present,local_Wd.log))
+                                    ele_th[i].start()
+                            for i in ele_th:
+                                ele_th[i].join()
+                            if(status_gwto):
                                 msg='Element Found. Global Wait Timeout completed'
                                 local_Wd.log.info(msg)
                                 logger.print_on_console(msg)
                                 webelement=send_webelement_to_keyword(driver,objectname,url)
-                        except TimeoutException as e:
-                            msg1='Element not Found. Global Wait Timeout executed'
-                            logger.print_on_console(msg1)
-                            local_Wd.log.error(msg1)
-                            local_Wd.log.error(e)
+                            else:
+                                msg1='Element not Found. Global Wait Timeout executed'
+                                logger.print_on_console(msg1)
+                                local_Wd.log.error(msg1)
+                                if simple_debug_gwto:
+                                    webelement=send_webelement_to_keyword(driver,objectname,url)
                         except Exception as e:
                             local_Wd.log.error(e)
                     if webelement == None and self.exception_flag:
@@ -597,7 +608,7 @@ class Dispatcher:
                     if url !=  '' and local_Wd.custom_object.is_int(url):
                         try:
                             local_Wd.log.debug('Encountered iframe/frame url')
-                            local_Wd.custom_object.switch_to_iframe(url,driver.current_window_handle)
+                            local_Wd.custom_object.switch_to_iframe(url,driver.current_window_handle,flag=True)
                             driver = browser_Keywords.local_bk.driver_obj
                         except Exception as e:
                             local_Wd.log.error(e,exc_info=True)
@@ -612,7 +623,7 @@ class Dispatcher:
                     if keyword==OPEN_BROWSER:
                         input.append(self.action)
                     actual_input=teststepproperty.inputval[0].split(";")
-                    if(keyword.lower() == "sendfunctionkeys"):
+                    if(keyword.lower() in ["sendfunctionkeys","sendkeys"]):
                         input.extend(actual_input)
                     ## Issue #190 Driver control won't switch back to parent window
                     if local_Wd.popup_object.check_if_no_popup_exists():
@@ -736,6 +747,18 @@ class Dispatcher:
                 local_Wd.log.error(e)
         return status,value
 
+    def find_ele(self,i,globalWait_to,driver,element_present,log):
+        global status_gwto
+        try:
+            log.debug('starting Global Wait TimeOut with oi'+str(i))
+            WebDriverWait(driver, globalWait_to).until(element_present)
+            status_gwto=True
+            msg1="Element Found with oi"+str(i)+". Global Wait Timeout executed"
+        except TimeoutException as e:
+            msg1="Element not Found with oi"+str(i)+". Global Wait Timeout executed"
+            log.debug(msg1)
+            log.error(e)
+
     def element_locator(self,driver,type,identifier,id_num):
         if identifier=='null': return None
         webElement = None
@@ -764,7 +787,7 @@ class Dispatcher:
 
     def getwebelement(self,driver,objectname,stepnum,custname):
         ##objectname = str(objectname)
-        global obj_flag
+        global obj_flag,simple_debug_gwto
         obj_flag=False
         webElement = None
         if objectname.strip() != '':
@@ -852,6 +875,11 @@ class Dispatcher:
                 local_Wd.log.error(err_msg)
         configvalues = readconfig.configvalues
         if((webElement==None or webElement== '') and configvalues['extn_enabled'].lower() == 'yes' and self.action=='debug' and isinstance(driver, webdriver.Chrome)):
+            if not(simple_debug_gwto) and (int(configvalues['globalWaitTimeOut']))>0:
+                simple_debug_gwto=True
+                if isinstance(webElement,list):
+                    webElement=webElement[0]
+                return webElement
             try:
                 flag=True
                 logger.print_on_console('Scrape the Element using extension')

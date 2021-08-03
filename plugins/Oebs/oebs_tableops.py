@@ -12,9 +12,9 @@
 import oebs_key_objects
 import logging
 import oebs_serverUtilities
-from oebs_msg import *
+from oebs_constants import *
 import oebs_mouseops
-
+import logger
 log = logging.getLogger('oebs_tableops.py')
 
 class TableOperations:
@@ -65,6 +65,9 @@ class TableOperations:
                 oebs_key_objects.custom_msg("MSG_RESULT_IS")
         except Exception as e:
             self.utilities_obj.cleardata()
+            err_msg = ERROR_CODE_DICT['err_get_row_count']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('%s',e)
             log.debug('Status %s',keywordresult)
         log.debug('Status %s',keywordresult)
@@ -117,6 +120,9 @@ class TableOperations:
                 oebs_key_objects.custom_msg("MSG_RESULT_IS")
         except Exception as e:
             self.utilities_obj.cleardata()
+            err_msg = ERROR_CODE_DICT['err_get_column_count']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('%s',e)
             log.debug('Status %s',keywordresult)
         log.debug('Status %s',keywordresult)
@@ -155,9 +161,13 @@ class TableOperations:
                         keywordresponse=cellcontextinfo.name
                 else:
                     log.debug('%s',MSG_INVALID_NOOF_INPUT)
+                    logger.print_on_console(MSG_INVALID_NOOF_INPUT)
                     oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
         except Exception as e:
             self.utilities_obj.cleardata()
+            err_msg = ERROR_CODE_DICT['err_get_cell_value']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('%s',e)
         return keywordresponse
 
@@ -212,10 +222,14 @@ class TableOperations:
                                 keywordresponse=innertablechildcontext.name
                             else:
                                 log.debug('%s',MSG_INVALID_NOOF_INPUT)
+                                logger.print_on_console(MSG_INVALID_NOOF_INPUT)
                                 oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
                         break
         except Exception as e:
             self.utilities_obj.cleardata()
+            err_msg = ERROR_CODE_DICT['err_get_cell_value']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('%s',e)
         return keywordresponse
 
@@ -270,6 +284,9 @@ class TableOperations:
                 oebs_key_objects.custom_msg("MSG_RESULT_IS")
         except Exception as e:
             self.utilities_obj.cleardata()
+            err_msg = ERROR_CODE_DICT['err_get_cell_value']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('%s',e)
             log.debug('Status %s',keywordresult)
         log.debug('Status %s',keywordresult)
@@ -298,6 +315,9 @@ class TableOperations:
             oebs_key_objects.custom_msg("MSG_STATUS")
         except Exception as e:
             self.utilities_obj.cleardata()
+            err_msg = ERROR_CODE_DICT['err_verify_cell_value']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('%s',e)
             log.debug('Status %s',keywordresult)
         log.debug('Status %s',keywordresult)
@@ -347,6 +367,9 @@ class TableOperations:
                             break
         except Exception as e:
             self.utilities_obj.cleardata()
+            err_msg = ERROR_CODE_DICT['err_cell_click']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('%s',e)
             log.debug('Status %s',keywordresult)
         log.debug('Status %s',keywordresult)
@@ -429,7 +452,7 @@ class TableOperations:
                 else:
                     log.debug('%s',MSG_INVALID_NOOF_INPUT)
                     oebs_key_objects.custom_msg.append(MSG_INVALID_NOOF_INPUT)
-
+                    logger.print_on_console(MSG_INVALID_NOOF_INPUT)
             elif(childcontext.role== 'table'):
                 if(oebs_key_objects.keyword_input[0] =='1'):
                     parentcontext=getparent(acc)
@@ -493,10 +516,14 @@ class TableOperations:
                                     keywordresult=MSG_PASS
                             else:
                                 log.debug('%s',MSG_INVALID_NOOF_INPUT)
+                                logger.print_on_console(MSG_INVALID_NOOF_INPUT)
                                 oebs_key_objects.custom_msg.append(MSG_INVALID_NOOF_INPUT)
                         break
         except Exception as e:
             self.utilities_obj.cleardata()
+            err_msg = ERROR_CODE_DICT['err_cell_click']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('%s',e)
         return keywordresponse
 
@@ -521,6 +548,7 @@ class TableOperations:
                 else:
                     log.debug('%s',MSG_INVALID_OBJECT)
                     oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
+                    logger.print_on_console(MSG_INVALID_INPUT)
                 break
             elif(childinfo.role =='table'):
                 parentacc = acc.getAccessibleContextInfo()
@@ -580,6 +608,7 @@ class TableOperations:
                     result=info.name
                 else:
                     log.debug('%s',MSG_INVALID_OBJECT)
+                    logger.print_on_console(MSG_INVALID_INPUT)
                     oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
                 break
             elif(childinfo.role =='table'):

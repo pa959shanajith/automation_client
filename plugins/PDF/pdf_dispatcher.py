@@ -47,9 +47,11 @@ class PDFDispatcher:
         result=[pdf_constants.TEST_RESULT_FAIL,pdf_constants.TEST_RESULT_FALSE,constants.OUTPUT_CONSTANT,err_msg]
 
         try:
-            dict = { 'gettext': self.pdf_keywords_obj.gettext,
-                     'verifytext': self.pdf_keywords_obj.verifytext,
-                     'getindexcount' : self.pdf_keywords_obj.getindexcount
+            dict = {'gettext': self.pdf_keywords_obj.gettext,
+                    'verifytext': self.pdf_keywords_obj.verifytext,
+                    'getindexcount' : self.pdf_keywords_obj.getindexcount,
+                    'gettextdynamic' : self.pdf_keywords_obj.gettextdynamic,
+                    'verifytextdynamic' : self.pdf_keywords_obj.verifytextdynamic
                    }
             keyword=keyword.lower()
             if keyword in list(dict.keys()):

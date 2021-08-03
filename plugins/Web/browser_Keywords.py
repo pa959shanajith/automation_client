@@ -31,6 +31,7 @@ import readconfig
 import core_utils
 import time
 import fileinput
+import glob
 from sendfunction_keys import SendFunctionKeys as SF
 driver_pre = None
 drivermap = []
@@ -735,6 +736,7 @@ class BrowserKeywords():
                         err_msg=self.__web_driver_exception(e)
                 elif window_num_flag == True:
                     remove_handles=[]
+                    handles_not_found=[]
                     try:
                         cur_handle=local_bk.driver_obj.current_window_handle
                         cwh_index=local_bk.all_handles.index(cur_handle)
@@ -756,18 +758,23 @@ class BrowserKeywords():
                                         logger.print_on_console(webconstants.INVALID_INPUT)
                                         err_msg = webconstants.INVALID_INPUT
                                         switch_window_flag = False
-                                else:
-                                    err_msg = 'One or more window handle not found'
-                                    logger.print_on_console(err_msg)
-                                    local_bk.log.error(err_msg) 
+                                else: 
                                     local_bk.log.info('window handle ' +str(i)+' is not found ')
+                                    handles_not_found.append(i)
                                     switch_window_flag = False
                             if len(remove_handles)>=1:
                                 for j in remove_handles:   
                                     local_bk.all_handles.remove(j)
                                 switch_window_flag = True
+                            if len(handles_not_found)>=1:
+                                err_msg = 'One or more window handle not found'
+                                logger.print_on_console(err_msg)
+                                local_bk.log.error(err_msg)
                         else:
                             window_num_flag = False
+                            err_msg = "Input has to be one less than the total number of subwindows(tabs)"
+                            logger.print_on_console(err_msg)
+                            local_bk.log.error(err_msg)
                     except Exception as e:
                         err_msg=self.__web_driver_exception(e)
                 elif not (window_num_flag==True or inp == 'all' or inp == ''):
@@ -793,12 +800,11 @@ class BrowserKeywords():
                                 if cwh_index > len(local_bk.all_handles):
                                     local_bk.driver_obj.switch_to.window(local_bk.all_handles[-1])
                                     self.update_recent_handle(local_bk.all_handles[-1])
-                                    status=webconstants.TEST_RESULT_PASS
-                                    result=webconstants.TEST_RESULT_TRUE
                                 elif cwh_index < len(local_bk.all_handles):
                                     prev_window=cwh_index-len(inp_list)
                                     local_bk.driver_obj.switch_to.window(local_bk.all_handles[prev_window])
                                     self.update_recent_handle(local_bk.all_handles[prev_window])
+                                if len(inp_list) == len(remove_handles):
                                     status=webconstants.TEST_RESULT_PASS
                                     result=webconstants.TEST_RESULT_TRUE
                             else:
@@ -817,8 +823,13 @@ class BrowserKeywords():
                         else:
                             local_bk.driver_obj.switch_to.window(cur_handle)
                             self.update_recent_handle(cur_handle)
-                            status=webconstants.TEST_RESULT_PASS
-                            result=webconstants.TEST_RESULT_TRUE
+                            if len(inp_list)>1:
+                                if len(inp_list) == len(remove_handles):
+                                    status=webconstants.TEST_RESULT_PASS
+                                    result=webconstants.TEST_RESULT_TRUE
+                            else:
+                                status=webconstants.TEST_RESULT_PASS
+                                result=webconstants.TEST_RESULT_TRUE
                     elif (inp == 'all' or inp == ''):
                         if inp == '':
                             if cwh_index == len(local_bk.all_handles):
@@ -1315,6 +1326,9 @@ class Singleton_DriverUtil():
         headless_mode = str(configvalues['headless_mode'])=='Yes'
         use_custom_debugport = str(configvalues["use_custom_debugport"].lower()) == "yes"
         close_browser_popup = configvalues['close_browser_popup']
+        incognito_private_mode = configvalues['incognito_private_mode']
+        extension_path = configvalues['chrome_extnpath']
+        extn_flag=False
         if (browser_num == '1'):
             try:
                 chrome_path = configvalues['chrome_path']
@@ -1326,13 +1340,27 @@ class Singleton_DriverUtil():
                     choptions.add_argument('start-maximized')
                     choptions.add_experimental_option('useAutomationExtension', False)
                     choptions.add_experimental_option("excludeSwitches",["enable-automation"])
+                    extns=glob.glob(webconstants.EXTENSIONS_PATH+os.sep+"*.crx")
                     if headless_mode:
                         WINDOW_SIZE = "1350,650"
                         choptions.add_argument("--window-size=%s" % WINDOW_SIZE)
                         choptions.headless = True
-                    if configvalues['extn_enabled'].lower()=='yes' and os.path.exists(webconstants.EXTENSION_PATH):
-                        choptions.add_extension(webconstants.EXTENSION_PATH)
-                    else:
+                    if configvalues['extn_enabled'].lower()=='yes' and os.path.exists(webconstants.AVO_EXTENSION_PATH):
+                        choptions.add_extension(webconstants.AVO_EXTENSION_PATH)
+                    if extension_path.lower() != 'default':
+                        extn=extension_path.split(";")
+                        for i in extn:
+                            if os.path.isfile(i):
+                                if os.path.splitext(i)[-1].lower()=='.crx':
+                                    extns.append(i)
+                            elif os.path.isdir(i):
+                                [extns.append(j) for j in glob.glob(i+os.sep+"*.crx")]
+                    if len(extns) > 0:
+                        for i in extns:
+                            if i != webconstants.AVO_EXTENSION_PATH:
+                                choptions.add_extension(os.path.abspath(i))
+                                extn_flag=True
+                    if extn_flag== False and configvalues['extn_enabled'].lower()=='no':
                         choptions.add_argument('--disable-extensions')
                     if str(chrome_path).lower() != 'default':
                         choptions.binary_location = str(chrome_path)
@@ -1351,11 +1379,22 @@ class Singleton_DriverUtil():
                         prefs["credentials_enable_service"] = False
                         prefs["profile.password_manager_enabled"] = False
                         choptions.add_experimental_option("prefs", prefs)
+                    if str(incognito_private_mode).lower() == 'yes':
+                        choptions.add_argument('--incognito')
                     if use_custom_debugport:
                         choptions.add_argument("--remote-debugging-port="+core_utils.find_open_port())
 
                     driver = webdriver.Chrome(executable_path=exec_path, options=choptions)
                     # driver.navigate().refresh()
+                    if extn_flag == True:
+                        time.sleep(3)
+                        handles=driver.window_handles
+                        main_handle=driver.current_window_handle
+                        for i in handles:
+                            driver.switch_to.window(i)
+                            if driver.current_window_handle != main_handle:
+                                driver.close()
+                                driver.switch_to.window(driver.window_handles[-1])
                     controller.process_ids.append(driver.service.process.pid)
                     drivermap.append(driver)
                     driver.maximize_window()
@@ -1381,6 +1420,8 @@ class Singleton_DriverUtil():
                         firefox_options.headless = True
                     if str(close_browser_popup).lower() == 'yes':
                         firefox_options.set_preference("credentials_enable_service", False)
+                    if str(incognito_private_mode).lower() == 'yes':
+                        firefox_options.set_preference("browser.privatebrowsing.autostart", True)
                     if str(configvalues['firefox_path']).lower() != "default":
                         from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
                         firefox_options.binary = FirefoxBinary(str(configvalues['firefox_path']))
@@ -1499,6 +1540,7 @@ class Singleton_DriverUtil():
         elif(browser_num == '8'):
             try:
                 if core.chromiumFlag:
+                    extn_flag= False
                     msoptions = webdriver.EdgeChromiumOptions()
                     msoptions.add_argument('start-maximized')
                     msoptions.add_experimental_option('useAutomationExtension', False)
@@ -1511,12 +1553,30 @@ class Singleton_DriverUtil():
                     #     msoptions.add_extension(webconstants.EXTENSION_PATH)
                     # else:
                     #     msoptions.add_argument('--disable-extensions')
-                    msoptions.add_argument('--disable-extensions')
+                    extension_path = configvalues['chrome_extnpath']
+                    extns=glob.glob(webconstants.EXTENSIONS_PATH+os.sep+"*.crx")
+                    if extension_path.lower() != 'default':
+                        extn=extension_path.split(";")
+                        for i in extn:
+                            if os.path.isfile(i):
+                                if os.path.splitext(i)[-1].lower()=='.crx':
+                                    extns.append(i)
+                            elif os.path.isdir(i):
+                                [extns.append(j) for j in glob.glob(i+os.sep+"*.crx")]
+                    if len(extns) > 0:
+                        for i in extns:
+                            if i != webconstants.AVO_EXTENSION_PATH:
+                                msoptions.add_extension(os.path.abspath(i))
+                                extn_flag=True
+                    if extn_flag== False:
+                        msoptions.add_argument('--disable-extensions')
                     if str(close_browser_popup).lower() == 'yes':
                         prefs = {}
                         prefs["credentials_enable_service"] = False
                         prefs["profile.password_manager_enabled"] = False
                         msoptions.add_experimental_option("prefs", prefs)
+                    if str(incognito_private_mode).lower() == 'yes':
+                        msoptions.add_argument("-inprivate")
                     if use_custom_debugport:
                         msoptions.add_argument("--remote-debugging-port="+core_utils.find_open_port())
                     caps = msoptions.to_capabilities()
@@ -1528,6 +1588,15 @@ class Singleton_DriverUtil():
                     controller.process_ids.append(driver.edge_service.process.pid)
                     drivermap.append(driver)
                     driver.maximize_window()
+                    if extn_flag == True:
+                        time.sleep(3)
+                        handles=driver.window_handles
+                        main_handle=driver.current_window_handle
+                        for i in handles:
+                            driver.switch_to.window(i)
+                            if driver.current_window_handle != main_handle:
+                                driver.close()
+                                driver.switch_to.window(driver.window_handles[-1])
                     msg = ('Headless ' if headless_mode else '') + 'Edge Chromium browser started'
                     logger.print_on_console(msg)
                     local_bk.log.info(msg)

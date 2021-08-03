@@ -23,7 +23,6 @@ if SYSTEM_OS == 'Windows' :
     from pyrobot import Robot
     import win32gui
     import pyrobot
-import table_keywords
 import time
 import urllib.request, urllib.parse, urllib.error, io
 import core_utils
@@ -34,6 +33,9 @@ import readconfig
 from  selenium.webdriver.common import action_chains
 from selenium.webdriver.common.action_chains import ActionChains
 import threading
+from table_keywords import TableOperationKeywords, local_tk
+
+
 local_uo = threading.local()
 
 class UtilWebKeywords:
@@ -43,7 +45,7 @@ class UtilWebKeywords:
         self.keys_info={}
         self.__create_keyinfo_dict()
         self.__load_Image_processingobj()
-        self.tblobj = table_keywords.TableOperationKeywords()
+        self.tblobj = TableOperationKeywords()
 
     def _invalid_input(self):
         err_msg=ERROR_CODE_DICT['ERR_INVALID_INPUT']
@@ -401,10 +403,10 @@ class UtilWebKeywords:
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
+        eleStatus = True
         local_uo.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if len(webelement.find_elements_by_xpath('.//ancestor::lightning-datatable')) >0:
-                from table_keywords import TableOperationKeywords
                 tableops = TableOperationKeywords()
                 row_num=int(args[0][0])
                 col_num=int(args[0][1])
@@ -441,7 +443,6 @@ class UtilWebKeywords:
             elif(webelement is not None and len(args[0]) == 2):
                 row = int(args[0][0])-1
                 col = int(args[0][1])-1
-                from table_keywords import TableOperationKeywords
                 tableops = TableOperationKeywords()
                 cell=tableops.javascriptExecutor(webelement,row,col)
                 element_list=cell.find_elements_by_xpath('.//*')
@@ -457,7 +458,6 @@ class UtilWebKeywords:
                 index=int(args[0][3])
                 eleStatus = False
                 counter = 1
-                from table_keywords import TableOperationKeywords
                 tableops = TableOperationKeywords()
                 cell=tableops.javascriptExecutor(webelement,row,col)
                 element_list=cell.find_elements_by_xpath('.//*')
@@ -529,8 +529,8 @@ class UtilWebKeywords:
                                    eleStatus =True
                                 else:
                                     counter+=1
-                    elif tag=='textbox':
-                         if (tagName==('input') and (tagType==('text') or tagType==('email') or tagType==('password') or tagType==('range') or tagType==('search') or tagType==('url') or tagType==('button') or tagType==('checkbox') or tagType==('color') or tagType==('date') or tagType==('datetime-local') or tagType==('file') or tagType==('image') or tagType==('month') or tagType==('week') or tagType==('time') or tagType==('number') or tagType==('radio') or tagType==('reset') or tagType==('submit') or tagType==('tel') or tagType==('None')) ):
+                    elif tag=='textbox' or tag=='input':
+                         if (tagName==('input') and (tagType==('text') or tagType==('email') or tagType==('password') or tagType==('search') or tagType==('url') or tagType==('color') or tagType==('date') or tagType==('datetime-local') or tagType==('file') or tagType==('month') or tagType==('week') or tagType==('time') or tagType==('number') or tagType==('tel') or tagType==('None')) ):
                             if index==childindex:
                                 eleStatus =True
                             else:
@@ -550,12 +550,14 @@ class UtilWebKeywords:
                                 else:
                                     counter+=1
                     else:
-                            eleStatus=True
+                            # Commented next line, as because of this, loop was not going into next iteration
+                            # eleStatus=True
+                            continue
 
                     if eleStatus==True:
                         webelement = cellChild
                         break
-            if webelement is not None:
+            if webelement is not None and eleStatus:
                 if SYSTEM_OS == 'Darwin' or SYSTEM_OS == 'Linux':
                     obj = Utils()
                     if isinstance(browser_Keywords.driver_obj, webdriver.Firefox):
@@ -707,6 +709,47 @@ class UtilWebKeywords:
             err_msg=self.__web_driver_exception(e)
         return status,methodoutput,output,err_msg
 
+
+    def send_keys(self, webelement, input, *args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        output=OUTPUT_CONSTANT
+        err_msg=None
+        text = False
+        try:
+            if len(input)>0:
+                input1 = input[0]
+                digit = 1
+                if len(input)==3 and ((input[2].startswith('|') and input[2].endswith('|')) or (input[2].startswith('{') and input[2].endswith('}'))):
+                    text = True
+                    digit = int(input[1]) if input[1].isdigit() else 1
+                elif len(input)==2 and ((input[1].startswith('|') and input[1].endswith('|')) or (input[1].startswith('{') and input[1].endswith('}'))):
+                    text = True
+                actions = ActionChains(browser_Keywords.local_bk.driver_obj)
+                if text == True:
+                    for i in range(digit):
+                        actions.send_keys(input1)
+                        actions.perform()
+                    status=TEST_RESULT_PASS
+                    methodoutput=TEST_RESULT_TRUE
+                elif input1.lower() in list(self.keys_info.keys()):
+                    digit = int(input[1]) if len(input)>1 and input[1].isdigit() else 1
+                    try:
+                        actions.send_keys(self.keys_info[input1.lower()]*digit)
+                        actions.perform()
+                    except Exception as e:
+                        local_uo.log.debug('Operated using option 2',e)
+                        actions.send_keys(self.keys_info[input1.lower()])
+                        actions.perform()
+                    status=TEST_RESULT_PASS
+                    methodoutput=TEST_RESULT_TRUE
+                else:
+                    err_msg = "Function key '"+input1+"' is not recognized."
+                    logger.print_on_console(err_msg)
+        except Exception as e:
+            err_msg=self.__web_driver_exception(e)
+        return status,methodoutput,output,err_msg
+
     def rightclick(self,webelement,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
@@ -757,7 +800,6 @@ class UtilWebKeywords:
                 if not(input is None):
                     row_num=int(input[0])-1
                     col_num=int(input[1])-1
-                    from table_keywords import TableOperationKeywords
                     tableops = TableOperationKeywords()
                     cell=tableops.javascriptExecutor(webelement,row_num,col_num)
                     element_list=cell.find_elements_by_xpath('.//*')
@@ -1012,7 +1054,7 @@ class UtilWebKeywords:
         local_uo.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             if webelement != None and webelement !='' and webelement.tag_name.lower()=='table':
-                if len(input) >= 4 and int(input[3]) <= 0:
+                if len(input) >= 4 and input[3] and int(input[3]) <= 0:
                     err_msg = self._index_zero()
                 elif input[2]:
                     if(len(input) == 5 and all(v for v in input) and (not input[2] == 'tr')):
@@ -1115,7 +1157,7 @@ class UtilWebKeywords:
             input.pop()
         try:
             if webelement != None and webelement !='' and webelement.tag_name.lower()=='table':
-                if len(input) >= 4 and int(input[3]) <= 0:
+                if len(input) >= 4 and input[3] and int(input[3]) <= 0:
                     err_msg = self._index_zero()
                 elif input[2]:
                     if((len(input)==5 or len(input)==6) and all(v for v in input) and (not input[2]=='tr')):
@@ -1249,7 +1291,6 @@ class UtilWebKeywords:
         eleStatus=False
         webelement1=None
         counter = 1
-        from table_keywords import TableOperationKeywords
         tableops = TableOperationKeywords()
         cell=tableops.javascriptExecutor(webelement,row_number,col_number)
         if(tag=='tablecell' or tag=='td'): 

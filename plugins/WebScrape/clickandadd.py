@@ -77,7 +77,7 @@ class Clickandadd():
             driver.execute_script(webscrape_utils_obj.javascript_clicknadd, driver.current_url,browser)
             log.info('start click and add operation on default/outer page done')
             browserlogs = None
-            if not(isinstance(driver,webdriver.Ie)):
+            if not(isinstance(driver,webdriver.Ie) or isinstance(driver,webdriver.Firefox)):
                 browserlogs = driver.get_log("browser")
             if browserlogs and len(browserlogs) > 0 and browserlogs[0]['level'] == 'SEVERE' and 'Refused to apply inline style' in browserlogs[0]['message'] :
                 logger.print_on_console('Content Security Policy directive restriction, element highlighting not possible.')
@@ -190,10 +190,13 @@ class Clickandadd():
             if (isinstance(driver,webdriver.Firefox) or isinstance(driver,webdriver.Chrome) or isinstance(driver,webdriver.Edge)):
                 if ((str(full_screenshot).lower()) == 'yes'):
                     screen = webscrape_utils_obj.fullpage_screenshot(driver, screen_shot_path)
+                    fullSS=True
                 else:
                     screen = driver.get_screenshot_as_base64()
+                    fullSS=False 
             else:
                 screen = driver.get_screenshot_as_base64()
+                fullSS=False
             scrapedin = ''
             if browserops.browser == 2:
                 scrapedin = 'FX'
@@ -216,6 +219,7 @@ class Clickandadd():
                 left_part=obj.scrape_wrap(';'.join(xpath_string[:2]))
                 right_part=obj.scrape_wrap(';'.join(xpath_string[3:]))
                 a['xpath'] = left_part+';'+xpath_string[2]+';'+right_part
+                a['fullSS']=fullSS
                 new_obj.append(a)
             tempne_stopclicknadd=new_obj
             data['view'] = tempne_stopclicknadd

@@ -23,11 +23,13 @@ from teststepproperty import TestStepProperty
 import handler
 import os,sys
 import re
+import wx
 import subprocess
 import logger
 import json
 from constants import *
 import dynamic_variable_handler
+import constant_variable_handler
 import reporting
 import core_utils
 import recording
@@ -83,6 +85,7 @@ class Controller():
         self.verify_dict={'web':VERIFY_EXISTS,
         'oebs':VERIFY_VISIBLE,'sap':VERIFY_EXISTS,'desktop':VERIFY_EXISTS,'mobileweb':VERIFY_EXISTS}
         self.dynamic_var_handler_obj=dynamic_variable_handler.DynamicVariables()
+        self.constant_var_handler_obj=constant_variable_handler.ConstantVariables()
         self.status=TEST_RESULT_FAIL
         self.scenario_start_time=''
         self.scenario_end_time=''
@@ -106,6 +109,8 @@ class Controller():
         local_cont.i = 0
         self.execution_mode = None
         self.runfrom_step_range_input=[]
+        self.tc_name_list=[]
+        self.constant_var_exists=False
         self.__load_generic()
 
     def __load_generic(self):
@@ -240,7 +245,7 @@ class Controller():
             logger.print_on_console('Error loading System plugin')
             log.error(e,exc_info=True)
 
-           
+
     def __load_aws(self):
         try:
             core_utils.get_all_the_imports('AWS/src')
@@ -354,7 +359,7 @@ class Controller():
         keyword_flag=True
         ignore_stat=False
         inpval=[]
-        start_time = datetime.now()      
+        start_time = datetime.now()
         #Check for 'terminate_flag' before execution
         if not(terminate_flag):
             #Check for 'pause_flag' before executionee
@@ -386,27 +391,6 @@ class Controller():
                         logger.print_on_console('Step Execution start time is : '+start_time_string)
                         log.info('Step Execution start time is : '+start_time_string)
                         index,result = self.keywordinvocation(index,inpval,self.reporting_obj,execution_env,*args)
-                        if tsp.name.lower()=='verifytextiris':
-                            #testcase_details_orig=tsp.testcase_details
-                            testcase_details=tsp.testcase_details
-                            if testcase_details=='':
-                                testcase_details={'actualResult_pass':'','testcaseDetails':'','actualResult_fail':''}
-                            elif type(testcase_details)==str:
-                                testcase_details=ast.literal_eval(testcase_details)
-                            new_array=result[2]
-                            if new_array[0]==None:
-                                new_array[0]='null'
-                            if new_array[1]==None:
-                                new_array[1]='null'
-                            if new_array[0]=='':
-                                new_array[0]='  '
-                            if new_array[1]=='':
-                                new_array[1]='  '
-                            testcase_details['testcaseDetails']=new_array[1]
-                            testcase_details['actualResult_pass']=new_array[0]
-                            testcase_details['actualResult_fail']=new_array[0]
-                            tsp.testcase_details=testcase_details
-
                     else:
                         keyword_flag=False
                         start_time = datetime.now()
@@ -466,12 +450,33 @@ class Controller():
 
     def split_input(self,input,keyword):
         ignore_status = False
+        const_var=False
         inpval = []
         input_list = input[0].split(SEMICOLON)
         if IGNORE_THIS_STEP in input_list:
             ignore_status=True
         if keyword.lower() in [IF,ELSE_IF,EVALUATE]:
             inpval=self.dynamic_var_handler_obj.simplify_expression(input,keyword,self)
+        elif keyword.lower() in CONSTANT_KEYWORDS:
+            if STATIC_NONE in input[0]:
+                input[0]=input[0].replace(STATIC_NONE,'')
+            string=input[0]
+            index=string.find(';')
+            if index >-1:
+                inpval.append(string[0:index])
+                inpval.append(string[index+1:len(string)])
+            elif string != '':
+                inpval.append(string)
+            if keyword.lower() == CREATE_CONST_VARIABLE and len(inpval)>1:
+                #createConstVariable ex: _a_;{a}
+                const_var=self.constant_var_handler_obj.check_for_constantvariables(inpval[1])            
+                if const_var!=TEST_RESULT_TRUE:
+                    #check if the inputval[1] is constant variable or not,
+                    #createConstVariable ex: _a_;{a}
+                    inpval[1]=self.dynamic_var_handler_obj.replace_dynamic_variable(inpval[1],'',self)
+                else:
+                    #createConstVariable ex: _a_;_b_  (_b_ is already created)
+                    inpval[1]=self.constant_var_handler_obj.get_constant_value(inpval[1])
         elif keyword.lower() in DYNAMIC_KEYWORDS:
             if STATIC_NONE in input[0]:
                 input[0]=input[0].replace(STATIC_NONE,'')
@@ -483,9 +488,17 @@ class Controller():
             elif string != '':
                 inpval.append(string)
             if keyword.lower() != CREATE_DYN_VARIABLE:
-                inpval[0]=self.dynamic_var_handler_obj.replace_dynamic_variable(inpval[0],keyword,self)
+                const_var=self.constant_var_handler_obj.check_for_constantvariables(inpval[0])
+                #check if the inputval[0] is constant variable or not,
+                #ex: COPY_VALUE->_a_;{a}
+                if const_var!=TEST_RESULT_TRUE:
+                    inpval[0]=self.dynamic_var_handler_obj.replace_dynamic_variable(inpval[0],keyword,self)
             if len(inpval)>1 and keyword.lower() in [COPY_VALUE,MODIFY_VALUE,CREATE_DYN_VARIABLE]:
                 exch = keyword.lower() == COPY_VALUE
+                const_var=self.constant_var_handler_obj.check_for_constantvariables(inpval[1])
+                if const_var==TEST_RESULT_TRUE:
+                    #to get the value of constantVarible,
+                    inpval[1]=self.constant_var_handler_obj.get_constant_value(inpval[1])
                 inpval[1]=self.dynamic_var_handler_obj.replace_dynamic_variable(inpval[1],'',self,no_exch_val=exch)
         else:
             if keyword.lower() in WS_KEYWORDS or keyword.lower() == 'navigatetourl':
@@ -494,8 +507,14 @@ class Controller():
                 if STATIC_NONE in x:
                     x=None
                 else:
-                    #To Handle dynamic variables of DB keywords,controller object is sent to dynamicVariableHandler
-                    x=self.dynamic_var_handler_obj.replace_dynamic_variable(x,keyword,self)
+                    # To Handle dynamic variables of DB keywords,controller object is sent to dynamicVariableHandler
+                    const_var=self.constant_var_handler_obj.check_for_constantvariables(x)
+                    #to get the value of constantVariable, ex:displayVariableValue
+                    if const_var==TEST_RESULT_TRUE:
+                        #ex:displayVariableValue _a_
+                        x=self.constant_var_handler_obj.get_constant_value(x)
+                    else:
+                        x=self.dynamic_var_handler_obj.replace_dynamic_variable(x,keyword,self)
                 inpval.append(x)
         return inpval,ignore_status
 
@@ -581,7 +600,7 @@ class Controller():
                         keyword_lower = tsp.name.lower()
                         #list containing keywords that should not print output on console, add keyword here to stop printing
                         #Fix for #17330 Addition of getAllValues in exception_list
-                        exception_list = ['getxmlblockdata','findimageinpdf','comparepdfs','getallvalues']
+                        exception_list = ['getxmlblockdata','findimageinpdf','comparepdfs','getallvalues','getcontent']
                         if (tsp.apptype.lower()!='desktop' and keyword_lower not in exception_list) : logger.print_on_console('Result obtained is ',",".join([str(display_keyword_response[local_cont.i])
                         if not isinstance(display_keyword_response[local_cont.i],str) else display_keyword_response[local_cont.i] for local_cont.i in range(len(display_keyword_response))]))
             else:
@@ -601,12 +620,35 @@ class Controller():
             keyword_response=result[1]
             result = result[:1] + (result[2],) + result[2:]
         if len(output)>0 and output[0] != '':
-            self.dynamic_var_handler_obj.store_dynamic_value(output[0],keyword_response,tsp.name)
+            const_var=self.constant_var_handler_obj.check_for_constantvariables(output[0])
+            #checks if the output variable is a constant variable or not  
+            if const_var==TEST_RESULT_TRUE:
+                if output[0] in constant_variable_handler.local_constant.constant_variable_map:
+                    #checks if the output variable(constant variable) is assigned with a value
+                    if tsp.name in FILEPATH_OUTPUT_FIELD_KEYWORDS:
+                        cosnt_val=constant_variable_handler.local_constant.constant_variable_map[output[0]]
+                        file_path = cosnt_val.split(";")[0] 
+                        if not(os.path.exists(file_path)):
+                            self.constant_var_exists=True
+                            err_msg="Error: Constant variable cannot be modified!"
+                            logger.print_on_console(err_msg)
+                            log.debug(err_msg)
+                    else:
+                        self.constant_var_exists=True
+                        err_msg="Error: Constant variable cannot be modified!"
+                        logger.print_on_console(err_msg)
+                        log.debug(err_msg)
+                else:
+                    #in the current step if _a_ is used in output and _a_ is not created, then _a_ should be created and the response of the keyword should be written to _a_
+                    self.constant_var_handler_obj.store_constant_value(output[0],keyword_response,tsp.name)
+            else:
+                self.dynamic_var_handler_obj.store_dynamic_value(output[0],keyword_response,tsp.name)
         if len(output)>1:
             self.dynamic_var_handler_obj.store_dynamic_value(output[1],result[1],tsp.name)
 
     def keywordinvocation(self,index,inpval,*args):
         global socket_object, iris_constant_step, status_percentage
+        self.constant_var_exists=False
         configvalues = self.configvalues
         try:
             time.sleep(float(configvalues['stepExecutionWait']))
@@ -748,6 +790,12 @@ class Controller():
             self.keyword_status=TEST_RESULT_FAIL
             if result!=TERMINATE:
                 self.store_result(result,teststepproperty)
+                if self.constant_var_exists:
+                    #if the output variable(constant variable) is assigned with a value and still constantVariable is used in output
+                    temp_re=list(result)
+                    temp_re[0]=TEST_RESULT_FAIL
+                    temp_re[1]=TEST_RESULT_FALSE
+                    result=tuple(temp_re)
                 self.status=result[0]
                 index+=1
                 self.keyword_status=self.status
@@ -778,7 +826,7 @@ class Controller():
                 if self.action.lower() == 'debug':
                     index = STOP
                 else:
-                    if teststepproperty.inputval[0] == 'testcase':
+                    if teststepproperty.inputval[0].lower() == 'testcase':
                         prev_index = index
                         index -= 1
                         teststepproperty_name = teststepproperty.testscript_name
@@ -788,7 +836,7 @@ class Controller():
                                 break
                         if (index + 1) == prev_index:
                             index = STOP
-                    elif teststepproperty.inputval[0] == 'module':
+                    elif teststepproperty.inputval[0].lower() == 'module':
                         local_cont.module_stop = True
                         index = STOP
                     else:
@@ -816,9 +864,12 @@ class Controller():
         while (i < len(tsplist)):
             #Check for 'terminate_flag' before execution
             if not(terminate_flag):
-                if self.runfrom_step_range_input:
-                    #checks if the current step num is greater than ending range of run from step, to Run till the ending range of run from step
-                    if tsplist[i].stepnum > last_step_val: break
+                if tsplist[i].testcase_num == last_tc_num:
+                    if mythread.cw.debugwindow is not None and not mythread.cw.debugwindow.IsShown():
+                        wx.CallAfter(mythread.cw.debugwindow.Show)
+                    if self.runfrom_step_range_input:
+                        #checks if the current step num is greater than ending range of run from step, to Run till the ending range of run from step
+                        if tsplist[i].stepnum > last_step_val: break
                 #Check for 'pause_flag' before execution
                 if pause_flag:
                     self.pause_execution()
@@ -941,6 +992,8 @@ class Controller():
         log.info('***DEBUG STARTED***')
         logger.print_on_console('***DEBUG STARTED***')
         print('=======================================================================================================')
+        if mythread.cw.debugwindow is not None:
+            wx.CallAfter(mythread.cw.debugwindow.Hide)
         for testcase in scenario:
             flag,browser_type,last_tc_num,datatables,_,_=obj.parse_json(testcase)
             if flag == False:
@@ -953,6 +1006,10 @@ class Controller():
                     if tsplist[k].name.lower() == 'openbrowser' and (IGNORE_THIS_STEP not in tsplist[k].inputval[0].split(';')):
                         tsplist[k].inputval = browser_type
         start_debug=False
+        for z in range(len(testcase)):
+            if "testcasename" in testcase[z]:
+                tc_name=testcase[z]["testcasename"]
+                self.tc_name_list.append(tc_name)
         if type(runfrom_step) != int:
             pattern = re.compile(r"[0-9]+-[0-9]+")
             match = pattern.search(runfrom_step)
@@ -962,7 +1019,7 @@ class Controller():
                 starting_val_end_range = first_step_val + 1
                 if first_step_val > 0 and first_step_val <= tsplist[-1].stepnum:
                     if last_step_val > first_step_val and last_step_val <= tsplist[-1].stepnum:
-                        testcase_details=testcase[0]['testcase']
+                        testcase_details=testcase[-2]['testcase']
                         no_of_steps=(last_step_val-first_step_val)+1
                         comment_step_count=0
                         tdlist=testcase_details[first_step_val-1:last_step_val]
@@ -971,7 +1028,7 @@ class Controller():
                             if (len(outputArray)>=1 and  '##' == outputArray[-1]):
                                 comment_step_count=comment_step_count+1
                         if comment_step_count<no_of_steps:
-                            runfrom_step = first_step_val             
+                            runfrom_step = first_step_val
                             start_debug = True
                         else:
                             status=TERMINATE
@@ -1017,6 +1074,8 @@ class Controller():
         obj.clearList(self)
         #clearing dynamic variables at the end of execution to support dynamic variable at the scenario level
         obj.clear_dyn_variables()
+        #clearing dynamic variables at the end of execution to support constant variable at the scenario level
+        obj.clear_const_variables()
         return status
 
     def invoke_execution(self,mythread,json_data,socketIO,wxObject,configvalues,qcObject,qtestObject,zephyrObject,aws_mode):
@@ -1116,26 +1175,26 @@ class Controller():
 
                         # if('integrationType' in qc_creds and qc_creds['integrationType'] == 'ALM'):
                         integ = 0
-                        if(qc_creds["alm"]["url"] != "" and len(scenario["qcdetails"]) != 0):
+                        if(qc_creds["alm"]["url"] != "" and len(scenario["qcdetails"]) > integ and scenario['qcdetails'][integ][0]["type"] == "ALM"):
                             qc_username=qc_creds['alm']['username']
                             qc_password=qc_creds['alm']['password']
                             qc_url=qc_creds['alm']['url']
                             qc_sceanrio_data=scenario['qcdetails'][integ]
                             integ += 1
                         # if('integrationType' in qc_creds and qc_creds['integrationType'] == 'qTest'):
-                        if(qc_creds["qtest"]["url"] != "" and len(scenario["qcdetails"]) != 0):
+                        if(qc_creds["qtest"]["url"] != "" and len(scenario["qcdetails"]) > integ and scenario['qcdetails'][integ]["type"] == "qTest"):
                             qtest_username=qc_creds["qtest"]["username"]
                             qtest_password=qc_creds["qtest"]["password"]
                             qtest_url=qc_creds["qtest"]["url"]
                             qtest_stepsup=qc_creds["qtest"]["qteststeps"]
-                            qc_sceanrio_data=scenario['qcdetails'][integ]
+                            qtest_sceanrio_data=scenario['qcdetails'][integ]
                             integ += 1
-                            qtest_project=qc_sceanrio_data['qtestproject']
-                            qtest_projectid=qc_sceanrio_data['qtestprojectid']
-                            qtest_suite=qc_sceanrio_data['qtestsuite']
-                            qtest_suiteid=qc_sceanrio_data['qtestsuiteid']
+                            qtest_project=qtest_sceanrio_data['qtestproject']
+                            qtest_projectid=qtest_sceanrio_data['qtestprojectid']
+                            qtest_suite=qtest_sceanrio_data['qtestsuite']
+                            qtest_suiteid=qtest_sceanrio_data['qtestsuiteid']
                         # if('integrationType' in qc_creds and qc_creds['integrationType'] == 'Zephyr'):
-                        if(qc_creds["zephyr"]["url"] != "" and len(scenario["qcdetails"]) != 0):
+                        if(qc_creds["zephyr"]["url"] != "" and len(scenario["qcdetails"]) > integ and scenario['qcdetails'][integ]["type"] == "Zephyr"):
                             zephyr_url=qc_creds["zephyr"]["url"]
                             zephyr_username=qc_creds["zephyr"]["username"]
                             zephyr_password=qc_creds["zephyr"]["password"]
@@ -1188,6 +1247,7 @@ class Controller():
                             scen_id=scenario_id.split('"')
                             aws_scenario=aws_scenario+scen_id
                             scenario_name=json_data['suitedetails'][suite_idx-1]["scenarioNames"][sc_idx]
+                            tsplist = handler.local_handler.tspList
                             if not terminate_flag:
                                 compile_status,pytest_file=tc_obj.compile_tc(tsplist,sc_idx+1,scenario_name)
                             if compile_status:
@@ -1274,6 +1334,7 @@ class Controller():
                             execute_result_data['report_type'] = report_type
                             if execution_env['env'] == 'saucelabs':
                                 browser_num={'1':'googlechrome','2':'firefox','3':'iexplore','7':'microsoftedge','8':'microsoftedge'}
+                                self.__load_web()
                                 import web_keywords
                                 self.obj = web_keywords.Sauce_Config()
                                 self.obj.get_sauceconf()
@@ -1322,12 +1383,15 @@ class Controller():
                             sc_idx += 1
                             exc_pass = False
                             report_json=con.reporting_obj.report_json_condition_check_testcase_empty[OVERALLSTATUS]
+                        integ=0
                         # if integration_type!="qTest" and integration_type!="Zephyr" and len(scenario['qcdetails'])==10 and (qc_url!='' and qc_password!='' and  qc_username!=''):
-                        if  len(scenario['qcdetails'])!=0 and qc_creds['alm']['url'] != '':
+                        if  len(scenario["qcdetails"]) > integ and qc_creds['alm']['url'] != '' and scenario['qcdetails'][integ][0]["type"] == "ALM":
+                            integ += 1
                             if type(qc_sceanrio_data) is not list:
                                 qc_domain=qc_sceanrio_data['qcdomain']
                                 qc_project=qc_sceanrio_data['qcproject']
                                 qc_folder=qc_sceanrio_data['qcfolderpath']
+                                qc_folderid=qc_sceanrio_data[i]['qcfolderid']
                                 qc_tsList=qc_sceanrio_data['qctestset']
                                 qc_testrunname=qc_sceanrio_data['qctestcase']
                                 qc_status_over=report_json[0]
@@ -1347,6 +1411,7 @@ class Controller():
                                     qc_status['qc_domain']=qc_domain
                                     qc_status['qc_project']=qc_project
                                     qc_status['qc_folder']=qc_folder
+                                    qc_status['qc_folderid']=qc_folderid
                                     qc_status['qc_tsList']=qc_tsList
                                     qc_status['qc_testrunname']=qc_testrunname
                                     qc_status['qc_update_status'] = qc_update_status
@@ -1366,6 +1431,7 @@ class Controller():
                                     qc_domain=qc_sceanrio_data[i]['qcdomain']
                                     qc_project=qc_sceanrio_data[i]['qcproject']
                                     qc_folder=qc_sceanrio_data[i]['qcfolderpath']
+                                    qc_folderid=qc_sceanrio_data[i]['qcfolderid']
                                     qc_tsList=qc_sceanrio_data[i]['qctestset']
                                     qc_testrunname=qc_sceanrio_data[i]['qctestcase']
                                     qc_status_over=report_json[0]
@@ -1385,6 +1451,7 @@ class Controller():
                                         qc_status['qc_domain']=qc_domain
                                         qc_status['qc_project']=qc_project
                                         qc_status['qc_folder']=qc_folder
+                                        qc_status['qc_folderid']=qc_folderid
                                         qc_status['qc_tsList']=qc_tsList
                                         qc_status['qc_testrunname']=qc_testrunname
                                         qc_status['qc_update_status'] = qc_update_status
@@ -1400,8 +1467,9 @@ class Controller():
                                     except Exception as e:
                                         logger.print_on_console('Error in Updating Qc details')
                         # if (integration_type=="qTest" and qc_url!='' and qc_password!='' and  qc_username!=''):
-                        if len(scenario['qcdetails'])!=0 and qc_creds['qtest']['url'] != '':
+                        if len(scenario["qcdetails"]) > integ and qc_creds['qtest']['url'] != '' and scenario['qcdetails'][integ]["type"] == "qTest":
                             qtest_status_over=report_json[0]
+                            integ += 1
                             try:
                                 qtest_status = {}
                                 qtest_status['qtestaction']='qtestupdate'
@@ -1443,8 +1511,9 @@ class Controller():
                                 log.error('Error in Updating qTest details '+str(e))
                                 logger.print_on_console('Error in Updating qTest details')
                         # if (integration_type=="Zephyr" and zephyr_password!='' and zephyr_username!='' and  zephyr_url!=''):
-                        if len(scenario['qcdetails'])!=0 and qc_creds['zephyr']['url'] != '':
+                        if len(scenario["qcdetails"]) > integ and qc_creds['zephyr']['url'] != '' and scenario['qcdetails'][integ]["type"] == "Zephyr":
                             zephyr_status_over=report_json[0]
+                            integ += 1
                             try:
                                 zephyr_status = {}
                                 zephyr_status['zephyraction']='zephyrupdate'
@@ -1494,10 +1563,31 @@ class Controller():
                         #logic for condition check
                         report_json=con.reporting_obj.report_json[OVERALLSTATUS]
                     time.sleep(1)
-            if aws_mode and not terminate_flag:
+            if aws_mode and not terminate_flag and not(True in testcase_empty_flag):
                 tc_obj.make_zip(pytest_files)
-                execution_status,step_results=self.aws_obj.run_aws_android_tests()
-                self.aws_report(aws_tsp,aws_scenario,step_results,suite_idx,execute_result_data,con.reporting_obj,json_data,socketIO)
+                execution_status,step_results,config_stat=self.aws_obj.run_aws_android_tests()
+                if execution_status and config_stat:
+                    self.aws_report(aws_tsp,aws_scenario,step_results,suite_idx,execute_result_data,con.reporting_obj,json_data,socketIO)
+                else:
+                    logger.print_on_console( '***Saving report of Scenario' ,str(sc_idx + 1),'***')
+                    log.info( '***Saving report of Scenario' +str(sc_idx + 1)+'***')
+                    os.chdir(self.cur_dir)
+                    filename='Scenario'+str(count + 1)+'.json'
+                    count+=1
+                    status_percentage["s_index"]=suite_idx-1
+                    status_percentage["index"]=sc_idx
+                    con.reporting_obj.user_termination=manual_terminate_flag
+                    if not(config_stat):
+                        info_msg=str("Error in Configuring AWS run")
+                    logger.print_on_console(info_msg)
+                    log.info(info_msg)
+                    con.reporting_obj.save_report_json_conditioncheck_testcase_empty(filename,info_msg,json_data,status_percentage)
+                    execute_result_data["reportData"] = con.reporting_obj.report_json_condition_check_testcase_empty
+                    socketIO.emit('result_executeTestSuite', execute_result_data)
+                    obj.clearList(con)
+                    sc_idx += 1
+                    exc_pass = False
+                    report_json=con.reporting_obj.report_json_condition_check_testcase_empty[OVERALLSTATUS]
                 if con.reporting_obj.overallstatus != 'Pass': exc_pass = False
                 if not(execution_status):
                     status=TERMINATE
@@ -1518,15 +1608,17 @@ class Controller():
             if status == TERMINATE: exc_pass = False
             socketIO.emit("return_status_executeTestSuite", dict({"status": "finished", "executionStatus": exc_pass,
                 "endTime": datetime.now().strftime(TIME_FORMAT)}, **base_execute_data))
-            if not exc_pass: 
+            if not exc_pass:
                 if status == TERMINATE and manual_terminate_flag:
                     mythread.test_status = 'userTerminate'
                 elif status == TERMINATE:
                     mythread.test_status = 'programTerminate'
-                else: 
+                else:
                     mythread.test_status = 'fail'
             #clearing dynamic variables at the end of execution to support dynamic variable at the scenario level
             obj.clear_dyn_variables()
+            #clearing dynamic variables at the end of execution to support constant variable at the scenario level
+            obj.clear_const_variables()
             logger.print_on_console('***SUITE ', str(suite_idx) ,' EXECUTION COMPLETED***')
             log.info('---------------------------------------------------------------------')
             print('=======================================================================================================')
@@ -1631,7 +1723,7 @@ class Controller():
             if action==EXECUTE:
                 aws_mode = len(args)>0 and args[0]
                 self.execution_mode = json_data['exec_mode'].lower()
-                kill_process()
+                if configvalues['kill_stale'].lower() == 'yes': kill_process()
                 if dis_sys_screenoff and is_admin and SYSTEM_OS == 'Windows':
                     self.disable_screen_timeout()
                     reset_sys_screenoff = True
@@ -1740,6 +1832,7 @@ class Controller():
             if(log1.handlers):
                 log1.handlers.clear()
             if json_data['exec_env'].lower() =='saucelabs':
+                self.__load_web()
                 import web_keywords
                 import sauceclient
                 s=web_keywords.Sauce_Config()
@@ -1875,6 +1968,19 @@ def kill_process():
         logger.print_on_console('Stale process killed')
 
     else:
+        try:
+            import browser_Keywords
+            for driver in browser_Keywords.drivermap:
+                driver.quit()
+            del browser_Keywords.drivermap[:]
+            if hasattr(browser_Keywords.local_bk, 'driver_obj'):
+                if (browser_Keywords.local_bk.driver_obj):
+                    browser_Keywords.local_bk.driver_obj = None
+            if hasattr(browser_Keywords.local_bk, 'pid_set'):
+                if (browser_Keywords.local_bk.pid_set):
+                    del browser_Keywords.local_bk.pid_set[:]
+        except Exception as e:
+            log.error(e)
         tries = {}
         while(len(process_ids) > 0):
             try:

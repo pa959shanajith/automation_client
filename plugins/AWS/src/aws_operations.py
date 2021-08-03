@@ -372,12 +372,15 @@ class AWS_Operations:
 
     def run_aws_android_tests(self):
         result=[]
+        result_status=False
+        config_status=False
         try:
             if not(self.terminateFlag):
                 self.get_run_configurations()
                 project_arn,app_arn,tp_arn,spec_arn,device_pool_arn=self.configure_run(self.project_name,self.app_name,self.package_name,self.pool_name)
                 if(project_arn and app_arn and tp_arn and spec_arn and device_pool_arn) is not None:
                     result_status,result = self.run_test(project_arn,app_arn,tp_arn,spec_arn,device_pool_arn)
+                    config_status=True
                 else:
                     if not(self.terminateFlag):
                         msg='Error in Configuring AWS run'
@@ -386,7 +389,7 @@ class AWS_Operations:
         except Exception as e:
             logger.print_on_console('Error in running aws tests')
             log.error(e)
-        return result_status,result
+        return result_status,result,config_status
 
     def download_results(self,test_run_arn,download_type,output_dir):
     ##    artifcats=self.dc.list_artifacts(arn='arn:aws:devicefarm:us-west-2:197128414257:run:02a594e3-ea23-48f8-a630-eac93487a7b1/25self.dc69bc-2907-4612-b890-92a66c0377d0',type='FILE')['artifacts']

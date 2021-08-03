@@ -103,7 +103,11 @@ VERIFY_VISIBLE='verifyvisible'
 
 DYNAMIC_KEYWORDS=['createdynvariable','copyvalue','modifyvalue','deletedynvariable']
 
+CONSTANT_KEYWORDS=['createconstvariable','deleteconstvariable']
+
 CREATE_DYN_VARIABLE='createdynvariable'
+
+CREATE_CONST_VARIABLE='createconstvariable'
 
 COPY_VALUE='copyvalue'
 
@@ -233,8 +237,10 @@ ERROR_CODE_DICT = {
                     'ERR_GETPARAM_EXCEL': "Excel sheet doesn't contain column names.",
                     'ERR_GETPARAM_UNIQUECOLUMN': 'Excel sheet should contain Unique Column names',
                     'ERR_XML_INVALID': 'Invalid XML format.',
-                    'ERR_DYNVAR': 'Variable does not Exist.',
+                    'ERR_DYNVAR': 'Variable does not exist.',
+                    'ERR_CONVAR': 'Constant Variable does not exist.',
                     'ERR_DYNVAR_ALREADY_EXISTS': 'Variable already exists',
+                    'ERR_CONSVAR_ALREADY_EXISTS': 'Constant Variable already exists',
                     'ERR_XML_TAGNAMES': "XML file doesn't contain tag names.",
                     'MSG_EXTERNAL_DATALIST_STATICVARIABLE': 'Invalid Input:No externalData List exists for static variable.',
                     'ERR_CAPTURE_SCREENSHOT':'Unable to capture the screenshots.',
@@ -299,7 +305,8 @@ ERROR_CODE_DICT = {
                     "ERR_DB_OPS": "Error with database operation",
                     "ERR_DB_QUERY": "Error with database query",
                     "ERR_FILE_WRITE": "Error writing to file",
-                    "ERR_JAVA_NOT_FOUND": "JAVA_HOME environment variable is not set"
+                    "ERR_JAVA_NOT_FOUND": "JAVA_HOME environment variable is not set",
+                    "ERR_INVALID_SHEET": "Input error: Invalid Sheet name"
                 }
 
 STOP='stop'
@@ -360,7 +367,7 @@ SCENARIO_NAME='scenarioName'
 
 RELEASE_NAME='releaseName'
 
-VERSION_NAME='versionname'
+VERSION='version'
 
 TERMINATED_BY='terminatedBy'
 
@@ -521,4 +528,8 @@ if SYSTEM_OS == "Windows":
 
 if (os.path.exists(UPDATER_LOC[:-3] + "py")): UPDATER_LOC = UPDATER_LOC[:-3] + "py"
 
+TEMP_PATH = AVO_ASSURE_HOME + OS_SEP + "output"
+
 PREDICTION_IMG_DIR = "Disabled"
+
+FILEPATH_OUTPUT_FIELD_KEYWORDS=["exportData","cellByCellCompare","getXmlBlockData","selectiveXmlFileCompare","compXmlFileWithXmlBlock","compareInputs","beautify","compareFiles","comparePDFs","findImageInPDF","selectiveCellCompare"]

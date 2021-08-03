@@ -21,6 +21,7 @@ import dropdown_listbox_MW
 import static_text_keywords_MW
 import device_keywords_MW
 import mob_screenshot_web
+import threading
 import logger
 from webconstants_MW import *
 import custom_keyword_MW
@@ -180,6 +181,9 @@ class Dispatcher:
         self.action=None
 
     def dispatcher(self,teststepproperty,input,reporting_obj,mythread):
+        global simple_debug_gwto, status_gwto
+        status_gwto =False
+        simple_debug_gwto=False
         objectname = teststepproperty.objectname
         output = teststepproperty.outputval
         objectname = objectname.strip()
@@ -363,20 +367,27 @@ class Dispatcher:
                     if globalWait_to > 0 and webelement is None:
                         try:
                             identifiers = objectname.split(';')
-                            obj_name=identifiers[0]
-                            if obj_name is not None:
-                                element_present = EC.presence_of_element_located((By.XPATH, obj_name))
-                                log.info('starting Global Wait TimeOut')
-                                WebDriverWait(browser_Keywords_MW.driver_obj, globalWait_to).until(element_present)
+                            ele_th={}
+                            obj_type={0:By.XPATH,1:By.ID,2:By.XPATH,3:By.NAME,5:By.CLASS_NAME,11:By.CSS_SELECTOR}
+                            for i in range(0,len(identifiers)):
+                                obj_name=identifiers[i]
+                                if  i in obj_type.keys() and not(obj_name in [None,'null']):
+                                    element_present=EC.presence_of_element_located((obj_type[i], obj_name))
+                                    ele_th[i]=threading.Thread(target = self.find_ele, name=i, args = (i,globalWait_to,browser_Keywords_MW.driver_obj,element_present,log))
+                                    ele_th[i].start()
+                            for i in ele_th:
+                                ele_th[i].join()
+                            if(status_gwto):
                                 msg='Element Found. Global Wait Timeout completed'
                                 log.info(msg)
                                 logger.print_on_console(msg)
                                 webelement=send_webelement_to_keyword(driver,objectname,url)
-                        except TimeoutException as e:
-                            msg1='Element not Found. Global Wait Timeout executed'
-                            logger.print_on_console(msg1)
-                            log.error(msg1)
-                            log.error(e)
+                            else:
+                                msg1='Element not Found. Global Wait Timeout executed'
+                                logger.print_on_console(msg1)
+                                log.error(msg1)
+                                if simple_debug_gwto:
+                                    webelement=send_webelement_to_keyword(driver,objectname,url)
                         except Exception as e:
                             log.error(e)
                     if webelement == None and self.exception_flag:
@@ -518,10 +529,21 @@ class Dispatcher:
                 log.error(e)
         return status,value
     
+    def find_ele(self,i,globalWait_to,driver,element_present,log):
+        global status_gwto
+        try:
+            log.debug('starting Global Wait TimeOut with oi'+str(i))
+            WebDriverWait(driver, globalWait_to).until(element_present)
+            status_gwto=True
+            msg1="Element Found with oi"+str(i)+". Global Wait Timeout executed"
+        except TimeoutException as e:
+            msg1="Element not Found with oi"+str(i)+". Global Wait Timeout executed"
+            log.debug(msg1)
+            log.error(e)
 
     def getwebelement(self,driver,objectname,stepnum,custname):
 ##        objectname = str(objectname)
-        global obj_flag
+        global obj_flag,simple_debug_gwto
         obj_flag=False
         webElement = None
         if objectname.strip() != '':
@@ -681,6 +703,11 @@ class Dispatcher:
                 log.error(err_msg)
         configvalues = readconfig.configvalues
         if((webElement==None or webElement== '') and configvalues['extn_enabled'].lower() == 'yes' and self.action=='debug' and isinstance(driver, webdriver.Chrome)):
+            if not(simple_debug_gwto):
+                simple_debug_gwto=True
+                if isinstance(webElement,list):
+                    webElement=webElement[0]
+                return webElement
             try:
                 flag=True
                 logger.print_on_console('Scrape the Element using extension')

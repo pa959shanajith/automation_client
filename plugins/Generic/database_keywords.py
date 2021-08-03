@@ -17,6 +17,7 @@ import xlwt
 from xlutils.copy import copy as xl_copy
 import openpyxl
 from openpyxl.utils import get_column_letter
+import xlrd
 from xlrd import open_workbook
 import generic_constants
 import os
@@ -24,6 +25,7 @@ import logger
 from encryption_utility import AESCipher
 import logging
 import dynamic_variable_handler
+import constant_variable_handler
 try:
     import pyodbc
     import jaydebeapi
@@ -39,6 +41,7 @@ class DatabaseOperation():
 
     def __init__(self):
         self.DV = dynamic_variable_handler.DynamicVariables()
+        self.CV = constant_variable_handler.ConstantVariables()
 
     def processException(self, e):
         etype = type(e)
@@ -52,10 +55,10 @@ class DatabaseOperation():
         elif etype in [pyodbc.DataError, pyodbc.ProgrammingError, pyodbc.NotSupportedError]:
             if hasattr(e, 'args') and len(e.args) > 1: ae = e.args[1].split(';')[0]
             err_msg = ERROR_CODE_DICT["ERR_DB_QUERY"]
-        elif etype == jpype._jvmfinder.JVMNotFoundException:
-            if hasattr(e, 'args'):
-                ae = e.args[0].split('.')[2].strip()
-            err_msg = ERROR_CODE_DICT['ERR_JAVA_NOT_FOUND']
+        ##22200: Invalid sheet error for verifydata
+        elif etype == xlrd.biffh.XLRDError:
+            err_msg = ERROR_CODE_DICT["ERR_INVALID_SHEET"]
+
         ##to handle mdb files exception     
         elif etype == pyodbc.Error:
             if hasattr(e, 'args') and len(e.args) > 1: ae = e.args[1].split(';')[-1]
@@ -65,6 +68,10 @@ class DatabaseOperation():
                 err_msg="Invalid DB file."
             else:
                 err_msg = ERROR_CODE_DICT['ERR_DB_OPS']
+        elif etype == jpype._jvmfinder.JVMNotFoundException:
+            if hasattr(e, 'args'):
+                ae = e.args[0].split('.')[2].strip()
+            err_msg = ERROR_CODE_DICT['ERR_JAVA_NOT_FOUND']
         else:
             err_msg = ERROR_CODE_DICT['ERR_DB_OPS']
         logger.print_on_console(err_msg) 
@@ -76,7 +83,67 @@ class DatabaseOperation():
         log.error(e)
         return err_msg
 
-    def runQuery(self, ip , port , userName , password, dbName, query, dbtype):
+    def mongoquery(self, query,q_type):
+        import json
+        from bson.json_util import dumps,loads
+        flag=False
+        query=json.loads(query)
+        if q_type == 'insert_many':
+            self.coll.insert_many(query)
+        elif q_type == 'insert_one':
+            self.coll.insert_one(query)
+        elif q_type == 'update_one':
+            self.coll.update_one(query)
+        elif q_type == 'update_many':
+            self.coll.update_many(query)
+        elif q_type == 'delete_one':
+            self.coll.delete_one(query)
+        elif q_type == 'delete_many':
+            self.coll.delete_many(query)
+        elif q_type == 'find_one':
+            res = self.coll.find_one(query)
+            flag=True
+        elif q_type == 'find':
+            res = self.coll.find(query)
+            flag=True
+        if flag:
+            json_rows = loads(dumps(res))
+            columns = [k for k,v in sorted(json_rows[0].items())]
+            columns=tuple(columns)
+            rows=[]
+            for i in json_rows:
+                row=[]
+                for k,v in sorted(i.items()):
+                    row.append(str(v))
+                row=tuple(row)
+                rows.append(row)
+            return rows,columns
+
+    def redisquery(self, cnxn, query, q_type):
+        if q_type == 'keys':
+            keys=cnxn.keys(query)
+            rows=[]
+            for i in keys:
+                key=i
+                val=cnxn.get(i)
+                if isinstance(key,bytes):
+                    key=key.decode('utf-8')
+                if isinstance(val,bytes):
+                    val=val.decode('utf-8')
+                rows.append(tuple([key,val]))
+            columns=tuple(['key','value'])
+            return rows,columns
+        if q_type=='get':
+            res=cnxn.get(query)
+            row=[query,res]
+        elif q_type=='set':
+            val=query.split(',')
+            if len(val)>=2:
+                val[1]=','.join(val[1:])
+                cnxn.set(val[0],val[1])
+        
+
+    def runQuery(self, ip , port , userName , password, dbName, query, dbtype, *args):
         """
         def : runQuery
         purpose : Executes the query
@@ -89,21 +156,47 @@ class DatabaseOperation():
         err_msg=None
         cursor = None
         try:
-            cnxn = self.connection(dbtype, ip , port , dbName, userName , password)
+            cnxn = self.connection(dbtype, ip , port , dbName, userName , password, args)
             if cnxn is not None:
-                cursor = cnxn.cursor()
-                statement = ['create','update','insert','CREATE','UPDATE','INSERT']
-                if any(x in query for x in statement ):
-                    log.debug('Inside IF condition')
-                    cursor.execute(query)  
-                    cnxn.commit()
+                dbtype=int(dbtype)
+                ## execute query in cassandra
+                if dbtype == 11:
+                    cnxn.execute(query)
+                    status=generic_constants.TEST_RESULT_PASS
+                    result=generic_constants.TEST_RESULT_TRUE
+                    cnxn=cnxn.shutdown()
+                ## execute query in mongo
+                elif dbtype == 9:
+                    db=cnxn[dbName]
+                    if len(args)==2:
+                        self.coll=db[args[0]]
+                        self.mongoquery(query,args[1])
+                        status=generic_constants.TEST_RESULT_PASS
+                        result=generic_constants.TEST_RESULT_TRUE
+                ## execute query in redis
+                elif dbtype == 10:
+                    self.redisquery(cnxn,query,args[0])
                     status=generic_constants.TEST_RESULT_PASS
                     result=generic_constants.TEST_RESULT_TRUE
                 else:
-                    log.debug('Inside else condition')
-                    cursor.execute(query)
-                    status=generic_constants.TEST_RESULT_PASS
-                    result=generic_constants.TEST_RESULT_TRUE
+                    cursor = cnxn.cursor()
+                    statement = ['create','update','insert','drop','delete','CREATE','UPDATE','INSERT','DROP','DELETE']
+                    if any(x in query for x in statement ):
+                        log.debug('Inside IF condition')
+                        cursor.execute(query)
+                        chk_var=['update','UPDATE','delete','DELETE']
+                        if(any(x in query for x in chk_var) and cursor.rowcount==0):
+                            status=generic_constants.TEST_RESULT_FAIL
+                            result=generic_constants.TEST_RESULT_FALSE
+                        else:
+                            cnxn.commit()
+                            status=generic_constants.TEST_RESULT_PASS
+                            result=generic_constants.TEST_RESULT_TRUE
+                    else:
+                        log.debug('Inside else condition')
+                        cursor.execute(query)
+                        status=generic_constants.TEST_RESULT_PASS
+                        result=generic_constants.TEST_RESULT_TRUE
         except Exception as e:
             err_msg = self.processException(e)
         finally:
@@ -111,7 +204,7 @@ class DatabaseOperation():
             if cnxn is not None: cnxn.close()
         return status,result,verb,err_msg
 
-    def secureRunQuery(self, ip , port , userName , password, dbName, query, dbtype):
+    def secureRunQuery(self, ip , port , userName , password, dbName, query, dbtype, *args):
         """
         def : secureRunQuery
         purpose : Executes the query
@@ -125,7 +218,7 @@ class DatabaseOperation():
         try:
             encryption_obj = AESCipher()
             decrypted_password = encryption_obj.decrypt(password)
-            status,result,verb,err_msg=self.runQuery(ip,port,userName,decrypted_password,dbName,query,dbtype)
+            status,result,verb,err_msg=self.runQuery(ip,port,userName,decrypted_password,dbName,query,dbtype,args)
         except Exception as e:
             err_msg = self.processException(e)
         return status,result,verb,err_msg
@@ -143,29 +236,58 @@ class DatabaseOperation():
         value = None
         err_msg=None
         details = []
+        res=[]
+        res.append(ip)
+        res.append(port)
+        res.append(userName)
+        res.append(password)
+        res.append(dbName)
+        res.append(query)
+        res.append(dbtype) 
         cnxn=None
+        cursor=None
         try:
-            cnxn = self.connection(dbtype, ip , port , dbName, userName , password)
+            cnxn = self.connection(dbtype, ip , port , dbName, userName , password, args)
             if cnxn is not None:
-                cursor=cnxn.cursor()
-                ##added to check if getalltables is not used with any other dbtype
-                if (query.lower() =='getalltables' and dbtype!='3'):
-                    err_msg = ERROR_CODE_DICT["ERR_DB_QUERY"]
-                    logger.print_on_console(err_msg)
-                    log.error(err_msg)
-                else:
-                    if query.lower() !='getalltables':
-                        ##added to check if given query is valid
-                        cursor.execute(query)
-                    details.append(ip)
-                    details.append(port)
-                    details.append(userName)
-                    details.append(password)
-                    details.append(dbName)
-                    details.append(query)
-                    details.append(dbtype)
+                dbtype=int(dbtype)
+                if dbtype == 13:
+                    res.append((args[0],args[1]))
+                ## execute query in cassandra 
+                if dbtype == 11: 
+                    cnxn.execute(query)
                     status=generic_constants.TEST_RESULT_PASS
                     result=generic_constants.TEST_RESULT_TRUE
+                    cnxn=cnxn.shutdown()
+                ## execute query in mongo
+                elif dbtype == 9:
+                    db=cnxn[dbName]
+                    if len(args)>=2:
+                        self.coll=db[args[0]]
+                        rows,columns=self.mongoquery(query,args[1])
+                        status=generic_constants.TEST_RESULT_PASS
+                        result=generic_constants.TEST_RESULT_TRUE
+                        res.append(args[0])
+                        res.append(args[1])
+                ## execute query in redis
+                elif dbtype == 10:
+                    rows,columns=self.redisquery(cnxn,query,args[0])
+                    res.append(args[0])
+                    status=generic_constants.TEST_RESULT_PASS
+                    result=generic_constants.TEST_RESULT_TRUE
+                ##added to check if getalltables is not used with any other dbtype
+                else:
+                    cursor = cnxn.cursor()
+                    if (query.lower() =='getalltables' and dbtype!='3'):
+                        err_msg = ERROR_CODE_DICT["ERR_DB_QUERY"]
+                        logger.print_on_console(err_msg)
+                        log.error(err_msg)
+                    else:
+                        if query.lower() !='getalltables':
+                            ##added to check if given query is valid
+                            cursor.execute(query)
+                            status=generic_constants.TEST_RESULT_PASS
+                            result=generic_constants.TEST_RESULT_TRUE
+                details=res
         except Exception as e:
             err_msg = self.processException(e)
         finally:
@@ -176,12 +298,13 @@ class DatabaseOperation():
     def fetchData(self,input_val,*args):
         value = None
         cursor = None
-        if(len(input_val)== 8):
+        if(len(input_val)>= 8):
             try:
-                cnxn = self.connection(input_val[6], input_val[0] , input_val[1] , input_val[4], input_val[2] , input_val[3])
+                cnxn = self.connection(input_val[6], input_val[0] , input_val[1] , input_val[4], input_val[2] , input_val[3],input_val[7])
+                dbtype=int(input_val[6])
                 if cnxn is not None:
                     import re
-                    data = re.findall(r'\[([^]]*)\]',input_val[7])
+                    data = re.findall(r'\[([^]]*)\]',input_val[-1])
                     ##if condition added to resolve invalid input in displaydynamicvariable when more then two indexes were entered
                     if(len(data)==2):
                         row = data[0]
@@ -190,20 +313,50 @@ class DatabaseOperation():
                         col = int(col)
                         row_no = row - 1
                         col_no = col - 1
-                        cursor = cnxn.cursor()
-                        ##fetching table names
-                        if (input_val[5].lower()=='getalltables'):
+                        if dbtype == 11: 
+                            from cassandra.query import dict_factory
+                            import uuid
+                            cnxn.row_factory = dict_factory
+                            query_res = cnxn.execute(input_val[5])
+                            columns = tuple(query_res.column_names)
+                            json_rows = query_res.current_rows
                             rows=[]
-                            tables=[]
-                            for table in list(cursor.tables()):
-                                if table[3]=='TABLE':
-                                    tables.append(table[2])
-                            rows.append(tables)
-                            value = rows[col_no][row_no]
+                            for i in json_rows:
+                                row=[]
+                                for k,v in i.items():
+                                    if isinstance(v,uuid.UUID):
+                                        row.append(str(v))
+                                    else:
+                                        row.append(v)
+                                row=tuple(row)
+                                rows.append(row)
+                            value=rows
+                            cnxn=cnxn.shutdown()
+                        ## execute query in mongo
+                        elif dbtype == 9:
+                            db=cnxn[input_val[4]]
+                            self.coll=db[input_val[7]]
+                            rows,columns=self.mongoquery(input_val[5],input_val[8])
+                            value=rows
+                        ## execute query in redis
+                        elif dbtype == 10:
+                            rows,columns=self.redisquery(cnxn,input_val[5],input_val[7])
+                            value=rows
                         else:
-                            cursor.execute(input_val[5])
-                            rows = cursor.fetchall()
-                            value = rows[row_no][col_no]
+                            cursor = cnxn.cursor()
+                            ##fetching table names
+                            if (input_val[5].lower()=='getalltables'):
+                                rows=[]
+                                tables=[]
+                                for table in list(cursor.tables()):
+                                    if table[3]=='TABLE':
+                                        tables.append(table[2])
+                                rows.append(tables)
+                                value = rows[col_no][row_no]
+                            else:
+                                cursor.execute(input_val[5])
+                                rows = cursor.fetchall()
+                        value = rows[row_no][col_no]
                         ##if condition added to fix issue:304-Generic : getData keyword:  Actual data  is not getting stored in dynamic variable instead "null" is stored.
                         ##changes done by jayashree.r
                     if value == None:
@@ -237,7 +390,7 @@ class DatabaseOperation():
             err_msg = self.processException(e)
         return status,result,value,err_msg
 
-    def verifyData(self, ip , port , userName , password, dbName, query, dbtype,inp_file,inp_sheet):
+    def verifyData(self, ip , port , userName , password, dbName, query, dbtype,inp_file,inp_sheet,*args):
         """
         def : verifyData
         purpose : Executes the query and compares the data with data in files
@@ -249,6 +402,7 @@ class DatabaseOperation():
         verb = OUTPUT_CONSTANT
         err_msg=None
         cursor=None
+        sheet=None
         try:
             ext = self.get_ext(inp_file)
             if ext == '.xls':
@@ -258,14 +412,47 @@ class DatabaseOperation():
             else:
                 file_path=self.create_file_csv()
 
-            cnxn = self.connection(dbtype, ip , port , dbName, userName , password)
+            cnxn = self.connection(dbtype, ip , port , dbName, userName , password,args)
             if cnxn is not None:
-                cursor = cnxn.cursor()
-                cursor.execute(query)
-                rows = cursor.fetchall()
-                columns = [column[0] for column in cursor.description]
+                dbtype=int(dbtype)
+                ## execute query in cassandra
+                if dbtype == 11: 
+                    from cassandra.query import dict_factory
+                    import uuid
+                    cnxn.row_factory = dict_factory
+                    query_res = cnxn.execute(query)
+                    columns = tuple(query_res.column_names)
+                    json_rows = query_res.current_rows
+                    rows=[]
+                    for i in json_rows:
+                        row=[]
+                        for k,v in i.items():
+                            if isinstance(v,uuid.UUID):
+                                row.append(str(v))
+                            else:
+                                row.append(v)
+                        row=tuple(row)
+                        rows.append(row)
+                    cnxn=cnxn.shutdown()
+                ## execute query in mongo
+                elif dbtype == 9:
+                    db=cnxn[dbName]
+                    if len(args)>=2:
+                        self.coll=db[args[0]]
+                        rows,columns=self.mongoquery(query,args[1])
+                ## execute query in redis
+                elif dbtype == 10:
+                    rows,columns=self.redisquery(cnxn,query,args[0])
+                else: 
+                    cursor = cnxn.cursor()
+                    cursor.execute(query)
+                    rows = cursor.fetchall()
+                    columns = [column[0] for column in cursor.description]
                 verify = os.path.isfile(inp_file)
-                if (verify == True):
+                if(verify== True and ext in[".xls",".xlsx"]):
+                    book = open_workbook(inp_file)
+                    sheet = book.sheet_by_name(inp_sheet)
+                if (verify == True and (type(sheet)==xlrd.sheet.Sheet or sheet == None)):
                     ext = self.get_ext(file_path)
                     if (ext == '.xls'):
                         work_book = xlwt.Workbook(encoding="utf-8")
@@ -416,8 +603,8 @@ class DatabaseOperation():
                         err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                         logger.print_on_console(err_msg)
                         log.info(err_msg)
-            else:
-                logger.print_on_console(generic_constants.FILE_NOT_EXISTS)
+                else:
+                    logger.print_on_console(generic_constants.FILE_NOT_EXISTS)
         except Exception as e:
             err_msg = self.processException(e)
         finally:
@@ -426,7 +613,7 @@ class DatabaseOperation():
             if cnxn is not None: cnxn.close()
         return status,result,verb,err_msg
 
-    def secureVerifyData(self, ip , port , userName , password, dbName, query, dbtype,inp_file,inp_sheet):
+    def secureVerifyData(self, ip , port , userName , password, dbName, query, dbtype,inp_file,inp_sheet, *args):
         """
         def : secureVerifyData
         purpose : Executes the query and compares the data with data in files
@@ -440,7 +627,7 @@ class DatabaseOperation():
         try:
             encryption_obj = AESCipher()
             decrypted_password = encryption_obj.decrypt(password)
-            status,result,verb,err_msg=self.verifyData(ip,port,userName,decrypted_password,dbName, query, dbtype,inp_file,inp_sheet)
+            status,result,verb,err_msg=self.verifyData(ip,port,userName,decrypted_password,dbName, query, dbtype,inp_file,inp_sheet,args)
         except Exception as e:
             err_msg = self.processException(e)
         return status,result,verb,err_msg
@@ -458,18 +645,53 @@ class DatabaseOperation():
         err_msg=None
         cursor = None
         try:
-            cnxn = self.connection(dbtype, ip , port , dbName, userName , password)
+            cnxn = self.connection(dbtype, ip , port , dbName, userName , password,args)
             if cnxn is not None:
-                cursor = cnxn.cursor()
-                try:
-                    cursor.execute(query)
-                except Exception as e:
-                    err_msg = "Invalid Query"
-                    log.error(err_msg)
-                    # logger.print_on_console(err_msg)    
-                rows = cursor.fetchall()
-                columns = [column[0] for column in cursor.description]
+                dbtype=int(dbtype)
+                ## execute query in cassandra
+                if dbtype == 11: 
+                    from cassandra.query import dict_factory
+                    import uuid
+                    cnxn.row_factory = dict_factory
+                    query_res = cnxn.execute(query)
+                    columns = tuple(query_res.column_names)
+                    json_rows = query_res.current_rows
+                    rows=[]
+                    for i in json_rows:
+                        row=[]
+                        for k,v in i.items():
+                            if isinstance(v,uuid.UUID):
+                                row.append(str(v))
+                            else:
+                                row.append(v)
+                        row=tuple(row)
+                        rows.append(row)
+                    cnxn=cnxn.shutdown()
+                ## execute query in mongo
+                elif dbtype == 9:
+                    db=cnxn[dbName]
+                    if len(args)>=2:
+                        self.coll=db[args[0]]
+                        rows,columns=self.mongoquery(query,args[1])
+                        args=args[2:]
+                ## execute query in redis
+                elif dbtype == 10:
+                    if len(args)>=2:
+                        rows,columns=self.redisquery(cnxn,query,args[0])
+                        args=args[1:]
+                else:
+                    cursor = cnxn.cursor()
+                    try:
+                        cursor.execute(query)
+                    except Exception as e:
+                        err_msg = "Invalid Query"
+                        log.error(err_msg)
+                        # logger.print_on_console(err_msg)    
+                    rows = cursor.fetchall()
+                    columns = [column[0] for column in cursor.description]
                 ##logic for output col reading
+                if dbtype == 13:
+                    args=args[2:]
                 if type(args) is tuple:
                     if str(args).startswith("(("):
                         args=args[0]
@@ -481,6 +703,21 @@ class DatabaseOperation():
                         if len(inp_path.split(';'))>1:
                             fields=inp_path.split(";")[0]
                             inp_sheet=inp_path.split(";")[1]
+                        else:
+                            fields=inp_path.split(";")[0]
+                            inp_sheet=None
+                    else:
+                        fields = None
+                        inp_sheet=None
+                elif (args[0].startswith("_")) and (args[0].endswith("_")):
+                    inp_path = self.CV.get_constant_value(args[0])
+                    if inp_path!=None:
+                        if len(inp_path.split(';'))>1:
+                            fields = None
+                            inp_sheet=None
+                        elif len(inp_path.split(';'))==1 and len(args)>1:
+                            fields=inp_path.split(";")[0]
+                            inp_sheet=args[1]                       
                         else:
                             fields=inp_path.split(";")[0]
                             inp_sheet=None
@@ -759,12 +996,12 @@ class DatabaseOperation():
             encryption_obj = AESCipher()
             decrypted_password = encryption_obj.decrypt(password)
             out_col = args
-            status,result,verb,err_msg=self.exportData(ip,port,userName,decrypted_password,dbName, query, dbtype, out_col)
+            status,result,verb,err_msg=self.exportData(ip,port,userName,decrypted_password,dbName, query, dbtype, out_col,args)
         except Exception as e:
             err_msg = self.processException(e)
         return status,result,verb,err_msg
 
-    def connection(self,dbtype, ip , port , dbName, userName , password):
+    def connection(self,dbtype, ip , port , dbName, userName , password, *args):
         """
         def : connection
         purpose : connecting to database based on database type given
@@ -804,6 +1041,29 @@ class DatabaseOperation():
                         err_msg=generic_constants.INVALID_INPUT
                         logger.print_on_console(err_msg)
                         log.error(err_msg)
+                elif dbtype == 8:
+                    import pymysql
+                    self.cnxn = pymysql.connect(host=ip,user=userName,password=password,db=dbName)
+                elif dbtype == 9:
+                    from pymongo import MongoClient
+                    self.cnxn = MongoClient(ip,int(port),username=userName,password=password,authSource=dbName)
+                elif dbtype == 10:
+                    import redis
+                    self.cnxn = redis.StrictRedis(host=ip,port=int(port),password=password,db=int(dbName))
+                elif dbtype == 11:
+                    from cassandra.cluster import Cluster
+                    from cassandra.auth import PlainTextAuthProvider
+                    self.cnxn = Cluster([ip],port=port,auth_provider=PlainTextAuthProvider(username=userName, password=password)).connect()
+                    self.cnxn.set_keyspace(dbName)
+                elif dbtype == 12:
+                    import sqlite3
+                    self.cnxn = sqlite3.connect(ip)
+                elif dbtype == 13:
+                    import snowflake.connector
+                    self.cnxn = snowflake.connector.connect(user=userName,password=password,account=ip,warehouse=args[0][0],database=dbName,schema=args[0][1])
+                elif dbtype == 14:
+                    import psycopg2
+                    self.cnxn = psycopg2.connect(host=ip,port=port,user=userName,password=password,database=dbName)
                 else:
                     self.cnxn = pyodbc.connect('driver=%s;SERVER=%s;PORT=%s;DATABASE=%s;UID=%s;PWD=%s' % ( dbNumber[dbtype], ip, port, dbName, userName ,password ) )
                 return self.cnxn

@@ -101,7 +101,7 @@ class Delay_keywords:
                         x=coreutilsobj.get_UTF_8(x)
                         if y == None:
                             y = 'null'
-                        if not((x.startswith('{') and x.endswith('}')) or (x.startswith('|') and x.endswith('|'))):
+                        if not((x.startswith('{') and x.endswith('}')) or (x.startswith('|') and x.endswith('|')) or (x.startswith('_') and x.endswith('_'))):
                             flag_invalid_syntax=True
 
                         elif x.startswith('|') and x.endswith('|') and x.count('|')!=2:
