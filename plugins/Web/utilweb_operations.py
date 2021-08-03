@@ -629,7 +629,7 @@ class UtilWebKeywords:
                 status=TEST_RESULT_PASS
                 methodoutput=TEST_RESULT_TRUE
         except WebDriverException as e:
-            if isinstance(browser_Keywords.local_bk.driver_obj,webdriver.Chrome):
+            if isinstance(browser_Keywords.local_bk.driver_obj, webdriver.Chrome) or isinstance(browser_Keywords.local_bk.driver_obj, webdriver.Firefox) or isinstance(browser_Keywords.local_bk.driver_obj, webdriver.Edge):
                 self.__setfocus(webelement)
                 robot=Robot()
                 robot.key_press('tab')
