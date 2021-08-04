@@ -608,7 +608,7 @@ class Dispatcher:
                     if url !=  '' and local_Wd.custom_object.is_int(url):
                         try:
                             local_Wd.log.debug('Encountered iframe/frame url')
-                            local_Wd.custom_object.switch_to_iframe(url,driver.current_window_handle)
+                            local_Wd.custom_object.switch_to_iframe(url,driver.current_window_handle,flag=True)
                             driver = browser_Keywords.local_bk.driver_obj
                         except Exception as e:
                             local_Wd.log.error(e,exc_info=True)
@@ -875,7 +875,7 @@ class Dispatcher:
                 local_Wd.log.error(err_msg)
         configvalues = readconfig.configvalues
         if((webElement==None or webElement== '') and configvalues['extn_enabled'].lower() == 'yes' and self.action=='debug' and isinstance(driver, webdriver.Chrome)):
-            if not(simple_debug_gwto):
+            if not(simple_debug_gwto) and (int(configvalues['globalWaitTimeOut']))>0:
                 simple_debug_gwto=True
                 if isinstance(webElement,list):
                     webElement=webElement[0]

@@ -32,7 +32,7 @@ def print_on_console(message,*args, **kwargs):
             if filename == 'logger':
                 caller = getframeinfo(sys._getframe(1))
                 filename=os.path.basename(caller.filename)[0:-3]
-            filename = filename + ':'+str(caller.lineno) +' '
+            filename += ':'+str(caller.lineno) + ' '
         except ValueError:
             filename = ''
 

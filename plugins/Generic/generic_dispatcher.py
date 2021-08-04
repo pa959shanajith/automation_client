@@ -29,6 +29,7 @@ import xml_operations
 import util_operations
 import word_operations
 import dynamic_variable
+import constant_variable
 import constants
 import logging
 import threading
@@ -56,6 +57,7 @@ class GenericKeywordDispatcher:
         local_generic.json_oper = xml_operations.JSONOperations()
         local_generic.util_operation_obj=util_operations.UtilOperations()
         local_generic.dyn_var_obj=dynamic_variable.DynamicVariables()
+        local_generic.const_var_obj=constant_variable.ConstantVariables()
         local_generic.log = logging.getLogger("generic_dispatcher.py")
         self.generic_dict={
             'tolowercase': local_generic.generic_string.toLowerCase,
@@ -164,7 +166,9 @@ class GenericKeywordDispatcher:
             'compxmlfilewithxmlblock' : local_generic.generic_file_xml.compXmlFileWithXmlBlock,
             'cellbycellcompare': local_generic.generic_file.cell_by_cell_compare,
             'findfilepath': local_generic.generic_file.find_file_path,
-            'selectivecellcompare': local_generic.generic_file.selective_cell_compare
+            'selectivecellcompare': local_generic.generic_file.selective_cell_compare,
+            'createconstvariable':local_generic.const_var_obj.create_constant_variable,
+            'deleteconstvariable':local_generic.const_var_obj.delete_const_variable
             }
 	#Call to fetch data in database keywords
     def fetch_data(self,input):
@@ -198,8 +202,8 @@ class GenericKeywordDispatcher:
                     output=[tsp.outputval]
                     if ';' in tsp.outputval:
                         output=tsp.outputval.split(';')
-                    if(keyword == "exportdata" or keyword=="secureexportdata" or keyword == "getdata" or keyword=="securegetdata") and len(message)>7:
-                        dataflag=True
+                    # if(keyword == "exportdata" or keyword=="secureexportdata" or keyword == "getdata" or keyword=="securegetdata") and len(message)>7:
+                    #     dataflag=True
                     #Changes for defect #983 - to resolve values of static and dynamic variables in output for this particular keyword
                     if(keyword == "exportdata" or keyword=="secureexportdata") and (len(output)>1):
                         #comment the below code for Azure Issue #22199

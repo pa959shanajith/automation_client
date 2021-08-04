@@ -29,6 +29,7 @@ import logger
 import json
 from constants import *
 import dynamic_variable_handler
+import constant_variable_handler
 import reporting
 import core_utils
 import recording
@@ -84,6 +85,7 @@ class Controller():
         self.verify_dict={'web':VERIFY_EXISTS,
         'oebs':VERIFY_VISIBLE,'sap':VERIFY_EXISTS,'desktop':VERIFY_EXISTS,'mobileweb':VERIFY_EXISTS}
         self.dynamic_var_handler_obj=dynamic_variable_handler.DynamicVariables()
+        self.constant_var_handler_obj=constant_variable_handler.ConstantVariables()
         self.status=TEST_RESULT_FAIL
         self.scenario_start_time=''
         self.scenario_end_time=''
@@ -108,6 +110,7 @@ class Controller():
         self.execution_mode = None
         self.runfrom_step_range_input=[]
         self.tc_name_list=[]
+        self.constant_var_exists=False
         self.__load_generic()
 
     def __load_generic(self):
@@ -447,12 +450,33 @@ class Controller():
 
     def split_input(self,input,keyword):
         ignore_status = False
+        const_var=False
         inpval = []
         input_list = input[0].split(SEMICOLON)
         if IGNORE_THIS_STEP in input_list:
             ignore_status=True
         if keyword.lower() in [IF,ELSE_IF,EVALUATE]:
             inpval=self.dynamic_var_handler_obj.simplify_expression(input,keyword,self)
+        elif keyword.lower() in CONSTANT_KEYWORDS:
+            if STATIC_NONE in input[0]:
+                input[0]=input[0].replace(STATIC_NONE,'')
+            string=input[0]
+            index=string.find(';')
+            if index >-1:
+                inpval.append(string[0:index])
+                inpval.append(string[index+1:len(string)])
+            elif string != '':
+                inpval.append(string)
+            if keyword.lower() == CREATE_CONST_VARIABLE and len(inpval)>1:
+                #createConstVariable ex: _a_;{a}
+                const_var=self.constant_var_handler_obj.check_for_constantvariables(inpval[1])            
+                if const_var!=TEST_RESULT_TRUE:
+                    #check if the inputval[1] is constant variable or not,
+                    #createConstVariable ex: _a_;{a}
+                    inpval[1]=self.dynamic_var_handler_obj.replace_dynamic_variable(inpval[1],'',self)
+                else:
+                    #createConstVariable ex: _a_;_b_  (_b_ is already created)
+                    inpval[1]=self.constant_var_handler_obj.get_constant_value(inpval[1])
         elif keyword.lower() in DYNAMIC_KEYWORDS:
             if STATIC_NONE in input[0]:
                 input[0]=input[0].replace(STATIC_NONE,'')
@@ -464,9 +488,17 @@ class Controller():
             elif string != '':
                 inpval.append(string)
             if keyword.lower() != CREATE_DYN_VARIABLE:
-                inpval[0]=self.dynamic_var_handler_obj.replace_dynamic_variable(inpval[0],keyword,self)
+                const_var=self.constant_var_handler_obj.check_for_constantvariables(inpval[0])
+                #check if the inputval[0] is constant variable or not,
+                #ex: COPY_VALUE->_a_;{a}
+                if const_var!=TEST_RESULT_TRUE:
+                    inpval[0]=self.dynamic_var_handler_obj.replace_dynamic_variable(inpval[0],keyword,self)
             if len(inpval)>1 and keyword.lower() in [COPY_VALUE,MODIFY_VALUE,CREATE_DYN_VARIABLE]:
                 exch = keyword.lower() == COPY_VALUE
+                const_var=self.constant_var_handler_obj.check_for_constantvariables(inpval[1])
+                if const_var==TEST_RESULT_TRUE:
+                    #to get the value of constantVarible,
+                    inpval[1]=self.constant_var_handler_obj.get_constant_value(inpval[1])
                 inpval[1]=self.dynamic_var_handler_obj.replace_dynamic_variable(inpval[1],'',self,no_exch_val=exch)
         else:
             if keyword.lower() in WS_KEYWORDS or keyword.lower() == 'navigatetourl':
@@ -475,8 +507,14 @@ class Controller():
                 if STATIC_NONE in x:
                     x=None
                 else:
-                    #To Handle dynamic variables of DB keywords,controller object is sent to dynamicVariableHandler
-                    x=self.dynamic_var_handler_obj.replace_dynamic_variable(x,keyword,self)
+                    # To Handle dynamic variables of DB keywords,controller object is sent to dynamicVariableHandler
+                    const_var=self.constant_var_handler_obj.check_for_constantvariables(x)
+                    #to get the value of constantVariable, ex:displayVariableValue
+                    if const_var==TEST_RESULT_TRUE:
+                        #ex:displayVariableValue _a_
+                        x=self.constant_var_handler_obj.get_constant_value(x)
+                    else:
+                        x=self.dynamic_var_handler_obj.replace_dynamic_variable(x,keyword,self)
                 inpval.append(x)
         return inpval,ignore_status
 
@@ -582,12 +620,35 @@ class Controller():
             keyword_response=result[1]
             result = result[:1] + (result[2],) + result[2:]
         if len(output)>0 and output[0] != '':
-            self.dynamic_var_handler_obj.store_dynamic_value(output[0],keyword_response,tsp.name)
+            const_var=self.constant_var_handler_obj.check_for_constantvariables(output[0])
+            #checks if the output variable is a constant variable or not  
+            if const_var==TEST_RESULT_TRUE:
+                if output[0] in constant_variable_handler.local_constant.constant_variable_map:
+                    #checks if the output variable(constant variable) is assigned with a value
+                    if tsp.name in FILEPATH_OUTPUT_FIELD_KEYWORDS:
+                        cosnt_val=constant_variable_handler.local_constant.constant_variable_map[output[0]]
+                        file_path = cosnt_val.split(";")[0] 
+                        if not(os.path.exists(file_path)):
+                            self.constant_var_exists=True
+                            err_msg="Error: Constant variable cannot be modified!"
+                            logger.print_on_console(err_msg)
+                            log.debug(err_msg)
+                    else:
+                        self.constant_var_exists=True
+                        err_msg="Error: Constant variable cannot be modified!"
+                        logger.print_on_console(err_msg)
+                        log.debug(err_msg)
+                else:
+                    #in the current step if _a_ is used in output and _a_ is not created, then _a_ should be created and the response of the keyword should be written to _a_
+                    self.constant_var_handler_obj.store_constant_value(output[0],keyword_response,tsp.name)
+            else:
+                self.dynamic_var_handler_obj.store_dynamic_value(output[0],keyword_response,tsp.name)
         if len(output)>1:
             self.dynamic_var_handler_obj.store_dynamic_value(output[1],result[1],tsp.name)
 
     def keywordinvocation(self,index,inpval,*args):
         global socket_object, iris_constant_step, status_percentage
+        self.constant_var_exists=False
         configvalues = self.configvalues
         try:
             time.sleep(float(configvalues['stepExecutionWait']))
@@ -729,6 +790,12 @@ class Controller():
             self.keyword_status=TEST_RESULT_FAIL
             if result!=TERMINATE:
                 self.store_result(result,teststepproperty)
+                if self.constant_var_exists:
+                    #if the output variable(constant variable) is assigned with a value and still constantVariable is used in output
+                    temp_re=list(result)
+                    temp_re[0]=TEST_RESULT_FAIL
+                    temp_re[1]=TEST_RESULT_FALSE
+                    result=tuple(temp_re)
                 self.status=result[0]
                 index+=1
                 self.keyword_status=self.status
@@ -759,7 +826,7 @@ class Controller():
                 if self.action.lower() == 'debug':
                     index = STOP
                 else:
-                    if teststepproperty.inputval[0] == 'testcase':
+                    if teststepproperty.inputval[0].lower() == 'testcase':
                         prev_index = index
                         index -= 1
                         teststepproperty_name = teststepproperty.testscript_name
@@ -769,7 +836,7 @@ class Controller():
                                 break
                         if (index + 1) == prev_index:
                             index = STOP
-                    elif teststepproperty.inputval[0] == 'module':
+                    elif teststepproperty.inputval[0].lower() == 'module':
                         local_cont.module_stop = True
                         index = STOP
                     else:
@@ -1007,6 +1074,8 @@ class Controller():
         obj.clearList(self)
         #clearing dynamic variables at the end of execution to support dynamic variable at the scenario level
         obj.clear_dyn_variables()
+        #clearing dynamic variables at the end of execution to support constant variable at the scenario level
+        obj.clear_const_variables()
         return status
 
     def invoke_execution(self,mythread,json_data,socketIO,wxObject,configvalues,qcObject,qtestObject,zephyrObject,aws_mode):
@@ -1548,6 +1617,8 @@ class Controller():
                     mythread.test_status = 'fail'
             #clearing dynamic variables at the end of execution to support dynamic variable at the scenario level
             obj.clear_dyn_variables()
+            #clearing dynamic variables at the end of execution to support constant variable at the scenario level
+            obj.clear_const_variables()
             logger.print_on_console('***SUITE ', str(suite_idx) ,' EXECUTION COMPLETED***')
             log.info('---------------------------------------------------------------------')
             print('=======================================================================================================')
@@ -1897,6 +1968,19 @@ def kill_process():
         logger.print_on_console('Stale process killed')
 
     else:
+        try:
+            import browser_Keywords
+            for driver in browser_Keywords.drivermap:
+                driver.quit()
+            del browser_Keywords.drivermap[:]
+            if hasattr(browser_Keywords.local_bk, 'driver_obj'):
+                if (browser_Keywords.local_bk.driver_obj):
+                    browser_Keywords.local_bk.driver_obj = None
+            if hasattr(browser_Keywords.local_bk, 'pid_set'):
+                if (browser_Keywords.local_bk.pid_set):
+                    del browser_Keywords.local_bk.pid_set[:]
+        except Exception as e:
+            log.error(e)
         tries = {}
         while(len(process_ids) > 0):
             try:

@@ -10,14 +10,16 @@
 #-------------------------------------------------------------------------------
 
 import oebs_api
-from oebs_msg import *
+from oebs_constants import *
 import oebs_key_objects
 import oebs_serverUtilities
 import oebs_mouseops
 import time
 import logging
+import logger
 import winuser
 import win32api
+import readconfig
 from oebs_utilops import UtilOperations
 
 log = logging.getLogger('oebs_elementsops.py')
@@ -55,12 +57,17 @@ class ElementOperations:
                     oebs_key_objects.custom_msg.append(str(MSG_CLICK_SUCCESSFUL))
                 else:
                     log.debug('MSG:%s',MSG_DISABLED_OBJECT)
+                    logger.print_on_console(MSG_DISABLED_OBJECT)
                     oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
             else:
                 log.debug('MSG:%s',MSG_ELEMENT_NOT_VISIBLE)
+                logger.print_on_console(MSG_ELEMENT_NOT_VISIBLE)
                 oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_VISIBLE)
         except Exception as e:
             self.utilities_obj.cleardata()
+            err_msg = ERROR_CODE_DICT['err_click_element']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('%s',e)
             log.debug('Status: %s',keywordresult)
         log.debug('Status: %s',keywordresult)
@@ -68,8 +75,7 @@ class ElementOperations:
         self.utilities_obj.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))
         oebs_key_objects.keyword_output.append(str(verifyresponse))
-
-
+        
     #Method to get element Text of the given Object location
     def getelementtext(self,acc):
         del oebs_key_objects.custom_msg[:]
@@ -102,13 +108,18 @@ class ElementOperations:
                     #sets the result to pass
                     keywordresult=MSG_PASS
                     log.debug('Result:%s',elementtext)
-                    keywordresponse = elementtext.encode('utf-8')
+                    #keywordresponse = elementtext.encode('utf-8')
+                    keywordresponse = elementtext
                     oebs_key_objects.custom_msg.append("MSG_RESULT_IS")
                 else:
                     log.debug('%s',MSG_TEXT_NOT_DEFINED)
+                    logger.print_on_console(MSG_TEXT_NOT_DEFINED)
                     oebs_key_objects.custom_msg.append(MSG_TEXT_NOT_DEFINED)
         except Exception as e:
             self.utilities_obj.cleardata()
+            err_msg = ERROR_CODE_DICT['err_get_element_text']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('%s',e)
             log.debug('Status %s',keywordresult)
         log.debug('Status %s',keywordresult)
@@ -131,9 +142,13 @@ class ElementOperations:
                 keywordresult = MSG_PASS
             else:
                 log.debug('%s',DEF_VERIFYEXISTS,MSG_INVALID_INPUT)
+                logger.print_on_console(MSG_INVALID_INPUT)
                 oebs_key_objects.custom_msg.append(MSG_HIDDEN_OBJECT)
         except Exception as e:
             self.utilities_obj.cleardata()
+            err_msg = ERROR_CODE_DICT['err_verify_element_exists']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('%s',DEF_VERIFYEXISTS,e)
             log.debug('Status %s',DEF_VERIFYEXISTS,keywordresult)
         log.debug('Status %s',DEF_VERIFYEXISTS,keywordresult)
@@ -189,15 +204,20 @@ class ElementOperations:
                                     oebs_key_objects.custom_msg.append(str('Text verification failed \'' + elementtext + '\' not equal to \''+textVerify+"\'."))
                             else:
                                 log.debug('%s',MSG_TEXT_NOT_DEFINED)
+                                logger.print_on_console(MSG_TEXT_NOT_DEFINED)
                                 oebs_key_objects.custom_msg.append(MSG_TEXT_NOT_DEFINED)
                         else:
                             log.debug('MSG:%s',MSG_INVALID_INPUT)
                             oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
                 else:
                     log.debug('MSG:%s',MSG_INVALID_NOOF_INPUT)
+                    logger.print_on_console(MSG_INVALID_INPUT)
                     oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
         except Exception as e:
             self.utilities_obj.cleardata()
+            err_msg = ERROR_CODE_DICT['err_verify_element_text']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('%s',e)
             log.debug('Status %s',keywordresult)
         log.debug('Status %s',keywordresult)
@@ -215,15 +235,25 @@ class ElementOperations:
         #sets the keywordResult to FAIL
         keywordresult = MSG_FAIL
         verifyresponse = MSG_FALSE
+        configvalues = readconfig.configvalues
         try:
             #gets the entire context information
             log.debug('Received Object Context',DEF_WAITFORELEMENTVISIBLE)
             #geting mouse state
             mousestate=oebs_mouseops.GetCursorInfo('state')
+            delay=int(configvalues['timeOut'])
             while(mousestate == 65543):
                 mousestate=oebs_mouseops.GetCursorInfo('state')
-            acc =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
-            if(acc):
+            start_time = time.time()
+            logger.print_on_console("Waiting for element to be visible")
+            while True:
+                acc =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
+                if acc and acc != "fail":
+                    break
+                if time.time() - start_time >= delay:
+                    break
+                time.sleep(0.25)
+            if(acc and acc != 'fail'):
                 charinfo = acc.getAccessibleContextInfo()
                 objstates = charinfo.states
                 #check for object visible
@@ -235,12 +265,17 @@ class ElementOperations:
                     verifyresponse = MSG_FALSE
                     keywordresult=MSG_FAIL
                     oebs_key_objects.custom_msg.append(MSG_TIME_OUT_EXCEPTION)
+                    logger.print_on_console(MSG_TIME_OUT_EXCEPTION)
                     log.debug('%s',keywordresult)
             else:
                 oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_EXISTS)
+                logger.print_on_console(MSG_ELEMENT_NOT_EXISTS)
                 log.debug('%s',MSG_ELEMENT_NOT_EXISTS)
         except Exception as e:
             self.utilities_obj.cleardata()
+            err_msg = ERROR_CODE_DICT['err_wait_element_visible']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('%s',e)
             log.debug('Status: %s',keywordresult)
         log.debug('Status: %s',keywordresult)

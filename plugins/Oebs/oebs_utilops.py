@@ -9,14 +9,14 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 
-from oebs_msg import *
+from oebs_constants import *
 import oebs_key_objects
 import oebs_serverUtilities
 import logging
 import oebs_mouseops
 from oebs_keyboardops import KeywordOperations
 import time
-import oebs_constants
+import logger
 global activeframes
 import logger
 activeframes=[]
@@ -46,17 +46,23 @@ class UtilOperations:
             if(self.getObjectVisibility(acc,x_coor,y_coor)):
                 if ('showing' or 'focusable') in curaccinfo.states:
                     oebs_mouseops.MouseOperation('move',x_coor,y_coor)
+                    acc.requestFocus()
                     keywordresponse = MSG_TRUE
                     keywordresult=MSG_PASS
                     log.debug('%s %s',MSG_RESULT_IS,keywordresult)
                 else:
                     log.debug('%s %s',MSG_RESULT_IS,keywordresult)
+                    logger.print_on_console(MSG_INVALID_OBJECT)
                     oebs_key_objects.custom_msg.append(MSG_INVALID_OBJECT)
             else:
                 log.debug('MSG:%s',MSG_ELEMENT_NOT_VISIBLE)
+                logger.print_on_console(MSG_ELEMENT_NOT_VISIBLE)
                 oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_VISIBLE)
         except Exception as e:
             self.utilities_obj.cleardata()
+            err_msg = ERROR_CODE_DICT['err_set_focus']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('%s',e)
             log.debug('Status %s',keywordresult)
         log.debug('Status %s',keywordresult)
@@ -88,15 +94,17 @@ class UtilOperations:
                 log.debug('%s',keywordresult)
             else:
                 log.debug('%s %s',DEF_DRAG)
+                logger.print_on_console(MSG_DISABLED_OBJECT)
                 oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
                 verifyresponse = MSG_FALSE
                 keywordresult = MSG_FAIL
                 log.debug('%s',keywordresult)
 
-
-
         except Exception as e:
             self.utilities_obj.cleardata()
+            err_msg = ERROR_CODE_DICT['err_drag']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('%s',e)
             log.debug('Status: %s',keywordresult)
         log.debug('Status: %s',keywordresult)
@@ -126,20 +134,22 @@ class UtilOperations:
                 oebs_mouseops.MouseOperation('slide',x_cor,y_cor)
                 oebs_mouseops.MouseOperation('release',x_cor,y_cor)
 
-
-
                 verifyresponse = MSG_TRUE
                 keywordresult = MSG_PASS
                 log.debug('%s',keywordresult)
             else:
                 log.debug('%s %s',DEF_DROP)
                 oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
+                logger.print_on_console(MSG_DISABLED_OBJECT)
                 verifyresponse = MSG_FALSE
                 keywordresult = MSG_FAIL
                 log.debug('%s',keywordresult)
 
         except Exception as e:
             self.utilities_obj.cleardata()
+            err_msg = ERROR_CODE_DICT['err_drop']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('%s',e)
             log.debug('Status: %s',keywordresult)
         log.debug('Status: %s',keywordresult)
@@ -178,12 +188,16 @@ class UtilOperations:
             else:
                 log.debug('%s %s',DEF_DRAG)
                 oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
+                logger.print_on_console(MSG_DISABLED_OBJECT)
                 verifyresponse = MSG_FALSE
                 keywordresult = MSG_FAIL
                 log.debug('%s',keywordresult)
 
         except Exception as e:
             self.utilities_obj.cleardata()
+            err_msg = ERROR_CODE_DICT['err_mouse_hover']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('%s',e)
             log.debug('Status: %s',keywordresult)
         log.debug('Status: %s',keywordresult)
@@ -210,11 +224,15 @@ class UtilOperations:
             else:
                 log.debug('%s %s',DEF_VERIFYENABLED)
                 oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
+                logger.print_on_console(MSG_DISABLED_OBJECT)
                 verifyresponse = MSG_FALSE
                 keywordresult = MSG_FAIL
                 log.debug('%s',keywordresult)
         except Exception as e:
             self.utilities_obj.cleardata()
+            err_msg = ERROR_CODE_DICT['err_verify_enabled']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('%s',e)
             log.debug('Status %s',keywordresult)
         log.debug('Status %s',keywordresult)
@@ -223,7 +241,6 @@ class UtilOperations:
         self.utilities_obj.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))
         oebs_key_objects.keyword_output.append(str(verifyresponse))
-
 
     #Method to check given object is disabled
     def verifydisabled(self,acc):
@@ -247,6 +264,9 @@ class UtilOperations:
                 log.debug('%s',keywordresult)
         except Exception as e:
             self.utilities_obj.cleardata()
+            err_msg = ERROR_CODE_DICT['err_verify_disabled']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('%s',e)
             log.debug('Status %s',keywordresult)
         log.debug('Status %s',keywordresult)
@@ -279,12 +299,17 @@ class UtilOperations:
                     verifyresponse = MSG_FALSE
                     keywordresult=MSG_FAIL
                     oebs_key_objects.custom_msg.append(MSG_HIDDEN_OBJECT)
+                    logger.print_on_console(MSG_HIDDEN_OBJECT)
                     log.debug('%s',keywordresult)
             else:
                 log.debug('MSG:%s',MSG_ELEMENT_NOT_VISIBLE)
+                logger.print_on_console(MSG_ELEMENT_NOT_VISIBLE)
                 oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_VISIBLE)
         except Exception as e:
             self.utilities_obj.cleardata()
+            err_msg = ERROR_CODE_DICT['err_verify_visible']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('%s',e)
             log.debug('Status %s',keywordresult)
         log.debug('Status %s',keywordresult)
@@ -321,11 +346,15 @@ class UtilOperations:
             else:
                 log.debug('MSG:%s',MSG_ELEMENT_NOT_VISIBLE)
                 oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_VISIBLE)
+                logger.print_on_console(MSG_ELEMENT_NOT_VISIBLE)
                 verifyresponse = MSG_TRUE
                 keywordresult=MSG_PASS
 
         except Exception as e:
             self.utilities_obj.cleardata()
+            err_msg = ERROR_CODE_DICT['err_verify_hidden']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('%s',e)
             log.debug('Status %s',keywordresult)
         log.debug('Status %s',keywordresult)
@@ -334,7 +363,6 @@ class UtilOperations:
         self.utilities_obj.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))
         oebs_key_objects.keyword_output.append(str(verifyresponse))
-
 
     #Method to check given object is verifyreadonly
     def verifyreadonly(self,acc):
@@ -407,6 +435,7 @@ class UtilOperations:
                             oebs_key_objects.custom_msg.append(MSG_OBJECT_SELECTABLE)
                     else:
                         log.debug('MSG:%s',DEF_VERIFYREADONLY,MSG_ELEMENT_NOT_VISIBLE)
+                        logger.print_on_console(MSG_ELEMENT_NOT_VISIBLE)
                         oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_VISIBLE)
                 else:
                     oebs_key_objects.custom_msg.append(MSG_OBJECT_SELECTABLE)
@@ -420,9 +449,13 @@ class UtilOperations:
                     log.debug('%s',DEF_VERIFYREADONLY,keywordresult)
             else:
                 log.debug('Object Disabled',DEF_VERIFYREADONLY,MSG_DISABLED_OBJECT)
+                logger.print_on_console(MSG_DISABLED_OBJECT)
                 oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
         except Exception as e:
             self.utilities_obj.cleardata()
+            err_msg = ERROR_CODE_DICT['err_verify_read_only']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('%s',DEF_VERIFYREADONLY,e)
             log.debug('Status %s',DEF_VERIFYREADONLY,keywordresult)
         log.debug('Status %s',DEF_VERIFYREADONLY,keywordresult)
@@ -447,6 +480,9 @@ class UtilOperations:
             oebs_key_objects.custom_msg.append("MSG_RESULT_IS")
         except Exception as e:
             self.utilities_obj.cleardata()
+            err_msg = ERROR_CODE_DICT['err_get_tooltip_text']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('%s',DEF_GETTOOLTIPTEXT,e)
             log.debug('Status %s',DEF_GETTOOLTIPTEXT,keywordresult)
         log.debug('Status %s',DEF_GETTOOLTIPTEXT,keywordresult)
@@ -474,12 +510,16 @@ class UtilOperations:
                     keywordresult = MSG_PASS
                 else:
                     log.debug('MSG:%s',DEF_VERIFYTOOLTIPTEXT,MSG_INVALID_INPUT)
-                   # oebs_key_objects.custom_msg.append(str('Verification failed \'' + tooltiptext + '\' not equal to \''+text+"\'."))
+                    logger.print_on_console(MSG_INVALID_INPUT)
             else:
                 log.debug('%s',DEF_VERIFYTOOLTIPTEXT,MSG_INVALID_INPUT)
                 oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
+                logger.print_on_console(MSG_INVALID_INPUT)
         except Exception as e:
             self.utilities_obj.cleardata()
+            err_msg = ERROR_CODE_DICT['err_verify_tooltip_text']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('%s',DEF_VERIFYTOOLTIPTEXT,e)
             log.debug('Status %s',DEF_VERIFYTOOLTIPTEXT,keywordresult)
         log.debug('Status %s',DEF_VERIFYTOOLTIPTEXT,keywordresult)
@@ -504,10 +544,14 @@ class UtilOperations:
                 verifyresponse = MSG_TRUE
                 keywordresult = MSG_PASS
             else:
-                log.debug('%s',DEF_VERIFYEXISTS,MSG_INVALID_INPUT)
+                log.debug('%s',DEF_VERIFYEXISTS,MSG_HIDDEN_OBJECT)
+                logger.print_on_console(MSG_HIDDEN_OBJECT)
                 oebs_key_objects.custom_msg.append(MSG_HIDDEN_OBJECT)
         except Exception as e:
             self.utilities_obj.cleardata()
+            err_msg = ERROR_CODE_DICT['err_verify_exists']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('%s',DEF_VERIFYEXISTS,e)
             log.debug('Status %s',DEF_VERIFYEXISTS,keywordresult)
         log.debug('Status %s',DEF_VERIFYEXISTS,keywordresult)
@@ -516,7 +560,6 @@ class UtilOperations:
         self.utilities_obj.cleardata()
         oebs_key_objects.keyword_output.append(str(keywordresult))
         oebs_key_objects.keyword_output.append(str(verifyresponse))
-
 
     #Method to verify does not exists
     def verifydoesnotexists(self,acc):
@@ -542,6 +585,9 @@ class UtilOperations:
             verifyresponse = MSG_TRUE
             keywordresult = MSG_PASS
             self.utilities_obj.cleardata()
+            err_msg = ERROR_CODE_DICT['err_verify_not_exists']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.error('%s',e)
             log.debug('Status %s',keywordresult)
         log.debug('Status %s',DEF_VERIFYDOESNOTEXISTS,keywordresult)
@@ -578,12 +624,17 @@ class UtilOperations:
                     keywordresult=MSG_PASS
                 else:
                     log.debug('Object Disabled',MSG_DISABLED_OBJECT)
+                    logger.print_on_console(MSG_DISABLED_OBJECT)
                     oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
             else:
                 log.debug('MSG:%s',MSG_ELEMENT_NOT_VISIBLE)
+                logger.print_on_console(MSG_ELEMENT_NOT_VISIBLE)
                 oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_VISIBLE)
         except Exception as e:
             self.utilities_obj.cleardata()
+            err_msg = ERROR_CODE_DICT['err_right_click']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('%s',e)
             log.debug('Status: %s',keywordresult)
         log.debug('Status: %s',keywordresult)
@@ -657,15 +708,21 @@ class UtilOperations:
                             keywordresult=MSG_PASS
                         else:
                             log.debug('MSG:%s',MSG_INVALID_INPUT)
+                            logger.print_on_console(MSG_INVALID_INPUT)
                             oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
                     else:
-                        log.debug('MSG:%s',MSG_INVALID_NOOF_INPUT)
+                        log.debug('MSG:%s',MSG_INVALID_INPUT)
+                        logger.print_on_console(MSG_INVALID_INPUT)
                         oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
                 else:
                     log.debug('MSG:%s',MSG_INVALID_NOOF_INPUT)
+                    logger.print_on_console(MSG_INVALID_NOOF_INPUT)
                     oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
         except Exception as e:
             self.utilities_obj.cleardata()
+            err_msg = ERROR_CODE_DICT['err_switch_frame']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('%s',e)
             log.debug('Status %s',keywordresult)
         log.debug('Status %s',keywordresult)
@@ -779,34 +836,36 @@ class UtilOperations:
                 logger.print_on_console(MSG_INVALID_INPUT)
                 oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
 
-##            for i in range(len(string)):
-##                if string[i].isalpha():
-##                    if string[i].isupper():
-##                        self.keyboardops.keyboard_operation('keypress','CAPSLOCK')
-##                        self.keyboardops.keyboard_operation('keypress',string[i])
-##                        self.keyboardops.keyboard_operation('keypress','CAPSLOCK')
-##
-##                        keywordresult = MSG_PASS
-##                        verifyresponse = MSG_TRUE
-##                    else:
-##                        val = string[i].upper()
-##                        self.keyboardops.keyboard_operation('keypress',val)
-##                        keywordresult = MSG_PASS
-##                        verifyresponse = MSG_TRUE
-##                elif string[i].isdigit():
-##                    self.keyboardops.keyboard_operation('keypress',string[i])
-##                    keywordresult = MSG_PASS
-##                    verifyresponse = MSG_TRUE
-##                else:
-##                    if string[i] in oebs_constants.SENDFUNCTION_KEYS_DICT:
-##                        self.keyboardops.keyboard_operation('keydown','SHIFT')
-##                        self.keyboardops.keyboard_operation('keypress',oebs_constants.SENDFUNCTION_KEYS_DICT[string[i]])
-##                        self.keyboardops.keyboard_operation('keyup','SHIFT')
-##                        keywordresult = MSG_PASS
-##                        verifyresponse = MSG_TRUE
+        #    for i in range(len(string)):
+        #        if string[i].isalpha():
+        #            if string[i].isupper():
+        #                self.keyboardops.keyboard_operation('keypress','CAPSLOCK')
+        #                self.keyboardops.keyboard_operation('keypress',string[i])
+        #                self.keyboardops.keyboard_operation('keypress','CAPSLOCK')
+
+        #                keywordresult = MSG_PASS
+        #                verifyresponse = MSG_TRUE
+        #            else:
+        #                val = string[i].upper()
+        #                self.keyboardops.keyboard_operation('keypress',val)
+        #                keywordresult = MSG_PASS
+        #                verifyresponse = MSG_TRUE
+        #        elif string[i].isdigit():
+        #            self.keyboardops.keyboard_operation('keypress',string[i])
+        #            keywordresult = MSG_PASS
+        #            verifyresponse = MSG_TRUE
+        #        else:
+        #            if string[i] in oebs_constants.SENDFUNCTION_KEYS_DICT:
+        #                self.keyboardops.keyboard_operation('keydown','SHIFT')
+        #                self.keyboardops.keyboard_operation('keypress',oebs_constants.SENDFUNCTION_KEYS_DICT[string[i]])
+        #                self.keyboardops.keyboard_operation('keyup','SHIFT')
+        #                keywordresult = MSG_PASS
+        #                verifyresponse = MSG_TRUE
         except Exception as e:
             self.utilities_obj.cleardata()
-            log.error('%s',e)
+            err_msg = ERROR_CODE_DICT['err_send_function']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.debug('Status %s',keywordresult)
             oebs_key_objects.custom_msg.append(str(e))
         log.debug('Status %s',keywordresult)

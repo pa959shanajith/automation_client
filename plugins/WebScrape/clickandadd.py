@@ -190,10 +190,13 @@ class Clickandadd():
             if (isinstance(driver,webdriver.Firefox) or isinstance(driver,webdriver.Chrome) or isinstance(driver,webdriver.Edge)):
                 if ((str(full_screenshot).lower()) == 'yes'):
                     screen = webscrape_utils_obj.fullpage_screenshot(driver, screen_shot_path)
+                    fullSS=True
                 else:
                     screen = driver.get_screenshot_as_base64()
+                    fullSS=False 
             else:
                 screen = driver.get_screenshot_as_base64()
+                fullSS=False
             scrapedin = ''
             if browserops.browser == 2:
                 scrapedin = 'FX'
@@ -216,6 +219,7 @@ class Clickandadd():
                 left_part=obj.scrape_wrap(';'.join(xpath_string[:2]))
                 right_part=obj.scrape_wrap(';'.join(xpath_string[3:]))
                 a['xpath'] = left_part+';'+xpath_string[2]+';'+right_part
+                a['fullSS']=fullSS
                 new_obj.append(a)
             tempne_stopclicknadd=new_obj
             data['view'] = tempne_stopclicknadd

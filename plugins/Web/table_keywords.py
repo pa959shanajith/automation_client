@@ -201,6 +201,7 @@ class TableOperationKeywords():
             cellVal=None
             err_msg=None
             index = False
+            lightning = False
             local_tk.driver=browser_Keywords.local_bk.driver_obj
             local_tk.log.debug('got the driver instance from browser keyword')
             visibleFlag=True
@@ -208,6 +209,10 @@ class TableOperationKeywords():
                 if visibleFlag==True:
                     local_tk.log.debug('reading the inputs')
                     if(len(input_val) > 1):
+                        try:
+                            lightning = len(webElement.find_elements_by_xpath('.//ancestor::lightning-datatable'))>0
+                        except:
+                            lightning = False
                         if webElement.tag_name.lower() != 'table' and webElement.get_attribute('role') == 'grid':
                             body = True
                             right = True
@@ -297,7 +302,7 @@ class TableOperationKeywords():
                                             err_msg='Invalid input: Row not found'
                                             local_tk.log.error('Invalid input: Row not found')
                                             logger.print_on_console('Invalid input: Row not found')
-                        elif len(webElement.find_elements_by_xpath('.//ancestor::lightning-datatable')) >0:
+                        elif (lightning):
                             row_num=int(input_val[0])
                             col_num=int(input_val[1])
                             row_count=self.getRowCountJs(webElement)
@@ -372,6 +377,7 @@ class TableOperationKeywords():
             cellVal=None
             err_msg=None
             index = False
+            lightning = False
             local_tk.driver=browser_Keywords.local_bk.driver_obj
             local_tk.log.debug('got the driver instance from browser keyword')
             visibleFlag=True
@@ -380,6 +386,10 @@ class TableOperationKeywords():
                 if visibleFlag==True:
                     local_tk.log.debug('reading the inputs')
                     if(len(input_val) > 1):
+                        try:
+                            lightning = len(webElement.find_elements_by_xpath('.//ancestor::lightning-datatable'))>0
+                        except:
+                            lightning = False
                         if webElement.tag_name.lower() != 'table' and webElement.get_attribute('role') == 'grid':
                             body = True
                             right = True
@@ -489,7 +499,7 @@ class TableOperationKeywords():
                                             err_msg='Invalid input: Row not found'
                                             local_tk.log.error('Invalid input: Row not found')
                                             logger.print_on_console('Invalid input: Row not found')
-                        elif len(webElement.find_elements_by_xpath('.//ancestor::lightning-datatable')) >0:
+                        elif (lightning):
                             row_num=int(input_val[0])
                             col_num=int(input_val[1])
                             row_count=self.getRowCountJs(webElement)
@@ -587,12 +597,17 @@ class TableOperationKeywords():
             tooltip=None
             local_tk.driver=browser_Keywords.local_bk.driver_obj
             err_msg=None
+            lightning = False
             local_tk.log.debug('got the driver instance from browser keyword')
             visibleFlag=True
             if visibleFlag==True:
                 try:
+                    try:
+                        lightning = len(webElement.find_elements_by_xpath('.//ancestor::lightning-datatable'))>0
+                    except:
+                        lightning = False
                     local_tk.log.debug('reading the inputs')
-                    if len(webElement.find_elements_by_xpath('.//ancestor::lightning-datatable')) >0:
+                    if (lightning):
                         row_number=int(input_val[0])
                         col_number=int(input_val[1])
                         row_count=self.getRowCountJs(webElement)
@@ -671,73 +686,79 @@ class TableOperationKeywords():
             verifytooltip=None
             local_tk.driver=browser_Keywords.local_bk.driver_obj
             err_msg=None
+            lightning = False
             local_tk.log.debug('got the driver instance from browser keyword')
             visibleFlag=True
             if visibleFlag==True:
                 try:
                     local_tk.log.debug('reading the inputs')
-                    if (len(webElement.find_elements_by_xpath('.//ancestor::lightning-datatable')) >0) and (len(input_val) > 1):
-                        row_number=int(input_val[0])
-                        col_number=int(input_val[1])
-                        row_count=self.getRowCountJs(webElement)
-                        col_count=self.getColoumnCountJs(webElement)
-                        if row_number>row_count or col_number>col_count:
-                            local_tk.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                            err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                            logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                    if (len(input_val) > 1):
+                        try:
+                            lightning = len(webElement.find_elements_by_xpath('.//ancestor::lightning-datatable'))>0
+                        except:
+                            lightning = False
+                        if (lightning):
+                            row_number=int(input_val[0])
+                            col_number=int(input_val[1])
+                            row_count=self.getRowCountJs(webElement)
+                            col_count=self.getColoumnCountJs(webElement)
+                            if row_number>row_count or col_number>col_count:
+                                local_tk.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                                logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                            else:
+                                local_tk.log.debug('perfoming java script on element')
+                                remoteWebElement=self.javascriptExecutor(webElement,row_number-1,col_number-1)
+                                ele=remoteWebElement.find_elements_by_xpath('.//*')
+                                for i in ele:
+                                    contents=i.get_attribute('title') 
+                                    if contents !=None and contents.strip() != '':
+                                        verifytooltip=contents
+                                        expected_value=input_val[2].strip()
+                                        coreutilsobj=core_utils.CoreUtils()
+                                        expected_value=coreutilsobj.get_UTF_8(expected_value)
+                                        break
+                                if(verifytooltip == expected_value):
+                                    local_tk.log.info('Got the result : %s', str(verifytooltip))
+                                    logger.print_on_console('Got the result : ',str(verifytooltip))
+                                    status=TEST_RESULT_PASS
+                                    methodoutput=TEST_RESULT_TRUE
+                                else:
+                                    local_tk.log.info(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
+                                    err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
+                                    logger.print_on_console(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
+                                    logger.print_on_console('Actual value is : ',str(verifytooltip))
+                                    logger.print_on_console('Expected value is : ',str(expected_value))
                         else:
-                            local_tk.log.debug('perfoming java script on element')
-                            remoteWebElement=self.javascriptExecutor(webElement,row_number-1,col_number-1)
-                            ele=remoteWebElement.find_elements_by_xpath('.//*')
-                            for i in ele:
-                                contents=i.get_attribute('title') 
-                                if contents !=None and contents.strip() != '':
+                            row_number=int(input_val[0])
+                            col_number=int(input_val[1])
+                            row_count=self.getRowCountJs(webElement)
+                            col_count=self.getColoumnCountJs(webElement)
+                            if row_number>row_count or col_number>col_count:
+                                local_tk.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                                logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
+                            else:
+                                local_tk.log.debug('perfoming java script on element')
+                                contents = self.getTooltip(webElement, row_number, col_number)
+                               
+                                if contents !=None:
                                     verifytooltip=contents
                                     expected_value=input_val[2].strip()
                                     coreutilsobj=core_utils.CoreUtils()
                                     expected_value=coreutilsobj.get_UTF_8(expected_value)
-                                    break
-                            if(verifytooltip == expected_value):
-                                local_tk.log.info('Got the result : %s', str(verifytooltip))
-                                logger.print_on_console('Got the result : ',str(verifytooltip))
-                                status=TEST_RESULT_PASS
-                                methodoutput=TEST_RESULT_TRUE
-                            else:
-                                local_tk.log.info(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
-                                err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
-                                logger.print_on_console(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
-                                logger.print_on_console('Actual value is : ',str(verifytooltip))
-                                logger.print_on_console('Expected value is : ',str(expected_value))
-                    elif(len(input_val) > 1):
-                        row_number=int(input_val[0])
-                        col_number=int(input_val[1])
-                        row_count=self.getRowCountJs(webElement)
-                        col_count=self.getColoumnCountJs(webElement)
-                        if row_number>row_count or col_number>col_count:
-                            local_tk.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                            err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
-                            logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
-                        else:
-                            local_tk.log.debug('perfoming java script on element')
-                            contents = self.getTooltip(webElement, row_number, col_number)
-                           
-                            if contents !=None:
-                                verifytooltip=contents
-                                expected_value=input_val[2].strip()
-                                coreutilsobj=core_utils.CoreUtils()
-                                expected_value=coreutilsobj.get_UTF_8(expected_value)
 
-                            if(verifytooltip == expected_value):
-                                local_tk.log.info('Got the result : %s', str(verifytooltip))
-                                logger.print_on_console('Got the result : ',str(verifytooltip))
-                                status=TEST_RESULT_PASS
-                                methodoutput=TEST_RESULT_TRUE
-                            else:
-                                local_tk.log.info(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
-                                err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
-                                logger.print_on_console(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
-                                logger.print_on_console('Actual value is : ',str(verifytooltip))
-                                logger.print_on_console('Expected value is : ',str(expected_value))
+                                if(verifytooltip == expected_value):
+                                    local_tk.log.info('Got the result : %s', str(verifytooltip))
+                                    logger.print_on_console('Got the result : ',str(verifytooltip))
+                                    status=TEST_RESULT_PASS
+                                    methodoutput=TEST_RESULT_TRUE
+                                else:
+                                    local_tk.log.info(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
+                                    err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
+                                    logger.print_on_console(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
+                                    logger.print_on_console('Actual value is : ',str(verifytooltip))
+                                    logger.print_on_console('Expected value is : ',str(expected_value))
                     else:
                         local_tk.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                         err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
@@ -760,6 +781,7 @@ class TableOperationKeywords():
             methodoutput=TEST_RESULT_FALSE
             err_msg=None
             index = False
+            lightning = False
             output_val=OUTPUT_CONSTANT
             local_tk.log.debug('reading the inputs')
             if(len(input_arr) > 1):
@@ -768,6 +790,10 @@ class TableOperationKeywords():
                 visibleFlag=True
                 if visibleFlag==True:
                     try:
+                        try:
+                            lightning = len(webElement.find_elements_by_xpath('.//ancestor::lightning-datatable'))>0
+                        except:
+                            lightning = False
                         if webElement.tag_name.lower() != 'table' and webElement.get_attribute('role') == 'grid':
                             body = True
                             right = True
@@ -882,7 +908,7 @@ class TableOperationKeywords():
                                             err_msg='Invalid input: Row not found'
                                             local_tk.log.error('Invalid input: Row not found')
                                             logger.print_on_console('Invalid input: Row not found')
-                        elif len(webElement.find_elements_by_xpath('.//ancestor::lightning-datatable')) >0:
+                        elif (lightning):
                             row_num=int(input_arr[0])
                             col_num=int(input_arr[1])
                             row_count=self.getRowCountJs(webElement)
@@ -1373,6 +1399,7 @@ class TableOperationKeywords():
             row_number=None
             err_msg=None
             container=None
+            lightning = False
             local_tk.log.debug('reading the inputs')
             text=input_val[0].strip()
             coreutilsobj=core_utils.CoreUtils()
@@ -1383,6 +1410,10 @@ class TableOperationKeywords():
             if (webElement is not None):
                 if visibleFlag==True:
                     try:
+                        try:
+                            lightning = len(webElement.find_elements_by_xpath('.//ancestor::lightning-datatable'))>0
+                        except:
+                            lightning = False
                         if webElement.tag_name.lower() != 'table' and webElement.get_attribute('role') == 'grid':
                             body = True
                             right = True
@@ -1433,7 +1464,7 @@ class TableOperationKeywords():
                                     err_msg = 'Error in fetching Row number'
                                     local_tk.log.info('Error in fetching Row number')
                                     logger.print_on_console('Error in fetching Row number')
-                        elif len(webElement.find_elements_by_xpath('.//ancestor::lightning-datatable')) >0:
+                        elif (lightning):
                             cell=webElement.find_elements_by_xpath('//*[text()="'+text+'"]')
                             if len(cell)!=0:
                                 tr=cell[0].find_element_by_xpath('.//ancestor::tr')
@@ -1481,6 +1512,7 @@ class TableOperationKeywords():
             col_number=None
             err_msg = None
             container = None
+            lightning = False
             local_tk.driver=browser_Keywords.local_bk.driver_obj
             local_tk.log.debug('got the driver instance from browser keyword')
             visibleFlag=True
@@ -1491,6 +1523,10 @@ class TableOperationKeywords():
             if (webElement is not None):
                 if visibleFlag==True:
                     try:
+                        try:
+                            lightning = len(webElement.find_elements_by_xpath('.//ancestor::lightning-datatable'))>0
+                        except:
+                            lightning = False
                         if webElement.tag_name.lower() != 'table' and webElement.get_attribute('role') == 'grid':
                             body = True
                             right = True
@@ -1541,7 +1577,7 @@ class TableOperationKeywords():
                                     err_msg = 'Error in fetching Col number'
                                     local_tk.log.info('Error in fetching Col number')
                                     logger.print_on_console('Error in fetching Col number')
-                        elif len(webElement.find_elements_by_xpath('.//ancestor::lightning-datatable')) >0:
+                        elif (lightning):
                             cell=webElement.find_element_by_xpath('//*[text()="'+text+'"]')
                             if len(cell)!=0:
                                 tc=cell.find_elements_by_xpath('.//ancestor::th')

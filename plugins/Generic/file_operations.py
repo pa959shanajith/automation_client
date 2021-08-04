@@ -33,6 +33,7 @@ from xlrd import open_workbook
 import shutil
 import pathlib
 import dynamic_variable_handler
+import constant_variable_handler
 import logging
 from itertools import islice
 import re
@@ -54,6 +55,7 @@ class FileOperations:
         self.csv_obj=excel_operations.ExcelCSV()
         self.convert=excel_operations.ExcelFile()
         self.DV = dynamic_variable_handler.DynamicVariables()
+        self.CV = constant_variable_handler.ConstantVariables()
 
         """Mapping of keywords to its respective methods"""
         self.dict={'.txt_write_to_file':self.txt.write_to_file,
@@ -397,7 +399,7 @@ class FileOperations:
         output_res = OUTPUT_CONSTANT
         try:
             if(extension.strip() == ''): extension='null'
-            if(opt.strip() == ''): opt=0
+            if(not(isinstance(opt, int)) and opt.strip() == ''): opt=0
             if( source_path and destination_path ):
                 source_path=os.path.normpath(source_path)
                 destination_path=os.path.normpath(destination_path)
@@ -536,7 +538,7 @@ class FileOperations:
         output_res = OUTPUT_CONSTANT
         try:
             if(extension.strip() == ''): extension='null'
-            if(opt.strip() == ''): opt=0
+            if(not(isinstance(opt,int)) and opt.strip() == ''): opt=0
             if( source_path and destination_path ):
                 try:
                     if( os.path.splitext(source_path)[1] and not os.path.splitext(destination_path)[1] ):
@@ -1508,6 +1510,7 @@ class FileOperations:
         sheet_exist=[]
         input_filed_set = False
         dyn_var_opt = False
+        con_var_opt = False
         log.debug('Comparing content cell by cell of .xls files ')
         try:
             if (len(input_val)==5):
@@ -1543,6 +1546,19 @@ class FileOperations:
                             log.debug("File out path is not valid, setting to default")
                             output_feild = None
                         #logger.print_on_console("Choosen the dynamic file path")
+                elif(str(args[0].split(";")[0]).startswith("_") and str(args[0].split(";")[0]).endswith("_")):
+                    out_path=self.CV.get_constant_value(args[0].split(";")[0])
+                    con_var_opt = True
+                    if ( out_path ):
+                        try:
+                            if os.path.exists(out_path):
+                                output_feild = out_path
+                            else:
+                                output_feild = out_path.split(";")[0]
+                            log.info("Choosen the constant file path")
+                        except Exception as e:
+                            log.debug("File out path is not valid, setting to default")
+                            output_feild = None
                 else:
                     output_feild = args[0].split(";")[0]
                     log.info("Choosen the direct file path")
@@ -1651,7 +1667,7 @@ class FileOperations:
                     else:
                         log.debug("Output file not provided")
                         if (collect_content) :
-                            if opt==True or dyn_var_opt:
+                            if opt==True or dyn_var_opt or con_var_opt:
                                 comp_flg=True
                                 if len(collect_content)!=0:
                                     for each_key in collect_content.keys():
@@ -1745,6 +1761,7 @@ class FileOperations:
             flag1=False
             flag2=False
             dyn_var_opt = False
+            con_var_opt = False
             filepath1=input[0]
             filepath2=input[3]
             sheetname1=input[1]
@@ -1753,8 +1770,13 @@ class FileOperations:
             range2=input[5].split(':')
             res1={}
             output_feild = None
-            extension1=os.path.splitext(filepath1)[1]
-            extension2=os.path.splitext(filepath2)[1]
+            extension1=os.path.splitext(filepath1)[1] if(filepath1 !=None) else None
+            extension2=os.path.splitext(filepath2)[1] if(filepath2 !=None) else None
+            if (extension1==None or extension2==None):
+                err_msg=ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                log.error(err_msg)
+                logger.print_on_console(err_msg)
+                return status,methodoutput,res1,err_msg
             if(len(input)>6):
                 case=input[6]
             else:
@@ -2205,6 +2227,13 @@ class FileOperations:
                 methodoutput = TEST_RESULT_TRUE
                 if(out_path):
                     output_feild = out_path
+            elif(str(args[0].split(";")[0]).startswith("_") and str(args[0].split(";")[0]).endswith("_")):
+                out_path=self.CV.get_constant_value(args[0])
+                con_var_opt = True
+                status = TEST_RESULT_PASS
+                methodoutput = TEST_RESULT_TRUE
+                if(out_path):
+                    output_feild = out_path
             else:
                 output_feild = args[0].split(";")[0]
             if(output_feild):
@@ -2212,9 +2241,9 @@ class FileOperations:
                 sheet='selectiveCellCompare'
                 result=os.path.isfile(output_feild)
 
-                logger.print_on_console( "Writing the output of selectiveCellCompare to file ")
                 msg='Output file has old entries! Erasing old data to store incoming result.'
                 if status_get_ext and file_extension is not None and file_extension in generic_constants.SELECTIVE_CELL_FILE_TYPES:
+                    logger.print_on_console( "Writing the output of selectiveCellCompare to file ")
                     if(file_extension=='.xlsx'):
                         if result==True:
                             wb=openpyxl.load_workbook(output_feild)
@@ -2284,7 +2313,7 @@ class FileOperations:
                         methodoutput = TEST_RESULT_TRUE
                 else:
                     err_msg = 'Warning! : Invalid file extension(Supports only .xlsx, .xls, .txt, .csv).'
-            elif not dyn_var_opt:
+            elif not dyn_var_opt or not con_var_opt:
                 err_msg='Output field is empty'
                 log.error(err_msg)
                 logger.print_on_console(err_msg)

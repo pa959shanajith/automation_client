@@ -691,6 +691,17 @@ class GetParam():
                         logger.print_on_console( '***Invalid filter, Provide valid start row and end row value***')
                         return_value =TERMINATE
                     else:
+                        numRows = 0
+                        if(len(data.values()) == 0 or len(list(data.values())[0]) == 0):
+                            log.info('Empty Data. Please provide valid data')
+                            logger.print_on_console( '***Empty Data. Please provide valid data***')
+                            paramindex = TERMINATE 
+                        elif(len(data.values()) > 0):
+                            numRows = len(list(data.values())[0])+1
+                        endLimit = min(endRow, numRows)
+                        if endLimit < endRow:
+                            log.info("Data Param end row value is greater than the number of rows")
+                            logger.print_on_console("Data Param end row value is greater than the number of rows")
                         log.info( '***Data Parameterization started***')
                         logger.print_on_console( '***Data Parameterization started***')
                         #Reporting part
@@ -701,7 +712,6 @@ class GetParam():
                         self.add_report_step_getparam(reporting_obj,step_description)
                         step_description='Start Loop'
                         self.add_report_step_getparam(reporting_obj,step_description)
-                        endLimit = min(endRow, len(data)+1)
                         #Reporting part ends
                         for i in range(startRow-1,endLimit):
                             if self.name.lower()==GETPARAM:
