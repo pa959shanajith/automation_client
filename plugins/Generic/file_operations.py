@@ -362,13 +362,10 @@ class FileOperations:
                         zipf.close()
 
                     elif(input_ext=='.zip'):
-                        unzip_path=os.path.dirname(destination_path)+'\\'+file1.split('.')[0]
-                        if(not os.path.isdir(source_path.split('.')[0])):
-                            with zipfile.ZipFile(source_path, 'r') as zip_ref:
-                                zip_ref.extractall(unzip_path)
-                            zip_ref.close()
-                        else:
-                            err_msg = 'Zip folder already exists in the destination path'
+                        unzip_path=os.path.dirname(destination_path)
+                        with zipfile.ZipFile(source_path, 'r') as zip_ref:
+                            zip_ref.extractall(unzip_path)
+                        zip_ref.close()
 
                     else:
                         err_msg = 'File conversion support is not given for ' + str(input_ext) + ' to ' + str(extension)
