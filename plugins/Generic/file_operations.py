@@ -1774,7 +1774,7 @@ class FileOperations:
                 log.error(err_msg)
                 logger.print_on_console(err_msg)
                 return status,methodoutput,res1,err_msg
-            if(len(input)>6):
+            if(len(input)>6 and isinstance(input[6], str)):
                 case=input[6]
             else:
                 case=''
@@ -1817,7 +1817,7 @@ class FileOperations:
                 for aa in range(len(output1)):
                     res1[x]=[]
                     for bb in range(len(output2[i])):
-                        if(case!=''):
+                        if(case!='' and case.lower() == 'ignorecase'):
                             if (output1[aa][bb].lower()==output2[aa][bb].lower()):
                                 output='True'
                                 res1[x].append(output)
@@ -1874,7 +1874,7 @@ class FileOperations:
                 for aa in range(len(cell1)):
                     res1[x]=[]
                     for bb in range(len(cell2[i])):
-                        if(case!=''):
+                        if(case!='' and case.lower() == 'ignorecase'):
                             if (str(cell1[aa][bb].value).lower()==str(cell2[aa][bb].value).lower()):
                                 output='True'
                                 res1[x].append(output)
@@ -1963,7 +1963,7 @@ class FileOperations:
                 for aa in range(len(output1)):
                     res1[j]=[]
                     for bb in range(len(output2[i])):
-                        if(case!=''):
+                        if(case!='' and case.lower() == 'ignorecase'):
                             if (str(output1[aa][bb]).lower()==str(output2[aa][bb]).lower()):
                                 output='True'
                                 res1[j].append(output)
@@ -2060,7 +2060,7 @@ class FileOperations:
                 for aa in range(len(output1)):
                     res1[j]=[]
                     for bb in range(len(output2[i])):
-                        if(case!=''):
+                        if(case!='' and case.lower() == 'ignorecase'):
                             if (str(output1[aa][bb]).lower()==str(output2[aa][bb]).lower()):
                                 output='True'
                                 res1[j].append(output)
@@ -2176,7 +2176,7 @@ class FileOperations:
                 for aa in range(len(output1)):
                     res1[j]=[]
                     for bb in range(len(output2[i])):
-                        if(case!=''):
+                        if(case!='' and case.lower() == 'ignorecase'):
                             if (str(output1[aa][bb]).lower()==str(output2[aa][bb]).lower()):
                                 output='True'
                                 res1[j].append(output)
