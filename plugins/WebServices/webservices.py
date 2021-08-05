@@ -232,7 +232,7 @@ class WSkeywords:
                 header=header.strip()
                 log.debug('Setting the input header template to Header ')
                 self.setHeader(header)
-                logger.print_on_console('Header has been set to :',self.baseReqHeader)
+                # logger.print_on_console('Header has been set to :',self.baseReqHeader)
                 log.info('Input header template has been set ')
                 log.debug(STATUS_METHODOUTPUT_UPDATE)
                 # output=self.baseReqHeader
@@ -401,12 +401,6 @@ class WSkeywords:
         param body : body of the webservice to set
         return : Returns True if it sets the url else False
         """
-        # Dummy body
-        # comment this to accept body from backend
-        # body = f"{{\"email\": \"eve.holt@reqres.in\",\"password\": \"pistol\"}}"
-
-        # body = '{"gg": "ez"}'
-
         status = ws_constants.TEST_RESULT_FAIL
         methodoutput = ws_constants.TEST_RESULT_FALSE
         err_msg=None

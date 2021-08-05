@@ -362,13 +362,10 @@ class FileOperations:
                         zipf.close()
 
                     elif(input_ext=='.zip'):
-                        unzip_path=os.path.dirname(destination_path)+'\\'+file1.split('.')[0]
-                        if(not os.path.isdir(source_path.split('.')[0])):
-                            with zipfile.ZipFile(source_path, 'r') as zip_ref:
-                                zip_ref.extractall(unzip_path)
-                            zip_ref.close()
-                        else:
-                            err_msg = 'Zip folder already exists in the destination path'
+                        unzip_path=os.path.dirname(destination_path)
+                        with zipfile.ZipFile(source_path, 'r') as zip_ref:
+                            zip_ref.extractall(unzip_path)
+                        zip_ref.close()
 
                     else:
                         err_msg = 'File conversion support is not given for ' + str(input_ext) + ' to ' + str(extension)
@@ -1630,7 +1627,11 @@ class FileOperations:
                         log.error('some error : {}'.format(e))
                     if( output_feild ):
                         if os.path.exists(output_feild):
+                            sheet='CellByCellCompare_Result'
                             logger.print_on_console( "Writing the output of cellByCellCompare to file ")
+                            msg='Output file has old entries! Erasing old data to store incoming result.'
+                            logger.print_on_console(msg)
+                            self.xlsx_obj.clear_content_xlsx(os.path.dirname(output_feild),os.path.basename(output_feild),sheet)
                             flg, err_msg = self.write_result_file(output_feild, collect_content, 'CellByCellCompare_Result')
                         else:
                             status_excel_create_file = False
@@ -1759,15 +1760,14 @@ class FileOperations:
             output_res=OUTPUT_CONSTANT
             log.debug('reading the inputs')
             flag1=False
-            flag2=False
             dyn_var_opt = False
             con_var_opt = False
             filepath1=input[0]
             filepath2=input[3]
             sheetname1=input[1]
             sheetname2=input[4]
-            range1=input[2].split(':')
-            range2=input[5].split(':')
+            range1=input[2].split(':') if ':' in input[2] else None
+            range2=input[5].split(':') if ':' in input[5] else None
             res1={}
             output_feild = None
             extension1=os.path.splitext(filepath1)[1] if(filepath1 !=None) else None
@@ -1777,7 +1777,12 @@ class FileOperations:
                 log.error(err_msg)
                 logger.print_on_console(err_msg)
                 return status,methodoutput,res1,err_msg
-            if(len(input)>6):
+            if (range1==None or range2==None):
+                err_msg="Invalid Range Delimiter! Please provide valid range"
+                log.error(err_msg)
+                logger.print_on_console(err_msg)
+                return status,methodoutput,res1,err_msg
+            if(len(input)>6 and isinstance(input[6], str)):
                 case=input[6]
             else:
                 case=''
@@ -1820,7 +1825,7 @@ class FileOperations:
                 for aa in range(len(output1)):
                     res1[x]=[]
                     for bb in range(len(output2[i])):
-                        if(case!=''):
+                        if(case!='' and case.lower() == 'ignorecase'):
                             if (output1[aa][bb].lower()==output2[aa][bb].lower()):
                                 output='True'
                                 res1[x].append(output)
@@ -1877,7 +1882,7 @@ class FileOperations:
                 for aa in range(len(cell1)):
                     res1[x]=[]
                     for bb in range(len(cell2[i])):
-                        if(case!=''):
+                        if(case!='' and case.lower() == 'ignorecase'):
                             if (str(cell1[aa][bb].value).lower()==str(cell2[aa][bb].value).lower()):
                                 output='True'
                                 res1[x].append(output)
@@ -1966,7 +1971,7 @@ class FileOperations:
                 for aa in range(len(output1)):
                     res1[j]=[]
                     for bb in range(len(output2[i])):
-                        if(case!=''):
+                        if(case!='' and case.lower() == 'ignorecase'):
                             if (str(output1[aa][bb]).lower()==str(output2[aa][bb]).lower()):
                                 output='True'
                                 res1[j].append(output)
@@ -2063,7 +2068,7 @@ class FileOperations:
                 for aa in range(len(output1)):
                     res1[j]=[]
                     for bb in range(len(output2[i])):
-                        if(case!=''):
+                        if(case!='' and case.lower() == 'ignorecase'):
                             if (str(output1[aa][bb]).lower()==str(output2[aa][bb]).lower()):
                                 output='True'
                                 res1[j].append(output)
@@ -2179,7 +2184,7 @@ class FileOperations:
                 for aa in range(len(output1)):
                     res1[j]=[]
                     for bb in range(len(output2[i])):
-                        if(case!=''):
+                        if(case!='' and case.lower() == 'ignorecase'):
                             if (str(output1[aa][bb]).lower()==str(output2[aa][bb]).lower()):
                                 output='True'
                                 res1[j].append(output)
@@ -2223,19 +2228,18 @@ class FileOperations:
             if(str(args[0].split(";")[0]).startswith("{") and str(args[0].split(";")[0]).endswith("}")):
                 out_path = self.DV.get_dynamic_value(args[0].split(";")[0])
                 dyn_var_opt = True
-                status = TEST_RESULT_PASS
-                methodoutput = TEST_RESULT_TRUE
                 if(out_path):
                     output_feild = out_path
             elif(str(args[0].split(";")[0]).startswith("_") and str(args[0].split(";")[0]).endswith("_")):
                 out_path=self.CV.get_constant_value(args[0])
                 con_var_opt = True
-                status = TEST_RESULT_PASS
-                methodoutput = TEST_RESULT_TRUE
                 if(out_path):
                     output_feild = out_path
             else:
                 output_feild = args[0].split(";")[0]
+            if res1:
+                status = TEST_RESULT_PASS
+                methodoutput = TEST_RESULT_TRUE
             if(output_feild):
                 file_extension,status_get_ext = self.__get_ext(output_feild)
                 sheet='selectiveCellCompare'
@@ -2302,11 +2306,12 @@ class FileOperations:
                     if(file_extension=='.csv' or file_extension=='.txt'):
                         flag1, err_msg = self.write_result_file(output_feild, res1, sheet)
 
-                    if(flag1==False):
+                    if flag1 is False:
                         log.error(err_msg)
                         logger.print_on_console(err_msg)
-
-                    if(flag1 or flag2):
+                        status=TEST_RESULT_FAIL
+                        methodoutput=TEST_RESULT_FALSE
+                    else:
                         log.info('Compared cells between the mentioned files')
                         logger.print_on_console('Compared cells between the mentioned files')
                         status = TEST_RESULT_PASS

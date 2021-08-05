@@ -58,7 +58,7 @@ class GetParam():
         self.testcase_details=testcase_details
 
     def print_step(self):
-##        logger.print_on_console('Step: '+str(self.index)+' '+self.name+' '+str(self.inputval)+' '+self.testscript_name+' '+str(self.info_dict))
+        ##        logger.print_on_console('Step: '+str(self.index)+' '+self.name+' '+str(self.inputval)+' '+self.testscript_name+' '+str(self.info_dict))
         log.info('Step: '+str(self.index)+' '+self.name+' '+str(self.inputval)+' '+self.testscript_name+' '+str(self.info_dict))
 
 
@@ -599,6 +599,7 @@ class GetParam():
                 fileinfo = input
                 filepath = fileinfo[0]
                 data = self.invokegetparam(input,datatables)
+                handler.local_handler.paramData=data
                 startRow = None
                 endRow =None
                 filter = None

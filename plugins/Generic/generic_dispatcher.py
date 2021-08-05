@@ -232,33 +232,21 @@ class GenericKeywordDispatcher:
                             var = str(output[0])[1:len(str(output[0]))-1]
                             output[0] = data[var][0]
                     message.extend(output)
-                if( keyword in ['comparefiles',"comparepdfs","findimageinpdf",'beautify','compareinputs','getxmlblockdata','selectivexmlfilecompare','compxmlfilewithxmlblock','cellbycellcompare','findfilepath','selectivecellcompare'] ):
+                if( keyword in ['exportdata','comparefiles',"comparepdfs","findimageinpdf",'beautify','compareinputs','getxmlblockdata','selectivexmlfilecompare','compxmlfilewithxmlblock','cellbycellcompare','findfilepath','selectivecellcompare'] ):
                     input = list(message)
                     output = tsp.outputval
                     if (str(output)==''):
                         output=output
-                    #split output for static variable
-                    elif (str(output[0]).startswith("|")):
+                    if str(output).startswith("|") and str(output).endswith("|"):
                         if ';' in output:
+                            # 2 static variables being passed
                             output = output.split(';')
+                            # perform parsing of the first static variable
+                            output[0] =  local_generic.util_operation_obj.staticFetch(tsp.index, output[0])
+                            output = ';'.join(output)
                         else:
-                            opList=[]
-                            opList.append(output)
-                            output = opList
-                    elif str(output[0]).startswith("|") and str(output[0]).endswith("|"):
-                        import handler
-                        import controller
-                        con = controller.Controller()
-                        for test in handler.local_handler.tspList:
-                            if((test.name).lower() == "getparam"):
-                                teststep = test
-                                break
-                        rawinput = teststep.inputval
-                        inpval,ignore_stat=con.split_input(rawinput,tsp.name)
-                        data = teststep.invokegetparam(inpval)
-                        var = str(output[0])[1:len(str(output[0]))-1]
-                        output[0] = data[var][0]
-                        output=';'.join(output)
+                            # only single variable being passed
+                            output = local_generic.util_operation_obj.staticFetch(tsp.index,output)
                     result= self.generic_dict[keyword](input,output)
                 elif(dataflag):
                     err_msg=generic_constants.INVALID_INPUT
@@ -273,7 +261,8 @@ class GenericKeywordDispatcher:
                     result=list(result)
                     result.append(result[2])
          except TypeError as e:
-            err_msg=constants.ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']
+            err_msg = constants.ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']
+            local_generic.log.error(e, exc_info=True)
             result[3]=err_msg
             result[2]=None
          except Exception as e:

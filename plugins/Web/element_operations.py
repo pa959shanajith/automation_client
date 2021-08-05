@@ -40,14 +40,18 @@ class ElementKeywords:
             text = webelement.text
             if text is None or text is '':
                 text=webelement.get_attribute('value')
+                local_eo.log.debug('Element text found by Attribute value')
             if text is None or text is '':
                 text=webelement.get_attribute('name')
+                local_eo.log.debug('Element text found by Attribute name')
             if text is None or text is '':
                 text=self.__get_tooltip(webelement)
             if text is None or text is '':
                 text=webelement.get_attribute('placeholder')
+                local_eo.log.debug('Element text found by Attribute placeholder')
             if text is None or text is '':
                 text=webelement.get_attribute('href')
+                local_eo.log.debug('Element text found by Attribute href')
         except Exception as e:
             local_eo.log.error(e)
             logger.print_on_console(e)
@@ -57,8 +61,10 @@ class ElementKeywords:
         text=''
         try:
             text = webelement.get_attribute('title')
-            if text =='':
+            if text : local_eo.log.debug('Element text found by tooltip-Attribute title')
+            if text is None or text is '':
                 text = webelement.get_attribute('data-original-title')
+                local_eo.log.debug('Element text found by tooltip-Attribute data-original-title')
         except Exception as e:
             local_eo.log.error(e)
             logger.print_on_console(e)
@@ -122,7 +128,9 @@ class ElementKeywords:
                         text = browser_Keywords.local_bk.driver_obj.execute_script("""return arguments[0].innerText""",webelement)
                     else:
                         text = webelement.get_attribute('innerText')
-                        # text=self.__getelement_text(webelement)
+                        if text is None or text is '': 
+                            local_eo.log.debug('Element Attribute not found,fetching with __getelement_text function')
+                            text=self.__getelement_text(webelement)
                     if text==input:
                        logger.print_on_console('Element Text matched')
                        local_eo.log.info('Element Text matched')
