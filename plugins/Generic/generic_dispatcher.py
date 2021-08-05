@@ -237,35 +237,13 @@ class GenericKeywordDispatcher:
                     output = tsp.outputval
                     if (str(output)==''):
                         output=output
-                    #split output for static variable
-                    # elif (str(output[0]).startswith("|")):
-                    #     if ';' in output:
-                    #         output = output.split(';')
-                    #     else:
-                    #         opList=[]
-                    #         opList.append(output)
-                    #         output = opList
-                    # elif str(output[0]).startswith("|") and str(output[0]).endswith("|"):
-                        # import handler
-                        # import controller
-                        # con = controller.Controller()
-                        # for test in handler.local_handler.tspList:
-                        #     if((test.name).lower() == "getparam"):
-                        #         teststep = test
-                        #         break
-                        # rawinput = teststep.inputval
-                        # inpval,ignore_stat=con.split_input(rawinput,tsp.name)
-                        # data = teststep.invokegetparam(inpval)
-                        # var = str(output[0])[1:len(str(output[0]))-1]
-                        # output[0] = data[var][0]
-                        # output=';'.join(output)
                     if str(output).startswith("|") and str(output).endswith("|"):
                         if ';' in output:
                             # 2 static variables being passed
                             output = output.split(';')
                             # perform parsing of the first static variable
                             output[0] =  local_generic.util_operation_obj.staticFetch(tsp.index, output[0])
-                            ';'.join(output)
+                            output = ';'.join(output)
                         else:
                             # only single variable being passed
                             output = local_generic.util_operation_obj.staticFetch(tsp.index,output)
