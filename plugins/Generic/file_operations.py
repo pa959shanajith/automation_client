@@ -362,13 +362,10 @@ class FileOperations:
                         zipf.close()
 
                     elif(input_ext=='.zip'):
-                        unzip_path=os.path.dirname(destination_path)+'\\'+file1.split('.')[0]
-                        if(not os.path.isdir(source_path.split('.')[0])):
-                            with zipfile.ZipFile(source_path, 'r') as zip_ref:
-                                zip_ref.extractall(unzip_path)
-                            zip_ref.close()
-                        else:
-                            err_msg = 'Zip folder already exists in the destination path'
+                        unzip_path=os.path.dirname(destination_path)
+                        with zipfile.ZipFile(source_path, 'r') as zip_ref:
+                            zip_ref.extractall(unzip_path)
+                        zip_ref.close()
 
                     else:
                         err_msg = 'File conversion support is not given for ' + str(input_ext) + ' to ' + str(extension)
@@ -1763,7 +1760,6 @@ class FileOperations:
             output_res=OUTPUT_CONSTANT
             log.debug('reading the inputs')
             flag1=False
-            flag2=False
             dyn_var_opt = False
             con_var_opt = False
             filepath1=input[0]
@@ -1786,7 +1782,7 @@ class FileOperations:
                 log.error(err_msg)
                 logger.print_on_console(err_msg)
                 return status,methodoutput,res1,err_msg
-            if(len(input)>6):
+            if(len(input)>6 and isinstance(input[6], str)):
                 case=input[6]
             else:
                 case=''
@@ -1829,7 +1825,7 @@ class FileOperations:
                 for aa in range(len(output1)):
                     res1[x]=[]
                     for bb in range(len(output2[i])):
-                        if(case!=''):
+                        if(case!='' and case.lower() == 'ignorecase'):
                             if (output1[aa][bb].lower()==output2[aa][bb].lower()):
                                 output='True'
                                 res1[x].append(output)
@@ -1886,7 +1882,7 @@ class FileOperations:
                 for aa in range(len(cell1)):
                     res1[x]=[]
                     for bb in range(len(cell2[i])):
-                        if(case!=''):
+                        if(case!='' and case.lower() == 'ignorecase'):
                             if (str(cell1[aa][bb].value).lower()==str(cell2[aa][bb].value).lower()):
                                 output='True'
                                 res1[x].append(output)
@@ -1975,7 +1971,7 @@ class FileOperations:
                 for aa in range(len(output1)):
                     res1[j]=[]
                     for bb in range(len(output2[i])):
-                        if(case!=''):
+                        if(case!='' and case.lower() == 'ignorecase'):
                             if (str(output1[aa][bb]).lower()==str(output2[aa][bb]).lower()):
                                 output='True'
                                 res1[j].append(output)
@@ -2072,7 +2068,7 @@ class FileOperations:
                 for aa in range(len(output1)):
                     res1[j]=[]
                     for bb in range(len(output2[i])):
-                        if(case!=''):
+                        if(case!='' and case.lower() == 'ignorecase'):
                             if (str(output1[aa][bb]).lower()==str(output2[aa][bb]).lower()):
                                 output='True'
                                 res1[j].append(output)
@@ -2188,7 +2184,7 @@ class FileOperations:
                 for aa in range(len(output1)):
                     res1[j]=[]
                     for bb in range(len(output2[i])):
-                        if(case!=''):
+                        if(case!='' and case.lower() == 'ignorecase'):
                             if (str(output1[aa][bb]).lower()==str(output2[aa][bb]).lower()):
                                 output='True'
                                 res1[j].append(output)
@@ -2310,13 +2306,12 @@ class FileOperations:
                     if(file_extension=='.csv' or file_extension=='.txt'):
                         flag1, err_msg = self.write_result_file(output_feild, res1, sheet)
 
-                    if(flag1==False):
+                    if flag1 is False:
                         log.error(err_msg)
                         logger.print_on_console(err_msg)
                         status=TEST_RESULT_FAIL
                         methodoutput=TEST_RESULT_FALSE
-
-                    if(flag1 or flag2):
+                    else:
                         log.info('Compared cells between the mentioned files')
                         logger.print_on_console('Compared cells between the mentioned files')
                         status = TEST_RESULT_PASS
