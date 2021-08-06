@@ -247,7 +247,7 @@ class ElementOperations:
             start_time = time.time()
             logger.print_on_console("Waiting for element to be visible")
             while True:
-                acc =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
+                acc, visible =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
                 if acc and acc != "fail":
                     break
                 if time.time() - start_time >= delay:

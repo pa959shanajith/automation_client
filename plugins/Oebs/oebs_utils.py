@@ -90,17 +90,19 @@ class Utils:
         status=True
         try:
             self.set_to_foreground(windowname)
-            acc = self.utils_obj.object_generator(windowname, objectname, 'highlight', [], '')
+            acc, visible = self.utils_obj.object_generator(windowname, objectname, 'highlight', [], '')
             if not acc or (acc and str(acc) == 'fail'):
                 logger.print_on_console(ERROR_CODE_DICT['err_object_highlight'])
+                status = False
+            elif not visible:
+                logger.print_on_console(ERROR_CODE_DICT['err_visible'])
                 status = False
             else:
                 acc.requestFocus()
                 logger.print_on_console('Highlighting in progress')
-                charinfo = acc.getAccessibleContextInfo()
-                obj=oebsServer.OebsKeywords()
-                size=obj.getobjectsize(windowname,objectname)
-                if -1 in size or 'showing' not in charinfo.states:
+                curaccinfo = acc.getAccessibleContextInfo()
+                size = [curaccinfo.x, curaccinfo.y, curaccinfo.width, curaccinfo.height]
+                if -1 in size or 'showing' not in curaccinfo.states:
                     logger.print_on_console(ERROR_CODE_DICT['err_object_highlight'])
                     status = False
                 else:

@@ -214,61 +214,38 @@ class PathGenerator():
         tagname = current_acc_info.name
         text = current_acc_info.name
         j = current_acc_info.indexInParent
-        if obj._get_object_depth() == 0:
+        queue = []
+        p = ''
+        loop = True
+        while loop:
+            current_acc_info = obj._get__JABAccContextInfo()
+            tagrole = current_acc_info.role
+            tagname = current_acc_info.name
+            text = current_acc_info.name
+            j = current_acc_info.indexInParent
+
+
             if self.path == '':
-                if len(current_acc_info.name.strip()) == 0:
-                    self.path = current_acc_info.role + '[' + str(j) + ']'
+                if len(current_acc_info.description.strip()) == 0:
+                    self.path = current_acc_info.role + '[' + str(j) + ']' 
                 else:
                     if 'panel' in current_acc_info.role:
                         self.path = current_acc_info.role  + '[' + str(j) + ']'
                     else:
-                        self.path  = current_acc_info.role + '[' + str(current_acc_info.name.strip()) + ']'
+                        self.path = current_acc_info.role + '[' + str(current_acc_info.description.strip()) + ']' 
             else:
-                if len(current_acc_info.name.strip()) == 0:
-                    self.path = self.path + '//' + current_acc_info.role  + '[' + str(j) + ']'
+                if len(current_acc_info.description.strip()) == 0:
+                    self.path = current_acc_info.role  + '[' + str(j) + ']' + '//' + self.path
                 else:
                     if 'panel' in current_acc_info.role:
-                        self.path = self.path + '//' + current_acc_info.role  + '[' + str(j) + ']'
+                        self.path = current_acc_info.role  + '[' + str(j) + ']' + '//' + self.path
                     else:
-                        self.path = self.path + '//' + current_acc_info.role  + '[' + str(current_acc_info.name.strip()) + ']' 
-        if obj._get_object_depth() != 0:
-            # calls same function with parent obj until it reaches top i.e object depth == 0
-            parent_acc = obj._get_parent()
-            self.generate_xpath(parent_acc)
-            if j >= parent_acc._get_childCount():
-                # do something when j >= parent_acc child count to get the correct index in parent
-                j = parent_acc._get_childCount() - 1
-            if self.path == '':
-                if len(current_acc_info.name.strip()) == 0:
-                    self.path = current_acc_info.role + '[' + str(j) + ']'
-                else:
-                    if 'panel' in current_acc_info.role:
-                        self.path = current_acc_info.role  + '[' + str(j) + ']'
-                    else:
-                        self.path  = current_acc_info.role + '[' + str(current_acc_info.name.strip()) + ']'
+                        self.path = current_acc_info.role  + '[' + str(current_acc_info.description.strip()) + ']' + '//' + self.path
+            if obj._get_object_depth() > 0:
+                obj = obj._get_parent()
             else:
-                if len(current_acc_info.name.strip()) == 0:
-                    self.path = self.path + '//' + current_acc_info.role  + '[' + str(j) + ']'
-                else:
-                    if 'panel' in current_acc_info.role:
-                        self.path = self.path + '//' + current_acc_info.role  + '[' + str(j) + ']'
-                    else:
-                        self.path = self.path + '//' + current_acc_info.role  + '[' + str(current_acc_info.name.strip()) + ']'
-        
-            if 'showing' in current_acc_info.states:
-                size = str(current_acc_info.x)+','+str(current_acc_info.y)+','+str(current_acc_info.width)+','+str(current_acc_info.height)
-                global activeframename
-                states = current_acc_info.states
-                if 'internal frame' in self.path:
-                    if current_acc_info.role == 'internal frame':
-                        if 'active' in states:
-                            regular_exp = re.compile('(internal frame(.*?|\s)*[\]]+)')
-                            new_xpath = regular_exp.findall(self.path)
-                            temp_list = []
-                            for i in range(len(new_xpath)):
-                                temp_list.append(new_xpath[i][0])
-                            framename = temp_list[len(temp_list)-1]
-                            activeframename = framename
+                loop = False
+
         return self.path
 
     def isFree(self):
