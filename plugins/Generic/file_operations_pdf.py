@@ -571,8 +571,6 @@ class FileOperationsPDF:
         err_msg = None
         value = constants.OUTPUT_CONSTANT
         output_path = None
-        result = {}
-        result['count'] = 0
         try:
             #check if inputs are permissible
             if len(input_val) == 2:
@@ -698,9 +696,9 @@ class FileOperationsPDF:
             #get similarity and location of template image found page
             output_res[i + 1] ,output_res["abs_max"] = self.compare(image,template,output_res['abs_max'])
         #check if the maximum similarity obtained is greater than 30 percentage
-        if output_res["abs_max"] < 0.3:
+        if output_res["abs_max"] < 0.29:
             #fail the test step due to poor template image
-            return None
+            return None, 0
         output = []
         log_output = []
         total_found = 0
