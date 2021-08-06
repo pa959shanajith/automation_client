@@ -32,22 +32,39 @@ class Screenshot():
         path = constants.SCREENSHOT_PATH
         filePath = ''
         try:
-            if len(args) == 2:
-                inputval = args[0]
-                filename = args[1]
+            if('action' in args[0]):
                 log.debug('Reading the inputs')
-                try:
-                    if not os.path.exists(inputval):
-                        os.makedirs(inputval)
-                    if filename!=None:
-                        if '.' in filename:
-                            filename=filename.split('.')[0]
-                        filePath=str(inputval) + '/'+ filename
-                    else:
-                        filename=self.generateUniqueFileName()
-                        filePath=str(inputval) + '/'+ filename
-                except Exception as e:
-                    logger.print_on_console( e)
+                if(len(args[0]['inputs'])>3):
+                    logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_NO_INPUT'])
+                    output = None
+                elif(args[0]['inputs']!='' and len(args[0]['inputs'])==2):
+                    try:
+                        inputval = args[0]['inputs'][0]
+                        filename = args[0]['inputs'][1]
+                        if(inputval=='' or not os.path.isdir(inputval)):
+                            inputval = path
+                        elif(not os.path.exists(inputval)):
+                            os.makedirs(inputval)
+                        if (filename!=''):
+                            if '.' in filename:
+                                filename = filename.split('.')[0]
+                            filePath = str(inputval) + '/'+ filename
+                        else:
+                            filename = self.generateUniqueFileName()
+                            filePath = str(inputval) + '/'+ filename
+                    except Exception as e:
+                        logger.print_on_console(e)
+                elif(args[0]['action']=='execute' and args[0]['inputs']==''):
+                    filename = self.generateUniqueFileName()
+                    screenData = args[0]['screen_data']
+                    path = path+screenData['projectname']+os.sep+screenData['releaseid']+os.sep+screenData['cyclename']+os.sep+datetime.datetime.now().strftime("%Y-%m-%d")+os.sep
+                    if(not os.path.exists(path)):
+                        os.makedirs(path)
+                    filePath = path + filename
+                elif(args[0]['action']=='debug' and args[0]['inputs']==''):
+                    filePath = path+self.generateUniqueFileName()
+                else:
+                    output = None
             else:
                 try:
                     if path=="Disabled":

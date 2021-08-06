@@ -248,6 +248,21 @@ class GenericKeywordDispatcher:
                             # only single variable being passed
                             output = local_generic.util_operation_obj.staticFetch(tsp.index,output)
                     result= self.generic_dict[keyword](input,output)
+                elif(keyword =='capturescreenshot'):
+                    screenshot_data={}
+                    message = list(message)
+                    if(len(message)>1):
+                        screenshot_data['inputs'] = message
+                    elif(len(message)==1 and message[0]!=''):
+                        message.append('')
+                        screenshot_data['inputs'] = message
+                    else:
+                        screenshot_data['inputs'] = ''
+                    if(mythread.action == 'execute'):
+                        screen_data = mythread.json_data['suitedetails'][0]
+                        screenshot_data['screen_data'] = screen_data
+                    screenshot_data['action'] = mythread.action
+                    result= self.generic_dict[keyword](screenshot_data)
                 elif(dataflag):
                     err_msg=generic_constants.INVALID_INPUT
                     result[3]=err_msg
