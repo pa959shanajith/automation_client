@@ -65,21 +65,21 @@ class FullScrape:
         tagname = curaccinfo.name
         text = curaccinfo.name
         if xpath == '':
-            if len(curaccinfo.name.strip()) == 0:
+            if len(curaccinfo.description.strip()) == 0:
                 path = curaccinfo.role + '[' + str(i) + ']'
             else:
                 if 'panel' in curaccinfo.role:
                     path = curaccinfo.role  + '[' + str(i) + ']'
                 else:
-                   path  = curaccinfo.role + '[' + str(curaccinfo.name.strip()) + ']'
+                   path  = curaccinfo.role + '[' + str(curaccinfo.description.strip()) + ']'
         else:
-            if len(curaccinfo.name.strip()) == 0:
+            if len(curaccinfo.description.strip()) == 0:
                 path = xpath + '/' + curaccinfo.role  + '[' + str(i) + ']'
             else:
                 if 'panel' in curaccinfo.role:
                     path = xpath + '/' + curaccinfo.role + '[' + str(i) + ']'
                 else:
-                    path = xpath + '/' + curaccinfo.role  + '[' + str(curaccinfo.name.strip()) + ']'
+                    path = xpath + '/' + curaccinfo.role  + '[' + str(curaccinfo.description.strip()) + ']'
 
         if len( curaccinfo.name) == 0 :
             tagname = curaccinfo.role
@@ -152,10 +152,6 @@ class FullScrape:
             text = acc.getAccessibleTextRange(0,charinfo.charCount - 1)
         text = str(text)
         text = text.strip()
-        #Calculating co ordinates for embedded screenshots
-##            utils_obj=oebs_utils.Utils()
-##            isjavares, hwnd = utils_obj.isjavawindow(window)
-##            win_rect= win32gui.GetWindowRect(hwnd)
         x1_win = win_rect[0]
         y1_win = win_rect[1]
         x2_win = win_rect[2]
@@ -175,16 +171,8 @@ class FullScrape:
             text = tagname
         text = text.replace('<','')
         text = text.replace('>','')
-        #----------------------------------------custname
         custname = None
         custname = self.postfixCustname(str(curaccinfo.role),text.strip())
-        #----------------------------------------custname
-        # if hiddentag:
-        #     left_need = 0
-        #     top_need = 0
-        #     width = 0
-        #     height = 0
-        #     return
         tempne.append({"custname":custname,
                 "tag":curaccinfo.role,
                 "xpath":path + ';' + name.strip() + ';' + str(indexInParent)  + ';' + str(childrencount) + ';'+ str(parentname).strip() + ';' + str(parentxpath) + ';' + str(parentchildcount) + ';' + str(parentindex)+ ';' + str(parenttag)+ ';' + str(curaccinfo.role) + ';' + description,

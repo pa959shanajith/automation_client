@@ -116,14 +116,16 @@ class FileOperationsPDF:
                     select_input = True
                     type_input = True
                 #check wether third optional input if it exists is empty string or selective or all
-                if len(input_val) >= 3 and input_val[2] != None  and (input_val[2] == 'selective' or input_val[2] == "all" or input_val[2] == ""): 
+                if len(input_val) >= 3 and input_val[2] != None  and (input_val[2].strip() == 'selective' or input_val[2].strip() == "all" or input_val[2].strip() == ""): 
                     if input_val[2] != "":
                         res_opt = input_val[2].strip().lower()
                     select_input = True
                 #check wether fourth optional input if it exists is empty string or pagewise or complete 
-                if len(input_val) == 4 and input_val[3] != None and (input_val[3] == 'pagewise' or input_val[3] == "complete" or input_val[3] == ""): 
+                if len(input_val) == 4 and input_val[3] != None and (input_val[3].strip() == 'pagewise' or input_val[3].strip() == "complete" or input_val[3].strip() == ""): 
                     if input_val[3] != "":
                         type_opt = input_val[3].strip().lower()
+                    type_input = True 
+                elif len(input_val) == 3:
                     type_input = True 
                 #check wether both filepath exists and wether the optional inputs are valid
                 if os.path.isfile(filePathA) and os.path.isfile(filePathB) and select_input and type_input:
@@ -177,8 +179,7 @@ class FileOperationsPDF:
                                             with open(output_path,'w') as f:
                                                 f.write(str(output_res))
                                         else:
-                                            err_msg = generic_constants.FILE_NOT_EXISTS
-                                            flg = False
+                                            logger.print_on_console(generic_constants.INVALID_OUTPUT_PATH)
                                 except Exception as ex:
                                     err_msg = ("Exception occurred while writing to output file in compareFile : " + str(ex))
                                     log.debug( err_msg )
@@ -570,8 +571,6 @@ class FileOperationsPDF:
         err_msg = None
         value = constants.OUTPUT_CONSTANT
         output_path = None
-        result = {}
-        result['count'] = 0
         try:
             #check if inputs are permissible
             if len(input_val) == 2:
@@ -626,8 +625,7 @@ class FileOperationsPDF:
                                             with open(output_path,'w') as f:
                                                 f.write(str(output_res))
                                         else:
-                                            err_msg = generic_constants.FILE_NOT_EXISTS
-                                            flg = False
+                                            logger.print_on_console(generic_constants.INVALID_OUTPUT_PATH)
                                 except Exception as ex:
                                     err_msg = ("Exception occurred while writing to output file in compareFile : " + str(ex))
                                     log.debug( err_msg )
@@ -698,9 +696,9 @@ class FileOperationsPDF:
             #get similarity and location of template image found page
             output_res[i + 1] ,output_res["abs_max"] = self.compare(image,template,output_res['abs_max'])
         #check if the maximum similarity obtained is greater than 30 percentage
-        if output_res["abs_max"] < 0.3:
+        if output_res["abs_max"] < 0.29:
             #fail the test step due to poor template image
-            return None
+            return None, 0
         output = []
         log_output = []
         total_found = 0

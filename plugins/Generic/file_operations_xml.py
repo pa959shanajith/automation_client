@@ -86,8 +86,7 @@ class FileOperationsXml:
                                                 for v in elementList:
                                                     f.write(v)
                                         else:
-                                            err_msg = generic_constants.FILE_NOT_EXISTS
-                                            flg = False
+                                            logger.print_on_console(generic_constants.INVALID_OUTPUT_PATH)
                                     except Exception as e:
                                         err_msg = ("Exception occurred while writing to output file in getXmlBlockData : " + str(e))
                                         log.error( err_msg )
@@ -204,8 +203,7 @@ class FileOperationsXml:
                                                 with open(output_path,'w') as f:
                                                     f.write(output_res)
                                             else:
-                                                err_msg = generic_constants.FILE_NOT_EXISTS
-                                                flg = False
+                                                logger.print_on_console(generic_constants.INVALID_OUTPUT_PATH)
                                     else:
                                         err_msg = INVALID_INPUT
                                         flg = False
@@ -325,8 +323,7 @@ class FileOperationsXml:
                                                 with open(output_path,'w') as f:
                                                     f.write(output_res)
                                             else:
-                                                err_msg = generic_constants.FILE_NOT_EXISTS
-                                                flg = False
+                                                logger.print_on_console(generic_constants.INVALID_OUTPUT_PATH)
                                     else:
                                         err_msg = INVALID_INPUT
                                         flg = False
@@ -414,8 +411,7 @@ class FileOperationsXml:
                                     with open(output_path,'w') as f:
                                         f.write(output_res)
                                 else:
-                                    err_msg='Wrong file path entered'
-                                    flg = False
+                                    logger.print_on_console(generic_constants.INVALID_OUTPUT_PATH)
                         except Exception as ex:
                             err_msg = ("Exception occurred while writing to output file in compareInputs : " + str(ex))
                             log.debug( err_msg )
@@ -483,8 +479,7 @@ class FileOperationsXml:
                                 with open(output_path,'w') as f:
                                     f.write(beautified_output)
                             else:
-                                flg = False
-                                err_msg='Wrong file path entered'
+                                logger.print_on_console(generic_constants.INVALID_OUTPUT_PATH)
                     except Exception as ex:
                         err_msg = ("Exception occurred while writing to output file in beautify_file : " + str(ex))
                         log.debug( err_msg )
@@ -575,8 +570,7 @@ class FileOperationsXml:
                                         with open(output_path,'w') as f:
                                             f.write(output_res)
                                     else:
-                                        err_msg = generic_constants.FILE_NOT_EXISTS
-                                        flg = False
+                                        logger.print_on_console(generic_constants.INVALID_OUTPUT_PATH)
                             except Exception as ex:
                                 err_msg = ("Exception occurred while writing to output file in compareFile : " + str(ex))
                                 log.debug( err_msg )

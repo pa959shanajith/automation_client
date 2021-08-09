@@ -105,3 +105,5 @@ ERR_XML_BLOCK='Block number should be a number'
 UNICODE_ERR="'ascii' codec can't encode character"
 
 TEMPLATE_ERR = ' Template Image Incorrect '
+
+INVALID_OUTPUT_PATH = 'Output file path is not valid. Overwriting the variable with the keyword result'

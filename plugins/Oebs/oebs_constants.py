@@ -121,7 +121,9 @@ ERROR_CODE_DICT = {
     "err_minimize": "Unable to minimize window",
     "err_maximize": "Unable to maximize window",
     "err_close": "Unable to close window",
-    "err_foreground": "Unable to bring window to foreground"
+    "err_foreground": "Unable to bring window to foreground",
+    'err_alternate_path': 'Object not found in alternate xpaths, unable to locate object',
+    'err_visible': 'Element not visible, unable to highlight'
 }
 
 
