@@ -557,6 +557,8 @@ class TableOperationKeywords():
                                 remoteWebElement=self.javascriptExecutor(webElement,row_num-1,col_num-1)
                                 cellVal=self.getChildNodes(remoteWebElement)
                                 cellVal=cellVal.strip()
+                                if cellVal.find('\xa0')!=-1:
+                                    cellVal = cellVal.replace("\xa0"," ")
                                 expected_value=input_val[2].strip()
                                 coreutilsobj=core_utils.CoreUtils()
                                 expected_value=coreutilsobj.get_UTF_8(expected_value)
