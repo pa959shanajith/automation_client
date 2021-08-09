@@ -99,9 +99,7 @@ class Utilities:
                     else:
                         path = xpath + '/' + elementObj.role  + '[' + str(elementObj.description.strip()) + ']'
             if path == currentxpathtemp:
-                if paneindex == 0:
-                    return active_parent, acc, True
-                return active_parent, acc, False
+                return active_parent, acc, paneindex == 0
 
             curr = currentxpathtemp.split('/')
             p = path.split('/')
@@ -143,7 +141,7 @@ class Utilities:
                     skip_over = variable_path[pane_occurances[i]:len(variable_path)].find('/') + pane_occurances[i]
                     variable_path = fixed_path + 'scroll pane' + variable_path[skip_over:len(variable_path)]
                     log.info('Searching for object in alternate xpath: ' + variable_path)
-                    active_parent, acc, visible = self.iterate_over_varaible_panes(a,objecttofind,variable_path,0,'',windowname, pane_occurances[i])
+                    active_parent, acc, visible = self.iterate_over_other_panes(a,objecttofind,variable_path,0,'',windowname, pane_occurances[i])
                     if acc and str(acc) != '':
                         return active_parent, acc, visible
                 log.info(ERROR_CODE_DICT['err_alternate_path'])
@@ -151,7 +149,7 @@ class Utilities:
                 return False, '', False
 
 
-    def iterate_over_varaible_panes(self, a, objecttofind, currentxpathtemp, i, p, windowname, location):
+    def iterate_over_other_panes(self, a, objecttofind, currentxpathtemp, i, p, windowname, location):
         queue = []
         active_parent = False
         queue.append((p,a,i,0))
@@ -203,9 +201,7 @@ class Utilities:
                         path = xpath + '/' + elementObj.role  + '[' + str(elementObj.description.strip()) + ']'
 
             if path == currentxpathtemp:
-                if paneindex == 0:
-                    return active_parent, acc, True
-                return active_parent, acc, False
+                return active_parent, acc, paneindex == 0
 
             curr = currentxpathtemp.split('/')
             p = path.split('/')
