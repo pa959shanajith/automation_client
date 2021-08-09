@@ -122,6 +122,8 @@ class ElementKeywords:
         if webelement is not None:
             try:
                 input=input[0]
+                if input.find('\xa0')!=-1:
+                    input = input.replace("\xa0"," ")
                 if input is not None:
                     util = UtilWebKeywords()
                     if not(util.is_visible(webelement)) and configvalues['ignoreVisibilityCheck'].strip().lower() == "yes":

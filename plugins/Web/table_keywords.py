@@ -560,6 +560,8 @@ class TableOperationKeywords():
                                 if cellVal.find('\xa0')!=-1:
                                     cellVal = cellVal.replace("\xa0"," ")
                                 expected_value=input_val[2].strip()
+                                if expected_value.find('\xa0')!=-1:
+                                    expected_value = expected_value.replace("\xa0"," ")
                                 coreutilsobj=core_utils.CoreUtils()
                                 expected_value=coreutilsobj.get_UTF_8(expected_value)
                                 if(cellVal == expected_value):
