@@ -34,7 +34,7 @@ class Screenshot():
         try:
             if('action' in args[0]):
                 log.debug('Reading the inputs')
-                if(len(args[0]['inputs'])>3):
+                if(len(args[0]['inputs'])>2):
                     logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_NO_INPUT'])
                     output = None
                 elif(args[0]['inputs']!='' and len(args[0]['inputs'])==2):
@@ -53,8 +53,12 @@ class Screenshot():
                             filename = self.generateUniqueFileName()
                             filePath = str(inputval) + '/'+ filename
                     except Exception as e:
-                        logger.print_on_console(e)
-                elif(args[0]['action']=='execute' and args[0]['inputs']==''):
+                        logger.error(e)
+                        output = None
+                        err_msg = "Error while capturing screenshot"
+                        logger.print_on_console(err_msg)
+                        log.error(err_msg)
+                elif(args[0]['action']==EXECUTE and args[0]['inputs']==''):
                     filename = self.generateUniqueFileName()
                     screenData = args[0]['screen_data']
                     path = path+screenData['projectname']+os.sep+screenData['releaseid']+os.sep+screenData['cyclename']+os.sep+datetime.datetime.now().strftime("%Y-%m-%d")+os.sep
