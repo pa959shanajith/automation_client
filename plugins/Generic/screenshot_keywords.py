@@ -53,7 +53,7 @@ class Screenshot():
                             filename = self.generateUniqueFileName()
                             filePath = str(inputval) + '/'+ filename
                     except Exception as e:
-                        logger.error(e)
+                        log.error(e)
                         output = None
                         err_msg = "Error while capturing screenshot"
                         logger.print_on_console(err_msg)
