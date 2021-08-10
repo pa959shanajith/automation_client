@@ -922,7 +922,7 @@ class FileOperationsPDF:
                                 text_content = [content]
                                 del content
                                 content = [text_content, output_res]
-                                logger.print_on_console("Output is a 2D list of length 2, the first item is a list containing the text fetched from the PDF and the second item is a list containing the text fetched from the images")
+                                logger.print_on_console("The first item in the output list is the text fetched from the PDF, the second item is a list containing text from the images")
                         else:
                             err_msg = 'No images found in the PDF file'
                             # if condition is "all" and pdf contains both text and image text
@@ -930,7 +930,7 @@ class FileOperationsPDF:
                                 text_content = [content]
                                 del content
                                 content = [text_content, output_res]
-                                logger.print_on_console("Output is a 2D list of length 2, the first item is a list containing the text fetched from the PDF and the second item is a list containing the text fetched from the images")
+                                logger.print_on_console("The first item in the output list is the text fetched from the PDF, the second item is a list containing text from the images")
                                 
                 elif len(args)>2 and args[2] not in ['text','']:
                     content = None
