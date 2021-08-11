@@ -426,8 +426,7 @@ class BrowserKeywords():
                         #condition when password is saved  by windows credential manager
                         #return with Failed flag
                     else:
-                        from pywinauto.application import Application as appl
-                        app = appl().Connect(title=u'Windows Security')
+                        app = Application().Connect(title=u'Windows Security')
                         credentialdialogxamlhost = app['Windows Security']
                         time.sleep(0.5)
                         credentialdialogxamlhost.ClickInput()

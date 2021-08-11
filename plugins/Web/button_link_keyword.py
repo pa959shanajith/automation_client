@@ -10,6 +10,7 @@
 #-------------------------------------------------------------------------------
 
 import os
+import platform
 import logger
 import webconstants
 import time
@@ -567,7 +568,7 @@ class ButtonLinkKeyword():
         pid, ppid, browser_name = self.__get_pid_ppid_browser()
         if ppid == None: return False
         if pid == None and browser_name != "edge legacy": return False
-        if browser_name != 'internet explorer':
+        if not (browser_name == 'internet explorer' and 'Windows-10' in platform.platform()):
             pid = psutil.Process(pid).children()[-1].pid
         def winEnumHandler(hwnd, pidx): # get handle of upload window
             _, current_pid = win32process.GetWindowThreadProcessId(hwnd)
@@ -624,8 +625,12 @@ class ButtonLinkKeyword():
                             break
                     if file_box and open_but:
                         file_box.set_edit_text(inputfile)
+                        time.sleep(0.5)
                         open_but.click()
-                    time.sleep(1)
+                        if 'Windows-7' in platform.platform():
+                            try: open_but.click()
+                            except: pass
+                    time.sleep(2)
                     if win32process.GetWindowThreadProcessId(handle)[0] == 0:
                         status = True
                 except Exception as e:
