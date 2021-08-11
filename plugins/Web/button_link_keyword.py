@@ -14,13 +14,13 @@ import logger
 import webconstants
 import time
 from selenium import webdriver
-from constants import SYSTEM_OS
+from constants import *
 if SYSTEM_OS == 'Windows' :
     from pyrobot import Robot, Keys
     import win32process
+    from pywinauto import Application
 import browser_Keywords
 import logging
-from constants import *
 import core_utils
 import threading
 from string_ops_keywords import *
@@ -29,7 +29,7 @@ import pyautogui
 import psutil
 import readconfig
 local_blk = threading.local()
-##text_javascript = """function stext_content(f) {     var sfirstText = '';     var stextdisplay = '';     for (var z = 0; z < f.childNodes.length; z++) {         var scurNode = f.childNodes[z];         swhitespace = /^\s*$/;         if (scurNode.nodeName === '#text' && !(swhitespace.test(scurNode.nodeValue))) {             sfirstText = scurNode.nodeValue;             stextdisplay = stextdisplay + sfirstText;         }     }     return (stextdisplay); }; return stext_content(arguments[0])"""
+
 class ButtonLinkKeyword():
     def __init__(self):
         local_blk.log = logging.getLogger('button_link_keyword.py')
@@ -537,7 +537,8 @@ class ButtonLinkKeyword():
         local_blk.log.info(RETURN_RESULT)
         return status,methodoutput,output,err_msg
 
-    def get_ppid_browser(self):
+    def __get_pid_ppid_browser(self):
+        pid=None
         ppid=None
         browser_name = browser_Keywords.local_bk.driver_obj.capabilities.get('browserName')
         platform_name = browser_Keywords.local_bk.driver_obj.capabilities.get('platformName')
@@ -554,34 +555,41 @@ class ButtonLinkKeyword():
                     ppid = browser_Keywords.local_bk.driver_obj.iedriver.process.pid
                 elif browser_name == 'edge legacy' or browser_name == 'msedge':
                     ppid = browser_Keywords.local_bk.driver_obj.edge_service.process.pid
+                cprocs = psutil.Process(ppid).children()
+                if len(cprocs) > 0:
+                    pid = cprocs[1].pid if cprocs[0].name() == 'conhost.exe' else cprocs[0].pid
         except Exception as e:
-            local_blk.log.debug("Problem while getting the ppid: {}".format(e))        
-        return ppid, browser_name
+            local_blk.log.debug("Problem while getting the process id: {}".format(e))
+        return pid, ppid, browser_name
 
-    def check_fileDialogOpen(self):
+    def __get_file_dialog_handle(self):
         hwnds = []
-        ppid, browser_name = self.get_ppid_browser()
-        if ppid == None:
-            return False
-        def winEnumHandler(hwnd, hwnd_list):
-            if win32gui.IsWindowVisible(hwnd) and win32gui.GetWindowText(hwnd) in ["Open","File Upload", "Choose File to Upload"]:
-                hwnd_list.append(hwnd)
-        win32gui.EnumWindows(winEnumHandler, hwnds)
-        pids = [win32process.GetWindowThreadProcessId(h)[1] for h in hwnds]
-        if browser_name == 'internet explorer':
-            ppids = [psutil.Process(p).ppid() for p in pids]
-        else:
-            ppids = [psutil.Process(p).parent().ppid() for p in pids]
-        return ppid in ppids
+        pid, ppid, browser_name = self.__get_pid_ppid_browser()
+        if ppid == None: return False
+        if pid == None and browser_name != "edge legacy": return False
+        if browser_name != 'internet explorer':
+            pid = psutil.Process(pid).children()[-1].pid
+        def winEnumHandler(hwnd, pidx): # get handle of upload window
+            _, current_pid = win32process.GetWindowThreadProcessId(hwnd)
+            if win32gui.IsWindowVisible(hwnd) and win32gui.GetWindowText(hwnd) in ["Open", "File Upload", "Choose File to Upload"]:
+                if browser_name == "edge legacy":
+                    if psutil.Process(current_pid).name() == "PickerHost.exe":
+                        hwnds.append(hwnd)
+                elif pidx == current_pid:
+                    hwnds.append(hwnd)
+        win32gui.EnumWindows(winEnumHandler, pid)
+        handle = hwnds[0] if (len(hwnds) > 0) else None
+        return handle
 
-    def upload_time_func(self,tries=10, time_sleep=0.5):
+    def __upload_time_func(self,tries=10, time_sleep=0.5):
         while tries > 0:
-            if self.check_fileDialogOpen():
-                local_blk.log.info("Window Found and returning the true")
-                return True
+            win_handle = self.__get_file_dialog_handle()
+            if win_handle is not None:
+                local_blk.log.info("Window handle found: %s", win_handle)
+                return win_handle
             time.sleep(time_sleep)
             tries -= 1
-        return False
+        return None
 
     def __upload_operation(self,inputfile,args):
         status = False
@@ -594,28 +602,61 @@ class ButtonLinkKeyword():
             time_sleep = 0.5
             if len(args) > 2:
                 maxTries = int(int(args[2]) / time_sleep)
-            result_call = self.upload_time_func(maxTries, time_sleep)
-            if result_call!=False:
-                configvalues = readconfig.configvalues
-                pyautogui.PAUSE = 1
-                pyautogui.keyDown('alt')
-                pyautogui.keyDown('n')
-                pyautogui.PAUSE = 1
-                pyautogui.keyUp('alt')
-                pyautogui.keyUp('n')
-                pyautogui.PAUSE = 1
-                pyautogui.typewrite(inputfile, interval=float(configvalues['delay_stringinput']))
-                pyautogui.PAUSE = 1
-                pyautogui.keyDown('enter')
-                pyautogui.PAUSE = 1
-                pyautogui.keyUp('enter')
-                pyautogui.PAUSE = 1
-                status = True
+            handle = self.__upload_time_func(maxTries, time_sleep)
+            if handle is not None:
+                try:
+                    local_blk.log.info("Trying with method 1")
+                    app=Application().connect(handle=handle,allow_magic_lookup=False)
+                    win=app[win32gui.GetWindowText(handle)]
+                    # win.minimize()
+                    open_but = None
+                    file_box = None
+                    w_c = win.children()
+                    for c in w_c:
+                        if str(c.friendly_class_name())=="Button" and c.window_text()=="&Open":
+                            open_but = c
+                            break
+                    for i in range(len(w_c)):
+                        c = w_c[i]
+                        if (str(c.friendly_class_name())=="Edit" and c.is_visible() 
+                            and w_c[i+1].window_text().find("File") > -1):
+                            file_box = c
+                            break
+                    if file_box and open_but:
+                        file_box.set_edit_text(inputfile)
+                        open_but.click()
+                    time.sleep(1)
+                    if win32process.GetWindowThreadProcessId(handle)[0] == 0:
+                        status = True
+                except Exception as e:
+                    err_msg = EXCEPTION_OCCURED + " in method 1"
+                    logger.print_on_console(err_msg)
+                    local_blk.log.error(err_msg)
+                    local_blk.log.error(e)
+                if not status:
+                    local_blk.log.info("Trying with method 2")
+                    logger.print_on_console("Trying with method 2")
+                    configvalues = readconfig.configvalues
+                    pyautogui.PAUSE = 1
+                    pyautogui.keyDown('alt')
+                    pyautogui.keyDown('n')
+                    pyautogui.PAUSE = 1
+                    pyautogui.keyUp('alt')
+                    pyautogui.keyUp('n')
+                    pyautogui.PAUSE = 1
+                    pyautogui.typewrite(inputfile, interval=float(configvalues['delay_stringinput']))
+                    pyautogui.PAUSE = 1
+                    pyautogui.keyDown('enter')
+                    pyautogui.PAUSE = 1
+                    pyautogui.keyUp('enter')
+                    pyautogui.PAUSE = 1
+                    status = True
             else:
                 status = False
         except Exception as e:
-            logger.print_on_console(EXCEPTION_OCCURED,e)
-            local_blk.log.error(EXCEPTION_OCCURED)
+            err_msg = EXCEPTION_OCCURED
+            logger.print_on_console(err_msg)
+            local_blk.log.error(err_msg)
             local_blk.log.error(e)
         return status
 
@@ -636,6 +677,7 @@ class ButtonLinkKeyword():
             local_blk.log.error(EXCEPTION_OCCURED)
             local_blk.log.error(e)
         return status
+
     def __click_for_file_upload(self,driver,webelement):
         status = False
         try:
