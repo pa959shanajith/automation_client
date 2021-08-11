@@ -1763,7 +1763,7 @@ class FileOperations:
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
             err_msg=None
-            output_res=OUTPUT_CONSTANT
+            case = ''
             log.debug('reading the inputs')
             flag1=False
             dyn_var_opt = False
@@ -1788,10 +1788,11 @@ class FileOperations:
                 log.error(err_msg)
                 logger.print_on_console(err_msg)
                 return status,methodoutput,res1,err_msg
-            if(len(input)>6 and isinstance(input[6], str)):
-                case=input[6]
-            else:
-                case=''
+            if(len(input)>6):
+                if(isinstance(input[6], str) and input[6].lower() == 'ignorecase'):
+                    case = input[6]
+                else:
+                    logger.print_on_console('Warning! : Case check input is invalid, Hence ignorecase has not been applied.')
 
             if(extension1=='.csv' and extension2=='.csv'):#both files are csv
                 col11 = " ".join(re.findall("[a-zA-Z]+", range1[0]))
@@ -1831,7 +1832,7 @@ class FileOperations:
                 for aa in range(len(output1)):
                     res1[x]=[]
                     for bb in range(len(output2[i])):
-                        if(case!='' and case.lower() == 'ignorecase'):
+                        if(case!=''):
                             if (output1[aa][bb].lower()==output2[aa][bb].lower()):
                                 output='True'
                                 res1[x].append(output)
@@ -1888,7 +1889,7 @@ class FileOperations:
                 for aa in range(len(cell1)):
                     res1[x]=[]
                     for bb in range(len(cell2[i])):
-                        if(case!='' and case.lower() == 'ignorecase'):
+                        if(case!=''):
                             if (str(cell1[aa][bb].value).lower()==str(cell2[aa][bb].value).lower()):
                                 output='True'
                                 res1[x].append(output)
@@ -1977,7 +1978,7 @@ class FileOperations:
                 for aa in range(len(output1)):
                     res1[j]=[]
                     for bb in range(len(output2[i])):
-                        if(case!='' and case.lower() == 'ignorecase'):
+                        if(case!=''):
                             if (str(output1[aa][bb]).lower()==str(output2[aa][bb]).lower()):
                                 output='True'
                                 res1[j].append(output)
@@ -2074,7 +2075,7 @@ class FileOperations:
                 for aa in range(len(output1)):
                     res1[j]=[]
                     for bb in range(len(output2[i])):
-                        if(case!='' and case.lower() == 'ignorecase'):
+                        if(case!=''):
                             if (str(output1[aa][bb]).lower()==str(output2[aa][bb]).lower()):
                                 output='True'
                                 res1[j].append(output)
@@ -2190,7 +2191,7 @@ class FileOperations:
                 for aa in range(len(output1)):
                     res1[j]=[]
                     for bb in range(len(output2[i])):
-                        if(case!='' and case.lower() == 'ignorecase'):
+                        if(case!=''):
                             if (str(output1[aa][bb]).lower()==str(output2[aa][bb]).lower()):
                                 output='True'
                                 res1[j].append(output)
