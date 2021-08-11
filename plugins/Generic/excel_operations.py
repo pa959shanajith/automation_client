@@ -762,9 +762,11 @@ class ExcelXLS:
             from itertools import zip_longest
             book1 = open_workbook(input_path1)
             book2 = open_workbook(input_path2)
-            sheet1 = book1.sheet_by_name(sheetname1)
-            sheet2 = book2.sheet_by_name(sheetname2)
-
+            sheet1 = book1.sheet_by_name(sheetname1) if sheetname1!='' else None
+            sheet2 = book2.sheet_by_name(sheetname2) if sheetname2!='' else None
+            if (sheet1==None or sheet2==None):
+                err_msg=ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                return status,err_msg
             for rownum in range(max(sheet1.nrows, sheet2.nrows)):
                 if rownum < sheet1.nrows and rownum < sheet2.nrows:
                     row_rb1 = sheet1.row_values(rownum)
@@ -1821,6 +1823,8 @@ class ExcelCSV:
             data_file2=[]
             x = False
             status = False
+            if len(args)>0 and input_path2=='':
+                input_path2=args[0]
             try :
                 with open(input_path1 , 'rt') as file1:
                     reader =csv.reader(file1)
