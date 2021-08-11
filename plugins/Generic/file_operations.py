@@ -38,6 +38,7 @@ import logging
 from itertools import islice
 import re
 import zipfile
+import platform
 log = logging.getLogger('file_operations.py')
 
 
@@ -1189,6 +1190,11 @@ class FileOperations:
                     #Press 'tab' key to get the focus on 'search tab'
                     obj.execute_key('tab',1)
                     time.sleep(1)
+                    ##Press 'tab' key again for windows 10 to focus on 'organise'
+                    if str(platform.release()) == '10':
+                        log.debug("Windows 10 machine detected, pereforming an extra 'tab'")
+                        obj.execute_key('tab',1)
+                        time.sleep(1)
                     #Press 'alt+n' key to create a new file
                     obj.press_multiple_keys(['alt','n'],1)
                     time.sleep(1)

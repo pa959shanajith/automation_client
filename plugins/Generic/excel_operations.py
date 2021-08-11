@@ -78,9 +78,13 @@ class ExcelFile:
         #This is to support the feature of   simulataneous writing and reading to a file
         excelobj= object_creator()
         excel=excelobj.excel_object()
-        excel.DisplayAlerts = False
-        excel_file = excel.Workbooks.Open(input_path)
-        excel_file.Close(True)
+        if excel!=None:
+            try:
+                excel.DisplayAlerts = False
+                excel_file = excel.Workbooks.Open(input_path)
+                excel_file.Close(True)
+            except Exception as e:
+                log.debug("Excel COM object error",e)
 
 
     def __get_ext(self,input_path):
