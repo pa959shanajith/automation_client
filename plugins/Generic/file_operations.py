@@ -843,8 +843,6 @@ class FileOperations:
                     if res:
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
-            else:
-                err_msg=result[3]
         except TypeError as e:
             err_msg=ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']
         except Exception as e:
