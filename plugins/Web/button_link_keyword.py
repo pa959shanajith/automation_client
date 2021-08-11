@@ -217,16 +217,19 @@ class ButtonLinkKeyword():
                 local_blk.log.debug('Going to fetch the button name')
                 buttonname = webelement.text
                 local_blk.log.info('Button name fetched from the AUT using selenium')
-                logger.print_on_console('Button name : ' , buttonname)
-
-                if buttonname == None or len(buttonname) == 0:
+                # if buttonname is not None or empty string and length is greater than 0 print on the console
+                if buttonname not in [None, ''] and len(buttonname) != 0:
+                    logger.print_on_console('Button name : ' , buttonname)
+                # checking button name is None or empty string and length is 0
+                if buttonname in [None, ''] or len(buttonname) == 0:
                     local_blk.log.debug('Button name not recieved using selenium text method, Getting value attribute')
                     #if text is empty search for the value attribute
                     buttonname = webelement.get_attribute(webconstants.VALUE)
                     local_blk.log.info('Button name fetched from the AUT using value attribute')
                     local_blk.log.info(buttonname)
                     logger.print_on_console('Button name : ' , buttonname)
-                if buttonname == None or len(buttonname) == 0:
+                # checking button name is None or empty string and length is 0
+                if buttonname in [None, ''] or len(buttonname) == 0:
                     local_blk.log.debug('Button name not recieved using selenium text method/ value attribute, Getting name attribute')
                     #if value is empty search for the name attribute
                     buttonname = webelement.get_attribute(webconstants.NAME)
