@@ -1723,7 +1723,6 @@ class FileOperations:
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
             err_msg=None
-            output_res=OUTPUT_CONSTANT
             log.debug('reading the inputs')
             output=[]
             if(len(input)==2):
@@ -1731,7 +1730,7 @@ class FileOperations:
                 folderpath=input[1]
                 for root, dirs, files in os.walk(folderpath):
                     if filename in files:
-                        output.append(root.replace("\\","/")+'/'+filename)
+                        output.append(os.path.join(root,filename).replace('\\','/'))
                 if(output==[]):
                     log.info('File does not exist inside '+folderpath)
                     logger.print_on_console('File does not exist inside '+folderpath)
