@@ -215,11 +215,11 @@ class ElementKeywords:
                             yoffset=browser_Keywords.local_bk.driver_obj.execute_script(MOUSE_HOVER_FF)
                             obj.mouse_move(int(location.get('x')+9),int(location.get('y')+yoffset))
                         else:
-                            obj.enumwindows()
-                            if len(obj.rect)>1:
+                            offset = browser_Keywords.local_bk.driver_obj.execute_script("return window.outerHeight - window.innerHeight;")
+                            if offset>0:
                                 height=int(size.get('height')/2)
                                 width=int(size.get('width')/2)
-                                obj.mouse_move(int(location.get('x')+width),int(location.get('y')+obj.rect[1]+height))
+                                obj.mouse_move(int(location.get('x')+width),int(location.get('y')+offset+height))
                             else:
                                 err_msg='Element to be dragged should be on top'
                                 local_eo.log.error=err_msg
