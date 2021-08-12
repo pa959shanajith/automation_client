@@ -388,12 +388,23 @@ class FileOperationsXml:
                         else:
                             output_path = args[0].split(";")[0]
                     if ( len(input_val) == 3 and (input_val[2] != None or input_val[2] != '' )) : res_opt = input_val[2].strip().lower()
-                    output_res = self.compare_texts(inputtext1,inputtext2)
+                    try:
+                        import xml.etree.ElementTree as ET
+                        root1 = ET.fromstring(inputtext1)
+                        root2 = ET.fromstring(inputtext2)
+                        xml_data_flag = True
+                        del root1,root2
+                    except:
+                        xml_data_flag = False
+                    if not xml_data_flag:
+                        output_res = self.compare_texts(inputtext1, inputtext2)
+                    else:output_res = self.compare_xml_texts(inputtext1, inputtext2)
                     if ( output_res ):
                         flg = True
                         optFlg = True
                         try:
-                            num_diff,ch_lines = self.get_diff_count(output_res)
+                            if not xml_data_flag: num_diff, ch_lines = self.get_diff_count(output_res)
+                            else: num_diff, ch_lines = self.get_diff_count_xml(output_res)
                             if(num_diff):
                                 logger.print_on_console("The number of differences in compareInputs are: ",num_diff)
                             elif(int(num_diff) == 0):
@@ -667,6 +678,19 @@ class FileOperationsXml:
             log.error("Exception occurred in compare_texts while comparing two texts, ERR_MSG:" + str(e))
         return out
 
+    def compare_xml_texts(self, xml_input1, xml_input2):
+        """
+        def : compare_xml_text
+        purpose : compares two xml content
+        param : xml data-1, xml data-2
+        return : differed xml
+        """
+        out = None
+        try:
+            out = main.diff_texts(xml_input1, xml_input2, diff_options={'fast_match': False}, formatter=formatting.XMLFormatter(normalize=formatting.WS_BOTH)).split("\n")
+        except Exception as e:
+            log.debug("Could not found the difference in XML content", e)
+        return out
     def compare_xmls(self, xml_input1, xml_input2):
         """
         def : compare_xmls
