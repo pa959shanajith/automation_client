@@ -11,7 +11,7 @@ import uuid
 import signal
 import subprocess
 from datetime import datetime
-from selenium import webdriver
+from selenium import webdriver, common
 from random import random
 import core_utils
 import logger
@@ -1661,6 +1661,16 @@ def check_browser():
                         chromeFlag = True
             if chromeFlag == False:
                 logger.print_on_console('WARNING!! : Chrome version ',str(browser_ver),' is not supported.')
+        # Handling the session not able to create exception occurs when browser and driver are incompatable.
+        except common.exceptions.SessionNotCreatedException as e:
+            # getting the current browser version from error message.
+            browser_ver = e.msg[109:111]
+            if len(browser_ver) > 0 and browser_ver.isdigit():
+                # driver version above 85 this line will print on the console.
+                logger.print_on_console('WARNING!! : Chrome version ',str(browser_ver),' is not supported.')
+            else:
+                # driver version below 86 this line will print on the console.
+                logger.print_on_console('WARNING!! : Current version of Chrome is not supported.')
         except Exception as e:
             logger.print_on_console("Error in checking chrome version")
             log.error("Error in checking chrome version")
@@ -1690,7 +1700,7 @@ def check_browser():
                     if browser_ver >= v[0] and browser_ver <= v[1]:
                         firefoxFlag=True
             if firefoxFlag == False:
-                logger.print_on_console('WARNING!! : Firefox version ',str(browser_ver),' is not supported.')
+                logger.print_on_console('WARNING!! : Firefox version ',str(browser_ver)[:2],' is not supported.')
         except Exception as e:
             logger.print_on_console("Error in checking Firefox version")
             log.error("Error in checking Firefox version")
@@ -1763,6 +1773,16 @@ def check_browser():
                         chromiumFlag=True
             if chromiumFlag == False :
                 logger.print_on_console('WARNING!! : Edge Chromium version ',str(browser_ver),' is not supported.')
+        # Handling the session not able to create exception occurs when browser and driver are incompatable.
+        except common.exceptions.SessionNotCreatedException as e:
+            # getting the current browser version from error message.
+            browser_ver = e.msg[109:111]
+            if len(browser_ver) > 0 and browser_ver.isdigit():
+                # driver version above 85 this line will print on the console.
+                logger.print_on_console('WARNING!! : Edge Chromium version ',str(browser_ver),' is not supported.')
+            else:
+                # driver version below 86 this line will print on the console.
+                logger.print_on_console('WARNING!! : Current version of Edge Chromium is not supported.')
         except Exception as e:
             logger.print_on_console("Error in checking Edge Chromium version")
             log.error("Error in checking Edge Chromium version")
