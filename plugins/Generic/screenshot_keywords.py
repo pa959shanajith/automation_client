@@ -42,9 +42,8 @@ class Screenshot():
                         inputval = args[0]['inputs'][0]
                         filename = args[0]['inputs'][1]
                         if(inputval=='' or not os.path.isdir(inputval)):
+                            logger.print_on_console("Invalid file path! Saving screenshot in the default folder")
                             inputval = path
-                        elif(not os.path.exists(inputval)):
-                            os.makedirs(inputval)
                         if (filename!=''):
                             if '.' in filename:
                                 filename = filename.split('.')[0]
