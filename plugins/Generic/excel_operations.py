@@ -873,7 +873,9 @@ class ExcelXLS:
             else:
                 err_msg='File/Sheet does not exist to clear'
                 log.error(err_msg)
-
+        except PermissionError as ex:
+            err_msg = generic_constants.FILE_OPENED
+            log.error(ex)
         except Exception as e:
             err_msg='File/Sheet does not exist to clear'
             log.error(e)
@@ -1409,10 +1411,12 @@ class ExcelXLSX:
             book.remove(sheet)
             book.save(inputpath)
             status=True
+        except PermissionError as ex:
+            err_msg = generic_constants.FILE_OPENED
+            log.error(ex)
         except Exception as e:
             err_msg='Error occured in clearing the content of excel sheet'
             log.error(e)
-            logger.print_on_console(err_msg)
         return status,err_msg
 
 
