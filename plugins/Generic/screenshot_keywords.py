@@ -34,25 +34,22 @@ class Screenshot():
         try:
             if('action' in args[0]):
                 log.debug('Reading the inputs')
-                if(len(args[0]['inputs'])>3):
+                if(len(args[0]['inputs'])>2):
                     logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_NO_INPUT'])
                     output = None
                 elif(args[0]['inputs']!='' and len(args[0]['inputs'])==2):
-                    try:
-                        inputval = args[0]['inputs'][0]
-                        filename = args[0]['inputs'][1]
-                        if(inputval=='' or not os.path.isdir(inputval)):
-                            logger.print_on_console("Invalid file path! Saving screenshot in the default folder")
-                            inputval = path
-                        if (filename!=''):
-                            if '.' in filename:
-                                filename = filename.split('.')[0]
-                            filePath = str(inputval) + '/'+ filename
-                        else:
-                            filename = self.generateUniqueFileName()
-                            filePath = str(inputval) + '/'+ filename
-                    except Exception as e:
-                        log.error(e)
+                    inputval = args[0]['inputs'][0]
+                    filename = args[0]['inputs'][1]
+                    if(inputval=='' or not os.path.isdir(inputval)):
+                        logger.print_on_console("Invalid file path! Saving screenshot in the default folder")
+                        inputval = path
+                    if (filename!=''):
+                        if '.' in filename:
+                            filename = filename.split('.')[0]
+                        filePath = str(inputval) + '/'+ filename
+                    else:
+                        filename = self.generateUniqueFileName()
+                        filePath = str(inputval) + '/'+ filename
                 elif(args[0]['action']==EXECUTE and args[0]['inputs']==''):
                     filename = self.generateUniqueFileName()
                     screenData = args[0]['screen_data']
@@ -65,19 +62,16 @@ class Screenshot():
                 else:
                     output = None
             else:
-                try:
-                    if path=="Disabled":
-                        logger.print_on_console(ERROR_CODE_DICT['ERR_SCREENSHOT_PATH'])
-                        output=None
-                    else:
-                        filename=self.generateUniqueFileName()
-                        path=path+args[0]['projectname']+os.sep+args[0]['releaseid']+os.sep+args[0]['cyclename']+os.sep+datetime.datetime.now().strftime("%Y-%m-%d")+os.sep
-                        if(not os.path.exists(path)):
-                            os.makedirs(path)
-                        filePath = path + filename
-                        output = filePath+'.png'
-                except Exception as e:
-                    log.error(e)
+                if path=="Disabled":
+                    logger.print_on_console(ERROR_CODE_DICT['ERR_SCREENSHOT_PATH'])
+                    output=None
+                else:
+                    filename=self.generateUniqueFileName()
+                    path=path+args[0]['projectname']+os.sep+args[0]['releaseid']+os.sep+args[0]['cyclename']+os.sep+datetime.datetime.now().strftime("%Y-%m-%d")+os.sep
+                    if(not os.path.exists(path)):
+                        os.makedirs(path)
+                    filePath = path + filename
+                    output = filePath+'.png'
             if output==None:
                 log.debug('screenshot capture failed')
                 output=OUTPUT_CONSTANT
