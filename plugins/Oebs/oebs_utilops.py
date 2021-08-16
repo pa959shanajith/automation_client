@@ -404,7 +404,7 @@ class UtilOperations:
                         oebs_mouseops.MouseOperation('click',x_coor,y_coor)
                         self.keyboardops.keyboard_operation('keypress','A_DOWN')
                         time.sleep(0.1)
-                        requiredcontext=self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]")
+                        requiredcontext, visible = self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]")
                         listObj = self.utilities_obj.looptolist(requiredcontext)
                         childobj=listObj.getAccessibleChildFromContext(int(childindex))
                         childcontext=childobj.getAccessibleContextInfo()
@@ -425,7 +425,7 @@ class UtilOperations:
                         else:
                             self.keyboardops.keyboard_operation('keypress','A_UP')
                             time.sleep(0.1)
-                            requiredcontext=self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]")
+                            requiredcontext, visible = self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]")
                             listObj = self.utilities_obj.looptolist(requiredcontext)
                             childobj=listObj.getAccessibleChildFromContext(int(childindex))
                             childcontext=childobj.getAccessibleContextInfo()

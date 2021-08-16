@@ -78,9 +78,13 @@ class ExcelFile:
         #This is to support the feature of   simulataneous writing and reading to a file
         excelobj= object_creator()
         excel=excelobj.excel_object()
-        excel.DisplayAlerts = False
-        excel_file = excel.Workbooks.Open(input_path)
-        excel_file.Close(True)
+        if excel!=None:
+            try:
+                excel.DisplayAlerts = False
+                excel_file = excel.Workbooks.Open(input_path)
+                excel_file.Close(True)
+            except Exception as e:
+                log.debug("Excel COM object error",e)
 
 
     def __get_ext(self,input_path):
@@ -758,9 +762,11 @@ class ExcelXLS:
             from itertools import zip_longest
             book1 = open_workbook(input_path1)
             book2 = open_workbook(input_path2)
-            sheet1 = book1.sheet_by_name(sheetname1)
-            sheet2 = book2.sheet_by_name(sheetname2)
-
+            sheet1 = book1.sheet_by_name(sheetname1) if sheetname1!='' else None
+            sheet2 = book2.sheet_by_name(sheetname2) if sheetname2!='' else None
+            if (sheet1==None or sheet2==None):
+                err_msg=ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                return status,err_msg
             for rownum in range(max(sheet1.nrows, sheet2.nrows)):
                 if rownum < sheet1.nrows and rownum < sheet2.nrows:
                     row_rb1 = sheet1.row_values(rownum)
@@ -867,7 +873,9 @@ class ExcelXLS:
             else:
                 err_msg='File/Sheet does not exist to clear'
                 log.error(err_msg)
-
+        except PermissionError as ex:
+            err_msg = generic_constants.FILE_OPENED
+            log.error(ex)
         except Exception as e:
             err_msg='File/Sheet does not exist to clear'
             log.error(e)
@@ -1403,10 +1411,12 @@ class ExcelXLSX:
             book.remove(sheet)
             book.save(inputpath)
             status=True
+        except PermissionError as ex:
+            err_msg = generic_constants.FILE_OPENED
+            log.error(ex)
         except Exception as e:
             err_msg='Error occured in clearing the content of excel sheet'
             log.error(e)
-            logger.print_on_console(err_msg)
         return status,err_msg
 
 
@@ -1817,6 +1827,8 @@ class ExcelCSV:
             data_file2=[]
             x = False
             status = False
+            if len(args)>0 and input_path2=='':
+                input_path2=args[0]
             try :
                 with open(input_path1 , 'rt') as file1:
                     reader =csv.reader(file1)

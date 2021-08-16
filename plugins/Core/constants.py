@@ -306,7 +306,8 @@ ERROR_CODE_DICT = {
                     "ERR_DB_QUERY": "Error with database query",
                     "ERR_FILE_WRITE": "Error writing to file",
                     "ERR_JAVA_NOT_FOUND": "JAVA_HOME environment variable is not set",
-                    "ERR_INVALID_SHEET": "Input error: Invalid Sheet name"
+                    "ERR_INVALID_SHEET": "Input error: Invalid Sheet name",
+                    "ERR_TIMEOUT_EXCEEDED":"Delay Timeout Exceeded"
                 }
 
 STOP='stop'

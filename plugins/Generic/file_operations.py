@@ -38,6 +38,7 @@ import logging
 from itertools import islice
 import re
 import zipfile
+import platform
 log = logging.getLogger('file_operations.py')
 
 
@@ -362,13 +363,10 @@ class FileOperations:
                         zipf.close()
 
                     elif(input_ext=='.zip'):
-                        unzip_path=os.path.dirname(destination_path)+'\\'+file1.split('.')[0]
-                        if(not os.path.isdir(source_path.split('.')[0])):
-                            with zipfile.ZipFile(source_path, 'r') as zip_ref:
-                                zip_ref.extractall(unzip_path)
-                            zip_ref.close()
-                        else:
-                            err_msg = 'Zip folder already exists in the destination path'
+                        unzip_path=os.path.dirname(destination_path)
+                        with zipfile.ZipFile(source_path, 'r') as zip_ref:
+                            zip_ref.extractall(unzip_path)
+                        zip_ref.close()
 
                     else:
                         err_msg = 'File conversion support is not given for ' + str(input_ext) + ' to ' + str(extension)
@@ -791,7 +789,7 @@ class FileOperations:
                 path2=params[2]
             log.debug('verifying whether the files exists')
             result1=self.verify_file_exists(params[0],'')
-            result2=self.verify_file_exists(path2,'')
+            result2=self.verify_file_exists(path2,'') if path2!='' else TEST_RESULT_FAIL
             if result1[1] == TEST_RESULT_TRUE and result2[1]==TEST_RESULT_TRUE :
                 file_ext1,status1=self.__get_ext(params[0])
                 file_ext2,status2=self.__get_ext(path2)
@@ -809,6 +807,8 @@ class FileOperations:
                 err_msg=result1[3]
                 if err_msg==None:
                     err_msg=result2[3]
+            if type(result2) != list and result2==TEST_RESULT_FAIL:
+                err_msg=generic_constants.INVALID_INPUT
         except TypeError as e:
             err_msg=ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']
         except Exception as e:
@@ -845,8 +845,6 @@ class FileOperations:
                     if res:
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
-            else:
-                err_msg=result[3]
         except TypeError as e:
             err_msg=ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']
         except Exception as e:
@@ -1190,6 +1188,11 @@ class FileOperations:
                     #Press 'tab' key to get the focus on 'search tab'
                     obj.execute_key('tab',1)
                     time.sleep(1)
+                    ##Press 'tab' key again for windows 10 to focus on 'organise'
+                    if str(platform.release()) == '10':
+                        log.debug("Windows 10 machine detected, pereforming an extra 'tab'")
+                        obj.execute_key('tab',1)
+                        time.sleep(1)
                     #Press 'alt+n' key to create a new file
                     obj.press_multiple_keys(['alt','n'],1)
                     time.sleep(1)
@@ -1502,6 +1505,7 @@ class FileOperations:
         desc = None
         collect_content={}
         opt = False
+        xlsx_compare = False
         input_path1 = None
         sheetname1 = None
         input_path2 = None
@@ -1513,11 +1517,14 @@ class FileOperations:
         con_var_opt = False
         log.debug('Comparing content cell by cell of .xls files ')
         try:
+            import csv
             if (len(input_val)==5):
                 input_path1 = input_val[0]
                 sheetname1 = input_val[1]
                 input_path2 = input_val[2]
                 sheetname2 = input_val[3]
+                extension1=os.path.splitext(input_path1)[1] if(input_path1 !=None) else None
+                extension2=os.path.splitext(input_path2)[1] if(input_path2 !=None) else None
                 if ( len(input_val) == 5 and input_val[4].strip().lower() == 'selective'):
                     logger.print_on_console("Selective Option Set to True")
                     opt = True
@@ -1528,12 +1535,13 @@ class FileOperations:
                 sheetname1 = input_val[1]
                 input_path2 = input_val[2]
                 sheetname2 = input_val[3]
+                extension1=os.path.splitext(input_path1)[1] if(input_path1 !=None) else None
+                extension2=os.path.splitext(input_path2)[1] if(input_path2 !=None) else None
                 input_filed_set = True
             else:
                 input_filed_set = False
 
             if input_filed_set:
-
                 if(str(args[0].split(";")[0]).startswith("{") and str(args[0].split(";")[0]).endswith("}")):
                     out_path=self.DV.get_dynamic_value(args[0].split(";")[0])
                     dyn_var_opt = True
@@ -1563,8 +1571,8 @@ class FileOperations:
                     output_feild = args[0].split(";")[0]
                     log.info("Choosen the direct file path")
                     #logger.print_on_console("Choosen the direct file path")
-
-
+            if(extension1=='.xlsx' and extension2=='.xlsx'):# Indicates both files are excel(.xlsx)
+                xlsx_compare = True
                 book1 = open_workbook(input_path1)
                 book2 = open_workbook(input_path2)
                 try:
@@ -1630,7 +1638,13 @@ class FileOperations:
                         log.error('some error : {}'.format(e))
                     if( output_feild ):
                         if os.path.exists(output_feild):
+                            wb=openpyxl.load_workbook(output_feild)
+                            sheet='CellByCellCompare_Result'
                             logger.print_on_console( "Writing the output of cellByCellCompare to file ")
+                            if(sheet in wb.sheetnames):
+                                msg='Output file has old entries! Erasing old data to store incoming result.'
+                                logger.print_on_console(msg)
+                                self.xlsx_obj.clear_content_xlsx(os.path.dirname(output_feild),os.path.basename(output_feild),sheet)
                             flg, err_msg = self.write_result_file(output_feild, collect_content, 'CellByCellCompare_Result')
                         else:
                             status_excel_create_file = False
@@ -1664,34 +1678,152 @@ class FileOperations:
                                 if len(collect_content)!=0:
                                     status = TEST_RESULT_PASS
                                     result = TEST_RESULT_TRUE
-                    else:
-                        log.debug("Output file not provided")
-                        if (collect_content) :
-                            if opt==True or dyn_var_opt or con_var_opt:
-                                comp_flg=True
-                                if len(collect_content)!=0:
-                                    for each_key in collect_content.keys():
-                                        for each_match in collect_content[each_key]:
-                                            if each_match.find("Not Matched")!=-1:
-                                                comp_flg=False
-                                    if comp_flg!=False:
-                                        logger.print_on_console("Input files are same")
-                                    else:
-                                        logger.print_on_console("Input files are not same")
-
-                                    status = TEST_RESULT_PASS
-                                    result = TEST_RESULT_TRUE
-                                else:
-                                    logger.print_on_console("Input files are empty")
-                            output = collect_content
-                        else :
-                            err_msg = "Content is empty"
                 else:
                     if sheet_exist!=None:
                         err_msg="Provided sheet doesn't exist: {}".format(', '.join(sheet_exist))
                     else:
                         err_msg = 'Error : Validity of file path 1 is : ' + str(result1[1]) + 'and validity of file path 2 is : ' + str(result2[1]) + '. Please make sure file paths entered are correct'
-            else:
+            elif(extension1=='.csv' and extension2=='.csv'):#both files are csv
+                i,j,x=0,0,0
+                output1,output2={},{}
+                with open(input_path1,'r') as f1:
+                    reader1=csv.reader(f1)
+                    for row in reader1: #row 
+                        output1[i]=[]
+                        for column in row: #column 
+                            output1[i].append(column)
+                        i+=1                
+                with open(input_path2,'r') as f2:
+                    reader2=csv.reader(f2)
+                    for row in reader2: #row 
+                        output2[j]=[]
+                        for column in row: #column 
+                            output2[j].append(column)
+                        j+=1
+                i=list(output2.keys())[0]
+                count=0
+                for aa in range(len(output1)):
+                    collect_content[x]=[]
+                    for bb in range(len(output2[i])):
+                        if (output1[aa][bb]==output2[aa][bb]):
+                            output='Matched'
+                            collect_content[x].append(output)
+                        else:
+                            output='Not Matched'
+                            if (opt==True):
+                                output="Not Matched, Cell Values {} and {}".format(output1[aa][bb],output2[aa][bb])
+                            collect_content[x].append(output)
+                    count+=1
+                    x+=1
+                    if(count>=len(output2)):
+                        break
+            if( output_feild ) and not(xlsx_compare):
+                file_extension,status_get_ext = self.__get_ext(output_feild)
+                sheet='CellByCellCompare_Result'
+                result=os.path.isfile(output_feild)
+                msg='Output file has old entries! Erasing old data to store incoming result.'
+                if status_get_ext and file_extension is not None and file_extension in generic_constants.SELECTIVE_CELL_FILE_TYPES:
+                    logger.print_on_console( "Writing the output of selectiveCellCompare to file ")
+                    if(file_extension=='.xlsx'):
+                        if result==True:
+                            wb=openpyxl.load_workbook(output_feild)
+                        else:
+                            logger.print_on_console("File Does not exists, creating the file in specified path {}".format(output_feild))
+                            wb=openpyxl.Workbook()
+
+                        if(sheet in wb.sheetnames):
+                            logger.print_on_console(msg)
+                            self.xlsx_obj.clear_content_xlsx(os.path.dirname(output_feild),os.path.basename(output_feild),sheet)
+                            wb=openpyxl.load_workbook(output_feild)
+                        else:
+                            wb.create_sheet(index=0, title=sheet)
+
+                        row,col=1,1
+                        getSheet=wb[sheet]
+                        for key, value in collect_content.items():
+                            for i in range(len(collect_content[key])):
+                                getSheet.cell(row, col , value[i])
+                                col += 1
+                            col = 1
+                            row+=1
+                        wb.save(output_feild)
+                        wb.close()
+                        flg=True
+                    elif(file_extension=='.xls'):
+                        if result==True:
+                            rb = open_workbook(output_feild)
+                            wb = xl_copy(rb)
+                            getSheet = wb.get_sheet(sheet)
+                        else:
+                            logger.print_on_console("File Does not exists, creating the file in specified path {}".format(output_feild))
+                            wb = xlwt.Workbook(encoding="utf-8")
+                        try:
+                            if(getSheet):
+                                logger.print_on_console(msg)
+                                self.xls_obj.clear_content_xls(os.path.dirname(output_feild),os.path.basename(output_feild),sheet)
+                                rb = open_workbook(output_feild)
+                                wb = xl_copy(rb)
+                                getSheet = wb.get_sheet(sheet)
+                        except:
+                            getSheet = wb.add_sheet(sheet)
+
+                        row,col=0,0
+                        for key, value in collect_content.items():
+                            for i in range(len(collect_content[key])):
+                                getSheet.write(row, col , value[i])
+                                col += 1
+                            col = 0
+                            row+=1
+                        wb.save(output_feild)
+                        flg=True
+
+                    #for csv and txt
+                    if(file_extension=='.csv' or file_extension=='.txt'):
+                        flg, err_msg = self.write_result_file(output_feild, collect_content, sheet)
+                if ( flg ):
+                    if opt==True:
+                        comp_flg=True
+                        if len(collect_content)!=0:
+                            for each_key in collect_content.keys():
+                                for each_match in collect_content[each_key]:
+                                    if each_match.find("Not Matched")!=-1:
+                                        comp_flg=False
+                            if comp_flg!=False:
+                                logger.print_on_console("Input files are same")
+                            else:
+                                logger.print_on_console("Input files are not same")
+                            status = TEST_RESULT_PASS
+                            result = TEST_RESULT_TRUE
+                        else:
+                            logger.print_on_console("Input files are empty")
+
+                    else:
+                        if len(collect_content)!=0:
+                            status = TEST_RESULT_PASS
+                            result = TEST_RESULT_TRUE
+            if not(output_feild):
+                log.debug("Output file not provided")
+                if (collect_content) :
+                    if opt==True or dyn_var_opt or con_var_opt:
+                        comp_flg=True
+                        if len(collect_content)!=0:
+                            for each_key in collect_content.keys():
+                                for each_match in collect_content[each_key]:
+                                    if each_match.find("Not Matched")!=-1:
+                                        comp_flg=False
+                            if comp_flg!=False:
+                                logger.print_on_console("Input files are same")
+                            else:
+                                logger.print_on_console("Input files are not same")
+
+                            status = TEST_RESULT_PASS
+                            result = TEST_RESULT_TRUE
+                        else:
+                            logger.print_on_console("Input files are empty")
+                    output = collect_content
+                else :
+                    err_msg = "Content is empty"
+            if input_filed_set==False:
                 err_msg="Invalid Inputs, Please provide the proper inputs"
 
             if ( err_msg ):
@@ -1702,7 +1834,7 @@ class FileOperations:
             log.error(err_msg)
             logger.print_on_console(err_msg)
         try:
-            del input_path1, sheetname1, input_path2, sheetname2, book1, book2, row_max, col_max, output_feild, result1, result2, collect_content, sheet_exist,each_key,each_match,comp_flg#deleting variables
+            del input_path1, sheetname1, input_path2, sheetname2, book1, book2, row_max, col_max, output_feild, result1, result2, collect_content, sheet_exist,each_key,each_match,comp_flg,reader1,reader2#deleting variables
         except Exception as e :
             log.error('some error : {}'.format(e))
         return status, result, output, err_msg
@@ -1718,7 +1850,6 @@ class FileOperations:
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
             err_msg=None
-            output_res=OUTPUT_CONSTANT
             log.debug('reading the inputs')
             output=[]
             if(len(input)==2):
@@ -1726,7 +1857,7 @@ class FileOperations:
                 folderpath=input[1]
                 for root, dirs, files in os.walk(folderpath):
                     if filename in files:
-                        output.append(root.replace("\\","/")+'/'+filename)
+                        output.append(os.path.join(root,filename).replace('\\','/'))
                 if(output==[]):
                     log.info('File does not exist inside '+folderpath)
                     logger.print_on_console('File does not exist inside '+folderpath)
@@ -1757,30 +1888,41 @@ class FileOperations:
             methodoutput=TEST_RESULT_FALSE
             err_msg=None
             output_res=OUTPUT_CONSTANT
+            case = ''
             log.debug('reading the inputs')
             flag1=False
-            flag2=False
             dyn_var_opt = False
             con_var_opt = False
-            filepath1=input[0]
-            filepath2=input[3]
-            sheetname1=input[1]
-            sheetname2=input[4]
-            range1=input[2].split(':')
-            range2=input[5].split(':')
-            res1={}
-            output_feild = None
-            extension1=os.path.splitext(filepath1)[1] if(filepath1 !=None) else None
-            extension2=os.path.splitext(filepath2)[1] if(filepath2 !=None) else None
-            if (extension1==None or extension2==None):
+            input_valid = False
+            extension1 = None
+            extension2 = None
+            if len(input)<=7:
+                input_valid = True
+                filepath1=input[0]
+                filepath2=input[3]
+                sheetname1=input[1]
+                sheetname2=input[4]
+                range1=input[2].split(':') if ':' in input[2] else None
+                range2=input[5].split(':') if ':' in input[5] else None
+                res1={}
+                output_feild = None
+                extension1=os.path.splitext(filepath1)[1] if(filepath1 !=None) else None
+                extension2=os.path.splitext(filepath2)[1] if(filepath2 !=None) else None
+            if (extension1==None or extension2==None) or not input_valid:
                 err_msg=ERROR_CODE_DICT['ERR_INVALID_INPUT']
                 log.error(err_msg)
                 logger.print_on_console(err_msg)
-                return status,methodoutput,res1,err_msg
+                return status,methodoutput,output_res,err_msg
+            if (range1==None or range2==None):
+                err_msg="Invalid Range Delimiter! Please provide valid range"
+                log.error(err_msg)
+                logger.print_on_console(err_msg)
+                return status,methodoutput,output_res,err_msg
             if(len(input)>6):
-                case=input[6]
-            else:
-                case=''
+                if(isinstance(input[6], str) and input[6].lower() == 'ignorecase'):
+                    case = input[6]
+                else:
+                    logger.print_on_console('Warning! : Case check input is invalid, Hence ignorecase has not been applied.')
 
             if(extension1=='.csv' and extension2=='.csv'):#both files are csv
                 col11 = " ".join(re.findall("[a-zA-Z]+", range1[0]))
@@ -2223,19 +2365,18 @@ class FileOperations:
             if(str(args[0].split(";")[0]).startswith("{") and str(args[0].split(";")[0]).endswith("}")):
                 out_path = self.DV.get_dynamic_value(args[0].split(";")[0])
                 dyn_var_opt = True
-                status = TEST_RESULT_PASS
-                methodoutput = TEST_RESULT_TRUE
                 if(out_path):
                     output_feild = out_path
             elif(str(args[0].split(";")[0]).startswith("_") and str(args[0].split(";")[0]).endswith("_")):
                 out_path=self.CV.get_constant_value(args[0])
                 con_var_opt = True
-                status = TEST_RESULT_PASS
-                methodoutput = TEST_RESULT_TRUE
                 if(out_path):
                     output_feild = out_path
             else:
                 output_feild = args[0].split(";")[0]
+            if res1:
+                status = TEST_RESULT_PASS
+                methodoutput = TEST_RESULT_TRUE
             if(output_feild):
                 file_extension,status_get_ext = self.__get_ext(output_feild)
                 sheet='selectiveCellCompare'
@@ -2302,11 +2443,12 @@ class FileOperations:
                     if(file_extension=='.csv' or file_extension=='.txt'):
                         flag1, err_msg = self.write_result_file(output_feild, res1, sheet)
 
-                    if(flag1==False):
+                    if flag1 is False:
                         log.error(err_msg)
                         logger.print_on_console(err_msg)
-
-                    if(flag1 or flag2):
+                        status=TEST_RESULT_FAIL
+                        methodoutput=TEST_RESULT_FALSE
+                    else:
                         log.info('Compared cells between the mentioned files')
                         logger.print_on_console('Compared cells between the mentioned files')
                         status = TEST_RESULT_PASS

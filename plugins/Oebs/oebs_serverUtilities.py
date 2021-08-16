@@ -20,7 +20,6 @@ import re
 global count
 count=''
 accessContext=''
-accessContextParent = ''
 access=''
 index=0
 k = 0
@@ -41,7 +40,7 @@ class Utilities:
     def swooptoelement(self,a,objecttofind,currentxpathtemp,i,p,windowname):
         queue = []
         active_parent = False
-        queue.append((p,a,i))
+        queue.append((p,a,i,0))
         identifiers = objecttofind.split(';')
         uniquepath = identifiers[0]
         name = identifiers[1]
@@ -61,11 +60,11 @@ class Utilities:
                 internal_frame_list.append(each_internal_frame.lstrip('internal frame[')[:-1])
         
         while len(queue) > 0:
-            xpath, acc, index = queue.pop(0)
+            xpath, acc, index, paneindex = queue.pop(0)
             elementObj = acc.getAccessibleContextInfo()
 
             if xpath == '':
-                if len(elementObj.name.strip()) == 0:
+                if len(elementObj.description.strip()) == 0:
                     if 'internal frame' in elementObj.role or 'frame' in elementObj.role:
                         path = elementObj.role
                     elif 'panel' in elementObj.role:
@@ -79,10 +78,10 @@ class Utilities:
                     elif 'panel' in elementObj.role:
                         path = elementObj.role + '[' + str(index) + ']'
                     else:
-                        path = elementObj.role + '[' + str(elementObj.name.strip()) + ']'
+                        path = elementObj.role + '[' + str(elementObj.description.strip()) + ']'
 
             else:
-                if len(elementObj.name.strip()) == 0:
+                if len(elementObj.description.strip()) == 0:
                     if 'internal frame' in elementObj.role:
                         path = xpath + '/' + elementObj.role
                     elif 'panel' in elementObj.role:
@@ -92,18 +91,15 @@ class Utilities:
 
                 else:
                     if 'internal frame' in elementObj.role:
-                        if elementObj.name.strip() not in internal_frame_list:
+                        if elementObj.description.strip() not in internal_frame_list:
                             continue
                         path = xpath + '/' + elementObj.role
                     elif 'panel' in elementObj.role:
                         path = xpath + '/' + elementObj.role + '[' + str(index) + ']'
                     else:
-                        path = xpath + '/' + elementObj.role  + '[' + str(elementObj.name.strip()) + ']'
-
+                        path = xpath + '/' + elementObj.role  + '[' + str(elementObj.description.strip()) + ']'
             if path == currentxpathtemp:
-                global accessContextParent
-                accessContextParent = acc
-                return active_parent
+                return active_parent, acc, paneindex == 0
 
             curr = currentxpathtemp.split('/')
             p = path.split('/')
@@ -112,27 +108,134 @@ class Utilities:
                 if 'active' in elementObj.states and windowname != elementObj.name:
                     active_parent = True
                 for index in range(elementObj.childrenCount):
-                    elementObj = acc.getAccessibleChildFromContext(index)
+                    element = acc.getAccessibleChildFromContext(index)
 
-                    elementcontext=elementObj.getAccessibleContextInfo()
+                    elementcontext=element.getAccessibleContextInfo()
                     if elementcontext.role == 'internal frame':
                         if 'active' in elementcontext.states:
-                            queue.append((path, elementObj, index))
+                            queue.append((path, element, index, index))
                         else:
                             hasinternal=0
                             children=elementcontext.childrenCount
                             for childrencount in range(int(children)):
-                                childobj=elementObj.getAccessibleChildFromContext(childrencount)
+                                childobj=element.getAccessibleChildFromContext(childrencount)
                                 childrencontext=childobj.getAccessibleContextInfo()
                                 if 'internal frame' in childrencontext.role:
                                     hasinternal=1
                                     break
                             if hasinternal ==1:
-                                queue.append((path, elementObj, index))
+                                queue.append((path, element, index, index))
                             else:
                                 index = index + 1
                     else:
-                        queue.append((path, elementObj, index))     
+                        if elementcontext.role == 'scroll pane':
+                            queue.append((path, element, index, index))
+                        else:
+                            queue.append((path, element, index, paneindex))   
+            elif len(queue) == 0:
+                logger.print_on_console("Object not found in provided path, searching in alternate scroll panes for the object")
+                pane_occurances = [m.start() for m in re.finditer('scroll pane', currentxpathtemp)]
+                variable_path = currentxpathtemp
+                for i in range(len(pane_occurances) - 1, -1, -1):
+                    fixed_path = variable_path[0:pane_occurances[i]]
+                    skip_over = variable_path[pane_occurances[i]:len(variable_path)].find('/') + pane_occurances[i]
+                    variable_path = fixed_path + 'scroll pane' + variable_path[skip_over:len(variable_path)]
+                    log.info('Searching for object in alternate xpath: ' + variable_path)
+                    active_parent, acc, visible = self.iterate_over_other_panes(a,objecttofind,variable_path,0,'',windowname, pane_occurances[i])
+                    if acc and str(acc) != '':
+                        return active_parent, acc, visible
+                log.info(ERROR_CODE_DICT['err_alternate_path'])
+                logger.print_on_console(ERROR_CODE_DICT['err_alternate_path'])
+                return False, '', False
+
+
+    def iterate_over_other_panes(self, a, objecttofind, currentxpathtemp, i, p, windowname, location):
+        queue = []
+        active_parent = False
+        queue.append((p,a,i,0))
+        identifiers = objecttofind.split(';')
+        uniquepath = identifiers[0]
+        internal_frame_list = []
+        for each_internal_frame in uniquepath.split('/'):
+            if each_internal_frame.find('internal frame')!=-1:
+                internal_frame_list.append(each_internal_frame.lstrip('internal frame[')[:-1])
+        
+        while len(queue) > 0:
+            xpath, acc, index, paneindex = queue.pop(0)
+            elementObj = acc.getAccessibleContextInfo()
+
+            if xpath == '':
+                if len(elementObj.description.strip()) == 0:
+                    if 'internal frame' in elementObj.role or 'frame' in elementObj.role or ('scroll pane' in elementObj.role and len(path) + 1 >= location):
+                        path = elementObj.role
+                    elif 'panel' in elementObj.role:
+                        path = elementObj.role + '[' + str(index) + ']'
+                    else:
+                        path = elementObj.role + '[' + str(index) + ']'
+
+                else:
+                    if 'internal frame' in elementObj.role or 'frame' in elementObj.role or ('scroll pane' in elementObj.role and len(path) + 1 >= location):
+                        path = elementObj.role
+                    elif 'panel' in elementObj.role:
+                        path = elementObj.role + '[' + str(index) + ']'
+                    else:
+                        path = elementObj.role + '[' + str(elementObj.description.strip()) + ']'
+            else:
+                if len(elementObj.description.strip()) == 0:
+                    if 'internal frame' in elementObj.role or ('scroll pane' in elementObj.role and len(path) + 1>= location):
+                        path = xpath + '/' + elementObj.role
+                    elif 'panel' in elementObj.role:
+                        path = xpath + '/' + elementObj.role + '[' + str(index) + ']'
+                    else:
+                        path = xpath + '/' + elementObj.role  + '[' + str(index) + ']'
+                else:
+                    if 'internal frame' in elementObj.role:
+                        if elementObj.description.strip() not in internal_frame_list:
+                            continue
+                        path = xpath + '/' + elementObj.role
+                    elif 'scroll pane' in elementObj.role and len(path) + 1 >= location :
+                        path = xpath + '/' + elementObj.role
+                    elif 'panel' in elementObj.role:
+                        path = xpath + '/' + elementObj.role + '[' + str(index) + ']'
+                    else:
+                        path = xpath + '/' + elementObj.role  + '[' + str(elementObj.description.strip()) + ']'
+
+            if path == currentxpathtemp:
+                return active_parent, acc, paneindex == 0
+
+            curr = currentxpathtemp.split('/')
+            p = path.split('/')
+            index = len(p) - 1
+            if len(curr) > index and curr[index] == p[index]:
+                if 'active' in elementObj.states and windowname != elementObj.name:
+                    active_parent = True
+                for index in range(elementObj.childrenCount):
+                    element = acc.getAccessibleChildFromContext(index)
+
+                    elementcontext=element.getAccessibleContextInfo()
+                    if elementcontext.role == 'internal frame':
+                        if 'active' in elementcontext.states:
+                            queue.append((path, element, index, paneindex))
+                        else:
+                            hasinternal=0
+                            children=elementcontext.childrenCount
+                            for childrencount in range(int(children)):
+                                childobj=element.getAccessibleChildFromContext(childrencount)
+                                childrencontext=childobj.getAccessibleContextInfo()
+                                if 'internal frame' in childrencontext.role:
+                                    hasinternal=1
+                                    break
+                            if hasinternal ==1:
+                                queue.append((path, element, index , paneindex))
+                            else:
+                                index = index + 1
+                    else:
+                        if elementcontext.role == 'scroll pane':
+                            queue.append((path, element, index, index))
+                        else:
+                            queue.append((path, element, index, paneindex))
+            elif len(queue) == 0:
+                return active_parent, '', False 
     
     def methodtofillmap(self,acc,xpath,i):
         global  accessContext
@@ -202,9 +305,7 @@ class Utilities:
 
     def object_generator(self,applicationname,locator,keyword,inputs,outputs):
         global accessContext
-        global ELEMENT_FOUND
-        ELEMENT_FOUND=False
-        active_parent = None
+        accessContext = ''
         #OBJECTLOCATION for the object is sent from the user
         del oebs_key_objects.keyword_input[:]
         oebs_key_objects.xpath = locator
@@ -218,19 +319,20 @@ class Utilities:
         if ';' in uniquepath:
             requiredxpath = uniquepath.split(';')
             parentxpathtemp = ''
-            parentxpathtemp = requiredxpath[5]
+            absolute_path = requiredxpath[0]
 
             regularexp = re.compile('(frame(.*?|\s)*[\]]+)')
-            newxpath = regularexp.findall(parentxpathtemp)
+            newxpath = regularexp.findall(absolute_path)
 
             newlist2=[]
             for i in range(len(newxpath)):
                 newlist2.append(newxpath[i][0])
 
             for i in range(len(newlist2)):
-                parentxpathtemp=parentxpathtemp.replace(newlist2[i],'frame')
+                absolute_path = absolute_path.replace(newlist2[i],'frame')
 
-            active_parent = self.swooptoelement(oebs_api.JABContext(hwnd),oebs_key_objects.xpath,parentxpathtemp,0,'', applicationname)
+            active_parent, accessContextParent, visible = self.swooptoelement(oebs_api.JABContext(hwnd), oebs_key_objects.xpath, absolute_path ,0 ,'', applicationname)
+            accessContextParent = accessContextParent or ''
             if active_parent is None:
                 active_parent = False
             self.methodtofillmap(oebs_api.JABContext(hwnd),'',0)
@@ -238,20 +340,11 @@ class Utilities:
             identifiers = oebs_key_objects.xpath.split(';')
             uniquepath = identifiers[0]
             name = identifiers[1]
-            indexinParent = identifiers[2]
-            childrencount = identifiers[3]
-            parentname = identifiers[4]
-            parxpath = identifiers[5]
-            parentchildcount = identifiers[6]
-            parentindex = identifiers[7]
-            parenttag = identifiers[8]
-            childtag = identifiers[9]
             description=''
             try:
                 description=identifiers[10]
             except Exception:
                 description=''
-            global accessContextParent
             retacc = accessContextParent
             keytocompare=name+';'+description
             if(keytocompare in objectDictWithNameDesc):
@@ -267,78 +360,10 @@ class Utilities:
                     xpathneeded=xpathneeded.replace(newlist2[i],'frame')
                 if(accessContextParent):
                     accessContextParent.releaseJavaObject()
-                self.swooptoelement(oebs_api.JABContext(hwnd),oebs_key_objects.xpath,xpathneeded,0,'', applicationname)
-                accessContext=accessContextParent
+                active_parent, accessContextParent, visible = self.swooptoelement(oebs_api.JABContext(hwnd),oebs_key_objects.xpath,xpathneeded,0,'', applicationname)
                 flag='true'
 
-            elif (accessContextParent):
-                tema = retacc.getAccessibleContextInfo()
-                if retacc is not None:
-                    parentInfo = retacc.getAccessibleContextInfo()
-                    accarrname = []
-                    accarrdesc = []
-
-                    for index in range(parentInfo.childrenCount):
-                        elementObj = retacc.getAccessibleChildFromContext(index)
-                        childInfo = elementObj.getAccessibleContextInfo()
-                        if len(childInfo.name) > 0 :
-                            if ((name == str(childInfo.name).strip()) and (childtag == str(childInfo.role))):
-                                accessContext = elementObj
-                                accarrname.append(elementObj)
-
-                    if(len(accarrname) > 1 or len(accarrname) == 0):
-                        for index in range(parentInfo.childrenCount):
-                            elementObj = retacc.getAccessibleChildFromContext(index)
-                            childInfo = elementObj.getAccessibleContextInfo()
-                            if len(description) != 0 and len(childInfo.description) > 0:
-                                if (description == str(childInfo.description).strip() and childtag == str(childInfo.role)):
-                                    accessContext=elementObj
-                                    accarrdesc.append(elementObj)
-
-                        if(len(accarrdesc) > 1 or len(accarrdesc) == 0):
-                            if( int(parentchildcount) < int(parentInfo.childrenCount)):
-                                for index in range(parentInfo.childrenCount):
-                                    elementObj = retacc.getAccessibleChildFromContext(index)
-                                    childInfo = elementObj.getAccessibleContextInfo()
-                                    if('focused' in childInfo.states):
-                                        firstelecontext=retacc.getAccessibleChildFromContext(0)
-                                        firsteleinfo=firstelecontext.getAccessibleContextInfo()
-                                        if((firsteleinfo.role == 'text') and (firsteleinfo.childrenCount == 1)):
-                                            firstelechildcontext=firstelecontext.getAccessibleChildFromContext(0)
-                                            firstelechildinfo=firstelechildcontext.getAccessibleContextInfo()
-                                            if(firstelechildinfo.role == 'push button'):
-                                                indexinParent=int(indexinParent)+1
-                                                for index in range(parentInfo.childrenCount):
-                                                    elementObj = retacc.getAccessibleChildFromContext(index)
-                                                    childInfo = elementObj.getAccessibleContextInfo()
-                                                    if(str(indexinParent) == str(childInfo.indexInParent).strip() and childtag == str(childInfo.role)):
-                                                        accessContext=elementObj
-                                                        flag = 'true'
-                                                        break
-                                    elif(not('internal frame' in parentxpathtemp)):
-                                         for index in range(parentInfo.childrenCount):
-                                            elementObj = retacc.getAccessibleChildFromContext(index)
-                                            childInfo = elementObj.getAccessibleContextInfo()
-                                            if(str(indexinParent) == str(childInfo.indexInParent).strip() and childtag == str(childInfo.role)):
-                                                accessContext=elementObj
-                                                flag = 'true'
-                                                break
-                            else:
-                                for index in range(parentInfo.childrenCount):
-                                    elementObj = retacc.getAccessibleChildFromContext(index)
-                                    childInfo = elementObj.getAccessibleContextInfo()
-                                    if(str(indexinParent) == str(childInfo.indexInParent).strip() and childtag == str(childInfo.role)):
-                                        accessContext=elementObj
-                                        flag = 'true'
-                                        break
-                        else:
-                            accessContext = accarrdesc[0]
-                            flag = 'true'
-                    else:
-                        accessContext = accarrname[0]
-                        flag = 'true'
-
-
+        accessContext=accessContextParent
         #keyword is sent from the user
         oebs_key_objects.keyword = keyword
         #input sent from the user
@@ -350,176 +375,92 @@ class Utilities:
         #output thats to be sent from the server to client
         oebs_key_objects.keyword_output = outputs.split(';')
 
-        if flag == 'true' :
-             ELEMENT_FOUND=True
-             return accessContext
+        if str(accessContextParent) != '' :
+            return accessContextParent, visible
         else :
-            ELEMENT_FOUND=False
-            return 'fail'
+            return 'fail', False
 
     def object_generator_test(self,applicationname,locator,keyword,inputs,outputs):
-            global accessContext
-            global ELEMENT_FOUND
-            ELEMENT_FOUND=False
-            active_parent = None
-            #OBJECTLOCATION for the object is sent from the user
-            del oebs_key_objects.keyword_input[:]
-            oebs_key_objects.xpath = locator
-            #Application name is sent from the user
-            oebs_key_objects.applicationname = applicationname
-            utils_obj=oebs_utils.Utils()
-            isjavares, hwnd = utils_obj.isjavawindow(oebs_key_objects.applicationname)
-            #method enables to move to perticular object and fetches its Contexts
-            uniquepath=oebs_key_objects.xpath
-            flag = 'false'
-            if ';' in uniquepath:
-                requiredxpath = uniquepath.split(';')
-                parentxpathtemp = ''
-                parentxpathtemp = requiredxpath[5]
 
+        active_parent = None
+        #OBJECTLOCATION for the object is sent from the user
+        del oebs_key_objects.keyword_input[:]
+        oebs_key_objects.xpath = locator
+        #Application name is sent from the user
+        oebs_key_objects.applicationname = applicationname
+        utils_obj=oebs_utils.Utils()
+        isjavares, hwnd = utils_obj.isjavawindow(oebs_key_objects.applicationname)
+        #method enables to move to perticular object and fetches its Contexts
+        uniquepath=oebs_key_objects.xpath
+        flag = 'false'
+        if ';' in uniquepath:
+            requiredxpath = uniquepath.split(';')
+            parentxpathtemp = ''
+            absolute_path = requiredxpath[0]
+
+            regularexp = re.compile('(frame(.*?|\s)*[\]]+)')
+            newxpath = regularexp.findall(absolute_path)
+
+            newlist2=[]
+            for i in range(len(newxpath)):
+                newlist2.append(newxpath[i][0])
+
+            for i in range(len(newlist2)):
+                absolute_path = absolute_path.replace(newlist2[i],'frame')
+
+            active_parent, accessContextParent, visible = self.swooptoelement(oebs_api.JABContext(hwnd), oebs_key_objects.xpath, absolute_path ,0 ,'', applicationname)
+            accessContextParent = accessContextParent or ''
+            if active_parent is None:
+                active_parent = False
+            self.methodtofillmap(oebs_api.JABContext(hwnd),'',0)
+
+            identifiers = oebs_key_objects.xpath.split(';')
+            uniquepath = identifiers[0]
+            name = identifiers[1]
+            description=''
+            try:
+                description=identifiers[10]
+            except Exception:
+                description=''
+            retacc = accessContextParent
+            keytocompare=name+';'+description
+            if(keytocompare in objectDictWithNameDesc):
+                xpathneeded=objectDictWithNameDesc.get(keytocompare)
                 regularexp = re.compile('(frame(.*?|\s)*[\]]+)')
-                newxpath = regularexp.findall(parentxpathtemp)
+                newxpath = regularexp.findall(xpathneeded)
 
                 newlist2=[]
                 for i in range(len(newxpath)):
                     newlist2.append(newxpath[i][0])
 
                 for i in range(len(newlist2)):
-                    parentxpathtemp=parentxpathtemp.replace(newlist2[i],'frame')
+                    xpathneeded=xpathneeded.replace(newlist2[i],'frame')
+                if(accessContextParent):
+                    accessContextParent.releaseJavaObject()
+                active_parent, accessContextParent, visible = self.swooptoelement(oebs_api.JABContext(hwnd),oebs_key_objects.xpath,xpathneeded,0,'', applicationname)
 
-                active_parent = self.swooptoelement(oebs_api.JABContext(hwnd),oebs_key_objects.xpath,parentxpathtemp,0,'', applicationname)
-                if active_parent is None:
-                    active_parent = False
-                self.methodtofillmap(oebs_api.JABContext(hwnd),'',0)
+        accessContext=accessContextParent
+        #keyword is sent from the user
+        oebs_key_objects.keyword = keyword
+        #input sent from the user
+        inputs = ast.literal_eval(str(inputs))
+        inputs = [n for n in inputs]
 
-                identifiers = oebs_key_objects.xpath.split(';')
-                uniquepath = identifiers[0]
-                name = identifiers[1]
-                indexinParent = identifiers[2]
-                childrencount = identifiers[3]
-                parentname = identifiers[4]
-                parxpath = identifiers[5]
-                parentchildcount = identifiers[6]
-                parentindex = identifiers[7]
-                parenttag = identifiers[8]
-                childtag = identifiers[9]
-                description=''
-                try:
-                    description=identifiers[10]
-                except Exception:
-                    description=''
-                global accessContextParent
-                retacc = accessContextParent
-                keytocompare=name+';'+description
-                if(keytocompare in objectDictWithNameDesc):
-                    xpathneeded=objectDictWithNameDesc.get(keytocompare)
-                    regularexp = re.compile('(frame(.*?|\s)*[\]]+)')
-                    newxpath = regularexp.findall(xpathneeded)
+        for index in range(len(inputs)):
+            oebs_key_objects.keyword_input.append(inputs[index])
+        #output thats to be sent from the server to client
+        oebs_key_objects.keyword_output = outputs.split(';')
 
-                    newlist2=[]
-                    for i in range(len(newxpath)):
-                        newlist2.append(newxpath[i][0])
-
-                    for i in range(len(newlist2)):
-                        xpathneeded=xpathneeded.replace(newlist2[i],'frame')
-                    if(accessContextParent):
-                        accessContextParent.releaseJavaObject()
-                    self.swooptoelement(oebs_api.JABContext(hwnd),oebs_key_objects.xpath,xpathneeded,0,'', applicationname)
-                    accessContext=accessContextParent
-                    flag='true'
-
-                elif (accessContextParent):
-                    tema = retacc.getAccessibleContextInfo()
-                    if retacc is not None:
-                        parentInfo = retacc.getAccessibleContextInfo()
-                        accarrname = []
-                        accarrdesc = []
-
-                        for index in range(parentInfo.childrenCount):
-                            elementObj = retacc.getAccessibleChildFromContext(index)
-                            childInfo = elementObj.getAccessibleContextInfo()
-                            if len(childInfo.name) > 0 :
-                                if ((name == str(childInfo.name).strip()) and (childtag == str(childInfo.role))):
-                                    accessContext = elementObj
-                                    accarrname.append(elementObj)
-
-                        if(len(accarrname) > 1 or len(accarrname) == 0):
-                            for index in range(parentInfo.childrenCount):
-                                elementObj = retacc.getAccessibleChildFromContext(index)
-                                childInfo = elementObj.getAccessibleContextInfo()
-                                if len(description) != 0 and len(childInfo.description) > 0:
-                                    if (description == str(childInfo.description).strip() and childtag == str(childInfo.role)):
-                                        accessContext=elementObj
-                                        accarrdesc.append(elementObj)
-
-                            if(len(accarrdesc) > 1 or len(accarrdesc) == 0):
-                                if( int(parentchildcount) < int(parentInfo.childrenCount)):
-                                    for index in range(parentInfo.childrenCount):
-                                        elementObj = retacc.getAccessibleChildFromContext(index)
-                                        childInfo = elementObj.getAccessibleContextInfo()
-                                        if('focused' in childInfo.states):
-                                            firstelecontext=retacc.getAccessibleChildFromContext(0)
-                                            firsteleinfo=firstelecontext.getAccessibleContextInfo()
-                                            if((firsteleinfo.role == 'text') and (firsteleinfo.childrenCount == 1)):
-                                                firstelechildcontext=firstelecontext.getAccessibleChildFromContext(0)
-                                                firstelechildinfo=firstelechildcontext.getAccessibleContextInfo()
-                                                if(firstelechildinfo.role == 'push button'):
-                                                    indexinParent=int(indexinParent)+1
-                                                    for index in range(parentInfo.childrenCount):
-                                                        elementObj = retacc.getAccessibleChildFromContext(index)
-                                                        childInfo = elementObj.getAccessibleContextInfo()
-                                                        if(str(indexinParent) == str(childInfo.indexInParent).strip() and childtag == str(childInfo.role)):
-                                                            accessContext=elementObj
-                                                            flag = 'true'
-                                                            break
-                                        elif(not('internal frame' in parentxpathtemp)):
-                                            for index in range(parentInfo.childrenCount):
-                                                elementObj = retacc.getAccessibleChildFromContext(index)
-                                                childInfo = elementObj.getAccessibleContextInfo()
-                                                if(str(indexinParent) == str(childInfo.indexInParent).strip() and childtag == str(childInfo.role)):
-                                                    accessContext=elementObj
-                                                    flag = 'true'
-                                                    break
-                                else:
-                                    for index in range(parentInfo.childrenCount):
-                                        elementObj = retacc.getAccessibleChildFromContext(index)
-                                        childInfo = elementObj.getAccessibleContextInfo()
-                                        if(str(indexinParent) == str(childInfo.indexInParent).strip() and childtag == str(childInfo.role)):
-                                            accessContext=elementObj
-                                            flag = 'true'
-                                            break
-                            else:
-                                accessContext = accarrdesc[0]
-                                flag = 'true'
-                        else:
-                            accessContext = accarrname[0]
-                            flag = 'true'
-
-
-            #keyword is sent from the user
-            oebs_key_objects.keyword = keyword
-            #input sent from the user
-            inputs = ast.literal_eval(str(inputs))
-            inputs = [n for n in inputs]
-
-            for index in range(len(inputs)):
-                oebs_key_objects.keyword_input.append(inputs[index])
-            #output thats to be sent from the server to client
-            oebs_key_objects.keyword_output = outputs.split(';')
-
-            if flag == 'true' :
-                ELEMENT_FOUND=True
-                return accessContext, active_parent
-            else :
-                ELEMENT_FOUND=False
-                return 'fail', active_parent
+        if str(accessContextParent) != '' :
+            return accessContextParent, active_parent, visible
+        else :
+            return 'fail', False, False
 
 
     def getsize(self,xpath,windowname):
         #object is identified using normal object identification
-        self.object_generator(windowname,xpath,'',[],'')
+        accessContext, visible = self.object_generator(windowname,xpath,'',[],'')
         #context is taken from global value
-        global accessContext
         acc=accessContext
         #fetching the context
         curaccinfo=acc.getAccessibleContextInfo()

@@ -40,14 +40,18 @@ class ElementKeywords:
             text = webelement.text
             if text is None or text is '':
                 text=webelement.get_attribute('value')
+                local_eo.log.debug('Element text found by Attribute value')
             if text is None or text is '':
                 text=webelement.get_attribute('name')
+                local_eo.log.debug('Element text found by Attribute name')
             if text is None or text is '':
                 text=self.__get_tooltip(webelement)
             if text is None or text is '':
                 text=webelement.get_attribute('placeholder')
+                local_eo.log.debug('Element text found by Attribute placeholder')
             if text is None or text is '':
                 text=webelement.get_attribute('href')
+                local_eo.log.debug('Element text found by Attribute href')
         except Exception as e:
             local_eo.log.error(e)
             logger.print_on_console(e)
@@ -57,8 +61,10 @@ class ElementKeywords:
         text=''
         try:
             text = webelement.get_attribute('title')
-            if text =='':
+            if text : local_eo.log.debug('Element text found by tooltip-Attribute title')
+            if text is None or text is '':
                 text = webelement.get_attribute('data-original-title')
+                local_eo.log.debug('Element text found by tooltip-Attribute data-original-title')
         except Exception as e:
             local_eo.log.error(e)
             logger.print_on_console(e)
@@ -116,13 +122,18 @@ class ElementKeywords:
         if webelement is not None:
             try:
                 input=input[0]
+                if input.find('\xa0')!=-1:
+                    input = input.replace("\xa0"," ")
                 if input is not None:
                     util = UtilWebKeywords()
                     if not(util.is_visible(webelement)) and configvalues['ignoreVisibilityCheck'].strip().lower() == "yes":
                         text = browser_Keywords.local_bk.driver_obj.execute_script("""return arguments[0].innerText""",webelement)
                     else:
                         text = webelement.get_attribute('innerText')
-                        # text=self.__getelement_text(webelement)
+                        if text is None or text is '': 
+                            local_eo.log.debug('Element Attribute not found,fetching with __getelement_text function')
+                            text=self.__getelement_text(webelement)
+                    if text.find('\xa0')!=-1: text = text.replace("\xa0"," ")
                     if text==input:
                        logger.print_on_console('Element Text matched')
                        local_eo.log.info('Element Text matched')
@@ -204,11 +215,11 @@ class ElementKeywords:
                             yoffset=browser_Keywords.local_bk.driver_obj.execute_script(MOUSE_HOVER_FF)
                             obj.mouse_move(int(location.get('x')+9),int(location.get('y')+yoffset))
                         else:
-                            obj.enumwindows()
-                            if len(obj.rect)>1:
+                            offset = browser_Keywords.local_bk.driver_obj.execute_script("return window.outerHeight - window.innerHeight;")
+                            if offset>0:
                                 height=int(size.get('height')/2)
                                 width=int(size.get('width')/2)
-                                obj.mouse_move(int(location.get('x')+width),int(location.get('y')+obj.rect[1]+height))
+                                obj.mouse_move(int(location.get('x')+width),int(location.get('y')+offset+height))
                             else:
                                 err_msg='Element to be dragged should be on top'
                                 local_eo.log.error=err_msg
@@ -412,7 +423,6 @@ class ElementKeywords:
                     logger.print_on_console(INVALID_INPUT)
             except Exception as e:
                 local_eo.log.error(e)
-
                 logger.print_on_console(e)
                 err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         #return status and methodoutput
@@ -441,12 +451,15 @@ class ElementKeywords:
                 status=TEST_RESULT_PASS
                 methodoutput=TEST_RESULT_TRUE
         except TimeoutException as e:
-            logger.print_on_console('Delay timeout exceeded')
-            local_eo.log.error(e,exc_info=True)
-            err_msg='Delay timeout exceeded'
+            err_msg=ERROR_CODE_DICT['ERR_TIMEOUT_EXCEEDED']
+            logger.print_on_console(err_msg)
+            local_eo.log.error(err_msg)
+            local_eo.log.debug(e,exc_info=True)
         except Exception as e:
-            local_eo.log.error(e,exc_info=True)
             err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+            local_eo.log.error(err_msg)
+            logger.print_on_console(err_msg)
+            local_eo.log.debug(e,exc_info=True)
         return status,methodoutput,output,err_msg
 
     def drop_file(self,webelement,inputs,*args):

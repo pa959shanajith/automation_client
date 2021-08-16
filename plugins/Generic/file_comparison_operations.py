@@ -117,8 +117,6 @@ class TextFile:
             err_msg=generic_constants.ERR_MSG1+'Clearing Text content'+generic_constants.ERR_MSG2
             log.error(e)
         log.info('Status is '+str(status))
-        if err_msg!=None:
-            logger.print_on_console(err_msg)
         return status,err_msg
 
 
@@ -375,8 +373,6 @@ class XML:
             err_msg=generic_constants.ERR_MSG1+'Clearing XML '+generic_constants.ERR_MSG2
             log.error(e)
         log.info('Status is '+str(status))
-        if err_msg!=None:
-            logger.print_on_console(err_msg)
         return status,err_msg
 
 class JSON:
