@@ -1004,7 +1004,6 @@ class FileOperations:
         """
         Tflag= False
         try:
-
             status=TEST_RESULT_FAIL
             methodoutput=TEST_RESULT_FALSE
             linenumbers=None
@@ -1018,6 +1017,9 @@ class FileOperations:
                     result=self.verify_file_exists(params[0],'')
                     if result[1]==TEST_RESULT_TRUE:
                         file_ext,res=self.__get_ext(params[0])
+                        if file_ext == '.xlsx' or file_ext=='.xls':
+                            sheet_name=content
+                            data=args[0]
                         if res == True:
                             res,linenumbers,err_msg= self.dict[file_ext+'_get_line_number'](*params)
         ##                    logger.print_on_console(linenumbers)
@@ -1080,8 +1082,8 @@ class FileOperations:
                 for src, dest in list(self.cp1252.items()):
                     if src in content:
                         content = content.replace(src, dest)
-                content = content.encode('raw_unicode_escape')
-                params=self.__split(input_path,content,*args)
+                params=self.__split(input_path,content,*args)        
+                content = params[-1].encode('raw_unicode_escape')
                 result=self.verify_file_exists(params[0],'')
                 if result[1]==TEST_RESULT_TRUE:
                     file_ext,res=self.__get_ext(params[0])
@@ -1093,8 +1095,11 @@ class FileOperations:
                             methodoutput=TEST_RESULT_TRUE
                             Tflag=True
                         else:
-                            content=data.encode('cp1252')
                             params=self.__split(input_path,content,*args)
+                            content = data.encode('cp1252')
+                            if file_ext=='.xlsx' or file_ext=='.xls':
+                                params[1] = sheet_name
+                            params[-1]=content
                             result=self.verify_file_exists(params[0],'')
                             if result[1]==TEST_RESULT_TRUE:
                                 file_ext,res=self.__get_ext(params[0])
@@ -1105,6 +1110,9 @@ class FileOperations:
                                         status=TEST_RESULT_PASS
                                         methodoutput=TEST_RESULT_TRUE
                                         Tflag=True
+                                    else:
+                                        err_msg = ERROR_CODE_DICT["ERR_INPUT_NOT_PRESENT"]
+                                        linenumbers = OUTPUT_CONSTANT
                             else:
                                 err_msg=result[3]
                 else:
