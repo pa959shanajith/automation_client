@@ -1543,15 +1543,11 @@ class Singleton_DriverUtil():
                     msoptions = webdriver.EdgeChromiumOptions()
                     msoptions.add_argument('start-maximized')
                     msoptions.add_experimental_option('useAutomationExtension', False)
-                    # msoptions.add_experimental_option("excludeSwitches",["enable-automation"])
+                    msoptions.add_experimental_option("excludeSwitches",["enable-automation"])
                     if headless_mode:
                         WINDOW_SIZE = "1350,650"
                         msoptions.add_argument("--window-size=%s" % WINDOW_SIZE)
                         msoptions.headless = True
-                    # if configvalues['extn_enabled'].lower()=='yes' and os.path.exists(webconstants.EXTENSION_PATH):
-                    #     msoptions.add_extension(webconstants.EXTENSION_PATH)
-                    # else:
-                    #     msoptions.add_argument('--disable-extensions')
                     extension_path = configvalues['chrome_extnpath']
                     extns=glob.glob(webconstants.EXTENSIONS_PATH+os.sep+"*.crx")
                     if extension_path.lower() != 'default':
