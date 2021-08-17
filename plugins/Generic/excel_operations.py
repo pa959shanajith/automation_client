@@ -603,7 +603,7 @@ class ExcelXLS:
         line_number=[]
         err_msg=None
         try:
-            logger.print_on_console(generic_constants.INPUT_IS+input_path+' '+sheetname)
+            # logger.print_on_console(generic_constants.INPUT_IS+input_path+' '+sheetname)
             log.info(generic_constants.INPUT_IS+input_path+' '+sheetname)
             book = open_workbook(input_path)
             sheet = book.sheet_by_name(sheetname)
@@ -614,9 +614,9 @@ class ExcelXLS:
                         i = i+1
                         line_number.append(i)
                         status=True
-            log.info(line_number)
-            logger.print_on_console('Line numbers:')
-            logger.print_on_console(line_number)
+            # log.info(line_number)
+            # logger.print_on_console('Line numbers:')
+            # logger.print_on_console(line_number)
         except Exception as e:
            err_msg='Error getting line number in .xls'
            log.error(e)
@@ -1291,7 +1291,7 @@ class ExcelXLSX:
         status=False
         line_number=None
         err_msg=None
-        logger.print_on_console(generic_constants.INPUT_IS+input_path+' '+sheetname)
+        log.info(generic_constants.INPUT_IS+input_path+' '+sheetname)
         try:
             book = load_workbook(input_path,data_only=True)
             sheet = book.get_sheet_by_name(sheetname)
