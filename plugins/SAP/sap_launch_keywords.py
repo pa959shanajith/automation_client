@@ -60,23 +60,18 @@ class Launch_Keywords():
     def getSessWindow(self, *args):
         ses, wnd = None, None
         try:
-            #time.sleep(2)
             SapGui = self.uk.getSapObject()
             scrapingObj = Scrape()
             wnd = scrapingObj.getWindow(SapGui)
-            wndId =  wnd.__getattr__('id')
-            i = wndId.index('wnd')
-            wndNumber = wndId[i+4]
-            j = wndId.index('ses')
-            sesId = wndId[j:j+6]
-            ses = SapGui.FindByid(str(sesId))
+            latest_conn = list(SapGui.children)[-1] #getting latest connection
+            ses = list(latest_conn.children)[-1] #getting lastest session
         except Exception as e:
             log.error( sap_constants.NO_INSTANCE_OPEN_ERROR, e )
             logger.print_on_console( sap_constants.NO_INSTANCE_OPEN_ERROR )
         return ses, wnd
 
-    def close_modal_window(self, *args):
-        """Closes the popup/ModalWindow"""
+    def close_window(self, *args):
+        """Closes the Main/Dialog Window"""
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
         err_msg  = None
@@ -85,12 +80,12 @@ class Launch_Keywords():
             ses, wnd = self.getSessWindow()
             if ( ses and wnd ):
                 wndId =  wnd.__getattr__('id')
-                if( ses.FindById(wndId).type == "GuiModalWindow" ):
+                if( ses.FindById(wndId).type == "GuiModalWindow" or "GuiMainWindow" ):
                     ses.FindById(wndId).Close()
                     status = sap_constants.TEST_RESULT_PASS
                     result = sap_constants.TEST_RESULT_TRUE
                 else:
-                    err_msg = 'Element is not GuiModalWindow type'
+                    err_msg = 'Element is not GuiModalWindow or GuiMainWindow type'
             else:
                 err_msg = sap_constants.ELELMENT_NOT_FOUND
             if ( err_msg ):
@@ -99,12 +94,12 @@ class Launch_Keywords():
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
             log.error( err_msg )
-            logger.print_on_console( "Error occured in Close Modal Window" )
+            logger.print_on_console( "Error occured in Close Window" )
         return status, result, value, err_msg
 
 
-    def maximize_modal_window(self, *args):
-        """Raximizes the popup/ModalWindow"""
+    def maximize_window(self, *args):
+        """Maximizes the Main/Dialog Window"""
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
         err_msg  = None
@@ -113,12 +108,12 @@ class Launch_Keywords():
             ses, wnd = self.getSessWindow()
             if ( ses and wnd ):
                 wndId =  wnd.__getattr__('id')
-                if( ses.FindById(wndId).type == "GuiModalWindow" ):
+                if( ses.FindById(wndId).type == "GuiModalWindow" or "GuiMainWindow"):
                     ses.FindById(wndId).Maximize()
                     status = sap_constants.TEST_RESULT_PASS
                     result = sap_constants.TEST_RESULT_TRUE
                 else:
-                    err_msg = 'Element is not GuiModalWindow type'
+                    err_msg = 'Element is not GuiModalWindow or GuiMainWindow type'
             else:
                 err_msg = sap_constants.ELELMENT_NOT_FOUND
             if ( err_msg ):
@@ -127,11 +122,11 @@ class Launch_Keywords():
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
             log.error( err_msg )
-            logger.print_on_console( "Error occured in Maximize Modal Window" )
+            logger.print_on_console( "Error occured in Maximize Window" )
         return status, result, value, err_msg
 
-    def restore_modal_window(self, *args):
-        """Restores the popup/ModalWindow"""
+    def minimize_window(self, *args):
+        """Minimizes the SAP Main/Dialog Window"""
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
         err_msg  = None
@@ -140,12 +135,12 @@ class Launch_Keywords():
             ses, wnd = self.getSessWindow()
             if ( ses and wnd ):
                 wndId =  wnd.__getattr__('id')
-                if( ses.FindById(wndId).type == "GuiModalWindow" ):
-                    ses.FindById(wndId).Restore()
+                if( ses.FindById(wndId).type == "GuiModalWindow" or "GuiMainWindow" ):
+                    ses.FindById(wndId).Iconify()
                     status = sap_constants.TEST_RESULT_PASS
                     result = sap_constants.TEST_RESULT_TRUE
                 else:
-                    err_msg = 'Element is not GuiModalWindow type'
+                    err_msg = 'Element is not GuiModalWindow or GuiMainWindow type'
             else:
                 err_msg = sap_constants.ELELMENT_NOT_FOUND
             if ( err_msg ):
@@ -154,7 +149,34 @@ class Launch_Keywords():
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
             log.error( err_msg )
-            logger.print_on_console( "Error occured in Restore Modal Window" )
+            logger.print_on_console( "Error occured in Minimize Window" )
+        return status, result, value, err_msg
+
+    def restore_window(self, *args):
+        """Restores the Main/Dialog Window"""
+        status = sap_constants.TEST_RESULT_FAIL
+        result = sap_constants.TEST_RESULT_FALSE
+        err_msg  = None
+        value = OUTPUT_CONSTANT
+        try:
+            ses, wnd = self.getSessWindow()
+            if ( ses and wnd ):
+                wndId =  wnd.__getattr__('id')
+                if( ses.FindById(wndId).type == "GuiModalWindow" or "GuiMainWindow"):
+                    ses.FindById(wndId).Restore()
+                    status = sap_constants.TEST_RESULT_PASS
+                    result = sap_constants.TEST_RESULT_TRUE
+                else:
+                    err_msg = 'Element is not GuiModalWindow or GuiMainWindow type'
+            else:
+                err_msg = sap_constants.ELELMENT_NOT_FOUND
+            if ( err_msg ):
+                log.info( err_msg )
+                logger.print_on_console( err_msg )
+        except Exception as e:
+            err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
+            log.error( err_msg )
+            logger.print_on_console( "Error occured in Restore Window" )
         return status, result, value, err_msg
 
     def getWindowName(self, *args):
@@ -469,6 +491,7 @@ class Launch_Keywords():
                             ele = edit2Ele
                         ele.set_edit_text('')
                         ele.type_keys(server, with_spaces = True)
+                        time.sleep(0.4)#this delay is introduced as ServerConnect in SAP 7.70 upwards is very fast(would always select the first server connection)
                         if ( app['Log &OnButton'].exists() and app['Log &OnButton'].is_enabled() ):
                             app['Log &OnButton'].click()
                         elif ( app['Log &On'].exists() and app['Log &On'].is_enabled() ):
