@@ -17,6 +17,7 @@ import oebs_click_and_add
 import ast
 import json
 import re
+import time
 global count
 count=''
 accessContext=''
@@ -37,21 +38,13 @@ log = logging.getLogger('oebs_serverUtilities.py')
 class Utilities:
 
     #Method to swoop till the element at the given Object location
-    def swooptoelement(self,a,objecttofind,currentxpathtemp,i,p,windowname):
+    def swooptoelement(self , a, objecttofind, currentxpathtemp, i, p, windowname, errors = False):
         queue = []
         active_parent = False
+        page_tab_list = False
         queue.append((p,a,i,0))
         identifiers = objecttofind.split(';')
         uniquepath = identifiers[0]
-        name = identifiers[1]
-        indexinParent = identifiers[2]
-        childrencount = identifiers[3]
-        parentname = identifiers[4]
-        parxpath = identifiers[5]
-        parentchildcount = identifiers[6]
-        parentindex = identifiers[7]
-        parenttag = identifiers[8]
-        childtag = identifiers[9]
         #getting the internal frame name :
         
         internal_frame_list = []
@@ -99,7 +92,11 @@ class Utilities:
                     else:
                         path = xpath + '/' + elementObj.role  + '[' + str(elementObj.description.strip()) + ']'
             if path == currentxpathtemp:
-                return active_parent, acc, paneindex == 0
+                if currentxpathtemp.split("/").pop() == 'internal frame' and elementObj.name != identifiers[1]:
+                    continue
+                if page_tab_list:
+                    return active_parent, acc, paneindex == 0
+                return active_parent, acc, True
 
             curr = currentxpathtemp.split('/')
             p = path.split('/')
@@ -109,11 +106,12 @@ class Utilities:
                     active_parent = True
                 for index in range(elementObj.childrenCount):
                     element = acc.getAccessibleChildFromContext(index)
-
                     elementcontext=element.getAccessibleContextInfo()
+                    if elementcontext.role == "page tab list" and "page tab list" not in currentxpathtemp:
+                        page_tab_list = True
                     if elementcontext.role == 'internal frame':
-                        if 'active' in elementcontext.states:
-                            queue.append((path, element, index, index))
+                        if 'showing' in elementcontext.states:
+                            queue.append((path, element, index, paneindex))
                         else:
                             hasinternal=0
                             children=elementcontext.childrenCount
@@ -124,7 +122,7 @@ class Utilities:
                                     hasinternal=1
                                     break
                             if hasinternal ==1:
-                                queue.append((path, element, index, index))
+                                queue.append((path, element, index, paneindex))
                             else:
                                 index = index + 1
                     else:
@@ -133,19 +131,19 @@ class Utilities:
                         else:
                             queue.append((path, element, index, paneindex))   
             elif len(queue) == 0:
-                logger.print_on_console("Object not found in provided path, searching in alternate scroll panes for the object")
+                if errors: logger.print_on_console("Object not found in provided path, searching in alternate scroll panes for the object")
                 pane_occurances = [m.start() for m in re.finditer('scroll pane', currentxpathtemp)]
                 variable_path = currentxpathtemp
                 for i in range(len(pane_occurances) - 1, -1, -1):
                     fixed_path = variable_path[0:pane_occurances[i]]
                     skip_over = variable_path[pane_occurances[i]:len(variable_path)].find('/') + pane_occurances[i]
                     variable_path = fixed_path + 'scroll pane' + variable_path[skip_over:len(variable_path)]
-                    log.info('Searching for object in alternate xpath: ' + variable_path)
+                    if errors: log.info('Searching for object in alternate xpath: ' + variable_path)
                     active_parent, acc, visible = self.iterate_over_other_panes(a,objecttofind,variable_path,0,'',windowname, pane_occurances[i])
                     if acc and str(acc) != '':
                         return active_parent, acc, visible
                 log.info(ERROR_CODE_DICT['err_alternate_path'])
-                logger.print_on_console(ERROR_CODE_DICT['err_alternate_path'])
+                if errors: logger.print_on_console(ERROR_CODE_DICT['err_alternate_path'])
                 return False, '', False
 
 
@@ -155,7 +153,10 @@ class Utilities:
         queue.append((p,a,i,0))
         identifiers = objecttofind.split(';')
         uniquepath = identifiers[0]
+        alt_paths = {}
+        alt_paths_list = []
         internal_frame_list = []
+        visited = {}
         for each_internal_frame in uniquepath.split('/'):
             if each_internal_frame.find('internal frame')!=-1:
                 internal_frame_list.append(each_internal_frame.lstrip('internal frame[')[:-1])
@@ -199,14 +200,24 @@ class Utilities:
                         path = xpath + '/' + elementObj.role + '[' + str(index) + ']'
                     else:
                         path = xpath + '/' + elementObj.role  + '[' + str(elementObj.description.strip()) + ']'
-
-            if path == currentxpathtemp:
+            if path in visited:
+                continue
+            else:
+                visited[path] = True
+            if path.split('/').pop() == 'text[0]':
+                new_path = self.get_alt_paths(path, currentxpathtemp)
+                log.info("Hidden Push button detected, creating new xpath: " + new_path)
+                if new_path != '':
+                    logger.print_on_console("Hidden Push button detected, creating new xpaths")
+                    alt_paths_list.append(new_path)
+                    alt_paths[new_path] = len(alt_paths_list) - 1 
+            if path == currentxpathtemp or path in alt_paths:
                 return active_parent, acc, paneindex == 0
 
             curr = currentxpathtemp.split('/')
             p = path.split('/')
             index = len(p) - 1
-            if len(curr) > index and curr[index] == p[index]:
+            if (len(curr) > index and curr[index] == p[index]) or (len(alt_paths_list) > 0 and self.in_alt_paths(alt_paths_list, p[index], index)):
                 if 'active' in elementObj.states and windowname != elementObj.name:
                     active_parent = True
                 for index in range(elementObj.childrenCount):
@@ -237,6 +248,25 @@ class Utilities:
             elif len(queue) == 0:
                 return active_parent, '', False 
     
+    def get_alt_paths(self, path, xpath):
+        index_text = path.index('text[0]')
+        if index_text == -1: return ''
+        semi_path = xpath[index_text : len(xpath)]
+        m = re.search(r"\d",semi_path)
+        if not m: return ''
+        new_index = m.start()
+        li_path = list(semi_path)
+        li_path[new_index] = str(int(li_path[new_index]) + 1)
+        semi_path = ''.join(li_path)
+        return xpath[0:index_text] + semi_path
+
+    def in_alt_paths(self, alt_paths_list, path, index):
+        for alt_path in alt_paths_list:
+            path_list = alt_path.split("/")
+            if index < len(path_list) and path_list[index] == path:
+                return True
+        return False
+
     def methodtofillmap(self,acc,xpath,i):
         global  accessContext
         curaccinfo = acc.getAccessibleContextInfo()
@@ -303,7 +333,7 @@ class Utilities:
         return accessContext
 
 
-    def object_generator(self,applicationname,locator,keyword,inputs,outputs):
+    def object_generator(self,applicationname,locator,keyword,inputs,outputs, errors = False):
         global accessContext
         accessContext = ''
         #OBJECTLOCATION for the object is sent from the user
@@ -331,7 +361,7 @@ class Utilities:
             for i in range(len(newlist2)):
                 absolute_path = absolute_path.replace(newlist2[i],'frame')
 
-            active_parent, accessContextParent, visible = self.swooptoelement(oebs_api.JABContext(hwnd), oebs_key_objects.xpath, absolute_path ,0 ,'', applicationname)
+            active_parent, accessContextParent, visible = self.swooptoelement(oebs_api.JABContext(hwnd), oebs_key_objects.xpath, absolute_path ,0 ,'', applicationname, errors)
             accessContextParent = accessContextParent or ''
             if active_parent is None:
                 active_parent = False

@@ -247,13 +247,13 @@ class ElementOperations:
             start_time = time.time()
             logger.print_on_console("Waiting for element to be visible")
             while True:
-                acc, visible =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs)
-                if acc and acc != "fail":
+                acc, visible =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs, errors = False)
+                if acc and str(acc) != "fail":
                     break
                 if time.time() - start_time >= delay:
                     break
                 time.sleep(0.25)
-            if(acc and acc != 'fail'):
+            if(acc and str(acc) != 'fail'):
                 charinfo = acc.getAccessibleContextInfo()
                 objstates = charinfo.states
                 #check for object visible
