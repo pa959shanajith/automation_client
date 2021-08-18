@@ -94,7 +94,7 @@ class Launch_Keywords():
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
             log.error( err_msg )
-            logger.print_on_console( "Error occured in Close Window" )
+            logger.print_on_console( "Error occurred in Close Window" )
         return status, result, value, err_msg
 
 
@@ -122,7 +122,7 @@ class Launch_Keywords():
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
             log.error( err_msg )
-            logger.print_on_console( "Error occured in Maximize Window" )
+            logger.print_on_console( "Error occurred in Maximize Window" )
         return status, result, value, err_msg
 
     def minimize_window(self, *args):
@@ -149,7 +149,7 @@ class Launch_Keywords():
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
             log.error( err_msg )
-            logger.print_on_console( "Error occured in Minimize Window" )
+            logger.print_on_console( "Error occurred in Minimize Window" )
         return status, result, value, err_msg
 
     def restore_window(self, *args):
@@ -176,7 +176,7 @@ class Launch_Keywords():
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
             log.error( err_msg )
-            logger.print_on_console( "Error occured in Restore Window" )
+            logger.print_on_console( "Error occurred in Restore Window" )
         return status, result, value, err_msg
 
     def getWindowName(self, *args):
@@ -205,7 +205,7 @@ class Launch_Keywords():
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
             log.error( err_msg )
-            logger.print_on_console( "Error occured in Get Window Name" )
+            logger.print_on_console( "Error occurred in Get Window Name" )
         return status, result, value, err_msg
     def getStatusBarMessage(self, *args):
         status = sap_constants.TEST_RESULT_FAIL
@@ -238,7 +238,7 @@ class Launch_Keywords():
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
             log.error( err_msg )
-            logger.print_on_console( "Error occured in getStatusBarMessage" )
+            logger.print_on_console( "Error occurred in getStatusBarMessage" )
         return status, result, value, err_msg
 
     def doubleClickStatusBar(self, *args):
@@ -266,7 +266,7 @@ class Launch_Keywords():
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
             log.error( err_msg )
-            logger.print_on_console( "Error occured in doubleClickStatusBar" )
+            logger.print_on_console( "Error occurred in doubleClickStatusBar" )
         return status, result, value, err_msg
 
     def startTransaction(self, input_val, *args):
@@ -290,7 +290,7 @@ class Launch_Keywords():
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
             log.error( err_msg )
-            logger.print_on_console( "Error occured in Start Transaction" )
+            logger.print_on_console( "Error occurred in Start Transaction" )
         return status, result, value, err_msg
 
     def toolbar_actions(self, input_val, *args):
@@ -347,7 +347,7 @@ class Launch_Keywords():
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
             log.error( err_msg )
-            logger.print_on_console( "Error occured in ToolbarActions" )
+            logger.print_on_console( "Error occurred in ToolbarActions" )
         return status,result,value,err_msg
 
     def selectMenu(self, input_val, *args):
@@ -400,7 +400,7 @@ class Launch_Keywords():
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
             log.error( err_msg )
-            logger.print_on_console( "Error occured in SelectMenu" )
+            logger.print_on_console( "Error occurred in SelectMenu" )
         return status,result,value,err_msg
 
     def launch_application(self, input_val, *args):
@@ -456,7 +456,7 @@ class Launch_Keywords():
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
             log.error( err_msg )
-            logger.print_on_console( "Error occured in Launch Application" )
+            logger.print_on_console( "Error occurred in Launch Application" )
             term = TERMINATE
         if ( term  ):
             return term
@@ -557,7 +557,7 @@ class Launch_Keywords():
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
             log.error( err_msg )
-            logger.print_on_console( 'Error occured in Get Page Title' )
+            logger.print_on_console( 'Error occurred in Get Page Title' )
         return status, result, value, err_msg
 
     def getPopUpText(self, *args):
@@ -593,7 +593,7 @@ class Launch_Keywords():
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
             log.error( err_msg )
-            logger.print_on_console( 'Error occured in Get Popup Text' )
+            logger.print_on_console( 'Error occurred in Get Popup Text' )
         return status, result, value, err_msg
 
     def closeApplication(self, *args):
@@ -644,7 +644,7 @@ class Launch_Keywords():
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
             log.error( err_msg )
-            logger.print_on_console( 'Error occured in closeApplication' )
+            logger.print_on_console( 'Error occurred in closeApplication' )
         return status, result, verb, err_msg
 
     def captureScreenshot(self, screen_name, screen_id):
@@ -684,7 +684,7 @@ class Launch_Keywords():
         except Exception as e:
             error = sap_constants.ERROR_MSG + ' : ' + str(e)
             log.error( error )
-            logger.print_on_console( "Error has occured while capturing screenshot" )
+            logger.print_on_console( "Error has occurred while capturing screenshot" )
         #img.save(r'.\screenshot.png')
         return img
 
