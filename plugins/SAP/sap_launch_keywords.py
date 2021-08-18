@@ -423,13 +423,21 @@ class Launch_Keywords():
                 log.debug( 'Starting new SAP window' )
                 try:
                     app = Application(backend="win32").start(self.filePath).window(title=self.windowName)
-                    log.debug( 'Connecting to new SAP window' )
+                    log.debug( 'Launching new SAP window' )
                     time.sleep(4)
                     log.debug( 'The specified application is launched Successfully' )
                 except:
                     err_msg = 'Incorrect file path or window name'
                     term = TERMINATE
-                if ( app != None and app != '' ):
+                try:#To check if input Window name is correct
+                    app = None
+                    log.debug( 'Connecting to specified SAP window' )
+                    win = pywinauto.findwindows.find_window(title=self.windowName)
+                    app = Application(backend = "win32").connect(path = self.filePath).window(title = self.windowName)
+                    log.debug( 'Connected to specified SAP window' )
+                except:
+                    log.debug( 'Specified SAP Logon window name is incorrect' )
+                if ( app ):
                     status = sap_constants.TEST_RESULT_PASS
                     result = sap_constants.TEST_RESULT_TRUE
                 else:
@@ -518,7 +526,9 @@ class Launch_Keywords():
                             err_msg = 'The given window name is not found'
                             term = TERMINATE
                 except Exception as e:
-                    err_msg = sap_constants.ERROR_MSG + ' : ' + 'SAP Logon window does not exist, ' + str(e)
+                    err = str(e)
+                    if ('not found!' in err): err = err[:err.index('not found!')]
+                    err_msg = sap_constants.ERROR_MSG + ' : ' + "SAP Logon window '" + self.windowName + "' does not exist for " + err
                     term = TERMINATE
             elif ( start_window == 0 ):
                 err_msg = 'SAP Logon window does not exist'
