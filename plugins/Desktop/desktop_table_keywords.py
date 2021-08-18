@@ -83,7 +83,7 @@ class Table_Keywords():
                 log.info( 'Number of rows is : ', len(c) - const + 1)
                 status = desktop_constants.TEST_RESULT_PASS
                 result = desktop_constants.TEST_RESULT_TRUE
-                verb = len(c) - 2
+                verb = len(c) - 1 - const
             else:
                 err_msg = 'Unable to get row count'
                 log.info( err_msg )
