@@ -103,7 +103,7 @@ class Utils:
                 curaccinfo = acc.getAccessibleContextInfo()
                 size = [curaccinfo.x, curaccinfo.y, curaccinfo.width, curaccinfo.height]
                 if -1 in size or 'showing' not in curaccinfo.states:
-                    logger.print_on_console(ERROR_CODE_DICT['err_object_highlight'])
+                    logger.print_on_console(ERROR_CODE_DICT['err_visible'])
                     status = False
                 else:
                     rgn1=win32gui.CreateRectRgnIndirect((size[0] + 1, size[1] + 1,

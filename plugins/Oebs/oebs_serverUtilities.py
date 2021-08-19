@@ -38,7 +38,7 @@ log = logging.getLogger('oebs_serverUtilities.py')
 class Utilities:
 
     #Method to swoop till the element at the given Object location
-    def swooptoelement(self , a, objecttofind, currentxpathtemp, i, p, windowname, errors = False):
+    def swooptoelement(self , a, objecttofind, currentxpathtemp, i, p, windowname, errors = False, allow_showing = False):
         queue = []
         active_parent = False
         page_tab_list = False
@@ -110,7 +110,7 @@ class Utilities:
                     if elementcontext.role == "page tab list" and "page tab list" not in currentxpathtemp:
                         page_tab_list = True
                     if elementcontext.role == 'internal frame':
-                        if 'showing' in elementcontext.states:
+                        if 'active' in elementcontext.states or (allow_showing and 'showing' in elementcontext.states):
                             queue.append((path, element, index, paneindex))
                         else:
                             hasinternal=0
@@ -145,6 +145,7 @@ class Utilities:
                 log.info(ERROR_CODE_DICT['err_alternate_path'])
                 if errors: logger.print_on_console(ERROR_CODE_DICT['err_alternate_path'])
                 return False, '', False
+        return False, '', False
 
 
     def iterate_over_other_panes(self, a, objecttofind, currentxpathtemp, i, p, windowname, location):
@@ -247,6 +248,7 @@ class Utilities:
                             queue.append((path, element, index, paneindex))
             elif len(queue) == 0:
                 return active_parent, '', False 
+        return active_parent, '', False 
     
     def get_alt_paths(self, path, xpath):
         index_text = path.index('text[0]')
@@ -333,7 +335,7 @@ class Utilities:
         return accessContext
 
 
-    def object_generator(self,applicationname,locator,keyword,inputs,outputs, errors = False):
+    def object_generator(self,applicationname,locator,keyword,inputs,outputs, errors = False, allow_showing = False):
         global accessContext
         accessContext = ''
         #OBJECTLOCATION for the object is sent from the user
@@ -361,7 +363,7 @@ class Utilities:
             for i in range(len(newlist2)):
                 absolute_path = absolute_path.replace(newlist2[i],'frame')
 
-            active_parent, accessContextParent, visible = self.swooptoelement(oebs_api.JABContext(hwnd), oebs_key_objects.xpath, absolute_path ,0 ,'', applicationname, errors)
+            active_parent, accessContextParent, visible = self.swooptoelement(oebs_api.JABContext(hwnd), oebs_key_objects.xpath, absolute_path ,0 ,'', applicationname, errors, allow_showing)
             accessContextParent = accessContextParent or ''
             if active_parent is None:
                 active_parent = False
