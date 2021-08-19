@@ -60,23 +60,18 @@ class Launch_Keywords():
     def getSessWindow(self, *args):
         ses, wnd = None, None
         try:
-            #time.sleep(2)
             SapGui = self.uk.getSapObject()
             scrapingObj = Scrape()
             wnd = scrapingObj.getWindow(SapGui)
-            wndId =  wnd.__getattr__('id')
-            i = wndId.index('wnd')
-            wndNumber = wndId[i+4]
-            j = wndId.index('ses')
-            sesId = wndId[j:j+6]
-            ses = SapGui.FindByid(str(sesId))
+            latest_conn = list(SapGui.children)[-1] #getting latest connection
+            ses = list(latest_conn.children)[-1] #getting lastest session
         except Exception as e:
             log.error( sap_constants.NO_INSTANCE_OPEN_ERROR, e )
             logger.print_on_console( sap_constants.NO_INSTANCE_OPEN_ERROR )
         return ses, wnd
 
-    def close_modal_window(self, *args):
-        """Closes the popup/ModalWindow"""
+    def close_window(self, *args):
+        """Closes the Main/Dialog Window"""
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
         err_msg  = None
@@ -85,12 +80,12 @@ class Launch_Keywords():
             ses, wnd = self.getSessWindow()
             if ( ses and wnd ):
                 wndId =  wnd.__getattr__('id')
-                if( ses.FindById(wndId).type == "GuiModalWindow" ):
+                if( ses.FindById(wndId).type == "GuiModalWindow" or "GuiMainWindow" ):
                     ses.FindById(wndId).Close()
                     status = sap_constants.TEST_RESULT_PASS
                     result = sap_constants.TEST_RESULT_TRUE
                 else:
-                    err_msg = 'Element is not GuiModalWindow type'
+                    err_msg = 'Element is not GuiModalWindow or GuiMainWindow type'
             else:
                 err_msg = sap_constants.ELELMENT_NOT_FOUND
             if ( err_msg ):
@@ -99,12 +94,12 @@ class Launch_Keywords():
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
             log.error( err_msg )
-            logger.print_on_console( "Error occured in Close Modal Window" )
+            logger.print_on_console( "Error occurred in Close Window" )
         return status, result, value, err_msg
 
 
-    def maximize_modal_window(self, *args):
-        """Raximizes the popup/ModalWindow"""
+    def maximize_window(self, *args):
+        """Maximizes the Main/Dialog Window"""
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
         err_msg  = None
@@ -113,12 +108,12 @@ class Launch_Keywords():
             ses, wnd = self.getSessWindow()
             if ( ses and wnd ):
                 wndId =  wnd.__getattr__('id')
-                if( ses.FindById(wndId).type == "GuiModalWindow" ):
+                if( ses.FindById(wndId).type == "GuiModalWindow" or "GuiMainWindow"):
                     ses.FindById(wndId).Maximize()
                     status = sap_constants.TEST_RESULT_PASS
                     result = sap_constants.TEST_RESULT_TRUE
                 else:
-                    err_msg = 'Element is not GuiModalWindow type'
+                    err_msg = 'Element is not GuiModalWindow or GuiMainWindow type'
             else:
                 err_msg = sap_constants.ELELMENT_NOT_FOUND
             if ( err_msg ):
@@ -127,11 +122,11 @@ class Launch_Keywords():
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
             log.error( err_msg )
-            logger.print_on_console( "Error occured in Maximize Modal Window" )
+            logger.print_on_console( "Error occurred in Maximize Window" )
         return status, result, value, err_msg
 
-    def restore_modal_window(self, *args):
-        """Restores the popup/ModalWindow"""
+    def minimize_window(self, *args):
+        """Minimizes the SAP Main/Dialog Window"""
         status = sap_constants.TEST_RESULT_FAIL
         result = sap_constants.TEST_RESULT_FALSE
         err_msg  = None
@@ -140,12 +135,12 @@ class Launch_Keywords():
             ses, wnd = self.getSessWindow()
             if ( ses and wnd ):
                 wndId =  wnd.__getattr__('id')
-                if( ses.FindById(wndId).type == "GuiModalWindow" ):
-                    ses.FindById(wndId).Restore()
+                if( ses.FindById(wndId).type == "GuiModalWindow" or "GuiMainWindow" ):
+                    ses.FindById(wndId).Iconify()
                     status = sap_constants.TEST_RESULT_PASS
                     result = sap_constants.TEST_RESULT_TRUE
                 else:
-                    err_msg = 'Element is not GuiModalWindow type'
+                    err_msg = 'Element is not GuiModalWindow or GuiMainWindow type'
             else:
                 err_msg = sap_constants.ELELMENT_NOT_FOUND
             if ( err_msg ):
@@ -154,7 +149,34 @@ class Launch_Keywords():
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
             log.error( err_msg )
-            logger.print_on_console( "Error occured in Restore Modal Window" )
+            logger.print_on_console( "Error occurred in Minimize Window" )
+        return status, result, value, err_msg
+
+    def restore_window(self, *args):
+        """Restores the Main/Dialog Window"""
+        status = sap_constants.TEST_RESULT_FAIL
+        result = sap_constants.TEST_RESULT_FALSE
+        err_msg  = None
+        value = OUTPUT_CONSTANT
+        try:
+            ses, wnd = self.getSessWindow()
+            if ( ses and wnd ):
+                wndId =  wnd.__getattr__('id')
+                if( ses.FindById(wndId).type == "GuiModalWindow" or "GuiMainWindow"):
+                    ses.FindById(wndId).Restore()
+                    status = sap_constants.TEST_RESULT_PASS
+                    result = sap_constants.TEST_RESULT_TRUE
+                else:
+                    err_msg = 'Element is not GuiModalWindow or GuiMainWindow type'
+            else:
+                err_msg = sap_constants.ELELMENT_NOT_FOUND
+            if ( err_msg ):
+                log.info( err_msg )
+                logger.print_on_console( err_msg )
+        except Exception as e:
+            err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
+            log.error( err_msg )
+            logger.print_on_console( "Error occurred in Restore Window" )
         return status, result, value, err_msg
 
     def getWindowName(self, *args):
@@ -183,7 +205,7 @@ class Launch_Keywords():
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
             log.error( err_msg )
-            logger.print_on_console( "Error occured in Get Window Name" )
+            logger.print_on_console( "Error occurred in Get Window Name" )
         return status, result, value, err_msg
     def getStatusBarMessage(self, *args):
         status = sap_constants.TEST_RESULT_FAIL
@@ -216,7 +238,7 @@ class Launch_Keywords():
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
             log.error( err_msg )
-            logger.print_on_console( "Error occured in getStatusBarMessage" )
+            logger.print_on_console( "Error occurred in getStatusBarMessage" )
         return status, result, value, err_msg
 
     def doubleClickStatusBar(self, *args):
@@ -244,7 +266,7 @@ class Launch_Keywords():
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
             log.error( err_msg )
-            logger.print_on_console( "Error occured in doubleClickStatusBar" )
+            logger.print_on_console( "Error occurred in doubleClickStatusBar" )
         return status, result, value, err_msg
 
     def startTransaction(self, input_val, *args):
@@ -268,7 +290,7 @@ class Launch_Keywords():
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
             log.error( err_msg )
-            logger.print_on_console( "Error occured in Start Transaction" )
+            logger.print_on_console( "Error occurred in Start Transaction" )
         return status, result, value, err_msg
 
     def toolbar_actions(self, input_val, *args):
@@ -325,7 +347,7 @@ class Launch_Keywords():
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
             log.error( err_msg )
-            logger.print_on_console( "Error occured in ToolbarActions" )
+            logger.print_on_console( "Error occurred in ToolbarActions" )
         return status,result,value,err_msg
 
     def selectMenu(self, input_val, *args):
@@ -378,7 +400,7 @@ class Launch_Keywords():
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
             log.error( err_msg )
-            logger.print_on_console( "Error occured in SelectMenu" )
+            logger.print_on_console( "Error occurred in SelectMenu" )
         return status,result,value,err_msg
 
     def launch_application(self, input_val, *args):
@@ -401,13 +423,21 @@ class Launch_Keywords():
                 log.debug( 'Starting new SAP window' )
                 try:
                     app = Application(backend="win32").start(self.filePath).window(title=self.windowName)
-                    log.debug( 'Connecting to new SAP window' )
+                    log.debug( 'Launching new SAP window' )
                     time.sleep(4)
                     log.debug( 'The specified application is launched Successfully' )
                 except:
                     err_msg = 'Incorrect file path or window name'
                     term = TERMINATE
-                if ( app != None and app != '' ):
+                try:#To check if input Window name is correct
+                    app = None
+                    log.debug( 'Connecting to specified SAP window' )
+                    win = pywinauto.findwindows.find_window(title=self.windowName)
+                    app = Application(backend = "win32").connect(path = self.filePath).window(title = self.windowName)
+                    log.debug( 'Connected to specified SAP window' )
+                except:
+                    log.debug( 'Specified SAP Logon window name is incorrect' )
+                if ( app ):
                     status = sap_constants.TEST_RESULT_PASS
                     result = sap_constants.TEST_RESULT_TRUE
                 else:
@@ -434,7 +464,7 @@ class Launch_Keywords():
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
             log.error( err_msg )
-            logger.print_on_console( "Error occured in Launch Application" )
+            logger.print_on_console( "Error occurred in Launch Application" )
             term = TERMINATE
         if ( term  ):
             return term
@@ -469,6 +499,7 @@ class Launch_Keywords():
                             ele = edit2Ele
                         ele.set_edit_text('')
                         ele.type_keys(server, with_spaces = True)
+                        time.sleep(0.4)#this delay is introduced as ServerConnect in SAP 7.70 upwards is very fast(would always select the first server connection)
                         if ( app['Log &OnButton'].exists() and app['Log &OnButton'].is_enabled() ):
                             app['Log &OnButton'].click()
                         elif ( app['Log &On'].exists() and app['Log &On'].is_enabled() ):
@@ -495,7 +526,9 @@ class Launch_Keywords():
                             err_msg = 'The given window name is not found'
                             term = TERMINATE
                 except Exception as e:
-                    err_msg = sap_constants.ERROR_MSG + ' : ' + 'SAP Logon window does not exist, ' + str(e)
+                    err = str(e)
+                    if ('not found!' in err): err = err[:err.index('not found!')]
+                    err_msg = sap_constants.ERROR_MSG + ' : ' + "SAP Logon window '" + self.windowName + "' does not exist for " + err
                     term = TERMINATE
             elif ( start_window == 0 ):
                 err_msg = 'SAP Logon window does not exist'
@@ -534,7 +567,7 @@ class Launch_Keywords():
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
             log.error( err_msg )
-            logger.print_on_console( 'Error occured in Get Page Title' )
+            logger.print_on_console( 'Error occurred in Get Page Title' )
         return status, result, value, err_msg
 
     def getPopUpText(self, *args):
@@ -570,7 +603,7 @@ class Launch_Keywords():
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
             log.error( err_msg )
-            logger.print_on_console( 'Error occured in Get Popup Text' )
+            logger.print_on_console( 'Error occurred in Get Popup Text' )
         return status, result, value, err_msg
 
     def closeApplication(self, *args):
@@ -621,7 +654,7 @@ class Launch_Keywords():
         except Exception as e:
             err_msg = sap_constants.ERROR_MSG + ' : ' + str(e)
             log.error( err_msg )
-            logger.print_on_console( 'Error occured in closeApplication' )
+            logger.print_on_console( 'Error occurred in closeApplication' )
         return status, result, verb, err_msg
 
     def captureScreenshot(self, screen_name, screen_id):
@@ -661,7 +694,7 @@ class Launch_Keywords():
         except Exception as e:
             error = sap_constants.ERROR_MSG + ' : ' + str(e)
             log.error( error )
-            logger.print_on_console( "Error has occured while capturing screenshot" )
+            logger.print_on_console( "Error has occurred while capturing screenshot" )
         #img.save(r'.\screenshot.png')
         return img
 

@@ -242,13 +242,11 @@ class UtilWebKeywords:
                     res=True
                 if webelement.is_enabled() and not(res):
                     info_msg=ERROR_CODE_DICT['The object is Hidden']
-                    logger.print_on_console(err_msg)
                     local_uo.log.info(info_msg)
                 elif webelement.is_enabled() and res:
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
                     info_msg=ERROR_CODE_DICT['MSG_OBJECT_ENABLED']
-                    logger.print_on_console(err_msg)
                     local_uo.log.info(info_msg)
                 else:
                     err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
@@ -700,7 +698,7 @@ class UtilWebKeywords:
                         result = self.generic_sendfucntion_keys(input[0],*args)
                 if (result is not None) and (result[0]!="Fail"):
                     status=TEST_RESULT_PASS
-                    methodoutput=TEST_RESULT_TRUE     
+                    methodoutput=TEST_RESULT_TRUE
         except ElementNotInteractableException as ex:
             err_msg='Element is not interactable'
             logger.print_on_console(ex)
@@ -1081,7 +1079,7 @@ class UtilWebKeywords:
                             err_msg = 'Invalid Input: Index input cannot be 0 for table'
                             logger.print_on_console(err_msg)
                             local_uo.log.error(err_msg)
-                        else: 
+                        else:
                             err_msg = 'Input Error: Missing index'
                             logger.print_on_console(err_msg)
                             local_uo.log.error(err_msg)
@@ -1099,7 +1097,7 @@ class UtilWebKeywords:
             # elif css_flag and (len(input) == 2) and not err_msg:
             #     attr_name = input[0]
             #     eleStatus=True
-            if(eleStatus): 
+            if(eleStatus):
                 if webelement != None and webelement !='':
                     local_uo.log.info(INPUT_IS)
                     local_uo.log.info(input)
@@ -1124,7 +1122,7 @@ class UtilWebKeywords:
                                 output = value
                                 logger.print_on_console('Output: ', output)
                                 status = TEST_RESULT_PASS
-                                methodoutput = TEST_RESULT_TRUE                               
+                                methodoutput = TEST_RESULT_TRUE
                             elif not childSearchFlag:
                                 err_msg = 'CSS property does not exists'
                                 logger.print_on_console(err_msg)
@@ -1184,7 +1182,7 @@ class UtilWebKeywords:
                             err_msg = 'Invalid Input: Index input cannot be 0 for table'
                             logger.print_on_console(err_msg)
                             local_uo.log.error(err_msg)
-                        else: 
+                        else:
                             err_msg = 'Input Error: Please specify index'
                             logger.print_on_console(err_msg)
                             local_uo.log.error(err_msg)
@@ -1200,7 +1198,7 @@ class UtilWebKeywords:
                 eleStatus=True
             # elif css_flag and (len(input) == 2 or len(input) == 3) and not err_msg:
             #     attr_name = input[0]
-            #     eleStatus = True          
+            #     eleStatus = True
             if(eleStatus):
                 if webelement != None and webelement !='':
                     local_uo.log.info(INPUT_IS)
@@ -1237,7 +1235,7 @@ class UtilWebKeywords:
                                 local_uo.log.error(err_msg)
                         elif css_flag:
                             # childSearchFlag = False
-                            value,childSearchFlag=self.fetchcss(webelement,attr_name)   
+                            value,childSearchFlag=self.fetchcss(webelement,attr_name)
                             if value != '':
                                 # show output
                                 if len(input) == 6: result = input[5]
@@ -1293,7 +1291,7 @@ class UtilWebKeywords:
         counter = 1
         tableops = TableOperationKeywords()
         cell=tableops.javascriptExecutor(webelement,row_number,col_number)
-        if(tag=='tablecell' or tag=='td'): 
+        if(tag=='tablecell' or tag=='td'):
             eleStatus=True
             webelement1=cell
             return eleStatus,webelement1
@@ -1463,12 +1461,12 @@ class UtilWebKeywords:
                             else:
                                 err_msg = 'input value is empty'
                                 logger.print_on_console(err_msg)
-                                local_uo.log.error(err_msg)      
+                                local_uo.log.error(err_msg)
                 except Exception as e:
                     local_uo.log.error("Error in sendsecurefunction_keys")
-                    err_msg=self.__web_driver_exception(e)              
+                    err_msg=self.__web_driver_exception(e)
             return status,methodoutput,output,err_msg
-            
+
 
     def check_user_activation(self, browserlogs):
         if browserlogs and len(browserlogs) > 0:
@@ -1515,7 +1513,7 @@ class UtilWebKeywords:
                         if len(set(temp))==1:value=temp[0].lstrip()
                     except NoSuchAttributeException as ex:
                         err_msg += 'border-top border-right border-bottom border-left )'
-                # if attr_name in list(props.keys()):  
+                # if attr_name in list(props.keys()):
                 #     for i in props[attr_name]:
                 #         newValue = webelement.value_of_css_property(i)
                 #         if newValue != '':
