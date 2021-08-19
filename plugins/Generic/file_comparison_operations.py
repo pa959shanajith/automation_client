@@ -275,16 +275,19 @@ class TextFile:
                     for i in range(0,(len(args)-1)):
                         try:
                             #fix for #14921
-                            file.write(args[i])
+                            # \\n \\t are replaced by \n \t
                             file.write("\n")
+                            file.write(args[i].replace("\\n", "\n").replace("\\t", "\t").strip())
                         except:
                             file.write("\n")
-                            file.write(args[i].encode('UTF-8'))
+                            file.write(args[i].replace("\\n", "\n").replace("\\t", "\t").strip())
 
 
                 else:
 
                     content+=''.join(args)
+                    # \\n \\t are replaced by \n \t
+                    content = content.replace("\\n", "\n").replace("\\t", "\t").strip()
                     try:
                         file.write(content)
                     except:
