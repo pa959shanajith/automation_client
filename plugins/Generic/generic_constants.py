@@ -15,6 +15,8 @@ CONTENT_NOT_SAME=' Content do not match'
 
 INVALID_INPUT='Invalid Input'
 
+INVALID_NUMBER_OF_INPUTS='Input Error: Invalid number of inputs'
+
 INVALID_KEYWORD='Invalid Keyword'
 
 FILE_EXISTS='File exists'

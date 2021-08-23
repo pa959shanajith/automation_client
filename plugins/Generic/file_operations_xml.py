@@ -18,6 +18,7 @@ import xml.dom.minidom
 from lxml import etree
 import tempfile
 import os
+import sys
 import string
 import random
 import dynamic_variable_handler
@@ -139,7 +140,8 @@ class FileOperationsXml:
                     if ( out_path ): output_path = out_path
                 else:
                     output_path = args[0].split(";")[0]
-            if (len(input_val)>=4):
+            # if input length is 4 then only proceed.
+            if (len(input_val) == 4 and len(input_val[-1]) != 0):
                 path1 = input_val[0]
                 path2 = input_val[1]
                 if ((input_val[2]) != '') : res_opt = input_val[2].lower().strip()
@@ -200,7 +202,8 @@ class FileOperationsXml:
                                                 log.debug( "Writing the output of selectiveXmlFileCompare to file : " + str(output_path) )
                                                 logger.print_on_console( "Writing the output of selectiveXmlFileCompare to file.")
                                                 optFlg = False
-                                                with open(output_path,'w') as f:
+                                                # Changed to append mode from write mode
+                                                with open(output_path,'a') as f:
                                                     f.write(output_res)
                                             else:
                                                 logger.print_on_console(generic_constants.INVALID_OUTPUT_PATH)
@@ -213,7 +216,8 @@ class FileOperationsXml:
                                     log.debug( err_msg )
                                     flg = False
                             else:
-                                err_msg = 'Invalid XML data'
+                                if output_res != "Invalid XML data":
+                                    err_msg = 'Invalid XML data'
                                 flg = False
                             if( flg ):
                                 status = TEST_RESULT_PASS
@@ -228,7 +232,7 @@ class FileOperationsXml:
                 else:
                     err_msg = generic_constants.FILE_NOT_EXISTS
             else:
-                err_msg = generic_constants.INVALID_INPUT
+                err_msg = generic_constants.INVALID_NUMBER_OF_INPUTS
             if ( err_msg != None ):
                 log.error(err_msg)
                 logger.print_on_console(err_msg)
@@ -267,7 +271,8 @@ class FileOperationsXml:
                     if ( out_path ): output_path = out_path
                 else:
                     output_path = args[0].split(";")[0]
-            if( len(input_val) >= 4 ):
+            # if input length is 4 then proceed
+            if( len(input_val) == 4 and len(input_val[len(input_val) - 1]) != 0):
                 blockVal = ';'.join(input_val[3:])
                 if ((input_val[2]) != '') : res_opt = input_val[2].lower().strip()
                 blockData = input_val[1]
@@ -347,7 +352,7 @@ class FileOperationsXml:
                 else:
                     err_msg = generic_constants.FILE_NOT_EXISTS
             else:
-                err_msg = generic_constants.INVALID_INPUT
+                err_msg = generic_constants.INVALID_NUMBER_OF_INPUTS
             if ( err_msg != None ):
                 log.error(err_msg)
                 logger.print_on_console(err_msg)
@@ -712,6 +717,17 @@ class FileOperationsXml:
                     log.info('Inputs are same')
                     logger.print_on_console( 'Inputs are same' )
                 out = main.diff_texts(xml_input1, xml_input2, diff_options={'fast_match': False},formatter=formatting.XMLFormatter(normalize=formatting.WS_BOTH)).split("\n")
+        # Handling the empty xml document exception.
+        except etree.XMLSyntaxError as e:
+            # get caller method name
+            called_method_name = sys._getframe(1).f_code.co_name
+            if called_method_name == "selectiveXmlFileCompare" and "Document is empty" in e.msg:
+                out = "Invalid XML data"
+                logger.print_on_console("Invalid XML data")
+                log.error("Invalid XML data")
+            else:
+                log.error(e.msg)
+            return out
         except Exception as e:
             logger.print_on_console( "Exception occurred in compare_xmls while comparing two xml data" )
             log.error( "Exception occurred in compare_xmls while comparing two xml data, ERR_MSG:" + str(e) )
