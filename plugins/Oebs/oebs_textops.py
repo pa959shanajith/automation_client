@@ -435,6 +435,7 @@ class TextOperations:
         try:
             time.sleep(3)
             #gets the entire context information
+            acc.requestFocus()
             curaccinfo = acc.getAccessibleContextInfo()
             log.debug('Received Object Context',DEF_CLEARTEXT)
             if 'enabled' in curaccinfo.states:

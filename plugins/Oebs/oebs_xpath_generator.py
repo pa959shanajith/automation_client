@@ -66,7 +66,7 @@ class PathGenerator():
             return
         
         #added me "label"
-        if eventName == 'mousePressed' and current_acc_info.role not in ('text','combo box','push button','check box','radio button', 'label','page tab list', 'tool bar', 'menu'):
+        if eventName == 'mousePressed' and current_acc_info.role not in ('text','combo box','push button','check box','radio button', 'label','page tab list', 'tool bar', 'menu', 'scroll bar'):
             return
 
         if -1 in (current_acc_info.x,current_acc_info.y,current_acc_info.width,current_acc_info.height):
