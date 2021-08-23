@@ -142,7 +142,7 @@ class FileOperationsXml:
                 else:
                     output_path = args[0].split(";")[0]
             # if input length is 4 then only proceed.
-            if (len(input_val) == 4 and len(input_val[len(input_val) - 1]) != 0):
+            if (len(input_val) == 4 and len(input_val[-1]) != 0):
                 path1 = input_val[0]
                 path2 = input_val[1]
                 if ((input_val[2]) != '') : res_opt = input_val[2].lower().strip()
@@ -220,7 +220,6 @@ class FileOperationsXml:
                             else:
                                 if output_res != "Invalid XML data":
                                     err_msg = 'Invalid XML data'
-                                # err_msg = 'Invalid XML data'
                                 flg = False
                             if( flg ):
                                 status = TEST_RESULT_PASS
@@ -243,7 +242,6 @@ class FileOperationsXml:
             err_msg = ("Exception occurred in selectiveXmlFileCompare while comparing two files, ERROR : " + str(e))
             log.error( err_msg )
             logger.print_on_console( "Error occured in selectiveXmlFileCompare" )
-            # logger.print_on_console(e)
         return status, result, value ,err_msg
 
     def compXmlFileWithXmlBlock(self,input_val,*args):
@@ -634,7 +632,6 @@ class FileOperationsXml:
             pretty_xml_as_string = os.linesep.join([s for s in pretty_xml_as_string.splitlines() if s.strip()])
             flag = True
         except Exception as e:
-            logger.print_on_console(e)
             logger.print_on_console('Invalid xml input ')
             log.error(e)
         if not (flag):
@@ -711,11 +708,9 @@ class FileOperationsXml:
                 logger.print_on_console("Invalid XML data")
                 log.error("Invalid XML data")
             else:
-                #logger.print_on_console(e.msg)
                 log.error(e.msg)
             return out
         except Exception as e:
-            # logger.print_on_console(e)
             logger.print_on_console( "Exception occurred in compare_xmls while comparing two xml data" )
             log.error( "Exception occurred in compare_xmls while comparing two xml data, ERR_MSG:" + str(e) )
         return out
