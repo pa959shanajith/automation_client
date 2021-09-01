@@ -113,6 +113,8 @@ class WebScrape_Utils:
                     driver.execute_script("window.scrollTo({0}, {1})".format(rectangle[0], rectangle[1]))
                     code = '''var elems = document.body.getElementsByTagName("*"); var len = elems.length; document.body.style.removeProperty('max-width'); document.body.style.removeProperty('overflow-x'); for (var i=0;i<len;i++) { 	if (window.getComputedStyle(elems[i],null).getPropertyValue('position') == 'fixed') { 		elems[i].style.removeProperty('opacity'); 	} }'''
                     driver.execute_script(code)
+                if not os.path.exists(screen_shot_path):
+                    os.makedirs(os.path.dirname(screen_shot_path))
                 stitched_image.save(screen_shot_path)
                 with open(screen_shot_path, "rb") as f:
                     b64_screen = base64.b64encode(f.read())
@@ -121,7 +123,7 @@ class WebScrape_Utils:
                 screen = driver.get_screenshot_as_base64()
         except Exception as e:
             screen = driver.get_screenshot_as_base64()
-        return screen
+        return screen, total_width, total_height
 
     """Method to switch into frames and iframes"""
     def switchtoframe_webscrape(self,driver,currenthandle,mypath):

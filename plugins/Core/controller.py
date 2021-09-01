@@ -336,6 +336,7 @@ class Controller():
             while self.conthread.paused:
                 self.conthread.pause_cond.wait()
 
+   
     def methodinvocation(self,index,execution_env,datatables=[],*args):
         global pause_flag
         result=(TEST_RESULT_FAIL,TEST_RESULT_FALSE,OUTPUT_CONSTANT,None)
@@ -885,7 +886,7 @@ class Controller():
                         script_info =  screen_testcase_map[tsplist[index].testscript_name]
                         #Check if browser is present or not
                         if hasattr(browser_Keywords.local_bk, 'driver_obj') and browser_Keywords.local_bk.driver_obj is not None and len(script_info['accessibility_parameters']) > 0:
-                            acc_result = local_cont.accessibility_testing_obj.runCrawler(browser_Keywords.local_bk.driver_obj, script_info, screen_testcase_map["executionid"])
+                            acc_result = local_cont.accessibility_testing_obj.runCrawler(browser_Keywords.local_bk.driver_obj, script_info, screen_testcase_map["executionid"], index)
                             #Check if accessibility Testing was successful
                             if acc_result and acc_result["status"] != "fail":
                                 accessibility_reports.append(acc_result)
@@ -1216,6 +1217,7 @@ class Controller():
                                 screen_testcase_map[step['testcasename']]["cycleid"] = suite['cycleid']
                                 screen_testcase_map["executionid"] = execute_result_data['executionId']
                                 screen_testcase_map[step['testcasename']]['accessibility_parameters'] = accessibility_parameters
+                                screen_testcase_map[step['testcasename']]['projectname'] = suite['projectname']
                             #check for temrinate flag before parsing tsp list
                             if terminate_flag:
                                 break

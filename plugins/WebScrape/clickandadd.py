@@ -189,7 +189,7 @@ class Clickandadd():
             full_screenshot = str(configvalues['full_screenshot'])
             if (isinstance(driver,webdriver.Firefox) or isinstance(driver,webdriver.Chrome) or isinstance(driver,webdriver.Edge)):
                 if ((str(full_screenshot).lower()) == 'yes'):
-                    screen = webscrape_utils_obj.fullpage_screenshot(driver, screen_shot_path)
+                    screen, total_width, total_height = webscrape_utils_obj.fullpage_screenshot(driver, screen_shot_path)
                     fullSS=True
                 else:
                     screen = driver.get_screenshot_as_base64()
