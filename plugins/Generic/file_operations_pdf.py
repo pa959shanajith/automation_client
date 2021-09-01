@@ -826,6 +826,10 @@ class FileOperationsPDF:
                 page = doc[pagenumber]
                 content=page.getText()
                 ## content=content.encode('utf-8')
+                if len(args) == 0:
+                    log.info('Content is ')
+                    log.info(content)
+                    status=True
                 if len(args)>1 and args[1]=='_internal_verify_content':
                     return content
                 if len(args) >= 2 and not (args[0] is None and args[1] is None):
@@ -841,7 +845,11 @@ class FileOperationsPDF:
                         else:
                             startIndex=content.find(start)+len(start)
                     if not end is '':
-                        endIndex=content.find(end)
+                        if content.find(end) == -1:
+                            content = None
+                            err_msg="End string not found in the content"
+                        else:
+                            endIndex=content.find(end)
                     if not(err_msg):
                         content=content[startIndex:endIndex]
                         log.info('Content between Start and End string is ')

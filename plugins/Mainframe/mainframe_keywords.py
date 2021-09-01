@@ -923,31 +923,32 @@ class MainframeKeywords:
         err_msg=None
         output=OUTPUT_CONSTANT
         try:
+            inputs = inputs[0] if (inputs[0] != "") else None
             if self.emulator_type in self.emulator_types:
                 log.info("Closing %s emulator...",self.emulator_type)
                 #Print the state of keyword on ICE console
                 logger.print_on_console("Closing " + self.emulator_type +" emulator...")
             if( inputs or self.emulator_type == MAINFRAME_HOD ):
                 import subprocess,win32gui,win32process
-                if(inputs[0]):
-                    hwnd = win32gui.FindWindow(None,str(inputs[0]).strip())
+                if(inputs):
+                    hwnd = win32gui.FindWindow(None,str(inputs).strip())
                     threadid,pid = win32process.GetWindowThreadProcessId(hwnd)
                     a = subprocess.call("TASKKILL /F /T /PID " + str(pid))
                 else:
                     a = 1
-                    inputs[0] = MAINFRAME_HOD
+                    inputs = MAINFRAME_HOD
                 b = subprocess.call("TASKKILL /F /IM AvoAssureMFapi.exe")
                 if( a == 0 and b == 0 ):
-                    log.info('Closed both ' + str(inputs[0]) + ' mainframe and AvoAssureMFapi.exe')
+                    log.info('Closed both ' + str(inputs) + ' mainframe and AvoAssureMFapi.exe')
                     result = True
                 elif( a == 0 and b != 0 ):
-                    log.info('Closed ' + str(inputs[0]) + ' mainframe, but unable to close AvoAssureMFapi.exe')
+                    log.info('Closed ' + str(inputs) + ' mainframe, but unable to close AvoAssureMFapi.exe')
                     result = True
                 elif( a != 0 and b == 0 ):
-                    err_msg = 'Unable to close' + str(inputs[0]) + ' mainframe, but able to close AvoAssureMFapi.exe'
+                    err_msg = 'Unable to close' + str(inputs) + ' mainframe, but able to close AvoAssureMFapi.exe'
                     log.error(err_msg)
                 else:
-                    err_msg = 'Unable to close both ' + str(inputs[0]) + ' mainframe and AvoAssureMFapi.exe'
+                    err_msg = 'Unable to close both ' + str(inputs) + ' mainframe and AvoAssureMFapi.exe'
                     log.error(err_msg)
                 del pid,threadid,hwnd,inputs,a,b #delete unused variables
             else:
