@@ -50,7 +50,7 @@ class ButtonOperations:
                         splitval=buttonName.strip()
                     log.debug('%s %s',MSG_RESULT_IS,buttonName)
                     keywordresult=MSG_PASS
-                    keywordresponse = buttonName
+                    keywordresponse = splitval
                     oebs_key_objects.custom_msg.append(str(MSG_RESULT_IS + keywordresponse))
                 else:
                     log.debug('%s',MSG_NAME_NOT_DEFINED)

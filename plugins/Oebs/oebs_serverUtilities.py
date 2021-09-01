@@ -18,6 +18,7 @@ import ast
 import json
 import re
 import time
+import readconfig
 global count
 count=''
 accessContext=''
@@ -130,7 +131,7 @@ class Utilities:
                             queue.append((path, element, index, index))
                         else:
                             queue.append((path, element, index, paneindex))   
-            elif len(queue) == 0:
+            if len(queue) == 0:
                 if errors: logger.print_on_console("Object not found in provided path, searching in alternate scroll panes for the object")
                 pane_occurances = [m.start() for m in re.finditer('scroll pane', currentxpathtemp)]
                 variable_path = currentxpathtemp
@@ -204,7 +205,7 @@ class Utilities:
             if path in visited:
                 continue
             else:
-                visited[path] = True
+                visited[path + str(index)] = True
             if path.split('/').pop() == 'text[0]':
                 new_path = self.get_alt_paths(path, currentxpathtemp)
                 log.info("Hidden Push button detected, creating new xpath: " + new_path)
@@ -212,6 +213,7 @@ class Utilities:
                     logger.print_on_console("Hidden Push button detected, creating new xpaths")
                     alt_paths_list.append(new_path)
                     alt_paths[new_path] = len(alt_paths_list) - 1 
+           
             if path == currentxpathtemp or path in alt_paths:
                 return active_parent, acc, paneindex == 0
 
@@ -254,11 +256,13 @@ class Utilities:
         index_text = path.index('text[0]')
         if index_text == -1: return ''
         semi_path = xpath[index_text : len(xpath)]
-        m = re.search(r"\d",semi_path)
-        if not m: return ''
-        new_index = m.start()
+        pat = r'(?<=\[).+?(?=\])'
+        m = re.findall(pat, semi_path)
+        if not m or len(m) <= 0: return ''
+        if not m[0].isdigit(): return ''
+        new_index = m[0]
+        semi_path = semi_path.replace(m[0],str(int(new_index) + 1))
         li_path = list(semi_path)
-        li_path[new_index] = str(int(li_path[new_index]) + 1)
         semi_path = ''.join(li_path)
         return xpath[0:index_text] + semi_path
 
@@ -268,72 +272,6 @@ class Utilities:
             if index < len(path_list) and path_list[index] == path:
                 return True
         return False
-
-    def methodtofillmap(self,acc,xpath,i):
-        global  accessContext
-        curaccinfo = acc.getAccessibleContextInfo()
-        tagrole = curaccinfo.role
-        tagname = ''
-        text = curaccinfo.name
-        if xpath == '':
-            if len(curaccinfo.name.strip()) == 0:
-                path = curaccinfo.role + '[' + str(i) + ']'
-            else:
-                if 'panel' in curaccinfo.role:
-                    path = curaccinfo.role  + '[' + str(i) + ']'
-                else:
-                    path = curaccinfo.role + '[' + str(curaccinfo.name.strip()) + ']'
-        else:
-            if len(curaccinfo.name.strip()) == 0:
-                path = xpath + '/' + curaccinfo.role  + '[' + str(i) + ']'
-            else:
-                if 'panel' in curaccinfo.role:
-                    path = xpath + '/' + curaccinfo.role  + '[' + str(i) + ']'
-                else:
-                    path = xpath + '/' + curaccinfo.role  + '[' + str(curaccinfo.name.strip()) + ']'
-
-        global activeframename
-        if('internal frame' in curaccinfo.role):
-            if('active' in curaccinfo.states):
-                activeframename=curaccinfo.name.strip()
-
-        if(activeframename):
-            if(activeframename in path):
-                global objectDictWithNameDesc
-                name=''
-                desc=''
-                if(curaccinfo.name):
-                    name=str(curaccinfo.name)
-                else:
-                    name=str(curaccinfo.name)
-                if(curaccinfo.description):
-                    desc=str(curaccinfo.description)
-                else:
-                    desc=str(curaccinfo.description)
-                namewithdesc=name+';'+desc
-                if(deletedobjectlist):
-                    if(not(namewithdesc in deletedobjectlist)):
-                        if(namewithdesc in objectDictWithNameDesc):
-                            objectDictWithNameDesc.pop(namewithdesc)
-                            deletedobjectlist.append(namewithdesc)
-                        else:
-                            objectDictWithNameDesc[namewithdesc]=path
-                elif(objectDictWithNameDesc):
-                    if(namewithdesc in objectDictWithNameDesc):
-                        objectDictWithNameDesc.pop(namewithdesc)
-                        deletedobjectlist.append(namewithdesc)
-                    else:
-                        objectDictWithNameDesc[namewithdesc]=path
-
-                else:
-                    objectDictWithNameDesc[namewithdesc]=path
-
-        for i in range(curaccinfo.childrenCount):
-            childacc = acc.getAccessibleChildFromContext(i)
-            acc.releaseJavaObject()
-            self.methodtofillmap(childacc,path,i)
-        return accessContext
-
 
     def object_generator(self,applicationname,locator,keyword,inputs,outputs, errors = False, allow_showing = False):
         global accessContext
@@ -367,7 +305,6 @@ class Utilities:
             accessContextParent = accessContextParent or ''
             if active_parent is None:
                 active_parent = False
-            self.methodtofillmap(oebs_api.JABContext(hwnd),'',0)
 
             identifiers = oebs_key_objects.xpath.split(';')
             uniquepath = identifiers[0]
@@ -406,10 +343,16 @@ class Utilities:
             oebs_key_objects.keyword_input.append(inputs[index])
         #output thats to be sent from the server to client
         oebs_key_objects.keyword_output = outputs.split(';')
-
-        if str(accessContextParent) != '' :
-            return accessContextParent, visible
-        else :
+        configvalues = readconfig.configvalues
+        ignore_hidden = configvalues['ignoreVisibilityCheck']
+        if str(accessContextParent) != '' and ((ignore_hidden == 'No' and visible) or ignore_hidden == 'Yes'):
+            if ignore_hidden == 'Yes' and not visible:
+                logger.print_on_console(ERROR_CODE_DICT['wrn_found_not_visible'])  
+            return accessContextParent, True
+        elif str(accessContextParent) != '' and ignore_hidden == 'No' and not visible:
+            logger.print_on_console(ERROR_CODE_DICT['err_found_not_visible'])
+            return 'fail', False
+        else:
             return 'fail', False
 
     def object_generator_test(self,applicationname,locator,keyword,inputs,outputs):
@@ -444,7 +387,6 @@ class Utilities:
             accessContextParent = accessContextParent or ''
             if active_parent is None:
                 active_parent = False
-            self.methodtofillmap(oebs_api.JABContext(hwnd),'',0)
 
             identifiers = oebs_key_objects.xpath.split(';')
             uniquepath = identifiers[0]
@@ -525,7 +467,7 @@ class Utilities:
                     path = xpath + '/' + curaccinfo.role  + '[' + str(curaccinfo.name.strip()) + ']'
         if path == loc:
             global k
-            k = 1;
+            k = 1
         for i in range(curaccinfo.childrenCount):
             if k == 0:
                 childacc = acc.getAccessibleChildFromContext(i)

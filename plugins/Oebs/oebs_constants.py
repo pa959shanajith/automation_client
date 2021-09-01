@@ -123,7 +123,12 @@ ERROR_CODE_DICT = {
     "err_close": "Unable to close window",
     "err_foreground": "Unable to bring window to foreground",
     'err_alternate_path': 'Object not found in alternate xpaths, unable to locate object',
-    'err_visible': 'Element not visible, unable to highlight'
+    'err_visible': 'Element not visible, unable to highlight',
+    'err_found_not_visible': 'Hidden Object found, Enable Ignore Visibility Check from ICE config to use this object',
+    'err_push_btn_scroll_bar': 'Push Buttons inside scroll bars can not be scraped',
+    'err_scroll_in_list': 'Scroll bar inside list can not be scraped',
+    'wrn_found_not_visible': 'Hidden Object found, but Ignore Visibility Check is enabled, performing operation'
+
 }
 
 
