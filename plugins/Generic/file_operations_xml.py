@@ -560,6 +560,12 @@ class FileOperationsXml:
                             self.deleteSortFileTempLoc()
                             if(output_res):
                                 num_diff,ch_lines = self.get_diff_count_xml(output_res)
+                        elif (fileExtensionA == '.json' and fileExtensionB == '.json'):
+                            # output_res contains the diffs, name_list contains the common names between 2 JSON content
+                            output_res,name_list = self.compare_json(filePathA, filePathB)
+                            if(output_res):
+                                num_diff, ch_lines = self.get_diff_count_json(output_res)
+                                output_res = name_list+output_res
                         else:
                             output_res = self.compare_texts(file1_lines,file2_lines)
                             if(output_res):
@@ -733,6 +739,55 @@ class FileOperationsXml:
             log.error( "Exception occurred in compare_xmls while comparing two xml data, ERR_MSG:" + str(e) )
         return out
 
+    def compare_json(self, json_file1, json_file2):
+        """
+        def : compare_json
+        purpose : compares two json files
+        param : inputPath-1,inputPath-2
+        return : differed json and common names list
+        """
+        try:
+            with open(json_file1, 'r') as f:
+                json1 = json.load(f)
+            with open(json_file2, 'r') as f:
+                json2 = json.load(f)
+            not_in_json1 = []
+            not_in_json2 = []
+            name_list=[]
+            # diff_count = 0            
+            for key in json1:
+                if key not in json2:
+                    not_in_json2.append(f'- {dict({key: json1[key]})}')
+                    # diff_count += 1
+                elif key in json2:
+                    if isinstance(json1[key], list) and isinstance(json2[key], list):
+                        if not (sorted(json1[key]) == sorted(json2[key])):
+                            not_in_json2.append(f'- {dict({key: json1[key]})}')
+                            diff_count += 1
+                        else:
+                            name_list.append(f'{dict({key: json1[key]})}')
+                    elif json1[key] != json2[key]:
+                        not_in_json2.append(f'- {dict({key: json1[key]})}')
+                        # diff_count += 1
+                    else:
+                        name_list.append(f'{dict({key: json1[key]})}')
+            for key in json2:
+                if key not in json1:
+                    not_in_json1.append(f'+ {dict({key: json2[key]})}')
+                    # diff_count += 1
+                elif key in json1:
+                    if isinstance(json1[key], list) and isinstance(json2[key], list):
+                        if not (sorted(json1[key]) == sorted(json2[key])):
+                            not_in_json1.append(f'+ {dict({key: json2[key]})}')
+                            # diff_count += 1
+                    elif json1[key] != json2[key]:
+                        not_in_json1.append(f'+ {dict({key: json2[key]})}')
+                        # diff_count += 1
+        except Exception as e:
+            logger.print_on_console( "Exception occurred in compare_json while comparing two json file data" )
+            log.error( "Exception occurred in compare_json while comparing two json file data, ERR_MSG:" + str(e) )
+        return not_in_json2+not_in_json1, name_list
+
     def get_diff_count(self,output_response):
         """
         def : get_diff_count
@@ -775,6 +830,19 @@ class FileOperationsXml:
             if(line.find("diff:") != -1):
                 ch_lines.append(line)
         return num_diff,ch_lines
+    def get_diff_count_json(self,output_response):
+        """
+        def : get_diff_count_json
+        purpose : counts number of differences between json inputs
+        param : difference of inputs
+        return : count of differences
+        """
+        # ch_lines = [] ch_lines same as output_response
+        num_diff=0
+        for line in output_response:
+            if line.startswith('+') or line.startswith('-'):
+                num_diff+=1
+        return num_diff,output_response
 
     #-----------------------------------------------sorting functions
     def get_node_key(self,node, attr=None):

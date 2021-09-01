@@ -94,7 +94,9 @@ class ElementKeywords:
                 else:
                     if(util.is_visible(webelement)):
                         text = webelement.get_attribute('innerText')
+                        if text.find('\xa0')!=-1:text=text.replace('\xa0'," ")
                         # text=self.__getelement_text(webelement)
+                        if text.find('\n')!=-1:text=text.replace('\n'," ")
                         logger.print_on_console('Element text: ',text)
                         local_eo.log.info('Element text: ')
                         local_eo.log.info(text)
@@ -134,7 +136,7 @@ class ElementKeywords:
                             local_eo.log.debug('Element Attribute not found,fetching with __getelement_text function')
                             text=self.__getelement_text(webelement)
                     if text.find('\xa0')!=-1: text = text.replace("\xa0"," ")
-                    if text==input:
+                    if text.replace("\n"," ")==input:
                        logger.print_on_console('Element Text matched')
                        local_eo.log.info('Element Text matched')
                        local_eo.log.info(STATUS_METHODOUTPUT_UPDATE)
