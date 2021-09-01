@@ -24,6 +24,7 @@ import random
 import dynamic_variable_handler
 import constant_variable_handler
 import logging
+import ast
 log = logging.getLogger('file_operations_xml.py')
 
 class FileOperationsXml:
@@ -59,7 +60,7 @@ class FileOperationsXml:
                     if ( out_path ): output_path = out_path
                 else:
                     output_path = args[0].split(";")[0]
-            if ( len(input_val) >= 2 ):
+            if ( len(input_val) == 2 and len(input_val[-1]) != 0 ):
                 blockVal = ';'.join(input_val[1:])
                 path = input_val[0]
                 if os.path.isfile(path):
@@ -99,15 +100,15 @@ class FileOperationsXml:
                                     if( optFlg ):
                                         value = elementList
                             else:
-                                err_msg = 'Invalid block : XML data not found'
+                                err_msg = 'Invalid tag, requires a valid tag identifier'
                         else:
-                            err_msg = 'Invalid block : incorrect input block data'
+                            err_msg = 'Invalid tag, requires a valid tag identifier'
                     else:
                         err_msg = 'Invalid XML data'
                 else:
                     err_msg = generic_constants.FILE_NOT_EXISTS
             else:
-                err_msg = generic_constants.INVALID_INPUT
+                err_msg = generic_constants.INVALID_NUMBER_OF_INPUTS
             if ( err_msg != None ):
                 log.error(err_msg)
                 logger.print_on_console(err_msg)
@@ -203,7 +204,7 @@ class FileOperationsXml:
                                                 logger.print_on_console( "Writing the output of selectiveXmlFileCompare to file.")
                                                 optFlg = False
                                                 # Changed to append mode from write mode
-                                                with open(output_path,'a') as f:
+                                                with open(output_path,'w') as f:
                                                     f.write(output_res)
                                             else:
                                                 logger.print_on_console(generic_constants.INVALID_OUTPUT_PATH)
@@ -272,10 +273,15 @@ class FileOperationsXml:
                 else:
                     output_path = args[0].split(";")[0]
             # if input length is 4 then proceed
-            if( len(input_val) == 4 and len(input_val[len(input_val) - 1]) != 0):
+            if(len(input_val) == 4 and len(input_val[-1]) != 0):
                 blockVal = ';'.join(input_val[3:])
                 if ((input_val[2]) != '') : res_opt = input_val[2].lower().strip()
                 blockData = input_val[1]
+                if "[" in blockData and "]" in blockData:
+                    blockData = ast.literal_eval(blockData)
+                else:
+                    blockData = [blockData]
+
                 path = input_val[0]
                 if( os.path.isfile( path ) ):
                     try: elm = etree.parse( path )
@@ -293,17 +299,29 @@ class FileOperationsXml:
                             logger.print_on_console( "Blocks found with given block xpath : " + str(len(elementList)) )
                             fg1 = True
                             fg2 = True
-                            try : xml.dom.minidom.parseString(self.beautify_xml_file(blockData))
-                            except : fg1 = False
+                            for data in blockData:
+                                try : xml.dom.minidom.parseString(self.beautify_xml_file(data))
+                                except : fg1 = False
                             for eL in elementList:
                                 try : xml.dom.minidom.parseString(self.beautify_xml_file(eL))
                                 except : fg2 = False
-                            for eL in elementList:
-                                if ( fg1 and fg2 ):
-                                    out = self.compare_xmls( self.beautify_xml_file( blockData ), self.beautify_xml_file( eL ) )
-                                else :
-                                    out = self.compare_texts( self.beautify_xml_file( blockData ), self.beautify_xml_file( eL ) )
-                                output_res.extend( out )
+                            if blockData == elementList:
+                                output_res.extend(blockData)
+                            else:
+                                for eL in elementList:
+                                    out = []
+                                    if ( fg1 and fg2 ):
+                                        for data in blockData:
+                                            out_1 = self.compare_xmls( self.beautify_xml_file( data ), self.beautify_xml_file( eL ) )
+                                            if out_1 and out_1 not in out:
+                                                out.extend(out_1)
+                                    else :
+                                        for data in blockData:
+                                            out_1 = self.compare_texts( self.beautify_xml_file( data ), self.beautify_xml_file( eL ) )
+                                            if out_1 and out_1 not in out:
+                                                out.extend(out_1)
+                                    output_res.extend( out )
+                                    del out
                             if ( output_res and len(output_res) > 0 ):
                                 flg = True
                                 optFlg = True

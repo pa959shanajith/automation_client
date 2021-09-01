@@ -327,6 +327,13 @@ class UtilWebKeywords:
                     local_uo.log.info(info_msg)
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
+                elif webelement.get_attribute("type") in ['checkbox', 'radio'] and webelement.get_attribute("onclick") in ['return false', 'return false;', 'this.checked = false', 'this.checked = false;', 'this.checked=false', 'this.checked=false;']:
+                    # Checking readonly property for checkbox and radio buttons which have onclick attribute value
+                    info_msg=ERROR_CODE_DICT['ERR_ELEMENT_IS_READONLY']
+                    logger.print_on_console(info_msg)
+                    local_uo.log.info(info_msg)
+                    status=TEST_RESULT_PASS
+                    methodoutput=TEST_RESULT_TRUE
                 else:
                     err_msg=ERROR_CODE_DICT['ERR_ELEMENT_IS_NOT_READONLY']
                     logger.print_on_console(err_msg)
