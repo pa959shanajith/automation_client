@@ -27,27 +27,28 @@ obj=None
 
 class ScrapeWindow(wx.Frame):
     def __init__(self, parent, id, title, filePath, socketIO):
-        self.uk=SapUtilKeywords()
-        wx.Frame.__init__(self, parent, title=title,
-                   pos = (300, 150), size = (210, 150), style=wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER | wx.MAXIMIZE_BOX | wx.CLOSE_BOX) )
-        self.SetBackgroundColour('#e6e7e8')
-        self.iconpath = os.environ["IMAGES_PATH"] + "/avo.ico"
-        self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
-        self.core_utilsobject = core_utils.CoreUtils()
-        self.parent = parent
-        global obj
-        obj = sap_launch_keywords.Launch_Keywords()
-        self.socketIO = socketIO
-        fileLoc = filePath.split(';')[0]
-        windowname = filePath.split(';')[1]
+        scrape_flag = False
         input_val = []
-        input_val.append(fileLoc)
-        input_val.append(windowname)
-        status = obj.launch_application(input_val)
-        self.scrapeoptions = ['Full', 'Button', 'Textbox', 'Dropdown', 'Label', 'Radiobutton', 'Checkbox', 'Table', 'Scroll Bar', 'Tab', 'Shell', 'SContainer', 'Other Tags']
-        self.tag_map = {'Full':'full','Button':'button', 'Textbox':'input', 'Dropdown':'select', 'Label':'label', 'Radiobutton':'radiobutton', 'Checkbox':'checkbox', 'Table':'table', 'Scroll Bar':'GuiScrollContainer', 'Tab':'GuiTab', 'Shell':'shell', 'SContainer':'scontainer', 'Other Tags':'others'}
-        if ( status != TERMINATE ):
-            try:
+        try:
+            self.uk=SapUtilKeywords()
+            wx.Frame.__init__(self, parent, title=title,
+                    pos = (300, 150), size = (210, 150), style=wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER | wx.MAXIMIZE_BOX | wx.CLOSE_BOX) )
+            self.SetBackgroundColour('#e6e7e8')
+            self.iconpath = os.environ["IMAGES_PATH"] + "/avo.ico"
+            self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
+            self.core_utilsobject = core_utils.CoreUtils()
+            self.parent = parent
+            global obj
+            obj = sap_launch_keywords.Launch_Keywords()
+            self.socketIO = socketIO
+            fileLoc = filePath.split(';')[0]
+            windowname = filePath.split(';')[1]
+            input_val.append(fileLoc)
+            input_val.append(windowname)
+            status = obj.launch_application(input_val)
+            self.scrapeoptions = ['Full', 'Button', 'Textbox', 'Dropdown', 'Label', 'Radiobutton', 'Checkbox', 'Table', 'Scroll Bar', 'Tab', 'Shell', 'SContainer', 'Other Tags']
+            self.tag_map = {'Full':'full','Button':'button', 'Textbox':'input', 'Dropdown':'select', 'Label':'label', 'Radiobutton':'radiobutton', 'Checkbox':'checkbox', 'Table':'table', 'Scroll Bar':'GuiScrollContainer', 'Tab':'GuiTab', 'Shell':'shell', 'SContainer':'scontainer', 'Other Tags':'others'}
+            if ( status != TERMINATE ):
                 self.panel = wx.Panel(self)
                 self.vsizer = wx.BoxSizer(wx.VERTICAL)
                 self.startbutton = wx.ToggleButton(self.panel, label = "Start ClickAndAdd", pos=(12, 18), size=(175, 25))
@@ -59,23 +60,30 @@ class ScrapeWindow(wx.Frame):
 
                 self.fullscrapebutton = wx.Button(self.panel, label="Scrape", pos = (101, 48), size = (86, 25))
                 self.fullscrapebutton.Bind(wx.EVT_BUTTON, self.fullscrape)
-            except Exception as e:
-                log.error(e)
-                logger.print_on_console(e)
 
-            import cropandadd
-            global cropandaddobj
-            cropandaddobj = cropandadd.Cropandadd()
-            self.cropbutton = wx.ToggleButton(self.panel, label = "Start IRIS", pos = (12, 78), size = (175, 25))
-            self.cropbutton.Bind(wx.EVT_TOGGLEBUTTON, self.cropandadd)
-            self.Centre()
-            style = self.GetWindowStyle()
-            self.SetWindowStyle( style | wx.STAY_ON_TOP )
-            wx.Frame(self.panel, style = wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER)
-            self.Show()
-        else:
+                import cropandadd
+                global cropandaddobj
+                cropandaddobj = cropandadd.Cropandadd()
+                self.cropbutton = wx.ToggleButton(self.panel, label = "Start IRIS", pos = (12, 78), size = (175, 25))
+                self.cropbutton.Bind(wx.EVT_TOGGLEBUTTON, self.cropandadd)
+                self.Centre()
+                style = self.GetWindowStyle()
+                self.SetWindowStyle( style | wx.STAY_ON_TOP )
+                wx.Frame(self.panel, style = wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER)
+                self.Show()
+            else:
+                scrape_flag=True
+        except IndexError as ex:
+            scrape_flag=True
+            log.error(ex)
+            logger.print_on_console("Failed to launch application. Please provide valid inputs")
+        except Exception as e:
+            scrape_flag=True
+            log.error(e)
+        if (scrape_flag):
             self.socketIO.emit('scrape','Fail')
             self.parent.schedule.Enable()
+            self.Close()
 
     def clickandadd(self, event):
         state = event.GetEventObject().GetValue()
