@@ -99,7 +99,7 @@ class Reporting:
             output = ','.join(output_list)
 
             #output=con.dynamic_var_handler_obj.replace_dynamic_variable(tsp.outputval,tsp.name,con)
-            if (tsp.name.lower() in MULTIPLE_OUTPUT_KEYWORDS and output != '' and output != None) or tsp.name.lower()==DISPALY_VARIABLE_VALUE:
+            if (tsp.name.lower() in MULTIPLE_OUTPUT_KEYWORDS and output != '' and output != None) or (tsp.name.lower()==DISPALY_VARIABLE_VALUE) or tsp.name.lower()=='capturescreenshot':
                 output=tsp.additionalinfo
             apptype=tsp.apptype
             params=tsp.name.lower(),tsp,inputVal,input,output,con,self
@@ -112,7 +112,9 @@ class Reporting:
             'sap':self.step_description_obj.sap,
             'desktopjava':self.step_description_obj.oebs,
             'mainframe':self.step_description_obj.mainframe,
-            'system':self.step_description_obj.system}
+            'system': self.step_description_obj.system}
+            # if apptype.lower == 'generic' and tsp.name.lower()=='capturescreenshot':
+            #     params[4]=tsp.additonalInfo
             description=apptype_description[apptype.lower()](*params)
             description=self.core_utilsobject.get_UTF_8(description)
 ##            description=description.encode('utf-8')
