@@ -112,7 +112,7 @@ class Object_Mapper():
             maindir = os.environ["AVO_ASSURE_HOME"]
             screen_shot_path = maindir + '/output/' + domconstants.SCREENSHOT_IMG
             if (isinstance(self.driver, webdriver.Firefox) or isinstance(self.driver, webdriver.Chrome)):
-                screen = self.webscrapeutilsobj.fullpage_screenshot(self.driver, screen_shot_path)
+                screen, total_width, total_height = self.webscrapeutilsobj.fullpage_screenshot(self.driver, screen_shot_path)
             else:
                 screen = self.driver.get_screenshot_as_base64()
             self.data['comparedin'] = comparedin

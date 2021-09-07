@@ -107,6 +107,7 @@ class ScrapeDispatcher(wx.Frame):
             self.cropbutton.Disable()
 
             event.GetEventObject().SetLabel("Stop ClickAndAdd")
+            self.utils_obj.set_to_foreground(windownametoscrape)
             oebs_click_and_add.init_core(windownametoscrape)
             logger.print_on_console('Select the elements from AUT')
 

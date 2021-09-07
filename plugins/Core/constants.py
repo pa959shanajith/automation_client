@@ -266,6 +266,7 @@ ERROR_CODE_DICT = {
                     'ERR_CONNECTION_FAILED':'Unable to establish connection to DB',
                     'ERR_VALUES_DOESNOT_MATCH':'Values does not match',
                     'ERR_INPUT_TYPE_MISMATCH': 'Cannot set text to a numerical textbox',
+                    'ERR_INPUT_NOT_PRESENT':'Content does not exist in the file',
                     #controller messages
                     'ERR_ENDIF_TERMINATE_EXECUTION': ' Execution Terminated : End if/Endfor is missing',
                     'ERR_INVALID_TESTCASE':'Execution Terminated : Jump to test case name not present',

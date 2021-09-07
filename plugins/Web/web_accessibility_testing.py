@@ -26,6 +26,8 @@ import logger
 import logging
 import time
 import readconfig
+from webscrape_utils import WebScrape_Utils
+import constants
 log = logging.getLogger(__name__)
 
 # imports for Accessibility
@@ -47,6 +49,7 @@ class Web_Accessibility_Testing:
         self.subdomain = ""
         self.crawlStatus = True
         self.searchData = None
+        self.webscrape_utils_obj = WebScrape_Utils()
 
     def parse(self, obj, driver):
         """
@@ -92,19 +95,39 @@ class Web_Accessibility_Testing:
                 for rule in self.searchData:
                     if rule["selected"]:
                         accessTags.append(rule["tag"])
-                accessOptions = {'runOnly': {'type': "tag", 'values': accessTags}}
+                accessOptions = {'runOnly': {'type': "tag", 'values': accessTags}, 'elementRef':"true"}
                 axe = Axe(driver)
                 # Inject axe-core javascript into page.
                 axe.inject()
                 results = self.run(options=accessOptions, browsertype = agent, driver = driver)
                 #results = axe.run(options=accessOptions, browsertype = agent)
                 violationCount = dict()
+                report_obj = {"violations":[],"passes":[]}
                 for violation in results["violations"]:
                     for tag in violation["tags"]:
                         if tag in violationCount:
                             violationCount[tag] += 1
                         else:
                             violationCount[tag] = 1
+                for status in report_obj:
+                    for element in results[status]:
+                        rep = {}
+                        rep["description"] = element['description']
+                        rep['help'] = element['help']
+                        rep['impact'] = element['impact']
+                        rep['tags'] = element['tags']
+                        rep['elements'] = []
+                        for nodes in element['nodes']:
+                            element_details = {}
+                            element_details['html'] = nodes['html']
+                            element_details['rect'] = nodes['element'].rect
+                            if 'failureSummary' in nodes:
+                                element_details['solution'] = nodes['failureSummary']
+                            else:
+                                element_details['solution'] = "N/A"
+                            rep['elements'].append(element_details)
+                        report_obj[status].append(rep)
+
                 # logger.print_on_console(violationCount)
                 for rule in self.searchData:
                     if rule["tag"] in violationCount:
@@ -113,7 +136,7 @@ class Web_Accessibility_Testing:
                     else:
                         rule["pass"] = True
                         rule["count"] = 0
-                obj["accessibility"] = results
+                obj["accessibility"] = report_obj
                 obj["access-rules"] = self.searchData
 
                 if soup.title:
@@ -178,7 +201,7 @@ class Web_Accessibility_Testing:
 
 
 
-    def runCrawler(self, driver, script_info, executionid):
+    def runCrawler(self, driver, script_info, executionid, index):
         """
         Crawl through the html document at level 0 and test each element in the document.
 
@@ -230,6 +253,21 @@ class Web_Accessibility_Testing:
         # Stop everything in the case of disconnection from server
         if controller.disconnect_flag:
             return True
+        try:
+            logger.print_on_console('Capturing Screenshot for Accessibility Testing')
+            if not os.path.exists(constants.SCREENSHOT_PATH ):
+                path = os.getcwd() + os.sep + "output" + os.sep + executionid + os.sep + str(index) +".png"
+            else:    
+                path = constants.SCREENSHOT_PATH + script_info['projectname'] + os.sep + "acctest" + os.sep + executionid + os.sep + str(index) +".png"
+
+            screenshot, width, height = self.webscrape_utils_obj.fullpage_screenshot(driver, path)
+            result['screenshotpath'] = path
+            result['width'] = width
+            result['height'] = height
+        except Exception as e:
+            logger.print_on_console('Error in taking screenshot')
+            log.error(e,exc_info=True)
+
         time_taken = time.clock() - start
         crawling_status = "succesfully"
         if controller.terminate_flag:

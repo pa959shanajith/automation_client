@@ -381,15 +381,44 @@ class XMLOperations():
                     log.info('Block number: ',block_number)
                     block = blocks[block_number-1].getchildren()
                     log.info('Iterating child in the block')
-                    for child in block:
-                        if '}' in child.tag:
-                            if child.text != None:
-                                log.info('Child text :',child.text)
-                                blockvalue.append(  '<' + child.tag.split('}')[1]  + '>' + child.text +  '</' + child.tag.split('}')[1]  + '>')
-                            else:
-                                blockvalue.append(  '<' + child.tag.split('}')[1]  + '/>')
+                    def get_child_nodes_xml(node):
+                        """
+                        def : get_child_nodes_xml
+                        purpose : get_child_nodes_xml is used to get the all the child nodes of a node in xml Recursively
+                        param : xml etree object
+                        return : child nodes of a node as string
+                        """
+
+                        child_elements = node.getchildren()
+                        if len(child_elements) > 0:
+                            child_nodes = ''
+                            for element in child_elements:
+                                if len(element.getchildren()) > 0:
+                                    child_nodes = get_child_nodes_xml(element)
+                                else:
+                                    if '}' in element.tag:
+                                        if element.text != None:
+                                            log.info('Child text :',element.text)
+                                            child_nodes += '<' + element.tag.split('}')[1]  + '>' + element.text +  '</' + element.tag.split('}')[1]  + '>'
+                                        else:
+                                            child_nodes += '<' + element.tag.split('}')[1]  + '/>'
+                                    else:
+                                        if element.text != None:
+                                            child_nodes += '<' + element.tag + '>' + element.text +  '</' + element.tag + '>'
+                            return '<' + node.tag + '>' + child_nodes +  '</' + node.tag + '>'
                         else:
-                            blockvalue.append(  '<' + child.tag + '>' + child.text +  '</' + child.tag + '>')
+                            if '}' in node.tag:
+                                if node.text != None:
+                                    log.info('Child text :',node.text)
+                                    return '<' + node.tag.split('}')[1]  + '>' + node.text +  '</' + node.tag.split('}')[1]  + '>'
+                                else:
+                                    return '<' + node.tag.split('}')[1]  + '/>'
+                            else:
+                                if node.text != None:
+                                    return '<' + node.tag + '>' + node.text +  '</' + node.tag + '>'
+                    for child in block:
+                        child_nodes = get_child_nodes_xml(child)
+                        blockvalue.append(child_nodes)
                     status = TEST_RESULT_PASS
                     methodoutput = TEST_RESULT_TRUE
                     log.info(STATUS_METHODOUTPUT_UPDATE)

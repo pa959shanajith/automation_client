@@ -7,6 +7,8 @@ import time
 import ast
 import win32gui
 import win32api
+from oebs_constants import *
+import logger
 import oebs_click_and_add
 import os
 log=logging.getLogger('oebs_xpath_generator.py')
@@ -122,6 +124,8 @@ class PathGenerator():
         
         self.path_generator_free = False
         xpath = self.generate_xpath(obj)
+        if xpath == 'fail':
+            return
         # get the value selected in combo box - not implemented yet
         # traverse throught the childern of the obj (combo box) and check the status of all childern if selected 
         # get the name and index of parent of the child
@@ -243,6 +247,19 @@ class PathGenerator():
                         self.path = current_acc_info.role  + '[' + str(current_acc_info.description.strip()) + ']' + '//' + self.path
             if obj._get_object_depth() > 0:
                 obj = obj._get_parent()
+                parent = obj._get__JABAccContextInfo()
+                if current_acc_info.role == 'push button' and parent.role == 'scroll bar':
+                    err_msg = ERROR_CODE_DICT['err_push_btn_scroll_bar']
+                    logger.print_on_console(err_msg)
+                    log.error(err_msg)
+                    self.path = ''
+                    return 'fail'
+                if current_acc_info.role == 'scroll bar' and parent.role == 'scroll pane':
+                    err_msg = ERROR_CODE_DICT['err_scroll_in_list']
+                    logger.print_on_console(err_msg)
+                    log.error(err_msg)
+                    self.path = ''
+                    return 'fail'
             else:
                 loop = False
 
