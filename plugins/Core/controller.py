@@ -34,6 +34,8 @@ import reporting
 import core_utils
 import recording
 from logging.handlers import TimedRotatingFileHandler
+from logger import CustomHandler
+import shutil
 local_cont = threading.local()
 #index for iterating the teststepproperty for executor
 ##i = 0
@@ -856,6 +858,8 @@ class Controller():
         start_time_string=self.scenario_start_time.strftime(TIME_FORMAT)
         logger.print_on_console('Scenario Execution start time is : '+start_time_string,'\n')
         global pause_flag
+        hn = execution_env['handlerno']
+        log.root.handlers[hn].createTspObj(execution_env['scenario_id'],execution_env['browser'])
         if local_cont.generic_dispatcher_obj is not None and local_cont.generic_dispatcher_obj.action is None:
             local_cont.generic_dispatcher_obj.action=action
         #Check for 'run from step' with range as input
@@ -878,7 +882,9 @@ class Controller():
                 self.debugfrom_step=debugfrom_step
                 try:
                     index = i
+                    log.root.handlers[hn].starttsp(tsplist[index],execution_env['scenario_id'],execution_env['browser'])
                     i = self.methodinvocation(i,execution_env,datatables)
+                    log.root.handlers[hn].stoptsp(tsplist[index],execution_env['scenario_id'],execution_env['browser'])
                     #Check wether accessibility testing has to be executed
                     if accessibility_testing and (index + 1 >= len(tsplist) or (tsplist[index].testscript_name != tsplist[index + 1].testscript_name and screen_testcase_map[tsplist[index].testscript_name]['screenid'] != screen_testcase_map[tsplist[index + 1].testscript_name]['screenid'])):
                         if local_cont.accessibility_testing_obj is None: self.__load_web()
@@ -1079,7 +1085,7 @@ class Controller():
         obj.clear_const_variables()
         return status
 
-    def invoke_execution(self,mythread,json_data,socketIO,wxObject,configvalues,qcObject,qtestObject,zephyrObject,aws_mode):
+    def invoke_execution(self,mythread,json_data,socketIO,wxObject,configvalues,qcObject,qtestObject,zephyrObject,aws_mode,browserno='0',threadName=''):
         global terminate_flag, status_percentage, saucelabs_count, screen_testcase_map
         qc_url=''
         qc_password=''
@@ -1137,11 +1143,22 @@ class Controller():
             base_execute_data = {
                 'batchId': batch_id,
                 'executionId': execution_ids[suite_idx-1],
-                'testsuiteId': suite_id
+                'testsuiteId': suite_id,
+                'projectname' : suite['projectname']
             }
             socketIO.emit("return_status_executeTestSuite", dict({"status": "started",
                 'startTime': datetime.now().strftime(TIME_FORMAT)}, **base_execute_data))
             execute_result_data = dict({'scenarioId': None, 'reportData': None}, **base_execute_data)
+            if(self.execution_mode == PARALLEL):
+                log_handler = CustomHandler(self.execution_mode,base_execute_data,browserno)
+                log_filter = ThreadLogFilter(threadName)
+                log_handler.addFilter(log_filter)
+            else:
+                log_handler = CustomHandler(self.execution_mode,base_execute_data)
+            formatter = logging.Formatter("%(asctime)s %(levelname)s %(name)s.%(funcName)s:%(lineno)d %(message)s")
+            log_handler.setFormatter(formatter)
+            log.root.addHandler(log_handler)
+            handlerno = len(log.root.handlers)-1
             if aws_mode:
                 pytest_files=[]
                 #Logic to Execute each suite for each of the browser
@@ -1291,7 +1308,8 @@ class Controller():
                             # sc_idx += 1
                             # execute_flag=False
                         else:
-                            execution_env = {'env':'default'}
+                            # for sauce labs and for aws need broeser and scrnarioid??
+                            execution_env = {'env':'default','browser':browser,'scenario_id':scenario_id,'handlerno':handlerno}
                         if flag and execute_flag :
                             #check for temrinate flag before execution
                             tsplist = obj.read_step()
@@ -1733,6 +1751,11 @@ class Controller():
                     status=self.invoke_execution(mythread,json_data,socketIO,wxObject,self.configvalues,qc_soc,qtest_soc,zephyr_soc,aws_mode)
                 elif self.execution_mode == PARALLEL:
                     status = self.invoke_parralel_exe(mythread,json_data,socketIO,wxObject,self.configvalues,qc_soc,qtest_soc,zephyr_soc,aws_mode)
+                a = len(log.root.handlers)-1
+                for i in range(a):
+                    log.root.handlers[1].writeManifest()
+                    log.root.removeHandler(log.root.handlers[1])
+                shutil.rmtree(os.sep.join([os.getcwd(),'output','.logs',json_data['batchId']]), ignore_errors=True)
             elif action==DEBUG:
                 self.debug_choice=wxObject.choice
                 self.debug_mode=debug_mode
@@ -1852,7 +1875,7 @@ class Controller():
                 for j in range(len(jsondata_dict[i]['suitedetails'])):
                     jsondata_dict[i]['suitedetails'][j]['browserType'] = [browsers_data[i]]
                 thread_name = "test_thread_browser" + str(browsers_data[i])
-                th[i] = threading.Thread(target = self.invoke_execution, name = thread_name, args = (mythread,jsondata_dict[i],socketIO,wxObject,configvalues,qc_soc,qtest_soc,zephyr_soc,aws_mode))
+                th[i] = threading.Thread(target = self.invoke_execution, name = thread_name, args = (mythread,jsondata_dict[i],socketIO,wxObject,configvalues,qc_soc,qtest_soc,zephyr_soc,aws_mode,browsers_data[i],thread_name))
                 self.seperate_log(th[i], browsers_data[i]) #function that creates different logs for each browser
                 if SYSTEM_OS =='Linux': time.sleep(0.5)
                 th[i].start()

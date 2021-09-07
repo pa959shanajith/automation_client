@@ -676,24 +676,19 @@ class Dispatcher:
                 result=list(result)
                 result[3]=err_msg
             screen_shot_obj = screenshot_keywords.Screenshot()
-            headless_mode = str(configvalues['headless_mode'])=='Yes'
             if self.action == EXECUTE:
                 if result != TERMINATE:
                     result=list(result)
                     screen_details=mythread.json_data['suitedetails'][0]
-                    sauceFlag=False
-                    if execution_env['env'] == 'saucelabs':
-                        sauceFlag=True
+                    driverFlag=False
+                    if ( str(configvalues['headless_mode'])=='Yes' or execution_env['env'] == 'saucelabs'):
+                        driverFlag=driver
                     if configvalues['screenShot_Flag'].lower() == 'fail':
                         if result[0].lower() == 'fail':
-                            file_path = screen_shot_obj.captureScreenshot(screen_details,web=False)
-                            if headless_mode or sauceFlag:
-                                driver.save_screenshot(file_path[2])
+                            file_path = screen_shot_obj.captureScreenshot(screen_details,driver=driverFlag,web=False)
                             result.append(file_path[2])
                     elif configvalues['screenShot_Flag'].lower() == 'all':
-                        file_path = screen_shot_obj.captureScreenshot(screen_details,web=False)
-                        if headless_mode or sauceFlag:
-                            driver.save_screenshot(file_path[2])
+                        file_path = screen_shot_obj.captureScreenshot(screen_details,driver=driverFlag,web=False)
                         result.append(file_path[2])
         except TypeError as e:
             local_Wd.log.error(e,exc_info=True)
