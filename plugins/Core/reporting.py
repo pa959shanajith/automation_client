@@ -112,9 +112,7 @@ class Reporting:
             'sap':self.step_description_obj.sap,
             'desktopjava':self.step_description_obj.oebs,
             'mainframe':self.step_description_obj.mainframe,
-            'system': self.step_description_obj.system}
-            # if apptype.lower == 'generic' and tsp.name.lower()=='capturescreenshot':
-            #     params[4]=tsp.additonalInfo
+            'system':self.step_description_obj.system}
             description=apptype_description[apptype.lower()](*params)
             description=self.core_utilsobject.get_UTF_8(description)
 ##            description=description.encode('utf-8')
