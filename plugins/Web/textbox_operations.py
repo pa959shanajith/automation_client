@@ -1127,7 +1127,10 @@ class TextboxKeywords:
                             if obj.is_visible(webelement):
                                 webelement.clear()
                                 from selenium.webdriver.common.keys import Keys
-                                webelement.send_keys(Keys.BACK_SPACE)
+                                try:
+                                    webelement.send_keys(Keys.BACK_SPACE)
+                                except Exception as e:
+                                    local_to.log.debug('Warning!: Could not perform back spack function due to error : '+str(e))
                             else:
                                 self.__clear_text(webelement)
                             status=TEST_RESULT_PASS
