@@ -542,6 +542,7 @@ class JSONOperations():
                         nested=nested[int(number[i])-1]
                     else:
                         nested=nested[0]
+                    nested = nested[block[i]]
             try:
                 if isinstance(nested,list) and int(number[i+1]) != None and int(number[i+1])!='':
                     if int(number[i+1])-1 != -1 :
@@ -552,10 +553,10 @@ class JSONOperations():
                             methodoutput = TEST_RESULT_TRUE
                         else:
                             log.debug('Invalid key given')
-                            err_msg= ERR_XML
+                            err_msg= ERR_JSON
                     else:
                         log.debug('Index out of range')
-                        err_msg= ERR_XML
+                        err_msg= ERR_JSON
                 elif isinstance(nested,dict):
                     if key_name in nested:
                         key_value = nested[key_name]
@@ -564,7 +565,7 @@ class JSONOperations():
                         methodoutput = TEST_RESULT_TRUE
                     else:
                         log.debug('Invalid key given')
-                        err_msg= ERR_XML
+                        err_msg= ERR_JSON
                 else:
                         key_value = nested[0][key_name];
                         logger.print_on_console('Key : ',key_name, ' Value : ',key_value)
@@ -573,13 +574,15 @@ class JSONOperations():
                 if(err_msg != None):
                     logger.print_on_console(err_msg)
             except Exception as e:
-                err_msg=ERR_XML
+                err_msg=ERR_JSON
                 logger.print_on_console(err_msg)
                 log.error(e)
         except Exception as e:
-            err_msg=EXCEPTION_OCCURED
-            log.error(e)
-##        key_value=key_value.encode('utf-8')
+            if err_msg is None:
+                err_msg = ERR_JSON
+                logger.print_on_console(err_msg)
+                logger.error(e)
+                
         return status,methodoutput,key_value,err_msg
 
     def parsexmltodict(self,input_string,block_key_name,block_count,key_name,args):
