@@ -248,6 +248,8 @@ class StepDescription:
         # Generic-JSON
         def getkeyvalue():
             return "Get the Key Value of JSON and save the value '" + output+ "' in '" + tsp.outputval + "'"
+        def setkeyvalue():
+            return "Set the Key Value of JSON and save the value '" + output+ "' in '" + tsp.outputval + "'"
 
         #DB-operations
         def getdata():

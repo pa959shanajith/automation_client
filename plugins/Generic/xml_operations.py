@@ -582,7 +582,7 @@ class JSONOperations():
                 err_msg = ERR_JSON
                 logger.print_on_console(err_msg)
                 logger.error(e)
-                
+
         return status,methodoutput,key_value,err_msg
 
     def parsexmltodict(self,input_string,block_key_name,block_count,key_name,args):
@@ -645,3 +645,84 @@ class JSONOperations():
             log.error(e)
 
         return status,methodoutput,key_value,err_msg
+
+    def set_key_value(self,input_string,block_key_name,block_count,key_name,key_value,*args):
+        """
+        def : set_key_value
+        purpose : set_key_value is used to set the key Value of the specified key in the given json with given value
+        param  : inputs : 1. json 2. block_key_name 3. block_count 4. key_name
+        return : pass,true / fail,false, keyvalue
+        """
+        status = TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FALSE
+        err_msg=None
+        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        try:
+            xml_class=XMLOperations()
+            input_string=xml_class.check_xml_json_file(input_string)
+            encoded_inp_string=input_string
+            if isinstance(input_string,str):
+                encoded_inp_string=input_string.encode('utf-8')
+            input_json=json.loads(encoded_inp_string, strict=False)
+            if "{" in key_value and "}" in key_value:
+                key_value = json.loads(key_value)
+            block=block_key_name.split('.')
+            number=block_count.split(',')
+            nested=input_json
+            for i in range(0,len(block)):
+                if(block[i] in nested and isinstance(nested,dict)):
+                    nested=nested[block[i]]
+                elif(isinstance(nested,list)):
+                    if int(number[i])-1 != -1:
+                        nested = nested[int(number[i])-1]
+                    else:
+                        nested=nested[0]
+                    nested = nested[block[i]]
+            try:
+                if isinstance(nested,list) and int(number[i+1]) != None and int(number[i+1])!='':
+                    if int(number[i+1])-1 != -1 :
+                        if key_name in nested[int(number[i+1])-1]:
+                            nested[int(number[i+1])-1][key_name] = key_value
+                            logger.print_on_console('Key : ', key_name, ' with Value : ', key_value, ' is set.')
+                            input_json = json.dumps(input_json)
+                            status = TEST_RESULT_PASS
+                            methodoutput = TEST_RESULT_TRUE
+                        else:
+                            log.debug('Invalid key given')
+                            err_msg= ERR_JSON
+                    else:
+                        log.debug('Index out of range')
+                        err_msg= ERR_JSON
+                elif isinstance(nested,dict):
+                    if key_name in nested:
+                        nested[key_name] = key_value
+                        logger.print_on_console('Key : ', key_name, ' with Value : ', key_value, ' is set.')
+                        input_json = json.dumps(input_json)
+                        status = TEST_RESULT_PASS
+                        methodoutput = TEST_RESULT_TRUE
+                    else:
+                        log.debug('Invalid key given')
+                        err_msg= ERR_JSON
+                else:
+                        nested[0][key_name] = key_value
+                        logger.print_on_console('Key : ', key_name, ' with Value : ', key_value, ' is set.')
+                        input_json = json.dumps(input_json)
+                        status = TEST_RESULT_PASS
+                        methodoutput = TEST_RESULT_TRUE
+                if(err_msg != None):
+                    logger.print_on_console(err_msg)
+            except Exception as e:
+                err_msg=ERR_JSON
+                logger.print_on_console(err_msg)
+                logger.error(e)
+        except json.decoder.JSONDecodeError as e:
+            err_msg = str(e.msg) + " in JSON/Key value"
+            logger.print_on_console(err_msg)
+            logger.error(err_msg)
+        except Exception as e:
+            if err_msg is None:
+                err_msg = ERR_JSON
+                logger.print_on_console(err_msg)
+                logger.error(e)
+                
+        return status,methodoutput,input_json,err_msg
