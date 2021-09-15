@@ -381,6 +381,7 @@ class XMLOperations():
                     log.info('Block number: ',block_number)
                     block = blocks[block_number-1].getchildren()
                     log.info('Iterating child in the block')
+
                     def get_child_nodes_xml(node):
                         """
                         def : get_child_nodes_xml
@@ -396,26 +397,87 @@ class XMLOperations():
                                 if len(element.getchildren()) > 0:
                                     child_nodes = get_child_nodes_xml(element)
                                 else:
+                                    attributes = ""
+                                    for k, v in element.attrib.items():
+                                        if "XMLSchema-instance" in k and "}" in k:
+                                            k = "xsi:" + k.split("}")[1]
+                                        elif "XMLSchema" in k and "}" in k:
+                                            k = "xsd:" + k.split("}")[1]
+                                        attributes += k + "=" + '"' + v + '"' + " "
+                                    attributes = attributes.strip()
                                     if '}' in element.tag:
                                         if element.text != None:
                                             log.info('Child text :',element.text)
-                                            child_nodes += '<' + element.tag.split('}')[1]  + '>' + element.text +  '</' + element.tag.split('}')[1]  + '>'
+                                            if attributes != "":
+                                                child_nodes += '<' + element.tag.split('}')[1]  + " " + attributes + '>' + element.text +  '</' + element.tag.split('}')[1]  + '>'
+                                            else:
+                                                child_nodes += '<' + element.tag.split('}')[1] + '>' + element.text + '</' + element.tag.split('}')[1] + '>'
                                         else:
-                                            child_nodes += '<' + element.tag.split('}')[1]  + '/>'
+                                            if attributes != "":
+                                                child_nodes += '<' + element.tag.split('}')[1]  + " " + attributes + '/>'
+                                            else:
+                                                child_nodes += '<' + element.tag.split('}')[1]  + '/>'
                                     else:
                                         if element.text != None:
-                                            child_nodes += '<' + element.tag + '>' + element.text +  '</' + element.tag + '>'
-                            return '<' + node.tag + '>' + child_nodes +  '</' + node.tag + '>'
+                                            if attributes != "":
+                                                child_nodes += '<' + element.tag + " " + attributes + '>' + element.text +  '</' + element.tag + '>'
+                                            else:
+                                                child_nodes += '<' + element.tag + '>' + element.text +  '</' + element.tag + '>'
+                                        else:
+                                            if attributes != "":
+                                                child_nodes += '<' + element.tag  + " " + attributes + '/>'
+                                            else:
+                                                child_nodes += '<' + element.tag  + '/>'
+                            attributes = ""
+                            for k, v in node.attrib.items():
+                                if "XMLSchema-instance" in k and "}" in k:
+                                    k = "xsi:" + k.split("}")[1]
+                                elif "XMLSchema" in k and "}" in k:
+                                    k = "xsd:" + k.split("}")[1]
+                                attributes += k + "=" + '"' + v + '"' + " "
+                            attributes = attributes.strip()
+                            if "}" in node.tag:
+                                if attributes != "":
+                                    return '<' + node.tag.split('}')[1] + " " + attributes + '>' + child_nodes +  '</' + node.tag.split('}')[1] + '>'
+                                else:
+                                    return '<' + node.tag.split('}')[1] + '>' + child_nodes +  '</' + node.tag.split('}')[1] + '>'
+                            else:
+                                if attributes != "":
+                                    return '<' + node.tag + " " + attributes + '>' + child_nodes +  '</' + node.tag + '>'
+                                else:
+                                    return '<' + node.tag + '>' + child_nodes +  '</' + node.tag + '>'
                         else:
+                            attributes = ""
+                            for k, v in node.attrib.items():
+                                if "XMLSchema-instance" in k and "}" in k:
+                                    k = "xsi:" + k.split("}")[1]
+                                elif "XMLSchema" in k and "}" in k:
+                                    k = "xsd:" + k.split("}")[1]
+                                attributes += k + "=" + '"' + v + '"' + " "
+                            attributes = attributes.strip()
                             if '}' in node.tag:
                                 if node.text != None:
                                     log.info('Child text :',node.text)
-                                    return '<' + node.tag.split('}')[1]  + '>' + node.text +  '</' + node.tag.split('}')[1]  + '>'
+                                    if attributes != "":
+                                        return '<' + node.tag.split('}')[1]  + " " + attributes + '>' + node.text +  '</' + node.tag.split('}')[1]  + '>'
+                                    else:
+                                        return '<' + node.tag.split('}')[1]  + '>' + node.text +  '</' + node.tag.split('}')[1]  + '>'
                                 else:
-                                    return '<' + node.tag.split('}')[1]  + '/>'
+                                    if attributes != "":
+                                        return '<' + node.tag.split('}')[1]  + " " + attributes + '/>'
+                                    else:
+                                        return '<' + node.tag.split('}')[1]  + '/>'
                             else:
                                 if node.text != None:
-                                    return '<' + node.tag + '>' + node.text +  '</' + node.tag + '>'
+                                    if attributes != "":
+                                        return '<' + node.tag + " " + attributes + '>' + node.text +  '</' + node.tag + '>'
+                                    else:
+                                        return '<' + node.tag + '>' + node.text +  '</' + node.tag + '>'
+                                else:
+                                    if attributes != "":
+                                        return '<' + node.tag  + " " + attributes + '/>'
+                                    else:
+                                        return '<' + node.tag  + '/>'
                     for child in block:
                         child_nodes = get_child_nodes_xml(child)
                         blockvalue.append(child_nodes)
