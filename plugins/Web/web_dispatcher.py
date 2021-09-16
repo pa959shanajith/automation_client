@@ -686,14 +686,22 @@ class Dispatcher:
                         sauceFlag=True
                     if configvalues['screenShot_Flag'].lower() == 'fail':
                         if result[0].lower() == 'fail':
-                            file_path = screen_shot_obj.captureScreenshot(screen_details,web=False)
-                            if headless_mode or sauceFlag:
+                            if local_Wd.popup_object.check_if_no_popup_exists():
+                                file_path = screen_shot_obj.captureScreenshot(screen_details,web=True)
                                 driver.save_screenshot(file_path[2])
+                            else:
+                                local_Wd.log.debug("Pop up exists; Taking the screenshot using generic functions")
+                                if not(headless_mode or sauceFlag):
+                                    file_path = screen_shot_obj.captureScreenshot(screen_details,web=False)
                             result.append(file_path[2])
                     elif configvalues['screenShot_Flag'].lower() == 'all':
-                        file_path = screen_shot_obj.captureScreenshot(screen_details,web=False)
-                        if headless_mode or sauceFlag:
+                        if local_Wd.popup_object.check_if_no_popup_exists():
+                            file_path = screen_shot_obj.captureScreenshot(screen_details,web=True)
                             driver.save_screenshot(file_path[2])
+                        else:
+                            local_Wd.log.debug("Pop up exists; Taking the screenshot using generic functions")
+                            if not(headless_mode or sauceFlag):
+                                file_path = screen_shot_obj.captureScreenshot(screen_details,web=False)
                         result.append(file_path[2])
         except TypeError as e:
             local_Wd.log.error(e,exc_info=True)
