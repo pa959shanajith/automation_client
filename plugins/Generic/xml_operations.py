@@ -581,7 +581,7 @@ class JSONOperations():
             if err_msg is None:
                 err_msg = ERR_JSON
                 logger.print_on_console(err_msg)
-                logger.error(e)
+                log.error(e)
 
         return status,methodoutput,key_value,err_msg
 
@@ -690,9 +690,11 @@ class JSONOperations():
                         else:
                             log.debug('Invalid key given')
                             err_msg= ERR_JSON
+                            input_json = None
                     else:
                         log.debug('Index out of range')
                         err_msg= ERR_JSON
+                        input_json = None
                 elif isinstance(nested,dict):
                     if key_name in nested:
                         nested[key_name] = key_value
@@ -703,6 +705,7 @@ class JSONOperations():
                     else:
                         log.debug('Invalid key given')
                         err_msg= ERR_JSON
+                        input_json = None
                 else:
                         nested[0][key_name] = key_value
                         logger.print_on_console('Key : ', key_name, ' with Value : ', key_value, ' is set.')
@@ -713,16 +716,19 @@ class JSONOperations():
                     logger.print_on_console(err_msg)
             except Exception as e:
                 err_msg=ERR_JSON
+                input_json = None
                 logger.print_on_console(err_msg)
-                logger.error(e)
+                log.error(e)
         except json.decoder.JSONDecodeError as e:
             err_msg = str(e.msg) + " in JSON/Key value"
+            input_json = None
             logger.print_on_console(err_msg)
-            logger.error(err_msg)
+            log.error(e)
         except Exception as e:
             if err_msg is None:
                 err_msg = ERR_JSON
+                input_json = None
                 logger.print_on_console(err_msg)
-                logger.error(e)
+                log.error(e)
                 
         return status,methodoutput,input_json,err_msg
