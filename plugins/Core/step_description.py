@@ -205,7 +205,7 @@ class StepDescription:
         def verifyvalues():
             return "Verify values '" + str(inputval[0]) + "' and '" + inputval[1]+ "' and save the result in '"+ tsp.outputval + "'."
         def capturescreenshot():
-            return 'Captured Screenshot'
+            return 'Captured Screenshot and placed in '+str(output)
         def comparecontent():
             return "Compare the contents of file '"+ str(inputval[0])+ "' and '"+ str(inputval[1])+ "'"
         def copyvalue():
