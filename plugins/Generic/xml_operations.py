@@ -455,10 +455,8 @@ class XMLOperations():
         output = OUTPUT_CONSTANT
         err_msg=None
         try:
-            #Make sure params are strings
+            # Make sure params are strings
             log.debug('Conver xml param to string')
-##            object_string1 = str(object_string1)
-##            object_string2 = str(object_string2)
             #Remove new lines
             log.debug('Remove new lines')
             object_string1 = object_string1.replace('\n','')
@@ -581,6 +579,7 @@ class JSONOperations():
             if err_msg is None:
                 err_msg = ERR_JSON
                 logger.print_on_console(err_msg)
+                log.error(err_msg)
                 log.error(e)
 
         return status,methodoutput,key_value,err_msg
@@ -718,17 +717,19 @@ class JSONOperations():
                 err_msg=ERR_JSON
                 input_json = None
                 logger.print_on_console(err_msg)
+                log.error(err_msg)
                 log.error(e)
         except json.decoder.JSONDecodeError as e:
             err_msg = str(e.msg) + " in JSON/Key value"
             input_json = None
             logger.print_on_console(err_msg)
+            log.error(err_msg)
             log.error(e)
         except Exception as e:
             if err_msg is None:
                 err_msg = ERR_JSON
                 input_json = None
                 logger.print_on_console(err_msg)
+                log.error(err_msg)
                 log.error(e)
-                
         return status,methodoutput,input_json,err_msg
