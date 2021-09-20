@@ -17,6 +17,7 @@ import oebs_key_objects
 import oebsServer
 import logging
 import logger
+import time
 import oebs_serverUtilities
 from oebs_utilops import UtilOperations
 
@@ -139,6 +140,8 @@ class ButtonOperations:
         verifyresponse = MSG_FALSE
         try:
             #gets the entire context information
+            time.sleep(1)
+            acc.requestFocus()
             charinfo = acc.getAccessibleContextInfo()
             log.debug('Received Object Context',DEF_CLICK)
             objstates = charinfo.states

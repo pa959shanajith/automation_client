@@ -38,6 +38,8 @@ class ElementOperations:
         verifyresponse = MSG_FALSE
         try:
             #gets the entire context information
+            time.sleep(1)
+            acc.requestFocus()
             charinfo = acc.getAccessibleContextInfo()
             log.debug('Received Object Context',DEF_CLICKELEMENT)
             objstates = charinfo.states
@@ -51,6 +53,9 @@ class ElementOperations:
                 if 'enabled' in objstates:
                     log.debug('Click Happens on :%s , %s',x_coor,y_coor)
                     oebs_mouseops.MouseOperation('click',x_coor,y_coor)
+                    charinfo = acc.getAccessibleContextInfo()
+                    if 'selectable' in charinfo.states and 'selected' not in charinfo.states:
+                        logger.print_on_console('Element clicked but operation not detected, Please use alternative keyword double click')
                     verifyresponse = MSG_TRUE
                     keywordresult=MSG_PASS
                     log.debug('%s',MSG_CLICK_SUCCESSFUL)
