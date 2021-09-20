@@ -1226,7 +1226,7 @@ class Controller():
                                 break
                             print('\n')
                             if (True in testcase_empty_flag):
-                                if(condition_check_value==1):
+                                if(int(condition_check_value)==1):
                                     condition_check_flag = True
                                     logger.print_on_console('Condition Check: Terminated by program ')
                                 info_msg=str("Scenario cannot be executed, since the following testcases are empty: "+','.join(empty_testcase_names))
@@ -1363,7 +1363,7 @@ class Controller():
                             #Check is made to fix issue #401
                             overall_status=report_json[0][OVERALLSTATUS] if len(report_json)>0 else TEST_RESULT_FAIL
                             if overall_status != TEST_RESULT_PASS: exc_pass = False
-                            if(condition_check_value==1):
+                            if(int(condition_check_value)==1):
                                 if(overall_status==TEST_RESULT_PASS):
                                     continue
                                 else:
