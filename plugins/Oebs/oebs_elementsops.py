@@ -56,10 +56,11 @@ class ElementOperations:
                     charinfo = acc.getAccessibleContextInfo()
                     if 'selectable' in charinfo.states and 'selected' not in charinfo.states:
                         logger.print_on_console('Element clicked but operation not detected, Please use alternative keyword double click')
-                    verifyresponse = MSG_TRUE
-                    keywordresult=MSG_PASS
-                    log.debug('%s',MSG_CLICK_SUCCESSFUL)
-                    oebs_key_objects.custom_msg.append(str(MSG_CLICK_SUCCESSFUL))
+                    else:    
+                        verifyresponse = MSG_TRUE
+                        keywordresult=MSG_PASS
+                        log.debug('%s',MSG_CLICK_SUCCESSFUL)
+                        oebs_key_objects.custom_msg.append(str(MSG_CLICK_SUCCESSFUL))
                 else:
                     log.debug('MSG:%s',MSG_DISABLED_OBJECT)
                     logger.print_on_console(MSG_DISABLED_OBJECT)
