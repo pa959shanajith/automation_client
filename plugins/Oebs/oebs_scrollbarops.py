@@ -40,7 +40,7 @@ class ScrollbarOperations:
             height = charinfo.height
             x2_cor = x1_cor+width
             y2_cor = y1_cor+height
-            if len(oebs_key_objects.keyword_input) == 0 or oebs_key_objects.keyword_input[0]=='' or oebs_key_objects.keyword_input[0]==None:
+            if len(oebs_key_objects.keyword_input) == 0 or oebs_key_objects.keyword_input[0]=='' or oebs_key_objects.keyword_input[0]==None or not oebs_key_objects.keyword_input[0].isdigit():
                 err_msg = ERROR_CODE_DICT['invalid_input_scroll']
                 log.info(err_msg)
                 logger.print_on_console(err_msg)
@@ -95,7 +95,7 @@ class ScrollbarOperations:
             height = charinfo.height
             x2_cor = x1_cor+width
             y2_cor = y1_cor+height
-            if len(oebs_key_objects.keyword_input) == 0 or oebs_key_objects.keyword_input[0]=='' or oebs_key_objects.keyword_input[0]==None:
+            if len(oebs_key_objects.keyword_input) == 0 or oebs_key_objects.keyword_input[0]=='' or oebs_key_objects.keyword_input[0]==None or not oebs_key_objects.keyword_input[0].isdigit():
                 err_msg = ERROR_CODE_DICT['invalid_input_scroll']
                 log.info(err_msg)
                 logger.print_on_console(err_msg)
@@ -148,7 +148,7 @@ class ScrollbarOperations:
             height = charinfo.height
             x2_cor = x1_cor+width
             y2_cor = y1_cor+height
-            if len(oebs_key_objects.keyword_input) == 0 or oebs_key_objects.keyword_input[0]=='' or oebs_key_objects.keyword_input[0]==None:
+            if len(oebs_key_objects.keyword_input) == 0 or oebs_key_objects.keyword_input[0]=='' or oebs_key_objects.keyword_input[0]==None or not oebs_key_objects.keyword_input[0].isdigit():
                 err_msg = ERROR_CODE_DICT['invalid_input_scroll']
                 log.info(err_msg)
                 logger.print_on_console(err_msg)
@@ -202,7 +202,7 @@ class ScrollbarOperations:
             height = charinfo.height
             x2_cor = x1_cor+width
             y2_cor = y1_cor+height
-            if len(oebs_key_objects.keyword_input) == 0 or oebs_key_objects.keyword_input[0]=='' or oebs_key_objects.keyword_input[0]==None:
+            if len(oebs_key_objects.keyword_input) == 0 or oebs_key_objects.keyword_input[0]=='' or oebs_key_objects.keyword_input[0]==None or not oebs_key_objects.keyword_input[0].isdigit():
                 err_msg = ERROR_CODE_DICT['invalid_input_scroll']
                 log.info(err_msg)
                 logger.print_on_console(err_msg)
