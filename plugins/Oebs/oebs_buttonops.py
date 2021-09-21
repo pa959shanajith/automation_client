@@ -17,6 +17,7 @@ import oebs_key_objects
 import oebsServer
 import logging
 import logger
+import time
 import oebs_serverUtilities
 from oebs_utilops import UtilOperations
 
@@ -45,12 +46,12 @@ class ButtonOperations:
                     if 'alt' in buttonName:
                         buttonName=buttonName.split("alt",1)[0].strip()
                     elif 'ALT' in buttonName:
-                        splitval=buttonName.split("ALT",1)[0].strip()
+                        buttonName=buttonName.split("ALT",1)[0].strip()
                     else:
-                        splitval=buttonName.strip()
+                        buttonName=buttonName.strip()
                     log.debug('%s %s',MSG_RESULT_IS,buttonName)
                     keywordresult=MSG_PASS
-                    keywordresponse = splitval
+                    keywordresponse = buttonName
                     oebs_key_objects.custom_msg.append(str(MSG_RESULT_IS + keywordresponse))
                 else:
                     log.debug('%s',MSG_NAME_NOT_DEFINED)
@@ -139,6 +140,8 @@ class ButtonOperations:
         verifyresponse = MSG_FALSE
         try:
             #gets the entire context information
+            time.sleep(1)
+            acc.requestFocus()
             charinfo = acc.getAccessibleContextInfo()
             log.debug('Received Object Context',DEF_CLICK)
             objstates = charinfo.states

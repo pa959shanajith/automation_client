@@ -83,7 +83,6 @@ class TextOperations:
 
     #Method to settext at the given Object location
     def settext(self,acc):
-
         del oebs_key_objects.custom_msg[:]
         #sets the keywordresult to FAIL
         keywordresult=MSG_FAIL
@@ -92,6 +91,7 @@ class TextOperations:
         try:
             #gets the entire context information
             time.sleep(3)
+            acc.requestFocus()
             curaccinfo = acc.getAccessibleContextInfo()
             log.debug('Received Object Context',DEF_SETTEXT)
             if 'enabled' in curaccinfo.states:
@@ -231,6 +231,7 @@ class TextOperations:
         try:
             #gets the entire context information
             time.sleep(3)
+            acc.requestFocus()
             curaccinfo = acc.getAccessibleContextInfo()
             log.debug('Received Object Context',DEF_SETTEXT)
             if 'enabled' in curaccinfo.states:
