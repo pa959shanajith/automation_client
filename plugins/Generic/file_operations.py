@@ -1649,25 +1649,27 @@ class FileOperations:
                         err_msg = 'Error : Validity of file path 1 is : ' + str(result1[1]) + 'and validity of file path 2 is : ' + str(result2[1]) + '. Please make sure file paths entered are correct'
             elif(extension1=='.csv' and extension2=='.csv'):#both files are csv
                 i,j,x=0,0,0
-                output1,output2={},{}
+                output1,output2=[],[]
                 with open(input_path1,'r') as f1:
                     reader1=csv.reader(f1)
-                    for row in reader1: #row 
-                        output1[i]=[]
-                        for column in row: #column 
-                            output1[i].append(column)
-                        i+=1                
+                    for row in reader1:
+                        output1.append(row)            
                 with open(input_path2,'r') as f2:
                     reader2=csv.reader(f2)
-                    for row in reader2: #row 
-                        output2[j]=[]
-                        for column in row: #column 
-                            output2[j].append(column)
-                        j+=1
+                    for row in reader2:
+                        output2.append(row) 
                 rc1=len(output1)
                 rc2=len(output2)
-                cc1=len(output1[0])
-                cc2=len(output2[0])
+                cc1=0
+                cc2=0
+                for i in range(len(output1)):
+                    temp_1=len(output1[i])
+                    if temp_1>cc1:
+                        cc1=temp_1                
+                for j in range(len(output2)):
+                    temp_2=len(output2[j])
+                    if temp_2>cc2:
+                        cc2=temp_2
                 row_max=max(rc1,rc2)
                 col_max=max(cc1,cc2)
                 for aa in range(int(row_max)): 
@@ -1727,22 +1729,20 @@ class FileOperations:
                         book1 = open_workbook(file2)
                         sheet1 = book1.sheet_by_name(sheetname1)
 
-                output1,output2={},{}
+                output1,output2=[],{}
                 i,x,j=0,0,0
                 if(file1):
                     with open(file1,'r') as f1:
                         reader1=csv.reader(f1)
-                        for row in reader1: #row 
-                            output1[i]=[]
-                            for column in row: #column 
-                                output1[i].append(column)
-                            i+=1
+                        for row in reader1: 
+                            output1.append(row)
                     rc_csv=len(output1)
-                    cc_csv=len(output1[0])
-
-                #verify whether file exists or not
-                result1=self.verify_file_exists(file1,'')
-                result2=self.verify_file_exists(file2,'')
+                    cc_csv=0
+                    cc2=0
+                    for i in range(len(output1)):
+                        temp_1=len(output1[i])
+                        if temp_1>cc_csv:
+                            cc_csv=temp_1
 
                 if(extension1=='.xlsx' or extension2=='.xlsx'):
                     min_row=sheet1.min_row
