@@ -89,8 +89,8 @@ class For():
             logger.print_on_console('\nEncountered :'+self.name+'\n')
             self.executed=True
             index=self.getEndfor()
-            logger.print_on_console('***For: Iteration '+str(local_for.iteration_count[index])+' completed***\n\n')
-            log.info('***For: Iteration '+str(local_for.iteration_count[index])+' completed***\n\n')
+            logger.print_on_console('***For: Iteration '+str(local_for.iteration_count[index])+' completed***\n')
+            log.info('***For: Iteration '+str(local_for.iteration_count[index])+' completed***\n')
             #Reporting part
             self.add_report_step(reporting_obj,'Iteration: '+str(local_for.iteration_count[index])+' executed')
             #Reporting part ends

@@ -117,6 +117,7 @@ class Controller():
         try:
             if local_cont.generic_dispatcher_obj==None:
                 core_utils.get_all_the_imports('Generic')
+                core_utils.get_all_the_imports('IRIS')
                 import generic_dispatcher
                 local_cont.generic_dispatcher_obj = generic_dispatcher.GenericKeywordDispatcher()
         except Exception as e:
@@ -336,7 +337,7 @@ class Controller():
             while self.conthread.paused:
                 self.conthread.pause_cond.wait()
 
-   
+
     def methodinvocation(self,index,execution_env,datatables=[],*args):
         global pause_flag
         result=(TEST_RESULT_FAIL,TEST_RESULT_FALSE,OUTPUT_CONSTANT,None)
@@ -470,7 +471,7 @@ class Controller():
                 inpval.append(string)
             if keyword.lower() == CREATE_CONST_VARIABLE and len(inpval)>1:
                 #createConstVariable ex: _a_;{a}
-                const_var=self.constant_var_handler_obj.check_for_constantvariables(inpval[1])            
+                const_var=self.constant_var_handler_obj.check_for_constantvariables(inpval[1])
                 if const_var!=TEST_RESULT_TRUE:
                     #check if the inputval[1] is constant variable or not,
                     #createConstVariable ex: _a_;{a}
@@ -622,13 +623,13 @@ class Controller():
             result = result[:1] + (result[2],) + result[2:]
         if len(output)>0 and output[0] != '':
             const_var=self.constant_var_handler_obj.check_for_constantvariables(output[0])
-            #checks if the output variable is a constant variable or not  
+            #checks if the output variable is a constant variable or not
             if const_var==TEST_RESULT_TRUE:
                 if output[0] in constant_variable_handler.local_constant.constant_variable_map:
                     #checks if the output variable(constant variable) is assigned with a value
                     if tsp.name in FILEPATH_OUTPUT_FIELD_KEYWORDS:
                         cosnt_val=constant_variable_handler.local_constant.constant_variable_map[output[0]]
-                        file_path = cosnt_val.split(";")[0] 
+                        file_path = cosnt_val.split(";")[0]
                         if not(os.path.exists(file_path)):
                             self.constant_var_exists=True
                             err_msg="Error: Constant variable cannot be modified!"

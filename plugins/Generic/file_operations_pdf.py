@@ -73,7 +73,7 @@ class FileOperationsPDF:
     def compare_content(self,input_val,args):
         """
         def : compare_content
-        purpose : compares_content of two PDFs 
+        purpose : compares_content of two PDFs
         param : list[], list[]
         """
         status = constants.TEST_RESULT_FAIL
@@ -99,14 +99,14 @@ class FileOperationsPDF:
                         path_temp = args.split(";")[0].replace("{","").replace("}","")
                         if os.path.exists(path_temp):
                             output_path = path_temp
-                        else:     
+                        else:
                             out_path = self.DV.get_dynamic_value(args.split(";")[0])
                             if ( out_path ): output_path = out_path
                     elif str(args.split(";")[0]).startswith("_") and str(args.split(";")[0]).endswith("_"):
                         path_temp = args.split(";")[0].replace("_","").replace("_","")
                         if os.path.exists(path_temp):
                             output_path = path_temp
-                        else:     
+                        else:
                             out_path = self.CV.get_constant_value(args.split(";")[0])
                             if ( out_path ): output_path = out_path
                     else:
@@ -116,17 +116,17 @@ class FileOperationsPDF:
                     select_input = True
                     type_input = True
                 #check wether third optional input if it exists is empty string or selective or all
-                if len(input_val) >= 3 and input_val[2] != None  and (input_val[2].strip() == 'selective' or input_val[2].strip() == "all" or input_val[2].strip() == ""): 
+                if len(input_val) >= 3 and input_val[2] != None  and (input_val[2].strip() == 'selective' or input_val[2].strip() == "all" or input_val[2].strip() == ""):
                     if input_val[2] != "":
                         res_opt = input_val[2].strip().lower()
                     select_input = True
-                #check wether fourth optional input if it exists is empty string or pagewise or complete 
-                if len(input_val) == 4 and input_val[3] != None and (input_val[3].strip() == 'pagewise' or input_val[3].strip() == "complete" or input_val[3].strip() == ""): 
+                #check wether fourth optional input if it exists is empty string or pagewise or complete
+                if len(input_val) == 4 and input_val[3] != None and (input_val[3].strip() == 'pagewise' or input_val[3].strip() == "complete" or input_val[3].strip() == ""):
                     if input_val[3] != "":
                         type_opt = input_val[3].strip().lower()
-                    type_input = True 
+                    type_input = True
                 elif len(input_val) == 3:
-                    type_input = True 
+                    type_input = True
                 #check wether both filepath exists and wether the optional inputs are valid
                 if os.path.isfile(filePathA) and os.path.isfile(filePathB) and select_input and type_input:
                     if os.path.getsize(filePathA)>0 and os.path.getsize(filePathB)>0:
@@ -134,19 +134,19 @@ class FileOperationsPDF:
                         fileNameB, fileExtensionB = os.path.splitext(filePathB)
                         #check wether both files are PDF
                         if fileExtensionB.lower() == ".pdf" and fileExtensionA.lower() == ".pdf":
-                            pdf1 = open(filePathA, 'rb')  
-                            pdf2 = open(filePathB, 'rb')  
-                            #creating a pdf reader object via PYPDF2 for text comparison 
+                            pdf1 = open(filePathA, 'rb')
+                            pdf2 = open(filePathB, 'rb')
+                            #creating a pdf reader object via PYPDF2 for text comparison
                             pdfReader1 = PyPDF2.PdfFileReader(pdf1, overwriteWarnings=False)
                             pdfReader2 = PyPDF2.PdfFileReader(pdf2, overwriteWarnings=False)
-                            #opening documents via fitz for image comparison 
+                            #opening documents via fitz for image comparison
                             doc1 = fitz.open(filePathA)
                             doc2 = fitz.open(filePathB)
                             #check which comparison (pagewise/complete) is requested
                             if type_opt == 'pagewise':
                                 output_res_dict = self.compare_pagewise(pdfReader1,pdfReader2,res_opt,doc1,doc2)
                                 output_res = self.convert_output_to_list(output_res_dict)
-                            if type_opt == 'complete': 
+                            if type_opt == 'complete':
                                 output_res_dict = self.compare_complete(pdfReader1,pdfReader2,res_opt,doc1,doc2)
                                 output_res = self.convert_output_to_list(output_res_dict)
                             #closing all reader objects
@@ -161,7 +161,7 @@ class FileOperationsPDF:
                                 try:
                                     log.info("Result to be displayed is : " + str(res_opt))
                                     logger.print_on_console("Result to be displayed is : " + str(res_opt))
-                                    #checking wether extractText of pyPDF2 failed            
+                                    #checking wether extractText of pyPDF2 failed
                                     if "error" in output_res_dict and output_res_dict['error']:
                                         logger.print_on_console("Pages empty or text not supported in comparePDFs")
                                     elif len(output_res):
@@ -275,7 +275,7 @@ class FileOperationsPDF:
             for i in range(pdfReader1.numPages,pdfReader2.numPages):
                 result[i + 1] = {}
                 #get text in the extra page from PDF2
-                test_str2 = pdfReader2.getPage(i).extractText().replace('\n',"") 
+                test_str2 = pdfReader2.getPage(i).extractText().replace('\n',"")
                 total_char2 = len(test_str2)
                 #check wether extractText failed
                 if total_char2 == 0 or test_str2 == " ":
@@ -303,6 +303,7 @@ class FileOperationsPDF:
         #to be added/removed when common sequence starts, reffered as start
         start = " --cSTART--"
         #iterate over all common charcter sequences
+        add_index = None
         for cmn_str in match_arr:
             #check if the sequence is not empty string
             if cmn_str != '' and cmn_str != ' ' and len(cmn_str) > 1:
@@ -312,12 +313,12 @@ class FileOperationsPDF:
                 pageA = pageA.replace(cmn_str, comman_match)
                 pageB = pageB.replace(cmn_str, comman_match)
         #all the additions are values between end and start identifiers in the page of PDF2
-        #find all the character sequence between the end () start pattern 
+        #find all the character sequence between the end () start pattern
         add = re.findall(pattern,pageB)
         #all the deletions are values between end and start identifiers in the page of PDF1
-        #find all the character sequence between the end () start pattern 
+        #find all the character sequence between the end () start pattern
         dele = re.findall(pattern,pageA)
-        #iterate over all the deletions 
+        #iterate over all the deletions
         for deletion in dele:
             #for each deletion found replace (end deletion start) pattern witth ||--- deletion ---|| pattern
             pageA = pageA.replace(end + deletion + start," ||---" + deletion + " ---|| ")
@@ -338,10 +339,12 @@ class FileOperationsPDF:
                 #The deletion occurs after the last matching character sequence hence it has to be displayed after this sequence in page of PDF1
                 #iterate over all occurences of last matching character sequence
                 for i in re.finditer(prev_matches[len(prev_matches) -1],pageA):
-                    #check if proceeding common character sequences exist and 
+                    #check if proceeding common character sequences exist and
                     # if the index of last preceeding common charcter sequence is less then the proceeding common sequence
                     if not post_matches or (post_matches and i.start() < pageA.find(post_matches[0])):
                         add_index = i.start()  + len(prev_matches[len(prev_matches) - 1])
+                if (add_index == None):
+                    add_index = pageA.find(prev_matches[len(prev_matches) - 1]) + len(prev_matches[len(prev_matches) - 1])
             except Exception as e:
                 #exception occurs because the last precceding common character sequence has special characters not supported by regex
                 log.info("Un accepted regex caharchter")
@@ -356,7 +359,7 @@ class FileOperationsPDF:
                     pageA = pageA.replace(cmn_str,"")
         #remove start and end identifiers from result
         pageA = pageA.replace(start , "")
-        pageA = pageA.replace(end, "")           
+        pageA = pageA.replace(end, "")
         return pageA
 
     def get_number_diff_pages(self,comparison_result):
@@ -371,7 +374,7 @@ class FileOperationsPDF:
         #iterate over result and check if element contains addition (+++) or deletions (---)
         for page in comparison_result:
             if comparison_result[page]['comparison_result'].find("+++") != -1 or comparison_result[page]['comparison_result'].find("---") != -1:
-                difference_found += 1 
+                difference_found += 1
         return difference_found
 
     def convert_output_to_list(self,dictionary):
@@ -405,7 +408,7 @@ class FileOperationsPDF:
                 temp_page.append(current_page["matches"])
             result.append(temp_page)
         return result
-            
+
     def compare_complete(self,pdfReader1,pdfReader2,opt,doc1,doc2):
         sim = {}
         result = {}
@@ -439,7 +442,7 @@ class FileOperationsPDF:
                 test_str1_copy = test_str1
                 matched_count = 0
                 matches = []
-                #get all mathcing character sequences between both pages of PDF1 and PDF2 (page i of PDF1 compared to page j of PDF2) 
+                #get all mathcing character sequences between both pages of PDF1 and PDF2 (page i of PDF1 compared to page j of PDF2)
                 match_page = difflib.SequenceMatcher(None, test_str1, test_str2).get_matching_blocks()
                 for match in match_page:
                     matched = test_str1_copy[match.a:match.a + match.size]
@@ -467,7 +470,7 @@ class FileOperationsPDF:
                 result[i + 1]["pageMatch"] = -1
                 result[i + 1]["comparison_result"] = "||---" + test_str1 + "---||"
                 result[i + 1]["images"] = self.compare_images(doc1,None,i,j)
-            
+
         j = 0
         i = pdfReader1.numPages + 1
         #iterate over entire PDF2 and check wether ther are extra/unmatched pages ind PDF2
@@ -538,7 +541,7 @@ class FileOperationsPDF:
             #extra image in page of pdf2 not found in pdf1 hence added
             elif img2 is None:
                 result[1] += 1
-                
+
         return result
 
     def subtract_and_check_if_identical(self,img1,img2):
@@ -556,8 +559,8 @@ class FileOperationsPDF:
             #images are different since they have different dimensions
             return False
         #subtract and check if two images are identical
-        difference = cv2.subtract(img1, img2)    
-        result = not np.any(difference) 
+        difference = cv2.subtract(img1, img2)
+        result = not np.any(difference)
         return result
 
     def locate_image(self,input_val,args):
@@ -585,33 +588,33 @@ class FileOperationsPDF:
                         path_temp = args.split(";")[0].replace("{","").replace("}","")
                         if os.path.exists(path_temp):
                             output_path = path_temp
-                        else:     
+                        else:
                             out_path = self.DV.get_dynamic_value(args.split(";")[0])
                             if ( out_path ): output_path = out_path
                     elif str(args.split(";")[0]).startswith("_") and str(args.split(";")[0]).endswith("_"):
                         path_temp = args.split(";")[0].replace("_","").replace("_","")
                         if os.path.exists(path_temp):
                             output_path = path_temp
-                        else:     
+                        else:
                             out_path = self.CV.get_constant_value(args.split(";")[0])
                             if ( out_path ): output_path = out_path
                     else:
                         output_path = args.split(";")[0]
-                #check wether both filepath exists 
+                #check wether both filepath exists
                 if os.path.isfile(filePathA) and os.path.isfile(filePathB):
                     if os.path.getsize(filePathA)>0 and os.path.getsize(filePathB)>0:
                         fileNameA, fileExtensionA = os.path.splitext(filePathA)
                         fileNameB, fileExtensionB = os.path.splitext(filePathB)
                         #check if input 1 is pdf and input 2 is PNG
-                        if fileExtensionA.lower() == ".pdf" and fileExtensionB.lower() == ".png":   
+                        if fileExtensionA.lower() == ".pdf" and fileExtensionB.lower() == ".png":
                             #get output and total occurencs of tempate image found
                             output_res,total_found = self.get_thresholded_similar_images(filePathA,filePathB)
                             if output_res is not None:
                                 #mark test step as successfull
                                 flg = True
                                 optFlg = True
-                                try:  
-                                    if total_found > 0:      
+                                try:
+                                    if total_found > 0:
                                         logger.print_on_console("Total number of image occurances are: ",total_found)
                                     else:
                                         logger.print_on_console("No image occurances in PDF")
@@ -666,13 +669,13 @@ class FileOperationsPDF:
         """
         im = np.frombuffer(pix.samples, dtype=np.uint8).reshape(pix.h, pix.w, pix.n)
         y1 = np.ascontiguousarray(im[..., [2, 1, 0]])  # rgb to bgr
-        return y1 
+        return y1
 
     def get_thresholded_similar_images(self,filePathA,filePathB):
         """
         def : get_thresholded_similar_images
         purpose : find occurences of template image after calculating similarities in each page
-        param : str (filePath to PDF),str (filepath to PNG) 
+        param : str (filePath to PDF),str (filepath to PNG)
         return : [[]]
 
         """
@@ -710,15 +713,15 @@ class FileOperationsPDF:
             if output_res[image]['max_corr'] > output_res['abs_max'] - 0.02 and output_res[image]['max_corr'] <= output_res['abs_max']:
                 #cv2.imwrite("result"+str(image)+".png",output_res[image]["image"])
                 #tempate image found, add to to output, increase total found by 1
-                page = [] 
+                page = []
                 page.append(image)
                 page.append(output_res[image]['count'])
                 total_found += output_res[image]['count']
                 page.append(output_res[image]['location'])
-                
+
             else:
                 #template not found
-                page = [] 
+                page = []
                 page.append(image)
                 page.append(0)
                 page.append([])
@@ -729,7 +732,7 @@ class FileOperationsPDF:
             log_output.append(page_copy)
         #log ouptut containing similarity percentage for reference
         log.info("Result of findImageInPDF"+ str(log_output))
-        return output,total_found            
+        return output,total_found
 
     def compare(self,image,template,abs_max):
         template = cv2.Canny(template, 50, 200)
@@ -792,7 +795,7 @@ class FileOperationsPDF:
             if found[1]/dimensions[1] > 1/3:
                 y = 2
                 if found[1]/dimensions[1] >2/3:
-                    y = 1 
+                    y = 1
             #store location
             results["location"].append(location_dict[y,x])
         #make a bounding box on the found location, for future use
@@ -924,7 +927,7 @@ class FileOperationsPDF:
                             if args[2] == 'image':
                                 content = output_res
                             else:
-                                # if condition is "all" and pdf contains both text and image text  
+                                # if condition is "all" and pdf contains both text and image text
                                 text_content = [content]
                                 del content
                                 content = [text_content, output_res]
@@ -937,7 +940,7 @@ class FileOperationsPDF:
                                 del content
                                 content = [text_content, output_res]
                                 logger.print_on_console("The first item in the output list is the text fetched from the PDF, the second item is a list containing text from the images")
-                                
+
                 elif len(args)>2 and args[2] not in ['text','']:
                     content = None
                     status=False
