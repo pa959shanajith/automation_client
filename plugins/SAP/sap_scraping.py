@@ -20,6 +20,7 @@ import ctypes
 import win32gui
 import win32api
 import win32process
+import platform
 from threading import Thread
 ctrldownflag = False
 stopumpingmsgs = False
@@ -167,26 +168,68 @@ class Scrape:
                         get_object = GetObject()
                         ses = get_object.GetSession(self.window_id)
                         try:
-                            obj = ses.FindByPosition(self.coordX, self.coordY, False)
-                            elem = ses.FindById(obj(0))
-                            # if (elem.type != 'GuiModalWindow'):
-                            custname = None
-                            wnd_title = ses.FindById(self.window_id).Text
-                            path = wnd_title + elem.__getattr__("Id")[25:]
-                            custname, tag = scrape_obj.get_ele_custname_tag(elem)
-                            dict = {
-                                    'xpath': path,
-                                    'id': elem.__getattr__("Id"),
-                                    'text': elem.__getattr__("Text"),
-                                    'tag': tag,
-                                    'custname': custname,
-                                    'left': elem.__getattr__("ScreenLeft"),
-                                    'top': elem.__getattr__("ScreenTop"),
-                                    'height': elem.__getattr__("Height"),
-                                    'width': elem.__getattr__("Width"),
-                                    'tooltip': elem.__getattr__("ToolTip"),
-                                    'defaulttooltip': elem.__getattr__("DefaultToolTip")
-                                    }
+                            from screeninfo import get_monitors
+                            if (str(platform.system()).lower() == 'windows' and str(platform.release()) == str(10) and get_monitors()[0].height >= 1080 and ctypes.windll.shcore.GetScaleFactorForDevice(0)/100 >= 1.25 ):
+                                """
+                                This custom logic is written for SAP clickandadd scrape specifically for windows 10 when scaling factor is 125%+ and screen resolution is 1080p greater
+                                The general FindByPosition logic fails as some versions of SAP GUI are not dependant on scaling factor hence when passing screen x,y it will not the fetch correct elements.
+                                Limitation/general info : will collect screeninfo of first monitor in a multi monitor setup
+                                """
+                                log.debug('Performing ClickAndAdd scrape via custom logic.Condition : Platform: windows 10, Screen: greater that 1080p, Scale&Layout: greater than 125% ')
+                                try:
+                                    def match(x, y, width, height, coord_x, coord_y):
+                                        expectedx = int(x) + int(width)
+                                        expectedy = int(y) + int(height)
+                                        if ( (coord_x >= x and coord_x <= expectedx) and (coord_y >= y and coord_y <= expectedy) ):
+                                            return 1
+                                        else:
+                                            return 0
+                                    SAP_obj = get_object.GetSAPObj()
+                                    wndname = scrape_obj.getWindow(SAP_obj)
+                                    wnd_title = wndname.__getattr__("Text")
+                                    all_items = scrape_obj.full_scrape(wndname,wnd_title)
+                                    tempobjects = []
+                                    for i in all_items:
+                                        res = match(i['left'], i['top'], i['width'], i['height'], self.coordX, self.coordY)
+                                        if ( res == 1 ):
+                                            tempobjects.append(i)
+                                    dict = None
+                                    for i in range (len(tempobjects)):
+                                        try:
+                                            first_ele = tempobjects[i]
+                                            dict = first_ele
+                                            next_ele = tempobjects[i+1]
+                                            if( (first_ele['left'] > next_ele['left']) and (first_ele['top'] > next_ele['top']) ):
+                                                tempobjects[i+1] = first_ele
+                                                dict = first_ele
+                                            else:
+                                                dict = next_ele
+                                        except Exception as e:
+                                            break
+                                except Exception as e:
+                                    log.error( 'Error occurred in custom clickandadd scraping' + str(e) )
+                            else:
+                                log.debug('Performing ClickAndAdd scrape via normal logic')
+                                obj = ses.FindByPosition(self.coordX, self.coordY, False)
+                                elem = ses.FindById(obj(0))
+                                # if (elem.type != 'GuiModalWindow'):
+                                custname = None
+                                wnd_title = ses.FindById(self.window_id).Text
+                                path = wnd_title + elem.__getattr__("Id")[25:]
+                                custname, tag = scrape_obj.get_ele_custname_tag(elem)
+                                dict = {
+                                        'xpath': path,
+                                        'id': elem.__getattr__("Id"),
+                                        'text': elem.__getattr__("Text"),
+                                        'tag': tag,
+                                        'custname': custname,
+                                        'left': elem.__getattr__("ScreenLeft"),
+                                        'top': elem.__getattr__("ScreenTop"),
+                                        'height': elem.__getattr__("Height"),
+                                        'width': elem.__getattr__("Width"),
+                                        'tooltip': elem.__getattr__("ToolTip"),
+                                        'defaulttooltip': elem.__getattr__("DefaultToolTip")
+                                        }
                             if ( dict not in view ):#------------to handle duplicate elements from backend
                                 view.append(dict)
                             #Highlight objects while scraping
@@ -318,6 +361,9 @@ class Scrape:
                     def __init__(self):
                         from saputil_operations import SapUtilKeywords
                         self.uk = SapUtilKeywords()
+
+                    def GetSAPObj(self):
+                        return self.uk.getSapObject()
 
                     def GetSession(self, window_id):
                         """ Returns the session of window to scrape """

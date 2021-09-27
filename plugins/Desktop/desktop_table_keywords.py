@@ -99,13 +99,19 @@ class Table_Keywords():
         result = desktop_constants.TEST_RESULT_FALSE
         verb = OUTPUT_CONSTANT
         err_msg = None
+        row_ele = None
         try:
             if ( element.friendly_class_name() == 'Table' and element.texts()[0] == 'DataGridView' ):
                 c = element.children()
-                log.info( 'Number of rows is', len(c[1].children()) )
+                for i in range(0, len(c)):
+                    if( str(c[i].friendly_class_name().lower()) != 'scrollbar' ):
+                        log.debug( 'Element is of type : ' + str(c[i].friendly_class_name().lower()) )
+                        row_ele = c[i]
+                        break
+                log.info( 'Number of rows is', len(row_ele.children()) )
                 status = desktop_constants.TEST_RESULT_PASS
                 result = desktop_constants.TEST_RESULT_TRUE
-                verb = len(c[1].children())
+                verb = len(row_ele.children())
             else:
                 err_msg = 'Unable to get col count'
                 log.info( err_msg )
