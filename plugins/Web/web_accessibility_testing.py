@@ -26,6 +26,7 @@ import logger
 import logging
 import time
 import readconfig
+import screenshot_keywords
 from webscrape_utils import WebScrape_Utils
 import constants
 log = logging.getLogger(__name__)
@@ -251,17 +252,18 @@ class Web_Accessibility_Testing:
             result['status'] = "fail"
             log.error(e,exc_info=True)
         # Stop everything in the case of disconnection from server
+        ######################################## acessbility #########################################
         if controller.disconnect_flag:
             return True
         try:
             logger.print_on_console('Capturing Screenshot for Accessibility Testing')
-            if not os.path.exists(constants.SCREENSHOT_PATH ):
-                path = os.getcwd() + os.sep + "output" + os.sep + executionid + os.sep + str(index) +".png"
-            else:    
-                path = constants.SCREENSHOT_PATH + script_info['projectname'] + os.sep + "acctest" + os.sep + executionid + os.sep + str(index) +".png"
-
-            screenshot, width, height = self.webscrape_utils_obj.fullpage_screenshot(driver, path)
-            result['screenshotpath'] = path
+            temppath = os.getcwd() + os.sep + "output" + os.sep + executionid + os.sep + str(index) +".png"
+            screenshot, width, height = self.webscrape_utils_obj.fullpage_screenshot(driver, temppath)
+            screen_shot_obj = screenshot_keywords.Screenshot()
+            script_info['executionid'] = executionid
+            script_info['temppath'] = temppath
+            output = screen_shot_obj.captureScreenshot(script_info,accessibility=True)
+            result['screenshotpath'] = output[2]
             result['width'] = width
             result['height'] = height
         except Exception as e:

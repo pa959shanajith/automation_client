@@ -1233,6 +1233,8 @@ class Controller():
                                 screen_testcase_map[step['testcasename']]["screenname"] = step['screenname']
                                 screen_testcase_map[step['testcasename']]["screenid"] = step['screenid']
                                 screen_testcase_map[step['testcasename']]["cycleid"] = suite['cycleid']
+                                screen_testcase_map[step['testcasename']]["releaseid"] = suite['releaseid']
+                                screen_testcase_map[step['testcasename']]["cyclename"] = suite['cyclename']
                                 screen_testcase_map["executionid"] = execute_result_data['executionId']
                                 screen_testcase_map[step['testcasename']]['accessibility_parameters'] = accessibility_parameters
                                 screen_testcase_map[step['testcasename']]['projectname'] = suite['projectname']

@@ -19,7 +19,7 @@ class reportNFS():
             result = self.client.fput_object(*args,content_type="image/png")
             return result
         except Exception as exc:
-            log.error(e)
+            log.error(exc)
             err_msg = ERROR_CODE_DICT['ERR_SAVE_IMG']
             logger.print_on_console(err_msg)
             return "fail"

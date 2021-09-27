@@ -24,7 +24,7 @@ import logging
 
 log = logging.getLogger('screenshot_keywords.py')
 class Screenshot():
-    def captureScreenshot(self,*args,web=False,driver=False):
+    def captureScreenshot(self,*args,web=False,driver=False,accessibility=False):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
@@ -77,9 +77,15 @@ class Screenshot():
                 log.debug('screenshot capture failed')
                 output=OUTPUT_CONSTANT
             else:
+                bucketname = 'screenshots'
                 tempobj=self.generateUniqueFileName() +'.png'
                 tempPath=os.sep.join([os.getcwd(),'output','.screenshots', tempobj])
-                if driver:
+                objpath = args[0]['projectname']+'/'+args[0]['releaseid']+'/'+args[0]['cyclename']+'/'+tempobj
+                if accessibility:
+                    bucketname = 'accessibilityscreenshots'
+                    tempPath = args[0]['temppath']
+                    objpath = args[0]['projectname']+'/'+args[0]['releaseid']+'/'+args[0]['cyclename']+'/'+args[0]['executionid']+'/'+tempobj
+                elif driver:
                     #for sauceLab and headLess 
                     driver.save_screenshot(tempPath) 
                 elif not(web):
@@ -87,8 +93,6 @@ class Screenshot():
                     img.save(tempPath)
                 else:
                     pass #add logic for capture through driver to be added here
-                bucketname = 'screenshots'
-                objpath = args[0]['projectname']+'/'+args[0]['releaseid']+'/'+args[0]['cyclename']+'/'+tempobj
                 r = reportNFS().saveimage(bucketname,objpath,tempPath)
                 os.remove(tempPath)
                 if r=='fail':
