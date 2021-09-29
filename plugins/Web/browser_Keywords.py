@@ -266,9 +266,9 @@ class BrowserKeywords():
                 local_bk.driver_obj.switch_to.window(handles[-1])
                 h=local_bk.driver_obj.current_window_handle
                 local_bk.all_handles.insert(cwh_in+1,h)
-                local_bk.recent_handles.insert(cwh_in+1,h)
+                # local_bk.recent_handles.insert(cwh_in+1,h)
                 # local_bk.all_handles.append(h)
-                # local_bk.recent_handles.append(h)
+                local_bk.recent_handles.append(h)
                 status=webconstants.TEST_RESULT_PASS
                 result=webconstants.TEST_RESULT_TRUE
         except Exception as e:
