@@ -99,7 +99,7 @@ class CustomHandler(BaseRotatingHandler):
          
     def logline(self,ind,start=False):
         if start:
-            return [ self.filename , sum(1 for line in open(self.filename)) + 1]
+            return [ self.filename.split("\\")[-1] , sum(1 for line in open(self.filename)) + 1]
         else:
             return sum(1 for line in open(self.filename))
 
