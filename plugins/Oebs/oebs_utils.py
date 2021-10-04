@@ -106,10 +106,9 @@ class Utils:
                     logger.print_on_console(ERROR_CODE_DICT['err_visible'])
                     status = False
                 else:
-                    rgn1=win32gui.CreateRectRgnIndirect((size[0] + 1, size[1] + 1,
-                                        size[0] + size[2] - 1, size[1] + size[3] - 1))
-                    rgn2=win32gui.CreateRectRgnIndirect((size[0] + 4, size[1] + 4,
-                                        size[0] + size[2] - 4, size[1] + size[3] - 4))
+                    rgn1=win32gui.CreateRectRgnIndirect((size[0] - 3, size[1] - 3,
+                                        size[0] + size[2] + 3, size[1] + size[3] + 3))
+                    rgn2=win32gui.CreateRectRgnIndirect((size[0], size[1], size[0] + size[2], size[1] + size[3]))
                     isjavares, hwnd = self.isjavawindow(windowname)
                     if win32gui.IsWindowVisible(hwnd) and win32gui.GetWindowText(win32gui.GetForegroundWindow()) == windowname:
 

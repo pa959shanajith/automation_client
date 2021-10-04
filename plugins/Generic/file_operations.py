@@ -1971,21 +1971,39 @@ class FileOperations:
                     res1[x]=[]
                     for bb in range(len(output2[i])):
                         if(case!=''):
-                            if (output1[aa][bb].lower()==output2[aa][bb].lower()):
-                                output='True'
+                            if len(output1[aa]) != 0 and len(output2[aa]) != 0:
+                                if (output1[aa][bb].lower()==output2[aa][bb].lower()):
+                                    output='True'
+                                    res1[x].append(output)
+                                else:
+                                    output='False'
+                                    res1[x].append(output)
+                            elif len(output1[aa]) == 0 or len(output2[aa]) == 0:
+                                output='False'
                                 res1[x].append(output)
                             else:
                                 output='False'
                                 res1[x].append(output)
                         else:
-                            if (output1[aa][bb]==output2[aa][bb]):
-                                output='True'
+                            if len(output1[aa]) != 0 and len(output2[aa]) != 0:
+                                if (output1[aa][bb]==output2[aa][bb]):
+                                    output='True'
+                                    res1[x].append(output)
+                                else:
+                                    output='False'
+                                    res1[x].append(output)
+                            elif len(output1[aa]) == 0 or len(output2[aa]) == 0:
+                                output='False'
                                 res1[x].append(output)
                             else:
                                 output='False'
                                 res1[x].append(output)
+                    if len(output1[aa]) == 0 and len(output2[i]) == 0:
+                        output='True'
+                        res1[x].append(output)
                     count+=1
                     x+=1
+                    i+=1
                     if(count>=len(output2)):
                         break
 
@@ -1998,7 +2016,11 @@ class FileOperations:
                         for j in range(len(output2[xx])):
                             output='False'
                             res1[x].append(output)
+                        if len(output2[xx]) == 0:
+                            output='False'
+                            res1[x].append(output)
                         x+=1
+                        xx+=1
                 elif(len(output1)>len(output2)):
                     for i in range(len(output2)):
                         output1.pop(i)
@@ -2008,7 +2030,11 @@ class FileOperations:
                         for j in range(len(output1[xx])):
                             output='False'
                             res1[x].append(output)
+                        if len(output1[xx]) == 0:
+                            output='False'
+                            res1[x].append(output)
                         x+=1
+                        xx+=1
 
             elif(extension1=='.xlsx' and extension2=='.xlsx'):# Indicates both files are excel(.xlsx)
                 book1 = openpyxl.load_workbook(filepath1)

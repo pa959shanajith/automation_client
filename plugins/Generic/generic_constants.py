@@ -102,6 +102,8 @@ ERR_MSG3=' folder'
 
 ERR_XML='Invalid tag/missing tag/blockcount in XML input'
 
+ERR_JSON='Invalid key/missing key/block index in JSON input'
+
 ERR_XML_BLOCK='Block number should be a number'
 
 UNICODE_ERR="'ascii' codec can't encode character"

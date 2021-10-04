@@ -6,7 +6,7 @@ import base64
 import PIL.ImageGrab
 import numpy as np
 import cv2
-import screeninfo
+# import screeninfo
 import os
 import time
 import controller
@@ -41,7 +41,11 @@ class Cropandadd():
     def startcropandadd(self,wx_window):
         try:
             controller.terminate_flag = False
-            wx_window.Hide()
+            if SYSTEM_OS == 'Darwin':
+                import wx
+                wx_window.HideWithEffect(wx.SHOW_EFFECT_ROLL_TO_BOTTOM)
+            else:
+                wx_window.Hide()
             time.sleep(1)
             im = PIL.ImageGrab.grab()
             test_img_path = TEMP_PATH + OS_SEP + "test.png"

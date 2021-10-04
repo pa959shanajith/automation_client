@@ -158,6 +158,7 @@ class GenericKeywordDispatcher:
             'readxml': local_generic.generic_word.readxml,
             'readpdf': local_generic.generic_word.readPdf,
             'getkeyvalue': local_generic.json_oper.get_key_value,
+            'setkeyvalue': local_generic.json_oper.set_key_value,
             'comparefiles': local_generic.generic_file_xml.compare_files,
             'beautify': local_generic.generic_file_xml.beautify_file,
             'compareinputs': local_generic.generic_file_xml.compare_inputs,
