@@ -742,12 +742,16 @@ class TextboxKeywords:
                         err_msg = self._invalid_input()
                 if webelement.tag_name[0:9] == 'lightning':
                     text=webelement.text
+                    if '\xa0' in text:
+                        text = text.replace('\xa0', " ")
                     if(text!=None and text!=''):
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE  
                         check_flag=False
                 if check_flag==True and not err_msg:
                     text=self.__get_text(webelement)
+                    if '\xa0' in text:
+                        text = text.replace('\xa0', " ")
                     if text is None:
                         err_msg=self._noneGetText()
                     else:
@@ -933,15 +937,23 @@ class TextboxKeywords:
                         err_msg = self._invalid_input()
                 if webelement.tag_name[0:9] == 'lightning':
                     text=webelement.text
+                    if '\xa0' in text:
+                        text = text.replace('\xa0', " ")
+                    if '\xa0' in input:
+                        input = input.replace('\xa0', " ")
                     if(text==input):
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE  
                         check_flag=False
                 if check_flag==True and not err_msg:
                     text=self.__get_text(webelement)
+                    if '\xa0' in text:
+                        text = text.replace('\xa0', " ")
                     input=input[0]
                     coreutilsobj=core_utils.CoreUtils()
                     input=coreutilsobj.get_UTF_8(input)
+                    if '\xa0' in input:
+                        input = input.replace('\xa0', " ")
                     if text==input:
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE

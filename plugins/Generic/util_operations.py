@@ -319,6 +319,11 @@ class UtilOperations:
             if input1 != None and input2 != None and input1 != '' and input2 != '' :
                 # input1=str(input1).replace('\n','').replace('\r','')
                 # input2=str(input2).replace('\n','').replace('\r','')
+                if '\xa0' in input1:
+                    input1=input1.replace('\xa0', " ")
+                if '\xa0' in input2:
+                    input2 = input2.replace('\xa0', " ")
+                    
                 if input1==input2:
                     log.debug('Values are equal')
                     logger.print_on_console('Values are equal')
