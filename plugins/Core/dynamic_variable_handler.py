@@ -30,6 +30,7 @@ class DynamicVariables:
         local_dynamic.dynamic_variable_map=OrderedDict()
         self.const_var_obj=constant_variable_handler.ConstantVariables()
         local_dynamic.log = logging.getLogger('dynamic_variable_handler.py')
+        self.valid_nested_dynamic_variable =TEST_RESULT_FALSE
 
 	#TO ftech the value form Data base
     def getDBdata(self,inp_value,con_obj):
@@ -77,6 +78,8 @@ class DynamicVariables:
                     else:
                         if not isinstance(temp_value,str): temp_value = str(temp_value)
                         actual_value=actual_value.replace(input_var,temp_value)
+            if self.valid_nested_dynamic_variable == TEST_RESULT_FALSE and keyword.lower()=='displayvariablevalue' and status==TEST_RESULT_TRUE:
+                actual_value=None
         else:
             status,nested_var=self.check_dynamic_inside_dynamic(input_var)
             if status==TEST_RESULT_TRUE:
@@ -163,6 +166,7 @@ class DynamicVariables:
     def check_dynamic_inside_dynamic(self,inputvar):
         #checks whether the given variable is contains another dynamic inside it
         status = TEST_RESULT_FALSE
+        self.valid_nested_dynamic_variable = TEST_RESULT_FALSE
         nested_variable=None
         if (inputvar.startswith('{') and inputvar.endswith('}')) or (inputvar.count('{') > 0 and inputvar.count('}') > 0):
             try:
@@ -175,6 +179,8 @@ class DynamicVariables:
             nested_variable = regularexp.findall(inputvar)
             if len(nested_variable) > 0 :
                 status = TEST_RESULT_TRUE
+            if len(nested_variable) > 0 and (inputvar.count('{') > 1 and inputvar.count('}') > 1):
+                self.valid_nested_dynamic_variable = TEST_RESULT_TRUE
         return status,nested_variable
 
      #To get the value of the nested dynamic variable Eg ({b} value in '{a[{b}]}')
