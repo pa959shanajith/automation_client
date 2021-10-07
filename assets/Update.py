@@ -156,13 +156,16 @@ class Updater:
         self.temp_location = None
         log.info( 'All class variables initialized.' )
 
-    def assignment(self,vers_aval,ver_client,SERVER_LOC,extraction_loc,loc_7z):
+    def assignment(self,datatags_file_loc,ver_client,SERVER_LOC,extraction_loc,loc_7z):
         """Assigning value to class variables"""
         #-----------------assignment
+        with open(datatags_file_loc) as f:
+            content = f.read()
+        os.remove(datatags_file_loc)
         log.info( 'Assigning all class variables.' )
-        self.vers_aval=vers_aval
+        self.vers_aval = json.loads(content.replace("'",'"'))
         log.info( '=>Versions avaliable : ' + str(self.vers_aval))
-        self.ver_client =ver_client
+        self.ver_client = ver_client
         log.info( '=>Client Version : ' + str(self.ver_client))
         self.loc_7z = loc_7z
         log.info( '=>7z location : ' + str(self.loc_7z))
@@ -644,7 +647,7 @@ def main():
             comm_obj.close_ICE(sys.argv[7])#---------------------------------->1.Close ICE
             comm_obj.percentageIncri(msg,15,"ICE closed.")
             comm_obj.percentageIncri(msg,20,"Updating...")
-            obj.assignment(json.loads(sys.argv[2].replace("'",'\"')[1:-1]), json.loads(sys.argv[3].replace("'", '\"')[1:-1]), sys.argv[4], sys.argv[5], sys.argv[6])#---------------------------------->2.Assign Values
+            obj.assignment(sys.argv[2], json.loads(sys.argv[3].replace("'", '\"')[1:-1]), sys.argv[4], sys.argv[5], sys.argv[6])#---------------------------------->2.Assign Values
             comm_obj.percentageIncri(msg,25,"Updating...")
             comm_obj.percentageIncri(msg,30,"Creating backup.")
             err_msg = obj.create_backup()#---------------------------------->3.Create backup 'AvoAssureICE_backup' into Rollback folder
