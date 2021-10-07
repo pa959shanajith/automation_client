@@ -159,6 +159,7 @@ class FileOperationsPDF:
                                 flg = True
                                 optFlg = True
                                 try:
+                                    logger.print_on_console("Warning!:Table content within PDFs is not supported, It might show inconsistencies in result.")
                                     log.info("Result to be displayed is : " + str(res_opt))
                                     logger.print_on_console("Result to be displayed is : " + str(res_opt))
                                     #checking wether extractText of pyPDF2 failed
