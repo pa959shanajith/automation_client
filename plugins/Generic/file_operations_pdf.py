@@ -171,7 +171,7 @@ class FileOperationsPDF:
                                     #checking if output path exists and is not an instance of some other type not supported
                                     if output_path and not isinstance(output_path,list):
                                         #checking wether path exists
-                                        if(os.path.exists(output_path) or os.path.exists(os.path.dirname(output_path))):
+                                        if isinstance(output_path,str) and (os.path.exists(output_path) or os.path.exists(os.path.dirname(output_path))):
                                             log.debug( "Writing the output of comparePDFs to file : " + str(output_path) )
                                             logger.print_on_console( "Writing the output of comparePDFs to file.")
                                             #writing to file therefore no need to write to dynamic variable
@@ -620,7 +620,7 @@ class FileOperationsPDF:
                                         logger.print_on_console("No image occurances in PDF")
                                     #checking if output path exists and is not an instance of some other type not supported
                                     if output_path and not isinstance(output_path,list):
-                                        if(os.path.exists(output_path) or os.path.exists(os.path.dirname(output_path))):
+                                        if isinstance(output_path, str) and (os.path.exists(output_path) or os.path.exists(os.path.dirname(output_path))):
                                             log.debug( "Writing the output of PDFimageCompare to file : " + str(output_res) )
                                             logger.print_on_console( "Writing the output of PDFimageCompare to file.")
                                             #writing to file therefore no need to write to dynamic variable
