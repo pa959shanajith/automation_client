@@ -159,7 +159,6 @@ class FileOperationsPDF:
                                 flg = True
                                 optFlg = True
                                 try:
-                                    logger.print_on_console("Warning!:Table content within PDFs is not supported, It might show inconsistencies in result.")
                                     log.info("Result to be displayed is : " + str(res_opt))
                                     logger.print_on_console("Result to be displayed is : " + str(res_opt))
                                     #checking wether extractText of pyPDF2 failed
@@ -189,6 +188,7 @@ class FileOperationsPDF:
                                     status = constants.TEST_RESULT_PASS
                                     result = constants.TEST_RESULT_TRUE
                                     log.info("Comparision of files completed")
+                                    logger.print_on_console("Warning!:Table content within PDFs is not supported, It might show inconsistencies in result.")
                                     #checking wether the output is to be written to dyanamic variable or not
                                     if( optFlg ):
                                         value = output_res
