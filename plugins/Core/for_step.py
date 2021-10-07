@@ -86,7 +86,7 @@ class For():
 
         #block to execute endFor
         if self.name.lower() == constants.ENDFOR:
-            logger.print_on_console('\nEncountered :'+self.name+'\n')
+            logger.print_on_console('Encountered :'+self.name+'\n')
             self.executed=True
             index=self.getEndfor()
             logger.print_on_console('***For: Iteration '+str(local_for.iteration_count[index])+' completed***\n')

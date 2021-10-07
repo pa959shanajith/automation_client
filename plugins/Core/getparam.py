@@ -365,7 +365,7 @@ class GetParam():
     def readDatatable(self,fileinfo,datatables):
         """
         def : readDatatable
-        purpose : To read the content of the datatable(format: [{'col1':'row1'},{'col1':'row2'}]) 
+        purpose : To read the content of the datatable(format: [{'col1':'row1'},{'col1':'row2'}])
             and store it in dictionary
         param input : input contains Datatable name and filters (optional)
         return : Returns dictionary (format: {'col1':['row1','row2']})
@@ -696,7 +696,7 @@ class GetParam():
                         if(len(data.values()) == 0 or len(list(data.values())[0]) == 0):
                             log.info('Empty Data. Please provide valid data')
                             logger.print_on_console( '***Empty Data. Please provide valid data***')
-                            paramindex = TERMINATE 
+                            paramindex = TERMINATE
                         elif(len(data.values()) > 0):
                             numRows = len(list(data.values())[0])+1
                         endLimit = min(endRow, numRows)
@@ -732,8 +732,8 @@ class GetParam():
                                         paramindex =con.methodinvocation(paramindex,execution_env,datatables,input)
                                         if paramindex in [TERMINATE,BREAK_POINT,STOP]:
                                             return paramindex
-                                    log.info( '***Data Param: Iteration ' + str(k) + ' completed***\n\n')
-                                    logger.print_on_console( '***Data Param: Iteration ',k, ' completed***\n\n')
+                                    log.info( '***Data Param: Iteration ' + str(k) + ' completed***\n')
+                                    logger.print_on_console( '***Data Param: Iteration ',k, ' completed***\n')
                                     #Reporting part
                                     step_description='Dataparam: Iteration '+str(k)+' executed'
                                     reporting_obj.name='Iteration '+str(k)
@@ -783,9 +783,8 @@ class GetParam():
                                     paramindex =con.methodinvocation(paramindex,execution_env,datatables,input)
                                     if paramindex in [TERMINATE,BREAK_POINT,STOP]:
                                         return paramindex
-                                log.info( '***Data Param: Iteration '+str(k)+ ' completed***\n\n')
-                                logger.print_on_console('***Data Param: Iteration ',k, ' completed***\n\n')
-
+                                log.info( '***Data Param: Iteration '+str(k)+ ' completed***\n')
+                                logger.print_on_console('***Data Param: Iteration ',k, ' completed***\n')
                                 #Reporting part
                                 step_description='Dataparam: Iteration '+str(k)+' executed'
                                 reporting_obj.name='Iteration '+str(k)
@@ -834,8 +833,8 @@ class GetParam():
                                     paramindex =con.methodinvocation(paramindex,execution_env,datatables,input)
                                     if paramindex in [TERMINATE,BREAK_POINT,STOP]:
                                         return paramindex
-                                log.info( '***Data Param: Iteration '+str(k)+ ' completed***\n\n')
-                                logger.print_on_console('***Data Param: Iteration ',k, ' completed***\n\n')
+                                log.info( '***Data Param: Iteration '+str(k)+ ' completed***\n')
+                                logger.print_on_console('***Data Param: Iteration ',k, ' completed***\n')
                                 #Reporting part
                                 step_description='Dataparam: Iteration '+str(k)+' executed'
                                 reporting_obj.name='Iteration '+str(k)
