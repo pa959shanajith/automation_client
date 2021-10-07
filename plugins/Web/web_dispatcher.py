@@ -729,7 +729,7 @@ class Dispatcher:
             local_Wd.log.info('checking for the url error')
             try:
                 urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', browser_Keywords.local_bk.driver_obj.current_url)
-                if urlparse(urls[0]).netloc == "ntp.msn.com":
+                if urls!=[] and urlparse(urls[0]).netloc == "ntp.msn.com":
                     urls=[]
                 if urls != []:
                     headers = {'User-Agent': 'AvoAssure/' + os.getenv('AVO_ASSURE_VERSION')}
