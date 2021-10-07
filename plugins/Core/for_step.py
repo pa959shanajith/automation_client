@@ -67,7 +67,7 @@ class For():
         #Reporting part ends
 
     def invalid_for_input(self,endForNum,inputval,reporting_obj):
-        logger.print_on_console('\nEncountered :'+self.name+'\n')
+        logger.print_on_console('Encountered :'+self.name+'\n')
         logger.print_on_console('Invalid for count '+inputval+'\n')
         #Reporting part
         self.step_description='Encountered :'+self.name+' Invalid for count '+inputval
@@ -135,7 +135,7 @@ class For():
 
                 else:
                     if self.count==1:
-                        logger.print_on_console('\nEncountered :'+self.name+'\n')
+                        logger.print_on_console('Encountered :'+self.name+'\n')
                         #Reporting part
                         self.add_report_step_for(reporting_obj,'Execute the steps in the loop for the given count '+str(inputval))
                         #Reporting part ends
