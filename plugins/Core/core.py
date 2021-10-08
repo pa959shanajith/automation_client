@@ -1559,8 +1559,8 @@ class Main():
                 cw.scrapewindow = sapScrapeObj.ScrapeWindow(parent = cw,id = -1, title="Avo Assure - SAP Scrapper",filePath = browsername,socketIO = socketIO)
                 sapScrapeFlag=False
             elif oebsScrapeFlag==True:
-                cw.scrapewindow = oebsScrapeObj.ScrapeDispatcher(parent = cw,id = -1, title="Avo Assure - Oebs Scrapper",filePath = browsername,socketIO = socketIO)
                 oebsScrapeFlag=False
+                cw.scrapewindow = oebsScrapeObj.ScrapeDispatcher(parent = cw,id = -1, title="Avo Assure - Oebs Scrapper",filePath = browsername,socketIO = socketIO)
             elif pdfScrapeFlag==True:
                 cw.scrapewindow = pdfScrapeObj.ScrapeDispatcher(parent = cw,id = -1, title="Avo Assure - PDF Scrapper",filePath = browsername,socketIO = socketIO)
                 pdfScrapeFlag=False
