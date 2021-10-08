@@ -43,12 +43,6 @@ import handler
 import readconfig
 from OpenSSL import crypto
 log = logging.getLogger('webservices.py')
-
-def isEmpty(v):
-    if isinstance(v, str):
-        return not v and not v.strip()
-    return not v
-    
 class WSkeywords:
 
     """The instantiation operation __init__ creates an empty object of the class WSkeywords when it is instantiated"""
@@ -406,15 +400,10 @@ class WSkeywords:
         err_msg=None
         output=OUTPUT_CONSTANT
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
-        is_json = "application/json" in self.baseReqHeader
         try:
-            if not is_json and body.startswith('{') and body.endswith('}'):
-                body = json.loads(body)
-            else:
-                body=str(body)
-            if body != None and not isEmpty(body):
-                 if isinstance(body, str):
-                    body=body.strip()
+            body=str(body)
+            if body != None and body.strip() != '':
+                 body=body.strip()
                  self.baseReqBody = body
                  log.info('Input body has been set to base Request body ')
                  log.debug(STATUS_METHODOUTPUT_UPDATE)
@@ -448,7 +437,6 @@ class WSkeywords:
             self.baseResHeader=response.headers
             #added status code
             self.baseResHeader['StatusCode']=response.status_code
-            self.baseResHeader['Reason'] = response.reason
             log.info(ws_constants.RESPONSE_HEADER+'\n'+str(self.baseResHeader))
             brb=response.content
             if brb.find(b'Content-Type: image/png')!=-1:
@@ -463,8 +451,7 @@ class WSkeywords:
             log.debug(STATUS_METHODOUTPUT_UPDATE)
             status = ws_constants.TEST_RESULT_PASS
             methodoutput = ws_constants.TEST_RESULT_TRUE
-            output=(self.baseResHeader,str(self.baseResBody).replace("&gt;",">").replace("&lt;","<")
-            , response.status_code, response.reason)
+            output=(self.baseResHeader,str(self.baseResBody).replace("&gt;",">").replace("&lt;","<"))
         except Exception as e:
             err_msg=ws_constants.METHOD_INVALID_INPUT
             log.error(e)
@@ -506,41 +493,6 @@ class WSkeywords:
                 else:
                     req_body=self.baseReqBody
                 response = requests.post(self.baseEndPointURL, data = req_body, headers=self.baseReqHeader, cookies=self.req_cookies, proxies=self.proxies, cert=self.client_cert, verify=self.server_cert, auth=self.req_auth, params=self.req_params)
-
-                if response != None and response != False:
-                    self.clearCertFiles()
-                    status,methodoutput,output=self.__saveResults(response)
-                else:
-                    err_msg=ws_constants.METHOD_INVALID_INPUT
-                    log.error(err_msg)
-            else:
-                err_msg=ws_constants.METHOD_INVALID_INPUT
-                log.error(err_msg)
-                logger.print_on_console(ws_constants.METHOD_INVALID_INPUT)
-        except Exception as e:
-            err_msg=str(e)
-            log.error(e)
-            logger.print_on_console(e)
-        log.info(RETURN_RESULT)
-        return status,methodoutput,output,err_msg
-
-    def request(self, method):
-        status = ws_constants.TEST_RESULT_FAIL
-        methodoutput = ws_constants.TEST_RESULT_FALSE
-        log.debug(STATUS_METHODOUTPUT_LOCALVARIABLES)
-        output=OUTPUT_CONSTANT
-        err_msg=None
-        try:
-            self.get_cookies()
-            if not (self.baseEndPointURL is '' and self.baseReqBody is '' and self.baseReqHeader is ''):
-                if ws_constants.CONTENT_TYPE_JSON in self.content_type.lower():
-                    try:
-                        req_body=json.dumps(json.loads(self.baseReqBody))
-                    except:
-                        req_body=json.dumps(self.baseReqBody)
-                else:
-                    req_body=self.baseReqBody
-                response = requests.request(method, self.baseEndPointURL, data = req_body, headers=self.baseReqHeader, cookies=self.req_cookies, proxies=self.proxies, cert=self.client_cert, verify=self.server_cert, auth=self.req_auth, params=self.req_params)
 
                 if response != None and response != False:
                     self.clearCertFiles()
@@ -681,10 +633,7 @@ class WSkeywords:
             log.info(STATUS_METHODOUTPUT_UPDATE)
             status = ws_constants.TEST_RESULT_PASS
             methodoutput = ws_constants.TEST_RESULT_TRUE
-            if self.baseMethod in dict:
-                result= dict[self.baseMethod](self)
-            else:
-                result = WSkeywords.request(self, self.baseMethod)
+            result= dict[self.baseMethod](self)
         else:
             log.error(ERROR_CODE_DICT['ERR_INVALID_METHOD'])
             err_msg = ERROR_CODE_DICT['ERR_INVALID_METHOD']
@@ -713,13 +662,13 @@ class WSkeywords:
                 else:
                     for key in res:
                         headerresp = headerresp +str(key) + ":" + str (res[key]) + "##"
-                    response=headerresp+'rEsPONseBOdY: '+res[1]
+                    response=headerresp+'rEsPONseBOdY: '
             #response = response.decode('utf-8') if (type(response)==bytes) else str(response)
             response= str(response)
             if response == '':
                 response = 'fail'
             if testcasename == '':
-                response = response.replace("##", '  ')
+                response = response.replace("##", ' ')
                 socketIO.emit('result_debugTestCaseWS',response)
         except Exception as e:
             logger.print_on_console(e)
