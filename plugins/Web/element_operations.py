@@ -292,9 +292,12 @@ class ElementKeywords:
                         size=webelement.size
                         local_eo.log.info('location is :')
                         local_eo.log.info(location)
-                        if (args[0][0] != ''):
-                            time1=float(args[0][0])
-                            time.sleep(time1)
+                        if len(args[0]) > 0:
+                            if(args[0][0]!=''):
+                                time1=float(args[0][0])
+                                time.sleep(time1)
+                            else:
+                                time.sleep(0.5)
                         else:
                             time.sleep(0.5)
                         if isinstance(browser_Keywords.local_bk.driver_obj,webdriver.Firefox):
@@ -310,9 +313,12 @@ class ElementKeywords:
                                 err_msg='Element to be dragged should be on top'
                                 local_eo.log.error=err_msg
                                 logger.print_on_console(err_msg)
-                        if(args[0][0]!=''):
-                            time1=float(args[0][0])
-                            time.sleep(time1)
+                        if len(args[0]) > 0:
+                            if(args[0][0]!=''):
+                                time1=float(args[0][0])
+                                time.sleep(time1)
+                            else:
+                                time.sleep(0.5)
                         else:
                             time.sleep(0.5)
                         obj.mouse_release(LEFT_BUTTON)
@@ -329,9 +335,12 @@ class ElementKeywords:
                         size=webelement.size
                         local_eo.log.info('location is :')
                         local_eo.log.info(location)
-                        if(args[0][0]!=''):
-                            time1=float(args[0][0])
-                            time.sleep(time1)
+                        if len(args[0]) > 0:
+                            if(args[0][0]!=''):
+                                time1=float(args[0][0])
+                                time.sleep(time1)
+                            else:
+                                time.sleep(0.5)
                         else:
                             time.sleep(0.5)
                         obj=Utils()
@@ -345,9 +354,12 @@ class ElementKeywords:
                             local_eo.log.info(width)
                             local_eo.log.info(height)
                             obj.slide_linux(int(location.get('x')),int(location.get('y')+height), 0)
-                        if(args[0][0]!=''):
-                            time1=float(args[0][0])
-                            time.sleep(time1)
+                        if len(args[0]) > 0:
+                            if(args[0][0]!=''):
+                                time1=float(args[0][0])
+                                time.sleep(time1)
+                            else:
+                                time.sleep(0.5)
                         else:
                             time.sleep(0.5)
                         pag.mouseUp(button='left')

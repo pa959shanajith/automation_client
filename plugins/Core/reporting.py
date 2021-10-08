@@ -132,9 +132,10 @@ class Reporting:
         """
         if self.overallstatus==TERMINATE:
             self.add_termination_step()
-        self.start_time=str(start_time)
-        self.end_time=str(end_time)
-        self.ellapsed_time=str(ellapsed_time)
+        self.start_time=str(start_time).split('.')[0]
+        self.end_time=str(end_time).split('.')[0]
+        self.ellapsed_time=str(ellapsed_time).split('.')[0].split(':')
+        self.ellapsed_time="~" + ("0" + self.ellapsed_time[0])[-2:] + ":" + ("0" + self.ellapsed_time[1])[-2:] + ":" + ("0" + self.ellapsed_time[2])[-2:]
         getTym = self.end_time.split(".")[0]
         getDat = getTym.split(" ")[0].split("-")
         self.date = getDat[1] + "/" + getDat[2] + "/" + getDat[0]
@@ -159,9 +160,10 @@ class Reporting:
             """
             start_time = datetime.now()
             end_time = datetime.now()
-            self.ellapsed_time = str(end_time - start_time)
-            self.start_time=str(start_time)
-            self.end_time=str(end_time)
+            self.ellapsed_time = str(end_time - start_time).split('.')[0].split(':')
+            self.ellapsed_time="~" + ("0" + self.ellapsed_time[0])[-2:] + ":" + ("0" + self.ellapsed_time[1])[-2:] + ":" + ("0" + self.ellapsed_time[2])[-2:]
+            self.start_time=str(start_time).split('.')[0]
+            self.end_time=str(end_time).split('.')[0]
             getTym = self.end_time.split(".")[0]
             getDat = getTym.split(" ")[0].split("-")
             self.date = getDat[1] + "/" + getDat[2] + "/" + getDat[0]
@@ -186,9 +188,10 @@ class Reporting:
             """
             start_time = datetime.now()
             end_time = datetime.now()
-            self.ellapsed_time = str(end_time - start_time)
-            self.start_time=str(start_time)
-            self.end_time=str(end_time)
+            self.ellapsed_time = str(end_time - start_time).split('.')[0].split(':')
+            self.ellapsed_time="~" + ("0" + self.ellapsed_time[0])[-2:] + ":" + ("0" + self.ellapsed_time[1])[-2:] + ":" + ("0" + self.ellapsed_time[2])[-2:]
+            self.start_time=str(start_time).split('.')
+            self.end_time=str(end_time).split('.')
             getTym = self.end_time.split(".")[0]
             getDat = getTym.split(" ")[0].split("-")
             self.date = getDat[1] + "/" + getDat[2] + "/" + getDat[0]
@@ -444,13 +447,13 @@ class Reporting:
                 report_json[OVERALLSTATUS][0][CYCLE_NAME]=json_data["suitedetails"][i["s_index"]]['cyclename']
                 report_json[OVERALLSTATUS][0][VERSION]=json_data["version"]
                 if i['total']>0:
-                    report_json[OVERALLSTATUS][0]["pass"]=str(round(i["Pass"]/i['total']*100,2))
-                    report_json[OVERALLSTATUS][0]["fail"]=str(round(i["Fail"]/i['total']*100,2))
-                    report_json[OVERALLSTATUS][0]["terminate"]=str(round(i["Terminate"]/i['total']*100,2))
+                    report_json[OVERALLSTATUS][0]["pass"]=str(round(i["Pass"]/i['total']*100,2)) if len(str(round(i["Pass"]/i['total']*100,2)).split('.')[-1]) == 2 else str(round(i["Pass"]/i['total']*100,2)) + "0"
+                    report_json[OVERALLSTATUS][0]["fail"]=str(round(i["Fail"]/i['total']*100,2)) if len(str(round(i["Fail"]/i['total']*100,2)).split('.')[-1]) == 2 else str(round(i["Fail"]/i['total']*100,2)) + "0"
+                    report_json[OVERALLSTATUS][0]["terminate"]=str(round(i["Terminate"]/i['total']*100,2)) if len(str(round(i["Terminate"]/i['total']*100,2)).split('.')[-1]) == 2 else str(round(i["Terminate"]/i['total']*100,2)) + "0"
                 else:
-                    report_json[OVERALLSTATUS][0]["pass"]="0"
-                    report_json[OVERALLSTATUS][0]["fail"]="0"
-                    report_json[OVERALLSTATUS][0]["terminate"]="0"
+                    report_json[OVERALLSTATUS][0]["pass"]="0.00"
+                    report_json[OVERALLSTATUS][0]["fail"]="0.00"
+                    report_json[OVERALLSTATUS][0]["terminate"]="0.00"
             if len(report_json[ROWS]) != 0:
                 for i in report_json[ROWS]:
                     if i[COMMENTS]:
@@ -478,13 +481,13 @@ class Reporting:
                 report_json_condition_check[OVERALLSTATUS][0][CYCLE_NAME]=json_data["suitedetails"][i["s_index"]]['cyclename']
                 report_json_condition_check[OVERALLSTATUS][0][VERSION]=json_data["version"]
                 if i['total']>0:
-                    report_json_condition_check[OVERALLSTATUS][0]["pass"]=str(round(i["Pass"]/i['total']*100,2))
-                    report_json_condition_check[OVERALLSTATUS][0]["fail"]=str(round(i["Fail"]/i['total']*100,2))
-                    report_json_condition_check[OVERALLSTATUS][0]["terminate"]=str(round(i["Terminate"]/i['total']*100,2))
+                    report_json_condition_check[OVERALLSTATUS][0]["pass"]=str(round(i["Pass"]/i['total']*100,2)) if len(str(round(i["Pass"]/i['total']*100,2)).split('.')[-1]) == 2 else str(round(i["Pass"]/i['total']*100,2)) + "0"
+                    report_json_condition_check[OVERALLSTATUS][0]["fail"]=str(round(i["Fail"]/i['total']*100,2)) if len(str(round(i["Fail"]/i['total']*100,2)).split('.')[-1]) == 2 else str(round(i["Fail"]/i['total']*100,2)) + "0"
+                    report_json_condition_check[OVERALLSTATUS][0]["terminate"]=str(round(i["Terminate"]/i['total']*100,2)) if len(str(round(i["Terminate"]/i['total']*100,2)).split('.')[-1]) == 2 else str(round(i["Terminate"]/i['total']*100,2)) + "0"
                 else:
-                    report_json_condition_check[OVERALLSTATUS][0]["pass"]="0"
-                    report_json_condition_check[OVERALLSTATUS][0]["fail"]="0"
-                    report_json_condition_check[OVERALLSTATUS][0]["terminate"]="0"
+                    report_json_condition_check[OVERALLSTATUS][0]["pass"]="0.00"
+                    report_json_condition_check[OVERALLSTATUS][0]["fail"]="0.00"
+                    report_json_condition_check[OVERALLSTATUS][0]["terminate"]="0.00"
 
             with open(filename, 'w') as outfile:
                     log.info('Writing report data to the file '+filename)
@@ -509,13 +512,13 @@ class Reporting:
                 report_json_condition_check_testcase_empty[OVERALLSTATUS][0][CYCLE_NAME]=json_data["suitedetails"][i["s_index"]]['cyclename']
                 report_json_condition_check_testcase_empty[OVERALLSTATUS][0][VERSION]=json_data["version"]
                 if i['total']>0:
-                    report_json_condition_check_testcase_empty[OVERALLSTATUS][0]["pass"]=str(round(i["Pass"]/i['total']*100,2))
-                    report_json_condition_check_testcase_empty[OVERALLSTATUS][0]["fail"]=str(round(i["Fail"]/i['total']*100,2))
-                    report_json_condition_check_testcase_empty[OVERALLSTATUS][0]["terminate"]=str(round(i["Terminate"]/i['total']*100,2))
+                    report_json_condition_check_testcase_empty[OVERALLSTATUS][0]["pass"]=str(round(i["Pass"]/i['total']*100,2)) if len(str(round(i["Pass"]/i['total']*100,2)).split('.')[-1]) == 2 else str(round(i["Pass"]/i['total']*100,2)) + "0"
+                    report_json_condition_check_testcase_empty[OVERALLSTATUS][0]["fail"]=str(round(i["Fail"]/i['total']*100,2)) if len(str(round(i["Fail"]/i['total']*100,2)).split('.')[-1]) == 2 else str(round(i["Fail"]/i['total']*100,2)) + "0"
+                    report_json_condition_check_testcase_empty[OVERALLSTATUS][0]["terminate"]=str(round(i["Terminate"]/i['total']*100,2)) if len(str(round(i["Terminate"]/i['total']*100,2)).split('.')[-1]) == 2 else str(round(i["Terminate"]/i['total']*100,2)) + "0"
                 else:
-                    report_json_condition_check_testcase_empty[OVERALLSTATUS][0]["pass"]="0"
-                    report_json_condition_check_testcase_empty[OVERALLSTATUS][0]["fail"]="0"
-                    report_json_condition_check_testcase_empty[OVERALLSTATUS][0]["terminate"]="0"
+                    report_json_condition_check_testcase_empty[OVERALLSTATUS][0]["pass"]="0.00"
+                    report_json_condition_check_testcase_empty[OVERALLSTATUS][0]["fail"]="0.00"
+                    report_json_condition_check_testcase_empty[OVERALLSTATUS][0]["terminate"]="0.00"
             with open(filename, 'w') as outfile:
                     log.info('Writing report data to the file '+filename)
                     json.dump(report_json_condition_check_testcase_empty, outfile, indent=4, sort_keys=False)
@@ -533,7 +536,9 @@ class Reporting:
         """
         overallstatus_array=[]
         overallstatus_obj={}
-        overallstatus_obj[ELLAPSED_TIME]=str(datetime.now() - datetime.now())
+        ellapsed_time = str(datetime.now() - datetime.now()).split('.')[0].split(':')
+        ellapsed_time = "~" + ("0" + ellapsed_time[0])[-2:] + ":" + ("0" + ellapsed_time[1])[-2:] + ":" + ("0" + ellapsed_time[2])[-2:]
+        overallstatus_obj[ELLAPSED_TIME]=ellapsed_time
         overallstatus_obj[END_TIME]= datetime.now().strftime(TIME_FORMAT)
         overallstatus_obj[BROWSER_VERSION]='N/A'
         overallstatus_obj[START_TIME]=datetime.now().strftime(TIME_FORMAT)
