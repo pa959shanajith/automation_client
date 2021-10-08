@@ -316,15 +316,12 @@ class UtilOperations:
         err_msg=None
         try:
             log.debug('reading the inputs')
-            if input1 != None and input2 != None and input1 != '' and input2 != '' :
-                # input1=str(input1).replace('\n','').replace('\r','')
-                # input2=str(input2).replace('\n','').replace('\r','')
-                if '\xa0' in input1:
-                    input1=input1.replace('\xa0', " ")
-                if '\xa0' in input2:
+            if input1 != None and input2 != None:
+                if isinstance(input1,str) and '\xa0' in input1:
+                    input1 = input1.replace('\xa0', " ")
+                if isinstance(input1, str) and '\xa0' in input2:
                     input2 = input2.replace('\xa0', " ")
-                    
-                if input1==input2:
+                if str(input1)==str(input2):
                     log.debug('Values are equal')
                     logger.print_on_console('Values are equal')
                     methodoutput=TEST_RESULT_TRUE
