@@ -33,6 +33,7 @@ class Update_Rollback:
         self.loc_7z = None
         self.updater_loc = None
         self.option = None
+        self.datatags_file_loc = None
         #----------------------------------Required for both Update and Rollback
 
     def update(self, data_from_server, path, SERVER_LOC, UNPAC_LOC, LOC_7Z, UPDATER_LOC, OPTION):
@@ -120,7 +121,7 @@ class Update_Rollback:
                     elif vs1 < vs2:
                         return -1
                 return 0
-
+            #compare the current client version with the version avaliable in server
             compare_res = compare(client_version,server_version)
             if ( compare_res == 1 or compare_res == 0 ):self.update_flag = False
             else:self.update_flag = True
@@ -187,9 +188,15 @@ class Update_Rollback:
         return update_msg
 
     def run_updater(self):
-        """function to run Updater.py/Updater.exe ' UPDATE ' feature"""
+        """Function to run Updater.py/Updater.exe ' UPDATE ' feature"""
         try:
-            update_cmd = str(self.updater_loc) + ' ' + str(self.option) + ' """' + str(self.data_tags) + '""" """' + str(self.client_tag) + '""" ' + str(self.SERVER_LOC) + ' ' + str(self.Update_loc) + ' ' + str(self.loc_7z) + ' ' + str(os.getpid())
+            #write datatags to datatags_file
+            self.datatags_file_loc = str(self.Update_loc)+"\\datatags_file.txt"
+            f = open(self.datatags_file_loc, "w")
+            f.write(str(self.data_tags))
+            f.close()
+            #Command to send to the updater file
+            update_cmd = str(self.updater_loc) + ' ' + str(self.option) + ' ' + str(self.datatags_file_loc) + ' """' + str(self.client_tag) + '""" ' + str(self.SERVER_LOC) + ' ' + str(self.Update_loc) + ' ' + str(self.loc_7z) + ' ' + str(os.getpid())
             msg = "Sending the following data to Updater."
             if (self.updater_loc.endswith(".py")):
                 update_cmd = 'python ' + update_cmd
@@ -199,10 +206,10 @@ class Update_Rollback:
             #os.system(update_cmd)
             subprocess.run(update_cmd, shell = True)
         except Exception as e:
-            log.error( "Error in download_and_run_updater : " + str(e) )
+            log.error( "Error in run_updater : " + str(e) )
 
     def run_rollback(self):
-        """function to run Updater.py/Updater.exe ' ROLLBACK ' feature"""
+        """Function to run Updater.py/Updater.exe ' ROLLBACK ' feature"""
         try:
             update_cmd = str(self.updater_loc) + ' ' + str(self.option) + ' ' + str(self.Update_loc) + ' ' + str(self.loc_7z) + ' ' + str(os.getpid())
             msg = "Sending the following data to Updater."
