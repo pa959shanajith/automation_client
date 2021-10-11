@@ -127,7 +127,10 @@ ERROR_CODE_DICT = {
     'err_found_not_visible': 'Hidden Object found, Enable Ignore Visibility Check from ICE config to use this object',
     'err_push_btn_scroll_bar': 'Push Buttons inside scroll bars can not be scraped',
     'err_scroll_in_list': 'Scroll bar inside list can not be scraped',
-    'wrn_found_not_visible': 'Hidden Object found, but Ignore Visibility Check is enabled, performing operation'
+    'wrn_found_not_visible': 'Hidden Object found, but Ignore Visibility Check is enabled, performing operation',
+    'err_object_background': 'Window containing object is not on top, can not perform operation',
+    'err_value': 'Value does not exist',
+    'err_operation_detect': 'Element clicked but operation not detected, Please use alternative keyword double click'
 
 }
 

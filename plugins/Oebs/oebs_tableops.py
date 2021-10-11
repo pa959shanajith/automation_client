@@ -24,11 +24,10 @@ class TableOperations:
 
     #Method to get row count of a table
     def getrowcount(self,acc):
-        del oebs_key_objects.custom_msg[:]
-        #sets the keywordresult to FAIL
-        keywordresult=MSG_FAIL
-        #this is the response obtained from the keyword
-        keywordresponse=''
+        status = TEST_RESULT_FAIL
+        methodoutput = ''
+        output_res = OUTPUT_CONSTANT
+        err_msg = None
         rowcount = ''
         try:
                 log.debug('Received Object Context',DEF_GETROWCOUNT)
@@ -39,8 +38,8 @@ class TableOperations:
                     tablechild=acc.getAccessibleChildFromContext(count)
                     tablechildcontext=tablechild.getAccessibleContextInfo()
                     if(tablechildcontext.role =='row header'):
-                        keywordresult=MSG_PASS
-                        keywordresponse = str(tablechildcontext.childrenCount+1)
+                        status=TEST_RESULT_PASS
+                        methodoutput = str(tablechildcontext.childrenCount+1)
                         break
                     elif tablechildcontext.role == 'label':
                         parentacc = acc.getAccessibleParentFromContext()
@@ -48,8 +47,8 @@ class TableOperations:
                         if parentinfo.role == 'viewport':
                             tableinfo = acc.getAccessibleTableInfo()
                             rowcount = tableinfo.rowCount
-                            keywordresult=MSG_PASS
-                            keywordresponse = str(rowcount)
+                            status=TEST_RESULT_PASS
+                            methodoutput = str(rowcount)
                             break
                         elif parentinfo.role == 'table':
                             curaccinfo=parentacc.getAccessibleContextInfo()
@@ -58,32 +57,26 @@ class TableOperations:
                                 tablechild=parentacc.getAccessibleChildFromContext(count)
                                 tablechildcontext=tablechild.getAccessibleContextInfo()
                                 if(tablechildcontext.role =='row header'):
-                                    keywordresult=MSG_PASS
-                                    keywordresponse = str(tablechildcontext.childrenCount)
+                                    status=TEST_RESULT_PASS
+                                    methodoutput = str(tablechildcontext.childrenCount)
                                     break
                             break
-                oebs_key_objects.custom_msg("MSG_RESULT_IS")
         except Exception as e:
             self.utilities_obj.cleardata()
             err_msg = ERROR_CODE_DICT['err_get_row_count']
             logger.print_on_console(err_msg)
             log.error(err_msg)
             log.debug('%s',e)
-            log.debug('Status %s',keywordresult)
-        log.debug('Status %s',keywordresult)
-        # response is sent to the client
-        self.utilities_obj.cleardata()
-        oebs_key_objects.keyword_output.append(str(keywordresult))
-        oebs_key_objects.keyword_output.append(str(keywordresponse))
-
+            log.debug('Status %s',status)
+        log.debug('Status %s',status)
+        return status,methodoutput,output_res,err_msg
 
     #Method to get column count of a table
     def getcolumncount(self,acc):
-        del oebs_key_objects.custom_msg[:]
-        #sets the keywordresult to FAIL
-        keywordresult=MSG_FAIL
-        #this is the response obtained from the keyword
-        keywordresponse=''
+        status = TEST_RESULT_FAIL
+        methodoutput = ''
+        output_res = OUTPUT_CONSTANT
+        err_msg = None
         columncount = ''
         try:
                 log.debug('Received Object Context',DEF_GETCOLUMNCOUNT)
@@ -94,8 +87,8 @@ class TableOperations:
                     tablechild=acc.getAccessibleChildFromContext(count)
                     tablechildcontext=tablechild.getAccessibleContextInfo()
                     if(tablechildcontext.role =='column header'):
-                        keywordresult=MSG_PASS
-                        keywordresponse = str(tablechildcontext.childrenCount)
+                        status=TEST_RESULT_PASS
+                        methodoutput = str(tablechildcontext.childrenCount)
                         break
                     elif tablechildcontext.role == 'label':
                         parentacc = acc.getAccessibleParentFromContext()
@@ -103,8 +96,8 @@ class TableOperations:
                         if parentinfo.role == 'viewport':
                             tableinfo = acc.getAccessibleTableInfo()
                             columncount = tableinfo.columnCount
-                            keywordresult=MSG_PASS
-                            keywordresponse = str(columncount)
+                            status=TEST_RESULT_PASS
+                            methodoutput = str(columncount)
                             break
                         elif parentinfo.role == 'table':
                             curaccinfo=parentacc.getAccessibleContextInfo()
@@ -113,34 +106,30 @@ class TableOperations:
                                 tablechild=parentacc.getAccessibleChildFromContext(count)
                                 tablechildcontext=tablechild.getAccessibleContextInfo()
                                 if(tablechildcontext.role =='column header'):
-                                    keywordresult=MSG_PASS
-                                    keywordresponse = str(tablechildcontext.childrenCount)
+                                    status=TEST_RESULT_PASS
+                                    methodoutput = str(tablechildcontext.childrenCount)
                                     break
                             break
-                oebs_key_objects.custom_msg("MSG_RESULT_IS")
         except Exception as e:
             self.utilities_obj.cleardata()
             err_msg = ERROR_CODE_DICT['err_get_column_count']
             logger.print_on_console(err_msg)
             log.error(err_msg)
             log.debug('%s',e)
-            log.debug('Status %s',keywordresult)
-        log.debug('Status %s',keywordresult)
-        # response is sent to the client
-        self.utilities_obj.cleardata()
-        oebs_key_objects.keyword_output.append(str(keywordresult))
-        oebs_key_objects.keyword_output.append(str(keywordresponse))
+            log.debug('Status %s',status)
+        log.debug('Status %s',status)
+        return status,methodoutput,output_res,err_msg
 
     #Method to get cell value of given Object/XPATH
     def getcellvaluejava(self,acc):
         del oebs_key_objects.custom_msg[:]
             #this is the response obtained from the keyword
-        keywordresponse=''
+        methodoutput=''
         try:
             log.debug('Received Object Context',DEF_GETCELLVALUEJAVA)
             if(oebs_key_objects.keyword_input[0] =='1'):
                 parentcontext=self.getparent(acc)
-                keywordresponse=self.getheader(parentcontext)
+                methodoutput=self.getheader(parentcontext)
             else:
                 #gets the inputs which user has passed and subtracting 1 or 2 to match the values which user passes with the table index as table index starts with 0
                 rowinput=int(oebs_key_objects.keyword_input[0])-2
@@ -158,7 +147,7 @@ class TableOperations:
                     contextinfo=acc.getAccessibleChildFromContext(index)
                     cellcontextinfo=contextinfo.getAccessibleContextInfo()
                     if(cellcontextinfo.role == 'label'):
-                        keywordresponse=cellcontextinfo.name
+                        methodoutput=cellcontextinfo.name
                 else:
                     log.debug('%s',MSG_INVALID_NOOF_INPUT)
                     logger.print_on_console(MSG_INVALID_NOOF_INPUT)
@@ -169,10 +158,10 @@ class TableOperations:
             logger.print_on_console(err_msg)
             log.error(err_msg)
             log.debug('%s',e)
-        return keywordresponse
+        return methodoutput
 
     def getcellvalueOebs(self,acc):
-        keywordresponse=''
+        methodoutput=''
         try:
             log.debug('Received Object Context',DEF_GETCELLVALUEOEBS)
             parentinfo=acc.getAccessibleParentFromContext()
@@ -190,7 +179,7 @@ class TableOperations:
                     index = (rowinput*actualcoulmncount)+coulmninput
                     innertablechild=acc.getAccessibleChildFromContext(index)
                     innertablechildcontext=innertablechild.getAccessibleContextInfo()
-                    keywordresponse=innertablechildcontext.name
+                    methodoutput=innertablechildcontext.name
                 else:
                     log.debug('%s',MSG_INVALID_NOOF_INPUT)
                     oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
@@ -199,9 +188,9 @@ class TableOperations:
                 if(oebs_key_objects.keyword_input[0] =='1'):
                     parentcontext=self.getparent(acc)
                     if(parentcontext):
-                        keywordresponse=self.getheader(parentcontext)
+                        methodoutput=self.getheader(parentcontext)
                     else:
-                        keywordresponse=self.getheader(acc)
+                        methodoutput=self.getheader(acc)
                 else:
                     rowinput=int(oebs_key_objects.keyword_input[0])-2
                     coulmninput=int(oebs_key_objects.keyword_input[1])-1
@@ -219,7 +208,7 @@ class TableOperations:
                                 index = (rowinput*actualcoulmncount)+coulmninput
                                 innertablechild=tablechild.getAccessibleChildFromContext(index)
                                 innertablechildcontext=innertablechild.getAccessibleContextInfo()
-                                keywordresponse=innertablechildcontext.name
+                                methodoutput=innertablechildcontext.name
                             else:
                                 log.debug('%s',MSG_INVALID_NOOF_INPUT)
                                 logger.print_on_console(MSG_INVALID_NOOF_INPUT)
@@ -231,15 +220,14 @@ class TableOperations:
             logger.print_on_console(err_msg)
             log.error(err_msg)
             log.debug('%s',e)
-        return keywordresponse
+        return methodoutput
 
 
     def getcellvalue(self,acc):
-        del oebs_key_objects.custom_msg[:]
-        #sets the keywordresult to FAIL
-        keywordresult=MSG_FAIL
-        #this is the response obtained from the keyword
-        keywordresponse=''
+        status = TEST_RESULT_FAIL
+        methodoutput = ''
+        output_res = OUTPUT_CONSTANT
+        err_msg = None
         try:
                 log.debug('Received Object Context',DEF_GETCELLVALUE)
                 #gets the accessible table information
@@ -258,16 +246,16 @@ class TableOperations:
                                         splitval=splitval.split("is",1)[1]
                                 elif 'Column' in result:
                                     splitval=result.split("Column",1)[0]
-                        keywordresponse=splitval.strip()
-                        keywordresult=MSG_PASS
+                        methodoutput=splitval.strip()
+                        status=TEST_RESULT_PASS
                         break
                     elif tablechildcontext.role == 'label':
                         parentacc = acc.getAccessibleParentFromContext()
                         parentinfo = parentacc.getAccessibleContextInfo()
                         if parentinfo.role == 'viewport':
-                            keywordresponse = self.getcellvaluejava(acc)
-                            if(keywordresponse):
-                                keywordresult=MSG_PASS
+                            methodoutput = self.getcellvaluejava(acc)
+                            if(methodoutput):
+                                status=TEST_RESULT_PASS
                             break
                         elif parentinfo.role == 'table':
                             result = self.getcellvalueOebs(acc)
@@ -278,31 +266,26 @@ class TableOperations:
                                         splitval=splitval.split("is",1)[1]
                                 elif 'Column' in result:
                                     splitval=result.split("Column",1)[0]
-                            keywordresponse=splitval.strip()
-                            keywordresult=MSG_PASS
+                            methodoutput=splitval.strip()
+                            status=TEST_RESULT_PASS
                             break
-                oebs_key_objects.custom_msg("MSG_RESULT_IS")
         except Exception as e:
             self.utilities_obj.cleardata()
             err_msg = ERROR_CODE_DICT['err_get_cell_value']
             logger.print_on_console(err_msg)
             log.error(err_msg)
             log.debug('%s',e)
-            log.debug('Status %s',keywordresult)
-        log.debug('Status %s',keywordresult)
-        # response is sent to the client
-        self.utilities_obj.cleardata()
-        oebs_key_objects.keyword_output.append(str(keywordresult))
-        oebs_key_objects.keyword_output.append(str(keywordresponse))
+            log.debug('Status %s',status)
+        log.debug('Status %s',status)
+        return status,methodoutput,output_res,err_msg
+
 
     #Method to verify cell value of given Object/XPATH with actual present in application
     def verifycellvalue(self,acc):
-        del oebs_key_objects.custom_msg[:]
-            #sets the keywordresult to FAIL
-        keywordresult = MSG_FAIL
-            #this is the response obtained from the keyword
-        keywordresponse=''
-        verifyresponse=MSG_FALSE
+        status = TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FALSE
+        output_res = OUTPUT_CONSTANT
+        err_msg = None
         try:
             log.debug('Received Object Context',DEF_VERIFYCELLVALUE)
             #getting cell value using getCellValue method
@@ -310,31 +293,24 @@ class TableOperations:
             self.getcellvalue(acc)
             fetchedcellvalue = oebs_key_objects.keyword_output[1]
             if inputcellvalue == fetchedcellvalue:
-                keywordresult=MSG_PASS
-                verifyresponse=MSG_TRUE
-            oebs_key_objects.custom_msg("MSG_STATUS")
+                status=TEST_RESULT_PASS
+                methodoutput=TEST_RESULT_TRUE
         except Exception as e:
             self.utilities_obj.cleardata()
             err_msg = ERROR_CODE_DICT['err_verify_cell_value']
             logger.print_on_console(err_msg)
             log.error(err_msg)
             log.debug('%s',e)
-            log.debug('Status %s',keywordresult)
-        log.debug('Status %s',keywordresult)
-        # response is sent to the client
-        self.utilities_obj.cleardata()
-        oebs_key_objects.keyword_output.append(str(keywordresult))
-        oebs_key_objects.keyword_output.append(str(verifyresponse))
-
+            log.debug('Status %s',status)
+        log.debug('Status %s',status)
+        return status,methodoutput,output_res,err_msg
 
     #Method to cell click of given Object/XPATH with actual present in application
     def cellclick(self,acc):
-        del oebs_key_objects.custom_msg[:]
-            #sets the keywordresult to FAIL
-        keywordresult = MSG_FAIL
-            #this is the response obtained from the keyword
-        keywordresponse=MSG_TRUE
-        verifyresponse=MSG_FALSE
+        status = TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FALSE
+        output_res = OUTPUT_CONSTANT
+        err_msg = None
         try:
             log.debug('Received Object Context',DEF_CELLCLICK)
             #getting cell value using getCellValue method
@@ -348,22 +324,22 @@ class TableOperations:
 
                         result=self.cellclickoebs(acc)
                         if(result):
-                            keywordresponse=MSG_TRUE
-                            keywordresult=MSG_PASS
+                            methodoutput=TEST_RESULT_TRUE
+                            status=TEST_RESULT_PASS
                         break
                     elif tablechildcontext.role == 'label':
                         parentacc = acc.getAccessibleParentFromContext()
                         parentinfo = parentacc.getAccessibleContextInfo()
                         if parentinfo.role == 'viewport':
-                            keywordresponse = getcellvaluejava(acc)
-                            if(keywordresponse):
-                                keywordresult=MSG_PASS
+                            methodoutput = getcellvaluejava(acc)
+                            if(methodoutput):
+                                status=TEST_RESULT_PASS
                             break
                         elif parentinfo.role == 'table':
                             result =self.cellclickoebs(acc)
                             if(result):
-                                keywordresponse=MSG_TRUE
-                                keywordresult=MSG_PASS
+                                methodoutput=TEST_RESULT_TRUE
+                                status=TEST_RESULT_PASS
                             break
         except Exception as e:
             self.utilities_obj.cleardata()
@@ -371,14 +347,9 @@ class TableOperations:
             logger.print_on_console(err_msg)
             log.error(err_msg)
             log.debug('%s',e)
-            log.debug('Status %s',keywordresult)
-        log.debug('Status %s',keywordresult)
-        # response is sent to the client
-        self.utilities_obj.cleardata()
-        oebs_key_objects.keyword_output.append(str(keywordresult))
-        oebs_key_objects.keyword_output.append(str(keywordresponse))
-
-
+            log.debug('Status %s',status)
+        log.debug('Status %s',status)
+        return status,methodoutput,output_res,err_msg
 
     def getparent(self,acc):
         parentcon=acc.getAccessibleParentFromContext()
@@ -394,9 +365,9 @@ class TableOperations:
 
     #Method to cell click of OEBS table
     def cellclickoebs(self,acc):
-      #  keywordresponse=''
-        keywordresponse = MSG_FALSE
-        keywordresult=MSG_FAIL
+        #  methodoutput=''
+        methodoutput = TEST_RESULT_FALSE
+        status=TEST_RESULT_FAIL
         try:
             log.debug('Received Object Context',DEF_CELLCLICK)
             parentinfo=acc.getAccessibleParentFromContext()
@@ -447,8 +418,8 @@ class TableOperations:
                     parent_height = parentcontext.height
                     parent_width = parentcontext.width
                     if((x_coor > parent_x and x_coor<(parent_x + parent_width)) and (y_coor>parent_y and y_coor<(parent_y+parent_height))):
-                     oebs_mouseops.MouseOperation('click',x_coor,y_coor)
-                     keywordresponse=MSG_TRUE
+                        oebs_mouseops.MouseOperation('click',x_coor,y_coor)
+                        methodoutput=TEST_RESULT_TRUE
                 else:
                     log.debug('%s',MSG_INVALID_NOOF_INPUT)
                     oebs_key_objects.custom_msg.append(MSG_INVALID_NOOF_INPUT)
@@ -457,9 +428,9 @@ class TableOperations:
                 if(oebs_key_objects.keyword_input[0] =='1'):
                     parentcontext=getparent(acc)
                     if(parentcontext):
-                        keywordresponse=getclickheader(parentcontext)
+                        methodoutput=getclickheader(parentcontext)
                     else:
-                        keywordresponse=getclickheader(acc)
+                        methodoutput=getclickheader(acc)
                 else:
                     rowinput=int(oebs_key_objects.keyword_input[0])-2
                     coulmninput=int(oebs_key_objects.keyword_input[1])-1
@@ -512,8 +483,8 @@ class TableOperations:
                                 if((x_coor > parent_x and x_coor<(parent_x + parent_width)) and (y_coor>parent_y and y_coor<(parent_y+parent_height))):
                                     oebs_mouseops.MouseOperation('click',x_coor,y_coor)
                                     log.debug('Click Successful',DEF_CLICK)
-                                    keywordresponse = MSG_TRUE
-                                    keywordresult=MSG_PASS
+                                    methodoutput = TEST_RESULT_TRUE
+                                    status=TEST_RESULT_PASS
                             else:
                                 log.debug('%s',MSG_INVALID_NOOF_INPUT)
                                 logger.print_on_console(MSG_INVALID_NOOF_INPUT)
@@ -525,12 +496,12 @@ class TableOperations:
             logger.print_on_console(err_msg)
             log.error(err_msg)
             log.debug('%s',e)
-        return keywordresponse
+        return methodoutput
 
     #Method to click table header
     def getclickheader(self,acc):
-        keywordresult = MSG_FAIL
-        keywordresponse = MSG_FALSE
+        status = TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FALSE
         del oebs_key_objects.custom_msg[:]
         result=''
         contextinfo=acc.getAccessibleContextInfo()
@@ -568,8 +539,8 @@ class TableOperations:
                             y_coor = (columnheadery+(columnheadery+columnheaderheight))/2
                             if((x_coor > columnheaderx and x_coor<(columnheaderx + columnheaderwidth)) and (y_coor>columnheadery and y_coor<(columnheadery+columnheaderheight))):
                                 oebs_mouseops.MouseOperation('click',x_coor,y_coor)
-                                keywordresponse = MSG_TRUE
-                                keywordresult=MSG_PASS
+                                methodoutput = TEST_RESULT_TRUE
+                                status=TEST_RESULT_PASS
 
 
                 else:
@@ -584,11 +555,11 @@ class TableOperations:
                     y_coor = (columnheadery+(columnheadery+columnheaderheight))/2
                     if((x_coor > columnheaderx and x_coor<(columnheaderx + columnheaderwidth)) and (y_coor>columnheadery and y_coor<(columnheadery+columnheaderheight))):
                         oebs_mouseops.MouseOperation('click',x_coor,y_coor)
-                        keywordresponse = MSG_TRUE
-                        keywordresult=MSG_PASS
+                        methodoutput = TEST_RESULT_TRUE
+                        status=TEST_RESULT_PASS
 
                 break
-        return keywordresponse
+        return methodoutput
 
 
     def getheader(self,acc):

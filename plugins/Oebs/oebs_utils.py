@@ -374,7 +374,6 @@ class Utils:
 
 
     def captureScreenshot(self,applicationname):
-##        time.sleep(0.120)
         image=None
         isjavares, hwnd = self.isjavawindow(applicationname)
         window_handle=hwnd

@@ -276,6 +276,7 @@ class Utilities:
     def object_generator(self,applicationname,locator,keyword,inputs,outputs, errors = False, allow_showing = False):
         global accessContext
         accessContext = ''
+        active_parent = None
         #OBJECTLOCATION for the object is sent from the user
         del oebs_key_objects.keyword_input[:]
         oebs_key_objects.xpath = locator
@@ -348,86 +349,11 @@ class Utilities:
         if str(accessContextParent) != '' and ((ignore_hidden == 'No' and visible) or ignore_hidden == 'Yes'):
             if ignore_hidden == 'Yes' and not visible:
                 logger.print_on_console(ERROR_CODE_DICT['wrn_found_not_visible'])  
-            return accessContextParent, True
+            return accessContextParent, True, active_parent
         elif str(accessContextParent) != '' and ignore_hidden == 'No' and not visible:
             logger.print_on_console(ERROR_CODE_DICT['err_found_not_visible'])
-            return 'fail', False
+            return 'fail', False, False
         else:
-            return 'fail', False
-
-    def object_generator_test(self,applicationname,locator,keyword,inputs,outputs):
-
-        active_parent = None
-        #OBJECTLOCATION for the object is sent from the user
-        del oebs_key_objects.keyword_input[:]
-        oebs_key_objects.xpath = locator
-        #Application name is sent from the user
-        oebs_key_objects.applicationname = applicationname
-        utils_obj=oebs_utils.Utils()
-        isjavares, hwnd = utils_obj.isjavawindow(oebs_key_objects.applicationname)
-        #method enables to move to perticular object and fetches its Contexts
-        uniquepath=oebs_key_objects.xpath
-        flag = 'false'
-        if ';' in uniquepath:
-            requiredxpath = uniquepath.split(';')
-            parentxpathtemp = ''
-            absolute_path = requiredxpath[0]
-
-            regularexp = re.compile('(frame(.*?|\s)*[\]]+)')
-            newxpath = regularexp.findall(absolute_path)
-
-            newlist2=[]
-            for i in range(len(newxpath)):
-                newlist2.append(newxpath[i][0])
-
-            for i in range(len(newlist2)):
-                absolute_path = absolute_path.replace(newlist2[i],'frame')
-
-            active_parent, accessContextParent, visible = self.swooptoelement(oebs_api.JABContext(hwnd), oebs_key_objects.xpath, absolute_path ,0 ,'', applicationname)
-            accessContextParent = accessContextParent or ''
-            if active_parent is None:
-                active_parent = False
-
-            identifiers = oebs_key_objects.xpath.split(';')
-            uniquepath = identifiers[0]
-            name = identifiers[1]
-            description=''
-            try:
-                description=identifiers[10]
-            except Exception:
-                description=''
-            retacc = accessContextParent
-            keytocompare=name+';'+description
-            if(keytocompare in objectDictWithNameDesc):
-                xpathneeded=objectDictWithNameDesc.get(keytocompare)
-                regularexp = re.compile('(frame(.*?|\s)*[\]]+)')
-                newxpath = regularexp.findall(xpathneeded)
-
-                newlist2=[]
-                for i in range(len(newxpath)):
-                    newlist2.append(newxpath[i][0])
-
-                for i in range(len(newlist2)):
-                    xpathneeded=xpathneeded.replace(newlist2[i],'frame')
-                if(accessContextParent):
-                    accessContextParent.releaseJavaObject()
-                active_parent, accessContextParent, visible = self.swooptoelement(oebs_api.JABContext(hwnd),oebs_key_objects.xpath,xpathneeded,0,'', applicationname)
-
-        accessContext=accessContextParent
-        #keyword is sent from the user
-        oebs_key_objects.keyword = keyword
-        #input sent from the user
-        inputs = ast.literal_eval(str(inputs))
-        inputs = [n for n in inputs]
-
-        for index in range(len(inputs)):
-            oebs_key_objects.keyword_input.append(inputs[index])
-        #output thats to be sent from the server to client
-        oebs_key_objects.keyword_output = outputs.split(';')
-
-        if str(accessContextParent) != '' :
-            return accessContextParent, active_parent, visible
-        else :
             return 'fail', False, False
 
 

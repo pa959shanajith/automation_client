@@ -31,10 +31,10 @@ class UtilOperations:
 
     #Method to setfocus on the User given Object
     def setfocus(self,acc):
-        del oebs_key_objects.custom_msg[:]
-        #sets the keywordresult to FAIL
-        keywordresult=MSG_FAIL
-        keywordresponse=MSG_FALSE
+        status = TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FAIL
+        output_res = OUTPUT_CONSTANT
+        err_msg = None
         try:
             #gets the entire context information
             curaccinfo = acc.getAccessibleContextInfo()
@@ -47,35 +47,32 @@ class UtilOperations:
                 if ('showing' or 'focusable') in curaccinfo.states:
                     oebs_mouseops.MouseOperation('move',x_coor,y_coor)
                     acc.requestFocus()
-                    keywordresponse = MSG_TRUE
-                    keywordresult=MSG_PASS
-                    log.debug('%s %s',MSG_RESULT_IS,keywordresult)
+                    methodoutput = TEST_RESULT_TRUE
+                    status=TEST_RESULT_PASS
+                    log.debug('%s %s',MSG_RESULT_IS,status)
                 else:
-                    log.debug('%s %s',MSG_RESULT_IS,keywordresult)
+                    log.debug('%s %s',MSG_RESULT_IS,status)
                     logger.print_on_console(MSG_INVALID_OBJECT)
-                    oebs_key_objects.custom_msg.append(MSG_INVALID_OBJECT)
+                    err_msg = MSG_INVALID_OBJECT
             else:
                 log.debug('MSG:%s',MSG_ELEMENT_NOT_VISIBLE)
                 logger.print_on_console(MSG_ELEMENT_NOT_VISIBLE)
-                oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_VISIBLE)
+                err_msg = MSG_ELEMENT_NOT_VISIBLE
         except Exception as e:
             self.utilities_obj.cleardata()
             err_msg = ERROR_CODE_DICT['err_set_focus']
             logger.print_on_console(err_msg)
             log.error(err_msg)
             log.debug('%s',e)
-            log.debug('Status %s',keywordresult)
-        log.debug('Status %s',keywordresult)
-        # response is sent to the client
-        self.utilities_obj.cleardata()
-        oebs_key_objects.keyword_output.append(str(keywordresult))
-        oebs_key_objects.keyword_output.append(str(keywordresponse))
+            log.debug('Status %s',status)
+        log.debug('Status %s',status)
+        return status,methodoutput,output_res,err_msg
 
     def drag(self,acc):
-        del oebs_key_objects.custom_msg[:]
-         #sets the keywordresult to FAIL
-        keywordresult=MSG_FAIL
-        verifyresponse = MSG_FALSE
+        status = TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FAIL
+        output_res = OUTPUT_CONSTANT
+        err_msg = None
         try:
             curaccinfo = acc.getAccessibleContextInfo()
             objstates = curaccinfo.states
@@ -89,16 +86,16 @@ class UtilOperations:
                 x_cor = (x1+x2)/2
                 y_cor = (y1+y2)/2
                 oebs_mouseops.MouseOperation('hold',x_cor,y_cor)
-                verifyresponse = MSG_TRUE
-                keywordresult = MSG_PASS
-                log.debug('%s',keywordresult)
+                methodoutput = TEST_RESULT_TRUE
+                status = TEST_RESULT_PASS
+                log.debug('%s',status)
             else:
                 log.debug('%s %s',DEF_DRAG)
                 logger.print_on_console(MSG_DISABLED_OBJECT)
-                oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
-                verifyresponse = MSG_FALSE
-                keywordresult = MSG_FAIL
-                log.debug('%s',keywordresult)
+                err_msg = MSG_DISABLED_OBJECT
+                methodoutput = TEST_RESULT_FAIL
+                status = TEST_RESULT_FAIL
+                log.debug('%s',status)
 
         except Exception as e:
             self.utilities_obj.cleardata()
@@ -106,18 +103,15 @@ class UtilOperations:
             logger.print_on_console(err_msg)
             log.error(err_msg)
             log.debug('%s',e)
-            log.debug('Status: %s',keywordresult)
-        log.debug('Status: %s',keywordresult)
-        # response is sent to the client
-        self.utilities_obj.cleardata()
-        oebs_key_objects.keyword_output.append(str(keywordresult))
-        oebs_key_objects.keyword_output.append(str(verifyresponse))
+            log.debug('Status: %s',status)
+        log.debug('Status: %s',status)
+        return status,methodoutput,output_res,err_msg
 
     def drop(self,acc):
-        del oebs_key_objects.custom_msg[:]
-         #sets the keywordresult to FAIL
-        keywordresult=MSG_FAIL
-        verifyresponse = MSG_FALSE
+        err_msg = None
+        status = TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FAIL
+        output_res = OUTPUT_CONSTANT
         try:
             curaccinfo = acc.getAccessibleContextInfo()
             objstates = curaccinfo.states
@@ -134,16 +128,16 @@ class UtilOperations:
                 oebs_mouseops.MouseOperation('slide',x_cor,y_cor)
                 oebs_mouseops.MouseOperation('release',x_cor,y_cor)
 
-                verifyresponse = MSG_TRUE
-                keywordresult = MSG_PASS
-                log.debug('%s',keywordresult)
+                methodoutput = TEST_RESULT_TRUE
+                status = TEST_RESULT_PASS
+                log.debug('%s',status)
             else:
                 log.debug('%s %s',DEF_DROP)
-                oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
+                err_msg = MSG_DISABLED_OBJECT
                 logger.print_on_console(MSG_DISABLED_OBJECT)
-                verifyresponse = MSG_FALSE
-                keywordresult = MSG_FAIL
-                log.debug('%s',keywordresult)
+                methodoutput = TEST_RESULT_FAIL
+                status = TEST_RESULT_FAIL
+                log.debug('%s',status)
 
         except Exception as e:
             self.utilities_obj.cleardata()
@@ -151,18 +145,15 @@ class UtilOperations:
             logger.print_on_console(err_msg)
             log.error(err_msg)
             log.debug('%s',e)
-            log.debug('Status: %s',keywordresult)
-        log.debug('Status: %s',keywordresult)
-        # response is sent to the client
-        self.utilities_obj.cleardata()
-        oebs_key_objects.keyword_output.append(str(keywordresult))
-        oebs_key_objects.keyword_output.append(str(verifyresponse))
+            log.debug('Status: %s',status)
+        log.debug('Status: %s',status)
+        return status, methodoutput, output_res, err_msg
 
     def mousehover(self,acc):
-        del oebs_key_objects.custom_msg[:]
-         #sets the keywordresult to FAIL
-        keywordresult=MSG_FAIL
-        verifyresponse = MSG_FALSE
+        status=TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FAIL
+        output_res = OUTPUT_CONSTANT
+        err_msg = None
         try:
             curaccinfo = acc.getAccessibleContextInfo()
             objstates = curaccinfo.states
@@ -182,16 +173,16 @@ class UtilOperations:
                 #y_cor = y2
                 print(x_cor)
                 oebs_mouseops.MouseOperation('move',x_cor,y_cor)
-                verifyresponse = MSG_TRUE
-                keywordresult = MSG_PASS
-                log.debug('%s',keywordresult)
+                methodoutput = TEST_RESULT_TRUE
+                status = TEST_RESULT_PASS
+                log.debug('%s',status)
             else:
                 log.debug('%s %s',DEF_DRAG)
-                oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
+                err_msg = MSG_DISABLED_OBJECT
                 logger.print_on_console(MSG_DISABLED_OBJECT)
-                verifyresponse = MSG_FALSE
-                keywordresult = MSG_FAIL
-                log.debug('%s',keywordresult)
+                methodoutput = TEST_RESULT_FAIL
+                status = TEST_RESULT_FAIL
+                log.debug('%s',status)
 
         except Exception as e:
             self.utilities_obj.cleardata()
@@ -199,89 +190,80 @@ class UtilOperations:
             logger.print_on_console(err_msg)
             log.error(err_msg)
             log.debug('%s',e)
-            log.debug('Status: %s',keywordresult)
-        log.debug('Status: %s',keywordresult)
-        # response is sent to the client
-        self.utilities_obj.cleardata()
-        oebs_key_objects.keyword_output.append(str(keywordresult))
-        oebs_key_objects.keyword_output.append(str(verifyresponse))
+            log.debug('Status: %s',status)
+        log.debug('Status: %s',status)
+        return status,methodoutput,output_res,err_msg
 
     #Method to check given object is enabled
     def verifyenabled(self,acc):
-        del oebs_key_objects.custom_msg[:]
-         #sets the keywordresult to FAIL
-        keywordresult=MSG_FAIL
-        verifyresponse = MSG_FALSE
+        status = TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FAIL
+        output_res = OUTPUT_CONSTANT
+        err_msg = None
         try:
             #gets the entire context information
             curaccinfo = acc.getAccessibleContextInfo()
             log.debug('Received Object Context',DEF_VERIFYENABLED)
             objstates = curaccinfo.states
             if 'enabled' in objstates:
-                verifyresponse = MSG_TRUE
-                keywordresult = MSG_PASS
-                log.debug('%s',keywordresult)
+                methodoutput = TEST_RESULT_TRUE
+                status = TEST_RESULT_PASS
+                log.debug('%s',status)
             else:
                 log.debug('%s %s',DEF_VERIFYENABLED)
-                oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
+                err_msg = MSG_DISABLED_OBJECT
                 logger.print_on_console(MSG_DISABLED_OBJECT)
-                verifyresponse = MSG_FALSE
-                keywordresult = MSG_FAIL
-                log.debug('%s',keywordresult)
+                methodoutput = TEST_RESULT_FAIL
+                status = TEST_RESULT_FAIL
+                log.debug('%s',status)
         except Exception as e:
             self.utilities_obj.cleardata()
             err_msg = ERROR_CODE_DICT['err_verify_enabled']
             logger.print_on_console(err_msg)
             log.error(err_msg)
             log.debug('%s',e)
-            log.debug('Status %s',keywordresult)
-        log.debug('Status %s',keywordresult)
-        log.debug('Verify Response %s',str(verifyresponse))
-        # response is sent to the client
-        self.utilities_obj.cleardata()
-        oebs_key_objects.keyword_output.append(str(keywordresult))
-        oebs_key_objects.keyword_output.append(str(verifyresponse))
+            log.debug('Status %s',status)
+        log.debug('Status %s',status)
+        log.debug('Verify Response %s',str(methodoutput))
+        return status,methodoutput,output_res,err_msg
 
     #Method to check given object is disabled
     def verifydisabled(self,acc):
-        del oebs_key_objects.custom_msg[:]
-         #sets the keywordresult to FAIL
-        keywordresult=MSG_FAIL
-        verifyresponse = MSG_FALSE
+        status=TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FAIL
+        output_res = OUTPUT_CONSTANT
+        err_msg = None
         try:
             #gets the entire context information
             curaccinfo = acc.getAccessibleContextInfo()
             log.debug('Received Object Context',DEF_VERIFYDISABLED)
             objstates = curaccinfo.states
             if 'enabled' in objstates:
-                verifyresponse = MSG_FALSE
-                keywordresult = MSG_FAIL
-                log.debug('%s',keywordresult)
-                oebs_key_objects.custom_msg.append(MSG_OBJECT_ENABLED)
+                methodoutput = TEST_RESULT_FAIL
+                status = TEST_RESULT_FAIL
+                log.debug('%s',status)
+                err_msg = MSG_OBJECT_ENABLED
             else:
-                verifyresponse = MSG_TRUE
-                keywordresult= MSG_PASS
-                log.debug('%s',keywordresult)
+                methodoutput = TEST_RESULT_TRUE
+                status= TEST_RESULT_PASS
+                log.debug('%s',status)
         except Exception as e:
             self.utilities_obj.cleardata()
             err_msg = ERROR_CODE_DICT['err_verify_disabled']
             logger.print_on_console(err_msg)
             log.error(err_msg)
             log.debug('%s',e)
-            log.debug('Status %s',keywordresult)
-        log.debug('Status %s',keywordresult)
-        log.debug('Verify Response %s',str(verifyresponse))
-        # response is sent to the client
-        self.utilities_obj.cleardata()
-        oebs_key_objects.keyword_output.append(str(keywordresult))
-        oebs_key_objects.keyword_output.append(str(verifyresponse))
+            log.debug('Status %s',status)
+        log.debug('Status %s',status)
+        log.debug('Verify Response %s',str(methodoutput))
+        return status,methodoutput,output_res,err_msg
 
     #Method to check given object is visible
     def verifyvisible(self,acc):
-        del oebs_key_objects.custom_msg[:]
-         #sets the keywordresult to FAIL
-        keywordresult=MSG_FAIL
-        verifyresponse = MSG_FALSE
+        status=TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FAIL
+        output_res = OUTPUT_CONSTANT
+        err_msg = None
         try:
             #gets the entire context information
             curaccinfo = acc.getAccessibleContextInfo()
@@ -292,39 +274,36 @@ class UtilOperations:
             #Visibility check for scrollbar
             if(self.getObjectVisibility(acc,x_coor,y_coor)):
                 if 'visible' in objstates:
-                    verifyresponse = MSG_TRUE
-                    keywordresult=MSG_PASS
-                    log.debug('%s',keywordresult)
+                    methodoutput = TEST_RESULT_TRUE
+                    status=TEST_RESULT_PASS
+                    log.debug('%s',status)
                 else:
-                    verifyresponse = MSG_FALSE
-                    keywordresult=MSG_FAIL
-                    oebs_key_objects.custom_msg.append(MSG_HIDDEN_OBJECT)
+                    methodoutput = TEST_RESULT_FAIL
+                    status=TEST_RESULT_FAIL
+                    err_msg = MSG_HIDDEN_OBJECT
                     logger.print_on_console(MSG_HIDDEN_OBJECT)
-                    log.debug('%s',keywordresult)
+                    log.debug('%s',status)
             else:
                 log.debug('MSG:%s',MSG_ELEMENT_NOT_VISIBLE)
                 logger.print_on_console(MSG_ELEMENT_NOT_VISIBLE)
-                oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_VISIBLE)
+                err_msg = MSG_ELEMENT_NOT_VISIBLE
         except Exception as e:
             self.utilities_obj.cleardata()
             err_msg = ERROR_CODE_DICT['err_verify_visible']
             logger.print_on_console(err_msg)
             log.error(err_msg)
             log.debug('%s',e)
-            log.debug('Status %s',keywordresult)
-        log.debug('Status %s',keywordresult)
-        log.debug('Verify Response %s',str(verifyresponse))
-        # response is sent to the client
-        self.utilities_obj.cleardata()
-        oebs_key_objects.keyword_output.append(str(keywordresult))
-        oebs_key_objects.keyword_output.append(str(verifyresponse))
+            log.debug('Status %s',status)
+        log.debug('Status %s',status)
+        log.debug('Verify Response %s',str(methodoutput))
+        return status,methodoutput,output_res,err_msg
 
     #Method to check given object is hidden
     def verifyhidden(self,acc):
-        del oebs_key_objects.custom_msg[:]
-         #sets the keywordresult to FAIL
-        keywordresult=MSG_FAIL
-        verifyresponse = MSG_FALSE
+        status = TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FAIL
+        output_res = OUTPUT_CONSTANT
+        err_msg = None
         try:
             #gets the entire context information
             curaccinfo = acc.getAccessibleContextInfo()
@@ -335,20 +314,20 @@ class UtilOperations:
             #Visibility check for scrollbar
             if(self.getObjectVisibility(acc,x_coor,y_coor)):
                 if 'visible' and 'showing' in objstates:
-                    verifyresponse = MSG_FALSE
-                    keywordresult=MSG_FAIL
-                    log.debug('%s',keywordresult)
-                    oebs_key_objects.custom_msg.append(MSG_OBJECT_VISIBLE)
+                    methodoutput = TEST_RESULT_FAIL
+                    status=TEST_RESULT_FAIL
+                    log.debug('%s',status)
+                    err_msg = MSG_OBJECT_VISIBLE
                 else:
-                    verifyresponse = MSG_TRUE
-                    keywordresult=MSG_PASS
-                    log.debug('%s',keywordresult)
+                    methodoutput = TEST_RESULT_TRUE
+                    status=TEST_RESULT_PASS
+                    log.debug('%s',status)
             else:
                 log.debug('MSG:%s',MSG_ELEMENT_NOT_VISIBLE)
-                oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_VISIBLE)
+                err_msg = MSG_ELEMENT_NOT_VISIBLE
                 logger.print_on_console(MSG_ELEMENT_NOT_VISIBLE)
-                verifyresponse = MSG_TRUE
-                keywordresult=MSG_PASS
+                methodoutput = TEST_RESULT_TRUE
+                status=TEST_RESULT_PASS
 
         except Exception as e:
             self.utilities_obj.cleardata()
@@ -356,20 +335,17 @@ class UtilOperations:
             logger.print_on_console(err_msg)
             log.error(err_msg)
             log.debug('%s',e)
-            log.debug('Status %s',keywordresult)
-        log.debug('Status %s',keywordresult)
-        log.debug('Verify Response %s',str(verifyresponse))
-        # response is sent to the client
-        self.utilities_obj.cleardata()
-        oebs_key_objects.keyword_output.append(str(keywordresult))
-        oebs_key_objects.keyword_output.append(str(verifyresponse))
+            log.debug('Status %s',status)
+        log.debug('Status %s',status)
+        log.debug('Verify Response %s',str(methodoutput))
+        return status,methodoutput,output_res,err_msg
 
     #Method to check given object is verifyreadonly
     def verifyreadonly(self,acc):
-        del oebs_key_objects.custom_msg[:]
-         #sets the keywordresult to FAIL
-        keywordresult = MSG_FAIL
-        verifyresponse = MSG_FALSE
+        status = TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FAIL
+        output_res = OUTPUT_CONSTANT
+        err_msg = None
         try:
             #gets the entire context information
             currinfo = acc.getAccessibleContextInfo()
@@ -396,21 +372,17 @@ class UtilOperations:
                     if 'selected' in labelcontext.states:
                         currentselection=labelcontext.indexInParent
                 if currentselection == 0:
-                    #x_coor = int(currinfo.x + (0.5 * currinfo.width))
-                    #y_coor = int(currinfo.y + (0.5 * currinfo.height))
-                    #Visibility check for scrollbar
-
                     if(self.getObjectVisibility(acc,x_coor,y_coor)):
                         oebs_mouseops.MouseOperation('click',x_coor,y_coor)
                         self.keyboardops.keyboard_operation('keypress','A_DOWN')
                         time.sleep(0.1)
-                        requiredcontext, visible = self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]")
+                        requiredcontext, visible, active_parent = self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]")
                         listObj = self.utilities_obj.looptolist(requiredcontext)
                         childobj=listObj.getAccessibleChildFromContext(int(childindex))
                         childcontext=childobj.getAccessibleContextInfo()
                         if 'selected' in childcontext.states:
-                            keywordresult = MSG_PASS
-                            verifyresponse = MSG_TRUE
+                            status = TEST_RESULT_PASS
+                            methodoutput = TEST_RESULT_TRUE
                         self.keyboardops.keyboard_operation('keypress','ENTER')
                         time.sleep(0.4)
                         for selected in range(children):
@@ -419,101 +391,94 @@ class UtilOperations:
                             if 'selected' in labelcontext.states:
                                 currentselection=labelcontext.indexInParent
                         if currentselection == 0:
-                            oebs_key_objects.custom_msg.append(MSG_OBJECT_READONLY)
-                            keywordresult = MSG_PASS
-                            verifyresponse = MSG_TRUE
+                            status = TEST_RESULT_PASS
+                            methodoutput = TEST_RESULT_TRUE
                         else:
                             self.keyboardops.keyboard_operation('keypress','A_UP')
                             time.sleep(0.1)
-                            requiredcontext, visible = self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]")
+                            requiredcontext, visible, active_parent = self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]")
                             listObj = self.utilities_obj.looptolist(requiredcontext)
                             childobj=listObj.getAccessibleChildFromContext(int(childindex))
                             childcontext=childobj.getAccessibleContextInfo()
                             if 'selected' in childcontext.states:
-                                keywordresult = MSG_PASS
-                                verifyresponse = MSG_TRUE
-                            oebs_key_objects.custom_msg.append(MSG_OBJECT_SELECTABLE)
+                                status = TEST_RESULT_PASS
+                                methodoutput = TEST_RESULT_TRUE
+                            methodoutput = MSG_OBJECT_SELECTABLE
                     else:
                         log.debug('MSG:%s',DEF_VERIFYREADONLY,MSG_ELEMENT_NOT_VISIBLE)
                         logger.print_on_console(MSG_ELEMENT_NOT_VISIBLE)
-                        oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_VISIBLE)
+                        err_msg = MSG_ELEMENT_NOT_VISIBLE
                 else:
-                    oebs_key_objects.custom_msg.append(MSG_OBJECT_SELECTABLE)
+                    methodoutput = MSG_OBJECT_SELECTABLE
             elif 'enabled' in objstates:
                 if 'editable' in objstates:
-                    log.debug('%s',DEF_VERIFYREADONLY,keywordresult)
-                    oebs_key_objects.custom_msg.append(MSG_OBJECT_EDITABLE)
+                    log.debug('%s',DEF_VERIFYREADONLY,status)
+                    methodoutput = MSG_OBJECT_EDITABLE
                 else:
-                    verifyresponse = MSG_TRUE
-                    keywordresult=MSG_PASS
-                    log.debug('%s',DEF_VERIFYREADONLY,keywordresult)
+                    methodoutput = TEST_RESULT_TRUE
+                    status=TEST_RESULT_PASS
+                    log.debug('%s',DEF_VERIFYREADONLY,status)
             else:
                 log.debug('Object Disabled',DEF_VERIFYREADONLY,MSG_DISABLED_OBJECT)
                 logger.print_on_console(MSG_DISABLED_OBJECT)
-                oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
+                err_msg = MSG_DISABLED_OBJECT
         except Exception as e:
             self.utilities_obj.cleardata()
             err_msg = ERROR_CODE_DICT['err_verify_read_only']
             logger.print_on_console(err_msg)
             log.error(err_msg)
             log.debug('%s',DEF_VERIFYREADONLY,e)
-            log.debug('Status %s',DEF_VERIFYREADONLY,keywordresult)
-        log.debug('Status %s',DEF_VERIFYREADONLY,keywordresult)
-        log.debug('Verify Response %s',DEF_VERIFYREADONLY,str(verifyresponse))
-        # response is sent to the client
-        self.utilities_obj.cleardata()
-        oebs_key_objects.keyword_output.append(str(keywordresult))
-        oebs_key_objects.keyword_output.append(str(verifyresponse))
+            log.debug('Status %s',DEF_VERIFYREADONLY,status)
+        log.debug('Status %s',DEF_VERIFYREADONLY,status)
+        log.debug('Verify Response %s',DEF_VERIFYREADONLY,str(methodoutput))
+        return status,methodoutput,output_res,err_msg
 
     #Method to get tool tip text
     def gettooltiptext(self,acc):
-        del oebs_key_objects.custom_msg[:]
-         #sets the keywordresult to FAIL
-        keywordresult = MSG_FAIL
-        keywordresponse=''
+        status = TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FAIL
+        output_res = OUTPUT_CONSTANT
+        err_msg = None
         try:
             #gets the entire context information
             curaccinfo = acc.getAccessibleContextInfo()
             log.debug('Received Object Context',DEF_GETTOOLTIPTEXT)
-            keywordresponse = curaccinfo.description
-            keywordresult = MSG_PASS
-            oebs_key_objects.custom_msg.append("MSG_RESULT_IS")
+            methodoutput = curaccinfo.description
+            status = TEST_RESULT_PASS
         except Exception as e:
             self.utilities_obj.cleardata()
             err_msg = ERROR_CODE_DICT['err_get_tooltip_text']
             logger.print_on_console(err_msg)
             log.error(err_msg)
             log.debug('%s',DEF_GETTOOLTIPTEXT,e)
-            log.debug('Status %s',DEF_GETTOOLTIPTEXT,keywordresult)
-        log.debug('Status %s',DEF_GETTOOLTIPTEXT,keywordresult)
-        # response is sent to the client
-        self.utilities_obj.cleardata()
-        oebs_key_objects.keyword_output.append(str(keywordresult))
-        oebs_key_objects.keyword_output.append(str(keywordresponse))
+            log.debug('Status %s',DEF_GETTOOLTIPTEXT,status)
+        log.debug('Status %s',DEF_GETTOOLTIPTEXT,status)
+        return status,methodoutput,output_res,err_msg
 
     #Method to verify tool tip text
     def verifytooltiptext(self,acc):
-        del oebs_key_objects.custom_msg[:]
-         #sets the keywordresult to FAIL
-        keywordresult = MSG_FAIL
-        verifyresponse = MSG_FALSE
+        status = TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FAIL
+        output_res = OUTPUT_CONSTANT
+        err_msg = None
         try:
             #gets the entire context information
             curaccinfo = acc.getAccessibleContextInfo()
             log.debug('Received Object Context',DEF_VERIFYTOOLTIPTEXT)
             if len(oebs_key_objects.keyword_input) == 1:
                 text=oebs_key_objects.keyword_input[0]
-               # oebs_key_objects.custom_msg.append(str('User Input: ' + text))
+                # oebs_key_objects.custom_msg.append(str('User Input: ' + text))
                 tooltiptext = curaccinfo.description
                 if text == tooltiptext:
-                    verifyresponse = MSG_TRUE
-                    keywordresult = MSG_PASS
+                    methodoutput = TEST_RESULT_TRUE
+                    status = TEST_RESULT_PASS
                 else:
                     log.debug('MSG:%s',DEF_VERIFYTOOLTIPTEXT,MSG_INVALID_INPUT)
                     logger.print_on_console(MSG_INVALID_INPUT)
+                    err_msg = MSG_INVALID_INPUT
             else:
                 log.debug('%s',DEF_VERIFYTOOLTIPTEXT,MSG_INVALID_INPUT)
-                oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
+                err_msg = MSG_INVALID_INPUT
                 logger.print_on_console(MSG_INVALID_INPUT)
         except Exception as e:
             self.utilities_obj.cleardata()
@@ -521,52 +486,45 @@ class UtilOperations:
             logger.print_on_console(err_msg)
             log.error(err_msg)
             log.debug('%s',DEF_VERIFYTOOLTIPTEXT,e)
-            log.debug('Status %s',DEF_VERIFYTOOLTIPTEXT,keywordresult)
-        log.debug('Status %s',DEF_VERIFYTOOLTIPTEXT,keywordresult)
-        log.debug('Verify Response %s',DEF_VERIFYTOOLTIPTEXT,str(verifyresponse))
-        # response is sent to the client
-        self.utilities_obj.cleardata()
-        oebs_key_objects.keyword_output.append(str(keywordresult))
-        oebs_key_objects.keyword_output.append(str(verifyresponse))
-
+            log.debug('Status %s',DEF_VERIFYTOOLTIPTEXT,status)
+        log.debug('Status %s',DEF_VERIFYTOOLTIPTEXT,status)
+        log.debug('Verify Response %s',DEF_VERIFYTOOLTIPTEXT,str(methodoutput))
+        return status,methodoutput,output_res,err_msg
 
     #Method to verify exists
     def verifyexists(self,acc):
-        del oebs_key_objects.custom_msg[:]
-         #sets the keywordresult to FAIL
-        keywordresult = MSG_FAIL
-        verifyresponse = MSG_FALSE
+        status = TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FAIL
+        output_res = OUTPUT_CONSTANT
+        err_msg = None
         try:
             #gets the entire context information
             curaccinfo = acc.getAccessibleContextInfo()
             log.debug('Received Object Context',DEF_VERIFYEXISTS)
             if('showing' in curaccinfo.states and 'visible' in curaccinfo.states):
-                verifyresponse = MSG_TRUE
-                keywordresult = MSG_PASS
+                methodoutput = TEST_RESULT_TRUE
+                status = TEST_RESULT_PASS
             else:
                 log.debug('%s',DEF_VERIFYEXISTS,MSG_HIDDEN_OBJECT)
                 logger.print_on_console(MSG_HIDDEN_OBJECT)
-                oebs_key_objects.custom_msg.append(MSG_HIDDEN_OBJECT)
+                err_msg = MSG_HIDDEN_OBJECT
         except Exception as e:
             self.utilities_obj.cleardata()
             err_msg = ERROR_CODE_DICT['err_verify_exists']
             logger.print_on_console(err_msg)
             log.error(err_msg)
             log.debug('%s',DEF_VERIFYEXISTS,e)
-            log.debug('Status %s',DEF_VERIFYEXISTS,keywordresult)
-        log.debug('Status %s',DEF_VERIFYEXISTS,keywordresult)
-        log.debug('Verify Response %s',DEF_VERIFYEXISTS,str(verifyresponse))
-        # response is sent to the client
-        self.utilities_obj.cleardata()
-        oebs_key_objects.keyword_output.append(str(keywordresult))
-        oebs_key_objects.keyword_output.append(str(verifyresponse))
+            log.debug('Status %s',DEF_VERIFYEXISTS,status)
+        log.debug('Status %s',DEF_VERIFYEXISTS,status)
+        log.debug('Verify Response %s',DEF_VERIFYEXISTS,str(methodoutput))
+        return status,methodoutput,output_res,err_msg
 
     #Method to verify does not exists
     def verifydoesnotexists(self,acc):
-        del oebs_key_objects.custom_msg[:]
-         #sets the keywordresult to FAIL
-        keywordresult = MSG_FAIL
-        verifyresponse = MSG_FALSE
+        status = TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FAIL
+        output_res = OUTPUT_CONSTANT
+        err_msg = None
         try:
             #gets the entire context information
             if(str(acc)!='fail'):
@@ -574,36 +532,32 @@ class UtilOperations:
                 log.debug('Received Object Context',DEF_VERIFYDOESNOTEXISTS)
                 if(acc):
                     log.debug('%s',DEF_VERIFYDOESNOTEXISTS,MSG_ELEMENT_EXIST)
-                    oebs_key_objects.custom_msg.append(MSG_ELEMENT_EXIST)
+                    err_msg = MSG_ELEMENT_EXIST
                 else:
-                    verifyresponse = MSG_TRUE
-                    keywordresult = MSG_PASS
+                    methodoutput = TEST_RESULT_TRUE
+                    status = TEST_RESULT_PASS
             else:
-                verifyresponse = MSG_TRUE
-                keywordresult = MSG_PASS
+                methodoutput = TEST_RESULT_TRUE
+                status = TEST_RESULT_PASS
         except Exception as e:
-            verifyresponse = MSG_TRUE
-            keywordresult = MSG_PASS
+            methodoutput = TEST_RESULT_TRUE
+            status = TEST_RESULT_PASS
             self.utilities_obj.cleardata()
             err_msg = ERROR_CODE_DICT['err_verify_not_exists']
             logger.print_on_console(err_msg)
             log.error(err_msg)
             log.error('%s',e)
-            log.debug('Status %s',keywordresult)
-        log.debug('Status %s',DEF_VERIFYDOESNOTEXISTS,keywordresult)
-        log.debug('Verify Response %s',DEF_VERIFYDOESNOTEXISTS,str(verifyresponse))
-        # response is sent to the client
-        self.utilities_obj.cleardata()
-        oebs_key_objects.keyword_output.append(str(keywordresult))
-        oebs_key_objects.keyword_output.append(str(verifyresponse))
-
+            log.debug('Status %s',status)
+        log.debug('Status %s',DEF_VERIFYDOESNOTEXISTS,status)
+        log.debug('Verify Response %s',DEF_VERIFYDOESNOTEXISTS,str(methodoutput))
+        return status,methodoutput,output_res,err_msg
 
     #Method to perform rightclick operation
     def rightclick(self,acc):
-        del oebs_key_objects.custom_msg[:]
-     	#sets the keywordResult to FAIL
-        keywordresult = MSG_FAIL
-        verifyresponse = MSG_FALSE
+        status = TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FAIL
+        output_res = OUTPUT_CONSTANT
+        err_msg = None
         try:
             #gets the entire context information
             charinfo = acc.getAccessibleContextInfo()
@@ -620,38 +574,34 @@ class UtilOperations:
                     log.debug('RightClick Happens on :%s , %s',x_coor,y_coor)
                     oebs_mouseops.MouseOperation('rightclick',x_coor,y_coor)
                     log.debug('RightClick Successful',DEF_RIGHTCLICK)
-                    verifyresponse = MSG_TRUE
-                    keywordresult=MSG_PASS
+                    methodoutput = TEST_RESULT_TRUE
+                    status=TEST_RESULT_PASS
                 else:
                     log.debug('Object Disabled',MSG_DISABLED_OBJECT)
                     logger.print_on_console(MSG_DISABLED_OBJECT)
-                    oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
+                    err_msg = MSG_DISABLED_OBJECT
             else:
                 log.debug('MSG:%s',MSG_ELEMENT_NOT_VISIBLE)
                 logger.print_on_console(MSG_ELEMENT_NOT_VISIBLE)
-                oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_VISIBLE)
+                err_msg = MSG_ELEMENT_NOT_VISIBLE
         except Exception as e:
             self.utilities_obj.cleardata()
             err_msg = ERROR_CODE_DICT['err_right_click']
             logger.print_on_console(err_msg)
             log.error(err_msg)
             log.debug('%s',e)
-            log.debug('Status: %s',keywordresult)
-        log.debug('Status: %s',keywordresult)
-        # response is sent to the client
-        self.utilities_obj.cleardata()
-        oebs_key_objects.keyword_output.append(str(keywordresult))
-        oebs_key_objects.keyword_output.append(str(verifyresponse))
-
+            log.debug('Status: %s',status)
+        log.debug('Status: %s',status)
+        return status,methodoutput,output_res,err_msg
 
     #definition for switching from one internal frame to another
     def switchtoframe(self,acc):
         global activeframes
         activeframes=[]
-        del oebs_key_objects.custom_msg[:]
-         #sets the keywordresult to FAIL
-        keywordresult = MSG_FAIL
-        verifyresponse = MSG_FALSE
+        status = TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FAIL
+        output_res = OUTPUT_CONSTANT
+        err_msg = None
         try:
             framecontext=acc.getAccessibleContextInfo()
             log.debug('Received Object Context',DEF_SWITCHTOFRAME)
@@ -696,43 +646,38 @@ class UtilOperations:
                                         failflag = -1
                         if failflag == 1 :
                             log.debug('MSG:%s',MSG_INVALID_INPUT)
-                            oebs_key_objects.custom_msg.append("Switch to Frame Failed.")
+                            err_msg = "Switch to Frame Failed"
                         elif failflag == -1 :
                             log.debug('MSG:%s',MSG_INVALID_INPUT)
-                            oebs_key_objects.custom_msg.append("Switch to Frame Failed.")
+                            err_msg = "Switch to Frame Failed"
                             oebs_mouseops.MouseOperation('click',x_coormenu,y_coormenu)
                         elif failflag == 0:
-                            #sets the verifyresponse to TRUE
-                            verifyresponse = MSG_TRUE
-                            #sets the keywordresult to pass
-                            keywordresult=MSG_PASS
+                            #sets the methodoutput to TRUE
+                            methodoutput = TEST_RESULT_TRUE
+                            #sets the status to pass
+                            status=TEST_RESULT_PASS
                         else:
                             log.debug('MSG:%s',MSG_INVALID_INPUT)
                             logger.print_on_console(MSG_INVALID_INPUT)
-                            oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
+                            err_msg = MSG_INVALID_INPUT
                     else:
                         log.debug('MSG:%s',MSG_INVALID_INPUT)
                         logger.print_on_console(MSG_INVALID_INPUT)
-                        oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
+                        err_msg = MSG_INVALID_INPUT
                 else:
                     log.debug('MSG:%s',MSG_INVALID_NOOF_INPUT)
                     logger.print_on_console(MSG_INVALID_NOOF_INPUT)
-                    oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
+                    err_msg = MSG_INVALID_INPUT
         except Exception as e:
             self.utilities_obj.cleardata()
             err_msg = ERROR_CODE_DICT['err_switch_frame']
             logger.print_on_console(err_msg)
             log.error(err_msg)
             log.debug('%s',e)
-            log.debug('Status %s',keywordresult)
-        log.debug('Status %s',keywordresult)
-        log.debug('Verify Response %s',str(verifyresponse))
-        # response is sent to the client
-        self.utilities_obj.cleardata()
-        oebs_key_objects.keyword_output.append(str(keywordresult))
-        oebs_key_objects.keyword_output.append(str(verifyresponse))
-
-
+            log.debug('Status %s',status)
+        log.debug('Status %s',status)
+        log.debug('Verify Response %s',str(methodoutput))
+        return status,methodoutput,output_res,err_msg
 
     def getactiveframes(self,frameobj):
         framecontext=frameobj.getAccessibleContextInfo()
@@ -770,7 +715,6 @@ class UtilOperations:
         except Exception as e:
             return True
 
-
     #parent access context
     def viewportacc(self,acc):
         global accontext
@@ -806,10 +750,10 @@ class UtilOperations:
 
     #Method for send function keys
     def sendfunctionkeys(self,acc):
-        del oebs_key_objects.custom_msg[:]
-         #sets the keywordresult to FAIL
-        keywordresult = MSG_FAIL
-        verifyresponse = MSG_FALSE
+        status = TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FAIL
+        output_res = OUTPUT_CONSTANT
+        err_msg = None
         try:
             #gets the entire context information
             curaccinfo = acc.getAccessibleContextInfo()
@@ -823,18 +767,18 @@ class UtilOperations:
                     count=int(float(count))
                 except Exception as e:
                     log.error(e)
-                    oebs_key_objects.custom_msg.append(MSG_INVALID_FORMAT_INPUT)
+                    err_msg = MSG_INVALID_FORMAT_INPUT
             if string!=None and string.strip() != '':
                 for i in range(count):
                     import time
                     time.sleep(0.5)
                     res=self.keyboardops.keyboard_operation_sendfunctionkeys('keypress',string)
                     if res:
-                        keywordresult = MSG_PASS
-                        verifyresponse = MSG_TRUE
+                        status = TEST_RESULT_PASS
+                        methodoutput = TEST_RESULT_TRUE
             else:
                 logger.print_on_console(MSG_INVALID_INPUT)
-                oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
+                err_msg = MSG_INVALID_INPUT
 
         #    for i in range(len(string)):
         #        if string[i].isalpha():
@@ -843,35 +787,31 @@ class UtilOperations:
         #                self.keyboardops.keyboard_operation('keypress',string[i])
         #                self.keyboardops.keyboard_operation('keypress','CAPSLOCK')
 
-        #                keywordresult = MSG_PASS
-        #                verifyresponse = MSG_TRUE
+        #                status = TEST_RESULT_PASS
+        #                methodoutput = TEST_RESULT_TRUE
         #            else:
         #                val = string[i].upper()
         #                self.keyboardops.keyboard_operation('keypress',val)
-        #                keywordresult = MSG_PASS
-        #                verifyresponse = MSG_TRUE
+        #                status = TEST_RESULT_PASS
+        #                methodoutput = TEST_RESULT_TRUE
         #        elif string[i].isdigit():
         #            self.keyboardops.keyboard_operation('keypress',string[i])
-        #            keywordresult = MSG_PASS
-        #            verifyresponse = MSG_TRUE
+        #            status = TEST_RESULT_PASS
+        #            methodoutput = TEST_RESULT_TRUE
         #        else:
         #            if string[i] in oebs_constants.SENDFUNCTION_KEYS_DICT:
         #                self.keyboardops.keyboard_operation('keydown','SHIFT')
         #                self.keyboardops.keyboard_operation('keypress',oebs_constants.SENDFUNCTION_KEYS_DICT[string[i]])
         #                self.keyboardops.keyboard_operation('keyup','SHIFT')
-        #                keywordresult = MSG_PASS
-        #                verifyresponse = MSG_TRUE
+        #                status = TEST_RESULT_PASS
+        #                methodoutput = TEST_RESULT_TRUE
         except Exception as e:
             self.utilities_obj.cleardata()
             err_msg = ERROR_CODE_DICT['err_send_function']
             logger.print_on_console(err_msg)
             log.error(err_msg)
-            log.debug('Status %s',keywordresult)
-            oebs_key_objects.custom_msg.append(str(e))
-        log.debug('Status %s',keywordresult)
-        log.debug('Verify Response %s',str(verifyresponse))
-        # response is sent to the client
-        self.utilities_obj.cleardata()
-        oebs_key_objects.keyword_output.append(str(keywordresult))
-        oebs_key_objects.keyword_output.append(str(verifyresponse))
+            log.debug('Status %s',status)
+        log.debug('Status %s',status)
+        log.debug('Verify Response %s',str(methodoutput))
+        return status,methodoutput,output_res,err_msg
 

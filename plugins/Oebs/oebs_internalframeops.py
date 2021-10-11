@@ -30,10 +30,10 @@ class InternalFrameOperations:
 
 
     def closeframe(self,acc):
-        del oebs_key_objects.custom_msg[:]
-     	#sets the keywordResult to FAIL
-        keywordresult = MSG_FAIL
-        verifyresponse = MSG_FALSE
+        status = TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FALSE
+        output_res = OUTPUT_CONSTANT
+        err_msg = None
         try:
             #gets the entire context information
             charinfo = acc.getAccessibleContextInfo()
@@ -43,7 +43,6 @@ class InternalFrameOperations:
                 accessibleactionsinfo = acc.getAccessibleActions()
                 actioncount = accessibleactionsinfo.actionsCount
                 for i in range(actioncount):
-
                     actiontext = accessibleactionsinfo.actionInfo[i].name
                     if(str(actiontext) == 'Close Window'):
                         x1 = charinfo.x
@@ -53,37 +52,31 @@ class InternalFrameOperations:
                         xcor = x2 - 10
                         ycor = y1 + 10
                         oebs_mouseops.MouseOperation('click',xcor,ycor)
-                        verifyresponse = MSG_TRUE
-                        keywordresult=MSG_PASS
+                        methodoutput = TEST_RESULT_TRUE
+                        status=TEST_RESULT_PASS
                     else:
-                        log.debug('Object Disabled',MSG_DISABLED_OBJECT)
-                        logger.print_on_console(MSG_DISABLED_OBJECT)
-                        oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
-
-
+                        err_msg = MSG_DISABLED_OBJECT
+                        log.debug('Object Disabled',err_msg)
+                        logger.print_on_console(err_msg)
             else:
-                log.debug('Object Disabled',MSG_DISABLED_OBJECT)
-                logger.print_on_console(MSG_DISABLED_OBJECT)
-                oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
-
+                err_msg = MSG_DISABLED_OBJECT
+                log.debug('Object Disabled',err_msg)
+                logger.print_on_console(err_msg)
         except Exception as e:
             self.utilities_obj.cleardata()
             err_msg = ERROR_CODE_DICT['err_close_frame']
             logger.print_on_console(err_msg)
             log.error(err_msg)
             log.debug('%s',e)
-            log.debug('Status: %s',keywordresult)
-        log.debug('Status: %s',keywordresult)
-        # response is sent to the client
-        self.utilities_obj.cleardata()
-        oebs_key_objects.keyword_output.append(str(keywordresult))
-        oebs_key_objects.keyword_output.append(str(verifyresponse))
+            log.debug('Status: %s',status)
+        log.debug('Status: %s',status)
+        return status,methodoutput,output_res,err_msg
 
     def togglemaximize(self,acc):
-        del oebs_key_objects.custom_msg[:]
-     	#sets the keywordResult to FAIL
-        keywordresult = MSG_FAIL
-        verifyresponse = MSG_FALSE
+        status = TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FALSE
+        output_res = OUTPUT_CONSTANT
+        err_msg = None
         try:
             #gets the entire context information
             charinfo = acc.getAccessibleContextInfo()
@@ -98,36 +91,31 @@ class InternalFrameOperations:
                     if(str(actiontext) == 'Toggle Maximized'):
                         found = True
                         acc.doAccessibleActions(i,'Toggle Maximized')
-                        verifyresponse = MSG_TRUE
-                        keywordresult=MSG_PASS
+                        methodoutput = TEST_RESULT_TRUE
+                        status=TEST_RESULT_PASS
                 if not found:
-                    log.debug('Object Disabled',MSG_DISABLED_OBJECT)
-                    logger.print_on_console(MSG_DISABLED_OBJECT)
-                    oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
+                    err_msg = MSG_DISABLED_OBJECT
+                    log.debug('Object Disabled',err_msg)
+                    logger.print_on_console(err_msg)
             else:
-                log.debug('Object Disabled',MSG_DISABLED_OBJECT)
-                logger.print_on_console(MSG_DISABLED_OBJECT)
-                oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
-
+                err_msg = MSG_DISABLED_OBJECT
+                log.debug('Object Disabled',err_msg)
+                logger.print_on_console(err_msg)
         except Exception as e:
             self.utilities_obj.cleardata()
             err_msg = ERROR_CODE_DICT['err_toggle_maxamize']
             logger.print_on_console(err_msg)
             log.error(err_msg)
             log.debug('%s',e)
-            log.debug('Status: %s',keywordresult)
-        log.debug('Status: %s',keywordresult)
-        # response is sent to the client
-        self.utilities_obj.cleardata()
-        oebs_key_objects.keyword_output.append(str(keywordresult))
-        oebs_key_objects.keyword_output.append(str(verifyresponse))
-
+            log.debug('Status: %s',status)
+        log.debug('Status: %s',status)
+        return status,methodoutput,output_res,err_msg
 
     def toggleminimize(self,acc):
-        del oebs_key_objects.custom_msg[:]
-     	#sets the keywordResult to FAIL
-        keywordresult = MSG_FAIL
-        verifyresponse = MSG_FALSE
+        status = TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FALSE
+        output_res = OUTPUT_CONSTANT
+        err_msg = None
         try:
             #gets the entire context information
             charinfo = acc.getAccessibleContextInfo()
@@ -151,27 +139,22 @@ class InternalFrameOperations:
                             for i in range(0,4):
                                 keywordop_obj.keyboard_operation('keypress','A_DOWN')
                             keywordop_obj.keyboard_operation('keypress','ENTER')
-                        verifyresponse = MSG_TRUE
-                        keywordresult=MSG_PASS
+                        methodoutput = TEST_RESULT_TRUE
+                        status=TEST_RESULT_PASS
                 if not found:
                     err_msg = ERROR_CODE_DICT['err_minimize']
                     log.debug('Object Disabled',err_msg)
                     logger.print_on_console(err_msg)
-                    oebs_key_objects.custom_msg.append(err_msg)
             else:
-                log.debug('Object Disabled',MSG_DISABLED_OBJECT)
-                logger.print_on_console(MSG_DISABLED_OBJECT)
-                oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
-
+                err_msg = MSG_DISABLED_OBJECT
+                log.debug('Object Disabled',err_msg)
+                logger.print_on_console(err_msg)
         except Exception as e:
             self.utilities_obj.cleardata()
             err_msg = ERROR_CODE_DICT['err_toggle_minimize']
             logger.print_on_console(err_msg)
             log.error(err_msg)
             log.debug('%s',e)
-            log.debug('Status: %s',keywordresult)
-        log.debug('Status: %s',keywordresult)
-        # response is sent to the client
-        self.utilities_obj.cleardata()
-        oebs_key_objects.keyword_output.append(str(keywordresult))
-        oebs_key_objects.keyword_output.append(str(verifyresponse))
+            log.debug('Status: %s',status)
+        log.debug('Status: %s',status)
+        return status,methodoutput,output_res,err_msg
