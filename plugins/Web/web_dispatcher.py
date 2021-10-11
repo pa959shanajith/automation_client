@@ -682,27 +682,42 @@ class Dispatcher:
                     result=list(result)
                     screen_details=mythread.json_data['suitedetails'][0]
                     sauceFlag=False
+                    file_path=None
                     if execution_env['env'] == 'saucelabs':
                         sauceFlag=True
                     if configvalues['screenShot_Flag'].lower() == 'fail':
                         if result[0].lower() == 'fail':
-                            if local_Wd.popup_object.check_if_no_popup_exists():
+                            if not(headless_mode or sauceFlag):
+                                if configvalues['browser_screenshots'].lower() == 'yes':
+                                    if local_Wd.popup_object.check_if_no_popup_exists():
+                                        file_path = screen_shot_obj.captureScreenshot(screen_details,web=True)
+                                        driver.save_screenshot(file_path[2])
+                                    else:
+                                        local_Wd.log.debug("Pop up exists; Taking the screenshot using generic functions")
+                                        file_path = screen_shot_obj.captureScreenshot(screen_details,web=False)
+                                else:
+                                    file_path = screen_shot_obj.captureScreenshot(screen_details,web=False)
+                            elif local_Wd.popup_object.check_if_no_popup_exists():
                                 file_path = screen_shot_obj.captureScreenshot(screen_details,web=True)
                                 driver.save_screenshot(file_path[2])
-                            else:
-                                local_Wd.log.debug("Pop up exists; Taking the screenshot using generic functions")
-                                if not(headless_mode or sauceFlag):
-                                    file_path = screen_shot_obj.captureScreenshot(screen_details,web=False)
-                            result.append(file_path[2])
+                            if (file_path): result.append(file_path[2])
                     elif configvalues['screenShot_Flag'].lower() == 'all':
-                        if local_Wd.popup_object.check_if_no_popup_exists():
-                            file_path = screen_shot_obj.captureScreenshot(screen_details,web=True)
-                            driver.save_screenshot(file_path[2])
-                        else:
-                            local_Wd.log.debug("Pop up exists; Taking the screenshot using generic functions")
+                        if result[0].lower() == 'fail':
                             if not(headless_mode or sauceFlag):
-                                file_path = screen_shot_obj.captureScreenshot(screen_details,web=False)
-                        result.append(file_path[2])
+                                if configvalues['browser_screenshots'].lower() == 'yes':
+                                    if local_Wd.popup_object.check_if_no_popup_exists():
+                                        file_path = screen_shot_obj.captureScreenshot(screen_details,web=True)
+                                        driver.save_screenshot(file_path[2])
+                                    else:
+                                        local_Wd.log.debug("Pop up exists; Taking the screenshot using generic functions")
+                                        file_path = screen_shot_obj.captureScreenshot(screen_details,web=False)
+                                else:
+                                    file_path = screen_shot_obj.captureScreenshot(screen_details,web=False)
+                            elif local_Wd.popup_object.check_if_no_popup_exists():
+                                file_path = screen_shot_obj.captureScreenshot(screen_details,web=True)
+                                driver.save_screenshot(file_path[2])
+                            if (file_path): result.append(file_path[2])
+
         except TypeError as e:
             local_Wd.log.error(e,exc_info=True)
             err_msg=ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']
