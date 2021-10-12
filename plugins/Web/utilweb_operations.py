@@ -724,6 +724,7 @@ class UtilWebKeywords:
         try:
             if len(input)>0:
                 input1 = input[0]
+                mul_inp = input1.split('+')
                 digit = 1
                 if len(input)==3 and ((input[2].startswith('|') and input[2].endswith('|')) or (input[2].startswith('{') and input[2].endswith('}'))):
                     text = True
@@ -748,6 +749,19 @@ class UtilWebKeywords:
                         actions.perform()
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
+                elif len(mul_inp)==2:
+                    actions.key_down(self.keys_info[mul_inp[0].lower()])
+                    actions.send_keys(self.keys_info[mul_inp[1].lower()])
+                    actions.key_up(self.keys_info[mul_inp[0].lower()])
+                    actions.perform()
+                elif len(mul_inp)==3:
+                    actions.key_down(self.keys_info[mul_inp[0].lower()])
+                    actions.key_down(self.keys_info[mul_inp[1].lower()])
+                    actions.send_keys(self.keys_info[mul_inp[2].lower()])
+                    actions.perform()
+                    actions.key_up(self.keys_info[mul_inp[1].lower()])
+                    actions.key_up(self.keys_info[mul_inp[0].lower()])
+                    actions.perform()
                 else:
                     err_msg = "Function key '"+input1+"' is not recognized."
                     logger.print_on_console(err_msg)
