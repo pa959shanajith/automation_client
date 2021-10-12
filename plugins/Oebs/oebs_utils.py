@@ -13,7 +13,6 @@ import win32gui
 import win32process
 import win32con
 import win32api
-import oebsServer
 import oebs_api
 from oebs_constants import *
 import logger
@@ -374,7 +373,6 @@ class Utils:
 
 
     def captureScreenshot(self,applicationname):
-##        time.sleep(0.120)
         image=None
         isjavares, hwnd = self.isjavawindow(applicationname)
         window_handle=hwnd

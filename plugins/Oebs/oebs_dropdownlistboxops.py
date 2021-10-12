@@ -30,11 +30,10 @@ class DropdownListboxOperations:
 
     #Method to get dropdown/listbox values of given Object/XPATH
     def getselected(self,acc):
-        del oebs_key_objects.custom_msg[:]
-        #sets the keywordresult to FAIL
-        keywordresult = MSG_FAIL
-        #this is the response obtained from the keyword
-        keywordresponse=''
+        status = TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FALSE
+        output_res = OUTPUT_CONSTANT
+        err_msg = None
         selectedvalue = []
         try:
             charinfo = acc.getAccessibleContextInfo()
@@ -50,57 +49,46 @@ class DropdownListboxOperations:
                     childstates=childcontextinfo.states
                     if 'selected' in childstates:
                         selectedvalue.append(childcontextinfo.name)
-                        keywordresult=MSG_PASS
+                        status=TEST_RESULT_PASS
             #check for listbox
             elif charinfo.role == 'list':
                 #calling getselected def to get all selected values in list
                 selectedvalue = self.getselectedlist(acc)
-                keywordresult = MSG_PASS
+                status = TEST_RESULT_PASS
             else:
                 log.debug('%s',MSG_INVALID_INPUT)
                 logger.print_on_console(MSG_INVALID_INPUT)
-                oebs_key_objects.custom_msg.append(MSG_INVALID_OBJECT)
+                err_msg = MSG_INVALID_OBJECT
             outputsize = len(selectedvalue)
             for i in range(outputsize):
                 if outputsize == 1:
                     if charinfo.role == 'list':
-                        keywordresponse=selectedvalue[i]
-                        keywordresponse = keywordresponse + ';'
+                        methodoutput=selectedvalue[i]
+                        methodoutput = methodoutput + ';'
                     else:
-                        keywordresponse=selectedvalue[i]
-                        selectedvalue = keywordresponse
+                        methodoutput=selectedvalue[i]
+                        selectedvalue = methodoutput
                 else:
-                    keywordresponse=keywordresponse + selectedvalue[i]
+                    methodoutput=methodoutput + selectedvalue[i]
                     if i < outputsize - 1:
-                        keywordresponse = keywordresponse + ';'
-            if keywordresult == MSG_PASS:
-
-                if(len(selectedvalue)>1):
-                    oebs_key_objects.custom_msg.append("MSG_RESULT_IS")
-                else:
-                    oebs_key_objects.custom_msg.append("MSG_RESULT_IS")
+                        methodoutput = methodoutput + ';'
         except Exception as e:
             self.utilities_obj.cleardata()
             err_msg = ERROR_CODE_DICT['err_get_selected']
             logger.print_on_console(err_msg)
             log.error(err_msg)
             log.debug('%s',e)
-            log.debug('Status %s',keywordresult)
-        log.debug('Status %s',keywordresult)
-        # response is sent to the client
-        self.utilities_obj.cleardata()
-        oebs_key_objects.keyword_output.append(str(keywordresult))
-        oebs_key_objects.keyword_output.append(selectedvalue)
-
+            log.debug('Status %s',status)
+        log.debug('Status %s',status)
+        return status,methodoutput,output_res,err_msg
 
     #Method to verify dropdown selected value of given Object/XPATH
     def verifyselectedvalue(self,acc):
-        del oebs_key_objects.custom_msg[:]
-        #sets the keywordresult to FAIL
-        keywordresult=MSG_FAIL
+        status = TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FALSE
+        output_res = OUTPUT_CONSTANT
+        err_msg = None
         selectedvalue = []
-        #sets the verifyresponse to FALSE
-        verifyresponse = MSG_FALSE
         try:
             charinfo = acc.getAccessibleContextInfo()
             log.debug('Received Object Context',DEF_VERIFYSELECTEDVALUE)
@@ -110,8 +98,8 @@ class DropdownListboxOperations:
                 selectedvalue = self.getselectedlist(childAcc)
                 inputValue = oebs_key_objects.keyword_input
                 if selectedvalue == inputValue:
-                    keywordresult=MSG_PASS
-                    verifyresponse=MSG_TRUE
+                    status=TEST_RESULT_PASS
+                    methodoutput=TEST_RESULT_TRUE
             #check for listbox
             elif charinfo.role == 'list':
                 inputValue = oebs_key_objects.keyword_input
@@ -119,65 +107,56 @@ class DropdownListboxOperations:
                 selectedvalue = self.getselectedlist(acc)
                 #verifys selected values with given input
                 if selectedvalue == inputValue:
-                    keywordresult=MSG_PASS
-                    verifyresponse=MSG_TRUE
+                    status=TEST_RESULT_PASS
+                    methodoutput=TEST_RESULT_TRUE
             else:
                 log.debug('%s',MSG_INVALID_OBJECT)
-                oebs_key_objects.custom_msg.append(MSG_INVALID_OBJECT)
+                err_msg = MSG_INVALID_OBJECT
                 logger.print_on_console(MSG_INVALID_OBJECT)
-            if keywordresult == MSG_FAIL:
-                oebs_key_objects.custom_msg.append(MSG_VERIFYFAIL)
+            if status == TEST_RESULT_FAIL:
+                err_msg = MSG_VERIFYFAIL
+                logger.print_on_console(MSG_VERIFYFAIL)
         except Exception as e:
             self.utilities_obj.cleardata()
             err_msg = ERROR_CODE_DICT['err_verify_selected']
             logger.print_on_console(err_msg)
             log.error(err_msg)
             log.debug('%s',e)
-            log.debug('Status %s',keywordresult)
-        log.debug('Status %s',keywordresult)
-        # response is sent to the client
-        self.utilities_obj.cleardata()
-        oebs_key_objects.keyword_output.append(str(keywordresult))
-        oebs_key_objects.keyword_output.append(str(verifyresponse))
-
+            log.debug('Status %s',status)
+        log.debug('Status %s',status)
+        return status,methodoutput,output_res,err_msg
 
     #Method to getcount of dropdown/listbox
     def getcount(self,acc):
-        del oebs_key_objects.custom_msg[:]
-        #sets the keywordresult to FAIL
-        keywordresult=MSG_FAIL
-        var = []
-        keywordresponse=''
+        status = TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FALSE
+        output_res = OUTPUT_CONSTANT
+        err_msg = None
         countvalue = ''
         try:
-            verifyresponse = MSG_FALSE
+            methodoutput = TEST_RESULT_FALSE
             charinfo = acc.getAccessibleContextInfo()
             log.debug('Received Object Context',DEF_GETCOUNT)
             countvalue = charinfo.childrenCount
             log.debug('children count: %s',countvalue)
-            oebs_key_objects.custom_msg.append("MSG_RESULT_IS")
-            keywordresult=MSG_PASS
-            keywordresponse=str(countvalue)
+            status=TEST_RESULT_PASS
+            methodoutput=str(countvalue)
         except Exception as e:
             self.utilities_obj.cleardata()
             log.debug('%s',e)
             err_msg = ERROR_CODE_DICT['err_get_count']
             logger.print_on_console(err_msg)
             log.error(err_msg)
-            log.debug('Status %s',keywordresult)
-        log.debug('Status %s',keywordresult)
-        # response is sent to the client
-        self.utilities_obj.cleardata()
-        oebs_key_objects.keyword_output.append(str(keywordresult))
-        oebs_key_objects.keyword_output.append(str(keywordresponse))
+            log.debug('Status %s',status)
+        log.debug('Status %s',status)
+        return status,methodoutput,output_res,err_msg
 
     #Method to verify count value of dropdown/listbox
     def verifycount(self,acc):
-        del oebs_key_objects.custom_msg[:]
-        #sets the keywordresult to FAIL
-        keywordresult=MSG_FAIL
-        #sets the verifyresponse to FALSE
-        verifyresponse = MSG_FALSE
+        status = TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FALSE
+        output_res = OUTPUT_CONSTANT
+        err_msg = None
         try:
             if len(oebs_key_objects.keyword_input) == 1:
                 inputVal=oebs_key_objects.keyword_input[0]
@@ -185,37 +164,32 @@ class DropdownListboxOperations:
                 log.debug('Received Object Context',DEF_VERIFYCOUNT)
                 countvalue = charinfo.childrenCount
                 if countvalue == int(inputVal):
-                    keywordresult=MSG_PASS
-                    verifyresponse = MSG_TRUE
+                    status=TEST_RESULT_PASS
+                    methodoutput = TEST_RESULT_TRUE
                 else:
                     log.debug('%s',MSG_INVALID_INPUT)
                     logger.print_on_console(MSG_INVALID_INPUT)
-                    oebs_key_objects.custom_msg.append(MSG_VERIFYFAIL)
+                    err_msg = MSG_INVALID_INPUT
             else:
                 log.debug('MSG:%s',MSG_INVALID_NOOF_INPUT)
-                oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
+                err_msg = MSG_INVALID_INPUT
+                logger.print_on_console(err_msg)
         except Exception as e:
             self.utilities_obj.cleardata()
             err_msg = ERROR_CODE_DICT['err_verify_count']
             logger.print_on_console(err_msg)
             log.error(err_msg)
             log.debug('%s',e)
-            log.debug('Status %s',keywordresult)
-        log.debug('Status %s',keywordresult)
-        # response is sent to the client
-        self.utilities_obj.cleardata()
-        oebs_key_objects.keyword_output.append(str(keywordresult))
-        oebs_key_objects.keyword_output.append(str(verifyresponse))
-
+            log.debug('Status %s',status)
+        log.debug('Status %s',status)
+        return status,methodoutput,output_res,err_msg
 
     #Method to verify all values of dropdown/listbox
     def verifyallvalues(self,acc):
-        del oebs_key_objects.custom_msg[:]
-        #sets the keywordresult to FAIL
-        keywordresult = MSG_FAIL
-        #sets the verifyresponse to FALSE
-        verifyresponse = MSG_FALSE
-        outputvalues = []
+        status = TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FALSE
+        output_res = OUTPUT_CONSTANT
+        err_msg = None
         inputValues = oebs_key_objects.keyword_input
         try:
             charinfo = acc.getAccessibleContextInfo()
@@ -225,44 +199,39 @@ class DropdownListboxOperations:
                 #calling getvaluesdropdown def to get all values in dropdown
                     generatedvalues  = self.getvaluesdropdown(acc)
                     if sorted(generatedvalues) == sorted(inputValues):
-                        keywordresult=MSG_PASS
-                        verifyresponse = MSG_TRUE
+                        status=TEST_RESULT_PASS
+                        methodoutput = TEST_RESULT_TRUE
             #check for listbox
             elif charinfo.role == 'list':
                 #calling getvalueslist def to get all values in list
                 listvalues = self.getvalueslist(acc)
                 if len(inputValues) > 0 and str(listvalues) == inputValues[0]:
-                        keywordresult=MSG_PASS
-                        verifyresponse =MSG_TRUE
+                        status=TEST_RESULT_PASS
+                        methodoutput =TEST_RESULT_TRUE
             else:
                 log.debug('%s',MSG_INVALID_OBJECT)
-                oebs_key_objects.custom_msg.append(MSG_INVALID_OBJECT)
-                logger.print_on_console(MSG_INVALID_OBJECT)
-            if keywordresult == MSG_FAIL:
-                oebs_key_objects.custom_msg.append(MSG_VERIFYFAIL)
-                logger.print_on_console(MSG_VERIFYFAIL)
+                err_msg = MSG_INVALID_OBJECT
+                logger.print_on_console(err_msg)
+            if status == TEST_RESULT_FAIL:
+                err_msg = MSG_VERIFYFAIL
+                logger.print_on_console(err_msg)
         except Exception as e:
             self.utilities_obj.cleardata()
             log.debug('%s',e)
             err_msg = ERROR_CODE_DICT['err_verify_all_values']
             logger.print_on_console(err_msg)
             log.error(err_msg)
-            log.debug('Status %s',keywordresult)
-        log.debug('Status %s',keywordresult)
-        # response is sent to the client
-        self.utilities_obj.cleardata()
-        oebs_key_objects.keyword_output.append(str(keywordresult))
-        oebs_key_objects.keyword_output.append(str(verifyresponse))
+            log.debug('Status %s',status)
+        log.debug('Status %s',status)
+        return status,methodoutput,output_res,err_msg
 
     #Method to verify given values present in list/dropdown
     def verifyvaluesexists(self,acc):
-        del oebs_key_objects.custom_msg[:]
-        #sets the keywordresult to FAIL
-        keywordresult = MSG_FAIL
-        #sets the verifyresponse to FALSE
-        verifyresponse = MSG_FALSE
+        status = TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FALSE
+        output_res = OUTPUT_CONSTANT
+        err_msg = None
         flag = 0
-        outputvalues = []
         try:
             log.debug('Received Object Context',DEF_VERIFYVALUESEXISTS)
             charinfo = acc.getAccessibleContextInfo()
@@ -275,11 +244,11 @@ class DropdownListboxOperations:
                     inputlength = len(inputValues)
                     for i in range(0,inputlength):
                         if inputValues[i] in generatedvalues:
-                            keywordresult=MSG_PASS
-                            verifyresponse = MSG_TRUE
+                            status=TEST_RESULT_PASS
+                            methodoutput = TEST_RESULT_TRUE
                         else:
-                            keywordresult=MSG_FAIL
-                            verifyresponse = MSG_FALSE
+                            status=TEST_RESULT_FAIL
+                            methodoutput = TEST_RESULT_FALSE
                 #check for listbox
                 elif charinfo.role == 'list':
                     #calling getvalueslist def to get all values in list
@@ -288,36 +257,34 @@ class DropdownListboxOperations:
                     for i in range(0,inputlength):
                         if inputValues[i] in listvalues:
                             flag+=1
-                            keywordresult=MSG_PASS
-                            verifyresponse = MSG_TRUE
+                            status=TEST_RESULT_PASS
+                            methodoutput = TEST_RESULT_TRUE
 
                         if(flag==inputlength):
-                            keywordresult=MSG_PASS
-                            verifyresponse = MSG_TRUE
+                            status=TEST_RESULT_PASS
+                            methodoutput = TEST_RESULT_TRUE
                         else:
-                            keywordresult=MSG_FAIL
-                            verifyresponse = MSG_FALSE
+                            status=TEST_RESULT_FAIL
+                            methodoutput = TEST_RESULT_FALSE
                 else:
                     log.debug('%s',MSG_INVALID_INPUT)
-                if keywordresult == MSG_FAIL:
-                    oebs_key_objects.custom_msg.append(MSG_VERIFYFAIL)
-                    logger.print_on_console(MSG_VERIFYFAIL)
+                    err_msg = MSG_INVALID_INPUT
+                    logger.print_on_console(err_msg)
+                if status == TEST_RESULT_FAIL:
+                    err_msg = MSG_VERIFYFAIL
+                    logger.print_on_console(err_msg)
             else:
-                oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
-                logger.print_on_console(MSG_INVALID_INPUT)
+                err_msg = MSG_INVALID_INPUT
+                logger.print_on_console(err_msg)
         except Exception as e:
             self.utilities_obj.cleardata()
             log.debug('%s',e)
             err_msg = ERROR_CODE_DICT['err_verify_values_exist']
             logger.print_on_console(err_msg)
             log.error(err_msg)
-            log.debug('Status %s',keywordresult)
-        log.debug('Status %s',keywordresult)
-        # response is sent to the client
-        self.utilities_obj.cleardata()
-        oebs_key_objects.keyword_output.append(str(keywordresult))
-        oebs_key_objects.keyword_output.append(str(verifyresponse))
-
+            log.debug('Status %s',status)
+        log.debug('Status %s',status)
+        return status,methodoutput,output_res,err_msg
 
     #Method to get selected values for listbox
     def getselectedlist(self,acc):
@@ -330,8 +297,8 @@ class DropdownListboxOperations:
                 acccontext = childAcc.getAccessibleContextInfo()
                 state = acccontext.states
                 if 'selected' in state:
-                       value = acccontext.name
-                       selectedvalue.append(str(value))
+                        value = acccontext.name
+                        selectedvalue.append(str(value))
         if len(selectedvalue) == 1:
             return selectedvalue[0]
         return selectedvalue
@@ -355,15 +322,15 @@ class DropdownListboxOperations:
         selectedvalue = []
         contextInfo = charinfo.getAccessibleContextInfo()
         if contextInfo.role == 'list':
-                        #global selectedvalue
-                        count1 = contextInfo.childrenCount
-                        for num in range(0, count1) :
-                            acctemp = charinfo.getAccessibleChildFromContext(num)
-                            acccontext = acctemp.getAccessibleContextInfo()
-                            state = acccontext.role
-                            if state=='label':
-                                value = acccontext.name
-                                selectedvalue.append(str(value))
+            #global selectedvalue
+            count1 = contextInfo.childrenCount
+            for num in range(0, count1) :
+                acctemp = charinfo.getAccessibleChildFromContext(num)
+                acccontext = acctemp.getAccessibleContextInfo()
+                state = acccontext.role
+                if state=='label':
+                    value = acccontext.name
+                    selectedvalue.append(str(value))
         return selectedvalue
 
     #Method to get all values of listbox
@@ -384,10 +351,10 @@ class DropdownListboxOperations:
 
     #method to verify whether given values are selected in listbox object
     def	verifyselectedvalues(self,acc):
-        del oebs_key_objects.custom_msg[:]
-        #sets the keywordresult to FAIL
-        keywordresult = MSG_FAIL
-        verifyresponse = MSG_FALSE
+        status = TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FALSE
+        output_res = OUTPUT_CONSTANT
+        err_msg = None
         try:
             accinfo=acc.getAccessibleContextInfo()
             log.debug('Received Object Context',DEF_VERIFYSELECTEDVALUES)
@@ -395,42 +362,37 @@ class DropdownListboxOperations:
                 count=0
                 for num in range(0,accinfo.childrenCount):
                     for counter in range(0,len(oebs_key_objects.keyword_input)):
-                     childinfo=acc.getAccessibleChildFromContext(num)
-                     childcontextInfo=childinfo.getAccessibleContextInfo()
-                     if (childcontextInfo.name == oebs_key_objects.keyword_input[counter]):
-                        if('selected' in childcontextInfo.states):
-                            count=count+1
-                        else:
-                            break
+                        childinfo=acc.getAccessibleChildFromContext(num)
+                        childcontextInfo=childinfo.getAccessibleContextInfo()
+                        if (childcontextInfo.name == oebs_key_objects.keyword_input[counter]):
+                            if('selected' in childcontextInfo.states):
+                                count=count+1
+                            else:
+                                break
                 if(count == len(oebs_key_objects.keyword_input)):
-                    verifyresponse = MSG_TRUE
-                    keywordresult=MSG_PASS
+                    methodoutput = TEST_RESULT_TRUE
+                    status=TEST_RESULT_PASS
                 else:
-                    verifyresponse = MSG_FALSE
-                if keywordresult == MSG_FAIL:
-                    oebs_key_objects.custom_msg.append(MSG_VERIFYFAIL)
-                    logger.print_on_console(MSG_VERIFYFAIL)
+                    methodoutput = TEST_RESULT_FALSE
+                if status == TEST_RESULT_FAIL:
+                    err_msg = MSG_VERIFYFAIL
+                    logger.print_on_console(err_msg)
         except Exception as e:
             self.utilities_obj.cleardata()
             log.debug('%s',e)
             err_msg = ERROR_CODE_DICT['err_verify_selected_values']
             logger.print_on_console(err_msg)
             log.error(err_msg)
-            log.debug('Status %s',keywordresult)
-        log.debug('Status %s',keywordresult)
-        # response is sent to the client
-        self.utilities_obj.cleardata()
-        oebs_key_objects.keyword_output.append(str(keywordresult))
-        oebs_key_objects.keyword_output.append(str(verifyresponse))
-
+            log.debug('Status %s',status)
+        log.debug('Status %s',status)
+        return status,methodoutput,output_res,err_msg
 
     #Method to get the values of the given Object location by passing their indexes
     def getmultiplevaluesbyindexes(self,acc):
-        del oebs_key_objects.custom_msg[:]
-        #sets the keywordresult to FAIL
-        keywordresult=MSG_FAIL
-        #this is the response obtained from the keyword
-        keywordresponse=''
+        status = TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FALSE
+        output_res = OUTPUT_CONSTANT
+        err_msg = None
         output_list=None
         try:
             #gets the entire context information
@@ -445,42 +407,38 @@ class DropdownListboxOperations:
                         actualelement=acc.getAccessibleChildFromContext(int(i))
                         elementcontext=actualelement.getAccessibleContextInfo()
                         if index == 0:
-                            keywordresponse=elementcontext.name
-                            keywordresponse=keywordresponse + ';'
+                            methodoutput=elementcontext.name
+                            methodoutput=methodoutput + ';'
 
                         else:
-                            keywordresponse=keywordresponse + elementcontext.name
+                            methodoutput=methodoutput + elementcontext.name
                             if(index !=valueslength-1):
-                             keywordresponse=keywordresponse + ';'
+                                methodoutput=methodoutput + ';'
                         output_list.append(elementcontext.name)
-                    keywordresult=MSG_PASS
+                    status=TEST_RESULT_PASS
                 else:
                     log.debug('%s',DEF_GETMULTIPLEVALUESBYINDEXES,MSG_INVALID_INPUT)
-                    oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
+                    err_msg = MSG_INVALID_INPUT
+                    logger.print_on_console(err_msg)
             else:
                 log.debug('Not a List',DEF_GETMULTIPLEVALUESBYINDEXES)
-                logger.print_on_console(ERROR_CODE_DICT['err_object'])
-                oebs_key_objects.custom_msg.append('Not a List.')
+                err_msg = ERROR_CODE_DICT['err_object']
+                logger.print_on_console(err_msg)
         except Exception as e:
             self.utilities_obj.cleardata()
             err_msg = ERROR_CODE_DICT['err_get_multiple_index']
             logger.print_on_console(err_msg)
             log.error(err_msg)
             log.debug('%s',DEF_GETMULTIPLEVALUESBYINDEXES,e)
-            log.debug('Status %s',DEF_GETMULTIPLEVALUESBYINDEXES,keywordresult)
-        log.debug('Status %s',DEF_GETMULTIPLEVALUESBYINDEXES,keywordresult)
-        # response is sent to the client
-        self.utilities_obj.cleardata()
-        oebs_key_objects.keyword_output.append(str(keywordresult))
-        oebs_key_objects.keyword_output.append(output_list)
-
+            log.debug('Status %s',DEF_GETMULTIPLEVALUESBYINDEXES,status)
+        log.debug('Status %s',DEF_GETMULTIPLEVALUESBYINDEXES,status)
+        return status,output_list,output_res,err_msg
 
     def selectvaluebyindex(self,acc):
-        del oebs_key_objects.custom_msg[:]
-        #sets the keywordresult to FAIL
-        keywordresult=MSG_FAIL
-        #this is the response obtained from the keyword
-        verifyresponse=MSG_FALSE
+        status = TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FALSE
+        output_res = OUTPUT_CONSTANT
+        err_msg = None
         try:
             #gets the entire context information
             currinfo = acc.getAccessibleContextInfo()
@@ -507,8 +465,8 @@ class DropdownListboxOperations:
                                 currinfo=acc.getAccessibleContextInfo()
                                 if currinfo.accessibleAction == 1:
                                     acc.addAccessibleSelectionFromContext(int(childindex))
-                                    keywordresult = MSG_PASS
-                                    verifyresponse = MSG_TRUE
+                                    status = TEST_RESULT_PASS
+                                    methodoutput = TEST_RESULT_TRUE
                                     log.debug('Value is selected')
                                 else:
                                     currentselection=0
@@ -523,30 +481,30 @@ class DropdownListboxOperations:
                                             moveloc=currentselection-childindex
                                             for index in range(int(moveloc)):
                                                 self.keyboardops_obj.keyboard_operation('keypress','A_UP')
-                                            requiredcontext, visible = self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]")
+                                            requiredcontext, visible, active_parent = self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]")
                                             listObj = self.utilities_obj.looptolist(requiredcontext)
                                             childobj=listObj.getAccessibleChildFromContext(int(childindex))
                                             childcontext=childobj.getAccessibleContextInfo()
                                             if 'selected' in childcontext.states:
-                                                keywordresult = MSG_PASS
-                                                verifyresponse = MSG_TRUE
+                                                status = TEST_RESULT_PASS
+                                                methodoutput = TEST_RESULT_TRUE
                                             log.debug('Value is selected')
                                         elif currentselection<childindex:
                                             moveloc=childindex-currentselection
                                             for index in range(int(moveloc)):
                                                 self.keyboardops_obj.keyboard_operation('keypress','A_DOWN')
                                                 time.sleep(0.1)
-                                            requiredcontext, visible = self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]")
+                                            requiredcontext, visible, active_parent = self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]")
                                             listObj = self.utilities_obj.looptolist(requiredcontext)
                                             childobj=listObj.getAccessibleChildFromContext(int(childindex))
                                             childcontext=childobj.getAccessibleContextInfo()
                                             if 'selected' in childcontext.states:
-                                                keywordresult = MSG_PASS
-                                                verifyresponse = MSG_TRUE
+                                                status = TEST_RESULT_PASS
+                                                methodoutput = TEST_RESULT_TRUE
                                             log.debug('Value is selected')
                                     else:
-                                        keywordresult = MSG_PASS
-                                        verifyresponse = MSG_TRUE
+                                        status = TEST_RESULT_PASS
+                                        methodoutput = TEST_RESULT_TRUE
                                         logger.print_on_console(MSG_INVALID_NOOF_INPUT)
                                         log.debug('%s',MSG_INVALID_NOOF_INPUT)
                                     log.debug('Value is selected')
@@ -556,22 +514,22 @@ class DropdownListboxOperations:
                                 labelobj1=acc.getAccessibleChildFromContext(childindex)
                                 labelcontext1=labelobj1.getAccessibleContextInfo()
                                 if 'selected' in labelcontext1.states:
-                                    oebs_key_objects.custom_msg.append(MSG_OBJECT_SELECTABLE)
-                                    keywordresult = MSG_PASS
-                                    verifyresponse = MSG_TRUE
+                                    status = TEST_RESULT_PASS
+                                    methodoutput = TEST_RESULT_TRUE
                                 else:
-                                    oebs_key_objects.custom_msg.append(MSG_OBJECT_READONLY)
-                                    logger.print_on_console(MSG_OBJECT_READONLY)
-                                    keywordresult = MSG_FAIL
-                                    verifyresponse = MSG_FALSE
+                                    err_msg = MSG_OBJECT_READONLY
+                                    logger.print_on_console(err_msg)
+                                    status = TEST_RESULT_FAIL
+                                    methodoutput = TEST_RESULT_FALSE
                             else:
                                 log.debug('MSG:%s',MSG_ELEMENT_NOT_VISIBLE)
-                                oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_VISIBLE)
+                                err_msg = MSG_ELEMENT_NOT_VISIBLE
+                                logger.print_on_console(err_msg)
                         else:
                             if currinfo.accessibleAction == 1:
                                 acc.addAccessibleSelectionFromContext(int(childindex))
-                                keywordresult = MSG_PASS
-                                verifyresponse = MSG_TRUE
+                                status = TEST_RESULT_PASS
+                                methodoutput = TEST_RESULT_TRUE
                                 log.debug('Value is selected')
                             else:
                                 labelcontext=''
@@ -596,67 +554,64 @@ class DropdownListboxOperations:
                                             for index in range(int(moveloc)):
                                                 self.keyboardops_obj.keyboard_operations('keypress','A_UP')
                                                 time.sleep(0.1)
-                                            requiredcontext, visible = self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]")
+                                            requiredcontext, visible, active_parent = self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]")
                                             listObj = self.utilities_obj.looptolist(requiredcontext)
                                             childobj=listObj.getAccessibleChildFromContext(int(childindex))
                                             childcontext=childobj.getAccessibleContextInfo()
                                             if 'selected' in childcontext.states:
-                                                keywordresult = MSG_PASS
-                                                verifyresponse = MSG_TRUE
+                                                status = TEST_RESULT_PASS
+                                                methodoutput = TEST_RESULT_TRUE
                                             log.debug('Value is selected')
                                         elif currentselection<childindex:
                                             moveloc=childindex-currentselection
                                             for index in range(int(moveloc)):
                                                 self.keyboardops_obj.keyboard_operation('keypress','A_DOWN')
                                                 time.sleep(0.1)
-                                            requiredcontext, visible = self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]")
+                                            requiredcontext, visible, active_parent = self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]")
                                             listObj = self.utilities_obj.looptolist(requiredcontext)
                                             childobj=listObj.getAccessibleChildFromContext(int(childindex))
                                             childcontext=childobj.getAccessibleContextInfo()
                                             if 'selected' in childcontext.states:
-                                                keywordresult = MSG_PASS
-                                                verifyresponse = MSG_TRUE
+                                                status = TEST_RESULT_PASS
+                                                methodoutput = TEST_RESULT_TRUE
                                             log.debug('Value is selected')
                                     else:
-                                        keywordresult = MSG_PASS
-                                        verifyresponse = MSG_TRUE
+                                        status = TEST_RESULT_PASS
+                                        methodoutput = TEST_RESULT_TRUE
                                         logger.print_on_console(MSG_INVALID_NOOF_INPUT)
                                         log.debug('%s',MSG_INVALID_NOOF_INPUT)
                                 else:
                                     log.debug('MSG:%s',MSG_ELEMENT_NOT_VISIBLE)
-                                    logger.print_on_console(MSG_ELEMENT_NOT_VISIBLE)
-                                    oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_VISIBLE)
+                                    err_msg = MSG_ELEMENT_NOT_VISIBLE
+                                    logger.print_on_console(err_msg)
                     else:
+                        err_msg = MSG_INVALID_INPUT
                         log.debug('%s',MSG_INVALID_NOOF_INPUT)
-                        logger.print_on_console(MSG_INVALID_INPUT)
-                        oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
+                        logger.print_on_console(err_msg)
                 else:
-                    log.debug('%s',MSG_INVALID_INPUT)
-                    logger.print_on_console(MSG_INVALID_INPUT)
-                    oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
+                    err_msg = MSG_INVALID_INPUT
+                    log.debug('%s',err_msg)
+                    logger.print_on_console(err_msg)
             else:
-                log.debug('%s',MSG_INVALID_NOOF_INPUT)
-                logger.print_on_console(MSG_INVALID_NOOF_INPUT)
-                oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
+                err_msg = MSG_INVALID_NOOF_INPUT
+                log.debug('%s',err_msg)
+                logger.print_on_console(err_msg)    
         except Exception as e:
             self.utilities_obj.cleardata()
             err_msg = ERROR_CODE_DICT['err_select_value_index']
             logger.print_on_console(err_msg)
             log.error(err_msg)
             log.debug('%s',e)
-            log.debug('Status %s',keywordresult)
-        log.debug('Status %s',keywordresult)
-        # response is sent to the client
-        self.utilities_obj.cleardata()
-        oebs_key_objects.keyword_output.append(str(keywordresult))
-        oebs_key_objects.keyword_output.append(str(verifyresponse))
+            log.debug('Status %s',status)
+        log.debug('Status %s',status)
+        return status,methodoutput,output_res,err_msg
 
     #Method to returns text of the given Object location
     def getvaluebyindex(self,acc):
-        del oebs_key_objects.custom_msg[:]
-        #sets the keywordresult to FAIL
-        keywordresponse = ''
-        keywordresult=MSG_FAIL
+        status = TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FALSE
+        output_res = OUTPUT_CONSTANT
+        err_msg = None
         try:
             charinfo = acc.getAccessibleContextInfo()
             accinfo=self.utilities_obj.looptolist(acc)
@@ -665,41 +620,36 @@ class DropdownListboxOperations:
             #if (int(oebs_key_objects.keyword_input[0]) < listcontxtInfo.childrenCount and oebs_key_objects.keyword_input[0] >= 0):
             if(oebs_key_objects.keyword_input[0] != ''):
                 if(int(oebs_key_objects.keyword_input[0]) > listcontxtInfo.childrenCount or int(oebs_key_objects.keyword_input[0]) < 0):
-                    log.debug('%s',MSG_INVALID_INPUT)
-                    oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
-                    logger.print_on_console(MSG_INVALID_INPUT)
+                    err_msg = MSG_INVALID_INPUT
+                    log.debug('%s',err_msg)
+                    logger.print_on_console(err_msg)
                 else:
                     childinfo=accinfo.getAccessibleChildFromContext(int(oebs_key_objects.keyword_input[0]))
                     childcontxt=childinfo.getAccessibleContextInfo()
-                    keywordresult=MSG_PASS
-                    keywordresponse=childcontxt.name
+                    status=TEST_RESULT_PASS
+                    methodoutput=childcontxt.name
             else:
-                log.debug('%s',MSG_INVALID_INPUT)
-                logger.print_on_console(MSG_INVALID_INPUT)
-                oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
+                err_msg = MSG_INVALID_INPUT
+                log.debug('%s',err_msg)
+                logger.print_on_console(err_msg)   
         except Exception as e:
             self.utilities_obj.cleardata()
             err_msg = ERROR_CODE_DICT['err_get_value_index']
             logger.print_on_console(err_msg)
             log.error(err_msg)
             log.debug('%s',e)
-            log.debug('Status %s',keywordresult)
-        log.debug('Status %s',keywordresult)
-        # response is sent to the client
-        self.utilities_obj.cleardata()
-        oebs_key_objects.keyword_output.append(str(keywordresult))
-        oebs_key_objects.keyword_output.append(str(keywordresponse))
+            log.debug('Status %s',status)
+        log.debug('Status %s',status)
+        return status,methodoutput,output_res,err_msg
+
 
 
     #Added for the issue #8010
     def getallvalues(self,acc):
-        del oebs_key_objects.custom_msg[:]
-        #sets the keywordresult to FAIL
-        keywordresult = MSG_FAIL
-        #sets the verifyresponse to FALSE
-        keywordresponse = MSG_FALSE
-        #outputvalues = []
-        #inputValues = oebs_key_objects.keyword_input
+        status = TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FALSE
+        output_res = OUTPUT_CONSTANT
+        err_msg = None
         try:
             charinfo = acc.getAccessibleContextInfo()
             log.debug('Received Object Context',DEF_VERIFYALLVALUES)
@@ -708,21 +658,21 @@ class DropdownListboxOperations:
                 #calling getvaluesdropdown def to get all values in dropdown
                     generatedvalues  = self.getvaluesdropdown(acc)
                     if len(generatedvalues)!=0:
-                        keywordresult=MSG_PASS
-                        keywordresponse=str(generatedvalues)
+                        status=TEST_RESULT_PASS
+                        methodoutput=str(generatedvalues)
             #check for listbox
             elif charinfo.role == 'list':
                 #calling getvalueslist def to get all values in list
                 listvalues = self.getvalueslist(acc)
                 if len(listvalues)!=0:
-                        keywordresult=MSG_PASS
-                        keywordresponse = str(listvalues)
+                        status=TEST_RESULT_PASS
+                        methodoutput = str(listvalues)
             else:
-                log.debug('%s',MSG_INVALID_OBJECT)
-                oebs_key_objects.custom_msg.append(MSG_INVALID_OBJECT)
-                logger.print_on_console(MSG_INVALID_OBJECT)
-            if keywordresult == MSG_FAIL:
-                oebs_key_objects.custom_msg.append(MSG_VERIFYFAIL)
+                err_msg = MSG_INVALID_OBJECT
+                log.debug('%s',err_msg)
+                logger.print_on_console(err_msg)
+            if status == TEST_RESULT_FAIL:
+                err_msg = MSG_VERIFYFAIL
                 logger.print_on_console(MSG_VERIFYFAIL)
         except Exception as e:
             self.utilities_obj.cleardata()
@@ -730,48 +680,43 @@ class DropdownListboxOperations:
             logger.print_on_console(err_msg)
             log.error(err_msg)
             log.debug('%s',e)
-            log.debug('Status %s',keywordresult)
-        log.debug('Status %s',keywordresult)
-        # response is sent to the client
-        self.utilities_obj.cleardata()
-        oebs_key_objects.keyword_output.append(str(keywordresult))
-        oebs_key_objects.keyword_output.append(str(keywordresponse))
+            log.debug('Status %s',status)
+        log.debug('Status %s',status)
+        return status,methodoutput,output_res,err_msg
 
     #Method to selects all text of the given Object location
     def selectallvalues(self,acc):
-        del oebs_key_objects.custom_msg[:]
-        verifyresponse = MSG_FALSE
-        keywordresult=MSG_FAIL
+        status = TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FALSE
+        output_res = OUTPUT_CONSTANT
+        err_msg = None
         try:
             log.debug('Received Object Context')
             curaccinfo=acc.getAccessibleContextInfo()
             if(curaccinfo.role == 'list' and 'multiselectable' in curaccinfo.states):
                 getAcceess=acc.selectAllAccessibleSelectionFromContext()
-                verifyresponse = MSG_TRUE
-                keywordresult=MSG_PASS
+                methodoutput = TEST_RESULT_TRUE
+                status=TEST_RESULT_PASS
             else:
-                oebs_key_objects.custom_msg.append(MSG_SINGLESELECTION_LIST)
-                logger.print_on_console(MSG_SINGLESELECTION_LIST)
+                err_msg = MSG_SINGLESELECTION_LIST
+                log.debug('%s',err_msg)
+                logger.print_on_console(err_msg)
         except Exception as e:
             self.utilities_obj.cleardata()
             err_msg = ERROR_CODE_DICT['err_select_all_values']
             logger.print_on_console(err_msg)
             log.error(err_msg)
             log.debug('%s',e)
-            log.debug('Status %s',keywordresult)
-        log.debug('Status %s',keywordresult)
-        # response is sent to the client
-        self.utilities_obj.cleardata()
-        oebs_key_objects.keyword_output.append(str(keywordresult))
-        oebs_key_objects.keyword_output.append(str(verifyresponse))
+            log.debug('Status %s',status)
+        log.debug('Status %s',status)
+        return status,methodoutput,output_res,err_msg
 
     #Method to deselects all text of the given Object location
     def deselectall(self,acc):
-        del oebs_key_objects.custom_msg[:]
-        #sets the keywordresult to FAIL
-        keywordresult=MSG_FAIL
-        #this is the response obtained from the keyword
-        verifyresponse = MSG_FALSE
+        status = TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FALSE
+        output_res = OUTPUT_CONSTANT
+        err_msg = None
         try:
             #gets the entire context information
             currinfo = acc.getAccessibleContextInfo()
@@ -779,29 +724,28 @@ class DropdownListboxOperations:
                 values = currinfo.childrenCount
                 for index in range(int(values)):
                     getAcceess=acc.removeAccessibleSelectionFromContext(index)
-                verifyresponse = MSG_TRUE
-                keywordresult=MSG_PASS
+                methodoutput = TEST_RESULT_TRUE
+                status=TEST_RESULT_PASS
             else:
-                oebs_key_objects.custom_msg.append(MSG_SINGLESELECTION_LIST)
-                logger.print_on_console(MSG_SINGLESELECTION_LIST)
+                err_msg = MSG_SINGLESELECTION_LIST
+                log.debug('%s',err_msg)
+                logger.print_on_console(err_msg)
         except Exception as e:
             self.utilities_obj.cleardata()
             err_msg = ERROR_CODE_DICT['err_deselect_all']
             logger.print_on_console(err_msg)
             log.error(err_msg)
             log.debug('%s',e)
-            log.debug('Status %s',keywordresult)
-        log.debug('Status %s',keywordresult)
-        # response is sent to the client
-        self.utilities_obj.cleardata()
-        oebs_key_objects.keyword_output.append(str(keywordresult))
-        oebs_key_objects.keyword_output.append(str(verifyresponse))
+            log.debug('Status %s',status)
+        log.debug('Status %s',status)
+        return status,methodoutput,output_res,err_msg
 
     #Method to selects multiple text of the given Object location providing thier indexes
     def selectmultiplevaluesbyindexes(self,acc):
-        del oebs_key_objects.custom_msg[:]
-        verifyresponse = MSG_FALSE
-        keywordresult=MSG_FAIL
+        status = TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FALSE
+        output_res = OUTPUT_CONSTANT
+        err_msg = None
         try:
             #gets the entire context information
             contextinfo=acc.getAccessibleContextInfo()
@@ -820,42 +764,38 @@ class DropdownListboxOperations:
                             childrennames.append(oebs_key_objects.keyword_input[index])
                         if(int(childrennames[index]) < int(contextinfo.childrenCount)):
                             acc.addAccessibleSelectionFromContext(int(childrennames[index]))
-                            verifyresponse=MSG_TRUE
-                            keywordresult=MSG_PASS
+                            methodoutput=TEST_RESULT_TRUE
+                            status=TEST_RESULT_PASS
                         else:
-                            log.debug('%s',MSG_INVALID_INPUT)
-                            logger.print_on_console(MSG_INVALID_INPUT)
-                            verifyresponse = MSG_FALSE
-                            keywordresult=MSG_FAIL
+                            err_msg = MSG_INVALID_INPUT
+                            log.debug('%s',err_msg)
+                            logger.print_on_console(err_msg)
+                            methodoutput = TEST_RESULT_FALSE
+                            status=TEST_RESULT_FAIL
                             break
                 else:
-                    oebs_key_objects.custom_msg.append(MSG_SINGLESELECTION_LIST)
+                    err_msg = MSG_SINGLESELECTION_LIST
                     logger.print_on_console(MSG_SINGLESELECTION_LIST)
-                    keywordresult=MSG_FAIL
+                    status=TEST_RESULT_FAIL
             else:
-                log.debug('%s',MSG_INVALID_INPUT)
-                oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
-                logger.print_on_console(MSG_INVALID_INPUT)
+                err_msg = MSG_INVALID_INPUT
+                log.debug('%s',err_msg)
+                logger.print_on_console(err_msg)
         except Exception as e:
             self.utilities_obj.cleardata()
             err_msg = ERROR_CODE_DICT['err_select_multiple_values']
             logger.print_on_console(err_msg)
             log.error(err_msg)
             log.debug('%s',e)
-            log.debug('Status %s',keywordresult)
-        log.debug('Status %s',keywordresult)
-        # response is sent to the client
-        self.utilities_obj.cleardata()
-        oebs_key_objects.keyword_output.append(str(keywordresult))
-        oebs_key_objects.keyword_output.append(str(verifyresponse))
-
+            log.debug('Status %s',status)
+        log.debug('Status %s',status)
+        return status,methodoutput,output_res,err_msg
 
     def selectvaluebytext(self,acc):
-        del oebs_key_objects.custom_msg[:]
-        #sets the keywordresult to FAIL
-        keywordresult=MSG_FAIL
-        #this is the response obtained from the keyword
-        verifyresponse=MSG_FALSE
+        status = TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FALSE
+        output_res = OUTPUT_CONSTANT
+        err_msg = None
         try:
             #gets the entire context information
             currinfo = acc.getAccessibleContextInfo()
@@ -888,13 +828,14 @@ class DropdownListboxOperations:
                                     fetchedname = childcontext.name
                                     if(childname == fetchedname):
                                         acc.addAccessibleSelectionFromContext(index)
-                                        keywordresult = MSG_PASS
-                                        verifyresponse = MSG_TRUE
+                                        status = TEST_RESULT_PASS
+                                        methodoutput = TEST_RESULT_TRUE
                                         log.debug('Value selected is %s',fetchedname)
                                         break
                                     else:
                                         log.debug('Value Does not exist',DEF_SELECTVALUEBYTEXT)
-                                        oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
+                                        err_msg = ERROR_CODE_DICT['err_value']
+                                        logger.print_on_console(err_msg)
                             else:
                                 elementPos=0
                                 for index in range(children):
@@ -909,22 +850,24 @@ class DropdownListboxOperations:
                                         else:
                                             elementPos=-1
                                 if elementPos != -1:
-                                    keywordresult = MSG_PASS
-                                    verifyresponse = MSG_TRUE
+                                    status = TEST_RESULT_PASS
+                                    methodoutput = TEST_RESULT_TRUE
                                     self.keyboardops_obj.keyboard_operation('keypress','HOME')
                                     for num in range(elementPos):
                                         self.keyboardops_obj.keyboard_operation('keypress','A_DOWN')
                                         time.sleep(0.1)
-                                    requiredcontext, visible = self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]")
+                                    requiredcontext, visible, active_parent = self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]")
                                     listObj = self.utilities_obj.looptolist(requiredcontext)
                                     childobj=listObj.getAccessibleChildFromContext(int(elementPos))
                                     childcontext=childobj.getAccessibleContextInfo()
                                     if 'selected' in childcontext.states:
-                                        keywordresult = MSG_PASS
-                                        verifyresponse = MSG_TRUE
+                                        status = TEST_RESULT_PASS
+                                        methodoutput = TEST_RESULT_TRUE
                                     log.debug('Value is selected',DEF_SELECTVALUEBYTEXT)
                                 else:
                                     log.debug('Value Does not exist',DEF_SELECTVALUEBYTEXT)
+                                    err_msg = ERROR_CODE_DICT['err_value']
+                                    logger.print_on_console(err_msg)
                             #combo box is revert back with below code
                             self.keyboardops_obj.keyboard_operation('keypress','ENTER')
                             time.sleep(0.4)
@@ -932,22 +875,22 @@ class DropdownListboxOperations:
                             labelcontext1=labelobj1.getAccessibleContextInfo()
                             if 'selected' in labelcontext1.states:
                                 oebs_key_objects.custom_msg.append(MSG_OBJECT_SELECTABLE)
-                                keywordresult = MSG_PASS
-                                verifyresponse = MSG_TRUE
+                                status = TEST_RESULT_PASS
+                                methodoutput = TEST_RESULT_TRUE
                             else:
-                                oebs_key_objects.custom_msg.append(MSG_OBJECT_READONLY)
-                                logger.print_on_console(MSG_OBJECT_READONLY)
-                                keywordresult = MSG_FAIL
-                                verifyresponse = MSG_FALSE
+                                err_msg = MSG_OBJECT_READONLY
+                                logger.print_on_console(err_msg)
+                                status = TEST_RESULT_FAIL
+                                methodoutput = TEST_RESULT_FALSE
                         else:
-                                log.debug('MSG:%s',MSG_ELEMENT_NOT_VISIBLE)
-                                logger.print_on_console(MSG_ELEMENT_NOT_VISIBLE)
-                                oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_VISIBLE)
+                            err_msg = MSG_ELEMENT_NOT_VISIBLE
+                            log.debug('MSG:%s',err_msg)
+                            logger.print_on_console(err_msg)
                     else:
                         if currinfo.accessibleAction == 1:
                             acc.addAccessibleSelectionFromContext(int(childindex))
-                            keywordresult = MSG_PASS
-                            verifyresponse = MSG_TRUE
+                            status = TEST_RESULT_PASS
+                            methodoutput = TEST_RESULT_TRUE
                             log.debug('Value is selected',DEF_SELECTVALUEBYTEXT)
                         else:
                             labelContext=''
@@ -988,68 +931,63 @@ class DropdownListboxOperations:
                                             for index in range(int(moveloc)):
                                                 self.keyboardops_obj.keyboard_operation('keypress','A_UP')
                                                 time.sleep(0.1)
-                                            requiredcontext, visible = self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]")
+                                            requiredcontext, visible, active_parent = self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]")
                                             listObj = self.utilities_obj.looptolist(requiredcontext)
                                             childobj=listObj.getAccessibleChildFromContext(int(elementPos))
                                             childcontext=childobj.getAccessibleContextInfo()
                                             if 'selected' in childcontext.states:
-                                                keywordresult = MSG_PASS
-                                                verifyresponse = MSG_TRUE
+                                                status = TEST_RESULT_PASS
+                                                methodoutput = TEST_RESULT_TRUE
                                             log.debug('Value is selected',DEF_SELECTVALUEBYTEXT)
                                         elif currentselection<elementPos:
                                             moveloc=elementPos-currentselection
                                             for index in range(int(moveloc)):
                                                 self.keyboardops_obj.keyboard_operation('keypress','A_DOWN')
                                                 time.sleep(0.1)
-                                            requiredcontext, visible = self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]")
+                                            requiredcontext, visible, active_parent = self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]")
                                             listObj = self.utilities_obj.looptolist(requiredcontext)
                                             childobj=listObj.getAccessibleChildFromContext(int(elementPos))
                                             childcontext=childobj.getAccessibleContextInfo()
                                             if 'selected' in childcontext.states:
-                                                keywordresult = MSG_PASS
-                                                verifyresponse = MSG_TRUE
+                                                status = TEST_RESULT_PASS
+                                                methodoutput = TEST_RESULT_TRUE
                                             log.debug('Value is selected',DEF_SELECTVALUEBYTEXT)
                                     else:
-                                        keywordresult = MSG_PASS
-                                        verifyresponse = MSG_TRUE
+                                        status = TEST_RESULT_PASS
+                                        methodoutput = TEST_RESULT_TRUE
                                         logger.print_on_console(MSG_INVALID_NOOF_INPUT)
                                         log.debug('%s',MSG_INVALID_NOOF_INPUT)
                                 else:
                                     log.debug('Value Does not exist',DEF_SELECTVALUEBYTEXT)
                                     logger.print_on_console(MSG_INVALID_INPUT)
-                                    oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
+                                    err_msg = MSG_INVALID_INPUT
                             else:
                                 log.debug('MSG:%s',MSG_ELEMENT_NOT_VISIBLE)
                                 logger.print_on_console(MSG_ELEMENT_NOT_VISIBLE)
-                                oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_VISIBLE)
+                                err_msg = MSG_ELEMENT_NOT_VISIBLE
                 else:
                     log.debug('%s',MSG_INVALID_INPUT)
                     logger.print_on_console(MSG_INVALID_NOOF_INPUT)
-                    oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
+                    err_msg = MSG_INVALID_INPUT
             else:
                 log.debug('%s',MSG_INVALID_NOOF_INPUT)
                 logger.print_on_console(MSG_INVALID_NOOF_INPUT)
-                oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
+                err_msg = MSG_INVALID_INPUT
         except Exception as e:
             self.utilities_obj.cleardata()
             err_msg = ERROR_CODE_DICT['err_select_value_text']
             logger.print_on_console(err_msg)
             log.error(err_msg)
             log.debug('%s',e)
-            log.debug('Status %s',keywordresult)
-        log.debug('Status %s',keywordresult)
-        # response is sent to the client
-        self.utilities_obj.cleardata()
-        oebs_key_objects.keyword_output.append(str(keywordresult))
-        oebs_key_objects.keyword_output.append(str(verifyresponse))
-
+            log.debug('Status %s',status)
+        log.debug('Status %s',status)
+        return status,methodoutput,output_res,err_msg
 
     def selectmultiplevaluesbytext(self,acc):
-        del oebs_key_objects.custom_msg[:]
-        #sets the keywordresult to FAIL
-        keywordresult=MSG_FAIL
-        #this is the response obtained from the keyword
-        verifyresponse=MSG_FALSE
+        status = TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FALSE
+        output_res = OUTPUT_CONSTANT
+        err_msg = None
         try:
             #gets the entire context information
             currinfo = acc.getAccessibleContextInfo()
@@ -1075,18 +1013,19 @@ class DropdownListboxOperations:
                             acc.addAccessibleSelectionFromContext(index)
                             childrenselected = childrenselected + 1
                     if childrenselected == len(childrennames):
-                        keywordresult = MSG_PASS
-                        verifyresponse = MSG_TRUE
+                        status = TEST_RESULT_PASS
+                        methodoutput = TEST_RESULT_TRUE
                     else:
-                        logger.print_on_console(ERROR_CODE_DICT['err_multi_select'])
-                        keywordresult=MSG_FAIL
+                        err_msg = ERROR_CODE_DICT['err_multi_select']
+                        logger.print_on_console(err_msg)
+                        status=TEST_RESULT_FAIL
                 else:
-                    oebs_key_objects.custom_msg.append(MSG_SINGLESELECTION_LIST)
-                    logger.print_on_console(MSG_SINGLESELECTION_LIST)
-                    keywordresult=MSG_FAIL
+                    err_msg = MSG_SINGLESELECTION_LIST
+                    logger.print_on_console(err_msg)
+                    status=TEST_RESULT_FAIL
             else:
                 log.debug('%s',MSG_INVALID_NOOF_INPUT)
-                oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
+                err_msg = MSG_INVALID_INPUT
                 logger.print_on_console(MSG_INVALID_INPUT)
         except Exception as e:
             self.utilities_obj.cleardata()
@@ -1094,9 +1033,6 @@ class DropdownListboxOperations:
             logger.print_on_console(err_msg)
             log.error(err_msg)
             log.debug('%s',e)
-            log.debug('Status %s',keywordresult)
-        log.debug('Status %s',keywordresult)
-        # response is sent to the client
-        self.utilities_obj.cleardata()
-        oebs_key_objects.keyword_output.append(str(keywordresult))
-        oebs_key_objects.keyword_output.append(str(verifyresponse))
+            log.debug('Status %s',status)
+        log.debug('Status %s',status)
+        return status,methodoutput,output_res,err_msg
