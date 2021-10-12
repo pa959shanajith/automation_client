@@ -247,20 +247,4 @@ class Clickandadd():
             if (isinstance(driver,webdriver.Ie)):
                 logger.print_on_console('Please make sure security settings are at the same level by clicking on Tools ->Internet Options -> Security tab(either all the checkboxes should be  checked or unchecked) and retry')
                 log.error(e,exc_info=True)
-        try:
-            res_data=[]
-            res_data=data['view']
-            i = 0
-            while i < len(res_data):
-                j = i + 1
-                while j < len(res_data):
-                    if res_data[i]['custname']==res_data[j]['custname'] and res_data[i]['tag']==res_data[j]['tag'] and res_data[i]['url']==res_data[j]['url']:
-                        del res_data[j]
-                    else:
-                        j += 1
-                i += 1
-            data['view']=res_data
-        except Exception as e:
-            log.error(e)
-            logger.print_on_console('Error while filtering scraped objects')
         return data

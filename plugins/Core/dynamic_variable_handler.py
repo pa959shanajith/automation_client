@@ -61,12 +61,13 @@ class DynamicVariables:
             if status==TEST_RESULT_TRUE:
                 value=self.get_nestedDyn_value(nested_var,input_var)
                 actual_value=value
-                if self.check_for_dynamicvariables(value,keyword)==TEST_RESULT_TRUE:
+                status_var=self.check_for_dynamicvariables(value,keyword)
+                if status_var==TEST_RESULT_TRUE:
                     actual_value=self.get_dynamic_value(value)
                     if actual_value==None:
                         db_result=self.getDBdata(value,con_obj)
                         actual_value=db_result[1]
-                else:
+                elif status_var==TEST_RESULT_FALSE and keyword.lower()=='displayvariablevalue':
                     actual_value=None
 
             elif self.check_for_dynamicvariables(input_var,keyword)==TEST_RESULT_TRUE:
