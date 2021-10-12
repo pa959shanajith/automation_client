@@ -182,7 +182,6 @@ MSG_TIME_OUT_EXCEPTION = "Timeout exception"
 
 ## Logging Related Constants FILE NAMES
 FILE_OEBSCLICKANADD = "oebsclickandadd"
-FILE_OEBSSERVER = "oebsServer"
 OEBS_TEXTOPS = "oebs_textops"
 OEBS_UTILOPS = "oebs_utilops"
 OEBS_BUTTONOPS = "oebs_buttonops"
@@ -193,14 +192,9 @@ OEBS_TABLEOPS = "oebs_tableops"
 OEBS_SCROLLBAR = "oebs_scrollbarops"
 OEBS_INTERNALFRAMEOPS = "oebs_internalframeops"
 
-# DEFINITIONS RELATED TO oebsServer
-DEF_CLICKANDADD = "clickandadd"
-DEF_WINDOWSRUN = "windowsrun"
-DEF_GETHWNDFROMWINDOWNAME = "GetHwndFromWindowName"
+# DEFINITIONS RELATED TO full scrape
 DEF_GETENTIREOBJECTLIST = "getentireobjectlist"
 DEF_ISJAVAWINDOW = "isjavawindow"
-DEF_GETOBJECTFORCUSTOM = "getobjectforcustom"
-DEF_REGISTERFUNCTIONS = "register_functions"
 
 # DEFINITIONS RELATED TO BUTTON/LINK
 DEF_GETBUTTONNAME = "getbuttonname"

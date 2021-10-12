@@ -500,7 +500,9 @@ class Utilities:
             self.menubarelement(elementObj,index,path)
 
 
-    def getobjectforcustom(self,acc,window,parentxpath,type,eleIndex):
+    def getobjectforcustom(self,windowname,parentxpath,element_type,eleIndex):
+        isjavares, hwnd = utils_obj.isjavawindow(windowname)
+        acc = oebs_api.JABContext(hwnd)
         fullscrape_obj=oebs_fullscrape.FullScrape()
         tempne=[]
         eleproperties=''
@@ -527,7 +529,7 @@ class Utilities:
                 verifyflag = True
             if(verifyflag):
                 if( not((tag == 'panel') or (tag == 'scroll pane') or (tag =='viewport'))):
-                    if(tag == type):
+                    if(tag == element_type):
                         if(int(counter) == int(eleIndex)):
                             eleproperties=str(tempne[i].get('xpath'))
                             return eleproperties

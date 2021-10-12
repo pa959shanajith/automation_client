@@ -18,7 +18,9 @@ from oebs_keyboardops import KeywordOperations
 import time
 import logger
 global activeframes
-import logger
+import ast
+import oebs_api
+from oebs_utils import Utils
 activeframes=[]
 
 log = logging.getLogger('oebs_utilops.py')
@@ -26,8 +28,9 @@ log = logging.getLogger('oebs_utilops.py')
 class UtilOperations:
 
     def __init__(self):
-        self.utilities_obj=oebs_serverUtilities.Utilities()
-        self.keyboardops=KeywordOperations()
+        self.utilities_obj = oebs_serverUtilities.Utilities()
+        self.keyboardops = KeywordOperations()
+        self.utils_obj = Utils()
 
     #Method to setfocus on the User given Object
     def setfocus(self,acc):
@@ -595,7 +598,7 @@ class UtilOperations:
         return status,methodoutput,output_res,err_msg
 
     #definition for switching from one internal frame to another
-    def switchtoframe(self,acc):
+    def switchtoframe(self,applicationname,objectname,keyword,inputs,outputs):
         global activeframes
         activeframes=[]
         status = TEST_RESULT_FAIL
@@ -603,6 +606,16 @@ class UtilOperations:
         output_res = OUTPUT_CONSTANT
         err_msg = None
         try:
+            inputs = ast.literal_eval(str(inputs))
+            #input sent from the user
+            inputs = ast.literal_eval(str(inputs))
+            inputs = [n for n in inputs]
+            oebs_key_objects.keyword_input = []
+            for index in range(len(inputs)):
+                oebs_key_objects.keyword_input.append(inputs[index])
+            oebs_key_objects.keyword_output = outputs.split(';')
+            isjavares, hwnd = self.utils_obj.isjavawindow(applicationname)
+            acc=oebs_api.JABContext(hwnd)
             framecontext=acc.getAccessibleContextInfo()
             log.debug('Received Object Context',DEF_SWITCHTOFRAME)
             failflag = -1

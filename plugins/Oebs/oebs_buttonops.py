@@ -14,7 +14,6 @@ import oebs_api
 from oebs_constants import *
 import oebs_mouseops
 import oebs_key_objects
-import oebsServer
 import logging
 import logger
 import time

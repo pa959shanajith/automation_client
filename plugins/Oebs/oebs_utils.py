@@ -13,7 +13,6 @@ import win32gui
 import win32process
 import win32con
 import win32api
-import oebsServer
 import oebs_api
 from oebs_constants import *
 import logger

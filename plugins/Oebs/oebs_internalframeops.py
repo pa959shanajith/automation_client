@@ -13,7 +13,6 @@ import oebs_api
 from oebs_constants import *
 import logger
 import oebs_key_objects
-import oebsServer
 import oebs_serverUtilities
 import logging
 import oebs_mouseops

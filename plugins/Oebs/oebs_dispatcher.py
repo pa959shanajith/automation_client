@@ -9,7 +9,6 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 
-from oebsServer import OebsKeywords
 import oebs_fullscrape
 import oebs_utils
 import logger
@@ -36,7 +35,6 @@ log = logging.getLogger('oebs_dispatcher.py')
 
 class OebsDispatcher:
 
-    oebs_keywords=OebsKeywords()
     utils_obj=oebs_utils.Utils()
     scrape_obj=oebs_fullscrape.FullScrape()
 
@@ -94,7 +92,7 @@ class OebsDispatcher:
                             'toggleminimize' : self.internalframeops_obj.toggleminimize,
                             'togglemaximize'      : self.internalframeops_obj.togglemaximize,
                             'closeframe'      : self.internalframeops_obj.closeframe,
-                            'switchtoframe':self.oebs_keywords.switchtoframe,
+                            'switchtoframe':self.utilops_obj.switchtoframe,
 
                             'down':self.scrollbarops_obj.down,
                             'up' : self.scrollbarops_obj.up,
@@ -241,7 +239,7 @@ class OebsDispatcher:
                 if ele_type in self.get_ele_type:
                     ele_type=self.get_ele_type[ele_type]
                 if (keyword in self.custom_dict and ele_type in self.custom_dict[keyword]) or keyword in list(self.custom_dict_element.values())[0]:
-                    custom_oebs_element=self.oebs_keywords.getobjectforcustom(self.windowname,parent_xpath,ele_type,input[1])
+                    custom_oebs_element=self.utilities_obj.getobjectforcustom(self.windowname,parent_xpath,ele_type,input[1])
                     log.info('custom_oebs_element')
                     log.info(custom_oebs_element)
                     if custom_oebs_element != '':
@@ -289,7 +287,7 @@ class OebsDispatcher:
                     else:
                         if (keyword.lower() == 'getstatusiris') : result = self.keyword_dict[keyword](ele, input, output, tsp.objectname.split(';')[-2])
                         else : result = self.keyword_dict[keyword](ele, input, output)
-                elif keyword in ['findwindowandattach', 'waitforelementvisible']:
+                elif keyword in ['findwindowandattach', 'waitforelementvisible','switchtoframe','getobjectforcustom']:
                     result = self.keyword_dict[keyword](*message)
                 else:
                     accessContext , visible, active_parent =  self.utilities_obj.object_generator(*message)
