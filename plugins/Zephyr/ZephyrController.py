@@ -45,20 +45,27 @@ class ZephyrWindow():
     def login(self,filePath):
         res = "invalidcredentials"
         try:
-            self.baseURL = filePath["zephyrURL"]
-            self.zephyrUserName = filePath["zephyrUserName"]
-            self.zephyrPassword = filePath["zephyrPassword"]
+            zephyrPayload = filePath["zephyrPayload"]
+            self.baseURL = zephyrPayload["zephyrURL"]
             self.zephyrURL = self.baseURL + "/flex/services/rest/latest"
 
             relative_path = "/project/lite"
-            userpass = bytes(self.zephyrUserName + ':' + self.zephyrPassword,'ascii')
-            encSt = base64.b64encode(userpass)
-            headersVal = {'Authorization':'Basic %s'% encSt.decode('ascii')}
-            self.headers =  headersVal
-            respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, verify=False,proxies=readconfig.proxies)
-            if respon.status_code == 200:
-                JsonObject = respon.json()
-                res = [{'id':i['id'],'name':i['name']} for i in JsonObject]
+            self.authType = zephyrPayload["authtype"]
+            if self.authType == "basic":
+                userpass = bytes(zephyrPayload["zephyrUserName"] + ':' + zephyrPayload["zephyrPassword"],'ascii')
+                encSt = base64.b64encode(userpass)
+                headersVal = {'Authorization':'Basic %s'% encSt.decode('ascii')}
+                self.headers =  headersVal
+                respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, verify=False,proxies=readconfig.proxies)
+                if respon.status_code == 200:
+                    JsonObject = respon.json()
+                    res = [{'id':i['id'],'name':i['name']} for i in JsonObject]
+            else:
+                self.headers = {'Authorization':'Bearer %s'% zephyrPayload["zephyrApiToken"]}
+                respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, verify=False,proxies=readconfig.proxies)
+                if respon.status_code == 200:
+                    JsonObject = respon.json()
+                    res = [{'id':i['id'],'name':i['name']} for i in JsonObject]
         except Exception as e:
             err_msg='Error while Login in Zephyr'
             log.error(err_msg)
@@ -251,7 +258,10 @@ class ZephyrWindow():
                 zephyrLoginLoad["zephyrUserName"] = data['zephyr_username']
                 zephyrLoginLoad["zephyrPassword"] = data['zephyr_password']
                 zephyrLoginLoad["zephyrURL"] = data['zephyr_url']
-                self.login(zephyrLoginLoad)
+                zephyrLoginLoad["zephyrApiToken"] = data['zephyr_apitoken']
+                zephyrLoginLoad["authtype"] = data['zephyr_authtype']
+                zephyrPayload = {"zephyrPayload":zephyrLoginLoad}
+                self.login(zephyrPayload)
             # get schedule
             cyclephaseid = data["treeid"]
             releaseid = data["releaseid"]

@@ -1088,6 +1088,8 @@ class Controller():
         zephyr_password=''
         zephyr_username=''
         zephyr_url=''
+        zephyr_apitoken=''
+        zephyr_authtype=''
         con = Controller()
         obj = handler.Handler()
         status=COMPLETED
@@ -1200,6 +1202,8 @@ class Controller():
                             zephyr_url=qc_creds["zephyr"]["url"]
                             zephyr_username=qc_creds["zephyr"]["username"]
                             zephyr_password=qc_creds["zephyr"]["password"]
+                            zephyr_apitoken=qc_creds["zephyr"]["apitoken"]
+                            zephyr_authtype=qc_creds["zephyr"]["authtype"]
                             zephyr_sceanrio_data=scenario['qcdetails'][integ]
                             integ += 1
                             zephyr_releaseid=zephyr_sceanrio_data['releaseid']
@@ -1527,6 +1531,8 @@ class Controller():
                                 zephyr_status['zephyr_password']=zephyr_password
                                 zephyr_status['zephyr_url']=zephyr_url
                                 zephyr_status['zephyr_username']=zephyr_username
+                                zephyr_status['zephyr_apitoken']=zephyr_apitoken
+                                zephyr_status['zephyr_authtype']=zephyr_authtype
                                 zephyr_update_status=zephyr_status_over['overallstatus']
                                 if(zephyr_update_status.lower()=='pass'):
                                     zephyr_status['status']='1'
