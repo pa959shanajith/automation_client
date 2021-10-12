@@ -676,33 +676,28 @@ class Dispatcher:
                 result=list(result)
                 result[3]=err_msg
             screen_shot_obj = screenshot_keywords.Screenshot()
-            headless_mode = str(configvalues['headless_mode'])=='Yes'
             if self.action == EXECUTE:
                 if result != TERMINATE:
                     result=list(result)
+                    headless_mode = str(configvalues['headless_mode'])=='Yes'
+                    sauceFlag = execution_env['env'] == 'saucelabs'
+                    screenShot_Flag = configvalues['screenShot_Flag'].lower()
+                    browser_screenshots = configvalues['browser_screenshots'].lower() == 'yes'
                     screen_details=mythread.json_data['suitedetails'][0]
-                    sauceFlag=False
-                    if execution_env['env'] == 'saucelabs':
-                        sauceFlag=True
-                    if configvalues['screenShot_Flag'].lower() == 'fail':
-                        if result[0].lower() == 'fail':
+                    file_path=None
+                    if ((screenShot_Flag == 'fail' and result[0].lower() == 'fail')
+                      or screenShot_Flag == 'all'):
+                        if browser_screenshots or headless_mode or sauceFlag:
                             if local_Wd.popup_object.check_if_no_popup_exists():
                                 file_path = screen_shot_obj.captureScreenshot(screen_details,web=True)
                                 driver.save_screenshot(file_path[2])
-                            else:
+                            elif not (headless_mode or sauceFlag):
                                 local_Wd.log.debug("Pop up exists; Taking the screenshot using generic functions")
-                                if not(headless_mode or sauceFlag):
-                                    file_path = screen_shot_obj.captureScreenshot(screen_details,web=False)
-                            result.append(file_path[2])
-                    elif configvalues['screenShot_Flag'].lower() == 'all':
-                        if local_Wd.popup_object.check_if_no_popup_exists():
-                            file_path = screen_shot_obj.captureScreenshot(screen_details,web=True)
-                            driver.save_screenshot(file_path[2])
-                        else:
-                            local_Wd.log.debug("Pop up exists; Taking the screenshot using generic functions")
-                            if not(headless_mode or sauceFlag):
                                 file_path = screen_shot_obj.captureScreenshot(screen_details,web=False)
-                        result.append(file_path[2])
+                        else:
+                            file_path = screen_shot_obj.captureScreenshot(screen_details,web=False)
+                        if (file_path): result.append(file_path[2])
+
         except TypeError as e:
             local_Wd.log.error(e,exc_info=True)
             err_msg=ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']
