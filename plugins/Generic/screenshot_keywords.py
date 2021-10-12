@@ -46,10 +46,16 @@ class Screenshot():
                     if (filename!=''):
                         if '.' in filename:
                             filename = filename.split('.')[0]
-                        filePath = str(inputval) + '/'+ filename
+                        if str(inputval).endswith(os.sep):
+                            filePath = str(inputval) + filename
+                        else:
+                            filePath = str(inputval) + os.sep+ filename
                     else:
                         filename = self.generateUniqueFileName()
-                        filePath = str(inputval) + '/'+ filename
+                        if str(inputval).endswith(os.sep):
+                            filePath = str(inputval) + filename
+                        else:
+                            filePath = str(inputval) + os.sep + filename
                 elif(args[0]['action']==EXECUTE and args[0]['inputs']==''):
                     filename = self.generateUniqueFileName()
                     screenData = args[0]['screen_data']
@@ -78,11 +84,13 @@ class Screenshot():
             else:
                 log.debug('screenshot captured')
                 logger.print_on_console('Screenshot captured')
+                hyperlink = filePath+'.png'
                 if not(web):
                     img=ImageGrab.grab()
                     img.save(filePath+'.png')
                 status=TEST_RESULT_PASS
                 methodoutput=TEST_RESULT_TRUE
+                output = hyperlink
         except Exception as e:
             log.error(e)
             logger.print_on_console("Error while capturing screenshot")

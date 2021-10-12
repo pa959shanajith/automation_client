@@ -536,6 +536,8 @@ class BrowserKeywords():
                 page_title= local_bk.driver_obj.title
                 if (page_title is ''):
                     page_title= local_bk.driver_obj.current_url
+                    if isinstance(local_bk.driver_obj, webdriver.Firefox) and (page_title == 'about:blank' or page_title == 'about:newtab'):
+                        page_title="New Tab" 
                 page_title.strip()
                 coreutilsobj=core_utils.CoreUtils()
                 userinput=coreutilsobj.get_UTF_8(input_val[0])
