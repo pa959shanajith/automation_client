@@ -147,7 +147,7 @@ class SendFunctionKeys:
             err_msg=INPUT_ERROR
 
     def press_key(self,key):
-        log.debug('pressing  the key', key)
+        log.debug('pressing  the key %s', key)
         if SYSTEM_OS == "Darwin" or SYSTEM_OS == 'Linux' or key=="altright":
             pyautogui.keyDown(key)
         else:
@@ -155,7 +155,7 @@ class SendFunctionKeys:
             robot.key_press(key)
 
     def release_key(self,key):
-        log.debug('releasing  the key', key)
+        log.debug('releasing  the key %s', key)
         if SYSTEM_OS == "Darwin" or SYSTEM_OS == 'Linux' or key=="altright":
             pyautogui.keyUp(key)
         else:

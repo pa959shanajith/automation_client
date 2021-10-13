@@ -541,34 +541,9 @@ class ButtonLinkKeyword():
         local_blk.log.info(RETURN_RESULT)
         return status,methodoutput,output,err_msg
 
-    def __get_pid_ppid_browser(self):
-        pid=None
-        ppid=None
-        browser_name = browser_Keywords.local_bk.driver_obj.capabilities.get('browserName')
-        platform_name = browser_Keywords.local_bk.driver_obj.capabilities.get('platformName')
-        try:
-            if platform_name != 'Darwin':
-                if browser_name == 'chrome':
-                    ppid = browser_Keywords.local_bk.driver_obj.service.process.pid
-                elif browser_name == 'firefox':
-                    try:
-                        ppid = browser_Keywords.local_bk.driver_obj.binary.process.pid
-                    except:
-                        ppid = browser_Keywords.local_bk.driver_obj.service.process.pid
-                elif browser_name == 'internet explorer':
-                    ppid = browser_Keywords.local_bk.driver_obj.iedriver.process.pid
-                elif browser_name == 'edge legacy' or browser_name == 'msedge':
-                    ppid = browser_Keywords.local_bk.driver_obj.edge_service.process.pid
-                cprocs = psutil.Process(ppid).children()
-                if len(cprocs) > 0:
-                    pid = cprocs[1].pid if cprocs[0].name() == 'conhost.exe' else cprocs[0].pid
-        except Exception as e:
-            local_blk.log.debug("Problem while getting the process id: {}".format(e))
-        return pid, ppid, browser_name
-
     def __get_file_dialog_handle(self):
         hwnds = []
-        pid, ppid, browser_name = self.__get_pid_ppid_browser()
+        pid, ppid, _, browser_name = browser_Keywords.get_pid_ppid_browser()
         if ppid == None: return False
         if pid == None and browser_name != "edge legacy": return False
         if not (browser_name == 'internet explorer' and 'Windows-10' in platform.platform()):
