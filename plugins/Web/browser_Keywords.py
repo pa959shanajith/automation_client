@@ -1721,3 +1721,32 @@ class Singleton_DriverUtil():
                 break
         local_bk.log.info('Flag:',str(flag1))
         return flag1
+
+
+def get_pid_ppid_browser():
+    pidb=pid=None
+    ppid=None
+    browser_name = local_bk.driver_obj.capabilities.get('browserName')
+    platform_name = local_bk.driver_obj.capabilities.get('platformName')
+    if platform_name is None: platform_name = local_bk.driver_obj.capabilities.get('platform')
+    try:
+        if platform_name.lower() == 'windows':
+            if browser_name == 'chrome':
+                ppid = local_bk.driver_obj.service.process.pid
+            elif browser_name == 'firefox':
+                try:
+                    ppid = local_bk.driver_obj.binary.process.pid
+                except:
+                    ppid = local_bk.driver_obj.service.process.pid
+            elif browser_name == 'internet explorer':
+                ppid = local_bk.driver_obj.iedriver.process.pid
+            elif browser_name == 'edge legacy' or browser_name == 'msedge':
+                ppid = local_bk.driver_obj.edge_service.process.pid
+            cprocs = psutil.Process(ppid).children()
+            if len(cprocs) > 0:
+                pidb=pid = cprocs[1].pid if cprocs[0].name() == 'conhost.exe' else cprocs[0].pid
+            if browser_name == 'firefox':
+                pidb = psutil.Process(pid).children()[0].pid
+    except Exception as e:
+        local_bk.log.debug("Problem while getting the process id: {}".format(e))
+    return pid, ppid, pidb, browser_name
