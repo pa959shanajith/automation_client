@@ -2039,7 +2039,7 @@ class FileOperations:
             log.error(err_msg)
             logger.print_on_console(err_msg)
         try:
-            del input_path1, sheetname1, input_path2, sheetname2, book1, book2, row_max, col_max, output_feild, result1, result2, collect_content, sheet_exist,reader1,reader2, opt, cc#deleting variables
+            del input_path1, sheetname1, input_path2, sheetname2, row_max, col_max, output_feild, collect_content, opt#deleting variables
         except Exception as e :
             log.error('some error : {}'.format(e))
         return status, result, output, err_msg
