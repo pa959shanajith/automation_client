@@ -195,6 +195,7 @@ class Dispatcher:
             'opennewtab':local_Wd.browser_object.openNewTab,
             'execute_js':local_Wd.browser_object.execute_js,
             'getbrowsername': local_Wd.browser_object.getBrowserName,
+            'savefile': local_Wd.browser_object.save_file,
 
             'clickiris':iris_object.clickiris,
             'doubleclickiris':iris_object.doubleclickiris,
