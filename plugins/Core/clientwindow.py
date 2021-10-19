@@ -548,7 +548,7 @@ class Config_window(wx.Frame):
             "Disp_var":[(235,252),(135, 25),(375,248), (70,-1)],
             "C_Timeout" :[(12,282),(120, 25),(135,278), (70,-1)],
             "Delay_Stringinput":[(235,282),(130, 25),(375,278), (70,-1)],
-            "panel1":[(10,340),(100,30),(440,215),(8, 335)],
+            "panel1":[(12,345),(100,20),(440,185),(8, 365)],
             "err_text":[(50,555),(350, 25)],
             "Save":[(100,580), (100, 28)],
             "Close":[(250,580), (100, 28)]
@@ -572,7 +572,7 @@ class Config_window(wx.Frame):
             "Disp_var":[(288,252),(140, 25),(448,248),(85,-1)],
             "C_Timeout" :[(12,282),(120, 25),(180,278), (80,-1)],
             "Delay_Stringinput":[(288,282),(140, 25),(448,278), (85,-1)],
-            "panel1":[(10,340),(100,30),(440,215),(8, 335)],
+            "panel1":[(10,345),(100,20),(440,185),(8, 365)],
             "err_text":[(85,555),(350, 25)],
             "Save":[(130,580),(100, 28)],
             "Close":[(370,580),(120, 28)]
@@ -746,7 +746,7 @@ class Config_window(wx.Frame):
             self.Delay_input.SetValue("0.005")
 
         self.config_param=wx.StaticText(self.panel,label="Config Parameters",pos=config_fields["panel1"][0],size=config_fields["panel1"][1], style=0, name="")
-        font = wx.Font(9, wx.DEFAULT, wx.NORMAL, wx.NORMAL)
+        font = wx.Font(9, wx.DEFAULT, wx.ITALIC, wx.BOLD)
         self.config_param.SetFont(font)
 
         #ToolTips for static texts boxes
