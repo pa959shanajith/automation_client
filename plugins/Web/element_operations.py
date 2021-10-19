@@ -220,7 +220,17 @@ class ElementKeywords:
                         local_eo.log.info(location)
                         if isinstance(browser_Keywords.local_bk.driver_obj,webdriver.Firefox):
                             yoffset=browser_Keywords.local_bk.driver_obj.execute_script(MOUSE_HOVER_FF)
-                            obj.mouse_move(int(location.get('x')+9),int(location.get('y')+yoffset))
+                            obj.mouse_move(int(location.get('x')+9),int(location.get('y')+yoffset+6))
+                        elif isinstance(browser_Keywords.local_bk.driver_obj,webdriver.Ie):
+                            offset = browser_Keywords.local_bk.driver_obj.execute_script("return window.outerHeight - window.innerHeight;")
+                            if offset>0:
+                                height=int(size.get('height')/2)
+                                width=int(size.get('width')/2)
+                                obj.mouse_move(int(location.get('x')+width),int(location.get('y')+offset+height-14))
+                            else:
+                                err_msg='Element to be dragged should be on top'
+                                local_eo.log.error=err_msg
+                                logger.print_on_console(err_msg)
                         else:
                             offset = browser_Keywords.local_bk.driver_obj.execute_script("return window.outerHeight - window.innerHeight;")
                             if offset>0:
@@ -247,7 +257,7 @@ class ElementKeywords:
                         local_eo.log.info(location)
                         if isinstance(browser_Keywords.local_bk.driver_obj,webdriver.Firefox):
                             yoffset=browser_Keywords.local_bk.driver_obj.execute_script(MOUSE_HOVER_FF)
-                            pag.moveTo(int(location.get('x')+9),int(location.get('y')+yoffset))
+                            pag.moveTo(int(location.get('x')+9),int(location.get('y')+yoffset+6))
                         else:
                             height=int(size.get('height')/2)
                             width=int(size.get('width')/2)
@@ -302,7 +312,17 @@ class ElementKeywords:
                             time.sleep(0.5)
                         if isinstance(browser_Keywords.local_bk.driver_obj,webdriver.Firefox):
                             yoffset=browser_Keywords.local_bk.driver_obj.execute_script(MOUSE_HOVER_FF)
-                            obj.slide(int(location.get('x')+9),int(location.get('y')+yoffset), 0)
+                            obj.slide(int(location.get('x')+9),int(location.get('y')+yoffset+6), 0)
+                        elif isinstance(browser_Keywords.local_bk.driver_obj,webdriver.Ie):
+                            obj.enumwindows()
+                            if len(obj.rect)>1:
+                                height=int(size.get('height')/2)
+                                width=int(size.get('width')/2)
+                                obj.slide(int(location.get('x')+width),int(location.get('y')+obj.rect[1]+height+6), "slow")
+                            else:
+                                err_msg='Element to be dragged should be on top'
+                                local_eo.log.error=err_msg
+                                logger.print_on_console(err_msg)
                         else:
                             obj.enumwindows()
                             if len(obj.rect)>1:
@@ -347,7 +367,7 @@ class ElementKeywords:
                         import pyautogui as pag
                         if isinstance(browser_Keywords.local_bk.driver_obj, webdriver.Firefox):
                             yoffset=browser_Keywords.local_bk.driver_obj.execute_script(MOUSE_HOVER_FF)
-                            obj.slide_linux(int(location.get('x')+9),int(location.get('y')+yoffset), 0)
+                            obj.slide_linux(int(location.get('x')+9),int(location.get('y')+yoffset+6), 0)
                         else:
                             height=int(size.get('height')/2)
                             width=int(size.get('width')/2)
