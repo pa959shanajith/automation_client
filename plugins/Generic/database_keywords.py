@@ -726,11 +726,21 @@ class DatabaseOperation():
                         inp_sheet=None
                 else:
                     if len(args)>1:
-                        fields = args[0]
-                        inp_sheet=args[1]
+                        if (args[0].startswith('|') and args[0].endswith('|')):
+                            from util_operations import UtilOperations
+                            fields=UtilOperations().staticFetch(0, args[0])
+                            inp_sheet = args[1]
+                        else:
+                            fields = args[0]
+                            inp_sheet=args[1]
                     else:
-                        fields=args[0]
-                        inp_sheet=None
+                        if args[0].startswith('|') and args[0].endswith('|'):
+                            from util_operations import UtilOperations
+                            fields = UtilOperations().staticFetch(0, args[0])
+                            inp_sheet = None
+                        else:
+                            fields=args[0]
+                            inp_sheet=None
                 ext = self.get_ext(fields)
                 if (ext == '.xls'):
                     verify = os.path.isfile(fields)
