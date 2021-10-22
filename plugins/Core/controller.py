@@ -1359,7 +1359,8 @@ class Controller():
                                 for i in range(0,len(all_jobs)):
                                     if(all_jobs[i]['browser']==browser_num[browser]):
                                         file_creations_status=j.get_job_asset_content(all_jobs[i]['id'],file_name,path)
-                                execute_result_data['reportData']['overallstatus'][0]['video']=video_path
+                                if len(all_jobs)!=0:
+                                    execute_result_data['reportData']['overallstatus'][0]['video']=video_path
                             socketIO.emit('result_executeTestSuite', execute_result_data)
                             obj.clearList(con)
                             sc_idx += 1
