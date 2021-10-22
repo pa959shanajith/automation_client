@@ -39,33 +39,22 @@ class QcWindow():
     def login(self,filePath):
         res = "invalidcredentials"
         try:
-            flag=True
             user_name=filePath["qcUsername"]
             pass_word=filePath["qcPassword"]
             self.Qc_Url=filePath["qcURL"]
             self.headers = {'cache-control': "no-cache"}
-            login_url = self.Qc_Url + '/authentication-point/authenticate'
-            resp = requests.post(login_url, auth=HTTPBasicAuth(user_name, pass_word),  headers=self.headers,proxies=readconfig.proxies)
+            login_url = self.Qc_Url + '/api/authentication/sign-in'
+            resp = requests.get(login_url, auth=HTTPBasicAuth(user_name, pass_word),  headers=self.headers,proxies=readconfig.proxies)
             if resp.status_code == 500 or resp.status_code == 503 :
                 res = "serverdown"
             if resp.status_code == 200:
-                cookieName = resp.headers.get('Set-Cookie')
-                LWSSO_COOKIE_KEY = cookieName[cookieName.index("=") + 1: cookieName.index(";")]
-                self.cookies = {'LWSSO_COOKIE_KEY': LWSSO_COOKIE_KEY}
+                self.cookies=resp.cookies
             else:
                 self.headers = {"Content-Type": "application/json"}
                 login_url = self.Qc_Url + '/rest/oauth2/login'
                 payload={"clientId":user_name,"secret":pass_word}
                 resp = requests.post(login_url,  headers=self.headers,data=json.dumps(payload),proxies=readconfig.proxies)
                 self.cookies=resp.cookies
-                flag=False
-            if flag:
-                qcSessionEndPoint = self.Qc_Url + "/rest/site-session"
-                response = requests.post(qcSessionEndPoint, headers=self.headers, cookies=self.cookies,proxies=readconfig.proxies)
-                if response.status_code == 200 | response.status_code == 201:
-                    cookieName = response.headers.get('Set-Cookie').split(",")[1]
-                    QCSession = cookieName[cookieName.index("=") + 1: cookieName.index(";")]
-                    self.cookies['QCSession'] = QCSession
         
             #fetching domains
             domain_dict={}
