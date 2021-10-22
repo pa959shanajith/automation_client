@@ -40,13 +40,6 @@ import re
 import zipfile
 import platform
 import time
-import psutil
-from pywinauto import Application
-if SYSTEM_OS=='Windows':
-    import win32gui
-    import win32api
-    import win32con
-    import win32process
 
 log = logging.getLogger('file_operations.py')
 
@@ -1135,39 +1128,7 @@ class FileOperations:
             logger.print_on_console(err_msg)
         return status,methodoutput,linenumbers,err_msg
 
-    def __open_save_file_dialog(self, pidb):
-        hwnds = []
-        def winEnumHandler(hwnd, pidx): # get handles/windows of application/browser
-            _, current_pid = win32process.GetWindowThreadProcessId(hwnd)
-            if win32gui.IsWindowVisible(hwnd) and current_pid == pidx:
-                hwnds.append(hwnd)
-        win32gui.EnumWindows(winEnumHandler, pidb)
-        if len(hwnds) > 0:
-            wind_brw = hwnds[0]
-            app=Application().connect(handle=wind_brw,allow_magic_lookup=False)
-            win=app[win32gui.GetWindowText(wind_brw)]
-            win.type_keys('^s') # Send Ctrl+S to open save file dialouge
-            time.sleep(1)
-
-
-    def __get_file_dialog_handle(self, pid, ppid, browser_name, all_hwnds=False):
-        hwnds = []
-        if (browser_name == 'internet explorer' and 'Windows-10' in platform.platform()): pids = [pid]
-        else: pids=[c.pid for c in psutil.Process(pid).children()]
-        def winEnumHandler(hwnd, pidx): # get handle of save window
-            _, current_pid = win32process.GetWindowThreadProcessId(hwnd)
-            if win32gui.IsWindowVisible(hwnd) and win32gui.GetWindowText(hwnd) in ["Save Webpage", "Save As", "Confirm Save As"]:
-                if browser_name == "edge legacy":
-                    if psutil.Process(current_pid).name() == "PickerHost.exe":
-                        hwnds.append(hwnd)
-                elif current_pid in pidx:
-                    hwnds.append(hwnd)
-        win32gui.EnumWindows(winEnumHandler, pids)
-        if all_hwnds: return hwnds
-        handle = hwnds[0] if (len(hwnds) > 0) else None
-        return handle
-
-    def save_file(self,folder_path,file_path,*args):
+    def save_file(self,folder_path,file_path):
         """
         def : save_file
         purpose : Saving a file in windows
@@ -1176,7 +1137,6 @@ class FileOperations:
 
         """
         try:
-            import time
             from sendfunction_keys import SendFunctionKeys
             obj=SendFunctionKeys()
             configvalues = readconfig.configvalues
@@ -1189,7 +1149,6 @@ class FileOperations:
             folder_path=str(folder_path)
             file_path=str(file_path)
             log.debug('Folder path is '+folder_path+' and File is '+file_path)
-            brute_logic = False
             if (not(folder_path is None or folder_path == '' or file_path is None or file_path == '') and os.path.exists(folder_path)):
                 log.debug('saving the file')
                 """
@@ -1220,99 +1179,7 @@ class FileOperations:
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
                     log.info('File has been saved')
-                elif SYSTEM_OS=='Windows':
-                    try:
-                        import browser_Keywords
-                        if browser_Keywords.local_bk.driver_obj is None: brute_logic = True
-                        else:
-                            pid, ppid, pidb, browser_name = browser_Keywords.get_pid_ppid_browser()
-                            if ppid == None: brute_logic = True
-                            if pid == None and browser_name != "edge legacy": brute_logic = True
-                            else:
-                                self.__open_save_file_dialog(pidb)
-                                def __save_time_func(tries=10, time_sleep=0.5):
-                                    while tries > 0:
-                                        win_handle = self.__get_file_dialog_handle(pid, ppid, browser_name)
-                                        if win_handle is not None:
-                                            log.info("Window handle found: %s", win_handle)
-                                            return win_handle
-                                        time.sleep(time_sleep)
-                                        tries -= 1
-                                    return None
-
-                                maxTries = 10
-                                time_sleep = 0.5
-                                if len(args) > 0:
-                                    maxTries = int(int(args[0]) / time_sleep)
-                                handle = __save_time_func(maxTries, time_sleep)
-                                if handle is None: brute_logic = True
-                                else:
-                                    try:
-                                        log.info("Trying with method 1")
-                                        app=Application().connect(handle=handle,allow_magic_lookup=False)
-                                        win=app[win32gui.GetWindowText(handle)]
-                                        # win.minimize()
-                                        save_but = None
-                                        file_box = None
-                                        w_c = win.children()
-                                        for c in w_c:
-                                            if str(c.friendly_class_name())=="Button" and c.window_text()=="&Save":
-                                                save_but = c
-                                                break
-                                        for i in range(len(w_c)):
-                                            c = w_c[i]
-                                            if (str(c.friendly_class_name())=="Edit" and c.is_visible()
-                                            and w_c[i-1].class_name()=="ComboBox"):
-                                                file_box = c
-                                                break
-                                        if file_box and save_but:
-                                            file_box.set_edit_text(full_path)
-                                            time.sleep(0.5)
-                                            save_but.click()
-                                            if 'Windows-7' in platform.platform():
-                                                try: save_but.click()
-                                                except: pass
-                                            time.sleep(1)
-                                            if win32process.GetWindowThreadProcessId(handle)[0] != 0:
-                                                win_handles = self.__get_file_dialog_handle(pid, ppid, browser_name, all_hwnds=True)
-                                                wind_csa = None
-                                                for hw in win_handles:
-                                                    if win32gui.GetWindowText(hw) == 'Confirm Save As':
-                                                        wind_csa = hw
-                                                        break
-                                                if wind_csa:
-                                                    app2=Application().connect(handle=wind_csa,allow_magic_lookup=False)
-                                                    win2=app2['Confirm Save As']
-                                                    # win2.minimize()
-                                                    yes_but = None
-                                                    w_c = win2.children()
-                                                    for c in w_c:
-                                                        if str(c.friendly_class_name())=="Button" and c.window_text()=="&Yes":
-                                                            yes_but = c
-                                                            break
-                                                    yes_but.click()
-                                                    time.sleep(1)
-                                                    if win32process.GetWindowThreadProcessId(handle)[0] != 0:
-                                                        # Added alt+y sendfunction key for automating overwrite process if the file is already existed.
-                                                        obj.press_multiple_keys(['alt','y'],1)
-                                                        time.sleep(1)
-                                                    if win32process.GetWindowThreadProcessId(handle)[0] == 0:
-                                                        status=TEST_RESULT_PASS
-                                                        methodoutput=TEST_RESULT_TRUE
-                                                        log.info('File has been saved')
-                                                else: brute_logic = True
-                                    except Exception as e:
-                                        err_msg = EXCEPTION_OCCURED + " in method 1"
-                                        logger.print_on_console(err_msg)
-                                        log.error(err_msg)
-                                        log.error(e)
-                                        brute_logic = True
-                    except ImportError:
-                        brute_logic = True
                 else:
-                    brute_logic = True
-
-                if brute_logic:
                     #Get the focus on Windows Dialog box by pressing 'alt+d'
                     obj.press_multiple_keys(['alt','d'],1)      ##added timer after every step
                     time.sleep(1)
