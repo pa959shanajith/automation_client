@@ -329,7 +329,7 @@ class BluezoneKeywords:
             self.host.WaitReady(10,1000)
             file_status =  self.host.WaitForText((job_path), (8, 11, 5000))
             jobno = None
-            if file_status== True:
+            if file_status== 4 or file_status== True:
                 self.host.Setcursor(8,2)
                 self.host.SendKeys(MAINFRAME_KEY_V)
                 self.host.WaitReady(10,1000)
@@ -342,7 +342,7 @@ class BluezoneKeywords:
                 self.host.WaitReady(10,2000)
                 jobname = self.host.ReadScreen(buffer_var,8,6,12)
                 self.host.WaitReady(10,1000)
-                if jobname[1] == member_name:
+                if jobname[1].strip().lower() == member_name:
                     self.host.SendKeys(MAINFRAME_KEY_T)
                     self.host.WaitReady(5,100)
                     self.host.SendKeys(MAINFRAME_KEY_T)
