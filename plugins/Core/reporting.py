@@ -115,6 +115,7 @@ class Reporting:
             'system':self.step_description_obj.system}
             description=apptype_description[apptype.lower()](*params)
             description=self.core_utilsobject.get_UTF_8(description)
+            description = description.replace("'", '"')
 ##            description=description.encode('utf-8')
 
         except Exception as e:
@@ -137,8 +138,7 @@ class Reporting:
         self.ellapsed_time=str(ellapsed_time).split('.')[0].split(':')
         self.ellapsed_time="~" + ("0" + self.ellapsed_time[0])[-2:] + ":" + ("0" + self.ellapsed_time[1])[-2:] + ":" + ("0" + self.ellapsed_time[2])[-2:]
         getTym = self.end_time.split(".")[0]
-        getDat = getTym.split(" ")[0].split("-")
-        self.date = getDat[1] + "/" + getDat[2] + "/" + getDat[0]
+        self.date = getTym.split(" ")[0]
         self.time = getTym.split(" ")[1]
         obj={}
         obj[ELLAPSED_TIME]=self.ellapsed_time
@@ -165,8 +165,7 @@ class Reporting:
             self.start_time=str(start_time).split('.')[0]
             self.end_time=str(end_time).split('.')[0]
             getTym = self.end_time.split(".")[0]
-            getDat = getTym.split(" ")[0].split("-")
-            self.date = getDat[1] + "/" + getDat[2] + "/" + getDat[0]
+            self.date = getTym.split(" ")[0]
             self.time = getTym.split(" ")[1]
             obj={}
             obj[ELLAPSED_TIME]=self.ellapsed_time
@@ -193,8 +192,7 @@ class Reporting:
             self.start_time=str(start_time).split('.')
             self.end_time=str(end_time).split('.')
             getTym = self.end_time.split(".")[0]
-            getDat = getTym.split(" ")[0].split("-")
-            self.date = getDat[1] + "/" + getDat[2] + "/" + getDat[0]
+            self.date = getTym.split(" ")[0]
             self.time = getTym.split(" ")[1]
             obj={}
             obj[ELLAPSED_TIME]=self.ellapsed_time
@@ -337,6 +335,14 @@ class Reporting:
         report_obj.screenshot_path=self.core_utilsobject.get_UTF_8(report_obj.screenshot_path)
         obj[SCREENSHOT_PATH]= report_obj.screenshot_path
         report_obj.ellapsedtime=self.core_utilsobject.get_UTF_8(report_obj.ellapsedtime)
+        et = str(report_obj.ellapsedtime).split('.')
+        if len(et) == 1: 
+            et.append("000")
+        elap_time = et[0].split(':')
+        if len(et) < 3 and ":" not in et[0]:
+            report_obj.ellapsedtime = "00:00:" + ("0" + elap_time[0])[-2:] + ":" + et[1]
+        else:
+            report_obj.ellapsedtime = ("0" + elap_time[0])[-2:] + ":" + ("0" + elap_time[1])[-2:] + ":" + ("0" + elap_time[2])[-2:] + ":" + et[1]
         obj[ELLAPSED_TIME]=report_obj.ellapsedtime
         report_obj.remarks=self.core_utilsobject.get_UTF_8(report_obj.remarks)
         obj[REMARKS]=report_obj.remarks

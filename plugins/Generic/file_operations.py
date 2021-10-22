@@ -40,13 +40,6 @@ import re
 import zipfile
 import platform
 import time
-import psutil
-from pywinauto import Application
-if SYSTEM_OS=='Windows':
-    import win32gui
-    import win32api
-    import win32con
-    import win32process
 
 log = logging.getLogger('file_operations.py')
 
@@ -1135,39 +1128,7 @@ class FileOperations:
             logger.print_on_console(err_msg)
         return status,methodoutput,linenumbers,err_msg
 
-    def __open_save_file_dialog(self, pidb):
-        hwnds = []
-        def winEnumHandler(hwnd, pidx): # get handles/windows of application/browser
-            _, current_pid = win32process.GetWindowThreadProcessId(hwnd)
-            if win32gui.IsWindowVisible(hwnd) and current_pid == pidx:
-                hwnds.append(hwnd)
-        win32gui.EnumWindows(winEnumHandler, pidb)
-        if len(hwnds) > 0:
-            wind_brw = hwnds[0]
-            app=Application().connect(handle=wind_brw,allow_magic_lookup=False)
-            win=app[win32gui.GetWindowText(wind_brw)]
-            win.type_keys('^s') # Send Ctrl+S to open save file dialouge
-            time.sleep(1)
-
-
-    def __get_file_dialog_handle(self, pid, ppid, browser_name, all_hwnds=False):
-        hwnds = []
-        if (browser_name == 'internet explorer' and 'Windows-10' in platform.platform()): pids = [pid]
-        else: pids=[c.pid for c in psutil.Process(pid).children()]
-        def winEnumHandler(hwnd, pidx): # get handle of save window
-            _, current_pid = win32process.GetWindowThreadProcessId(hwnd)
-            if win32gui.IsWindowVisible(hwnd) and win32gui.GetWindowText(hwnd) in ["Save Webpage", "Save As", "Confirm Save As"]:
-                if browser_name == "edge legacy":
-                    if psutil.Process(current_pid).name() == "PickerHost.exe":
-                        hwnds.append(hwnd)
-                elif current_pid in pidx:
-                    hwnds.append(hwnd)
-        win32gui.EnumWindows(winEnumHandler, pids)
-        if all_hwnds: return hwnds
-        handle = hwnds[0] if (len(hwnds) > 0) else None
-        return handle
-
-    def save_file(self,folder_path,file_path,*args):
+    def save_file(self,folder_path,file_path):
         """
         def : save_file
         purpose : Saving a file in windows
@@ -1176,7 +1137,6 @@ class FileOperations:
 
         """
         try:
-            import time
             from sendfunction_keys import SendFunctionKeys
             obj=SendFunctionKeys()
             configvalues = readconfig.configvalues
@@ -1189,7 +1149,6 @@ class FileOperations:
             folder_path=str(folder_path)
             file_path=str(file_path)
             log.debug('Folder path is '+folder_path+' and File is '+file_path)
-            brute_logic = False
             if (not(folder_path is None or folder_path == '' or file_path is None or file_path == '') and os.path.exists(folder_path)):
                 log.debug('saving the file')
                 """
@@ -1220,99 +1179,7 @@ class FileOperations:
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
                     log.info('File has been saved')
-                elif SYSTEM_OS=='Windows':
-                    try:
-                        import browser_Keywords
-                        if browser_Keywords.local_bk.driver_obj is None: brute_logic = True
-                        else:
-                            pid, ppid, pidb, browser_name = browser_Keywords.get_pid_ppid_browser()
-                            if ppid == None: brute_logic = True
-                            if pid == None and browser_name != "edge legacy": brute_logic = True
-                            else:
-                                self.__open_save_file_dialog(pidb)
-                                def __save_time_func(tries=10, time_sleep=0.5):
-                                    while tries > 0:
-                                        win_handle = self.__get_file_dialog_handle(pid, ppid, browser_name)
-                                        if win_handle is not None:
-                                            log.info("Window handle found: %s", win_handle)
-                                            return win_handle
-                                        time.sleep(time_sleep)
-                                        tries -= 1
-                                    return None
-
-                                maxTries = 10
-                                time_sleep = 0.5
-                                if len(args) > 0:
-                                    maxTries = int(int(args[0]) / time_sleep)
-                                handle = __save_time_func(maxTries, time_sleep)
-                                if handle is None: brute_logic = True
-                                else:
-                                    try:
-                                        log.info("Trying with method 1")
-                                        app=Application().connect(handle=handle,allow_magic_lookup=False)
-                                        win=app[win32gui.GetWindowText(handle)]
-                                        # win.minimize()
-                                        save_but = None
-                                        file_box = None
-                                        w_c = win.children()
-                                        for c in w_c:
-                                            if str(c.friendly_class_name())=="Button" and c.window_text()=="&Save":
-                                                save_but = c
-                                                break
-                                        for i in range(len(w_c)):
-                                            c = w_c[i]
-                                            if (str(c.friendly_class_name())=="Edit" and c.is_visible()
-                                            and w_c[i-1].class_name()=="ComboBox"):
-                                                file_box = c
-                                                break
-                                        if file_box and save_but:
-                                            file_box.set_edit_text(full_path)
-                                            time.sleep(0.5)
-                                            save_but.click()
-                                            if 'Windows-7' in platform.platform():
-                                                try: save_but.click()
-                                                except: pass
-                                            time.sleep(1)
-                                            if win32process.GetWindowThreadProcessId(handle)[0] != 0:
-                                                win_handles = self.__get_file_dialog_handle(pid, ppid, browser_name, all_hwnds=True)
-                                                wind_csa = None
-                                                for hw in win_handles:
-                                                    if win32gui.GetWindowText(hw) == 'Confirm Save As':
-                                                        wind_csa = hw
-                                                        break
-                                                if wind_csa:
-                                                    app2=Application().connect(handle=wind_csa,allow_magic_lookup=False)
-                                                    win2=app2['Confirm Save As']
-                                                    # win2.minimize()
-                                                    yes_but = None
-                                                    w_c = win2.children()
-                                                    for c in w_c:
-                                                        if str(c.friendly_class_name())=="Button" and c.window_text()=="&Yes":
-                                                            yes_but = c
-                                                            break
-                                                    yes_but.click()
-                                                    time.sleep(1)
-                                                    if win32process.GetWindowThreadProcessId(handle)[0] != 0:
-                                                        # Added alt+y sendfunction key for automating overwrite process if the file is already existed.
-                                                        obj.press_multiple_keys(['alt','y'],1)
-                                                        time.sleep(1)
-                                                    if win32process.GetWindowThreadProcessId(handle)[0] == 0:
-                                                        status=TEST_RESULT_PASS
-                                                        methodoutput=TEST_RESULT_TRUE
-                                                        log.info('File has been saved')
-                                                else: brute_logic = True
-                                    except Exception as e:
-                                        err_msg = EXCEPTION_OCCURED + " in method 1"
-                                        logger.print_on_console(err_msg)
-                                        log.error(err_msg)
-                                        log.error(e)
-                                        brute_logic = True
-                    except ImportError:
-                        brute_logic = True
                 else:
-                    brute_logic = True
-
-                if brute_logic:
                     #Get the focus on Windows Dialog box by pressing 'alt+d'
                     obj.press_multiple_keys(['alt','d'],1)      ##added timer after every step
                     time.sleep(1)
@@ -1630,8 +1497,8 @@ class FileOperations:
     def cell_by_cell_compare(self,input_val,*args):
         """
         def : cell_by_cell_compare
-        purpose : compares the data of given sheets of 2 different excel files and write down the result in another result sheet.
-        param : input : <input_path1>;<sheet1(optional)>;<input_path2>;<sheet2(optional)>;<selective(optional- will print diff b/w mismatched text of each cell in provided output excel file )> output: output_path(optional)
+        purpose : cell by cell comparison between excel and csv files.
+        param : input : <input_path1>;<sheet1(optional)>;<input_path2>;<sheet2(optional)>;<selective(optional- will print diff b/w mismatched text of each cell in provided input files )> output: output_path(optional)
         return : bool/ if output file mentioned then prints cell by cell to that file
         """
         status = TEST_RESULT_FAIL
@@ -1651,28 +1518,28 @@ class FileOperations:
         input_filed_set = False
         dyn_var_opt = False
         con_var_opt = False
-        log.debug('Comparing content cell by cell of .xls files ')
+        log.debug('Comparing content cell by cell of given files ')
         try:
             import csv
             if (len(input_val)==5):
                 input_path1 = input_val[0]
                 sheetname1 = input_val[1]
-                input_path2 = input_val[2]
-                sheetname2 = input_val[3]
+                input_path2 = input_val[2]               
                 extension1=os.path.splitext(input_path1)[1] if(input_path1 !=None) else None
                 extension2=os.path.splitext(input_path2)[1] if(input_path2 !=None) else None
+                sheetname2 = input_val[3] if (extension2!='.csv') else None
                 if ( len(input_val) == 5 and input_val[4].strip().lower() == 'selective'):
                     logger.print_on_console("Selective Option Set to True")
                     opt = True
                     log.info("Selective option set True")
                 input_filed_set = True
-            elif (len(input_val)==4):
+            elif (len(input_val)>=3):
                 input_path1 = input_val[0]
                 sheetname1 = input_val[1]
                 input_path2 = input_val[2]
-                sheetname2 = input_val[3]
                 extension1=os.path.splitext(input_path1)[1] if(input_path1 !=None) else None
                 extension2=os.path.splitext(input_path2)[1] if(input_path2 !=None) else None
+                sheetname2 = input_val[3] if (extension2!='.csv') else None
                 input_filed_set = True
             else:
                 input_filed_set = False
@@ -1704,10 +1571,10 @@ class FileOperations:
                             log.debug("File out path is not valid, setting to default")
                             output_feild = None
                 else:
-                    output_feild = args[0].split(";")[0]
+                    output_feild = args[0].split(";")[0] if args[0]!='' else None
                     log.info("Choosen the direct file path")
                     #logger.print_on_console("Choosen the direct file path")
-            if(extension1=='.xlsx' and extension2=='.xlsx') or (extension1=='.xls' and extension2=='.xls'):# Indicates both files are excel(.xlsx, .xls)
+            if(extension1 in ['.xlsx','.xls'] and extension2 in ['.xlsx','.xls']):# Indicates both files are excel(.xlsx, .xls)
                 book1 = open_workbook(input_path1)
                 book2 = open_workbook(input_path2)
                 try:
@@ -1882,7 +1749,10 @@ class FileOperations:
                     for eachcell in cell1:
                         output2[x]=[]
                         for i in range(len(eachcell)):
-                            output2[x].append(eachcell[i].value)
+                            if eachcell[i].data_type=='n' and type(eachcell[i].value) == int:
+                                output2[x].append(str(eachcell[i].value))
+                            else:
+                                output2[x].append(eachcell[i].value)
                         x+=1
                 elif (extension1=='.xls' or extension2=='.xls'):
                     max_row=sheet1.nrows
@@ -2018,6 +1888,10 @@ class FileOperations:
                             result = TEST_RESULT_TRUE
                         else:
                             logger.print_on_console("Input files are empty")
+                    else:
+                        logger.print_on_console("output variable or file path is not present")
+                        status = TEST_RESULT_PASS
+                        result = TEST_RESULT_TRUE
                     output = collect_content
                 else :
                     err_msg = "Content is empty"
@@ -2032,7 +1906,7 @@ class FileOperations:
             log.error(err_msg)
             logger.print_on_console(err_msg)
         try:
-            del input_path1, sheetname1, input_path2, sheetname2, book1, book2, row_max, col_max, output_feild, result1, result2, collect_content, sheet_exist,each_key,each_match,comp_flg,reader1,reader2, opt, cc#deleting variables
+            del input_path1, sheetname1, input_path2, sheetname2, row_max, col_max, output_feild, collect_content, opt#deleting variables
         except Exception as e :
             log.error('some error : {}'.format(e))
         return status, result, output, err_msg
