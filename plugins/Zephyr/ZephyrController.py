@@ -106,7 +106,7 @@ class ZephyrWindow():
             logger.print_on_console(err_msg)
             log.error(eproject, exc_info=True)
         return res
-        
+   
     def get_cycle_phases(self,filePath):
         res = {}
         try:
@@ -188,11 +188,47 @@ class ZephyrWindow():
             log.error(eproject, exc_info=True)
         return res
 
+    def get_modules(self,parentFetchList,mods=[]):
+        try:
+            for parid in parentFetchList:
+                relative_path = "/testcasetree/"+str(parid)
+                respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, verify=False,proxies=readconfig.proxies)
+                if respon.status_code == 200:
+                    JsonObject = respon.json()
+                    if "categories" in JsonObject and len(JsonObject["categories"]) != 0:
+                        fp = {}
+                        for modul in JsonObject["categories"]:
+                            mods.append({
+                                "parid":modul["id"],
+                                "treeid":parentFetchList[parid]
+                            })
+                            fp[modul["id"]] = parentFetchList[parid]
+                        mods = self.get_modules(fp, mods)
+        except Exception as eproject:
+            err_msg = 'Error while fetching testcases from Zephyr'
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
+            log.error(eproject, exc_info=True)
+        return mods
+
     def get_testcases(self,filePath):
-        res = []
+        res = {"modules" : [],"testcases": []}
+        updateflag = False
         try:
             # get all testcases
             treeid = filePath["treeId"]
+            if "updateflag" in filePath: updateflag = filePath["updateflag"]
+            relative_path = "/testcasetree/"+str(treeid)
+            respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, verify=False,proxies=readconfig.proxies)
+            if respon.status_code == 200:
+                JsonObject = respon.json()
+                if "categories" in JsonObject and len(JsonObject["categories"]) != 0:
+                    for modul in JsonObject["categories"]:
+                        phaseObj = {modul["id"]:modul["name"]}
+                        res["modules"].append(phaseObj)
+                        if updateflag: 
+                            res["testcases"] = self.get_testcases_treeid(modul["id"], res["testcases"])
+                if updateflag: res["parentids"] = self.get_modules(filePath["parentFetchList"],[])
             relative_path = "/testcase/planning/"+str(treeid)
             respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, verify=False,proxies=readconfig.proxies)
             if respon.status_code == 200:
@@ -205,11 +241,12 @@ class ZephyrWindow():
                         if 'rts' in i:
                             req_id = i['testcase']['requirementIds']
                             requirement_details = self.get_requirement_details(req_id)
-                            res.append({
+                            res["testcases"].append({
                                 'id':i['testcase']['testcaseId'],
                                 'name':i['testcase']['name'],
                                 'cyclePhaseId': i['rts']['cyclePhaseId'],
-                                'reqdetails': requirement_details
+                                'parentId': treeid,
+                                'reqdetails': requirement_details,
                             })
         except Exception as eproject:
             err_msg = 'Error while fetching testcases from Zephyr'
@@ -218,12 +255,55 @@ class ZephyrWindow():
             log.error(eproject, exc_info=True)
         return res
 
+    def get_testcases_treeid(self, treeid, tests):
+        try:
+            relative_path = "/testcasetree/"+str(treeid)
+            respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, verify=False,proxies=readconfig.proxies)
+            if respon.status_code == 200:
+                JsonObject = respon.json()
+                if "categories" in JsonObject and len(JsonObject["categories"]) != 0:
+                    for modul in JsonObject["categories"]:
+                        self.get_testcases_treeid(modul["id"], tests)
+            relative_path = "/testcase/planning/"+str(treeid)
+            respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, verify=False,proxies=readconfig.proxies)
+            if respon.status_code == 200:
+                JsonObject = respon.json()
+                # Fetch testcases
+                if JsonObject["resultSize"] != 0:
+                    results = JsonObject["results"]
+                    # Fetch requirement details of testcases
+                    for i in results:
+                        if 'rts' in i:
+                            req_id = i['testcase']['requirementIds']
+                            requirement_details = self.get_requirement_details(req_id)
+                            tests.append({
+                                'id':i['testcase']['testcaseId'],
+                                'name':i['testcase']['name'],
+                                'cyclePhaseId': i['rts']['cyclePhaseId'],
+                                'parentId': treeid,
+                                'reqdetails': requirement_details,
+                            })
+        except Exception as eproject:
+            err_msg = 'Error while fetching testcases from Zephyr'
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
+            log.error(eproject, exc_info=True)
+        return tests
+
     def get_mapped_testcases(self,filePath):
-        res = []
+        res = {"modules" : [],"testcases": []}
         try:
             # get all testcases
             treeid = filePath["treeId"]
             mappedTests = filePath["mappedTests"]
+            relative_path = "/testcasetree/"+str(treeid)
+            respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, verify=False,proxies=readconfig.proxies)
+            if respon.status_code == 200:
+                JsonObject = respon.json()
+                if "categories" in JsonObject and len(JsonObject["categories"]) != 0:
+                    for modul in JsonObject["categories"]:
+                        phaseObj = {modul["id"]:modul["name"]}
+                        res["modules"].append(phaseObj)
             relative_path = "/testcase/planning/"+str(treeid)
             respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, verify=False,proxies=readconfig.proxies)
             if respon.status_code == 200:
@@ -237,10 +317,11 @@ class ZephyrWindow():
                             req_id = i['testcase']['requirementIds']
                             requirement_details = self.get_requirement_details(req_id)
                             if int(i['testcase']['testcaseId']) in mappedTests:
-                                res.append({
+                                res["testcases"].append({
                                     'id':i['testcase']['testcaseId'],
                                     'name':i['testcase']['name'],
                                     'cyclePhaseId': i['rts']['cyclePhaseId'],
+                                    'parentId': treeid,
                                     'reqdetails': requirement_details
                                 })
         except Exception as eproject:
@@ -267,13 +348,15 @@ class ZephyrWindow():
             releaseid = data["releaseid"]
             testcaseid = data["testid"]
             status_tc = data["status"]
-            relative_path = "/execution/user/project?cyclephaseid="+str(cyclephaseid)+"&releaseid="+str(releaseid)
+            parentid = data["parentid"]
+            relative_path = "/execution?parentid="+str(parentid)+"&cyclephaseid="+str(cyclephaseid)+"&releaseid="+str(releaseid)
+            # relative_path = "/execution/user/project?cyclephaseid="+str(cyclephaseid)+"&releaseid="+str(releaseid)
             respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, verify=False,proxies=readconfig.proxies)
             if respon.status_code == 200:
                 JsonObject = respon.json()
                 if JsonObject["resultSize"] != 0:
                     results = JsonObject["results"]
-                    result = [i for i in results if str(i["tcrTreeTestcase"]["testcase"]["id"])==testcaseid]
+                    result = [i for i in results if str(i["tcrTreeTestcase"]["testcase"]["testcaseId"])==testcaseid]
                     scheduleid = result[0]["id"]
                     testerid = result[0]["testerId"]
                     relative_path_update = "/execution/bulk?scheduleids="+str(scheduleid)+"&status="+str(status_tc)+"&testerid="+str(testerid)+"&tcrCatalogTreeId=&allExecutions=&includeanyoneuser="
