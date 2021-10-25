@@ -1210,7 +1210,8 @@ class Controller():
                             zephyr_projectid=zephyr_sceanrio_data['projectid']
                             zephyr_treeid=zephyr_sceanrio_data['treeid']
                             zephy_testid=zephyr_sceanrio_data['testid']
-                            zephyr_parentid=zephyr_sceanrio_data['parentid']
+                            if 'parentid' in zephyr_sceanrio_data: zephyr_parentid=zephyr_sceanrio_data['parentid']
+                            else: zephyr_parentid=''
 
                         #Iterating through each test case in the scenario
                         for testcase in [eval(scenario[scenario_id])]:
