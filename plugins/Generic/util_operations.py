@@ -19,6 +19,7 @@ from constants import *
 import core_utils
 import logging
 import ast
+import io, urllib.request, urllib.error
 if SYSTEM_OS != 'Darwin':
     import win32api,win32con
 if SYSTEM_OS == 'Darwin':
@@ -250,11 +251,35 @@ class UtilOperations:
         err_msg=None
         try:
             log.debug('reading the inputs')
-            if file1 != None and file2 != None and file1 != '' and file2 != '' and os.path.exists(file1) and os.path.exists(file2) :
+            if file1 != None and file2 != None and file1 != '' and file2 != '':
 				#960 Imageverificaton added ssim and histogram algo. (Himanshu)
                 #sending Image path instead of Images (Himanshu)
                 #img1 = Image.open(file1)
                 #img2 = Image.open(file2)
+                # if file path passed as network location
+                if "file:" in file1:
+                    server_url = file1.split(":")[1].replace("\\", "/")
+                    file_name = server_url.split("/")[-1]
+                    server_url = server_url.split("/")
+                    server_path = "//"
+                    for element in server_url[:-1]:
+                        if element != '':
+                            server_path += element + "/"
+                    img_src = os.path.normpath(server_path) + os.sep
+                    img_src = "file:" + img_src + file_name
+                    file1 = io.BytesIO(urllib.request.urlopen(img_src).read())
+                # if file path passed as network location
+                if "file:" in file2:
+                    server_url = file2.split(":")[1].replace("\\", "/")
+                    file_name = server_url.split("/")[-1]
+                    server_url = server_url.split("/")
+                    server_path = "//"
+                    for element in server_url[:-1]:
+                        if element != '':
+                            server_path += element + "/"
+                    img_src = os.path.normpath(server_path) + os.sep
+                    img_src = "file:" + img_src + file_name
+                    file2 = io.BytesIO(urllib.request.urlopen(img_src).read())
                 log.debug('comparing the images')
                 if self.verify_image_obj != None:
                 	#Meaning user has advanced image processing plugin
@@ -273,12 +298,14 @@ class UtilOperations:
                         width1, height1 = img1.size
                         width2, height2 = img2.size
                         size=(min(width1,width2,1024),min(height1,height2,800))
-                        if not(file1.split('.')[-1]=='jpg'):
-                            img1 = img1.convert('RGB')
-                            #print 'converted img 1'
-                        if not(file2.split('.')[-1]=='jpg'):
-                            img2 = img2.convert('RGB')
-                            #print 'converted img 2'
+                        # if not(file1.split('.')[-1]=='jpg'):
+                        #     img1 = img1.convert('RGB')
+                        #     #print 'converted img 1'
+                        # if not(file2.split('.')[-1]=='jpg'):
+                        #     img2 = img2.convert('RGB')
+                        #     #print 'converted img 2'
+                        img1 = img1.convert('RGB')
+                        img2 = img2.convert('RGB')
                         img1 = img1.resize(size)
                         img2 = img2.resize(size)
                         imageA = np.asarray(img1)
@@ -298,6 +325,14 @@ class UtilOperations:
             if err_msg != None:
                 logger.print_on_console(err_msg)
                 log.error(err_msg)
+        except urllib.error.URLError as e:
+            err_msg=ERROR_CODE_DICT['ERR_NO_IMAGE_SOURCE']
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
+        except FileNotFoundError as e:
+            err_msg=ERROR_CODE_DICT['ERR_NO_IMAGE_SOURCE']
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
         except Exception as e:
             log.error(e)
             logger.print_on_console(e)

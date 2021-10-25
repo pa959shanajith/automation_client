@@ -34,6 +34,7 @@ from  selenium.webdriver.common import action_chains
 from selenium.webdriver.common.action_chains import ActionChains
 import threading
 from table_keywords import TableOperationKeywords, local_tk
+import os
 
 
 local_uo = threading.local()
@@ -932,12 +933,35 @@ class UtilWebKeywords:
             from PIL import Image
             if webelement!=None and webelement !='':
                 img_src = webelement.get_attribute("src")
+                # if file path passed as network location in src attribute
+                if "file:" in img_src:
+                    server_url = img_src.split(":")[1].replace("\\", "/")
+                    file_name = server_url.split("/")[-1]
+                    server_url = server_url.split("/")
+                    server_path = "//"
+                    for element in server_url[:-1]:
+                        if element != '':
+                            server_path += element + "/"
+                    img_src = os.path.normpath(server_path) + os.sep
+                    img_src = "file:" + img_src + file_name
                 file1 = io.BytesIO(urllib.request.urlopen(img_src).read())
                 file2=input[0]
                 local_uo.log.info(INPUT_IS)
                 local_uo.log.info(file2)
-                if file1 != None and file2 != None and  file2 != '' and os.path.exists(file2) :
+                if file1 != None and file2 != None and  file2 != '':
                     local_uo.log.debug('comparing the images')
+                    # if file path passed as network location
+                    if "file:" in file2:
+                        server_url = file2.split(":")[1].replace("\\", "/")
+                        file_name = server_url.split("/")[-1]
+                        server_url = server_url.split("/")
+                        server_path = "//"
+                        for element in server_url[:-1]:
+                            if element != '':
+                                server_path += element + "/"
+                        img_src = os.path.normpath(server_path) + os.sep
+                        img_src = "file:" + img_src + file_name
+                        file2 = io.BytesIO(urllib.request.urlopen(img_src).read())
                     if self.verify_image_obj != None: #Meaning user has advanced image processing plugin
                         if self.verify_image_obj.imagecomparison(file1,file2):
                             info_msg=ERROR_CODE_DICT['MSG_IMAGE_COMPARE_PASS']
@@ -974,6 +998,14 @@ class UtilWebKeywords:
             if err_msg != None:
                 logger.print_on_console(err_msg)
                 local_uo.log.error(err_msg)
+        except urllib.error.URLError as e:
+            err_msg=ERROR_CODE_DICT['ERR_NO_IMAGE_SOURCE']
+            local_uo.log.error(err_msg)
+            logger.print_on_console(err_msg)
+        except FileNotFoundError as e:
+            err_msg=ERROR_CODE_DICT['ERR_NO_IMAGE_SOURCE']
+            local_uo.log.error(err_msg)
+            logger.print_on_console(err_msg)
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
         return status,methodoutput,output,err_msg
@@ -988,12 +1020,35 @@ class UtilWebKeywords:
             from PIL import Image
             if webelement!=None and webelement !='':
                 img_src = webelement.get_attribute("src")
+                # if file path passed as network location in src attribute
+                if "file:" in img_src:
+                    server_url = img_src.split(":")[1].replace("\\", "/")
+                    file_name = server_url.split("/")[-1]
+                    server_url = server_url.split("/")
+                    server_path = "//"
+                    for element in server_url[:-1]:
+                        if element != '':
+                            server_path += element + "/"
+                    img_src = os.path.normpath(server_path) + os.sep
+                    img_src = "file:" + img_src + file_name
                 file1 = io.BytesIO(urllib.request.urlopen(img_src).read())
                 file2=input[0]
                 local_uo.log.info(INPUT_IS)
                 local_uo.log.info(file2)
-                if file1 != None and file2 != None and  file2 != '' and os.path.exists(file2) :
+                if file1 != None and file2 != None and  file2 != '':
                     local_uo.log.debug('comparing the images')
+                    # if file path passed as network location
+                    if "file:" in file2:
+                        server_url = file2.split(":")[1].replace("\\", "/")
+                        file_name = server_url.split("/")[-1]
+                        server_url = server_url.split("/")
+                        server_path = "//"
+                        for element in server_url[:-1]:
+                            if element != '':
+                                server_path += element + "/"
+                        img_src = os.path.normpath(server_path) + os.sep
+                        img_src = "file:" + img_src + file_name
+                        file2 = io.BytesIO(urllib.request.urlopen(img_src).read())
                     if self.verify_image_obj != None: #Meaning user has advanced image processing plugin
                         if self.verify_image_obj.imagecomparison(file1,file2):
                             info_msg=ERROR_CODE_DICT['MSG_IMAGE_COMPARE_PASS']
@@ -1029,6 +1084,14 @@ class UtilWebKeywords:
                 if err_msg != None:
                     logger.print_on_console(err_msg)
                     local_uo.log.error(err_msg)
+        except urllib.error.URLError as e:
+            err_msg=ERROR_CODE_DICT['ERR_NO_IMAGE_SOURCE']
+            local_uo.log.error(err_msg)
+            logger.print_on_console(err_msg)
+        except FileNotFoundError as e:
+            err_msg=ERROR_CODE_DICT['ERR_NO_IMAGE_SOURCE']
+            local_uo.log.error(err_msg)
+            logger.print_on_console(err_msg)
         except Exception as e:
             local_uo.log.error(e)
             logger.print_on_console(e)
