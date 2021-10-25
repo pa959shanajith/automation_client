@@ -205,7 +205,7 @@ class ZephyrWindow():
                             fp[modul["id"]] = parentFetchList[parid]
                         mods = self.get_modules(fp, mods)
         except Exception as eproject:
-            err_msg = 'Error while fetching testcases from Zephyr'
+            err_msg = 'Error while fetching modules from Zephyr'
             log.error(err_msg)
             logger.print_on_console(err_msg)
             log.error(eproject, exc_info=True)
