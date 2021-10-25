@@ -155,6 +155,8 @@ class DatabaseOperation():
         verb = OUTPUT_CONSTANT
         err_msg=None
         cursor = None
+        if args and isinstance(args[0],tuple):
+            args=list(args[0])
         try:
             cnxn = self.connection(dbtype, ip , port , dbName, userName , password, args)
             if cnxn is not None:
@@ -246,6 +248,8 @@ class DatabaseOperation():
         res.append(dbtype) 
         cnxn=None
         cursor=None
+        if args and isinstance(args[0],tuple):
+            args=list(args[0])
         try:
             cnxn = self.connection(dbtype, ip , port , dbName, userName , password, args)
             if cnxn is not None:
@@ -403,6 +407,8 @@ class DatabaseOperation():
         err_msg=None
         cursor=None
         sheet=None
+        if args and isinstance(args[0],tuple):
+            args=list(args[0])
         try:
             ext = self.get_ext(inp_file)
             if ext == '.xls':
@@ -644,6 +650,8 @@ class DatabaseOperation():
         verb = OUTPUT_CONSTANT
         err_msg=None
         cursor = None
+        if args and isinstance(args[0],tuple):
+            args=list(args[0])
         try:
             cnxn = self.connection(dbtype, ip , port , dbName, userName , password,args)
             if cnxn is not None:
