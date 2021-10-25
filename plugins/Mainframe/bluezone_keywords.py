@@ -119,9 +119,9 @@ class BluezoneKeywords:
                 uidchk = self.host.WaitForText(userID, (6, 20,5000))
                 if uidchk == 4:
                      self.host.Waitready(10,2000)
-                     self.host.sendkeys(password)
-                     self.host.Waitready(10,2000)
-                     self.host.sendkeys(MAINFRAME_KEY_ENTER)
+                    #  self.host.sendkeys(password)
+                    #  self.host.Waitready(10,2000)
+                    #  self.host.sendkeys(MAINFRAME_KEY_ENTER)
                      pwdchk = self.host.WaitForText(MAINFRAME_NOT_AUTHORISED, (0o2, 21,5000))
                      if pwdchk == 4:
                         self.host.Waitready(10,2000)
@@ -176,7 +176,7 @@ class BluezoneKeywords:
             log.error(err_msg)
             log.error(e)
             logger.print_on_console(err_msg)
-        return (return_value == 1),output,err_msg
+        return (return_value == 0),output,err_msg
 
     def send_value(self,text):
         #Logic to Login to Bluezone Emulator goes here
