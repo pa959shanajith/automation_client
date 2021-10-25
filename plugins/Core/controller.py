@@ -1210,6 +1210,7 @@ class Controller():
                             zephyr_projectid=zephyr_sceanrio_data['projectid']
                             zephyr_treeid=zephyr_sceanrio_data['treeid']
                             zephy_testid=zephyr_sceanrio_data['testid']
+                            zephyr_parentid=zephyr_sceanrio_data['parentid']
 
                         #Iterating through each test case in the scenario
                         for testcase in [eval(scenario[scenario_id])]:
@@ -1528,6 +1529,7 @@ class Controller():
                                 zephyr_status['testid']=zephy_testid
                                 zephyr_status['projectId']=zephyr_projectid
                                 zephyr_status['treeid']=zephyr_treeid
+                                zephyr_status['parentid']=zephyr_parentid
                                 zephyr_status['zephyr_password']=zephyr_password
                                 zephyr_status['zephyr_url']=zephyr_url
                                 zephyr_status['zephyr_username']=zephyr_username
