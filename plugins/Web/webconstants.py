@@ -57,6 +57,8 @@ if SYSTEM_OS == "Windows":
 
 SET_TEXT_SCRIPT="""arguments[0].value=arguments[1]"""
 
+SET_TEXT_SCRIPT_DIV_SPAN="""arguments[0].textContent=arguments[1]"""
+
 CLICK_RADIO_CHECKBOX="""arguments[0].click()"""
 
 CLEAR_TEXT_SCRIPT="""arguments[0].value=''"""
