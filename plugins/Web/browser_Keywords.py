@@ -1397,6 +1397,10 @@ class BrowserKeywords():
                                                                 break
                                                         ok_but.click()
                                                         time.sleep(1)
+                                                    else:
+                                                        status=TEST_RESULT_PASS
+                                                        methodoutput=TEST_RESULT_TRUE
+                                                        local_bk.log.info('File has been saved')
                                                 else:
                                                     status=TEST_RESULT_PASS
                                                     methodoutput=TEST_RESULT_TRUE

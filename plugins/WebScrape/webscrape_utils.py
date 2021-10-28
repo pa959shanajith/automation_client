@@ -49,6 +49,7 @@ class WebScrape_Utils:
     """Method to take screenshot of the current web page, returns the image as a base64 string"""
     def fullpage_screenshot(self,driver, screen_shot_path):
         try:
+            log.info("Performing full page screenshot")
             total_width = driver.execute_script("return document.body.offsetWidth")
             total_height = driver.execute_script("return document.body.parentNode.scrollHeight")
             viewport_width = driver.execute_script("return window.innerWidth")
@@ -113,7 +114,7 @@ class WebScrape_Utils:
                     driver.execute_script("window.scrollTo({0}, {1})".format(rectangle[0], rectangle[1]))
                     code = '''var elems = document.body.getElementsByTagName("*"); var len = elems.length; document.body.style.removeProperty('max-width'); document.body.style.removeProperty('overflow-x'); for (var i=0;i<len;i++) { 	if (window.getComputedStyle(elems[i],null).getPropertyValue('position') == 'fixed') { 		elems[i].style.removeProperty('opacity'); 	} }'''
                     driver.execute_script(code)
-                if not os.path.exists(screen_shot_path):
+                if not os.path.exists(os.path.dirname(screen_shot_path)):
                     os.makedirs(os.path.dirname(screen_shot_path))
                 stitched_image.save(screen_shot_path)
                 with open(screen_shot_path, "rb") as f:
@@ -122,6 +123,8 @@ class WebScrape_Utils:
             else:
                 screen = driver.get_screenshot_as_base64()
         except Exception as e:
+            log.debug("Error while performing full page screenshot")
+            log.debug(e,exc_info=True)
             screen = driver.get_screenshot_as_base64()
         return screen, total_width, total_height
 
@@ -266,3 +269,25 @@ class WebScrape_Utils:
         win32gui.SetWindowPos(hwnd[winSize - 1], win32con.HWND_NOTOPMOST, 0, 0, 0, 0,
                               win32con.SWP_SHOWWINDOW + win32con.SWP_NOMOVE + win32con.SWP_NOSIZE)
         return hwnd[winSize - 1]
+
+
+# def test(a,b,part):
+#     part=2
+#     for rectangle in rectangles:
+#         driver.execute_script("window.scrollTo({0}, {1})".format(rectangle[0], rectangle[1]))
+#         file_name = "part_{0}.png".format(part)
+#         driver.get_screenshot_as_file(file_name)
+#         screenshot = Image.open(file_name)
+#         if rectangle[1] + viewport_height > total_height:
+#             offset = (rectangle[0], total_height - viewport_height)
+#         else:
+#             offset = (rectangle[0], rectangle[1])
+#         stitched_image.paste(screenshot, offset)
+#         # screenshot.close()
+#         del screenshot
+#         os.remove(file_name)
+#         part = part + 1
+#         previous = rectangle
+#         driver.execute_script("window.scrollTo({0}, {1})".format(rectangle[0], rectangle[1]))
+#         code = '''var elems = document.body.getElementsByTagName("*"); var len = elems.length; document.body.style.removeProperty('max-width'); document.body.style.removeProperty('overflow-x'); for (var i=0;i<len;i++) { 	if (window.getComputedStyle(elems[i],  null).getPropertyValue('position') == 'fixed') { 		elems[i].style.removeProperty  ('opacity'); 	} }'''
+#         driver.execute_script(code)
