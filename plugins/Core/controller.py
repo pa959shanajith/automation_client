@@ -867,7 +867,7 @@ class Controller():
             #Check for 'terminate_flag' before execution
             if not(terminate_flag):
                 if tsplist[i].testcase_num == last_tc_num:
-                    if mythread.cw.debugwindow is not None:
+                    if mythread.cw and mythread.cw.debugwindow is not None:
                         wx.CallAfter(mythread.cw.debugwindow.Show)
                     if self.runfrom_step_range_input:
                         #checks if the current step num is greater than ending range of run from step, to Run till the ending range of run from step
@@ -994,7 +994,7 @@ class Controller():
         log.info('***DEBUG STARTED***')
         logger.print_on_console('***DEBUG STARTED***')
         print('=======================================================================================================')
-        if mythread.cw.debugwindow is not None:
+        if mythread.cw and mythread.cw.debugwindow is not None:
             wx.CallAfter(mythread.cw.debugwindow.Hide)
         for testcase in scenario:
             flag,browser_type,last_tc_num,datatables,_,_=obj.parse_json(testcase)
