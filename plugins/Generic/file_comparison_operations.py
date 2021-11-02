@@ -33,7 +33,7 @@ log = logging.getLogger('file_operations_pdf.py')
 
 class TextFile:
 
-    def verify_content(self,input_path,content):
+    def verify_content(self,input_path,content,abs=False):
         """
         def : verify_content
         purpose : verifies whether the content is given text file
@@ -43,17 +43,34 @@ class TextFile:
         """
         status=False
         err_msg=None
+        log.info("Performing verifyContent for text file")
         try:
-            log.debug('Verifying content of Text file ')
-            with open(input_path) as myFile:
-                for num, line in enumerate(myFile, 1):
-                    line = line.replace('\n','')
-                    if content == line :
-                        log.info('found at line:'+str(num))
-##                        logger.print_on_console('found at line:',(num))
-                        status=True
-            if not(status):
-                err_msg=generic_constants.CONTENT_NOT_PRESENT
+            abs_flag = True if abs.lower() == 'abs' else False
+            if not abs_flag:
+                log.debug('Verifying content of Text file')
+                with open(input_path) as myFile:
+                    for num, line in enumerate(myFile, 1):
+                        line = line.replace('\n','')
+                        if content == line :
+                            log.info('found at line:'+str(num))
+    ##                        logger.print_on_console('found at line:',(num))
+                            status=True
+                if not(status):
+                    err_msg=generic_constants.CONTENT_NOT_PRESENT
+            elif abs_flag:
+                log.debug("Absolute verifyContent")
+                file_content=[]
+                with open(input_path) as myFile:
+                    for num, line in enumerate(myFile, 1):
+                        line = line.replace('\n', '')
+                        file_content.append(line)
+                full_file_content = ''.join(file_content)
+                content=content.replace("\n","")
+                del file_content
+                if full_file_content==content:
+                    log.info("Content matched")
+                    status=True
+                    del full_file_content
         except IOError:
             err_msg=constants.ERROR_CODE_DICT['ERR_FILE_NOT_ACESSIBLE']
         except Exception as e:

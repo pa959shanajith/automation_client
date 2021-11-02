@@ -204,7 +204,7 @@ class FileOperations:
             log.debug('reading the inputs')
             inputpath=inputpath.strip()
             log.debug(generic_constants.INPUT_IS+inputpath+' File name '+file_name)
-##            logger.print_on_console(generic_constants.INPUT_IS+inputpath+' File name '+file_name)
+           #logger.print_on_console(generic_constants.INPUT_IS+inputpath+' File name '+file_name)
             if not (inputpath is None and inputpath is ''):
                 rename_path=inputpath+'/'+rename_file
                 inputpath=inputpath+'/'+file_name
@@ -681,7 +681,7 @@ class FileOperations:
             output_res=OUTPUT_CONSTANT
             log.debug('reading the inputs')
             log.debug(generic_constants.INPUT_IS+inputpath+' File name '+file_name)
-##            logger.print_on_console(generic_constants.INPUT_IS+inputpath+' File name '+file_name)
+            #logger.print_on_console(generic_constants.INPUT_IS+inputpath+' File name '+file_name)
             if not (input is None and input is ''):
                 if os.path.isfile(inputpath+'/'+file_name):
                     log.debug('removing the file')
