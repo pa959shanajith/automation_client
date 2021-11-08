@@ -304,6 +304,9 @@ class BrowserKeywords():
                 url = url.strip()
                 if url[0:7].lower()!='http://' and url[0:8].lower()!='https://' and url[0:5].lower()!='file:':
                     url='http://'+url
+                if (isinstance(local_bk.driver_obj,webdriver.Firefox)) and url[0:5].lower() == 'file:' and url[0:10].count("/") != 5:
+                    url = url.split(":")
+                    url = url[0] + ":" + "///" + url[1]
                 local_bk.driver_obj.get(url)
                 #ignore certificate implementation
                 try:
