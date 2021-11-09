@@ -61,8 +61,8 @@ class TextFile:
             elif abs:
                 log.debug("Absolute verifyContent")
                 file_content=[]
-                with open(input_path) as myFile:
-                    for num, line in enumerate(myFile, 1):
+                with open(input_path) as my_file:
+                    for num, line in enumerate(my_file, 1):
                         line = line.replace('\n', '')
                         file_content.append(line)
                 full_file_content = ''.join(file_content)
@@ -72,6 +72,8 @@ class TextFile:
                     log.info("Content matched")
                     status=True
                     del full_file_content
+                if not status:
+                    err_msg = generic_constants.CONTENT_NOT_PRESENT
         except IOError:
             err_msg=constants.ERROR_CODE_DICT['ERR_FILE_NOT_ACESSIBLE']
         except Exception as e:
