@@ -138,7 +138,8 @@ class InstallAndLaunch():
                     if self.start_server():
                         if device_name == 'wifi':
                             device_name = device_keywords_object.wifi_connect()
-                        if device_name != '':
+                        result_cdd=self.check_device_details(device_name,platform_version)
+                        if device_name != '' and result_cdd==TEST_RESULT_TRUE:
                             activityName = device_keywords_object.activity_name(apk_path)
                             packageName = device_keywords_object.package_name(apk_path)
                             logger.print_on_console("Connected device name:",device_name)
@@ -172,6 +173,9 @@ class InstallAndLaunch():
                         return None
                 except Exception as e:
                     self.print_error("Not able to install or launch application")
+                    # temp_res=device_keywords_object.get_device_list('')
+                    # if device_name not in temp_res[2]:
+                    #     self.print_error("Please provide valid Device ID")
                     log.error(e,exc_info=True)
                     driver = None
                     device_id = None
@@ -182,6 +186,30 @@ class InstallAndLaunch():
             device_id = None
         return driver
 
+    def check_device_details(self,dv_name,platform_ver):
+        res_1=TEST_RESULT_TRUE
+        res_2=TEST_RESULT_FALSE
+        res=TEST_RESULT_FALSE
+        try:
+            temp_res=device_keywords_object.get_device_list('')
+            if dv_name not in temp_res[2]:
+                self.print_error("Please provide valid Device ID")
+                res_1=TEST_RESULT_FALSE
+            if platform_ver!='' and res_1==TEST_RESULT_TRUE:
+                adb=os.environ['ANDROID_HOME']+"\\platform-tools\\adb.exe"
+                if dv_name is not None:
+                    cmd = adb + ' -s '+ dv_name+' shell getprop ro.build.version.release '
+                s = subprocess.check_output(cmd.split(),universal_newlines=True).strip()
+                if s==platform_ver:
+                    res_2=TEST_RESULT_TRUE
+                else:
+                    self.print_error("Please provide valid Platform version")
+            if res_1==TEST_RESULT_TRUE and res_2==TEST_RESULT_TRUE:
+                res=TEST_RESULT_TRUE
+        except Exception as e:
+            self.print_error("Not able to check device details")
+            log.error(e,exc_info=True)
+        return res
 
     def scrape(self):
         if driver is not None:
