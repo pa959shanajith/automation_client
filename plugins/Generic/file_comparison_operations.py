@@ -43,10 +43,11 @@ class TextFile:
         """
         status=False
         err_msg=None
-        log.info("Performing verifyContent for text file")
         try:
-            abs_flag = True if abs.lower() == 'abs' else False
-            if not abs_flag:
+            if not isinstance(abs,bool):
+                if abs.lower()=='abs':abs=True
+                else: abs=False
+            if not abs:
                 log.debug('Verifying content of Text file')
                 with open(input_path) as myFile:
                     for num, line in enumerate(myFile, 1):
@@ -57,7 +58,7 @@ class TextFile:
                             status=True
                 if not(status):
                     err_msg=generic_constants.CONTENT_NOT_PRESENT
-            elif abs_flag:
+            elif abs:
                 log.debug("Absolute verifyContent")
                 file_content=[]
                 with open(input_path) as myFile:
