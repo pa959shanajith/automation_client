@@ -1397,12 +1397,19 @@ class BrowserKeywords():
                                                                 break
                                                         ok_but.click()
                                                         time.sleep(1)
+                                                    else:
+                                                        status=TEST_RESULT_PASS
+                                                        methodoutput=TEST_RESULT_TRUE
+                                                        local_bk.log.info('File has been saved')
                                                 else:
                                                     status=TEST_RESULT_PASS
                                                     methodoutput=TEST_RESULT_TRUE
                                                     local_bk.log.info('File has been saved')
                                         else: brute_logic = True
-                                    else: brute_logic = True
+                                    else:
+                                        status=TEST_RESULT_PASS
+                                        methodoutput=TEST_RESULT_TRUE
+                                        local_bk.log.info('File has been saved')
                             except Exception as e:
                                 err_msg = EXCEPTION_OCCURED + " in method 1"
                                 logger.print_on_console(err_msg)

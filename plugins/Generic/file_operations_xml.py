@@ -716,7 +716,7 @@ class FileOperationsXml:
         """
         out = None
         try:
-            out = main.diff_texts(xml_input1, xml_input2, diff_options={'fast_match': False}, formatter=formatting.XMLFormatter(normalize=formatting.WS_BOTH)).split("\n")
+            out = main.diff_texts(xml_input1, xml_input2, diff_options={'fast_match': True,'ratio_mode':'accurate'}, formatter=formatting.XMLFormatter(normalize=formatting.WS_BOTH)).split("\n")
         except Exception as e:
             log.debug("Could not found the difference in XML content", e)
         return out

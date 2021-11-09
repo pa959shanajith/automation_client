@@ -129,33 +129,6 @@ class ElementOperations:
         self.utilities_obj.cleardata()
         return status,methodoutput,output_res,err_msg
 
-    def verifyelementexists(self,acc):
-        status = TEST_RESULT_FAIL
-        methodoutput = TEST_RESULT_FALSE
-        output_res = OUTPUT_CONSTANT
-        err_msg = None
-        try:
-            #gets the entire context information
-            curaccinfo = acc.getAccessibleContextInfo()
-            log.debug('Received Object Context',DEF_VERIFYEXISTS)
-            if('showing' in curaccinfo.states and 'visible' in curaccinfo.states):
-                methodoutput = TEST_RESULT_TRUE
-                status = TEST_RESULT_PASS
-            else:
-                err_msg = MSG_HIDDEN_OBJECT
-                log.debug('%s',DEF_VERIFYEXISTS,MSG_HIDDEN_OBJECT)
-                logger.print_on_console(MSG_HIDDEN_OBJECT)
-        except Exception as e:
-            self.utilities_obj.cleardata()
-            err_msg = ERROR_CODE_DICT['err_verify_element_exists']
-            logger.print_on_console(err_msg)
-            log.error(err_msg)
-            log.debug('%s',DEF_VERIFYEXISTS,e)
-            log.debug('Status %s',DEF_VERIFYEXISTS,status)
-        log.debug('Status %s',DEF_VERIFYEXISTS,status)
-        log.debug('Verify Element Exists Response %s',DEF_VERIFYEXISTS,str(methodoutput))
-        return status,methodoutput,output_res,err_msg
-
     #Method to verify element text of the given Object location matches with the User Provided Text
     def verifyelementtext(self,acc):
         status = TEST_RESULT_FAIL

@@ -108,7 +108,6 @@ class OebsDispatcher:
                             'verifyelementtext' : self.elementsops_obj.verifyelementtext,
                             'getelementtext'  : self.elementsops_obj.getelementtext,
                             'clickelement':self.elementsops_obj.clickelement,
-                            'verifyelementexists':self.elementsops_obj.verifyelementexists,
 
 
                             'selectmultiplevaluesbytext':self.dropdownlistboxops_obj.selectmultiplevaluesbytext,
