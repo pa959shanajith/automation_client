@@ -173,9 +173,6 @@ class InstallAndLaunch():
                         return None
                 except Exception as e:
                     self.print_error("Not able to install or launch application")
-                    # temp_res=device_keywords_object.get_device_list('')
-                    # if device_name not in temp_res[2]:
-                    #     self.print_error("Please provide valid Device ID")
                     log.error(e,exc_info=True)
                     driver = None
                     device_id = None

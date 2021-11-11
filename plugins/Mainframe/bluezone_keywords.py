@@ -330,9 +330,7 @@ class BluezoneKeywords:
             file_status =  self.host.WaitForText((job_path), (8, 11, 5000))
             jobno = None
             temp_file_status = self.host.ReadScreen(buffer_var,len(job_path)+3,8,11)
-            # if file_status== 4 or file_status== True:
             if temp_file_status[1].strip().lower()==job_path or file_status== True:
-                logger.print_on_console("inside file_status check")
                 self.host.Setcursor(8,2)
                 self.host.SendKeys(MAINFRAME_KEY_V)
                 self.host.WaitReady(10,1000)
@@ -346,7 +344,6 @@ class BluezoneKeywords:
                 jobname = self.host.ReadScreen(buffer_var,8,6,12)
                 self.host.WaitReady(10,1000)
                 if jobname[1].strip().lower() == member_name:
-                    logger.print_on_console("inside jobname == member_name check")
                     self.host.SendKeys(MAINFRAME_KEY_T)
                     self.host.WaitReady(5,100)
                     self.host.SendKeys(MAINFRAME_KEY_T)
@@ -780,7 +777,7 @@ class BluezoneAPIKeywords:
         output=None
         return_value = None
         try:
-            data = dataTransmitter("setcursor", 4, 15)
+            data = dataTransmitter("setcursor", 4, 14)
             stat = data["stat"]
             if stat == 0:
                 dataTransmitter("sendvalue", [MAINFRAME_KEY_3_4, MAINFRAME_KEY_ENTER, MAINFRAME_KEY_T,
@@ -788,13 +785,12 @@ class BluezoneAPIKeywords:
                 file_status = dataTransmitter("waitfortext", job_path, 8, 11, 5)
                 jobno = None
                 temp_file_status = dataTransmitter("gettext", len(job_path)+3, 8, 11)
-                # if file_status["stat"] != 4:
-                if file_status["stat"] != 4 or temp_file_status[1].strip().lower()==job_path:
+                if file_status["stat"] != 4 or temp_file_status['res'].strip().lower()==job_path:
                     dataTransmitter("setcursor", 8, 2)
                     dataTransmitter("sendvalue", [MAINFRAME_KEY_V, MAINFRAME_KEY_ENTER, MAINFRAME_KEY_f,
                         member_name,MAINFRAME_KEY_ENTER])
                     jobname = dataTransmitter("gettext", 8, 6, 12)
-                    if jobname["ret"] == member_name:
+                    if jobname['res'].strip().lower() == member_name:
                         dataTransmitter("sendvalue", [MAINFRAME_KEY_T, MAINFRAME_KEY_T, MAINFRAME_KEY_SUB,
                             MAINFRAME_KEY_ENTER])
                         resultCode = dataTransmitter("waitfortext", MAINFRAME_KEY_IKJ, 1, 1, 2)
@@ -803,7 +799,7 @@ class BluezoneAPIKeywords:
                         else:
                             jobno = dataTransmitter("gettext", 8, 1, 25)
                             dataTransmitter("sendvalue", MAINFRAME_KEY_ENTER)
-                        jobno = jobno["ret"]
+                        jobno = jobno["res"]
                         log.debug('Job Number: ' + str(jobno))
                         return_value = 0
                         output = jobno
