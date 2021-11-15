@@ -2028,7 +2028,7 @@ def kill_process():
                 adb=os.environ['ANDROID_HOME']+"\\platform-tools\\adb.exe"
                 cmd = adb + ' -s '+ browser_Keywords_MW.device_id +' shell pm clear com.android.chrome '
                 s = subprocess.check_output(cmd.split(),universal_newlines=True).strip()
-                if (browser_Keywords_MW.driver_obj):
+                if (browser_Keywords_MW.driver_obj) and s =='Success':
                     browser_Keywords_MW.driver_obj = None
         except ImportError:pass
         except Exception as e:
