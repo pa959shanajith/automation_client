@@ -135,10 +135,11 @@ class InstallAndLaunch():
                     if p[1] == 4723 and driver is not None:
                         return driver
                 try:
+                    result_cdd=TEST_RESULT_FALSE
                     if self.start_server():
                         if device_name == 'wifi':
                             device_name = device_keywords_object.wifi_connect()
-                        result_cdd=self.check_device_details(device_name,platform_version)
+                        result_cdd=self.check_device_details(device_name,platform_version) if platform_version!=None else TEST_RESULT_TRUE
                         if device_name != '' and result_cdd==TEST_RESULT_TRUE:
                             activityName = device_keywords_object.activity_name(apk_path)
                             packageName = device_keywords_object.package_name(apk_path)
