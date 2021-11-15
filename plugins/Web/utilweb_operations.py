@@ -797,12 +797,26 @@ class UtilWebKeywords:
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
                     else:
-                        from selenium.webdriver.common.action_chains import ActionChains
-                        action_obj=ActionChains(browser_Keywords.local_bk.driver_obj)
-                        action_obj.context_click(webelement).perform()
-                        local_uo.log.debug('Performed Right click')
-                        status=TEST_RESULT_PASS
-                        methodoutput=TEST_RESULT_TRUE
+                        if args[0][0]=='' or args[0][0]=='0':
+                            local_uo.log.debug('Performing first type of Right click')
+                            from selenium.webdriver.common.action_chains import ActionChains
+                            action_obj=ActionChains(browser_Keywords.local_bk.driver_obj)
+                            action_obj.context_click(webelement).perform()
+                            local_uo.log.debug('Performed Right click')
+                            status=TEST_RESULT_PASS
+                            methodoutput=TEST_RESULT_TRUE
+                        elif args[0][0] != '' and args[0][0] == '1':
+                            local_uo.log.debug('Performing second type of Right click')
+                            from selenium.webdriver.common.keys import Keys
+                            # focus on the element
+                            browser_Keywords.local_bk.driver_obj.execute_script("""arguments[0].focus();""", webelement)
+                            # send keys
+                            webelement.send_keys(Keys.SHIFT+Keys.F10)
+                            local_uo.log.debug('Performed second type Right click')
+                            status = TEST_RESULT_PASS
+                            methodoutput = TEST_RESULT_TRUE
+                        else:
+                            err_msg = "Please provide Valid input"
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
         return status,methodoutput,output,err_msg
