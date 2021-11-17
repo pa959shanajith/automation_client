@@ -594,21 +594,37 @@ class UtilWebKeywords:
                     if isinstance(browser_Keywords.local_bk.driver_obj,webdriver.Firefox):
                         #Scroll happens only if webelement is not displayed on screen.
                         if not self.is_inView(webelement):
-                            browser_Keywords.local_bk.driver_obj.execute_script("arguments[0].scrollIntoView(true);", webelement)
-                            location=obj.get_element_location(webelement)
+                            # Scroll till the element is in the middle
+                            desired_y_cor = (webelement.size['height'] / 2) + webelement.location['y']
+                            current_y_cor = (browser_Keywords.local_bk.driver_obj.execute_script('return window.innerHeight') / 2) + browser_Keywords.local_bk.driver_obj.execute_script('return window.pageYOffset')
+                            scroll_y_cor_by = desired_y_cor - current_y_cor
+                            browser_Keywords.local_bk.driver_obj.execute_script("window.scrollBy(0, arguments[0]);", scroll_y_cor_by)
+                            page_yoffset = browser_Keywords.local_bk.driver_obj.execute_script('return window.pageYOffset')
+                            location['y'] = location['y'] - page_yoffset
+                        elif self.is_inView(webelement):
+                            page_yoffset = browser_Keywords.local_bk.driver_obj.execute_script('return window.pageYOffset')
+                            location['y'] = location['y'] - page_yoffset
                         javascript = "return window.mozInnerScreenY"
                         value=browser_Keywords.local_bk.driver_obj.execute_script(javascript)
                         offset=int(value)
                         robot=pyrobot.Robot()
-                        robot.set_mouse_pos(int(location.get('x')+18),int(location.get('y')+offset+18))
+                        robot.set_mouse_pos(int(location.get('x')+18),int(location.get('y')+offset+10))
                         local_uo.log.debug('hover performed')
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
                     else:
                         #Scroll happens only if webelement is not displayed on screen.
                         if not self.is_inView(webelement):
-                            browser_Keywords.local_bk.driver_obj.execute_script("arguments[0].scrollIntoView(true);", webelement)
-                            location=obj.get_element_location(webelement)
+                            # Scroll till the element is in the middle
+                            desired_y_cor = (webelement.size['height'] / 2) + webelement.location['y']
+                            current_y_cor = (browser_Keywords.local_bk.driver_obj.execute_script('return window.innerHeight') / 2) + browser_Keywords.local_bk.driver_obj.execute_script('return window.pageYOffset')
+                            scroll_y_cor_by = desired_y_cor - current_y_cor
+                            browser_Keywords.local_bk.driver_obj.execute_script("window.scrollBy(0, arguments[0]);", scroll_y_cor_by)
+                            page_yoffset = browser_Keywords.local_bk.driver_obj.execute_script('return window.pageYOffset')
+                            location['y'] = location['y'] - page_yoffset
+                        elif self.is_inView(webelement):
+                            page_yoffset = browser_Keywords.local_bk.driver_obj.execute_script('return window.pageYOffset')
+                            location['y'] = location['y'] - page_yoffset
                         offset = browser_Keywords.local_bk.driver_obj.execute_script("return window.outerHeight - window.innerHeight;")
                         obj.mouse_move(int(location.get('x'))+9,int(location.get('y')+offset))
                         local_uo.log.debug('hover performed')
