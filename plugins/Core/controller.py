@@ -1655,68 +1655,72 @@ class Controller():
         inpval=[]
         keyword_flag=True
         ignore_stat=False
-        path_file=os.environ['AVO_ASSURE_HOME']+os.sep+'output'
-        os.chdir(path_file)
-        f=open("step_result.txt","w")
-        f.writelines(str(step_results))
-        list_time=step_results[-1]
-        del step_results[-1]
-        list_time=eval(list_time)
-        format_time='%Y-%m-%d %H:%M:%S.%f'
-        for i in step_results:
-            self.scenario_start_time=datetime.strptime(list_time[idx_t], format_time)
-            status_percentage = {TEST_RESULT_PASS:0,TEST_RESULT_FAIL:0,TERMINATE:0,"total":0}
-            pass_val=fail_val=0
-            obj_reporting.report_string=[]
-            obj_reporting.overallstatus_array=[]
-            obj_reporting.overallstatus=TEST_RESULT_PASS
-            obj_reporting.report_json[ROWS]=obj_reporting.report_string
-            obj_reporting.report_json[OVERALLSTATUS]=obj_reporting.overallstatus_array
-            tc_aws=aws_tsp[sc_idx]
-            os.chdir(self.cur_dir)
-            filename='Scenario'+str(sc_idx+1)+'.json'
-            for tsp in tc_aws:
-                if tsp.name=='LaunchApplication':
-                    inpval = tsp.inputval[0].split(';')
-                    result=['Pass',True,'9cc33d6fe25973868b30f4439f09901a',None]
-                    self.status=result[0]
-                    if result[0]=='Pass':
-                        pass_val+=1
-                        status_percentage["total"]+=1
+        try:
+            path_file=os.environ['AVO_ASSURE_HOME']+os.sep+'output'
+            os.chdir(path_file)
+            f=open("step_result.txt","w")
+            f.writelines(str(step_results))
+            list_time=step_results[-1]
+            del step_results[-1]
+            list_time=eval(list_time)
+            format_time='%Y-%m-%d %H:%M:%S.%f'
+            for i in step_results:
+                self.scenario_start_time=datetime.strptime(list_time[idx_t], format_time)
+                status_percentage = {TEST_RESULT_PASS:0,TEST_RESULT_FAIL:0,TERMINATE:0,"total":0}
+                pass_val=fail_val=0
+                obj_reporting.report_string=[]
+                obj_reporting.overallstatus_array=[]
+                obj_reporting.overallstatus=TEST_RESULT_PASS
+                obj_reporting.report_json[ROWS]=obj_reporting.report_string
+                obj_reporting.report_json[OVERALLSTATUS]=obj_reporting.overallstatus_array
+                tc_aws=aws_tsp[sc_idx]
+                os.chdir(self.cur_dir)
+                filename='Scenario'+str(sc_idx+1)+'.json'
+                for tsp in tc_aws:
+                    if tsp.name=='launchApplication':
+                        inpval = tsp.inputval[0].split(';')
+                        result=['Pass',True,'9cc33d6fe25973868b30f4439f09901a',None]
+                        self.status=result[0]
+                        if result[0]=='Pass':
+                            pass_val+=1
+                            status_percentage["total"]+=1
+                        else:
+                            fail_val+=1
+                            status_percentage["total"]+=1
+                        ellapsed_time=''
+                        obj_reporting.generate_report_step(tsp,self.status,self,ellapsed_time,keyword_flag,result,ignore_stat,inpval)
+                        continue
                     else:
-                        fail_val+=1
-                        status_percentage["total"]+=1
-                    ellapsed_time=''
-                    obj_reporting.generate_report_step(tsp,self.status,self,ellapsed_time,keyword_flag,result,ignore_stat,inpval)
-                    continue
-                else:
-                    self.status=i[str(tsp.stepnum)][0]
-                    if self.status=='Pass':
-                        pass_val+=1
-                        status_percentage["total"]+=1
-                    elif self.status=='Fail':
-                        fail_val+=1
-                        status_percentage["total"]+=1
-                        obj_reporting.overallstatus=self.status
-                    inpval = tsp.inputval[0].split(';')
-                    result=i[str(tsp.stepnum)]
-                    ellapsed_time=''
-                    obj_reporting.generate_report_step(tsp,self.status,self,ellapsed_time,keyword_flag,result,ignore_stat,inpval)
-                    continue
-            self.scenario_end_time=datetime.strptime(list_time[idx_t+1], format_time)
-            self.scenario_ellapsed_time=self.scenario_end_time-self.scenario_start_time
-            obj_reporting.build_overallstatus(self.scenario_start_time,self.scenario_end_time,self.scenario_ellapsed_time)
-            status_percentage[TEST_RESULT_PASS]=pass_val
-            status_percentage[TEST_RESULT_FAIL]=fail_val
-            status_percentage["s_index"]=suite_idx-1
-            status_percentage["index"]=sc_idx
-            obj_reporting.user_termination=manual_terminate_flag
-            obj_reporting.save_report_json(filename,json_data,status_percentage)
-            execute_result_data["scenarioId"]=aws_scenario[sc_idx]
-            execute_result_data["reportData"] = obj_reporting.report_json
-            socketIO.emit('result_executeTestSuite', execute_result_data)
-            sc_idx+=1
-            idx_t+=1
+                        self.status=i[str(tsp.stepnum)][0]
+                        if self.status=='Pass':
+                            pass_val+=1
+                            status_percentage["total"]+=1
+                        elif self.status=='Fail':
+                            fail_val+=1
+                            status_percentage["total"]+=1
+                            obj_reporting.overallstatus=self.status
+                        inpval = tsp.inputval[0].split(';')
+                        result=i[str(tsp.stepnum)]
+                        ellapsed_time=''
+                        obj_reporting.generate_report_step(tsp,self.status,self,ellapsed_time,keyword_flag,result,ignore_stat,inpval)
+                        continue
+                self.scenario_end_time=datetime.strptime(list_time[idx_t+1], format_time)
+                self.scenario_ellapsed_time=self.scenario_end_time-self.scenario_start_time
+                obj_reporting.build_overallstatus(self.scenario_start_time,self.scenario_end_time,self.scenario_ellapsed_time)
+                status_percentage[TEST_RESULT_PASS]=pass_val
+                status_percentage[TEST_RESULT_FAIL]=fail_val
+                status_percentage["s_index"]=suite_idx-1
+                status_percentage["index"]=sc_idx
+                obj_reporting.user_termination=manual_terminate_flag
+                obj_reporting.save_report_json(filename,json_data,status_percentage)
+                execute_result_data["scenarioId"]=aws_scenario[sc_idx]
+                execute_result_data["reportData"] = obj_reporting.report_json
+                socketIO.emit('result_executeTestSuite', execute_result_data)
+                sc_idx+=1
+                idx_t+=1
+        except Exception as e:
+            logger.print_on_console("Exception in aws_report")
+            log.error("Exception in aws_report. Error: " + str(e))
 
     def invoke_controller(self,action,mythread,debug_mode,runfrom_step,json_data,root_obj,socketIO,qc_soc,qtest_soc,zephyr_soc,*args):
         status = COMPLETED
@@ -2021,7 +2025,10 @@ def kill_process():
             import browser_Keywords_MW
             del browser_Keywords_MW.drivermap[:]
             if hasattr(browser_Keywords_MW, 'driver_obj'):
-                if (browser_Keywords_MW.driver_obj):
+                adb=os.environ['ANDROID_HOME']+"\\platform-tools\\adb.exe"
+                cmd = adb + ' -s '+ browser_Keywords_MW.device_id +' shell pm clear com.android.chrome '
+                s = subprocess.check_output(cmd.split(),universal_newlines=True).strip()
+                if (browser_Keywords_MW.driver_obj) and s =='Success':
                     browser_Keywords_MW.driver_obj = None
         except ImportError:pass
         except Exception as e:
