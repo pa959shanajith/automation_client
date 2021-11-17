@@ -1280,7 +1280,7 @@ class ExcelXLSX:
             if c in string.ascii_letters:
                 num = num * 26 + (ord(c.upper()) - ord('A')) + 1
         return num
-    def get_linenumber_xlsx(self,input_path,sheetname,content):
+    def get_linenumber_xlsx(self,input_path,sheetname,content,abs_flag=False):
         """
         def : get_linenumber_xlsx
         purpose : get the line number where content is present in given .xlsx file
@@ -1297,13 +1297,27 @@ class ExcelXLSX:
             sheet = book.get_sheet_by_name(sheetname)
             i=0
             value=[]
-            for row in sheet.iter_rows():
-                i+=1
-                for cell in row:
-                    if  cell.internal_value is not None and content == cell.internal_value:
-                        value.append(i)
-                        status=True
-            line_number=value
+            if not abs_flag:
+                for row in sheet.iter_rows():
+                    i+=1
+                    for cell in row:
+                        if  cell.internal_value is not None and content == cell.internal_value:
+                            value.append(i)
+                            status=True
+                line_number=value
+            else:
+                file_content=[]
+                for row in sheet.iter_rows():
+                    for cell in row:
+                        if  cell.internal_value is not None:
+                            file_content.append(cell.internal_value)
+                full_file_content=''.join(map(str,file_content))
+                del file_content
+                content=content.replace("\t","")
+                if content.replace(" ","")==full_file_content.replace(" ",""):
+                    line_number=sheet.max_row
+                    status=True
+                    del full_file_content
         except Exception as e:
            err_msg='Error getting line number in .xlsx'
            log.error(e)
@@ -1376,7 +1390,8 @@ class ExcelXLSX:
 
         """
         status=False
-        res,line_number,err_msg=self.get_linenumber_xlsx(input_path,sheetname,content)
+        abs_flag=True if args[-1].lower()=='abs' else False
+        res,line_number,err_msg=self.get_linenumber_xlsx(input_path,sheetname,content,abs_flag)
         if res and line_number != None:
             status=True
         return status,err_msg
