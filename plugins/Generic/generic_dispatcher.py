@@ -206,7 +206,7 @@ class GenericKeywordDispatcher:
                     # if(keyword == "exportdata" or keyword=="secureexportdata" or keyword == "getdata" or keyword=="securegetdata") and len(message)>7:
                     #     dataflag=True
                     #Changes for defect #983 - to resolve values of static and dynamic variables in output for this particular keyword
-                    if(keyword == "exportdata" or keyword=="secureexportdata") and (len(output)>1):
+                    if(keyword=="secureexportdata") and (len(output)>1):
                         #comment the below code for Azure Issue #22199
                         '''
                         if tsp.outputval.find(';')!=-1:
