@@ -715,8 +715,8 @@ class DatabaseOperation():
                             inp_sheet=None
                         elif len(inp_path.split(';'))==1:
                             fields=inp_path.split(";")[0]
-                            if args[1]=='':inp_sheet=None
-                            else: inp_sheet=args[1]
+                            if len(args)==1:inp_sheet=None
+                            elif len(args)==2 and args[1]!='': inp_sheet=args[1]
                     else:
                         fields = None
                         inp_sheet=None
