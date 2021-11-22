@@ -349,7 +349,7 @@ class ZephyrWindow():
             testcaseid = data["testid"]
             status_tc = data["status"]
             parentid = data["parentid"]
-            relative_path = "/execution?parentid="+str(parentid)+"&cyclephaseid="+str(cyclephaseid)+"&releaseid="+str(releaseid)
+            relative_path = "/execution?parentid="+str(parentid)+"&cyclephaseid="+str(cyclephaseid)+"&releaseid="+str(releaseid)+"&pagesize=0&isascorder=true"
             # relative_path = "/execution/user/project?cyclephaseid="+str(cyclephaseid)+"&releaseid="+str(releaseid)
             respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, verify=False,proxies=readconfig.proxies)
             if respon.status_code == 200:
