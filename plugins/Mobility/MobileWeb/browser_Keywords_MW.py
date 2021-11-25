@@ -152,7 +152,8 @@ class BrowserKeywords():
                     result = webconstants_MW.TEST_RESULT_TRUE
                     status = webconstants_MW.TEST_RESULT_PASS
             else:
-                if driver_obj is not None:
+                res_cb=self.check_browser_active(inputs)
+                if driver_obj is not None and res_cb==webconstants_MW.TEST_RESULT_TRUE:
                     result = webconstants_MW.TEST_RESULT_TRUE
                     status = webconstants_MW.TEST_RESULT_PASS
                     return status, result, output, err_msg
@@ -162,7 +163,8 @@ class BrowserKeywords():
                     device_id = input_list[0]
                     if device_id == 'wifi':
                         device_id=device_object.wifi_connect()
-                    if device_id != '':
+                    result_cdd=self.check_device_details(device_id,input_list[1]) if input_list[1]!=None else webconstants_MW.TEST_RESULT_TRUE
+                    if device_id != '' and result_cdd==webconstants_MW.TEST_RESULT_TRUE:
                         self.start_server()
                         obj = Singleton_DriverUtil()
                         # Logic to make sure that logic of usage of existing driver is not applicable to execution
@@ -211,8 +213,6 @@ class BrowserKeywords():
                                 driver_obj.switch_to.window(driver_handles[0])
                         result = webconstants_MW.TEST_RESULT_TRUE
                         status = webconstants_MW.TEST_RESULT_PASS
-                    else:
-                        logger.print_on_console('please enter device ID')
                 else:
                     logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
         except Exception as e:
@@ -229,6 +229,48 @@ class BrowserKeywords():
             log.error(err_msg)
         return status, result, output, err_msg
 
+    def check_browser_active(self, inputs):
+        res=webconstants_MW.TEST_RESULT_FALSE
+        dv_name=inputs[0]
+        try:
+            adb=os.environ['ANDROID_HOME']+"\\platform-tools\\adb.exe"
+            if dv_name is not None:
+                cmd = adb + ' -s '+ dv_name+' shell pidof com.android.chrome'
+            s = subprocess.check_output(cmd.split(),universal_newlines=True).strip()
+            if s!="":
+                res=webconstants_MW.TEST_RESULT_TRUE
+        except subprocess.CalledProcessError as esc:
+            log.error(esc)
+        except Exception as e:
+            logger.print_on_console("Not able to check browser active")
+            log.error(e,exc_info=True)
+        return res
+
+    def check_device_details(self,dv_name,platform_ver):
+        res_1=webconstants_MW.TEST_RESULT_TRUE
+        res_2=webconstants_MW.TEST_RESULT_FALSE
+        res=webconstants_MW.TEST_RESULT_FALSE
+        try:
+            device_keywords_object = device_keywords_MW.Device_Keywords()
+            temp_res=device_keywords_object.get_device_list('')
+            if dv_name not in temp_res[2]:
+                logger.print_on_console("Please provide valid Device ID")
+                res_1=webconstants_MW.TEST_RESULT_FALSE
+            if platform_ver!='' and res_1==webconstants_MW.TEST_RESULT_TRUE:
+                adb=os.environ['ANDROID_HOME']+"\\platform-tools\\adb.exe"
+                if dv_name is not None:
+                    cmd = adb + ' -s '+ dv_name+' shell getprop ro.build.version.release '
+                s = subprocess.check_output(cmd.split(),universal_newlines=True).strip()
+                if s==platform_ver:
+                    res_2=webconstants_MW.TEST_RESULT_TRUE
+                else:
+                    logger.print_on_console("Please provide valid Platform version")
+            if res_1==webconstants_MW.TEST_RESULT_TRUE and res_2==webconstants_MW.TEST_RESULT_TRUE:
+                res=webconstants_MW.TEST_RESULT_TRUE
+        except Exception as e:
+            logger.print_on_console("Not able to check device details")
+            log.error(e,exc_info=True)
+        return res
 
     def openNewTab(self ,*args):
         global driver_obj
@@ -277,7 +319,7 @@ class BrowserKeywords():
                 curHandle=driver_obj.current_window_handle
             except Exception as e:
                 log.error(e)
-                rev_recent_handles=list(recent_handles)
+                rev_recent_handles=list(self.recent_handles)
                 rev_recent_handles.reverse()
                 for h in rev_recent_handles:
                     try:
@@ -548,13 +590,13 @@ class BrowserKeywords():
             else:
                 android_home = os.environ['ANDROID_HOME']
                 if android_home is not None:
-                    cmd = android_home + '\\platform-tools\\'
-                    os.chdir(cmd)
-                    cmd = cmd + 'adb.exe shell am force-stop "com.android.chrome"'
-                    op = subprocess.check_output(cmd)
-                    driver_obj = None
-                    status=webconstants_MW.TEST_RESULT_PASS
-                    result=webconstants_MW.TEST_RESULT_TRUE
+                    adb=os.environ['ANDROID_HOME']+"\\platform-tools\\adb.exe"
+                    cmd = adb + ' -s '+ device_id +' shell pm clear com.android.chrome '
+                    s = subprocess.check_output(cmd.split(),universal_newlines=True).strip()
+                    if (driver_obj) and s =='Success':
+                        driver_obj = None
+                        status=webconstants_MW.TEST_RESULT_PASS
+                        result=webconstants_MW.TEST_RESULT_TRUE
                 else:
                     err_msg='NO_ANDROID_HOME'
 
