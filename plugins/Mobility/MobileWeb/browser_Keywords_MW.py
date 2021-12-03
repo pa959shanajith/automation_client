@@ -163,7 +163,7 @@ class BrowserKeywords():
                     device_id = input_list[0]
                     if device_id == 'wifi':
                         device_id=device_object.wifi_connect()
-                    result_cdd=self.check_device_details(device_id,input_list[1]) if input_list[1]!=None else webconstants_MW.TEST_RESULT_TRUE
+                    result_cdd=self.check_device_details(device_id,input_list[1])
                     if device_id != '' and result_cdd==webconstants_MW.TEST_RESULT_TRUE:
                         self.start_server()
                         obj = Singleton_DriverUtil()
