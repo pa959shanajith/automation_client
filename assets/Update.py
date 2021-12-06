@@ -96,12 +96,13 @@ class Message(wx.Frame):
         (keepGoing, skip) = self.progress.Update(taskPercent, update_msg)
 
     def ShowMessage(self,warning=None):
-        if (warning=='rollback'): dlg = wx.MessageBox("Avo Assure ICE rolled back successfully. Click 'OK' start ICE.", 'Info',wx.OK | wx.ICON_INFORMATION)
-        elif (warning and 'Error!: unable to add files to backup' in warning) : dlg = wx.MessageBox("Avo Assure ICE failed to update due to files being used by another process. Click 'OK' to start ICE.", 'Error',wx.OK | wx.ICON_EXCLAMATION)
-        elif (warning) : dlg = wx.MessageBox("Avo Assure ICE updated with warnings. Click 'OK' to start ICE.", 'Info',wx.OK | wx.ICON_INFORMATION)
-        else : dlg = wx.MessageBox("Avo Assure ICE updated successfully. Click 'OK' to start ICE.", 'Info',wx.OK | wx.ICON_INFORMATION)
-        if (dlg == 4 ):
+        if (warning=='rollback'): dlg = wx.MessageBox("Avo Assure ICE rolled back successfully. Click 'OK' start ICE.", 'Info',wx.OK | wx.ICON_INFORMATION | wx.CANCEL)
+        elif (warning and 'Error!: unable to add files to backup' in warning) : dlg = wx.MessageBox("Avo Assure ICE failed to update due to files being used by another process. Click 'OK' to start ICE.", 'Error',wx.OK | wx.ICON_EXCLAMATION | wx.CANCEL)
+        elif (warning) : dlg = wx.MessageBox("Avo Assure ICE updated with warnings. Click 'OK' to start ICE.", 'Info',wx.OK | wx.ICON_INFORMATION | wx.CANCEL)
+        else : dlg = wx.MessageBox("Avo Assure ICE updated successfully. Click 'OK' to start ICE.", 'Info',wx.OK | wx.ICON_INFORMATION | wx.CANCEL)
+        if (dlg == 4 or dlg == 16):
             self.Close()
+        return dlg
 
 class getProxy():
 
@@ -651,6 +652,7 @@ def main():
             comm_obj.percentageIncri(msg,25,"Updating...")
             comm_obj.percentageIncri(msg,30,"Creating backup.")
             err_msg = obj.create_backup()#---------------------------------->3.Create backup 'AvoAssureICE_backup' into Rollback folder
+            dlg_selected = 0
             if( not err_msg ):
                 comm_obj.percentageIncri(msg,35,"Backup created.")
                 comm_obj.percentageIncri(msg,40,"Updating...")
@@ -672,14 +674,14 @@ def main():
                     comm_obj.percentageIncri(msg,95,"Updated to latest available patch.")
                     comm_obj.percentageIncri(msg,100,"Updated...")
                     msg.destoryProgress()
-                    msg.ShowMessage(warning_msg)
+                    dlg_selected = msg.ShowMessage(warning_msg)
                 else:
                     comm_obj.percentageIncri(msg,85,"Files downloaded and extracted")
                     comm_obj.percentageIncri(msg,90,"Updating...")
                     comm_obj.percentageIncri(msg,95,"Successfully Updated!")
                     comm_obj.percentageIncri(msg,100,"Updated...")
                     msg.destoryProgress()
-                    msg.ShowMessage()
+                    dlg_selected = msg.ShowMessage()
             else:
                 comm_obj.percentageIncri(msg,50,err_msg)
                 time.sleep(2)
@@ -688,9 +690,10 @@ def main():
                 comm_obj.percentageIncri(msg,85,"Please ensure that files in Avo Assure are not being used by another process.")
                 comm_obj.percentageIncri(msg,100,"Updated Failed!")
                 msg.destoryProgress()
-                msg.ShowMessage(err_msg)
+                dlg_selected = msg.ShowMessage(err_msg)
 
-            comm_obj.restartICE(sys.argv[5])#---------------------------------->7.Restart ICE
+            if dlg_selected == 4:
+                comm_obj.restartICE(sys.argv[5])#---------------------------------->7.Restart ICE
 
         elif ( sys.argv[1] == 'ROLLBACK' ):
             print( "=>ROLLBACK selected" )
@@ -709,6 +712,7 @@ def main():
             comm_obj.close_ICE(sys.argv[4])#---------------------------------->1.Close ICE
             comm_obj.percentageIncri(msg,30,"ICE Closed.")
             comm_obj.percentageIncri(msg,35,"Rolling back changes...")
+            dlg_selected = 0
             if ( res == True ):
                 comm_obj.percentageIncri(msg,40,"Deleting old instance...")
                 obj.delete_old_instance()#---------------------------------->2.Delete old instance of Avo Assure ICE and about_manifest.json
@@ -728,14 +732,16 @@ def main():
                 comm_obj.percentageIncri(msg,95,"Successfully rolled back changes!")
                 comm_obj.percentageIncri(msg,100,"Success!")
                 msg.destoryProgress()
-                msg.ShowMessage('rollback')
+                dlg_selected = msg.ShowMessage('rollback')
             elif ( res == False ):
                 i = 35
                 while ( i >= 1 ):
                     comm_obj.percentageIncri(msg,i,"Backup not found...")
                     i = i-5
                 msg.destoryProgress()
-            comm_obj.restartICE(sys.argv[2])#---------------------------------->6.Restart ICE
+
+            if dlg_selected == 4:
+                comm_obj.restartICE(sys.argv[2])#---------------------------------->6.Restart ICE
     else:
         log.error( "Wrong values passed" )
     app.MainLoop()
