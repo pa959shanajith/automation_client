@@ -25,6 +25,7 @@ from constants import *
 import desktop_launch_keywords
 import base64
 import logger
+import wx
 ctrldownflag = False
 stopumpingmsgs = False
 
@@ -32,6 +33,7 @@ import logging
 log = logging.getLogger( 'desktop_scraping.py' )
 actualobjects = []
 allobjects = []
+click_count = 0
 class Scrape:
     def clickandadd(self, operation, wxobject):
         window_name = desktop_launch_keywords.window_name
@@ -64,6 +66,9 @@ class Scrape:
                                 return 0
                         try:
                             global allobjects
+                            if str(wxobject.backend_process).strip() == 'B':
+                                wxobject.startbutton.SetBackgroundColour(wx.Colour(211,211,211))
+                                wxobject.startbutton.Disable()
                             allobjects = self.get_all_children_caller()
                             objects = allobjects['view']
                             tempobjects = []
@@ -88,8 +93,16 @@ class Scrape:
                             disp_obj = desktop_dispatcher.DesktopDispatcher()
                             ele = disp_obj.get_desktop_element(actualelement['xpath'], actualelement['url'])
                             global actualobjects
+                            global click_count
                             if ( actualelement not in actualobjects ):#------check to remove duplicate elements
                                 actualobjects.append(actualelement)
+                            else:
+                                click_count -= 1
+
+                            if str(wxobject.backend_process).strip() == 'B':  
+                                if click_count == len(actualobjects):
+                                    wxobject.startbutton.Enable()
+                                    wxobject.startbutton.SetBackgroundColour('')
                         except Exception as e:
                             logger.print_on_console( 'Clicked option is not a part of DesktopGUI' )
                             log.error( 'Clicked option is not a part of DesktopGUI. Error msg : ', e )
@@ -162,6 +175,8 @@ class Scrape:
                                                         coordX = pos[0]
                                                         coordY = pos[1]
                                                         obj = OutlookThread(coordX, coordY, window_id)
+                                                        global click_count
+                                                        click_count += 1
                                                         return False
                             except Exception as e:
                                 log.error( 'Error occoured while performing OnMouseLeftDown function, Error Msg : ', e )
@@ -230,10 +245,12 @@ class Scrape:
                 log.error('Exception occoured when trying to perform START_CLICK_AND_ADD, Error Msg : ', exception)
         elif ( operation == 'STOPCLICKANDADD' ):
             global actualobjects
+            global click_count
             try:
-                obj_ref.StopPump()
                 allobjects = actualobjects
+                obj_ref.StopPump()
                 actualobjects = []
+                click_count = 0
             except Exception as exception:
                 logger.print_on_console ( 'Exception occoured when trying to perform STOP_CLICK_AND_ADD' )
                 log.error('Exception occoured when trying to perform STOP_CLICK_AND_ADD, Error Msg : ', exception)
