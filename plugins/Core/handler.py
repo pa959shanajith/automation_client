@@ -193,7 +193,7 @@ class Handler():
             elif 'browserType' in json_data:
                 browser_type=json_data['browserType']
             if 'datatables' in json_data:
-                datatables=json_data['datatables']
+                datatables.append(json_data['datatables'][0])
         flag=self.create_list(script,testcasename_list,extract_path,appType)
         return flag,browser_type,len(script),datatables,testcase_empty_flag,empty_testcase_names
 
