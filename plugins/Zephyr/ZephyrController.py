@@ -106,29 +106,28 @@ class ZephyrWindow():
             logger.print_on_console(err_msg)
             log.error(eproject, exc_info=True)
         return res
-   
+
     def get_cycle_phases(self,filePath):
         res = {}
         try:
             # get all cycles, phases
             releaseid = filePath["releaseId"]
-            relative_path = "/testcasetree/phases/execution/"+str(releaseid)
+            relative_path = "/cycle/release/"+str(releaseid)
             respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, verify=False,proxies=readconfig.proxies)
             if respon.status_code == 200:
                 JsonObject = respon.json()
-                # Loop through and get cycle, phase and testcases(fetch using API)
-                res = {} # {"cyclename":[{"id":"phase1"}]}
-                phaseObj = {}
                 for cycle in JsonObject:
-                    phaseObj = {}
-                    if cycle["cycleName"] in res.keys():
-                        phaseObj[cycle["tcrCatalogTree"]["id"]] = cycle["tcrCatalogTree"]["name"]
-                        res[cycle["cycleName"]].append(phaseObj)
-                    else:
-                        phaseObj[cycle["tcrCatalogTree"]["id"]] = cycle["tcrCatalogTree"]["name"]
-                        res[cycle["cycleName"]] = [phaseObj]
+                    cyclename = cycle["name"]
+                    for phase in cycle["cyclePhases"]:
+                        phaseObj={}
+                        if cyclename in res.keys():
+                            phaseObj[phase["tcrCatalogTreeId"]] = phase["name"]
+                            res[cyclename].append(phaseObj)
+                        else:
+                            phaseObj[phase["tcrCatalogTreeId"]] = phase["name"]
+                            res[cyclename] = [phaseObj]
         except Exception as eproject:
-            err_msg = 'Error while fetching cycles, phases from Zephyr'
+            err_msg = 'Error while fetching cycles from Zephyr'
             log.error(err_msg)
             logger.print_on_console(err_msg)
             log.error(eproject, exc_info=True)
@@ -140,7 +139,7 @@ class ZephyrWindow():
             # get all cycles, phases
             releaseid = filePath["releaseId"]
             mappedPhases = filePath["mappedPhases"]
-            relative_path = "/testcasetree/phases/execution/"+str(releaseid)
+            relative_path = "/cycle/release/"+str(releaseid)
             respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, verify=False,proxies=readconfig.proxies)
             if respon.status_code == 200:
                 JsonObject = respon.json()
@@ -148,39 +147,13 @@ class ZephyrWindow():
                 res = {} # {"cyclename":[{"id":"phase1"}]}
                 phaseObj = {}
                 for cycle in JsonObject:
-                    phaseObj = {}
-                    if cycle["cycleName"] in res.keys():
-                        if len(mappedPhases) > 0:
-                            treeid = cycle["tcrCatalogTree"]["id"]
-                            relative_path = "/testcase/planning/"+str(treeid)
-                            respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, verify=False,proxies=readconfig.proxies)
-                            if respon.status_code == 200:
-                                JsonObject = respon.json()
-                                # Fetch testcases
-                                if JsonObject["resultSize"] != 0:
-                                    results = JsonObject["results"]
-                                    if len(results) > 0 and 'rts' in results[0]:
-                                        phaseid = results[0]['rts']['cyclePhaseId']
-                                        if phaseid in mappedPhases:
-                                            phaseObj[cycle["tcrCatalogTree"]["id"]] = cycle["tcrCatalogTree"]["name"]
-                                            phaseObj["phaseid"] = phaseid
-                                            res[cycle["cycleName"]].append(phaseObj)
-                    else:
-                        if len(mappedPhases) > 0:
-                            treeid = cycle["tcrCatalogTree"]["id"]
-                            relative_path = "/testcase/planning/"+str(treeid)
-                            respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, verify=False,proxies=readconfig.proxies)
-                            if respon.status_code == 200:
-                                JsonObject = respon.json()
-                                # Fetch testcases
-                                if JsonObject["resultSize"] != 0:
-                                    results = JsonObject["results"]
-                                    if len(results) > 0 and 'rts' in results[0]:
-                                        phaseid = results[0]['rts']['cyclePhaseId']
-                                        if phaseid in mappedPhases:
-                                            phaseObj[cycle["tcrCatalogTree"]["id"]] = cycle["tcrCatalogTree"]["name"]
-                                            phaseObj["phaseid"] = phaseid
-                                            res[cycle["cycleName"]] = [phaseObj]
+                    for phase in cycle["cyclePhases"]:
+                        if phase["id"] in mappedPhases:
+                            phaseObj={}
+                            phaseObj[phase["tcrCatalogTreeId"]] = phase["name"]
+                            phaseObj["phaseid"] = phase["id"]
+                            if cycle["name"] in res.keys(): res[cycle["name"]].append(phaseObj)
+                            else: res[cycle["name"]] = [phaseObj]
         except Exception as eproject:
             err_msg = 'Error while fetching cycles, phases from Zephyr'
             log.error(err_msg)
@@ -229,7 +202,7 @@ class ZephyrWindow():
                         if updateflag: 
                             res["testcases"] = self.get_testcases_treeid(modul["id"], res["testcases"])
                 if updateflag: res["parentids"] = self.get_modules(filePath["parentFetchList"],[])
-            relative_path = "/testcase/planning/"+str(treeid)
+            relative_path = "/testcase/planning/"+str(treeid)+"?pagesize=0&isascorder=true"
             respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, verify=False,proxies=readconfig.proxies)
             if respon.status_code == 200:
                 JsonObject = respon.json()
@@ -264,7 +237,7 @@ class ZephyrWindow():
                 if "categories" in JsonObject and len(JsonObject["categories"]) != 0:
                     for modul in JsonObject["categories"]:
                         self.get_testcases_treeid(modul["id"], tests)
-            relative_path = "/testcase/planning/"+str(treeid)
+            relative_path = "/testcase/planning/"+str(treeid)+"?pagesize=0&isascorder=true"
             respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, verify=False,proxies=readconfig.proxies)
             if respon.status_code == 200:
                 JsonObject = respon.json()
@@ -304,7 +277,7 @@ class ZephyrWindow():
                     for modul in JsonObject["categories"]:
                         phaseObj = {modul["id"]:modul["name"]}
                         res["modules"].append(phaseObj)
-            relative_path = "/testcase/planning/"+str(treeid)
+            relative_path = "/testcase/planning/"+str(treeid)+"?pagesize=0&isascorder=true"
             respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, verify=False,proxies=readconfig.proxies)
             if respon.status_code == 200:
                 JsonObject = respon.json()
