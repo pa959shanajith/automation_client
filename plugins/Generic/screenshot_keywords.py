@@ -94,7 +94,8 @@ class Screenshot():
                 else:
                     pass #add logic for capture through driver to be added here
                 r = reportNFS().saveimage(bucketname,objpath,tempPath)
-                os.remove(tempPath)
+                if not accessibility: #add logic to clear accessibility screenshots after some time period
+                    os.remove(tempPath)
                 if r=='fail':
                     raise Exception('error while saving in reportNFS') 
                 else:
@@ -105,6 +106,7 @@ class Screenshot():
                 methodoutput=TEST_RESULT_TRUE
         except Exception as e:
             log.error(e)
+            output=OUTPUT_CONSTANT
             logger.print_on_console("Error while capturing screenshot")
             err_msg=ERROR_CODE_DICT['ERR_SCREENSHOT_PATH']
             logger.print_on_console(err_msg)
