@@ -709,11 +709,14 @@ class DatabaseOperation():
                     inp_path = self.DV.get_dynamic_value(args[0])
                     if inp_path!=None:
                         if len(inp_path.split(';'))>1:
-                            fields=inp_path.split(";")[0]
-                            inp_sheet=inp_path.split(";")[1]
-                        else:
-                            fields=inp_path.split(";")[0]
+                            # fields=inp_path.split(";")[0]
+                            # inp_sheet=inp_path.split(";")[1]
+                            fields = None
                             inp_sheet=None
+                        elif len(inp_path.split(';'))==1:
+                            fields=inp_path.split(";")[0]
+                            if len(args)==1:inp_sheet=None
+                            elif len(args)==2 and args[1]!='': inp_sheet=args[1]
                     else:
                         fields = None
                         inp_sheet=None
