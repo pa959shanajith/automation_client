@@ -466,10 +466,7 @@ class MainNamespace(BaseNamespace):
             elif str(args[0]).endswith('ipa'):
                 browsername = args[0] + ";" + args[2] + ";" + args[3]+";" + args[4]
             """
-            if SYSTEM_OS=='Darwin':
-                core_utils.get_all_the_imports('Mobility/MobileApp')
-            else:
-                core_utils.get_all_the_imports('Mobility')
+            core_utils.get_all_the_imports('Mobility')
             import mobile_app_scrape
             global mobileScrapeObj
             mobileScrapeObj=mobile_app_scrape
@@ -494,10 +491,7 @@ class MainNamespace(BaseNamespace):
             d = args[2]
             data = {}
             action = d['action']
-            if SYSTEM_OS=='Darwin':
-                core_utils.get_all_the_imports('Mobility/MobileWeb')
-            else:
-                core_utils.get_all_the_imports('Mobility')
+            core_utils.get_all_the_imports('Mobility')
             if action == 'userobject':
                 core_utils.get_all_the_imports('Mobility/MobileWeb')
                 import UserObjectScrape_MW

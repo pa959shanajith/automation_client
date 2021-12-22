@@ -1915,16 +1915,20 @@ def kill_process():
     if SYSTEM_OS == 'Darwin':
         try:
             import browser_Keywords_MW
-            browser_Keywords_MW.driver_obj.quit()
+            if browser_Keywords_MW.driver_obj != None:
+                browser_Keywords_MW.driver_obj.quit()
+                browser_Keywords_MW.driver_obj = None
         except ImportError: pass
         except Exception as e:
-            logger.print_on_console('Error in stopping scraping driver as driver is already closed')
+            logger.print_on_console('Error in stopping mobile browser driver as driver is already closed')
             log.error(e)
 
 
         try:
-            import install_and_launch
-            install_and_launch.driver.quit()
+            import android_scrapping
+            if android_scrapping.driver != None:
+                android_scrapping.driver.quit()
+                android_scrapping.driver = None
         except ImportError: pass
         except Exception as e:
             logger.print_on_console('Error in stopping application driver as driver is already closed')
@@ -1945,20 +1949,20 @@ def kill_process():
             logger.print_on_console('Exception in stopping server')
             log.error(e)
 
-        # try:
-        #     # os.system("killall -9 Safari")
-        #         # This kills all instances of safari browser even if it is not opened by Avo Assure.
-        #         # Issue when Avo Assure is opened in Safari browser
-        #     for id in process_ids:
-        #         os.system("killall -9 " + str(id))
-        #     # os.system("killall -9 safaridriver")
-        #     # os.system("killall -9 node_appium")
-        #     # os.system("killall -9 xcodebuild")
-        #     # os.system("killall -9 chromedriver")
-        #     # os.system("killall -9 geckodriver")
-        # except Exception as e:
-        #     logger.print_on_console('Exception in stopping server')
-        #     log.error(e)
+        try:
+            #os.system("killall -9 Safari")
+            ## This kills all instances of safari browser even if it is not opened by Avo Assure.
+            ## Issue when Avo Assure is opened in Safari browser
+            #for id in process_ids:
+            #    os.system("killall -9 " + str(id))
+            #os.system("killall -9 safaridriver")
+            os.system("killall -9 node_appium")
+            os.system("killall -9 xcodebuild")
+            #os.system("killall -9 chromedriver")
+            #os.system("killall -9 geckodriver")
+        except Exception as e:
+            logger.print_on_console('Exception in stopping server')
+            log.error(e)
         log.info('Stale processes killed')
         logger.print_on_console('Stale processes killed')
     elif SYSTEM_OS == 'Linux':
