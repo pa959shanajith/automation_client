@@ -629,6 +629,8 @@ class Dispatcher:
                     ## Issue #190 Driver control won't switch back to parent window
                     if local_Wd.popup_object.check_if_no_popup_exists():
                         local_Wd.browser_object.validate_current_window_handle()
+                    if driver is not None:
+                        window_handles_count_1=len(driver.window_handles)
                     if objectname=="@Object":
                         ##webelement = input[0]
                         input =input[1:]
@@ -690,8 +692,34 @@ class Dispatcher:
                       or screenShot_Flag == 'all'):
                         if browser_screenshots or headless_mode or sauceFlag:
                             if local_Wd.popup_object.check_if_no_popup_exists():
-                                file_path = screen_shot_obj.captureScreenshot(screen_details,web=True)
-                                driver.save_screenshot(file_path[2])
+                                window_handles_count_2=len(driver.window_handles)
+                                diff_whc=window_handles_count_2-window_handles_count_1
+                                if keyword.lower() in ["click","press","clickelement","mouseclick","clickiris"] and diff_whc==1:
+                                    local_Wd.log.debug("Look up window detected")  
+                                    try:
+                                        local_Wd.log.debug("checking if system is locked or not")
+                                        process_name='LogonUI.exe'
+                                        callall='TASKLIST'
+                                        import subprocess
+                                        outputall=subprocess.check_output(callall)
+                                        outputstringall=str(outputall)
+                                        if process_name in outputstringall:
+                                            logger.print_on_console("System is Locked, Taking the screenshot using Driver")
+                                            local_Wd.log.debug("System is Locked, Taking the screenshot using Driver")
+                                            file_path = screen_shot_obj.captureScreenshot(screen_details,web=True)
+                                            temp=driver.current_window_handle
+                                            driver.switch_to_window(driver.window_handles[-1]) 
+                                            driver.save_screenshot(file_path[2])
+                                            driver.switch_to_window(temp)
+                                        else: 
+                                            logger.print_on_console("System is Unlocked, Taking the screenshot using generic functions")
+                                            local_Wd.log.debug("System is Unlocked, Taking the screenshot using generic functions")
+                                            file_path = screen_shot_obj.captureScreenshot(screen_details,web=False)
+                                    except Exception as e:
+                                        local_Wd.log.error(e,exc_info=True)
+                                else:
+                                    file_path = screen_shot_obj.captureScreenshot(screen_details,web=True)
+                                    driver.save_screenshot(file_path[2])
                             elif not (headless_mode or sauceFlag):
                                 local_Wd.log.debug("Pop up exists; Taking the screenshot using generic functions")
                                 file_path = screen_shot_obj.captureScreenshot(screen_details,web=False)
