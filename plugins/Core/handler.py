@@ -194,9 +194,12 @@ class Handler():
                 browser_type=json_data['browserType']
             if 'datatables' in json_data:
                 if not len(json_data['datatables']):
+                    # when datatables values are not present
                     datatables=json_data['datatables']
                 else:
-                    datatables.append(json_data['datatables'][0])
+                    # loop through all the datatables present testcase and append to datatables
+                    for dt_index in range(len(json_data['datatables'])):
+                        datatables.append(json_data['datatables'][dt_index])
         flag=self.create_list(script,testcasename_list,extract_path,appType)
         return flag,browser_type,len(script),datatables,testcase_empty_flag,empty_testcase_names
 
