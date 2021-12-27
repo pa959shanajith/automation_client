@@ -214,14 +214,13 @@ class ZephyrWindow():
                         if 'rts' in i:
                             req_id = i['testcase']['requirementIds']
                             requirement_details = self.get_requirement_details(req_id)
-                            tc = {
+                            res["testcases"].append({
                                 'id':i['testcase']['testcaseId'],
+                                'name':i['testcase']['name'],
                                 'cyclePhaseId': i['rts']['cyclePhaseId'],
                                 'parentId': treeid,
                                 'reqdetails': requirement_details,
-                            }
-                            if 'name' in i['testcase']: tc['name']=i['testcase']['name']
-                            res["testcases"].append(tc)
+                            })
         except Exception as eproject:
             err_msg = 'Error while fetching testcases from Zephyr'
             log.error(err_msg)
@@ -291,14 +290,13 @@ class ZephyrWindow():
                             req_id = i['testcase']['requirementIds']
                             requirement_details = self.get_requirement_details(req_id)
                             if int(i['testcase']['testcaseId']) in mappedTests:
-                                tc = {
+                                res["testcases"].append({
                                     'id':i['testcase']['testcaseId'],
+                                    'name':i['testcase']['name'],
                                     'cyclePhaseId': i['rts']['cyclePhaseId'],
                                     'parentId': treeid,
                                     'reqdetails': requirement_details
-                                }
-                                if 'name' in i['testcase']: tc['name']=i['testcase']['name']
-                                res["testcases"].append(tc)
+                                })
         except Exception as eproject:
             err_msg = 'Error while fetching testcases from Zephyr'
             log.error(err_msg)
