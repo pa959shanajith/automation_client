@@ -89,7 +89,7 @@ class Clickandadd():
                     path = myipath + str(iframes) + 'i' + '/'
                     if webscrape_utils_obj.switchtoframe_webscrape(driver, currenthandle, path):
                         log.debug('switched to iframe/frame %s', path)
-                        driver.execute_script(webscrape_utils_obj.javascript_clicknadd, path)
+                        driver.execute_script(webscrape_utils_obj.javascript_clicknadd, path, browser)
                         log.debug('Start ClickAndAdd scrape operation on iframe %s is done', path)
                         callback_scrape_start_cna_iframes(path)
                         callback_scrape_start_cna_frames(path)
