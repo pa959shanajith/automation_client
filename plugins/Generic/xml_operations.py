@@ -591,9 +591,13 @@ class JSONOperations():
             if isinstance(input_string,str):
                 encoded_inp_string=input_string.encode('utf-8')
             input_json=json.loads(encoded_inp_string)
-            block=block_key_name.split('.')
+            if block_key_name != '':
+                block = block_key_name.split('.')
+            else:
+                block = []
             number=block_count.split(',')
             nested=input_json
+            i = -1
             for i in range(0,len(block)):
                 if(block[i] in nested and isinstance(nested,dict)):
                     nested=nested[block[i]]
@@ -727,9 +731,13 @@ class JSONOperations():
             input_json=json.loads(encoded_inp_string, strict=False)
             if "{" in key_value and "}" in key_value:
                 key_value = json.loads(key_value)
-            block=block_key_name.split('.')
+            if block_key_name != '':
+                block = block_key_name.split('.')
+            else:
+                block = []
             number=block_count.split(',')
             nested=input_json
+            i = -1
             for i in range(0,len(block)):
                 if(block[i] in nested and isinstance(nested,dict)):
                     nested=nested[block[i]]
