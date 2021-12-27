@@ -56,13 +56,13 @@ class ZephyrWindow():
                 encSt = base64.b64encode(userpass)
                 headersVal = {'Authorization':'Basic %s'% encSt.decode('ascii')}
                 self.headers =  headersVal
-                respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, verify=False,proxies=readconfig.proxies)
+                respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, proxies=readconfig.proxies)
                 if respon.status_code == 200:
                     JsonObject = respon.json()
                     res = [{'id':i['id'],'name':i['name']} for i in JsonObject]
             else:
                 self.headers = {'Authorization':'Bearer %s'% zephyrPayload["zephyrApiToken"]}
-                respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, verify=False,proxies=readconfig.proxies)
+                respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, proxies=readconfig.proxies)
                 if respon.status_code == 200:
                     JsonObject = respon.json()
                     res = [{'id':i['id'],'name':i['name']} for i in JsonObject]
@@ -79,7 +79,7 @@ class ZephyrWindow():
             self.zephyrURL = self.baseURL + "/flex/services/rest/latest"
 
             relative_path = "/project/lite"
-            respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, verify=False,proxies=readconfig.proxies)
+            respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, proxies=readconfig.proxies)
             if respon.status_code == 200:
                 JsonObject = respon.json()
                 res = [{'id':i['id'],'name':i['name']} for i in JsonObject]
@@ -96,7 +96,7 @@ class ZephyrWindow():
             # get all releases
             projectId = filePath["projectId"]
             relative_path = "/release/project/"+str(projectId)
-            respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, verify=False,proxies=readconfig.proxies)
+            respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, proxies=readconfig.proxies)
             if respon.status_code == 200:
                 JsonObject = respon.json()
                 res = [{'id':i['id'],'name':i['name']} for i in JsonObject]
@@ -113,7 +113,7 @@ class ZephyrWindow():
             # get all cycles, phases
             releaseid = filePath["releaseId"]
             relative_path = "/cycle/release/"+str(releaseid)
-            respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, verify=False,proxies=readconfig.proxies)
+            respon = requests.get(self.zephyrURL+relative_path, headers=self.headers,proxies=readconfig.proxies)
             if respon.status_code == 200:
                 JsonObject = respon.json()
                 for cycle in JsonObject:
@@ -140,7 +140,7 @@ class ZephyrWindow():
             releaseid = filePath["releaseId"]
             mappedPhases = filePath["mappedPhases"]
             relative_path = "/cycle/release/"+str(releaseid)
-            respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, verify=False,proxies=readconfig.proxies)
+            respon = requests.get(self.zephyrURL+relative_path, headers=self.headers,proxies=readconfig.proxies)
             if respon.status_code == 200:
                 JsonObject = respon.json()
                 # Loop through and get cycle, phase and testcases(fetch using API)
@@ -165,7 +165,7 @@ class ZephyrWindow():
         try:
             for parid in parentFetchList:
                 relative_path = "/testcasetree/"+str(parid)
-                respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, verify=False,proxies=readconfig.proxies)
+                respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, proxies=readconfig.proxies)
                 if respon.status_code == 200:
                     JsonObject = respon.json()
                     if "categories" in JsonObject and len(JsonObject["categories"]) != 0:
@@ -192,7 +192,7 @@ class ZephyrWindow():
             treeid = filePath["treeId"]
             if "updateflag" in filePath: updateflag = filePath["updateflag"]
             relative_path = "/testcasetree/"+str(treeid)
-            respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, verify=False,proxies=readconfig.proxies)
+            respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, proxies=readconfig.proxies)
             if respon.status_code == 200:
                 JsonObject = respon.json()
                 if "categories" in JsonObject and len(JsonObject["categories"]) != 0:
@@ -203,7 +203,7 @@ class ZephyrWindow():
                             res["testcases"] = self.get_testcases_treeid(modul["id"], res["testcases"])
                 if updateflag: res["parentids"] = self.get_modules(filePath["parentFetchList"],[])
             relative_path = "/testcase/planning/"+str(treeid)+"?pagesize=0&isascorder=true"
-            respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, verify=False,proxies=readconfig.proxies)
+            respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, proxies=readconfig.proxies)
             if respon.status_code == 200:
                 JsonObject = respon.json()
                 # Fetch testcases
@@ -214,13 +214,14 @@ class ZephyrWindow():
                         if 'rts' in i:
                             req_id = i['testcase']['requirementIds']
                             requirement_details = self.get_requirement_details(req_id)
-                            res["testcases"].append({
+                            tc = {
                                 'id':i['testcase']['testcaseId'],
-                                'name':i['testcase']['name'],
                                 'cyclePhaseId': i['rts']['cyclePhaseId'],
                                 'parentId': treeid,
                                 'reqdetails': requirement_details,
-                            })
+                            }
+                            if 'name' in i['testcase']: tc['name']=i['testcase']['name']
+                            res["testcases"].append(tc)
         except Exception as eproject:
             err_msg = 'Error while fetching testcases from Zephyr'
             log.error(err_msg)
@@ -231,14 +232,14 @@ class ZephyrWindow():
     def get_testcases_treeid(self, treeid, tests):
         try:
             relative_path = "/testcasetree/"+str(treeid)
-            respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, verify=False,proxies=readconfig.proxies)
+            respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, proxies=readconfig.proxies)
             if respon.status_code == 200:
                 JsonObject = respon.json()
                 if "categories" in JsonObject and len(JsonObject["categories"]) != 0:
                     for modul in JsonObject["categories"]:
                         self.get_testcases_treeid(modul["id"], tests)
             relative_path = "/testcase/planning/"+str(treeid)+"?pagesize=0&isascorder=true"
-            respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, verify=False,proxies=readconfig.proxies)
+            respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, proxies=readconfig.proxies)
             if respon.status_code == 200:
                 JsonObject = respon.json()
                 # Fetch testcases
@@ -270,7 +271,7 @@ class ZephyrWindow():
             treeid = filePath["treeId"]
             mappedTests = filePath["mappedTests"]
             relative_path = "/testcasetree/"+str(treeid)
-            respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, verify=False,proxies=readconfig.proxies)
+            respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, proxies=readconfig.proxies)
             if respon.status_code == 200:
                 JsonObject = respon.json()
                 if "categories" in JsonObject and len(JsonObject["categories"]) != 0:
@@ -278,7 +279,7 @@ class ZephyrWindow():
                         phaseObj = {modul["id"]:modul["name"]}
                         res["modules"].append(phaseObj)
             relative_path = "/testcase/planning/"+str(treeid)+"?pagesize=0&isascorder=true"
-            respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, verify=False,proxies=readconfig.proxies)
+            respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, proxies=readconfig.proxies)
             if respon.status_code == 200:
                 JsonObject = respon.json()
                 # Fetch testcases
@@ -290,13 +291,14 @@ class ZephyrWindow():
                             req_id = i['testcase']['requirementIds']
                             requirement_details = self.get_requirement_details(req_id)
                             if int(i['testcase']['testcaseId']) in mappedTests:
-                                res["testcases"].append({
+                                tc = {
                                     'id':i['testcase']['testcaseId'],
-                                    'name':i['testcase']['name'],
                                     'cyclePhaseId': i['rts']['cyclePhaseId'],
                                     'parentId': treeid,
                                     'reqdetails': requirement_details
-                                })
+                                }
+                                if 'name' in i['testcase']: tc['name']=i['testcase']['name']
+                                res["testcases"].append(tc)
         except Exception as eproject:
             err_msg = 'Error while fetching testcases from Zephyr'
             log.error(err_msg)
@@ -324,7 +326,7 @@ class ZephyrWindow():
             parentid = data["parentid"]
             relative_path = "/execution?parentid="+str(parentid)+"&cyclephaseid="+str(cyclephaseid)+"&releaseid="+str(releaseid)+"&pagesize=0&isascorder=true"
             # relative_path = "/execution/user/project?cyclephaseid="+str(cyclephaseid)+"&releaseid="+str(releaseid)
-            respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, verify=False,proxies=readconfig.proxies)
+            respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, proxies=readconfig.proxies)
             if respon.status_code == 200:
                 JsonObject = respon.json()
                 if JsonObject["resultSize"] != 0:
@@ -353,7 +355,7 @@ class ZephyrWindow():
             if len(requirementid) >=1:
                 for i in requirementid:
                     relative_path = "/requirement/"+str(i)
-                    respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, verify=False,proxies=readconfig.proxies)
+                    respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, proxies=readconfig.proxies)
                     if respon.status_code == 200:
                         JsonObject = respon.json()
                         # Fetch requirement details
