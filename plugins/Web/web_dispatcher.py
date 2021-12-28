@@ -629,8 +629,8 @@ class Dispatcher:
                     ## Issue #190 Driver control won't switch back to parent window
                     if local_Wd.popup_object.check_if_no_popup_exists():
                         local_Wd.browser_object.validate_current_window_handle()
-                    if driver is not None:
-                        window_handles_count_1=len(driver.window_handles)
+                    if driver is not None and self.action == EXECUTE and configvalues['browser_screenshots'].lower() == 'yes':
+                        window_handles_count_begin=len(driver.window_handles)
                     if objectname=="@Object":
                         ##webelement = input[0]
                         input =input[1:]
@@ -692,8 +692,8 @@ class Dispatcher:
                       or screenShot_Flag == 'all'):
                         if browser_screenshots or headless_mode or sauceFlag:
                             if local_Wd.popup_object.check_if_no_popup_exists():
-                                window_handles_count_2=len(driver.window_handles)
-                                diff_whc=window_handles_count_2-window_handles_count_1
+                                window_handles_count_end=len(driver.window_handles)
+                                diff_whc=window_handles_count_end-window_handles_count_begin
                                 if keyword.lower() in ["click","press","clickelement","mouseclick","clickiris"] and diff_whc==1:
                                     local_Wd.log.debug("Look up window detected")  
                                     try:
