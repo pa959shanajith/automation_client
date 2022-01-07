@@ -158,6 +158,7 @@ class GenericKeywordDispatcher:
             'readxml': local_generic.generic_word.readxml,
             'readpdf': local_generic.generic_word.readPdf,
             'getkeyvalue': local_generic.json_oper.get_key_value,
+            'setkeyvalue': local_generic.json_oper.set_key_value,
             'comparefiles': local_generic.generic_file_xml.compare_files,
             'beautify': local_generic.generic_file_xml.beautify_file,
             'compareinputs': local_generic.generic_file_xml.compare_inputs,
@@ -205,7 +206,7 @@ class GenericKeywordDispatcher:
                     # if(keyword == "exportdata" or keyword=="secureexportdata" or keyword == "getdata" or keyword=="securegetdata") and len(message)>7:
                     #     dataflag=True
                     #Changes for defect #983 - to resolve values of static and dynamic variables in output for this particular keyword
-                    if(keyword == "exportdata" or keyword=="secureexportdata") and (len(output)>1):
+                    if(keyword=="secureexportdata") and (len(output)>1):
                         #comment the below code for Azure Issue #22199
                         '''
                         if tsp.outputval.find(';')!=-1:
@@ -232,7 +233,7 @@ class GenericKeywordDispatcher:
                             var = str(output[0])[1:len(str(output[0]))-1]
                             output[0] = data[var][0]
                     message.extend(output)
-                if( keyword in ['exportdata','comparefiles',"comparepdfs","findimageinpdf",'beautify','compareinputs','getxmlblockdata','selectivexmlfilecompare','compxmlfilewithxmlblock','cellbycellcompare','findfilepath','selectivecellcompare'] ):
+                if( keyword in ['comparefiles',"comparepdfs","findimageinpdf",'beautify','compareinputs','getxmlblockdata','selectivexmlfilecompare','compxmlfilewithxmlblock','cellbycellcompare','findfilepath','selectivecellcompare'] ):
                     input = list(message)
                     output = tsp.outputval
                     if (str(output)==''):

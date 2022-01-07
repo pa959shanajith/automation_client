@@ -127,7 +127,10 @@ ERROR_CODE_DICT = {
     'err_found_not_visible': 'Hidden Object found, Enable Ignore Visibility Check from ICE config to use this object',
     'err_push_btn_scroll_bar': 'Push Buttons inside scroll bars can not be scraped',
     'err_scroll_in_list': 'Scroll bar inside list can not be scraped',
-    'wrn_found_not_visible': 'Hidden Object found, but Ignore Visibility Check is enabled, performing operation'
+    'wrn_found_not_visible': 'Hidden Object found, but Ignore Visibility Check is enabled, performing operation',
+    'err_object_background': 'Window containing object is not on top, can not perform operation',
+    'err_value': 'Value does not exist',
+    'err_operation_detect': 'Element clicked but operation not detected, Please use alternative keyword double click'
 
 }
 
@@ -179,7 +182,6 @@ MSG_TIME_OUT_EXCEPTION = "Timeout exception"
 
 ## Logging Related Constants FILE NAMES
 FILE_OEBSCLICKANADD = "oebsclickandadd"
-FILE_OEBSSERVER = "oebsServer"
 OEBS_TEXTOPS = "oebs_textops"
 OEBS_UTILOPS = "oebs_utilops"
 OEBS_BUTTONOPS = "oebs_buttonops"
@@ -190,14 +192,9 @@ OEBS_TABLEOPS = "oebs_tableops"
 OEBS_SCROLLBAR = "oebs_scrollbarops"
 OEBS_INTERNALFRAMEOPS = "oebs_internalframeops"
 
-# DEFINITIONS RELATED TO oebsServer
-DEF_CLICKANDADD = "clickandadd"
-DEF_WINDOWSRUN = "windowsrun"
-DEF_GETHWNDFROMWINDOWNAME = "GetHwndFromWindowName"
+# DEFINITIONS RELATED TO full scrape
 DEF_GETENTIREOBJECTLIST = "getentireobjectlist"
 DEF_ISJAVAWINDOW = "isjavawindow"
-DEF_GETOBJECTFORCUSTOM = "getobjectforcustom"
-DEF_REGISTERFUNCTIONS = "register_functions"
 
 # DEFINITIONS RELATED TO BUTTON/LINK
 DEF_GETBUTTONNAME = "getbuttonname"

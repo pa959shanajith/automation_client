@@ -13,7 +13,6 @@ import win32gui
 import win32process
 import win32con
 import win32api
-import oebsServer
 import oebs_api
 from oebs_constants import *
 import logger
@@ -90,7 +89,7 @@ class Utils:
         status=True
         try:
             self.set_to_foreground(windowname)
-            acc, visible = self.utils_obj.object_generator(windowname, objectname, 'highlight', [], '', errors = True)
+            acc, visible, active_parent = self.utils_obj.object_generator(windowname, objectname, 'highlight', [], '', errors = True)
             if not acc or (acc and str(acc) == 'fail'):
                 logger.print_on_console(ERROR_CODE_DICT['err_object_highlight'])
                 status = False
@@ -106,10 +105,9 @@ class Utils:
                     logger.print_on_console(ERROR_CODE_DICT['err_visible'])
                     status = False
                 else:
-                    rgn1=win32gui.CreateRectRgnIndirect((size[0] + 1, size[1] + 1,
-                                        size[0] + size[2] - 1, size[1] + size[3] - 1))
-                    rgn2=win32gui.CreateRectRgnIndirect((size[0] + 4, size[1] + 4,
-                                        size[0] + size[2] - 4, size[1] + size[3] - 4))
+                    rgn1=win32gui.CreateRectRgnIndirect((size[0] - 3, size[1] - 3,
+                                        size[0] + size[2] + 3, size[1] + size[3] + 3))
+                    rgn2=win32gui.CreateRectRgnIndirect((size[0], size[1], size[0] + size[2], size[1] + size[3]))
                     isjavares, hwnd = self.isjavawindow(windowname)
                     if win32gui.IsWindowVisible(hwnd) and win32gui.GetWindowText(win32gui.GetForegroundWindow()) == windowname:
 
@@ -375,7 +373,6 @@ class Utils:
 
 
     def captureScreenshot(self,applicationname):
-##        time.sleep(0.120)
         image=None
         isjavares, hwnd = self.isjavawindow(applicationname)
         window_handle=hwnd

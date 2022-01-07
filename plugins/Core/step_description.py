@@ -9,7 +9,7 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 import logger
-
+from constants import OUTPUT_CONSTANT
 class StepDescription:
 
     def generic(self,keyword,tsp,inputval,input,output,con,reporting_obj):
@@ -205,7 +205,10 @@ class StepDescription:
         def verifyvalues():
             return "Verify values '" + str(inputval[0]) + "' and '" + inputval[1]+ "' and save the result in '"+ tsp.outputval + "'."
         def capturescreenshot():
-            return 'Captured Screenshot'
+            if output == OUTPUT_CONSTANT:
+                return 'Capture Screenshot'
+            else:
+                return 'Captured Screenshot and placed in '+str(output)
         def comparecontent():
             return "Compare the contents of file '"+ str(inputval[0])+ "' and '"+ str(inputval[1])+ "'"
         def copyvalue():
@@ -244,6 +247,12 @@ class StepDescription:
             return 'Get Block Value of XML and save the value '+"'"+ output+"'"+' in '+"'" + tsp.outputval + "'"
         def gettagvalue():
             return "Get Tag Value of XML and save the value '" + output+ "' in '" + tsp.outputval + "'"
+
+        # Generic-JSON
+        def getkeyvalue():
+            return "Get the Key Value of JSON and save the value '" + output+ "' in '" + tsp.outputval + "'"
+        def setkeyvalue():
+            return "Set the Key Value of JSON and save the value '" + output+ "' in '" + tsp.outputval + "'"
 
         #DB-operations
         def getdata():

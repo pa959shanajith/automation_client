@@ -80,7 +80,7 @@ class FileOperationsXml:
                                 optFlg = True
                                 if ( elementList and output_path ):
                                     try:
-                                        if( os.path.exists(output_path) or os.path.exists(os.path.dirname(output_path)) ):
+                                        if isinstance(output_path, str) and (os.path.exists(output_path) or os.path.exists(os.path.dirname(output_path))):
                                             log.debug( "Writing the output of getXmlBlockData to file : " + str(output_path) )
                                             logger.print_on_console( "Writing the output of getXmlBlockData to file.")
                                             optFlg = False
@@ -199,7 +199,7 @@ class FileOperationsXml:
                                         elif(int(num_diff) == 0):
                                             logger.print_on_console("No Difference between files in selectiveXmlFileCompare" )
                                         if(output_path):
-                                            if( os.path.isfile(output_path) or os.path.exists(os.path.dirname(output_path)) ):
+                                            if isinstance(output_path,str) and ( os.path.isfile(output_path) or os.path.exists(os.path.dirname(output_path)) ):
                                                 log.debug( "Writing the output of selectiveXmlFileCompare to file : " + str(output_path) )
                                                 logger.print_on_console( "Writing the output of selectiveXmlFileCompare to file.")
                                                 optFlg = False
@@ -339,7 +339,7 @@ class FileOperationsXml:
                                         elif(int(num_diff) == 0):
                                             logger.print_on_console("No Difference between files in compXmlFileWithXmlBlock" )
                                         if( output_path ):
-                                            if( os.path.isfile(output_path) or os.path.exists(os.path.dirname(output_path)) ):
+                                            if isinstance(output_path,str) and ( os.path.isfile(output_path) or os.path.exists(os.path.dirname(output_path)) ):
                                                 log.debug( "Writing the output of compXmlFileWithXmlBlock to file : " + str(output_path) )
                                                 logger.print_on_console( "Writing the output of compXmlFileWithXmlBlock to file.")
                                                 optFlg = False
@@ -438,7 +438,7 @@ class FileOperationsXml:
                                 if (res_opt == 'selective') : output_res = ch_lines
                             output_res = '\n'.join(output_res)
                             if(output_path):
-                                if(os.path.isfile(output_path) or os.path.exists(os.path.dirname(output_path))):
+                                if isinstance(output_path,str) and (os.path.isfile(output_path) or os.path.exists(os.path.dirname(output_path))):
                                     log.debug( "Writing the output of compareInputs to file : " + str(output_path) )
                                     logger.print_on_console( "Writing the output of compareInputs to file.")
                                     optFlg = False
@@ -506,7 +506,7 @@ class FileOperationsXml:
                     optFlg = True
                     try:
                         if(output_path):
-                            if(os.path.isfile(output_path) or os.path.exists(os.path.dirname(output_path))):
+                            if isinstance(output_path,str) and (os.path.isfile(output_path) or os.path.exists(os.path.dirname(output_path))):
                                 log.debug( "Writing the output of beautify to file: " + str(output_path) )
                                 logger.print_on_console( "Writing the output of beautify to file.")
                                 optFlg = False
@@ -603,7 +603,7 @@ class FileOperationsXml:
                                 elif(int(num_diff) == 0):
                                     logger.print_on_console("No Difference between inputs in compareFile")
                                 if(output_path):
-                                    if(os.path.exists(output_path) or os.path.exists(os.path.dirname(output_path))):
+                                    if isinstance(output_path,str) and (os.path.exists(output_path) or os.path.exists(os.path.dirname(output_path))):
                                         log.debug( "Writing the output of compareFiles to file : " + str(output_path) )
                                         logger.print_on_console( "Writing the output of compareFiles to file.")
                                         optFlg = False
@@ -716,7 +716,7 @@ class FileOperationsXml:
         """
         out = None
         try:
-            out = main.diff_texts(xml_input1, xml_input2, diff_options={'fast_match': False}, formatter=formatting.XMLFormatter(normalize=formatting.WS_BOTH)).split("\n")
+            out = main.diff_texts(xml_input1, xml_input2, diff_options={'fast_match': True,'ratio_mode':'accurate'}, formatter=formatting.XMLFormatter(normalize=formatting.WS_BOTH)).split("\n")
         except Exception as e:
             log.debug("Could not found the difference in XML content", e)
         return out

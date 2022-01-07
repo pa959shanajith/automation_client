@@ -32,12 +32,14 @@ class ElementOperations:
 
     #Method to perform click operation
     def clickelement(self,acc):
-        del oebs_key_objects.custom_msg[:]
-        #sets the keywordResult to FAIL
-        keywordresult = MSG_FAIL
-        verifyresponse = MSG_FALSE
+        status = TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FALSE
+        output_res = OUTPUT_CONSTANT
+        err_msg = None
         try:
             #gets the entire context information
+            time.sleep(1)
+            acc.requestFocus()
             charinfo = acc.getAccessibleContextInfo()
             log.debug('Received Object Context',DEF_CLICKELEMENT)
             objstates = charinfo.states
@@ -51,38 +53,38 @@ class ElementOperations:
                 if 'enabled' in objstates:
                     log.debug('Click Happens on :%s , %s',x_coor,y_coor)
                     oebs_mouseops.MouseOperation('click',x_coor,y_coor)
-                    verifyresponse = MSG_TRUE
-                    keywordresult=MSG_PASS
-                    log.debug('%s',MSG_CLICK_SUCCESSFUL)
-                    oebs_key_objects.custom_msg.append(str(MSG_CLICK_SUCCESSFUL))
+                    charinfo = acc.getAccessibleContextInfo()
+                    if 'selectable' in charinfo.states and 'selected' not in charinfo.states:
+                        err_msg = ERROR_CODE_DICT['err_operation_detect']
+                        logger.print_on_console(err_msg)
+                    else:    
+                        methodoutput = TEST_RESULT_TRUE
+                        status=TEST_RESULT_PASS
+                        log.debug('%s',MSG_CLICK_SUCCESSFUL)
                 else:
-                    log.debug('MSG:%s',MSG_DISABLED_OBJECT)
-                    logger.print_on_console(MSG_DISABLED_OBJECT)
-                    oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
+                    err_msg = MSG_DISABLED_OBJECT
+                    log.debug('MSG:%s',err_msg)
+                    logger.print_on_console(err_msg)
             else:
-                log.debug('MSG:%s',MSG_ELEMENT_NOT_VISIBLE)
-                logger.print_on_console(MSG_ELEMENT_NOT_VISIBLE)
-                oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_VISIBLE)
+                err_msg = MSG_ELEMENT_NOT_VISIBLE
+                log.debug('MSG:%s',err_msg)
+                logger.print_on_console(err_msg)
         except Exception as e:
             self.utilities_obj.cleardata()
             err_msg = ERROR_CODE_DICT['err_click_element']
             logger.print_on_console(err_msg)
             log.error(err_msg)
             log.debug('%s',e)
-            log.debug('Status: %s',keywordresult)
-        log.debug('Status: %s',keywordresult)
-        # response is sent to the client
-        self.utilities_obj.cleardata()
-        oebs_key_objects.keyword_output.append(str(keywordresult))
-        oebs_key_objects.keyword_output.append(str(verifyresponse))
+            log.debug('Status: %s',status)
+        log.debug('Status: %s',status)
+        return status,methodoutput,output_res,err_msg
         
     #Method to get element Text of the given Object location
     def getelementtext(self,acc):
-        del oebs_key_objects.custom_msg[:]
-        #sets the keywordresult to FAIL
-        keywordresult=MSG_FAIL
-        #this is the response obtained from the keyword
-        keywordresponse=''
+        status = TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FALSE
+        output_res = OUTPUT_CONSTANT
+        err_msg = None
         try:
             #gets the entire context information
             charinfo = acc.getAccessibleContextInfo()
@@ -90,10 +92,11 @@ class ElementOperations:
             objstates = charinfo.states
             #check for element hidden
             if 'hidden' in objstates:
-                verifyresponse = MSG_FALSE
-                keywordresult=MSG_FAIL
-                log.debug('%s',MSG_HIDDEN_OBJECT)
-                oebs_key_objects.custom_msg.append(MSG_HIDDEN_OBJECT)
+                methodoutput = TEST_RESULT_FALSE
+                status=TEST_RESULT_FAIL
+                err_msg = MSG_HIDDEN_OBJECT
+                log.debug('%s',err_msg)
+                logger.print_on_console(err_msg)
             else:
                 if (charinfo.name != None and charinfo.name !=''):
                     fetchedText = charinfo.name
@@ -106,77 +109,45 @@ class ElementOperations:
                     elementtext = splitval.strip()
                     log.debug('element text is %s',elementtext)
                     #sets the result to pass
-                    keywordresult=MSG_PASS
+                    status=TEST_RESULT_PASS
                     log.debug('Result:%s',elementtext)
-                    #keywordresponse = elementtext.encode('utf-8')
-                    keywordresponse = elementtext
-                    oebs_key_objects.custom_msg.append("MSG_RESULT_IS")
+                    #methodoutput = elementtext.encode('utf-8')
+                    methodoutput = elementtext
                 else:
-                    log.debug('%s',MSG_TEXT_NOT_DEFINED)
-                    logger.print_on_console(MSG_TEXT_NOT_DEFINED)
-                    oebs_key_objects.custom_msg.append(MSG_TEXT_NOT_DEFINED)
+                    err_msg = MSG_TEXT_NOT_DEFINED
+                    log.debug('%s',err_msg)
+                    logger.print_on_console(err_msg)
         except Exception as e:
             self.utilities_obj.cleardata()
             err_msg = ERROR_CODE_DICT['err_get_element_text']
             logger.print_on_console(err_msg)
             log.error(err_msg)
             log.debug('%s',e)
-            log.debug('Status %s',keywordresult)
-        log.debug('Status %s',keywordresult)
+            log.debug('Status %s',status)
+        log.debug('Status %s',status)
         # response is sent to the client
         self.utilities_obj.cleardata()
-        oebs_key_objects.keyword_output.append(str(keywordresult))
-        oebs_key_objects.keyword_output.append(str(keywordresponse))
-
-    def verifyelementexists(self,acc):
-        del oebs_key_objects.custom_msg[:]
-         #sets the keywordresult to FAIL
-        keywordresult = MSG_FAIL
-        verifyresponse = MSG_FALSE
-        try:
-            #gets the entire context information
-            curaccinfo = acc.getAccessibleContextInfo()
-            log.debug('Received Object Context',DEF_VERIFYEXISTS)
-            if('showing' in curaccinfo.states and 'visible' in curaccinfo.states):
-                verifyresponse = MSG_TRUE
-                keywordresult = MSG_PASS
-            else:
-                log.debug('%s',DEF_VERIFYEXISTS,MSG_INVALID_INPUT)
-                logger.print_on_console(MSG_INVALID_INPUT)
-                oebs_key_objects.custom_msg.append(MSG_HIDDEN_OBJECT)
-        except Exception as e:
-            self.utilities_obj.cleardata()
-            err_msg = ERROR_CODE_DICT['err_verify_element_exists']
-            logger.print_on_console(err_msg)
-            log.error(err_msg)
-            log.debug('%s',DEF_VERIFYEXISTS,e)
-            log.debug('Status %s',DEF_VERIFYEXISTS,keywordresult)
-        log.debug('Status %s',DEF_VERIFYEXISTS,keywordresult)
-        log.debug('Verify Element Exists Response %s',DEF_VERIFYEXISTS,str(verifyresponse))
-        # response is sent to the client
-        self.utilities_obj.cleardata()
-        oebs_key_objects.keyword_output.append(str(keywordresult))
-        oebs_key_objects.keyword_output.append(str(verifyresponse))
-
+        return status,methodoutput,output_res,err_msg
 
     #Method to verify element text of the given Object location matches with the User Provided Text
     def verifyelementtext(self,acc):
-        del oebs_key_objects.custom_msg[:]
-        #sets the keywordresult to FAIL
-        keywordresult=MSG_FAIL
+        status = TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FALSE
+        output_res = OUTPUT_CONSTANT
+        err_msg = None
         try:
-            #sets the verifyresponse to FALSE
-            verifyresponse = MSG_FALSE
+            #sets the methodoutput to FALSE
+            methodoutput = TEST_RESULT_FALSE
             #gets the entire context information
             curaccinfo = acc.getAccessibleContextInfo()
             log.debug('Received Object Context',DEF_VERIFYELEMENTTEXT)
             objstates = curaccinfo.states
             #check for element hidden
             if 'hidden' in objstates:
-                verifyresponse = MSG_FALSE
-                keywordresult=MSG_FAIL
+                methodoutput = TEST_RESULT_FALSE
+                status=TEST_RESULT_FAIL
                 log.debug('%s',MSG_HIDDEN_OBJECT)
-                oebs_key_objects.custom_msg.append(MSG_HIDDEN_OBJECT)
+                err_msg = MSG_HIDDEN_OBJECT
             else:
                 if len(oebs_key_objects.keyword_input) == 1:
                         textVerify=oebs_key_objects.keyword_input[0]
@@ -195,46 +166,44 @@ class ElementOperations:
                                 #checks the user provided text with the text in the object
                                 if elementtext == textVerify:
                                     log.debug('Text verified',DEF_VERIFYELEMENTTEXT)
-                                    #sets the verifyresponse to TRUE
-                                    verifyresponse = MSG_TRUE
-                                    #sets the keywordresult to pass
-                                    keywordresult=MSG_PASS
+                                    #sets the methodoutput to TRUE
+                                    methodoutput = TEST_RESULT_TRUE
+                                    #sets the status to pass
+                                    status=TEST_RESULT_PASS
                                 else:
                                     log.debug('Text verification failed',DEF_VERIFYELEMENTTEXT)
-                                    oebs_key_objects.custom_msg.append(str('Text verification failed \'' + elementtext + '\' not equal to \''+textVerify+"\'."))
+                                    err_msg = str('Text verification failed \'' + elementtext + '\' not equal to \''+textVerify+"\'.")
+                                    logger.print_on_console(err_msg)
                             else:
-                                log.debug('%s',MSG_TEXT_NOT_DEFINED)
-                                logger.print_on_console(MSG_TEXT_NOT_DEFINED)
-                                oebs_key_objects.custom_msg.append(MSG_TEXT_NOT_DEFINED)
+                                err_msg = MSG_TEXT_NOT_DEFINED
+                                log.debug('%s',err_msg)
+                                logger.print_on_console(err_msg)
                         else:
-                            log.debug('MSG:%s',MSG_INVALID_INPUT)
-                            oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
+                            err_msg = MSG_INVALID_INPUT
+                            log.debug('MSG:%s',err_msg)
+                            logger.print_on_console(err_msg)
                 else:
-                    log.debug('MSG:%s',MSG_INVALID_NOOF_INPUT)
-                    logger.print_on_console(MSG_INVALID_INPUT)
-                    oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
+                    err_msg = MSG_INVALID_INPUT
+                    log.debug('MSG:%s',err_msg)
+                    logger.print_on_console(err_msg)
         except Exception as e:
             self.utilities_obj.cleardata()
             err_msg = ERROR_CODE_DICT['err_verify_element_text']
             logger.print_on_console(err_msg)
             log.error(err_msg)
             log.debug('%s',e)
-            log.debug('Status %s',keywordresult)
-        log.debug('Status %s',keywordresult)
-        log.debug('Verify Response %s',str(verifyresponse))
-        # response is sent to the client
-        self.utilities_obj.cleardata()
-        oebs_key_objects.keyword_output.append(str(keywordresult))
-        oebs_key_objects.keyword_output.append(str(verifyresponse))
-
+            log.debug('Status %s',status)
+        log.debug('Status %s',status)
+        log.debug('Verify Response %s',str(methodoutput))
+        return status,methodoutput,output_res,err_msg
 
     #Method to waitforelementvisible
     def waitforelementvisible(self,applicationname,objectname,keyword,inputs,outputs):
         acc = ''
-        del oebs_key_objects.custom_msg[:]
-        #sets the keywordResult to FAIL
-        keywordresult = MSG_FAIL
-        verifyresponse = MSG_FALSE
+        status = TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FALSE
+        output_res = OUTPUT_CONSTANT
+        err_msg = None
         configvalues = readconfig.configvalues
         try:
             #gets the entire context information
@@ -247,7 +216,7 @@ class ElementOperations:
             start_time = time.time()
             logger.print_on_console("Waiting for element to be visible")
             while True:
-                acc, visible =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs, errors = False)
+                acc, visible, active_parent =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs, errors = False)
                 if acc and str(acc) != "fail":
                     break
                 if time.time() - start_time >= delay:
@@ -258,29 +227,27 @@ class ElementOperations:
                 objstates = charinfo.states
                 #check for object visible
                 if(('showing' in objstates) and ('visible' in objstates)):
-                    verifyresponse = MSG_TRUE
-                    keywordresult=MSG_PASS
-                    log.debug('%s',keywordresult)
+                    methodoutput = TEST_RESULT_TRUE
+                    status=TEST_RESULT_PASS
+                    log.debug('%s',status)
                 else:
-                    verifyresponse = MSG_FALSE
-                    keywordresult=MSG_FAIL
-                    oebs_key_objects.custom_msg.append(MSG_TIME_OUT_EXCEPTION)
-                    logger.print_on_console(MSG_TIME_OUT_EXCEPTION)
-                    log.debug('%s',keywordresult)
+                    methodoutput = TEST_RESULT_FALSE
+                    status=TEST_RESULT_FAIL
+                    err_msg = MSG_TIME_OUT_EXCEPTION
+                    logger.print_on_console(err_msg)
+                    log.debug('%s',err_msg)
             else:
-                oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_EXISTS)
-                logger.print_on_console(MSG_ELEMENT_NOT_EXISTS)
-                log.debug('%s',MSG_ELEMENT_NOT_EXISTS)
+                err_msg = MSG_ELEMENT_NOT_EXISTS
+                logger.print_on_console(err_msg)
+                log.debug('%s',err_msg)
         except Exception as e:
             self.utilities_obj.cleardata()
             err_msg = ERROR_CODE_DICT['err_wait_element_visible']
             logger.print_on_console(err_msg)
             log.error(err_msg)
             log.debug('%s',e)
-            log.debug('Status: %s',keywordresult)
-        log.debug('Status: %s',keywordresult)
+            log.debug('Status: %s',status)
+        log.debug('Status: %s',status)
         # response is sent to the client
-        self.utilities_obj.cleardata()
-        oebs_key_objects.keyword_output.append(str(keywordresult))
-        oebs_key_objects.keyword_output.append(str(verifyresponse))
+        return status,methodoutput,output_res,err_msg
 

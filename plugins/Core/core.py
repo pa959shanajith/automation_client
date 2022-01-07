@@ -466,10 +466,7 @@ class MainNamespace(BaseNamespace):
             elif str(args[0]).endswith('ipa'):
                 browsername = args[0] + ";" + args[2] + ";" + args[3]+";" + args[4]
             """
-            if SYSTEM_OS=='Darwin':
-                core_utils.get_all_the_imports('Mobility/MobileApp')
-            else:
-                core_utils.get_all_the_imports('Mobility')
+            core_utils.get_all_the_imports('Mobility')
             import mobile_app_scrape
             global mobileScrapeObj
             mobileScrapeObj=mobile_app_scrape
@@ -494,10 +491,7 @@ class MainNamespace(BaseNamespace):
             d = args[2]
             data = {}
             action = d['action']
-            if SYSTEM_OS=='Darwin':
-                core_utils.get_all_the_imports('Mobility/MobileWeb')
-            else:
-                core_utils.get_all_the_imports('Mobility')
+            core_utils.get_all_the_imports('Mobility')
             if action == 'userobject':
                 core_utils.get_all_the_imports('Mobility/MobileWeb')
                 import UserObjectScrape_MW
@@ -1559,8 +1553,8 @@ class Main():
                 cw.scrapewindow = sapScrapeObj.ScrapeWindow(parent = cw,id = -1, title="Avo Assure - SAP Scrapper",filePath = browsername,socketIO = socketIO)
                 sapScrapeFlag=False
             elif oebsScrapeFlag==True:
-                cw.scrapewindow = oebsScrapeObj.ScrapeDispatcher(parent = cw,id = -1, title="Avo Assure - Oebs Scrapper",filePath = browsername,socketIO = socketIO)
                 oebsScrapeFlag=False
+                cw.scrapewindow = oebsScrapeObj.ScrapeDispatcher(parent = cw,id = -1, title="Avo Assure - Oebs Scrapper",filePath = browsername,socketIO = socketIO)
             elif pdfScrapeFlag==True:
                 cw.scrapewindow = pdfScrapeObj.ScrapeDispatcher(parent = cw,id = -1, title="Avo Assure - PDF Scrapper",filePath = browsername,socketIO = socketIO)
                 pdfScrapeFlag=False
@@ -1897,7 +1891,7 @@ def set_ICE_status(one_time_ping = False,connect=True,interval = 60000):
         status_ping_thread.start()
     log.debug('Ping Server')
     # Add ICE identification and status, which is busy by default
-    result = {"hostip":socket.gethostbyname(socket.gethostname()),"time":str(datetime.now()),"connected":connect}
+    result = {"hostip":socket.gethostbyname(socket.gethostname()),"time":str(datetime.utcnow()),"connected":connect}
     result['status'] = execution_flag or termination_inprogress
     if cw is not None:
         result['mode'] = cw.schedule.GetValue()

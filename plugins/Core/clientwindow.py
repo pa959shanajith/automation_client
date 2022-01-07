@@ -548,7 +548,7 @@ class Config_window(wx.Frame):
             "Disp_var":[(235,252),(135, 25),(375,248), (70,-1)],
             "C_Timeout" :[(12,282),(120, 25),(135,278), (70,-1)],
             "Delay_Stringinput":[(235,282),(130, 25),(375,278), (70,-1)],
-            "panel1":[(10,340),(100,30),(440,215),(8, 335)],
+            "panel1":[(12,345),(100,20),(440,185),(8, 365)],
             "err_text":[(50,555),(350, 25)],
             "Save":[(100,580), (100, 28)],
             "Close":[(250,580), (100, 28)]
@@ -572,7 +572,7 @@ class Config_window(wx.Frame):
             "Disp_var":[(288,252),(140, 25),(448,248),(85,-1)],
             "C_Timeout" :[(12,282),(120, 25),(180,278), (80,-1)],
             "Delay_Stringinput":[(288,282),(140, 25),(448,278), (85,-1)],
-            "panel1":[(10,340),(100,30),(440,215),(8, 335)],
+            "panel1":[(10,345),(100,20),(440,185),(8, 365)],
             "err_text":[(85,555),(350, 25)],
             "Save":[(130,580),(100, 28)],
             "Close":[(370,580),(120, 28)]
@@ -746,7 +746,7 @@ class Config_window(wx.Frame):
             self.Delay_input.SetValue("0.005")
 
         self.config_param=wx.StaticText(self.panel,label="Config Parameters",pos=config_fields["panel1"][0],size=config_fields["panel1"][1], style=0, name="")
-        font = wx.Font(9, wx.DEFAULT, wx.NORMAL, wx.NORMAL)
+        font = wx.Font(9, wx.DEFAULT, wx.ITALIC, wx.BOLD)
         self.config_param.SetFont(font)
 
         #ToolTips for static texts boxes
@@ -1022,6 +1022,14 @@ class Config_window(wx.Frame):
             self.rbox23.SetSelection(1)
         self.rbox23.SetToolTip(wx.ToolTip("Kills stale processes before start of every execution"))
 
+        self.rbox24 = wx.RadioBox(self.panel1, label = "Browser Screenshots", choices = lblList,
+            majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
+        if isConfigJson != False and isConfigJson['browser_screenshots'].title() == lblList[0]:
+            self.rbox24.SetSelection(0)
+        else:
+            self.rbox24.SetSelection(1)
+        self.rbox24.SetToolTip(wx.ToolTip("Captures screenshots using Browser's driver instance"))
+
         #Adding GridSizer which will show the radio buttons into grid of 12 rows and 2 colums it can be changed based on the requirements
         self.gs=wx.GridSizer(12,2,5,5)
         self.gs.AddMany([(self.rbox9,0,wx.EXPAND), (self.rbox1,0,wx.EXPAND), (self.rbox2,0,wx.EXPAND),
@@ -1030,8 +1038,8 @@ class Config_window(wx.Frame):
             (self.rbox10,0,wx.EXPAND), (self.rbox11,0,wx.EXPAND), (self.rbox12,0,wx.EXPAND),
             (self.rbox13,0,wx.EXPAND), (self.rbox14,0,wx.EXPAND), (self.rbox15,0,wx.EXPAND),
             (self.rbox16,0,wx.EXPAND), (self.rbox17,0,wx.EXPAND), (self.rbox18,0,wx.EXPAND),
-            (self.rbox19,0,wx.EXPAND), (self.rbox20,0,wx.EXPAND), (self.rbox21,0,wx.EXPAND), 
-            (self.rbox22,0,wx.EXPAND), (self.rbox23,0,wx.EXPAND)])
+            (self.rbox19,0,wx.EXPAND), (self.rbox20,0,wx.EXPAND), (self.rbox21,0,wx.EXPAND),
+            (self.rbox22,0,wx.EXPAND), (self.rbox23,0,wx.EXPAND), (self.rbox24,0,wx.EXPAND)])
 
         #adding  GridSizer to bSizer which is a box sizer
         self.bSizer.Add(self.gs, 1, wx.EXPAND | wx.TOP, 5)
@@ -1139,6 +1147,7 @@ class Config_window(wx.Frame):
         disable_screen_timeout = self.rbox21.GetStringSelection()
         incognito_private_mode = self.rbox22.GetStringSelection()
         kill_stale = self.rbox23.GetStringSelection()
+        browser_screenshots = self.rbox24.GetStringSelection()
         if extn_enabled == 'Yes' and headless_mode == 'Yes':
             self.error_msg.SetLabel("Extension Enable must be disabled when Headless Mode is enabled")
             self.error_msg.SetForegroundColour((255,0,0))
@@ -1183,6 +1192,7 @@ class Config_window(wx.Frame):
         data['disable_screen_timeout']=disable_screen_timeout.strip()
         data['incognito_private_mode']=incognito_private_mode.strip()
         data['kill_stale']=kill_stale.strip()
+        data['browser_screenshots']=browser_screenshots.strip()
         config_data=data
         if (data['server_ip']!='' and data['server_port']!='' and data['server_cert']!='' and
             data['chrome_path']!='' and data['queryTimeOut'] not in ['','sec'] and data['logFile_Path']!='' and

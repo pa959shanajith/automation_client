@@ -305,17 +305,32 @@ class TextboxKeywords:
                                         obj.get_element_location(webelement)
                                     webelement.clear()
                                 local_to.log.debug('Setting the text')
-                                browser_Keywords.local_bk.driver_obj.execute_script(SET_TEXT_SCRIPT, webelement, input)
-                                # Bug #19221. To check if value is set or not.
-                                value = browser_Keywords.local_bk.driver_obj.execute_script('return arguments[0].value', webelement)
-                                if value == input:
-                                    # implies that the value has been set in the textbox
-                                    status = TEST_RESULT_PASS
-                                    methodouput = TEST_RESULT_TRUE
-                                else:
-                                    if webelement.get_attribute('type') == 'number':
-                                        err_msg = ERROR_CODE_DICT['ERR_INPUT_TYPE_MISMATCH']
+                                if webelement.tag_name in ['div', 'span']:
+                                    if webelement.get_attribute("contenteditable") == "true":
+                                        browser_Keywords.local_bk.driver_obj.execute_script(SET_TEXT_SCRIPT_DIV_SPAN, webelement, input)
+                                        value = browser_Keywords.local_bk.driver_obj.execute_script('return arguments[0].textContent', webelement)
+                                        if value == input:
+                                            status = TEST_RESULT_PASS
+                                            methodoutput = TEST_RESULT_TRUE
+                                        else:
+                                            err_msg = ERROR_CODE_DICT['ERR_INPUT_TYPE_MISMATCH']
+                                            logger.print_on_console(err_msg)
+                                    else:
+                                        err_msg=ERROR_CODE_DICT['ERR_INVALID_ELEMENT_STATE_EXCEPTION']
+                                        local_to.log.error(err_msg)
                                         logger.print_on_console(err_msg)
+                                else:
+                                    browser_Keywords.local_bk.driver_obj.execute_script(SET_TEXT_SCRIPT, webelement, input)
+                                    # Bug #19221. To check if value is set or not.
+                                    value = browser_Keywords.local_bk.driver_obj.execute_script('return arguments[0].value', webelement)
+                                    if value == input:
+                                        # implies that the value has been set in the textbox
+                                        status = TEST_RESULT_PASS
+                                        methodoutput = TEST_RESULT_TRUE
+                                    else:
+                                        if webelement.get_attribute('type') == 'number':
+                                            err_msg = ERROR_CODE_DICT['ERR_INPUT_TYPE_MISMATCH']
+                                            logger.print_on_console(err_msg)
                             else:
                                 err_msg=self.__read_only()
                 else:
@@ -515,6 +530,8 @@ class TextboxKeywords:
                                         pass
                                     local_to.log.debug('Sending the value via part 1')
                                     browser_Keywords.local_bk.driver_obj.execute_script(SET_TEXT_SCRIPT,webelement,input)
+                                    status=TEST_RESULT_PASS
+                                    methodoutput=TEST_RESULT_TRUE
                                 else:
                                     try:
                                         webelement.clear()
@@ -522,20 +539,37 @@ class TextboxKeywords:
                                         local_to.log.error('Exception in clearing text')
                                         pass
                                     if(isinstance(browser_Keywords.local_bk.driver_obj,selenium.webdriver.Ie) and self.__check_IE_64bit_from_config):
-                                        input=input+" "
-                                        for i in range (0,len(input)+1):
-                                            browser_Keywords.local_bk.driver_obj.execute_script(SET_TEXT_SCRIPT,webelement,input[0:i])
-                                        from sendfunction_keys import SendFunctionKeys
-                                        obj=SendFunctionKeys()
-                                        obj.sendfunction_keys("backspace",*args)
+                                        if webelement.tag_name in ['div', 'span']:
+                                            if webelement.get_attribute("contenteditable") == "true":
+                                                browser_Keywords.local_bk.driver_obj.execute_script(SET_TEXT_SCRIPT_DIV_SPAN, webelement, input)
+                                                value = browser_Keywords.local_bk.driver_obj.execute_script('return arguments[0].textContent', webelement)
+                                                if value == input:
+                                                    status = TEST_RESULT_PASS
+                                                    methodoutput = TEST_RESULT_TRUE
+                                                else:
+                                                    err_msg = ERROR_CODE_DICT['ERR_INPUT_TYPE_MISMATCH']
+                                                    logger.print_on_console(err_msg)
+                                            else:
+                                                err_msg=ERROR_CODE_DICT['ERR_INVALID_ELEMENT_STATE_EXCEPTION']
+                                                local_to.log.error(err_msg)
+                                                logger.print_on_console(err_msg)
+                                        else:
+                                            input=input+" "
+                                            for i in range (0,len(input)+1):
+                                                browser_Keywords.local_bk.driver_obj.execute_script(SET_TEXT_SCRIPT,webelement,input[0:i])
+                                            from sendfunction_keys import SendFunctionKeys
+                                            obj=SendFunctionKeys()
+                                            obj.sendfunction_keys("backspace",*args)
+                                            status=TEST_RESULT_PASS
+                                            methodoutput=TEST_RESULT_TRUE
                                     else:
                                         from selenium.webdriver.common.keys import Keys
                                         text = self.__get_text(webelement)
                                         if text and (len(text) > 0):
                                             webelement.send_keys(Keys.BACK_SPACE * len(text))
                                         webelement.send_keys(input)
-                                status=TEST_RESULT_PASS
-                                methodoutput=TEST_RESULT_TRUE
+                                        status=TEST_RESULT_PASS
+                                        methodoutput=TEST_RESULT_TRUE
                             else:
                                 err_msg=self.__read_only()
                 else:
@@ -742,12 +776,16 @@ class TextboxKeywords:
                         err_msg = self._invalid_input()
                 if webelement.tag_name[0:9] == 'lightning':
                     text=webelement.text
+                    if '\xa0' in text:
+                        text = text.replace('\xa0', " ")
                     if(text!=None and text!=''):
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE  
                         check_flag=False
                 if check_flag==True and not err_msg:
                     text=self.__get_text(webelement)
+                    if '\xa0' in text:
+                        text = text.replace('\xa0', " ")
                     if text is None:
                         err_msg=self._noneGetText()
                     else:
@@ -933,15 +971,23 @@ class TextboxKeywords:
                         err_msg = self._invalid_input()
                 if webelement.tag_name[0:9] == 'lightning':
                     text=webelement.text
+                    if '\xa0' in text:
+                        text = text.replace('\xa0', " ")
+                    if '\xa0' in input:
+                        input = input.replace('\xa0', " ")
                     if(text==input):
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE  
                         check_flag=False
                 if check_flag==True and not err_msg:
                     text=self.__get_text(webelement)
+                    if '\xa0' in text:
+                        text = text.replace('\xa0', " ")
                     input=input[0]
                     coreutilsobj=core_utils.CoreUtils()
                     input=coreutilsobj.get_UTF_8(input)
+                    if '\xa0' in input:
+                        input = input.replace('\xa0', " ")
                     if text==input:
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE

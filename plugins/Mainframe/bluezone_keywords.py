@@ -89,7 +89,7 @@ class BluezoneKeywords:
         return (return_value == 0),output,err_msg
 
     def login(self,region,userID,password):
-        #Logic to Login to Bluezone Emulator goes here
+        #Logic to Login to Bluezone Emulator goes here(64 bit)
         err_msg=None
         output=OUTPUT_CONSTANT
         return_value = None
@@ -97,46 +97,42 @@ class BluezoneKeywords:
             region = region.replace("@","@@")
             userID = userID.replace("@","@@")
             password = password.replace("@","@@")
-            return_value = self.host.sendkeys(region)
-            if return_value == 1:
+            self.host.sendkeys(region)
+            self.host.Waitready(10,2000)
+            self.host.sendkeys(MAINFRAME_KEY_ENTER)
+            self.host.Waitready(10,2000)
+            region_chk = self.host.ReadScreen('',20,1,len(region)+3)
+            if region_chk[1] == 'COMMAND UNRECOGNIZED':
                 err_msg = MAINFRAME_CLIENT_NOT_CON
                 log.error(err_msg)
                 logger.print_on_console(err_msg)
             else:
-                self.host.Waitready(10,2000)
-                self.host.sendkeys(MAINFRAME_KEY_ENTER)
-                self.host.Waitready(10,2000)
                 self.host.sendkeys(userID)
-                self.host.Waitready(10,1000)
+                self.host.Waitready(10,2000)
                 self.host.sendkeys(MAINFRAME_KEY_ENTER)
-                self.host.Waitready(10,1000)
-                self.host.sendkeys(password)
-                self.host.Waitready(10,1000)
-                self.host.sendkeys(MAINFRAME_KEY_ENTER)
-                self.host.Waitready(10,1000)
-                self.host.sendkeys(MAINFRAME_KEY_ENTER)
-                self.host.Waitready(10,1000)
-                uidchk = self.host.WaitForText(userID, (6, 20,5000))
-                if uidchk == 4:
-                     self.host.Waitready(10,2000)
-                     self.host.sendkeys(password)
-                     self.host.Waitready(10,2000)
-                     self.host.sendkeys(MAINFRAME_KEY_ENTER)
-                     pwdchk = self.host.WaitForText(MAINFRAME_NOT_AUTHORISED, (0o2, 21,5000))
-                     if pwdchk == 4:
-                        self.host.Waitready(10,2000)
+                self.host.Waitready(10,2000)
+                uidchk = self.host.ReadScreen('',1,6,4)
+                if uidchk[1] != '*':
+                    self.host.sendkeys(password)
+                    self.host.Waitready(10,2000)
+                    self.host.sendkeys(MAINFRAME_KEY_ENTER)
+                    self.host.Waitready(10,2000)
+                    pwdchk =  self.host.ReadScreen('',14,2,21)
+                    if pwdchk[1] == MAINFRAME_NOT_AUTHORISED:
                         self.host.sendkeys(MAINFRAME_KEY_F3)
                         self.host.Waitready(10,2000)
                         err_msg=MAINFRAME_LOGIN_FAIL
-                     else:
-                        self.host.Waitready(10,2000)
-                        self.host.sendkeys(MAINFRAME_KEY_ENTER)
+                        logger.print_on_console(err_msg)
+                    else:
                         return_value = 0
+                        self.host.sendkeys(MAINFRAME_KEY_ENTER)
+                        self.host.Waitready(10,2000)                  
                 else:
-                     self.host.Waitready(10,2000)
-                     self.host.sendkeys(MAINFRAME_KEY_F3)
-                     log.info(MAINFRAME_WRONG_USERID)
-                     err_msg=MAINFRAME_WRONG_USERID
+                    self.host.sendkeys(MAINFRAME_KEY_F3)
+                    self.host.Waitready(10,2000)
+                    log.info(MAINFRAME_WRONG_USERID)
+                    err_msg=MAINFRAME_WRONG_USERID
+                    logger.print_on_console(err_msg)
         except Exception as e:
             err_msg = "Error: Unable to login into Emulator."
             log.error(err_msg)
@@ -176,7 +172,7 @@ class BluezoneKeywords:
             log.error(err_msg)
             log.error(e)
             logger.print_on_console(err_msg)
-        return (return_value == 1),output,err_msg
+        return (return_value == 0),output,err_msg
 
     def send_value(self,text):
         #Logic to Login to Bluezone Emulator goes here
@@ -329,7 +325,8 @@ class BluezoneKeywords:
             self.host.WaitReady(10,1000)
             file_status =  self.host.WaitForText((job_path), (8, 11, 5000))
             jobno = None
-            if file_status== True:
+            temp_file_status = self.host.ReadScreen(buffer_var,len(job_path)+3,8,11)
+            if temp_file_status[1].strip().lower()==job_path or file_status== True:
                 self.host.Setcursor(8,2)
                 self.host.SendKeys(MAINFRAME_KEY_V)
                 self.host.WaitReady(10,1000)
@@ -342,7 +339,7 @@ class BluezoneKeywords:
                 self.host.WaitReady(10,2000)
                 jobname = self.host.ReadScreen(buffer_var,8,6,12)
                 self.host.WaitReady(10,1000)
-                if jobname[1] == member_name:
+                if jobname[1].strip().lower() == member_name:
                     self.host.SendKeys(MAINFRAME_KEY_T)
                     self.host.WaitReady(5,100)
                     self.host.SendKeys(MAINFRAME_KEY_T)
@@ -573,12 +570,13 @@ class BluezoneAPIKeywords:
             data = dataTransmitter("sendvalue", [region, MAINFRAME_KEY_ENTER])
             stat = data["stat"]
             if stat == 0:
-                dataTransmitter("sendvalue", [userID, MAINFRAME_KEY_ENTER, password, MAINFRAME_KEY_ENTER, MAINFRAME_KEY_ENTER])
-                uidcheck = dataTransmitter("waitfortext", userID, 6, 20, 5)
-                if uidcheck["stat"] == 4:
+                dataTransmitter("sendvalue", [userID, MAINFRAME_KEY_ENTER])
+                uidcheck = dataTransmitter("gettext", 1, 6, 4)
+                if uidcheck["stat"] == 0:
                     dataTransmitter("sendvalue", [password, MAINFRAME_KEY_ENTER])
-                    pwdcheck = dataTransmitter("waitfortext", MAINFRAME_NOT_AUTHORISED, 2, 21, 5)
-                    if pwdcheck["stat"] == 4:
+                    pwdcheck = dataTransmitter("gettext",14,2,21)
+                    logger.print_on_console(pwdcheck)
+                    if pwdcheck["stat"] == 0:
                         dataTransmitter("sendvalue", MAINFRAME_KEY_ENTER)
                         return_value = 0
                     else:
@@ -590,8 +588,7 @@ class BluezoneAPIKeywords:
             else:
                 err_msg = "Error: "+data["emsg"]
                 log.debug("Return Value is "+str(stat))
-            if err_msg != 0:
-                err_msg = "Error: Unable to login into " + self.emulator_type + " Mainframe."
+            if err_msg is not None:
                 log.error(err_msg)
                 logger.print_on_console(err_msg)
         except Exception as e:
@@ -776,19 +773,20 @@ class BluezoneAPIKeywords:
         output=None
         return_value = None
         try:
-            data = dataTransmitter("setcursor", 4, 15)
+            data = dataTransmitter("setcursor", 4, 14)
             stat = data["stat"]
             if stat == 0:
                 dataTransmitter("sendvalue", [MAINFRAME_KEY_3_4, MAINFRAME_KEY_ENTER, MAINFRAME_KEY_T,
-                    MAINFRAME_KEY_F, job_path, MAINFRAME_KEY_ENTER, MAINFRAME_KEY_f, MAINFRAME_KEY_ENTER])
+                    MAINFRAME_KEY_F, job_path, MAINFRAME_KEY_ENTER, MAINFRAME_KEY_f,job_path, MAINFRAME_KEY_ENTER])
                 file_status = dataTransmitter("waitfortext", job_path, 8, 11, 5)
                 jobno = None
-                if file_status["stat"] != 4:
+                temp_file_status = dataTransmitter("gettext", len(job_path)+3, 8, 11)
+                if file_status["stat"] != 4 or temp_file_status['res'].strip().lower()==job_path:
                     dataTransmitter("setcursor", 8, 2)
                     dataTransmitter("sendvalue", [MAINFRAME_KEY_V, MAINFRAME_KEY_ENTER, MAINFRAME_KEY_f,
                         member_name,MAINFRAME_KEY_ENTER])
                     jobname = dataTransmitter("gettext", 8, 6, 12)
-                    if jobname["ret"] == member_name:
+                    if jobname['res'].strip().lower() == member_name:
                         dataTransmitter("sendvalue", [MAINFRAME_KEY_T, MAINFRAME_KEY_T, MAINFRAME_KEY_SUB,
                             MAINFRAME_KEY_ENTER])
                         resultCode = dataTransmitter("waitfortext", MAINFRAME_KEY_IKJ, 1, 1, 2)
@@ -797,7 +795,7 @@ class BluezoneAPIKeywords:
                         else:
                             jobno = dataTransmitter("gettext", 8, 1, 25)
                             dataTransmitter("sendvalue", MAINFRAME_KEY_ENTER)
-                        jobno = jobno["ret"]
+                        jobno = jobno["res"]
                         log.debug('Job Number: ' + str(jobno))
                         return_value = 0
                         output = jobno

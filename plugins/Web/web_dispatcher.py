@@ -40,7 +40,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
-
+from urllib.parse import urlparse
 local_Wd = threading.local()
 
 class Dispatcher:
@@ -195,6 +195,7 @@ class Dispatcher:
             'opennewtab':local_Wd.browser_object.openNewTab,
             'execute_js':local_Wd.browser_object.execute_js,
             'getbrowsername': local_Wd.browser_object.getBrowserName,
+            'savefile': local_Wd.browser_object.save_file,
 
             'clickiris':iris_object.clickiris,
             'doubleclickiris':iris_object.doubleclickiris,
@@ -377,8 +378,8 @@ class Dispatcher:
             'selectvaluebytext': ['dropdown','listbox','select'],
             'getallvalues':['dropdown','listbox','select'],
             'verifyallvalues': ['dropdown','listbox','select'],
-            'settext': ['textbox','textarea','password','number','email','url'],
-            'sendvalue':['textbox','textarea','password','number','email','url'],
+            'settext': ['textbox','textarea','password','number','email','url','div','span'],
+            'sendvalue':['textbox','textarea','password','number','email','url','div','span'],
             'gettext': ['textbox','textarea','password','number','email','url'],
             'setsecuretext':['textbox','password'],
             'sendsecurevalue':['textbox','password'],
@@ -679,17 +680,25 @@ class Dispatcher:
             if self.action == EXECUTE:
                 if result != TERMINATE:
                     result=list(result)
+                    headless_mode = str(configvalues['headless_mode'])=='Yes'
+                    sauceFlag = execution_env['env'] == 'saucelabs'
+                    screenShot_Flag = configvalues['screenShot_Flag'].lower()
+                    browser_screenshots = configvalues['browser_screenshots'].lower() == 'yes'
                     screen_details=mythread.json_data['suitedetails'][0]
-                    driverFlag=False
-                    if ( str(configvalues['headless_mode'])=='Yes' or execution_env['env'] == 'saucelabs'):
-                        driverFlag=driver
-                    if configvalues['screenShot_Flag'].lower() == 'fail':
-                        if result[0].lower() == 'fail':
-                            file_path = screen_shot_obj.captureScreenshot(screen_details,driver=driverFlag,web=False)
-                            result.append(file_path[2])
-                    elif configvalues['screenShot_Flag'].lower() == 'all':
-                        file_path = screen_shot_obj.captureScreenshot(screen_details,driver=driverFlag,web=False)
-                        result.append(file_path[2])
+                    file_path=None
+                    if ((screenShot_Flag == 'fail' and result[0].lower() == 'fail')
+                      or screenShot_Flag == 'all'):
+                        if browser_screenshots or headless_mode or sauceFlag:
+                            if local_Wd.popup_object.check_if_no_popup_exists():
+                                file_path = screen_shot_obj.captureScreenshot(screen_details,web=True)
+                                driver.save_screenshot(file_path[2])
+                            elif not (headless_mode or sauceFlag):
+                                local_Wd.log.debug("Pop up exists; Taking the screenshot using generic functions")
+                                file_path = screen_shot_obj.captureScreenshot(screen_details,web=False)
+                        else:
+                            file_path = screen_shot_obj.captureScreenshot(screen_details,web=False)
+                        if (file_path): result.append(file_path[2])
+
         except TypeError as e:
             local_Wd.log.error(e,exc_info=True)
             err_msg=ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']
@@ -716,6 +725,8 @@ class Dispatcher:
             local_Wd.log.info('checking for the url error')
             try:
                 urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', browser_Keywords.local_bk.driver_obj.current_url)
+                if urls!=[] and urlparse(urls[0]).netloc == "ntp.msn.com":
+                    urls=[]
                 if urls != []:
                     headers = {'User-Agent': 'AvoAssure/' + os.getenv('AVO_ASSURE_VERSION')}
                     response=requests.get(urls[0], headers=headers, verify=False, proxies=readconfig.proxies)

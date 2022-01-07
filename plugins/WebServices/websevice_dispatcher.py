@@ -48,7 +48,7 @@ class Dispatcher:
                 elif keyword == 'executerequest':
                     message=list(message)
                     message.append(socketIO)
-                    
+
                 result= ws_dict[keyword](*message)
             else:
                 err_msg=ws_constants.METHOD_INVALID

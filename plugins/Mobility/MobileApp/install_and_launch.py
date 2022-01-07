@@ -70,6 +70,7 @@ class LaunchAndInstall():
                         result = mobile_app_constants.TEST_RESULT_TRUE
             else:
                 os.system("killall -9 node_appium")
+                os.system("killall -9 xcodebuild")
                 status = mobile_app_constants.TEST_RESULT_PASS
                 result = mobile_app_constants.TEST_RESULT_TRUE
         except Exception as e:
@@ -115,7 +116,7 @@ class LaunchAndInstall():
         return status,result,output,err_msg
 
 
-    def closeApplication(self,inputval,*args):
+    def closeApplication(self, ele, inputval, *args):
         status=mobile_app_constants.TEST_RESULT_FAIL
         result=mobile_app_constants.TEST_RESULT_FALSE
         err_msg=None
@@ -130,6 +131,8 @@ class LaunchAndInstall():
                     android_scrapping.driver.terminate_app(inputval[0])
                 else:
                     android_scrapping.driver.close_app()
+                android_scrapping.driver.quit()
+                android_scrapping.driver = None
             if err_msg is None:
                 status=mobile_app_constants.TEST_RESULT_PASS
                 result=mobile_app_constants.TEST_RESULT_TRUE

@@ -45,7 +45,7 @@ class ScrapeWindow(wx.Frame):
         self.invalid_url_msg = "There is no URL in the browser selected or the URL is empty/blank. Please load the webpage and then start performing the desired action."
         self.parent = parent
         self.driver = browser_Keywords_MW.driver_obj
-        if status[1] == False:
+        if status[1] == 'False':
             self.socketIO.emit('scrape',status)
             if self.driver is not None: self.driver.close()
             self.parent.schedule.Enable()

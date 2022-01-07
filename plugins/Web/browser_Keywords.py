@@ -266,9 +266,9 @@ class BrowserKeywords():
                 local_bk.driver_obj.switch_to.window(handles[-1])
                 h=local_bk.driver_obj.current_window_handle
                 local_bk.all_handles.insert(cwh_in+1,h)
-                local_bk.recent_handles.insert(cwh_in+1,h)
+                # local_bk.recent_handles.insert(cwh_in+1,h)
                 # local_bk.all_handles.append(h)
-                # local_bk.recent_handles.append(h)
+                local_bk.recent_handles.append(h)
                 status=webconstants.TEST_RESULT_PASS
                 result=webconstants.TEST_RESULT_TRUE
         except Exception as e:
@@ -304,6 +304,9 @@ class BrowserKeywords():
                 url = url.strip()
                 if url[0:7].lower()!='http://' and url[0:8].lower()!='https://' and url[0:5].lower()!='file:':
                     url='http://'+url
+                if (isinstance(local_bk.driver_obj,webdriver.Firefox)) and url[0:5].lower() == 'file:' and url[0:10].count("/") != 5:
+                    url = url.split(":")
+                    url = url[0] + ":" + "///" + url[1]
                 local_bk.driver_obj.get(url)
                 #ignore certificate implementation
                 try:
@@ -536,6 +539,8 @@ class BrowserKeywords():
                 page_title= local_bk.driver_obj.title
                 if (page_title is ''):
                     page_title= local_bk.driver_obj.current_url
+                    if isinstance(local_bk.driver_obj, webdriver.Firefox) and (page_title == 'about:blank' or page_title == 'about:newtab'):
+                        page_title="New Tab" 
                 page_title.strip()
                 coreutilsobj=core_utils.CoreUtils()
                 userinput=coreutilsobj.get_UTF_8(input_val[0])
@@ -1232,6 +1237,210 @@ class BrowserKeywords():
                 logger.print_on_console(verb)
         logger.print_on_console(verb)
         return status, result, output, err_msg
+
+    def __open_save_file_dialog(self, pidb):
+        hwnds = []
+        def winEnumHandler(hwnd, pidx): # get handles/windows of application/browser
+            _, current_pid = win32process.GetWindowThreadProcessId(hwnd)
+            if win32gui.IsWindowVisible(hwnd) and current_pid == pidx and len(win32gui.GetWindowText(hwnd).strip()) != 0:
+                hwnds.append(hwnd)
+        win32gui.EnumWindows(winEnumHandler, pidb)
+        if len(hwnds) > 0:
+            wind_brw = hwnds[0]
+            app=Application().connect(handle=wind_brw,allow_magic_lookup=False)
+            win=app[win32gui.GetWindowText(wind_brw)]
+            win.type_keys('^s') # Send Ctrl+S to open save file dialouge
+            time.sleep(1)
+
+    def __get_file_dialog_handle(self, pid, ppid, browser_name, all_hwnds=False):
+        hwnds = []
+        if (browser_name == 'internet explorer' and 'Windows-10' in platform.platform()): pids = [pid]
+        else: pids=[c.pid for c in psutil.Process(pid).children()]
+        def winEnumHandler(hwnd, pidx): # get handle of save window
+            _, current_pid = win32process.GetWindowThreadProcessId(hwnd)
+            if win32gui.IsWindowVisible(hwnd) and win32gui.GetWindowText(hwnd) in ["Save Webpage", "Save As", "Confirm Save As", "Error Saving Webpage"]:
+                if browser_name == "edge legacy":
+                    if psutil.Process(current_pid).name() == "PickerHost.exe":
+                        hwnds.append(hwnd)
+                elif current_pid in pidx:
+                    hwnds.append(hwnd)
+        win32gui.EnumWindows(winEnumHandler, pids)
+        if all_hwnds: return hwnds
+        handle = hwnds[0] if (len(hwnds) > 0) else None
+        return handle
+
+    def save_file(self,element,args):
+        """
+        def : save_file
+        purpose : Saving a file in windows
+        param : folder_path,file_path,wait_time
+        return :
+
+        """
+        try:
+            status=TEST_RESULT_FAIL
+            methodoutput=TEST_RESULT_FALSE
+            err_msg=None
+            output=OUTPUT_CONSTANT
+            local_bk.log.debug('Reading the inputs')
+            brute_logic = False
+            folder_path=str(args[0]) if len(args) > 0 else None
+            file_path=str(args[1]) if len(args) > 1 else None
+            local_bk.log.debug('Folder path is '+str(folder_path)+' and File is '+str(file_path))
+            if (not(folder_path is None or folder_path == '' or file_path is None or file_path == '') and os.path.exists(folder_path)):
+                local_bk.log.debug('Saving the file')
+                full_path = os.path.join(folder_path, file_path)
+                if SYSTEM_OS=='Windows':
+                    pid, ppid, pidb, browser_name = get_pid_ppid_browser()
+                    if not ((ppid == None) or (pid == None and browser_name != "edge legacy")):
+                        self.__open_save_file_dialog(pidb)
+                        def __save_time_func(tries=10, time_sleep=0.5):
+                            while tries > 0:
+                                win_handle = self.__get_file_dialog_handle(pid, ppid, browser_name)
+                                if win_handle is not None:
+                                    local_bk.log.info("Window handle found: %s", win_handle)
+                                    return win_handle
+                                time.sleep(time_sleep)
+                                tries -= 1
+                            return None
+
+                        maxTries = 10
+                        time_sleep = 0.5
+                        if len(args) > 2:
+                            maxTries = int(int(args[2]) / time_sleep)
+                        handle = __save_time_func(maxTries, time_sleep)
+                        if handle is None: brute_logic = True
+                        else:
+                            try:
+                                local_bk.log.info("Trying with method 1")
+                                app=Application().connect(handle=handle,allow_magic_lookup=False)
+                                win=app[win32gui.GetWindowText(handle)]
+                                # win.minimize()
+                                save_but = None
+                                file_box = None
+                                w_c = win.children()
+                                for c in w_c:
+                                    if str(c.friendly_class_name())=="Button" and c.window_text()=="&Save":
+                                        save_but = c
+                                        break
+                                for i in range(len(w_c)):
+                                    c = w_c[i]
+                                    if (str(c.friendly_class_name())=="Edit" and c.is_visible()
+                                    and w_c[i-1].class_name()=="ComboBox"):
+                                        file_box = c
+                                        break
+                                if file_box and save_but:
+                                    file_box.set_edit_text(full_path)
+                                    time.sleep(0.5)
+                                    save_but.set_focus()
+                                    save_but.click()
+                                    time.sleep(1)
+                                    if win32process.GetWindowThreadProcessId(handle)[0] != 0:
+                                        local_bk.log.info("Checking if save is clicked")
+                                        win_handles = self.__get_file_dialog_handle(pid, ppid, browser_name, all_hwnds=True)
+                                        # if len(win_handles) == 1 and ('Windows-7' in platform.platform() or browser_name == "internet explorer"):
+                                        if len(win_handles) == 1:
+                                            local_bk.log.info("Clicking save again")
+                                            try:
+                                                save_but.set_focus()
+                                                save_but.click()
+                                            except: pass
+                                            time.sleep(1)
+                                    if 'Windows-7' in platform.platform(): time.sleep(1)
+                                    if win32process.GetWindowThreadProcessId(handle)[0] != 0:
+                                        local_bk.log.info("File already present, trying to overwrite")
+                                        win_handles = self.__get_file_dialog_handle(pid, ppid, browser_name, all_hwnds=True)
+                                        wind_csa = None
+                                        for hw in win_handles:
+                                            if win32gui.GetWindowText(hw) == 'Confirm Save As':
+                                                wind_csa = hw
+                                                break
+                                        if wind_csa:
+                                            app2=Application().connect(handle=wind_csa,allow_magic_lookup=False)
+                                            win2=app2['Confirm Save As']
+                                            # win2.minimize()
+                                            yes_but = None
+                                            w_c = win2.children()
+                                            for c in w_c:
+                                                if str(c.friendly_class_name())=="Button" and c.window_text()=="&Yes":
+                                                    yes_but = c
+                                                    break
+                                            yes_but.set_focus()
+                                            yes_but.click()
+                                            time.sleep(1)
+                                            if 'Windows-7' in platform.platform(): time.sleep(1)
+                                            if win32process.GetWindowThreadProcessId(handle)[0] != 0:
+                                                local_bk.log.info("File already present, trying to overwrite with send function keys")
+                                                # Added alt+y sendfunction key for automating overwrite process if the file is already existed.
+                                                SF().press_multiple_keys(['alt','y'],1)
+                                                time.sleep(1)
+                                            if win32process.GetWindowThreadProcessId(handle)[0] == 0:
+                                                if browser_name == "internet explorer":
+                                                    local_bk.log.info("Checking if error popup is present for IE")
+                                                    tleft = 6
+                                                    while tleft > 0:
+                                                        tleft -= 1
+                                                        time.sleep(1)
+                                                        win_handles = self.__get_file_dialog_handle(pid, ppid, browser_name, all_hwnds=True)
+                                                        wind_esw = None
+                                                        for hw in win_handles:
+                                                            if win32gui.GetWindowText(hw) == 'Error Saving Webpage':
+                                                                wind_esw = hw
+                                                                tleft = 0
+                                                                break
+                                                    if wind_esw:
+                                                        app2=Application().connect(handle=wind_esw,allow_magic_lookup=False)
+                                                        win2=app2['Error Saving Webpage']
+                                                        # win2.minimize()
+                                                        ok_but = None
+                                                        w_c = win2.children()
+                                                        for c in w_c:
+                                                            if str(c.friendly_class_name())=="Button" and c.window_text()=="&Yes":
+                                                                ok_but = c
+                                                                break
+                                                        ok_but.click()
+                                                        time.sleep(1)
+                                                    else:
+                                                        status=TEST_RESULT_PASS
+                                                        methodoutput=TEST_RESULT_TRUE
+                                                        local_bk.log.info('File has been saved')
+                                                else:
+                                                    status=TEST_RESULT_PASS
+                                                    methodoutput=TEST_RESULT_TRUE
+                                                    local_bk.log.info('File has been saved')
+                                        else: brute_logic = True
+                                    else:
+                                        status=TEST_RESULT_PASS
+                                        methodoutput=TEST_RESULT_TRUE
+                                        local_bk.log.info('File has been saved')
+                            except Exception as e:
+                                err_msg = EXCEPTION_OCCURED + " in method 1"
+                                logger.print_on_console(err_msg)
+                                local_bk.log.error(err_msg)
+                                local_bk.log.error(e)
+                                brute_logic = True
+                else:
+                    emsg = "For non-windows system, use @generic send function keys"
+                    logger.print_on_console(emsg)
+                    local_bk.log.info(emsg)
+
+                if brute_logic:
+                    import file_operations
+                    file_obj = file_operations.FileOperations()
+                    status,methodoutput,output,err_msg = file_obj.save_file(folder_path,file_path)
+            else:
+                err_msg='Invalid file path'
+        except (IOError,WindowsError):
+            err_msg=ERROR_CODE_DICT['ERR_FILE_NOT_ACESSIBLE']
+        except Exception as e:
+            local_bk.log.error(e)
+            err_msg="Error while Saving file"
+        if err_msg is not None and not brute_logic:
+            local_bk.log.error(err_msg)
+            logger.print_on_console(err_msg)
+        return status,methodoutput,output,err_msg
+
+
 class Singleton_DriverUtil():
 
     def check_if_driver_exists_in_map(self,browserType):
@@ -1719,3 +1928,32 @@ class Singleton_DriverUtil():
                 break
         local_bk.log.info('Flag:',str(flag1))
         return flag1
+
+
+def get_pid_ppid_browser():
+    pidb=pid=None
+    ppid=None
+    browser_name = local_bk.driver_obj.capabilities.get('browserName')
+    platform_name = local_bk.driver_obj.capabilities.get('platformName')
+    if platform_name is None: platform_name = local_bk.driver_obj.capabilities.get('platform')
+    try:
+        if platform_name.lower() == 'windows':
+            if browser_name == 'chrome':
+                ppid = local_bk.driver_obj.service.process.pid
+            elif browser_name == 'firefox':
+                try:
+                    ppid = local_bk.driver_obj.binary.process.pid
+                except:
+                    ppid = local_bk.driver_obj.service.process.pid
+            elif browser_name == 'internet explorer':
+                ppid = local_bk.driver_obj.iedriver.process.pid
+            elif browser_name == 'edge legacy' or browser_name == 'msedge':
+                ppid = local_bk.driver_obj.edge_service.process.pid
+            cprocs = psutil.Process(ppid).children()
+            if len(cprocs) > 0:
+                pidb=pid = cprocs[1].pid if cprocs[0].name() == 'conhost.exe' else cprocs[0].pid
+            if browser_name == 'firefox':
+                pidb = psutil.Process(pid).children()[0].pid
+    except Exception as e:
+        local_bk.log.debug("Problem while getting the process id: {}".format(e))
+    return pid, ppid, pidb, browser_name

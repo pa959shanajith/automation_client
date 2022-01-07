@@ -155,6 +155,8 @@ class DatabaseOperation():
         verb = OUTPUT_CONSTANT
         err_msg=None
         cursor = None
+        if args and isinstance(args[0],tuple):
+            args=list(args[0])
         try:
             cnxn = self.connection(dbtype, ip , port , dbName, userName , password, args)
             if cnxn is not None:
@@ -246,6 +248,8 @@ class DatabaseOperation():
         res.append(dbtype) 
         cnxn=None
         cursor=None
+        if args and isinstance(args[0],tuple):
+            args=list(args[0])
         try:
             cnxn = self.connection(dbtype, ip , port , dbName, userName , password, args)
             if cnxn is not None:
@@ -403,6 +407,8 @@ class DatabaseOperation():
         err_msg=None
         cursor=None
         sheet=None
+        if args and isinstance(args[0],tuple):
+            args=list(args[0])
         try:
             ext = self.get_ext(inp_file)
             if ext == '.xls':
@@ -644,6 +650,8 @@ class DatabaseOperation():
         verb = OUTPUT_CONSTANT
         err_msg=None
         cursor = None
+        if args and isinstance(args[0],tuple):
+            args=list(args[0])
         try:
             cnxn = self.connection(dbtype, ip , port , dbName, userName , password,args)
             if cnxn is not None:
@@ -701,11 +709,14 @@ class DatabaseOperation():
                     inp_path = self.DV.get_dynamic_value(args[0])
                     if inp_path!=None:
                         if len(inp_path.split(';'))>1:
-                            fields=inp_path.split(";")[0]
-                            inp_sheet=inp_path.split(";")[1]
-                        else:
-                            fields=inp_path.split(";")[0]
+                            # fields=inp_path.split(";")[0]
+                            # inp_sheet=inp_path.split(";")[1]
+                            fields = None
                             inp_sheet=None
+                        elif len(inp_path.split(';'))==1:
+                            fields=inp_path.split(";")[0]
+                            if len(args)==1:inp_sheet=None
+                            elif len(args)==2 and args[1]!='': inp_sheet=args[1]
                     else:
                         fields = None
                         inp_sheet=None
@@ -726,11 +737,21 @@ class DatabaseOperation():
                         inp_sheet=None
                 else:
                     if len(args)>1:
-                        fields = args[0]
-                        inp_sheet=args[1]
+                        if (args[0].startswith('|') and args[0].endswith('|')):
+                            from util_operations import UtilOperations
+                            fields=UtilOperations().staticFetch(0, args[0])
+                            inp_sheet = args[1]
+                        else:
+                            fields = args[0]
+                            inp_sheet=args[1]
                     else:
-                        fields=args[0]
-                        inp_sheet=None
+                        if args[0].startswith('|') and args[0].endswith('|'):
+                            from util_operations import UtilOperations
+                            fields = UtilOperations().staticFetch(0, args[0])
+                            inp_sheet = None
+                        else:
+                            fields=args[0]
+                            inp_sheet=None
                 ext = self.get_ext(fields)
                 if (ext == '.xls'):
                     verify = os.path.isfile(fields)

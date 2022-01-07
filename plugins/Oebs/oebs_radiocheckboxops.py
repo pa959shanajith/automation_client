@@ -28,10 +28,10 @@ class RadioCheckboxOperations:
 
     #Method to select radio button
     def selectradiobutton(self,acc):
-        del oebs_key_objects.custom_msg[:]
-        #sets the keywordresult to FAIL
-        keywordresult=MSG_FAIL
-        verifyresponse = MSG_FALSE
+        status = TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FALSE
+        output_res = OUTPUT_CONSTANT
+        err_msg = None
         try:
             #gets the entire context information
             curaccinfo = acc.getAccessibleContextInfo()
@@ -45,42 +45,38 @@ class RadioCheckboxOperations:
                 if 'enabled' in objstates:
                     if 'checked' in objstates:
                         log.debug('%s',MSG_OBJECTSELECTED)
-                        oebs_key_objects.custom_msg.append(MSG_OBJECTSELECTED)
-                        keywordresult=MSG_PASS
+                        logger.print_on_console(MSG_OBJECTSELECTED)
+                        status=TEST_RESULT_PASS
                     else:
                         oebs_mouseops.MouseOperation('click',x_coor,y_coor)
                         time.sleep(2)
-                        verifyresponse = MSG_TRUE
-                        keywordresult=MSG_PASS
+                        methodoutput = TEST_RESULT_TRUE
+                        status=TEST_RESULT_PASS
                 else:
-                   log.debug('MSG:%s',MSG_DISABLED_OBJECT)
-                   logger.print_on_console(MSG_DISABLED_OBJECT)
-                   oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
+                    err_msg = MSG_DISABLED_OBJECT
+                    log.debug('MSG:%s',err_msg)
+                    logger.print_on_console(err_msg)
             else:
-                log.debug('MSG:%s',MSG_ELEMENT_NOT_VISIBLE)
-                logger.print_on_console(MSG_ELEMENT_NOT_VISIBLE)
-                oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_VISIBLE)
+                err_msg = MSG_ELEMENT_NOT_VISIBLE
+                log.debug('MSG:%s',err_msg)
+                logger.print_on_console(err_msg)
         except Exception as e:
             self.utilities_obj.cleardata()
             err_msg = ERROR_CODE_DICT['err_select_radiobutton']
             logger.print_on_console(err_msg)
             log.error(err_msg)
             log.debug('%s',e)
-            log.debug('Status %s',keywordresult)
-        log.debug('Result %s',verifyresponse)
-        log.debug('Status %s',keywordresult)
-        # response is sent to the client
-        self.utilities_obj.cleardata()
-        oebs_key_objects.keyword_output.append(str(keywordresult))
-        oebs_key_objects.keyword_output.append(str(verifyresponse))
-
+            log.debug('Status %s',status)
+        log.debug('Result %s',methodoutput)
+        log.debug('Status %s',status)
+        return status,methodoutput,output_res,err_msg
 
     #Method to select checkbox
     def selectcheckbox(self,acc):
-        del oebs_key_objects.custom_msg[:]
-        #sets the keywordresult to FAIL
-        keywordresult=MSG_FAIL
-        verifyresponse = MSG_FALSE
+        status = TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FALSE
+        output_res = OUTPUT_CONSTANT
+        err_msg = None
         try:
             #gets the entire context information
             curaccinfo = acc.getAccessibleContextInfo()
@@ -95,47 +91,45 @@ class RadioCheckboxOperations:
                     if 'checked' in objstates:
                         log.debug('%s',MSG_OBJECTSELECTED)
                         oebs_key_objects.custom_msg.append(MSG_OBJECTSELECTED)
-                        verifyresponse = MSG_TRUE
-                        keywordresult=MSG_PASS
+                        methodoutput = TEST_RESULT_TRUE
+                        status=TEST_RESULT_PASS
                     else:
                         oebs_mouseops.MouseOperation('click',x_coor,y_coor)
                         time.sleep(2)
                         curaccinfo = acc.getAccessibleContextInfo()
                         objstates = curaccinfo.states
                         if 'checked' in objstates:
-                            verifyresponse = MSG_TRUE
-                            keywordresult=MSG_PASS
+                            methodoutput = TEST_RESULT_TRUE
+                            status=TEST_RESULT_PASS
                         else:
-                            log.debug('%s',MSG_OBJECT_READONLY)
-                            oebs_key_objects.custom_msg.append(MSG_OBJECT_READONLY)
+                            err_msg = MSG_OBJECT_READONLY
+                            log.debug('%s',err_msg)
+                            logger.print_on_console(err_msg)
                 else:
-                    log.debug('%s',MSG_DISABLED_OBJECT)
-                    logger.print_on_console(MSG_DISABLED_OBJECT)
-                    oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
+                    err_msg = MSG_DISABLED_OBJECT
+                    log.debug('%s',err_msg)
+                    logger.print_on_console(err_msg)
             else:
-                log.debug('MSG:%s',MSG_ELEMENT_NOT_VISIBLE)
-                logger.print_on_console(MSG_ELEMENT_NOT_VISIBLE)
-                oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_VISIBLE)
+                err_msg = MSG_ELEMENT_NOT_VISIBLE
+                log.debug('MSG:%s',err_msg)
+                logger.print_on_console(err_msg)
         except Exception as e:
             self.utilities_obj.cleardata()
             err_msg = ERROR_CODE_DICT['err_select_checkbox']
             logger.print_on_console(err_msg)
             log.error(err_msg)
             log.debug('%s',e)
-            log.debug('Status %s',keywordresult)
-        log.debug('Result %s',verifyresponse)
-        log.debug('Status %s',keywordresult)
-        # response is sent to the client
-        self.utilities_obj.cleardata()
-        oebs_key_objects.keyword_output.append(str(keywordresult))
-        oebs_key_objects.keyword_output.append(str(verifyresponse))
+            log.debug('Status %s',status)
+        log.debug('Result %s',methodoutput)
+        log.debug('Status %s',status)
+        return status,methodoutput,output_res,err_msg
 
     #Method to un-select checkbox
     def unselectcheckbox(self,acc):
-        del oebs_key_objects.custom_msg[:]
-        #sets the keywordresult to FAIL
-        keywordresult=MSG_FAIL
-        verifyresponse = MSG_FALSE
+        status = TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FALSE
+        output_res = OUTPUT_CONSTANT
+        err_msg = None
         try:
             #gets the entire context information
             curaccinfo = acc.getAccessibleContextInfo()
@@ -153,42 +147,39 @@ class RadioCheckboxOperations:
                         curaccinfo = acc.getAccessibleContextInfo()
                         objstates = curaccinfo.states
                         if 'checked' in objstates:
-                            log.debug('%s',MSG_OBJECT_READONLY)
-                            oebs_key_objects.custom_msg.append(MSG_OBJECT_READONLY)
+                            err_msg = MSG_OBJECT_READONLY
+                            log.debug('%s',err_msg)
+                            logger.print_on_console(err_msg)
                         else:
-                            verifyresponse = MSG_TRUE
-                            keywordresult=MSG_PASS
+                            methodoutput = TEST_RESULT_TRUE
+                            status=TEST_RESULT_PASS
                     else:
-                        verifyresponse = MSG_TRUE
-                        keywordresult=MSG_PASS
+                        methodoutput = TEST_RESULT_TRUE
+                        status=TEST_RESULT_PASS
                 else:
-                    log.debug('Object is disabled',MSG_DISABLED_OBJECT)
-                    logger.print_on_console(MSG_DISABLED_OBJECT)
-                    oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
+                    err_msg = MSG_DISABLED_OBJECT
+                    log.debug('Object is disabled',err_msg)
+                    logger.print_on_console(err_msg)
             else:
-                log.debug('MSG:%s',MSG_ELEMENT_NOT_VISIBLE)
-                logger.print_on_console(MSG_ELEMENT_NOT_VISIBLE)
-                oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_VISIBLE)
+                err_msg = MSG_ELEMENT_NOT_VISIBLE
+                log.debug('MSG:%s',err_msg)
+                logger.print_on_console(err_msg)
         except Exception as e:
             self.utilities_obj.cleardata()
             err_msg = ERROR_CODE_DICT['err_unselect_checkbox']
             logger.print_on_console(err_msg)
             log.error(err_msg)
             log.debug('%s',e)
-            log.debug('Status %s',keywordresult)
-        log.debug('Result %s',verifyresponse)
-        log.debug('Status %s',keywordresult)
-        # response is sent to the client
-        self.utilities_obj.cleardata()
-        oebs_key_objects.keyword_output.append(str(keywordresult))
-        oebs_key_objects.keyword_output.append(str(verifyresponse))
-
+            log.debug('Status %s',status)
+        log.debug('Result %s',methodoutput)
+        log.debug('Status %s',status)
+        return status,methodoutput,output_res,err_msg
 
     def getstatus(self,acc):
-        del oebs_key_objects.custom_msg[:]
-        #sets the keywordResult to FAIL
-        keywordresult=MSG_FAIL
-        keywordresponse = ''
+        status = TEST_RESULT_FAIL
+        methodoutput = ''
+        output_res = OUTPUT_CONSTANT
+        err_msg = None
         flag = ''
         try:
             #gets the entire context information
@@ -198,41 +189,33 @@ class RadioCheckboxOperations:
             radiocheckboxrole = curaccinfo.role
             if radiocheckboxrole == 'check box':
                 if 'checked' in objstates:
-                    keywordresult=MSG_PASS
+                    status=TEST_RESULT_PASS
                     flag = 'Checked'
-                    keywordresponse = flag
-                    oebs_key_objects.custom_msg.append("MSG_RESULT_IS")
+                    methodoutput = flag
                 else:
-                    keywordresult=MSG_PASS
+                    status=TEST_RESULT_PASS
                     flag = 'UnChecked'
-                    keywordresponse = flag
-                    oebs_key_objects.custom_msg.append("MSG_RESULT_IS")
+                    methodoutput = flag
             elif radiocheckboxrole == 'radio button':
                 if 'checked' in objstates:
-                    keywordresult=MSG_PASS
+                    status=TEST_RESULT_PASS
                     flag = 'Selected'
-                    keywordresponse = flag
-                    oebs_key_objects.custom_msg.append("MSG_RESULT_IS")
+                    methodoutput = flag
                 else:
-                    keywordresult=MSG_PASS
+                    status=TEST_RESULT_PASS
                     flag = 'UnSelected'
-                    keywordresponse = flag
-                    oebs_key_objects.custom_msg.append("MSG_RESULT_IS")
+                    methodoutput = flag
             elif radiocheckboxrole == 'push button':
                     flag=objstates
-                    keywordresult=MSG_PASS
-                    keywordresponse = flag
-                    oebs_key_objects.custom_msg.append("MSG_RESULT_IS")
+                    status=TEST_RESULT_PASS
+                    methodoutput = flag
         except Exception as e:
             self.utilities_obj.cleardata()
             err_msg = ERROR_CODE_DICT['err_get_status']
             logger.print_on_console(err_msg)
             log.error(err_msg)
             log.debug('%s',e)
-            log.debug('Result %s',keywordresponse)
-        log.debug('Status %s',keywordresult)
-        # response is sent to the client
-        self.utilities_obj.cleardata()
-        oebs_key_objects.keyword_output.append(str(keywordresult))
-        oebs_key_objects.keyword_output.append(str(keywordresponse))
+            log.debug('Result %s',methodoutput)
+        log.debug('Status %s',status)
+        return status,methodoutput,output_res,err_msg
 

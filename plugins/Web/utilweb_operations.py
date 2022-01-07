@@ -34,6 +34,7 @@ from  selenium.webdriver.common import action_chains
 from selenium.webdriver.common.action_chains import ActionChains
 import threading
 from table_keywords import TableOperationKeywords, local_tk
+import os
 
 
 local_uo = threading.local()
@@ -593,21 +594,37 @@ class UtilWebKeywords:
                     if isinstance(browser_Keywords.local_bk.driver_obj,webdriver.Firefox):
                         #Scroll happens only if webelement is not displayed on screen.
                         if not self.is_inView(webelement):
-                            browser_Keywords.local_bk.driver_obj.execute_script("arguments[0].scrollIntoView(true);", webelement)
-                            location=obj.get_element_location(webelement)
+                            # Scroll till the element is in the middle
+                            desired_y_cor = (webelement.size['height'] / 2) + webelement.location['y']
+                            current_y_cor = (browser_Keywords.local_bk.driver_obj.execute_script('return window.innerHeight') / 2) + browser_Keywords.local_bk.driver_obj.execute_script('return window.pageYOffset')
+                            scroll_y_cor_by = desired_y_cor - current_y_cor
+                            browser_Keywords.local_bk.driver_obj.execute_script("window.scrollBy(0, arguments[0]);", scroll_y_cor_by)
+                            page_yoffset = browser_Keywords.local_bk.driver_obj.execute_script('return window.pageYOffset')
+                            location['y'] = location['y'] - page_yoffset
+                        elif self.is_inView(webelement):
+                            page_yoffset = browser_Keywords.local_bk.driver_obj.execute_script('return window.pageYOffset')
+                            location['y'] = location['y'] - page_yoffset
                         javascript = "return window.mozInnerScreenY"
                         value=browser_Keywords.local_bk.driver_obj.execute_script(javascript)
                         offset=int(value)
                         robot=pyrobot.Robot()
-                        robot.set_mouse_pos(int(location.get('x')+18),int(location.get('y')+offset+18))
+                        robot.set_mouse_pos(int(location.get('x')+18),int(location.get('y')+offset+10))
                         local_uo.log.debug('hover performed')
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
                     else:
                         #Scroll happens only if webelement is not displayed on screen.
                         if not self.is_inView(webelement):
-                            browser_Keywords.local_bk.driver_obj.execute_script("arguments[0].scrollIntoView(true);", webelement)
-                            location=obj.get_element_location(webelement)
+                            # Scroll till the element is in the middle
+                            desired_y_cor = (webelement.size['height'] / 2) + webelement.location['y']
+                            current_y_cor = (browser_Keywords.local_bk.driver_obj.execute_script('return window.innerHeight') / 2) + browser_Keywords.local_bk.driver_obj.execute_script('return window.pageYOffset')
+                            scroll_y_cor_by = desired_y_cor - current_y_cor
+                            browser_Keywords.local_bk.driver_obj.execute_script("window.scrollBy(0, arguments[0]);", scroll_y_cor_by)
+                            page_yoffset = browser_Keywords.local_bk.driver_obj.execute_script('return window.pageYOffset')
+                            location['y'] = location['y'] - page_yoffset
+                        elif self.is_inView(webelement):
+                            page_yoffset = browser_Keywords.local_bk.driver_obj.execute_script('return window.pageYOffset')
+                            location['y'] = location['y'] - page_yoffset
                         offset = browser_Keywords.local_bk.driver_obj.execute_script("return window.outerHeight - window.innerHeight;")
                         obj.mouse_move(int(location.get('x'))+9,int(location.get('y')+offset))
                         local_uo.log.debug('hover performed')
@@ -724,6 +741,7 @@ class UtilWebKeywords:
         try:
             if len(input)>0:
                 input1 = input[0]
+                mul_inp = input1.split('+')
                 digit = 1
                 if len(input)==3 and ((input[2].startswith('|') and input[2].endswith('|')) or (input[2].startswith('{') and input[2].endswith('}'))):
                     text = True
@@ -748,6 +766,19 @@ class UtilWebKeywords:
                         actions.perform()
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
+                elif len(mul_inp)==2:
+                    actions.key_down(self.keys_info[mul_inp[0].lower()])
+                    actions.send_keys(self.keys_info[mul_inp[1].lower()])
+                    actions.key_up(self.keys_info[mul_inp[0].lower()])
+                    actions.perform()
+                elif len(mul_inp)==3:
+                    actions.key_down(self.keys_info[mul_inp[0].lower()])
+                    actions.key_down(self.keys_info[mul_inp[1].lower()])
+                    actions.send_keys(self.keys_info[mul_inp[2].lower()])
+                    actions.perform()
+                    actions.key_up(self.keys_info[mul_inp[1].lower()])
+                    actions.key_up(self.keys_info[mul_inp[0].lower()])
+                    actions.perform()
                 else:
                     err_msg = "Function key '"+input1+"' is not recognized."
                     logger.print_on_console(err_msg)
@@ -782,12 +813,26 @@ class UtilWebKeywords:
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
                     else:
-                        from selenium.webdriver.common.action_chains import ActionChains
-                        action_obj=ActionChains(browser_Keywords.local_bk.driver_obj)
-                        action_obj.context_click(webelement).perform()
-                        local_uo.log.debug('Performed Right click')
-                        status=TEST_RESULT_PASS
-                        methodoutput=TEST_RESULT_TRUE
+                        if args[0][0]=='' or args[0][0]=='0':
+                            local_uo.log.debug('Performing first type of Right click')
+                            from selenium.webdriver.common.action_chains import ActionChains
+                            action_obj=ActionChains(browser_Keywords.local_bk.driver_obj)
+                            action_obj.context_click(webelement).perform()
+                            local_uo.log.debug('Performed Right click')
+                            status=TEST_RESULT_PASS
+                            methodoutput=TEST_RESULT_TRUE
+                        elif args[0][0] != '' and args[0][0] == '1':
+                            local_uo.log.debug('Performing second type of Right click')
+                            from selenium.webdriver.common.keys import Keys
+                            # focus on the element
+                            browser_Keywords.local_bk.driver_obj.execute_script("""arguments[0].focus();""", webelement)
+                            # send keys
+                            webelement.send_keys(Keys.SHIFT+Keys.F10)
+                            local_uo.log.debug('Performed second type Right click')
+                            status = TEST_RESULT_PASS
+                            methodoutput = TEST_RESULT_TRUE
+                        else:
+                            err_msg = "Please provide Valid input"
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
         return status,methodoutput,output,err_msg
@@ -918,12 +963,35 @@ class UtilWebKeywords:
             from PIL import Image
             if webelement!=None and webelement !='':
                 img_src = webelement.get_attribute("src")
+                # if file path passed as network location in src attribute
+                if "file:" in img_src:
+                    server_url = img_src.split(":")[1].replace("\\", "/")
+                    file_name = server_url.split("/")[-1]
+                    server_url = server_url.split("/")
+                    server_path = "//"
+                    for element in server_url[:-1]:
+                        if element != '':
+                            server_path += element + "/"
+                    img_src = os.path.normpath(server_path) + os.sep
+                    img_src = "file:" + img_src + file_name
                 file1 = io.BytesIO(urllib.request.urlopen(img_src).read())
                 file2=input[0]
                 local_uo.log.info(INPUT_IS)
                 local_uo.log.info(file2)
-                if file1 != None and file2 != None and  file2 != '' and os.path.exists(file2) :
+                if file1 != None and file2 != None and  file2 != '':
                     local_uo.log.debug('comparing the images')
+                    # if file path passed as network location
+                    if "file:" in file2:
+                        server_url = file2.split(":")[1].replace("\\", "/")
+                        file_name = server_url.split("/")[-1]
+                        server_url = server_url.split("/")
+                        server_path = "//"
+                        for element in server_url[:-1]:
+                            if element != '':
+                                server_path += element + "/"
+                        img_src = os.path.normpath(server_path) + os.sep
+                        img_src = "file:" + img_src + file_name
+                        file2 = io.BytesIO(urllib.request.urlopen(img_src).read())
                     if self.verify_image_obj != None: #Meaning user has advanced image processing plugin
                         if self.verify_image_obj.imagecomparison(file1,file2):
                             info_msg=ERROR_CODE_DICT['MSG_IMAGE_COMPARE_PASS']
@@ -960,6 +1028,14 @@ class UtilWebKeywords:
             if err_msg != None:
                 logger.print_on_console(err_msg)
                 local_uo.log.error(err_msg)
+        except urllib.error.URLError as e:
+            err_msg=ERROR_CODE_DICT['ERR_NO_IMAGE_SOURCE']
+            local_uo.log.error(err_msg)
+            logger.print_on_console(err_msg)
+        except FileNotFoundError as e:
+            err_msg=ERROR_CODE_DICT['ERR_NO_IMAGE_SOURCE']
+            local_uo.log.error(err_msg)
+            logger.print_on_console(err_msg)
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
         return status,methodoutput,output,err_msg
@@ -974,12 +1050,35 @@ class UtilWebKeywords:
             from PIL import Image
             if webelement!=None and webelement !='':
                 img_src = webelement.get_attribute("src")
+                # if file path passed as network location in src attribute
+                if "file:" in img_src:
+                    server_url = img_src.split(":")[1].replace("\\", "/")
+                    file_name = server_url.split("/")[-1]
+                    server_url = server_url.split("/")
+                    server_path = "//"
+                    for element in server_url[:-1]:
+                        if element != '':
+                            server_path += element + "/"
+                    img_src = os.path.normpath(server_path) + os.sep
+                    img_src = "file:" + img_src + file_name
                 file1 = io.BytesIO(urllib.request.urlopen(img_src).read())
                 file2=input[0]
                 local_uo.log.info(INPUT_IS)
                 local_uo.log.info(file2)
-                if file1 != None and file2 != None and  file2 != '' and os.path.exists(file2) :
+                if file1 != None and file2 != None and  file2 != '':
                     local_uo.log.debug('comparing the images')
+                    # if file path passed as network location
+                    if "file:" in file2:
+                        server_url = file2.split(":")[1].replace("\\", "/")
+                        file_name = server_url.split("/")[-1]
+                        server_url = server_url.split("/")
+                        server_path = "//"
+                        for element in server_url[:-1]:
+                            if element != '':
+                                server_path += element + "/"
+                        img_src = os.path.normpath(server_path) + os.sep
+                        img_src = "file:" + img_src + file_name
+                        file2 = io.BytesIO(urllib.request.urlopen(img_src).read())
                     if self.verify_image_obj != None: #Meaning user has advanced image processing plugin
                         if self.verify_image_obj.imagecomparison(file1,file2):
                             info_msg=ERROR_CODE_DICT['MSG_IMAGE_COMPARE_PASS']
@@ -1015,6 +1114,14 @@ class UtilWebKeywords:
                 if err_msg != None:
                     logger.print_on_console(err_msg)
                     local_uo.log.error(err_msg)
+        except urllib.error.URLError as e:
+            err_msg=ERROR_CODE_DICT['ERR_NO_IMAGE_SOURCE']
+            local_uo.log.error(err_msg)
+            logger.print_on_console(err_msg)
+        except FileNotFoundError as e:
+            err_msg=ERROR_CODE_DICT['ERR_NO_IMAGE_SOURCE']
+            local_uo.log.error(err_msg)
+            logger.print_on_console(err_msg)
         except Exception as e:
             local_uo.log.error(e)
             logger.print_on_console(e)

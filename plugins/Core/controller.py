@@ -871,7 +871,7 @@ class Controller():
             #Check for 'terminate_flag' before execution
             if not(terminate_flag):
                 if tsplist[i].testcase_num == last_tc_num:
-                    if mythread.cw.debugwindow is not None:
+                    if mythread.cw and mythread.cw.debugwindow is not None:
                         wx.CallAfter(mythread.cw.debugwindow.Show)
                     if self.runfrom_step_range_input:
                         #checks if the current step num is greater than ending range of run from step, to Run till the ending range of run from step
@@ -1000,7 +1000,7 @@ class Controller():
         log.info('***DEBUG STARTED***')
         logger.print_on_console('***DEBUG STARTED***')
         print('=======================================================================================================')
-        if mythread.cw.debugwindow is not None:
+        if mythread.cw and mythread.cw.debugwindow is not None:
             wx.CallAfter(mythread.cw.debugwindow.Hide)
         for testcase in scenario:
             flag,browser_type,last_tc_num,datatables,_,_=obj.parse_json(testcase)
@@ -1094,6 +1094,8 @@ class Controller():
         zephyr_password=''
         zephyr_username=''
         zephyr_url=''
+        zephyr_apitoken=''
+        zephyr_authtype=''
         con = Controller()
         obj = handler.Handler()
         status=COMPLETED
@@ -1217,12 +1219,16 @@ class Controller():
                             zephyr_url=qc_creds["zephyr"]["url"]
                             zephyr_username=qc_creds["zephyr"]["username"]
                             zephyr_password=qc_creds["zephyr"]["password"]
+                            zephyr_apitoken=qc_creds["zephyr"]["apitoken"]
+                            zephyr_authtype=qc_creds["zephyr"]["authtype"]
                             zephyr_sceanrio_data=scenario['qcdetails'][integ]
                             integ += 1
                             zephyr_releaseid=zephyr_sceanrio_data['releaseid']
                             zephyr_projectid=zephyr_sceanrio_data['projectid']
                             zephyr_treeid=zephyr_sceanrio_data['treeid']
                             zephy_testid=zephyr_sceanrio_data['testid']
+                            if 'parentid' in zephyr_sceanrio_data: zephyr_parentid=zephyr_sceanrio_data['parentid']
+                            else: zephyr_parentid=''
 
                         #Iterating through each test case in the scenario
                         for testcase in [eval(scenario[scenario_id])]:
@@ -1375,7 +1381,8 @@ class Controller():
                                 for i in range(0,len(all_jobs)):
                                     if(all_jobs[i]['browser']==browser_num[browser]):
                                         file_creations_status=j.get_job_asset_content(all_jobs[i]['id'],file_name,path)
-                                execute_result_data['reportData']['overallstatus'][0]['video']=video_path
+                                if len(all_jobs)!=0:
+                                    execute_result_data['reportData']['overallstatus'][0]['video']=video_path
                             socketIO.emit('result_executeTestSuite', execute_result_data)
                             obj.clearList(con)
                             sc_idx += 1
@@ -1544,9 +1551,12 @@ class Controller():
                                 zephyr_status['testid']=zephy_testid
                                 zephyr_status['projectId']=zephyr_projectid
                                 zephyr_status['treeid']=zephyr_treeid
+                                zephyr_status['parentid']=zephyr_parentid
                                 zephyr_status['zephyr_password']=zephyr_password
                                 zephyr_status['zephyr_url']=zephyr_url
                                 zephyr_status['zephyr_username']=zephyr_username
+                                zephyr_status['zephyr_apitoken']=zephyr_apitoken
+                                zephyr_status['zephyr_authtype']=zephyr_authtype
                                 zephyr_update_status=zephyr_status_over['overallstatus']
                                 if(zephyr_update_status.lower()=='pass'):
                                     zephyr_status['status']='1'
@@ -1665,68 +1675,72 @@ class Controller():
         inpval=[]
         keyword_flag=True
         ignore_stat=False
-        path_file=os.environ['AVO_ASSURE_HOME']+os.sep+'output'
-        os.chdir(path_file)
-        f=open("step_result.txt","w")
-        f.writelines(str(step_results))
-        list_time=step_results[-1]
-        del step_results[-1]
-        list_time=eval(list_time)
-        format_time='%Y-%m-%d %H:%M:%S.%f'
-        for i in step_results:
-            self.scenario_start_time=datetime.strptime(list_time[idx_t], format_time)
-            status_percentage = {TEST_RESULT_PASS:0,TEST_RESULT_FAIL:0,TERMINATE:0,"total":0}
-            pass_val=fail_val=0
-            obj_reporting.report_string=[]
-            obj_reporting.overallstatus_array=[]
-            obj_reporting.overallstatus=TEST_RESULT_PASS
-            obj_reporting.report_json[ROWS]=obj_reporting.report_string
-            obj_reporting.report_json[OVERALLSTATUS]=obj_reporting.overallstatus_array
-            tc_aws=aws_tsp[sc_idx]
-            os.chdir(self.cur_dir)
-            filename='Scenario'+str(sc_idx+1)+'.json'
-            for tsp in tc_aws:
-                if tsp.name=='LaunchApplication':
-                    inpval = tsp.inputval[0].split(';')
-                    result=['Pass',True,'9cc33d6fe25973868b30f4439f09901a',None]
-                    self.status=result[0]
-                    if result[0]=='Pass':
-                        pass_val+=1
-                        status_percentage["total"]+=1
+        try:
+            path_file=os.environ['AVO_ASSURE_HOME']+os.sep+'output'
+            os.chdir(path_file)
+            f=open("step_result.txt","w")
+            f.writelines(str(step_results))
+            list_time=step_results[-1]
+            del step_results[-1]
+            list_time=eval(list_time)
+            format_time='%Y-%m-%d %H:%M:%S.%f'
+            for i in step_results:
+                self.scenario_start_time=datetime.strptime(list_time[idx_t], format_time)
+                status_percentage = {TEST_RESULT_PASS:0,TEST_RESULT_FAIL:0,TERMINATE:0,"total":0}
+                pass_val=fail_val=0
+                obj_reporting.report_string=[]
+                obj_reporting.overallstatus_array=[]
+                obj_reporting.overallstatus=TEST_RESULT_PASS
+                obj_reporting.report_json[ROWS]=obj_reporting.report_string
+                obj_reporting.report_json[OVERALLSTATUS]=obj_reporting.overallstatus_array
+                tc_aws=aws_tsp[sc_idx]
+                os.chdir(self.cur_dir)
+                filename='Scenario'+str(sc_idx+1)+'.json'
+                for tsp in tc_aws:
+                    if tsp.name=='launchApplication':
+                        inpval = tsp.inputval[0].split(';')
+                        result=['Pass',True,'9cc33d6fe25973868b30f4439f09901a',None]
+                        self.status=result[0]
+                        if result[0]=='Pass':
+                            pass_val+=1
+                            status_percentage["total"]+=1
+                        else:
+                            fail_val+=1
+                            status_percentage["total"]+=1
+                        ellapsed_time=''
+                        obj_reporting.generate_report_step(tsp,self.status,self,ellapsed_time,keyword_flag,result,ignore_stat,inpval)
+                        continue
                     else:
-                        fail_val+=1
-                        status_percentage["total"]+=1
-                    ellapsed_time=''
-                    obj_reporting.generate_report_step(tsp,self.status,self,ellapsed_time,keyword_flag,result,ignore_stat,inpval)
-                    continue
-                else:
-                    self.status=i[str(tsp.stepnum)][0]
-                    if self.status=='Pass':
-                        pass_val+=1
-                        status_percentage["total"]+=1
-                    elif self.status=='Fail':
-                        fail_val+=1
-                        status_percentage["total"]+=1
-                        obj_reporting.overallstatus=self.status
-                    inpval = tsp.inputval[0].split(';')
-                    result=i[str(tsp.stepnum)]
-                    ellapsed_time=''
-                    obj_reporting.generate_report_step(tsp,self.status,self,ellapsed_time,keyword_flag,result,ignore_stat,inpval)
-                    continue
-            self.scenario_end_time=datetime.strptime(list_time[idx_t+1], format_time)
-            self.scenario_ellapsed_time=self.scenario_end_time-self.scenario_start_time
-            obj_reporting.build_overallstatus(self.scenario_start_time,self.scenario_end_time,self.scenario_ellapsed_time)
-            status_percentage[TEST_RESULT_PASS]=pass_val
-            status_percentage[TEST_RESULT_FAIL]=fail_val
-            status_percentage["s_index"]=suite_idx-1
-            status_percentage["index"]=sc_idx
-            obj_reporting.user_termination=manual_terminate_flag
-            obj_reporting.save_report_json(filename,json_data,status_percentage)
-            execute_result_data["scenarioId"]=aws_scenario[sc_idx]
-            execute_result_data["reportData"] = obj_reporting.report_json
-            socketIO.emit('result_executeTestSuite', execute_result_data)
-            sc_idx+=1
-            idx_t+=1
+                        self.status=i[str(tsp.stepnum)][0]
+                        if self.status=='Pass':
+                            pass_val+=1
+                            status_percentage["total"]+=1
+                        elif self.status=='Fail':
+                            fail_val+=1
+                            status_percentage["total"]+=1
+                            obj_reporting.overallstatus=self.status
+                        inpval = tsp.inputval[0].split(';')
+                        result=i[str(tsp.stepnum)]
+                        ellapsed_time=''
+                        obj_reporting.generate_report_step(tsp,self.status,self,ellapsed_time,keyword_flag,result,ignore_stat,inpval)
+                        continue
+                self.scenario_end_time=datetime.strptime(list_time[idx_t+1], format_time)
+                self.scenario_ellapsed_time=self.scenario_end_time-self.scenario_start_time
+                obj_reporting.build_overallstatus(self.scenario_start_time,self.scenario_end_time,self.scenario_ellapsed_time)
+                status_percentage[TEST_RESULT_PASS]=pass_val
+                status_percentage[TEST_RESULT_FAIL]=fail_val
+                status_percentage["s_index"]=suite_idx-1
+                status_percentage["index"]=sc_idx
+                obj_reporting.user_termination=manual_terminate_flag
+                obj_reporting.save_report_json(filename,json_data,status_percentage)
+                execute_result_data["scenarioId"]=aws_scenario[sc_idx]
+                execute_result_data["reportData"] = obj_reporting.report_json
+                socketIO.emit('result_executeTestSuite', execute_result_data)
+                sc_idx+=1
+                idx_t+=1
+        except Exception as e:
+            logger.print_on_console("Exception in aws_report")
+            log.error("Exception in aws_report. Error: " + str(e))
 
     def invoke_controller(self,action,mythread,debug_mode,runfrom_step,json_data,root_obj,socketIO,qc_soc,qtest_soc,zephyr_soc,*args):
         status = COMPLETED
@@ -1926,16 +1940,20 @@ def kill_process():
     if SYSTEM_OS == 'Darwin':
         try:
             import browser_Keywords_MW
-            browser_Keywords_MW.driver_obj.quit()
+            if browser_Keywords_MW.driver_obj != None:
+                browser_Keywords_MW.driver_obj.quit()
+                browser_Keywords_MW.driver_obj = None
         except ImportError: pass
         except Exception as e:
-            logger.print_on_console('Error in stopping scraping driver as driver is already closed')
+            logger.print_on_console('Error in stopping mobile browser driver as driver is already closed')
             log.error(e)
 
 
         try:
-            import install_and_launch
-            install_and_launch.driver.quit()
+            import android_scrapping
+            if android_scrapping.driver != None:
+                android_scrapping.driver.quit()
+                android_scrapping.driver = None
         except ImportError: pass
         except Exception as e:
             logger.print_on_console('Error in stopping application driver as driver is already closed')
@@ -1956,20 +1974,20 @@ def kill_process():
             logger.print_on_console('Exception in stopping server')
             log.error(e)
 
-        # try:
-        #     # os.system("killall -9 Safari")
-        #         # This kills all instances of safari browser even if it is not opened by Avo Assure.
-        #         # Issue when Avo Assure is opened in Safari browser
-        #     for id in process_ids:
-        #         os.system("killall -9 " + str(id))
-        #     # os.system("killall -9 safaridriver")
-        #     # os.system("killall -9 node_appium")
-        #     # os.system("killall -9 xcodebuild")
-        #     # os.system("killall -9 chromedriver")
-        #     # os.system("killall -9 geckodriver")
-        # except Exception as e:
-        #     logger.print_on_console('Exception in stopping server')
-        #     log.error(e)
+        try:
+            #os.system("killall -9 Safari")
+            ## This kills all instances of safari browser even if it is not opened by Avo Assure.
+            ## Issue when Avo Assure is opened in Safari browser
+            #for id in process_ids:
+            #    os.system("killall -9 " + str(id))
+            #os.system("killall -9 safaridriver")
+            os.system("killall -9 node_appium")
+            os.system("killall -9 xcodebuild")
+            #os.system("killall -9 chromedriver")
+            #os.system("killall -9 geckodriver")
+        except Exception as e:
+            logger.print_on_console('Exception in stopping server')
+            log.error(e)
         log.info('Stale processes killed')
         logger.print_on_console('Stale processes killed')
     elif SYSTEM_OS == 'Linux':
@@ -2036,7 +2054,10 @@ def kill_process():
             import browser_Keywords_MW
             del browser_Keywords_MW.drivermap[:]
             if hasattr(browser_Keywords_MW, 'driver_obj'):
-                if (browser_Keywords_MW.driver_obj):
+                adb=os.environ['ANDROID_HOME']+"\\platform-tools\\adb.exe"
+                cmd = adb + ' -s '+ browser_Keywords_MW.device_id +' shell pm clear com.android.chrome '
+                s = subprocess.check_output(cmd.split(),universal_newlines=True).strip()
+                if (browser_Keywords_MW.driver_obj) and s =='Success':
                     browser_Keywords_MW.driver_obj = None
         except ImportError:pass
         except Exception as e:

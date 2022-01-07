@@ -37,11 +37,10 @@ class TextOperations:
 
     #Method to get Text of the given Object location
     def gettext(self,acc):
-        del oebs_key_objects.custom_msg[:]
-        #sets the keywordresult to FAIL
-        keywordresult=MSG_FAIL
-        #this is the response obtained from the keyword
-        keywordresponse=''
+        status = TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FALSE
+        output_res = OUTPUT_CONSTANT
+        err_msg = None
         try:
             #gets the entire context information
             charinfo = acc.getAccessibleContextInfo()
@@ -56,42 +55,38 @@ class TextOperations:
                     text = acc.getAccessibleTextRange(0,charinfo.charCount - 1)
                     log.debug('Text Box text is %s',text)
                     #sets the result to pass
-                    keywordresult=MSG_PASS
+                    status=TEST_RESULT_PASS
                     log.debug('Result:%s',text)
-                    keywordresponse = text
-                    oebs_key_objects.custom_msg.append("MSG_RESULT_IS")
+                    methodoutput = text
+                    logger.print_on_console("MSG_RESULT_IS")
                 else:
-                    log.debug('MSG:%s',MSG_DISABLED_OBJECT)
-                    logger.print_on_console(MSG_DISABLED_OBJECT)
-                    oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
+                    err_msg = MSG_DISABLED_OBJECT
+                    log.debug('MSG:%s',err_msg)
+                    logger.print_on_console(err_msg)
             else:
-                log.debug('%s',MSG_INVALID_OBJECT)
-                logger.print_on_console(MSG_INVALID_OBJECT)
-                oebs_key_objects.custom_msg.append(MSG_INVALID_OBJECT)
+                err_msg = MSG_INVALID_OBJECT
+                log.debug('%s',err_msg)
+                logger.print_on_console(err_msg)
         except Exception as e:
             self.utilities_obj.cleardata()
             err_msg = ERROR_CODE_DICT['err_get_text']
             logger.print_on_console(err_msg)
             log.error(err_msg)
             log.debug('%s',e)
-            log.debug('Status %s',keywordresult)
-        log.debug('Status %s',keywordresult)
-        # response is sent to the client
-        self.utilities_obj.cleardata()
-        oebs_key_objects.keyword_output.append(str(keywordresult))
-        oebs_key_objects.keyword_output.append(str(keywordresponse))
+            log.debug('Status %s',status)
+        log.debug('Status %s',status)
+        return status,methodoutput,output_res,err_msg
 
     #Method to settext at the given Object location
     def settext(self,acc):
-
-        del oebs_key_objects.custom_msg[:]
-        #sets the keywordresult to FAIL
-        keywordresult=MSG_FAIL
-        #this is the response obtained from the keyword
-        keywordresponse=MSG_FALSE
+        status = TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FALSE
+        output_res = OUTPUT_CONSTANT
+        err_msg = None
         try:
             #gets the entire context information
             time.sleep(3)
+            acc.requestFocus()
             curaccinfo = acc.getAccessibleContextInfo()
             log.debug('Received Object Context',DEF_SETTEXT)
             if 'enabled' in curaccinfo.states:
@@ -114,20 +109,24 @@ class TextOperations:
                                     result = acc.setTextContents(text)
                                     if result:
                                         #sets the result to pass
-                                        keywordresult=MSG_PASS
-                                        keywordresponse=MSG_TRUE
+                                        status=TEST_RESULT_PASS
+                                        methodoutput=TEST_RESULT_TRUE
                                 else:
-                                    log.debug('MSG:%s',MSG_INVALID_INPUT)
-                                    oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
+                                    err_msg = MSG_INVALID_INPUT
+                                    log.debug('MSG:%s',err_msg)
+                                    logger.print_on_console(err_msg)
                             else:
-                                log.debug('MSG:%s',MSG_INVALID_INPUT)
-                                oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
+                                err_msg = MSG_INVALID_INPUT
+                                log.debug('MSG:%s',err_msg)
+                                logger.print_on_console(err_msg)
                         else:
-                            log.debug('MSG:%s',MSG_INVALID_OBJECT)
-                            oebs_key_objects.custom_msg.append(MSG_INVALID_OBJECT)
+                            err_msg = MSG_INVALID_OBJECT
+                            log.debug('MSG:%s',err_msg)
+                            logger.print_on_console(err_msg)
                     else:
-                        log.debug('MSG:%s',MSG_OBJECT_READONLY)
-                        oebs_key_objects.custom_msg.append(MSG_OBJECT_READONLY)
+                        err_msg = MSG_OBJECT_READONLY
+                        log.debug('MSG:%s',err_msg)
+                        logger.print_on_console(err_msg)
                 else:
                     #gets the entire context information
                     curaccinfo = acc.getAccessibleContextInfo()
@@ -163,7 +162,7 @@ class TextOperations:
 
                                     mousestate=oebs_mouseops.GetCursorInfo('state')
                                     while(mousestate == 65543):
-                                         mousestate=oebs_mouseops.GetCursorInfo('state')
+                                            mousestate=oebs_mouseops.GetCursorInfo('state')
 
 
                                     if 'focused' in curaccinfo.states:
@@ -180,57 +179,53 @@ class TextOperations:
                                         for length in range(index):
                                             shell.SendKeys('{'+text[length]+'}')
                                             #sets the result to pass;
-                                            keywordresult=MSG_PASS
-                                            keywordresponse=MSG_TRUE
+                                            status=TEST_RESULT_PASS
+                                            methodoutput=TEST_RESULT_TRUE
                                     else:
-                                        log.debug('MSG:%s',MSG_ELEMENT_NON_EDITABLE)
-                                        logger.print_on_console(MSG_ELEMENT_NON_EDITABLE)
-                                        oebs_key_objects.custom_msg.append(MSG_ELEMENT_NON_EDITABLE)
+                                        err_msg = MSG_ELEMENT_NON_EDITABLE
+                                        log.debug('MSG:%s',err_msg)
+                                        logger.print_on_console(err_msg)
                                 else:
-                                    log.debug('MSG:%s',MSG_OBJECT_READONLY)
-                                    logger.print_on_console(MSG_OBJECT_READONLY)
-                                    oebs_key_objects.custom_msg.append(MSG_OBJECT_READONLY)
+                                    err_msg = MSG_OBJECT_READONLY
+                                    log.debug('MSG:%s',err_msg)
+                                    logger.print_on_console(err_msg)
                             else:
-                                log.debug('MSG:%s',MSG_ELEMENT_NOT_VISIBLE)
-                                logger.print_on_console(MSG_ELEMENT_NOT_VISIBLE)
-                                oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_VISIBLE)
+                                err_msg = MSG_ELEMENT_NOT_VISIBLE
+                                log.debug('MSG:%s',err_msg)
+                                logger.print_on_console(err_msg)
                         else:
-                            log.debug('MSG:%s',MSG_INVALID_INPUT)
-                            logger.print_on_console(MSG_INVALID_INPUT)
-                            oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
+                            err_msg = MSG_INVALID_INPUT
+                            log.debug('MSG:%s',err_msg)
+                            logger.print_on_console(err_msg)
                     else:
-                        log.debug('MSG:%s',MSG_INVALID_NOOF_INPUT)
-                        logger.print_on_console(MSG_INVALID_INPUT)
-                        oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
+                        err_msg = MSG_INVALID_INPUT
+                        log.debug('MSG:%s',err_msg)
+                        logger.print_on_console(err_msg)
             else:
-                log.debug('MSG:%s',MSG_DISABLED_OBJECT)
-                logger.print_on_console(MSG_DISABLED_OBJECT)
-                oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
+                err_msg = MSG_DISABLED_OBJECT
+                log.debug('MSG:%s',err_msg)
+                logger.print_on_console(err_msg)
         except Exception as e:
             self.utilities_obj.cleardata()
             err_msg = ERROR_CODE_DICT['err_set_text']
             logger.print_on_console(err_msg)
             log.error(err_msg)
-            log.debug('Status %s',keywordresult)
+            log.debug('Status %s',status)
             oebs_key_objects.custom_msg=[]
-            oebs_key_objects.custom_msg.append(str(e))
-        log.debug('Status %s',keywordresult)
-        # response is sent to the client
-        self.utilities_obj.cleardata()
-        oebs_key_objects.keyword_output.append(str(keywordresult))
-        oebs_key_objects.keyword_output.append(str(keywordresponse))
+            logger.print_on_console(str(e))
+        log.debug('Status %s',status)
+        return status,methodoutput,output_res,err_msg
 
     #implemented for #8010-Azure
     def setsecuretext(self,acc):
-
-        del oebs_key_objects.custom_msg[:]
-        #sets the keywordresult to FAIL
-        keywordresult=MSG_FAIL
-        #this is the response obtained from the keyword
-        keywordresponse=MSG_FALSE
+        status = TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FALSE
+        output_res = OUTPUT_CONSTANT
+        err_msg = None
         try:
             #gets the entire context information
             time.sleep(3)
+            acc.requestFocus()
             curaccinfo = acc.getAccessibleContextInfo()
             log.debug('Received Object Context',DEF_SETTEXT)
             if 'enabled' in curaccinfo.states:
@@ -256,24 +251,24 @@ class TextOperations:
                                     result = acc.setTextContents(text)
                                     if result:
                                         #sets the result to pass
-                                        keywordresult=MSG_PASS
-                                        keywordresponse=MSG_TRUE
+                                        status=TEST_RESULT_PASS
+                                        methodoutput=TEST_RESULT_TRUE
                                 else:
-                                    log.debug('MSG:%s',MSG_INVALID_INPUT)
-                                    logger.print_on_console(MSG_INVALID_INPUT)
-                                    oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
+                                    err_msg = MSG_INVALID_INPUT
+                                    log.debug('MSG:%s',err_msg)
+                                    logger.print_on_console(err_msg)
                             else:
-                                log.debug('MSG:%s',MSG_INVALID_INPUT)
-                                logger.print_on_console(MSG_INVALID_INPUT)
-                                oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
+                                err_msg = MSG_INVALID_INPUT
+                                log.debug('MSG:%s',err_msg)
+                                logger.print_on_console(err_msg)
                         else:
-                            log.debug('MSG:%s',MSG_INVALID_OBJECT)
-                            logger.print_on_console(MSG_INVALID_OBJECT)
-                            oebs_key_objects.custom_msg.append(MSG_INVALID_OBJECT)
+                            err_msg = MSG_INVALID_OBJECT
+                            log.debug('MSG:%s',err_msg)
+                            logger.print_on_console(err_msg)
                     else:
-                        log.debug('MSG:%s',MSG_OBJECT_READONLY)
-                        logger.print_on_console(MSG_OBJECT_READONLY)
-                        oebs_key_objects.custom_msg.append(MSG_OBJECT_READONLY)
+                        err_msg = MSG_OBJECT_READONLY
+                        log.debug('MSG:%s',err_msg)
+                        logger.print_on_console(err_msg)
                 else:
                     #gets the entire context information
                     curaccinfo = acc.getAccessibleContextInfo()
@@ -312,7 +307,7 @@ class TextOperations:
 
                                     mousestate=oebs_mouseops.GetCursorInfo('state')
                                     while(mousestate == 65543):
-                                         mousestate=oebs_mouseops.GetCursorInfo('state')
+                                            mousestate=oebs_mouseops.GetCursorInfo('state')
 
 
                                     if 'focused' in curaccinfo.states:
@@ -329,53 +324,50 @@ class TextOperations:
                                         for length in range(index):
                                             shell.SendKeys('{'+text[length]+'}')
                                             #sets the result to pass;
-                                            keywordresult=MSG_PASS
-                                            keywordresponse=MSG_TRUE
+                                            status=TEST_RESULT_PASS
+                                            methodoutput=TEST_RESULT_TRUE
                                     else:
-                                        log.debug('MSG:%s',MSG_ELEMENT_NON_EDITABLE)
-                                        oebs_key_objects.custom_msg.append(MSG_ELEMENT_NON_EDITABLE)
-
+                                        err_msg = MSG_ELEMENT_NON_EDITABLE
+                                        log.debug('MSG:%s',err_msg)
+                                        logger.print_on_console(err_msg)
                                 else:
-                                    log.debug('MSG:%s',MSG_OBJECT_READONLY)
-                                    logger.print_on_console(MSG_OBJECT_READONLY)
-                                    oebs_key_objects.custom_msg.append(MSG_OBJECT_READONLY)
+                                    err_msg = MSG_OBJECT_READONLY
+                                    log.debug('MSG:%s',err_msg)
+                                    logger.print_on_console(err_msg)
                             else:
-                                log.debug('MSG:%s',MSG_ELEMENT_NOT_VISIBLE)
-                                logger.print_on_console(MSG_ELEMENT_NOT_VISIBLE)
-                                oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_VISIBLE)
+                                err_msg = MSG_ELEMENT_NOT_VISIBLE
+                                log.debug('MSG:%s',err_msg)
+                                logger.print_on_console(err_msg)
                         else:
-                            log.debug('MSG:%s',MSG_INVALID_INPUT)
-                            logger.print_on_console(MSG_INVALID_INPUT)
-                            oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
+                            err_msg = MSG_INVALID_INPUT
+                            log.debug('MSG:%s',err_msg)
+                            logger.print_on_console(err_msg)
                     else:
-                        log.debug('MSG:%s',MSG_INVALID_NOOF_INPUT)
-                        logger.print_on_console(MSG_INVALID_INPUT)
-                        oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
+                        err_msg = MSG_INVALID_NOOF_INPUT
+                        log.debug('MSG:%s',err_msg)
+                        logger.print_on_console(err_msg)
             else:
-                log.debug('MSG:%s',MSG_DISABLED_OBJECT)
-                logger.print_on_console(MSG_DISABLED_OBJECT)
-                oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
+                err_msg = MSG_DISABLED_OBJECT
+                log.debug('MSG:%s',err_msg)
+                logger.print_on_console(err_msg)
         except Exception as e:
             self.utilities_obj.cleardata()
             err_msg = ERROR_CODE_DICT['err_set_secure_text']
             logger.print_on_console(err_msg)
             log.error(err_msg)
-            log.debug('Status %s',keywordresult)
+            log.debug('Status %s',status)
             oebs_key_objects.custom_msg=[]
-            oebs_key_objects.custom_msg.append(str(e))
-        log.debug('Status %s',keywordresult)
-        # response is sent to the client
-        self.utilities_obj.cleardata()
-        oebs_key_objects.keyword_output.append(str(keywordresult))
-        oebs_key_objects.keyword_output.append(str(keywordresponse))
+            logger.print_on_console(str(e))
+        log.debug('Status %s',status)
+        return status,methodoutput,output_res,err_msg
 
-   #Method to verifytext of the given Object location matches with the User Provided Text
+
+    #Method to verifytext of the given Object location matches with the User Provided Text
     def verifytext(self,acc):
-        del oebs_key_objects.custom_msg[:]
-        #sets the keywordresult to FAIL
-        keywordresult=MSG_FAIL
-        #sets the verifyresponse to FALSE
-        verifyresponse = MSG_FALSE
+        status = TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FALSE
+        output_res = OUTPUT_CONSTANT
+        err_msg = None
         try:
             #gets the entire context information
             curaccinfo = acc.getAccessibleContextInfo()
@@ -392,46 +384,42 @@ class TextOperations:
                         #checks the user provided text with the text in the object
                         if fetchedText == textVerify:
                             log.debug('Text verified',DEF_VERIFYTEXT)
-                            #sets the verifyresponse to TRUE
-                            verifyresponse = MSG_TRUE
-                             #sets the keywordresult to pass
-                            keywordresult=MSG_PASS
+                            #sets the methodoutput to TRUE
+                            methodoutput = TEST_RESULT_TRUE
+                                #sets the status to pass
+                            status=TEST_RESULT_PASS
                         else:
                             log.debug('Text verification failed',DEF_VERIFYTEXT)
-                            oebs_key_objects.custom_msg.append(str('Text verification failed \'' + fetchedText + '\' not equal to \''+textVerify+"\'."))
+                            logger.print_on_console(str('Text verification failed \'' + fetchedText + '\' not equal to \''+textVerify+"\'."))
                     else:
-                        log.debug('MSG:%s',MSG_INVALID_INPUT)
-                        logger.print_on_console(MSG_INVALID_INPUT)
-                        oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
+                        err_msg = MSG_INVALID_INPUT
+                        log.debug('MSG:%s',err_msg)
+                        logger.print_on_console(err_msg)
                 else:
-                    log.debug('MSG:%s',MSG_INVALID_NOOF_INPUT)
-                    logger.print_on_console(MSG_INVALID_INPUT)
-                    oebs_key_objects.custom_msg.append(MSG_INVALID_INPUT)
+                    err_msg = MSG_INVALID_NOOF_INPUT
+                    log.debug('MSG:%s',err_msg)
+                    logger.print_on_console(err_msg)
             else:
-                log.debug('MSG:%s',MSG_INVALID_OBJECT)
-                logger.print_on_console(MSG_INVALID_OBJECT)
-                oebs_key_objects.custom_msg.append(MSG_INVALID_OBJECT)
+                err_msg = MSG_INVALID_OBJECT
+                log.debug('MSG:%s',err_msg)
+                logger.print_on_console(err_msg)
         except Exception as e:
             self.utilities_obj.cleardata()
             err_msg = ERROR_CODE_DICT['err_verify_text']
             logger.print_on_console(err_msg)
             log.error(err_msg)
             log.debug('%s',e)
-            log.debug('Status %s',keywordresult)
-        log.debug('Status %s',keywordresult)
-        log.debug('Verify Response %s',str(verifyresponse))
-        # response is sent to the client
-        self.utilities_obj.cleardata()
-        oebs_key_objects.keyword_output.append(str(keywordresult))
-        oebs_key_objects.keyword_output.append(str(verifyresponse))
+            log.debug('Status %s',status)
+        log.debug('Status %s',status)
+        log.debug('Verify Response %s',str(methodoutput))
+        return status,methodoutput,output_res,err_msg
 
     #Method to cleartext of the given Object location matches with the User Provided Text
     def cleartext(self,acc):
-        del oebs_key_objects.custom_msg[:]
-        #sets the keywordresult to FAIL
-        keywordresult=MSG_FAIL
-        #this is the response obtained from the keyword
-        verifyresponse=MSG_FALSE
+        status = TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FALSE
+        output_res = OUTPUT_CONSTANT
+        err_msg = None
         try:
             time.sleep(3)
             #gets the entire context information
@@ -454,17 +442,17 @@ class TextOperations:
                             result = acc.setTextContents(text)
                             if result:
                                 #sets the result to pass
-                                keywordresult=MSG_PASS
-                                verifyresponse=MSG_TRUE
+                                status=TEST_RESULT_PASS
+                                methodoutput=TEST_RESULT_TRUE
                                 log.debug('MSG:%s',MSG_TEXTBOX_CLEARED)
                         else:
-                            log.debug('MSG:%s',MSG_INVALID_OBJECT)
-                            logger.print_on_console(MSG_INVALID_OBJECT)
-                            oebs_key_objects.custom_msg.append(MSG_INVALID_OBJECT)
+                            err_msg = MSG_INVALID_OBJECT
+                            log.debug('MSG:%s',err_msg)
+                            logger.print_on_console(err_msg)
                     else:
-                        log.debug('MSG:%s',MSG_OBJECT_READONLY)
-                        logger.print_on_console(MSG_OBJECT_READONLY)
-                        oebs_key_objects.custom_msg.append(MSG_OBJECT_READONLY)
+                        err_msg = MSG_OBJECT_READONLY
+                        log.debug('MSG:%s',err_msg)
+                        logger.print_on_console(err_msg)
                 else:
                     if 'editable' in curaccinfo.states:
                         x_coor = int(curaccinfo.x + (0.5 * curaccinfo.width))
@@ -509,37 +497,34 @@ class TextOperations:
                                                 shell.SendKeys("{DELETE}")
                                             log.debug('MSG:%s',MSG_TEXTBOX_CLEARED)
                                             #sets the result to pass
-                                            keywordresult=MSG_PASS
-                                            verifyresponse=MSG_TRUE
+                                            status=TEST_RESULT_PASS
+                                            methodoutput=TEST_RESULT_TRUE
                                         else:
-                                            log.debug('MSG:%s',MSG_ELEMENT_NOT_FOCUSABLE)
-                                            logger.print_on_console(MSG_ELEMENT_NOT_FOCUSABLE)
-                                            oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_FOCUSABLE)
+                                            err_msg = MSG_ELEMENT_NOT_FOCUSABLE
+                                            log.debug('MSG:%s',err_msg)
+                                            logger.print_on_console(err_msg)
                                 else:
-                                    log.debug('MSG:%s',MSG_ELEMENT_NON_EDITABLE)
-                                    logger.print_on_console(MSG_ELEMENT_NON_EDITABLE)
-                                    oebs_key_objects.custom_msg.append(MSG_ELEMENT_NON_EDITABLE)
+                                    err_msg = MSG_ELEMENT_NON_EDITABLE
+                                    log.debug('MSG:%s',err_msg)
+                                    logger.print_on_console(err_msg)
                             else:
-                                log.debug('MSG:%s',MSG_ELEMENT_NOT_VISIBLE)
-                                logger.print_on_console(MSG_ELEMENT_NOT_VISIBLE)
-                                oebs_key_objects.custom_msg.append(MSG_ELEMENT_NOT_VISIBLE)
+                                err_msg = MSG_ELEMENT_NOT_VISIBLE
+                                log.debug('MSG:%s',err_msg)
+                                logger.print_on_console(err_msg)
                     else:
-                        log.debug('MSG:%s',MSG_OBJECT_READONLY)
-                        logger.print_on_console(MSG_OBJECT_READONLY)
-                        oebs_key_objects.custom_msg.append(MSG_OBJECT_READONLY)
+                        err_msg = MSG_OBJECT_READONLY
+                        log.debug('MSG:%s',err_msg)
+                        logger.print_on_console(err_msg)
             else:
-                log.debug('MSG:%s',MSG_DISABLED_OBJECT)
-                logger.print_on_console(MSG_DISABLED_OBJECT)
-                oebs_key_objects.custom_msg.append(MSG_DISABLED_OBJECT)
+                err_msg = MSG_DISABLED_OBJECT
+                log.debug('MSG:%s',err_msg)
+                logger.print_on_console(err_msg)
         except Exception as e:
             self.utilities_obj.cleardata()
             err_msg = ERROR_CODE_DICT['err_clear_text']
             logger.print_on_console(err_msg)
             log.error(err_msg)
             log.debug('%s',e)
-            log.debug('Status %s',keywordresult)
-        log.debug('Status %s',keywordresult)
-        # response is sent to the client
-        self.utilities_obj.cleardata()
-        oebs_key_objects.keyword_output.append(str(keywordresult))
-        oebs_key_objects.keyword_output.append(str(verifyresponse))
+            log.debug('Status %s',status)
+        log.debug('Status %s',status)
+        return status,methodoutput,output_res,err_msg

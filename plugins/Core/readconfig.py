@@ -34,7 +34,7 @@ class readConfig():
         "firefox_path":"", "prediction_for_iris_objects":"","hide_soft_key":"","connection_timeout":"","extn_enabled":"",
         "headless_mode":"","update_check":"", "delay_stringinput":"","clear_cache":"","screen_rec":"","full_screenshot":"",
         "close_browser_popup":"","incognito_private_mode":"", "use_custom_debugport":"","disable_screen_timeout":"",
-        "globalWaitTimeOut":"", "kill_stale":"","chrome_extnpath":""}
+        "globalWaitTimeOut":"", "kill_stale":"","chrome_extnpath":"","browser_screenshots":""}
         if os.path.isfile(self.config_path)==True:
             try:
                 conf = open(self.config_path, 'r')
@@ -79,6 +79,7 @@ class readConfig():
                 configvalues['disable_screen_timeout']=params['disable_screen_timeout']
                 configvalues['chrome_extnpath']=params['chrome_extnpath']
                 configvalues['kill_stale']=params['kill_stale']
+                configvalues['browser_screenshots']=params['browser_screenshots']
             except Exception as e:
                 configvalues['errorflag']=e
         else:
