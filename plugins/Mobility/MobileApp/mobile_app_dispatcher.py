@@ -40,6 +40,7 @@ import subprocess
 import platform
 import time
 import android_custom
+import sys
 apptypes = None
 
 log = logging.getLogger('mobile_app_dispatcher.py')
@@ -153,6 +154,9 @@ class MobileDispatcher:
         objectname = teststepproperty.objectname
         object_name_ios = objectname
         # SOME IRIS FLAG FUNCTIONS
+        if SYSTEM_OS=='Darwin':
+            path=os.environ['AVO_ASSURE_HOME']+os.sep+'plugins'+os.sep+'Mobility'+os.sep+'iris_mobile'
+            sys.path.append(path)
         import iris_mobile
         iris_mobile_object = iris_mobile.iris_mobile_class()
         self.mob_dict['pressiris'] = iris_mobile_object.Press
