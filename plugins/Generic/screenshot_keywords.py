@@ -91,6 +91,8 @@ class Screenshot():
                     bucketname = 'accessibilityscreenshots'
                     tempPath = args[0]['temppath']
                     objpath = args[0]['projectname']+'/'+args[0]['releaseid']+'/'+args[0]['cyclename']+'/'+args[0]['executionid']+'/'+tempobj
+                elif driver:
+                    driver.save_screenshot(tempPath)
                 elif not(web):
                     img=ImageGrab.grab()
                     img.save(tempPath)
@@ -107,7 +109,6 @@ class Screenshot():
                 logger.print_on_console('Screenshot captured')
                 status=TEST_RESULT_PASS
                 methodoutput=TEST_RESULT_TRUE
-                output = tempPath
         except Exception as e:
             log.error(e)
             output=OUTPUT_CONSTANT

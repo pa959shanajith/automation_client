@@ -690,8 +690,7 @@ class Dispatcher:
                       or screenShot_Flag == 'all'):
                         if browser_screenshots or headless_mode or sauceFlag:
                             if local_Wd.popup_object.check_if_no_popup_exists():
-                                file_path = screen_shot_obj.captureScreenshot(screen_details,web=True)
-                                driver.save_screenshot(file_path[2])
+                                file_path = screen_shot_obj.captureScreenshot(screen_details, driver=driver, web=True)
                             elif not (headless_mode or sauceFlag):
                                 local_Wd.log.debug("Pop up exists; Taking the screenshot using generic functions")
                                 file_path = screen_shot_obj.captureScreenshot(screen_details,web=False)
