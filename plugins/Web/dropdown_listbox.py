@@ -1592,6 +1592,9 @@ class DropdownKeywords():
         verb = OUTPUT_CONSTANT
         err_msg=None
         local_ddl.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        # Handling absMatch value coming as part of the input list for custom keyword verifyValuesExists
+        if len(input) > 0 and input[-1].lower() == "abs":
+            input = input[:-1]
         if webelement is not None:
             if ((webelement.is_enabled())):
                 local_ddl.log.info('Recieved web element from the web dispatcher')
