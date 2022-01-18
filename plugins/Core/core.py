@@ -361,7 +361,7 @@ class MainNamespace(BaseNamespace):
                 import iris_operations
                 iris_operations.update_dataset(d,socketIO)
             else:
-                if action == 'scrape':
+                if action in ['scrape','replace']:
                     task = d['task']
                     if str(task) == 'OPEN BROWSER CH':
                         browsername = '1'

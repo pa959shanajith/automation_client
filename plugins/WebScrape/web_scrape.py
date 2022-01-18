@@ -53,7 +53,7 @@ class ScrapeWindow(wx.Frame):
                 self.panel = wx.Panel(self)
                 self.core_utilsobject = core_utils.CoreUtils()
                 self.webscrape_utils_obj = WebScrape_Utils()
-                if (self.action == 'scrape'):
+                if (self.action in ['scrape','replace']):
                     self.vsizer = wx.BoxSizer(wx.VERTICAL)
                     self.startbutton = wx.ToggleButton(self.panel, label="Start ClickAndAdd",pos=(12,18 ), size=(175, 25))
                     self.startbutton.Bind(wx.EVT_TOGGLEBUTTON, self.clickandadd)
@@ -89,6 +89,7 @@ class ScrapeWindow(wx.Frame):
                     cropandaddobj = cropandadd.Cropandadd()
                     self.cropbutton = wx.ToggleButton(self.panel, label="Start IRIS",pos=(12,108 ), size=(175, 25))
                     self.cropbutton.Bind(wx.EVT_TOGGLEBUTTON, self.cropandadd)
+                    if(self.action == 'replace'): self.cropbutton.Disable()
 
                 elif(self.action == 'compare'):
                     try:
@@ -153,6 +154,7 @@ class ScrapeWindow(wx.Frame):
 
         else:
             d = clickandaddoj.stopclickandadd()
+            d['action'] = self.action
             logger.print_on_console('Scrapped data saved successfully in domelements.json file')
 
             # Check the limit of data size as per Avo Assure standards
