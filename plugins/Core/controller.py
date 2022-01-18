@@ -153,6 +153,7 @@ class Controller():
             if self.mobile_app_dispatcher_obj==None:
                 if SYSTEM_OS=='Darwin':
                     core_utils.get_all_the_imports('Mobility/MobileApp')
+                    core_utils.get_all_the_imports('Mobility/iris_mobile')
                 else:
                     core_utils.get_all_the_imports('Mobility')
                 import mobile_app_dispatcher
