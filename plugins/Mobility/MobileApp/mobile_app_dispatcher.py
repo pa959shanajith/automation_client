@@ -40,7 +40,6 @@ import subprocess
 import platform
 import time
 import android_custom
-import sys
 apptypes = None
 
 log = logging.getLogger('mobile_app_dispatcher.py')
