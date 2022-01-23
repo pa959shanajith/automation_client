@@ -245,6 +245,7 @@ class ScrapeWindow(wx.Frame):
                 if d.lower() == 'fail':
                     self.socketIO.emit('scrape',d)
             else:
+                d['action'] = self.action
                 self.socketIO.emit('scrape',d)
                 logger.print_on_console('Full scrape  completed')
         else:
