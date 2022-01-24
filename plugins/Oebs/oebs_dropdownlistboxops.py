@@ -97,7 +97,8 @@ class DropdownListboxOperations:
                 childAcc = self.utilities_obj.looptolist(acc)
                 selectedvalue = self.getselectedlist(childAcc)
                 inputValue = oebs_key_objects.keyword_input
-                if selectedvalue == inputValue:
+                # inputValue is a list
+                if selectedvalue in inputValue:
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
             #check for listbox
@@ -106,7 +107,8 @@ class DropdownListboxOperations:
                 #calling getselected def to get all selected values in list
                 selectedvalue = self.getselectedlist(acc)
                 #verifys selected values with given input
-                if selectedvalue == inputValue:
+                # inputValue is a list
+                if selectedvalue in inputValue:
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
             else:
@@ -659,14 +661,14 @@ class DropdownListboxOperations:
                     generatedvalues  = self.getvaluesdropdown(acc)
                     if len(generatedvalues)!=0:
                         status=TEST_RESULT_PASS
-                        methodoutput=str(generatedvalues)
+                        methodoutput = generatedvalues
             #check for listbox
             elif charinfo.role == 'list':
                 #calling getvalueslist def to get all values in list
                 listvalues = self.getvalueslist(acc)
                 if len(listvalues)!=0:
                         status=TEST_RESULT_PASS
-                        methodoutput = str(listvalues)
+                        methodoutput = listvalues
             else:
                 err_msg = MSG_INVALID_OBJECT
                 log.debug('%s',err_msg)
