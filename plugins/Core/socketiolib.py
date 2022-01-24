@@ -11,6 +11,7 @@
 #-------------------------------------------------------------------------------
 
 import os
+import ssl
 import json
 import logging
 import urllib3
@@ -160,7 +161,8 @@ class EngineIO(EioClient):
         # so that they are preserved when connecting to the WebSocket route
         cookies = None
         extra_options = {}
-        extra_options['sslopt'] = {}   ##~
+        # extra_options['sslopt'] = {}   ##~
+        extra_options['sslopt'] = {'ssl_version': ssl.PROTOCOL_TLSv1_2}   ##~
         if self.http:
             # cookies
             cookies = '; '.join(["{}={}".format(cookie.name, cookie.value)
