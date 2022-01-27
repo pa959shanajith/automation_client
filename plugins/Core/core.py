@@ -777,6 +777,12 @@ class MainNamespace(BaseNamespace):
         set_ICE_status(False, True, intv)
         spath=args[0]
         import constants
+        import reportnfs
+        nfs_obj = reportnfs.reportNFS()
+        if nfs_obj is not None: 
+            constants.SCREENSHOT_NFS_AVAILABLE=True
+        else:
+            print("Screenshot storage not reachable. Storing screenshots in `Screenshots` folder present in AvoAssure_ICE/AvoAssure")
         if(SYSTEM_OS=='Darwin'):
             spath=spath["mac"]
         else:

@@ -14,8 +14,7 @@ from PIL import ImageGrab
 import  datetime
 import time
 import logger
-from reportnfs import reportNFS
-import generic_constants
+import reportnfs
 import os
 import uuid
 from constants import *
@@ -30,77 +29,55 @@ class Screenshot():
         output=OUTPUT_CONSTANT
         err_msg=None
         path = constants.SCREENSHOT_PATH
-        filePath = ''
+        genericStep = False
+        DEBUG_ACTION =  False
         try:
+            
+            if not constants.SCREENSHOT_NFS_AVAILABLE:
+                path = self.createScreenshotFolder()
+
             if('action' in args[0]):
+                DEBUG_ACTION = args[0]['action']==DEBUG
                 ## for generic keyword capture screen
                 log.debug('Reading the inputs')
-                if(len(args[0]['inputs'])>2):
+                if(len(args[0]['inputs'])<=2):
+                    genericStep = self.genericScreenshot(args[0]['inputs'],path) + '.png'
+                else:
                     logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_NO_INPUT'])
                     output = None
-                elif(args[0]['inputs']!='' and len(args[0]['inputs'])==2):
-                    inputval = args[0]['inputs'][0]
-                    filename = args[0]['inputs'][1]
-                    if(inputval=='' or not os.path.isdir(inputval)):
-                        logger.print_on_console("Invalid file path! Saving screenshot in the default folder")
-                        inputval = path
-                    if (filename!=''):
-                        if '.' in filename:
-                            filename = filename.split('.')[0]
-                        if str(inputval).endswith(os.sep):
-                            filePath = str(inputval) + filename
-                        else:
-                            filePath = str(inputval) + os.sep+ filename
-                    else:
-                        filename = self.generateUniqueFileName()
-                        if str(inputval).endswith(os.sep):
-                            filePath = str(inputval) + filename
-                        else:
-                            filePath = str(inputval) + os.sep + filename
-                elif(args[0]['action']==EXECUTE and args[0]['inputs']==''):
-                    filename = self.generateUniqueFileName()
-                    screenData = args[0]['screen_data']
-                    path = path+screenData['projectname']+os.sep+screenData['releaseid']+os.sep+screenData['cyclename']+os.sep+datetime.datetime.now().strftime("%Y-%m-%d")+os.sep
-                    if(not os.path.exists(path)):
-                        os.makedirs(path)
-                    filePath = path + filename
-                elif(args[0]['action']=='debug' and args[0]['inputs']==''):
-                    filePath = path+self.generateUniqueFileName()
-                else:
-                    output = None
-            else:
-                if path=="Disabled":
-                    logger.print_on_console(ERROR_CODE_DICT['ERR_SCREENSHOT_PATH'])
-                    output=None
-                else:
-                    filename=self.generateUniqueFileName()
-                    path=path+args[0]['projectname']+os.sep+args[0]['releaseid']+os.sep+args[0]['cyclename']+os.sep+datetime.datetime.now().strftime("%Y-%m-%d")+os.sep
-                    if(not os.path.exists(path)):
-                        os.makedirs(path)
-                    filePath = path + filename
-                    output = filePath+'.png'
-            if output==None:
-                log.debug('screenshot capture failed')
-                output=OUTPUT_CONSTANT
-            else:
-                bucketname = 'screenshots'
-                tempobj=self.generateUniqueFileName() +'.png'
-                tempPath=os.sep.join([os.getcwd(),'output','.screenshots', tempobj])
-                objpath = args[0]['projectname']+'/'+args[0]['releaseid']+'/'+args[0]['cyclename']+'/'+tempobj
-                if accessibility:
-                    bucketname = 'accessibilityscreenshots'
-                    tempPath = args[0]['temppath']
-                    objpath = args[0]['projectname']+'/'+args[0]['releaseid']+'/'+args[0]['cyclename']+'/'+args[0]['executionid']+'/'+tempobj
-                elif driver:
-                    driver.save_screenshot(tempPath)
-                elif not(web):
-                    img=ImageGrab.grab()
-                    img.save(tempPath)
-                else:
-                    pass #add logic for capture through driver to be added here
-                r = reportNFS().saveimage(bucketname,objpath,tempPath)
-                if not accessibility: #add logic to clear accessibility screenshots after some time period
-                    os.remove(tempPath)
+
+            if output!=None:
+                r="pass"
+                objpath = path
+                if(not DEBUG_ACTION):
+                    data = args[0]
+                    if(genericStep):
+                        data = args[0]["screen_data"]
+                    bucketname = 'screenshots'
+                    tempobj=self.generateUniqueFileName() +'.png'
+                    objpath = data['projectname']+'/'+data['releaseid']+'/'+data['cyclename']+'/'+tempobj
+                    tempPath=os.sep.join([path, objpath])
+                    if accessibility:
+                        bucketname = 'accessibilityscreenshots'
+                        tempPath = data['temppath']
+                        objpath = data['projectname']+'/'+data['releaseid']+'/'+data['cyclename']+'/'+data['executionid']+'/'+tempobj
+                    elif driver:
+                        driver.save_screenshot(tempPath)
+                    elif not(web):
+                        img=ImageGrab.grab()
+                        img.save(tempPath)
+                    #pushing screenshots to NFS
+                    if(constants.SCREENSHOT_NFS_AVAILABLE):
+                        r = reportnfs.client.saveimage(bucketname,objpath,tempPath)
+                    if not accessibility or not constants.SCREENSHOT_NFS_AVAILABLE: #add logic to clear accessibility screenshots after some time period
+                        os.remove(tempPath)
+                if(genericStep):
+                    if driver:
+                        driver.save_screenshot(genericStep)
+                    elif not(web):
+                        img=ImageGrab.grab()
+                        img.save(genericStep)
+                #keeping a copy of screenshot in folder for generic keyword
                 if r=='fail':
                     raise Exception('error while saving in reportNFS') 
                 else:
@@ -109,6 +86,7 @@ class Screenshot():
                 logger.print_on_console('Screenshot captured')
                 status=TEST_RESULT_PASS
                 methodoutput=TEST_RESULT_TRUE
+
         except Exception as e:
             log.error(e)
             output=OUTPUT_CONSTANT
@@ -120,4 +98,35 @@ class Screenshot():
     def generateUniqueFileName(self):
         filename=datetime.datetime.now().strftime("%Y-%m-%d-%H_%M_%S_"+str(uuid.uuid4()))
         return filename
+    
+    def createScreenshotFolder(self):
+        path=os.sep.join([os.getcwd(),'screenshots'])
+        if(not os.path.exists(path)):
+            os.makedirs(path)
+        return path
+
+    def genericScreenshot(self,arg,path):
+        if(arg == ''):
+            inputval=filename=''
+        else:
+            inputval=arg[0]
+            filename=arg[1]
+        if(inputval=='' or not os.path.isdir(inputval)):
+            logger.print_on_console("Invalid file path! Saving screenshot in the default folder screenshots")
+            inputval = self.createScreenshotFolder()
+        if (filename!=''):
+            if '.' in filename:
+                filename = filename.split('.')[0]
+            if str(inputval).endswith(os.sep):
+                filePath = str(inputval) + filename
+            else:
+                filePath = str(inputval) + os.sep+ filename
+        else:
+            filename = self.generateUniqueFileName()
+            if str(inputval).endswith(os.sep):
+                filePath = str(inputval) + filename
+            else:
+                filePath = str(inputval) + os.sep + filename
+        return filePath
+        
 

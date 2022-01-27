@@ -23,7 +23,7 @@ import json
 # from colorama import Fore, Style, init as init_colorama
 from inspect import getframeinfo, stack
 from constants import *
-from reportnfs import reportNFS
+import reportnfs
 from logging.handlers import BaseRotatingHandler
 import logging
 logger = logging.getLogger('logger.py')
@@ -71,7 +71,6 @@ def print_on_console(message,*args, **kwargs):
 def log(message):
     print(message)
 
-browser_name = {'1':'Chrome', '2':'FireFox', '3':'IE', '6': 'Safari', '7':'EdgeLegacy', '8':'EdgeChromium'}
 
 class CustomHandler(BaseRotatingHandler):
 
@@ -81,8 +80,8 @@ class CustomHandler(BaseRotatingHandler):
         if not os.path.exists(logpath):
             os.makedirs(logpath, exist_ok=True)
         if excType==PARALLEL:
-            manifest_filepath = os.path.normpath(logpath + os.sep + browser_name[ind]+'_manifest.json').replace("\\","\\\\")
-            filename = os.path.normpath(logpath + os.sep +browser_name[ind]+'.log').replace("\\","\\\\")
+            manifest_filepath = os.path.normpath(logpath + os.sep + BROWSER_NAME[ind]+'_manifest.json').replace("\\","\\\\")
+            filename = os.path.normpath(logpath + os.sep +BROWSER_NAME[ind]+'.log').replace("\\","\\\\")
         else:
             filename = os.path.normpath(logpath+ os.sep + 'Execution.log').replace("\\","\\\\")
             manifest_filepath = os.path.normpath(logpath + os.sep + 'manifest.json').replace("\\","\\\\")
@@ -97,11 +96,12 @@ class CustomHandler(BaseRotatingHandler):
         self.temp = {}
         self.projectId = excData['projectname']
          
-    def logline(self,ind,start=False):
-        if start:
-            return [ self.filename.split("\\")[-1] , sum(1 for line in open(self.filename)) + 1]
-        else:
-            return sum(1 for line in open(self.filename))
+    def logline(self,_,start=False):
+        with open(self.filename) as fo:
+            if start:
+                return [ self.filename.split("\\")[-1] , sum(1 for _ in fo) + 1]
+            else:
+                return sum(1 for _ in fo)
 
     def createTspObj(self,scenario_id,browser):
         self.manifest["root"].append({"scenario_id":scenario_id,"browser":browser,"tcdetails":[]})
@@ -148,8 +148,8 @@ class CustomHandler(BaseRotatingHandler):
                 json.dump(self.manifest,f)
             fn = self.projectId + self.filename.replace("\\\\","/").split(".logs")[1]
             mn = self.projectId + self.manifest_path.replace("\\\\","/").split(".logs")[1]
-            r = reportNFS().savelogs('logs',fn,self.filename)
-            m = reportNFS().savelogs('logs',mn,self.manifest_path)
+            r = reportnfs.client.savelogs('logs',fn,self.filename)
+            m = reportnfs.client.savelogs('logs',mn,self.manifest_path)
             if r =='fail' or m=='fail' :
                 raise Exception('error while saving in reportNFS')
         except Exception as e:

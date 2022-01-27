@@ -3,6 +3,8 @@ from pdfkitlib_override import pdfkit
 import logger
 import logging
 import re
+import reportnfs
+import constants
 SEP = os.sep
 log = logging.getLogger('generatepdf.py')
 template_path = os.environ["AVO_ASSURE_HOME"] + "/plugins/PdfReport/template.html"
@@ -35,8 +37,22 @@ class WatchThread(threading.Thread):
                 f1.writelines(lines)
         '''
         try:
-            with open(report_path, 'wb+') as output, open(source, 'rb') as input:
-                output.write(input.read())
+            with open(report_path, 'w') as output, open(source, 'rb') as input:
+                json_data = json.load(input)
+                for r in json_data['rows']:
+                    if "screenshot_path" in r and r['screenshot_path'] is not None:
+                        try:
+                            path = "fail"
+                            if(constants.SCREENSHOT_NFS_AVAILABLE):
+                                path = reportnfs.client.getobjectlink('screenshots',r['screenshot_path'])
+                            if(path != "fail"):
+                                r['screenshot_path']=path
+                            else:
+                                r['screenshot_path']=os.sep.join([constants.SCREENSHOT_PATH_ALT, r['screenshot_path']])
+                        except:
+                            pass
+                json_data = json.dumps(json_data)
+                output.write(json_data)
                 #output.write(data)
             #shutil.copyfile(source, os.getcwd())
             #os.rename(filename, report_path)
