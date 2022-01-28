@@ -24,7 +24,7 @@ socketIO = None
 bench_thread = []
 threadNames = []
 terminated = False
-BENCHAMRK_OUTPUT_LOC=os.environ["AVO_ASSURE_HOME"]+os.sep+"benchmark output"
+BENCHAMRK_OUTPUT_LOC=os.path.join(os.environ["AVO_ASSURE_HOME"],"output","benchmark")
 
 def init(times,socket):
     global bench_thread,terminated
