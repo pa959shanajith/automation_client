@@ -14,7 +14,7 @@ import socket
 import datetime
 import core
 import readconfig
-
+import shutil
 log = logging.getLogger('benchmark.py')
 resArray = []
 string = ""
@@ -24,6 +24,7 @@ socketIO = None
 bench_thread = []
 threadNames = []
 terminated = False
+BENCHAMRK_OUTPUT_LOC=os.path.join(os.environ["AVO_ASSURE_HOME"],"output","benchmark")
 
 def init(times,socket):
     global bench_thread,terminated
@@ -70,14 +71,19 @@ def stop(terminateExec):
    
 def delete_memory_test_file():
     global terminated
-    if os.path.exists('output.txt'):
-        try:
-            os.unlink('output.txt')
-            return True
-        except Exception as e:
-            log.error(e)
-            terminated = True
-            logger.print_on_console("Another instance of benchmark running, terminating.")
+    if os.path.isdir(BENCHAMRK_OUTPUT_LOC):
+        if os.path.exists(BENCHAMRK_OUTPUT_LOC+os.sep+'memory_benchmark.txt'):
+            try:
+                time.sleep(2)
+                # os.unlink('memory_benchmark.txt')
+                shutil.rmtree(BENCHAMRK_OUTPUT_LOC,ignore_errors=True)
+                if os.path.isfile(BENCHAMRK_OUTPUT_LOC+os.sep+'memory_benchmark.txt'):
+                    os.unlink(BENCHAMRK_OUTPUT_LOC+os.sep+'memory_benchmark.txt')
+                return True
+            except Exception as e:
+                log.error(e,exc_info=True)
+                terminated = True
+                logger.print_on_console("Another instance of benchmark running, terminating.")
 
 
 
@@ -114,28 +120,40 @@ def memory():
         logger.print_on_console("Running memory benchmark")
         global string
         delete_memory_test_file()
+        if not os.path.isdir(BENCHAMRK_OUTPUT_LOC):
+            os.makedirs(BENCHAMRK_OUTPUT_LOC)
         for x in range(4):
             string = string + string
         for j in range(2): 
             if terminated:
                 return -99
             beforeFile = time.time()
-            if os.path.exists("output.txt"):
-                outputFile = os.stat("output.txt")
+            if os.path.exists(BENCHAMRK_OUTPUT_LOC+os.sep+"memory_benchmark.txt"):
+                outputFile = os.stat(BENCHAMRK_OUTPUT_LOC+os.sep+"memory_benchmark.txt")
                 if outputFile.st_size/100000 > 4000:
                     delete_memory_test_file()
             for i in range(30):
                 if terminated:
                     return -99
-                f = open("output.txt", "a")
-                f.write(string)
-                f.close()
+                try:
+                    with open(BENCHAMRK_OUTPUT_LOC+os.sep+"memory_benchmark.txt","a") as f:
+                        f.write(string)
+                        f.close()
+                except:
+                    f.close()
+                finally:
+                    f.close()
             for i in range(4):
                 if terminated:
                     return -99
-                f = open("output.txt", "r")
-                f.read()
-                f.close()
+                try:   
+                    with open(BENCHAMRK_OUTPUT_LOC+os.sep+"memory_benchmark.txt", "r") as f:
+                        f.read()
+                        f.close()
+                except:
+                    f.close()
+                finally:
+                    f.close()
             delete_memory_test_file()
             afterFile = time.time()
             resArray.append(afterFile - beforeFile)
