@@ -5,6 +5,8 @@ import logging
 import re
 import reportnfs
 import constants
+from constants import *
+
 SEP = os.sep
 log = logging.getLogger('generatepdf.py')
 template_path = os.environ["AVO_ASSURE_HOME"] + "/plugins/PdfReport/template.html"
@@ -40,17 +42,17 @@ class WatchThread(threading.Thread):
             with open(report_path, 'w') as output, open(source, 'rb') as input:
                 json_data = json.load(input)
                 for r in json_data['rows']:
-                    if "screenshot_path" in r and r['screenshot_path'] is not None:
+                    ss = r.get(SCREENSHOT_PATH, None)
+                    ss_alt = r.get(SCREENSHOT_PATH_ALT, None)
+                    path = "fail"
+                    if ss is not None and ss != OUTPUT_CONSTANT and ss.strip() != '':
                         try:
-                            path = "fail"
                             if(constants.SCREENSHOT_NFS_AVAILABLE):
-                                path = reportnfs.client.getobjectlink('screenshots',r['screenshot_path'])
-                            if(path != "fail"):
-                                r['screenshot_path']=path
-                            else:
-                                r['screenshot_path']=os.sep.join([constants.SCREENSHOT_PATH_ALT, r['screenshot_path']])
+                                path = r[SCREENSHOT_PATH] = reportnfs.client.getobjectlink('screenshots',ss)
                         except:
                             pass
+                    if path == "fail" and ss_alt != None:
+                        r[SCREENSHOT_PATH] = ss_alt
                 json_data = json.dumps(json_data)
                 output.write(json_data)
                 #output.write(data)

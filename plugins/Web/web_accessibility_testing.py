@@ -256,7 +256,7 @@ class Web_Accessibility_Testing:
             return True
         try:
             logger.print_on_console('Capturing Screenshot for Accessibility Testing')
-            temppath = os.getcwd() + os.sep + "output" + os.sep + executionid + os.sep + str(index) +".png"
+            temppath = AVO_ASSURE_HOME + os.sep + "output" + os.sep + executionid + os.sep + str(index) +".png"
             _, width, height = self.webscrape_utils_obj.fullpage_screenshot(driver, temppath)
             screen_shot_obj = screenshot_keywords.Screenshot()
             script_info['executionid'] = executionid

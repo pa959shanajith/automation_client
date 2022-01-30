@@ -28,35 +28,33 @@ class Screenshot():
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
-        path = constants.SCREENSHOT_PATH
+        path = ''
         genericStep = False
         DEBUG_ACTION =  False
         try:
-            
-            if not constants.SCREENSHOT_NFS_AVAILABLE:
-                path = self.createScreenshotFolder()
 
             if('action' in args[0]):
                 DEBUG_ACTION = args[0]['action']==DEBUG
                 ## for generic keyword capture screen
                 log.debug('Reading the inputs')
                 if(len(args[0]['inputs'])<=2):
-                    genericStep = self.genericScreenshot(args[0]['inputs'],path) + '.png'
+                    genericStep = self.genericScreenshot(args[0]['inputs'])
                 else:
                     logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_NO_INPUT'])
+                    log.error(ERROR_CODE_DICT['ERR_INVALID_NO_INPUT'])
                     output = None
 
             if output!=None:
                 r="pass"
                 objpath = path
-                if(not DEBUG_ACTION):
+                if not DEBUG_ACTION:
                     data = args[0]
                     if(genericStep):
                         data = args[0]["screen_data"]
                     bucketname = 'screenshots'
                     tempobj=self.generateUniqueFileName() +'.png'
                     objpath = data['projectname']+'/'+data['releaseid']+'/'+data['cyclename']+'/'+tempobj
-                    tempPath=os.sep.join([path, objpath])
+                    tempPath=os.path.join(path, objpath)
                     if accessibility:
                         bucketname = 'accessibilityscreenshots'
                         tempPath = data['temppath']
@@ -67,14 +65,17 @@ class Screenshot():
                         img=ImageGrab.grab()
                         img.save(tempPath)
                     #pushing screenshots to NFS
-                    if(constants.SCREENSHOT_NFS_AVAILABLE):
+                    if constants.SCREENSHOT_NFS_AVAILABLE:
                         r = reportnfs.client.saveimage(bucketname,objpath,tempPath)
-                    if not accessibility or not constants.SCREENSHOT_NFS_AVAILABLE: #add logic to clear accessibility screenshots after some time period
+                    if not accessibility or constants.SCREENSHOT_NFS_AVAILABLE: 
+                        #add logic to clear accessibility screenshots after some time period
                         os.remove(tempPath)
                 if(genericStep):
                     if driver:
                         driver.save_screenshot(genericStep)
-                    elif not(web):
+                    else
+                        if web:
+                            log.warn("Capturing screenshot using generic since browser driver is not available")
                         img=ImageGrab.grab()
                         img.save(genericStep)
                 #keeping a copy of screenshot in folder for generic keyword
@@ -98,35 +99,18 @@ class Screenshot():
     def generateUniqueFileName(self):
         filename=datetime.datetime.now().strftime("%Y-%m-%d-%H_%M_%S_"+str(uuid.uuid4()))
         return filename
-    
-    def createScreenshotFolder(self):
-        path=os.sep.join([os.getcwd(),'screenshots'])
-        if(not os.path.exists(path)):
-            os.makedirs(path)
-        return path
 
-    def genericScreenshot(self,arg,path):
-        if(arg == ''):
-            inputval=filename=''
-        else:
+    def genericScreenshot(self,arg):
+        inputval=filename=''
+        if arg != '':
             inputval=arg[0]
             filename=arg[1]
         if(inputval=='' or not os.path.isdir(inputval)):
             logger.print_on_console("Invalid file path! Saving screenshot in the default folder screenshots")
-            inputval = self.createScreenshotFolder()
-        if (filename!=''):
-            if '.' in filename:
-                filename = filename.split('.')[0]
-            if str(inputval).endswith(os.sep):
-                filePath = str(inputval) + filename
-            else:
-                filePath = str(inputval) + os.sep+ filename
-        else:
-            filename = self.generateUniqueFileName()
-            if str(inputval).endswith(os.sep):
-                filePath = str(inputval) + filename
-            else:
-                filePath = str(inputval) + os.sep + filename
-        return filePath
+            inputval = SCREENSHOT_PATH_LOCAL
+        if filename.strip() == '': filename = self.generateUniqueFileName()
+        else if '.' in filename: filename = filename.split('.')[0]
+        filepath = os.path.join(os.path.normpath(inputval), filename)
+        return filePath +'.png'
         
 

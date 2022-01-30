@@ -768,34 +768,26 @@ class MainNamespace(BaseNamespace):
             logger.print_on_console(err_msg)
             log.error(e,exc_info=True)
 
-    def on_update_screenshot_path(self,*args):
-        if root.gui: benchmark.init(args[1], socketIO)
+    def on_update_variables(self,*args):
+        if root.gui: benchmark.init(args[0], socketIO)
         intv = 120000
-        if args and len(args) >= 2:
-            try: intv = int(args[2])
+        if args and len(args) >= 1:
+            try: intv = int(args[1])
             except: pass
         set_ICE_status(False, True, intv)
-        spath=args[0]
         import constants
         import reportnfs
         nfs_obj = reportnfs.reportNFS()
         if nfs_obj is not None: 
             constants.SCREENSHOT_NFS_AVAILABLE=True
         else:
-            print("Screenshot storage not reachable. Storing screenshots in `Screenshots` folder present in AvoAssure_ICE/AvoAssure")
-        if(SYSTEM_OS=='Darwin'):
-            spath=spath["mac"]
-        else:
-            spath=spath["default"]
-        if len(spath) != 0 and os.path.exists(spath):
-            constants.SCREENSHOT_PATH=os.path.normpath(spath)+OS_SEP
-        else:
-            constants.SCREENSHOT_PATH="Disabled"
-            logger.print_on_console("Screenshot capturing disabled since user does not have sufficient privileges for screenshot folder\n")
-            log.info("Screenshot capturing disabled since user does not have sufficient privileges for screenshot folder\n")
+            if not os.path.exists(SCREENSHOT_PATH_LOCAL):
+                os.makedirs(SCREENSHOT_PATH_LOCAL)
+            logger.print_on_console("Screenshot storage not reachable. Storing screenshots in `Screenshots` folder present in AvoAssure_ICE/AvoAssure")
+            log.warning("Screenshot storage not reachable. Storing screenshots in `Screenshots` folder present in AvoAssure_ICE/AvoAssure")
         #----------------------------------------------------------------------Object Prediction Path
-        if args and len(args) >= 3:
-            predictionPath = args[3]
+        if args and len(args) >= 2:
+            predictionPath = args[2]
             if(SYSTEM_OS=='Darwin'):
                 predictionPath = predictionPath["mac"]
             else:

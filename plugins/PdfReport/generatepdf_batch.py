@@ -1,5 +1,8 @@
 import os, json, wx, shutil, threading, time
 from pdfkitlib_override import pdfkit
+import reportnfs
+import constants
+from constants import *
 import logger
 import logging
 log = logging.getLogger('generatepdf_batch.py')
@@ -49,7 +52,7 @@ class WatchThread(threading.Thread):
                     continue
                 log.debug(">>>>>>>>"+source+SEP+filename)
                 try:
-                    with open(report_path, 'wb+') as output, open(source+SEP+filename, 'rb') as src_path:
+                    with open(report_path, 'w+') as output, open(source+SEP+filename, 'rb') as src_path:
                         emsg = None
                         try:
                             json_data = json.load(src_path)
@@ -58,12 +61,24 @@ class WatchThread(threading.Thread):
                         except:
                             emsg = str(filename)+" is not a valid JSON file."
                         finally:
-                            src_path.seek(0)
-                        if emsg is not None:
-                            logger.print_on_console(emsg)
-                            log.error(emsg)
-                            continue
-                        output.write(src_path.read())
+                            if emsg is not None:
+                                logger.print_on_console(emsg)
+                                log.error(emsg)
+                            else:
+                                for r in json_data['rows']:
+                                    ss = r.get(SCREENSHOT_PATH, None)
+                                    ss_alt = r.get(SCREENSHOT_PATH_ALT, None)
+                                    path = "fail"
+                                    if ss is not None and ss != OUTPUT_CONSTANT and ss.strip() != '':
+                                        try:
+                                            if(constants.SCREENSHOT_NFS_AVAILABLE):
+                                                path = r[SCREENSHOT_PATH] = reportnfs.client.getobjectlink('screenshots',ss)
+                                        except:
+                                            pass
+                                    if path == "fail" and ss_alt != None:
+                                        r[SCREENSHOT_PATH] = ss_alt
+                                json_data=json.dump(json_data)
+                                output.write(json_data)
                         #output.write(data)
                     #shutil.copyfile(source, os.getcwd())
                     #os.rename(filename, report_path)

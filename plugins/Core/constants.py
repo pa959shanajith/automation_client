@@ -15,6 +15,8 @@ from os.path import normpath
 
 OS_SEP = os.sep
 
+AVO_ASSURE_HOME = os.environ["AVO_ASSURE_HOME"]
+
 IF='if'
 
 ELSE_IF='elseif'
@@ -341,6 +343,8 @@ SCREENSHOT_PATH_ALT = 'screenshot_path_alt'
 
 SCREENSHOT_NFS_AVAILABLE = False
 
+SCREENSHOT_PATH_LOCAL = AVO_ASSURE_HOME + OS_SEP + 'Screenshots'
+
 STEP_DESCRIPTION='StepDescription'
 
 ELLAPSED_TIME='EllapsedTime'
@@ -500,8 +504,6 @@ SYSTEM_OS = platform.system()
 AWSKEYWORDS=[]
 
 line_separator = "======================================================================================================="
-
-AVO_ASSURE_HOME = os.environ["AVO_ASSURE_HOME"]
 
 IMAGES_PATH = normpath(AVO_ASSURE_HOME + "/assets/images") + OS_SEP
 
