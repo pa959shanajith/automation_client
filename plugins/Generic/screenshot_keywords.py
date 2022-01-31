@@ -73,7 +73,7 @@ class Screenshot():
                 if(genericStep):
                     if driver:
                         driver.save_screenshot(genericStep)
-                    else
+                    else:
                         if web:
                             log.warn("Capturing screenshot using generic since browser driver is not available")
                         img=ImageGrab.grab()
@@ -109,7 +109,7 @@ class Screenshot():
             logger.print_on_console("Invalid file path! Saving screenshot in the default folder screenshots")
             inputval = SCREENSHOT_PATH_LOCAL
         if filename.strip() == '': filename = self.generateUniqueFileName()
-        else if '.' in filename: filename = filename.split('.')[0]
+        elif '.' in filename: filename = filename.split('.')[0]
         filepath = os.path.join(os.path.normpath(inputval), filename)
         return filePath +'.png'
         
