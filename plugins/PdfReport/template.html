@@ -163,7 +163,7 @@
 
 
 <div class="mainContainer">
-    {{#each overallstatus}}
+    {{#with overallstatus}}
     <div class="h2Header" >
       <div class="headerRepDetails" >
           <label>Report Generated Date : </label><span class='latobold'>{{date}}</span>
@@ -238,7 +238,7 @@
             </tbody>
         </table>
     </div>
-    {{/each}}
+    {{/with}}
     <div class="maintabCont">
         <!-- <span class='hide'>{{remarksLength}}</span> -->
         <span class='hide'>{{commentsLength}}</span>
