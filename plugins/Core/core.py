@@ -778,11 +778,11 @@ class MainNamespace(BaseNamespace):
         import constants
         import reportnfs
         nfs_obj = reportnfs.reportNFS()
+        if not os.path.exists(SCREENSHOT_PATH_LOCAL):
+            os.makedirs(SCREENSHOT_PATH_LOCAL)
         if nfs_obj is not None: 
             constants.SCREENSHOT_NFS_AVAILABLE=True
         else:
-            if not os.path.exists(SCREENSHOT_PATH_LOCAL):
-                os.makedirs(SCREENSHOT_PATH_LOCAL)
             logger.print_on_console("Screenshot storage not reachable. Storing screenshots in `Screenshots` folder present in AvoAssure_ICE/AvoAssure")
             log.warning("Screenshot storage not reachable. Storing screenshots in `Screenshots` folder present in AvoAssure_ICE/AvoAssure")
         #----------------------------------------------------------------------Object Prediction Path

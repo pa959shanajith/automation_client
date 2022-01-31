@@ -28,7 +28,6 @@ class Screenshot():
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
-        path = ''
         genericStep = False
         DEBUG_ACTION =  False
         try:
@@ -46,7 +45,7 @@ class Screenshot():
 
             if output!=None:
                 r="pass"
-                objpath = path
+                objpath = ''
                 if not DEBUG_ACTION:
                     data = args[0]
                     if(genericStep):
@@ -54,7 +53,10 @@ class Screenshot():
                     bucketname = 'screenshots'
                     tempobj=self.generateUniqueFileName() +'.png'
                     objpath = data['projectname']+'/'+data['releaseid']+'/'+data['cyclename']+'/'+tempobj
-                    tempPath=os.path.join(path, objpath)
+                    tempPath=os.path.join(SCREENSHOT_PATH_LOCAL, data['projectname'],data['releaseid'],data['cyclename'])
+                    if not os.path.exists(tempPath):
+                        os.makedirs(tempPath)
+                    tempPath=tempPath+OS_SEP+tempobj
                     if accessibility:
                         bucketname = 'accessibilityscreenshots'
                         tempPath = data['temppath']
@@ -73,7 +75,7 @@ class Screenshot():
                 if(genericStep):
                     if driver:
                         driver.save_screenshot(genericStep)
-                    else
+                    else:
                         if web:
                             log.warn("Capturing screenshot using generic since browser driver is not available")
                         img=ImageGrab.grab()
@@ -109,8 +111,8 @@ class Screenshot():
             logger.print_on_console("Invalid file path! Saving screenshot in the default folder screenshots")
             inputval = SCREENSHOT_PATH_LOCAL
         if filename.strip() == '': filename = self.generateUniqueFileName()
-        else if '.' in filename: filename = filename.split('.')[0]
+        elif '.' in filename: filename = filename.split('.')[0]
         filepath = os.path.join(os.path.normpath(inputval), filename)
-        return filePath +'.png'
+        return filepath +'.png'
         
 
