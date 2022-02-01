@@ -13,8 +13,6 @@ from PIL import ImageGrab
 import  datetime
 import time
 import logger
-
-##import generic_constants
 import os
 import uuid
 from constants import *
@@ -25,12 +23,11 @@ import logging
 
 log = logging.getLogger('mob_screenshot.py')
 class Screenshot():
-    def captureScreenshot(self,screenshot_data="",*args):
+    def captureScreenshot(self,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
-##        inputval,filename,
         filePath = ''
         try:
             if len(args) == 2:
@@ -43,10 +40,10 @@ class Screenshot():
                     if filename!=None:
                         if '.' in filename:
                             filename=filename.split('.')[0]
-                        filePath=str(inputval) + '/'+ filename
+                        filePath=str(inputval) + os.sep+ filename
                     else:
                         filename=self.generateUniqueFileName()
-                        filePath=str(inputval) + '/'+ filename
+                        filePath=str(inputval) + os.sep+ filename
                 except Exception as e:
                     log.error(e)
             else:
@@ -70,40 +67,19 @@ class Screenshot():
                 log.debug('screenshot capture failed')
                 output=OUTPUT_CONSTANT
             else:
-                import platform
-                if platform.system() == 'Darwin':
-                    try:
-                        import base64
-                        png_recovered = base64.decodestring(screenshot_data)
-                        f = open(filePath+'.png', "w")
-                        f.write(png_recovered)
-                        f.close()
-                        log.debug('screenshot captured')
-                        status = TEST_RESULT_PASS
-                        methodoutput = TEST_RESULT_TRUE
-                    except Exception as e:
-                        log.error(e)
-                        logger.print_on_console(e)
-                        err_msg = ERROR_CODE_DICT['ERR_SCREENSHOT_PATH']
-                        logger.print_on_console(err_msg)
-                    return status,methodoutput,output,err_msg
-                else:
-
+                log.debug('Capturing Screenshot')
+                if android_scrapping.driver==None:
+                    img=ImageGrab.grab()
+                    img.save(filePath+'.png')
                     log.debug('screenshot captured')
-                    if android_scrapping.driver==None:
-                        img=ImageGrab.grab()
-                        img.save(filePath+'.png')
-    ##                    logger.print_on_console('screenshot captured')
-                    else:
-                        img=android_scrapping.driver.save_screenshot(filePath+'.png')
-    ##                    logger.print_on_console('screenshot captured')
-                    status=TEST_RESULT_PASS
-                    methodoutput=TEST_RESULT_TRUE
-    ##                log.debug('screenshot captured and saved in : ',filePath+'.png')
-    ##                logger.print_on_console('The Specified path is not found, hence screenshot captured and saved in default path')
+                else:
+                    img=android_scrapping.driver.save_screenshot(filePath+'.png')
+                    log.debug('screenshot captured')
+                status=TEST_RESULT_PASS
+                methodoutput=TEST_RESULT_TRUE
+                log.debug('screenshot captured and saved in : ',filePath+'.png')
         except Exception as e:
             log.error(e)
-            logger.print_on_console(e)
             err_msg=ERROR_CODE_DICT['ERR_SCREENSHOT_PATH']
             logger.print_on_console(err_msg)
         return status,methodoutput,output,err_msg

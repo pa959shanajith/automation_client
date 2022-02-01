@@ -214,20 +214,19 @@ class MobileDispatcher:
                 err_msg=INVALID_KEYWORD
                 result[3]=err_msg
             if keyword not in NON_WEBELEMENT_KEYWORDS:
-                if SYSTEM_OS != "Darwin":
-                    if self.action == 'execute':
-                        result=list(result)
-                        screen_shot_obj = mob_screenshot.Screenshot()
-                        configobj = readconfig.readConfig()
-                        configvalues = configobj.readJson()
-                        screen_details=mythread.json_data['suitedetails'][0]
-                        if configvalues['screenShot_Flag'].lower() == 'fail':
-                            if result[0].lower() == 'fail':
-                                file_path =screen_shot_obj.captureScreenshot(screen_details)
-                                result.append(file_path[2])
-                        elif configvalues['screenShot_Flag'].lower() == 'all':
-                            file_path = screen_shot_obj.captureScreenshot(screen_details)
+                if self.action == 'execute':
+                    result=list(result)
+                    screen_shot_obj = mob_screenshot.Screenshot()
+                    configobj = readconfig.readConfig()
+                    configvalues = configobj.readJson()
+                    screen_details=mythread.json_data['suitedetails'][0]
+                    if configvalues['screenShot_Flag'].lower() == 'fail':
+                        if result[0].lower() == 'fail':
+                            file_path =screen_shot_obj.captureScreenshot(screen_details)
                             result.append(file_path[2])
+                    elif configvalues['screenShot_Flag'].lower() == 'all':
+                        file_path = screen_shot_obj.captureScreenshot(screen_details)
+                        result.append(file_path[2])
         except TypeError as e:
             err_msg=ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']
             result[3]=err_msg
@@ -278,3 +277,4 @@ class MobileDispatcher:
                     log.debug('Element not found')
                     log.debug(str(Ex))
         return mobileElement, xpath
+

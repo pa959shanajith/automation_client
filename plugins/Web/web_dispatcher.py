@@ -378,16 +378,31 @@ class Dispatcher:
             'selectvaluebytext': ['dropdown','listbox','select'],
             'getallvalues':['dropdown','listbox','select'],
             'verifyallvalues': ['dropdown','listbox','select'],
+            'getcount': ['dropdown','listbox','select'],
+            'getselected': ['dropdown','listbox','select'],
+            'getvaluebyindex': ['dropdown','listbox','select'],
+            'verifycount': ['dropdown','listbox','select'],
+            'verifyselectedvalue': ['dropdown','listbox','select'],
+            'verifyvaluesexists': ['dropdown','listbox','select'],
             'settext': ['textbox','textarea','password','number','email','url','div','span'],
+            'cleartext': ['textbox','textarea','password','number','email','url'],
+            'gettextboxlength': ['textbox','textarea','password','number','email','url'],
+            'verifytext': ['textbox','textarea','password','number','email','url'],
             'sendvalue':['textbox','textarea','password','number','email','url','div','span'],
             'gettext': ['textbox','textarea','password','number','email','url'],
             'setsecuretext':['textbox','password'],
             'sendsecurevalue':['textbox','password'],
             'getattributevalue':['radio','checkbox','dropdown','select','listbox','textbox','textarea','password','number','email','url','grid'],
-            'verifyattribute':['radio','checkbox','dropdown','select','listbox','textbox','textarea','password','number','email','url','grid']
+            'verifyattribute':['radio','checkbox','dropdown','select','listbox','textbox','textarea','password','number','email','url','grid'],
+            'getbuttonname': ['button','submit','reset'],
+            'verifybuttonname': ['button','submit','reset'],
+            'getlinktext': ['a','link'],
+            'verifylinktext': ['a','link'],
+            'verifywebimages': ['img'],
+            'imagesimilaritypercentage': ['img']
         }
         custom_dict_element={'element':['getobjectcount','getobject','clickelement','doubleclick','rightclick','getelementtext','verifyelementtext','drag', 'drop','gettooltiptext','verifytooltiptext','verifyexists', 'verifydoesnotexists','verifyvisible', 'switchtotab','switchtowindow','setfocus','sendfunctionkeys', 'sendsecurefunctionkeys',
-            'tab','waitforelementvisible','mousehover','press','verifyenabled','verifydisabled','verifyreadonly','getattributevalue','verifyattribute','getrowcount','getcolumncount','getcellvalue','verifycellvalue','getcelltooltip','verifycelltooltip','cellclick','getrownumbytext','getcolnumbytext','getinnertable','selectbyabsolutevalue','horizontalscroll','verticalscroll']}
+            'tab','waitforelementvisible','mousehover','press','verifyenabled','verifydisabled','verifyreadonly','getattributevalue','verifyattribute','getrowcount','getcolumncount','getcellvalue','verifycellvalue','getcelltooltip','verifycelltooltip','cellclick','getrownumbytext','getcolnumbytext','getinnertable','selectbyabsolutevalue','horizontalscroll','verticalscroll','click','uploadfile','dropfile']}
 
         result=[TEST_RESULT_FAIL,TEST_RESULT_FALSE,OUTPUT_CONSTANT,err_msg]
 

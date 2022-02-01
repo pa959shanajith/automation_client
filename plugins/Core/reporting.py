@@ -18,6 +18,7 @@ import step_description
 import copy
 from datetime import datetime
 import core_utils
+import constants
 log = logging.getLogger("reporting.py")
 
 
@@ -333,7 +334,10 @@ class Reporting:
         report_obj.step_description=self.core_utilsobject.get_UTF_8(report_obj.step_description)
         obj[STEP_DESCRIPTION]=report_obj.step_description
         report_obj.screenshot_path=self.core_utilsobject.get_UTF_8(report_obj.screenshot_path)
-        obj[SCREENSHOT_PATH]= report_obj.screenshot_path
+        if constants.SCREENSHOT_NFS_AVAILABLE: 
+            obj[SCREENSHOT_PATH]= report_obj.screenshot_path
+        else: 
+            obj[SCREENSHOT_PATH_ALT]= report_obj.screenshot_path
         report_obj.ellapsedtime=self.core_utilsobject.get_UTF_8(report_obj.ellapsedtime)
         et = str(report_obj.ellapsedtime).split('.')
         if len(et) == 1: 

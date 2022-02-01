@@ -123,11 +123,12 @@ class LaunchAndInstall():
         output=OUTPUT_CONSTANT
         global device_keywords_object
         try:
-            logger.print_on_console("Package name to be terminated:",android_scrapping.packageName)
             if SYSTEM_OS != 'Darwin':
+                logger.print_on_console("Package name to be terminated:",android_scrapping.packageName)
                 err_msg = device_keywords_object.close_app(android_scrapping.packageName, android_scrapping.device_id)
             else:
                 if (inputval):
+                    logger.print_on_console("Package name to be terminated: ",inputval[0])
                     android_scrapping.driver.terminate_app(inputval[0])
                 else:
                     android_scrapping.driver.close_app()
@@ -178,3 +179,4 @@ class LaunchAndInstall():
             err_msg = self.print_error("Error occurred in Launch App")
             log.error(e,exc_info=True)
         return status,result,output,err_msg
+

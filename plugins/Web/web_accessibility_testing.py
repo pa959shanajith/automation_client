@@ -252,13 +252,12 @@ class Web_Accessibility_Testing:
             result['status'] = "fail"
             log.error(e,exc_info=True)
         # Stop everything in the case of disconnection from server
-        ######################################## acessbility #########################################
         if controller.disconnect_flag:
             return True
         try:
             logger.print_on_console('Capturing Screenshot for Accessibility Testing')
-            temppath = os.getcwd() + os.sep + "output" + os.sep + executionid + os.sep + str(index) +".png"
-            screenshot, width, height = self.webscrape_utils_obj.fullpage_screenshot(driver, temppath)
+            temppath = AVO_ASSURE_HOME + os.sep + "output" + os.sep + executionid + os.sep + str(index) +".png"
+            _, width, height = self.webscrape_utils_obj.fullpage_screenshot(driver, temppath)
             screen_shot_obj = screenshot_keywords.Screenshot()
             script_info['executionid'] = executionid
             script_info['temppath'] = temppath

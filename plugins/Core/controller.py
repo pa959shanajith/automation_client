@@ -34,7 +34,6 @@ import reporting
 import core_utils
 import recording
 from logging.handlers import TimedRotatingFileHandler
-from logger import CustomHandler
 import shutil
 local_cont = threading.local()
 #index for iterating the teststepproperty for executor
@@ -155,6 +154,7 @@ class Controller():
             if self.mobile_app_dispatcher_obj==None:
                 if SYSTEM_OS=='Darwin':
                     core_utils.get_all_the_imports('Mobility/MobileApp')
+                    core_utils.get_all_the_imports('Mobility/iris_mobile')
                 else:
                     core_utils.get_all_the_imports('Mobility')
                 import mobile_app_dispatcher
@@ -859,8 +859,9 @@ class Controller():
         start_time_string=self.scenario_start_time.strftime(TIME_FORMAT)
         logger.print_on_console('Scenario Execution start time is : '+start_time_string,'\n')
         global pause_flag
-        hn = execution_env['handlerno']
-        log.root.handlers[hn].createTspObj(execution_env['scenario_id'],execution_env['browser'])
+        if(action != DEBUG):
+            hn = execution_env['handlerno']
+            log.root.handlers[hn].createTspObj(execution_env['scenario_id'],execution_env['browser'])
         if local_cont.generic_dispatcher_obj is not None and local_cont.generic_dispatcher_obj.action is None:
             local_cont.generic_dispatcher_obj.action=action
         #Check for 'run from step' with range as input
@@ -883,9 +884,11 @@ class Controller():
                 self.debugfrom_step=debugfrom_step
                 try:
                     index = i
-                    log.root.handlers[hn].starttsp(tsplist[index],execution_env['scenario_id'],execution_env['browser'])
+                    if(action != DEBUG):    
+                        log.root.handlers[hn].starttsp(tsplist[index],execution_env['scenario_id'],execution_env['browser'])
                     i = self.methodinvocation(i,execution_env,datatables)
-                    log.root.handlers[hn].stoptsp(tsplist[index],execution_env['scenario_id'],execution_env['browser'])
+                    if(action != DEBUG):
+                        log.root.handlers[hn].stoptsp(tsplist[index],execution_env['scenario_id'],execution_env['browser'])
                     #Check wether accessibility testing has to be executed
                     if accessibility_testing and (index + 1 >= len(tsplist) or (tsplist[index].testscript_name != tsplist[index + 1].testscript_name and screen_testcase_map[tsplist[index].testscript_name]['screenid'] != screen_testcase_map[tsplist[index + 1].testscript_name]['screenid'])):
                         if local_cont.accessibility_testing_obj is None: self.__load_web()
@@ -1153,11 +1156,11 @@ class Controller():
                 'startTime': datetime.now().strftime(TIME_FORMAT)}, **base_execute_data))
             execute_result_data = dict({'scenarioId': None, 'reportData': None}, **base_execute_data)
             if(self.execution_mode == PARALLEL):
-                log_handler = CustomHandler(self.execution_mode,base_execute_data,browserno)
+                log_handler = logger.CustomHandler(self.execution_mode,base_execute_data,browserno)
                 log_filter = ThreadLogFilter(threadName)
                 log_handler.addFilter(log_filter)
             else:
-                log_handler = CustomHandler(self.execution_mode,base_execute_data)
+                log_handler = logger.CustomHandler(self.execution_mode,base_execute_data)
             formatter = logging.Formatter("%(asctime)s %(levelname)s %(name)s.%(funcName)s:%(lineno)d %(message)s")
             log_handler.setFormatter(formatter)
             log.root.addHandler(log_handler)
@@ -1317,7 +1320,7 @@ class Controller():
                             # sc_idx += 1
                             # execute_flag=False
                         else:
-                            # for sauce labs and for aws need broeser and scrnarioid??
+                            # For sauce labs / AWS pass browser and scenario_id in execution_env to push logs into NFS
                             execution_env = {'env':'default','browser':browser,'scenario_id':scenario_id,'handlerno':handlerno}
                         if flag and execute_flag :
                             #check for temrinate flag before execution
@@ -1768,8 +1771,8 @@ class Controller():
                     status=self.invoke_execution(mythread,json_data,socketIO,wxObject,self.configvalues,qc_soc,qtest_soc,zephyr_soc,aws_mode)
                 elif self.execution_mode == PARALLEL:
                     status = self.invoke_parralel_exe(mythread,json_data,socketIO,wxObject,self.configvalues,qc_soc,qtest_soc,zephyr_soc,aws_mode)
-                a = len(log.root.handlers)-1
-                for i in range(a):
+                # Remove all the added custom handlers. Handler at 0 index is main one. So we start removing from 1st index.
+                for _ in range(len(log.root.handlers)-1):
                     log.root.handlers[1].writeManifest()
                     log.root.removeHandler(log.root.handlers[1])
                 shutil.rmtree(os.sep.join([os.getcwd(),'output','.logs',json_data['batchId']]), ignore_errors=True)
@@ -1844,7 +1847,6 @@ class Controller():
             log.error("Exception in reset screen timeout. Error: " + str(e))
 
     def reset_screen_timeout(self):
-        import os
         try:
             log.info("reset screen timeout process started")
             setactive_cmd="powercfg -setactive "+self.change_power_option
@@ -1936,7 +1938,6 @@ class Controller():
 def kill_process():
     import tempfile
     import psutil
-    import os,shutil
     if SYSTEM_OS == 'Darwin':
         try:
             import browser_Keywords_MW

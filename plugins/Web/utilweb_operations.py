@@ -964,7 +964,7 @@ class UtilWebKeywords:
             if webelement!=None and webelement !='':
                 img_src = webelement.get_attribute("src")
                 # if file path passed as network location in src attribute
-                if "file:" in img_src:
+                if "file:" in img_src and "///" not in img_src:
                     server_url = img_src.split(":")[1].replace("\\", "/")
                     file_name = server_url.split("/")[-1]
                     server_url = server_url.split("/")
@@ -981,7 +981,7 @@ class UtilWebKeywords:
                 if file1 != None and file2 != None and  file2 != '':
                     local_uo.log.debug('comparing the images')
                     # if file path passed as network location
-                    if "file:" in file2:
+                    if "file:" in file2 and "///" not in file2:
                         server_url = file2.split(":")[1].replace("\\", "/")
                         file_name = server_url.split("/")[-1]
                         server_url = server_url.split("/")
@@ -1051,7 +1051,7 @@ class UtilWebKeywords:
             if webelement!=None and webelement !='':
                 img_src = webelement.get_attribute("src")
                 # if file path passed as network location in src attribute
-                if "file:" in img_src:
+                if "file:" in img_src and "///" not in img_src:
                     server_url = img_src.split(":")[1].replace("\\", "/")
                     file_name = server_url.split("/")[-1]
                     server_url = server_url.split("/")
@@ -1068,7 +1068,7 @@ class UtilWebKeywords:
                 if file1 != None and file2 != None and  file2 != '':
                     local_uo.log.debug('comparing the images')
                     # if file path passed as network location
-                    if "file:" in file2:
+                    if "file:" in file2 and "///" not in file2:
                         server_url = file2.split(":")[1].replace("\\", "/")
                         file_name = server_url.split("/")[-1]
                         server_url = server_url.split("/")
