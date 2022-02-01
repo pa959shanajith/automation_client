@@ -474,6 +474,8 @@ JIRA_ACTION_1 = 'loginToJira'
 
 JIRA_ACTION_2 = 'createIssueInJira'
 
+JIRA_ACTION_3 = 'getJiraConfigureFields'
+
 STATIC_NONE = "{#@#n_o_n_e#@#}"
 
 STATIC_DV_NAME = "{#@#n_u_m#@#}"
