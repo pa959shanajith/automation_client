@@ -378,16 +378,31 @@ class Dispatcher:
             'selectvaluebytext': ['dropdown','listbox','select'],
             'getallvalues':['dropdown','listbox','select'],
             'verifyallvalues': ['dropdown','listbox','select'],
+            'getcount': ['dropdown','listbox','select'],
+            'getselected': ['dropdown','listbox','select'],
+            'getvaluebyindex': ['dropdown','listbox','select'],
+            'verifycount': ['dropdown','listbox','select'],
+            'verifyselectedvalue': ['dropdown','listbox','select'],
+            'verifyvaluesexists': ['dropdown','listbox','select'],
             'settext': ['textbox','textarea','password','number','email','url','div','span'],
+            'cleartext': ['textbox','textarea','password','number','email','url'],
+            'gettextboxlength': ['textbox','textarea','password','number','email','url'],
+            'verifytext': ['textbox','textarea','password','number','email','url'],
             'sendvalue':['textbox','textarea','password','number','email','url','div','span'],
             'gettext': ['textbox','textarea','password','number','email','url'],
             'setsecuretext':['textbox','password'],
             'sendsecurevalue':['textbox','password'],
             'getattributevalue':['radio','checkbox','dropdown','select','listbox','textbox','textarea','password','number','email','url','grid'],
-            'verifyattribute':['radio','checkbox','dropdown','select','listbox','textbox','textarea','password','number','email','url','grid']
+            'verifyattribute':['radio','checkbox','dropdown','select','listbox','textbox','textarea','password','number','email','url','grid'],
+            'getbuttonname': ['button','submit','reset'],
+            'verifybuttonname': ['button','submit','reset'],
+            'getlinktext': ['a','link'],
+            'verifylinktext': ['a','link'],
+            'verifywebimages': ['img'],
+            'imagesimilaritypercentage': ['img']
         }
         custom_dict_element={'element':['getobjectcount','getobject','clickelement','doubleclick','rightclick','getelementtext','verifyelementtext','drag', 'drop','gettooltiptext','verifytooltiptext','verifyexists', 'verifydoesnotexists','verifyvisible', 'switchtotab','switchtowindow','setfocus','sendfunctionkeys', 'sendsecurefunctionkeys',
-            'tab','waitforelementvisible','mousehover','press','verifyenabled','verifydisabled','verifyreadonly','getattributevalue','verifyattribute','getrowcount','getcolumncount','getcellvalue','verifycellvalue','getcelltooltip','verifycelltooltip','cellclick','getrownumbytext','getcolnumbytext','getinnertable','selectbyabsolutevalue','horizontalscroll','verticalscroll']}
+            'tab','waitforelementvisible','mousehover','press','verifyenabled','verifydisabled','verifyreadonly','getattributevalue','verifyattribute','getrowcount','getcolumncount','getcellvalue','verifycellvalue','getcelltooltip','verifycelltooltip','cellclick','getrownumbytext','getcolnumbytext','getinnertable','selectbyabsolutevalue','horizontalscroll','verticalscroll','click','uploadfile','dropfile']}
 
         result=[TEST_RESULT_FAIL,TEST_RESULT_FALSE,OUTPUT_CONSTANT,err_msg]
 
@@ -690,8 +705,7 @@ class Dispatcher:
                       or screenShot_Flag == 'all'):
                         if browser_screenshots or headless_mode or sauceFlag:
                             if local_Wd.popup_object.check_if_no_popup_exists():
-                                file_path = screen_shot_obj.captureScreenshot(screen_details,web=True)
-                                driver.save_screenshot(file_path[2])
+                                file_path = screen_shot_obj.captureScreenshot(screen_details, driver=driver, web=True)
                             elif not (headless_mode or sauceFlag):
                                 local_Wd.log.debug("Pop up exists; Taking the screenshot using generic functions")
                                 file_path = screen_shot_obj.captureScreenshot(screen_details,web=False)

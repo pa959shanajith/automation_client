@@ -73,6 +73,7 @@ class Clickandadd():
                 driver.switch_to.window(currenthandle)
             else:
                 driver.switch_to.window(driver.current_window_handle)
+                currenthandle = driver.current_window_handle
             log.info('Performing the start click and add operation on default/outer page')
             driver.execute_script(webscrape_utils_obj.javascript_clicknadd, driver.current_url,browser)
             log.info('start click and add operation on default/outer page done')
@@ -117,7 +118,7 @@ class Clickandadd():
             driver.switch_to_default_content()
             status = domconstants.STATUS_SUCCESS
         except Exception as e:
-            log.error(e)
+            log.error(e, exc_info = True)
             status = domconstants.STATUS_FAIL
             logger.print_on_console('Error while performing start click and add scrape')
             if (isinstance(driver,webdriver.Ie)):

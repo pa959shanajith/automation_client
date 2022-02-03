@@ -15,6 +15,8 @@ from os.path import normpath
 
 OS_SEP = os.sep
 
+AVO_ASSURE_HOME = os.environ["AVO_ASSURE_HOME"]
+
 IF='if'
 
 ELSE_IF='elseif'
@@ -244,6 +246,10 @@ ERROR_CODE_DICT = {
                     'ERR_XML_TAGNAMES': "XML file doesn't contain tag names.",
                     'MSG_EXTERNAL_DATALIST_STATICVARIABLE': 'Invalid Input:No externalData List exists for static variable.',
                     'ERR_CAPTURE_SCREENSHOT':'Unable to capture the screenshots.',
+                    'ERR_CAPTURE_LOGS':'Unable to capture the logs.',
+                    'ERR_SAVE_IMG':'Unable to save the screenshot in report NFS',
+                    'ERR_SAVE_LOGS':'Unable to save the logs in report NFS',
+                    'ERR_GET_OBJ':'Unable to fetch the screenshot url from report NFS',
                     'ERR_DOUBLECLICK':'Error occurred while performing double click.',
                     'ERR_OBJECT_IS_NOT_LINK':'Given object is not a link.',
                     'ERR_ELEMENT_NOT_SELECTED':'Object not selected.',
@@ -332,6 +338,12 @@ STEP='Step'
 COMMENTS='Comments'
 
 SCREENSHOT_PATH = 'screenshot_path'
+
+SCREENSHOT_PATH_ALT = 'screenshot_path_alt'
+
+SCREENSHOT_NFS_AVAILABLE = False
+
+SCREENSHOT_PATH_LOCAL = AVO_ASSURE_HOME + OS_SEP + 'Screenshots'
 
 STEP_DESCRIPTION='StepDescription'
 
@@ -471,11 +483,15 @@ JIRA_ACTION_1 = 'loginToJira'
 
 JIRA_ACTION_2 = 'createIssueInJira'
 
+JIRA_ACTION_3 = 'getJiraConfigureFields'
+
 STATIC_NONE = "{#@#n_o_n_e#@#}"
 
 STATIC_DV_NAME = "{#@#n_u_m#@#}"
 
 WEB_ELEMENT_FOUND_FROM_GetInnerTable = 'Web Element found from GetInnerTable'
+
+BROWSER_NAME = {'1':'Chrome', '2':'FireFox', '3':'IE', '6': 'Safari', '7':'EdgeLegacy', '8':'EdgeChromium'}
 
 FIREFOX_BROWSER_VERSION = {"0.13":[52,53],"0.16":[52,53],"0.19":[55,62],"0.21":[55,62],"0.23":[55,64]}
 
@@ -490,8 +506,6 @@ SYSTEM_OS = platform.system()
 AWSKEYWORDS=[]
 
 line_separator = "======================================================================================================="
-
-AVO_ASSURE_HOME = os.environ["AVO_ASSURE_HOME"]
 
 IMAGES_PATH = normpath(AVO_ASSURE_HOME + "/assets/images") + OS_SEP
 
