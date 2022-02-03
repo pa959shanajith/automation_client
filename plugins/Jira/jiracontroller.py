@@ -36,7 +36,7 @@ class JiraWindow():
     def createIssue(self,data,socket):
         """
             Method to create issue in JIRA
-            inputs project id , summary , issuetype , priority , description , label , attachment
+            inputs project id , summary , issuetype , priority , description , ConfigureFields(selected)
             returns issue id created in JIRA
         """
         issue_id = None
@@ -51,7 +51,8 @@ class JiraWindow():
         linkedIssue_Type=None
         attachement_path=None
         Labels=None
-        Description=None
+        Epic_Name=None
+        description=None
         try:
             username= data['username']
             password = data['password']
@@ -71,8 +72,7 @@ class JiraWindow():
             flag = False
             if all(check1 is not None for check1 in [project_id, summary, issue_type, priority]):
                 log.debug('Condition passed inside if not none check')
-                if 'Description' in data:
-                    Description = data['Description']['userInput']
+                description = data['description']
                 if 'Environment' in data:
                     Environment = data['Environment']['userInput']
                 if 'Labels' in data:
@@ -107,13 +107,11 @@ class JiraWindow():
                     flag = True
                 if(flag):
                     if(issue_type == 'Story' or issue_type == 'Epic'):
-                        issue_dict = {'project': {'id': project_id},'summary': summary,'issuetype': {'name': issue_type}}
+                        issue_dict = {'project': {'id': project_id},'summary': summary,'issuetype': {'name': issue_type},'description': description}
                     else:
-                        issue_dict = {'project': {'id': project_id},'summary': summary,'issuetype': {'name': issue_type},'priority':{'name' : priority}}
+                        issue_dict = {'project': {'id': project_id},'summary': summary,'issuetype': {'name': issue_type},'priority':{'name' : priority},'description': description}
                     if(issue_type=='Sub-task'):
                         issue_dict['parent']={'key':parentid}
-                    if Description is not None and Description!='':
-                        issue_dict['description']= Description
                     if Assignee is not None and Assignee!='':
                         Assignee_id = self.getAccountID(Assignee)
                         issue_dict['assignee']={'accountId': Assignee_id}
@@ -129,7 +127,7 @@ class JiraWindow():
                     if Epic_Link_Ip is not None and Epic_Link_Ip!='':
                         issue_dict[Epic_Link['field_name']]=Epic_Link_Ip
                     if Epic_Name is not None and Epic_Name!='':
-                        issue_dict[Epic_Name['field_name']]=Epic_Name
+                        issue_dict[Epic_Name['field_name']]=Epic_Name['userInput']
                     create_issues = jira.create_issue(issue_dict)
                     issue_id = create_issues.key
                     if attachement_path != '' and  attachement_path is not None and check == True:
@@ -244,7 +242,7 @@ class JiraWindow():
                 if JsonObject['projects'][0]['name']==project_name:
                     all_fields=JsonObject['projects'][0]['issuetypes'][0]['fields']
                     for i in all_fields:
-                        if all_fields[i]['name'] not in ['Project', 'Issue Type', 'Summary', 'Priority'] or 'customfield' in all_fields[i]['key']:
+                        if all_fields[i]['name'] not in ['Project', 'Issue Type', 'Summary', 'Priority', 'Description'] or 'customfield' in all_fields[i]['key']:
                             temp = {}
                             temp['name']=all_fields[i]['name']
                             temp['key']=all_fields[i]['key']
