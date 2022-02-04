@@ -729,10 +729,6 @@ start = timer()
                     if ('{' in i.outputval and '}' in i.outputval):
                         self.f.write(space+"store_dyn_var("+repr(i.outputval)+")")
                     self.f.write(space+"addTeststep("+repr(step)+")")
-            # path=Saucelabs_tests+os.sep+'report.txt'
-            # path=path.replace('\\','\\\\')
-            # self.f.write("\nf=open('"+path+"','w')")
-            # self.f.write("\nf.write(repr(report))")
             self.f.write("\nf.close()")
             # self.f.write("\nprint(driver.session_id)")
             self.f.close()
