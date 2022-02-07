@@ -257,7 +257,7 @@ class UtilOperations:
                 #img1 = Image.open(file1)
                 #img2 = Image.open(file2)
                 # if file path passed as network location
-                if "file:" in file1:
+                if "file:" in file1 and "///" not in file1:
                     server_url = file1.split(":")[1].replace("\\", "/")
                     file_name = server_url.split("/")[-1]
                     server_url = server_url.split("/")
@@ -269,7 +269,7 @@ class UtilOperations:
                     img_src = "file:" + img_src + file_name
                     file1 = io.BytesIO(urllib.request.urlopen(img_src).read())
                 # if file path passed as network location
-                if "file:" in file2:
+                if "file:" in file2 and "///" not in file2:
                     server_url = file2.split(":")[1].replace("\\", "/")
                     file_name = server_url.split("/")[-1]
                     server_url = server_url.split("/")
