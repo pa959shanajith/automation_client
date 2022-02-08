@@ -1,165 +1,220 @@
-import subprocess, os, platform, sys
-import shutil
+import subprocess
+import os
+import sys
+from os import walk
+from os.path import splitext, join, dirname, normpath, basename
 from sys import executable as python
-from subprocess import PIPE
-from os.path import splitext,join,normpath,isfile,dirname,isdir,basename
-py_info = sys.version_info
-pythondir = dirname(python) + os.sep
-DEVNULL = open(os.devnull, 'w')
-errorcount = 0
+import py_compile
+import shutil
+sl = os.sep
+pythondir = dirname(sys.executable)+sl #remove python.exe
+pymajor = str(sys.version_info.major)
+pyminor = str(sys.version_info.minor)
+errorcount =0
 ext_o_c_py = [".o",".py",".c"]
+#cwd = os.getcwd()
 
-
-def del_ignore_folder_list(path="./folderignore.txt"):
-    fobj = open(path)
-    items = fobj.read().split('\n')
-    fobj.close()
-    folds = []
-    fils = []
-    system = platform.system()
-    plat_act = False
-    for i in items:
-        i = i.strip()
-        if i == '' or i[0] == '#': continue
-        if i[0] == '>':
-            plat_act = True if (i[1:].lower() == system.lower()) else False
-        if plat_act:
-            del_path = normpath(plugins_path+'/'+i[1:])
-            try:
-                if i[0] == ':':
-                    shutil.rmtree(del_path)
-                    folds.append(del_path)
-                elif i[0] == '?':
-                    os.remove(del_path)
-                    fils.append(del_path)
-            except:
-                pass
-    return folds, fils
-
-def get_req_plugins_list(path="./pluginrequired.txt"):
-    fobj = open(path)
-    plugs = fobj.read().split('\n')
-    fobj.close()
-    fplugs = ["Core", "Generic"]
-    for p in plugs:
-        p = p.strip()
-        if p != '' and p[0] != '#':
-            fplugs.append(p)
-    return fplugs
-
-def build_pyd(f):
+def build_pyd(full_path):
     global errorcount
     try:
-        fn = dirname(f)+os.sep+"build_"+basename(f[:-3]) #removing extesnion
-        cython_process =subprocess.Popen(python+" -m cython -"+str(py_info.major)+' '+f+" -o "+fn+".c",stdout=PIPE, stderr=PIPE,shell=True)
+        # pending save error and filename to file
+        cython_process =subprocess.Popen(python+" -m cython -"+pymajor+' '+full_path,stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         out,err = cython_process.communicate()
-        if cython_process.returncode != 0:
-            errorcount += 1
-            msg = f+"\nError:"+err.decode('utf-8')+"\nOutput:"+out.decode('utf-8')+"\n-------\n"
+        exitcode = cython_process.returncode
+        if not exitcode ==0:
+            errorcount = errorcount + 1
+            msg = full_path+"\nError:"+err.decode('utf-8')+"\nOutput:"+out.decode('utf-8')+"\n-------\n"
             print(msg)
-            cython_error.write(msg)
+            file_refer.write(msg)
             return
+        full_path = full_path[:-3] #removing extesnion
+        # file = file[:-3]
 
-        gcc_process = subprocess.Popen("gcc -c -I"+pythondir+"include -D MS_WIN64 -o "+fn+".o "+fn+".c",stdout=PIPE, stderr=PIPE,shell=True)
+        gcc_process = subprocess.Popen("gcc -shared -I"+pythondir+"include -DMS_WIN64 -L"+pythondir+"libs -o "+full_path+".pyd "+full_path+".c -lpython"+pymajor+pyminor,stdout=subprocess.PIPE, stderr=subprocess.PIPE,shell = True)
         out,err = gcc_process.communicate()
-        if gcc_process.returncode != 0:
-            errorcount += 1
-            print(f+"\nError:"+err.decode('utf-8')+"\nOutput:"+out.decode('utf-8')+"\n-------\n")
-        gcc_process_pyd = subprocess.Popen("gcc -shared -L"+pythondir+"libs -o "+f[:-3]+".pyd "+fn+".o -lpython"+str(py_info.major)+str(py_info.minor),stdout=PIPE, stderr=PIPE,shell=True)
-        out,err = gcc_process_pyd.communicate()
-        if gcc_process_pyd.returncode != 0:
-            errorcount += 1
-            print(f+"\nError:"+err.decode('utf-8')+"\nOutput:"+out.decode('utf-8')+"\n-------\n")
-        subprocess.call("del /Q /F "+f, stdout=DEVNULL, shell=True)
-    except Exception as e:
-        errorcount += 1
+        exitcode = gcc_process.returncode
+        if not exitcode ==0:
+            errorcount = errorcount + 1
+            msg = full_path+"\nError:"+err.decode('utf-8')+"\nOutput:"+out.decode('utf-8')+"\n-------\n"
+            print(msg)
+        full_path = full_path.replace("/","\\")
+        if os.path.isfile(full_path+".pyd"):
+            for ext in ext_o_c_py:
+                if os.path.isfile(full_path + ext):
+                    subprocess.check_call("del "+full_path + ext,shell=True)
+    except subprocess.CalledProcessError as e:
+        errorcount = errorcount + 1
         print(e)
+        return
 
-def build_exe_gcc(f,typ="c"):
-    return ""
+def build_pyc(full_path):
     global errorcount
     try:
-        cython_process = subprocess.Popen(python+" -m cython "+f+" --embed",stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        out,err = cython_process.communicate()
-        if cython_process.returncode != 0:
-            errorcount += 1
-            msg = f+"\nError:"+err.decode('utf-8')+"\nOutput:"+out.decode('utf-8')+"\n-------\n"
-            print(msg)
-            cython_error.write(msg)
-            return
-        f = f[:-3] #removing extesnion
+        py_compile.compile(full_path, full_path+'c', doraise=True)
+        if os.path.isfile(full_path+'c'):
+           subprocess.check_call("del "+full_path, shell = True)
+    except py_compile.PyCompileError as e:
+        errorcount = errorcount + 1
+        msg = full_path+"\nError:"+str(e)+"\n-------\n"
+        print(msg)
+        file_refer.write(msg)
+        return -1
 
-        if typ=="g": typ = "-mwindows"
-        else: typ = "-mconsole"
-        gcc_process = subprocess.Popen("gcc "+f+".c icon.res -I"+pythondir+"include -D MS_WIN64 -L"+pythondir+"libs -lpython27 "+typ+" -o "+f+".exe",stdout=subprocess.PIPE, stderr=subprocess.PIPE,shell = True)
-        out,err = gcc_process.communicate()
-        if gcc_process.returncode != 0:
-            errorcount += 1
-            print(f+"\nError:"+err.decode('utf-8')+"\nOutput:"+out.decode('utf-8')+"\n-------\n")
-        if os.path.isfile(f+".exe"):
-            for ext in ext_o_c_py:
-                if os.path.isfile(f + ext):
-                    subprocess.check_call("del "+f+ext,shell=True)
-    except Exception as e:
-        errorcount += 1
-        print(e)
-
-def build_exe_pyinstaller(f,typ="c"):
-    return ""
+def build_c(full_path, ffile, exe_args=False):
     global errorcount
     try:
-        if typ=="g": typ = "-mwindows"
-        else: typ = "-mconsole"
-        gcc_process = subprocess.Popen("gcc "+f+".c icon.res -I"+pythondir+"include -D MS_WIN64 -L"+pythondir+"libs -lpython27 "+typ+" -o "+f+".exe",stdout=subprocess.PIPE, stderr=subprocess.PIPE,shell = True)
-        out,err = gcc_process.communicate()
-        if gcc_process.returncode != 0:
-            errorcount += 1
-            print(f+"\nError:"+err.decode('utf-8')+"\nOutput:"+out.decode('utf-8')+"\n-------\n")
-        f = f.replace("/",os.sep)
-        if os.path.isfile(f+".exe"):
-            for ext in ext_o_c_py:
-                if os.path.isfile(f + ext):
-                    subprocess.check_call("del "+f+ext,shell=True)
-    except Exception as e:
-        errorcount += 1
+        exe_args = " --embed" if exe_args else ''
+        cython_process = subprocess.Popen(python+" -m cython -"+pymajor+' -o '+ffile+' '+full_path+exe_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        out, err = cython_process.communicate()
+        exitcode = cython_process.returncode
+        if not exitcode == 0:
+            errorcount = errorcount + 1
+            msg = full_path+"\nError:"+err.decode('utf-8')+"\nOutput:"+out.decode('utf-8')+"\n-------\n"
+            print(msg)
+            file_refer.write(msg)
+            return -1
+        if os.path.isfile(ffile):
+           subprocess.check_call("del "+full_path, shell = True)
+    except subprocess.CalledProcessError as e:
+        errorcount = errorcount + 1
         print(e)
+        return -1
+
+def build_exe(source, target, gui=False, console=False):
+    global errorcount
+    try:
+        if gui and console:
+            raise RuntimeError("BUILD FAILED : gui and console cannot be true both at the same time")
+        flags = "-municode"
+        if gui: flags += " -mwindows"
+        elif console: flags += " -mconsole"
+        gcc_process = subprocess.Popen("gcc -I"+pythondir+"include -DMS_WIN64 "+source+" ../avo_ico.res -o "+target+" "+flags+" -L"+pythondir+"libs -lpython"+pymajor+pyminor, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell = True)
+        out, err = gcc_process.communicate()
+        exitcode = gcc_process.returncode
+        if not exitcode == 0:
+            errorcount = errorcount + 1
+            print("Error while generating "+os.path.basename(target)+"\n" + out.decode('utf-8') + '\n' + err.decode('utf-8'))
+        if os.path.isfile(target):
+           subprocess.check_call("del "+source, shell = True)
+    except subprocess.CalledProcessError as e:
+        errorcount = errorcount + 1
+        print(e)
+        return -1
+
+def select_files(root, files, ign, fpyc):
+    py_files = []
+    print("\n\nDirectory ="+root+"\n")
+    for file in files:
+        full_path = normpath(join(root, file))
+        extsn = splitext(file)[1]
+        if extsn==".py":
+            if full_path in fpyc:
+                py_files.append(full_path)
+                build_pyc(full_path)
+            elif full_path not in ign:
+                py_files.append(full_path)
+                build_pyd(full_path)
+    return py_files
+
 
 def build_recursive_dir_tree(path):
-    # Removing plugins not needed
-    for root, dirs, files in os.walk(path):
-        print("\nRemoving unwanted plugins")
-        for d in dirs:
-            if d not in plugins:
-                print(d+" deleted")
-                shutil.rmtree(root+os.sep+d)
-        break
+    selected_files = []
+    ign = []
+    fpyc = []
+    with open(join(cwd, "build", "buildignore.txt")) as b_ign:
+        ign = [path+line.rstrip('\n') for line in b_ign]
+    for i, ignv in enumerate(ign):
+        ign[i] = normpath(ignv)
+    with open(join(cwd, "build", "buildpyc.txt")) as b_pyc:
+        fpyc = [path+line.rstrip('\n') for line in b_pyc]
+    for i, fpycv in enumerate(fpyc):
+        fpyc[i] = normpath(fpycv)
+    for root , _, files in walk(path):
+        root = normpath(root)
+        if root not in ign:
+            selected_files += select_files(root, files, ign, fpyc)
+    return selected_files
 
-    for root, dirs, files in os.walk(path):
-        print("\nProcessing Directory = "+os.path.basename(root))
-        #print("Processing files = "+str(files))
-        for f in files:
-            full_path = join(root, f)
-            if f[-3:] == ".py":
-                if f == "__main__.py": build_exe_gcc(full_path, "g")
-                else: build_pyd(full_path)
-    subprocess.call("del /S /F /Q *.py",stdout=DEVNULL,shell=True)
-    subprocess.call("del /S /F /Q build_*",stdout=DEVNULL,shell=True)
+
+def preprocess_deltafiles(path):
+    if os.getenv("DELTA_FILES", "").lower() != 'true': return None
+    flist = []
+    with open('deltafiles.txt') as dfo:
+        flist = dfo.read().split('\n')
+    folder_to_keep = set([path])
+    file_to_keep = []
+    prefix = path + sl
+    for fi in flist:
+        if fi.strip() == '': continue
+        if fi.startswith('R'):
+            status, _, fpath = fi.split('\t')
+            status = status[0]
+        else: status, fpath = fi.split('\t')
+        if status == 'D': continue
+        file_to_keep.append(normpath(prefix+fpath))
+        fopath = dirname(fpath)
+        while fopath != '':
+            folder_to_keep.add(normpath(prefix+fopath))
+            fopath = dirname(fopath)
+    for d in ['assets', 'plugins']:
+        rpath = path+sl+d
+        if rpath not in folder_to_keep:
+            os.system('rimraf ' + rpath)
+            continue
+        for root, dirs, files in walk(rpath):
+            root = normpath(root)
+            # if root not in folder_to_keep:
+                # os.system('rimraf ' + root)
+            del_list = []
+            for di in dirs:
+                fpath = root+sl+di
+                if fpath not in folder_to_keep:
+                    # os.system('rimraf ' + fpath)
+                    del_list.append(fpath)
+            for fi in files:
+                fpath = root+sl+fi
+                if fpath not in file_to_keep:
+                    # os.system('rimraf ' + fpath)
+                    del_list.append(fpath)
+            os.system('rimraf ' + ' '.join(del_list))
 
 print("Building process initiated....")
 cwd = os.getcwd()
-plugins_path = normpath(cwd + "/AvoAssure/plugins/")
-unit_tests_path = normpath(cwd + "/AvoAssure/unit_tests/")
-if os.path.isdir(unit_tests_path):
-    shutil.rmtree(unit_tests_path)
-os.chdir(plugins_path)
-print("\nCurrent working location: "+cwd)
-plugins = get_req_plugins_list("../../pluginrequired.txt")
-print("\nPlugins to build are: " + ", ".join(plugins))
-ign_folder, ign_file = del_ignore_folder_list("../../folderignore.txt")
-print("\nFolders to remove are: " + ", ".join(ign_folder))
-print("\nFiles to remove are: " + ", ".join(ign_file))
-cython_error = open('../../cython_error.txt','w+')
-build_recursive_dir_tree(plugins_path)
-cython_error.close()
+cwd += "" if basename(cwd) == "AvoAssure" else "AvoAssure"
+unit_tests_path = cwd + sl + "unit_tests"
+if os.path.isdir(unit_tests_path): shutil.rmtree(unit_tests_path)
+print(cwd)
+try:
+    preprocess_deltafiles(cwd)
+except Exception as e:
+    print("Error occured while processing delta files. Error: ", e)
+    raise RuntimeError("BUILD FAILED : There was error during processing delta files")
+
+file_refer = open('../cython_error.txt','a')
+try:
+    irismt_fileloc = os.path.abspath(cwd + "/assets/IRISMT/IRISMT")
+    if os.path.exists(irismt_fileloc+".py"):
+        build_c(irismt_fileloc+".py",irismt_fileloc+".c",exe_args=True)
+        build_exe(irismt_fileloc+".c",irismt_fileloc+".exe",gui=True)
+        if sys.platform == 'win32':
+            with open(dirname(irismt_fileloc)+sl+'startIRISMT.bat', 'w') as fo:
+                fo.write("@echo off\ncd ../..\nstart assets\IRISMT\IRISMT.exe\nexit")
+except Exception as e:
+    print("Failed to build IRISMT")
+    print("Error: ", e)
+try:
+    predcmt_fileloc = os.path.abspath(cwd + "/assets/ObjectPredictionMT/ObjectPredictionMT")
+    if os.path.exists(predcmt_fileloc+".py"):
+        build_c(predcmt_fileloc+".py",predcmt_fileloc+".c",exe_args=True)
+        build_exe(predcmt_fileloc+".c",predcmt_fileloc+".exe",gui=True)
+        if sys.platform == 'win32':
+            with open(dirname(predcmt_fileloc)+sl+'startObjectPredictionMT.bat', 'w') as fo:
+                fo.write("@echo off\ncd ../..\nstart assets\ObjectPredictionMT\ObjectPredictionMT.exe\nexit")
+except Exception as e:
+    print("Failed to build ObjectPredictionMT")
+    print("Error: ", e)
+build_recursive_dir_tree(cwd + sl +"plugins" + sl)
+file_refer.close()
+
 if errorcount > 0:
-    raise RuntimeError("BUILD FAILED : There are "+ str(errorcount) + " errors")
+    raise RuntimeError("BUILD FAILED : There are "+ str(errorcount) + " no of errors")
