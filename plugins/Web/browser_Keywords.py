@@ -924,8 +924,7 @@ class BrowserKeywords():
                 status=webconstants.TEST_RESULT_PASS
                 result=webconstants.TEST_RESULT_TRUE
             else:
-                drv={'3': 'Internet Explorer', '6': 'Safari', '7': 'Edge Legacy', '8': 'Edge Chromium'}
-                err_msg = "This function is not available for "+drv[self.browser_num]+'.'
+                err_msg = "This function is not available for "+BROWSER_NAME[self.browser_num]+'.'
                 logger.print_on_console(err_msg)
                 local_bk.log.error(err_msg)
         except Exception as e:

@@ -1913,8 +1913,7 @@ class Controller():
     def seperate_log(self, cur_thread, id):
         try:
             log = logging.getLogger("controller.py")
-            browser_name = {'1':'Chrome', '2':'FireFox', '3':'IE', '6': 'Safari', '7':'EdgeLegacy', '8':'EdgeChromium'}
-            log_filepath = os.path.normpath(os.path.dirname(self.configvalues["logFile_Path"]) + os.sep + 'TestautoV2_Parallel_' + str(browser_name[id]) + '.log').replace("\\","\\\\")
+            log_filepath = os.path.normpath(os.path.dirname(self.configvalues["logFile_Path"]) + os.sep + 'TestautoV2_Parallel_' + str(BROWSER_NAME_LOG[id]) + '.log').replace("\\","\\\\")
             file1 = open(log_filepath, 'a+')
             file1.close()
             threadName = cur_thread.name #Get name of each thread
