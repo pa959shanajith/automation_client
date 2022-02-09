@@ -1,0 +1,374 @@
+# trigger:
+#   - master
+
+variables:
+- name: PLATFORM
+  value: windows
+- group: default_set
+- group: ICE
+- name: NAS
+  value: \\$(NAS_IP)\$(NAS_SUBPATH)
+- name: PY_PATH
+  value: $(REPO_PATH)/$(PY_GIT_PATH)
+#  value: $(PACKAGE_PATH)/$(PY_PACKAGE_PATH)
+# - name: LOCAL_MOUNT
+#   value: $(USERPROFILE)\$(LOCAL_MOUNT_NAME)
+- name: TARGET_BRANCH
+  value: $(Build.SourceBranchName)
+
+name: $(repo_name)_$(Build.SourceBranchName)_$(Date:yyyyMMdd)$(Rev:.r)
+
+stages:
+- stage: Build
+  displayName: Build the package
+  jobs:
+  - job: BuildJob
+    pool:
+      name: Nineteen68 Pool
+      demands:
+        - PLATFORM -equals windows
+    steps:
+    - checkout: self
+      persistCredentials: true
+      path: s\AvoAssure
+      clean: true
+    - checkout: git://$(System.TeamProject)/$(VERSION_REPO)
+      persistCredentials: true
+      path: s\wsversion
+      clean: true
+    - script: |
+        cd wsversion
+        git checkout master
+        git config user.name "%BUILD_USER_NAME%"
+        git config user.email "%BUILD_USER_EMAIL%"
+        cd ../AvoAssure
+        git checkout %TARGET_BRANCH%
+        git config user.name "%BUILD_USER_NAME%"
+        git config user.email "%BUILD_USER_EMAIL%"
+      name: ConfigureGit
+      displayName: Configure branch and user
+    - script: |
+        cd $(Build.SourcesDirectory)
+        dir
+        Echo Removing Build old zips
+        del *.zip buildno.txt tagno.txt version.txt releasenotes.log
+      displayName: Cleaning up directory!
+    - task: BatchScript@1
+      inputs:
+        filename: '$(NAS)/$(STAGE_PATH)/updateportablepython.bat'
+      name: UpdatePortablePython
+      displayName: Updating remote portable python
+    # - script: |
+    #     dir
+    #     cd ..
+    #     set PYTHONDONTWRITEBYTECODE=1
+    #     git clone --single-branch -b master %NAS%\%PY_PATH% portable_python
+    #     ping 127.0.0.1 -n 2>nul 2>&1
+    #     REM xcopy /I /Q /Y /E /H %NAS%\%PY_PATH% portable_python
+    #     cd portable_python
+    #     del .gitignore
+    #     rmdir /S /Q .git
+    #     cd AvoAssure
+    #     del pip-*.txt
+    #     cd ..\..\AvoAssure
+    #   name: ClonePortablePython
+    #   displayName: Copy portable python into env
+    - script: |
+        echo Build Started!
+        cd $(Build.SourcesDirectory)/AvoAssure
+        git pull --tags -f
+        python .\build\genversion.py
+        call env.bat
+        set /p buildno=<buildno.txt
+        set /p prevbuildno=<prevbuildno.txt
+        set tagno=AvoAssure_ICE_%buildno%
+        REM  Uncomment below to build for a CBU
+        REM set tagno=CBU_%tagNO%
+        echo Build Number - %buildno%
+        echo Tag Number - %tagno%
+        move /Y buildno.txt ..\buildno.txt
+        move prevbuildno.txt ..\prevbuildno.txt
+        move /Y env.bat ..\env.bat
+        echo %tagno%>..\tagno.txt
+        echo ##vso[task.setvariable variable=tagno;isOutput=true]%tagno%
+        echo ##vso[task.setvariable variable=buildno;isOutput=true]%buildno%
+        echo ##vso[task.setvariable variable=prevbuildno;isOutput=true]%prevbuildno%
+        echo ##vso[task.setvariable variable=tagmsg;isOutput=true]%tag_msg%
+      name: Version
+      displayName: Create Build Version
+    - script: |
+        cd $(Build.SourcesDirectory)/AvoAssure
+        set buildno=%Version_buildno%
+        set prevbuildno=%Version_prevbuildno%
+        REM move /Y ../portable_python/* ./
+        REM move /Y ../portable_python/DLLs ./
+        REM move /Y ../portable_python/include ./
+        REM move /Y ../portable_python/Lib ./
+        REM move /Y ../portable_python/libs ./
+        Setlocal EnableDelayedExpansion
+        git diff --name-status %prevbuildno%..HEAD > deltafiles.txt
+        python.exe ./build/build.py
+        python.exe ./build/update.py %buildno%
+        cd ../wsversion
+        python generate_ice_manifest.py
+        copy about_manifest.json ..\AvoAssure\assets
+        cd ../AvoAssure
+        del .gitignore README.md Update.spec deltafiles.txt .project
+      name: Build
+      displayName: Build source code
+    - script: |
+        setlocal enabledelayedexpansion
+        cd $(Build.SourcesDirectory)/AvoAssure
+        rmdir /q /s build .vscode include test
+        if exist build\delete_files.txt (
+          for /F "tokens=*" %%A in (build\delete_files.txt) do (
+            set ipath=%%A
+            set tpath=!ipath:/=\!
+            echo Removing !tpath!...
+            if exist "!tpath!\*" (rmdir /q /s "!tpath!") else (if exist "!tpath!" del /q "!tpath!")
+          )
+        )
+        dir
+        REM cd ..
+        REM rmdir /q /s portable_python
+        REM cd AvoAssure
+      name: Cleanup
+      displayName: Remove extra files
+    - script: |
+        echo Tagging...
+        cd $(Build.SourcesDirectory)/AvoAssure
+        set tagno=%Version_tagno%
+        set buildno=%Version_buildno%
+        set prevbuildno=%Version_prevbuildno%
+        set tagmsg=%Version_tagmsg%
+        git log %TARGET_BRANCH% --pretty=format:"%%H - %%an           %%cd          %%s" %prevbuildno%..HEAD > ../releasenotes.log
+                                               
+        dir
+        echo BUILD NUMBER=%buildno%>../version.txt
+        git tag -f -a %buildno% -m "%tagmsg%"
+        REM For cbu it should be tagno. Comment above line and uncomment below line
+        REM git tag -a %tagno% -m "%tagmsg%"
+        git push --tags -f
+      name: Tag
+      displayName: Create tags and release notes
+    - script: |
+        cd $(Build.SourcesDirectory)/AvoAssure
+        set tagno=%Version_tagno%
+        REM rmdir /s /q .git
+        cd ..
+        echo Zipping package
+        7z.exe a -tzip -mmt=on -mx7 %tagno%.zip AvoAssure version.txt releasenotes.log -xr!AvoAssure\.git
+      name: Package
+      displayName: Building package
+    - task: CopyFiles@2
+      inputs:
+        SourceFolder: '$(Build.SourcesDirectory)'
+        Contents: |
+          $(Version.tagno).zip
+          *no.txt
+          env.bat
+        TargetFolder: '$(Build.ArtifactStagingDirectory)'
+        OverWrite: true
+        preserveTimestamp: true
+      name: CopyToStage
+      displayName: Push package to artifacts directory
+    - task: PublishPipelineArtifact@1
+      inputs:
+        targetPath: '$(Build.ArtifactStagingDirectory)'
+        artifact: 'package'
+      name: Publish
+      displayName: Publishing package for Azure Pipelines
+    - script: |
+        if "%LOG_VERSION%" == "true" (
+          cd $(Build.SourcesDirectory)/wsversion
+          set tagno=%Version_tagno%
+          set buildno=%Version_buildno%
+          python update_ice_version.py
+          git add version.json
+          git commit -m "Added ICE Release Version %Version_buildno%"
+          git push %ws_ver_repolink%
+        )
+      name: UpdateWSVersionManifest
+      displayName: Update ICE version in WS compatibility manifest
+
+
+# - stage: Test
+#   dependsOn:
+#   - Build
+#   displayName: Test the package
+#   variables:
+#     tagno: $[stageDependencies.Build.BuildJob.outputs['Version.tagno']]
+#     buildno: $[stageDependencies.Build.BuildJob.outputs['Version.buildno']]
+#   jobs:
+#   - job: TestJob
+#     pool:
+#       name: Nineteen68 Pool
+#       demands:
+#         - PLATFORM -equals windows
+#     steps:
+#     - checkout: none
+#     - script: |
+#         echo Nada!
+
+
+- stage: Stage
+  dependsOn:
+  - Build
+  # - Test
+  displayName: Place the package in staging server
+  variables:
+    tagno: $[stageDependencies.Build.BuildJob.outputs['Version.tagno']]
+    buildno: $[stageDependencies.Build.BuildJob.outputs['Version.buildno']]
+  jobs:
+  - job: StageJob
+    displayName: Place the package in staging server
+    pool:
+      name: Nineteen68 Pool
+      demands:
+        - PLATFORM -equals windows
+    steps:
+    - checkout: none
+    - task: DownloadPipelineArtifact@2
+      inputs:
+        buildType: 'current'
+        artifactName: 'package'
+        targetPath: '$(Build.ArtifactStagingDirectory)'
+      name: Fetch
+      displayName: Fetch package from Azure Pipelines
+    - script: |
+        echo BUILD NUMBER=%buildno% TAG NUMBER=%tagno%
+        dir $(Build.ArtifactStagingDirectory)
+      name: EchoArtifacts
+      displayName: Display available Artifacts
+    - task: WindowsMachineFileCopy@2
+      inputs:
+        SourcePath: '$(Build.ArtifactStagingDirectory)/$(tagno).zip'
+        MachineNames: '$(NAS_IP)'
+        AdminUserName: '$(SVC_USER)'
+        AdminPassword: '$(SVC_PWD)'
+        TargetPath: '$(NAS)/$(STAGE_PATH)'
+        AdditionalArguments: '/COPY:DT /DCOPY:T /IS /IT'
+      name: PushToNAS
+      displayName: Pushing to stage server
+    - task: WindowsMachineFileCopy@2
+      inputs:
+        SourcePath: '$(Build.ArtifactStagingDirectory)/$(tagno).zip'
+        MachineNames: '$(BUILD_SERVER)'
+        AdminUserName: '$(SVC_USER)'
+        AdminPassword: '$(SVC_PWD)'
+        TargetPath: '$(BUILD_PACKAGE_PATH)'
+        AdditionalArguments: '/COPY:DT /DCOPY:T /IS /IT'
+      name: PushTo99
+      displayName: Pushing to 99 packages folder
+
+
+- stage: Deploy
+  dependsOn:
+  - Build
+  - Stage
+  displayName: Place the package in prod folder
+  variables:
+    tagno: $[stageDependencies.Build.BuildJob.outputs['Version.tagno']]
+    buildno: $[stageDependencies.Build.BuildJob.outputs['Version.buildno']]
+  jobs:
+  - job: DeployJob
+    displayName: Deploy the package
+    pool:
+      name: Nineteen68 Pool
+      demands:
+        - PLATFORM -equals windows
+    steps:
+    - checkout: none
+    - task: DownloadPipelineArtifact@2
+      inputs:
+        buildType: 'current'
+        artifactName: 'package'
+        targetPath: '$(Build.ArtifactStagingDirectory)'
+      name: Fetch
+      displayName: Fetch package from Azure Pipelines
+    - task: WindowsMachineFileCopy@2
+      inputs:
+        SourcePath: '$(Build.ArtifactStagingDirectory)/$(tagno).zip'
+        MachineNames: '$(SERVER_HOST)'
+        AdminUserName: '$(SVC_USER)'
+        AdminPassword: '$(SVC_PWD)'
+        TargetPath: '$(CLIENT_PATH)\$(MAJOR_VERSION).$(MINOR_VERSION)'
+        AdditionalArguments: '/COPY:DT /DCOPY:T /IS /IT'
+      name: CopyToProd
+      displayName: Pushing package to Prod location!
+    # - script: |
+    #     echo BUILD NUMBER=%buildno% TAG NUMBER=%tagno%
+    #     cd $(Build.ArtifactStagingDirectory)
+    #     dir
+    #     @echo off
+    #     echo @echo off>updateice.bat
+    #     echo cd /d %CLIENT_PATH%>>updateice.bat
+    #     echo 7z.exe x -tzip -mmt=on -aoa -y %tagno%.zip -oAvoAssure_ICE AvoAssure>>updateice.bat
+    #     echo del %tagno%.zip>>updateice.bat
+    #     echo 7z.exe a -tzip -mmt=on -mx7 -y %CLIENT_FILENAME% AvoAssure_ICE>>updateice.bat
+    #     echo rmdir /s /q AvoAssure_ICE>>updateice.bat
+    #     echo del updateice.bat>>updateice.bat
+    #     @echo on
+    #   name: CreateICEUpdaterScript
+    #   displayName: Create script to update ICE
+    # - task: WindowsMachineFileCopy@2
+    #   inputs:
+    #     SourcePath: '$(Build.ArtifactStagingDirectory)/updateice.bat'
+    #     MachineNames: '$(SERVER_HOST)'
+    #     AdminUserName: '$(SVC_USER)'
+    #     AdminPassword: '$(SVC_PWD)'
+    #     TargetPath: '$(CLIENT_PATH)'
+    #     AdditionalArguments: '/COPY:DT /DCOPY:T /IS /IT'
+    #   name: CopyICEUpdaterScriptToProd
+    #   displayName: Pushing ICE Updater Script to Prod location!
+    # - task: WindowsMachineFileCopy@2
+    #   inputs:
+    #     SourcePath: '$(Build.ArtifactStagingDirectory)/$(tagno).zip'
+    #     MachineNames: '$(SERVER_HOST)'
+    #     AdminUserName: '$(SVC_USER)'
+    #     AdminPassword: '$(SVC_PWD)'
+    #     TargetPath: '$(CLIENT_PATH)'
+    #     AdditionalArguments: '/COPY:DT /DCOPY:T /IS /IT'
+    #   name: CopyToProd
+    #   displayName: Pushing package to Prod location!
+    # - task: BatchScript@1
+    #   condition: eq(variables['Agent.ComputerName'], 'SRV01NINETEEN68')
+    #   inputs:
+    #     filename: '$(CLIENT_PATH)\updateice.bat'
+    #   name: UpdateICEExecute
+    #   displayName: Execute Update ICE script
+    # - task: PowerShellOnTargetMachines@3
+    #   condition: ne(variables['Agent.ComputerName'], 'SRV01NINETEEN68')
+    #   inputs:
+    #     Machines: '$(SERVER_HOST)'
+    #     UserName: '$(SVC_USER)'
+    #     UserPassword: '$(SVC_PWD)'
+    #     ScriptType: 'FilePath'
+    #     ScriptPath: '$(CLIENT_PATH)\updateice.bat'
+    #     ErrorActionPreference: 'silentlyContinue'
+    #     ignoreLASTEXITCODE: true
+    #     WorkingDirectory: '$(CLIENT_PATH)'
+    #     RunPowershellInParallel: false
+
+
+- stage: Cleanup
+  condition: always()
+  displayName: Cleaup the work directory
+  variables:
+    tagno: $[stageDependencies.Build.BuildJob.outputs['Version.tagno']]
+    buildno: $[stageDependencies.Build.BuildJob.outputs['Version.buildno']]
+  jobs:
+  - job: CleanupJob
+    pool:
+      name: Nineteen68 Pool
+      demands:
+        - PLATFORM -equals windows
+    steps:
+    - checkout: none
+    - script: |
+        cd $(Build.SourcesDirectory)
+        dir
+        rmdir /S /Q AvoAssure wsversion
+        Echo Removing Build %tagno%
+        del %tagno%.zip buildno.txt tagno.txt version.txt releasenotes.log
+      displayName: Cleaning up directory!
