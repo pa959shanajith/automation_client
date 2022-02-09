@@ -75,8 +75,14 @@ class Utils:
         try:
             win32gui.BringWindowToTop(aut_handle)
             pythoncom.CoInitialize()
-            win32gui.ShowWindow(aut_handle, win32con.SW_MAXIMIZE)
-            shell = win32com.client.Dispatch("WScript.Shell")
+            try:
+                win32gui.ShowWindow(aut_handle, win32con.SW_MAXIMIZE)
+                shell = win32com.client.Dispatch("WScript.Shell")
+            except Exception as e:
+                err_msg = ERROR_CODE_DICT['err_shell']
+                log.error(err_msg)
+                log.debug(e)
+                logger.print_on_console(err_msg)
             shell.SendKeys('%')
             win32gui.SetForegroundWindow(aut_handle)
         except Exception as e:
