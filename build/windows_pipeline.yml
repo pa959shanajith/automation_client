@@ -1,6 +1,5 @@
-trigger:
-  # - master
-  - pipelines
+# trigger:
+#   - master
 
 variables:
 - name: PLATFORM
@@ -48,6 +47,12 @@ stages:
         git config user.email "%BUILD_USER_EMAIL%"
       name: ConfigureGit
       displayName: Configure branch and user
+    - script: |
+        cd $(Build.SourcesDirectory)
+        dir
+        Echo Removing Build old zips
+        del *.zip buildno.txt tagno.txt version.txt releasenotes.log
+      displayName: Cleaning up directory!
     - task: BatchScript@1
       inputs:
         filename: '$(NAS)/$(STAGE_PATH)/updateportablepython.bat'
@@ -114,6 +119,7 @@ stages:
     - script: |
         setlocal enabledelayedexpansion
         cd $(Build.SourcesDirectory)/AvoAssure
+        rmdir /q /s build .vscode include test
         if exist build\delete_files.txt (
           for /F "tokens=*" %%A in (build\delete_files.txt) do (
             set ipath=%%A
@@ -122,7 +128,7 @@ stages:
             if exist "!tpath!\*" (rmdir /q /s "!tpath!") else (if exist "!tpath!" del /q "!tpath!")
           )
         )
-        rmdir /q /s build include
+        dir
         REM cd ..
         REM rmdir /q /s portable_python
         REM cd AvoAssure
@@ -136,7 +142,7 @@ stages:
         set prevbuildno=%Version_prevbuildno%
         set tagmsg=%Version_tagmsg%
         git log %TARGET_BRANCH% --pretty=format:"%%H - %%an           %%cd          %%s" %prevbuildno%..HEAD > ../releasenotes.log
-        del .gitignore README.md deltafiles.txt
+                                               
         dir
         echo BUILD NUMBER=%buildno%>../version.txt
         git tag -f -a %buildno% -m "%tagmsg%"
@@ -148,10 +154,10 @@ stages:
     - script: |
         cd $(Build.SourcesDirectory)/AvoAssure
         set tagno=%Version_tagno%
-        rmdir /s /q .git
+        REM rmdir /s /q .git
         cd ..
         echo Zipping package
-        7z.exe a -tzip -mmt=on -mx7 %tagno%.zip AvoAssure version.txt releasenotes.log
+        7z.exe a -tzip -mmt=on -mx7 %tagno%.zip AvoAssure version.txt releasenotes.log -xr!AvoAssure\.git
       name: Package
       displayName: Building package
     - task: CopyFiles@2
@@ -175,6 +181,8 @@ stages:
     - script: |
         if "%LOG_VERSION%" == "true" (
           cd $(Build.SourcesDirectory)/wsversion
+          set tagno=%Version_tagno%
+          set buildno=%Version_buildno%
           python update_ice_version.py
           git add version.json
           git commit -m "Added ICE Release Version %Version_buildno%"
@@ -198,9 +206,7 @@ stages:
 #       demands:
 #         - PLATFORM -equals windows
 #     steps:
-#     - checkout: self
-#       persistCredentials: true
-#       clean: false
+#     - checkout: none
 #     - script: |
 #         echo Nada!
 
@@ -208,7 +214,7 @@ stages:
 - stage: Stage
   dependsOn:
   - Build
-#   - Test
+  # - Test
   displayName: Place the package in staging server
   variables:
     tagno: $[stageDependencies.Build.BuildJob.outputs['Version.tagno']]
@@ -282,7 +288,7 @@ stages:
       displayName: Fetch package from Azure Pipelines
     - task: WindowsMachineFileCopy@2
       inputs:
-        SourcePath: '$(Build.ArtifactStagingDirectory)/%tagno%.zip'
+        SourcePath: '$(Build.ArtifactStagingDirectory)/$(tagno).zip'
         MachineNames: '$(SERVER_HOST)'
         AdminUserName: '$(SVC_USER)'
         AdminPassword: '$(SVC_PWD)'
@@ -358,9 +364,7 @@ stages:
       demands:
         - PLATFORM -equals windows
     steps:
-    - checkout: self
-      persistCredentials: true
-      clean: true
+    - checkout: none
     - script: |
         cd $(Build.SourcesDirectory)
         dir
