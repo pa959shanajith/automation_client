@@ -119,18 +119,15 @@ def select_files(root, files, ign, fpyc):
 
 def build_recursive_dir_tree(path):
     selected_files = []
-    ign = []
-    fpyc = []
-    with open(join(cwd, "build", "buildignore.txt")) as b_ign:
-        ign = [path+line.rstrip('\n') for line in b_ign]
-    for i, ignv in enumerate(ign):
-        ign[i] = normpath(ignv)
-    with open(join(cwd, "build", "buildpyc.txt")) as b_pyc:
-        fpyc = [path+line.rstrip('\n') for line in b_pyc]
-    for i, fpycv in enumerate(fpyc):
-        fpyc[i] = normpath(fpycv)
-    for root , _, files in walk(path):
-        root = normpath(root)
+    ign = os.getenv("BUILD_IGNORE", [])
+    fpyc = os.getenv("BUILD_PYC", [])
+    if len(ign) > 0:
+        b_ign = ign.split(';')
+        ign = [normpath(path+line) for line in b_ign]
+    if len(fpyc) > 0:
+        b_pyc = fpyc.split(';')
+        fpyc = [normpath(path+line) for line in b_pyc]
+    for root, _, files in walk(path):
         if root not in ign:
             selected_files += select_files(root, files, ign, fpyc)
     return selected_files
@@ -180,7 +177,7 @@ def preprocess_deltafiles(path):
 
 print("Building process initiated....")
 cwd = os.getcwd()
-cwd += "" if basename(cwd) == "AvoAssure" else "AvoAssure"
+cwd += "" if basename(cwd) == "AvoAssure" else (sl + "AvoAssure")
 unit_tests_path = cwd + sl + "unit_tests"
 if os.path.isdir(unit_tests_path): shutil.rmtree(unit_tests_path)
 print(cwd)
