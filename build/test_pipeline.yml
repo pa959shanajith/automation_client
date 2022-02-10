@@ -58,5 +58,6 @@ stages:
         cd $(Build.SourcesDirectory)
         dir
         Echo Removing assets and plugins
-        rmdir /S /Q assets plugins
+        if exist "assets\*" (rmdir /q /s "assets")
+        if exist "plugins*" (rmdir /q /s "plugins")
       displayName: Cleaning up directory!
