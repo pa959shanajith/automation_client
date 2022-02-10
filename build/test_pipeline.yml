@@ -20,7 +20,7 @@ stages:
 - stage: Test
   displayName: Testing the package
   jobs:
-  - job: CythonTestJob
+  - job: TestJob
     pool:
       name: Nineteen68 Pool
       demands:
@@ -35,21 +35,12 @@ stages:
         del /s /q .\plugins\*.c
       name: CythonTest
       displayName: Test code for cython errors
-  - job: UnitTestJob
-    pool:
-      name: Nineteen68 Pool
-      demands:
-        - PLATFORM -equals windows
-    steps:
-    - checkout: self
-      clean: true
-    - script: |
-        echo Unit Test Started!
-        cd $(Build.SourcesDirectory)
-        REM python .\build\cython.py
-        REM del /s /q *.c
-      name: UnitTest
-      displayName: Test code for unit testing faults
+    # - script: |
+    #     echo Unit Test Started!
+    #     cd $(Build.SourcesDirectory)
+    #     REM python .\build\cython.py
+    #   name: UnitTest
+    #   displayName: Test code for unit testing faults
 
 
 - stage: Cleanup
