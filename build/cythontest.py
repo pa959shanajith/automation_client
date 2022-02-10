@@ -6,7 +6,7 @@ errorcount = 0
 def test_cython(f):
     global errorcount
     try:
-        cython_process = subprocess.Popen(python+" -m cython -"+str(sys.version_info.major)+' '+f,stdout=PIPE, stderr=PIPE,shell=True)
+        cython_process = subprocess.Popen(python+" -m cython -"+str(sys.version_info.major)+' '+f,stdout=PIPE, stderr=PIPE)
         out, err = cython_process.communicate()
         if cython_process.returncode != 0:
             errorcount += 1
@@ -18,12 +18,15 @@ def test_cython(f):
         print(e)
 
 print("Cython test initiated....")
-cwd = os.getcwd() + os.sep + "AvoAssure" + os.sep
+cwd = os.getcwd()
+cwd += "" if basename(cwd) == "AvoAssure" else (sl + "AvoAssure")
 print("\nCurrent working location: "+cwd)
 cython_error = open('../cython_error.txt','w+')
-for root, dirs, files in os.walk(cwd):
+for root, _, files in os.walk(cwd):
     for f in files:
         if f[-3:] == ".py": test_cython(root + os.sep + f)
 cython_error.close()
 if errorcount > 0:
     raise RuntimeError("Review Failed: There are "+ str(errorcount) + " errors")
+else:
+    print("Cython/Syntax test passes successfully")
