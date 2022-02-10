@@ -1,8 +1,9 @@
-trigger:
-  batch: true
-  branches:
-    include:
-    - "*"
+trigger: none
+# trigger:
+#   batch: true
+#   branches:
+#     include:
+#     - "*"
 
 variables:
 - name: PLATFORM
