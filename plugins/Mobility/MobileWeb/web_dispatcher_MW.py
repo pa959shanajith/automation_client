@@ -339,7 +339,7 @@ class Dispatcher:
                 log.info(reporting_obj.browser_version)
                 log.info(reporting_obj.browser_type)
             elif browser_Keywords_MW.driver_obj is None:
-                reporting_obj.browser_type=BROWSER_NAME[int(input[0])]
+                reporting_obj.browser_type=BROWSER_NAME[input[0]]
                 reporting_obj.browser_version= 'N/A'
                 log.info(reporting_obj.browser_version)
                 log.info(reporting_obj.browser_type)

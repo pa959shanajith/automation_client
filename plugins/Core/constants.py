@@ -491,7 +491,9 @@ STATIC_DV_NAME = "{#@#n_u_m#@#}"
 
 WEB_ELEMENT_FOUND_FROM_GetInnerTable = 'Web Element found from GetInnerTable'
 
-BROWSER_NAME = {'1':'Chrome', '2':'FireFox', '3':'IE', '6': 'Safari', '7':'EdgeLegacy', '8':'EdgeChromium'}
+BROWSER_NAME = {'1': 'Chrome', '2': 'Firefox', '3': 'Internet Explorer', '6': 'Safari', '7': 'Edge Legacy', '8': 'Edge Chromium'}
+
+BROWSER_NAME_LOG = {'1': 'Chrome', '2': 'FireFox', '3': 'InternetExplorer', '6': 'Safari', '7': 'EdgeLegacy', '8': 'EdgeChromium'}
 
 FIREFOX_BROWSER_VERSION = {"0.13":[52,53],"0.16":[52,53],"0.19":[55,62],"0.21":[55,62],"0.23":[55,64]}
 
