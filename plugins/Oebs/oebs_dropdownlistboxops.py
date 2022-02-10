@@ -507,8 +507,9 @@ class DropdownListboxOperations:
                                     else:
                                         status = TEST_RESULT_PASS
                                         methodoutput = TEST_RESULT_TRUE
-                                        logger.print_on_console(MSG_INVALID_NOOF_INPUT)
-                                        log.debug('%s',MSG_INVALID_NOOF_INPUT)
+                                        if currentselection != childindex:
+                                            logger.print_on_console(MSG_INVALID_NOOF_INPUT)
+                                            log.debug('%s',MSG_INVALID_NOOF_INPUT)
                                     log.debug('Value is selected')
                                 #combo box is revert back with below code
                                 self.keyboardops_obj.keyboard_operation('keypress','ENTER')
@@ -580,14 +581,15 @@ class DropdownListboxOperations:
                                     else:
                                         status = TEST_RESULT_PASS
                                         methodoutput = TEST_RESULT_TRUE
-                                        logger.print_on_console(MSG_INVALID_NOOF_INPUT)
-                                        log.debug('%s',MSG_INVALID_NOOF_INPUT)
+                                        if currentselection != childindex:
+                                            logger.print_on_console(MSG_INVALID_NOOF_INPUT)
+                                            log.debug('%s',MSG_INVALID_NOOF_INPUT)
                                 else:
                                     log.debug('MSG:%s',MSG_ELEMENT_NOT_VISIBLE)
                                     err_msg = MSG_ELEMENT_NOT_VISIBLE
                                     logger.print_on_console(err_msg)
                     else:
-                        err_msg = MSG_INVALID_INPUT
+                        err_msg = MSG_INVALID_NOOF_INPUT
                         log.debug('%s',MSG_INVALID_NOOF_INPUT)
                         logger.print_on_console(err_msg)
                 else:
