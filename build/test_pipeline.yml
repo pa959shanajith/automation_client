@@ -32,7 +32,7 @@ stages:
     - script: |
         echo Cython Test Started!
         cd $(Build.SourcesDirectory)
-        python .\build\cython.py
+        python .\build\cythontest.py
         del /s /q .\plugins\*.c
       name: CythonTest
       displayName: Test code for cython errors

@@ -139,7 +139,7 @@ def get_prev_ver():
     return out
 
 
-DEV_ENV = len(env("PROD")) == 0
+DEV_ENV = env("PROD_BUILD").lower() != "true"
 CBU = env("CBU") or "Internal"
 BRANCH = env("TARGET_BRANCH") or "master"
 MAJOR_VERSION = env("MAJOR_VERSION")
