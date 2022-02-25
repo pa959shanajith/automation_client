@@ -820,11 +820,19 @@ class FileOperationsPDF:
         status=False
         content=None
         err_msg=None
+        form_type='Adobe LiveCycle Forms 7.2'
         from PyPDF2 import PdfFileReader, PdfFileWriter
         import fitz
         try:
              log.debug('Get the content of pdf file: '+str(input_path)+','+str(pagenumber))
              doc=fitz.open(input_path)
+             adobe_live_form=True if doc.metadata['creator']==form_type and doc.metadata['producer'] ==form_type else False
+             if adobe_live_form:
+                 _,file_name=os.path.split(input_path)
+                 new_path = os.environ['AVO_ASSURE_HOME'] +os.sep+"output"+os.sep+file_name
+                 if not os.path.exists(new_path):
+                    logger.print_on_console('Adobe Live Forms PDF detected. Please flatten the PDF using executeFile keyword by passing the AcroBat Reader exe path')
+                 doc=fitz.open(new_path)
              pagenumber=int(pagenumber)-1
              if pagenumber<doc.pageCount:
                 page = doc[pagenumber]
@@ -957,3 +965,11 @@ class FileOperationsPDF:
             err_msg=generic_constants.ERR_MSG1+'Fetching PDF content'+generic_constants.ERR_MSG2
         log.info('Status is '+str(status))
         return status,content,err_msg
+
+
+# def a():
+#     word = win32com.client.Dispatch("Word.Application")
+#     doc = word.Documents.Open(doc_path)
+#     doc.SaveAs(pdf_filepath, FileFormat=17)
+#     doc.Close(0)
+#     word.Quit()
