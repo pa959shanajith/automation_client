@@ -64,7 +64,7 @@ class BatchOperationKeyword():
                     temp_file_loc = os.environ['AVO_ASSURE_HOME'] +os.sep+"output"+os.sep+file_name
                     import psutil
                     for proc in psutil.process_iter():
-                        if proc.name() == 'Acrobat.EXE':
+                        if proc.name() == 'Acrobat.exe':
                             proc.kill()
                     if os.path.isfile(temp_file_loc):
                         os.remove(temp_file_loc)
@@ -81,7 +81,7 @@ class BatchOperationKeyword():
                         status = TEST_RESULT_PASS
                         methodoutput = TEST_RESULT_TRUE
                         for proc in psutil.process_iter():
-                            if proc.name() == 'Acrobat.EXE':
+                            if proc.name() == 'Acrobat.exe':
                                 proc.kill()
                     else:
                         log.debug("Window not found")
