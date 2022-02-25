@@ -82,10 +82,7 @@ class BatchOperationKeyword():
                         main_window['5'].type_keys(temp_file_loc.replace(' ', '{SPACE}')+"{ENTER}")
                         time.sleep(5)
                         status = TEST_RESULT_PASS
-                        methodoutput = TEST_RESULT_TRUE   
-                        for proc in psutil.process_iter():
-                            if proc.name() == 'Acrobat.exe':
-                                proc.kill()
+                        methodoutput = TEST_RESULT_TRUE
                     else:
                         for proc in psutil.process_iter():
                             if proc.name() == 'Acrobat.exe':
