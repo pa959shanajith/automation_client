@@ -31,7 +31,7 @@ class BatchOperationKeyword():
         win32gui.EnumWindows(winEnum, hwnds)
         handle = hwnds[0] if (len(hwnds) > 0) else None
         return handle
-    def __save_as_output_time_func(self, tries=15, time_sleep=0.5):
+    def __save_as_output_time_func(self, tries=10, time_sleep=0.75):
         while tries > 0:
             win_handle = self.__get_file_dialog_handle()
             if win_handle is not None:
@@ -62,6 +62,10 @@ class BatchOperationKeyword():
                 elif pdf_file and os.path.splitext(pdf_file)[1]=='.pdf':
                     _, file_name = os.path.split(pdf_file)
                     temp_file_loc = os.environ['AVO_ASSURE_HOME'] +os.sep+"output"+os.sep+file_name
+                    import psutil
+                    for proc in psutil.process_iter():
+                        if proc.name() == 'Acrobat.EXE':
+                            proc.kill()
                     if os.path.isfile(temp_file_loc):
                         os.remove(temp_file_loc)
                     # win32api.ShellExecute(0, "print", filePath, None, ".", 0)
@@ -76,6 +80,9 @@ class BatchOperationKeyword():
                         time.sleep(5)
                         status = TEST_RESULT_PASS
                         methodoutput = TEST_RESULT_TRUE
+                        for proc in psutil.process_iter():
+                            if proc.name() == 'Acrobat.EXE':
+                                proc.kill()
                     else:
                         log.debug("Window not found")
 
