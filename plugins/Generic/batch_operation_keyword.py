@@ -10,6 +10,8 @@
 #-------------------------------------------------------------------------------
 
 import subprocess
+
+from pip import main
 import generic_constants
 import os
 import logger
@@ -76,14 +78,18 @@ class BatchOperationKeyword():
                         app = Application().connect(handle=win_handle, allow_magic_lookup=False)
                         main_window = app[win32gui.GetWindowText(win_handle)]
                         main_window.wait('exists enabled visible ready')
+                        main_window.set_focus()
                         main_window['5'].type_keys(temp_file_loc.replace(' ', '{SPACE}')+"{ENTER}")
                         time.sleep(5)
                         status = TEST_RESULT_PASS
-                        methodoutput = TEST_RESULT_TRUE
+                        methodoutput = TEST_RESULT_TRUE   
                         for proc in psutil.process_iter():
                             if proc.name() == 'Acrobat.exe':
                                 proc.kill()
                     else:
+                        for proc in psutil.process_iter():
+                            if proc.name() == 'Acrobat.exe':
+                                proc.kill()
                         log.debug("Window not found")
 
             elif file_ext in generic_constants.VBS_FILE_TYPE:
