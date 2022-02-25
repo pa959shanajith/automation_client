@@ -116,6 +116,7 @@ class GenericKeywordDispatcher:
             'deleterow':local_generic.generic_excel.delete_row,
             'getrowcount':local_generic.generic_excel.get_rowcount,
             'getcolumncount':local_generic.generic_excel.get_colcount,
+            'copyworkbook':local_generic.generic_excel.copy_workbook,
             'runquery':local_generic.generic_database.runQuery,
             'securerunquery': local_generic.generic_database.secureRunQuery,
             'getdata':local_generic.generic_database.getData,

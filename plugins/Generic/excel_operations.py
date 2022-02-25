@@ -9,6 +9,10 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 
+# from curses.ascii import isdigit
+from encodings import search_function
+from operator import index
+from tkinter.tix import Tree
 import logger
 import generic_constants
 import xlwt
@@ -24,6 +28,7 @@ from openpyxl import load_workbook
 from constants import *
 import logging
 from constants import *
+# from plugins.Generic.generic_constants import TEST_RESULT_FAIL, TEST_RESULT_FALSE
 log = logging.getLogger('excel_operations.py')
 import core_utils
 from xlrd.sheet import ctype_text
@@ -55,6 +60,7 @@ class ExcelFile:
         'clear_cell_.xls':self.xls_obj.clear_cell_xls,
         'get_rowcount_.xls':self.xls_obj.get_rowcount_xls,
         'get_colcount_.xls':self.xls_obj.get_colcount_xls,
+        'copy_workbook_.xls':self.xls_obj.copy_workbook_xls,
 
         'delete_row_.xlsx':self.xlsx_obj.delete_row_xlsx,
         'read_cell_.xlsx':self.xlsx_obj.read_cell_xlsx,
@@ -62,6 +68,7 @@ class ExcelFile:
         'clear_cell_.xlsx':self.xlsx_obj.clear_cell_xlsx,
         'get_rowcount_.xlsx':self.xlsx_obj.get_rowcount_xlsx,
         'get_colcount_.xlsx':self.xlsx_obj.get_colcount_xlsx,
+        'copy_workbook_.xlsx':self.xlsx_obj.copy_workbook_xlsx,
 
         'delete_row_.csv':self.csv_obj.delete_row_csv,
         'read_cell_.csv':self.csv_obj.read_cell_csv,
@@ -478,6 +485,58 @@ class ExcelFile:
             logger.print_on_console(err_msg)
         return status,methodoutput,output,err_msg
 
+    
+    def copy_workbook(self,filePath1,filePath2,option):
+        """
+        def : copy_workbook
+        purpose : calls the respective method to copy workbook from filePath1 to filePath2
+        param : filePath1,filePath2,option
+        return : Returns Bool
+
+        """
+        # output = OUTPUT_CONSTANT
+        err_msg = None
+        status = TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FALSE
+        option = 0 if option is None or '' else option
+        logger.print_on_console('Copy from workbook '+filePath1 + ' to ' + filePath2)
+        try:
+            if filePath1 != None and filePath2 != None:
+                file_ext1,res1,err_msg=self.__get_ext(filePath1)
+                file_ext2,res2,err_msg=self.__get_ext(filePath2)
+                if file_ext1 != '.xls' and file_ext1 != '.xlsx':
+                    err_msg = 'Invalid file format'
+                if file_ext2 != '.xls' and file_ext2 != '.xlsx':
+                    err_msg = 'Invalid file format'
+                
+                if file_ext1 == file_ext2 and err_msg is None:
+                    if res1 and res2:
+                        myfile = open(filePath1, "r")
+                        myfile.close()
+                        myfile = open(filePath2, "r")
+                        myfile.close()
+                        res,err_msg=self.dict['copy_workbook_'+file_ext1](filePath1,filePath2,option)
+                        if res:
+                            status=TEST_RESULT_PASS
+                            methodoutput=TEST_RESULT_TRUE
+                            info_msg="Successfully Copied"
+                            logger.print_on_console(info_msg)
+                else:
+                    if err_msg is not None:
+                        err_msg = 'Error in copying workbooks as file extensions are different.'
+            else:
+                err_msg=generic_constants.FILE_PATH_NOT_SET
+        except IOError:
+            err_msg=ERROR_CODE_DICT['ERR_FILE_NOT_ACESSIBLE']
+        except ValueError as e:
+            err_msg=ERROR_CODE_DICT['ERR_NUMBER_FORMAT_EXCEPTION']
+        except Exception as e:
+            err_msg='Error occured in copying workbooks.'
+            log.error(e)
+        if err_msg!=None:
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
+        return status,methodoutput,err_msg
 
     def convertStringToInt(self,col):
         num=0
@@ -1139,6 +1198,99 @@ class ExcelXLS:
             logger.print_on_console(err_msg)
         return status,err_msg
 
+    def getSheetTrueName(self,name):
+        if(name[-1] == ')'):
+            name = name[::-1]
+            num = ''
+            index = 0
+            for elem in range(1,len(name)):
+                if(name[elem] != '('):
+                    num+=name[elem]
+                else:
+                    index = elem
+                    break
+            
+            name = name[::-1]
+            num = num[::-1]
+            if(num == ''):
+                num = '0'
+            if(num.isdigit()):
+                if(index+1 == len(name)):
+                    return '',True,int(num)
+                # if(index+1 == ' '):
+                #     index+=1
+                return name[:-1*(index+1)],True,int(num)
+            else:
+                return name,False,1
+
+        return name,False,1
+
+
+    def copy_workbook_xls(self,filePath1,filePath2,option):
+        """
+        def : copy_workbook_xls
+        purpose : calls copy_workbook_xls to copy from one workbook to another
+        param : filePath1,filePath2,option
+        return : bool
+        """
+        status=False
+        err_msg=None
+        try:
+            wb1=open_workbook(filePath1)
+            wb2=open_workbook(filePath2)
+            sheetNames1 = wb1.sheet_names()
+            sheetNames2 = wb2.sheet_names()
+            copyWorkbook1 = xlutils.copy.copy(wb1)
+
+            if(option == '0'):
+                index = -1
+                for sheet in sheetNames2:
+                    index+=1
+                    if sheet.upper() not in (name.upper() for name in sheetNames1):
+                        sheetData = wb2.sheet_by_index(index)
+                        newSheet = copyWorkbook1.add_sheet(sheet)
+
+                        for row in range(sheetData.nrows):
+                            for col in range(sheetData.ncols):
+                                newSheet.write(row,col,sheetData.cell_value(row,col))
+
+            if(option == '1'):
+                copyWorkbook2 = xlutils.copy.copy(wb2)
+                index = -1
+                for sheet in sheetNames1:
+                    index+=1
+                    newSheetName = None
+                    if sheet.upper() not in (name.upper() for name in sheetNames2):
+                        newSheetName = sheet
+                    else:
+                        trueName,check,num = self.getSheetTrueName(sheet)
+                        if(check == False):
+                            trueName+=" "
+                        
+                        num+=1
+                        searchName = trueName+'('+str(num)+')'
+                        while(searchName.upper() in (name.upper() for name in sheetNames2)):
+                            num+=1
+                            searchName = trueName+'('+str(num)+')'
+                        newSheetName = searchName
+
+                    sheetNames2.append(newSheetName)
+                    sheetData = wb1.sheet_by_index(index)
+                    newSheet = copyWorkbook2.add_sheet(newSheetName)
+
+                    for row in range(sheetData.nrows):
+                        for col in range(sheetData.ncols):
+                            newSheet.write(row,col,sheetData.cell_value(row,col))
+
+                copyWorkbook2.save(filePath2)
+
+            if option == '0' or option == '2':
+                copyWorkbook1.save(filePath2)
+            status = True
+        except Exception as e:
+            err_msg = 'Error occured While copying'
+            log.error(e)
+        return status,err_msg
 
 
 class ExcelXLSX:
@@ -1694,6 +1846,95 @@ class ExcelXLSX:
             logger.print_on_console(err_msg)
         return status,err_msg
 
+    def getSheetTrueName(self,name):
+        if(name[-1] == ')'):
+            name = name[::-1]
+            num = ''
+            index = 0
+            for elem in range(1,len(name)):
+                if(name[elem] != '('):
+                    num+=name[elem]
+                else:
+                    index = elem
+                    break
+            
+            name = name[::-1]
+            num = num[::-1]
+            if(num == ''):
+                num = '0'
+            if(num.isdigit()):
+                if(index+1 == len(name)):
+                    return '',True,int(num)
+                # if(index+1 == ' '):
+                #     index+=1
+                return name[:-1*(index+1)],True,int(num)
+            else:
+                return name,False,1
+
+        return name,False,1
+
+
+    def copy_workbook_xlsx(self,filePath1,filePath2,option):
+        """
+        def : copy_workbook_xlsx
+        purpose : calls copy_workbook_xlsx to copy from one workbook to another
+        param : filePath1,filePath2,option
+        return : bool
+        """
+        status=False
+        err_msg=None
+        try:
+            wb1=openpyxl.load_workbook(filePath1)
+            wb2=openpyxl.load_workbook(filePath2)
+            sheetNames1 = wb1.sheetnames
+            sheetNames2 = wb2.sheetnames
+
+            if(option == '2'):
+                for sheets in sheetNames2:
+                    destSheet = wb2.get_sheet_by_name(sheets)
+                    wb2.remove(destSheet)
+
+            for sheet in sheetNames1:
+                sheetData = wb1.get_sheet_by_name(sheet)
+                destSheet = None
+                if sheet.upper() not in (name.upper() for name in wb2.sheetnames):
+                    wb2.create_sheet(sheet)
+                    destSheet = wb2.get_sheet_by_name(sheet)
+
+                elif(option == '0'):
+                    existingName = None
+                    for name in wb2.sheetnames:
+                        if(name.upper() == sheet.upper()):
+                            existingName = name
+                            break
+
+                    destSheet = wb2.get_sheet_by_name(existingName)
+                    destSheet.delete_rows(1,destSheet.max_row)
+
+                elif(option == '1'):
+                    trueName,check,num = self.getSheetTrueName(sheet)
+                    if(check == False):
+                        trueName+=" "
+                    
+                    num+=1
+                    searchName = trueName+'('+str(num)+')'
+                    while(searchName.upper() in (name.upper() for name in wb2.sheetnames)):
+                        num+=1
+                        searchName = trueName+'('+str(num)+')'
+                    wb2.create_sheet(searchName)
+                    destSheet = wb2.get_sheet_by_name(searchName)
+
+                for row in sheetData:
+                    for cell in row:
+                        destSheet[cell.coordinate].value = cell.value
+
+            wb2.save(filePath2)
+            wb1.save(filePath1)
+            status = True
+        except Exception as e:
+            log.error(e)
+            err_msg='Error occurred While copying Workbook'
+        return status,err_msg
 
 
 class ExcelCSV:
