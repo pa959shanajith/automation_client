@@ -20,6 +20,7 @@ import time
 if SYSTEM_OS=='Windows':
     import win32api,win32gui,win32print
     from pywinauto import Application
+    import pywinauto
 import logging
 
 
@@ -63,15 +64,33 @@ class BatchOperationKeyword():
                     methodoutput=TEST_RESULT_TRUE
                 elif pdf_file and os.path.splitext(pdf_file)[1]=='.pdf':
                     _, file_name = os.path.split(pdf_file)
+                    _, exe_name = os.path.split(filePath)
                     temp_file_loc = os.environ['AVO_ASSURE_HOME'] +os.sep+"output"+os.sep+file_name
                     import psutil
                     for proc in psutil.process_iter():
-                        if proc.name() == 'Acrobat.exe':
+                        if proc.name() == exe_name:
                             proc.kill()
                     if os.path.isfile(temp_file_loc):
                         os.remove(temp_file_loc)
                     # win32api.ShellExecute(0, "print", filePath, None, ".", 0)
                     subprocess.Popen([filePath, " /t ", pdf_file, " Microsoft Print To PDF"])
+                    execpt=True
+                    connect_tries=10
+                    connect_sl=0.1
+                    while execpt:
+                        for proc in psutil.process_iter():
+                            try:
+                                if proc.name() == exe_name:
+                                    appId = proc.pid
+                                    app_1 = Application().connect(process=appId)
+                                    execpt=False
+                            except pywinauto.application.AppNotConnected:
+                                log.debug("Exception occured while connecting to the Acrobat")
+                                connect_tries = connect_tries-1
+                                time.sleep(connect_sl)
+                                if connect_tries==0:
+                                    log.debug("Tried connecting to the Acrobat process. Process not launched")
+                                    execpt =False
                     win_handle = self.__save_as_output_time_func(tries,time_sleep)
                     if win_handle is not None:
                         win32gui.SetForegroundWindow(win_handle)
@@ -79,13 +98,19 @@ class BatchOperationKeyword():
                         main_window = app[win32gui.GetWindowText(win_handle)]
                         main_window.wait('exists enabled visible ready')
                         main_window.set_focus()
+                        temp=temp_file_loc
                         main_window['5'].type_keys(temp_file_loc.replace(' ', '{SPACE}')+"{ENTER}")
-                        time.sleep(5)
+                        time.sleep(2)
+                        log.debug("AdobeLive Form PDf flattened and placed in ")
+                        log.debug(temp)
                         status = TEST_RESULT_PASS
                         methodoutput = TEST_RESULT_TRUE
+                        for proc in psutil.process_iter():
+                            if proc.name() ==exe_name :
+                                proc.kill()
                     else:
                         for proc in psutil.process_iter():
-                            if proc.name() == 'Acrobat.exe':
+                            if proc.name() == exe_name:
                                 proc.kill()
                         log.debug("Window not found")
 
