@@ -86,7 +86,6 @@ class BatchOperationKeyword():
                                     break
                             except Exception as e:
                                 log.debug("Exception occured while connecting to the Acrobat")
-                                log.error(e)
                                 connect_tries = connect_tries-1
                                 time.sleep(connect_sl)
                                 if connect_tries == 0:
