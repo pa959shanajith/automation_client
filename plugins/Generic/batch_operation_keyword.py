@@ -63,8 +63,8 @@ class BatchOperationKeyword():
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
                 elif pdf_file and os.path.splitext(pdf_file)[1]=='.pdf':
-                    _, file_name = os.path.split(pdf_file)
-                    _, exe_name = os.path.split(filePath)
+                    file_name = os.path.split(pdf_file)[1]
+                    exe_name = os.path.split(filePath)[1]
                     temp_file_loc = os.environ['AVO_ASSURE_HOME'] +os.sep+"output"+os.sep+file_name
                     import psutil
                     for proc in psutil.process_iter():
@@ -74,23 +74,26 @@ class BatchOperationKeyword():
                         os.remove(temp_file_loc)
                     # win32api.ShellExecute(0, "print", filePath, None, ".", 0)
                     subprocess.Popen([filePath, " /t ", pdf_file, " Microsoft Print To PDF"])
-                    execpt=True
-                    connect_tries=10
+                    connect_tries=20
                     connect_sl=0.1
-                    while execpt:
+                    while connect_tries>0:
                         for proc in psutil.process_iter():
                             try:
                                 if proc.name() == exe_name:
                                     appId = proc.pid
                                     app_1 = Application().connect(process=appId)
-                                    execpt=False
-                            except pywinauto.application.AppNotConnected:
+                                    connect_tries=0
+                                    break
+                            except Exception as e:
                                 log.debug("Exception occured while connecting to the Acrobat")
+                                log.error(e)
                                 connect_tries = connect_tries-1
                                 time.sleep(connect_sl)
-                                if connect_tries==0:
+                                if connect_tries == 0:
                                     log.debug("Tried connecting to the Acrobat process. Process not launched")
-                                    execpt =False
+                                    msg = "Tried connecting to "+exe_name+" . Process not launched"
+                                    logger.print_on_console(msg)
+                                break
                     win_handle = self.__save_as_output_time_func(tries,time_sleep)
                     if win_handle is not None:
                         win32gui.SetForegroundWindow(win_handle)
@@ -105,14 +108,11 @@ class BatchOperationKeyword():
                         log.debug(temp)
                         status = TEST_RESULT_PASS
                         methodoutput = TEST_RESULT_TRUE
-                        for proc in psutil.process_iter():
-                            if proc.name() ==exe_name :
-                                proc.kill()
                     else:
-                        for proc in psutil.process_iter():
-                            if proc.name() == exe_name:
-                                proc.kill()
                         log.debug("Window not found")
+                    for proc in psutil.process_iter():
+                        if proc.name() == exe_name:
+                            proc.kill()
 
             elif file_ext in generic_constants.VBS_FILE_TYPE:
                 log.debug('executing .vbs file')
@@ -130,3 +130,24 @@ class BatchOperationKeyword():
             logger.print_on_console(err_msg)
         return status,methodoutput,output_res,err_msg
 
+def a():
+    import psutil,pywinauto
+    pid=10001
+    execpt=True
+    connect_tries=10
+    connect_sl=0.1
+    outer_cnt=10
+    inner_cnt=10
+    while execpt:
+        print("wh", connect_tries, execpt)
+        for proc in psutil.process_iter():
+            try:
+                app_1 = pywinauto.Application().connect(process=pid)
+                execpt=False
+            except:
+                connect_tries=connect_tries-1
+                if connect_tries==0:
+                    print("cnt 0")
+                    execpt =False
+                    print("Exception ",execpt)
+                break

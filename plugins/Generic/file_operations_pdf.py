@@ -828,7 +828,7 @@ class FileOperationsPDF:
              doc=fitz.open(input_path)
              adobe_live_form=True if doc.metadata['creator']==form_type and doc.metadata['producer'] ==form_type else False
              if adobe_live_form:
-                 _,file_name=os.path.split(input_path)
+                 file_name=os.path.split(input_path)[1]
                  new_path = os.environ['AVO_ASSURE_HOME'] +os.sep+"output"+os.sep+file_name
                  if not os.path.exists(new_path):
                     logger.print_on_console('Adobe Live Forms PDF detected. Please flatten the PDF using executeFile keyword by passing the AcroBat Reader exe path')
