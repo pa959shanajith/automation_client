@@ -9,7 +9,6 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 
-# from curses.ascii import isdigit
 from encodings import search_function
 from operator import index
 from tkinter.tix import Tree
@@ -28,7 +27,6 @@ from openpyxl import load_workbook
 from constants import *
 import logging
 from constants import *
-# from plugins.Generic.generic_constants import TEST_RESULT_FAIL, TEST_RESULT_FALSE
 log = logging.getLogger('excel_operations.py')
 import core_utils
 from xlrd.sheet import ctype_text
@@ -498,34 +496,35 @@ class ExcelFile:
         err_msg = None
         status = TEST_RESULT_FAIL
         methodoutput = TEST_RESULT_FALSE
-        option = 0 if option is None or '' else option
+        option = None if option not in ['0','1','2'] else option
         logger.print_on_console('Copy from workbook '+filePath1 + ' to ' + filePath2)
         try:
-            if filePath1 != None and filePath2 != None:
-                file_ext1,res1,err_msg=self.__get_ext(filePath1)
-                file_ext2,res2,err_msg=self.__get_ext(filePath2)
-                if file_ext1 != '.xls' and file_ext1 != '.xlsx':
-                    err_msg = 'Invalid file format'
-                if file_ext2 != '.xls' and file_ext2 != '.xlsx':
-                    err_msg = 'Invalid file format'
-                
-                if file_ext1 == file_ext2 and err_msg is None:
-                    if res1 and res2:
-                        myfile = open(filePath1, "r")
-                        myfile.close()
-                        myfile = open(filePath2, "r")
-                        myfile.close()
-                        res,err_msg=self.dict['copy_workbook_'+file_ext1](filePath1,filePath2,option)
-                        if res:
-                            status=TEST_RESULT_PASS
-                            methodoutput=TEST_RESULT_TRUE
-                            info_msg="Successfully Copied"
-                            logger.print_on_console(info_msg)
+            if option != None:
+                if filePath1 != None and filePath2 != None:
+                    file_ext1,res1,err_msg=self.__get_ext(filePath1)
+                    if err_msg is None:
+                        file_ext2,res2,err_msg=self.__get_ext(filePath2)
+                    if err_msg is None and (file_ext1 not in ['.xls','.xlsx'] or file_ext2 not in ['.xls','.xlsx']):
+                        err_msg = 'Invalid file format'
+                    
+                    if err_msg is None:
+                        if file_ext1 == file_ext2 and res1 and res2:
+                            myfile = open(filePath1, "r")
+                            myfile.close()
+                            myfile = open(filePath2, "r")
+                            myfile.close()
+                            res,err_msg=self.dict['copy_workbook_'+file_ext1](filePath1,filePath2,option)
+                            if res:
+                                status=TEST_RESULT_PASS
+                                methodoutput=TEST_RESULT_TRUE
+                                info_msg="Successfully Copied"
+                                logger.print_on_console(info_msg)
+                        else:
+                            err_msg = 'Error in copying workbooks as file extensions are different.'
                 else:
-                    if err_msg is not None:
-                        err_msg = 'Error in copying workbooks as file extensions are different.'
+                    err_msg=generic_constants.FILE_PATH_NOT_SET
             else:
-                err_msg=generic_constants.FILE_PATH_NOT_SET
+                err_msg = 'Option is Invalid.'
         except IOError:
             err_msg=ERROR_CODE_DICT['ERR_FILE_NOT_ACESSIBLE']
         except ValueError as e:
@@ -546,6 +545,32 @@ class ExcelFile:
                 num = num * 26 + (ord(c.upper()) - ord('A')) + 1
         return num
 
+    def getSheetTrueName(self,name):
+        if(name[-1] == ')'):
+            name = name[::-1]
+            num = ''
+            index = 0
+            for elem in range(1,len(name)):
+                if(name[elem] != '('):
+                    num+=name[elem]
+                else:
+                    index = elem
+                    break
+            
+            name = name[::-1]
+            num = num[::-1]
+            if(num == ''):
+                num = '0'
+            if(num.isdigit()):
+                if(index+1 == len(name)):
+                    return '',True,int(num)
+                # if(index+1 == ' '):
+                #     index+=1
+                return name[:-1*(index+1)],True,int(num)
+            else:
+                return name,False,1
+
+        return name,False,1
 
 class ExcelXLS:
 
@@ -1198,34 +1223,6 @@ class ExcelXLS:
             logger.print_on_console(err_msg)
         return status,err_msg
 
-    def getSheetTrueName(self,name):
-        if(name[-1] == ')'):
-            name = name[::-1]
-            num = ''
-            index = 0
-            for elem in range(1,len(name)):
-                if(name[elem] != '('):
-                    num+=name[elem]
-                else:
-                    index = elem
-                    break
-            
-            name = name[::-1]
-            num = num[::-1]
-            if(num == ''):
-                num = '0'
-            if(num.isdigit()):
-                if(index+1 == len(name)):
-                    return '',True,int(num)
-                # if(index+1 == ' '):
-                #     index+=1
-                return name[:-1*(index+1)],True,int(num)
-            else:
-                return name,False,1
-
-        return name,False,1
-
-
     def copy_workbook_xls(self,filePath1,filePath2,option):
         """
         def : copy_workbook_xls
@@ -1235,6 +1232,7 @@ class ExcelXLS:
         """
         status=False
         err_msg=None
+        self.excel_obj=ExcelFile()
         try:
             wb1=open_workbook(filePath1)
             wb2=open_workbook(filePath2)
@@ -1263,7 +1261,7 @@ class ExcelXLS:
                     if sheet.upper() not in (name.upper() for name in sheetNames2):
                         newSheetName = sheet
                     else:
-                        trueName,check,num = self.getSheetTrueName(sheet)
+                        trueName,check,num = self.excel_obj.getSheetTrueName(sheet)
                         if(check == False):
                             trueName+=" "
                         
@@ -1846,34 +1844,6 @@ class ExcelXLSX:
             logger.print_on_console(err_msg)
         return status,err_msg
 
-    def getSheetTrueName(self,name):
-        if(name[-1] == ')'):
-            name = name[::-1]
-            num = ''
-            index = 0
-            for elem in range(1,len(name)):
-                if(name[elem] != '('):
-                    num+=name[elem]
-                else:
-                    index = elem
-                    break
-            
-            name = name[::-1]
-            num = num[::-1]
-            if(num == ''):
-                num = '0'
-            if(num.isdigit()):
-                if(index+1 == len(name)):
-                    return '',True,int(num)
-                # if(index+1 == ' '):
-                #     index+=1
-                return name[:-1*(index+1)],True,int(num)
-            else:
-                return name,False,1
-
-        return name,False,1
-
-
     def copy_workbook_xlsx(self,filePath1,filePath2,option):
         """
         def : copy_workbook_xlsx
@@ -1883,6 +1853,7 @@ class ExcelXLSX:
         """
         status=False
         err_msg=None
+        self.excel_obj=ExcelFile()
         try:
             wb1=openpyxl.load_workbook(filePath1)
             wb2=openpyxl.load_workbook(filePath2)
@@ -1912,7 +1883,7 @@ class ExcelXLSX:
                     destSheet.delete_rows(1,destSheet.max_row)
 
                 elif(option == '1'):
-                    trueName,check,num = self.getSheetTrueName(sheet)
+                    trueName,check,num = self.excel_obj.getSheetTrueName(sheet)
                     if(check == False):
                         trueName+=" "
                     
