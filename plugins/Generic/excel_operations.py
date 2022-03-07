@@ -9,6 +9,7 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 
+from distutils.log import ERROR
 from encodings import search_function
 from operator import index
 from tkinter.tix import Tree
@@ -484,7 +485,7 @@ class ExcelFile:
         return status,methodoutput,output,err_msg
 
     
-    def copy_workbook(self,filePath1,filePath2,option):
+    def copy_workbook(self,filePath1,filePath2,*args):
         """
         def : copy_workbook
         purpose : calls the respective method to copy workbook from filePath1 to filePath2
@@ -496,7 +497,9 @@ class ExcelFile:
         err_msg = None
         status = TEST_RESULT_FAIL
         methodoutput = TEST_RESULT_FALSE
-        option = None if option not in ['0','1','2'] else option
+        option = '0'
+        if len(args) > 0 and args[0] != '':
+            option = None if args[0] not in ['0','1','2'] else args[0]
         logger.print_on_console('Copy from workbook '+filePath1 + ' to ' + filePath2)
         try:
             if option != None:
@@ -525,8 +528,8 @@ class ExcelFile:
                     err_msg=generic_constants.FILE_PATH_NOT_SET
             else:
                 err_msg = 'Option is Invalid.'
-        except IOError:
-            err_msg=ERROR_CODE_DICT['ERR_FILE_NOT_ACESSIBLE']
+        except IOError as e:
+            err_msg=ERROR_CODE_DICT['ERR_FILE_NOT_ACESSIBLE'] + ' / ' + ERROR_CODE_DICT['ERR_FILE_NOT_FOUND_EXCEPTION']
         except ValueError as e:
             err_msg=ERROR_CODE_DICT['ERR_NUMBER_FORMAT_EXCEPTION']
         except Exception as e:
@@ -1900,7 +1903,6 @@ class ExcelXLSX:
                         destSheet[cell.coordinate].value = cell.value
 
             wb2.save(filePath2)
-            wb1.save(filePath1)
             status = True
         except Exception as e:
             log.error(e)
