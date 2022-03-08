@@ -100,6 +100,7 @@ class GenericKeywordDispatcher:
             'comparecontent':local_generic.generic_file.compare_content,
             'comparepdfs':local_generic.generic_file_pdf.compare_content,
             'findimageinpdf':local_generic.generic_file_pdf.locate_image,
+            'normalizepdf': local_generic.generic_file_pdf.normalize_pdf,
             'comparejsoncontent':local_generic.generic_file.json_compare_content,
             'replacecontent':local_generic.generic_file.replace_content,
             'verifycontent':local_generic.generic_file.verify_content,
