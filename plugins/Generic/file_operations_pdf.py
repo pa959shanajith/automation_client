@@ -995,8 +995,8 @@ class FileOperationsPDF:
                 if opt==0:
                     # do not overwrite
                     if os.path.isfile(dest_file_path):
-                        # file already exists, append unique string to generate a new path
-                        final_path = dest_path+os.sep+file_name.split('.')[0]+"_"+uuid.uuid4().hex[:4].lower()+"."+file_name.split('.')[1]
+                        err_msg='File already exists in the directory'
+                        return False, err_msg, final_path
                     else:
                         # file does not already exist
                         final_path = dest_file_path
@@ -1096,7 +1096,7 @@ class FileOperationsPDF:
                             log.debug("Window not found")
                     else:
                         err_msg=res[1]
-                        logger.print_console(err_msg)
+                        logger.print_on_console(err_msg)
                 else:
                     err_msg="Invalid input"
                     logger.print_on_console(err_msg)
