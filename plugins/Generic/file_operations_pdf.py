@@ -32,7 +32,6 @@ import copy
 import time
 from PIL import Image
 from constants import *
-import uuid
 import subprocess
 if SYSTEM_OS == 'Windows':
     import win32api,win32gui,win32print
