@@ -8,7 +8,6 @@
 # Copyright:   (c) divyansh.singh 2020
 # Licence:     <your licence>
 
-from socket import timeout
 import logger
 import generic_constants
 import constants
