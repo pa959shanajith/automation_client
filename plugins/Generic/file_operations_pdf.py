@@ -8,6 +8,7 @@
 # Copyright:   (c) divyansh.singh 2020
 # Licence:     <your licence>
 
+from socket import timeout
 import logger
 import generic_constants
 import constants
@@ -1030,6 +1031,18 @@ class FileOperationsPDF:
                     appId = None
                     tries = 10
                     time_sleep = 0.5
+                    data=subprocess.check_output(['wmic','printer','list','brief']).decode('utf-8').split('\r\r\n')
+                    data=data[1:]
+                    printer_list=[]
+                    for line in data:
+                        for pn in line.split("  "):
+                            if pn!="":
+                                printer_list.append(pn)
+                                break
+                    if 'Microsoft Print to PDF' in printer_list:
+                        p_found=True
+                        def_printer = win32print.GetDefaultPrinter()
+                        win32print.SetDefaultPrinter("Microsoft Print to PDF")
                     # temp_file_loc = os.environ['AVO_ASSURE_HOME'] +os.sep+"output"+os.sep+file_name  
                     res = self.__save_file(pdf_file_path, file_name, destination_path, int(opt))
                     if res[0]:
@@ -1067,7 +1080,7 @@ class FileOperationsPDF:
                                 win32gui.SetForegroundWindow(win_handle)
                                 app = Application().connect(handle=win_handle, allow_magic_lookup=False)
                                 main_window = app[win32gui.GetWindowText(win_handle)]
-                                main_window.wait('exists enabled visible ready', timeout=5, retry_interval=1)
+                                main_window.wait('exists enabled visible ready',timeout=20,retry_interval=1)
                                 main_window.set_focus()
                                 temp = file_loc
                                 main_window['5'].type_keys(file_loc.replace(' ', '{SPACE}')+"{ENTER}")
@@ -1082,6 +1095,7 @@ class FileOperationsPDF:
                         else:
                             log.debug("Window not found")
                     else:
+                        err_msg=res[1]
                         logger.print_console(err_msg)
                 else:
                     err_msg="Invalid input"
@@ -1089,6 +1103,9 @@ class FileOperationsPDF:
             else:
               err_msg="File not found"
               logger.print_on_console(err_msg)  
-        if status:
-            output_res=temp
+        if status==TEST_RESULT_PASS and err_msg==None:
+            msg="PDF normalized and placed at "+str(temp)
+            logger.print_on_console(msg)
+        if p_found:
+            win32print.SetDefaultPrinter(def_printer)
         return status, methodoutput, output_res, err_msg
