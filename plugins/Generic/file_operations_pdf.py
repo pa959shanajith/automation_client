@@ -33,6 +33,7 @@ import time
 from PIL import Image
 from constants import *
 import subprocess
+import readconfig
 if SYSTEM_OS == 'Windows':
     import win32api,win32gui,win32print
     from pywinauto import Application
@@ -1023,8 +1024,10 @@ class FileOperationsPDF:
         if(not(isinstance(opt, int)) and opt.strip() == ''):opt = 0
         if SYSTEM_OS=='Windows':
             if os.path.isfile(acrobat_path) and os.path.isfile(pdf_file_path):
-                if exe_name.split('.')[1]=='exe' and file_name.split('.')[1]=='pdf' and int(opt) in [0,1]:            
-                    connect_tries = 20
+                if exe_name.split('.')[1]=='exe' and file_name.split('.')[1]=='pdf' and int(opt) in [0,1]:
+                    configvalues = readconfig.readConfig().readJson()
+                    connect_tries = int(configvalues['max_retries_app_launch'])
+                    wait_timeout=connect_tries
                     connect_sl = 1
                     appId = None
                     tries = 10
@@ -1078,7 +1081,8 @@ class FileOperationsPDF:
                                 win32gui.SetForegroundWindow(win_handle)
                                 app = Application().connect(handle=win_handle, allow_magic_lookup=False)
                                 main_window = app[win32gui.GetWindowText(win_handle)]
-                                main_window.wait('exists enabled visible ready',timeout=20,retry_interval=1)
+                                main_window.wait(
+                                    'exists enabled visible ready', timeout=wait_timeout, retry_interval=1)
                                 main_window.set_focus()
                                 temp = file_loc
                                 main_window['5'].type_keys(file_loc.replace(' ', '{SPACE}')+"{ENTER}")
