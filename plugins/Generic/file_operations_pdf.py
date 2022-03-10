@@ -1081,8 +1081,7 @@ class FileOperationsPDF:
                                 win32gui.SetForegroundWindow(win_handle)
                                 app = Application().connect(handle=win_handle, allow_magic_lookup=False)
                                 main_window = app[win32gui.GetWindowText(win_handle)]
-                                main_window.wait(
-                                    'exists enabled visible ready', timeout=wait_timeout, retry_interval=1)
+                                main_window.wait('exists enabled visible ready', timeout=wait_timeout, retry_interval=1)
                                 main_window.set_focus()
                                 temp = file_loc
                                 main_window['5'].type_keys(file_loc.replace(' ', '{SPACE}')+"{ENTER}")
