@@ -493,7 +493,7 @@ class ExcelFile:
         return : Returns Bool
 
         """
-        # output = OUTPUT_CONSTANT
+        output = OUTPUT_CONSTANT
         err_msg = None
         status = TEST_RESULT_FAIL
         methodoutput = TEST_RESULT_FALSE
@@ -538,7 +538,7 @@ class ExcelFile:
         if err_msg!=None:
             log.error(err_msg)
             logger.print_on_console(err_msg)
-        return status,methodoutput,err_msg
+        return status,methodoutput,output,err_msg
 
     def convertStringToInt(self,col):
         num=0
