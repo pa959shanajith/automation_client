@@ -9,6 +9,7 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 from selenium import webdriver
+from selenium.common.exceptions import NoSuchWindowException
 import edge_chromium_options
 from collections import OrderedDict
 import logger
@@ -1097,7 +1098,9 @@ class BrowserKeywords():
                         if isinstance(local_bk.driver_obj,webdriver.Ie):
                             win_name=local_bk.driver_obj.title
                             if win_name == '':
-                                win_name='Blank Page'
+                                win_name=local_bk.driver_obj.current_url
+                                if win_name == '':
+                                    win_name='Blank Page'
                             hwnd=win32gui.FindWindow(None, win_name+" - Internet Explorer")
                             if hwnd==0:
                                 hwnd=win32gui.FindWindow(None, win_name+" - Windows Internet Explorer")
