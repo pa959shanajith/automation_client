@@ -1003,7 +1003,7 @@ class FileOperationsPDF:
                     # overwrite   
                     if os.path.isfile(dest_file_path):
                         if src_file_path==dest_file_path:
-                            err_msg="Source file path and desitnation file path cant be the same"
+                            err_msg="Source file location and destination folder location should not match"
                             return False, err_msg, final_path
                         else:
                             os.remove(dest_file_path)
