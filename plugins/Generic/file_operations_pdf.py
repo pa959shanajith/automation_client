@@ -999,6 +999,7 @@ class FileOperationsPDF:
                     else:
                         # file does not already exist
                         final_path = dest_file_path
+                        return True, err_msg, final_path
                 elif opt==1:
                     # overwrite   
                     if os.path.isfile(dest_file_path):
@@ -1007,8 +1008,8 @@ class FileOperationsPDF:
                             return False, err_msg, final_path
                         else:
                             os.remove(dest_file_path)
-                            final_path=dest_file_path
-                            return True, err_msg, final_path
+                    final_path = dest_file_path
+                    return True,err_msg,final_path             
             else:
                 # should be only destination folder
                 err_msg="Destination should be folder"
