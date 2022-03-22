@@ -1,0 +1,64 @@
+trigger: none
+# trigger:
+#   batch: true
+#   branches:
+#     include:
+#     - "*"
+
+variables:
+- name: PLATFORM
+  value: windows
+- group: default_set
+- group: ICE
+- name: PY_PATH
+  value: $(REPO_PATH)/$(PY_GIT_PATH)
+- name: TARGET_BRANCH
+  value: $(Build.SourceBranchName)
+
+name: $(repo_name)_$(Build.SourceBranchName)_$(Date:yyyyMMdd)$(Rev:.r)
+
+stages:
+- stage: Test
+  displayName: Testing the package
+  jobs:
+  - job: TestJob
+    pool:
+      name: Nineteen68 Pool
+      demands:
+        - PLATFORM -equals windows
+    steps:
+    - checkout: self
+      clean: true
+    - script: |
+        echo Cython Test Started!
+        cd $(Build.SourcesDirectory)
+        python .\build\cythontest.py
+        del /s /q .\plugins\*.c
+      name: CythonTest
+      displayName: Test code for cython errors
+    # - script: |
+    #     echo Unit Test Started!
+    #     cd $(Build.SourcesDirectory)
+    #     REM python .\build\cython.py
+    #   name: UnitTest
+    #   displayName: Test code for unit testing faults
+
+
+- stage: Cleanup
+  condition: always()
+  displayName: Cleaup the work directory
+  jobs:
+  - job: CleanupJob
+    pool:
+      name: Nineteen68 Pool
+      demands:
+        - PLATFORM -equals windows
+    steps:
+    - checkout: none
+    - script: |
+        cd $(Build.SourcesDirectory)
+        dir
+        Echo Removing assets and plugins
+        if exist "assets\*" (rmdir /q /s "assets")
+        if exist "plugins*" (rmdir /q /s "plugins")
+      displayName: Cleaning up directory!

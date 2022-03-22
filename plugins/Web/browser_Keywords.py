@@ -9,6 +9,7 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 from selenium import webdriver
+from selenium.common.exceptions import NoSuchWindowException
 import edge_chromium_options
 from collections import OrderedDict
 import logger
@@ -924,8 +925,7 @@ class BrowserKeywords():
                 status=webconstants.TEST_RESULT_PASS
                 result=webconstants.TEST_RESULT_TRUE
             else:
-                drv={'3': 'Internet Explorer', '6': 'Safari', '7': 'Edge Legacy', '8': 'Edge Chromium'}
-                err_msg = "This function is not available for "+drv[self.browser_num]+'.'
+                err_msg = "This function is not available for "+BROWSER_NAME[self.browser_num]+'.'
                 logger.print_on_console(err_msg)
                 local_bk.log.error(err_msg)
         except Exception as e:
@@ -1098,7 +1098,9 @@ class BrowserKeywords():
                         if isinstance(local_bk.driver_obj,webdriver.Ie):
                             win_name=local_bk.driver_obj.title
                             if win_name == '':
-                                win_name='Blank Page'
+                                win_name=local_bk.driver_obj.current_url
+                                if win_name == '':
+                                    win_name='Blank Page'
                             hwnd=win32gui.FindWindow(None, win_name+" - Internet Explorer")
                             if hwnd==0:
                                 hwnd=win32gui.FindWindow(None, win_name+" - Windows Internet Explorer")

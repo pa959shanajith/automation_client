@@ -521,9 +521,9 @@ class Dispatcher:
                 reporting_obj.browser_version=browser_info.get('version')
                 if(reporting_obj.browser_version == '' or reporting_obj.browser_version == None):
                     reporting_obj.browser_version= browser_info['browserVersion']
-                reporting_obj.browser_type=BROWSER_NAME[int(input[0])]
+                reporting_obj.browser_type=BROWSER_NAME[input[0]]
             elif browser_Keywords.local_bk.driver_obj is None:
-                reporting_obj.browser_type=BROWSER_NAME[int(input[0])]
+                reporting_obj.browser_type=BROWSER_NAME[input[0]]
                 reporting_obj.browser_version = 'N/A'
                 local_Wd.log.info(reporting_obj.browser_version)
                 local_Wd.log.info(reporting_obj.browser_type)
@@ -534,7 +534,7 @@ class Dispatcher:
             if browser_Keywords.local_bk.driver_obj is not None:
                 browsername = BROWSER_NAME_MAP[browser_Keywords.local_bk.driver_obj.name.strip()]
             if self.action == DEBUG and keyword != 'openbrowser':
-                req_browsername = BROWSER_NAME.get(int(teststepproperty.browser_type[0]), 'N/A')
+                req_browsername = BROWSER_NAME.get(teststepproperty.browser_type[0], 'N/A')
                 if req_browsername != browsername:
                     err_msg = 'Requested browser not Active, please open browser'
                     logger.print_on_console(err_msg)

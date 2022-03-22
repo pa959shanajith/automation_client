@@ -1,5 +1,5 @@
 import os
-from constants import SYSTEM_OS
+from constants import SYSTEM_OS, BROWSER_NAME
 
 drivers_path = os.path.join(os.environ["AVO_ASSURE_HOME"], "lib", "Drivers")
 
@@ -181,8 +181,6 @@ NON_WEBELEMENT_KEYWORDS=['openbrowser','opennewtab','navigatetourl','getpagetitl
 'getpopuptext','verifypopuptext','clearcache','navigatewithauthenticate','getbrowsername']
 
 FOUND='found'
-
-BROWSER_NAME = {1: 'Chrome', 2: 'Firefox', 3: 'Internet Explorer', 6: 'Safari', 7: 'Edge Legacy', 8: 'Edge Chromium'}
 
 BROWSER_NAME_MAP = {'chrome': 'Chrome', 'firefox': 'Firefox', 'internet explorer': 'Internet Explorer', 'MicrosoftEdge': 'Edge Legacy', 'msedge': 'Edge Chromium', 'Safari': 'Safari'}
 

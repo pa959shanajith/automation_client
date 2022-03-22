@@ -322,23 +322,24 @@ class ZephyrWindow():
             testcaseid = data["testid"]
             status_tc = data["status"]
             parentid = data["parentid"]
-            relative_path = "/execution?parentid="+str(parentid)+"&cyclephaseid="+str(cyclephaseid)+"&releaseid="+str(releaseid)+"&pagesize=0&isascorder=true"
-            # relative_path = "/execution/user/project?cyclephaseid="+str(cyclephaseid)+"&releaseid="+str(releaseid)
-            respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, proxies=readconfig.proxies)
-            if respon.status_code == 200:
-                JsonObject = respon.json()
-                if JsonObject["resultSize"] != 0:
-                    results = JsonObject["results"]
-                    result = [i for i in results if str(i["tcrTreeTestcase"]["testcase"]["testcaseId"])==testcaseid]
-                    scheduleid = result[0]["id"]
-                    testerid = result[0]["testerId"]
-                    relative_path_update = "/execution/bulk?scheduleids="+str(scheduleid)+"&status="+str(status_tc)+"&testerid="+str(testerid)+"&tcrCatalogTreeId=&allExecutions=&includeanyoneuser="
-                    ids = []
-                    ids.append(scheduleid)
-                    data1 = {"ids":ids, "selectedAll":1, "serachView": "false", "teststepUpdate": "false"}
-                    response = requests.put(self.zephyrURL+relative_path_update , headers=self.headers, json=data1 ,proxies=readconfig.proxies)
-                    if response.status_code == 200:
-                        status = True
+            for index in range(len(cyclephaseid)):
+                relative_path = "/execution?parentid="+str(parentid[index])+"&cyclephaseid="+str(cyclephaseid[index])+"&releaseid="+str(releaseid)+"&pagesize=0&isascorder=true"
+                # relative_path = "/execution/user/project?cyclephaseid="+str(cyclephaseid)+"&releaseid="+str(releaseid)
+                respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, proxies=readconfig.proxies)
+                if respon.status_code == 200:
+                    JsonObject = respon.json()
+                    if JsonObject["resultSize"] != 0:
+                        results = JsonObject["results"]
+                        result = [i for i in results if str(i["tcrTreeTestcase"]["testcase"]["testcaseId"])==str(testcaseid[index])]
+                        scheduleid = result[0]["id"]
+                        testerid = result[0]["testerId"]
+                        relative_path_update = "/execution/bulk?scheduleids="+str(scheduleid)+"&status="+str(status_tc)+"&testerid="+str(testerid)+"&tcrCatalogTreeId=&allExecutions=&includeanyoneuser="
+                        ids = []
+                        ids.append(scheduleid)
+                        data1 = {"ids":ids, "selectedAll":1, "serachView": "false", "teststepUpdate": "false"}
+                        response = requests.put(self.zephyrURL+relative_path_update , headers=self.headers, json=data1 ,proxies=readconfig.proxies)
+                        if response.status_code == 200:
+                            status = True
         except Exception as e:
             err_msg = 'Error while updating data in Zephyr'
             log.error(err_msg)

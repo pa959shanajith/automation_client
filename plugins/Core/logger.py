@@ -80,8 +80,8 @@ class CustomHandler(BaseRotatingHandler):
         if not os.path.exists(logpath):
             os.makedirs(logpath, exist_ok=True)
         if excType==PARALLEL:
-            manifest_filepath = os.path.normpath(logpath + os.sep + BROWSER_NAME[ind]+'_manifest.json').replace("\\","\\\\")
-            filename = os.path.normpath(logpath + os.sep +BROWSER_NAME[ind]+'.log').replace("\\","\\\\")
+            manifest_filepath = os.path.normpath(logpath + os.sep + BROWSER_NAME_LOG[ind]+'_manifest.json').replace("\\","\\\\")
+            filename = os.path.normpath(logpath + os.sep +BROWSER_NAME_LOG[ind]+'.log').replace("\\","\\\\")
         else:
             filename = os.path.normpath(logpath+ os.sep + 'Execution.log').replace("\\","\\\\")
             manifest_filepath = os.path.normpath(logpath + os.sep + 'manifest.json').replace("\\","\\\\")

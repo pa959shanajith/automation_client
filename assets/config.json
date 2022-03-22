@@ -27,6 +27,7 @@
     "incognito_private_mode": "No",
     "kill_stale": "Yes",
     "logFile_Path": "./logs/TestautoV2.log",
+    "max_retries_app_launch": "20",
     "prediction_for_iris_objects": "No",
     "queryTimeOut": "3",
     "screenShot_Flag": "All",
