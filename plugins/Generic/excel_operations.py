@@ -1543,7 +1543,7 @@ class ExcelXLSX:
 
         """
         status=False
-        abs_flag=True if args[-1].lower()=='abs' else False
+        abs_flag=True if (len(args)>0 and args[0].lower()=='abs') else False
         res,line_number,err_msg=self.get_linenumber_xlsx(input_path,sheetname,content,abs_flag)
         if res and line_number != None:
             status=True
