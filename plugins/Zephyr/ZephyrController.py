@@ -212,15 +212,24 @@ class ZephyrWindow():
                     # Fetch requirement details of testcases
                     for i in results:
                         if 'rts' in i:
+                            name_err = False
                             req_id = i['testcase']['requirementIds']
                             requirement_details = self.get_requirement_details(req_id)
-                            res["testcases"].append({
+                            tc = {
                                 'id':i['testcase']['testcaseId'],
-                                'name':i['testcase']['name'],
                                 'cyclePhaseId': i['rts']['cyclePhaseId'],
                                 'parentId': treeid,
                                 'reqdetails': requirement_details,
-                            })
+                            }
+                            try:
+                                tc['name']=i['testcase']['name']
+                            except Exception as excname:
+                                name_err = True
+                                err_msg = 'Due to no name, Zephyr Testcase with id:'+str(tc['id'])+'  was not displayed.'
+                                log.error(err_msg)
+                                logger.print_on_console(err_msg)
+                                log.error(excname, exc_info=True)
+                            if not name_err: res["testcases"].append(tc)
         except Exception as eproject:
             err_msg = 'Error while fetching testcases from Zephyr'
             log.error(err_msg)
@@ -247,15 +256,24 @@ class ZephyrWindow():
                     # Fetch requirement details of testcases
                     for i in results:
                         if 'rts' in i:
+                            name_err = False
                             req_id = i['testcase']['requirementIds']
                             requirement_details = self.get_requirement_details(req_id)
-                            tests.append({
+                            tc = {
                                 'id':i['testcase']['testcaseId'],
-                                'name':i['testcase']['name'],
                                 'cyclePhaseId': i['rts']['cyclePhaseId'],
                                 'parentId': treeid,
                                 'reqdetails': requirement_details,
-                            })
+                            }
+                            try:
+                                tc['name']=i['testcase']['name']
+                            except Exception as excname:
+                                name_err = True
+                                err_msg = 'Due to no name, Zephyr Testcase with id:'+str(tc['id'])+'  was not displayed.'
+                                log.error(err_msg)
+                                logger.print_on_console(err_msg)
+                                log.error(excname, exc_info=True)
+                            if not name_err: tests.append(tc)
         except Exception as eproject:
             err_msg = 'Error while fetching testcases from Zephyr'
             log.error(err_msg)
@@ -287,16 +305,25 @@ class ZephyrWindow():
                     # Fetch requirement details of testcases
                     for i in results:
                         if 'rts' in i:
+                            name_err = False
                             req_id = i['testcase']['requirementIds']
                             requirement_details = self.get_requirement_details(req_id)
-                            if int(i['testcase']['testcaseId']) in mappedTests:
-                                res["testcases"].append({
+                            if int(i['testcase']['testcaseId']) in mappedTests or str(i['testcase']['testcaseId']) in mappedTests:
+                                tc = {
                                     'id':i['testcase']['testcaseId'],
-                                    'name':i['testcase']['name'],
                                     'cyclePhaseId': i['rts']['cyclePhaseId'],
                                     'parentId': treeid,
                                     'reqdetails': requirement_details
-                                })
+                                }
+                                try:
+                                    tc['name']=i['testcase']['name']
+                                except Exception as excname:
+                                    name_err = True
+                                    err_msg = 'Due to no name, Zephyr Testcase with id:'+str(tc['id'])+'  was not displayed.'
+                                    log.error(err_msg)
+                                    logger.print_on_console(err_msg)
+                                    log.error(excname, exc_info=True)
+                                if not name_err: res["testcases"].append(tc)
         except Exception as eproject:
             err_msg = 'Error while fetching testcases from Zephyr'
             log.error(err_msg)
