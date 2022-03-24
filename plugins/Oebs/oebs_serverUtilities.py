@@ -76,7 +76,7 @@ class Utilities:
 
             else:
                 if len(elementObj.description.strip()) == 0:
-                    if 'internal frame' in elementObj.role:
+                    if 'internal frame' in elementObj.role or 'frame' in elementObj.role:
                         path = xpath + '/' + elementObj.role
                     elif 'panel' in elementObj.role:
                         path = xpath + '/' + elementObj.role + '[' + str(index) + ']'
@@ -185,7 +185,7 @@ class Utilities:
                         path = elementObj.role + '[' + str(elementObj.description.strip()) + ']'
             else:
                 if len(elementObj.description.strip()) == 0:
-                    if 'internal frame' in elementObj.role or ('scroll pane' in elementObj.role and len(path) + 1>= location):
+                    if 'internal frame' in elementObj.role or 'frame' in elementObj.role or ('scroll pane' in elementObj.role and len(path) + 1>= location):
                         path = xpath + '/' + elementObj.role
                     elif 'panel' in elementObj.role:
                         path = xpath + '/' + elementObj.role + '[' + str(index) + ']'
