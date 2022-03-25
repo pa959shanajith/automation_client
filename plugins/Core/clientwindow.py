@@ -136,7 +136,11 @@ class ClientWindow(wx.Frame):
         # self.log.BeginTextColour((0, 50, 250))
         self.log.SetFont(font1)
 
-        self.schedule = wx.CheckBox(self.panel, label = 'Do Not Disturb',pos=(120, 10), size=(100, 25))
+        if SYSTEM_OS == 'Windows':
+            self.schedule = wx.CheckBox(self.panel, label='Do Not Disturb', pos=(120, 10), size=(100, 25))
+        else:
+            self.schedule = wx.CheckBox(self.panel, label = 'Do Not Disturb',pos=(120, 10))
+        # self.schedule = wx.CheckBox(self.panel, label = 'Do Not Disturb',pos=(120, 10), size=(100, 25))
         self.schedule.SetToolTip(wx.ToolTip("Enable Do Not Disturb Mode"))
         self.schedule.Bind(wx.EVT_CHECKBOX,self.onChecked_Schedule)
         self.schedule.Disable()
@@ -545,9 +549,10 @@ class Config_window(wx.Frame):
             "Delay":[(333,222),(40, 25),(375,218), (70,-1)],
             "Step_exec":[(12,252),(110, 25),(135,248),(70,-1)],
             "global_waittimeout":[(12,312),(120, 25),(135,308),(70,-1)],
-            "Disp_var":[(235,252),(135, 25),(375,248), (70,-1)],
+            "max_tries":[(222,312),(150, 25),(375,308), (70,-1)],
+            "Disp_var": [(222, 252), (135, 25), (375, 248), (70, -1)],
             "C_Timeout" :[(12,282),(120, 25),(135,278), (70,-1)],
-            "Delay_Stringinput":[(235,282),(130, 25),(375,278), (70,-1)],
+            "Delay_Stringinput":[(222,282),(130, 25),(375,278), (70,-1)],
             "panel1":[(12,345),(100,20),(440,185),(8, 365)],
             "err_text":[(50,555),(350, 25)],
             "Save":[(100,580), (100, 28)],
@@ -569,9 +574,10 @@ class Config_window(wx.Frame):
             "Delay":[(404,222),(40, 25),(448,218), (85,-1)],
             "Step_exec":[(12,252),(120, 25),(142,248),(80,-1)],
             "global_waittimeout":[(12,312),(120, 25),(180,308),(80,-1)],
-            "Disp_var":[(288,252),(140, 25),(448,248),(85,-1)],
+            "max_tries":[(273,312),(150, 25),(450,308), (85,-1)],
+            "Disp_var": [(273, 252), (135, 25), (450, 248), (85, -1)],
             "C_Timeout" :[(12,282),(120, 25),(180,278), (80,-1)],
-            "Delay_Stringinput":[(288,282),(140, 25),(448,278), (85,-1)],
+            "Delay_Stringinput":[(273,282),(130, 25),(450,278), (85,-1)],
             "panel1":[(10,345),(100,20),(440,185),(8, 365)],
             "err_text":[(85,555),(350, 25)],
             "Save":[(130,580),(100, 28)],
@@ -732,6 +738,16 @@ class Config_window(wx.Frame):
             self.conn_timeout.SetValue(isConfigJson['connection_timeout'])
         else:
             self.conn_timeout.SetValue("0")
+        # Max Retries for App Launch config value
+        self.max_retries=wx.StaticText(self.panel, label="Max Retries for App Launch", pos=config_fields["max_tries"][0],size=config_fields["max_tries"][1], style=0, name="")
+        self.max_launch_retries = wx.TextCtrl(self.panel, pos=config_fields["max_tries"][2], size=config_fields["max_tries"][3])
+        if isConfigJson['displayVariableTimeOut']=="":
+            self.max_launch_retries.SetValue("sec")
+            self.max_launch_retries.SetFont(font_italic)
+            self.max_launch_retries.SetForegroundColour('#848484')
+        else:
+            self.max_launch_retries.SetValue(isConfigJson['max_retries_app_launch'])
+            
 
         #Delay input box kept for provide the delay in typestring.
         self.delay_stringinput=wx.StaticText(self.panel, label="Delay for String Input", pos=config_fields["Delay_Stringinput"][0],size=config_fields["Delay_Stringinput"][1], style=0, name="")
@@ -766,12 +782,17 @@ class Config_window(wx.Frame):
         self.delay_stringinput.SetToolTip(wx.ToolTip("Character input delay for sendFunctionKeys"))
         self.globalWait_TimeOut.SetToolTip(wx.ToolTip("Timeout to wait for all objects to visible in AUT [in seconds]"))
         self.ch_extn_path.SetToolTip(wx.ToolTip("Chrome/Chromium extension path or default"))
+        self.max_retries.SetToolTip(wx.ToolTip("Maximum retries to launch PDF Reader for normalizePDF keyword"))
 
         ## Binding placeholders and restricting textareas to just numeric characters
         self.server_port.Bind(wx.EVT_CHAR, self.handle_keypress)
         self.disp_var_timeout.Bind(wx.EVT_SET_FOCUS,self.toggle1_generic)
         self.disp_var_timeout.Bind(wx.EVT_KILL_FOCUS,self.toggle2_generic)
         self.disp_var_timeout.Bind(wx.EVT_CHAR, self.handle_keypress)
+
+        self.max_launch_retries.Bind(wx.EVT_SET_FOCUS,self.toggle1_generic)
+        self.max_launch_retries.Bind(wx.EVT_KILL_FOCUS,self.toggle2_generic)
+        self.max_launch_retries.Bind(wx.EVT_CHAR, self.handle_keypress)
 
         self.query_timeout.Bind(wx.EVT_SET_FOCUS,self.toggle1_generic)
         self.query_timeout.Bind(wx.EVT_KILL_FOCUS,self.toggle2_generic)
@@ -1128,6 +1149,7 @@ class Config_window(wx.Frame):
         delay=self.delay.GetValue()
         stepExecutionWait=self.step_exe_wait.GetValue()
         displayVariableTimeOut=self.disp_var_timeout.GetValue()
+        max_retries_app_launch=self.max_launch_retries.GetValue()
         server_cert=self.server_cert.GetValue()
         browser_check=self.rbox8.GetStringSelection()
         tls_security=self.rbox9.GetStringSelection()
@@ -1168,6 +1190,7 @@ class Config_window(wx.Frame):
         data['globalWaitTimeOut'] = globalWait_TO.strip()
         data['stepExecutionWait'] = stepExecutionWait.strip()
         data['displayVariableTimeOut'] = displayVariableTimeOut.strip()
+        data['max_retries_app_launch'] = max_retries_app_launch.strip()
         data['httpStatusCode'] = httpStatusCode.strip()
         data['delay'] = delay.strip()
         data['ignoreVisibilityCheck'] = ignoreVisibilityCheck.strip()
@@ -1199,7 +1222,7 @@ class Config_window(wx.Frame):
             data['delay'] not in ['','sec'] and data['timeOut'] not in ['','sec'] and data['stepExecutionWait'] not in ['','sec'] and
             data['displayVariableTimeOut'] not in ['','sec'] and data['delay_stringinput'] not in ['','sec'] and
             data['firefox_path']!='' and data['connection_timeout'] not in ['','0 or >=8 hrs'] and data['chrome_profile']!='' and
-            data['chrome_extnpath']!=''):
+            data['chrome_extnpath']!='' and data['max_retries_app_launch'] not in ['','sec']):
             #---------------------------------------resetting the static texts
             self.error_msg.SetLabel("")
             self.sev_add.SetLabel('Server Address')
@@ -1232,6 +1255,8 @@ class Config_window(wx.Frame):
             self.dispVarTimeOut.SetForegroundColour((0,0,0))
             self.connection_timeout.SetLabel('Connection Timeout')
             self.connection_timeout.SetForegroundColour((0,0,0))
+            self.max_retries.SetLabel('Max Retries for App Launch')
+            self.max_retries.SetForegroundColour((0,0,0))
             #---------------------------------------creating the file in specified path
             try:
                 f = open(data['logFile_Path'], "a+")
@@ -1383,6 +1408,13 @@ class Config_window(wx.Frame):
             else:
                 self.connection_timeout.SetLabel('Connection Timeout')
                 self.connection_timeout.SetForegroundColour((0,0,0))
+            
+            if data['max_retries_app_launch'] == "sec":
+                self.max_retries.SetLabel('Max Retries for App Launch*')
+                self.max_retries.SetForegroundColour((255,0,0))
+            else:
+                self.max_retries.SetLabel('Max Retries for App Launch')
+                self.max_retries.SetForegroundColour((0, 0, 0))
 
     """jsonCreater saves the data in json form, location of file to be saved must be defined. This method will overwrite the existing .json file"""
     def jsonCreater(self,data):
@@ -1499,7 +1531,7 @@ class About_window(wx.Frame):
             msg1='Avo Assure ICE '+ str(data['version']) + ' (64-bit)' +' \n'
             msg2='Updated on : '+ str(data['updated_on']) +' \n'
             msg3='For any queries write to us at support@avoautomation.com'+' \n'
-            msg4='© Avo Automation\n'   
+            msg4='© Avo Automation\n'
             #------------------------------------Different co-ordinates for Windows and Mac
             if SYSTEM_OS=='Windows':
                 upload_fields= {
