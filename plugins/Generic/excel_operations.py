@@ -1517,6 +1517,8 @@ class ExcelXLSX:
         line_number=None
         err_msg=None
         log.info(generic_constants.INPUT_IS+input_path+' '+sheetname)
+        if not abs_flag and content.isdigit():
+            content=int(content)
         try:
             book = load_workbook(input_path,data_only=True)
             sheet = book.get_sheet_by_name(sheetname)
