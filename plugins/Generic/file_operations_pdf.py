@@ -8,6 +8,7 @@
 # Copyright:   (c) divyansh.singh 2020
 # Licence:     <your licence>
 
+
 import logger
 import generic_constants
 import constants
@@ -1117,3 +1118,28 @@ class FileOperationsPDF:
         if p_found and def_printer:
             win32print.SetDefaultPrinter(def_printer)
         return status, methodoutput, output_res, err_msg
+
+    def get_page_count(self,filePath):
+        """
+        def : get_page_count
+        purpose : get page count of .pdf file
+        param : filePath
+        return : pagecount [int]
+
+        """
+        status = False
+        err_msg = None
+        pageCount = None
+        from PyPDF2 import PdfFileReader
+        try:
+            pdfFile = PdfFileReader(open(filePath,'rb'))
+            pageCount = pdfFile.getNumPages()
+            status = True
+        except IOError:
+            err_msg=constants.ERROR_CODE_DICT['ERR_FILE_NOT_ACESSIBLE']
+        except Exception as e:
+            err_msg='Error occured in fetching Page count'
+            log.error(e)
+        if err_msg!=None:
+            logger.print_on_console(err_msg)
+        return status,pageCount,err_msg
