@@ -494,16 +494,23 @@ class ExcelFile:
         return : Returns Bool
 
         """
-        # output = OUTPUT_CONSTANT
+        output = OUTPUT_CONSTANT
         err_msg = None
         status = TEST_RESULT_FAIL
         methodoutput = TEST_RESULT_FALSE
         option = '0'
+        method = 'special' if SYSTEM_OS is 'Windows' else 'text'
+        from win32com.client import Dispatch
         if len(args) > 0 and args[0] != '':
             option = None if args[0] not in ['0','1','2'] else args[0]
+        if len(args) > 1 and args[1] != '':
+            method = None if args[1] not in ['text','special'] else args[1]
         logger.print_on_console('Copy from workbook '+filePath1 + ' to ' + filePath2)
+        wb1 = ''
+        wb2 = ''
+        excel = ''
         try:
-            if option != None:
+            if option != None and method != None:
                 if filePath1 != None and filePath2 != None:
                     file_ext1,res1,err_msg=self.__get_ext(filePath1)
                     if err_msg is None:
@@ -517,7 +524,67 @@ class ExcelFile:
                             myfile.close()
                             myfile = open(filePath2, "r")
                             myfile.close()
-                            res,err_msg=self.dict['copy_workbook_'+file_ext1](filePath1,filePath2,option)
+
+                            if(method == 'special'):
+                                if(SYSTEM_OS == 'Windows'):
+                                    excel = Dispatch("Excel.Application")
+                                    excel.Interactive = False
+                                    excel.Visible = False
+
+                                    wb1 = excel.Workbooks.Open(filePath1)
+                                    wb2 = excel.Workbooks.Open(filePath2)
+                                    excel.DisplayAlerts=False
+                                    deleteSheet = '?'
+                                    if(option == '2'):
+                                        for sheetName2 in wb2.Sheets:
+                                            if(wb2.Sheets.count > 1):
+                                                wb2.Worksheets(sheetName2.Name).Delete()
+                                        deleteSheet = wb2.Worksheets(1)
+                                    for sheetName1 in wb1.Sheets:
+                                        if(option == '1'):
+                                            ws1 = wb1.Worksheets(sheetName1.Name)
+                                            ws1.Copy(Before=wb2.Worksheets(1))
+                                        else:
+                                            check = ''
+                                            for sheetName2 in wb2.sheets:
+                                                if(sheetName1.Name.upper() == sheetName2.Name.upper()):
+                                                    check = sheetName2.Name
+                                                    break
+                                            
+                                            if(check == ''):
+                                                ws1 = wb1.Worksheets(sheetName1.Name)
+                                                ws1.Copy(wb2.Worksheets(1))
+                                            else:
+                                                addSheet = '?'
+                                                if(wb2.Sheets.count == 1):
+                                                    addSheet = wb2.Sheets.Add()
+
+                                                wb2.Worksheets(check).Delete()
+                                                ws1 = wb1.Worksheets(sheetName1.Name)
+                                                ws1.Copy(wb2.Worksheets(1))
+                                                if(option == '0'):
+                                                    wb2.Worksheets(sheetName1.Name).Name = check
+                                                elif(option == '2'):
+                                                    deleteSheet = '?'
+
+                                                if(addSheet != '?'):
+                                                    wb2.Worksheets(addSheet.Name).Delete()
+
+
+                                    if(deleteSheet != '?'):
+                                        wb2.Worksheets(deleteSheet.Name).Delete()
+                                    wb2.Close(SaveChanges=True)
+                                    wb1.Close(SaveChanges=True)
+                                    excel.DisplayAlerts=True
+                                    excel.Quit()
+                                    wb1 = ''
+                                    wb2 = ''
+                                    excel = ''
+                                    res = True
+                                else:
+                                    err_msg = 'copyWorkBook KeyWord is Only supported for Windows OS with excel application.'
+                            else:
+                                res,err_msg=self.dict['copy_workbook_'+file_ext1](filePath1,filePath2,option)
                             if res:
                                 status=TEST_RESULT_PASS
                                 methodoutput=TEST_RESULT_TRUE
@@ -539,7 +606,12 @@ class ExcelFile:
         if err_msg!=None:
             log.error(err_msg)
             logger.print_on_console(err_msg)
-        return status,methodoutput,err_msg
+        if wb1 != '' and wb2!='' and excel != '':
+            wb2.Close(SaveChanges=True)
+            wb1.Close(SaveChanges=True)
+            excel.Quit()
+
+        return status,methodoutput,output,err_msg
 
     def convertStringToInt(self,col):
         num=0
@@ -1465,6 +1537,8 @@ class ExcelXLSX:
         line_number=None
         err_msg=None
         log.info(generic_constants.INPUT_IS+input_path+' '+sheetname)
+        if not abs_flag and content.isdigit():
+            content=int(content)
         try:
             book = load_workbook(input_path,data_only=True)
             sheet = book.get_sheet_by_name(sheetname)
@@ -1563,7 +1637,7 @@ class ExcelXLSX:
 
         """
         status=False
-        abs_flag=True if args[-1].lower()=='abs' else False
+        abs_flag=True if (len(args)>0 and args[0].lower()=='abs') else False
         res,line_number,err_msg=self.get_linenumber_xlsx(input_path,sheetname,content,abs_flag)
         if res and line_number != None:
             status=True
@@ -1921,7 +1995,6 @@ class ExcelXLSX:
                 for row in sheetData:
                     for cell in row:
                         destSheet[cell.coordinate].value = cell.value
-
 
             wb2.save(filePath2)
             status = True

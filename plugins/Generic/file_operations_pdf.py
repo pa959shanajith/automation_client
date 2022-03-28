@@ -1000,14 +1000,19 @@ class FileOperationsPDF:
                     else:
                         # file does not already exist
                         final_path = dest_file_path
+                        return True, err_msg, final_path
                 elif opt==1:
                     # overwrite   
                     if os.path.isfile(dest_file_path):
-                        os.remove(dest_file_path)
-                    final_path=dest_file_path
-                return True, err_msg, final_path
+                        if src_file_path==dest_file_path:
+                            err_msg="Source file location and destination folder location should not match"
+                            return False, err_msg, final_path
+                        else:
+                            os.remove(dest_file_path)
+                    final_path = dest_file_path
+                    return True,err_msg,final_path             
             else:
-                # dhould be only destination folder
+                # should be only destination folder
                 err_msg="Destination should be folder"
                 return False,err_msg,final_path
         else:
@@ -1031,6 +1036,8 @@ class FileOperationsPDF:
                     wait_timeout=connect_tries
                     connect_sl = 1
                     appId = None
+                    p_found=None
+                    def_printer = None
                     tries = 10
                     time_sleep = 0.5
                     data=subprocess.check_output(['wmic','printer','list','brief']).decode('utf-8').split('\r\r\n')
@@ -1108,7 +1115,7 @@ class FileOperationsPDF:
         if status==TEST_RESULT_PASS and err_msg==None:
             msg="PDF normalized and placed at "+str(temp)
             logger.print_on_console(msg)
-        if p_found:
+        if p_found and def_printer:
             win32print.SetDefaultPrinter(def_printer)
         return status, methodoutput, output_res, err_msg
 
