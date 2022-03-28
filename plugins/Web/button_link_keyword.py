@@ -29,6 +29,7 @@ from utilweb_operations import *
 import pyautogui
 import psutil
 import readconfig
+from selenium.webdriver.common.by import By
 local_blk = threading.local()
 
 class ButtonLinkKeyword():
@@ -524,12 +525,19 @@ class ButtonLinkKeyword():
                             status = webconstants.TEST_RESULT_PASS
                             methodoutput = webconstants.TEST_RESULT_TRUE
                     else:
-                        if self.__click_for_file_upload(browser_Keywords.local_bk.driver_obj,webelement):
+                        #Checking for headless mode
+                        if (str(readconfig.configvalues['headless_mode'])=='Yes'):
+                            inputElement = webelement.find_element(By.XPATH,'..').find_element(By.XPATH,"//input[@type='file']")
+                            inputElement.send_keys(inputfile)
+                            status = webconstants.TEST_RESULT_PASS
+                            methodoutput = webconstants.TEST_RESULT_TRUE
+                        elif self.__click_for_file_upload(browser_Keywords.local_bk.driver_obj,webelement):
                             filestatus =self.__upload_operation(inputfile,inputs)
                             local_blk.log.info(STATUS_METHODOUTPUT_UPDATE)
                             if filestatus:
                                 status = webconstants.TEST_RESULT_PASS
                                 methodoutput = webconstants.TEST_RESULT_TRUE
+                    
                 else:
                     err_msg = WEB_ELEMENT_DISABLED
         except Exception as e:
