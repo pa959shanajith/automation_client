@@ -345,7 +345,7 @@ class MainNamespace(BaseNamespace):
             d = args[0]
             action = d['action']
             headless_mode = str(configvalues['headless_mode'])=='Yes'
-            if headless_mode and action == 'scrape':
+            if headless_mode and action in ['scrape','replace']:
                 log.info("Scraping cannot be performed in headless mode")
                 logger.print_on_console("Scraping cannot be performed in headless mode")
                 socketIO.emit('scrape','Terminate')

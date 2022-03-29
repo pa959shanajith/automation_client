@@ -40,6 +40,7 @@ import re
 import zipfile
 import platform
 import time
+import docx
 
 log = logging.getLogger('file_operations.py')
 
@@ -95,7 +96,11 @@ class FileOperations:
               '.xlsx_get_line_number':self.xlsx_obj.get_linenumber_xlsx,
 
               '.xlsx_create_file':self.xlsx_obj.create_file_xlsx,
-              '.xls_create_file':self.xls_obj.create_file_xls
+              '.xls_create_file':self.xls_obj.create_file_xls,
+
+              '.xlsx_get_page_count':self.xlsx_obj.get_page_count_xlsx,
+              '.xls_get_page_count':self.xls_obj.get_page_count_xls,
+              '.pdf_get_page_count':self.pdf.get_page_count
               }
 
     def create_file(self,inputpath,file_name):
@@ -2561,3 +2566,52 @@ class FileOperations:
             log.error(err_msg)
             logger.print_on_console(err_msg)
         return status,methodoutput,res1,err_msg
+
+    def get_page_count(self,filePath):
+        """
+        def : get_page_count
+        purpose : get page count of .pdf,.docx,.doc,.xls,.xlsx files
+        param : filePath
+        return : pagecount [int]
+        """
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        pageCount=None
+        from win32com.client import Dispatch
+        try:
+            if filePath != None:
+                file_ext,res=self.__get_ext(filePath)
+                if file_ext in ['.docx','.doc','.pdf','.xls','.xlsx']:
+                    if res == False:
+                        if SYSTEM_OS == 'Windows':
+                            word = Dispatch('Word.Application')
+                            word.Visible = False
+                            doc = word.Documents.Open(filePath)
+                            doc.Repaginate()
+                            pageCount = doc.ComputeStatistics(2)
+                            # doc.Close()
+                            # word.Quit()
+                            res = True
+                        else:
+                            err_msg = file_ext + ' Is Not Supported for Mac Os'
+                        # doc = zipfile.ZipFile(filePath, "r")
+                        # docXml = doc.read('docProps/app.xml')
+                        # parseXml = xml.dom.minidom.parseString(docXml)
+                        # pageCount = parseXml.getElementsByTagName('Pages')[0].childNodes[0].nodeValue
+                    else:
+                        res,pageCount,err_msg = self.dict[file_ext+'_get_page_count'](filePath)
+                if res:
+                    status=TEST_RESULT_PASS
+                    methodoutput=TEST_RESULT_TRUE
+                    info_msg="Page Count is "
+                    logger.print_on_console(info_msg + str(pageCount))
+        except Exception as e:
+            # err_msg=err_msg=generic_constants.ERR_MSG1+'getting line number of'+generic_constants.ERR_MSG2
+            err_msg = 'Error occured while fetching page count.'
+            log.error(e)
+        if err_msg!=None:
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
+
+        return status,methodoutput,pageCount,err_msg

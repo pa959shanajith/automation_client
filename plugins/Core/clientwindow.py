@@ -136,7 +136,11 @@ class ClientWindow(wx.Frame):
         # self.log.BeginTextColour((0, 50, 250))
         self.log.SetFont(font1)
 
-        self.schedule = wx.CheckBox(self.panel, label = 'Do Not Disturb',pos=(120, 10), size=(100, 25))
+        if SYSTEM_OS == 'Windows':
+            self.schedule = wx.CheckBox(self.panel, label='Do Not Disturb', pos=(120, 10), size=(100, 25))
+        else:
+            self.schedule = wx.CheckBox(self.panel, label = 'Do Not Disturb',pos=(120, 10))
+        # self.schedule = wx.CheckBox(self.panel, label = 'Do Not Disturb',pos=(120, 10), size=(100, 25))
         self.schedule.SetToolTip(wx.ToolTip("Enable Do Not Disturb Mode"))
         self.schedule.Bind(wx.EVT_CHECKBOX,self.onChecked_Schedule)
         self.schedule.Disable()
@@ -570,10 +574,10 @@ class Config_window(wx.Frame):
             "Delay":[(404,222),(40, 25),(448,218), (85,-1)],
             "Step_exec":[(12,252),(120, 25),(142,248),(80,-1)],
             "global_waittimeout":[(12,312),(120, 25),(180,308),(80,-1)],
-            "max_tries":[(222,312),(150, 25),(375,308), (80,-1)],
-            "Disp_var": [(222, 252), (135, 25), (375, 248), (85, -1)],
+            "max_tries":[(273,312),(150, 25),(450,308), (85,-1)],
+            "Disp_var": [(273, 252), (135, 25), (450, 248), (85, -1)],
             "C_Timeout" :[(12,282),(120, 25),(180,278), (80,-1)],
-            "Delay_Stringinput":[(222,282),(130, 25),(375,278), (85,-1)],
+            "Delay_Stringinput":[(273,282),(130, 25),(450,278), (85,-1)],
             "panel1":[(10,345),(100,20),(440,185),(8, 365)],
             "err_text":[(85,555),(350, 25)],
             "Save":[(130,580),(100, 28)],
@@ -1527,7 +1531,7 @@ class About_window(wx.Frame):
             msg1='Avo Assure ICE '+ str(data['version']) + ' (64-bit)' +' \n'
             msg2='Updated on : '+ str(data['updated_on']) +' \n'
             msg3='For any queries write to us at support@avoautomation.com'+' \n'
-            msg4='© Avo Automation\n'   
+            msg4='© Avo Automation\n'
             #------------------------------------Different co-ordinates for Windows and Mac
             if SYSTEM_OS=='Windows':
                 upload_fields= {
