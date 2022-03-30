@@ -351,9 +351,9 @@ class ZephyrWindow():
             parentid = data["parentid"]
             for index in range(len(cyclephaseid)):
                 if parentid[index]=='-1':
-                    relative_path = "/execution/user/project?cyclephaseid="+str(cyclephaseid[index])+"&releaseid="+str(releaseid)
+                    relative_path = "/execution/user/project?cyclephaseid="+str(cyclephaseid[index])+"&releaseid="+str(releaseid[index])
                 else:
-                    relative_path = "/execution?parentid="+str(parentid[index])+"&cyclephaseid="+str(cyclephaseid[index])+"&releaseid="+str(releaseid)+"&pagesize=0&isascorder=true"
+                    relative_path = "/execution?parentid="+str(parentid[index])+"&cyclephaseid="+str(cyclephaseid[index])+"&releaseid="+str(releaseid[index])+"&pagesize=0&isascorder=true"
                 # relative_path = "/execution/user/project?cyclephaseid="+str(cyclephaseid)+"&releaseid="+str(releaseid)
                 respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, proxies=readconfig.proxies)
                 if respon.status_code == 200:
