@@ -504,7 +504,7 @@ class ExcelFile:
         if len(args) > 0 and args[0] != '':
             option = None if args[0] not in ['0','1','2'] else args[0]
         if len(args) > 1 and args[1] != '':
-            method = None if args[1] not in ['text','special'] else args[1]
+            method = None if args[1].lower() not in ['text','special'] else args[1].lower()
         logger.print_on_console('Copy from workbook '+filePath1 + ' to ' + filePath2)
         wb1 = ''
         wb2 = ''
@@ -595,7 +595,7 @@ class ExcelFile:
                 else:
                     err_msg=generic_constants.FILE_PATH_NOT_SET
             else:
-                err_msg = 'Option is Invalid.'
+                err_msg = 'Option/Method is Invalid.'
         except IOError as e:
             err_msg=ERROR_CODE_DICT['ERR_FILE_NOT_ACESSIBLE'] + ' / ' + ERROR_CODE_DICT['ERR_FILE_NOT_FOUND_EXCEPTION']
         except ValueError as e:
