@@ -9,6 +9,7 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 
+from copy import copy 
 from distutils.log import ERROR
 from encodings import search_function
 from operator import index
@@ -503,7 +504,7 @@ class ExcelFile:
         if len(args) > 0 and args[0] != '':
             option = None if args[0] not in ['0','1','2'] else args[0]
         if len(args) > 1 and args[1] != '':
-            method = None if args[1] not in ['text','special'] else args[1]
+            method = None if args[1].lower() not in ['text','special'] else args[1].lower()
         logger.print_on_console('Copy from workbook '+filePath1 + ' to ' + filePath2)
         wb1 = ''
         wb2 = ''
@@ -594,7 +595,7 @@ class ExcelFile:
                 else:
                     err_msg=generic_constants.FILE_PATH_NOT_SET
             else:
-                err_msg = 'Option is Invalid.'
+                err_msg = 'Option/Method is Invalid.'
         except IOError as e:
             err_msg=ERROR_CODE_DICT['ERR_FILE_NOT_ACESSIBLE'] + ' / ' + ERROR_CODE_DICT['ERR_FILE_NOT_FOUND_EXCEPTION']
         except ValueError as e:
@@ -1365,6 +1366,25 @@ class ExcelXLS:
             log.error(e)
         return status,err_msg
 
+    def get_page_count_xls(self,filePath):
+        """
+        def : get_page_count
+        purpose : get page count of .xls file
+        param : filePath
+        return : pagecount [int]
+        """
+        status=False
+        err_msg=None
+        count = None
+        try:
+            wb = open_workbook(filePath)
+            count = len(wb.sheet_names())
+            status = True
+        except Exception as e:
+            log.error(e)
+            err_msg = 'Error occured fetching the page count.'
+        return status,count,err_msg
+
 
 class ExcelXLSX:
 
@@ -1517,6 +1537,8 @@ class ExcelXLSX:
         line_number=None
         err_msg=None
         log.info(generic_constants.INPUT_IS+input_path+' '+sheetname)
+        if not abs_flag and content.isdigit():
+            content=int(content)
         try:
             book = load_workbook(input_path,data_only=True)
             sheet = book.get_sheet_by_name(sheetname)
@@ -1973,13 +1995,33 @@ class ExcelXLSX:
                 for row in sheetData:
                     for cell in row:
                         destSheet[cell.coordinate].value = cell.value
-                        
+
             wb2.save(filePath2)
             status = True
         except Exception as e:
             log.error(e)
             err_msg='Error occurred While copying Workbook'
         return status,err_msg
+
+    def get_page_count_xlsx(self,filePath):
+        """
+        def : get_page_count
+        purpose : get page count of .xlsx file
+        param : filePath
+        return : pagecount [int]
+        """
+        status=False
+        err_msg=None
+        count = None
+        try:
+            wb = openpyxl.load_workbook(filePath)
+            count = len(wb.sheetnames)
+            status = True
+        except Exception as e:
+            log.error(e)
+            err_msg = 'Error occured fetching the page count.'
+        return status,count,err_msg
+
 
 
 class ExcelCSV:
