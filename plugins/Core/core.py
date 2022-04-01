@@ -1644,7 +1644,6 @@ def check_browser():
                 browser_ver = driver.capabilities['version']
             elif 'browserVersion' in  driver.capabilities.keys():
                 browser_ver = driver.capabilities['browserVersion']
-            # browser_ver = int(browser_ver.encode('utf-8')[:3])
             browser_ver = int(browser_ver.split(".")[0].encode('utf-8'))
             try:
                 driver.close()
