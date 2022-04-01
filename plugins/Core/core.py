@@ -1605,7 +1605,7 @@ def check_browser():
                     params = json.load(open(ICE_CONST))
                     if params['CHROME_VERSION'] != "":
                         for k,v in list(params['CHROME_VERSION'].items()):
-                            CHROME_DRIVER_VERSION[str(k)]=[int(str(v)[:2]),int(str(v)[3:])]
+                            CHROME_DRIVER_VERSION[str(k)]=[int(str(v).split(',')[0]),int(str(v).split(',')[1])]
                     if params['FIREFOX_VERSION'] != "":
                         for k,v in list(params['FIREFOX_VERSION'].items()):
                             FIREFOX_BROWSER_VERSION[str(k)]=[int(str(v)[:2]),int(str(v)[3:])]
@@ -1626,7 +1626,10 @@ def check_browser():
             #checking browser for chrome
             p = subprocess.Popen('"' + CHROME_DRIVER_PATH + '" --version', stdout=subprocess.PIPE, bufsize=1, shell=True)
             a = p.stdout.readline()
-            a = a.decode('utf-8')[13:17]
+            if a.decode('utf-8')[13:18].endswith('.'):
+                a = a.decode('utf-8')[13:17]
+            else:
+                a = a.decode('utf-8')[13:18]
             choptions1 = webdriver.ChromeOptions()
             if str(configvalues['chrome_path']).lower()!="default":
                 choptions1.binary_location=str(configvalues['chrome_path'])
@@ -1641,7 +1644,8 @@ def check_browser():
                 browser_ver = driver.capabilities['version']
             elif 'browserVersion' in  driver.capabilities.keys():
                 browser_ver = driver.capabilities['browserVersion']
-            browser_ver = int(browser_ver.encode('utf-8')[:2])
+            # browser_ver = int(browser_ver.encode('utf-8')[:3])
+            browser_ver = int(browser_ver.split(".")[0].encode('utf-8'))
             try:
                 driver.close()
                 driver.quit()
