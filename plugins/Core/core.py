@@ -1759,7 +1759,6 @@ def check_browser():
             driver = webdriver.Edge(capabilities=caps, executable_path=EDGE_CHROMIUM_DRIVER_PATH)
             browser_ver = driver.capabilities['browserVersion']
             browser_ver1 = browser_ver.encode('utf-8')
-            # browser_ver = int(browser_ver1[:2])
             browser_ver = int(browser_ver.split(".")[0].encode('utf-8'))
             try:
                 driver.close()
