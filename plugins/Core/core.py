@@ -345,7 +345,7 @@ class MainNamespace(BaseNamespace):
             d = args[0]
             action = d['action']
             headless_mode = str(configvalues['headless_mode'])=='Yes'
-            if headless_mode and action == 'scrape':
+            if headless_mode and action in ['scrape','replace']:
                 log.info("Scraping cannot be performed in headless mode")
                 logger.print_on_console("Scraping cannot be performed in headless mode")
                 socketIO.emit('scrape','Terminate')
@@ -1605,7 +1605,7 @@ def check_browser():
                     params = json.load(open(ICE_CONST))
                     if params['CHROME_VERSION'] != "":
                         for k,v in list(params['CHROME_VERSION'].items()):
-                            CHROME_DRIVER_VERSION[str(k)]=[int(str(v)[:2]),int(str(v)[3:])]
+                            CHROME_DRIVER_VERSION[str(k)]=[int(str(v).split(',')[0]),int(str(v).split(',')[1])]
                     if params['FIREFOX_VERSION'] != "":
                         for k,v in list(params['FIREFOX_VERSION'].items()):
                             FIREFOX_BROWSER_VERSION[str(k)]=[int(str(v)[:2]),int(str(v)[3:])]
@@ -1614,7 +1614,7 @@ def check_browser():
                             EDGE_VERSION[str(k)]=[(str(v)[:8]),(str(v)[13:21])]
                     if params['EDGE_CHROMIUM_VERSION'] != "":
                         for k,v in list(params['EDGE_CHROMIUM_VERSION'].items()):
-                            EDGE_CHROMIUM_VERSION[str(k)]=[int(str(v)[:2]),int(str(v)[3:])]
+                            EDGE_CHROMIUM_VERSION[str(k)]=[int(str(v).split(',')[0]),int(str(v).split(',')[1])]
                 else:
                     logger.print_on_console("Unable to locate ICE parameters")
             except Exception as e:
@@ -1626,7 +1626,10 @@ def check_browser():
             #checking browser for chrome
             p = subprocess.Popen('"' + CHROME_DRIVER_PATH + '" --version', stdout=subprocess.PIPE, bufsize=1, shell=True)
             a = p.stdout.readline()
-            a = a.decode('utf-8')[13:17]
+            if a.decode('utf-8')[13:18].endswith('.'):
+                a = a.decode('utf-8')[13:17]
+            else:
+                a = a.decode('utf-8')[13:18]
             choptions1 = webdriver.ChromeOptions()
             if str(configvalues['chrome_path']).lower()!="default":
                 choptions1.binary_location=str(configvalues['chrome_path'])
@@ -1641,7 +1644,7 @@ def check_browser():
                 browser_ver = driver.capabilities['version']
             elif 'browserVersion' in  driver.capabilities.keys():
                 browser_ver = driver.capabilities['browserVersion']
-            browser_ver = int(browser_ver.encode('utf-8')[:2])
+            browser_ver = int(browser_ver.split(".")[0].encode('utf-8'))
             try:
                 driver.close()
                 driver.quit()
@@ -1740,7 +1743,10 @@ def check_browser():
         try:
             p = subprocess.Popen('"' + EDGE_CHROMIUM_DRIVER_PATH + '" --version', stdout=subprocess.PIPE, bufsize=1,cwd=DRIVERS_PATH,shell=True)
             a = p.stdout.readline()
-            a = a.decode('utf-8')[13:17]
+            if a.decode('utf-8')[13:18].endswith('.'):
+                a = a.decode('utf-8')[13:17]
+            else:
+                a = a.decode('utf-8')[13:18]
             core_utils.get_all_the_imports('Web')
             import edge_chromium_options
             msoptions = webdriver.EdgeChromiumOptions()
@@ -1753,7 +1759,7 @@ def check_browser():
             driver = webdriver.Edge(capabilities=caps, executable_path=EDGE_CHROMIUM_DRIVER_PATH)
             browser_ver = driver.capabilities['browserVersion']
             browser_ver1 = browser_ver.encode('utf-8')
-            browser_ver = int(browser_ver1[:2])
+            browser_ver = int(browser_ver.split(".")[0].encode('utf-8'))
             try:
                 driver.close()
                 driver.quit()

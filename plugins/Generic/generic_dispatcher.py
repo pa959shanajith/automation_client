@@ -100,6 +100,7 @@ class GenericKeywordDispatcher:
             'comparecontent':local_generic.generic_file.compare_content,
             'comparepdfs':local_generic.generic_file_pdf.compare_content,
             'findimageinpdf':local_generic.generic_file_pdf.locate_image,
+            'normalizepdf': local_generic.generic_file_pdf.normalize_pdf,
             'comparejsoncontent':local_generic.generic_file.json_compare_content,
             'replacecontent':local_generic.generic_file.replace_content,
             'verifycontent':local_generic.generic_file.verify_content,
@@ -116,6 +117,7 @@ class GenericKeywordDispatcher:
             'deleterow':local_generic.generic_excel.delete_row,
             'getrowcount':local_generic.generic_excel.get_rowcount,
             'getcolumncount':local_generic.generic_excel.get_colcount,
+            'copyworkbook':local_generic.generic_excel.copy_workbook,
             'runquery':local_generic.generic_database.runQuery,
             'securerunquery': local_generic.generic_database.secureRunQuery,
             'getdata':local_generic.generic_database.getData,
@@ -168,6 +170,7 @@ class GenericKeywordDispatcher:
             'cellbycellcompare': local_generic.generic_file.cell_by_cell_compare,
             'findfilepath': local_generic.generic_file.find_file_path,
             'selectivecellcompare': local_generic.generic_file.selective_cell_compare,
+            'getpagecount': local_generic.generic_file.get_page_count,
             'createconstvariable':local_generic.const_var_obj.create_constant_variable,
             'deleteconstvariable':local_generic.const_var_obj.delete_const_variable
             }

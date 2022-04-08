@@ -9,6 +9,11 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 
+from copy import copy 
+from distutils.log import ERROR
+from encodings import search_function
+from operator import index
+from tkinter.tix import Tree
 import logger
 import generic_constants
 import xlwt
@@ -55,6 +60,7 @@ class ExcelFile:
         'clear_cell_.xls':self.xls_obj.clear_cell_xls,
         'get_rowcount_.xls':self.xls_obj.get_rowcount_xls,
         'get_colcount_.xls':self.xls_obj.get_colcount_xls,
+        'copy_workbook_.xls':self.xls_obj.copy_workbook_xls,
 
         'delete_row_.xlsx':self.xlsx_obj.delete_row_xlsx,
         'read_cell_.xlsx':self.xlsx_obj.read_cell_xlsx,
@@ -62,6 +68,7 @@ class ExcelFile:
         'clear_cell_.xlsx':self.xlsx_obj.clear_cell_xlsx,
         'get_rowcount_.xlsx':self.xlsx_obj.get_rowcount_xlsx,
         'get_colcount_.xlsx':self.xlsx_obj.get_colcount_xlsx,
+        'copy_workbook_.xlsx':self.xlsx_obj.copy_workbook_xlsx,
 
         'delete_row_.csv':self.csv_obj.delete_row_csv,
         'read_cell_.csv':self.csv_obj.read_cell_csv,
@@ -478,6 +485,133 @@ class ExcelFile:
             logger.print_on_console(err_msg)
         return status,methodoutput,output,err_msg
 
+    
+    def copy_workbook(self,filePath1,filePath2,*args):
+        """
+        def : copy_workbook
+        purpose : calls the respective method to copy workbook from filePath1 to filePath2
+        param : filePath1,filePath2,option
+        return : Returns Bool
+
+        """
+        output = OUTPUT_CONSTANT
+        err_msg = None
+        status = TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FALSE
+        option = '0'
+        method = 'special' if SYSTEM_OS is 'Windows' else 'text'
+        from win32com.client import Dispatch
+        if len(args) > 0 and args[0] != '':
+            option = None if args[0] not in ['0','1','2'] else args[0]
+        if len(args) > 1 and args[1] != '':
+            method = None if args[1].lower() not in ['text','special'] else args[1].lower()
+        logger.print_on_console('Copy from workbook '+filePath1 + ' to ' + filePath2)
+        wb1 = ''
+        wb2 = ''
+        excel = ''
+        try:
+            if option != None and method != None:
+                if filePath1 != None and filePath2 != None:
+                    file_ext1,res1,err_msg=self.__get_ext(filePath1)
+                    if err_msg is None:
+                        file_ext2,res2,err_msg=self.__get_ext(filePath2)
+                    if err_msg is None and (file_ext1 not in ['.xls','.xlsx'] or file_ext2 not in ['.xls','.xlsx']):
+                        err_msg = 'Invalid file format'
+                    
+                    if err_msg is None:
+                        if file_ext1 == file_ext2 and res1 and res2:
+                            myfile = open(filePath1, "r")
+                            myfile.close()
+                            myfile = open(filePath2, "r")
+                            myfile.close()
+
+                            if(method == 'special'):
+                                if(SYSTEM_OS == 'Windows'):
+                                    excel = Dispatch("Excel.Application")
+                                    excel.Interactive = False
+                                    excel.Visible = False
+
+                                    wb1 = excel.Workbooks.Open(filePath1)
+                                    wb2 = excel.Workbooks.Open(filePath2)
+                                    excel.DisplayAlerts=False
+                                    deleteSheet = '?'
+                                    if(option == '2'):
+                                        for sheetName2 in wb2.Sheets:
+                                            if(wb2.Sheets.count > 1):
+                                                wb2.Worksheets(sheetName2.Name).Delete()
+                                        deleteSheet = wb2.Worksheets(1)
+                                    for sheetName1 in wb1.Sheets:
+                                        if(option == '1'):
+                                            ws1 = wb1.Worksheets(sheetName1.Name)
+                                            ws1.Copy(Before=wb2.Worksheets(1))
+                                        else:
+                                            check = ''
+                                            for sheetName2 in wb2.sheets:
+                                                if(sheetName1.Name.upper() == sheetName2.Name.upper()):
+                                                    check = sheetName2.Name
+                                                    break
+                                            
+                                            if(check == ''):
+                                                ws1 = wb1.Worksheets(sheetName1.Name)
+                                                ws1.Copy(wb2.Worksheets(1))
+                                            else:
+                                                addSheet = '?'
+                                                if(wb2.Sheets.count == 1):
+                                                    addSheet = wb2.Sheets.Add()
+
+                                                wb2.Worksheets(check).Delete()
+                                                ws1 = wb1.Worksheets(sheetName1.Name)
+                                                ws1.Copy(wb2.Worksheets(1))
+                                                if(option == '0'):
+                                                    wb2.Worksheets(sheetName1.Name).Name = check
+                                                elif(option == '2'):
+                                                    deleteSheet = '?'
+
+                                                if(addSheet != '?'):
+                                                    wb2.Worksheets(addSheet.Name).Delete()
+
+
+                                    if(deleteSheet != '?'):
+                                        wb2.Worksheets(deleteSheet.Name).Delete()
+                                    wb2.Close(SaveChanges=True)
+                                    wb1.Close(SaveChanges=True)
+                                    excel.DisplayAlerts=True
+                                    excel.Quit()
+                                    wb1 = ''
+                                    wb2 = ''
+                                    excel = ''
+                                    res = True
+                                else:
+                                    err_msg = 'copyWorkBook KeyWord is Only supported for Windows OS with excel application.'
+                            else:
+                                res,err_msg=self.dict['copy_workbook_'+file_ext1](filePath1,filePath2,option)
+                            if res:
+                                status=TEST_RESULT_PASS
+                                methodoutput=TEST_RESULT_TRUE
+                                info_msg="Successfully Copied"
+                                logger.print_on_console(info_msg)
+                        else:
+                            err_msg = 'Error in copying workbooks as file extensions are different.'
+                else:
+                    err_msg=generic_constants.FILE_PATH_NOT_SET
+            else:
+                err_msg = 'Option/Method is Invalid.'
+        except IOError as e:
+            err_msg=ERROR_CODE_DICT['ERR_FILE_NOT_ACESSIBLE'] + ' / ' + ERROR_CODE_DICT['ERR_FILE_NOT_FOUND_EXCEPTION']
+        except ValueError as e:
+            err_msg=ERROR_CODE_DICT['ERR_NUMBER_FORMAT_EXCEPTION']
+        except Exception as e:
+            err_msg='Error occured in copying workbooks.'
+            log.error(e)
+        if err_msg!=None:
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
+        if wb1 != '' and wb2!='' and excel != '':
+            wb2.Close(SaveChanges=True)
+            wb1.Close(SaveChanges=True)
+            excel.Quit()
+
+        return status,methodoutput,output,err_msg
 
     def convertStringToInt(self,col):
         num=0
@@ -487,6 +621,32 @@ class ExcelFile:
                 num = num * 26 + (ord(c.upper()) - ord('A')) + 1
         return num
 
+    def getSheetTrueName(self,name):
+        if(name[-1] == ')'):
+            name = name[::-1]
+            num = ''
+            index = 0
+            for elem in range(1,len(name)):
+                if(name[elem] != '('):
+                    num+=name[elem]
+                else:
+                    index = elem
+                    break
+            
+            name = name[::-1]
+            num = num[::-1]
+            if(num == ''):
+                num = '0'
+            if(num.isdigit()):
+                if(index+1 == len(name)):
+                    return '',True,int(num)
+                # if(index+1 == ' '):
+                #     index+=1
+                return name[:-1*(index+1)],True,int(num)
+            else:
+                return name,False,1
+
+        return name,False,1
 
 class ExcelXLS:
 
@@ -1139,6 +1299,91 @@ class ExcelXLS:
             logger.print_on_console(err_msg)
         return status,err_msg
 
+    def copy_workbook_xls(self,filePath1,filePath2,option):
+        """
+        def : copy_workbook_xls
+        purpose : calls copy_workbook_xls to copy from one workbook to another
+        param : filePath1,filePath2,option
+        return : bool
+        """
+        status=False
+        err_msg=None
+        self.excel_obj=ExcelFile()
+        try:
+            wb1=open_workbook(filePath1)
+            wb2=open_workbook(filePath2)
+            sheetNames1 = wb1.sheet_names()
+            sheetNames2 = wb2.sheet_names()
+            copyWorkbook1 = xlutils.copy.copy(wb1)
+
+            if(option == '0'):
+                index = -1
+                for sheet in sheetNames2:
+                    index+=1
+                    if sheet.upper() not in (name.upper() for name in sheetNames1):
+                        sheetData = wb2.sheet_by_index(index)
+                        newSheet = copyWorkbook1.add_sheet(sheet)
+
+                        for row in range(sheetData.nrows):
+                            for col in range(sheetData.ncols):
+                                newSheet.write(row,col,sheetData.cell_value(row,col))
+
+            if(option == '1'):
+                copyWorkbook2 = xlutils.copy.copy(wb2)
+                index = -1
+                for sheet in sheetNames1:
+                    index+=1
+                    newSheetName = None
+                    if sheet.upper() not in (name.upper() for name in sheetNames2):
+                        newSheetName = sheet
+                    else:
+                        trueName,check,num = self.excel_obj.getSheetTrueName(sheet)
+                        if(check == False):
+                            trueName+=" "
+                        
+                        num+=1
+                        searchName = trueName+'('+str(num)+')'
+                        while(searchName.upper() in (name.upper() for name in sheetNames2)):
+                            num+=1
+                            searchName = trueName+'('+str(num)+')'
+                        newSheetName = searchName
+
+                    sheetNames2.append(newSheetName)
+                    sheetData = wb1.sheet_by_index(index)
+                    newSheet = copyWorkbook2.add_sheet(newSheetName)
+
+                    for row in range(sheetData.nrows):
+                        for col in range(sheetData.ncols):
+                            newSheet.write(row,col,sheetData.cell_value(row,col))
+
+                copyWorkbook2.save(filePath2)
+
+            if option == '0' or option == '2':
+                copyWorkbook1.save(filePath2)
+            status = True
+        except Exception as e:
+            err_msg = 'Error occured While copying'
+            log.error(e)
+        return status,err_msg
+
+    def get_page_count_xls(self,filePath):
+        """
+        def : get_page_count
+        purpose : get page count of .xls file
+        param : filePath
+        return : pagecount [int]
+        """
+        status=False
+        err_msg=None
+        count = None
+        try:
+            wb = open_workbook(filePath)
+            count = len(wb.sheet_names())
+            status = True
+        except Exception as e:
+            log.error(e)
+            err_msg = 'Error occured fetching the page count.'
+        return status,count,err_msg
 
 
 class ExcelXLSX:
@@ -1292,6 +1537,8 @@ class ExcelXLSX:
         line_number=None
         err_msg=None
         log.info(generic_constants.INPUT_IS+input_path+' '+sheetname)
+        if not abs_flag and content.isdigit():
+            content=int(content)
         try:
             book = load_workbook(input_path,data_only=True)
             sheet = book.get_sheet_by_name(sheetname)
@@ -1390,7 +1637,7 @@ class ExcelXLSX:
 
         """
         status=False
-        abs_flag=True if args[-1].lower()=='abs' else False
+        abs_flag=True if (len(args)>0 and args[0].lower()=='abs') else False
         res,line_number,err_msg=self.get_linenumber_xlsx(input_path,sheetname,content,abs_flag)
         if res and line_number != None:
             status=True
@@ -1693,6 +1940,87 @@ class ExcelXLSX:
             err_msg='Error occurred creating .xlsx file '
             logger.print_on_console(err_msg)
         return status,err_msg
+
+    def copy_workbook_xlsx(self,filePath1,filePath2,option):
+        """
+        def : copy_workbook_xlsx
+        purpose : calls copy_workbook_xlsx to copy from one workbook to another
+        param : filePath1,filePath2,option
+        return : bool
+        """
+        status=False
+        err_msg=None
+        self.excel_obj=ExcelFile()
+        try:
+            wb1=openpyxl.load_workbook(filePath1)
+            wb2=openpyxl.load_workbook(filePath2)
+            sheetNames1 = wb1.sheetnames
+            sheetNames2 = wb2.sheetnames
+
+            if(option == '2'):
+                for sheets in sheetNames2:
+                    destSheet = wb2.get_sheet_by_name(sheets)
+                    wb2.remove(destSheet)
+
+            for sheet in sheetNames1:
+                sheetData = wb1.get_sheet_by_name(sheet)
+                destSheet = None
+                if sheet.upper() not in (name.upper() for name in wb2.sheetnames):
+                    wb2.create_sheet(sheet)
+                    destSheet = wb2.get_sheet_by_name(sheet)
+
+                elif(option == '0'):
+                    existingName = None
+                    for name in wb2.sheetnames:
+                        if(name.upper() == sheet.upper()):
+                            existingName = name
+                            break
+
+                    destSheet = wb2.get_sheet_by_name(existingName)
+                    destSheet.delete_rows(1,destSheet.max_row)
+
+                elif(option == '1'):
+                    trueName,check,num = self.excel_obj.getSheetTrueName(sheet)
+                    if(check == False):
+                        trueName+=" "
+                    
+                    num+=1
+                    searchName = trueName+'('+str(num)+')'
+                    while(searchName.upper() in (name.upper() for name in wb2.sheetnames)):
+                        num+=1
+                        searchName = trueName+'('+str(num)+')'
+                    wb2.create_sheet(searchName)
+                    destSheet = wb2.get_sheet_by_name(searchName)
+
+                for row in sheetData:
+                    for cell in row:
+                        destSheet[cell.coordinate].value = cell.value
+
+            wb2.save(filePath2)
+            status = True
+        except Exception as e:
+            log.error(e)
+            err_msg='Error occurred While copying Workbook'
+        return status,err_msg
+
+    def get_page_count_xlsx(self,filePath):
+        """
+        def : get_page_count
+        purpose : get page count of .xlsx file
+        param : filePath
+        return : pagecount [int]
+        """
+        status=False
+        err_msg=None
+        count = None
+        try:
+            wb = openpyxl.load_workbook(filePath)
+            count = len(wb.sheetnames)
+            status = True
+        except Exception as e:
+            log.error(e)
+            err_msg = 'Error occured fetching the page count.'
+        return status,count,err_msg
 
 
 

@@ -1303,7 +1303,7 @@ class Controller():
                             # self.__load_web()
                             # import script_generator
                             scenario_name=json_data['suitedetails'][suite_idx-1]["scenarioNames"][sc_idx]
-                            execution_env = {'env':'saucelabs','scenario':scenario_name}
+                            execution_env = {'env': 'saucelabs','browser':browser,'scenario': scenario_name,'scenario_id':scenario_id,'handlerno': handlerno}
                             now=datetime.now()
                             # if not terminate_flag:
                             #     saucelabs_obj=script_generator.SauceLabs_Operations(scenario_name,str(saucelabs_count))

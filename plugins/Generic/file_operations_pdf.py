@@ -8,6 +8,7 @@
 # Copyright:   (c) divyansh.singh 2020
 # Licence:     <your licence>
 
+
 import logger
 import generic_constants
 import constants
@@ -31,6 +32,14 @@ import re
 import copy
 import time
 from PIL import Image
+from constants import *
+import subprocess
+import readconfig
+if SYSTEM_OS == 'Windows':
+    import win32api,win32gui,win32print
+    from pywinauto import Application
+    import pywinauto
+    import psutil
 log = logging.getLogger('file_operations_pdf.py')
 from pytesseract import pytesseract
 TESSERACT_PATH = os.environ["AVO_ASSURE_HOME"] + '/Lib/Tesseract-OCR'
@@ -820,6 +829,7 @@ class FileOperationsPDF:
         status=False
         content=None
         err_msg=None
+        form_type='Adobe LiveCycle Forms 7.2'
         from PyPDF2 import PdfFileReader, PdfFileWriter
         import fitz
         try:
@@ -957,3 +967,179 @@ class FileOperationsPDF:
             err_msg=generic_constants.ERR_MSG1+'Fetching PDF content'+generic_constants.ERR_MSG2
         log.info('Status is '+str(status))
         return status,content,err_msg
+
+    def __get_file_dialog_handle(self):
+        hwnds = []
+        def winEnum(hwnd, hwnds):
+            if win32gui.IsWindowVisible(hwnd) and win32gui.GetWindowText(hwnd) == 'Save Print Output As':
+                hwnds.append(hwnd)
+        win32gui.EnumWindows(winEnum, hwnds)
+        handle = hwnds[0] if (len(hwnds) > 0) else None
+        return handle
+
+    def __save_as_output_time_func(self, tries=10, time_sleep=0.75):
+        while tries > 0:
+            win_handle = self.__get_file_dialog_handle()
+            if win_handle is not None:
+                log.info("Window handle found: %s", win_handle)
+                return win_handle
+            time.sleep(time_sleep)
+            tries -= 1
+        return None
+    def __save_file(self,src_file_path,file_name,dest_path,opt):
+        err_msg=None
+        final_path=None
+        if not os.path.splitext(dest_path)[1]:
+            if os.path.isdir(dest_path):
+                dest_file_path=dest_path+os.sep+file_name
+                if opt==0:
+                    # do not overwrite
+                    if os.path.isfile(dest_file_path):
+                        err_msg='File already exists in the directory'
+                        return False, err_msg, final_path
+                    else:
+                        # file does not already exist
+                        final_path = dest_file_path
+                        return True, err_msg, final_path
+                elif opt==1:
+                    # overwrite   
+                    if os.path.isfile(dest_file_path):
+                        if src_file_path==dest_file_path:
+                            err_msg="Source file location and destination folder location should not match"
+                            return False, err_msg, final_path
+                        else:
+                            os.remove(dest_file_path)
+                    final_path = dest_file_path
+                    return True,err_msg,final_path             
+            else:
+                # should be only destination folder
+                err_msg="Destination should be folder"
+                return False,err_msg,final_path
+        else:
+            # dhould be only destination folder
+            err_msg = "Destination should be folder"
+            return False, err_msg, final_path
+
+    def normalize_pdf(self,acrobat_path,pdf_file_path,destination_path,opt=0):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        output_res = OUTPUT_CONSTANT
+        err_msg = None
+        exe_name = os.path.split(acrobat_path)[1]
+        file_name = os.path.split(pdf_file_path)[1]
+        if(not(isinstance(opt, int)) and opt.strip() == ''):opt = 0
+        if SYSTEM_OS=='Windows':
+            if os.path.isfile(acrobat_path) and os.path.isfile(pdf_file_path):
+                if exe_name.split('.')[1]=='exe' and file_name.split('.')[1]=='pdf' and int(opt) in [0,1]:
+                    configvalues = readconfig.readConfig().readJson()
+                    connect_tries = int(configvalues['max_retries_app_launch'])
+                    wait_timeout=connect_tries
+                    connect_sl = 1
+                    appId = None
+                    p_found=None
+                    def_printer = None
+                    tries = 10
+                    time_sleep = 0.5
+                    data=subprocess.check_output(['wmic','printer','list','brief']).decode('utf-8').split('\r\r\n')
+                    data=data[1:]
+                    printer_list=[]
+                    for line in data:
+                        for pn in line.split("  "):
+                            if pn!="":
+                                printer_list.append(pn)
+                                break
+                    if 'Microsoft Print to PDF' in printer_list:
+                        p_found=True
+                        def_printer = win32print.GetDefaultPrinter()
+                        win32print.SetDefaultPrinter("Microsoft Print to PDF")
+                    # temp_file_loc = os.environ['AVO_ASSURE_HOME'] +os.sep+"output"+os.sep+file_name  
+                    res = self.__save_file(pdf_file_path, file_name, destination_path, int(opt))
+                    if res[0]:
+                        file_loc=res[2]
+                        for proc in psutil.process_iter():
+                            if proc.name() == exe_name:
+                                proc.kill()
+                        time.sleep(1)
+                        # win32api.ShellExecute(0, "print", filePath, None, ".", 0)
+                        subprocess.Popen([acrobat_path, " /t ", pdf_file_path, " Microsoft Print To PDF"])
+                        for proc in psutil.process_iter():
+                            if proc.name() == exe_name:
+                                appId = proc.pid
+                        msg = "Acrobat Process found with ID " + str(appId)
+                        log.debug(msg)
+                        while connect_tries > 0:
+                            try:
+                                app_1 = Application().connect(process=appId)
+                                app_1.top_window()
+                                connect_tries = 0
+                                break
+                            except Exception as e:
+                                log.debug("Exception occured while connecting to the Acrobat")
+                                log.error(e)
+                                connect_tries = connect_tries-1
+                                time.sleep(connect_sl)
+                                if connect_tries == 0:
+                                    log.debug("Tried connecting to the Acrobat process. Process not launched")
+                                    msg = "Tried connecting to "+exe_name+" . Process not launched"
+                                    logger.print_on_console(msg)
+                                    break
+                        win_handle = self.__save_as_output_time_func(tries, time_sleep)
+                        if win_handle is not None:
+                            try:
+                                win32gui.SetForegroundWindow(win_handle)
+                                app = Application().connect(handle=win_handle, allow_magic_lookup=False)
+                                main_window = app[win32gui.GetWindowText(win_handle)]
+                                main_window.wait('exists enabled visible ready', timeout=wait_timeout, retry_interval=1)
+                                main_window.set_focus()
+                                temp = file_loc
+                                main_window['5'].type_keys(file_loc.replace(' ', '{SPACE}')+"{ENTER}")
+                                time.sleep(2)
+                                log.debug("AdobeLive Form PDF flattened and placed in ")
+                                log.debug(temp)
+                                status = TEST_RESULT_PASS
+                                methodoutput = TEST_RESULT_TRUE
+                            except Exception as e:
+                                log.debug("Exception occured in entering the path")
+                                log.error(e)
+                        else:
+                            log.debug("Window not found")
+                    else:
+                        err_msg=res[1]
+                        logger.print_on_console(err_msg)
+                else:
+                    err_msg="Invalid input"
+                    logger.print_on_console(err_msg)
+            else:
+              err_msg="File not found"
+              logger.print_on_console(err_msg)  
+        if status==TEST_RESULT_PASS and err_msg==None:
+            msg="PDF normalized and placed at "+str(temp)
+            logger.print_on_console(msg)
+        if p_found and def_printer:
+            win32print.SetDefaultPrinter(def_printer)
+        return status, methodoutput, output_res, err_msg
+
+    def get_page_count(self,filePath):
+        """
+        def : get_page_count
+        purpose : get page count of .pdf file
+        param : filePath
+        return : pagecount [int]
+
+        """
+        status = False
+        err_msg = None
+        pageCount = None
+        from PyPDF2 import PdfFileReader
+        try:
+            pdfFile = PdfFileReader(open(filePath,'rb'))
+            pageCount = pdfFile.getNumPages()
+            status = True
+        except IOError:
+            err_msg=constants.ERROR_CODE_DICT['ERR_FILE_NOT_ACESSIBLE']
+        except Exception as e:
+            err_msg='Error occured in fetching Page count'
+            log.error(e)
+        if err_msg!=None:
+            logger.print_on_console(err_msg)
+        return status,pageCount,err_msg
