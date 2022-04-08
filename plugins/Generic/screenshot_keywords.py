@@ -30,6 +30,8 @@ class Screenshot():
         err_msg=None
         genericStep = False
         DEBUG_ACTION =  False
+        path = constants.SCREENSHOT_PATH
+        filePath = ''
         try:
 
             if('action' in args[0]):
@@ -42,6 +44,9 @@ class Screenshot():
                     logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_NO_INPUT'])
                     log.error(ERROR_CODE_DICT['ERR_INVALID_NO_INPUT'])
                     output = None
+            elif path=="Disabled":
+                logger.print_on_console(ERROR_CODE_DICT['ERR_SCREENSHOT_PATH'])
+                output=None
 
             if output!=None:
                 r="pass"
@@ -50,41 +55,41 @@ class Screenshot():
                     data = args[0]
                     if(genericStep):
                         data = args[0]["screen_data"]
-                    bucketname = 'screenshots'
-                    tempobj=self.generateUniqueFileName() +'.png'
-                    objpath = data['projectname']+'/'+data['releaseid']+'/'+data['cyclename']+'/'+tempobj
-                    tempPath=os.path.join(SCREENSHOT_PATH_LOCAL, data['projectname'],data['releaseid'],data['cyclename'])
+                    # bucketname = 'screenshots' #switch
+                    tempobj=self.generateUniqueFileName() +'.png' #necessary? coz genericStep already there
+                    # objpath = data['projectname']+'/'+data['releaseid']+'/'+data['cyclename']+'/'+tempobj
+                    tempPath=os.path.join(path, data['projectname'],data['releaseid'],data['cyclename'], datetime.datetime.now().strftime("%Y-%m-%d"))
                     if not os.path.exists(tempPath):
                         os.makedirs(tempPath)
                     tempPath=tempPath+OS_SEP+tempobj
-                    if accessibility:
-                        bucketname = 'accessibilityscreenshots'
-                        tempPath = data['temppath']
-                        objpath = data['projectname']+'/'+data['releaseid']+'/'+data['cyclename']+'/'+data['executionid']+'/'+tempobj
-                    elif driver:
+                    # if accessibility:
+                        # bucketname = 'accessibilityscreenshots' #switch
+                        # tempPath = data['temppath']
+                        # objpath = data['projectname']+'/'+data['releaseid']+'/'+data['cyclename']+'/'+data['executionid']+'/'+tempobj
+                    if driver:
                         driver.save_screenshot(tempPath)
                     elif not(web):
                         img=ImageGrab.grab()
                         img.save(tempPath)
-                    #pushing screenshots to NFS
-                    if constants.SCREENSHOT_NFS_AVAILABLE:
-                        r = reportnfs.client.saveimage(bucketname,objpath,tempPath)
-                    if not accessibility or constants.SCREENSHOT_NFS_AVAILABLE: 
-                        #add logic to clear accessibility screenshots after some time period
-                        os.remove(tempPath)
-                if(genericStep):
-                    if driver:
-                        driver.save_screenshot(genericStep)
-                    else:
-                        if web:
-                            log.warn("Capturing screenshot using generic since browser driver is not available")
-                        img=ImageGrab.grab()
-                        img.save(genericStep)
+                    #pushing screenshots to NFS #switch
+                    # if constants.SCREENSHOT_NFS_AVAILABLE: #switch
+                    #     r = reportnfs.client.saveimage(bucketname,objpath,tempPath)
+                    # if not accessibility or constants.SCREENSHOT_NFS_AVAILABLE: 
+                    #     #add logic to clear accessibility screenshots after some time period
+                    #     os.remove(tempPath)
+                # if(genericStep):
+                #     if driver:
+                #         driver.save_screenshot(genericStep)
+                #     else:
+                #         if web:
+                #             log.warn("Capturing screenshot using generic since browser driver is not available")
+                #         img=ImageGrab.grab()
+                #         img.save(genericStep)
                 #keeping a copy of screenshot in folder for generic keyword
-                if r=='fail':
-                    raise Exception('error while saving in reportNFS') 
-                else:
-                    output = objpath
+                # if r=='fail':
+                #     raise Exception('error while saving in reportNFS') 
+                # else:
+                    output = tempPath
                 log.debug('screenshot captured')
                 logger.print_on_console('Screenshot captured')
                 status=TEST_RESULT_PASS

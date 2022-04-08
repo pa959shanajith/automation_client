@@ -334,10 +334,10 @@ class Reporting:
         report_obj.step_description=self.core_utilsobject.get_UTF_8(report_obj.step_description)
         obj[STEP_DESCRIPTION]=report_obj.step_description
         report_obj.screenshot_path=self.core_utilsobject.get_UTF_8(report_obj.screenshot_path)
-        if constants.SCREENSHOT_NFS_AVAILABLE: 
-            obj[SCREENSHOT_PATH]= report_obj.screenshot_path
-        else: 
-            obj[SCREENSHOT_PATH_ALT]= report_obj.screenshot_path
+        # if constants.SCREENSHOT_NFS_AVAILABLE: 
+        obj[SCREENSHOT_PATH]= report_obj.screenshot_path
+        # else: 
+        #     obj[SCREENSHOT_PATH_ALT]= report_obj.screenshot_path
         report_obj.ellapsedtime=self.core_utilsobject.get_UTF_8(report_obj.ellapsedtime)
         et = str(report_obj.ellapsedtime).split('.')
         if len(et) == 1: 
@@ -416,6 +416,12 @@ class Reporting:
                     comments= result_tuple[3]
                 if(len(result_tuple) == 5):
                     screenshot_path = result_tuple[4]
+                    try:
+                        if (not os.path.exists(result_tuple[4])):
+                            screenshot_path = None
+                    except:
+                        if (not os.path.exists(str(result_tuple[4]))):
+                            screenshot_path = None
                 else:
                     screenshot_path = None
 
