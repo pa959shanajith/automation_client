@@ -721,10 +721,12 @@ class Dispatcher:
                                         if process_name in outputstringall:
                                             logger.print_on_console("System is Locked, Taking the screenshot using Driver")
                                             local_Wd.log.debug("System is Locked, Taking the screenshot using Driver")
-                                            file_path = screen_shot_obj.captureScreenshot(screen_details,web=True)
+                                            # file_path = screen_shot_obj.captureScreenshot(screen_details,web=True, driver=driver)
+                                            # logger.print_on_console(file_path)
                                             temp=driver.current_window_handle
                                             driver.switch_to_window(driver.window_handles[-1]) 
-                                            driver.save_screenshot(file_path[2])
+                                            # driver.save_screenshot(file_path[2])
+                                            file_path = screen_shot_obj.captureScreenshot(screen_details,web=True, driver=driver)
                                             driver.switch_to_window(temp)
                                         else: 
                                             logger.print_on_console("System is Unlocked, Taking the screenshot using generic functions")
@@ -733,8 +735,8 @@ class Dispatcher:
                                     except Exception as e:
                                         local_Wd.log.error(e,exc_info=True)
                                 else:
-                                    file_path = screen_shot_obj.captureScreenshot(screen_details,web=True)
-                                    driver.save_screenshot(file_path[2])
+                                    file_path = screen_shot_obj.captureScreenshot(screen_details,web=True, driver=driver)
+                                    # driver.save_screenshot(file_path[2])
                             elif not (headless_mode or sauceFlag):
                                 local_Wd.log.debug("Pop up exists; Taking the screenshot using generic functions")
                                 file_path = screen_shot_obj.captureScreenshot(screen_details,web=False)
