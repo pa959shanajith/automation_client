@@ -77,7 +77,7 @@ class WatchThread(threading.Thread):
                                             pass
                                     if path == "fail" and ss_alt != None:
                                         r[SCREENSHOT_PATH] = ss_alt
-                                json_data=json.dump(json_data)
+                                json_data=json.dumps(json_data)
                                 output.write(json_data)
                         #output.write(data)
                     #shutil.copyfile(source, os.getcwd())
