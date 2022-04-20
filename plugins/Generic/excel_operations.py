@@ -500,6 +500,7 @@ class ExcelFile:
         methodoutput = TEST_RESULT_FALSE
         option = '0'
         method = 'special' if SYSTEM_OS is 'Windows' else 'text'
+        last = ''
         from win32com.client import Dispatch
         if len(args) > 0 and args[0] != '':
             option = None if args[0] not in ['0','1','2'] else args[0]
@@ -543,7 +544,11 @@ class ExcelFile:
                                     for sheetName1 in wb1.Sheets:
                                         if(option == '1'):
                                             ws1 = wb1.Worksheets(sheetName1.Name)
-                                            ws1.Copy(Before=wb2.Worksheets(1))
+                                            last = wb2.Worksheets.Count
+                                            if wb1.Worksheets[sheetName1.Name].Visible == 0:
+                                                ws1.Copy(wb2.Worksheets(last))
+                                            else:
+                                                ws1.Copy(None,After=wb2.Worksheets(last))
                                         else:
                                             check = ''
                                             for sheetName2 in wb2.sheets:
@@ -553,7 +558,11 @@ class ExcelFile:
                                             
                                             if(check == ''):
                                                 ws1 = wb1.Worksheets(sheetName1.Name)
-                                                ws1.Copy(wb2.Worksheets(1))
+                                                last = wb2.Worksheets.Count
+                                                if wb1.Worksheets[sheetName1.Name].Visible == 0:
+                                                    ws1.Copy(wb2.Worksheets(last))
+                                                else:
+                                                    ws1.Copy(None,After=wb2.Worksheets(last))
                                             else:
                                                 addSheet = '?'
                                                 if(wb2.Sheets.count == 1):
@@ -561,7 +570,11 @@ class ExcelFile:
 
                                                 wb2.Worksheets(check).Delete()
                                                 ws1 = wb1.Worksheets(sheetName1.Name)
-                                                ws1.Copy(wb2.Worksheets(1))
+                                                last = wb2.Worksheets.Count
+                                                if wb1.Worksheets[sheetName1.Name].Visible == 0:
+                                                    ws1.Copy(wb2.Worksheets(last))
+                                                else:
+                                                    ws1.Copy(None,After=wb2.Worksheets(last))
                                                 if(option == '0'):
                                                     wb2.Worksheets(sheetName1.Name).Name = check
                                                 elif(option == '2'):
