@@ -39,22 +39,8 @@ class WatchThread(threading.Thread):
                 f1.writelines(lines)
         '''
         try:
-            with open(report_path, 'w') as output, open(source, 'rb') as input:
-                json_data = json.load(input)
-                for r in json_data['rows']:
-                    ss = r.get(SCREENSHOT_PATH, None)
-                    ss_alt = r.get(SCREENSHOT_PATH_ALT, None)
-                    path = "fail"
-                    if ss is not None and ss != OUTPUT_CONSTANT and ss.strip() != '':
-                        try:
-                            if(constants.SCREENSHOT_NFS_AVAILABLE):
-                                path = r[SCREENSHOT_PATH] = reportnfs.client.getobjectlink('screenshots',ss)
-                        except:
-                            pass
-                    if path == "fail" and ss_alt != None:
-                        r[SCREENSHOT_PATH] = ss_alt
-                json_data = json.dumps(json_data)
-                output.write(json_data)
+            with open(report_path, 'wb+') as output, open(source, 'rb') as input:
+                output.write(input.read())
                 #output.write(data)
             #shutil.copyfile(source, os.getcwd())
             #os.rename(filename, report_path)

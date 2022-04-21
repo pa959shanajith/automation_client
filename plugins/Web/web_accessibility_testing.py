@@ -256,13 +256,12 @@ class Web_Accessibility_Testing:
             return True
         try:
             logger.print_on_console('Capturing Screenshot for Accessibility Testing')
-            temppath = AVO_ASSURE_HOME + os.sep + "output" + os.sep + executionid + os.sep + str(index) +".png"
-            _, width, height = self.webscrape_utils_obj.fullpage_screenshot(driver, temppath)
-            screen_shot_obj = screenshot_keywords.Screenshot()
-            script_info['executionid'] = executionid
-            script_info['temppath'] = temppath
-            output = screen_shot_obj.captureScreenshot(script_info,accessibility=True)
-            result['screenshotpath'] = output[2]
+            if not os.path.exists(constants.SCREENSHOT_PATH ):
+                path = os.getcwd() + os.sep + "output" + os.sep + executionid + os.sep + str(index) +".png"
+            else:    
+                path = constants.SCREENSHOT_PATH + script_info['projectname'] + os.sep + "acctest" + os.sep + executionid + os.sep + str(index) +".png"
+            screenshot, width, height = self.webscrape_utils_obj.fullpage_screenshot(driver, path)
+            result['screenshotpath'] = path
             result['width'] = width
             result['height'] = height
         except Exception as e:
