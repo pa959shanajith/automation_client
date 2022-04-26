@@ -16,6 +16,8 @@ from utilweb_operations import UtilWebKeywords
 from button_link_keyword import ButtonLinkKeyword
 import browser_Keywords
 from webconstants import *
+import ast
+import time
 import readconfig
 import time
 
@@ -533,5 +535,86 @@ class ElementKeywords:
         local_eo.log.info(RETURN_RESULT)
         return status,methodoutput,output,err_msg
 
+    def get_ag_grid_tooltip_text(self,webelement,*args):
+        status = TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FALSE
+        text = None
+        err_msg = None
+        tooltip_text = None
+        local_eo.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        try:
+            if args[0]!=['']:    
+                coords = ast.literal_eval(args[0][0])
+                x,y=int(coords[0]),int(coords[1])  
+            tooltip_text,err_msg = self.__get_ag_grid_tooltip_text(webelement,x,y)
+            if text != None or text != '':
+                local_eo.log.info(STATUS_METHODOUTPUT_UPDATE)
+                status=TEST_RESULT_PASS
+                methodoutput=TEST_RESULT_TRUE
+            else:
+                if err_msg!=None:
+                    err_msg = "Not able to fetch the dynamic ag-grid tooltip text "
+                logger.print_on_console(err_msg)
+        except Exception as e:
+            local_eo.log.debug("Exception occured on getting the ag-grid tooltip")
+            local_eo.log.error(e)
+            err_msg="Please provide valid input"
+        return status, methodoutput, tooltip_text, err_msg
+    
+    def __get_ag_grid_tooltip_text(self,webelement,x=None,y=None):
+        """ Refrenced in get_ag_grid_tooltip_text and verify_tooltip_text
+        This method is used to fetch the tooltip text of an grid element that does not have tittle or other attribute which renders the 
+        tooltip.
+        Usually a new element get appended in the DOM which renders the text for the tooltip.
+        Mandatory mousehover is perfomed using selenium action chains so that the element gets appended in the DOM.
+        ADD_OBS_JS attaches an mutationObserver constructor to the body of the html DOM and monitors any element that gets attached while 
+        hover is performed.
+        REMOVE_OBS_JS removes the mutationObserver from the DOM and returns the element texzt that it captured
+        """
+        local_eo.log.debug("Executing __get_ag_grid_tooltip_text")
+        text=None
+        err_msg=None
+        try:
+            if x is not None and y is not None:
+                if webelement is not None :
+                    import pyautogui 
+                    curr_x,curr_y=pyautogui.position()
+                    if curr_x-3<=x<=curr_x+3 and curr_y-3<=y<=curr_y+3:
+                        pyautogui.FAILSAFE = False
+                        pyautogui.moveTo(0,0)
+                        time.sleep(2)
+                    local_eo.log.debug("Finding tooltip for grid based")
+                    ADD_OBS_JS = """console.log("Adding observation JS");try {window.texts = [];let config = {attributes: false,childList: true,subtree:true};const callback = function (mutationsList, observer) {for (const mutation of mutationsList) {if (mutation.type === 'childList' && mutation != undefined && mutation.addedNodes.length > 0) {console.log('A child node has been added or removed.');if(mutation.addedNodes[0].innerText!= undefined && mutation.addedNodes[0].innerText !=''){window.texts.push(mutation.addedNodes[0].innerText);}                                      }}};const observer = new MutationObserver(callback);observer.observe(document.body, config); window.obs = observer;} catch (err) {console.log("Error occured in ADD_OBS_JS");console.log(err);}"""
+                    local_eo.log.debug("Initialzed ADD_OBS_JS")
+                    import browser_Keywords
+                    from utils_web import Utils
+                    obj=Utils()
+                    local_eo.log.debug("Imported browser_Keywords")
+                    webdriver = browser_Keywords.local_bk.driver_obj
+                    local_eo.log.debug("browser_Keywords.local_bk.driver_obj")
+                    webdriver.execute_script(ADD_OBS_JS)
+                    time.sleep(1)
+                    local_eo.log.debug("Added ADD_OBS_JS")
+                    REMOVE_OBS_JS = """try{window.obs.disconnect();console.log(window.texts);for(let i = 0;i<window.texts.length; i++){return window.texts;}}catch (err){console.log("Error occured in REMOVE_OBS_JS");console.log(err);}"""
+                    local_eo.log.debug("Initialized REMOVE_OBS_JS")
+                    obj.mouse_move(int(x),int(y))
+                    # noticed that in client webpage its taking time to return the tooltip text from the JS code
+                    time.sleep(3)
+                    local_eo.log.debug("Performed ActionChains")
+                    element_added = webdriver.execute_script(REMOVE_OBS_JS)
+                    local_eo.log.debug("Removed observation from browser using JS")
+                    if element_added!=None:
+                        text = element_added[0]
+                        local_eo.log.info(text)
+                    else:
+                        err_msg="dynamic ToolTip text not fetched"
+                else:
+                    err_msg="Element is not present"  
+            else:
+                err_msg="Please input the coordinates"
+        except Exception as e:
+            local_eo.log.debug("Exception occured in __get_ag_grid_tooltip_text")
+            local_eo.log.error(e)
+        return text, err_msg
 
 
