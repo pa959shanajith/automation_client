@@ -615,6 +615,9 @@ class IRISKeywords():
         elements = []
         width = None
         height = None
+        if(args[1] != '' and len(args[1].split(';')) == 2):
+            log.debug("Set ret_coords_only to True")
+            ret_coords_only = True
         try:
             img = None
             if(len(args) == 3 and args[2]!='' and verifyFlag ):
@@ -699,8 +702,7 @@ class IRISKeywords():
             if(len(res)>0):
                 if SYSTEM_OS == 'Windows': pythoncom.CoInitialize()
                 log.info('Performing doubleClick')
-                if not ret_coords_only:
-                    pyautogui.doubleClick()
+                pyautogui.doubleClick()
                 log.info('doubleClick performed')
                 status= TEST_RESULT_PASS
                 result = TEST_RESULT_TRUE
