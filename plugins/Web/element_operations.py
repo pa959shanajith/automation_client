@@ -438,11 +438,20 @@ class ElementKeywords:
         output=OUTPUT_CONSTANT
         local_eo.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         tool_tip = None
+        dynamic_tooltip=False
         if webelement is not None:
             try:
+                if len(input)==2 and input[1]!="":
+                    coords=ast.literal_eval(input[1])
+                    x, y=int(coords[0]), int(coords[1])
+                    input.pop()
+                    dynamic_tooltip=True
                 input=input[0]
                 if input is not None and input != '':
-                    tool_tip=self.__get_tooltip(webelement)
+                    if dynamic_tooltip:
+                        tool_tip,err_msg=self.__get_ag_grid_tooltip_text(webelement,x,y)
+                    else:
+                        tool_tip=self.__get_tooltip(webelement)
                     if input==tool_tip:
                         logger.print_on_console('Tool tip Text matched')
                         local_eo.log.info('Tool tip Text matched')
