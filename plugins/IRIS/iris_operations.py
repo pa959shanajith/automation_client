@@ -672,7 +672,7 @@ class IRISKeywords():
         width = None
         height = None
         ret_coords_only=False
-        if(len(args[0]) == 1 and args[0][0]!='' and int(args[0][0].lower().strip()) == 1):
+        if(args[1]!='' and len(args[1].split(';'))==2):
             log.debug("Set ret_coords_only to True")
             ret_coords_only=True
         try:
