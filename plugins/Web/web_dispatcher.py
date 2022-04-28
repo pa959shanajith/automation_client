@@ -126,6 +126,7 @@ class Dispatcher:
             'drag':local_Wd.element_object.drag,
             'drop':local_Wd.element_object.drop,
             'dropfile':local_Wd.element_object.drop_file,
+            'getaggridtooltiptext':local_Wd.element_object.get_ag_grid_tooltip_text,
             'settext':local_Wd.textbox_object.set_text,
             'sendvalue':local_Wd.textbox_object.send_value,
             'gettext':local_Wd.textbox_object.get_text,
