@@ -615,6 +615,9 @@ class IRISKeywords():
         elements = []
         width = None
         height = None
+        if(args[1] != '' and len(args[1].split(';')) == 2):
+            log.debug("Set ret_coords_only to True")
+            ret_coords_only = True
         try:
             img = None
             if(len(args) == 3 and args[2]!='' and verifyFlag ):
@@ -671,6 +674,10 @@ class IRISKeywords():
         elements =[]
         width = None
         height = None
+        ret_coords_only=False
+        if(args[1]!='' and len(args[1].split(';'))==2):
+            log.debug("Set ret_coords_only to True")
+            ret_coords_only=True
         try:
             if(len(args) == 3 and args[2]!='' and verifyFlag ):
                 log.info('IRIS element recognised as a relative element')
@@ -685,9 +692,13 @@ class IRISKeywords():
                 width = res[2] - res[0]
                 height = res[3] - res[1]
                 pyautogui.moveTo(res[0]+ int(width/2),res[1] + int(height/2))
+                if(res!=None and ret_coords_only):
+                    value=[res[0]+ int(width//2),res[1] + int(height//2)]
             else:
                 log.info('IRIS element recognised as a non-relative element')
                 res, width, height = gotoobject(element)
+                if (len(res)>0 and ret_coords_only):
+                    value = [res[0] + int(width//2), res[1] + int(height//2)]
             if(len(res)>0):
                 if SYSTEM_OS == 'Windows': pythoncom.CoInitialize()
                 log.info('Performing doubleClick')
