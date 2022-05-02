@@ -8,6 +8,7 @@
 # Copyright:   (c) sushma.p 2016
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
+from json import tool
 import logger
 import os
 from selenium import webdriver
@@ -450,6 +451,10 @@ class ElementKeywords:
                 if input is not None and input != '':
                     if dynamic_tooltip:
                         tool_tip,err_msg=self.__get_ag_grid_tooltip_text(webelement,x,y)
+                        if tool_tip!=None and '\n' in tool_tip:
+                            tool_tip=tool_tip.replace("\n","")
+                            tool_tip=tool_tip.replace(" ","")
+                            input=input.replace(" ","")
                     else:
                         tool_tip=self.__get_tooltip(webelement)
                     if input==tool_tip:
