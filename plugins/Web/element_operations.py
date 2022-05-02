@@ -8,7 +8,7 @@
 # Copyright:   (c) sushma.p 2016
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
-from json import tool
+
 import logger
 import os
 from selenium import webdriver
