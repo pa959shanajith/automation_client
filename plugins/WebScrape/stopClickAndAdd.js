@@ -51,7 +51,6 @@ if (document.getElementById('AvoAssureCheckboxHighlight') || document.getElement
     var className = "AvoAssure_Highlight";
     var classNameB = "AvoAssureBorderHighlight";
     var classNameC = "AvoAssureCheckboxHighlight";
-    debugger;
     for (var i = 0; i < a.length; i++) {
         if (a[i].classList) {
             a[i].classList.remove(className);

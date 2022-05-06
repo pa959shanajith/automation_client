@@ -1,5 +1,4 @@
 
-      var hasNumber = /\d/;   
 if (!window.Element || !window.Element.prototype || !window.Element.prototype.hasAttribute) {
     (function () {
         function hasAttribute(attrName) {
@@ -158,7 +157,6 @@ if (head == undefined) {
     head.appendChild(style);
     head.appendChild(style_new);
     head.appendChild(style0);
-
 }
 
 function getElementsByClassName(classname) {
@@ -197,7 +195,7 @@ function leave_handler(event) {
         event.preventDefault();
         event.stopPropagation();
     }
-    var f = event.fromElement;//event.target || event.srcElement;
+    var f = event.fromElement;
     var classNameT = 'AvoAssureBorderHighlight';
     var classNameTT = 'AvoAssureCheckboxHighlight';
     if (f.classList) {
@@ -210,7 +208,6 @@ function leave_handler(event) {
         var reg = new RegExp('(\\s|^)' + classNameTT + '(\\s|$)');
         f.className = f.className.replace(reg, ' ');
     }
-
 }
 
 function hov_handler(event) {
@@ -222,7 +219,7 @@ function hov_handler(event) {
         event.preventDefault();
         event.stopPropagation();
     }
-    var f = event.toElement;//event.target || event.srcElement;
+    var f = event.toElement;
     var tagname = f.tagName.toLowerCase();
     var classNameT = 'AvoAssureBorderHighlight';
     var classNameTT = 'AvoAssureCheckboxHighlight';
@@ -254,10 +251,10 @@ function hov_handler(event) {
             }
         } else {
             if (f.type == 'checkbox' || f.type == 'radio' || tagname == 'td' || tagname == 'th') {
-                //console.log('hover highlight radio/checkbox');
+                console.log('hover highlight radio/checkbox');
                 f.classList.add(classNameTT);
             } else {
-                //console.log('hover highlight');
+                console.log('hover highlight');
                 f.classList.add(classNameT);
             }
         }
@@ -265,8 +262,8 @@ function hov_handler(event) {
 }
 var currentElement;
 function handler(event) {
+
     
-    // debugger;
     tagtype = '';
     if (window.tastopflag == 'true') {
         if (window.Prototype) {
@@ -369,13 +366,13 @@ function handler(event) {
                 role = 'grid';
             }
         }
-        for (var path = '';e.nodeName=='#document-fragment'|| (e && e.nodeType == 1); e = e.assignedSlot||e.parentNode) {
+        for (var path = ''; e &&(e.nodeName=='#document-fragment'|| e.nodeType == 1); e = e.assignedSlot||e.parentNode) {
             if (e.nodeName=='#document-fragment')
                 e=e.host;
             var predicate = [];
             var parentNode;
             parentNode = e.parentNode;
-            if (parentNode.shadowRoot&&parentNode.shadowRoot.toString()=='[object ShadowRoot]')
+            if (parentNode.shadowRoot&&parentNode.shadowRoot.toString()=='[object ShadowRoot]'&&e.assignedSlot)
                 var siblings = e.assignedSlot.assignedNodes();
             else
                 var siblings = parentNode.children;
@@ -389,7 +386,7 @@ function handler(event) {
                     }
                 }
             }
-            if ((idx == 1 && count == 1)) {
+            if (idx == 1 && count == 1) {
                 idx = null;
             }
             if (useId && e.id) {        
@@ -412,8 +409,7 @@ function handler(event) {
                     firstpass = 1;
                 } else if (salesF) {
                     rpath = '//' + e.tagName.toLowerCase() + idx + predicate + rpath;
-                }
-                else {
+                } else {
                     if (svgTags.indexOf(e.tagName.toLowerCase()) !== -1) {
                         rpath = '/*[local-name()="' + e.tagName.toLowerCase() + '"]' + idx + predicate + rpath;
                     } else if (e.tagName.toLowerCase() === 'foreignobject') {
@@ -444,7 +440,7 @@ function handler(event) {
                 if (idx1 == 1 && count1 == 1) {
                     idx1 = null;
                 }
-                if (useId && g.id ) {
+                if (useId && g.id) {
                     predicate1[predicate1.length] = '@id=' + '"' + g.id + '"';
                     unique1 = true;
                 }
@@ -698,9 +694,7 @@ function handler(event) {
                     ssclassname.baseVal = ssclassname.baseVal.trim();
                 }
             }
-            console.log(path)
-            debugger;
-                newPath = String(path) + ';' + String(id) + ';' + String(rpath) + ';' + ssname + ';' + sstagname + ';' + ssclassname + ';' + coordinates + ';' + textvalue;
+            newPath = String(path) + ';' + String(id) + ';' + String(rpath) + ';' + ssname + ';' + sstagname + ';' + ssclassname + ';' + coordinates + ';' + textvalue;
 
             for (var i = 0; i < arr.length; i++) {
                 if (arr[i].xpath == newPath) {
@@ -728,7 +722,6 @@ function handler(event) {
                 f.setAttribute('className', className + ' AvoAssure_Highlight');
                 f.style.setAttribute('cssText', 'background: #fff300 !important; border: 2px solid #cc3300 !important;outline: 2px solid #fff300 !important;');
             } else {
-                console.log('highlight');
                 f.setAttribute('class', className + ' AvoAssure_Highlight');
                 f.setAttribute('style', 'background: #fff300 !important; border: 2px solid #cc3300 !important;outline: 2px solid #fff300 !important;');
             }
@@ -773,8 +766,8 @@ function click(ae, isIE, be) {
                 ae[i].addEventListener('mouseup', block_handler, true);
             } else if (ae[i].attachEvent) {
                 ae[i].attachEvent('onclick', handler);
-                ae[i].attachEvent('onmouseover', hov_handler); -
-                    ae[i].attachEvent('onmouseleave', leave_handler);
+                ae[i].attachEvent('onmouseover', hov_handler);
+                ae[i].attachEvent('onmouseleave', leave_handler);
                 ae[i].attachEvent('onmousedown', block_handler);
                 ae[i].attachEvent('onmouseup', block_handler);
             }
@@ -798,7 +791,6 @@ function click(ae, isIE, be) {
                 ae[i].attachEvent('onmouseleave', leave_handler);
                 ae[i].attachEvent('onmousedown', block_handler);
                 ae[i].attachEvent('onmouseup', block_handler);
-
             }
         }
     }
@@ -833,6 +825,6 @@ function text_content(f) {
 
 function addNodesOuter(array, collection) {
     for (var i = 0; collection && collection.length && i < collection.length; i++) {
-        array.push(collection[i]);
+            array.push(collection[i]);
     }
 };
