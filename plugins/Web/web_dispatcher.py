@@ -843,14 +843,14 @@ class Dispatcher:
             local_Wd.log.debug('Identifiers are ')
             local_Wd.log.debug(identifiers)
             if len(identifiers)>=3:
-                #find by Relative xpath
-                webElement=self.element_locator(driver,'rxpath',identifiers[0],'1')
+                #find by absolute xpath
+                webElement=self.element_locator(driver,'xpath',identifiers[0],'1')
                 if not(webElement):
                     #find by id
                     webElement=self.element_locator(driver,'id',identifiers[1],'2')
                     if not(webElement):
-                        #find by absolute xpath
-                        webElement=self.element_locator(driver,'xpath',identifiers[2],'3')
+                        #find by relative xpath
+                        webElement=self.element_locator(driver,'rxpath',identifiers[2],'3')
                         if not(webElement):
                             #find by name
                             webElement=self.element_locator(driver,'name',identifiers[3],'4')
