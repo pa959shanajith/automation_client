@@ -153,7 +153,7 @@ for (var i=0;i<ele.length;i++)
 // if (salele.length > 0) addNodesOuter(ae, salele[0].getElementsByTagName('*'));
 // salele = document.getElementsByTagName('records-lwc-detail-panel');
 // if (salele.length > 0) addNodesOuter(ae, salele[0].getElementsByTagName('*'));
-var css = '.AvoAssureCheckboxHighlight {outline:2px solid black!important; box-shadow: 0px 0px 0px 4px yellow !important;}',
+var css = '.AvoAssureCheckboxHighlight {outline:2px solid black!important;opacity:1!important; box-shadow: 0px 0px 0px 4px yellow !important;}',
     head = document.head || document.getElementsByTagName('head')[0],
     style = document.createElement('style');
 style.type = 'text/css';
@@ -232,7 +232,7 @@ function leave_handler(event) {
         event.preventDefault();
         event.stopPropagation();
     }
-    var f = event.fromElement;
+    var f = event.fromElement || event.target || event.srcElement;
     var classNameT = 'AvoAssureBorderHighlight';
     var classNameTT = 'AvoAssureCheckboxHighlight';
     if (f.classList) {
@@ -256,7 +256,7 @@ function hov_handler(event) {
         event.preventDefault();
         event.stopPropagation();
     }
-    var f = event.toElement;
+    var f = event.toElement || event.target || event.srcElement;
     var tagname = f.tagName.toLowerCase();
     var classNameT = 'AvoAssureBorderHighlight';
     var classNameTT = 'AvoAssureCheckboxHighlight';
@@ -375,8 +375,8 @@ function handler(event) {
             window.event.cancelBubble = true;
             window.event.returnValue = false;
         }
-        var e = currentElement;
-        var f = currentElement;
+        var e = currentElement || event.target || event.srcElement;
+        var f = currentElement || event.target || event.srcElement;
         if (event.srcElement.nodeName.toLowerCase() == 'one-record-home-flexipage2' || event.srcElement.nodeName.toLowerCase() == 'records-lwc-detail-panel') {
             // e = event.toElement;
             // f = event.toElement;
@@ -731,6 +731,7 @@ function handler(event) {
                     ssclassname.baseVal = ssclassname.baseVal.trim();
                 }
             }
+            
             newPath = String(path) + ';' + String(id) + ';' + String(rpath) + ';' + ssname + ';' + sstagname + ';' + ssclassname + ';' + coordinates + ';' + textvalue;
 
             for (var i = 0; i < arr.length; i++) {
@@ -757,10 +758,10 @@ function handler(event) {
             if (browser == 3) {
                 f.setAttribute('class', className + ' AvoAssure_Highlight');
                 f.setAttribute('className', className + ' AvoAssure_Highlight');
-                f.style.setAttribute('cssText', 'background: #fff300 !important; border: 2px solid #cc3300 !important;outline: 2px solid #fff300 !important;');
+                f.style.setAttribute('cssText', 'background: #fff300 !important;opacity:1!important; border: 2px solid #cc3300 !important;outline: 2px solid #fff300 !important;');
             } else {
                 f.setAttribute('class', className + ' AvoAssure_Highlight');
-                f.setAttribute('style', 'background: #fff300 !important; border: 2px solid #cc3300 !important;outline: 2px solid #fff300 !important;');
+                f.setAttribute('style', 'background: #fff300 !important;opacity:1!important; border: 2px solid #cc3300 !important;outline: 2px solid #fff300 !important;');
             }
         }
         return false;
@@ -865,6 +866,8 @@ function addNodesOuter(array, collection) {
             array.push(collection[i]);
     }
 };"""
+    """Javascript logic used in stop click and add operation in IE"""
+    javascript_stopclicknadd_IE = """window.tastopflag = "true";document.getElementsByTagName('HTML')[0].click();function getElementsByClassName(classname) {    var a = [];    var re = new RegExp('(^| )' + classname + '( |$)');    var els = document.getElementsByTagName("*");    var elesal = document.getElementsByTagName("one-record-home-flexipage2");    var elesal1 = document.getElementsByTagName("records-lwc-detail-panel");    for (var i = 0, j = els.length; i < j; i++)        if (re.test(els[i].className)) a.push(els[i]);    if (elesal.length > 0) {        els1 = elesal[0].getElementsByTagName("*");        for (var i = 0, j = els1.length; i < j; i++) {            if (re.test(els1[i].className)) {                a.push(els1[i]);            }        }    }    if (elesal1.length > 0) {        els2 = elesal1[0].getElementsByTagName("*");        for (var i = 0, j = els2.length; i < j; i++) {            if (re.test(els2[i].className)) {                a.push(els2[i]);            }        }    }    return a;}if (document.getElementById('AvoAssureCheckboxHighlight') || document.getElementById('AvoAssureBorderHighlight')) {    styleTag = document.getElementById('AvoAssureCheckboxHighlight');    styleTagH = document.getElementById('AvoAssureBorderHighlight');    head = document.head || document.getElementsByTagName('head')[0] || document.getElementById('AvoAssure_head');    head.removeChild(styleTag);    head.removeChild(styleTagH);    var a = getElementsByClassName('AvoAssure_Highlight');    for (var i = 0; i < a.length; i++) {        a[i].removeAttribute('style');    }    var elms = document.querySelectorAll("*[style]");    Array.prototype.forEach.call(elms, function(elm) {        var clr = elm.style.background || "";        clr = clr.replace(/\s/g, "").toLowerCase();        if (clr === '#fff300' || clr === 'rgb(255,243,0)' || clr === 'rgb(255,243,0)nonerepeatscroll0%0%') {            elm.removeAttribute('style');        }    });    if (document.getElementById('AvoAssure_head') != undefined) {        var html = document.children[0];        if (html.childElementCount > 1) html.removeChild(html.children[1]);    }    var b = getElementsByClassName('AvoAssureBorderHighlight');    var c = getElementsByClassName('AvoAssureCheckboxHighlight');    var className = "AvoAssure_Highlight";    var classNameB = "AvoAssureBorderHighlight";    var classNameC = "AvoAssureCheckboxHighlight";    for (var i = 0; i < a.length; i++) {        if (a[i].classList) {            a[i].classList.remove(className);        } else if (hasClass(a[i], className)) {            var reg = new RegExp('(\\s|^)' + className + '(\\s|$)');            a[i].className = a[i].className.replace(reg, ' ');        }    }    for (var i = 0; i < b.length; i++) {        if (b[i].classList) {            b[i].classList.remove(classNameB);        } else if (hasClass(b[i], classNameB)) {            var reg = new RegExp('(\\s|^)' + classNameB + '(\\s|$)');            b[i].className = b[i].className.replace(reg, ' ');        }    }    for (var i = 0; i < c.length; i++) {        if (c[i].classList) {            c[i].classList.remove(classNameC);        } else if (hasClass(c[i], classNameC)) {            var reg = new RegExp('(\\s|^)' + classNameC + '(\\s|$)');            c[i].className = c[i].className.replace(reg, ' ');        }    }}var temp = window.tasarr;window.tasarr = null;return (temp);"""
 
     """Javascript logic used in stop click and add operation"""
     javascript_stopclicknadd = """window.tastopflag = "true";
