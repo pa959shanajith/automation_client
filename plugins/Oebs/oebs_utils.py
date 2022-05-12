@@ -24,7 +24,7 @@ from ctypes import wintypes
 import os
 import re
 import oebs_serverUtilities
-import win32com
+import win32com.client
 import pythoncom
 
 log = logging.getLogger('oebs_utils.py')
