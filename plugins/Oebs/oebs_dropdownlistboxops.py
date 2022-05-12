@@ -483,7 +483,7 @@ class DropdownListboxOperations:
                                             moveloc=currentselection-childindex
                                             for index in range(int(moveloc)):
                                                 self.keyboardops_obj.keyboard_operation('keypress','A_UP')
-                                            requiredcontext, visible, active_parent = self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]")
+                                            requiredcontext, visible, active_parent = self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]",oebs_key_objects.object_type)
                                             listObj = self.utilities_obj.looptolist(requiredcontext)
                                             childobj=listObj.getAccessibleChildFromContext(int(childindex))
                                             childcontext=childobj.getAccessibleContextInfo()
@@ -496,7 +496,7 @@ class DropdownListboxOperations:
                                             for index in range(int(moveloc)):
                                                 self.keyboardops_obj.keyboard_operation('keypress','A_DOWN')
                                                 time.sleep(0.1)
-                                            requiredcontext, visible, active_parent = self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]")
+                                            requiredcontext, visible, active_parent = self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]",oebs_key_objects.object_type)
                                             listObj = self.utilities_obj.looptolist(requiredcontext)
                                             childobj=listObj.getAccessibleChildFromContext(int(childindex))
                                             childcontext=childobj.getAccessibleContextInfo()
@@ -557,7 +557,7 @@ class DropdownListboxOperations:
                                             for index in range(int(moveloc)):
                                                 self.keyboardops_obj.keyboard_operations('keypress','A_UP')
                                                 time.sleep(0.1)
-                                            requiredcontext, visible, active_parent = self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]")
+                                            requiredcontext, visible, active_parent = self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]",oebs_key_objects.object_type)
                                             listObj = self.utilities_obj.looptolist(requiredcontext)
                                             childobj=listObj.getAccessibleChildFromContext(int(childindex))
                                             childcontext=childobj.getAccessibleContextInfo()
@@ -570,7 +570,7 @@ class DropdownListboxOperations:
                                             for index in range(int(moveloc)):
                                                 self.keyboardops_obj.keyboard_operation('keypress','A_DOWN')
                                                 time.sleep(0.1)
-                                            requiredcontext, visible, active_parent = self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]")
+                                            requiredcontext, visible, active_parent = self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]",oebs_key_objects.object_type)
                                             listObj = self.utilities_obj.looptolist(requiredcontext)
                                             childobj=listObj.getAccessibleChildFromContext(int(childindex))
                                             childcontext=childobj.getAccessibleContextInfo()
@@ -860,7 +860,7 @@ class DropdownListboxOperations:
                                     for num in range(elementPos):
                                         self.keyboardops_obj.keyboard_operation('keypress','A_DOWN')
                                         time.sleep(0.1)
-                                    requiredcontext, visible, active_parent = self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]")
+                                    requiredcontext, visible, active_parent = self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]",oebs_key_objects.object_type)
                                     listObj = self.utilities_obj.looptolist(requiredcontext)
                                     childobj=listObj.getAccessibleChildFromContext(int(elementPos))
                                     childcontext=childobj.getAccessibleContextInfo()
@@ -935,7 +935,7 @@ class DropdownListboxOperations:
                                             for index in range(int(moveloc)):
                                                 self.keyboardops_obj.keyboard_operation('keypress','A_UP')
                                                 time.sleep(0.1)
-                                            requiredcontext, visible, active_parent = self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]")
+                                            requiredcontext, visible, active_parent = self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]",oebs_key_objects.object_type)
                                             listObj = self.utilities_obj.looptolist(requiredcontext)
                                             childobj=listObj.getAccessibleChildFromContext(int(elementPos))
                                             childcontext=childobj.getAccessibleContextInfo()
@@ -948,7 +948,7 @@ class DropdownListboxOperations:
                                             for index in range(int(moveloc)):
                                                 self.keyboardops_obj.keyboard_operation('keypress','A_DOWN')
                                                 time.sleep(0.1)
-                                            requiredcontext, visible, active_parent = self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]")
+                                            requiredcontext, visible, active_parent = self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]",oebs_key_objects.object_type)
                                             listObj = self.utilities_obj.looptolist(requiredcontext)
                                             childobj=listObj.getAccessibleChildFromContext(int(elementPos))
                                             childcontext=childobj.getAccessibleContextInfo()

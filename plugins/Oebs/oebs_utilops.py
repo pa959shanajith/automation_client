@@ -379,7 +379,7 @@ class UtilOperations:
                         oebs_mouseops.MouseOperation('click',x_coor,y_coor)
                         self.keyboardops.keyboard_operation('keypress','A_DOWN')
                         time.sleep(0.1)
-                        requiredcontext, visible, active_parent = self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]")
+                        requiredcontext, visible, active_parent = self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]",oebs_key_objects.object_type`)
                         listObj = self.utilities_obj.looptolist(requiredcontext)
                         childobj=listObj.getAccessibleChildFromContext(int(childindex))
                         childcontext=childobj.getAccessibleContextInfo()
@@ -399,7 +399,7 @@ class UtilOperations:
                         else:
                             self.keyboardops.keyboard_operation('keypress','A_UP')
                             time.sleep(0.1)
-                            requiredcontext, visible, active_parent = self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]")
+                            requiredcontext, visible, active_parent = self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]",oebs_key_objects.object_type)
                             listObj = self.utilities_obj.looptolist(requiredcontext)
                             childobj=listObj.getAccessibleChildFromContext(int(childindex))
                             childcontext=childobj.getAccessibleContextInfo()
@@ -598,7 +598,7 @@ class UtilOperations:
         return status,methodoutput,output_res,err_msg
 
     #definition for switching from one internal frame to another
-    def switchtoframe(self,applicationname,objectname,keyword,inputs,outputs):
+    def switchtoframe(self,applicationname,objectname,keyword,inputs,outputs,object_type):
         global activeframes
         activeframes=[]
         status = TEST_RESULT_FAIL
@@ -606,7 +606,6 @@ class UtilOperations:
         output_res = OUTPUT_CONSTANT
         err_msg = None
         try:
-            inputs = ast.literal_eval(str(inputs))
             #input sent from the user
             inputs = ast.literal_eval(str(inputs))
             inputs = [n for n in inputs]
@@ -639,7 +638,7 @@ class UtilOperations:
                             if 'window' in str(menuchildcontext.name).lower():
                                 x_coormenu = int(menuchildcontext.x + (0.5 * menuchildcontext.width))
                                 y_coormenu = int(menuchildcontext.y + (0.5 * menuchildcontext.height))
-                                oebs_mouseops.MouseOperation('click',x_coormenu,y_coormenu)
+                                oebs_mouseops.MouseOperation('hold',x_coormenu,y_coormenu)
                                 time.sleep(2)
                                 menuchildcontext=menuchildobj.getAccessibleContextInfo()
                                 for windowchildren in range (menuchildcontext.childrenCount):

@@ -220,8 +220,7 @@ class OebsDispatcher:
 
     def print_error(self,err_msg):
         err_msg1=constants.ERROR_CODE_DICT[err_msg]
-        if err_msg!='ERR_CUSTOM_NOTFOUND':
-            logger.print_on_console(err_msg1)
+        logger.print_on_console(err_msg1)
         log.error(err_msg1)
 
 
@@ -251,11 +250,9 @@ class OebsDispatcher:
                         self.print_error('ERR_CUSTOM_NOTFOUND')
                 else:
                     self.print_error('ERR_CUSTOM_MISMATCH')
-
             else:
-                 self.print_error('ERR_CUSTOM_NOTFOUND')
-                 self.print_error('ERR_PRECONDITION_NOTMET')
-        message=[self.windowname,objectname,tsp.name,input,tsp.outputval]
+                self.print_error('ERR_PRECONDITION_NOTMET')
+        message=[self.windowname,objectname,tsp.name,input,tsp.outputval,tsp.objectname]
         return message
 
     def dispatcher(self,tsp,input,mythread,*message):
@@ -325,10 +322,10 @@ class OebsDispatcher:
             if e.args[0] == 'Result 0':
                 logger.print_on_console('Element Not Found')
             else:
-                logger.print_on_console('Exception at dispatcher')
+                log.debug('Exception at dispatcher')
         except Exception as e:
             log.error(e)
-            logger.print_on_console('Exception at dispatcher')
+            log.debug('Exception at dispatcher')
         if err_msg!=None:
             log.error(err_msg)
             logger.print_on_console(err_msg)
