@@ -105,6 +105,7 @@ ERROR_CODE_DICT = {
     "err_verify_not_exists": "Unable to verify if object does not exist",
     "err_right_click": "Unable to perform right click",
     "err_switch_frame": "Unable to switch to frame",
+    "err_select_menu": "Error occurred in select menu operation",
     "err_send_function": "Unable to perform send function keys",
     "err_init_core": "Unable to intialise core",
     "err_click_add": "Error occurred during click and add",

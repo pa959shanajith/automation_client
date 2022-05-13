@@ -39,7 +39,7 @@ log = logging.getLogger('oebs_serverUtilities.py')
 class Utilities:
 
     #Method to swoop till the element at the given Object location
-    def swooptoelement(self , a, objecttofind, currentxpathtemp, i, p, windowname, errors = False, allow_showing = False):
+    def swooptoelement(self , a, objecttofind, currentxpathtemp, i, p, windowname, object_type, errors = False, allow_showing = False):
         queue = []
         active_parent = False
         page_tab_list = False
@@ -72,7 +72,10 @@ class Utilities:
                     elif 'panel' in elementObj.role:
                         path = elementObj.role + '[' + str(index) + ']'
                     else:
-                        path = elementObj.role + '[' + str(elementObj.description.strip()) + ']'
+                        if object_type == "@Custom":
+                            path = elementObj.role + '[' + str(index) + ']' + '[' + str(elementObj.description.strip()) + ']'
+                        else:
+                            path = elementObj.role + '[' + str(elementObj.description.strip()) + ']'
 
             else:
                 if len(elementObj.description.strip()) == 0:
@@ -91,7 +94,10 @@ class Utilities:
                     elif 'panel' in elementObj.role:
                         path = xpath + '/' + elementObj.role + '[' + str(index) + ']'
                     else:
-                        path = xpath + '/' + elementObj.role  + '[' + str(elementObj.description.strip()) + ']'
+                        if object_type == "@Custom":
+                            path = xpath + '/' + elementObj.role  + '[' + str(index) + ']'  + '[' + str(elementObj.description.strip()) + ']'
+                        else:
+                            path = xpath + '/' + elementObj.role  + '[' + str(elementObj.description.strip()) + ']'
             if path == currentxpathtemp:
                 if currentxpathtemp.split("/").pop() == 'internal frame' and elementObj.name != identifiers[1]:
                     continue
@@ -140,7 +146,7 @@ class Utilities:
                     skip_over = variable_path[pane_occurances[i]:len(variable_path)].find('/') + pane_occurances[i]
                     variable_path = fixed_path + 'scroll pane' + variable_path[skip_over:len(variable_path)]
                     if errors: log.info('Searching for object in alternate xpath: ' + variable_path)
-                    active_parent, acc, visible = self.iterate_over_other_panes(a,objecttofind,variable_path,0,'',windowname, pane_occurances[i])
+                    active_parent, acc, visible = self.iterate_over_other_panes(a,objecttofind,variable_path,0,'',windowname, pane_occurances[i], object_type)
                     if acc and str(acc) != '':
                         return active_parent, acc, visible
                 log.info(ERROR_CODE_DICT['err_alternate_path'])
@@ -149,7 +155,7 @@ class Utilities:
         return False, '', False
 
 
-    def iterate_over_other_panes(self, a, objecttofind, currentxpathtemp, i, p, windowname, location):
+    def iterate_over_other_panes(self, a, objecttofind, currentxpathtemp, i, p, windowname, location, object_type):
         queue = []
         active_parent = False
         queue.append((p,a,i,0))
@@ -182,7 +188,10 @@ class Utilities:
                     elif 'panel' in elementObj.role:
                         path = elementObj.role + '[' + str(index) + ']'
                     else:
-                        path = elementObj.role + '[' + str(elementObj.description.strip()) + ']'
+                        if object_type == "@Custom":
+                            path = elementObj.role  + '[' + str(index) + ']' + '[' + str(elementObj.description.strip()) + ']'
+                        else:
+                            path = elementObj.role + '[' + str(elementObj.description.strip()) + ']'
             else:
                 if len(elementObj.description.strip()) == 0:
                     if 'internal frame' in elementObj.role or 'frame' in elementObj.role or ('scroll pane' in elementObj.role and len(path) + 1>= location):
@@ -201,7 +210,10 @@ class Utilities:
                     elif 'panel' in elementObj.role:
                         path = xpath + '/' + elementObj.role + '[' + str(index) + ']'
                     else:
-                        path = xpath + '/' + elementObj.role  + '[' + str(elementObj.description.strip()) + ']'
+                        if object_type == "@Custom":
+                            path = xpath + '/' + elementObj.role  + '[' + str(index) + ']' + '[' + str(elementObj.description.strip()) + ']'
+                        else:
+                            path = xpath + '/' + elementObj.role  + '[' + str(elementObj.description.strip()) + ']'
             if path in visited:
                 continue
             else:
@@ -212,8 +224,8 @@ class Utilities:
                 if new_path != '':
                     logger.print_on_console("Hidden Push button detected, creating new xpaths")
                     alt_paths_list.append(new_path)
-                    alt_paths[new_path] = len(alt_paths_list) - 1 
-           
+                    alt_paths[new_path] = len(alt_paths_list) - 1
+
             if path == currentxpathtemp or path in alt_paths:
                 return active_parent, acc, paneindex == 0
 
@@ -273,7 +285,7 @@ class Utilities:
                 return True
         return False
 
-    def object_generator(self,applicationname,locator,keyword,inputs,outputs, errors = False, allow_showing = False):
+    def object_generator(self,applicationname,locator,keyword,inputs,outputs,object_type, errors = False, allow_showing = False):
         global accessContext
         accessContext = ''
         active_parent = None
@@ -282,6 +294,7 @@ class Utilities:
         oebs_key_objects.xpath = locator
         #Application name is sent from the user
         oebs_key_objects.applicationname = applicationname
+        oebs_key_objects.object_type = object_type
         utils_obj=oebs_utils.Utils()
         isjavares, hwnd = utils_obj.isjavawindow(oebs_key_objects.applicationname)
         #method enables to move to perticular object and fetches its Contexts
@@ -302,7 +315,7 @@ class Utilities:
             for i in range(len(newlist2)):
                 absolute_path = absolute_path.replace(newlist2[i],'frame')
 
-            active_parent, accessContextParent, visible = self.swooptoelement(oebs_api.JABContext(hwnd), oebs_key_objects.xpath, absolute_path ,0 ,'', applicationname, errors, allow_showing)
+            active_parent, accessContextParent, visible = self.swooptoelement(oebs_api.JABContext(hwnd), oebs_key_objects.xpath, absolute_path ,0 ,'', applicationname, object_type, errors, allow_showing)
             accessContextParent = accessContextParent or ''
             if active_parent is None:
                 active_parent = False
@@ -330,7 +343,7 @@ class Utilities:
                     xpathneeded=xpathneeded.replace(newlist2[i],'frame')
                 if(accessContextParent):
                     accessContextParent.releaseJavaObject()
-                active_parent, accessContextParent, visible = self.swooptoelement(oebs_api.JABContext(hwnd),oebs_key_objects.xpath,xpathneeded,0,'', applicationname)
+                active_parent, accessContextParent, visible = self.swooptoelement(oebs_api.JABContext(hwnd),oebs_key_objects.xpath,xpathneeded,0,'', applicationname, object_type)
                 flag='true'
 
         accessContext=accessContextParent
@@ -359,7 +372,7 @@ class Utilities:
 
     def getsize(self,xpath,windowname):
         #object is identified using normal object identification
-        accessContext, visible = self.object_generator(windowname,xpath,'',[],'')
+        accessContext, visible = self.object_generator(windowname,xpath,'',[],'','')
         #context is taken from global value
         acc=accessContext
         #fetching the context
@@ -471,23 +484,23 @@ class Utilities:
         elementObj = acc.getAccessibleContextInfo()
         if xpath == '':
              if len(elementObj.name.strip()) == 0:
-                if 'internal frame' in elementObj.role:
+                if 'internal frame' in elementObj.role or 'frame' in elementObj.role:
                     path = elementObj.role
                 else:
                     path = elementObj.role + '[' + str(index) + ']'
              else:
-                if 'internal frame' in elementObj.role:
+                if 'internal frame' in elementObj.role or 'frame' in elementObj.role:
                     path = elementObj.role
                 else:
                     path = elementObj.role + '[' + str(elementObj.name.strip()) + ']'
         else:
             if len(elementObj.name.strip()) == 0:
-                if 'internal frame' in elementObj.role:
+                if 'internal frame' in elementObj.role or 'frame' in elementObj.role:
                     path = xpath + '/' + elementObj.role
                 else:
                     path = xpath + '/' + elementObj.role  + '[' + str(index) + ']'
             else:
-                if 'internal frame' in elementObj.role:
+                if 'internal frame' in elementObj.role or 'frame' in elementObj.role:
                     path = xpath + '/' + elementObj.role
                 else:
                     path = xpath + '/' + elementObj.role  + '[' + str(elementObj.name.strip()) + ']'
@@ -501,6 +514,7 @@ class Utilities:
 
 
     def getobjectforcustom(self,windowname,parentxpath,element_type,eleIndex):
+        utils_obj=oebs_utils.Utils()
         isjavares, hwnd = utils_obj.isjavawindow(windowname)
         acc = oebs_api.JABContext(hwnd)
         fullscrape_obj=oebs_fullscrape.FullScrape()
@@ -513,27 +527,31 @@ class Utilities:
         if(int(eleIndex) < 0):
             return eleproperties
         descriptiongiven=xpathsplitarr[10]
-        fullscrape_obj.custom_winrect(window)
-        fullscrape_obj.acccontext(acc,tempne,xpath,0,window)
+        fullscrape_obj.custom_winrect(windowname)
+        fullscrape_obj.acccontext_custom(acc,tempne,xpath,0,windowname)
         verifyflag=False
-        for i in range(len(tempne)):
-            xpatharr=(str(tempne[i].get('xpath'))).split(';')
-            tag=str(tempne[i].get('tag'))
+        parent_index = 0
+        for index in range(len(tempne)):
+            xpatharr=(str(tempne[index].get('xpath'))).split(';')
+            tag=str(tempne[index].get('tag'))
             path=xpatharr[0]
             runTimedescription=''
             if(xpatharr[10]):
                 runTimedescription=xpatharr[10]
             if(parentxpath== path and verifyflag == False):
                 verifyflag = True
-            elif(verifyflag == False and descriptiongiven == runTimedescription):
+                parent_index = index
+            elif(verifyflag == False and descriptiongiven == runTimedescription and runTimedescription != ''):
                 verifyflag = True
+                parent_index = index
             if(verifyflag):
                 if( not((tag == 'panel') or (tag == 'scroll pane') or (tag =='viewport'))):
                     if(tag == element_type):
-                        if(int(counter) == int(eleIndex)):
-                            eleproperties=str(tempne[i].get('xpath'))
-                            return eleproperties
-                        counter+=1
+                        if index >= parent_index:
+                            if(int(counter) == int(eleIndex)):
+                                eleproperties=str(tempne[index].get('xpath'))
+                                return eleproperties
+                            counter+=1
 
         return eleproperties
 

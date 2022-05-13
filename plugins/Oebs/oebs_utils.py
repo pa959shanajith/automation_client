@@ -24,7 +24,7 @@ from ctypes import wintypes
 import os
 import re
 import oebs_serverUtilities
-import win32com
+import win32com.client
 import pythoncom
 
 log = logging.getLogger('oebs_utils.py')
@@ -95,7 +95,7 @@ class Utils:
         status=True
         try:
             self.set_to_foreground(windowname)
-            acc, visible, active_parent = self.utils_obj.object_generator(windowname, objectname, 'highlight', [], '', errors = True)
+            acc, visible, active_parent = self.utils_obj.object_generator(windowname, objectname, 'highlight', [], '', objectname, errors = True)
             if not acc or (acc and str(acc) == 'fail'):
                 logger.print_on_console(ERROR_CODE_DICT['err_object_highlight'])
                 status = False
