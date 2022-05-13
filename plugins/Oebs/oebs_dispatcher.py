@@ -93,6 +93,7 @@ class OebsDispatcher:
                             'togglemaximize'      : self.internalframeops_obj.togglemaximize,
                             'closeframe'      : self.internalframeops_obj.closeframe,
                             'switchtoframe':self.utilops_obj.switchtoframe,
+                            'selectmenu':self.utilops_obj.select_menu,
 
                             'down':self.scrollbarops_obj.down,
                             'up' : self.scrollbarops_obj.up,
@@ -283,7 +284,7 @@ class OebsDispatcher:
                     else:
                         if (keyword.lower() == 'getstatusiris') : result = self.keyword_dict[keyword](ele, input, output, tsp.objectname.split(';')[-2])
                         else : result = self.keyword_dict[keyword](ele, input, output)
-                elif keyword in ['findwindowandattach', 'waitforelementvisible','switchtoframe','getobjectforcustom']:
+                elif keyword in ['findwindowandattach', 'waitforelementvisible','switchtoframe','getobjectforcustom','selectmenu']:
                     result = self.keyword_dict[keyword](*message)
                 else:
                     accessContext , visible, active_parent =  self.utilities_obj.object_generator(*message)

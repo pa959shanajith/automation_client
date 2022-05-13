@@ -327,6 +327,24 @@ class StepDescription:
         return locals()[keyword]()
 
     def oebs(self,keyword,tsp,inputval,input,output,con,reporting_obj):
+        #-----------------------------------Added this step as input was returned as a string
+        if type(input) is str:                  #----checking if input is a string
+            if "," in input:                    #----checking if the string has a ","
+                input = input.split(",")        #--------spliting the input by checking for "," then store the result in list input
+        #-----------------------------------------if  more than one dynamic variable is given as output , considers only the first one
+        try:
+            if len(tsp.outputval)>0:
+                if(";" in tsp.outputval):
+                    i = tsp.outputval.index(";")
+                    tsp_outputval=tsp.outputval[:i]
+                else:
+                    tsp_outputval = tsp.outputval
+                if("," in output):
+                    ni = output.index(',')
+                    output =output[:ni]
+        except:
+            pass
+
         def launchapplication():
             return "The application present in the path '"+ inputval[0] +"' is launched."
         def findwindowandattach():
@@ -335,6 +353,8 @@ class StepDescription:
             return 'The application is closed'
         def switchtoframe():
             return "Control switched to Frame(): '"+ input+ "'"
+        def selectmenu():
+            return 'Select Menu :' + "'" + inputval + "'" + ' and the result '+ "'" +output + "'" + ' is saved in the variable ' + "'" + tsp_outputval + "'" +  '.'
         def setfocus():
             return 'Set focus on'+ "'" + tsp.custname + "'"
         def waitforelementvisible():

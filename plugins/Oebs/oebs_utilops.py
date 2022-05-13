@@ -827,3 +827,87 @@ class UtilOperations:
         log.debug('Verify Response %s',str(methodoutput))
         return status,methodoutput,output_res,err_msg
 
+    def select_menu(self,applicationname,objectname,keyword,inputs,outputs,object_type):
+        """
+        def : select_menu
+        purpose : select menu is used to select the menu items.
+        param  : inputs : 1. Heirarchy of the menu item 
+        return : pass,true / fail,false
+        """
+
+        status = TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FAIL
+        output_res = OUTPUT_CONSTANT
+        err_msg = None
+        
+        try:
+            #input sent from the user
+            inputs = ast.literal_eval(str(inputs))
+            inputs = [n for n in inputs]
+            oebs_key_objects.keyword_input = []
+            for index in range(len(inputs)):
+                oebs_key_objects.keyword_input.append(inputs[index])
+            oebs_key_objects.keyword_output = outputs.split(';')
+            isjavares, hwnd = self.utils_obj.isjavawindow(applicationname)
+            acc=oebs_api.JABContext(hwnd)
+
+            if len(oebs_key_objects.keyword_input) > 0:
+                global counter,flag1,flag2
+                counter = 0
+                flag1 = flag2 =  False
+                menuobj=self.utilities_obj.menugenerator(acc)
+
+                def search_in_menu(menu_obj):
+                    global counter,flag1,flag2
+                    try:
+                        menubarcontext=menu_obj.getAccessibleContextInfo()
+                        for childindex in range(menubarcontext.childrenCount):
+                            menuchildobj = menu_obj.getAccessibleChildFromContext(childindex)
+                            menuchildcontext=menuchildobj.getAccessibleContextInfo()
+                            if oebs_key_objects.keyword_input[counter].lower() not in str(menuchildcontext.name).lower():
+                                flag1 = False
+                            elif oebs_key_objects.keyword_input[counter].lower() in str(menuchildcontext.name).lower():
+                                x_coormenu = int(menuchildcontext.x + (0.5 * menuchildcontext.width))
+                                y_coormenu = int(menuchildcontext.y + (0.5 * menuchildcontext.height))
+                                if menuchildcontext.role != 'menu item':
+                                    oebs_mouseops.MouseOperation('hold',x_coormenu,y_coormenu)
+                                else:
+                                    oebs_mouseops.MouseOperation('hold',menuchildcontext.x + 10,y_coormenu)
+                                time.sleep(2)
+                                flag1 = True
+                                counter += 1
+                                if counter < len(oebs_key_objects.keyword_input):
+                                    search_in_menu(menuchildobj)
+                                else:
+                                    if menuchildcontext.role != 'menu item':
+                                        oebs_mouseops.MouseOperation('click',x_coormenu,y_coormenu)
+                                    else:
+                                        oebs_mouseops.MouseOperation('click',menuchildcontext.x + 10,y_coormenu)
+                                    flag2 = True
+                                    break
+                            if flag2:
+                                    break
+                    except Exception as e:
+                        err_msg = ERROR_CODE_DICT['err_select_menu']
+                        logger.print_on_console(err_msg)
+                        log.error(err_msg)
+                        log.debug('%s',e)
+                
+                search_in_menu(menuobj)
+
+                if flag1 == True and flag2 == True:
+                    status = TEST_RESULT_PASS
+                    methodoutput = TEST_RESULT_TRUE
+                elif flag1 != False or flag2 == False:
+                    err_msg = ERROR_CODE_DICT['err_select_menu']
+
+            if err_msg:
+                log.info(err_msg)
+                logger.print_on_console (err_msg)
+        except Exception as e:
+            self.utilities_obj.cleardata()
+            err_msg = ERROR_CODE_DICT['err_select_menu']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
+            log.debug('%s',e)
+        return status,methodoutput,output_res,err_msg
