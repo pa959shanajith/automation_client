@@ -1366,25 +1366,6 @@ class ExcelXLS:
             log.error(e)
         return status,err_msg
 
-    def get_page_count_xls(self,filePath):
-        """
-        def : get_page_count
-        purpose : get page count of .xls file
-        param : filePath
-        return : pagecount [int]
-        """
-        status=False
-        err_msg=None
-        count = None
-        try:
-            wb = open_workbook(filePath)
-            count = len(wb.sheet_names())
-            status = True
-        except Exception as e:
-            log.error(e)
-            err_msg = 'Error occured fetching the page count.'
-        return status,count,err_msg
-
 
 class ExcelXLSX:
 
@@ -2002,25 +1983,6 @@ class ExcelXLSX:
             log.error(e)
             err_msg='Error occurred While copying Workbook'
         return status,err_msg
-
-    def get_page_count_xlsx(self,filePath):
-        """
-        def : get_page_count
-        purpose : get page count of .xlsx file
-        param : filePath
-        return : pagecount [int]
-        """
-        status=False
-        err_msg=None
-        count = None
-        try:
-            wb = openpyxl.load_workbook(filePath)
-            count = len(wb.sheetnames)
-            status = True
-        except Exception as e:
-            log.error(e)
-            err_msg = 'Error occured fetching the page count.'
-        return status,count,err_msg
 
 
 
