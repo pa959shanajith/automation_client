@@ -526,12 +526,12 @@ class ButtonLinkKeyword():
                             methodoutput = webconstants.TEST_RESULT_TRUE
                     else:
                         #Checking for headless mode
-                        if (str(readconfig.configvalues['headless_mode'])=='Yes'):
-                            inputElement = webelement.find_element(By.XPATH,'..').find_element(By.XPATH,"//input[@type='file']")
-                            inputElement.send_keys(inputfile)
-                            status = webconstants.TEST_RESULT_PASS
-                            methodoutput = webconstants.TEST_RESULT_TRUE
-                        elif self.__click_for_file_upload(browser_Keywords.local_bk.driver_obj,webelement):
+                        inputElement = webelement.find_element(By.XPATH,'..').find_element(By.XPATH,"//input[@type='file']")
+                        # if (str(readconfig.configvalues['headless_mode'])=='Yes'):
+                        inputElement.send_keys(inputfile)
+                        status = webconstants.TEST_RESULT_PASS
+                        methodoutput = webconstants.TEST_RESULT_TRUE
+                        if self.__click_for_file_upload(browser_Keywords.local_bk.driver_obj,webelement):
                             filestatus =self.__upload_operation(inputfile,inputs)
                             local_blk.log.info(STATUS_METHODOUTPUT_UPDATE)
                             if filestatus:

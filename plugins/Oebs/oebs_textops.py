@@ -23,6 +23,7 @@ import time
 import pythoncom
 import logger
 from encryption_utility import AESCipher
+from pyrobot import Robot
 pythoncom.CoInitialize()
 shell = win32com.client.Dispatch("WScript.Shell")
 
@@ -134,6 +135,7 @@ class TextOperations:
                     x_coor = int(curaccinfo.x + (0.5 * curaccinfo.width))
                     y_coor = int(curaccinfo.y + (0.5 * curaccinfo.height))
                     log.debug('Text Box is accessible',DEF_SETTEXT)
+                    robot = Robot()
                     if len(oebs_key_objects.keyword_input) == 1:
                         #if text != None:
                         if (oebs_key_objects.keyword_input[0] != ''):
@@ -171,16 +173,37 @@ class TextOperations:
 
                                         self.keywordops_obj.keyboard_operation('keypress','HOME')
                                         #clears the text untill all characters are deleted
-                                        for num in range(character.charCount):
-                                            shell.SendKeys("{DELETE}")
+                                        try:
+                                            log.debug("Clearing the textbox using Shell.")
+                                            log.debug(shell)
+                                            for num in range(character.charCount):
+                                                shell.SendKeys("{DELETE}")
+                                            log.debug("Textbox is cleared using Shell.")
+                                        except Exception as e:
+                                            log.debug("Clearing the textbox using PyRobot.")
+                                            for num in range(character.charCount):
+                                                robot.press_and_release("delete")
+                                            log.debug("Textbox is cleared using PyRobot.")
 
 
                                         #sets the text value to the object
-                                        for length in range(index):
-                                            shell.SendKeys('{'+text[length]+'}')
-                                            #sets the result to pass;
+                                        try:
+                                            log.debug("Textbox setText using Shell.")
+                                            log.debug(shell)
+                                            for length in range(index):
+                                                shell.SendKeys('{'+text[length]+'}')
+                                                #sets the result to pass;
+                                                status=TEST_RESULT_PASS
+                                                methodoutput=TEST_RESULT_TRUE
+                                            log.debug("Textbox setText done using Shell.")
+                                        except Exception as e:
+                                            # Sets the text value to the object
+                                            log.debug("Textbox setText using PyRobot.")
+                                            robot.type_string(text,0.005)
+                                            #sets the result to pass
                                             status=TEST_RESULT_PASS
                                             methodoutput=TEST_RESULT_TRUE
+                                            log.debug("Textbox setText done using PyRobot.")
                                     else:
                                         err_msg = MSG_ELEMENT_NON_EDITABLE
                                         log.debug('MSG:%s',err_msg)
@@ -276,6 +299,7 @@ class TextOperations:
                     x_coor = int(curaccinfo.x + (0.5 * curaccinfo.width))
                     y_coor = int(curaccinfo.y + (0.5 * curaccinfo.height))
                     log.debug('Text Box is accessible {}'.format(DEF_SETTEXT))
+                    robot = Robot()
                     if len(oebs_key_objects.keyword_input) == 1:
                         #if text != None:
                         if (oebs_key_objects.keyword_input[0] != ''):
@@ -316,16 +340,37 @@ class TextOperations:
 
                                         self.keywordops_obj.keyboard_operation('keypress','HOME')
                                         #clears the text untill all characters are deleted
-                                        for num in range(character.charCount):
-                                            shell.SendKeys("{DELETE}")
+                                        try:
+                                            log.debug("Clearing the textbox using Shell.")
+                                            log.debug(shell)
+                                            for num in range(character.charCount):
+                                                shell.SendKeys("{DELETE}")
+                                            log.debug("Textbox is cleared using Shell.")
+                                        except Exception as e:
+                                            log.debug("Clearing the textbox using PyRobot.")
+                                            for num in range(character.charCount):
+                                                robot.press_and_release("delete")
+                                            log.debug("Textbox is cleared using PyRobot.")
 
 
                                         #sets the text value to the object
-                                        for length in range(index):
-                                            shell.SendKeys('{'+text[length]+'}')
-                                            #sets the result to pass;
+                                        try:
+                                            log.debug("Textbox setText using Shell.")
+                                            log.debug(shell)
+                                            for length in range(index):
+                                                shell.SendKeys('{'+text[length]+'}')
+                                                #sets the result to pass;
+                                                status=TEST_RESULT_PASS
+                                                methodoutput=TEST_RESULT_TRUE
+                                            log.debug("Textbox setText done using Shell.")
+                                        except Exception as e:
+                                            # Sets the text value to the object
+                                            log.debug("Textbox setText using PyRobot.")
+                                            robot.type_string(text,0.005)
+                                            #sets the result to pass
                                             status=TEST_RESULT_PASS
                                             methodoutput=TEST_RESULT_TRUE
+                                            log.debug("Textbox setText done using PyRobot.")
                                     else:
                                         err_msg = MSG_ELEMENT_NON_EDITABLE
                                         log.debug('MSG:%s',err_msg)

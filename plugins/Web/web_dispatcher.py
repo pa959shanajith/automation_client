@@ -126,6 +126,7 @@ class Dispatcher:
             'drag':local_Wd.element_object.drag,
             'drop':local_Wd.element_object.drop,
             'dropfile':local_Wd.element_object.drop_file,
+            'getaggridtooltiptext':local_Wd.element_object.get_ag_grid_tooltip_text,
             'settext':local_Wd.textbox_object.set_text,
             'sendvalue':local_Wd.textbox_object.send_value,
             'gettext':local_Wd.textbox_object.get_text,
@@ -644,6 +645,8 @@ class Dispatcher:
                     ## Issue #190 Driver control won't switch back to parent window
                     if local_Wd.popup_object.check_if_no_popup_exists():
                         local_Wd.browser_object.validate_current_window_handle()
+                    if driver is not None and self.action == EXECUTE and configvalues['browser_screenshots'].lower() == 'yes':
+                        window_handles_count_begin=len(driver.window_handles)
                     if objectname=="@Object":
                         ##webelement = input[0]
                         input =input[1:]
@@ -705,7 +708,32 @@ class Dispatcher:
                       or screenShot_Flag == 'all'):
                         if browser_screenshots or headless_mode or sauceFlag:
                             if local_Wd.popup_object.check_if_no_popup_exists():
-                                file_path = screen_shot_obj.captureScreenshot(screen_details, driver=driver, web=True)
+                                window_handles_count_end=len(driver.window_handles)
+                                diff_whc=window_handles_count_end-window_handles_count_begin
+                                try:
+                                    if keyword.lower() in ["click","press","clickelement","mouseclick","clickiris"] and diff_whc==1:
+                                        local_Wd.log.debug("Look up window detected")  
+                                        local_Wd.log.debug("checking if system is locked or not")
+                                        process_name='LogonUI.exe'
+                                        callall='TASKLIST'
+                                        import subprocess
+                                        outputall=subprocess.check_output(callall)
+                                        outputstringall=str(outputall)
+                                        if process_name in outputstringall:
+                                            msg="System is Locked, Taking the screenshot using Driver"
+                                            logger.print_on_console(msg)
+                                            local_Wd.log.debug(msg)
+                                            temp=driver.current_window_handle
+                                            driver.switch_to_window(driver.window_handles[-1]) 
+                                            file_path = screen_shot_obj.captureScreenshot(screen_details,web=True, driver=driver)
+                                            driver.switch_to_window(temp)
+                                        else:
+                                            local_Wd.log.debug("System is Unlocked, Taking the screenshot using generic functions")
+                                            file_path = screen_shot_obj.captureScreenshot(screen_details,web=False)
+                                    else:
+                                        file_path = screen_shot_obj.captureScreenshot(screen_details,web=True, driver=driver)
+                                except Exception as e:
+                                    local_Wd.log.error(e,exc_info=True)
                             elif not (headless_mode or sauceFlag):
                                 local_Wd.log.debug("Pop up exists; Taking the screenshot using generic functions")
                                 file_path = screen_shot_obj.captureScreenshot(screen_details,web=False)
@@ -815,14 +843,14 @@ class Dispatcher:
             local_Wd.log.debug('Identifiers are ')
             local_Wd.log.debug(identifiers)
             if len(identifiers)>=3:
-                #find by Relative xpath
-                webElement=self.element_locator(driver,'rxpath',identifiers[0],'1')
+                #find by absolute xpath
+                webElement=self.element_locator(driver,'xpath',identifiers[0],'1')
                 if not(webElement):
                     #find by id
                     webElement=self.element_locator(driver,'id',identifiers[1],'2')
                     if not(webElement):
-                        #find by absolute xpath
-                        webElement=self.element_locator(driver,'xpath',identifiers[2],'3')
+                        #find by relative xpath
+                        webElement=self.element_locator(driver,'rxpath',identifiers[2],'3')
                         if not(webElement):
                             #find by name
                             webElement=self.element_locator(driver,'name',identifiers[3],'4')

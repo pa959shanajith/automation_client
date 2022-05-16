@@ -136,7 +136,10 @@ class Clickandadd():
             log.info('Obtained driver from browserops.py class .....')
             tempne_stopclicknadd = []
             log.info('Performing the stopclickandd operation on default/outer page')
-            tempreturn_stopclicknadd = driver.execute_script(webscrape_utils_obj.javascript_stopclicknadd)
+            if (isinstance(driver,webdriver.Ie)):
+                tempreturn_stopclicknadd = driver.execute_script(webscrape_utils_obj.javascript_stopclicknadd_IE)
+            else:
+                tempreturn_stopclicknadd = driver.execute_script(webscrape_utils_obj.javascript_stopclicknadd)
             log.info('stopclickandd operation on default/outer page is done and data is obtained')
             tempne_stopclicknadd.extend(tempreturn_stopclicknadd)
 
@@ -153,7 +156,10 @@ class Clickandadd():
                     if webscrape_utils_obj.switchtoframe_webscrape(driver, currenthandle, path):
                         in_iframe = driver.execute_script(webscrape_utils_obj.javascript_in_iframe)
                         log.debug('switched to iframe/frame %s', path)
-                        temp = driver.execute_script(webscrape_utils_obj.javascript_stopclicknadd, path)
+                        if (isinstance(driver,webdriver.Ie)):
+                            temp = driver.execute_script(webscrape_utils_obj.javascript_stopclicknadd_IE, path)
+                        else:
+                            temp = driver.execute_script(webscrape_utils_obj.javascript_stopclicknadd, path)
                         if temp is not None:
                             if in_iframe and rect is not None:
                                 for element in temp:
@@ -172,7 +178,10 @@ class Clickandadd():
                     path = myipath + str(frames) + 'f' + '/'
                     if webscrape_utils_obj.switchtoframe_webscrape(driver, currenthandle, path):
                         log.debug('switched to iframe/frame %s', path)
-                        temp = driver.execute_script(webscrape_utils_obj.javascript_stopclicknadd, path)
+                        if (isinstance(driver,webdriver.Ie)):
+                            temp = driver.execute_script(webscrape_utils_obj.javascript_stopclicknadd_IE, path)
+                        else:
+                            temp = driver.execute_script(webscrape_utils_obj.javascript_stopclicknadd, path)
                         if temp is not None:
                             log.debug('Stop ClickAndAdd scrape operation on frame %s is done', path)
                             tempne_stopclicknadd.extend(temp)

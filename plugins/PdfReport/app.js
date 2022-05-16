@@ -29,7 +29,7 @@ Handlebars.registerHelper('validateImageID', function(path, slno) {
 });
 
 Handlebars.registerHelper('validateImagePath', function(path) {
-  return path? 'block' : 'none';
+	return path ? 'block' : 'none';
 });
 
 Handlebars.registerHelper('getDataURI', function(uri) {

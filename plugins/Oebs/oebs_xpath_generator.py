@@ -228,6 +228,8 @@ class PathGenerator():
             j = current_acc_info.indexInParent
             if j == 2 and current_acc_info.role == "panel" and tagrole == "combo box":
                 j = 1
+            if j == -1 and current_acc_info.role == "frame":
+                j = 0
 
             if self.path == '':
                 if len(current_acc_info.description.strip()) == 0:

@@ -884,11 +884,11 @@ class Controller():
                 self.debugfrom_step=debugfrom_step
                 try:
                     index = i
-                    if(action != DEBUG):    
-                        log.root.handlers[hn].starttsp(tsplist[index],execution_env['scenario_id'],execution_env['browser'])
+                    # if(action != DEBUG):    
+                    #     log.root.handlers[hn].starttsp(tsplist[index],execution_env['scenario_id'],execution_env['browser'])
                     i = self.methodinvocation(i,execution_env,datatables)
-                    if(action != DEBUG):
-                        log.root.handlers[hn].stoptsp(tsplist[index],execution_env['scenario_id'],execution_env['browser'])
+                    # if(action != DEBUG):
+                    #     log.root.handlers[hn].stoptsp(tsplist[index],execution_env['scenario_id'],execution_env['browser'])
                     #Check wether accessibility testing has to be executed
                     if accessibility_testing and (index + 1 >= len(tsplist) or (tsplist[index].testscript_name != tsplist[index + 1].testscript_name and screen_testcase_map[tsplist[index].testscript_name]['screenid'] != screen_testcase_map[tsplist[index + 1].testscript_name]['screenid'])):
                         if local_cont.accessibility_testing_obj is None: self.__load_web()
@@ -1354,7 +1354,7 @@ class Controller():
                             count+=1
                             #check if user has manually terminated during execution, then check if the teststep data and overallstatus is [] if so poputale default values in teststep data and overallstatus
                             if terminate_flag:
-                                if con.reporting_obj.report_json[ROWS]==[] and con.reporting_obj.report_json[OVERALLSTATUS]==[]:
+                                if con.reporting_obj.report_json[ROWS]==[] and con.reporting_obj.report_json[OVERALLSTATUS]=={}:
                                     con.reporting_obj.add_to_reporting_obj()
                             status_percentage["s_index"]=suite_idx-1
                             status_percentage["index"]=sc_idx
@@ -1392,7 +1392,7 @@ class Controller():
                             #logic for condition check
                             report_json=con.reporting_obj.report_json[OVERALLSTATUS]
                             #Check is made to fix issue #401
-                            overall_status=report_json[0][OVERALLSTATUS] if len(report_json)>0 else TEST_RESULT_FAIL
+                            overall_status=report_json[OVERALLSTATUS] if len(report_json)>0 else TEST_RESULT_FAIL
                             if overall_status != TEST_RESULT_PASS: exc_pass = False
                             if(int(condition_check_value)==1):
                                 if(overall_status==TEST_RESULT_PASS):
@@ -1427,7 +1427,7 @@ class Controller():
                                 qc_folderid=qc_sceanrio_data[i]['qcfolderid']
                                 qc_tsList=qc_sceanrio_data['qctestset']
                                 qc_testrunname=qc_sceanrio_data['qctestcase']
-                                qc_status_over=report_json[0]
+                                qc_status_over=report_json
                                 qc_update_status=qc_status_over['overallstatus']
                                 if(str(qc_update_status).lower()=='pass'):
                                     qc_update_status='Passed'
@@ -1467,7 +1467,7 @@ class Controller():
                                     qc_folderid=qc_sceanrio_data[i]['qcfolderid']
                                     qc_tsList=qc_sceanrio_data[i]['qctestset']
                                     qc_testrunname=qc_sceanrio_data[i]['qctestcase']
-                                    qc_status_over=report_json[0]
+                                    qc_status_over=report_json
                                     qc_update_status=qc_status_over['overallstatus']
                                     if(str(qc_update_status).lower()=='pass'):
                                         qc_update_status='Passed'
@@ -1501,7 +1501,7 @@ class Controller():
                                         logger.print_on_console('Error in Updating Qc details')
                         # if (integration_type=="qTest" and qc_url!='' and qc_password!='' and  qc_username!=''):
                         if len(scenario["qcdetails"]) > integ and qc_creds['qtest']['url'] != '' and scenario['qcdetails'][integ]["type"] == "qTest":
-                            qtest_status_over=report_json[0]
+                            qtest_status_over=report_json
                             integ += 1
                             try:
                                 qtest_status = {}
@@ -1545,7 +1545,7 @@ class Controller():
                                 logger.print_on_console('Error in Updating qTest details')
                         # if (integration_type=="Zephyr" and zephyr_password!='' and zephyr_username!='' and  zephyr_url!=''):
                         if len(scenario["qcdetails"]) > integ and qc_creds['zephyr']['url'] != '' and scenario['qcdetails'][integ]["type"] == "Zephyr":
-                            zephyr_status_over=report_json[0]
+                            zephyr_status_over=report_json
                             integ += 1
                             try:
                                 zephyr_status = {}
@@ -1692,10 +1692,10 @@ class Controller():
                 status_percentage = {TEST_RESULT_PASS:0,TEST_RESULT_FAIL:0,TERMINATE:0,"total":0}
                 pass_val=fail_val=0
                 obj_reporting.report_string=[]
-                obj_reporting.overallstatus_array=[]
+                obj_reporting.overallstatus_obj={}
                 obj_reporting.overallstatus=TEST_RESULT_PASS
                 obj_reporting.report_json[ROWS]=obj_reporting.report_string
-                obj_reporting.report_json[OVERALLSTATUS]=obj_reporting.overallstatus_array
+                obj_reporting.report_json[OVERALLSTATUS]=obj_reporting.overallstatus_obj
                 tc_aws=aws_tsp[sc_idx]
                 os.chdir(self.cur_dir)
                 filename='Scenario'+str(sc_idx+1)+'.json'

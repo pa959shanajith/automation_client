@@ -12,3 +12,4 @@ keyword_input = []
 keyword_output = []
 applicationname=''
 custom_msg=[]
+object_type=''

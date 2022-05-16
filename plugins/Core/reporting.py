@@ -32,12 +32,12 @@ class Reporting:
     def __init__(self):
         self.report_string=[]
         self.report_string_testcase_empty = []
-        self.overallstatus_array=[]
+        self.overallstatus_obj={}
         self.comments_length=[]
-        self.overallstatus_array_incomplete = []
-        self.report_json={ROWS:self.report_string,OVERALLSTATUS:self.overallstatus_array,COMMENTS_LENGTH:self.comments_length}
-        self.report_json_condition_check={ROWS:self.report_string,OVERALLSTATUS:self.overallstatus_array_incomplete,COMMENTS_LENGTH:self.comments_length}
-        self.report_json_condition_check_testcase_empty={ROWS:self.report_string_testcase_empty,OVERALLSTATUS:self.overallstatus_array_incomplete,COMMENTS_LENGTH:self.comments_length}
+        self.overallstatus_obj_incomplete = {}
+        self.report_json={ROWS:self.report_string,OVERALLSTATUS:self.overallstatus_obj,COMMENTS_LENGTH:self.comments_length}
+        self.report_json_condition_check={ROWS:self.report_string,OVERALLSTATUS:self.overallstatus_obj_incomplete,COMMENTS_LENGTH:self.comments_length}
+        self.report_json_condition_check_testcase_empty={ROWS:self.report_string_testcase_empty,OVERALLSTATUS:self.overallstatus_obj_incomplete,COMMENTS_LENGTH:self.comments_length}
 
         self.nested_flag=False
         self.pid_list=[]
@@ -151,7 +151,8 @@ class Reporting:
         obj[DATE]=self.date
         obj[TIME]=self.time
         if args and args[0]: obj['video'] = args[0]
-        self.overallstatus_array.append(obj)
+        self.overallstatus_obj=obj
+        self.report_json[OVERALLSTATUS]=obj
 
     def build_overallstatus_conditionCheck(self):
             """
@@ -178,7 +179,8 @@ class Reporting:
             obj[BROWSER_TYPE]=self.browser_type
             obj[DATE]=self.date
             obj[TIME]=self.time
-            self.overallstatus_array_incomplete.append(obj)
+            self.overallstatus_obj_incomplete=obj
+            self.report_json_condition_check[OVERALLSTATUS]=obj
 
     def build_overallstatus_conditionCheck_testcase_empty(self):
             """
@@ -205,7 +207,8 @@ class Reporting:
             obj[BROWSER_TYPE]=self.browser_type
             obj[DATE]=self.date
             obj[TIME]=self.time
-            self.overallstatus_array_incomplete.append(obj)
+            self.overallstatus_obj_incomplete=obj
+            self.report_json_condition_check_testcase_empty[OVERALLSTATUS]=obj
 
     def get_pid(self):
         """
@@ -334,10 +337,10 @@ class Reporting:
         report_obj.step_description=self.core_utilsobject.get_UTF_8(report_obj.step_description)
         obj[STEP_DESCRIPTION]=report_obj.step_description
         report_obj.screenshot_path=self.core_utilsobject.get_UTF_8(report_obj.screenshot_path)
-        if constants.SCREENSHOT_NFS_AVAILABLE: 
-            obj[SCREENSHOT_PATH]= report_obj.screenshot_path
-        else: 
-            obj[SCREENSHOT_PATH_ALT]= report_obj.screenshot_path
+        # if constants.SCREENSHOT_NFS_AVAILABLE: 
+        obj[SCREENSHOT_PATH]= report_obj.screenshot_path
+        # else: 
+        #     obj[SCREENSHOT_PATH_ALT]= report_obj.screenshot_path
         report_obj.ellapsedtime=self.core_utilsobject.get_UTF_8(report_obj.ellapsedtime)
         et = str(report_obj.ellapsedtime).split('.')
         if len(et) == 1: 
@@ -416,6 +419,12 @@ class Reporting:
                     comments= result_tuple[3]
                 if(len(result_tuple) == 5):
                     screenshot_path = result_tuple[4]
+                    try:
+                        if (not os.path.exists(result_tuple[4])):
+                            screenshot_path = None
+                    except:
+                        if (not os.path.exists(str(result_tuple[4]))):
+                            screenshot_path = None
                 else:
                     screenshot_path = None
 
@@ -438,26 +447,26 @@ class Reporting:
     def save_report_json(self,filename,json_data,i):
         try:
             terminated_by = 'N/A'
-            if self.report_json[OVERALLSTATUS][0][OVERALLSTATUS] == TERMINATE:
+            if self.report_json[OVERALLSTATUS][OVERALLSTATUS] == TERMINATE:
                 terminated_by = USER_TERMINATED if self.user_termination else PROGRAM_TERMINATED
-            self.report_json[OVERALLSTATUS][0][TERMINATED_BY] = terminated_by
+            self.report_json[OVERALLSTATUS][TERMINATED_BY] = terminated_by
             report_json=copy.deepcopy(self.report_json)
             log.debug('Saving report json to a file')
             if ("suitedetails" in json_data):
-                report_json[OVERALLSTATUS][0][RELEASE_NAME]=json_data["suitedetails"][i["s_index"]]['releaseid']
-                report_json[OVERALLSTATUS][0][DOMAIN_NAME]=json_data["suitedetails"][i["s_index"]]['domainname']
-                report_json[OVERALLSTATUS][0][PROJECT_NAME]=json_data["suitedetails"][i["s_index"]]['projectname']
-                report_json[OVERALLSTATUS][0][SCENARIO_NAME]=json_data["suitedetails"][i["s_index"]]['scenarioNames'][i["index"]]
-                report_json[OVERALLSTATUS][0][CYCLE_NAME]=json_data["suitedetails"][i["s_index"]]['cyclename']
-                report_json[OVERALLSTATUS][0][VERSION]=json_data["version"]
+                report_json[OVERALLSTATUS][RELEASE_NAME]=json_data["suitedetails"][i["s_index"]]['releaseid']
+                report_json[OVERALLSTATUS][DOMAIN_NAME]=json_data["suitedetails"][i["s_index"]]['domainname']
+                report_json[OVERALLSTATUS][PROJECT_NAME]=json_data["suitedetails"][i["s_index"]]['projectname']
+                report_json[OVERALLSTATUS][SCENARIO_NAME]=json_data["suitedetails"][i["s_index"]]['scenarioNames'][i["index"]]
+                report_json[OVERALLSTATUS][CYCLE_NAME]=json_data["suitedetails"][i["s_index"]]['cyclename']
+                report_json[OVERALLSTATUS][VERSION]=json_data["version"]
                 if i['total']>0:
-                    report_json[OVERALLSTATUS][0]["pass"]=str(round(i["Pass"]/i['total']*100,2)) if len(str(round(i["Pass"]/i['total']*100,2)).split('.')[-1]) == 2 else str(round(i["Pass"]/i['total']*100,2)) + "0"
-                    report_json[OVERALLSTATUS][0]["fail"]=str(round(i["Fail"]/i['total']*100,2)) if len(str(round(i["Fail"]/i['total']*100,2)).split('.')[-1]) == 2 else str(round(i["Fail"]/i['total']*100,2)) + "0"
-                    report_json[OVERALLSTATUS][0]["terminate"]=str(round(i["Terminate"]/i['total']*100,2)) if len(str(round(i["Terminate"]/i['total']*100,2)).split('.')[-1]) == 2 else str(round(i["Terminate"]/i['total']*100,2)) + "0"
+                    report_json[OVERALLSTATUS]["pass"]=str(round(i["Pass"]/i['total']*100,2)) if len(str(round(i["Pass"]/i['total']*100,2)).split('.')[-1]) == 2 else str(round(i["Pass"]/i['total']*100,2)) + "0"
+                    report_json[OVERALLSTATUS]["fail"]=str(round(i["Fail"]/i['total']*100,2)) if len(str(round(i["Fail"]/i['total']*100,2)).split('.')[-1]) == 2 else str(round(i["Fail"]/i['total']*100,2)) + "0"
+                    report_json[OVERALLSTATUS]["terminate"]=str(round(i["Terminate"]/i['total']*100,2)) if len(str(round(i["Terminate"]/i['total']*100,2)).split('.')[-1]) == 2 else str(round(i["Terminate"]/i['total']*100,2)) + "0"
                 else:
-                    report_json[OVERALLSTATUS][0]["pass"]="0.00"
-                    report_json[OVERALLSTATUS][0]["fail"]="0.00"
-                    report_json[OVERALLSTATUS][0]["terminate"]="0.00"
+                    report_json[OVERALLSTATUS]["pass"]="0.00"
+                    report_json[OVERALLSTATUS]["fail"]="0.00"
+                    report_json[OVERALLSTATUS]["terminate"]="0.00"
             if len(report_json[ROWS]) != 0:
                 for i in report_json[ROWS]:
                     if i[COMMENTS]:
@@ -475,23 +484,23 @@ class Reporting:
         try:
             log.debug('Saving report json to a file')
             self.build_overallstatus_conditionCheck()
-            self.report_json_condition_check[OVERALLSTATUS][0][TERMINATED_BY] = USER_TERMINATED if self.user_termination else PROGRAM_TERMINATED
+            self.report_json_condition_check[OVERALLSTATUS][TERMINATED_BY] = USER_TERMINATED if self.user_termination else PROGRAM_TERMINATED
             report_json_condition_check=copy.deepcopy(self.report_json_condition_check)
             if ("suitedetails" in json_data):
-                report_json_condition_check[OVERALLSTATUS][0][RELEASE_NAME]=json_data["suitedetails"][i["s_index"]]['releaseid']
-                report_json_condition_check[OVERALLSTATUS][0][DOMAIN_NAME]=json_data["suitedetails"][i["s_index"]]['domainname']
-                report_json_condition_check[OVERALLSTATUS][0][PROJECT_NAME]=json_data["suitedetails"][i["s_index"]]['projectname']
-                report_json_condition_check[OVERALLSTATUS][0][SCENARIO_NAME]=json_data["suitedetails"][i["s_index"]]['scenarioNames'][i["index"]]
-                report_json_condition_check[OVERALLSTATUS][0][CYCLE_NAME]=json_data["suitedetails"][i["s_index"]]['cyclename']
-                report_json_condition_check[OVERALLSTATUS][0][VERSION]=json_data["version"]
+                report_json_condition_check[OVERALLSTATUS][RELEASE_NAME]=json_data["suitedetails"][i["s_index"]]['releaseid']
+                report_json_condition_check[OVERALLSTATUS][DOMAIN_NAME]=json_data["suitedetails"][i["s_index"]]['domainname']
+                report_json_condition_check[OVERALLSTATUS][PROJECT_NAME]=json_data["suitedetails"][i["s_index"]]['projectname']
+                report_json_condition_check[OVERALLSTATUS][SCENARIO_NAME]=json_data["suitedetails"][i["s_index"]]['scenarioNames'][i["index"]]
+                report_json_condition_check[OVERALLSTATUS][CYCLE_NAME]=json_data["suitedetails"][i["s_index"]]['cyclename']
+                report_json_condition_check[OVERALLSTATUS][VERSION]=json_data["version"]
                 if i['total']>0:
-                    report_json_condition_check[OVERALLSTATUS][0]["pass"]=str(round(i["Pass"]/i['total']*100,2)) if len(str(round(i["Pass"]/i['total']*100,2)).split('.')[-1]) == 2 else str(round(i["Pass"]/i['total']*100,2)) + "0"
-                    report_json_condition_check[OVERALLSTATUS][0]["fail"]=str(round(i["Fail"]/i['total']*100,2)) if len(str(round(i["Fail"]/i['total']*100,2)).split('.')[-1]) == 2 else str(round(i["Fail"]/i['total']*100,2)) + "0"
-                    report_json_condition_check[OVERALLSTATUS][0]["terminate"]=str(round(i["Terminate"]/i['total']*100,2)) if len(str(round(i["Terminate"]/i['total']*100,2)).split('.')[-1]) == 2 else str(round(i["Terminate"]/i['total']*100,2)) + "0"
+                    report_json_condition_check[OVERALLSTATUS]["pass"]=str(round(i["Pass"]/i['total']*100,2)) if len(str(round(i["Pass"]/i['total']*100,2)).split('.')[-1]) == 2 else str(round(i["Pass"]/i['total']*100,2)) + "0"
+                    report_json_condition_check[OVERALLSTATUS]["fail"]=str(round(i["Fail"]/i['total']*100,2)) if len(str(round(i["Fail"]/i['total']*100,2)).split('.')[-1]) == 2 else str(round(i["Fail"]/i['total']*100,2)) + "0"
+                    report_json_condition_check[OVERALLSTATUS]["terminate"]=str(round(i["Terminate"]/i['total']*100,2)) if len(str(round(i["Terminate"]/i['total']*100,2)).split('.')[-1]) == 2 else str(round(i["Terminate"]/i['total']*100,2)) + "0"
                 else:
-                    report_json_condition_check[OVERALLSTATUS][0]["pass"]="0.00"
-                    report_json_condition_check[OVERALLSTATUS][0]["fail"]="0.00"
-                    report_json_condition_check[OVERALLSTATUS][0]["terminate"]="0.00"
+                    report_json_condition_check[OVERALLSTATUS]["pass"]="0.00"
+                    report_json_condition_check[OVERALLSTATUS]["fail"]="0.00"
+                    report_json_condition_check[OVERALLSTATUS]["terminate"]="0.00"
 
             with open(filename, 'w') as outfile:
                     log.info('Writing report data to the file '+filename)
@@ -506,23 +515,23 @@ class Reporting:
             log.debug('Saving report json to a file')
             self.add_report_testcase_empty(description)
             self.build_overallstatus_conditionCheck_testcase_empty()
-            self.report_json_condition_check_testcase_empty[OVERALLSTATUS][0][TERMINATED_BY] = USER_TERMINATED if self.user_termination else PROGRAM_TERMINATED
+            self.report_json_condition_check_testcase_empty[OVERALLSTATUS][TERMINATED_BY] = USER_TERMINATED if self.user_termination else PROGRAM_TERMINATED
             report_json_condition_check_testcase_empty=copy.deepcopy(self.report_json_condition_check_testcase_empty)
             if ("suitedetails" in json_data):
-                report_json_condition_check_testcase_empty[OVERALLSTATUS][0][RELEASE_NAME]=json_data["suitedetails"][i["s_index"]]['releaseid']
-                report_json_condition_check_testcase_empty[OVERALLSTATUS][0][DOMAIN_NAME]=json_data["suitedetails"][i["s_index"]]['domainname']
-                report_json_condition_check_testcase_empty[OVERALLSTATUS][0][PROJECT_NAME]=json_data["suitedetails"][i["s_index"]]['projectname']
-                report_json_condition_check_testcase_empty[OVERALLSTATUS][0][SCENARIO_NAME]=json_data["suitedetails"][i["s_index"]]['scenarioNames'][i["index"]]
-                report_json_condition_check_testcase_empty[OVERALLSTATUS][0][CYCLE_NAME]=json_data["suitedetails"][i["s_index"]]['cyclename']
-                report_json_condition_check_testcase_empty[OVERALLSTATUS][0][VERSION]=json_data["version"]
+                report_json_condition_check_testcase_empty[OVERALLSTATUS][RELEASE_NAME]=json_data["suitedetails"][i["s_index"]]['releaseid']
+                report_json_condition_check_testcase_empty[OVERALLSTATUS][DOMAIN_NAME]=json_data["suitedetails"][i["s_index"]]['domainname']
+                report_json_condition_check_testcase_empty[OVERALLSTATUS][PROJECT_NAME]=json_data["suitedetails"][i["s_index"]]['projectname']
+                report_json_condition_check_testcase_empty[OVERALLSTATUS][SCENARIO_NAME]=json_data["suitedetails"][i["s_index"]]['scenarioNames'][i["index"]]
+                report_json_condition_check_testcase_empty[OVERALLSTATUS][CYCLE_NAME]=json_data["suitedetails"][i["s_index"]]['cyclename']
+                report_json_condition_check_testcase_empty[OVERALLSTATUS][VERSION]=json_data["version"]
                 if i['total']>0:
-                    report_json_condition_check_testcase_empty[OVERALLSTATUS][0]["pass"]=str(round(i["Pass"]/i['total']*100,2)) if len(str(round(i["Pass"]/i['total']*100,2)).split('.')[-1]) == 2 else str(round(i["Pass"]/i['total']*100,2)) + "0"
-                    report_json_condition_check_testcase_empty[OVERALLSTATUS][0]["fail"]=str(round(i["Fail"]/i['total']*100,2)) if len(str(round(i["Fail"]/i['total']*100,2)).split('.')[-1]) == 2 else str(round(i["Fail"]/i['total']*100,2)) + "0"
-                    report_json_condition_check_testcase_empty[OVERALLSTATUS][0]["terminate"]=str(round(i["Terminate"]/i['total']*100,2)) if len(str(round(i["Terminate"]/i['total']*100,2)).split('.')[-1]) == 2 else str(round(i["Terminate"]/i['total']*100,2)) + "0"
+                    report_json_condition_check_testcase_empty[OVERALLSTATUS]["pass"]=str(round(i["Pass"]/i['total']*100,2)) if len(str(round(i["Pass"]/i['total']*100,2)).split('.')[-1]) == 2 else str(round(i["Pass"]/i['total']*100,2)) + "0"
+                    report_json_condition_check_testcase_empty[OVERALLSTATUS]["fail"]=str(round(i["Fail"]/i['total']*100,2)) if len(str(round(i["Fail"]/i['total']*100,2)).split('.')[-1]) == 2 else str(round(i["Fail"]/i['total']*100,2)) + "0"
+                    report_json_condition_check_testcase_empty[OVERALLSTATUS]["terminate"]=str(round(i["Terminate"]/i['total']*100,2)) if len(str(round(i["Terminate"]/i['total']*100,2)).split('.')[-1]) == 2 else str(round(i["Terminate"]/i['total']*100,2)) + "0"
                 else:
-                    report_json_condition_check_testcase_empty[OVERALLSTATUS][0]["pass"]="0.00"
-                    report_json_condition_check_testcase_empty[OVERALLSTATUS][0]["fail"]="0.00"
-                    report_json_condition_check_testcase_empty[OVERALLSTATUS][0]["terminate"]="0.00"
+                    report_json_condition_check_testcase_empty[OVERALLSTATUS]["pass"]="0.00"
+                    report_json_condition_check_testcase_empty[OVERALLSTATUS]["fail"]="0.00"
+                    report_json_condition_check_testcase_empty[OVERALLSTATUS]["terminate"]="0.00"
             with open(filename, 'w') as outfile:
                     log.info('Writing report data to the file '+filename)
                     json.dump(report_json_condition_check_testcase_empty, outfile, indent=4, sort_keys=False)
@@ -538,7 +547,6 @@ class Reporting:
         this causes the reports to not be generated for the scenarios/suits which are terminated manually
 
         """
-        overallstatus_array=[]
         overallstatus_obj={}
         ellapsed_time = str(datetime.now() - datetime.now()).split('.')[0].split(':')
         ellapsed_time = "~" + ("0" + ellapsed_time[0])[-2:] + ":" + ("0" + ellapsed_time[1])[-2:] + ":" + ("0" + ellapsed_time[2])[-2:]
@@ -548,8 +556,7 @@ class Reporting:
         overallstatus_obj[START_TIME]=datetime.now().strftime(TIME_FORMAT)
         overallstatus_obj[OVERALLSTATUS]=TERMINATE
         overallstatus_obj[BROWSER_TYPE]='N/A'
-        overallstatus_array.append(overallstatus_obj)
-        self.report_json[OVERALLSTATUS]=overallstatus_array
+        self.report_json[OVERALLSTATUS]=overallstatus_obj
         row_array=[]
         row_obj={}
         row_obj[ID]=0
