@@ -98,8 +98,6 @@ class FileOperations:
               '.xlsx_create_file':self.xlsx_obj.create_file_xlsx,
               '.xls_create_file':self.xls_obj.create_file_xls,
 
-              '.xlsx_get_page_count':self.xlsx_obj.get_page_count_xlsx,
-              '.xls_get_page_count':self.xls_obj.get_page_count_xls,
               '.pdf_get_page_count':self.pdf.get_page_count
               }
 
@@ -2570,7 +2568,7 @@ class FileOperations:
     def get_page_count(self,filePath):
         """
         def : get_page_count
-        purpose : get page count of .pdf,.docx,.doc,.xls,.xlsx files
+        purpose : get page count of .pdf files
         param : filePath
         return : pagecount [int]
         """
@@ -2578,34 +2576,22 @@ class FileOperations:
         methodoutput=TEST_RESULT_FALSE
         err_msg=None
         pageCount=None
-        from win32com.client import Dispatch
         try:
-            if filePath != None:
+            if filePath != None and filePath != '':
                 file_ext,res=self.__get_ext(filePath)
-                if file_ext in ['.docx','.doc','.pdf','.xls','.xlsx']:
-                    if res == False:
-                        if SYSTEM_OS == 'Windows':
-                            word = Dispatch('Word.Application')
-                            word.Visible = False
-                            doc = word.Documents.Open(filePath)
-                            doc.Repaginate()
-                            pageCount = doc.ComputeStatistics(2)
-                            # doc.Close()
-                            # word.Quit()
-                            res = True
-                        else:
-                            err_msg = file_ext + ' Is Not Supported for Mac Os'
-                        # doc = zipfile.ZipFile(filePath, "r")
-                        # docXml = doc.read('docProps/app.xml')
-                        # parseXml = xml.dom.minidom.parseString(docXml)
-                        # pageCount = parseXml.getElementsByTagName('Pages')[0].childNodes[0].nodeValue
-                    else:
-                        res,pageCount,err_msg = self.dict[file_ext+'_get_page_count'](filePath)
-                if res:
+                if file_ext == '.pdf':
+                    res,pageCount,err_msg = self.dict[file_ext+'_get_page_count'](filePath)
+                else:
+                    err_msg = file_ext + ' File type is not supported.'
+               
+                if res and err_msg == None:
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
                     info_msg="Page Count is "
                     logger.print_on_console(info_msg + str(pageCount))
+            else:
+                err_msg = 'Error in File Path.'
+
         except Exception as e:
             # err_msg=err_msg=generic_constants.ERR_MSG1+'getting line number of'+generic_constants.ERR_MSG2
             err_msg = 'Error occured while fetching page count.'
