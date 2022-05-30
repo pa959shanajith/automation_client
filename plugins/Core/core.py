@@ -1704,14 +1704,14 @@ def check_browser():
                     except:
                         chromeFlag = False 
                 if chromeFlag == False:
-                    logger.print_on_console('WARNING!! : Chrome version ',str(browser_ver),' is not supported.')
+                    logger.print_on_console('WARNING!! : Chrome version '+str(browser_ver)+' is not supported.')
         # Handling the session not able to create exception occurs when browser and driver are incompatable.
         except common.exceptions.SessionNotCreatedException as e:
             # getting the current browser version from error message.
             browser_ver = e.msg[109:111]
             if len(browser_ver) > 0 and browser_ver.isdigit():
                 # driver version above 85 this line will print on the console.
-                logger.print_on_console('WARNING!! : Chrome version ',str(browser_ver),' is not supported.')
+                logger.print_on_console('WARNING!! : Chrome version '+str(browser_ver)+' is not supported.')
             else:
                 # driver version below 86 this line will print on the console.
                 logger.print_on_console('WARNING!! : Current version of Chrome is not supported.')
@@ -1765,7 +1765,7 @@ def check_browser():
                             if str(browser_ver) >= v[0] or str(browser_ver) <= v[1]:
                                 edgeFlag = True
                     if edgeFlag == False:
-                        logger.print_on_console('WARNING!! : MS Edge Legacy version ',str(browser_ver),' is not supported.')
+                        logger.print_on_console('WARNING!! : MS Edge Legacy version '+str(browser_ver)+' is not supported.')
                 else:
                     logger.print_on_console("WARNING!! : To perform MS Edge Legacy check, all instances of MS Edge legacy should be closed. Close the instances and restart ICE again")
             else:
@@ -1792,14 +1792,14 @@ def check_browser():
                     except:
                         chromiumFlag = False 
                 if chromiumFlag == False :
-                    logger.print_on_console('WARNING!! : Edge Chromium version ',str(browser_ver),' is not supported.')
+                    logger.print_on_console('WARNING!! : Edge Chromium version '+str(browser_ver)+' is not supported.')
         # Handling the session not able to create exception occurs when browser and driver are incompatable.
         except common.exceptions.SessionNotCreatedException as e:
             # getting the current browser version from error message.
             browser_ver = e.msg[109:111]
             if len(browser_ver) > 0 and browser_ver.isdigit():
                 # driver version above 85 this line will print on the console.
-                logger.print_on_console('WARNING!! : Edge Chromium version ',str(browser_ver),' is not supported.')
+                logger.print_on_console('WARNING!! : Edge Chromium version '+str(browser_ver)+' is not supported.')
             else:
                 # driver version below 86 this line will print on the console.
                 logger.print_on_console('WARNING!! : Current version of Edge Chromium is not supported.')
