@@ -1704,14 +1704,12 @@ def check_browser():
                     except:
                         chromeFlag = False 
                 if chromeFlag == False:
-                    logger.print_on_console('WARNING!! : Chrome version '+str(browser_ver)+' is not supported.')
+                    logger.print_on_console('WARNING!! : Chrome version '+CHROME_VERSION.split('.')[0]+' is not supported.')
         # Handling the session not able to create exception occurs when browser and driver are incompatable.
         except common.exceptions.SessionNotCreatedException as e:
-            # getting the current browser version from error message.
-            browser_ver = e.msg[109:111]
-            if len(browser_ver) > 0 and browser_ver.isdigit():
+            if len(CHROME_VERSION) > 0:
                 # driver version above 85 this line will print on the console.
-                logger.print_on_console('WARNING!! : Chrome version '+str(browser_ver)+' is not supported.')
+                logger.print_on_console('WARNING!! : Chrome version '+CHROME_VERSION.split('.')[0]+' is not supported.')
             else:
                 # driver version below 86 this line will print on the console.
                 logger.print_on_console('WARNING!! : Current version of Chrome is not supported.')
@@ -1732,7 +1730,7 @@ def check_browser():
                     firefoxFlag = False
 
                 if firefoxFlag == False:
-                    logger.print_on_console('WARNING!! : Firefox version  is not supported.')
+                    logger.print_on_console('WARNING!! : Firefox version '+FIREFOX_VERSION+' is not supported.')
         except Exception as e:
             logger.print_on_console("Error in checking Firefox version")
             log.error("Error in checking Firefox version")
@@ -1792,14 +1790,12 @@ def check_browser():
                     except:
                         chromiumFlag = False 
                 if chromiumFlag == False :
-                    logger.print_on_console('WARNING!! : Edge Chromium version '+str(browser_ver)+' is not supported.')
+                    logger.print_on_console('WARNING!! : Edge Chromium version '+EDGE_CHROMIUM_VERSION.split('.')[0]+' is not supported.')
         # Handling the session not able to create exception occurs when browser and driver are incompatable.
         except common.exceptions.SessionNotCreatedException as e:
-            # getting the current browser version from error message.
-            browser_ver = e.msg[109:111]
-            if len(browser_ver) > 0 and browser_ver.isdigit():
+            if len(EDGE_CHROMIUM_VERSION) > 0:
                 # driver version above 85 this line will print on the console.
-                logger.print_on_console('WARNING!! : Edge Chromium version '+str(browser_ver)+' is not supported.')
+                logger.print_on_console('WARNING!! : Edge Chromium version '+EDGE_CHROMIUM_VERSION.split('.')[0]+' is not supported.')
             else:
                 # driver version below 86 this line will print on the console.
                 logger.print_on_console('WARNING!! : Current version of Edge Chromium is not supported.')
