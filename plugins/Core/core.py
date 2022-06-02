@@ -1687,7 +1687,7 @@ def check_browser():
             try:
                 if SYSTEM_OS == 'Windows':
                     CHROME_VERSION=get_Browser_Version('CHROME')
-                    EDGE_CHROMIUM_VERSION=get_Browser_Version('EDGE') 
+                    CHROMIUM_VERSION=get_Browser_Version('EDGE') 
                     FIREFOX_VERSION=  get_Browser_Version('FIREFOX')
                 elif SYSTEM_OS == 'Darwin':
                     if os.path.isfile(ICE_CONST)==True:
@@ -1866,25 +1866,25 @@ def check_browser():
         #checking browser for microsoft edge(chromium based)
         # try:
         if SYSTEM_OS == 'Windows':
-            if EDGE_CHROMIUM_VERSION != -1:
+            if CHROMIUM_VERSION != -1:
                 chromiumFlag = False
                 if os.path.exists(EDGE_CHROMIUM_DRIVER_PATH):
                     p = subprocess.Popen('"' + EDGE_CHROMIUM_DRIVER_PATH + '" --version', stdout=subprocess.PIPE, bufsize=1,cwd=DRIVERS_PATH,shell=True)
                     a = p.stdout.readline()
                     a = a.decode('utf-8')[13:17]
                     a=a.split('.')[0]
-                    if str(a) == EDGE_CHROMIUM_VERSION.split('.')[0]:
+                    if str(a) == CHROMIUM_VERSION.split('.')[0]:
                         chromiumFlag = True
                 if not os.path.exists(EDGE_CHROMIUM_DRIVER_PATH) or chromiumFlag == False:
                     try:
-                        URL="https://driver.avoautomation.com/driver/msedgedriver"+EDGE_CHROMIUM_VERSION.split('.')[0]+".exe"
+                        URL="https://driver.avoautomation.com/driver/msedgedriver"+CHROMIUM_VERSION.split('.')[0]+".exe"
                         request.urlretrieve(URL,EDGE_CHROMIUM_DRIVER_PATH)
                         chromiumFlag = True
                     except:
                         chromiumFlag = False 
 
                 if chromiumFlag == False :
-                    logger.print_on_console('WARNING!! : Edge Chromium version ',EDGE_CHROMIUM_VERSION.split('.')[0],' is not supported.')        
+                    logger.print_on_console('WARNING!! : Edge Chromium version ',CHROMIUM_VERSION.split('.')[0],' is not supported.')        
         elif SYSTEM_OS == 'Darwin':
             try:
                 
