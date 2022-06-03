@@ -34,6 +34,16 @@ from win32com.client import Dispatch
 from urllib import request
 from bs4 import BeautifulSoup                                                               
 from socketiolib import SocketIO, BaseNamespace, prepare_http_session
+import ssl
+
+try:
+   _create_unverified_https_context = ssl._create_unverified_context
+except AttributeError:
+    # Legacy Python that doesn't verify HTTPS certificates by default
+    pass
+else:
+    # Handle target environment that doesn't support HTTPS verification
+    ssl._create_default_https_context = _create_unverified_https_context
 
 log = logging.getLogger('core.py')
 root = None
@@ -1618,8 +1628,10 @@ def get_Browser_Version(browser_Name):
         if browser_Name == 'CHROME':
             path_flag=False
             if readconfig.configvalues['chrome_path'] == 'default':
-                paths = [r"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
-                    r"C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe"]
+                paths = [os.path.expandvars(r'%ProgramFiles%\\Google\\Chrome\\Application\\chrome.exe'),
+                os.path.expandvars(r'%ProgramFiles(x86)%\\Google\\Chrome\\Application\\chrome.exe'),
+                os.path.expandvars(r'%LocalAppData%\\Google\\Chrome\\Application\\chrome.exe'),
+                os.path.expandvars(r'%AppData%/Google/Chrome/Application/chrome.exe')]
                 for p in paths:
                     if os.path.exists(p):
                         path_flag=True
@@ -1637,14 +1649,16 @@ def get_Browser_Version(browser_Name):
                 logger.print_on_console("Error in checking chrome version")
                 log.error("Error in checking chrome version")
                 return -1
-                    
-            
+                               
 
         elif browser_Name == 'FIREFOX':
             path_flag=False
             if readconfig.configvalues['firefox_path'] == 'default':
-                paths = [r"C:\\Program Files\\Mozilla Firefox\\firefox.exe",
-                    r"C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe"]
+                paths = [os.path.expandvars(r'%ProgramFiles%\\Mozilla Firefox\\firefox.exe'),
+                os.path.expandvars(r'%ProgramFiles(x86)%\\Mozilla Firefox\\firefox.exe'),
+                os.path.expandvars(r'%LocalAppData%\\Mozilla Firefox\\firefox.exe'),
+                os.path.expandvars(r'%AppData%\\Mozilla Firefox\\firefox.exe')]
+
 
                 for p in paths:
                     if os.path.exists(p):
@@ -1665,15 +1679,41 @@ def get_Browser_Version(browser_Name):
                 return -1
 
         elif browser_Name == 'EDGE':
-            msedgeExe = r"C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe"
-            if os.path.exists(msedgeExe):
-                edge_version=get_version_via_com(msedgeExe)
+            path_flag=False
+            paths = [os.path.expandvars(r'%ProgramFiles%\\Microsoft\\Edge\\Application\\msedge.exe'),
+                os.path.expandvars(r'%ProgramFiles(x86)%\\Microsoft\\Edge\\Application\\msedge.exe')]
+
+            for p in paths:
+                if os.path.exists(p):
+                    path_flag=True
+                    break
+
+            if path_flag == True:
+                edge_version=list(filter(None, [get_version_via_com(p) for p in paths]))[0]
                 return edge_version
             else:
                 logger.print_on_console("Error in checking Edge Chromium version") 
                 log.error("Error in checking Edge Chromium version") 
-                return -1   
+                return -1 
 
+        elif browser_Name == 'IE':
+            path_flag=False
+            paths = [os.path.expandvars(r'%ProgramFiles%\\Internet Explorer\\iexplore.exe'),
+                os.path.expandvars(r'%ProgramFiles(x86)%\Internet Explorer\\iexplore.exe')]
+
+            for p in paths:
+                if os.path.exists(p):
+                    path_flag=True
+                    break
+
+            if path_flag == True:
+                ie_version=list(filter(None, [get_version_via_com(p) for p in paths]))[0]
+                return ie_version
+            else:
+                logger.print_on_console("Error in checking Edge Chromium version") 
+                log.error("Error in checking Edge Chromium version") 
+                return -1         
+             
     except:
         return -1
 
@@ -1689,6 +1729,8 @@ def check_browser():
                     CHROME_VERSION=get_Browser_Version('CHROME')
                     CHROMIUM_VERSION=get_Browser_Version('EDGE') 
                     FIREFOX_VERSION=  get_Browser_Version('FIREFOX')
+                    IE_VERSION=  get_Browser_Version('IE')
+
                 elif SYSTEM_OS == 'Darwin':
                     if os.path.isfile(ICE_CONST)==True:
                         params = json.load(open(ICE_CONST))
@@ -1707,7 +1749,23 @@ def check_browser():
             except Exception as e:
                 logger.print_on_console("Unable to locate ICE parameters")
                 log.error(e)
-            
+            #checking browser for IE
+            if SYSTEM_OS == 'Windows':
+                try:
+                    if IE_VERSION != -1:
+                        try:
+                            URL="https://driver.avoautomation.com/driver/IEDriverServer.exe"
+                            request.urlretrieve(URL,normpath(DRIVERS_PATH + "/IEDriverServer.exe"))
+                            ieFlag = True  
+                        except:
+                            ieFlag = False
+
+                        if ieFlag == False:
+                            logger.print_on_console('WARNING!! : Internet Explorer is not supported.')
+                except Exception as e:
+                    logger.print_on_console("Error in checking Internet Explorer version")
+                    log.error("Error in checking Internet Explorer version")
+                    log.error(e,exc_info=True)
 
             #checking browser for chrome
             if SYSTEM_OS == 'Windows':
