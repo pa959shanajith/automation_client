@@ -68,6 +68,11 @@ class ClientWindow(wx.Frame):
         self.scrapewindow = None
         self.pausewindow = None
         self.pluginPDF = None
+        self.aboutWindow = None
+        self.ProxyConfig_window = None
+        self.Config_window = None
+        self.Check_Update_window = None
+        self.rollback_window = None
         self.action=''
         self.debug_mode=False
         self.choice='Normal'
@@ -227,7 +232,10 @@ class ClientWindow(wx.Frame):
                 msg = '--Edit Config selected--'
                 logger.print_on_console(msg)
                 log.info(msg)
-                Config_window(parent = None,id = -1, title="Avo Assure Configuration")
+                if(self.Config_window):
+                    self.Config_window.Raise()
+                else:
+                    self.Config_window = Config_window(parent = None,id = -1, title="Avo Assure Configuration")
             except Exception as e:
                 msg = "Error while updating configuration"
                 logger.print_on_console(msg)
@@ -238,7 +246,10 @@ class ClientWindow(wx.Frame):
                 msg = '--Edit Proxy Config selected--'
                 logger.print_on_console(msg)
                 log.info(msg)
-                ProxyConfig_window(parent = None,id = -1, title="Avo Assure Proxy Configuration")
+                if (self.ProxyConfig_window):
+                    self.ProxyConfig_window.Raise()
+                else:
+                    self.ProxyConfig_window = ProxyConfig_window(parent = None,id = -1, title="Avo Assure Proxy Configuration")
             except Exception as e:
                 msg = "Error while updating proxy configuration"
                 logger.print_on_console(msg)
@@ -247,6 +258,7 @@ class ClientWindow(wx.Frame):
         elif id==151:      # When user selects Tools > Generate PDF Report
             try:
                 if (self.pluginPDF!= None) and (bool(self.pluginPDF) != False):
+                    self.pluginPDF.Raise()
                     msg = 'Report PDF generation plugin is already active'
                 else:
                     if pdfgentool is None:
@@ -266,6 +278,7 @@ class ClientWindow(wx.Frame):
             try:
                 if (self.pluginPDF!= None) and (bool(self.pluginPDF) != False):
                     msg = 'Report PDF generation plugin is already active'
+                    self.pluginPDF.Raise()
                 else:
                     if pdfgentool is None:
                         #con = controller.Controller()
@@ -284,7 +297,10 @@ class ClientWindow(wx.Frame):
         elif id == 160:      # When user selects Edit > About
             try:
                 log.info('--About selected--')
-                About_window(parent = None,id = -1, title="About")
+                if (self.aboutWindow):
+                    self.aboutWindow.Raise()
+                else:
+                    self.aboutWindow = About_window(parent = None,id = -1, title="About")
             except Exception as e:
                 msg = "Error while selecting about file"
                 logger.print_on_console(msg)
@@ -293,7 +309,10 @@ class ClientWindow(wx.Frame):
         elif id==161:      # When user selects Edit > Check for updates
             try:
                 log.info('--Check for updates selected--')
-                Check_Update_window(parent = None,id = -1, title="Check for Updates")
+                if (self.Check_Update_window):
+                    self.Check_Update_window.Raise()
+                else:
+                    self.Check_Update_window = Check_Update_window(parent = None,id = -1, title="Check for Updates")
             except Exception as e:
                 msg = "Error while updating file"
                 logger.print_on_console(msg)
@@ -303,7 +322,10 @@ class ClientWindow(wx.Frame):
         elif id==162:      # When user selects Edit > Rollback
             try:
                 log.info('--Rollback selected--')
-                rollback_window(parent = None,id = -1, title="Rollback")
+                if (self.rollback_window):
+                    self.rollback_window.Raise()
+                else:
+                    self.rollback_window = rollback_window(parent = None,id = -1, title="Rollback")
             except Exception as e:
                 msg = "Error while rolling back file"
                 logger.print_on_console(msg)
