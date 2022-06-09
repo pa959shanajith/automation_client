@@ -30,7 +30,8 @@ import update_module
 import shutil
 from icetoken import ICEToken
 import benchmark
-from win32com.client import Dispatch
+if SYSTEM_OS=='Windows':
+    from win32com.client import Dispatch
 from urllib import request
 from bs4 import BeautifulSoup                                                               
 from socketiolib import SocketIO, BaseNamespace, prepare_http_session
@@ -1739,7 +1740,7 @@ def check_browser():
                                 CHROME_DRIVER_VERSION[str(k)]=[int(str(v).split(',')[0]),int(str(v).split(',')[1])]
                         if params['FIREFOX_VERSION'] != "":
                             for k,v in list(params['FIREFOX_VERSION'].items()):
-                                FIREFOX_BROWSER_VERSION[str(k)]=[int(str(v)[:2]),int(str(v)[3:])]
+                                FIREFOX_BROWSER_VERSION[str(k)]=[int(str(v).split(',')[0]),int(str(v).split(',')[1])]
                         if params['EDGE_VERSION'] != "":
                             for k,v in list(params['EDGE_VERSION'].items()):
                                 EDGE_VERSION[str(k)]=[(str(v)[:8]),(str(v)[13:21])]
@@ -1866,7 +1867,7 @@ def check_browser():
                     firefox_options.binary = FirefoxBinary(str(configvalues['firefox_path']))
                 log_path = AVO_ASSURE_HOME + OS_SEP + "output" + OS_SEP +  "geckodriver.log"
                 driver = webdriver.Firefox(options=firefox_options, executable_path=GECKODRIVER_PATH, service_log_path=log_path)
-                browser_ver = float(driver.capabilities['browserVersion'].encode('utf-8')[:4])
+                browser_ver = int(driver.capabilities['browserVersion'].split(".")[0].encode('utf-8'))
                 try:
                     driver.close()
                     driver.quit()
@@ -1878,7 +1879,7 @@ def check_browser():
                         if browser_ver >= v[0] and browser_ver <= v[1]:
                             firefoxFlag=True
                 if firefoxFlag == False:
-                    logger.print_on_console('WARNING!! : Firefox version ',str(browser_ver)[:2],' is not supported.')
+                    logger.print_on_console('WARNING!! : Firefox version ',str(browser_ver),' is not supported.')
             except Exception as e:
                 logger.print_on_console("Error in checking Firefox version")
                 log.error("Error in checking Firefox version")
