@@ -226,7 +226,12 @@ class Handler():
             batch_id=new_obj['batchId']
             execution_ids=new_obj['executionIds']
             exec_mode=new_obj['exec_mode']
-            qc_creds=new_obj['integration']
+            if 'integration' in new_obj:
+                qc_creds=new_obj['integration']
+            else:
+                qc_creds={ "alm": { "url": "", "username": "", "password": "" },
+                           "qtest": { "url": "", "username": "", "password": "", "qteststeps": "" },
+                           "zephyr": { "url": "", "username": "", "password": "" }}
             if 'reportType' in new_obj: report_type = new_obj['reportType']
             for json_data,suite_id in zip(suite_details,suiteId_list):
                 for i in json_data[suite_id]:
