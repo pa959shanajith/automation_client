@@ -36,6 +36,8 @@ from urllib import request
 from bs4 import BeautifulSoup                                                               
 from socketiolib import SocketIO, BaseNamespace, prepare_http_session
 import ssl
+from urllib import request
+
 
 try:
    _create_unverified_https_context = ssl._create_unverified_context
