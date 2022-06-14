@@ -36,6 +36,8 @@ from urllib import request
 from bs4 import BeautifulSoup                                                               
 from socketiolib import SocketIO, BaseNamespace, prepare_http_session
 import ssl
+from urllib import request
+
 
 try:
    _create_unverified_https_context = ssl._create_unverified_context
@@ -1722,122 +1724,103 @@ def check_browser():
     global browsercheckFlag, browsercheck_inprogress
     browsercheck_inprogress = True
     try:
+        logger.print_on_console('Browser compatibility check started')
+        global chromeFlag,firefoxFlag,edgeFlag,chromiumFlag, edgeFlagComp
         try:
-            logger.print_on_console('Browser compatibility check started')
-            global chromeFlag,firefoxFlag,edgeFlag,chromiumFlag, edgeFlagComp
-            try:
-                if SYSTEM_OS == 'Windows':
-                    CHROME_VERSION=get_Browser_Version('CHROME')
-                    CHROMIUM_VERSION=get_Browser_Version('EDGE') 
-                    FIREFOX_VERSION=  get_Browser_Version('FIREFOX')
-                    IE_VERSION=  get_Browser_Version('IE')
-
-                elif SYSTEM_OS == 'Darwin':
-                    if os.path.isfile(ICE_CONST)==True:
-                        params = json.load(open(ICE_CONST))
-                        if params['CHROME_VERSION'] != "":
-                            for k,v in list(params['CHROME_VERSION'].items()):
-                                CHROME_DRIVER_VERSION[str(k)]=[int(str(v).split(',')[0]),int(str(v).split(',')[1])]
-                        if params['FIREFOX_VERSION'] != "":
-                            for k,v in list(params['FIREFOX_VERSION'].items()):
-                                FIREFOX_BROWSER_VERSION[str(k)]=[int(str(v).split(',')[0]),int(str(v).split(',')[1])]
-                        if params['EDGE_VERSION'] != "":
-                            for k,v in list(params['EDGE_VERSION'].items()):
-                                EDGE_VERSION[str(k)]=[(str(v)[:8]),(str(v)[13:21])]
-                        if params['EDGE_CHROMIUM_VERSION'] != "":
-                            for k,v in list(params['EDGE_CHROMIUM_VERSION'].items()):
-                                EDGE_CHROMIUM_VERSION[str(k)]=[int(str(v).split(',')[0]),int(str(v).split(',')[1])]    
-            except Exception as e:
-                logger.print_on_console("Unable to locate ICE parameters")
-                log.error(e)
-            #checking browser for IE
             if SYSTEM_OS == 'Windows':
-                try:
-                    if IE_VERSION != -1:
-                        try:
-                            URL="https://driver.avoautomation.com/driver/IEDriverServer.exe"
-                            request.urlretrieve(URL,normpath(DRIVERS_PATH + "/IEDriverServer.exe"))
-                            ieFlag = True  
-                        except:
-                            ieFlag = False
-
-                        if ieFlag == False:
-                            logger.print_on_console('WARNING!! : Internet Explorer is not supported.')
-                except Exception as e:
-                    logger.print_on_console("Error in checking Internet Explorer version")
-                    log.error("Error in checking Internet Explorer version")
-                    log.error(e,exc_info=True)
-
-            #checking browser for chrome
-            if SYSTEM_OS == 'Windows':
-                if CHROME_VERSION != -1:
-                    chromeFlag = False
-                    if os.path.exists(CHROME_DRIVER_PATH):
-                        p = subprocess.Popen('"' + CHROME_DRIVER_PATH + '" --version', stdout=subprocess.PIPE, bufsize=1, shell=True)
-                        a = p.stdout.readline()
-                        a = a.decode('utf-8')[13:17]
-                        a=a.split('.')[0]
-                        if str(a) == CHROME_VERSION.split('.')[0]:
-                            chromeFlag = True
-                    if not os.path.exists(CHROME_DRIVER_PATH) or chromeFlag == False:
-                        try:
-                            URL="https://driver.avoautomation.com/driver/chromedriver"+CHROME_VERSION.split('.')[0]+".exe"
-                            request.urlretrieve(URL,CHROME_DRIVER_PATH)
-                            chromeFlag = True
-                        except:
-                            chromeFlag = False 
-                    if chromeFlag == False:
-                        logger.print_on_console('WARNING!! : Chrome version ',CHROME_VERSION.split('.')[0],' is not supported.')    
+                CHROME_VERSION=get_Browser_Version('CHROME')
+                CHROMIUM_VERSION=get_Browser_Version('EDGE') 
+                FIREFOX_VERSION=  get_Browser_Version('FIREFOX')
+                IE_VERSION=  get_Browser_Version('IE')
 
             elif SYSTEM_OS == 'Darwin':
-                try:
+                if os.path.exists("/Applications/Google Chrome.app"):
+                    CHROME_VERSION=os.popen('mdls -raw -name kMDItemVersion "/Applications/Google Chrome.app"').read()
+                    if 'could not find' in CHROME_VERSION:
+                        CHROME_VERSION=-1
+                    else:
+                        CHROME_VERSION=CHROME_VERSION.split(".")[0] 
+                else:
+                    CHROME_VERSION=-1  
+
+                if os.path.exists("/Applications/Microsoft Edge.app"):
+                    CHROMIUM_VERSION=os.popen('mdls -raw -name kMDItemVersion "/Applications/Microsoft Edge.app"').read()
+                    if 'could not find' in CHROMIUM_VERSION:
+                        CHROMIUM_VERSION=-1   
+                    else:
+                        CHROMIUM_VERSION=CHROMIUM_VERSION.split(".")[0] 
+                else:
+                    CHROMIUM_VERSION=-1    
+
+                if os.path.exists("/Applications/Firefox.app"):
+                    FIREFOX_VERSION=os.popen('mdls -raw -name kMDItemVersion "/Applications/Firefox.app"').read()
+                    if 'could not find' in FIREFOX_VERSION:
+                        FIREFOX_VERSION=-1
+                    else:
+                        FIREFOX_VERSION=FIREFOX_VERSION.split(".")[0] 
+                else:
+                    FIREFOX_VERSION=-1
+
+        except Exception as e:
+            logger.print_on_console("Unable to locate ICE parameters")
+            log.error(e)
+        #checking browser for IE
+        if SYSTEM_OS == 'Windows':
+            try:
+                if IE_VERSION != -1:
+                    try:
+                        URL="https://driver.avoautomation.com/driver/IEDriverServer.exe"
+                        request.urlretrieve(URL,normpath(DRIVERS_PATH + "/IEDriverServer.exe"))
+                        ieFlag = True  
+                    except:
+                        ieFlag = False
+
+                    if ieFlag == False:
+                        logger.print_on_console('WARNING!! : Internet Explorer is not supported.')
+            except Exception as e:
+                logger.print_on_console("Error in checking Internet Explorer version")
+                log.error("Error in checking Internet Explorer version")
+                log.error(e,exc_info=True)
+
+        #checking browser for chrome
+        if SYSTEM_OS == 'Windows':
+            if CHROME_VERSION != -1:
+                chromeFlag = False
+                if os.path.exists(CHROME_DRIVER_PATH):
                     p = subprocess.Popen('"' + CHROME_DRIVER_PATH + '" --version', stdout=subprocess.PIPE, bufsize=1, shell=True)
                     a = p.stdout.readline()
-                    if a.decode('utf-8')[13:18].endswith('.'):
-                        a = a.decode('utf-8')[13:17]
-                    else:
-                        a = a.decode('utf-8')[13:18]
-                    choptions1 = webdriver.ChromeOptions()
-                    if str(configvalues['chrome_path']).lower()!="default":
-                        choptions1.binary_location=str(configvalues['chrome_path'])
-                    choptions1.headless = True
-                    if configvalues["use_custom_debugport"].lower() == "yes":
-                        choptions1.add_argument("--remote-debugging-port="+core_utils.find_open_port())
-                    driver = webdriver.Chrome(options=choptions1, executable_path=CHROME_DRIVER_PATH)
-                    # Check for the chrome 75 version.
-                    # As the key value of 'version' is changed from 'version' to 'browserVersion'
-                    browser_ver=''
-                    if 'version' in  driver.capabilities.keys():
-                        browser_ver = driver.capabilities['version']
-                    elif 'browserVersion' in  driver.capabilities.keys():
-                        browser_ver = driver.capabilities['browserVersion']
-                    browser_ver = int(browser_ver.split(".")[0].encode('utf-8'))
+                    a = a.decode('utf-8')[13:17]
+                    a=a.split('.')[0]
+                    if str(a) == CHROME_VERSION.split('.')[0]:
+                        chromeFlag = True
+                if not os.path.exists(CHROME_DRIVER_PATH) or chromeFlag == False:
                     try:
-                        driver.close()
-                        driver.quit()
+                        URL="https://driver.avoautomation.com/driver/chromedriver"+CHROME_VERSION.split('.')[0]+".exe"
+                        request.urlretrieve(URL,CHROME_DRIVER_PATH)
+                        chromeFlag = True
                     except:
-                        pass
-                    driver=None
-                    for k,v in list(CHROME_DRIVER_VERSION.items()):
-                        if a == k:
-                            if browser_ver >= v[0] and browser_ver <= v[1]:
-                                chromeFlag = True
-                    if chromeFlag == False:
-                        logger.print_on_console('WARNING!! : Chrome version ',str(browser_ver),' is not supported.')        
-                # Handling the session not able to create exception occurs when browser and driver are incompatable.
-                except common.exceptions.SessionNotCreatedException as e:
-                    browser_ver = e.msg[109:111]
-                    if len(browser_ver) > 0:
-                        # driver version above 85 this line will print on the console.
-                        logger.print_on_console('WARNING!! : Chrome version ',str(browser_ver),' is not supported.')
-                    else:
-                        # driver version below 86 this line will print on the console.
-                        logger.print_on_console('WARNING!! : Current version of Chrome is not supported.')
-        except Exception as e:
-            logger.print_on_console("Error in checking chrome version")
-            log.error("Error in checking chrome version")
-            log.error(e,exc_info=True)
+                        chromeFlag = False 
+                if chromeFlag == False:
+                    logger.print_on_console('WARNING!! : Chrome version ',CHROME_VERSION.split('.')[0],' is not supported.')    
 
+        elif SYSTEM_OS == 'Darwin':
+            if CHROME_VERSION != -1:
+                chromeFlag = False
+                if os.path.exists(CHROME_DRIVER_PATH):
+                    p = os.Popen('"' + CHROME_DRIVER_PATH + '" --version')
+                    a = p.read()
+                    a=a.split(' ')[1].split('.')[0]
+                    if str(a) == CHROME_VERSION:
+                        chromeFlag = True
+                if not os.path.exists(CHROME_DRIVER_PATH) or chromeFlag == False:
+                    try:
+                        URL="https://driver.avoautomation.com/driver/chromedriver"+CHROME_VERSION
+                        request.urlretrieve(URL,CHROME_DRIVER_PATH)
+                        chromeFlag = True
+                    except:
+                        chromeFlag = False 
+                if chromeFlag == False:
+                    logger.print_on_console('WARNING!! : Chrome version ',CHROME_VERSION,' is not supported.')
         #checking browser for firefox
         if SYSTEM_OS == 'Windows':
             try:
@@ -1857,29 +1840,16 @@ def check_browser():
                 log.error(e,exc_info=True)
         elif SYSTEM_OS == 'Darwin':
             try:
-                p = subprocess.Popen('"' + GECKODRIVER_PATH + '" --version', stdout=subprocess.PIPE, bufsize=1, shell=True)
-                a = p.stdout.readline()
-                a = a.decode('utf-8')[12:16]
-                firefox_options = webdriver.FirefoxOptions()
-                firefox_options.headless = True
-                if str(configvalues['firefox_path']).lower() != "default":
-                    from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
-                    firefox_options.binary = FirefoxBinary(str(configvalues['firefox_path']))
-                log_path = AVO_ASSURE_HOME + OS_SEP + "output" + OS_SEP +  "geckodriver.log"
-                driver = webdriver.Firefox(options=firefox_options, executable_path=GECKODRIVER_PATH, service_log_path=log_path)
-                browser_ver = int(driver.capabilities['browserVersion'].split(".")[0].encode('utf-8'))
-                try:
-                    driver.close()
-                    driver.quit()
-                except:
-                    pass
-                driver=None
-                for k,v in list(FIREFOX_BROWSER_VERSION.items()):
-                    if a == k:
-                        if browser_ver >= v[0] and browser_ver <= v[1]:
-                            firefoxFlag=True
-                if firefoxFlag == False:
-                    logger.print_on_console('WARNING!! : Firefox version ',str(browser_ver),' is not supported.')
+                if FIREFOX_VERSION != -1:
+                    try:
+                        URL="https://driver.avoautomation.com/driver/geckodriver"
+                        request.urlretrieve(URL,GECKODRIVER_PATH)
+                        firefoxFlag = True  
+                    except:
+                        firefoxFlag = False
+
+                    if firefoxFlag == False:
+                        logger.print_on_console('WARNING!! : Firefox version',FIREFOX_VERSION,' is not supported.')
             except Exception as e:
                 logger.print_on_console("Error in checking Firefox version")
                 log.error("Error in checking Firefox version")
@@ -1945,58 +1915,29 @@ def check_browser():
                 if chromiumFlag == False :
                     logger.print_on_console('WARNING!! : Edge Chromium version ',CHROMIUM_VERSION.split('.')[0],' is not supported.')        
         elif SYSTEM_OS == 'Darwin':
-            try:
-                
-                p = subprocess.Popen('"' + EDGE_CHROMIUM_DRIVER_PATH + '" --version', stdout=subprocess.PIPE, bufsize=1,cwd=DRIVERS_PATH,shell=True)
-                a = p.stdout.readline()
-                if a.decode('utf-8')[13:18].endswith('.'):
-                    a = a.decode('utf-8')[13:17]
-                else:
-                    a = a.decode('utf-8')[13:18]
-                core_utils.get_all_the_imports('Web')
-                import edge_chromium_options
-                msoptions = webdriver.EdgeChromiumOptions()
-                msoptions.headless = True
-                if configvalues["use_custom_debugport"].lower() == "yes":
-                    msoptions.add_argument("--remote-debugging-port="+core_utils.find_open_port())
-                caps = msoptions.to_capabilities()
-                if SYSTEM_OS == 'Darwin': #MAC check for edge chromium
-                    caps['platform'] = 'MAC'
-                driver = webdriver.Edge(capabilities=caps, executable_path=EDGE_CHROMIUM_DRIVER_PATH)
-                browser_ver = driver.capabilities['browserVersion']
-                browser_ver1 = browser_ver.encode('utf-8')
-                browser_ver = int(browser_ver.split(".")[0].encode('utf-8'))
-                try:
-                    driver.close()
-                    driver.quit()
-                except:
-                    pass
-                driver=None
-                for k,v in list(EDGE_CHROMIUM_VERSION.items()):
-                    if a == k:
-                        if browser_ver >= v[0] and browser_ver <= v[1]:
-                            chromiumFlag=True
+            if CHROMIUM_VERSION != -1:
+                chromiumFlag = False
+                if os.path.exists(EDGE_CHROMIUM_DRIVER_PATH):
+                    p = os.Popen('"' + EDGE_CHROMIUM_DRIVER_PATH + '" --version')
+                    a = p.read()
+                    a=a.split(' ')[1].split('.')[0]
+                    if str(a) == CHROMIUM_VERSION:
+                        chromiumFlag = True
+                if not os.path.exists(EDGE_CHROMIUM_DRIVER_PATH) or chromiumFlag == False:
+                    try:
+                        URL="https://driver.avoautomation.com/driver/msedgedriver"+CHROMIUM_VERSION
+                        request.urlretrieve(URL,EDGE_CHROMIUM_DRIVER_PATH)
+                        chromiumFlag = True
+                    except:
+                        chromiumFlag = False 
+
                 if chromiumFlag == False :
-                    logger.print_on_console('WARNING!! : Edge Chromium version ',str(browser_ver),' is not supported.')
-            # Handling the session not able to create exception occurs when browser and driver are incompatable.
-            except common.exceptions.SessionNotCreatedException as e:
-                # getting the current browser version from error message.
-                browser_ver = e.msg[109:111]
-                if len(browser_ver) > 0:
-                    # driver version above 85 this line will print on the console.
-                    logger.print_on_console('WARNING!! : Edge Chromium version ',str(browser_ver),' is not supported.')
-                else:
-                    # driver version below 86 this line will print on the console.
-                    logger.print_on_console('WARNING!! : Current version of Edge Chromium is not supported.')
-        # except Exception as e:
-        #     logger.print_on_console("Error in checking Edge Chromium version")
-        #     log.error("Error in checking Edge Chromium version")
-        #     log.error(e,exc_info=True)
+                    logger.print_on_console('WARNING!! : Edge Chromium version ',CHROMIUM_VERSION,' is not supported.')
 
         if chromeFlag == True and firefoxFlag == True and edgeFlag == True and chromiumFlag == True:
             logger.print_on_console('Current version of browsers are supported')
         browsercheckFlag = True
-    except Exception as e:
+    except Exception as e: 
         err = "Error while checking for browser compatibility"
         logger.print_on_console(err)
         log.debug(err)
