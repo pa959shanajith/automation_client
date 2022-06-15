@@ -1807,7 +1807,7 @@ def check_browser():
             if CHROME_VERSION != -1:
                 chromeFlag = False
                 if os.path.exists(CHROME_DRIVER_PATH):
-                    p = os.Popen('"' + CHROME_DRIVER_PATH + '" --version')
+                    p = os.popen('"' + CHROME_DRIVER_PATH + '" --version')
                     a = p.read()
                     a=a.split(' ')[1].split('.')[0]
                     if str(a) == CHROME_VERSION:
@@ -1918,7 +1918,7 @@ def check_browser():
             if CHROMIUM_VERSION != -1:
                 chromiumFlag = False
                 if os.path.exists(EDGE_CHROMIUM_DRIVER_PATH):
-                    p = os.Popen('"' + EDGE_CHROMIUM_DRIVER_PATH + '" --version')
+                    p = os.popen('"' + EDGE_CHROMIUM_DRIVER_PATH + '" --version')
                     a = p.read()
                     a=a.split(' ')[1].split('.')[0]
                     if str(a) == CHROMIUM_VERSION:
