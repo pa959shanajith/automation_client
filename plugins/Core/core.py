@@ -1897,13 +1897,13 @@ def check_browser():
         if SYSTEM_OS == 'Windows':
             if CHROMIUM_VERSION != -1:
                 chromiumFlag = False
-                if os.path.exists(EDGE_CHROMIUM_DRIVER_PATH):
-                    p = subprocess.Popen('"' + EDGE_CHROMIUM_DRIVER_PATH + '" --version', stdout=subprocess.PIPE, bufsize=1,cwd=DRIVERS_PATH,shell=True)
-                    a = p.stdout.readline()
-                    a = a.decode('utf-8')[13:17]
-                    a=a.split('.')[0]
-                    if str(a) == CHROMIUM_VERSION.split('.')[0]:
-                        chromiumFlag = True
+                # if os.path.exists(EDGE_CHROMIUM_DRIVER_PATH):
+                #     p = subprocess.Popen('"' + EDGE_CHROMIUM_DRIVER_PATH + '" --version', stdout=subprocess.PIPE, bufsize=1,cwd=DRIVERS_PATH,shell=True)
+                #     a = p.stdout.readline()
+                #     a = a.decode('utf-8')[13:17]
+                #     a=a.split('.')[0]
+                #     if str(a) == CHROMIUM_VERSION.split('.')[0]:
+                #         chromiumFlag = True
                 if not os.path.exists(EDGE_CHROMIUM_DRIVER_PATH) or chromiumFlag == False:
                     try:
                         URL="https://driver.avoautomation.com/driver/msedgedriver"+CHROMIUM_VERSION.split('.')[0]+".exe"
