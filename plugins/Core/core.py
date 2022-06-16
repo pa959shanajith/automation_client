@@ -1917,12 +1917,12 @@ def check_browser():
         elif SYSTEM_OS == 'Darwin':
             if CHROMIUM_VERSION != -1:
                 chromiumFlag = False
-                if os.path.exists(EDGE_CHROMIUM_DRIVER_PATH):
-                    p = os.popen('"' + EDGE_CHROMIUM_DRIVER_PATH + '" --version')
-                    a = p.read()
-                    a=a.split(' ')[1].split('.')[0]
-                    if str(a) == CHROMIUM_VERSION:
-                        chromiumFlag = True
+                # if os.path.exists(EDGE_CHROMIUM_DRIVER_PATH):
+                #     p = os.popen('"' + EDGE_CHROMIUM_DRIVER_PATH + '" --version')
+                #     a = p.read()
+                #     a=a.split(' ')[1].split('.')[0]
+                #     if str(a) == CHROMIUM_VERSION:
+                #         chromiumFlag = True
                 if not os.path.exists(EDGE_CHROMIUM_DRIVER_PATH) or chromiumFlag == False:
                     try:
                         URL="https://driver.avoautomation.com/driver/msedgedriver"+CHROMIUM_VERSION
