@@ -1132,7 +1132,7 @@ class FileOperationsPDF:
         pageCount = None
         from PyPDF2 import PdfFileReader
         try:
-            pdfFile = PdfFileReader(open(filePath,'rb'))
+            pdfFile = PdfFileReader(open(filePath,'rb'), overwriteWarnings=False)
             pageCount = pdfFile.getNumPages()
             status = True
         except IOError:
