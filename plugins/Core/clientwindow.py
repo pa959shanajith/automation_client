@@ -1947,7 +1947,7 @@ def check_update(flag):
         request = None
         emsg = "Error in fetching update manifest from server"
         try:
-            request = requests.get(SERVER_LOC + "/manifest.json", **req_kw_args)
+            request = requests.get(SERVER_LOC + "/manifest.json", verify=False)
             if(request.status_code ==200):
                 data = json.loads(request.text) #will return json of the manifest
         except Exception as e:
