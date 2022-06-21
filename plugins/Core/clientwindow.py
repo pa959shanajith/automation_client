@@ -1669,7 +1669,9 @@ class Check_Update_window(wx.Frame):
             self.close(event)
             logger.print_on_console("--Updating Files and Packages--")
             log.info("--Updating Files and Packages--")
-            update_obj.run_updater()
+            l_ver=check_update(False)
+            l_ver=l_ver[1]
+            update_obj.run_updater(l_ver)
         except Exception as e:
             log.error('Error occured in update_ice : ' + str(e))
             logger.print_on_console('Error occured in update_ice : ' + str(e))
