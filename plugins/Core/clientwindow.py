@@ -124,10 +124,10 @@ class ClientWindow(wx.Frame):
         self.helpMenu.Append(self.aboutItem)
         self.updateItem = wx.MenuItem(self.helpMenu, 161, text="Check for Updates", kind=wx.ITEM_NORMAL)
         self.helpMenu.Append(self.updateItem)
-        self.updateItem.Enable(False)
+        self.updateItem.Enable(True)
         self.rollbackItem = wx.MenuItem(self.helpMenu, 162, text="Rollback", kind=wx.ITEM_NORMAL)
         self.helpMenu.Append(self.rollbackItem)
-        self.rollbackItem.Enable(False)
+        self.rollbackItem.Enable(True)
         self.menubar.Append(self.helpMenu, '&Help')
 
         self.Bind(wx.EVT_MENU, self.menuhandler)
