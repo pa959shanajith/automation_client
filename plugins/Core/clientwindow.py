@@ -1563,9 +1563,9 @@ class About_window(wx.Frame):
             }
             else:
                 upload_fields={
-                "Frame":[(300, 150),(550,220)],#(diff +85,+10 from windows)
+                "Frame":[(300, 150),(400,220)],#(diff +85,+10 from windows)
                 "disp_msg":[(12,38),(80,28),(116,38),(382,-1),(504,38),(30, -1)],
-                "Close":[(285,88),(100, 28)]
+                "Close":[(285,148),(100, 28)]
             }
             wx.Frame.__init__(self, parent, title=title,pos=upload_fields["Frame"][0], size=upload_fields["Frame"][1], style = wx.CAPTION|wx.CLIP_CHILDREN)
             self.SetBackgroundColour('#e6e7e8')
@@ -1575,8 +1575,12 @@ class About_window(wx.Frame):
             self.panel = wx.Panel(self)
             self.image = wx.StaticBitmap(self.panel, -1, wx.Bitmap(IMAGES_PATH + 'AVO_Assure.png', wx.BITMAP_TYPE_ANY), wx.Point(10, 10))
             self.msg1=wx.StaticText(self.panel, -1, str(msg1), wx.Point(170, 20), wx.Size(200, 50)).SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.BOLD))
-            self.msg2=wx.StaticText(self.panel, -1, str(msg2), wx.Point(170, 55), wx.Size(200, 50))
-            self.msg3=wx.StaticText(self.panel, -1, str(msg3), wx.Point(10, 90), wx.Size(350, 50))
+            if SYSTEM_OS=='Windows':
+                self.msg2=wx.StaticText(self.panel, -1, str(msg2), wx.Point(170, 55), wx.Size(200, 50))
+                self.msg3=wx.StaticText(self.panel, -1, str(msg3), wx.Point(10, 90), wx.Size(350, 50))
+            elif SYSTEM_OS=='Darwin':
+                self.msg2 = wx.StaticText(self.panel, -1, str(msg2), wx.Point(170, 55), wx.Size(300, 50))
+                self.msg3 = wx.StaticText(self.panel, -1, str(msg3), wx.Point(10, 90), wx.Size(400, 50))
             self.msg4=wx.StaticText(self.panel, -1, str(msg4), wx.Point(10, 120), wx.Size(200, 50))
             self.close_btn = wx.Button(self.panel, label="Close",pos=upload_fields["Close"][0], size=upload_fields["Close"][1])
             self.close_btn.Bind(wx.EVT_BUTTON, self.close)
