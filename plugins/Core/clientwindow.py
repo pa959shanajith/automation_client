@@ -124,10 +124,10 @@ class ClientWindow(wx.Frame):
         self.helpMenu.Append(self.aboutItem)
         self.updateItem = wx.MenuItem(self.helpMenu, 161, text="Check for Updates", kind=wx.ITEM_NORMAL)
         self.helpMenu.Append(self.updateItem)
-        self.updateItem.Enable(False)
+        self.updateItem.Enable(True)
         self.rollbackItem = wx.MenuItem(self.helpMenu, 162, text="Rollback", kind=wx.ITEM_NORMAL)
         self.helpMenu.Append(self.rollbackItem)
-        self.rollbackItem.Enable(False)
+        self.rollbackItem.Enable(True)
         self.menubar.Append(self.helpMenu, '&Help')
 
         self.Bind(wx.EVT_MENU, self.menuhandler)
@@ -1673,7 +1673,9 @@ class Check_Update_window(wx.Frame):
             self.close(event)
             logger.print_on_console("--Updating Files and Packages--")
             log.info("--Updating Files and Packages--")
-            update_obj.run_updater()
+            l_ver=check_update(False)
+            l_ver=l_ver[1]
+            update_obj.run_updater(l_ver)
         except Exception as e:
             log.error('Error occured in update_ice : ' + str(e))
             logger.print_on_console('Error occured in update_ice : ' + str(e))
@@ -1951,7 +1953,7 @@ def check_update(flag):
         request = None
         emsg = "Error in fetching update manifest from server"
         try:
-            request = requests.get(SERVER_LOC + "/manifest.json", **req_kw_args)
+            request = requests.get(SERVER_LOC + "/manifest.json", verify=False)
             if(request.status_code ==200):
                 data = json.loads(request.text) #will return json of the manifest
         except Exception as e:
