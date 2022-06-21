@@ -120,6 +120,8 @@ class CustomKeyword:
 
 
     def getCustomobject(self,reference_ele,ele_type,visible_text,ele_index,url,absMatch):
+        import web_dispatcher
+        finalXpath = web_dispatcher.finalXpath
         custom_element=None
         msg1='Element type is '+str(ele_type)
         coreutilsobj=core_utils.CoreUtils()
@@ -133,7 +135,13 @@ class CustomKeyword:
         local_ck.log.info(msg2)
         logger.print_on_console(msg3)
         local_ck.log.info(msg3)
-        if not(ele_type is None or ele_type=='' or visible_text is None or ele_index is None):
+        if not ele_type in list(self.tagtype.keys()):
+            childIndex = str(int(finalXpath[finalXpath.rindex('[')+1:-1])+int(ele_index))
+            finalXpath = finalXpath[:finalXpath.rindex('[')] +'['+ childIndex+ ']'
+            print(finalXpath)
+            custom_element = browser_Keywords.local_bk.driver_obj.find_elements_by_xpath(finalXpath)[0]
+        
+        elif not(ele_type is None or ele_type=='' or visible_text is None or ele_index is None):
             #Commneting the getElementXPath script since it was freezing the application in MNT.
             #As of now, it's a hot fix for MNT to make sure custom keywords do not impact the application functionality
             #ele_xpath=self.getElementXPath(reference_ele)
@@ -160,6 +168,7 @@ class CustomKeyword:
 
         else:
             logger.print_on_console(INVALID_INPUT)
+
         return custom_element
 
 
