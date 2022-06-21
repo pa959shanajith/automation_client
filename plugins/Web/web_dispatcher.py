@@ -834,7 +834,6 @@ class Dispatcher:
         return webElement
 
     def getwebelement(self,driver,objectname,stepnum,custname):
-        ##objectname = str(objectname)
         global obj_flag,simple_debug_gwto
         obj_flag=False
         webElement = None
@@ -842,6 +841,8 @@ class Dispatcher:
             identifiers = objectname.split(';')
             local_Wd.log.debug('Identifiers are ')
             local_Wd.log.debug(identifiers)
+            global finalXpath
+            finalXpath = identifiers[0]
             if len(identifiers)>=3:
                 #find by absolute xpath
                 webElement=self.element_locator(driver,'xpath',identifiers[0],'1')
