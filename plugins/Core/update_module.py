@@ -187,7 +187,7 @@ class Update_Rollback:
             self.server_check_flag = False
         return update_msg
 
-    def run_updater(self):
+    def run_updater(self,l_ver):
         """Function to run Updater.py/Updater.exe ' UPDATE ' feature"""
         try:
             #write datatags to datatags_file
