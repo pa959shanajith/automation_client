@@ -42,9 +42,8 @@ from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
 from urllib.parse import urlparse
 local_Wd = threading.local()
-
+finalXpath = ""
 class Dispatcher:
-
     def __init__(self):
         local_Wd.popup_object = popup_keywords.PopupKeywords()
         local_Wd.browser_object = browser_Keywords.BrowserKeywords()
@@ -842,6 +841,9 @@ class Dispatcher:
             identifiers = objectname.split(';')
             local_Wd.log.debug('Identifiers are ')
             local_Wd.log.debug(identifiers)
+            # print(identifiers[0])
+            global finalXpath
+            finalXpath = identifiers[0]
             if len(identifiers)>=3:
                 #find by absolute xpath
                 webElement=self.element_locator(driver,'xpath',identifiers[0],'1')
