@@ -19,6 +19,8 @@ import logging
 import threading
 import time
 import readconfig
+from selenium.webdriver.common.by import By
+
 local_ck = threading.local()
 
 class CustomKeyword:
@@ -136,10 +138,18 @@ class CustomKeyword:
         logger.print_on_console(msg3)
         local_ck.log.info(msg3)
         if not ele_type in list(self.tagtype.keys()):
-            childIndex = str(int(finalXpath[finalXpath.rindex('[')+1:-1])+int(ele_index))
-            finalXpath = finalXpath[:finalXpath.rindex('[')] +'['+ childIndex+ ']'
-            print(finalXpath)
-            custom_element = browser_Keywords.local_bk.driver_obj.find_elements_by_xpath(finalXpath)[0]
+            if visible_text!='':
+                dropDown = reference_ele.find_element(By.XPATH,'..')
+                rows = dropDown.find_elements(By.XPATH,'*')
+                for row in rows:
+                    if row.get_attribute('outerText')==visible_text:
+                        custom_element=row
+                        break
+            else:
+                childIndex = str(int(finalXpath[finalXpath.rindex('[')+1:-1])+int(ele_index))
+                finalXpath = finalXpath[:finalXpath.rindex('[')] +'['+ childIndex+ ']'
+                print(finalXpath)
+                custom_element = browser_Keywords.local_bk.driver_obj.find_elements_by_xpath(finalXpath)[0]
         
         elif not(ele_type is None or ele_type=='' or visible_text is None or ele_index is None):
             #Commneting the getElementXPath script since it was freezing the application in MNT.
