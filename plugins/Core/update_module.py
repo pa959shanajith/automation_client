@@ -187,7 +187,7 @@ class Update_Rollback:
             self.server_check_flag = False
         return update_msg
 
-    def run_updater(self):
+    def run_updater(self,l_ver):
         """Function to run Updater.py/Updater.exe ' UPDATE ' feature"""
         try:
             #write datatags to datatags_file
@@ -196,7 +196,7 @@ class Update_Rollback:
             f.write(str(self.data_tags))
             f.close()
             #Command to send to the updater file
-            update_cmd = str(self.updater_loc) + ' ' + str(self.option) + ' ' + str(self.datatags_file_loc) + ' """' + str(self.client_tag) + '""" ' + str(self.SERVER_LOC) + ' ' + str(self.Update_loc) + ' ' + str(self.loc_7z) + ' ' + str(os.getpid())
+            update_cmd = str(self.updater_loc) + ' ' + str(self.option) + ' ' + str(self.datatags_file_loc) + ' """' + str(self.client_tag) + '""" ' + str(self.SERVER_LOC) + ' ' + str(self.Update_loc) + ' ' + str(self.loc_7z) + ' ' + str(os.getpid()) + ' '+str(l_ver)
             msg = "Sending the following data to Updater."
             if (self.updater_loc.endswith(".py")):
                 update_cmd = 'python ' + update_cmd
