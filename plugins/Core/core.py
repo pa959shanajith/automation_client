@@ -1649,8 +1649,8 @@ def get_Browser_Version(browser_Name):
                 chrome_version = list(filter(None, [get_version_via_com(p) for p in paths]))[0]
                 return chrome_version
             else:
-                logger.print_on_console("Error in checking chrome version")
-                log.error("Error in checking chrome version")
+                logger.print_on_console("Chrome not found in default paths")
+                log.error("Chrome not found in default paths")
                 return -1
                                
 
@@ -1677,8 +1677,8 @@ def get_Browser_Version(browser_Name):
                 firefox_version = list(filter(None, [get_version_via_com(p) for p in paths]))[0]
                 return firefox_version 
             else:
-                logger.print_on_console("Error in checking Firefox version") 
-                log.error("Error in checking Firefox version") 
+                logger.print_on_console("Firefox not found in default paths") 
+                log.error("Firefox not found in default paths") 
                 return -1
 
         elif browser_Name == 'EDGE':
@@ -1695,8 +1695,8 @@ def get_Browser_Version(browser_Name):
                 edge_version=list(filter(None, [get_version_via_com(p) for p in paths]))[0]
                 return edge_version
             else:
-                logger.print_on_console("Error in checking Edge Chromium version") 
-                log.error("Error in checking Edge Chromium version") 
+                logger.print_on_console("Edge Chromium not found in default paths") 
+                log.error("Edge Chromium not found in default paths") 
                 return -1 
 
         elif browser_Name == 'IE':
@@ -1713,8 +1713,8 @@ def get_Browser_Version(browser_Name):
                 ie_version=list(filter(None, [get_version_via_com(p) for p in paths]))[0]
                 return ie_version
             else:
-                logger.print_on_console("Error in checking Edge Chromium version") 
-                log.error("Error in checking Edge Chromium version") 
+                logger.print_on_console("IE not found in default paths") 
+                log.error("IE not found in default paths") 
                 return -1         
              
     except:
@@ -1769,7 +1769,7 @@ def check_browser():
             try:
                 if IE_VERSION != -1:
                     try:
-                        URL="https://driver.avoautomation.com/driver/IEDriverServer.exe"
+                        URL=readconfig.configvalues["file_server_ip"]+ "/IEDriverServer.exe"
                         request.urlretrieve(URL,normpath(DRIVERS_PATH + "/IEDriverServer.exe"))
                         ieFlag = True  
                     except:
@@ -1795,7 +1795,7 @@ def check_browser():
                         chromeFlag = True
                 if not os.path.exists(CHROME_DRIVER_PATH) or chromeFlag == False:
                     try:
-                        URL="https://driver.avoautomation.com/driver/chromedriver"+CHROME_VERSION.split('.')[0]+".exe"
+                        URL=readconfig.configvalues["file_server_ip"]+"/chromedriver"+CHROME_VERSION.split('.')[0]+".exe"
                         request.urlretrieve(URL,CHROME_DRIVER_PATH)
                         chromeFlag = True
                     except:
@@ -1814,7 +1814,7 @@ def check_browser():
                         chromeFlag = True
                 if not os.path.exists(CHROME_DRIVER_PATH) or chromeFlag == False:
                     try:
-                        URL="https://driver.avoautomation.com/driver/chromedriver"+CHROME_VERSION
+                        URL=readconfig.configvalues["file_server_ip"]+"/chromedriver"+CHROME_VERSION
                         request.urlretrieve(URL,CHROME_DRIVER_PATH)
                         chromeFlag = True
                     except:
@@ -1826,7 +1826,7 @@ def check_browser():
             try:
                 if FIREFOX_VERSION != -1:
                     try:
-                        URL="https://driver.avoautomation.com/driver/geckodriver.exe"
+                        URL=readconfig.configvalues["file_server_ip"]+"/geckodriver.exe"
                         request.urlretrieve(URL,GECKODRIVER_PATH)
                         firefoxFlag = True  
                     except:
@@ -1842,7 +1842,7 @@ def check_browser():
             try:
                 if FIREFOX_VERSION != -1:
                     try:
-                        URL="https://driver.avoautomation.com/driver/geckodriver"
+                        URL=readconfig.configvalues["file_server_ip"]+"/geckodriver"
                         request.urlretrieve(URL,GECKODRIVER_PATH)
                         firefoxFlag = True  
                     except:
@@ -1906,7 +1906,7 @@ def check_browser():
                         chromiumFlag = True
                 if not os.path.exists(EDGE_CHROMIUM_DRIVER_PATH) or chromiumFlag == False:
                     try:
-                        URL="https://driver.avoautomation.com/driver/msedgedriver"+CHROMIUM_VERSION.split('.')[0]+".exe"
+                        URL=readconfig.configvalues["file_server_ip"]+"/msedgedriver"+CHROMIUM_VERSION.split('.')[0]+".exe"
                         request.urlretrieve(URL,EDGE_CHROMIUM_DRIVER_PATH)
                         chromiumFlag = True
                     except:
@@ -1925,7 +1925,7 @@ def check_browser():
                 #         chromiumFlag = True
                 if not os.path.exists(EDGE_CHROMIUM_DRIVER_PATH) or chromiumFlag == False:
                     try:
-                        URL="https://driver.avoautomation.com/driver/msedgedriver"+CHROMIUM_VERSION
+                        URL=readconfig.configvalues["file_server_ip"]+"/msedgedriver"+CHROMIUM_VERSION
                         request.urlretrieve(URL,EDGE_CHROMIUM_DRIVER_PATH)
                         chromiumFlag = True
                     except:
