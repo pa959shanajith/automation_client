@@ -1632,9 +1632,7 @@ def get_Browser_Version(browser_Name):
             path_flag=False
             if readconfig.configvalues['chrome_path'] == 'default':
                 paths = [os.path.expandvars(r'%ProgramFiles%\\Google\\Chrome\\Application\\chrome.exe'),
-                os.path.expandvars(r'%ProgramFiles(x86)%\\Google\\Chrome\\Application\\chrome.exe'),
-                os.path.expandvars(r'%LocalAppData%\\Google\\Chrome\\Application\\chrome.exe'),
-                os.path.expandvars(r'%AppData%/Google/Chrome/Application/chrome.exe')]
+                os.path.expandvars(r'%ProgramFiles(x86)%\\Google\\Chrome\\Application\\chrome.exe')]
                 for p in paths:
                     if os.path.exists(p):
                         path_flag=True
@@ -1658,9 +1656,7 @@ def get_Browser_Version(browser_Name):
             path_flag=False
             if readconfig.configvalues['firefox_path'] == 'default':
                 paths = [os.path.expandvars(r'%ProgramFiles%\\Mozilla Firefox\\firefox.exe'),
-                os.path.expandvars(r'%ProgramFiles(x86)%\\Mozilla Firefox\\firefox.exe'),
-                os.path.expandvars(r'%LocalAppData%\\Mozilla Firefox\\firefox.exe'),
-                os.path.expandvars(r'%AppData%\\Mozilla Firefox\\firefox.exe')]
+                os.path.expandvars(r'%ProgramFiles(x86)%\\Mozilla Firefox\\firefox.exe')]
 
 
                 for p in paths:
