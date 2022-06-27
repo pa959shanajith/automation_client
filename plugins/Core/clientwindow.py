@@ -1238,6 +1238,7 @@ class Config_window(wx.Frame):
         data['incognito_private_mode']=incognito_private_mode.strip()
         data['kill_stale']=kill_stale.strip()
         data['browser_screenshots']=browser_screenshots.strip()
+        data['file_server_ip']=readconfig.configvalues["file_server_ip"]
         config_data=data
         if (data['server_ip']!='' and data['server_port']!='' and data['server_cert']!='' and
             data['chrome_path']!='' and data['queryTimeOut'] not in ['','sec'] and data['logFile_Path']!='' and
