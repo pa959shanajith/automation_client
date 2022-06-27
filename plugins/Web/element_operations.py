@@ -666,6 +666,8 @@ class ElementKeywords:
                                 status = TEST_RESULT_PASS
                                 methodoutput = TEST_RESULT_TRUE
                             else:
+                                local_eo.log.error(INVALID_INPUT)
+                                err_msg=INVALID_INPUT
                                 logger.print_on_console(INVALID_INPUT)
                 except Exception as e:
                     local_eo.log.error(e)
@@ -695,8 +697,14 @@ class ElementKeywords:
                                 local_eo.log.info('Child elements are')
                                 local_eo.log.info(child_elements)
                                 local_eo.log.info(STATUS_METHODOUTPUT_UPDATE)
+                            else:
+                                local_eo.log.error(INVALID_INPUT)
+                                err_msg=INVALID_INPUT
+                                logger.print_on_console(INVALID_INPUT)
                     else:
-                        logger.print_on_console(INVALID_INPUT)
+                        err_msg="Input is empty, Please provide the valid input"
+                        local_eo.log.error(err_msg)
+                        logger.print_on_console(err_msg)
                 except Exception as e:
                     local_eo.log.error(e)
                     logger.print_on_console(e)
