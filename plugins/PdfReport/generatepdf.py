@@ -147,6 +147,20 @@ class GeneratePDFReport(wx.Frame):
             if not error_flag:
                 self.l4.SetLabel("Invalid JSON File")
                 error_flag = True
+        try:
+            newFileName = dest_file+'.pdf'
+            # file = files in os.walk(target)
+            for root, dirs, files in os.walk(target):
+                if newFileName in files:
+                    error_flag = True
+                    self.l4.SetLabel("File Name already exists")
+                
+                break
+        except:
+            if not error_flag:
+                self.l4.SetLabel("Error in Target pdf location")
+                error_flag = True
+
 
         if error_flag: return False
         self.l4.SetLabel("Processing...")

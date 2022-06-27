@@ -1,4 +1,5 @@
 import os, json, wx, shutil, threading, time
+from importlib_metadata import files
 from pdfkitlib_override import pdfkit
 import reportnfs
 import constants
@@ -144,8 +145,26 @@ class GeneratePDFReportBatch(wx.Frame):
             self.l4.SetLabel("No input field can be left empty!")
             error_flag = True
         elif not (os.path.isdir(target) and os.path.exists(source)):
-            self.l4.SetLabel("Either Source or Target path is Invalid!") 
+            self.l4.SetLabel("Either Source or Target path is Invalid!")
             error_flag = True
+        try:
+            sourceFileName = []
+            for root, dirs, files1 in os.walk(source):
+                sourceFileName = files1
+                break
+
+            for name in sourceFileName:
+                name = name[:-4] + 'pdf'
+                for root, dirs, files2 in os.walk(target):
+                    if name in files2:
+                        error_flag = True
+                        self.l4.SetLabel(name + " is already present in Target Folder")
+
+                    break
+        except:
+                if not error_flag:
+                    self.l4.SetLabel("Error in Target/Source pdf location")
+                    error_flag = True
 
         if error_flag: return False
 
