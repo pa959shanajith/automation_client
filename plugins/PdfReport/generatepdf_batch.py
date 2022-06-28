@@ -149,6 +149,7 @@ class GeneratePDFReportBatch(wx.Frame):
             error_flag = True
         try:
             sourceFileName = []
+            existingFiles = []
             for root, dirs, files1 in os.walk(source):
                 sourceFileName = files1
                 break
@@ -158,14 +159,24 @@ class GeneratePDFReportBatch(wx.Frame):
                 for root, dirs, files2 in os.walk(target):
                     if name in files2:
                         error_flag = True
-                        self.l4.SetLabel(name + " is already present in Target Folder")
+                        existingFiles.append(name)
+                        # self.l4.SetLabel(name + " is already present in Target Folder")
 
                     break
+
+            if len(existingFiles) > 0:
+                filesMsg = ','.join(map(str, existingFiles))
+                dlg = wx.MessageDialog(self,filesMsg + ' already exists.\nDo you want to replace it?','PDF Report Generator', wx.YES| wx.NO |wx.ICON_WARNING)
+                if dlg.ShowModal() == wx.ID_YES:
+                    error_flag = False
+
+                dlg.Destroy()
         except:
                 if not error_flag:
                     self.l4.SetLabel("Error in Target/Source pdf location")
                     error_flag = True
 
+        
         if error_flag: return False
 
         self.btn.SetLabel("Start" if self.started else "Stop")

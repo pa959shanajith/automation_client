@@ -153,7 +153,17 @@ class GeneratePDFReport(wx.Frame):
             for root, dirs, files in os.walk(target):
                 if newFileName in files:
                     error_flag = True
-                    self.l4.SetLabel("File Name already exists")
+                    # self.l4.SetLabel("File Name already exists")
+                    # logger.print_on_console("PDF Created Successfully")
+                    # r = wx.CallAfter(wx.MessageBox, newFileName + ' already exists click on Yes to override','PDF Report Generator', wx.YES | wx.NO | wx.ICON_ERROR)
+                    dlg = wx.MessageDialog(self,newFileName + ' already exists.\nDo you want to replace it?','PDF Report Generator', wx.YES| wx.NO |wx.ICON_WARNING)
+                    if dlg.ShowModal() == wx.ID_YES:
+                        error_flag = False
+                    else:
+                        self.l4.SetLabel("Please rename Target Pdf filename to proceed")
+
+                    dlg.Destroy()
+
                 
                 break
         except:
