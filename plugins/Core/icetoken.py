@@ -47,7 +47,7 @@ class ICEToken():
 
     """ Registration window for token """
     def token_window(self,parent,images_path):
-        self.tokenwindow=Token_window(parent = parent, id = -1, title="Avo Assure ICE Registration",images_path=images_path)
+        self.tokenwindow=Token_window(parent = parent, id = -1, title="Avo Assure Client Registration",images_path=images_path)
 
     """ Registration window for token """
     def kill_window(self):
@@ -104,22 +104,26 @@ class Token_window(wx.Frame):
     """Initialization and defining the wx-components of the pop-up"""
     def __init__(self, parent, id, title,images_path=None):
         try:
-            wx.Frame.__init__(self, parent=None, title=title, pos=(300, 150), size=(210, 180), style = wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER  | wx.MAXIMIZE_BOX))
+            wx.Frame.__init__(self, parent=None, title=title, pos=(300, 150), size=(420,210), style = wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER  | wx.MAXIMIZE_BOX | wx.MINIMIZE_BOX))
             self.SetBackgroundColour('#e6e7e8')
             self.parent=parent
             self.iconpath = images_path +"avo.ico"
             self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
             self.SetIcon(self.wicon)
             self.panel = wx.Panel(self)
-            self.tok_name=wx.StaticText(self.panel, label="Register", pos=(70,10),size=(70,20), style=0, name="")
-            self.url=wx.TextCtrl(self.panel, pos=(10,35), size=((175,28)))
-            self.token_name=wx.TextCtrl(self.panel, pos=(10,70), size=((175,28)))
-            self.submit_btn=wx.Button(self.panel, label="Submit",pos=(60,110), size=(60,28))
+            self.host_url_label = wx.StaticText((self.panel), label='Host URL', pos=(40,35), style=0, name='')
+            self.url = wx.TextCtrl((self.panel), pos=(108, 30), size=(250, 28))
+            self.token_label = wx.StaticText((self.panel), label='Token', pos=(40,80), style=0, name='')
+            #self.tok_name=wx.StaticText(self.panel, label="Register", pos=(70,10),size=(70,20), style=0, name="")
+            self.token_name = wx.TextCtrl((self.panel), pos=(108, 75), size=(250, 28))
+            #self.url=wx.TextCtrl(self.panel, pos=(10,35), size=((175,28)))
+            #self.token_name=wx.TextCtrl(self.panel, pos=(10,70), size=((175,28)))
+            self.submit_btn=wx.Button(self.panel, label="Submit", pos=(200, 115), size=(65,26))
             self.submit_btn.Bind(wx.EVT_BUTTON, self.submit_token)
-            self.url.SetValue('server-ip:port')
-            if self.parent.server_url.strip() != ':':
-                self.url.SetValue(self.parent.server_url)
-            self.token_name.SetValue('Token')
+            #self.url.SetValue('server-ip:port')
+            #if self.parent.server_url.strip() != ':':
+                #self.url.SetValue(self.parent.server_url)
+            #self.token_name.SetValue('Token')
             self.Centre()
             self.Bind(wx.EVT_CLOSE, self.close)
             wx.Frame(self.panel)
