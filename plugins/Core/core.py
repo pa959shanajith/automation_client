@@ -1772,10 +1772,10 @@ def check_browser():
                         ieFlag = False
 
                     if ieFlag == False:
-                        logger.print_on_console('WARNING!! : Internet Explorer is not supported.')
+                        logger.print_on_console('Unable to download Internet Explorer driver from AvoAssure server')
             except Exception as e:
-                logger.print_on_console("Error in checking Internet Explorer version")
-                log.error("Error in checking Internet Explorer version")
+                logger.print_on_console("Unable to download Internet Explorer driver from AvoAssure server")
+                log.error("Unable to download compatible Internet Explorer driver from AvoAssure server")
                 log.error(e,exc_info=True)
 
         #checking browser for chrome
@@ -1795,9 +1795,10 @@ def check_browser():
                         request.urlretrieve(URL,CHROME_DRIVER_PATH)
                         chromeFlag = True
                     except:
+                        logger.print_on_console("Unable to download compatible chrome driver from AvoAssure server")
                         chromeFlag = False 
                 if chromeFlag == False:
-                    logger.print_on_console('WARNING!! : Chrome version ',CHROME_VERSION.split('.')[0],' is not supported.')    
+                    logger.print_on_console('Unable to download compatible chrome driver from AvoAssure server')    
 
         elif SYSTEM_OS == 'Darwin':
             if CHROME_VERSION != -1:
@@ -1814,9 +1815,10 @@ def check_browser():
                         request.urlretrieve(URL,CHROME_DRIVER_PATH)
                         chromeFlag = True
                     except:
+                        logger.print_on_console("Unable to download compatible chrome driver from AvoAssure server")
                         chromeFlag = False 
                 if chromeFlag == False:
-                    logger.print_on_console('WARNING!! : Chrome version ',CHROME_VERSION,' is not supported.')
+                    logger.print_on_console('Unable to download compatible chrome driver from AvoAssure server')
         #checking browser for firefox
         if SYSTEM_OS == 'Windows':
             try:
@@ -1826,13 +1828,14 @@ def check_browser():
                         request.urlretrieve(URL,GECKODRIVER_PATH)
                         firefoxFlag = True  
                     except:
+                        logger.print_on_console("Unable to download compatible firefox driver from AvoAssure server")
                         firefoxFlag = False
 
                     if firefoxFlag == False:
-                        logger.print_on_console('WARNING!! : Firefox version',FIREFOX_VERSION,' is not supported.')
+                        logger.print_on_console('Unable to download compatible firefox driver from AvoAssure server')
             except Exception as e:
-                logger.print_on_console("Error in checking Firefox version")
-                log.error("Error in checking Firefox version")
+                logger.print_on_console("Unable to download compatible firefox driver from AvoAssure server")
+                log.error("Unable to download compatible firefox driver from AvoAssure server")
                 log.error(e,exc_info=True)
         elif SYSTEM_OS == 'Darwin':
             try:
@@ -1845,10 +1848,10 @@ def check_browser():
                         firefoxFlag = False
 
                     if firefoxFlag == False:
-                        logger.print_on_console('WARNING!! : Firefox version',FIREFOX_VERSION,' is not supported.')
+                        logger.print_on_console('Unable to download compatible firefox driver from AvoAssure server')
             except Exception as e:
-                logger.print_on_console("Error in checking Firefox version")
-                log.error("Error in checking Firefox version")
+                logger.print_on_console("Unable to download compatible firefox driver from AvoAssure server")
+                log.error("Unable to download compatible firefox driver from AvoAssure server")
                 log.error(e,exc_info=True)
 
         #Checking browser for microsoft edge
@@ -1909,7 +1912,7 @@ def check_browser():
                         chromiumFlag = False 
 
                 if chromiumFlag == False :
-                    logger.print_on_console('WARNING!! : Edge Chromium version ',CHROMIUM_VERSION.split('.')[0],' is not supported.')        
+                    logger.print_on_console('Unable to download compatible Edge Chromium driver from AvoAssure server')        
         elif SYSTEM_OS == 'Darwin':
             if CHROMIUM_VERSION != -1:
                 chromiumFlag = False
@@ -1928,7 +1931,7 @@ def check_browser():
                         chromiumFlag = False 
 
                 if chromiumFlag == False :
-                    logger.print_on_console('WARNING!! : Edge Chromium version ',CHROMIUM_VERSION,' is not supported.')
+                    logger.print_on_console(''Unable to download compatible Edge Chromium driver from AvoAssure server')
 
         if chromeFlag == True and firefoxFlag == True and edgeFlag == True and chromiumFlag == True:
             logger.print_on_console('Current version of browsers are supported')
