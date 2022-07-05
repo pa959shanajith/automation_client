@@ -19,6 +19,7 @@ import fullscrape
 from selenium import webdriver
 import logger
 import logging
+from constants import SYSTEM_OS
 if SYSTEM_OS=='Windows':
     from pywinauto import application
 status =domconstants.STATUS_FAIL
