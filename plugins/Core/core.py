@@ -138,7 +138,9 @@ class MainNamespace(BaseNamespace):
                             allow_connect = True
                             plugins_list = response['plugins']
                             if root.gui:
-                                cw.enable_disconnect()
+                                log.info("before changing to disconnect png")
+                                wx.CallAfter(cw.enable_disconnect)
+                                log.info("after changing to disconnect png")
                             controller.disconnect_flag=False
                         else:
                             if 'err_msg' in response: err_res = response['err_msg']
@@ -159,13 +161,14 @@ class MainNamespace(BaseNamespace):
                     root.token_obj.delete_token()
                     if root.gui:
                         logger.print_on_console("ICE is not registered with Avo Assure. Click to Register")
-                        cw.enable_register()
+                        wx.CallAfter(cw.enable_register)
                     else:
                         logger.print_on_console("ICE is not registered with Avo Assure. Try Again")
-                if root.gui: cw.connectbutton.Enable()
+                if root.gui: wx.CallAfter(cw.connectbutton.Enable)
 
                 if allow_connect:
-                    dnd_mode = cw.schedule.GetValue() if root.gui else False
+                    log.info("at core.py line 170")
+                    dnd_mode = wx.CallAfter(cw.schedule.GetValue) if root.gui else False
                     msg = ("Do Not Disturb" if dnd_mode else "Normal") + " Mode: Connection to the Avo Assure Server established"
                     logger.print_on_console(msg)
                     log.info(msg)
@@ -173,14 +176,17 @@ class MainNamespace(BaseNamespace):
                     logger.print_on_console(msg)
                     log.info(msg)
                     if root.gui:
-                        cw.SetTitle(root.name + " (" + root.ice_token["icename"] + ")")
-                        cw.schedule.Enable()
-                        cw.cancelbutton.Enable()
-                        cw.terminatebutton.Enable()
-                        cw.clearbutton.Enable()
-                        cw.rollbackItem.Enable(True)
-                        cw.updateItem.Enable(True)
-                        cw.rbox.Enable()
+                        log.info("At core.py line 179")
+                        # cw.SetTitle(root.name + " (" + root.ice_token["icename"] + ")")
+                        wx.CallAfter(cw.SetTitle,root.name + " (" + root.ice_token["icename"] + ")")
+                        wx.CallAfter(cw.schedule.Enable)
+                        wx.CallAfter(cw.cancelbutton.Enable)
+                        wx.CallAfter(cw.terminatebutton.Enable)
+                        wx.CallAfter(cw.clearbutton.Enable)
+                        wx.CallAfter(cw.rollbackItem.Enable,True)
+                        wx.CallAfter(cw.updateItem.Enable,True)
+                        wx.CallAfter(cw.rbox.Enable)
+                        log.info("At core.py line 188")
                     if browsercheckFlag == False:
                         check_browser()
                     #if updatecheckFlag == False and root.gui:
@@ -226,7 +232,7 @@ class MainNamespace(BaseNamespace):
                 logger.print_on_console(fail_msg)
                 log.info(fail_msg)
                 kill_conn = True
-                if root.gui: cw.connectbutton.Enable()
+                if root.gui: wx.CallAfter(cw.connectbutton.Enable)
 
         except Exception as e:
             err_msg='Error while Connecting to Server'
@@ -336,12 +342,12 @@ class MainNamespace(BaseNamespace):
             wait_until_browsercheck()
             exec_data = args[0]
             root.testthread = TestThread(root, DEBUG, exec_data, False)
-            cw.choice=cw.rbox.GetStringSelection()
+            cw.choice=wx.CallAfter(cw.rbox.GetStringSelection)
             logger.print_on_console(str(cw.choice)+' is Selected')
             if cw.choice == 'Normal':
-                cw.killChildWindow(debug=True)
+                wx.CallAfter(cw.killChildWindow,debug=True)
             cw.debug_mode=False
-            cw.breakpoint.Disable()
+            wx.CallAfter(cw.breakpoint.Disable)
             if cw.choice in ['Stepwise','RunfromStep']:
                 debugFlag = True
                 wx.PostEvent(cw.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, cw.GetId()))
@@ -1403,6 +1409,7 @@ class Main():
                 else:
                     # Re-Check token file on connection
                     status = self.verifyRegistration(verifyonly = True)
+                    log.info("At core.py line 1406")
                 if status == False:
                     self.ice_action = "register"
                     self.ice_token = None
@@ -1435,6 +1442,7 @@ class Main():
                 self.socketthread = ConnectionThread(mode)
                 self.socketthread.start()
                 self.socketthread.join()
+                log.info("At core.py line 1439")
             else:
                 self.killSocket(True)
                 log.info('Disconnected from Avo Assure server')
