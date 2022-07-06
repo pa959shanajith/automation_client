@@ -19,6 +19,9 @@ import fullscrape
 from selenium import webdriver
 import logger
 import logging
+from constants import SYSTEM_OS
+if SYSTEM_OS=='Windows':
+    from pywinauto import application
 status =domconstants.STATUS_FAIL
 from core_utils import CoreUtils
 log = logging.getLogger(__name__)
@@ -123,6 +126,12 @@ class Highlight():
         applystylestatus = False
         try:
             log.info('Inside apply_style method .....')
+            if SYSTEM_OS=='Windows':
+                app = application.Application()
+                app.connect(title_re=self.driver.title+'.*')
+                app_dialog = app.top_window()
+                app_dialog.minimize()
+                app_dialog.restore()
             if self.driver.name == 'internet explorer':
                 log.info('Before applying color to the element in IE browser .....')
                 self.driver.execute_script("arguments[0].style.setAttribute('cssText', arguments[1]);",

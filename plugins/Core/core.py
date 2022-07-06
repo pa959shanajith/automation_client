@@ -1632,9 +1632,7 @@ def get_Browser_Version(browser_Name):
             path_flag=False
             if readconfig.configvalues['chrome_path'] == 'default':
                 paths = [os.path.expandvars(r'%ProgramFiles%\\Google\\Chrome\\Application\\chrome.exe'),
-                os.path.expandvars(r'%ProgramFiles(x86)%\\Google\\Chrome\\Application\\chrome.exe'),
-                os.path.expandvars(r'%LocalAppData%\\Google\\Chrome\\Application\\chrome.exe'),
-                os.path.expandvars(r'%AppData%/Google/Chrome/Application/chrome.exe')]
+                os.path.expandvars(r'%ProgramFiles(x86)%\\Google\\Chrome\\Application\\chrome.exe')]
                 for p in paths:
                     if os.path.exists(p):
                         path_flag=True
@@ -1649,8 +1647,8 @@ def get_Browser_Version(browser_Name):
                 chrome_version = list(filter(None, [get_version_via_com(p) for p in paths]))[0]
                 return chrome_version
             else:
-                logger.print_on_console("Error in checking chrome version")
-                log.error("Error in checking chrome version")
+                logger.print_on_console("Chrome not found in default paths")
+                log.error("Chrome not found in default paths")
                 return -1
                                
 
@@ -1658,9 +1656,7 @@ def get_Browser_Version(browser_Name):
             path_flag=False
             if readconfig.configvalues['firefox_path'] == 'default':
                 paths = [os.path.expandvars(r'%ProgramFiles%\\Mozilla Firefox\\firefox.exe'),
-                os.path.expandvars(r'%ProgramFiles(x86)%\\Mozilla Firefox\\firefox.exe'),
-                os.path.expandvars(r'%LocalAppData%\\Mozilla Firefox\\firefox.exe'),
-                os.path.expandvars(r'%AppData%\\Mozilla Firefox\\firefox.exe')]
+                os.path.expandvars(r'%ProgramFiles(x86)%\\Mozilla Firefox\\firefox.exe')]
 
 
                 for p in paths:
@@ -1677,8 +1673,8 @@ def get_Browser_Version(browser_Name):
                 firefox_version = list(filter(None, [get_version_via_com(p) for p in paths]))[0]
                 return firefox_version 
             else:
-                logger.print_on_console("Error in checking Firefox version") 
-                log.error("Error in checking Firefox version") 
+                logger.print_on_console("Firefox not found in default paths") 
+                log.error("Firefox not found in default paths") 
                 return -1
 
         elif browser_Name == 'EDGE':
@@ -1695,8 +1691,8 @@ def get_Browser_Version(browser_Name):
                 edge_version=list(filter(None, [get_version_via_com(p) for p in paths]))[0]
                 return edge_version
             else:
-                logger.print_on_console("Error in checking Edge Chromium version") 
-                log.error("Error in checking Edge Chromium version") 
+                logger.print_on_console("Edge Chromium not found in default paths") 
+                log.error("Edge Chromium not found in default paths") 
                 return -1 
 
         elif browser_Name == 'IE':
@@ -1713,8 +1709,8 @@ def get_Browser_Version(browser_Name):
                 ie_version=list(filter(None, [get_version_via_com(p) for p in paths]))[0]
                 return ie_version
             else:
-                logger.print_on_console("Error in checking Edge Chromium version") 
-                log.error("Error in checking Edge Chromium version") 
+                logger.print_on_console("IE not found in default paths") 
+                log.error("IE not found in default paths") 
                 return -1         
              
     except:
@@ -1769,17 +1765,17 @@ def check_browser():
             try:
                 if IE_VERSION != -1:
                     try:
-                        URL="https://driver.avoautomation.com/driver/IEDriverServer.exe"
+                        URL=readconfig.configvalues["file_server_ip"]+ "/IEDriverServer.exe"
                         request.urlretrieve(URL,normpath(DRIVERS_PATH + "/IEDriverServer.exe"))
                         ieFlag = True  
                     except:
                         ieFlag = False
 
                     if ieFlag == False:
-                        logger.print_on_console('WARNING!! : Internet Explorer is not supported.')
+                        logger.print_on_console('Unable to download Internet Explorer driver from AvoAssure server')
             except Exception as e:
-                logger.print_on_console("Error in checking Internet Explorer version")
-                log.error("Error in checking Internet Explorer version")
+                logger.print_on_console("Unable to download Internet Explorer driver from AvoAssure server")
+                log.error("Unable to download compatible Internet Explorer driver from AvoAssure server")
                 log.error(e,exc_info=True)
 
         #checking browser for chrome
@@ -1795,13 +1791,14 @@ def check_browser():
                         chromeFlag = True
                 if not os.path.exists(CHROME_DRIVER_PATH) or chromeFlag == False:
                     try:
-                        URL="https://driver.avoautomation.com/driver/chromedriver"+CHROME_VERSION.split('.')[0]+".exe"
+                        URL=readconfig.configvalues["file_server_ip"]+"/chromedriver"+CHROME_VERSION.split('.')[0]+".exe"
                         request.urlretrieve(URL,CHROME_DRIVER_PATH)
                         chromeFlag = True
                     except:
+                        logger.print_on_console("Unable to download compatible chrome driver from AvoAssure server")
                         chromeFlag = False 
                 if chromeFlag == False:
-                    logger.print_on_console('WARNING!! : Chrome version ',CHROME_VERSION.split('.')[0],' is not supported.')    
+                    logger.print_on_console('Unable to download compatible chrome driver from AvoAssure server')    
 
         elif SYSTEM_OS == 'Darwin':
             if CHROME_VERSION != -1:
@@ -1814,45 +1811,47 @@ def check_browser():
                         chromeFlag = True
                 if not os.path.exists(CHROME_DRIVER_PATH) or chromeFlag == False:
                     try:
-                        URL="https://driver.avoautomation.com/driver/chromedriver"+CHROME_VERSION
+                        URL=readconfig.configvalues["file_server_ip"]+"/chromedriver"+CHROME_VERSION
                         request.urlretrieve(URL,CHROME_DRIVER_PATH)
                         chromeFlag = True
                     except:
+                        logger.print_on_console("Unable to download compatible chrome driver from AvoAssure server")
                         chromeFlag = False 
                 if chromeFlag == False:
-                    logger.print_on_console('WARNING!! : Chrome version ',CHROME_VERSION,' is not supported.')
+                    logger.print_on_console('Unable to download compatible chrome driver from AvoAssure server')
         #checking browser for firefox
         if SYSTEM_OS == 'Windows':
             try:
                 if FIREFOX_VERSION != -1:
                     try:
-                        URL="https://driver.avoautomation.com/driver/geckodriver.exe"
+                        URL=readconfig.configvalues["file_server_ip"]+"/geckodriver.exe"
                         request.urlretrieve(URL,GECKODRIVER_PATH)
                         firefoxFlag = True  
                     except:
+                        logger.print_on_console("Unable to download compatible firefox driver from AvoAssure server")
                         firefoxFlag = False
 
                     if firefoxFlag == False:
-                        logger.print_on_console('WARNING!! : Firefox version',FIREFOX_VERSION,' is not supported.')
+                        logger.print_on_console('Unable to download compatible firefox driver from AvoAssure server')
             except Exception as e:
-                logger.print_on_console("Error in checking Firefox version")
-                log.error("Error in checking Firefox version")
+                logger.print_on_console("Unable to download compatible firefox driver from AvoAssure server")
+                log.error("Unable to download compatible firefox driver from AvoAssure server")
                 log.error(e,exc_info=True)
         elif SYSTEM_OS == 'Darwin':
             try:
                 if FIREFOX_VERSION != -1:
                     try:
-                        URL="https://driver.avoautomation.com/driver/geckodriver"
+                        URL=readconfig.configvalues["file_server_ip"]+"/geckodriver"
                         request.urlretrieve(URL,GECKODRIVER_PATH)
                         firefoxFlag = True  
                     except:
                         firefoxFlag = False
 
                     if firefoxFlag == False:
-                        logger.print_on_console('WARNING!! : Firefox version',FIREFOX_VERSION,' is not supported.')
+                        logger.print_on_console('Unable to download compatible firefox driver from AvoAssure server')
             except Exception as e:
-                logger.print_on_console("Error in checking Firefox version")
-                log.error("Error in checking Firefox version")
+                logger.print_on_console("Unable to download compatible firefox driver from AvoAssure server")
+                log.error("Unable to download compatible firefox driver from AvoAssure server")
                 log.error(e,exc_info=True)
 
         #Checking browser for microsoft edge
@@ -1906,14 +1905,14 @@ def check_browser():
                         chromiumFlag = True
                 if not os.path.exists(EDGE_CHROMIUM_DRIVER_PATH) or chromiumFlag == False:
                     try:
-                        URL="https://driver.avoautomation.com/driver/msedgedriver"+CHROMIUM_VERSION.split('.')[0]+".exe"
+                        URL=readconfig.configvalues["file_server_ip"]+"/msedgedriver"+CHROMIUM_VERSION.split('.')[0]+".exe"
                         request.urlretrieve(URL,EDGE_CHROMIUM_DRIVER_PATH)
                         chromiumFlag = True
                     except:
                         chromiumFlag = False 
 
                 if chromiumFlag == False :
-                    logger.print_on_console('WARNING!! : Edge Chromium version ',CHROMIUM_VERSION.split('.')[0],' is not supported.')        
+                    logger.print_on_console('Unable to download compatible Edge Chromium driver from AvoAssure server')        
         elif SYSTEM_OS == 'Darwin':
             if CHROMIUM_VERSION != -1:
                 chromiumFlag = False
@@ -1925,14 +1924,14 @@ def check_browser():
                 #         chromiumFlag = True
                 if not os.path.exists(EDGE_CHROMIUM_DRIVER_PATH) or chromiumFlag == False:
                     try:
-                        URL="https://driver.avoautomation.com/driver/msedgedriver"+CHROMIUM_VERSION
+                        URL=readconfig.configvalues["file_server_ip"]+"/msedgedriver"+CHROMIUM_VERSION
                         request.urlretrieve(URL,EDGE_CHROMIUM_DRIVER_PATH)
                         chromiumFlag = True
                     except:
                         chromiumFlag = False 
 
                 if chromiumFlag == False :
-                    logger.print_on_console('WARNING!! : Edge Chromium version ',CHROMIUM_VERSION,' is not supported.')
+                    logger.print_on_console(''Unable to download compatible Edge Chromium driver from AvoAssure server')
 
         if chromeFlag == True and firefoxFlag == True and edgeFlag == True and chromiumFlag == True:
             logger.print_on_console('Current version of browsers are supported')

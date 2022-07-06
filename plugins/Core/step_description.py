@@ -1461,6 +1461,10 @@ class StepDescription:
             return 'Wait until the element '+ "'" + tsp.custname + "'" +'is visible'
         def dropfile():
             return 'Drop file executed'
+        def getchildelements():
+            return 'Get the child elements of the parent element '+ "'" + tsp.custname + "'"+ ' and save the elements  '+"'"+ output +"'"+ ' in '+"'"+tsp.outputval+"'"
+        def getchildelementcount():
+            return 'Get the count of child elements present in the element '+ "'" + tsp.custname + "'"+ ' and save the count  '+"'"+ output +"'"+ ' in '+"'"+tsp.outputval+"'"
 
         #Button link keywords
         def click():

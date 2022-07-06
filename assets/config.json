@@ -39,5 +39,6 @@
     "timeOut": "1",
     "tls_security": "High",
     "update_check": "No",
-    "use_custom_debugport": "No"
+    "use_custom_debugport": "No",
+    "file_server_ip":"https://driver.avoautomation.com/driver"
 }
