@@ -139,17 +139,30 @@ class CustomKeyword:
         local_ck.log.info(msg3)
         if not ele_type in list(self.tagtype.keys()):
             if visible_text!='':
-                dropDown = reference_ele.find_element(By.XPATH,'..')
+                if reference_ele.get_attribute('role')!='option':
+                    try:
+                        dropDown =  reference_ele.find_element_by_tag_name('UL')
+                    except:
+                        dropDown = reference_ele
+                else:
+                    dropDown = reference_ele.find_element(By.XPATH,'..')
                 rows = dropDown.find_elements(By.XPATH,'*')
                 for row in rows:
-                    if row.get_attribute('outerText')==visible_text:
+                    if row.get_attribute('outerText')[::-1].find(visible_text[::-1])==0:
                         custom_element=row
                         break
             else:
-                childIndex = str(int(finalXpath[finalXpath.rindex('[')+1:-1])+int(ele_index))
-                finalXpath = finalXpath[:finalXpath.rindex('[')] +'['+ childIndex+ ']'
-                print(finalXpath)
-                custom_element = browser_Keywords.local_bk.driver_obj.find_elements_by_xpath(finalXpath)[0]
+                if reference_ele.get_attribute('role')!='option':
+                    try:
+                        dropDown =  reference_ele.find_element_by_tag_name('UL')
+                    except:
+                        dropDown = reference_ele
+                    rows = dropDown.find_elements(By.XPATH,'*')
+                    custom_element = rows[int(ele_index)]
+                else:
+                    childIndex = str(int(finalXpath[finalXpath.rindex('[')+1:-1])+int(ele_index))
+                    finalXpath = finalXpath[:finalXpath.rindex('[')] +'['+ childIndex+ ']'
+                    custom_element = browser_Keywords.local_bk.driver_obj.find_elements_by_xpath(finalXpath)[0]
         
         elif not(ele_type is None or ele_type=='' or visible_text is None or ele_index is None):
             #Commneting the getElementXPath script since it was freezing the application in MNT.
@@ -178,7 +191,6 @@ class CustomKeyword:
 
         else:
             logger.print_on_console(INVALID_INPUT)
-
         return custom_element
 
 

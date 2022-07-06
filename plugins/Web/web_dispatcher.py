@@ -414,7 +414,6 @@ class Dispatcher:
             logger.print_on_console(err_msg)
             local_Wd.log.error(err_msg)
         def send_webelement_to_keyword(driver,objectname,url):
-            print(objectname)
             webelement=None
             getObjectFlag=False
             if driver:
