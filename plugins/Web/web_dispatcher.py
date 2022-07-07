@@ -413,7 +413,6 @@ class Dispatcher:
             err_msg=ERROR_CODE_DICT[err_msg]
             logger.print_on_console(err_msg)
             local_Wd.log.error(err_msg)
-
         def send_webelement_to_keyword(driver,objectname,url):
             webelement=None
             getObjectFlag=False
@@ -421,11 +420,18 @@ class Dispatcher:
                 local_Wd.log.debug('In send_webelement_to_keyword method')
                 #check if the element is in iframe or frame
                 try:
-                    if url and local_Wd.custom_object.is_int(url):
+                    if objectname!='@Custom' and (objectname.split(';')[2].find('iframe')!=-1):
+                        local_Wd.log.debug('Encountered iframe/frame url')
+                        iframe_xpath = objectname.split(';')[2].split(',')[0]
+                        local_Wd.custom_object.switch_to_iframe(iframe_xpath,driver.current_window_handle)
+                        driver = browser_Keywords.local_bk.driver_obj
+                        ele_inside_iframe_xpath = objectname.split(';')[2].split(',')[1]
+                        webelement = driver.find_element_by_xpath(ele_inside_iframe_xpath)
+                    elif url and local_Wd.custom_object.is_int(url):
                         local_Wd.log.debug('Encountered iframe/frame url')
                         local_Wd.custom_object.switch_to_iframe(url,driver.current_window_handle)
                         driver = browser_Keywords.local_bk.driver_obj
-                    if objectname==CUSTOM:
+                    elif objectname==CUSTOM:
                         local_Wd.log.info('Encountered custom object')
                         local_Wd.log.info('Custom flag is ')
                         local_Wd.log.info(teststepproperty.custom_flag)

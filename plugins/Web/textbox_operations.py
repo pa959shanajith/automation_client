@@ -522,7 +522,7 @@ class TextboxKeywords:
                                 user_input=self.validate_input(webelement,input)
                                 if user_input is not None:
                                     input=user_input
-                                if not(isvisble) and self.__check_visibility_from_config():
+                                if isvisble or (not(isvisble) and self.__check_visibility_from_config()):
                                     try:
                                         self.clear_text(webelement)
                                     except Exception as e:
