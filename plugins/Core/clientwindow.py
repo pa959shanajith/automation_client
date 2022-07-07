@@ -425,17 +425,17 @@ class ClientWindow(wx.Frame):
                 self.OnTerminate(event,"term_exec")
                 root.connection(name)
                 if self.connectbutton.GetName() != "register":
-                    self.enable_connect()
-                self.schedule.SetValue(False)
-                self.schedule.Disable()
-                self.rollbackItem.Enable(False)
-                self.updateItem.Enable(False)
+                    wx.CallAfter(self.enable_connect)
+                wx.CallAfter(self.schedule.SetValue,False)
+                wx.CallAfter(self.schedule.Disable)
+                wx.CallAfter(self.rollbackItem.Enable,False)
+                wx.CallAfter(self.updateItem.Enable,False)
         except:
-            self.cancelbutton.Disable()
-            self.terminatebutton.Disable()
-            self.clearbutton.Disable()
-            self.connectbutton.Enable()
-            self.rbox.Disable()
+            wx.CallAfter(self.cancelbutton.Disable)
+            wx.CallAfter(self.terminatebutton.Disable)
+            wx.CallAfter(self.clearbutton.Disable)
+            wx.CallAfter(self.connectbutton.Enable)
+            wx.CallAfter(self.rbox.Disable)
 
     def enable_connect(self, enable_button = True, repaint_title = True):
         self.connectbutton.SetBitmapLabel(self.connect_img)

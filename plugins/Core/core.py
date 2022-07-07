@@ -936,7 +936,7 @@ class MainNamespace(BaseNamespace):
                 cw.connectbutton.Disable()
             """Enables the Register button , if disconnection happened due to Invalid Token"""
             if root.ice_token is None:
-                if root.gui: cw.enable_register()
+                if root.gui: wx.CallAfter(cw.enable_register)
                 return
             else:
                 msg = 'Connectivity issue with Avo Assure Server. Attempting to restore connectivity...'
@@ -1334,7 +1334,7 @@ class Main():
         if err:
             log.error(err_msg)
             log.error(err)
-            if self.gui: self.cw.enable_register()
+            if self.gui: wx.CallAfter(self.cw.enable_register)
             else: self._wants_to_close = True
 
     def connection(self, mode):
@@ -1399,10 +1399,10 @@ class Main():
                     self.token_obj.delete_token()
                     if self.gui:
                         logger.print_on_console("ICE is not registered with Avo Assure. Click to Register")
-                        cw.enable_register()
+                        wx.CallAfter(cw.enable_register)
                     else:
                         logger.print_on_console("ICE is not registered with Avo Assure. Try Again")
-                if self.gui: cw.connectbutton.Enable()
+                if self.gui: wx.CallAfter(cw.connectbutton.Enable)
                 else: self._wants_to_close = True
             elif mode == 'connect' or mode == "guestconnect":
                 if mode == "guestconnect": status = True
@@ -1418,7 +1418,7 @@ class Main():
                         msg += " Click to Register"
                         logger.print_on_console(msg)
                         log.error(msg)
-                        cw.enable_register()
+                        wx.CallAfter(cw.enable_register)
                     else:
                         logger.print_on_console(msg)
                         log.error(msg)
@@ -1454,7 +1454,7 @@ class Main():
                     connection_Timer = None
                 if not self.gui: self._wants_to_close = True
                 else:
-                    if not self.token_obj.token: cw.enable_register()
+                    if not self.token_obj.token: wx.CallAfter(cw.enable_register)
         except Exception as e:
             emsg="Forbidden request, Connection refused, please configure server ip and server port in "
             if self.gui: emsg += "Edit -> Configuration"
@@ -1465,7 +1465,7 @@ class Main():
                 emsg = "Connection refused: Invalid Server URL."
                 if self.gui:
                     emsg += " Click on Connect to retry Registration"
-                    cw.enable_register()
+                    wx.CallAfter(cw.enable_register)
             logger.print_on_console(emsg)
             log.error(emsg)
             log.error(e,exc_info=True)
@@ -1540,7 +1540,7 @@ class Main():
             else:
                 if self.gui:
                     if not verifyonly:
-                        cw.enable_register(enable_button=False)
+                        wx.CallAfter(cw.enable_register,enable_button=False)
                         self.token_obj.token_window(self, IMAGES_PATH)
                 else:
                     if self.opts.host is not None: self.server_url = self.opts.host
