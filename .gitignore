@@ -13,7 +13,4 @@ libs/*
 logs/*
 output/*
 assets/packets.db
-DLLs
-include 
-Lib
-portable_python_ice
+
