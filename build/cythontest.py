@@ -2,6 +2,8 @@ import subprocess, os, sys
 from sys import executable as python
 from subprocess import PIPE
 errorcount = 0
+basename = os.path.basename
+sl = os.sep
 
 def test_cython(f):
     global errorcount
