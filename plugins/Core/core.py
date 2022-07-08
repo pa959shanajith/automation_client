@@ -1931,7 +1931,7 @@ def check_browser():
                         chromiumFlag = False 
 
                 if chromiumFlag == False :
-                    logger.print_on_console(''Unable to download compatible Edge Chromium driver from AvoAssure server')
+                    logger.print_on_console('Unable to download compatible Edge Chromium driver from AvoAssure server')
 
         if chromeFlag == True and firefoxFlag == True and edgeFlag == True and chromiumFlag == True:
             logger.print_on_console('Current version of browsers are supported')
