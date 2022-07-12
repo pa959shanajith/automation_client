@@ -28,6 +28,8 @@ stages:
         - PLATFORM -equals windows
     steps:
     - checkout: self
+      persistCredentials: true
+      path: s\AvoAssure
       clean: true
     - script: |
         echo Cython Test Started!
