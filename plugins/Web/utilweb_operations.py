@@ -595,16 +595,16 @@ return isVisible(s);"""
             if webelement is not None and eleStatus:
                 if SYSTEM_OS == 'Darwin' or SYSTEM_OS == 'Linux':
                     obj = Utils()
-                    if isinstance(browser_Keywords.driver_obj, webdriver.Firefox):
+                    if isinstance(browser_Keywords.local_bk.driver_obj, webdriver.Firefox):
                         javascript = "return window.mozInnerScreenY"
-                        value = browser_Keywords.driver_obj.execute_script(javascript)
+                        value = browser_Keywords.local_bk.driver_obj.execute_script(javascript)
                         offset = int(value)
                         location = webelement.location
-                        obj.mouse_move(int(location.get('x') + 18), int(location.get('y') + offset + 18))
-                        log.debug('hover performed')
+                        obj.mouse_move_posix(int(location.get('x') + 18), int(location.get('y') + offset + 18))
+                        #log.debug('hover performed')
                         status = TEST_RESULT_PASS
                         methodoutput = TEST_RESULT_TRUE
-                    elif isinstance(browser_Keywords.driver_obj, webdriver.Safari):
+                    elif isinstance(browser_Keywords.local_bk.driver_obj, webdriver.Safari):
                         location = obj.get_element_location(webelement)
                         obj.mouse_move(int(location.get('x') + 9), int(location.get('y') + 70))
                     else:

@@ -12,6 +12,7 @@ import os
 import sys
 import logging
 from constants import SYSTEM_OS
+import pyautogui
 if SYSTEM_OS=='Windows' :
     from pyrobot import Robot
     import win32gui
@@ -88,6 +89,11 @@ class Utils:
             import pyautogui as pag
             pag.moveTo(x,y)
 
+    def mouse_move_posix(self,x,y):
+        local_uw.log.debug('Moving the mouse to')
+        local_uw.log.debug(x)
+        local_uw.log.debug(y)
+        pyautogui.moveTo(x,y)
     def mouse_move(self,x,y):
         local_uw.log.debug('Moving the mouse to')
         local_uw.log.debug(x)
