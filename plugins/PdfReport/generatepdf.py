@@ -6,6 +6,7 @@ import re
 import reportnfs
 import constants
 from constants import *
+import sys
 
 SEP = os.sep
 log = logging.getLogger('generatepdf.py')
@@ -45,6 +46,10 @@ class WatchThread(threading.Thread):
             #shutil.copyfile(source, os.getcwd())
             #os.rename(filename, report_path)
             opts = {'quiet': ''}
+            if sys.platform=='linux':
+                # temporary fix for wkhtmltopdf 0.12.6 which is used in aarm64 ubuntu focal
+                # https://github.com/wkhtmltopdf/wkhtmltopdf/issues/4909
+                opts['enable-local-file-access']=''
             if log.getEffectiveLevel() == logging.DEBUG: opts = {}
             pdfkit.from_file(template_path, dest_file+'.pdf', options=opts, configuration=pdfkit_conf)
             try:
