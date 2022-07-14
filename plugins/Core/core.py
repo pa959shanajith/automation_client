@@ -30,6 +30,7 @@ import update_module
 import shutil
 from icetoken import ICEToken
 import benchmark
+import stat
 if SYSTEM_OS=='Windows':
     from win32com.client import Dispatch
 from urllib import request
@@ -1764,7 +1765,37 @@ def check_browser():
                         FIREFOX_VERSION=FIREFOX_VERSION.split(".")[0] 
                 else:
                     FIREFOX_VERSION=-1
-
+            elif SYSTEM_OS=='Linux':
+                if os.path.exists('/usr/bin/google-chrome'):
+                    with os.popen('/usr/bin/google-chrome --version') as p:
+                        CHROME_VERSION = p.read()
+                        p.close()
+                    if 'not found' in CHROME_VERSION:
+                        CHROME_VERSION=-1
+                    else:
+                        CHROME_VERSION=CHROME_VERSION.split(".")[0] 
+                else:
+                    CHROME_VERSION=-1
+                if os.path.exists('/usr/bin/edge-chromium'):
+                    with os.popen('/usr/bin/edge-chromium --version') as p:
+                        CHROMIUM_VERSION = p.read()
+                        p.close()
+                    if 'not found' in CHROMIUM_VERSION:
+                        CHROMIUM_VERSION=-1
+                    else:
+                        CHROMIUM_VERSION=CHROMIUM_VERSION.split(".")[0] 
+                else:
+                    CHROMIUM_VERSION=-1
+                if os.path.exists('/usr/bin/firefox'):
+                    with os.popen('firefox --version') as p:
+                        FIREFOX_VERSION=p.read()
+                        p.close()
+                    if 'not found' in FIREFOX_VERSION:
+                        FIREFOX_VERSION=-1
+                    else:
+                        FIREFOX_VERSION=FIREFOX_VERSION.split(".")[0] 
+                else:
+                    FIREFOX_VERSION=-1       
         except Exception as e:
             logger.print_on_console("Unable to locate ICE parameters")
             log.error(e)
@@ -1827,6 +1858,27 @@ def check_browser():
                         chromeFlag = False 
                 if chromeFlag == False:
                     logger.print_on_console('Unable to download compatible chrome driver from AvoAssure server')
+        elif SYSTEM_OS == 'Linux':
+            if CHROME_VERSION != -1:
+                chromeFlag = False
+                if os.path.exists(CHROME_DRIVER_PATH):
+                    p = os.popen('"' + CHROME_DRIVER_PATH + '" --version')
+                    a = p.read()
+                    a=a.split(' ')[1].split('.')[0]
+                    if str(a) == CHROME_VERSION:
+                        chromeFlag = True
+                if not os.path.exists(CHROME_DRIVER_PATH) or chromeFlag == False:
+                    try:
+                        URL=readconfig.configvalues["file_server_ip"]+"/ubuntu/chromedriver"+CHROME_VERSION
+                        request.urlretrieve(URL,CHROME_DRIVER_PATH)
+                        chromeFlag = True
+                        os.chmod(CHROME_DRIVER_PATH,stat.S_IEXEC | os.stat(CHROME_DRIVER_PATH).st_mode)
+                    except:
+                        logger.print_on_console("Unable to download compatible chrome driver from AvoAssure server")
+                        chromeFlag = False 
+                if chromeFlag == False:
+                    logger.print_on_console('Unable to download compatible chrome driver from AvoAssure server')
+        
         #checking browser for firefox
         if SYSTEM_OS == 'Windows':
             try:
@@ -1851,6 +1903,23 @@ def check_browser():
                     try:
                         URL=readconfig.configvalues["file_server_ip"]+"/geckodriver"
                         request.urlretrieve(URL,GECKODRIVER_PATH)
+                        firefoxFlag = True  
+                    except:
+                        firefoxFlag = False
+
+                    if firefoxFlag == False:
+                        logger.print_on_console('Unable to download compatible firefox driver from AvoAssure server')
+            except Exception as e:
+                logger.print_on_console("Unable to download compatible firefox driver from AvoAssure server")
+                log.error("Unable to download compatible firefox driver from AvoAssure server")
+                log.error(e,exc_info=True)
+        elif SYSTEM_OS == 'Linux':
+            try:
+                if FIREFOX_VERSION != -1:
+                    try:
+                        URL=readconfig.configvalues["file_server_ip"]+"/ubuntu/geckodriver"
+                        request.urlretrieve(URL,GECKODRIVER_PATH)
+                        os.chmod(GECKODRIVER_PATH,stat.S_IEXEC | os.stat(GECKODRIVER_PATH).st_mode)
                         firefoxFlag = True  
                     except:
                         firefoxFlag = False
@@ -1938,6 +2007,25 @@ def check_browser():
                     except:
                         chromiumFlag = False 
 
+                if chromiumFlag == False :
+                    logger.print_on_console('Unable to download compatible Edge Chromium driver from AvoAssure server')
+        elif SYSTEM_OS == 'Linux':
+            if CHROMIUM_VERSION != -1:
+                chromiumFlag = False
+                # if os.path.exists(EDGE_CHROMIUM_DRIVER_PATH):
+                #     p = os.popen('"' + EDGE_CHROMIUM_DRIVER_PATH + '" --version')
+                #     a = p.read()
+                #     a=a.split(' ')[1].split('.')[0]
+                #     if str(a) == CHROMIUM_VERSION:
+                #         chromiumFlag = True
+                if not os.path.exists(EDGE_CHROMIUM_DRIVER_PATH) or chromiumFlag == False:
+                    try:
+                        URL=readconfig.configvalues["file_server_ip"]+"/ubuntu/msedgedriver"+CHROMIUM_VERSION
+                        request.urlretrieve(URL,EDGE_CHROMIUM_DRIVER_PATH)
+                        chromiumFlag = True
+                        os.chmod(EDGE_CHROMIUM_DRIVER_PATH,stat.S_IEXEC | os.stat(EDGE_CHROMIUM_DRIVER_PATH).st_mode)
+                    except Exception as e:
+                        chromiumFlag = False 
                 if chromiumFlag == False :
                     logger.print_on_console('Unable to download compatible Edge Chromium driver from AvoAssure server')
 
