@@ -1562,9 +1562,15 @@ class About_window(wx.Frame):
                 "disp_msg":[(12,18),(80, 28),(100,18), (310,-1),(415,18),(30, -1)],
                 "Close":[(280,148), (100, 28)]
             }
-            else:
+            elif SYSTEM_OS=='Darwin':
                 upload_fields={
                 "Frame":[(300, 150),(400,220)],#(diff +85,+10 from windows)
+                "disp_msg":[(12,38),(80,28),(116,38),(382,-1),(504,38),(30, -1)],
+                "Close":[(285,148),(100, 28)]
+            }
+            else:
+                upload_fields={
+                "Frame":[(300, 150),(460,220)],
                 "disp_msg":[(12,38),(80,28),(116,38),(382,-1),(504,38),(30, -1)],
                 "Close":[(285,148),(100, 28)]
             }
@@ -1579,7 +1585,7 @@ class About_window(wx.Frame):
             if SYSTEM_OS=='Windows':
                 self.msg2=wx.StaticText(self.panel, -1, str(msg2), wx.Point(170, 55), wx.Size(200, 50))
                 self.msg3=wx.StaticText(self.panel, -1, str(msg3), wx.Point(10, 90), wx.Size(350, 50))
-            elif SYSTEM_OS=='Darwin':
+            else:
                 self.msg2 = wx.StaticText(self.panel, -1, str(msg2), wx.Point(170, 55), wx.Size(300, 50))
                 self.msg3 = wx.StaticText(self.panel, -1, str(msg3), wx.Point(10, 90), wx.Size(400, 50))
             self.msg4=wx.StaticText(self.panel, -1, str(msg4), wx.Point(10, 120), wx.Size(200, 50))
