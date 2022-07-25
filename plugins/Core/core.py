@@ -139,9 +139,7 @@ class MainNamespace(BaseNamespace):
                             allow_connect = True
                             plugins_list = response['plugins']
                             if root.gui:
-                                log.info("before changing to disconnect png")
                                 wx.CallAfter(cw.enable_disconnect)
-                                log.info("after changing to disconnect png")
                             controller.disconnect_flag=False
                         else:
                             if 'err_msg' in response: err_res = response['err_msg']
@@ -168,7 +166,6 @@ class MainNamespace(BaseNamespace):
                 if root.gui: wx.CallAfter(cw.connectbutton.Enable)
 
                 if allow_connect:
-                    log.info("at core.py line 170")
                     dnd_mode = wx.CallAfter(cw.schedule.GetValue) if root.gui else False
                     msg = ("Do Not Disturb" if dnd_mode else "Normal") + " Mode: Connection to the Avo Assure Server established"
                     logger.print_on_console(msg)
@@ -177,7 +174,6 @@ class MainNamespace(BaseNamespace):
                     logger.print_on_console(msg)
                     log.info(msg)
                     if root.gui:
-                        log.info("At core.py line 179")
                         # cw.SetTitle(root.name + " (" + root.ice_token["icename"] + ")")
                         wx.CallAfter(cw.SetTitle,root.name + " (" + root.ice_token["icename"] + ")")
                         wx.CallAfter(cw.schedule.Enable)
@@ -187,7 +183,6 @@ class MainNamespace(BaseNamespace):
                         wx.CallAfter(cw.rollbackItem.Enable,True)
                         wx.CallAfter(cw.updateItem.Enable,True)
                         wx.CallAfter(cw.rbox.Enable)
-                        log.info("At core.py line 188")
                     if browsercheckFlag == False:
                         check_browser()
                     #if updatecheckFlag == False and root.gui:
@@ -343,12 +338,12 @@ class MainNamespace(BaseNamespace):
             wait_until_browsercheck()
             exec_data = args[0]
             root.testthread = TestThread(root, DEBUG, exec_data, False)
-            cw.choice=wx.CallAfter(cw.rbox.GetStringSelection)
+            cw.choice=cw.rbox.GetStringSelection()
             logger.print_on_console(str(cw.choice)+' is Selected')
             if cw.choice == 'Normal':
-                wx.CallAfter(cw.killChildWindow,debug=True)
+                cw.killChildWindow(debug=True)
             cw.debug_mode=False
-            wx.CallAfter(cw.breakpoint.Disable)
+            cw.breakpoint.Disable()
             if cw.choice in ['Stepwise','RunfromStep']:
                 debugFlag = True
                 wx.PostEvent(cw.GetEventHandler(), wx.PyCommandEvent(wx.EVT_CHOICE.typeId, cw.GetId()))
@@ -1410,7 +1405,6 @@ class Main():
                 else:
                     # Re-Check token file on connection
                     status = self.verifyRegistration(verifyonly = True)
-                    log.info("At core.py line 1406")
                 if status == False:
                     self.ice_action = "register"
                     self.ice_token = None
@@ -1443,7 +1437,6 @@ class Main():
                 self.socketthread = ConnectionThread(mode)
                 self.socketthread.start()
                 self.socketthread.join()
-                log.info("At core.py line 1439")
             else:
                 self.killSocket(True)
                 log.info('Disconnected from Avo Assure server')
@@ -1773,17 +1766,17 @@ def check_browser():
                     if 'not found' in CHROME_VERSION:
                         CHROME_VERSION=-1
                     else:
-                        CHROME_VERSION=CHROME_VERSION.split(".")[0] 
+                        CHROME_VERSION=CHROME_VERSION.split(".")[0].split(" ")[2]
                 else:
                     CHROME_VERSION=-1
-                if os.path.exists('/usr/bin/edge-chromium'):
-                    with os.popen('/usr/bin/edge-chromium --version') as p:
+                if os.path.exists('/usr/bin/microsoft-edge'):
+                    with os.popen('/usr/bin/microsoft-edge --version') as p:
                         CHROMIUM_VERSION = p.read()
                         p.close()
                     if 'not found' in CHROMIUM_VERSION:
                         CHROMIUM_VERSION=-1
                     else:
-                        CHROMIUM_VERSION=CHROMIUM_VERSION.split(".")[0] 
+                        CHROMIUM_VERSION=CHROMIUM_VERSION.split(".")[0].split(" ")[2]
                 else:
                     CHROMIUM_VERSION=-1
                 if os.path.exists('/usr/bin/firefox'):
@@ -1793,7 +1786,7 @@ def check_browser():
                     if 'not found' in FIREFOX_VERSION:
                         FIREFOX_VERSION=-1
                     else:
-                        FIREFOX_VERSION=FIREFOX_VERSION.split(".")[0] 
+                        FIREFOX_VERSION=FIREFOX_VERSION.split(".")[0].split(" ")[2]
                 else:
                     FIREFOX_VERSION=-1       
         except Exception as e:
@@ -1869,7 +1862,7 @@ def check_browser():
                         chromeFlag = True
                 if not os.path.exists(CHROME_DRIVER_PATH) or chromeFlag == False:
                     try:
-                        URL=readconfig.configvalues["file_server_ip"]+"/ubuntu/chromedriver"+CHROME_VERSION
+                        URL=readconfig.configvalues["file_server_ip"]+"/chromedriver"+CHROME_VERSION
                         request.urlretrieve(URL,CHROME_DRIVER_PATH)
                         chromeFlag = True
                         os.chmod(CHROME_DRIVER_PATH,stat.S_IEXEC | os.stat(CHROME_DRIVER_PATH).st_mode)
