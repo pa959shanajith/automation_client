@@ -1862,7 +1862,7 @@ def check_browser():
                         chromeFlag = True
                 if not os.path.exists(CHROME_DRIVER_PATH) or chromeFlag == False:
                     try:
-                        URL=readconfig.configvalues["file_server_ip"]+"/chromedriver"+CHROME_VERSION
+                        URL=readconfig.configvalues["file_server_ip"]+"/"+SYSTEM_OS.lower()+"/"+platform.machine().lower()+"/chromedriver"+CHROME_VERSION
                         request.urlretrieve(URL,CHROME_DRIVER_PATH)
                         chromeFlag = True
                         os.chmod(CHROME_DRIVER_PATH,stat.S_IEXEC | os.stat(CHROME_DRIVER_PATH).st_mode)
@@ -1910,7 +1910,7 @@ def check_browser():
             try:
                 if FIREFOX_VERSION != -1:
                     try:
-                        URL=readconfig.configvalues["file_server_ip"]+"/ubuntu/geckodriver"
+                        URL=readconfig.configvalues["file_server_ip"]+"/"+SYSTEM_OS.lower()+"/"+platform.machine().lower()+"/geckodriver"
                         request.urlretrieve(URL,GECKODRIVER_PATH)
                         os.chmod(GECKODRIVER_PATH,stat.S_IEXEC | os.stat(GECKODRIVER_PATH).st_mode)
                         firefoxFlag = True  
@@ -2013,7 +2013,7 @@ def check_browser():
                 #         chromiumFlag = True
                 if not os.path.exists(EDGE_CHROMIUM_DRIVER_PATH) or chromiumFlag == False:
                     try:
-                        URL=readconfig.configvalues["file_server_ip"]+"/ubuntu/msedgedriver"+CHROMIUM_VERSION
+                        URL=readconfig.configvalues["file_server_ip"]+"/"+SYSTEM_OS.lower()+"/"+platform.machine().lower()+"msedgedriver"+CHROMIUM_VERSION
                         request.urlretrieve(URL,EDGE_CHROMIUM_DRIVER_PATH)
                         chromiumFlag = True
                         os.chmod(EDGE_CHROMIUM_DRIVER_PATH,stat.S_IEXEC | os.stat(EDGE_CHROMIUM_DRIVER_PATH).st_mode)
