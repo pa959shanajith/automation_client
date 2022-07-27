@@ -2013,7 +2013,7 @@ def check_browser():
                         chromiumFlag = True
                 if not os.path.exists(EDGE_CHROMIUM_DRIVER_PATH) or chromiumFlag == False:
                     try:
-                        URL=readconfig.configvalues["file_server_ip"]+"/"+SYSTEM_OS.lower()+"/"+platform.machine().lower()+"msedgedriver"+CHROMIUM_VERSION
+                        URL=readconfig.configvalues["file_server_ip"]+"/"+SYSTEM_OS.lower()+"/"+platform.machine().lower()+"/msedgedriver"+CHROMIUM_VERSION
                         request.urlretrieve(URL,EDGE_CHROMIUM_DRIVER_PATH)
                         chromiumFlag = True
                         os.chmod(EDGE_CHROMIUM_DRIVER_PATH,stat.S_IEXEC | os.stat(EDGE_CHROMIUM_DRIVER_PATH).st_mode)
