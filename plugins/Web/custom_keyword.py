@@ -137,7 +137,7 @@ class CustomKeyword:
         local_ck.log.info(msg2)
         logger.print_on_console(msg3)
         local_ck.log.info(msg3)
-        if not ele_type in list(self.tagtype.keys()):
+        if browser_Keywords.local_bk.driver_obj.execute_script("return document.evaluate(arguments[0], document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.getRootNode().toString();",finalXpath)=='[object ShadowRoot]':
             if visible_text!='':
                 if reference_ele.get_attribute('role')!='option':
                     try:
