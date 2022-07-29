@@ -431,7 +431,7 @@ class Dispatcher:
                         local_Wd.log.debug('Encountered iframe/frame url')
                         local_Wd.custom_object.switch_to_iframe(url,driver.current_window_handle)
                         driver = browser_Keywords.local_bk.driver_obj
-                    elif objectname==CUSTOM:
+                    if objectname==CUSTOM:
                         local_Wd.log.info('Encountered custom object')
                         local_Wd.log.info('Custom flag is ')
                         local_Wd.log.info(teststepproperty.custom_flag)
