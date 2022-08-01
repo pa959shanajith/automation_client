@@ -555,7 +555,7 @@ class Config_window(wx.Frame):
         #----------------------------------
 
         #------------------------------------Different co-ordinates for Windows and Mac
-        if SYSTEM_OS=='Windows' or SYSTEM_OS=='Linux':
+        if SYSTEM_OS=='Windows':
             config_fields= {
             "Frame":[(300, 150),(470,670)],
             "S_address":[(12,12),(85, 25),(110,8),(140,-1)],
@@ -580,7 +580,7 @@ class Config_window(wx.Frame):
             "Save":[(100,580), (100, 28)],
             "Close":[(250,580), (100, 28)]
             }
-        else:
+        elif SYSTEM_OS=='Darwin':
             config_fields={
             "Frame":[(300, 150),(600,670)],
             "S_address":[(12,12),(90,25),(116,8),(140,-1)],
@@ -605,6 +605,34 @@ class Config_window(wx.Frame):
             "Save":[(130,580),(100, 28)],
             "Close":[(370,580),(120, 28)]
             }
+        elif SYSTEM_OS=='Linux':
+            # position size
+            config_fields={
+            "Frame":[(300, 150),(600,670)], #done
+            "S_address":[(12,12),(120,25),(150,8),(140,25)], #done
+            "S_port": [(320,11),(120,25),(434,8), (140,25)], #done
+            "Chrm_path":[(12,42),(120,25),(150,38),(370,25),(534,38),(40, 25)], #done
+            "Chrm_profile":[(12,72),(120,25),(150,68),(370,25),(534,68),(40, 25)], #done
+            "Chrm_extn_path":[(12,102),(120,25),(150,98), (370,25),(534,98),(40,25)],#sone
+            "Ffox_path":[(12,132),(120,25),(150,128),(370,25),(534,128),(40,25)],#done
+            "Log_path":[(12,162),(120, 25),(150,158),(370,25),(534,158),(40,25)],#done
+            "S_cert":[(12,192),(130, 25),(150,188),(370,25),(534,188),(40,25)],#done
+            "Q_timeout":[(12,222),(115, 25),(150,218), (80,25)],
+            "Timeout":[(235,222),(80, 25),(315,218),(80,25)],
+            "Delay":[(404,222),(41, 25),(490,218), (85,25)],
+            "Step_exec":[(12,252),(150, 25),(180,248),(80,25)],
+            "Disp_var": [(273, 252), (-1, 25), (490, 248), (85, 25)],
+            "C_Timeout" :[(12,282),(-1, 25),(180,278), (80,25)],
+            "Delay_Stringinput":[(273,282),(-1, 25),(490,278), (85,25)],
+            "global_waittimeout":[(12,312),(-1, 25),(180,308),(80,25)],
+            "max_tries":[(273,312),(-1, 25),(490,308), (85,25)],
+            "panel1":[(10,345),(100,20),(565,185),(12,365)],
+            "err_text":[(85,555),(350, 25)],
+            "Save":[(130,580),(100, 28)],
+            "Close":[(370,580),(120, 28)]
+            }
+        
+
         wx.Frame.__init__(self, parent, title=title,
             pos=config_fields["Frame"][0], size=config_fields["Frame"][1],style = wx.CAPTION|wx.CLIP_CHILDREN)
 
@@ -618,7 +646,7 @@ class Config_window(wx.Frame):
         self.panel1 = wx.lib.scrolledpanel.ScrolledPanel(self.panel,-1,size=config_fields["panel1"][2], pos=config_fields["panel1"][3])
         self.panel1.SetupScrolling()
 
-        self.sev_add=wx.StaticText(self.panel, label="Server Address", pos=config_fields["S_address"][0],size=config_fields["S_address"][1], style=0, name="")
+        self.sev_add=wx.StaticText(self.panel, label="Server Address", pos=config_fields["S_address"][0], style=0, name="")
         self.server_add=wx.TextCtrl(self.panel, pos=config_fields["S_address"][2], size=config_fields["S_address"][3])
         if isConfigJson!=False:
             self.server_add.SetValue(isConfigJson['server_ip'])
