@@ -138,7 +138,7 @@ class CustomKeyword:
         logger.print_on_console(msg3)
         local_ck.log.info(msg3)
         #Checking the URL for dectecting salseforce component. Custom keyword for dropdowns and comboboxes for salesforce.
-        if browser_Keywords.local_bk.driver_obj.current_url.find('lightining.force')!=-1:
+        if browser_Keywords.local_bk.driver_obj.current_url.find('lightning.force')!=-1:
             if visible_text!='':
                 if reference_ele.get_attribute('role')!='option':
                     try:
