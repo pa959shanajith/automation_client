@@ -137,7 +137,8 @@ class CustomKeyword:
         local_ck.log.info(msg2)
         logger.print_on_console(msg3)
         local_ck.log.info(msg3)
-        if False and browser_Keywords.local_bk.driver_obj.execute_script("return document.evaluate(arguments[0], document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.getRootNode().toString();",finalXpath)=='[object ShadowRoot]':
+        #Checking the URL for dectecting salseforce component. Custom keyword for dropdowns and comboboxes for salesforce.
+        if browser_Keywords.local_bk.driver_obj.current_url.find('lightining.force')!=-1:
             if visible_text!='':
                 if reference_ele.get_attribute('role')!='option':
                     try:
