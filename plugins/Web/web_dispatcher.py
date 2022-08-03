@@ -850,16 +850,20 @@ class Dispatcher:
             local_Wd.log.debug('Identifiers are ')
             local_Wd.log.debug(identifiers)
             global finalXpath
-            finalXpath = identifiers[0]
+            #Absolute xpath is used to locate web element first as it doesn't change like relative xpath.
             if len(identifiers)>=3:
                 #find by absolute xpath
                 webElement=self.element_locator(driver,'xpath',identifiers[0],'1')
+                if (webElement):
+                    finalXpath = identifiers[0]
                 if not(webElement):
                     #find by id
                     webElement=self.element_locator(driver,'id',identifiers[1],'2')
                     if not(webElement):
                         #find by relative xpath
                         webElement=self.element_locator(driver,'rxpath',identifiers[2],'3')
+                        if (webElement):
+                            finalXpath = identifiers[2]
                         if not(webElement):
                             #find by name
                             webElement=self.element_locator(driver,'name',identifiers[3],'4')
