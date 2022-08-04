@@ -166,6 +166,7 @@ class MainNamespace(BaseNamespace):
                 if root.gui: wx.CallAfter(cw.connectbutton.Enable)
 
                 if allow_connect:
+                    log.info("at core.py line 170")
                     dnd_mode = wx.CallAfter(cw.schedule.GetValue) if root.gui else False
                     msg = ("Do Not Disturb" if dnd_mode else "Normal") + " Mode: Connection to the Avo Assure Server established"
                     logger.print_on_console(msg)
@@ -174,6 +175,7 @@ class MainNamespace(BaseNamespace):
                     logger.print_on_console(msg)
                     log.info(msg)
                     if root.gui:
+                        log.info("At core.py line 179")
                         # cw.SetTitle(root.name + " (" + root.ice_token["icename"] + ")")
                         wx.CallAfter(cw.SetTitle,root.name + " (" + root.ice_token["icename"] + ")")
                         wx.CallAfter(cw.schedule.Enable)
@@ -183,6 +185,7 @@ class MainNamespace(BaseNamespace):
                         wx.CallAfter(cw.rollbackItem.Enable,True)
                         wx.CallAfter(cw.updateItem.Enable,True)
                         wx.CallAfter(cw.rbox.Enable)
+                        log.info("At core.py line 188")
                     if browsercheckFlag == False:
                         check_browser()
                     #if updatecheckFlag == False and root.gui:
@@ -1866,8 +1869,9 @@ def check_browser():
                         request.urlretrieve(URL,CHROME_DRIVER_PATH)
                         chromeFlag = True
                         os.chmod(CHROME_DRIVER_PATH,stat.S_IEXEC | os.stat(CHROME_DRIVER_PATH).st_mode)
-                    except:
-                        logger.print_on_console("Unable to download compatible chrome driver from AvoAssure server")
+                    except Exception as e:
+                        log.debug("Error in chrome driver download")
+                        log.error(e)
                         chromeFlag = False 
                 if chromeFlag == False:
                     logger.print_on_console('Unable to download compatible chrome driver from AvoAssure server')
@@ -1914,7 +1918,9 @@ def check_browser():
                         request.urlretrieve(URL,GECKODRIVER_PATH)
                         os.chmod(GECKODRIVER_PATH,stat.S_IEXEC | os.stat(GECKODRIVER_PATH).st_mode)
                         firefoxFlag = True  
-                    except:
+                    except Exception as e:
+                        log.debug("Error in firefox driver check and download ")
+                        log.error(e)
                         firefoxFlag = False
 
                     if firefoxFlag == False:
@@ -2018,6 +2024,8 @@ def check_browser():
                         chromiumFlag = True
                         os.chmod(EDGE_CHROMIUM_DRIVER_PATH,stat.S_IEXEC | os.stat(EDGE_CHROMIUM_DRIVER_PATH).st_mode)
                     except Exception as e:
+                        log.debug("Error in edge-chromium driver download")
+                        log.error(e)
                         chromiumFlag = False 
                 if chromiumFlag == False :
                     logger.print_on_console('Unable to download compatible Edge Chromium driver from AvoAssure server')
