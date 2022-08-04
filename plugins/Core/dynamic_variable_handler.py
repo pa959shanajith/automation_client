@@ -319,7 +319,12 @@ class DynamicVariables:
                             if type(exp[i]) is int or type(exp[i]) is float:
                                 exp[i]=str(exp[i])
                             else:
-                                _=float(exp[i])
+                                if exp[i].find(',') != -1:
+                                    exp[i]=float(exp[i].replace(",",""))
+                                    inp_err_list[i]=exp[i]
+                                    _=float(exp[i])
+                                else:
+                                    _=float(exp[i])
                         except Exception as e:
                             if k==2:
                                 invalid_msg+=keyword+': Only numbers are allowed in expression\n'
@@ -334,7 +339,7 @@ class DynamicVariables:
         # Python3 issue fix. 020 is not a valid number
         for i in range(len(exp)):
             try:
-                part = int(exp[i])
+                part = float(exp[i])
                 exp[i] = str(part)
             except: pass
 

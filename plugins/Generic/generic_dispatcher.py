@@ -130,6 +130,7 @@ class GenericKeywordDispatcher:
             'capturescreenshot':local_generic.generic_screenshot.captureScreenshot,
             'executefile':local_generic.generic_batch.executeFile,
             'evaluate':local_generic.generic_math.eval,
+            'currencyconverter':local_generic.generic_math.currencyConverter,
             'wait':local_generic.generic_delay.wait,
             'pause':local_generic.generic_delay.pause,
             'sendfunctionkeys':local_generic.generic_sendkeys.sendfunction_keys,

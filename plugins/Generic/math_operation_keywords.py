@@ -160,3 +160,41 @@ class NumericStringParser(object):
             logger.print_on_console(err_msg)
         return status,methodoutput,output,err_msg
 
+
+    def currencyConverter(self, num_string, *args):
+        status = TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FALSE
+        output=None
+        err_msg=None
+        try:
+            if len(args)>1 and args[1] is not None:
+                logger.print_on_console('Input expression is',args[1],'\n')
+            else:
+                logger.print_on_console('Input expression is',num_string,'\n')
+            if len(args)>0 and args[0] is not None:
+                errs=args[0].split('\n')
+                for err in errs:
+                    logger.print_on_console(err+'\n')
+                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+            elif not (num_string is None or num_string is ''):
+                log.debug('Converting the variable value')
+                # logger.print_on_console('Converting the currency')
+                output = "{:,.2f}".format(float(num_string))
+                if isinstance(output,float):
+                    if output % 1 == 0.0:
+                        output = str(output)
+                    output=round(output,2)
+                elif isinstance(output,int):
+                    output=str(output)
+                log.debug('Got the result : %s', output)
+                # logger.print_on_console('Got the result : ', output)
+                status = TEST_RESULT_PASS
+                methodoutput = TEST_RESULT_TRUE
+            else:
+                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+        except Exception as e:
+            log.error(e)
+            err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+        if err_msg!=None:
+            logger.print_on_console(err_msg)
+        return status,methodoutput,output,err_msg
