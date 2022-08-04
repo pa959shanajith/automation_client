@@ -14,6 +14,7 @@ import json
 from webscrape_utils import WebScrape_Utils
 from selenium.common.exceptions import NoSuchWindowException
 from os.path import normpath
+from constants import SYSTEM_OS
 cropandaddobj = None
 browserobj = browserops.BrowserOperations()
 clickandaddoj = clickandadd.Clickandadd()
@@ -104,7 +105,7 @@ class ScrapeWindow(wx.Frame):
                     self.nextbutton.SetToolTip(wx.ToolTip("Select next window/tab"))
                     self.nextbutton.Hide()
 
-                    if checkWebPackage['isWebPackage'] == "False":
+                    if checkWebPackage['isWebPackage'] == "False" or SYSTEM_OS!='Linux':
                         import cropandadd
                         global cropandaddobj
                         cropandaddobj = cropandadd.Cropandadd()
