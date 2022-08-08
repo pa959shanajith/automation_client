@@ -7,5 +7,11 @@
     "username":"<>",
     "password":"<>"
     },
-    "platform":"Windows 7"
+    "platform":"Windows 7",
+    "mobile":{
+        "platformName": "Android",
+        "browserName": "Chrome",
+        "deviceName": "<>",
+        "platformVersion": "<>"
+    }
 }
