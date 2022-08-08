@@ -137,7 +137,8 @@ class CustomKeyword:
         local_ck.log.info(msg2)
         logger.print_on_console(msg3)
         local_ck.log.info(msg3)
-        if not ele_type in list(self.tagtype.keys()):
+        #Checking the URL for dectecting salseforce component. Custom keyword for dropdowns and comboboxes for salesforce.
+        if browser_Keywords.local_bk.driver_obj.current_url.find('lightning.force')!=-1:
             if visible_text!='':
                 if reference_ele.get_attribute('role')!='option':
                     try:
