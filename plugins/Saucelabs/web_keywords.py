@@ -253,7 +253,7 @@ class Browser_Keywords:
         output_val=OUTPUT_CONSTANT
         local_wk.driver.get('chrome://settings/clearBrowserData')
         time.sleep(5)
-        local_wk.driver.execute_script('return document.querySelector("body > settings-ui.shadowRoot.querySelector("#container.querySelector("#main.shadowRoot.querySelector("settings-basic-page.shadowRoot.querySelector("settings-privacy-page.shadowRoot.querySelector("settings-clear-browsing-data-dialog.shadowRoot.querySelector("#clearBrowsingDataDialog.querySelector("#clearBrowsingDataConfirm.click()))))))));')
+        local_wk.driver.execute_script('return document.querySelector("body > settings-ui").shadowRoot.querySelector("#container").querySelector("#main").shadowRoot.querySelector("settings-basic-page").shadowRoot.querySelector("settings-privacy-page").shadowRoot.querySelector("settings-clear-browsing-data-dialog").shadowRoot.querySelector("#clearBrowsingDataDialog").querySelector("#clearBrowsingDataConfirm").click();')
         status=TEST_RESULT_PASS
         methodoutput=TEST_RESULT_TRUE
         return status,methodoutput,output_val,err_msg
