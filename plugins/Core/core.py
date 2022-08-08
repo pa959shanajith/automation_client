@@ -2079,7 +2079,7 @@ def check_PatchUpdate():
             UPDATE_MSG=update_obj.send_update_message()
             l_ver = update_obj.fetch_current_value()
             SERVER_CHECK_MSG = update_obj.server_check_message()
-            if (SERVER_CHECK_MSG): logger.print_on_console(SERVER_CHECK_MSG)
+            if (SERVER_CHECK_MSG):log.info(SERVER_CHECK_MSG)
             #check if update avaliable
             if ( UPDATE_MSG == 'Update Available!!! Click on update' and flag == True ):
                 logger.print_on_console("An update is available. Click on 'Help' menu option -> 'Check for Updates' sub-menu option -> 'Update' button")
