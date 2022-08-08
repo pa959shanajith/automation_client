@@ -803,6 +803,8 @@ class MainNamespace(BaseNamespace):
         import constants
         if(SYSTEM_OS=='Darwin'):
             spath=spath["mac"]
+        elif SYSTEM_OS == 'Linux':
+            spath=spath['linux']
         else:
             spath=spath["default"]
         if len(spath) != 0 and os.path.exists(spath):
