@@ -33,6 +33,7 @@ import action_keyowrds_web
 import requests
 import readconfig
 import re
+import web_keywords_MW
 from selenium import webdriver  
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -59,6 +60,16 @@ class Dispatcher:
     custom_object=custom_keyword_MW.CustomKeyword()
     device_keywords_object = device_keywords_MW.Device_Keywords()
     webelement_map=OrderedDict()
+    
+    button_link_object_sl = web_keywords_MW.Button_link_Keywords()
+    popup_object_sl = web_keywords_MW.Browser_Popup_Keywords()
+    radio_check_obj_sl = web_keywords_MW.Radio_checkbox_Keywords()
+    table_obj_sl = web_keywords_MW.Table_Keywords()
+    element_obj_sl = web_keywords_MW.Element_Keywords()
+    textbox_obj_sl = web_keywords_MW.Textbox_Keywords()
+    dropdown_obj_sl = web_keywords_MW.Dropdown_Keywords()
+    util_obj_sl = web_keywords_MW.Util_Keywords()
+    browser_object_sl = web_keywords_MW.BrowserKeywords()
 
     MW_dict={
         'getobjectcount':custom_object.get_object_count,
@@ -177,11 +188,110 @@ class Dispatcher:
         
     }
 
+    sauce_mobile_web_dict = {
+        'click': element_obj_sl.click,
+        'press'  : element_obj_sl.press,
+        'doubleClick' : element_obj_sl.doubleClick,
+        'rightClick' : element_obj_sl.rightClick,
+		'verifyButtonName' : button_link_object_sl.verifyButtonName,
+        'getButtonName' : button_link_object_sl.getButtonName,
+        'getLinkText'    : button_link_object_sl.getLinkText,
+        'verifyLinkText' : button_link_object_sl.verifyLinkText,
+        'uploadfile'  : element_obj_sl.uploadFile,
+		
+		'acceptPopUp' : popup_object_sl.acceptPopUp,
+        'dismissPopUp': popup_object_sl.dismissPopUp,
+        'getPopUpText': popup_object_sl.getPopUpText,
+        'verifyPopUpText': popup_object_sl.verifyPopUpText,
+		
+		'getStatus': radio_check_obj_sl.getStatus,
+        'selectRadioButton': radio_check_obj_sl.selectRadioButton,
+        'selectCheckbox': radio_check_obj_sl.selectCheckbox,
+        'unselectCheckbox': radio_check_obj_sl.unselectCheckbox,
+		
+		'getRowCount' : table_obj_sl.getRowCount,
+        'getColumnCount' : table_obj_sl.getColumnCount,
+        'getCellValue' : table_obj_sl.getCellValue,
+        'verifyCellValue' : table_obj_sl.verifyCellValue,
+        'cellClick' : table_obj_sl.cellClick,
+        'getRowNumByText' : table_obj_sl.getRowNumByText,
+        'getColNumByText' : table_obj_sl.getColNumByText,
+        'getInnerTable' : table_obj_sl.getInnerTable,
+        'verifyCellToolTip' : table_obj_sl.verifyCellToolTip,
+		
+		'getElementText' : element_obj_sl.getElementText,
+        'verifyElementText' : element_obj_sl.verifyElementText,
+        'clickElement' : element_obj_sl.click,
+        'getToolTipText' : element_obj_sl.getToolTipText,
+        'verifyToolTipText' : element_obj_sl.verifyToolTipText,
+		
+		'setText': textbox_obj_sl.setText,
+        'sendValue': textbox_obj_sl.sendValue,
+        'getText': textbox_obj_sl.getText,
+        'verifyText': textbox_obj_sl.verifyText,
+        'clearText': textbox_obj_sl.clearText,
+        'getTextboxLength': textbox_obj_sl.getTextboxLength,
+        'verifyTextboxLength': textbox_obj_sl.verifyTextboxLength,
+        'setSecureText': textbox_obj_sl.setSecureText,
+        'sendSecureValue': textbox_obj_sl.sendSecureValue,
+		
+		'selectValueByIndex': dropdown_obj_sl.selectValueByIndex,
+		'getCount': dropdown_obj_sl.getCount,
+		'selectValueByText': dropdown_obj_sl.selectValueByText,
+		'verifySelectedValues': dropdown_obj_sl.verifySelectedValues,
+		'verifySelectedValue': dropdown_obj_sl.verifySelectedValue,
+		'verifyCount': dropdown_obj_sl.verifyCount,
+		'selectAllValues': dropdown_obj_sl.selectAllValues,
+		'selectMultipleValuesByIndexes': dropdown_obj_sl.selectMultipleValuesByIndexes,
+		'getSelected': dropdown_obj_sl.getSelected,
+		'selectMultipleValuesByText': dropdown_obj_sl.selectMultipleValuesByText,
+		'getMultipleValuesByIndexes': dropdown_obj_sl.getMultipleValuesByIndexes,
+		'verifyAllValues': dropdown_obj_sl.verifyAllValues,
+		'selectByAbsoluteValue': dropdown_obj_sl.selectByAbsoluteValue,
+		'getAllValues': dropdown_obj_sl.getAllValues,
+		'getValueByIndex': dropdown_obj_sl.getValueByIndex,
+		'verifyValuesExists': dropdown_obj_sl.verifyValuesExists,
+		'deselectAll': dropdown_obj_sl.deselectAll,
+		
+        'drag': util_obj_sl.drag,
+        'drop': util_obj_sl.drop,
+		'verifyVisible': util_obj_sl.verifyVisible,
+		'verifyExists': util_obj_sl.verifyExists,
+		'verifyDoesNotExists': util_obj_sl.verifyDoesNotExists,
+		'verifyEnabled': util_obj_sl.verifyEnabled,
+		'verifyDisabled': util_obj_sl.verifyDisabled,
+		'verifyHidden': util_obj_sl.verifyHidden,
+		'verifyReadOnly': util_obj_sl.verifyReadOnly,
+		'tab': util_obj_sl.tab,
+		'waitForElementVisible': util_obj_sl.waitForElementVisible,
+		'setFocus': element_obj_sl.setFocus,
+		'getElementTagValue': element_obj_sl.getElementTagValue,
+		'getAttributeValue': element_obj_sl.getAttributeValue,
+		'verifyAttribute': element_obj_sl.verifyAttribute,
+		
+		'openBrowser': browser_object_sl.openBrowser,
+		'openNewTab': browser_object_sl.openNewTab,
+		'navigateToURL': browser_object_sl.navigateToURL,
+		'getPageTitle': browser_object_sl.getPageTitle,
+		'getCurrentURL': browser_object_sl.getCurrentURL,
+		'refresh': browser_object_sl.refresh,
+		'verifyCurrentURL': browser_object_sl.verifyCurrentURL,
+		'closeBrowser': browser_object_sl.closeBrowser,
+		'closeSubWindows': browser_object_sl.closeSubWindows,
+		'switchToWindow': browser_object_sl.switchToWindow,
+		'verifyTextExists': browser_object_sl.verifyTextExists,
+		'verifyPageTitle': browser_object_sl.verifyPageTitle,
+		'clearCache': browser_object_sl.clearCache,
+		'navigateBack': browser_object_sl.navigateBack,
+		'navigateWithAuthenticate': browser_object_sl.navigateWithAuthenticate,
+    }
+
     def __init__(self):
         self.exception_flag=''
         self.action=None
+        self.sauce_conf = web_keywords_MW.Sauce_Config().get_sauceconf()
 
-    def dispatcher(self,teststepproperty,input,reporting_obj,mythread):
+    def dispatcher(self,teststepproperty,input,reporting_obj,mythread,execution_env):
         global simple_debug_gwto, status_gwto
         status_gwto =False
         simple_debug_gwto=False
@@ -331,10 +441,11 @@ class Dispatcher:
             if browser_Keywords_MW.driver_obj is not None:
                 log.info('Finding the browser information')
                 browser_info=browser_Keywords_MW.driver_obj.capabilities
-                adb=os.environ['ANDROID_HOME']+"\\platform-tools\\adb.exe"
-                cmd = adb + ' -s '+ browser_info['deviceName']+ ' shell dumpsys package com.android.chrome | grep "versionName"'
-                s = subprocess.check_output(cmd.split(),universal_newlines=True).strip()
-                reporting_obj.browser_version=s.split("=")[1]
+                if execution_env['env'] == 'default':
+                    adb=os.environ['ANDROID_HOME']+"\\platform-tools\\adb.exe"
+                    cmd = adb + ' -s '+ browser_info['deviceName']+ ' shell dumpsys package com.android.chrome | grep "versionName"'
+                    s = subprocess.check_output(cmd.split(),universal_newlines=True).strip()
+                    reporting_obj.browser_version=s.split("=")[1]
                 reporting_obj.browser_type=browser_info.get('browserName')
                 log.info(reporting_obj.browser_version)
                 log.info(reporting_obj.browser_type)
@@ -349,14 +460,15 @@ class Dispatcher:
             # window_ops_list=['click','press','doubleclick','rightclick','uploadfile','acceptpopup','dismisspopup','selectradiobutton','selectcheckbox','unselectcheckbox','cellclick','clickelement','drag','drop','settext','sendvalue','cleartext','setsecuretext','sendsecurevalue','selectvaluebyindex','selectvaluebytext','selectallvalues','selectmultiplevaluesbyindexes','selectmultiplevaluesbytext','verifyvaluesexists','deselectall','setfocus','mousehover','tab','sendfunctionkeys','rightclick','mouseclick','openbrowser','navigatetourl','opennewbrowser','refresh','closebrowser','closesubwindows','switchtowindow','clearcache','navigatewithauthenticate']
             if browser_Keywords_MW.driver_obj is not None:
                 browser_info=browser_Keywords_MW.driver_obj.capabilities
-                adb=os.environ['ANDROID_HOME']+"\\platform-tools\\adb.exe"
-                cmd = adb + ' -s '+ browser_info['deviceName']+ ' shell dumpsys package com.android.chrome | grep "versionName"'
-                s = subprocess.check_output(cmd.split(),universal_newlines=True).strip()
-                reporting_obj.browser_version=s.split("=")[1]
+                if execution_env['env'] == 'default':
+                    adb=os.environ['ANDROID_HOME']+"\\platform-tools\\adb.exe"
+                    cmd = adb + ' -s '+ browser_info['deviceName']+ ' shell dumpsys package com.android.chrome | grep "versionName"'
+                    s = subprocess.check_output(cmd.split(),universal_newlines=True).strip()
+                    reporting_obj.browser_version=s.split("=")[1]
                 reporting_obj.browser_type=browser_info.get('browserName')
                 log.info(reporting_obj.browser_version)
                 log.info(reporting_obj.browser_type)
-            if keyword in list(self.MW_dict.keys()):
+            if execution_env['env'] == 'default' and keyword in list(self.MW_dict.keys()):
                 flag=False
                 #Finding the webelement for NON_WEBELEMENT_KEYWORDS
                 if (keyword not in NON_WEBELEMENT_KEYWORDS) and (keyword!="waitForElementVisible"):
@@ -453,7 +565,37 @@ class Dispatcher:
                     elif keyword==OPEN_BROWSER:
                         find_browser_info(reporting_obj,mythread)
 
-
+            elif execution_env['env'] == 'saucelabs' and teststepproperty.name in list(self.sauce_mobile_web_dict.keys()):
+                if teststepproperty.custname=='@Browser' or teststepproperty.custname=='@BrowserPopUp':
+                    if(teststepproperty.name=="openBrowser"):
+                        config = self.sauce_conf["mobile"]
+                        desired_caps = {}
+                        desired_caps['platformName'] = config["platformName"]
+                        desired_caps['browserName'] = config["browserName"]
+                        desired_caps['appium:deviceName'] = config["deviceName"]
+                        desired_caps['appium:platformVersion'] = config["platformVersion"]
+                        desired_caps['sauce:options'] = {}
+                        desired_caps['sauce:options']['extendedDebugging'] = True
+                        desired_caps['sauce:options']['capturePerformance'] = True
+                        desired_caps["sauce:options"]["idleTimeout"] = 90
+                        desired_caps["sauce:options"]["name"] = teststepproperty.testscript_name
+                        result = self.sauce_mobile_web_dict[teststepproperty.name](self.sauce_conf['remote_url'],desired_caps)
+                        driver = web_keywords_MW.local_wk.driver
+                        browser_Keywords_MW.driver_obj = driver
+                        find_browser_info(reporting_obj,mythread)
+                    else:
+                        result = self.sauce_mobile_web_dict[teststepproperty.name](input)
+                elif teststepproperty.name in self.sauce_mobile_web_dict:
+                    xpath=teststepproperty.objectname.split(';')[0]
+                    if(teststepproperty.name=="waitForElementVisible"):
+                        input=xpath
+                    driver.switch_to.default_content()
+                    webelement=send_webelement_to_keyword(web_keywords_MW.local_wk.driver,objectname,url)
+                    result = self.sauce_mobile_web_dict[teststepproperty.name](webelement,input)
+                else:
+                    logger.print_on_console(teststepproperty.name+" keyword is not supported in saucelabs execution.")
+                    return False
+            
             else:
                 err_msg=INVALID_KEYWORD
                 result=list(result)
