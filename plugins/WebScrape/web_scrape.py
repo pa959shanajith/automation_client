@@ -105,7 +105,7 @@ class ScrapeWindow(wx.Frame):
                     self.nextbutton.SetToolTip(wx.ToolTip("Select next window/tab"))
                     self.nextbutton.Hide()
 
-                    if checkWebPackage['isWebPackage'] == "False" or SYSTEM_OS!='Linux':
+                    if checkWebPackage['isWebPackage'] == "False":
                         import cropandadd
                         global cropandaddobj
                         cropandaddobj = cropandadd.Cropandadd()
