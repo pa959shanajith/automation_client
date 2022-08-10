@@ -120,7 +120,7 @@ class ScrapeWindow(wx.Frame):
                     import cropandadd
                     global cropandaddobj
                     cropandaddobj = cropandadd.Cropandadd()
-                    self.cropbutton = wx.ToggleButton(self.panel, label="Start IRIS",pos=(12,108 ), size=(175, 25))
+                    self.cropbutton = wx.ToggleButton(self.panel, label="Start IRIS",pos=(290,160 ), size=(165, 30))
                     self.cropbutton.Bind(wx.EVT_TOGGLEBUTTON, self.cropandadd)
                     if(self.action == 'replace'): self.cropbutton.Disable()
 
