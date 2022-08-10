@@ -129,7 +129,7 @@ class ScrapeWindow(wx.Frame):
                         browserops.driver.get(data['scrapedurl'])
                     except:
                         log.error("scrapedurl is Empty")
-                    self.comparebutton = wx.ToggleButton(self.panel, label="Start Compare",pos=(12,38 ), size=(175, 28))
+                    self.comparebutton = wx.ToggleButton(self.panel, label="Start Compare",pos=(110,80 ), size=(260, 30))
                     self.comparebutton.Bind(wx.EVT_TOGGLEBUTTON, self.compare)
                 # Name : A sreenivasulu Date: 02/08/2022
                 # setting the URL from allowed_urls when istrail is true
