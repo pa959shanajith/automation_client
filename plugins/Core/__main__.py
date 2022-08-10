@@ -3,8 +3,15 @@ import os
 import logging
 import argparse
 import platform
+import wx
+from loadingwindow import Loading_window
 log = logging.getLogger('Avo_Assure')
 ice_ver = '3.0.0'
+
+def main():
+    global loadingobj
+    app = wx.App()
+    loadingobj = Loading_window(None)
 
 try:
     cfile = os.path.abspath(__file__)
@@ -62,6 +69,7 @@ if sys.platform == 'win32':
     if 'Windows-10' in host_os or 'Windows-8.1' in host_os:
         windll.shcore.SetProcessDpiAwareness(2)
     import msvcrt
+    # __builtins__open = __builtins__.open
     __builtins__open = __builtins__.open
     def __open_inheritance_hack(*args, **kwargs):
         result = __builtins__open(*args, **kwargs)
@@ -69,10 +77,12 @@ if sys.platform == 'win32':
         if configvalues["logFile_Path"] in args:
             windll.kernel32.SetHandleInformation(handle, 1, 0)
         return result
+    # __builtins__.open = __open_inheritance_hack
     __builtins__.open = __open_inheritance_hack
 
 if __name__ == "__main__":
     try:
+        main()
         appName = "Avo Assure ICE"
         path = os.environ["AVO_ASSURE_HOME"]+os.sep
         if not os.path.exists(path+"logs"): os.mkdir(path+"logs")
@@ -80,6 +90,6 @@ if __name__ == "__main__":
         import core
         core.configvalues = configvalues
         core.proxies = proxies
-        core.Main(appName, args)
+        core.Main(appName, args)      
     except Exception as e:
         log.error(e, exc_info=True)
