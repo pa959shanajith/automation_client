@@ -148,10 +148,10 @@ class CustomHandler(BaseRotatingHandler):
                 json.dump(self.manifest,f)
             fn = self.projectId + self.filename.replace("\\\\","/").split(".logs")[1]
             mn = self.projectId + self.manifest_path.replace("\\\\","/").split(".logs")[1]
-            r = reportnfs.client.savelogs('logs',fn,self.filename)
-            m = reportnfs.client.savelogs('logs',mn,self.manifest_path)
-            if r =='fail' or m=='fail' :
-                raise Exception('error while saving in reportNFS')
+            # r = reportnfs.client.savelogs('logs',fn,self.filename)
+            # m = reportnfs.client.savelogs('logs',mn,self.manifest_path)
+            # if r =='fail' or m=='fail' :
+            #     raise Exception('error while saving in reportNFS')
         except Exception as e:
             logger.error(e)
             err_msg = ERROR_CODE_DICT['ERR_CAPTURE_LOGS']
