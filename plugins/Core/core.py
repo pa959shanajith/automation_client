@@ -166,7 +166,6 @@ class MainNamespace(BaseNamespace):
                 if root.gui: wx.CallAfter(cw.connectbutton.Enable)
 
                 if allow_connect:
-                    log.info("at core.py line 170")
                     dnd_mode = wx.CallAfter(cw.schedule.GetValue) if root.gui else False
                     msg = ("Do Not Disturb" if dnd_mode else "Normal") + " Mode: Connection to the Avo Assure Server established"
                     logger.print_on_console(msg)
@@ -175,17 +174,16 @@ class MainNamespace(BaseNamespace):
                     logger.print_on_console(msg)
                     log.info(msg)
                     if root.gui:
-                        log.info("At core.py line 179")
                         # cw.SetTitle(root.name + " (" + root.ice_token["icename"] + ")")
                         wx.CallAfter(cw.SetTitle,root.name + " (" + root.ice_token["icename"] + ")")
                         wx.CallAfter(cw.schedule.Enable)
                         wx.CallAfter(cw.cancelbutton.Enable)
                         wx.CallAfter(cw.terminatebutton.Enable)
                         wx.CallAfter(cw.clearbutton.Enable)
-                        wx.CallAfter(cw.rollbackItem.Enable,True)
-                        wx.CallAfter(cw.updateItem.Enable,True)
+                        if SYSTEM_OS!='Linux':
+                            wx.CallAfter(cw.rollbackItem.Enable,True)
+                            wx.CallAfter(cw.updateItem.Enable,True)
                         wx.CallAfter(cw.rbox.Enable)
-                        log.info("At core.py line 188")
                     if browsercheckFlag == False:
                         check_browser()
                     #if updatecheckFlag == False and root.gui:

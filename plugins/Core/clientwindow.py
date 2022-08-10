@@ -122,12 +122,13 @@ class ClientWindow(wx.Frame):
 
         self.aboutItem = wx.MenuItem(self.helpMenu, 160, text="About", kind=wx.ITEM_NORMAL)
         self.helpMenu.Append(self.aboutItem)
-        self.updateItem = wx.MenuItem(self.helpMenu, 161, text="Check for Updates", kind=wx.ITEM_NORMAL)
-        self.helpMenu.Append(self.updateItem)
-        self.updateItem.Enable(True)
-        self.rollbackItem = wx.MenuItem(self.helpMenu, 162, text="Rollback", kind=wx.ITEM_NORMAL)
-        self.helpMenu.Append(self.rollbackItem)
-        self.rollbackItem.Enable(True)
+        if SYSTEM_OS!='Linux':
+            self.updateItem = wx.MenuItem(self.helpMenu, 161, text="Check for Updates", kind=wx.ITEM_NORMAL)
+            self.helpMenu.Append(self.updateItem)
+            self.updateItem.Enable(True)
+            self.rollbackItem = wx.MenuItem(self.helpMenu, 162, text="Rollback", kind=wx.ITEM_NORMAL)
+            self.helpMenu.Append(self.rollbackItem)
+            self.rollbackItem.Enable(True)
         self.menubar.Append(self.helpMenu, '&Help')
 
         self.Bind(wx.EVT_MENU, self.menuhandler)
@@ -428,8 +429,9 @@ class ClientWindow(wx.Frame):
                     wx.CallAfter(self.enable_connect)
                 wx.CallAfter(self.schedule.SetValue,False)
                 wx.CallAfter(self.schedule.Disable)
-                wx.CallAfter(self.rollbackItem.Enable,False)
-                wx.CallAfter(self.updateItem.Enable,False)
+                if SYSTEM_OS!='Linux':
+                    wx.CallAfter(self.rollbackItem.Enable,False)
+                    wx.CallAfter(self.updateItem.Enable,False)
         except:
             wx.CallAfter(self.cancelbutton.Disable)
             wx.CallAfter(self.terminatebutton.Disable)
@@ -646,7 +648,7 @@ class Config_window(wx.Frame):
         self.panel1 = wx.lib.scrolledpanel.ScrolledPanel(self.panel,-1,size=config_fields["panel1"][2], pos=config_fields["panel1"][3])
         self.panel1.SetupScrolling()
 
-        self.sev_add=wx.StaticText(self.panel, label="Server Address", pos=config_fields["S_address"][0], style=0, name="")
+        self.sev_add=wx.StaticText(self.panel, label="Server Address",size=config_fields["S_address"][1], pos=config_fields["S_address"][0], style=0, name="")
         self.server_add=wx.TextCtrl(self.panel, pos=config_fields["S_address"][2], size=config_fields["S_address"][3])
         if isConfigJson!=False:
             self.server_add.SetValue(isConfigJson['server_ip'])
@@ -2007,7 +2009,7 @@ def check_update(flag):
     UPDATE_MSG=update_obj.send_update_message()
     l_ver = update_obj.fetch_current_value()
     SERVER_CHECK_MSG = update_obj.server_check_message()
-    if (SERVER_CHECK_MSG):log.info(SERVER_CHECK_MSG)
+    if (SERVER_CHECK_MSG): log.info(SERVER_CHECK_MSG)
     #check if update avaliable
     if ( UPDATE_MSG == 'Update Available!!! Click on update' and flag == True ):
         logger.print_on_console("An update is available. Click on 'Help' menu option -> 'Check for Updates' sub-menu option -> 'Update' button")
