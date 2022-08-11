@@ -20,6 +20,7 @@ from os.path import normpath
 from constants import *
 import controller
 import readconfig
+from __main__ import loadingobj
 import clientwindow
 import json
 import socket
@@ -1215,8 +1216,9 @@ class Main():
             cw = clientwindow.ClientWindow()
             self.cw = cw
         # else:
-            #     logger.init_colorama(autoreset=True)
-
+        #logger.init_colorama(autoreset=True)
+        loadingobj.Close()
+        
         """ Creating Root Logger using logger file config and setting logfile path, which is in config.json """
         try:
             logfilename = os.path.normpath(configvalues["logFile_Path"]).replace("\\","\\\\")
@@ -1297,6 +1299,7 @@ class Main():
             subprocess.Popen("TASKKILL /F /IM AvoAssureMFapi.exe", stdout=nul, stderr=nul)
         sys.exit(0)
 
+
     def register(self, token, hold = False):
         ice_das_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
             'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
@@ -1317,19 +1320,25 @@ class Main():
             if len(url) == 1: url.append("443")
             configvalues['server_port']=url[1]
             if not hold: self.connection("register")
+            # Name : sreenivasulu A
+            return True
         except requests.exceptions.SSLError as e:
             err, err_msg, _ = _process_ssl_errors(str(e))
         except Exception as e:
             err = e
             if 'certificate' in str(e):
                 err, err_msg, _ = _process_ssl_errors(e)
+                return False
             else:
                 logger.print_on_console(err_msg)
+                return False
         if err:
             log.error(err_msg)
             log.error(err)
             if self.gui: self.cw.enable_register()
             else: self._wants_to_close = True
+            # Name : sreenivasulu A
+            return False 
 
     def connection(self, mode):
         try:
@@ -1506,6 +1515,7 @@ class Main():
         try:
             self.token_obj = ICEToken()
             self.server_url = configvalues['server_ip']+':'+configvalues['server_port']
+            self.Ice_Token = configvalues['ice_Token']
             if self.token_obj.token:
                 self.ice_token = self.token_obj.token
                 emsg = None
@@ -1587,7 +1597,10 @@ class Main():
                     core_utils.get_all_the_imports('WebScrape')
                     sys.coinit_flags = 2
                     import web_scrape
-                    cw.scrapewindow = web_scrape.ScrapeWindow(parent = cw,id = -1, title="Avo Assure - Web Scrapper",browser = browsername,socketIO = socketIO,action=action,data=data)
+                    # scrapewindow title is changed < Avo Assure - Web Scrapper > to < AvoAssure Object Identification >
+                    # changed  on Date:08/07/2022
+                    # Author : sreenivasulu
+                    cw.scrapewindow = web_scrape.ScrapeWindow(parent = cw,id = -1, title="AvoAssure Object Identification",browser = browsername,socketIO = socketIO,action=action,data=data)
                     browsername = ''
                 else:
                     import pause_display_operation
@@ -1609,9 +1622,9 @@ class Main():
             log.error(e,exc_info=True)
 
     def print_banner(self):
-        print('********************************************************************************************************')
-        print('============================================ '+self.name+' ============================================')
-        print('********************************************************************************************************')
+        print('********************************************************************************')
+        print('================================ '+self.name+' ================================')
+        print('********************************************************************************')
 
 def get_version_via_com(filename):
     import pythoncom
@@ -2058,3 +2071,4 @@ def stop_ping_thread():
         status_ping_thread.cancel()
         time.sleep(0.5)
         status_ping_thread = None
+
