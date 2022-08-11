@@ -15,7 +15,6 @@ import json
 from webscrape_utils import WebScrape_Utils
 from selenium.common.exceptions import NoSuchWindowException
 from os.path import normpath
-import urllib.parse
 cropandaddobj = None
 browserobj = browserops.BrowserOperations()
 clickandaddoj = clickandadd.Clickandadd()
@@ -26,9 +25,6 @@ checkWebPackage = None
 # Name: A sreenivaulu Date:02/08/2022
 # scraping is allowed for list of allowed_urls only if istrail=1  
 allowed_urls = readconfig.configvalues["sample_application_urls"]
-isTrial = ''
-# allowed_urls = [ i for i in readconfig.configvalues["sample_application_urls"]]
-# allowed_urls.append(readconfig.configvalues["sample_application_urls"])
 isTrial = readconfig.configvalues["isTrial"]
 
 class ScrapeWindow(wx.Frame):
@@ -117,12 +113,13 @@ class ScrapeWindow(wx.Frame):
                     self.nextbutton.SetToolTip(wx.ToolTip("Select next window/tab"))
                     self.nextbutton.Hide()
 
-                    import cropandadd
-                    global cropandaddobj
-                    cropandaddobj = cropandadd.Cropandadd()
-                    self.cropbutton = wx.ToggleButton(self.panel, label="Start IRIS",pos=(290,160 ), size=(165, 30))
-                    self.cropbutton.Bind(wx.EVT_TOGGLEBUTTON, self.cropandadd)
-                    if(self.action == 'replace'): self.cropbutton.Disable()
+                    if checkWebPackage['isWebPackage'] == "False":
+                        import cropandadd
+                        global cropandaddobj
+                        cropandaddobj = cropandadd.Cropandadd()
+                        self.cropbutton = wx.ToggleButton(self.panel, label="Start IRIS",pos=(290,160 ), size=(165, 30))
+                        self.cropbutton.Bind(wx.EVT_TOGGLEBUTTON, self.cropandadd)
+                        if(self.action == 'replace'): self.cropbutton.Disable()
 
                 elif(self.action == 'compare'):
                     try:
@@ -165,6 +162,7 @@ class ScrapeWindow(wx.Frame):
         self.driver.close()
 
     def clickandadd(self,event):
+        global checkWebPackage
         driver = browserops.driver
         current_url = driver.current_url
         # Name: SN adiga Date:02/08/2022
@@ -191,12 +189,14 @@ class ScrapeWindow(wx.Frame):
                     self.fullscrapebutton.Disable()
                     self.fullscrapedropdown.Disable()
                     self.visibilityCheck.Disable()
-                    self.cropbutton.Disable()
+                    if checkWebPackage['isWebPackage'] == "False":
+                        self.cropbutton.Disable()
                     if len(self.driver.window_handles) > 1 and not self.window_selected:
                         self.fullscrapebutton.Hide()
                         self.visibilityCheck.Hide()
                         self.startbutton.Hide()
-                        self.cropbutton.Hide()
+                        if checkWebPackage['isWebPackage'] == "False":
+                            self.cropbutton.Hide()
                         self.fullscrapedropdown.Hide()
                         self.nextbutton.Show()
                         self.resume_scraping_button.SetToolTip(wx.ToolTip("Resume " + self.scrape_type))
@@ -225,12 +225,14 @@ class ScrapeWindow(wx.Frame):
                 self.fullscrapebutton.Disable()
                 self.fullscrapedropdown.Disable()
                 self.visibilityCheck.Disable()
-                self.cropbutton.Disable()
+                if checkWebPackage['isWebPackage'] == "False":
+                    self.cropbutton.Disable()
                 if len(self.driver.window_handles) > 1 and not self.window_selected:
                     self.fullscrapebutton.Hide()
                     self.visibilityCheck.Hide()
                     self.startbutton.Hide()
-                    self.cropbutton.Hide()
+                    if checkWebPackage['isWebPackage'] == "False":
+                        self.cropbutton.Hide()
                     self.fullscrapedropdown.Hide()
                     self.nextbutton.Show()
                     self.resume_scraping_button.SetToolTip(wx.ToolTip("Resume " + self.scrape_type))
@@ -291,6 +293,7 @@ class ScrapeWindow(wx.Frame):
             self.Close()
 
     def fullscrape(self,event):
+        global checkWebPackage
         driver = browserops.driver
         current_url = driver.current_url
         # Name: SN adiga Date:02/08/2022
@@ -314,14 +317,16 @@ class ScrapeWindow(wx.Frame):
                 else:
                     self.scrape_type = "fullscrape"
                     self.startbutton.Disable()
-                    self.cropbutton.Disable()
+                    if checkWebPackage['isWebPackage'] == "False":
+                        self.cropbutton.Disable()  
 
                     logger.print_on_console('Performing fullscrape using option: ',self.scrape_selected_option[0])
                     if not isinstance(self.driver,webdriver.Ie) and len(self.driver.window_handles) > 1 and not self.window_selected:
                         self.fullscrapebutton.Hide()
                         self.startbutton.Hide()
                         self.visibilityCheck.Hide()
-                        self.cropbutton.Hide()
+                        if checkWebPackage['isWebPackage'] == "False":
+                            self.cropbutton.Hide()
                         self.fullscrapedropdown.Hide()
                         self.nextbutton.Show()
                         self.resume_scraping_button.SetToolTip(wx.ToolTip("Resume " + self.scrape_type))
@@ -346,14 +351,16 @@ class ScrapeWindow(wx.Frame):
             else:
                 self.scrape_type = "fullscrape"
                 self.startbutton.Disable()
-                self.cropbutton.Disable()
+                if checkWebPackage['isWebPackage'] == "False":
+                    self.cropbutton.Disable()
 
                 logger.print_on_console('Performing fullscrape using option: ',self.scrape_selected_option[0])
                 if not isinstance(self.driver,webdriver.Ie) and len(self.driver.window_handles) > 1 and not self.window_selected:
                     self.fullscrapebutton.Hide()
                     self.startbutton.Hide()
                     self.visibilityCheck.Hide()
-                    self.cropbutton.Hide()
+                    if checkWebPackage['isWebPackage'] == "False":
+                        self.cropbutton.Hide()
                     self.fullscrapedropdown.Hide()
                     self.nextbutton.Show()
                     self.resume_scraping_button.SetToolTip(wx.ToolTip("Resume " + self.scrape_type))
