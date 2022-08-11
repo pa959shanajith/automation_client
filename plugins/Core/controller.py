@@ -1089,7 +1089,7 @@ class Controller():
         #clearing dynamic variables at the end of execution to support constant variable at the scenario level
         obj.clear_const_variables()
         return status
-  
+
     def invoke_execution(self,mythread,json_data,socketIO,wxObject,configvalues,qcObject,qtestObject,zephyrObject,aws_mode,browserno='0',threadName=''):
         global terminate_flag, status_percentage, saucelabs_count, screen_testcase_map
         qc_url=''
@@ -1154,7 +1154,7 @@ class Controller():
                 'projectname' : suite['projectname']
             }
             socketIO.emit("return_status_executeTestSuite", dict({"status": "started",
-                    'startTime': datetime.now().strftime(TIME_FORMAT)}, **base_execute_data))
+                'startTime': datetime.now().strftime(TIME_FORMAT)}, **base_execute_data))
             execute_result_data = dict({'scenarioId': None, 'reportData': None}, **base_execute_data)
             if(self.execution_mode == PARALLEL):
                 log_handler = logger.CustomHandler(self.execution_mode,base_execute_data,browserno)
