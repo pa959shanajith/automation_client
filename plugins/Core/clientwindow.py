@@ -18,6 +18,7 @@ import io
 import handler
 import update_module
 import benchmark
+isTrial = readconfig.configvalues.get("isTrial")
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 log = logging.getLogger('clientwindow.py')
@@ -111,12 +112,12 @@ class ClientWindow(wx.Frame):
         # Name : A Sreenivasulu Date : 02/08/2022
         # configuration editmenu is disabled with low TLS Security Level
         configmenu = self.editMenu.Append(self.configItem)
-        configmenu.Enable(False)
+        if isTrial:
+            configmenu.Enable(False)
         # end
         self.proxyconfigItem = wx.MenuItem(self.editMenu, 104,text = "&Proxy Configuration",kind = wx.ITEM_NORMAL)
         self.editMenu.Append(self.proxyconfigItem)
         self.menubar.Append(self.editMenu, '&Edit')
-
         self.pdfReportItem = wx.MenuItem(self.toolMenu, 151,text = "Generate PDF &Report",kind = wx.ITEM_NORMAL)
         self.toolMenu.Append(self.pdfReportItem)
         self.pdfReportBatchItem = wx.MenuItem(self.toolMenu, 152,text = "Generate PDF Report (B&atch)",kind = wx.ITEM_NORMAL)
