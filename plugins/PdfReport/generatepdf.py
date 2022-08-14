@@ -60,8 +60,11 @@ class WatchThread(threading.Thread):
                     except: pass
                     shutil.move(os.getcwd()+SEP+dest_file+'.pdf', target)
                 logger.print_on_console("PDF Created Successfully")
-                wx.CallAfter(wx.MessageBox, 'PDF Created Successfully', 'Success', wx.OK | wx.ICON_INFORMATION)
-                wx.CallAfter(self.wxObj.Raise)
+                if sys.platform=='linux':      
+                    wx.CallAfter(wx.MessageBox,'PDF Created Successfully', 'Success', wx.OK | wx.ICON_INFORMATION | wx.STAY_ON_TOP)         
+                else:
+                    wx.CallAfter(wx.MessageBox, 'PDF Created Successfully', 'Success', wx.OK | wx.ICON_INFORMATION)
+                    wx.CallAfter(self.wxObj.Raise)
             except Exception as e:
                 emsg='PDF Created Successfully! But failed to move pdf. Please collect it from here: '+os.getcwd()
                 wx.CallAfter(wx.MessageBox, emsg, 'Access Denied (Requires admin previlege)', wx.OK | wx.ICON_ERROR)
@@ -76,8 +79,10 @@ class WatchThread(threading.Thread):
 
 class GeneratePDFReport(wx.Frame):
     def __init__(self, title, conf):
-        wx.Frame.__init__(self, parent=None, id=-1, title = title, size = (350,250),
-            style=wx.DEFAULT_FRAME_STYLE & ~ (wx.MAXIMIZE_BOX) & ~ (wx.RESIZE_BORDER))
+        if sys.platform=='linux':
+            wx.Frame.__init__(self, parent=None, id=-1, title = title, size = (350,250),style=wx.DEFAULT_FRAME_STYLE  & ~ (wx.MAXIMIZE_BOX) & ~ (wx.RESIZE_BORDER) | wx.STAY_ON_TOP)
+        else:
+            wx.Frame.__init__(self, parent=None, id=-1, title = title, size = (350,250),style=wx.DEFAULT_FRAME_STYLE & ~ (wx.MAXIMIZE_BOX) & ~ (wx.RESIZE_BORDER))
 
         global pdfkit_conf
         pdfkit_conf = conf
