@@ -158,7 +158,7 @@ class ClientWindow(wx.Frame):
         box.Add(self.log, 1, wx.ALL|wx.EXPAND, 5)
 
         #Radio buttons
-        lblList = ['Normal', 'Stepwise', 'RunFromStep']
+        lblList = ['Normal', 'Stepwise', 'RunfromStep']
         self.rbox = wx.RadioBox(self.panel,label = 'Debug options', pos = (10, 548), choices = lblList ,size=(380, 100),
         majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
 
@@ -361,11 +361,11 @@ class ClientWindow(wx.Frame):
             self.breakpoint.Clear()
             self.breakpoint.Disable()
             self.killChildWindow(debug=True)
-        elif self.choice in ['Stepwise','RunFromStep']:
+        elif self.choice in ['Stepwise','RunfromStep']:
             self.debug_mode=True
             ##if self.debugwindow == None:
             ##    self.debugwindow = DebugWindow(parent = None,id = -1, title="Debugger")
-            if self.choice=='RunFromStep':
+            if self.choice=='RunfromStep':
                 self.breakpoint.Enable()
             else:
                 self.breakpoint.Clear()
@@ -1244,6 +1244,9 @@ class Config_window(wx.Frame):
         data['kill_stale']=kill_stale.strip()
         data['browser_screenshots']=browser_screenshots.strip()
         data['file_server_ip']=readconfig.configvalues["file_server_ip"]
+        data['ice_Token']=readconfig.configvalues['ice_Token']
+        data['sample_application_urls']=readconfig.configvalues['sample_application_urls']
+        data['isTrial']=readconfig.configvalues['isTrial']
         config_data=data
         if (data['server_ip']!='' and data['server_port']!='' and data['server_cert']!='' and
             data['chrome_path']!='' and data['queryTimeOut'] not in ['','sec'] and data['logFile_Path']!='' and
@@ -1806,14 +1809,14 @@ class ProxyConfig_window(wx.Frame):
             #------------------------------------Different co-ordinates for Windows and Mac
             if SYSTEM_OS=='Windows' or SYSTEM_OS=='Linux':
                 upload_fields= {
-                "Frame":[(300, 150),(400,220)],
+                "Frame":[(300, 170),(400, 230)],
                 "disp_msg":[(12,18),(80, 28),(100,18), (310,-1),(415,18),(30, -1)],
-                "proxy_enable":[(12,10), (150, 48)],
-                "proxy_url":[(12,65),(95, 20),(110,61), (250,-1)],
-                "username":[(12,95),(95, 20),(110,91), (250,-1)],
-                "passwd":[(12,125),(95, 20),(110,121), (250,-1)],
-                "Save":[(92,148), (100, 28)],
-                "Close":[(192,148), (100, 28)]
+                "proxy_enable":[(17,7), (180,40)],
+                "proxy_url":[(17,67),(95, 50),(120,61), (245,-1)],
+                "username":[(17,97),(95, 20),(120,91), (245,-1)],
+                "passwd":[(17,128),(95, 20),(120,122), (245,-1)],
+                "Save":[(157, 153), (100, 28)],
+                "Close":[(264,153), (100, 28)]
             }
             else:
                 upload_fields={
