@@ -1912,7 +1912,11 @@ def check_browser():
                 if os.path.exists(EDGE_CHROMIUM_DRIVER_PATH):
                     p = subprocess.Popen('"' + EDGE_CHROMIUM_DRIVER_PATH + '" --version', stdout=subprocess.PIPE, bufsize=1,cwd=DRIVERS_PATH,shell=True)
                     a = p.stdout.readline()
-                    a = a.decode('utf-8')[13:17]
+                    a = a.decode('utf-8').split(' ')
+                    if len(a) == 5:
+                        a = a[3]
+                    else:
+                        a = a[1]    
                     a=a.split('.')[0]
                     if str(a) == CHROMIUM_VERSION.split('.')[0]:
                         chromiumFlag = True
