@@ -34,7 +34,7 @@ class DropdownListboxOperations:
         methodoutput = TEST_RESULT_FALSE
         output_res = OUTPUT_CONSTANT
         err_msg = None
-        selectedvalue = []
+        selectedvalue = ''
         try:
             charinfo = acc.getAccessibleContextInfo()
             log.debug('Received Object Context',DEF_GETSELECTED)
@@ -48,30 +48,21 @@ class DropdownListboxOperations:
                     childcontextinfo=childcontext.getAccessibleContextInfo()
                     childstates=childcontextinfo.states
                     if 'selected' in childstates:
-                        selectedvalue.append(childcontextinfo.name)
+                        selectedvalue = childcontextinfo.name
+                        output_res = selectedvalue
                         status=TEST_RESULT_PASS
+                        methodoutput = TEST_RESULT_TRUE
             #check for listbox
             elif charinfo.role == 'list':
                 #calling getselected def to get all selected values in list
                 selectedvalue = self.getselectedlist(acc)
+                output_res = selectedvalue
                 status = TEST_RESULT_PASS
+                methodoutput = TEST_RESULT_TRUE
             else:
                 log.debug('%s',MSG_INVALID_INPUT)
                 logger.print_on_console(MSG_INVALID_INPUT)
                 err_msg = MSG_INVALID_OBJECT
-            outputsize = len(selectedvalue)
-            for i in range(outputsize):
-                if outputsize == 1:
-                    if charinfo.role == 'list':
-                        methodoutput=selectedvalue[i]
-                        methodoutput = methodoutput + ';'
-                    else:
-                        methodoutput=selectedvalue[i]
-                        selectedvalue = methodoutput
-                else:
-                    methodoutput=methodoutput + selectedvalue[i]
-                    if i < outputsize - 1:
-                        methodoutput = methodoutput + ';'
         except Exception as e:
             self.utilities_obj.cleardata()
             err_msg = ERROR_CODE_DICT['err_get_selected']
@@ -290,7 +281,7 @@ class DropdownListboxOperations:
 
     #Method to get selected values for listbox
     def getselectedlist(self,acc):
-        selectedvalue = []
+        selectedvalue = ''
         charinfo = acc.getAccessibleContextInfo()
         count = charinfo.childrenCount
         if charinfo.role == 'list':
@@ -299,10 +290,8 @@ class DropdownListboxOperations:
                 acccontext = childAcc.getAccessibleContextInfo()
                 state = acccontext.states
                 if 'selected' in state:
-                        value = acccontext.name
-                        selectedvalue.append(str(value))
-        if len(selectedvalue) == 1:
-            return selectedvalue[0]
+                    selectedvalue = acccontext.name
+                    break
         return selectedvalue
 
     #Method to get count for dropdown
@@ -1040,3 +1029,4 @@ class DropdownListboxOperations:
             log.debug('Status %s',status)
         log.debug('Status %s',status)
         return status,methodoutput,output_res,err_msg
+        
