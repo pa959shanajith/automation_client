@@ -18,6 +18,7 @@ import io
 import handler
 import update_module
 import benchmark
+isTrial = readconfig.configvalues.get("isTrial")
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 log = logging.getLogger('clientwindow.py')
@@ -60,7 +61,7 @@ class ClientWindow(wx.Frame):
     def __init__(self):
         self.appName = root.name
         wx.Frame.__init__(self, parent=None,id=-1, title=self.appName,
-                   pos=(300, 150),  size=(800, 730),style=wx.DEFAULT_FRAME_STYLE & ~ (wx.MAXIMIZE_BOX))
+                   pos=(300, 150),  size=(800, 730),style=wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER  | wx.MAXIMIZE_BOX))
         self.SetBackgroundColour('#e6e7e8')
         ##self.ShowFullScreen(True,wx.ALL)
         ##self.SetBackgroundColour('#D0D0D0')
@@ -108,11 +109,15 @@ class ClientWindow(wx.Frame):
         self.menubar.Append(self.fileMenu, '&File')
 
         self.configItem = wx.MenuItem(self.editMenu, 103,text = "&Configuration",kind = wx.ITEM_NORMAL)
-        self.editMenu.Append(self.configItem)
+        # Name : A Sreenivasulu Date : 02/08/2022
+        # configuration editmenu is disabled with low TLS Security Level
+        configmenu = self.editMenu.Append(self.configItem)
+        if isTrial:
+            configmenu.Enable(False)
+        # end
         self.proxyconfigItem = wx.MenuItem(self.editMenu, 104,text = "&Proxy Configuration",kind = wx.ITEM_NORMAL)
         self.editMenu.Append(self.proxyconfigItem)
         self.menubar.Append(self.editMenu, '&Edit')
-
         self.pdfReportItem = wx.MenuItem(self.toolMenu, 151,text = "Generate PDF &Report",kind = wx.ITEM_NORMAL)
         self.toolMenu.Append(self.pdfReportItem)
         self.pdfReportBatchItem = wx.MenuItem(self.toolMenu, 152,text = "Generate PDF Report (B&atch)",kind = wx.ITEM_NORMAL)
@@ -143,7 +148,7 @@ class ClientWindow(wx.Frame):
         self.log.SetFont(font1)
 
         if SYSTEM_OS == 'Windows':
-            self.schedule = wx.CheckBox(self.panel, label='Do Not Disturb', pos=(120, 10), size=(100, 25))
+            self.schedule = wx.CheckBox(self.panel, label='Do Not Disturb', pos=(120, 10), size=(120, 25))
         else:
             self.schedule = wx.CheckBox(self.panel, label = 'Do Not Disturb',pos=(120, 10))
         # self.schedule = wx.CheckBox(self.panel, label = 'Do Not Disturb',pos=(120, 10), size=(100, 25))
@@ -155,29 +160,29 @@ class ClientWindow(wx.Frame):
 
         #Radio buttons
         lblList = ['Normal', 'Stepwise', 'RunfromStep']
-        self.rbox = wx.RadioBox(self.panel,label = 'Debug options', pos = (10, 548), choices = lblList ,size=(300, 100),
+        self.rbox = wx.RadioBox(self.panel,label = 'Debug options', pos = (10, 548), choices = lblList ,size=(380, 100),
         majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
 
         self.rbox.Bind(wx.EVT_RADIOBOX,self.onRadioBox)
-        self.breakpoint = wx.TextCtrl(self.panel, wx.ID_ANY, pos=(225, 595), size=(60,20), style = wx.TE_RICH)
+        self.breakpoint = wx.TextCtrl(self.panel, wx.ID_ANY, pos=(267, 605), size=(88,25), style = wx.TE_RICH)
         box.Add(self.breakpoint, 1, wx.ALL|wx.EXPAND, 5)
         self.breakpoint.Bind(wx.EVT_CHAR, self.handle_keypress)
         self.breakpoint.Disable()
 
-        self.cancelbutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap(IMAGES_PATH +"killStaleProcess.png", wx.BITMAP_TYPE_ANY), wx.Point(360, 555), wx.Size(50, 42))
+        self.cancelbutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap(IMAGES_PATH +"killStaleProcess.png", wx.BITMAP_TYPE_ANY), wx.Point(440, 555), wx.Size(50, 42))
         self.cancelbutton.Bind(wx.EVT_LEFT_DOWN, self.OnKillProcess)
         self.cancelbutton.SetToolTip(wx.ToolTip("To kill Stale process"))
-        self.cancel_label=wx.StaticText(self.panel, -1, 'Kill Stale Process', wx.Point(340, 600), wx.Size(100, 70))
+        self.cancel_label=wx.StaticText(self.panel, -1, 'Kill Stale Process', wx.Point(435, 600), wx.Size(100, 70))
 
-        self.terminatebutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap(IMAGES_PATH +"terminate.png", wx.BITMAP_TYPE_ANY), wx.Point(475, 555), wx.Size(50, 42))
+        self.terminatebutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap(IMAGES_PATH +"terminate.png", wx.BITMAP_TYPE_ANY), wx.Point(555, 555), wx.Size(50, 42))
         self.terminatebutton.Bind(wx.EVT_LEFT_DOWN, self.OnTerminate)
         self.terminatebutton.SetToolTip(wx.ToolTip("To Terminate the execution"))
-        self.terminate_label=wx.StaticText(self.panel, -1, 'Terminate', wx.Point(475, 600), wx.Size(100, 70))
+        self.terminate_label=wx.StaticText(self.panel, -1, 'Terminate', wx.Point(547, 600), wx.Size(100, 70))
 
-        self.clearbutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap(IMAGES_PATH +"clear.png", wx.BITMAP_TYPE_ANY), wx.Point(590, 555), wx.Size(50, 42))
+        self.clearbutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap(IMAGES_PATH +"clear.png", wx.BITMAP_TYPE_ANY), wx.Point(670, 555), wx.Size(50, 42))
         self.clearbutton.Bind(wx.EVT_LEFT_DOWN, self.OnClear)
         self.clearbutton.SetToolTip(wx.ToolTip("To clear the console area"))
-        self.clear_label=wx.StaticText(self.panel, -1, 'Clear', wx.Point(600, 600), wx.Size(100, 70))
+        self.clear_label=wx.StaticText(self.panel, -1, 'Clear', wx.Point(677, 600), wx.Size(100, 70))
         self.Bind(wx.EVT_CLOSE, root.close)
 
         box.AddStretchSpacer()
@@ -1269,6 +1274,9 @@ class Config_window(wx.Frame):
         data['kill_stale']=kill_stale.strip()
         data['browser_screenshots']=browser_screenshots.strip()
         data['file_server_ip']=readconfig.configvalues["file_server_ip"]
+        data['ice_Token']=readconfig.configvalues['ice_Token']
+        data['sample_application_urls']=readconfig.configvalues['sample_application_urls']
+        data['isTrial']=readconfig.configvalues['isTrial']
         config_data=data
         if (data['server_ip']!='' and data['server_port']!='' and data['server_cert']!='' and
             data['chrome_path']!='' and data['queryTimeOut'] not in ['','sec'] and data['logFile_Path']!='' and
@@ -1837,14 +1845,14 @@ class ProxyConfig_window(wx.Frame):
             #------------------------------------Different co-ordinates for Windows and Mac
             if SYSTEM_OS=='Windows' or SYSTEM_OS=='Linux':
                 upload_fields= {
-                "Frame":[(300, 150),(400,220)],
+                "Frame":[(300, 170),(400, 230)],
                 "disp_msg":[(12,18),(80, 28),(100,18), (310,-1),(415,18),(30, -1)],
-                "proxy_enable":[(12,10), (150, 48)],
-                "proxy_url":[(12,65),(95, 20),(110,61), (250,-1)],
-                "username":[(12,95),(95, 20),(110,91), (250,-1)],
-                "passwd":[(12,125),(95, 20),(110,121), (250,-1)],
-                "Save":[(92,148), (100, 28)],
-                "Close":[(192,148), (100, 28)]
+                "proxy_enable":[(17,7), (180,40)],
+                "proxy_url":[(17,67),(95, 50),(120,61), (245,-1)],
+                "username":[(17,97),(95, 20),(120,91), (245,-1)],
+                "passwd":[(17,128),(95, 20),(120,122), (245,-1)],
+                "Save":[(157, 153), (100, 28)],
+                "Close":[(264,153), (100, 28)]
             }
             else:
                 upload_fields={
@@ -2030,3 +2038,4 @@ def check_update(flag):
             logger.print_on_console( UPDATE_MSG )
             log.info( UPDATE_MSG )
     return False,l_ver
+

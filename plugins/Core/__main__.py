@@ -3,8 +3,15 @@ import os
 import logging
 import argparse
 import platform
+import wx
+from loadingwindow import Loading_window
 log = logging.getLogger('Avo_Assure')
 ice_ver = '3.0.0'
+
+def main():
+    global loadingobj
+    app = wx.App()
+    loadingobj = Loading_window(None)
 
 try:
     cfile = os.path.abspath(__file__)
@@ -73,6 +80,7 @@ if sys.platform == 'win32':
 
 if __name__ == "__main__":
     try:
+        main()
         appName = "Avo Assure ICE"
         path = os.environ["AVO_ASSURE_HOME"]+os.sep
         if not os.path.exists(path+"logs"): os.mkdir(path+"logs")
@@ -80,6 +88,6 @@ if __name__ == "__main__":
         import core
         core.configvalues = configvalues
         core.proxies = proxies
-        core.Main(appName, args)
+        core.Main(appName, args)      
     except Exception as e:
         log.error(e, exc_info=True)

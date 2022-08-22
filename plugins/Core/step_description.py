@@ -139,6 +139,8 @@ class StepDescription:
             return "Add the numbers '"+ input+"' and save the value '"+output +"' in '"+ tsp.outputval+"'"
         def evaluate():
             return "Evaluate Mathematical expression '"+ tsp.inputval[0]+"' and save the result '"+ output +"' in '"+ tsp.outputval+"'"
+        def currencyConverter():
+            return "currencyConverter '"+ tsp.inputval[0]+"' and save the result '"+ output +"' in '"+ tsp.outputval+"'"
 
         #Compare keywords
         def verifyobjects():
