@@ -653,7 +653,7 @@ class Config_window(wx.Frame):
         self.panel1 = wx.lib.scrolledpanel.ScrolledPanel(self.panel,-1,size=config_fields["panel1"][2], pos=config_fields["panel1"][3])
         self.panel1.SetupScrolling()
 
-        self.sev_add = wx.StaticText(self.panel, label="Server Address", pos=config_fields["S_address"][0], size=config_fields["S_address"][1], style=0, name="")
+        self.sev_add=wx.StaticText(self.panel, label="Server Address", pos=config_fields["S_address"][0], size=config_fields["S_address"][1], style=0, name="")
         self.server_add=wx.TextCtrl(self.panel, pos=config_fields["S_address"][2], size=config_fields["S_address"][3])
         if isConfigJson!=False:
             self.server_add.SetValue(isConfigJson['server_ip'])
