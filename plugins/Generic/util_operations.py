@@ -20,10 +20,9 @@ import core_utils
 import logging
 import ast
 import io, urllib.request, urllib.error
-if SYSTEM_OS != 'Darwin':
+if SYSTEM_OS == 'Windows':
     import win32api,win32con
-if SYSTEM_OS == 'Darwin':
-    import subprocess
+import subprocess
 
 log = logging.getLogger('util_operations.py')
 class UtilOperations:
