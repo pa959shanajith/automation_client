@@ -88,6 +88,6 @@ if __name__ == "__main__":
         import core
         core.configvalues = configvalues
         core.proxies = proxies
-        core.Main(appName, args)      
+        core.Main(appName, args, loadingobj)
     except Exception as e:
         log.error(e, exc_info=True)

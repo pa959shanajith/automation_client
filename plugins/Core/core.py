@@ -20,7 +20,7 @@ from os.path import normpath
 from constants import *
 import controller
 import readconfig
-from __main__ import loadingobj
+# from __main__ import loadingobj
 import clientwindow
 import json
 import socket
@@ -1193,7 +1193,7 @@ class TestThread(threading.Thread):
 
 
 class Main():
-    def __init__(self, appName, args):
+    def __init__(self, appName, args, loadingobj):
         self.name = appName
         self.gui = not (args.register or args.connect)
         self.cw = None

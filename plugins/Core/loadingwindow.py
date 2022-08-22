@@ -1,5 +1,5 @@
 import wx
-import __main__
+# import __main__
 import logging
 log = logging.getLogger('loadingwindow.py')
 
