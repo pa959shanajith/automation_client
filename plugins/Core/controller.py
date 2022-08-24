@@ -1992,6 +1992,7 @@ def kill_process():
         log.info('Stale processes killed')
         logger.print_on_console('Stale processes killed')
     elif SYSTEM_OS == 'Linux':
+        stale_process_killed=False
         log.info("killing stale process in linux")
         try:
             import browser_Keywords
@@ -2008,11 +2009,14 @@ def kill_process():
             if hasattr(browser_Keywords.local_bk, 'pid_set'):
                 if (browser_Keywords.local_bk.pid_set):
                     del browser_Keywords.local_bk.pid_set[:]
+            stale_process_killed=True
         except Exception as e:
-            logger.print_on_console('Unable to kill stale process')
-            log.error(e)
-        log.info('Stale process Killed')
-        logger.print_on_console('Stale process killed')
+            if isinstance(e,ModuleNotFoundError):
+                logger.print_on_console('No stale process to kill')
+                log.error(e,exc_info=True)
+        if stale_process_killed:
+            log.info('Stale process Killed')
+            logger.print_on_console('Stale process killed')
 
     else:
         try:

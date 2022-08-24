@@ -127,12 +127,13 @@ class ClientWindow(wx.Frame):
 
         self.aboutItem = wx.MenuItem(self.helpMenu, 160, text="About", kind=wx.ITEM_NORMAL)
         self.helpMenu.Append(self.aboutItem)
-        self.updateItem = wx.MenuItem(self.helpMenu, 161, text="Check for Updates", kind=wx.ITEM_NORMAL)
-        self.helpMenu.Append(self.updateItem)
-        self.updateItem.Enable(True)
-        self.rollbackItem = wx.MenuItem(self.helpMenu, 162, text="Rollback", kind=wx.ITEM_NORMAL)
-        self.helpMenu.Append(self.rollbackItem)
-        self.rollbackItem.Enable(True)
+        if SYSTEM_OS!='Linux':
+            self.updateItem = wx.MenuItem(self.helpMenu, 161, text="Check for Updates", kind=wx.ITEM_NORMAL)
+            self.helpMenu.Append(self.updateItem)
+            self.updateItem.Enable(True)
+            self.rollbackItem = wx.MenuItem(self.helpMenu, 162, text="Rollback", kind=wx.ITEM_NORMAL)
+            self.helpMenu.Append(self.rollbackItem)
+            self.rollbackItem.Enable(True)
         self.menubar.Append(self.helpMenu, '&Help')
 
         self.Bind(wx.EVT_MENU, self.menuhandler)
@@ -158,7 +159,7 @@ class ClientWindow(wx.Frame):
         box.Add(self.log, 1, wx.ALL|wx.EXPAND, 5)
 
         #Radio buttons
-        lblList = ['Normal', 'Stepwise', 'RunFromStep']
+        lblList = ['Normal', 'Stepwise', 'RunfromStep']
         self.rbox = wx.RadioBox(self.panel,label = 'Debug options', pos = (10, 548), choices = lblList ,size=(380, 100),
         majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
 
@@ -361,11 +362,11 @@ class ClientWindow(wx.Frame):
             self.breakpoint.Clear()
             self.breakpoint.Disable()
             self.killChildWindow(debug=True)
-        elif self.choice in ['Stepwise','RunFromStep']:
+        elif self.choice in ['Stepwise','RunfromStep']:
             self.debug_mode=True
             ##if self.debugwindow == None:
             ##    self.debugwindow = DebugWindow(parent = None,id = -1, title="Debugger")
-            if self.choice=='RunFromStep':
+            if self.choice=='RunfromStep':
                 self.breakpoint.Enable()
             else:
                 self.breakpoint.Clear()
@@ -430,17 +431,18 @@ class ClientWindow(wx.Frame):
                 self.OnTerminate(event,"term_exec")
                 root.connection(name)
                 if self.connectbutton.GetName() != "register":
-                    self.enable_connect()
-                self.schedule.SetValue(False)
-                self.schedule.Disable()
-                self.rollbackItem.Enable(False)
-                self.updateItem.Enable(False)
+                    wx.CallAfter(self.enable_connect)
+                wx.CallAfter(self.schedule.SetValue,False)
+                wx.CallAfter(self.schedule.Disable)
+                if SYSTEM_OS!='Linux':
+                    wx.CallAfter(self.rollbackItem.Enable,False)
+                    wx.CallAfter(self.updateItem.Enable,False)
         except:
-            self.cancelbutton.Disable()
-            self.terminatebutton.Disable()
-            self.clearbutton.Disable()
-            self.connectbutton.Enable()
-            self.rbox.Disable()
+            wx.CallAfter(self.cancelbutton.Disable)
+            wx.CallAfter(self.terminatebutton.Disable)
+            wx.CallAfter(self.clearbutton.Disable)
+            wx.CallAfter(self.connectbutton.Enable)
+            wx.CallAfter(self.rbox.Disable)
 
     def enable_connect(self, enable_button = True, repaint_title = True):
         self.connectbutton.SetBitmapLabel(self.connect_img)
@@ -560,7 +562,7 @@ class Config_window(wx.Frame):
         #----------------------------------
 
         #------------------------------------Different co-ordinates for Windows and Mac
-        if SYSTEM_OS=='Windows' or SYSTEM_OS=='Linux':
+        if SYSTEM_OS=='Windows':
             config_fields= {
             "Frame":[(300, 150),(470,670)],
             "S_address":[(12,12),(85, 25),(110,8),(140,-1)],
@@ -585,7 +587,7 @@ class Config_window(wx.Frame):
             "Save":[(100,580), (100, 28)],
             "Close":[(250,580), (100, 28)]
             }
-        else:
+        elif SYSTEM_OS=='Darwin':
             config_fields={
             "Frame":[(300, 150),(600,670)],
             "S_address":[(12,12),(90,25),(116,8),(140,-1)],
@@ -610,6 +612,34 @@ class Config_window(wx.Frame):
             "Save":[(130,580),(100, 28)],
             "Close":[(370,580),(120, 28)]
             }
+        elif SYSTEM_OS=='Linux':
+            # position size
+            config_fields={
+            "Frame":[(300, 150),(600,670)], 
+            "S_address":[(12,12),(120,25),(150,8),(140,25)], 
+            "S_port": [(320,11),(120,25),(434,8), (140,25)], 
+            "Chrm_path":[(12,42),(120,25),(150,38),(370,25),(534,38),(40, 25)], 
+            "Chrm_profile":[(12,72),(120,25),(150,68),(370,25),(534,68),(40, 25)], 
+            "Chrm_extn_path":[(12,102),(120,25),(150,98), (370,25),(534,98),(40,25)],
+            "Ffox_path":[(12,132),(120,25),(150,128),(370,25),(534,128),(40,25)],
+            "Log_path":[(12,162),(120, 25),(150,158),(370,25),(534,158),(40,25)],
+            "S_cert":[(12,192),(130, 25),(150,188),(370,25),(534,188),(40,25)],
+            "Q_timeout":[(12,222),(115, 25),(150,218), (80,25)],
+            "Timeout":[(235,222),(80, 25),(315,218),(80,25)],
+            "Delay":[(404,222),(41, 25),(490,218), (85,25)],
+            "Step_exec":[(12,252),(150, 25),(180,248),(80,25)],
+            "Disp_var": [(273, 252), (-1, 25), (490, 248), (85, 25)],
+            "C_Timeout" :[(12,282),(-1, 25),(180,278), (80,25)],
+            "Delay_Stringinput":[(273,282),(-1, 25),(490,278), (85,25)],
+            "global_waittimeout":[(12,312),(-1, 25),(180,308),(80,25)],
+            "max_tries":[(273,312),(-1, 25),(490,308), (85,25)],
+            "panel1":[(10,345),(100,20),(565,185),(12,365)],
+            "err_text":[(85,555),(350, 25)],
+            "Save":[(130,580),(100, 28)],
+            "Close":[(370,580),(120, 28)]
+            }
+        
+
         wx.Frame.__init__(self, parent, title=title,
             pos=config_fields["Frame"][0], size=config_fields["Frame"][1],style = wx.CAPTION|wx.CLIP_CHILDREN)
 
@@ -1244,6 +1274,9 @@ class Config_window(wx.Frame):
         data['kill_stale']=kill_stale.strip()
         data['browser_screenshots']=browser_screenshots.strip()
         data['file_server_ip']=readconfig.configvalues["file_server_ip"]
+        data['ice_Token']=readconfig.configvalues['ice_Token']
+        data['sample_application_urls']=readconfig.configvalues['sample_application_urls']
+        data['isTrial']=readconfig.configvalues['isTrial']
         config_data=data
         if (data['server_ip']!='' and data['server_port']!='' and data['server_cert']!='' and
             data['chrome_path']!='' and data['queryTimeOut'] not in ['','sec'] and data['logFile_Path']!='' and
@@ -1567,9 +1600,15 @@ class About_window(wx.Frame):
                 "disp_msg":[(12,18),(80, 28),(100,18), (310,-1),(415,18),(30, -1)],
                 "Close":[(280,148), (100, 28)]
             }
-            else:
+            elif SYSTEM_OS=='Darwin':
                 upload_fields={
                 "Frame":[(300, 150),(400,220)],#(diff +85,+10 from windows)
+                "disp_msg":[(12,38),(80,28),(116,38),(382,-1),(504,38),(30, -1)],
+                "Close":[(285,148),(100, 28)]
+            }
+            else:
+                upload_fields={
+                "Frame":[(300, 150),(460,220)],
                 "disp_msg":[(12,38),(80,28),(116,38),(382,-1),(504,38),(30, -1)],
                 "Close":[(285,148),(100, 28)]
             }
@@ -1584,7 +1623,7 @@ class About_window(wx.Frame):
             if SYSTEM_OS=='Windows':
                 self.msg2=wx.StaticText(self.panel, -1, str(msg2), wx.Point(170, 55), wx.Size(200, 50))
                 self.msg3=wx.StaticText(self.panel, -1, str(msg3), wx.Point(10, 90), wx.Size(350, 50))
-            elif SYSTEM_OS=='Darwin':
+            else:
                 self.msg2 = wx.StaticText(self.panel, -1, str(msg2), wx.Point(170, 55), wx.Size(300, 50))
                 self.msg3 = wx.StaticText(self.panel, -1, str(msg3), wx.Point(10, 90), wx.Size(400, 50))
             self.msg4=wx.StaticText(self.panel, -1, str(msg4), wx.Point(10, 120), wx.Size(200, 50))
@@ -1806,14 +1845,14 @@ class ProxyConfig_window(wx.Frame):
             #------------------------------------Different co-ordinates for Windows and Mac
             if SYSTEM_OS=='Windows' or SYSTEM_OS=='Linux':
                 upload_fields= {
-                "Frame":[(300, 150),(400,220)],
+                "Frame":[(300, 170),(400, 230)],
                 "disp_msg":[(12,18),(80, 28),(100,18), (310,-1),(415,18),(30, -1)],
-                "proxy_enable":[(12,10), (150, 48)],
-                "proxy_url":[(12,65),(95, 20),(110,61), (250,-1)],
-                "username":[(12,95),(95, 20),(110,91), (250,-1)],
-                "passwd":[(12,125),(95, 20),(110,121), (250,-1)],
-                "Save":[(92,148), (100, 28)],
-                "Close":[(192,148), (100, 28)]
+                "proxy_enable":[(17,7), (180,40)],
+                "proxy_url":[(17,67),(95, 50),(120,61), (245,-1)],
+                "username":[(17,97),(95, 20),(120,91), (245,-1)],
+                "passwd":[(17,128),(95, 20),(120,122), (245,-1)],
+                "Save":[(157, 153), (100, 28)],
+                "Close":[(264,153), (100, 28)]
             }
             else:
                 upload_fields={
@@ -1978,7 +2017,7 @@ def check_update(flag):
     UPDATE_MSG=update_obj.send_update_message()
     l_ver = update_obj.fetch_current_value()
     SERVER_CHECK_MSG = update_obj.server_check_message()
-    if (SERVER_CHECK_MSG): logger.print_on_console(SERVER_CHECK_MSG)
+    if (SERVER_CHECK_MSG): log.info(SERVER_CHECK_MSG)
     #check if update avaliable
     if ( UPDATE_MSG == 'Update Available!!! Click on update' and flag == True ):
         logger.print_on_console("An update is available. Click on 'Help' menu option -> 'Check for Updates' sub-menu option -> 'Update' button")
