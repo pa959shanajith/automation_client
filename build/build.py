@@ -182,11 +182,11 @@ cwd += "" if basename(cwd) == "AvoAssure" else (sl + "AvoAssure")
 unit_tests_path = cwd + sl + "unit_tests"
 if os.path.isdir(unit_tests_path): shutil.rmtree(unit_tests_path)
 print(cwd)
-# try:
-#     preprocess_deltafiles(cwd)
-# except Exception as e:
-#     print("Error occured while processing delta files. Error: ", e)
-#     raise RuntimeError("BUILD FAILED : There was error during processing delta files")
+try:
+    preprocess_deltafiles(cwd)
+except Exception as e:
+    print("Error occured while processing delta files. Error: ", e)
+    raise RuntimeError("BUILD FAILED : There was error during processing delta files")
 
 file_refer = open('../cython_error.txt','a')
 try:
@@ -224,8 +224,8 @@ try:
 except Exception as e:
     print("Failed to build main file")
     print("Error: ", e)
-# build_recursive_dir_tree(cwd + sl +"plugins" + sl)
+build_recursive_dir_tree(cwd + sl +"plugins" + sl)
 file_refer.close()
 
-# if errorcount > 0:
-#     raise RuntimeError("BUILD FAILED : There are "+ str(errorcount) + " no of errors")
+if errorcount > 0:
+    raise RuntimeError("BUILD FAILED : There are "+ str(errorcount) + " no of errors")
