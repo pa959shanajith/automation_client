@@ -13,3 +13,5 @@ libs/*
 logs/*
 output/*
 assets/packets.db
+lib/*
+bin/*
