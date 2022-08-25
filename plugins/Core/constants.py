@@ -477,7 +477,7 @@ STEPSTATUS_INREPORTS_ZERO = '0'
 
 EVALUATE='evaluate'
 
-NUMBER_FORMATTER='numberFormatter'
+NUMBER_FORMATTER='numberformatter'
 
 ENDFOR_DESCRIPTION='EndFor: completed'
 
