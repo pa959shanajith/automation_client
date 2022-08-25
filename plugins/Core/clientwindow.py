@@ -1854,11 +1854,22 @@ class ProxyConfig_window(wx.Frame):
                 "Save":[(157, 153), (100, 28)],
                 "Close":[(264,153), (100, 28)]
             }
-            else:
+            elif SYSTEM_OS=='Darwin':
                 upload_fields={
                 "Frame":[(300, 150),(550,220)],#(diff +85,+10 from windows)
                 "disp_msg":[(12,38),(80,28),(116,38),(382,-1),(504,38),(30, -1)],
                 "Close":[(285,88),(100, 28)]
+            }
+            elif SYSTEM_OS=='Linux':
+                upload_fields= {
+                "Frame":[(300, 170),(400, 230)],
+                "disp_msg":[(12,18),(80, 28),(100,18), (310,-1),(415,18),(30, -1)],
+                "proxy_enable":[(17,7), (180,40)],
+                "proxy_url":[(17,67),(95, 50),(120,61), (245,-1)],
+                "username":[(17,97),(95, 20),(120,91), (245,-1)],
+                "passwd":[(17,128),(95, 20),(120,122), (245,-1)],
+                "Save":[(157, 153), (100, 28)],
+                "Close":[(264,153), (100, 28)]
             }
             lblList = ['Enabled', 'Disabled']
             wx.Frame.__init__(self, parent, title=title,pos=upload_fields["Frame"][0], size=upload_fields["Frame"][1], style = wx.CAPTION|wx.CLIP_CHILDREN)
