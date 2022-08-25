@@ -851,7 +851,6 @@ class Dispatcher:
             local_Wd.log.debug('Identifiers are ')
             local_Wd.log.debug(identifiers)
             global finalXpath
-            print(identifiers[0])
             #Absolute xpath is used to locate web element first as it doesn't change like relative xpath.
             if len(identifiers)>=3:
                 #find by absolute xpath
