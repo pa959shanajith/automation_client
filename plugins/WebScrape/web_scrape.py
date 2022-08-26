@@ -37,14 +37,14 @@ class ScrapeWindow(wx.Frame):
             scrapper_window_config={
                 "frame":[(300, 150),(510, 270)],
                 "url_label_field": [(75, 34)],
-                "navigateURL_field": [(110, 30),(260, 30)],
-                "navigateurl_bttn_field":[(380,30 ), (75, 30)],
-                "startbutton_field":[(110, 160), (165, 30)],
+                "navigateURL_field": [(120, 30),(265, 30)],
+                "navigateurl_bttn_field":[(400,30 ), (80, 30)],
                 "scrape_type_label_field":[(25,83)],
-                "fullscrapedropdown_field":[(110, 80 ),(260, 30)],
-                "fullscrapebutton": [(380, 80),(75, 30)],
-                "visibilityCheck":[(110,120), (80, 20)],
-                "cropbutton_field":[(290,160 ), (165, 30)]
+                "fullscrapedropdown_field":[(120, 80 ),(265, 30)],
+                "fullscrapebutton": [(400, 80),(80, 30)],
+                "visibilityCheck":[(120,120), (86, 20)],
+                "cropbutton_field":[(290,160 ), (165, 30)],
+                "startbutton_field":[(110, 160), (165, 30)]
             }
         else:
             scrapper_window_config = {
@@ -59,7 +59,7 @@ class ScrapeWindow(wx.Frame):
                 "visibilityCheck": [(110, 120), (80, 20)],
                 "cropbutton_field": [(290, 160), (165, 30)]
             }
-        wx.Frame.__init__(self, parent, title=title,pos=(300, 150),  size=(510, 270) ,style=wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER  | wx.MAXIMIZE_BOX) )
+        wx.Frame.__init__(self, parent, title=title,pos=scrapper_window_config["frame"][0],  size=scrapper_window_config["frame"][1] ,style=wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER  | wx.MAXIMIZE_BOX) )
         self.SetBackgroundColour('#e6e7e8')
         self.iconpath = os.environ["IMAGES_PATH"] + "/avo.ico"
         self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
@@ -111,7 +111,7 @@ class ScrapeWindow(wx.Frame):
                     self.startbutton = wx.ToggleButton(self.panel, label="Start ClickAndAdd", pos=scrapper_window_config["startbutton_field"][0], size=scrapper_window_config["startbutton_field"][1])
                     self.startbutton.Bind(wx.EVT_TOGGLEBUTTON, self.clickandadd)
 
-                    self.url_label = wx.StaticText((self.panel), label='ScrapeType', pos=(25,83), style=0, name='')
+                    self.scrape_type = wx.StaticText((self.panel), label='ScrapeType', pos=scrapper_window_config["scrape_type_label_field"][0], style=0, name='')
                     self.fullscrapedropdown = wx.ComboBox(self.panel, value="Full", pos=scrapper_window_config["fullscrapedropdown_field"][0], size=scrapper_window_config["fullscrapedropdown_field"][1], choices=self.scrapeoptions, style=wx.CB_DROPDOWN)
                     self.fullscrapedropdown.SetEditable(False)
                     self.fullscrapedropdown.SetToolTip(wx.ToolTip("full objects will be scraped"))
@@ -142,7 +142,7 @@ class ScrapeWindow(wx.Frame):
                         import cropandadd
                         global cropandaddobj
                         cropandaddobj = cropandadd.Cropandadd()
-                        self.cropbutton = wx.ToggleButton(self.panel, label="Start IRIS",pos=scrapper_window_config["cropbutton_field"][0], size=scrapper_window_config["cropbutton_field"][1])
+                        self.cropbutton = wx.ToggleButton(self.panel, label="Start IRIS",pos=(290,160 ), size=(165, 30))
                         self.cropbutton.Bind(wx.EVT_TOGGLEBUTTON, self.cropandadd)
                         if(self.action == 'replace'): self.cropbutton.Disable()
 
@@ -398,7 +398,7 @@ class ScrapeWindow(wx.Frame):
     def visibility(self,event):
         global visiblity_status
         visiblity_state = event.GetEventObject()
-        log.info(visiblity_state.GetLabel(),' is clicked',visiblity_state.GetValue())
+        log.info(visiblity_state.GetLabel(),' is clicked',str(visiblity_state.GetValue()))
         visiblity_status= visiblity_state.GetValue()
 
     def perform_fullscrape(self):
