@@ -113,8 +113,7 @@ class GeneratePDFReportBatch(wx.Frame):
                 "label_field": [(12, 100)],
                 "start_bttn_field": [(135, 130), (80, 30)]
             }
-            wx.Frame.__init__(self, parent=None, id=-1, title = title, size = pdf_gen_tool_config["frame"][1],
-                              style=wx.DEFAULT_FRAME_STYLE & ~ (wx.MAXIMIZE_BOX) & ~ (wx.RESIZE_BORDER))
+        wx.Frame.__init__(self, parent=None, id=-1, title = title, size = pdf_gen_tool_config["frame"][1],style=wx.DEFAULT_FRAME_STYLE & ~ (wx.MAXIMIZE_BOX) & ~ (wx.RESIZE_BORDER))
         global pdfkit_conf
         pdfkit_conf = conf
         self.SetIcon(wx.Icon(os.environ["IMAGES_PATH"] + "/avo.ico", wx.BITMAP_TYPE_ICO))
