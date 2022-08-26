@@ -1862,15 +1862,15 @@ class ProxyConfig_window(wx.Frame):
             }
             elif SYSTEM_OS=='Linux':
                 upload_fields= {
-                "Frame":[(300, 170),(400, 230)],
-                "disp_msg":[(12,18),(80, 28),(100,18), (310,-1),(415,18),(30, -1)],
-                "proxy_enable":[(17,7), (180,40)],
-                "proxy_url":[(17,67),(95, 50),(120,61), (245,-1)],
-                "username":[(17,97),(95, 20),(120,91), (245,-1)],
-                "passwd":[(17,128),(95, 20),(120,122), (245,-1)],
-                "Save":[(157, 153), (100, 28)],
-                "Close":[(264,153), (100, 28)]
-            }
+                "Frame": [(300, 170), (420, 230)],
+                "disp_msg": [(12, 18), (80, 28), (100, 18), (310, -1), (415, 18), (30, -1)],
+                "proxy_enable": [(17, 7), (180, 40)],
+                "proxy_url": [(17, 67), (95, 50), (150, 61), (245, 25)],
+                "username": [(17, 97), (130, 40), (150, 91), (245, 25)],
+                "passwd": [(17, 128), (130, 50), (150, 122), (245, 25)],
+                "Save": [(157, 153), (100, 28)],
+                "Close": [(264, 153), (100, 28)]
+                }
             lblList = ['Enabled', 'Disabled']
             wx.Frame.__init__(self, parent, title=title,pos=upload_fields["Frame"][0], size=upload_fields["Frame"][1], style = wx.CAPTION|wx.CLIP_CHILDREN)
             self.SetBackgroundColour('#e6e7e8')
