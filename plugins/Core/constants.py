@@ -477,7 +477,7 @@ STEPSTATUS_INREPORTS_ZERO = '0'
 
 EVALUATE='evaluate'
 
-CURRENCY_CONVERTER='currencyconverter'
+NUMBER_FORMATTER='numberformatter'
 
 ENDFOR_DESCRIPTION='EndFor: completed'
 
