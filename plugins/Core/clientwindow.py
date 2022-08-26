@@ -1870,7 +1870,7 @@ class ProxyConfig_window(wx.Frame):
                 "passwd": [(17, 128), (130, 50), (150, 122), (245, 25)],
                 "Save": [(157, 153), (100, 28)],
                 "Close": [(264, 153), (100, 28)]
-                }
+            }
             lblList = ['Enabled', 'Disabled']
             wx.Frame.__init__(self, parent, title=title,pos=upload_fields["Frame"][0], size=upload_fields["Frame"][1], style = wx.CAPTION|wx.CLIP_CHILDREN)
             self.SetBackgroundColour('#e6e7e8')
