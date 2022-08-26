@@ -33,8 +33,33 @@ class ScrapeWindow(wx.Frame):
     def __init__(self, parent,id, title,browser,socketIO,action,data):
         global checkWebPackage
         checkWebPackage = self.get_client_manifest()
-        wx.Frame.__init__(self, parent, title=title,
-                   pos=(300, 150),  size=(510, 270) ,style=wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER  | wx.MAXIMIZE_BOX) )
+        if SYSTEM_OS == 'Linux':
+            scrapper_window_config={
+                "frame":[(300, 150),(510, 270)],
+                "url_label_field": [(75, 34)],
+                "navigateURL_field": [(110, 30),(260, 30)],
+                "navigateurl_bttn_field":[(380,30 ), (75, 30)],
+                "startbutton_field":[(110, 160), (165, 30)],
+                "scrape_type_label_field":[(25,83)],
+                "fullscrapedropdown_field":[(110, 80 ),(260, 30)],
+                "fullscrapebutton": [(380, 80),(75, 30)],
+                "visibilityCheck":[(110,120), (80, 20)],
+                "cropbutton_field":[(290,160 ), (165, 30)]
+            }
+        else:
+            scrapper_window_config = {
+                "frame": [(300, 150), (510, 270)],
+                "url_label_field": [(75, 34)],
+                "navigateURL_field": [(110, 30), (260, 30)],
+                "navigateurl_bttn_field": [(380, 30), (75, 30)],
+                "startbutton_field": [(110, 160), (165, 30)],
+                "scrape_type_label_field": [(25, 83)],
+                "fullscrapedropdown_field": [(110, 80), (260, 30)],
+                "fullscrapebutton": [(380, 80), (75, 30)],
+                "visibilityCheck": [(110, 120), (80, 20)],
+                "cropbutton_field": [(290, 160), (165, 30)]
+            }
+        wx.Frame.__init__(self, parent, title=title,pos=(300, 150),  size=(510, 270) ,style=wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER  | wx.MAXIMIZE_BOX) )
         self.SetBackgroundColour('#e6e7e8')
         self.iconpath = os.environ["IMAGES_PATH"] + "/avo.ico"
         self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
@@ -76,27 +101,26 @@ class ScrapeWindow(wx.Frame):
                     # Author:      sreenivasulu A
                     # Created:     08 - 07 - 2022
                     #-------------------------------------------------------------------------------
-                    self.url_label = wx.StaticText((self.panel), label='URL', pos=(75,34), style=0, name='')
-                    self.navigateURL = wx.TextCtrl((self.panel), pos=(110, 30), size=(260, 30))
-                    self.navigateurl = wx.Button(self.panel, label="Navigate",pos=(380,30 ), size=(75, 30))
+                    self.url_label = wx.StaticText((self.panel), label='URL', pos=scrapper_window_config["url_label_field"][0], style=0, name='')
+                    self.navigateURL = wx.TextCtrl((self.panel), pos=scrapper_window_config["navigateURL_field"][0], size=scrapper_window_config["navigateURL_field"][1])
+                    self.navigateurl = wx.Button(self.panel, label="Navigate", pos=scrapper_window_config["navigateurl_bttn_field"][0], size=scrapper_window_config["navigateurl_bttn_field"][1])
                     self.navigateurl.Bind(wx.EVT_BUTTON, self.navigateurl_scrape)
                     self.navigateurl.SetDefault()
                     self.navigateurl.SetFocus()
 
-                    self.startbutton = wx.ToggleButton(self.panel, label="Start ClickAndAdd",pos=(110, 160), size=(165, 30))
+                    self.startbutton = wx.ToggleButton(self.panel, label="Start ClickAndAdd", pos=scrapper_window_config["startbutton_field"][0], size=scrapper_window_config["startbutton_field"][1])
                     self.startbutton.Bind(wx.EVT_TOGGLEBUTTON, self.clickandadd)
 
                     self.url_label = wx.StaticText((self.panel), label='ScrapeType', pos=(25,83), style=0, name='')
-                    self.fullscrapedropdown = wx.ComboBox(self.panel, value="Full", pos=(110, 80 ),size=(260, 30), choices=self.scrapeoptions, style = wx.CB_DROPDOWN)
+                    self.fullscrapedropdown = wx.ComboBox(self.panel, value="Full", pos=scrapper_window_config["fullscrapedropdown_field"][0], size=scrapper_window_config["fullscrapedropdown_field"][1], choices=self.scrapeoptions, style=wx.CB_DROPDOWN)
                     self.fullscrapedropdown.SetEditable(False)
                     self.fullscrapedropdown.SetToolTip(wx.ToolTip("full objects will be scraped"))
                     self.fullscrapedropdown.Bind(wx.EVT_COMBOBOX,self.OnFullscrapeChoice)
 
-                    self.fullscrapebutton = wx.Button(self.panel, label="Scrape",pos=(380,80), size=(75, 30))
+                    self.fullscrapebutton = wx.Button(self.panel, label="Scrape", pos=scrapper_window_config["fullscrapebutton"][0], size=scrapper_window_config["fullscrapebutton"][1])
                     self.fullscrapebutton.Bind(wx.EVT_BUTTON, self.fullscrape)
 
-
-                    self.visibilityCheck = wx.CheckBox(self.panel, label="Visibility",pos=(110,120), size=(80, 20))
+                    self.visibilityCheck = wx.CheckBox(self.panel, label="Visibility", pos=scrapper_window_config["visibilityCheck"][0], size=scrapper_window_config["visibilityCheck"][1])
                     self.visibilityCheck.Bind(wx.EVT_CHECKBOX, self.visibility)
 
                     self.prevbutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap(os.environ["IMAGES_PATH"] +"stepBack.png", wx.BITMAP_TYPE_ANY), (35, 48), (35, 28))
@@ -118,7 +142,7 @@ class ScrapeWindow(wx.Frame):
                         import cropandadd
                         global cropandaddobj
                         cropandaddobj = cropandadd.Cropandadd()
-                        self.cropbutton = wx.ToggleButton(self.panel, label="Start IRIS",pos=(290,160 ), size=(165, 30))
+                        self.cropbutton = wx.ToggleButton(self.panel, label="Start IRIS",pos=scrapper_window_config["cropbutton_field"][0], size=scrapper_window_config["cropbutton_field"][1])
                         self.cropbutton.Bind(wx.EVT_TOGGLEBUTTON, self.cropandadd)
                         if(self.action == 'replace'): self.cropbutton.Disable()
 
