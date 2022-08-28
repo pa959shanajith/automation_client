@@ -1058,7 +1058,7 @@ class TestThread(threading.Thread):
     """Test Worker Thread Class."""
 
     #----------------------------------------------------------------------
-    def __init__(self, main, action, json_data, aws_mode):
+    def __init__(self, main, action, json_data, aws_mode, cicd_mode=False):
         """Init Worker Thread Class."""
         super(TestThread, self).__init__()
         self.name = "test_thread"
@@ -1078,6 +1078,7 @@ class TestThread(threading.Thread):
         self.json_data = json_data
         self.debug_mode = False if not(self.cw) else self.cw.debug_mode
         self.aws_mode = aws_mode
+        self.cicd_mode = cicd_mode
         self.test_status = 'pass'
         self.start()    # start the thread
 
@@ -1091,6 +1092,8 @@ class TestThread(threading.Thread):
     #----------------------------------------------------------------------
     def run(self):
         """Run Worker Thread."""
+        if self.cicd_mode:
+            check_browser()
         # This is the code executing in the new thread.
         global execution_flag, closeActiveConnection, connection_Timer, termination_inprogress
         batch_id = None
@@ -1130,49 +1133,57 @@ class TestThread(threading.Thread):
                 if root.gui: benchmark.stop(True)
                 apptype = self.json_data['apptype']
             if apptype == "DesktopJava": apptype = "oebs"
-            if apptype.lower() not in plugins_list:
-                logger.print_on_console('This app type is not part of the license.')
-                status=TERMINATE
+            if self.cicd_mode:
+            # if apptype.lower() not in plugins_list:
+            #     logger.print_on_console('This app type is not part of the license.')
+            #     status=TERMINATE
+            # else:
+                status = self.con.invoke_controller(self.action,self,self.debug_mode,runfrom_step,self.json_data,self.main,socketIO,qcObject,qtestObject,zephyrObject,self.aws_mode,self.cicd_mode)
             else:
-                status = self.con.invoke_controller(self.action,self,self.debug_mode,runfrom_step,self.json_data,self.main,socketIO,qcObject,qtestObject,zephyrObject,self.aws_mode)
+                if apptype.lower() not in plugins_list:
+                    logger.print_on_console('This app type is not part of the license.')
+                    status=TERMINATE
+                else:
+                    status = self.con.invoke_controller(self.action,self,self.debug_mode,runfrom_step,self.json_data,self.main,socketIO,qcObject,qtestObject,zephyrObject,self.aws_mode,self.cicd_mode)
 
             logger.print_on_console('Execution status '+status)
-
-            if status==TERMINATE:
-                logger.print_on_console('---------Termination Completed-------',color="YELLOW")
-            if self.action==DEBUG:
-                testcasename = handler.local_handler.testcasename
-                self.cw.killChildWindow(debug=True)
-                if (len(testcasename) > 0 or apptype.lower() not in plugins_list):
-                    if('UserObjectScrape' in sys.modules):
-                        import UserObjectScrape
-                        if(UserObjectScrape.update_data!={}):
-                            data=UserObjectScrape.update_data
-                            UserObjectScrape.update_data={}
-                            data['status']=status
-                            socketIO.emit('result_debugTestCase',data)
+            if self.cicd_mode is False:
+                if status==TERMINATE:
+                    logger.print_on_console('---------Termination Completed-------',color="YELLOW")
+                if self.action==DEBUG:
+                    testcasename = handler.local_handler.testcasename
+                    self.cw.killChildWindow(debug=True)
+                    if (len(testcasename) > 0 or apptype.lower() not in plugins_list):
+                        if('UserObjectScrape' in sys.modules):
+                            import UserObjectScrape
+                            if(UserObjectScrape.update_data!={}):
+                                data=UserObjectScrape.update_data
+                                UserObjectScrape.update_data={}
+                                data['status']=status
+                                socketIO.emit('result_debugTestCase',data)
+                            else:
+                                socketIO.emit('result_debugTestCase',status)
                         else:
                             socketIO.emit('result_debugTestCase',status)
                     else:
-                        socketIO.emit('result_debugTestCase',status)
-                else:
-                    socketIO.emit('result_debugTestCaseWS',status)
-            elif self.action==EXECUTE:
-                if self.test_status == 'pass' and status != COMPLETED: self.test_status = 'fail'
-                result = {"status":status, "batchId": batch_id, "testStatus": self.test_status}
-                if controller.manual_terminate_flag: result["userTerminated"] = True
-                socketIO.emit('result_executeTestSuite', result)
-        except Exception as e:
-            log.error(e, exc_info=True)
-            status=TERMINATE
-            if socketIO is not None:
-                if self.action==DEBUG:
-                    self.cw.killChildWindow(debug=True)
-                    socketIO.emit('result_debugTestCase',status)
+                        socketIO.emit('result_debugTestCaseWS',status)
                 elif self.action==EXECUTE:
-                    result = {"status":status, "batchId": batch_id, "testStatus": 'fail'}
+                    if self.test_status == 'pass' and status != COMPLETED: self.test_status = 'fail'
+                    result = {"status":status, "batchId": batch_id, "testStatus": self.test_status}
                     if controller.manual_terminate_flag: result["userTerminated"] = True
                     socketIO.emit('result_executeTestSuite', result)
+        except Exception as e:
+            log.error(e, exc_info=True)
+            if self.cicd_mode is False:
+                status=TERMINATE
+                if socketIO is not None:
+                    if self.action==DEBUG:
+                        self.cw.killChildWindow(debug=True)
+                        socketIO.emit('result_debugTestCase',status)
+                    elif self.action==EXECUTE:
+                        result = {"status":status, "batchId": batch_id, "testStatus": 'fail'}
+                        if controller.manual_terminate_flag: result["userTerminated"] = True
+                        socketIO.emit('result_executeTestSuite', result)
         if closeActiveConnection:
             closeActiveConnection = False
             connection_Timer = threading.Timer(300, self.main.closeConnection)
