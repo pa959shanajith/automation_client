@@ -18,7 +18,7 @@ LIB_FILE = PY_MJR+'.'+PY_MIN
 INCLUDE_DIR = LIB_FILE + ('m' if PY_MJR == '3' else '')
 errorcount = 0
 ext_o_c_py = [".py", ".c"]
-#print(pythondir,PY_MJR,PY_MIN,LIB_FILE,INCLUDE_DIR)
+print(pythondir,PY_MJR,PY_MIN,LIB_FILE,INCLUDE_DIR)
 
 # def  generate_manifest(semi_version):
 #     try:
