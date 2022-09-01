@@ -111,8 +111,9 @@ def build_recursive_dir_tree(path):
     selected_files = []
     ign = []
     # ign = [path + line.rstrip('\n') for line in open("./buildignore.txt")]
-    # for i, ignv in enumerate(ign):
-    #     ign[i] = os.path.normpath(ignv)
+    ign = ["AWS\android_spinner_keywords.py","AWS\custom_aws.py","AWS\generic_operations.py","AWS\testmobile_constants.py","AWS\android_operations_keywords.py"]
+    for i, ignv in enumerate(ign):
+        ign[i] = os.path.normpath(ignv)
     #print (ign)
     for root, dirs, files in walk(path):
         root = os.path.normpath(root)
@@ -144,7 +145,7 @@ print('Current directory ', cwd)
 
 build_recursive_dir_tree(cwd + "/plugins/AWS")
 
-# build_pyc(cwd+"/plugins/AWS/")
+build_pyc(cwd+"/plugins/AWS/")
 
 # generate_manifest("22.2")
 
