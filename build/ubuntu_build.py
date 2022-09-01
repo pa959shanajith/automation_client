@@ -63,6 +63,7 @@ def build(full_path, file, file_refer):
         out, err = cython_process.communicate()
         exitcode = cython_process.returncode
         if not exitcode == 0:
+            print("cython error",err)
             errorcount = errorcount + 1
             file_refer.write(str(full_path) + "\nError:" +
                              str(err) + "\nOutput:" + str(out) + "\n------- \n")
@@ -79,6 +80,7 @@ def build(full_path, file, file_refer):
         out, err = gcc_process_so.communicate()
         exitcode = gcc_process_so.returncode
         if not exitcode == 0:
+            print("gcc error",err)
             errorcount = errorcount + 1
         #full_path = full_path.replace("/", "\\")
         if os.path.isfile(full_path + ".so"):
