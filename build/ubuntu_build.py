@@ -111,7 +111,8 @@ def build_recursive_dir_tree(path):
     selected_files = []
     ign = []
     # ign = [path + line.rstrip('\n') for line in open("./buildignore.txt")]
-    ign = ["AWS/android_spinner_keywords.py","AWS/custom_aws.py","AWS/generic_operations.py","AWS/testmobile_constants.py","AWS/android_operations_keywords.py"]
+    ign = ["Core/__main__.py","AWS/android_spinner_keywords.py","AWS/custom_aws.py","AWS/generic_operations.py","AWS/testmobile_constants.py","AWS/android_operations_keywords.py"]
+    ign=[path + file for file in ign]
     for i, ignv in enumerate(ign):
         ign[i] = os.path.normpath(ignv)
     #print (ign)
