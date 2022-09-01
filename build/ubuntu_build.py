@@ -11,7 +11,7 @@ cwd = os.getcwd()
 #https://stackoverflow.com/questions/9875772/linux-c-linker-usr-bin-ld?lq=1
 #https://www.linuxtopia.org/online_books/an_introduction_to_gcc/gccintro_14.html
 #apt-get install libgtk2.0-0  for this error: ImportError: libgtk-x11-2.0.so.0: cannot open shared object file: No such file or directory
-pythondir = os.path.dirname(sys.executable)
+pythondir = os.path.dirname(os.path.dirname(sys.executable))
 PY_MJR = str(sys.version_info.major)
 PY_MIN = str(sys.version_info.minor)
 LIB_FILE = PY_MJR+'.'+PY_MIN
