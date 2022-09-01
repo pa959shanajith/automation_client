@@ -251,11 +251,33 @@ class Browser_Keywords:
         methodoutput=TEST_RESULT_FALSE
         err_msg=None
         output_val=OUTPUT_CONSTANT
-        local_wk.driver.get('chrome://settings/clearBrowserData')
-        time.sleep(5)
-        local_wk.driver.execute_script('return document.querySelector("body > settings-ui").shadowRoot.querySelector("#container").querySelector("#main").shadowRoot.querySelector("settings-basic-page").shadowRoot.querySelector("settings-privacy-page").shadowRoot.querySelector("settings-clear-browsing-data-dialog").shadowRoot.querySelector("#clearBrowsingDataDialog").querySelector("#clearBrowsingDataConfirm").click();')
-        status=TEST_RESULT_PASS
-        methodoutput=TEST_RESULT_TRUE
+        if local_wk.driver != None:
+            if local_wk.driver.name == 'internet explorer' or local_wk.driver.name == 'MicrosoftEdge':
+                local_wk.driver.delete_all_cookies()
+                status=TEST_RESULT_PASS
+                methodoutput=TEST_RESULT_TRUE
+            elif local_wk.driver.name == 'chrome':
+                local_wk.driver.get('chrome://settings/clearBrowserData')
+                time.sleep(5)
+                local_wk.driver.execute_script('return document.querySelector("body > settings-ui").shadowRoot.querySelector("#container").querySelector("#main").shadowRoot.querySelector("settings-basic-page").shadowRoot.querySelector("settings-privacy-page").shadowRoot.querySelector("settings-clear-browsing-data-dialog").shadowRoot.querySelector("#clearBrowsingDataDialog").querySelector("#clearBrowsingDataConfirm").click();')
+                status=TEST_RESULT_PASS
+                methodoutput=TEST_RESULT_TRUE
+            elif local_wk.driver.name=='msedge':
+                local_wk.driver.get('edge://settings/clearBrowserData')
+                time.sleep(5)
+                local_wk.driver.execute_script('return document.getElementById("clear-now").click();')
+                status=TEST_RESULT_PASS
+                methodoutput=TEST_RESULT_TRUE
+            elif local_wk.driver.name=='firefox':
+                local_wk.driver.get('about:preferences#privacy')
+                time.sleep(5)
+                local_wk.driver.find_element_by_css_selector('#clearSiteDataButton').click()
+                time.sleep(5)
+                local_wk.driver.execute_script("document.getElementsByTagName('browser')[0].contentWindow.document.getElementsByTagName('dialog')[0].shadowRoot.children[3].children[2].click()")
+                time.sleep(5)
+                local_wk.driver.switch_to.alert.accept()
+                status=TEST_RESULT_PASS
+                methodoutput=TEST_RESULT_TRUE
         return status,methodoutput,output_val,err_msg
 
     def verifyTextExists(self,input,*args):
