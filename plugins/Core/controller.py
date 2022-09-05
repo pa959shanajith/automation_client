@@ -1122,6 +1122,31 @@ class Controller():
         log.info( 'No  of Suites : '+str(len(suiteId_list)))
         logger.print_on_console('No  of Suites : ',str(len(suiteId_list)))
         headless_mode = str(configvalues['headless_mode'])=='Yes'
+        # logger.print_on_console(json_data['isHeadless'])
+        # if cicd_mode:
+        #     if json_data['isHeadless']:
+        #         logger.print_on_console('============================================================================')
+        #         logger.print_on_console(configvalues['headless_mode'])
+        #         logger.print_on_console('============================================================================')
+        #         # configvalues['headless_mode'] = 'Yes'
+        #         path = os.path.normpath(str(os.getcwd())+"/assets/config.json")
+        #         with open(path) as json_file:
+        #             json_decoded = json.load(json_file)
+        #         json_decoded['headless_mode'] = 'Yes'
+        #         json_decoded['cicd_mode'] = 'Yes'
+        #         with open(path, 'w') as json_file:
+        #             json.dump(json_decoded, json_file)
+        #     else:
+        #         path = os.path.normpath(str(os.getcwd())+"/assets/config.json")
+        #         with open(path) as json_file:
+        #             json_decoded = json.load(json_file)
+        #         json_decoded['headless_mode'] = 'No'
+        #         json_decoded['cicd_mode'] = 'No'
+        #         with open(path, 'w') as json_file:
+        #             json.dump(json_decoded, json_file)
+        # logger.print_on_console('============================================================================')
+        # logger.print_on_console(configvalues)
+        # logger.print_on_console('============================================================================')
         if headless_mode:
             log.info('Execution in headless mode')
             logger.print_on_console('Execution in headless mode')
@@ -1155,16 +1180,18 @@ class Controller():
                 'testsuiteId': suite_id,
                 'projectname' : suite['projectname']
             }
-            if cicd_mode is False:
-                # base_execute_data["event"] = "return_status_executeTestSuite"
-                # base_execute_data["configkey"] = opts.configkey
-                # base_execute_data["executionListId"] = opts.executionListId
-                # logger.print_on_console(base_execute_data)
-                # server_url = 'https://' + opts.serverurl + ':' + opts.serverport + '/setExecutionStatus'
-                # data_dict = dict({"status" : "started",
-                #     'startTime': datetime.now().strftime(TIME_FORMAT),"exce_data" : base_execute_data})
-                # res = requests.post(server_url,json=data_dict, verify=False)
+            if cicd_mode:
+                base_execute_data["event"] = "return_status_executeTestSuite"
+                base_execute_data["configkey"] = opts.configkey
+                base_execute_data["executionListId"] = opts.executionListId
+                base_execute_data["agentname"] = opts.agentname
+                base_execute_data['execReq'] = json_data
+                server_url = 'https://' + opts.serverurl + ':' + opts.serverport + '/setExecStatus'
+                data_dict = dict({"status" : "started",
+                    'startTime': datetime.now().strftime(TIME_FORMAT),"exce_data" : base_execute_data})
+                res = requests.post(server_url,json=data_dict, verify=False)
                 # #send response through API
+            else:
                 socketIO.emit("return_status_executeTestSuite", dict({"status": "started",
                     'startTime': datetime.now().strftime(TIME_FORMAT)}, **base_execute_data))
             execute_result_data = dict({'scenarioId': None, 'reportData': None}, **base_execute_data)
@@ -1404,6 +1431,7 @@ class Controller():
                                 execute_result_data["configkey"] = opts.configkey
                                 execute_result_data["executionListId"] = opts.executionListId
                                 execute_result_data["agentname"] = opts.agentname
+                                execute_result_data['execReq'] = json_data
                                 server_url = 'https://' + opts.serverurl + ':' + opts.serverport + '/setExecStatus'
                                 data_dict = dict({"exce_data" : execute_result_data})
                                 res = requests.post(server_url,json=data_dict, verify=False)
@@ -1433,15 +1461,16 @@ class Controller():
                             con.reporting_obj.user_termination=manual_terminate_flag
                             con.reporting_obj.save_report_json_conditioncheck_testcase_empty(filename,info_msg,json_data,status_percentage)
                             execute_result_data["reportData"] = con.reporting_obj.report_json_condition_check_testcase_empty
-                            if cicd_mode is False:
-                            #     execute_result_data["event"] = "result_executeTestSuite"
-                            #     execute_result_data["configkey"] = opts.configkey
-                            #     execute_result_data["executionListId"] = opts.executionListId
-                            #     execute_result_data["agentname"] = opts.agentname
-                            #     server_url = 'https://' + opts.serverurl + ':' + opts.serverport + '/setExecStatus'
-                            #     data_dict = dict({"exce_data" : execute_result_data})
-                            #     res = requests.post(server_url,json=data_dict, verify=False)                            
-                            # else:
+                            if cicd_mode:
+                                execute_result_data["event"] = "result_executeTestSuite"
+                                execute_result_data["configkey"] = opts.configkey
+                                execute_result_data["executionListId"] = opts.executionListId
+                                execute_result_data["agentname"] = opts.agentname
+                                execute_result_data['execReq'] = json_data
+                                server_url = 'https://' + opts.serverurl + ':' + opts.serverport + '/setExecStatus'
+                                data_dict = dict({"exce_data" : execute_result_data})
+                                res = requests.post(server_url,json=data_dict, verify=False)                            
+                            else:
                                 socketIO.emit('result_executeTestSuite', execute_result_data)
                             obj.clearList(con)
                             sc_idx += 1
@@ -1623,15 +1652,16 @@ class Controller():
                         con.reporting_obj.user_termination=manual_terminate_flag
                         con.reporting_obj.save_report_json_conditioncheck(filename,json_data,status_percentage)
                         execute_result_data["reportData"] = con.reporting_obj.report_json_condition_check
-                        if cicd_mode is False:
-                        #     execute_result_data["event"] = "result_executeTestSuite"
-                        #     execute_result_data["configkey"] = opts.configkey
-                        #     execute_result_data["executionListId"] = opts.executionListId
-                        #     execute_result_data["agentname"] = opts.agentname
-                        #     server_url = 'https://' + opts.serverurl + ':' + opts.serverport + '/setExecStatus'
-                        #     data_dict = dict({"exce_data" : execute_result_data})
-                        #     res = requests.post(server_url,json=data_dict, verify=False)
-                        # else:
+                        if cicd_mode:
+                            execute_result_data["event"] = "result_executeTestSuite"
+                            execute_result_data["configkey"] = opts.configkey
+                            execute_result_data["executionListId"] = opts.executionListId
+                            execute_result_data["agentname"] = opts.agentname
+                            execute_result_data['execReq'] = json_data
+                            server_url = 'https://' + opts.serverurl + ':' + opts.serverport + '/setExecStatus'
+                            data_dict = dict({"exce_data" : execute_result_data})
+                            res = requests.post(server_url,json=data_dict, verify=False)
+                        else:
                             socketIO.emit('result_executeTestSuite', execute_result_data)
                         obj.clearList(con)
                         sc_idx += 1
@@ -1660,14 +1690,15 @@ class Controller():
                     con.reporting_obj.save_report_json_conditioncheck_testcase_empty(filename,info_msg,json_data,status_percentage)
                     execute_result_data["reportData"] = con.reporting_obj.report_json_condition_check_testcase_empty
                     if cicd_mode is False:
-                    #     execute_result_data["event"] = "result_executeTestSuite"
-                    #     base_execute_data["configkey"] = opts.configkey
-                    #     base_execute_data["executionListId"] = opts.executionListId
-                    #     execute_result_data["agentname"] = opts.agentname
-                    #     server_url = 'https://' + opts.serverurl + ':' + opts.serverport + '/setExecStatus'
-                    #     data_dict = dict({"exce_data" : execute_result_data})
-                    #     res = requests.post(server_url,json=data_dict, verify=False)
-                    # else:
+                        execute_result_data["event"] = "result_executeTestSuite"
+                        execute_result_data["configkey"] = opts.configkey
+                        execute_result_data["executionListId"] = opts.executionListId
+                        execute_result_data["agentname"] = opts.agentname
+                        execute_result_data['execReq'] = json_data
+                        server_url = 'https://' + opts.serverurl + ':' + opts.serverport + '/setExecStatus'
+                        data_dict = dict({"exce_data" : execute_result_data})
+                        res = requests.post(server_url,json=data_dict, verify=False)
+                    else:
                         socketIO.emit('result_executeTestSuite', execute_result_data)
                     obj.clearList(con)
                     sc_idx += 1
@@ -1691,16 +1722,17 @@ class Controller():
             print('=======================================================================================================')
             log.info('***SUITE '+ str(suite_idx) +' EXECUTION COMPLETED***')
             if status == TERMINATE: exc_pass = False
-            if cicd_mode is False:
-            #     base_execute_data["event"] = "return_status_executeTestSuite"
-            #     base_execute_data["configkey"] = opts.configkey
-            #     base_execute_data["executionListId"] = opts.executionListId
-            #     execute_result_data["agentname"] = opts.agentname
-            #     server_url = 'https://' + opts.serverurl + ':' + opts.serverport + '/setExecStatus'
-            #     data_dict = dict({"status" : "finished", "executionStatus": exc_pass,
-            #         'endTime': datetime.now().strftime(TIME_FORMAT),"exce_data" : base_execute_data})
-            #     res = requests.post(server_url,json=data_dict, verify=False)
-            # else:
+            if cicd_mode:
+                base_execute_data["event"] = "return_status_executeTestSuite"
+                base_execute_data["configkey"] = opts.configkey
+                base_execute_data["executionListId"] = opts.executionListId
+                base_execute_data["agentname"] = opts.agentname
+                base_execute_data['execReq'] = json_data
+                server_url = 'https://' + opts.serverurl + ':' + opts.serverport + '/setExecStatus'
+                data_dict = dict({"status" : "finished", "executionStatus": exc_pass,
+                    'endTime': datetime.now().strftime(TIME_FORMAT),"exce_data" : base_execute_data})
+                res = requests.post(server_url,json=data_dict, verify=False)
+            else:
                 socketIO.emit("return_status_executeTestSuite", dict({"status": "finished", "executionStatus": exc_pass,
                     "endTime": datetime.now().strftime(TIME_FORMAT)}, **base_execute_data))
             if not exc_pass:

@@ -13,6 +13,7 @@ proxies=None
 root=None
 browsercheckFlag=False
 updatecheckFlag=False
+cicd_isheadless = 'No'
 
 class CiCdCore():
     def __init__(self, appName, args):
@@ -24,7 +25,7 @@ class CiCdCore():
         self.socketthread = None
         self.icesession = None
         self.server_url = None
-        global root, browsercheckFlag, updatecheckFlag
+        global root, browsercheckFlag, updatecheckFlag, cicd_isheadless
         root = self
         core.root = self
         updatecheckFlag = configvalues['update_check'].lower() == 'no'
@@ -59,6 +60,8 @@ class CiCdCore():
             logfilename_error_flag = True
             log.error(e)
         exec_req = self.fetchExecutionReq()
+        if exec_req['isHeadless']:
+            cicd_isheadless = 'Yes'
         aws_mode=False
         if exec_req != None and exec_req['apptype']=='MobileApp':
             if args[0]['suitedetails'][0]['browserType'][0]=='2':

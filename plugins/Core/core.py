@@ -1147,7 +1147,18 @@ class TestThread(threading.Thread):
                     status = self.con.invoke_controller(self.action,self,self.debug_mode,runfrom_step,self.json_data,self.main,socketIO,qcObject,qtestObject,zephyrObject,self.aws_mode,self.cicd_mode)
 
             logger.print_on_console('Execution status '+status)
-            if self.cicd_mode is False:
+            if self.cicd_mode:
+                opts = self.main.opts
+                if self.test_status == 'pass' and status != COMPLETED: self.test_status = 'fail'
+                result = {"status":status, "batchId": batch_id, "testStatus": self.test_status}
+                result['exec_req'] = self.json_data
+                result["event"] = "result_executeTestSuite"
+                result["configkey"] = opts.configkey
+                result["executionListId"] = opts.executionListId
+                result["agentname"] = opts.agentname
+                server_url = 'https://' + opts.serverurl + ':' + opts.serverport + '/setExecStatus'
+                res = requests.post(server_url,json=result, verify=False)
+            else:
                 if status==TERMINATE:
                     logger.print_on_console('---------Termination Completed-------',color="YELLOW")
                 if self.action==DEBUG:
