@@ -1151,7 +1151,7 @@ class TestThread(threading.Thread):
                 opts = self.main.opts
                 if self.test_status == 'pass' and status != COMPLETED: self.test_status = 'fail'
                 result = {"status":status, "batchId": batch_id, "testStatus": self.test_status}
-                result['exec_req'] = self.json_data
+                result['exec_req'] = {'execReq':self.json_data}
                 result["event"] = "result_executeTestSuite"
                 result["configkey"] = opts.configkey
                 result["executionListId"] = opts.executionListId
