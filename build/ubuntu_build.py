@@ -129,17 +129,44 @@ def build_pyc(path):
             fp = path+i
             py_compile.compile(fp, fp+"c")
             os.remove(fp)
-    new_path = os.path.dirname(
-        os.path.dirname(os.path.dirname(path)))+"/assets"
-    py_compile.compile(new_path+"/Update.py", new_path+"/Update.pyc")
-    os.remove(new_path+"/Update.py")
-    py_compile.compile(new_path+"/IRISMT/IRISMT.py",
-                       new_path+"/IRISMT/IRISMT.pyc")
-    os.remove(new_path+"/IRISMT/IRISMT.py")
-    py_compile.compile(new_path+"/ObjectPredictionMT/ObjectPredictionMT.py",
-                       new_path+"/ObjectPredictionMT/ObjectPredictionMT.pyc")
-    os.remove(new_path+"/ObjectPredictionMT/ObjectPredictionMT.py")
+    # new_path = os.path.dirname(
+    #     os.path.dirname(os.path.dirname(path)))+"/assets"
+    # py_compile.compile(new_path+"/Update.py", new_path+"/Update.pyc")
+    # os.remove(new_path+"/Update.py")
+    # py_compile.compile(new_path+"/IRISMT/IRISMT.py",
+    #                    new_path+"/IRISMT/IRISMT.pyc")
+    # os.remove(new_path+"/IRISMT/IRISMT.py")
+    # py_compile.compile(new_path+"/ObjectPredictionMT/ObjectPredictionMT.py",
+    #                    new_path+"/ObjectPredictionMT/ObjectPredictionMT.pyc")
+    # os.remove(new_path+"/ObjectPredictionMT/ObjectPredictionMT.py")
 
+
+def build_binaries(npath):
+    global errorcount
+    file_stream=open('../cython_error.txt', 'a')
+    fl_list = ["/assets/Update.py", "/assets/IRISMT/IRISMT.py", "/assets/ObjectPrediction/ObjectPredictionMT.py"]
+    for f in fl_list:
+        fp = npath+f
+        fp_c = npath+os.path.splitext(f)[0]+".c"
+        cython_process = subprocess.Popen(sys.executable + " -m cython -"+PY_MJR + " -o " +fp_c+" " + fp, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+        out, err = cython_process.communicate()
+        exitcode = cython_process.returncode
+        if not exitcode == 0:
+            print("cython error", err)
+            errorcount = errorcount + 1
+            file_stream.write(str(fp) + "\nError:" +str(err) + "\nOutput:" + str(out) + "\n------- \n")
+            return
+
+        gcc_cmd = "gcc -c "+fp_c + "-o "+npath+os.path.splitext(f)[0]+" - I"+pythondir+"/include/python"+INCLUDE_DIR+" -L" + pythondir +"/lib" +" -lpython3.7m"
+        #print(cmd)
+        gcc_process_so = subprocess.Popen(gcc_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+
+        out, err = gcc_process_so.communicate()
+        exitcode = gcc_process_so.returncode
+        if not exitcode == 0:
+            print("gcc error", err)
+            errorcount = errorcount + 1
+            return
 
 print("Building process initiated....")
 print('Current directory ', cwd)
@@ -148,7 +175,7 @@ build_recursive_dir_tree(cwd + "/plugins/")
 
 build_pyc(cwd+"/plugins/AWS/")
 
-# generate_manifest("22.2")
+build_binaries(cwd)
 
 
 if errorcount > 0:
