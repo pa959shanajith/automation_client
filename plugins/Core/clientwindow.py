@@ -1843,7 +1843,7 @@ class ProxyConfig_window(wx.Frame):
         try:
             data = self.readproxyconfig()
             #------------------------------------Different co-ordinates for Windows and Mac
-            if SYSTEM_OS=='Windows' or SYSTEM_OS=='Linux':
+            if SYSTEM_OS=='Windows':
                 upload_fields= {
                 "Frame":[(300, 170),(400, 230)],
                 "disp_msg":[(12,18),(80, 28),(100,18), (310,-1),(415,18),(30, -1)],
