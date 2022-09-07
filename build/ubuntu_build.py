@@ -164,7 +164,7 @@ def build_binaries(npath):
             file_stream.write(str(fp) + "\nError:" +str(err) + "\nOutput:" + str(out) + "\n------- \n")
             return
 
-        gcc_cmd = "gcc -c "+fp_c + " -o "+npath+os.path.splitext(f)[0]+" - I"+pythondir+"/include/python"+INCLUDE_DIR+" -L" + pythondir +"/lib" +" -lpython3.7m"
+        gcc_cmd = "gcc -c "+fp_c + " -o "+npath+os.path.splitext(f)[0]+" -I"+pythondir+"/include/python"+INCLUDE_DIR+" -L" + pythondir +"/lib" +" -lpython3.7m"
         # print(gcc_cmd)
         gcc_process_so = subprocess.Popen(gcc_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
         out, err = gcc_process_so.communicate()
