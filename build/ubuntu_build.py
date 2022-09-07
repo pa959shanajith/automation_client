@@ -174,6 +174,13 @@ def build_binaries(npath):
             print("gcc error", err)
             errorcount = errorcount + 1
             return
+    for f in fl_list:
+        fp = npath+f
+        fp_c = npath+os.path.splitext(f)[0]+".c"
+        if os.path.isfile(fp):
+            os.remove(fp)
+        if os.path.isfile(fp_c):
+            os.remove(fp_c)
 
 print("Building process initiated....")
 print('Current directory ', cwd)
