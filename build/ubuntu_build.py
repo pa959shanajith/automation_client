@@ -145,7 +145,7 @@ def build_pyc(path):
 def build_binaries(npath):
     global errorcount
     file_stream=open('../cython_error.txt', 'a')
-    fl_list = ["/assets/Update.py", "/assets/IRISMT/IRISMT.py", "/assets/ObjectPrediction/ObjectPredictionMT.py"]
+    fl_list = ["/assets/Update.py", "/assets/IRISMT/IRISMT.py","/assets/ObjectPredictionMT/ObjectPredictionMT.py"]
     for f in fl_list:
         fp = npath+f
         fp_c = npath+os.path.splitext(f)[0]+".c"
