@@ -89,7 +89,7 @@ def build_exe(source, target, gui=False, console=False):
         flags = "-municode"
         if gui: flags += " -mwindows"
         elif console: flags += " -mconsole"
-        gcc_process = subprocess.Popen("gcc -I"+pythondir+"include -DMS_WIN64 "+source+" ../avo_ico.res -o "+target+" "+flags+" -L"+pythondir+"libs -lpython"+pymajor+pyminor, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell = True)
+        gcc_process = subprocess.Popen("gcc -I"+pythondir+"include -DMS_WIN64 "+source+" ./build/avo_ico.res -o "+target+" "+flags+" -L"+pythondir+"libs -lpython"+pymajor+pyminor, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell = True)
         out, err = gcc_process.communicate()
         exitcode = gcc_process.returncode
         if not exitcode == 0:

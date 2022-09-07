@@ -161,7 +161,7 @@ class NumericStringParser(object):
         return status,methodoutput,output,err_msg
 
 
-    def currencyConverter(self, num_string, *args):
+    def numberFormatter(self, num_string, *args):
         status = TEST_RESULT_FAIL
         methodoutput = TEST_RESULT_FALSE
         output=None

@@ -137,7 +137,7 @@ class Test():
   },
   {
     "outputVal": "",
-    "keywordVal": "currencyConverter",
+    "keywordVal": "numberFormatter",
     "objectName": " ",
     "inputVal": [
       "1 + 3"
