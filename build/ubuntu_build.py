@@ -1,7 +1,8 @@
 import subprocess
 import os
 import sys
-import json,time
+import json
+import time
 from datetime import datetime
 from os import walk
 from os.path import splitext, join
@@ -151,15 +152,20 @@ def build_binaries(npath):
         cython_process = subprocess.Popen(sys.executable + " -m cython -"+PY_MJR + " -o " +fp_c+" " + fp, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
         out, err = cython_process.communicate()
         exitcode = cython_process.returncode
-        time.sleep(4)
+        if os.path.isfile(fp_c):
+            print(fp_c," file created")
+        else:
+            time.sleep(4)
+            if os.path.isfile(fp_c):
+                print(fp_c, " file created")
         if not exitcode == 0:
             print("cython error", err)
             errorcount = errorcount + 1
             file_stream.write(str(fp) + "\nError:" +str(err) + "\nOutput:" + str(out) + "\n------- \n")
             return
 
-        gcc_cmd = "gcc -c "+fp_c + "-o "+npath+os.path.splitext(f)[0]+" - I"+pythondir+"/include/python"+INCLUDE_DIR+" -L" + pythondir +"/lib" +" -lpython3.7m"
-        #print(cmd)
+        gcc_cmd = "gcc -c "+fp_c + " -o "+npath+os.path.splitext(f)[0]+" - I"+pythondir+"/include/python"+INCLUDE_DIR+" -L" + pythondir +"/lib" +" -lpython3.7m"
+        # print(gcc_cmd)
         gcc_process_so = subprocess.Popen(gcc_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
         out, err = gcc_process_so.communicate()
         exitcode = gcc_process_so.returncode
