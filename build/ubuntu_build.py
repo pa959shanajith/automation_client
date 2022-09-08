@@ -21,37 +21,6 @@ errorcount = 0
 ext_o_c_py = [".py", ".c"]
 print(pythondir,PY_MJR,PY_MIN,LIB_FILE,INCLUDE_DIR)
 
-# def  generate_manifest(semi_version):
-#     try:
-#         f=open("version.json","r")
-#         ver=json.load(f)
-#         f.close()
-#         min_comp = max_comp = ver["version"]
-#         updated_on = datetime.now().strftime('%m/%d/%Y %H:%M:%S')
-#         last_ice_patch_list = list(ver["iceversion"][semi_version].keys())
-#         if len(last_ice_patch_list) > 0:
-#             last_ice = ver["iceversion"][semi_version][last_ice_patch_list[-1]]
-#             version = last_ice['tag']
-#             min_comp = last_ice["min-compatibility"]
-#             baseline=last_ice['baseline']
-#             min_comp = last_ice["min-compatibility"]
-#             max_comp = last_ice["max-compatibility"]
-#         ice_ver = {
-#             "version": version,
-#             "p_tag": semi_version,
-#             "updated_on": updated_on,
-#             "baseline": baseline,
-#             "min-compatibility": min_comp,
-#             "max-compatibility": max_comp,
-#             "rollback": False,
-#             "rollback_on": "",
-#             "isWebPackage": "True"
-#         }
-#         with open(cwd+os.sep+"assets"+os.sep+"about_manifest.json", "w") as f:
-#            json.dump(ice_ver, f, indent="  ")
-#         print("Generated Manifest for ICE version " + version)
-#     except Exception as e:
-#         print(e)
 
 
 def build(full_path, file, file_refer):
@@ -75,8 +44,7 @@ def build(full_path, file, file_refer):
             "/lib -Wl,-rpath="+pythondir+"/lib -Wall -o " + \
             full_path+".so "+full_path+".c -lpython3.7m -fPIC"
         #print(cmd)
-        gcc_process_so = subprocess.Popen(
-            gcc_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+        gcc_process_so = subprocess.Popen(gcc_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
 
         out, err = gcc_process_so.communicate()
         exitcode = gcc_process_so.returncode
@@ -130,16 +98,6 @@ def build_pyc(path):
             fp = path+i
             py_compile.compile(fp, fp+"c")
             os.remove(fp)
-    # new_path = os.path.dirname(
-    #     os.path.dirname(os.path.dirname(path)))+"/assets"
-    # py_compile.compile(new_path+"/Update.py", new_path+"/Update.pyc")
-    # os.remove(new_path+"/Update.py")
-    # py_compile.compile(new_path+"/IRISMT/IRISMT.py",
-    #                    new_path+"/IRISMT/IRISMT.pyc")
-    # os.remove(new_path+"/IRISMT/IRISMT.py")
-    # py_compile.compile(new_path+"/ObjectPredictionMT/ObjectPredictionMT.py",
-    #                    new_path+"/ObjectPredictionMT/ObjectPredictionMT.pyc")
-    # os.remove(new_path+"/ObjectPredictionMT/ObjectPredictionMT.py")
 
 
 def build_binaries(npath):
@@ -149,7 +107,7 @@ def build_binaries(npath):
     for f in fl_list:
         fp = npath+f
         fp_c = npath+os.path.splitext(f)[0]+".c"
-        cython_process = subprocess.Popen(sys.executable + " -m cython -"+PY_MJR + " -o " +fp_c+" " + fp, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+        cython_process = subprocess.Popen(sys.executable + " -m cython -"+PY_MJR+" " + fp +" --embed", stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
         out, err = cython_process.communicate()
         exitcode = cython_process.returncode
         if os.path.isfile(fp_c):
@@ -163,9 +121,7 @@ def build_binaries(npath):
             errorcount = errorcount + 1
             file_stream.write(str(fp) + "\nError:" +str(err) + "\nOutput:" + str(out) + "\n------- \n")
             return
-
-        gcc_cmd = "gcc -c "+fp_c + " -o "+npath+os.path.splitext(f)[0]+" -I"+pythondir+"/include/python"+INCLUDE_DIR+" -L" + pythondir +"/lib" +" -lpython3.7m"
-        # print(gcc_cmd)
+        gcc_cmd = "gcc "+fp_c + " -o "+npath+os.path.splitext(f)[0]+" -I"+pythondir+"/include/python"+INCLUDE_DIR+" -L" + pythondir + "/lib -Wl,-rpath="+pythondir+"/lib" + " -lpython3.7m"
         gcc_process_so = subprocess.Popen(gcc_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
         out, err = gcc_process_so.communicate()
         exitcode = gcc_process_so.returncode
