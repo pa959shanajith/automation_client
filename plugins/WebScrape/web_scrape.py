@@ -78,6 +78,7 @@ class ScrapeWindow(wx.Frame):
         self.scrape_type = None
         self.invalid_urls = ["about:blank","data:,",""]
         self.invalid_url_msg = "There is no URL in the browser selected or the URL is empty/blank. Please load the webpage and then start performing the desired action."
+        self.allowed_url_msg = "Only AvoBank URL: "+ allowed_urls[0] + " is supported for this trial."
         self.parent = parent
         if status == False:
             self.socketIO.emit('scrape',status)
@@ -231,10 +232,7 @@ class ScrapeWindow(wx.Frame):
                     else:
                         self.perform_clickandadd()
             else:
-                driver.execute_script("alert('Only AvoBank URL is supported for this trial.')")
-                log.info('Only AvoBank URL is supported for this trial')
-                log.info("URL tried:"+' '+ current_url)
-  
+                wx.MessageBox(self.allowed_url_msg, "Avo Assure - Web Scraper", wx.OK | wx.ICON_ERROR)
         else:
             try:
                 if not(self.driver.current_window_handle):
@@ -361,9 +359,7 @@ class ScrapeWindow(wx.Frame):
                     else:
                         self.perform_fullscrape()
             else:
-                driver.execute_script("alert('Only AvoBank URL is supported for this trial.')")
-                log.info('Only AvoBank URL is supported for this trial')
-                log.info("URL tried:"+' '+ current_url)
+                wx.MessageBox(self.allowed_url_msg, "Avo Assure - Web Scraper", wx.OK | wx.ICON_ERROR)
         else:
             try:
                 if not(self.driver.current_window_handle):
