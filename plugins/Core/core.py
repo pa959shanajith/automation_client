@@ -806,7 +806,9 @@ class MainNamespace(BaseNamespace):
             spath=spath['linux']
         else:
             spath=spath["default"]
-        if len(spath) != 0 and os.path.exists(spath):
+        if readconfig.configvalues["isTrial"] == 1 :
+            constants.SCREENSHOT_PATH = os.getcwd()+OS_SEP+'screenshots'
+        elif len(spath) != 0 and os.path.exists(spath):
             constants.SCREENSHOT_PATH=os.path.normpath(spath)+OS_SEP
         else:
             constants.SCREENSHOT_PATH="Disabled"
@@ -1693,7 +1695,7 @@ def get_Browser_Version(browser_Name):
                                
 
         elif browser_Name == 'FIREFOX':
-            path_flag=False
+            path_flag=False 
             if readconfig.configvalues['firefox_path'] == 'default':
                 paths = [os.path.expandvars(r'%ProgramFiles%\\Mozilla Firefox\\firefox.exe'),
                 os.path.expandvars(r'%ProgramFiles(x86)%\\Mozilla Firefox\\firefox.exe')]
@@ -1708,7 +1710,7 @@ def get_Browser_Version(browser_Name):
                 for p in paths:
                     if os.path.exists(p):
                         path_flag=True
-
+        
             if path_flag == True:     
                 firefox_version = list(filter(None, [get_version_via_com(p) for p in paths]))[0]
                 return firefox_version 
