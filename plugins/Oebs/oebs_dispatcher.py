@@ -201,8 +201,21 @@ class OebsDispatcher:
                     'selectvaluebytext': ['combo box','list'],
 
                     'settext': ['text'],
-                    'gettext': ['text']
+                    'gettext': ['text'],
+                    'cleartext': ['text'],
+                    'setsecuretext': ['text'],
 
+                    'getbuttonname': ['push button'],
+                    'mousehover': ['push button','combo box'],
+                    'verifybuttonname': ['push button'],
+
+                    'getallvalues': ['combo box'],
+                    'getcount': ['combo box'],
+                    'getselected': ['combo box'],
+                    'getvaluebyindex': ['combo box'],
+                    'verifyallvalues': ['combo box'],
+                    'verifycount': ['combo box'],
+                    'verifyvaluesexists' : ['combo box']
                     }
 
     get_ele_type={
@@ -213,7 +226,7 @@ class OebsDispatcher:
                     'textbox':'text',
                     'button':'push button'
                     }
-    custom_dict_element={'element':['clickelement','setfocus','doubleclick','rightclick','getelementtext','verifyelementtext','verifyexists', 'verifydoesnotexists', 'verifyreadonly','verifyhidden','verifyvisible','sendfunctionkeys','waitforelementvisible']}
+    custom_dict_element={'element':['clickelement','setfocus','doubleclick','rightclick','getelementtext','verifyelementtext','verifyexists', 'verifydoesnotexists', 'verifyreadonly','verifyhidden','verifyvisible','sendfunctionkeys','waitforelementvisible', 'verifydisabled', 'verifyenabled']}
 
     def clear_oebs_window_name(self):
         log.info('Clearing the window name')
