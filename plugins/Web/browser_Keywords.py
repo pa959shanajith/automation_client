@@ -705,7 +705,6 @@ class BrowserKeywords():
         return status,result,output,err_msg
 
     def closeSubWindows(self,*args):
-        log.info(args)
         global local_bk
         status=webconstants.TEST_RESULT_FAIL
         result=webconstants.TEST_RESULT_FALSE
@@ -1544,7 +1543,6 @@ class Singleton_DriverUtil():
             headless_mode = True
         else:
             headless_mode = str(configvalues['headless_mode'])=='Yes'
-        logger.print_on_console(headless_mode)
         use_custom_debugport = str(configvalues["use_custom_debugport"].lower()) == "yes"
         close_browser_popup = configvalues['close_browser_popup']
         incognito_private_mode = configvalues['incognito_private_mode']

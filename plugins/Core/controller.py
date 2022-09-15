@@ -1122,31 +1122,6 @@ class Controller():
         log.info( 'No  of Suites : '+str(len(suiteId_list)))
         logger.print_on_console('No  of Suites : ',str(len(suiteId_list)))
         headless_mode = str(configvalues['headless_mode'])=='Yes'
-        # logger.print_on_console(json_data['isHeadless'])
-        # if cicd_mode:
-        #     if json_data['isHeadless']:
-        #         logger.print_on_console('============================================================================')
-        #         logger.print_on_console(configvalues['headless_mode'])
-        #         logger.print_on_console('============================================================================')
-        #         # configvalues['headless_mode'] = 'Yes'
-        #         path = os.path.normpath(str(os.getcwd())+"/assets/config.json")
-        #         with open(path) as json_file:
-        #             json_decoded = json.load(json_file)
-        #         json_decoded['headless_mode'] = 'Yes'
-        #         json_decoded['cicd_mode'] = 'Yes'
-        #         with open(path, 'w') as json_file:
-        #             json.dump(json_decoded, json_file)
-        #     else:
-        #         path = os.path.normpath(str(os.getcwd())+"/assets/config.json")
-        #         with open(path) as json_file:
-        #             json_decoded = json.load(json_file)
-        #         json_decoded['headless_mode'] = 'No'
-        #         json_decoded['cicd_mode'] = 'No'
-        #         with open(path, 'w') as json_file:
-        #             json.dump(json_decoded, json_file)
-        # logger.print_on_console('============================================================================')
-        # logger.print_on_console(configvalues)
-        # logger.print_on_console('============================================================================')
         if headless_mode:
             log.info('Execution in headless mode')
             logger.print_on_console('Execution in headless mode')
