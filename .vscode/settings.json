@@ -1,5 +1,5 @@
 {
-    "python.pythonPath": "${workspaceRoot}/python.exe",
+    "python.defaultInterpreterPath": "${workspaceRoot}/python.exe",
     "python.linting.pylintEnabled": true,
     "python.linting.enabled": true
 }
