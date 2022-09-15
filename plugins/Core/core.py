@@ -1160,6 +1160,8 @@ class TestThread(threading.Thread):
                 result["agentname"] = opts.agentname
                 server_url = 'https://' + opts.serverurl + ':' + opts.serverport + '/setExecStatus'
                 res = requests.post(server_url,json=result, verify=False)
+                from browser_Keywords import BrowserKeywords
+                BrowserKeywords.closeBrowser(self)
             else:
                 if status==TERMINATE:
                     logger.print_on_console('---------Termination Completed-------',color="YELLOW")

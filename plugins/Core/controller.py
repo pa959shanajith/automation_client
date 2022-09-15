@@ -1421,11 +1421,11 @@ class Controller():
                                         os.makedirs(path)
                                     file_name = datetime.now().strftime("%Y%m%d%H%M%S")
                                     video_path = path+"ScreenRecording_"+file_name+".mp4"
-                                for i in range(0,len(all_jobs)):
-                                    if(all_jobs[i]['browser']==browser_num[browser]):
-                                        file_creations_status=j.get_job_asset_content(all_jobs[i]['id'],file_name,path)
-                                if len(all_jobs)!=0:
-                                    execute_result_data['reportData']['overallstatus'][0]['video']=video_path
+                                    for i in range(0,len(all_jobs)):
+                                        if(all_jobs[i]['browser']==browser_num[browser]):
+                                            file_creations_status=j.get_job_asset_content(all_jobs[i]['id'],file_name,path)
+                                    if len(all_jobs)!=0:
+                                        execute_result_data['reportData']['overallstatus']['video']=video_path
                             if cicd_mode:
                                 execute_result_data["event"] = "result_executeTestSuite"
                                 execute_result_data["configkey"] = opts.configkey

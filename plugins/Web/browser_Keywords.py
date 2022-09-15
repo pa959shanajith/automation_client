@@ -705,6 +705,7 @@ class BrowserKeywords():
         return status,result,output,err_msg
 
     def closeSubWindows(self,*args):
+        log.info(args)
         global local_bk
         status=webconstants.TEST_RESULT_FAIL
         result=webconstants.TEST_RESULT_FALSE
