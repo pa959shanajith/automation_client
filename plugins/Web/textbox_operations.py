@@ -321,6 +321,7 @@ class TextboxKeywords:
                                         logger.print_on_console(err_msg)
                                 else:
                                     browser_Keywords.local_bk.driver_obj.execute_script(SET_TEXT_SCRIPT, webelement, input)
+                                    browser_Keywords.local_bk.driver_obj.execute_script(EVENTS_JS, webelement)
                                     # Bug #19221. To check if value is set or not.
                                     value = browser_Keywords.local_bk.driver_obj.execute_script('return arguments[0].value', webelement)
                                     if value == input:
