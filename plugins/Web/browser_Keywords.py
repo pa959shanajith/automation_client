@@ -34,6 +34,7 @@ import time
 import fileinput
 import glob
 from sendfunction_keys import SendFunctionKeys as SF
+import cicd_core
 driver_pre = None
 drivermap = []
 linux_drivermap=[]
@@ -1537,7 +1538,11 @@ class Singleton_DriverUtil():
         local_bk.log.debug(browser_num)
         logger.print_on_console( 'BROWSER NUM: ',str(browser_num))
         configvalues = readconfig.configvalues
-        headless_mode = str(configvalues['headless_mode'])=='Yes'
+        cicd_headless_mode = cicd_core.cicd_isheadless
+        if cicd_headless_mode == 'Yes':
+            headless_mode = True
+        else:
+            headless_mode = str(configvalues['headless_mode'])=='Yes'
         use_custom_debugport = str(configvalues["use_custom_debugport"].lower()) == "yes"
         close_browser_popup = configvalues['close_browser_popup']
         incognito_private_mode = configvalues['incognito_private_mode']
