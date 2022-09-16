@@ -33,9 +33,9 @@ class readConfig():
         "server_cert":"", "enableSecurityCheck":"","browser_check":"","tls_security":"","highlight_check":"",
         "firefox_path":"", "prediction_for_iris_objects":"","hide_soft_key":"","connection_timeout":"","extn_enabled":"",
         "headless_mode":"","update_check":"", "delay_stringinput":"","clear_cache":"","screen_rec":"","full_screenshot":"",
-        "close_browser_popup":"","incognito_private_mode":"", "use_custom_debugport":"","disable_screen_timeout":"",
+        "close_browser_popup":"","incognito_private_mode":"", "use_custom_debugport":"","disable_screen_timeout":"","element_load_timeout":"",
         "globalWaitTimeOut":"","kill_stale":"","chrome_extnpath":"","browser_screenshots":"","max_retries_app_launch":"","file_server_ip":"",
-        "ice_Token":"","isTrial":"","sample_application_urls":"","element_load_timeout":""}
+        "ice_Token":"","isTrial":"","sample_application_urls":""}
         if os.path.isfile(self.config_path)==True:
             try:
                 conf = open(self.config_path, 'r')
