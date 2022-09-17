@@ -17,6 +17,7 @@ import table_keywords
 import element_operations
 import textbox_operations
 import dropdown_listbox
+import combobox_operations
 import utilweb_operations
 import static_text_keywords
 import logger
@@ -57,6 +58,7 @@ class Dispatcher:
         local_Wd.util_object = utilweb_operations.UtilWebKeywords()
         local_Wd.statict_text_object = static_text_keywords.StaticTextKeywords()
         local_Wd.custom_object=custom_keyword.CustomKeyword()
+        local_Wd.combobox_object=combobox_operations.ComboboxKeywords()
         # local_Wd.driver_util = browser_Keywords.Singleton_DriverUtil()
 
         local_Wd.browser_obj_sl = web_keywords.Browser_Keywords()
@@ -199,6 +201,12 @@ class Dispatcher:
             'execute_js':local_Wd.browser_object.execute_js,
             'getbrowsername': local_Wd.browser_object.getBrowserName,
             'savefile': local_Wd.browser_object.save_file,
+
+            # Combobox Keywords
+            'cmbselectvaluebyindex':local_Wd.combobox_object.cmbSelectValueByIndex,
+            'cmbgetcount':local_Wd.combobox_object.cmbGetCount,
+            'cmbgetallvalues':local_Wd.combobox_object.cmbGetAllValues,
+            'cmbselectvaluebytext':local_Wd.combobox_object.cmbSelectValueByText,
 
             'clickiris':iris_object.clickiris,
             'doubleclickiris':iris_object.doubleclickiris,
@@ -402,7 +410,11 @@ class Dispatcher:
             'getlinktext': ['a','link'],
             'verifylinktext': ['a','link'],
             'verifywebimages': ['img'],
-            'imagesimilaritypercentage': ['img']
+            'imagesimilaritypercentage': ['img'],
+            'cmbselectvaluebyindex': ['textbox','div','span'],
+            'cmbgetcount': ['textbox','div','span'],
+            'cmbgetallvalues': ['textbox','div','span'],
+            'cmbselectvaluebytext': ['textbox','div','span']
         }
         custom_dict_element={'element':['getobjectcount','getobject','clickelement','doubleclick','rightclick','getelementtext','verifyelementtext','drag', 'drop','gettooltiptext','verifytooltiptext','verifyexists', 'verifydoesnotexists','verifyvisible', 'switchtotab','switchtowindow','setfocus','sendfunctionkeys', 'sendsecurefunctionkeys',
             'tab','waitforelementvisible','mousehover','press','verifyenabled','verifydisabled','verifyreadonly','getattributevalue','verifyattribute','getrowcount','getcolumncount','getcellvalue','verifycellvalue','getcelltooltip','verifycelltooltip','cellclick','getrownumbytext','getcolnumbytext','getinnertable','selectbyabsolutevalue','horizontalscroll','verticalscroll','click','uploadfile','dropfile']}
@@ -845,6 +857,7 @@ class Dispatcher:
         global obj_flag,simple_debug_gwto
         obj_flag=False
         webElement = None
+        configvalues = readconfig.configvalues
         if objectname.strip() != '':
             identifiers = objectname.split(';')
             local_Wd.log.debug('Identifiers are ')
@@ -852,31 +865,39 @@ class Dispatcher:
             global finalXpath
             #Absolute xpath is used to locate web element first as it doesn't change like relative xpath.
             if len(identifiers)>=3:
+                delayconst = int(configvalues['element_load_timeout'])
+                for i in range(delayconst):
                 #find by absolute xpath
-                webElement=self.element_locator(driver,'xpath',identifiers[0],'1')
-                if (webElement):
-                    finalXpath = identifiers[0]
-                if not(webElement):
-                    #find by id
-                    webElement=self.element_locator(driver,'id',identifiers[1],'2')
+                    webElement=self.element_locator(driver,'xpath',identifiers[0],'1')
+                    if (webElement):
+                        finalXpath = identifiers[0]
                     if not(webElement):
-                        #find by relative xpath
-                        webElement=self.element_locator(driver,'rxpath',identifiers[2],'3')
-                        if (webElement):
-                            finalXpath = identifiers[2]
+                        #find by id
+                        webElement=self.element_locator(driver,'id',identifiers[1],'2')
                         if not(webElement):
-                            #find by name
-                            webElement=self.element_locator(driver,'name',identifiers[3],'4')
+                            #find by relative xpath
+                            webElement=self.element_locator(driver,'rxpath',identifiers[2],'3')
+                            if (webElement):
+                                finalXpath = identifiers[2]
                             if not(webElement):
-                                 #find by classname
-                                webElement=self.element_locator(driver,'classname',identifiers[5],'5')
+                                #find by relative xpath
+                                webElement=self.element_locator(driver,'rxpath',identifiers[2],'3')
                                 if not(webElement):
-                                #find by css selector
-                                    if len(identifiers) > 11:
-                                        webElement=self.element_locator(driver,'css_selector',identifiers[11],'6')
+                                    #find by name
+                                    webElement=self.element_locator(driver,'name',identifiers[3],'4')
                                     if not(webElement):
-                                        webElement=None
-                                        local_Wd.log.info("Weblement not found with Primary identifers")
+                                        #find by classname
+                                        webElement=self.element_locator(driver,'classname',identifiers[5],'5')
+                                        if not(webElement):
+                                        #find by css selector
+                                            if len(identifiers) > 11:
+                                                webElement=self.element_locator(driver,'css_selector',identifiers[11],'6')
+                                            if not(webElement):
+                                                webElement=None
+                                                local_Wd.log.info("Weblement not found with Primary identifers")
+                    time.sleep(1)
+                    if (webElement):
+                        break
             #enhance object reconition changes
             if(webElement == None):
                 try:

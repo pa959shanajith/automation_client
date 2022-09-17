@@ -220,3 +220,37 @@ IGNORE_FILE_EXTENSIONS = ('.pdf','.docx','.zip','.dmg')
 
 # check whether element is in viewport
 INVIEW = """ var rect = arguments[0].getBoundingClientRect(); var windowHeight = (window.innerHeight || document.documentElement.clientHeight); var windowWidth = (window.innerWidth || document.documentElement.clientWidth); return ((rect.left >= 0) && (rect.top >= 0) && ((rect.left + rect.width) <= windowWidth) && ((rect.top + rect.height) <= windowHeight));"""
+
+EVENTS_JS = """
+var validEventList = ["blur", "change", "focus", "click", "keydown", "keypress", "keyup", "mousedown", "mousemove", "mouseup"];
+
+function Trigger_Post(element){
+    for (var event in validEventList) {
+        element.dispatchEvent(new Event(validEventList[event]));
+    }
+}
+Trigger_Post(arguments[0]);
+"""
+
+ELEMENT_LIST_JS = """
+if ((arguments[0].tagName.toLowerCase() == 'input') && (arguments[0].getAttribute('role') == 'combobox')) {
+    var ele_id;
+    if (arguments[0].getAttribute('aria-expanded') == 'false') {
+        arguments[0].click();
+    }
+    if (arguments[0].hasAttribute('aria-controls')) {
+        ele_id = arguments[0].getAttribute('aria-controls');
+    } 
+    else {
+        ele_id = arguments[0].getAttribute('aria-owns');
+    }
+
+    var element = document.getElementById(ele_id);
+    return element.querySelectorAll('[role="option"]');
+}
+else {
+    return arguments[0].children;
+}
+"""
+
+SET_VALUE_ATTRIBUTE = """arguments[0].value=arguments[1];"""

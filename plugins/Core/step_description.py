@@ -1468,6 +1468,20 @@ class StepDescription:
         def getchildelementcount():
             return 'Get the count of child elements present in the element '+ "'" + tsp.custname + "'"+ ' and save the count  '+"'"+ output +"'"+ ' in '+"'"+tsp.outputval+"'"
 
+        # Combobox Keywords
+        def cmbselectvaluebyindex():
+            return 'Select the value '+output+' with the index '+input+' present in the table cell '+"'" + tsp.custname+'['+inputval[0]+']['+inputval[1]+']'+"'."
+
+        def cmbgetcount():
+            return 'Get the count of values in the '+ "'" + tsp.custname + "'"+ ' and save the count ' +"'"+output+"'"+' in '+"'"+tsp.outputval+"'"
+
+        def cmbgetallvalues():
+            return 'Get all the values present in the '+"'"+tsp.custname+"' and save the values '"+ output + ' in ' + "'" + tsp.outputval + "' ."
+        
+        def cmbselectvaluebytext():
+            return 'Select value '+"'"+input+"'"+' in ' + tsp.custname
+
+
         #Button link keywords
         def click():
             return 'Click on '+ "'" + tsp.custname + "'"

@@ -45,5 +45,6 @@
     "timeOut": "1",
     "tls_security": "Low",
     "update_check": "No",
-    "use_custom_debugport": "No"
+    "use_custom_debugport": "No",
+    "element_load_timeout": "10"
 }
