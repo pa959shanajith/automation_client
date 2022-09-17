@@ -34,8 +34,8 @@ class readConfig():
         "firefox_path":"", "prediction_for_iris_objects":"","hide_soft_key":"","connection_timeout":"","extn_enabled":"",
         "headless_mode":"","update_check":"", "delay_stringinput":"","clear_cache":"","screen_rec":"","full_screenshot":"",
         "close_browser_popup":"","incognito_private_mode":"", "use_custom_debugport":"","disable_screen_timeout":"",
-        "globalWaitTimeOut":"","kill_stale":"","chrome_extnpath":"","browser_screenshots":"","max_retries_app_launch":"",
-        "element_load_timeout":""}
+        "globalWaitTimeOut":"","kill_stale":"","chrome_extnpath":"","browser_screenshots":"","max_retries_app_launch":"","file_server_ip":"",
+        "ice_Token":"","isTrial":"","sample_application_urls":"","element_load_timeout":""}
         if os.path.isfile(self.config_path)==True:
             try:
                 conf = open(self.config_path, 'r')
@@ -82,7 +82,12 @@ class readConfig():
                 configvalues['kill_stale']=params['kill_stale']
                 configvalues['browser_screenshots']=params['browser_screenshots']
                 configvalues["max_retries_app_launch"] = params['max_retries_app_launch']
+                configvalues['file_server_ip']=params['file_server_ip']
+                configvalues['ice_Token']=params['ice_Token']
+                configvalues['sample_application_urls']=params['sample_application_urls']
+                configvalues['isTrial']=params['isTrial']
                 configvalues['element_load_timeout'] = params['element_load_timeout']
+
             except Exception as e:
                 configvalues['errorflag']=e
         else:
