@@ -39,7 +39,7 @@
     "screenShot_Flag": "All",
     "screen_rec": "No",
     "server_cert": "assets\\CA_BUNDLE\\server.crt",
-    "server_ip": "localhost",
+    "server_ip": "srv01nineteen68",
     "server_port": "443",
     "stepExecutionWait": "1",
     "timeOut": "1",
