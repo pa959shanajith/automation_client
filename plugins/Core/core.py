@@ -1838,7 +1838,12 @@ def check_browser():
                 if IE_VERSION != -1:
                     try:
                         URL=readconfig.configvalues["file_server_ip"]+ "/IEDriverServer.exe"
-                        request.urlretrieve(URL,normpath(DRIVERS_PATH + "/IEDriverServer.exe"))
+                        if proxies:
+                            fileObj = requests.get(URL,verify=False,proxies=proxies)
+                            if(fileObj.status_code == 200):
+                                open(normpath(DRIVERS_PATH + "/IEDriverServer.exe"), 'wb').write(fileObj.content)
+                        else:
+                            request.urlretrieve(URL,normpath(DRIVERS_PATH + "/IEDriverServer.exe"))
                         ieFlag = True  
                     except:
                         ieFlag = False
@@ -1864,7 +1869,12 @@ def check_browser():
                 if not os.path.exists(CHROME_DRIVER_PATH) or chromeFlag == False:
                     try:
                         URL=readconfig.configvalues["file_server_ip"]+"/chromedriver"+CHROME_VERSION.split('.')[0]+".exe"
-                        request.urlretrieve(URL,CHROME_DRIVER_PATH)
+                        if proxies:
+                            fileObj = requests.get(URL,verify=False,proxies=proxies)
+                            if(fileObj.status_code == 200):
+                                open(CHROME_DRIVER_PATH, 'wb').write(fileObj.content)
+                        else:
+                            request.urlretrieve(URL,CHROME_DRIVER_PATH)
                         chromeFlag = True
                     except:
                         logger.print_on_console("Unable to download compatible chrome driver from AvoAssure server")
@@ -1919,7 +1929,12 @@ def check_browser():
                 if FIREFOX_VERSION != -1:
                     try:
                         URL=readconfig.configvalues["file_server_ip"]+"/geckodriver.exe"
-                        request.urlretrieve(URL,GECKODRIVER_PATH)
+                        if proxies:
+                            fileObj = requests.get(URL,verify=False,proxies=proxies)
+                            if(fileObj.status_code == 200):
+                                open(GECKODRIVER_PATH, 'wb').write(fileObj.content)
+                        else:
+                            request.urlretrieve(URL,GECKODRIVER_PATH)
                         firefoxFlag = True  
                     except:
                         logger.print_on_console("Unable to download compatible firefox driver from AvoAssure server")
@@ -2023,7 +2038,12 @@ def check_browser():
                 if not os.path.exists(EDGE_CHROMIUM_DRIVER_PATH) or chromiumFlag == False:
                     try:
                         URL=readconfig.configvalues["file_server_ip"]+"/msedgedriver"+CHROMIUM_VERSION.split('.')[0]+".exe"
-                        request.urlretrieve(URL,EDGE_CHROMIUM_DRIVER_PATH)
+                        if proxies:
+                            fileObj = requests.get(URL,verify=False,proxies=proxies)
+                            if(fileObj.status_code == 200):
+                                open(EDGE_CHROMIUM_DRIVER_PATH, 'wb').write(fileObj.content)
+                        else:
+                            request.urlretrieve(URL,EDGE_CHROMIUM_DRIVER_PATH)
                         chromiumFlag = True
                     except:
                         chromiumFlag = False 
