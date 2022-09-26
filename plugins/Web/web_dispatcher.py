@@ -858,6 +858,7 @@ class Dispatcher:
         global obj_flag,simple_debug_gwto
         obj_flag=False
         webElement = None
+        configvalues = readconfig.configvalues
         if objectname.strip() != '':
             identifiers = objectname.split(';')
             local_Wd.log.debug('Identifiers are ')
@@ -865,31 +866,36 @@ class Dispatcher:
             global finalXpath
             #Absolute xpath is used to locate web element first as it doesn't change like relative xpath.
             if len(identifiers)>=3:
+                delayconst = int(configvalues['element_load_timeout'])
+                for i in range(delayconst):
                 #find by absolute xpath
-                webElement=self.element_locator(driver,'xpath',identifiers[0],'1')
-                if (webElement):
-                    finalXpath = identifiers[0]
-                if not(webElement):
-                    #find by id
-                    webElement=self.element_locator(driver,'id',identifiers[1],'2')
+                    webElement=self.element_locator(driver,'xpath',identifiers[0],'1')
+                    if (webElement):
+                        finalXpath = identifiers[0]
                     if not(webElement):
-                        #find by relative xpath
-                        webElement=self.element_locator(driver,'rxpath',identifiers[2],'3')
-                        if (webElement):
-                            finalXpath = identifiers[2]
+                        #find by id
+                        webElement=self.element_locator(driver,'id',identifiers[1],'2')
                         if not(webElement):
-                            #find by name
-                            webElement=self.element_locator(driver,'name',identifiers[3],'4')
+                            #find by relative xpath
+                            webElement=self.element_locator(driver,'rxpath',identifiers[2],'3')
+                            if (webElement):
+                                finalXpath = identifiers[2]
                             if not(webElement):
-                                 #find by classname
-                                webElement=self.element_locator(driver,'classname',identifiers[5],'5')
+                                #find by name
+                                webElement=self.element_locator(driver,'name',identifiers[3],'4')
                                 if not(webElement):
-                                #find by css selector
-                                    if len(identifiers) > 11:
-                                        webElement=self.element_locator(driver,'css_selector',identifiers[11],'6')
+                                    #find by classname
+                                    webElement=self.element_locator(driver,'classname',identifiers[5],'5')
                                     if not(webElement):
-                                        webElement=None
-                                        local_Wd.log.info("Weblement not found with Primary identifers")
+                                    #find by css selector
+                                        if len(identifiers) > 11:
+                                            webElement=self.element_locator(driver,'css_selector',identifiers[11],'6')
+                                        if not(webElement):
+                                            webElement=None
+                                            local_Wd.log.info("Weblement not found with Primary identifers")
+                    time.sleep(1)
+                    if (webElement):
+                        break
             #enhance object reconition changes
             if(webElement == None):
                 try:
