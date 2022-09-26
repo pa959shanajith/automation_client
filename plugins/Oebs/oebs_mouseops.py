@@ -160,7 +160,7 @@ def MouseOperation(action, coord_x, coord_y):
         hold()
         return True
     elif (action == "release"):
-        move(coord_x, coord_y)
+        # move(coord_x, coord_y)
         release()
         return True
     elif (action == "rightclick"):

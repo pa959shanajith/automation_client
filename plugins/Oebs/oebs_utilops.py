@@ -88,6 +88,9 @@ class UtilOperations:
                 y2 = y1 + height
                 x_cor = (x1+x2)/2
                 y_cor = (y1+y2)/2
+                if curaccinfo.role == "panel":
+                    x_cor = x1
+                    y_cor = y1
                 oebs_mouseops.MouseOperation('hold',x_cor,y_cor)
                 methodoutput = TEST_RESULT_TRUE
                 status = TEST_RESULT_PASS
