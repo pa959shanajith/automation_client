@@ -9,32 +9,7 @@ EXTENSIONS_PATH = os.environ["AVO_ASSURE_HOME"] + os.sep + "extension"
 
 GET_XPATH_JS="""function getElementXPath(elt) {var path = "";for (; elt && elt.nodeType == 1; elt = elt.parentNode){idx = getElementIdx(elt);xname = elt.tagName;if (idx >= 1){xname += "[" + idx + "]";}path = "/" + xname + path;}return path;}function getElementIdx(elt){var count = 1;for (var sib = elt.previousSibling; sib ; sib = sib.previousSibling){if(sib.nodeType == 1 && sib.tagName == elt.tagName){count++;}}return count;}return getElementXPath(arguments[0]).toLowerCase();"""
 
-CLICK_JAVASCRIPT = """var evType;
-element = arguments[0];
-
-if (document.createEvent && element.getRootNode().toString() != '[object ShadowRoot]') {
-    evType = 'Click executed through part-1';
-    var evt = document.createEvent('MouseEvents');
-    evt.initMouseEvent('click', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
-    try {
-        setTimeout(function () {
-            element.dispatchEvent(evt)
-        }, 100);
-    } catch (error) {
-        return false;
-    }
-} else {
-    evType = 'Click executed through part-2';
-    try {
-        setTimeout(function () {
-            element.click();
-        }, 100);
-    } catch (error) {
-        return false;
-    }
-}
-
-return true;"""
+CLICK_JAVASCRIPT = """var evType; element=arguments[0]; if (document.createEvent) {     evType = 'Click executed through part-1';     var evt = document.createEvent('MouseEvents');     evt.initMouseEvent('click', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);   	setTimeout(function() {     	element.dispatchEvent(evt)    }, 100); } else {     evType = 'Click executed through part-2';   	setTimeout(function() {     element.click();   	}, 100); } return (evType);"""
 
 GET_CELL_JS="""var temp = fun(arguments[0], arguments[2], arguments[1]); return temp;  function fun(table, x, y) {     var m = [],         row, cell, xx, tx, ty, xxx, yyy;     for (yyy = 0; yyy < table.rows.length; yyy++) {         row = table.rows[yyy];         for (xxx = 0; xxx < row.cells.length; xxx++) {             cell = row.cells[xxx];             xx = xxx;             for (; m[yyy] && m[yyy][xx]; ++xx) {}             for (tx = xx; tx < xx + cell.colSpan; ++tx) {                 for (ty = yyy; ty < yyy + cell.rowSpan; ++ty) {                     if (!m[ty]) m[ty] = [];                     m[ty][tx] = true;                 }             }             if (xx <= x && x < xx + cell.colSpan && yyy <= y && y < yyy + cell.rowSpan) return cell;         }     }     return null; };"""
 
@@ -230,3 +205,37 @@ IGNORE_FILE_EXTENSIONS = ('.pdf','.docx','.zip','.dmg')
 
 # check whether element is in viewport
 INVIEW = """ var rect = arguments[0].getBoundingClientRect(); var windowHeight = (window.innerHeight || document.documentElement.clientHeight); var windowWidth = (window.innerWidth || document.documentElement.clientWidth); return ((rect.left >= 0) && (rect.top >= 0) && ((rect.left + rect.width) <= windowWidth) && ((rect.top + rect.height) <= windowHeight));"""
+
+EVENTS_JS = """
+var validEventList = ["blur", "change", "focus", "click", "keydown", "keypress", "keyup", "mousedown", "mousemove", "mouseup"];
+
+function Trigger_Post(element){
+    for (var event in validEventList) {
+        element.dispatchEvent(new Event(validEventList[event]));
+    }
+}
+Trigger_Post(arguments[0]);
+"""
+
+ELEMENT_LIST_JS = """
+if ((arguments[0].tagName.toLowerCase() == 'input') && (arguments[0].getAttribute('role') == 'combobox')) {
+    var ele_id;
+    if (arguments[0].getAttribute('aria-expanded') == 'false') {
+        arguments[0].click();
+    }
+    if (arguments[0].hasAttribute('aria-controls')) {
+        ele_id = arguments[0].getAttribute('aria-controls');
+    } 
+    else {
+        ele_id = arguments[0].getAttribute('aria-owns');
+    }
+
+    var element = document.getElementById(ele_id);
+    return element.querySelectorAll('[role="option"]');
+}
+else {
+    return arguments[0].children;
+}
+"""
+
+SET_VALUE_ATTRIBUTE = """arguments[0].value=arguments[1];"""

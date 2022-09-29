@@ -141,7 +141,37 @@ class UtilWebKeywords:
         flag=False
         local_uo.log.debug('Checking the visibility of element')
         try:
-            script="""var isVisible = (function() {     function inside(schild, sparent) {         while (schild) {             if (schild === sparent) return true;             schild = schild.parentNode;         }         return false;     };     return function(selem) {         if (document.hidden || selem.offsetWidth == 0 || selem.offsetHeight == 0 || selem.style.visibility == 'hidden' || selem.style.display == 'none' || selem.style.opacity === 0) return false;         var srect = selem.getBoundingClientRect();         if (window.getComputedStyle || selem.currentStyle) {             var sel = selem,                 scomp = null;             while (sel) {                 if (sel === document) {                     break;                 } else if (!sel.parentNode) return false;                 scomp = window.getComputedStyle ? window.getComputedStyle(sel, null) : sel.currentStyle;                 if (scomp && (scomp.visibility == 'hidden' || scomp.display == 'none' || (typeof scomp.opacity !== 'undefined' && !(scomp.opacity > 0)))) return false;                 sel = sel.parentNode;             }         }         return true;     } })(); var s = arguments[0]; return isVisible(s);"""
+            #Handled document fragments for salesforce. If document fragment is encountered, parentNode is replaced by host.
+            script="""var isVisible = (function () {
+    function inside(schild, sparent) {
+        while (schild) {
+            if (schild === sparent) return true;
+            schild = schild.parentNode;
+        }
+        return false;
+    };
+    return function (selem) {
+        if (document.hidden || selem.offsetWidth == 0 || selem.offsetHeight == 0 || selem.style.visibility == 'hidden' || selem.style.display == 'none' || selem.style.opacity === 0) return false;
+        var srect = selem.getBoundingClientRect();
+        if (window.getComputedStyle || selem.currentStyle) {
+            var sel = selem,
+                scomp = null;
+            while (sel) {
+                if (sel === document) {
+                    break;
+                } else if (!sel.parentNode) return false;
+                scomp = window.getComputedStyle ? window.getComputedStyle(sel, null) : sel.currentStyle;
+                if (scomp && (scomp.visibility == 'hidden' || scomp.display == 'none' || (typeof scomp.opacity !== 'undefined' && !(scomp.opacity > 0)))) return false;
+                sel = sel.parentNode;
+                if (sel.toString()=='[object ShadowRoot]')
+                    sel=sel.host;
+            }
+        }
+        return true;
+    }
+})();
+var s = arguments[0];
+return isVisible(s);"""
             flag= browser_Keywords.local_bk.driver_obj.execute_script(script,webelement)
         except Exception as e:
             self.__web_driver_exception(e)
@@ -566,16 +596,16 @@ class UtilWebKeywords:
             if webelement is not None and eleStatus:
                 if SYSTEM_OS == 'Darwin' or SYSTEM_OS == 'Linux':
                     obj = Utils()
-                    if isinstance(browser_Keywords.driver_obj, webdriver.Firefox):
+                    if isinstance(browser_Keywords.local_bk.driver_obj, webdriver.Firefox):
                         javascript = "return window.mozInnerScreenY"
-                        value = browser_Keywords.driver_obj.execute_script(javascript)
+                        value = browser_Keywords.local_bk.driver_obj.execute_script(javascript)
                         offset = int(value)
                         location = webelement.location
-                        obj.mouse_move(int(location.get('x') + 18), int(location.get('y') + offset + 18))
-                        log.debug('hover performed')
+                        obj.mouse_move_posix(int(location.get('x') + 18), int(location.get('y') + offset + 18))
+                        #log.debug('hover performed')
                         status = TEST_RESULT_PASS
                         methodoutput = TEST_RESULT_TRUE
-                    elif isinstance(browser_Keywords.driver_obj, webdriver.Safari):
+                    elif isinstance(browser_Keywords.local_bk.driver_obj, webdriver.Safari):
                         location = obj.get_element_location(webelement)
                         obj.mouse_move(int(location.get('x') + 9), int(location.get('y') + 70))
                     else:

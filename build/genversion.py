@@ -143,8 +143,10 @@ DEV_ENV = env("PROD_BUILD").lower() != "true"
 CBU = env("CBU") or "Internal"
 BRANCH = env("TARGET_BRANCH") or "master"
 MAJOR_VERSION = env("MAJOR_VERSION")
-MINOR_VERSION = get_minor_ver()
-PATCH_VERSION = get_patch_ver()
+MINOR_VERSION = env("MINOR_VERSION")
+PATCH_VERSION = env("PATCH_VERSION")
+# MINOR_VERSION = get_minor_ver()
+# PATCH_VERSION = get_patch_ver()
 
 RELEASE_VERSION = MAJOR_VERSION+"."+MINOR_VERSION+"."+PATCH_VERSION
 PREV_TAG = (env("prev_tag") or get_prev_ver()).replace('\r', '').replace('\n', '')

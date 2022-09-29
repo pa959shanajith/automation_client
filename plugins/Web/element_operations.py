@@ -631,4 +631,81 @@ class ElementKeywords:
             local_eo.log.error(e)
         return text, err_msg
 
+    def get_child_element_count(self,webelement,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output=OUTPUT_CONSTANT
+        local_eo.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        if webelement is not None:
+            local_eo.log.info('Recieved web element from the web dispatcher')
+            if webelement.is_enabled():
+                try:
+                    if args[0][0]=="":
+                        totalcount = browser_Keywords.local_bk.driver_obj.execute_script("""return arguments[0].childElementCount""",webelement)
+                        local_eo.log.info('Number of child element is')
+                        local_eo.log.info(totalcount)
+                        if totalcount is not None:
+                            output = str(totalcount)
+                            status = TEST_RESULT_PASS
+                            methodoutput = TEST_RESULT_TRUE
+                            logger.print_on_console('Number of child element is: ',output)
+                            local_eo.log.info(STATUS_METHODOUTPUT_UPDATE)
+                    else:
+                        op_list=[]
+                        child_elements = browser_Keywords.local_bk.driver_obj.execute_script("""return arguments[0].children""",webelement)
+                        for i in child_elements:
+                            op_list.append(i.tag_name)
+                        if len(op_list)!=0:
+                            output=op_list.count(args[0][0])
+                            if output>0:
+                                local_eo.log.info('number of '+ args[0][0] +'is')
+                                local_eo.log.info(child_elements)
+                                logger.print_on_console('Number of '+ args[0][0] +' is: ',output)
+                                local_eo.log.info(STATUS_METHODOUTPUT_UPDATE)
+                                status = TEST_RESULT_PASS
+                                methodoutput = TEST_RESULT_TRUE
+                            else:
+                                local_eo.log.error(INVALID_INPUT)
+                                err_msg=INVALID_INPUT
+                                logger.print_on_console(INVALID_INPUT)
+                except Exception as e:
+                    local_eo.log.error(e)
+                    logger.print_on_console(e)
+        return status,methodoutput,output,err_msg
 
+    def get_child_elements(self,webelement,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output=OUTPUT_CONSTANT
+        local_eo.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        if webelement is not None:
+            local_eo.log.info('Recieved web element from the web dispatcher')
+            if webelement.is_enabled():
+                try:
+                    if args[0][0]!="":
+                        op_list=[]
+                        child_elements = browser_Keywords.local_bk.driver_obj.execute_script("""return arguments[0].children""",webelement)
+                        for i in child_elements:
+                            op_list.append(i.tag_name)
+                        if len(op_list)!=0:
+                            if args[0][0].lower()=='tag':
+                                output = op_list
+                                status = TEST_RESULT_PASS
+                                methodoutput = TEST_RESULT_TRUE
+                                local_eo.log.info('Child elements are')
+                                local_eo.log.info(child_elements)
+                                local_eo.log.info(STATUS_METHODOUTPUT_UPDATE)
+                            else:
+                                local_eo.log.error(INVALID_INPUT)
+                                err_msg=INVALID_INPUT
+                                logger.print_on_console(INVALID_INPUT)
+                    else:
+                        err_msg="Input is empty, Please provide the valid input"
+                        local_eo.log.error(err_msg)
+                        logger.print_on_console(err_msg)
+                except Exception as e:
+                    local_eo.log.error(e)
+                    logger.print_on_console(e)
+        return status,methodoutput,output,err_msg

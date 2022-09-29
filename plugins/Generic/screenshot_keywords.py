@@ -77,18 +77,18 @@ class Screenshot():
                     # if not accessibility or constants.SCREENSHOT_NFS_AVAILABLE: 
                     #     #add logic to clear accessibility screenshots after some time period
                     #     os.remove(tempPath)
-                # if(genericStep):
-                #     if driver:
-                #         driver.save_screenshot(genericStep)
-                #     else:
-                #         if web:
-                #             log.warn("Capturing screenshot using generic since browser driver is not available")
-                #         img=ImageGrab.grab()
-                #         img.save(genericStep)
-                #keeping a copy of screenshot in folder for generic keyword
-                # if r=='fail':
-                #     raise Exception('error while saving in reportNFS') 
-                # else:
+                if(genericStep):
+                    if driver:
+                        driver.save_screenshot(genericStep)
+                    else:
+                        if web:
+                            log.warn("Capturing screenshot using generic since browser driver is not available")
+                        img=ImageGrab.grab()
+                        img.save(genericStep)
+                #  keeping a copy of screenshot in folder for generic keyword
+                if r=='fail':
+                    raise Exception('error while saving in reportNFS') 
+                elif not DEBUG_ACTION:
                     output = tempPath
                 log.debug('screenshot captured')
                 logger.print_on_console('Screenshot captured')

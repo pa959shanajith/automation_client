@@ -150,7 +150,7 @@ MSG_KEYWORD_NA = "Keyword Not Available"
 MSG_TEXTBOX_CLEARED = "The Text in the TextBox is Cleared."
 
 MSG_STATUS = "Executed and the status is:"
-MSG_INVALID_INPUT = "Input cannot be empty/null."
+MSG_INVALID_INPUT = "Input cannot be empty/null/invalid."
 MSG_RESULT = "Executed and the result is:"
 MSG_INVALID_OBJECT = "This Element is not Accessible."
 MSG_HIDDEN_OBJECT = "The Element is Hidden."

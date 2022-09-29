@@ -139,6 +139,8 @@ class StepDescription:
             return "Add the numbers '"+ input+"' and save the value '"+output +"' in '"+ tsp.outputval+"'"
         def evaluate():
             return "Evaluate Mathematical expression '"+ tsp.inputval[0]+"' and save the result '"+ output +"' in '"+ tsp.outputval+"'"
+        def numberFormatter():
+            return "numberFormatter '"+ tsp.inputval[0]+"' and save the result '"+ output +"' in '"+ tsp.outputval+"'"
 
         #Compare keywords
         def verifyobjects():
@@ -1461,6 +1463,24 @@ class StepDescription:
             return 'Wait until the element '+ "'" + tsp.custname + "'" +'is visible'
         def dropfile():
             return 'Drop file executed'
+        def getchildelements():
+            return 'Get the child elements of the parent element '+ "'" + tsp.custname + "'"+ ' and save the elements  '+"'"+ output +"'"+ ' in '+"'"+tsp.outputval+"'"
+        def getchildelementcount():
+            return 'Get the count of child elements present in the element '+ "'" + tsp.custname + "'"+ ' and save the count  '+"'"+ output +"'"+ ' in '+"'"+tsp.outputval+"'"
+
+        # Combobox Keywords
+        def cmbselectvaluebyindex():
+            return 'Select the value '+output+' with the index '+input+' present in the table cell '+"'" + tsp.custname+'['+inputval[0]+']['+inputval[1]+']'+"'."
+
+        def cmbgetcount():
+            return 'Get the count of values in the '+ "'" + tsp.custname + "'"+ ' and save the count ' +"'"+output+"'"+' in '+"'"+tsp.outputval+"'"
+
+        def cmbgetallvalues():
+            return 'Get all the values present in the '+"'"+tsp.custname+"' and save the values '"+ output + ' in ' + "'" + tsp.outputval + "' ."
+        
+        def cmbselectvaluebytext():
+            return 'Select value '+"'"+input+"'"+' in ' + tsp.custname
+
 
         #Button link keywords
         def click():

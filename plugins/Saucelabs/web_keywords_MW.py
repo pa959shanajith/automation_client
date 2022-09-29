@@ -4,15 +4,14 @@ import logging
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select
 from selenium import webdriver
-from selenium.webdriver.common.action_chains import ActionChains
-from timeit import default_timer as timer
-from datetime import timedelta
 import time
 from constants import *
+import logger
 import sauceclient
 import threading
+
 local_wk=threading.local()
-log=logging.getLogger('web_keywords.py')
+log=logging.getLogger('web_keywords_MW.py')
 def request_content(self, url, filename, dirpath=None, body=None, content_type=''):
     """Send http request for asset content"""
     headers = self.make_auth_headers(content_type)
@@ -67,240 +66,243 @@ def get_job_asset_content(self, job_id, filename, dirpath=None):
 sauceclient.SauceClient.request_content = request_content
 sauceclient.Jobs.get_job_asset_content = get_job_asset_content
 
-class Browser_Keywords:
-
+class BrowserKeywords():
     def __init__(self):
-        self.obj=Textbox_Keywords()
-        pass
-    
-    def openBrowser(self,url,browser,scenario,*args):
-        status=TEST_RESULT_FAIL
-        methodoutput=TEST_RESULT_FALSE
-        err_msg=None
-        output_val=OUTPUT_CONSTANT
-        # browser={'browserName': "chrome",'sauce:options':{'name':scenario}}
-        local_wk.driver = webdriver.Remote(command_executor=url, desired_capabilities=browser)
-        status=TEST_RESULT_PASS
-        methodoutput=TEST_RESULT_TRUE
-        return status,methodoutput,output_val,err_msg
+        self.browser_num=''
+        self.all_handles=[]
+        self.recent_handles=[]
 
-    def navigateToURL(self,input,*args):
-        status=TEST_RESULT_FAIL
-        methodoutput=TEST_RESULT_FALSE
-        err_msg=None
-        output_val=OUTPUT_CONSTANT
-        url=input[0]
-        if url[0:7].lower()!='http://' and url[0:8].lower()!='https://' and url[0:5].lower()!='file:':
-            url='http://'+url
-        input=url
-        local_wk.driver.get(input)
-        status=TEST_RESULT_PASS
-        methodoutput=TEST_RESULT_TRUE
-        return status,methodoutput,output_val,err_msg
+    def openBrowser(self,url,inputs,*args):
+        status = TEST_RESULT_FAIL
+        result = TEST_RESULT_FALSE
+        output = OUTPUT_CONSTANT
+        err_msg = None
+        try:
+            local_wk.driver = webdriver.Remote(command_executor=url, desired_capabilities=inputs)
+            status = TEST_RESULT_PASS
+            result = TEST_RESULT_TRUE
+        except Exception as e:
+            err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+            log.error(e)
+        return status,result,output,err_msg
 
-    def maximizeBrowser(self,*args):
-        status=TEST_RESULT_FAIL
-        methodoutput=TEST_RESULT_FALSE
-        err_msg=None
-        output_val=OUTPUT_CONSTANT
-        local_wk.driver.maximize_window()
-        status=TEST_RESULT_PASS
-        methodoutput=TEST_RESULT_TRUE
-        return status,methodoutput,output_val,err_msg
-    
-    def verifyPageTitle(self,input,*args):
-        status=TEST_RESULT_FAIL
-        methodoutput=TEST_RESULT_FALSE
-        err_msg=None
-        output_val=OUTPUT_CONSTANT
-        inp_title=input[0]
-        input=inp_title
-        title=local_wk.driver.title
-        output_val= 'True' if title==input else 'False'
-        status=TEST_RESULT_PASS if output_val == 'True' else 'Fail'
-        methodoutput=TEST_RESULT_TRUE
-        return status,methodoutput,output_val,err_msg 
+    def openNewTab(self ,*args):
+        status = TEST_RESULT_FAIL
+        result = TEST_RESULT_FALSE
+        output = OUTPUT_CONSTANT
+        err_msg = None
+        try:
+            local_wk.driver.execute_script("window.open('');")
+            handles = local_wk.driver.window_handles
+            local_wk.driver.switch_to.window(handles[-1])
+            h = local_wk.driver.current_window_handle
+            self.all_handles.append(h)
+            self.recent_handles.append(h)
+            status=TEST_RESULT_PASS
+            result=TEST_RESULT_TRUE
+        except Exception as e:
+            err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+            log.error(e)
+        return status,result,output,err_msg
+
+    def refresh(self,*args):
+        status = TEST_RESULT_FAIL
+        result = TEST_RESULT_FALSE
+        output = OUTPUT_CONSTANT
+        err_msg = None
+        try:
+            if(local_wk.driver != None):
+                local_wk.driver.refresh()
+                log.info('Browser refreshed')
+                status = TEST_RESULT_PASS
+                result = TEST_RESULT_TRUE
+        except Exception as e:
+            err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+            log.error(e)
+        return status,result,output,err_msg
+
+    def navigateToURL(self, url, *args):
+        status = TEST_RESULT_FAIL
+        result = TEST_RESULT_FALSE
+        output = OUTPUT_CONSTANT
+        err_msg = None
+        try:
+            url = url[0]
+            if not (url is None and url.strip() is ''):
+                url = url.strip()
+                if url[0:7].lower()!='http://' and url[0:8].lower()!='https://' and url[0:5].lower()!='file:':
+                    url='http://'+url
+                local_wk.driver.get(url)
+                log.info('Navigated to URL')
+                status = TEST_RESULT_PASS
+                result = TEST_RESULT_TRUE
+        except Exception as e:
+            err_msg = ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+            log.error(e)
+        if err_msg is not None:
+            log.error(err_msg)
+        return status,result,output,err_msg
 
     def getPageTitle(self,*args):
-        status=TEST_RESULT_FAIL
-        methodoutput=TEST_RESULT_FALSE
-        err_msg=None
-        output_val=OUTPUT_CONSTANT
-        output_val=local_wk.driver.title
-        status=TEST_RESULT_PASS
-        methodoutput=TEST_RESULT_TRUE
-        return status,methodoutput,output_val,err_msg
+        status = TEST_RESULT_FAIL
+        result = TEST_RESULT_FALSE
+        output = None
+        err_msg = None
+        try:
+            if (local_wk.driver!= None):
+                page_title= local_wk.driver.title
+                if (page_title is ''):
+                    page_title= local_wk.driver.current_url
+                page_title.strip()
+                logger.print_on_console('Page title is ',page_title)
+                log.info('Page title is ' + str(page_title))
+                status=TEST_RESULT_PASS
+                result=TEST_RESULT_TRUE
+        except Exception as e:
+            err_msg='error occured in get page title'
+            log.error(e)
+        if err_msg is not None:
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
+        return status,result,output,err_msg
 
     def getCurrentURL(self,*args):
-        status=TEST_RESULT_FAIL
-        methodoutput=TEST_RESULT_FALSE
-        err_msg=None
-        output_val=OUTPUT_CONSTANT
-        output_val=local_wk.driver.current_url
-        status=TEST_RESULT_PASS
-        methodoutput=TEST_RESULT_TRUE
-        return status,methodoutput,output_val,err_msg
+        status = TEST_RESULT_FAIL
+        result = TEST_RESULT_FALSE
+        url = None
+        err_msg = None
+        try:
+            if (local_wk.driver!= None):
+                url= local_wk.driver.current_url
+                url.strip()
+                logger.print_on_console('URL: ',url)
+                log.info('URL: '+ str(url))
+                status = TEST_RESULT_PASS
+                result = TEST_RESULT_TRUE
+            else:
+                err_msg = 'Driver object is null'
+        except Exception as e:
+            err_msg='error occured in get current url'
+            log.error(e)
+        if err_msg is not None:
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
+        return status,result,url,err_msg
 
-    def getBrowserName(self,*args):
-        status=TEST_RESULT_FAIL
-        methodoutput=TEST_RESULT_FALSE
-        err_msg=None
-        output_val=OUTPUT_CONSTANT
-        output_val=local_wk.driver.name
-        status=TEST_RESULT_PASS
-        methodoutput=TEST_RESULT_TRUE
-        return status,methodoutput,output_val,err_msg
-    
-    def verifyCurrentURL(self,input,*args):
-        status=TEST_RESULT_FAIL
-        methodoutput=TEST_RESULT_FALSE
-        err_msg=None
-        output_val=OUTPUT_CONSTANT
+    def verifyCurrentURL(self, input, *args):
+        status = TEST_RESULT_FAIL
+        result = TEST_RESULT_FALSE
+        output = OUTPUT_CONSTANT
+        err_msg = None
         inp_url=input[0]
         input=inp_url
         url=local_wk.driver.current_url
-        output_val = 'True' if url==input else 'False'
-        status=TEST_RESULT_PASS if output_val == 'True' else 'Fail'
-        methodoutput=TEST_RESULT_TRUE
-        return status,methodoutput,output_val,err_msg 
-    
-    def openNewTab(self,*args):
-        status=TEST_RESULT_FAIL
-        methodoutput=TEST_RESULT_FALSE
-        err_msg=None
-        output_val=OUTPUT_CONSTANT
-        local_wk.driver.execute_script('window.open('');')
-        local_wk.driver.switch_to.window(local_wk.driver.window_handles[int(local_wk.driver.window_handles.index(local_wk.driver.current_window_handle))+1])
-        status=TEST_RESULT_PASS
-        methodoutput=TEST_RESULT_TRUE
-        return status,methodoutput,output_val,err_msg
+        output = 'True' if url==input else 'False'
+        status=TEST_RESULT_PASS if output == 'True' else 'Fail'
+        result=TEST_RESULT_TRUE
+        return status,result,output,err_msg
 
-    def refresh(self,*args):
+    def closeBrowser(self,*args):
+        status = TEST_RESULT_FAIL
+        result = TEST_RESULT_FALSE
+        err_msg = None
+        output = OUTPUT_CONSTANT
+        try:
+            local_wk.driver.quit()
+            local_wk.driver = None
+            status = TEST_RESULT_PASS
+            result = TEST_RESULT_TRUE
+        except  Exception as e:
+            err_msg = 'error occured in close browser'
+            log.error(e)
+        if err_msg is not None:
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
+        return status,result,output,err_msg
+    
+    def closeSubWindows(self,*args):
+        status = TEST_RESULT_FAIL
+        result = TEST_RESULT_FALSE
+        err_msg = None
+        output = OUTPUT_CONSTANT
+        local_wk.driver.close()
+        local_wk.driver.switch_to.window(local_wk.driver.window_handles[-1])
+        status = TEST_RESULT_PASS
+        result = TEST_RESULT_TRUE
+        return status,result,output,err_msg
+
+    def clearCache(self,*args):
+        status = TEST_RESULT_FAIL
+        result = TEST_RESULT_FALSE
+        err_msg = None
+        output = OUTPUT_CONSTANT
+        local_wk.driver.get('chrome://settings/clearBrowserData')
+        time.sleep(5)
+        local_wk.driver.execute_script('return document.querySelector("body > settings-ui").shadowRoot.querySelector("#container").querySelector("#main").shadowRoot.querySelector("settings-basic-page").shadowRoot.querySelector("settings-privacy-page").shadowRoot.querySelector("settings-clear-browsing-data-dialog").shadowRoot.querySelector("#clearBrowsingDataDialog").querySelector("#clearBrowsingDataConfirm").click();')
+        status = TEST_RESULT_PASS
+        result = TEST_RESULT_TRUE
+        return status,result,output,err_msg
+
+    def switchToWindow(self,input,*args):
         status=TEST_RESULT_FAIL
-        methodoutput=TEST_RESULT_FALSE
+        result=TEST_RESULT_FALSE
         err_msg=None
-        output_val=OUTPUT_CONSTANT
-        local_wk.driver.refresh()
+        output=OUTPUT_CONSTANT
+        local_wk.driver.switch_to.window(local_wk.driver.window_handles[int(input[0])-1])
         status=TEST_RESULT_PASS
-        methodoutput=TEST_RESULT_TRUE
-        return status,methodoutput,output_val,err_msg
+        result=TEST_RESULT_TRUE
+        return status,result,output,err_msg
+
+    def verifyTextExists(self,input,*args):
+        status=TEST_RESULT_FAIL
+        result=TEST_RESULT_FALSE
+        err_msg=None
+        output=OUTPUT_CONSTANT
+        input=input[0]
+        occurrences_javascript = "function occurrences(string, subString, allowOverlapping) {      string += '';     subString += '';     if (subString.length <= 0) return (string.length + 1);      var n = 0,pos = 0,step = allowOverlapping ? 1 : subString.length;      while (true) {         pos = string.indexOf(subString, pos);         if (pos >= 0) {             ++n;             pos += step;         } else break;     }     return n; }; function saddNodesOuter(sarray, scollection) { 	for (var i = 0; scollection && scollection.length && i < scollection.length; i++) { 		sarray.push(scollection[i]); 	} }; function stext_content(f) { 	var sfirstText = ''; 	var stextdisplay = ''; 	for (var z = 0; z < f.childNodes.length; z++) { 		var scurNode = f.childNodes[z]; 		swhitespace = /^\\s*$/; 		if (scurNode.nodeName === '#text' && !(swhitespace.test(scurNode.nodeValue))) { 			sfirstText = scurNode.nodeValue; 			stextdisplay = stextdisplay + sfirstText; 		} 	} 	return (stextdisplay); }; var sae = []; var substr = arguments[0]; var sele = arguments.length > 1 ? arguments[1].getElementsByTagName('*') :  document.getElementsByTagName('*'); var text_occurrences = 0; saddNodesOuter(sae, sele);  for(var j=0;j<sae.length;j++){ 	stagname = sae[j].tagName.toLowerCase(); 	 	if (stagname != 'script' && stagname != 'meta' && stagname != 'html' && stagname != 'head' && stagname != 'style' && stagname != 'body' && stagname != 'form' && stagname != 'link' && stagname != 'noscript' && stagname != 'option' && stagname != '!' && stagname != 'code' && stagname != 'pre' && stagname != 'br' && stagname != 'animatetransform' && stagname != 'noembed') { 		text_occurrences += occurrences(stext_content(sae[j]),substr); 	} 	 }; return text_occurrences;bstr = arguments[0]; var sele = arguments.length > 1 ? arguments[1].getElementsByTagName('*') :  document.getElementsByTagName('*'); var text_occurrences = 0; saddNodesOuter(sae, sele);  for(var j=0;j<sae.length;j++){ 	stagname = sae[j].tagName.toLowerCase(); 	 	if (stagname != 'script' && stagname != 'meta' && stagname != 'html' && stagname != 'head' && stagname != 'style' && stagname != 'body' && stagname != 'form' && stagname != 'link' && stagname != 'noscript' && stagname != 'option' && stagname != '!' && stagname != 'code' && stagname != 'pre' && stagname != 'br' && stagname != 'animatetransform' && stagname != 'noembed') { 		text_occurrences += occurrences(stext_content(sae[j]),substr); 	} 	 }; return text_occurrences;"
+        output=int(local_wk.driver.execute_script(occurrences_javascript,input))
+        status=TEST_RESULT_PASS if output != 0 else 'Fail'
+        result=TEST_RESULT_TRUE
+        return status,result,output,err_msg 
+    
+    def verifyPageTitle(self,input,*args):
+        status=TEST_RESULT_FAIL
+        result=TEST_RESULT_FALSE
+        err_msg=None
+        output=OUTPUT_CONSTANT
+        inp_title=input[0]
+        title=local_wk.driver.title
+        output= 'True' if title==inp_title else 'False'
+        status=TEST_RESULT_PASS if output == 'True' else 'Fail'
+        result=TEST_RESULT_TRUE
+        return status,result,output,err_msg 
 
     def navigateBack(self,*args):
         status=TEST_RESULT_FAIL
-        methodoutput=TEST_RESULT_FALSE
+        result=TEST_RESULT_FALSE
         err_msg=None
-        output_val=OUTPUT_CONSTANT
+        output=OUTPUT_CONSTANT
         local_wk.driver.execute_script('window.history.go(-1)')
         status=TEST_RESULT_PASS
-        methodoutput=TEST_RESULT_TRUE
-        return status,methodoutput,output_val,err_msg
-    
-    def closeSubWindows(self,input,*args):
-        status=TEST_RESULT_FAIL
-        methodoutput=TEST_RESULT_FALSE
-        err_msg=None
-        output_val=OUTPUT_CONSTANT
-        # if(input[0].lower()=='all'):
-        # else:
-        local_wk.driver.close()
-        local_wk.driver.switch_to.window(local_wk.driver.window_handles[-1])
-        status=TEST_RESULT_PASS
-        methodoutput=TEST_RESULT_TRUE
-        return status,methodoutput,output_val,err_msg
-    
-    def switchToWindow(self,input,*args):
-        status=TEST_RESULT_FAIL
-        methodoutput=TEST_RESULT_FALSE
-        err_msg=None
-        output_val=OUTPUT_CONSTANT
-        local_wk.driver.switch_to.window(local_wk.driver.window_handles[int(input[0])-1])
-        status=TEST_RESULT_PASS
-        methodoutput=TEST_RESULT_TRUE
-        return status,methodoutput,output_val,err_msg
-    
+        result=TEST_RESULT_TRUE
+        return status,result,output,err_msg
+
     def navigateWithAuthenticate(self,input,*args):
         status=TEST_RESULT_FAIL
-        methodoutput=TEST_RESULT_FALSE
+        result=TEST_RESULT_FALSE
         err_msg=None
-        output_val=OUTPUT_CONSTANT
+        output=OUTPUT_CONSTANT
         input_val=input
         url=input_val[0]
         user=input_val[1]
         password=self.obj.decrypt(input_val[2])
         if url[0:7].lower() == 'http://': url=url[0:7]+user+':'+password+'@'+url[7:]
         elif url[0:8].lower() == 'https://': url=url[0:8]+user+':'+password+'@'+url[8:]
-        # url=url)
         input=[url,user,password]
         local_wk.driver.get(url)
         status=TEST_RESULT_PASS
-        methodoutput=TEST_RESULT_TRUE
-        return status,methodoutput,output_val,err_msg
-
-    def execute_js(self,input,*args):
-        status=TEST_RESULT_FAIL
-        methodoutput=TEST_RESULT_FALSE
-        err_msg=None
-        output_val=OUTPUT_CONSTANT
-        local_wk.driver.execute_script(inputval)
-        status=TEST_RESULT_PASS
-        methodoutput=TEST_RESULT_TRUE
-        return status,methodoutput,output_val,err_msg
-
-    def clearCache(self,*args):
-        status=TEST_RESULT_FAIL
-        methodoutput=TEST_RESULT_FALSE
-        err_msg=None
-        output_val=OUTPUT_CONSTANT
-        if local_wk.driver != None:
-            if local_wk.driver.name == 'internet explorer' or local_wk.driver.name == 'MicrosoftEdge':
-                local_wk.driver.delete_all_cookies()
-                status=TEST_RESULT_PASS
-                methodoutput=TEST_RESULT_TRUE
-            elif local_wk.driver.name == 'chrome':
-                local_wk.driver.get('chrome://settings/clearBrowserData')
-                time.sleep(5)
-                local_wk.driver.execute_script('return document.querySelector("body > settings-ui").shadowRoot.querySelector("#container").querySelector("#main").shadowRoot.querySelector("settings-basic-page").shadowRoot.querySelector("settings-privacy-page").shadowRoot.querySelector("settings-clear-browsing-data-dialog").shadowRoot.querySelector("#clearBrowsingDataDialog").querySelector("#clearBrowsingDataConfirm").click();')
-                status=TEST_RESULT_PASS
-                methodoutput=TEST_RESULT_TRUE
-            elif local_wk.driver.name=='msedge':
-                local_wk.driver.get('edge://settings/clearBrowserData')
-                time.sleep(5)
-                local_wk.driver.execute_script('return document.getElementById("clear-now").click();')
-                status=TEST_RESULT_PASS
-                methodoutput=TEST_RESULT_TRUE
-            elif local_wk.driver.name=='firefox':
-                local_wk.driver.get('about:preferences#privacy')
-                time.sleep(5)
-                local_wk.driver.find_element_by_css_selector('#clearSiteDataButton').click()
-                time.sleep(5)
-                local_wk.driver.execute_script("document.getElementsByTagName('browser')[0].contentWindow.document.getElementsByTagName('dialog')[0].shadowRoot.children[3].children[2].click()")
-                time.sleep(5)
-                local_wk.driver.switch_to.alert.accept()
-                status=TEST_RESULT_PASS
-                methodoutput=TEST_RESULT_TRUE
-        return status,methodoutput,output_val,err_msg
-
-    def verifyTextExists(self,input,*args):
-        status=TEST_RESULT_FAIL
-        methodoutput=TEST_RESULT_FALSE
-        err_msg=None
-        output_val=OUTPUT_CONSTANT
-        input=input[0]
-        occurrences_javascript = "function occurrences(string, subString, allowOverlapping) {      string += '';     subString += '';     if (subString.length <= 0) return (string.length + 1);      var n = 0,pos = 0,step = allowOverlapping ? 1 : subString.length;      while (true) {         pos = string.indexOf(subString, pos);         if (pos >= 0) {             ++n;             pos += step;         } else break;     }     return n; }; function saddNodesOuter(sarray, scollection) { 	for (var i = 0; scollection && scollection.length && i < scollection.length; i++) { 		sarray.push(scollection[i]); 	} }; function stext_content(f) { 	var sfirstText = ''; 	var stextdisplay = ''; 	for (var z = 0; z < f.childNodes.length; z++) { 		var scurNode = f.childNodes[z]; 		swhitespace = /^\\s*$/; 		if (scurNode.nodeName === '#text' && !(swhitespace.test(scurNode.nodeValue))) { 			sfirstText = scurNode.nodeValue; 			stextdisplay = stextdisplay + sfirstText; 		} 	} 	return (stextdisplay); }; var sae = []; var substr = arguments[0]; var sele = arguments.length > 1 ? arguments[1].getElementsByTagName('*') :  document.getElementsByTagName('*'); var text_occurrences = 0; saddNodesOuter(sae, sele);  for(var j=0;j<sae.length;j++){ 	stagname = sae[j].tagName.toLowerCase(); 	 	if (stagname != 'script' && stagname != 'meta' && stagname != 'html' && stagname != 'head' && stagname != 'style' && stagname != 'body' && stagname != 'form' && stagname != 'link' && stagname != 'noscript' && stagname != 'option' && stagname != '!' && stagname != 'code' && stagname != 'pre' && stagname != 'br' && stagname != 'animatetransform' && stagname != 'noembed') { 		text_occurrences += occurrences(stext_content(sae[j]),substr); 	} 	 }; return text_occurrences;bstr = arguments[0]; var sele = arguments.length > 1 ? arguments[1].getElementsByTagName('*') :  document.getElementsByTagName('*'); var text_occurrences = 0; saddNodesOuter(sae, sele);  for(var j=0;j<sae.length;j++){ 	stagname = sae[j].tagName.toLowerCase(); 	 	if (stagname != 'script' && stagname != 'meta' && stagname != 'html' && stagname != 'head' && stagname != 'style' && stagname != 'body' && stagname != 'form' && stagname != 'link' && stagname != 'noscript' && stagname != 'option' && stagname != '!' && stagname != 'code' && stagname != 'pre' && stagname != 'br' && stagname != 'animatetransform' && stagname != 'noembed') { 		text_occurrences += occurrences(stext_content(sae[j]),substr); 	} 	 }; return text_occurrences;"
-        output_val=int(local_wk.driver.execute_script(occurrences_javascript,input))
-        status=TEST_RESULT_PASS if output_val != 0 else 'Fail'
-        methodoutput=TEST_RESULT_TRUE
-        return status,methodoutput,output_val,err_msg 
-
-    def closeBrowser(self,*args):
-        status=TEST_RESULT_FAIL
-        methodoutput=TEST_RESULT_FALSE
-        err_msg=None
-        output_val=OUTPUT_CONSTANT
-        local_wk.driver.quit()
-        status=TEST_RESULT_PASS
-        methodoutput=TEST_RESULT_TRUE
-        return status,methodoutput,output_val,err_msg
+        result=TEST_RESULT_TRUE
+        return status,result,output,err_msg
 
 class Browser_Popup_Keywords():
 
@@ -407,12 +409,12 @@ class Button_link_Keywords():
         status=TEST_RESULT_PASS if output_val == 'True' else 'Fail'
         methodoutput=TEST_RESULT_TRUE
         return status,methodoutput,output_val,err_msg
-            
+
 class Dropdown_Keywords():
 
     def __init__(self):
         pass
-
+    
     def selectAllValues(self,webelement,input,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
@@ -671,6 +673,7 @@ class Element_Keywords:
         methodoutput=TEST_RESULT_FALSE
         err_msg=None
         output_val=OUTPUT_CONSTANT
+        BrowserKeywords
         local_wk.driver.execute_script("var evType; element=arguments[0]; if (document.createEvent) {     evType = 'Click executed through part-1';     var evt = document.createEvent('MouseEvents');     evt.initMouseEvent('click', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);   	setTimeout(function() {     	element.dispatchEvent(evt);     }, 100); } else {     evType = 'Click executed through part-2';   	setTimeout(function() {     element.click();   	}, 100); } return (evType);",webelement)
         status=TEST_RESULT_PASS
         methodoutput=TEST_RESULT_TRUE
@@ -732,16 +735,6 @@ class Element_Keywords:
         methodoutput=TEST_RESULT_TRUE
         return status,methodoutput,output_val,err_msg
 
-    def mouseHover(self,webelement,input,*args):
-        status=TEST_RESULT_FAIL
-        methodoutput=TEST_RESULT_FALSE
-        err_msg=None
-        output_val=OUTPUT_CONSTANT
-        webdriver.ActionChains(local_wk.driver).move_to_element(webelement).perform()
-        status=TEST_RESULT_PASS
-        methodoutput=TEST_RESULT_TRUE
-        return status,methodoutput,output_val,err_msg
-
     def setFocus(self,webelement,input,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
@@ -763,18 +756,6 @@ class Element_Keywords:
         return status,methodoutput,output_val,err_msg
     
     def uploadFile(self,webelement,input,*args):
-        status=TEST_RESULT_FAIL
-        methodoutput=TEST_RESULT_FALSE
-        err_msg=None
-        output_val=OUTPUT_CONSTANT
-        input=input[0].replace("\\","/")
-        input=input
-        webelement.send_keys(input)
-        status=TEST_RESULT_PASS
-        methodoutput=TEST_RESULT_TRUE
-        return status,methodoutput,output_val,err_msg
-
-    def dropFile(self,webelement,input,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         err_msg=None
@@ -1121,7 +1102,6 @@ class Textbox_Keywords():
         err_msg=None
         output_val=OUTPUT_CONSTANT
         input=input[0]
-        # input=self.decrypt(input_val[0])
         local_wk.driver.execute_script('arguments[0].value=arguments[1]',webelement,self.decrypt(input))
         status=TEST_RESULT_PASS
         methodoutput=TEST_RESULT_TRUE
@@ -1133,13 +1113,11 @@ class Textbox_Keywords():
         err_msg=None
         output_val=OUTPUT_CONSTANT
         input=input[0]
-        # input=self.decrypt(input_val[0])
         webelement.send_keys(self.decrypt(input))
         status=TEST_RESULT_PASS
         methodoutput=TEST_RESULT_TRUE
         return status,methodoutput,output_val,err_msg
 
-    
     def decrypt(self,enc):
         import base64
         from Crypto.Cipher import AES
@@ -1155,63 +1133,6 @@ class Util_Keywords():
         self.keys_info={}
         pass
 
-    def _createKeysInfoDict(self):
-        self.keys_info['null']=Keys.NULL
-        self.keys_info['cancel']=Keys.CANCEL
-        self.keys_info['help']=Keys.HELP
-        self.keys_info['backspace']=Keys.BACKSPACE
-        self.keys_info['tab']=Keys.TAB
-        self.keys_info['clear']=Keys.CLEAR
-        self.keys_info['return']=Keys.RETURN
-        self.keys_info['enter']=Keys.ENTER
-        self.keys_info['control']=Keys.CONTROL
-        self.keys_info['ctrl']=Keys.CONTROL
-        self.keys_info['alt']=Keys.ALT
-        self.keys_info['pause']=Keys.PAUSE
-        self.keys_info['escape']=Keys.ESCAPE
-        self.keys_info['space']=Keys.SPACE
-        self.keys_info['pageup']=Keys.PAGE_UP
-        self.keys_info['pagedown']=Keys.PAGE_DOWN
-        self.keys_info['end']=Keys.END
-        self.keys_info['home']=Keys.HOME
-        self.keys_info['leftarrow']=Keys.LEFT
-        self.keys_info['rightarrow']=Keys.RIGHT
-        self.keys_info['uparrow']=Keys.UP
-        self.keys_info['downarrow']=Keys.DOWN
-        self.keys_info['insert']=Keys.INSERT
-        self.keys_info['delete']=Keys.DELETE
-        self.keys_info['semicolon']=Keys.SEMICOLON
-        self.keys_info['equals']=Keys.EQUALS
-        self.keys_info['numpad0']=Keys.NUMPAD0
-        self.keys_info['numpad1']=Keys.NUMPAD1
-        self.keys_info['numpad2']=Keys.NUMPAD2
-        self.keys_info['numpad3']=Keys.NUMPAD3
-        self.keys_info['numpad4']=Keys.NUMPAD4
-        self.keys_info['numpad5']=Keys.NUMPAD5
-        self.keys_info['numpad6']=Keys.NUMPAD6
-        self.keys_info['numpad7']=Keys.NUMPAD7
-        self.keys_info['numpad8']=Keys.NUMPAD8
-        self.keys_info['numpad9']=Keys.NUMPAD9
-        self.keys_info['f1']=Keys.F1
-        self.keys_info['f2']=Keys.F2
-        self.keys_info['f3']=Keys.F3
-        self.keys_info['f4']=Keys.F4
-        self.keys_info['f5']=Keys.F5
-        self.keys_info['f6']=Keys.F6
-        self.keys_info['f7']=Keys.F7
-        self.keys_info['f8']=Keys.F8
-        self.keys_info['f9']=Keys.F9
-        self.keys_info['f10']=Keys.F10
-        self.keys_info['f11']=Keys.F11
-        self.keys_info['f12']=Keys.F12
-        self.keys_info['multiply']=Keys.MULTIPLY
-        self.keys_info['add']=Keys.ADD
-        self.keys_info['subtract']=Keys.SUBTRACT
-        self.keys_info['divide']=Keys.DIVIDE
-        self.keys_info['separator']=Keys.SEPARATOR
-        self.keys_info['decimal']=Keys.DECIMAL
-        pass
-
     def tab(self,webelement,input,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
@@ -1221,26 +1142,7 @@ class Util_Keywords():
         status=TEST_RESULT_PASS
         methodoutput=TEST_RESULT_TRUE
         return status,methodoutput,output_val,err_msg
-
-    def sendFunctionKeys(self,webelement,input,*args):
-        self._createKeysInfoDict()
-        status=TEST_RESULT_FAIL
-        methodoutput=TEST_RESULT_FALSE
-        err_msg=None
-        output_val=OUTPUT_CONSTANT
-        input1=input[0]
-        if input1.lower() in self.keys_info:
-            digits = [int(i)for i in input if i.isdigit()]
-            try:
-                webelement.send_keys(self.keys_info[input1.lower()]*digits[0])
-            except Exception as e:
-                webelement.send_keys(self.keys_info[input1.lower()])
-        else:
-            webelement.send_keys(input)
-        status=TEST_RESULT_PASS
-        methodoutput=TEST_RESULT_TRUE
-        return status,methodoutput,output_val,err_msg
-
+    
     def verifyVisible(self,webelement,input,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
@@ -1373,3 +1275,4 @@ class Sauce_Config():
 
     def get_saucejobs(self, sc):
         return sauceclient.Jobs(sc)
+        

@@ -88,6 +88,9 @@ class UtilOperations:
                 y2 = y1 + height
                 x_cor = (x1+x2)/2
                 y_cor = (y1+y2)/2
+                if curaccinfo.role == "panel":
+                    x_cor = x1
+                    y_cor = y1
                 oebs_mouseops.MouseOperation('hold',x_cor,y_cor)
                 methodoutput = TEST_RESULT_TRUE
                 status = TEST_RESULT_PASS
@@ -379,7 +382,7 @@ class UtilOperations:
                         oebs_mouseops.MouseOperation('click',x_coor,y_coor)
                         self.keyboardops.keyboard_operation('keypress','A_DOWN')
                         time.sleep(0.1)
-                        requiredcontext, visible, active_parent = self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]",oebs_key_objects.object_type`)
+                        requiredcontext, visible, active_parent = self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]",oebs_key_objects.object_type)
                         listObj = self.utilities_obj.looptolist(requiredcontext)
                         childobj=listObj.getAccessibleChildFromContext(int(childindex))
                         childcontext=childobj.getAccessibleContextInfo()

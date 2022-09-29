@@ -477,6 +477,8 @@ STEPSTATUS_INREPORTS_ZERO = '0'
 
 EVALUATE='evaluate'
 
+NUMBER_FORMATTER='numberformatter'
+
 ENDFOR_DESCRIPTION='EndFor: completed'
 
 JIRA_ACTION_1 = 'loginToJira'

@@ -34,6 +34,7 @@ import time
 import fileinput
 import glob
 from sendfunction_keys import SendFunctionKeys as SF
+import cicd_core
 driver_pre = None
 drivermap = []
 linux_drivermap=[]
@@ -919,7 +920,11 @@ class BrowserKeywords():
                 time.sleep(2)
                 local_bk.driver_obj.find_element_by_css_selector('#clearSiteDataButton').click()
                 time.sleep(2)
-                local_bk.driver_obj.execute_script("document.getElementsByTagName('browser')[0].contentWindow.document.getElementsByTagName('dialog')[0].shadowRoot.children[3].children[2].click()")
+                if SYSTEM_OS =='Windows' or SYSTEM_OS=='Darwin':
+                    local_bk.driver_obj.execute_script("document.getElementsByTagName('browser')[0].contentWindow.document.getElementsByTagName('dialog')[0].shadowRoot.children[3].children[2].click()")
+                elif SYSTEM_OS=='Linux':
+                    # click on clear button for linux as clear and cancel buttons are positioned differently in linux
+                    local_bk.driver_obj.execute_script("document.getElementsByTagName('browser')[0].contentWindow.document.getElementsByTagName('dialog')[0].shadowRoot.children[3].children[6].click()")
                 time.sleep(2)
                 local_bk.driver_obj.switch_to.alert.accept()
                 status=webconstants.TEST_RESULT_PASS
@@ -1533,7 +1538,11 @@ class Singleton_DriverUtil():
         local_bk.log.debug(browser_num)
         logger.print_on_console( 'BROWSER NUM: ',str(browser_num))
         configvalues = readconfig.configvalues
-        headless_mode = str(configvalues['headless_mode'])=='Yes'
+        cicd_headless_mode = cicd_core.cicd_isheadless
+        if cicd_headless_mode == 'Yes':
+            headless_mode = True
+        else:
+            headless_mode = str(configvalues['headless_mode'])=='Yes'
         use_custom_debugport = str(configvalues["use_custom_debugport"].lower()) == "yes"
         close_browser_popup = configvalues['close_browser_popup']
         incognito_private_mode = configvalues['incognito_private_mode']
@@ -1790,7 +1799,8 @@ class Singleton_DriverUtil():
                     chromium_path = webconstants.EDGE_CHROMIUM_DRIVER_PATH
                     if SYSTEM_OS == "Darwin":
                         caps['platform'] = 'MAC'
-
+                    if SYSTEM_OS=='Linux':
+                        caps['platform'] = 'LINUX'
                     driver = webdriver.Edge(capabilities=caps,executable_path=chromium_path)
                     controller.process_ids.append(driver.edge_service.process.pid)
                     drivermap.append(driver)

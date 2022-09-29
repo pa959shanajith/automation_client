@@ -657,7 +657,8 @@ def main():
                 comm_obj.percentageIncri(msg,35,"Backup created.")
                 comm_obj.percentageIncri(msg,40,"Updating...")
                 comm_obj.percentageIncri(msg,45,"Verifying latest files.")
-                new_version_list = obj.get_update_files()#---------------------------------->4.Get latest files to update
+                #new_version_list = obj.get_update_files()#---------------------------------->4.Get latest files to update
+                new_version_list = [sys.argv[8]]
                 comm_obj.percentageIncri(msg,50,"Latest files verified.")
                 comm_obj.percentageIncri(msg,55,"Updating...")
                 comm_obj.percentageIncri(msg,60,"Retrieving the latest files.")

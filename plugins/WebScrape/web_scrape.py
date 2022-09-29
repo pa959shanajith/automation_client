@@ -8,22 +8,58 @@ import fullscrape
 import time
 import objectspy
 import core_utils
+import readconfig
 import logger
 import logging
+import json
 from webscrape_utils import WebScrape_Utils
 from selenium.common.exceptions import NoSuchWindowException
+from os.path import normpath
+from constants import SYSTEM_OS
 cropandaddobj = None
 browserobj = browserops.BrowserOperations()
 clickandaddoj = clickandadd.Clickandadd()
 fullscrapeobj = fullscrape.Fullscrape()
 log = logging.getLogger(__name__)
 visiblity_status=False
+checkWebPackage = None
+# Name: A sreenivaulu Date:02/08/2022
+# scraping is allowed for list of allowed_urls only if istrail=1  
+allowed_urls = readconfig.configvalues["sample_application_urls"]
+isTrial = readconfig.configvalues["isTrial"]
 
 class ScrapeWindow(wx.Frame):
 
     def __init__(self, parent,id, title,browser,socketIO,action,data):
-        wx.Frame.__init__(self, parent, title=title,
-                   pos=(300, 150),  size=(210, 180) ,style=wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER  |wx.MAXIMIZE_BOX|wx.CLOSE_BOX) )
+        global checkWebPackage
+        checkWebPackage = self.get_client_manifest()
+        if SYSTEM_OS == 'Linux':
+            scrapper_window_config={
+                "frame":[(300, 150),(510, 270)],
+                "url_label_field": [(75, 34)],
+                "navigateURL_field": [(120, 30),(265, 30)],
+                "navigateurl_bttn_field":[(400,30 ), (80, 30)],
+                "scrape_type_label_field":[(25,83)],
+                "fullscrapedropdown_field":[(120, 80 ),(265, 30)],
+                "fullscrapebutton": [(400, 80),(80, 30)],
+                "visibilityCheck":[(120,120), (86, 20)],
+                "cropbutton_field":[(290,160 ), (165, 30)],
+                "startbutton_field":[(110, 160), (165, 30)]
+            }
+        else:
+            scrapper_window_config = {
+                "frame": [(300, 150), (510, 270)],
+                "url_label_field": [(75, 34)],
+                "navigateURL_field": [(110, 30), (260, 30)],
+                "navigateurl_bttn_field": [(380, 30), (75, 30)],
+                "startbutton_field": [(110, 160), (165, 30)],
+                "scrape_type_label_field": [(25, 83)],
+                "fullscrapedropdown_field": [(110, 80), (260, 30)],
+                "fullscrapebutton": [(380, 80), (75, 30)],
+                "visibilityCheck": [(110, 120), (80, 20)],
+                "cropbutton_field": [(290, 160), (165, 30)]
+            }
+        wx.Frame.__init__(self, parent, title=title,pos=scrapper_window_config["frame"][0],  size=scrapper_window_config["frame"][1] ,style=wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER  | wx.MAXIMIZE_BOX) )
         self.SetBackgroundColour('#e6e7e8')
         self.iconpath = os.environ["IMAGES_PATH"] + "/avo.ico"
         self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
@@ -42,6 +78,7 @@ class ScrapeWindow(wx.Frame):
         self.scrape_type = None
         self.invalid_urls = ["about:blank","data:,",""]
         self.invalid_url_msg = "There is no URL in the browser selected or the URL is empty/blank. Please load the webpage and then start performing the desired action."
+        self.allowed_url_msg = "Only AvoBank URL: "+ allowed_urls[0] + " is supported for this trial."
         self.parent = parent
         if status == False:
             self.socketIO.emit('scrape',status)
@@ -55,18 +92,36 @@ class ScrapeWindow(wx.Frame):
                 self.webscrape_utils_obj = WebScrape_Utils()
                 if (self.action in ['scrape','replace']):
                     self.vsizer = wx.BoxSizer(wx.VERTICAL)
-                    self.startbutton = wx.ToggleButton(self.panel, label="Start ClickAndAdd",pos=(12,18 ), size=(175, 25))
+
+                    #----------------- --------------------------------------------------------------
+                    # Name:        web_scrape window
+                    # Purpose:     1)textctrl is added for url to navigate a given url(input) in driver
+                    #              2) NAVIGATE button is added with binding func ==> def navigateurl_scrape(self,event)  
+                    #              3) all the textctrl , buttons and checkebox are alligned properly
+                    #
+                    # Author:      sreenivasulu A
+                    # Created:     08 - 07 - 2022
+                    #-------------------------------------------------------------------------------
+                    self.url_label = wx.StaticText((self.panel), label='URL', pos=scrapper_window_config["url_label_field"][0], style=0, name='')
+                    self.navigateURL = wx.TextCtrl((self.panel), pos=scrapper_window_config["navigateURL_field"][0], size=scrapper_window_config["navigateURL_field"][1])
+                    self.navigateurl = wx.Button(self.panel, label="Navigate", pos=scrapper_window_config["navigateurl_bttn_field"][0], size=scrapper_window_config["navigateurl_bttn_field"][1])
+                    self.navigateurl.Bind(wx.EVT_BUTTON, self.navigateurl_scrape)
+                    self.navigateurl.SetDefault()
+                    self.navigateurl.SetFocus()
+
+                    self.startbutton = wx.ToggleButton(self.panel, label="Start ClickAndAdd", pos=scrapper_window_config["startbutton_field"][0], size=scrapper_window_config["startbutton_field"][1])
                     self.startbutton.Bind(wx.EVT_TOGGLEBUTTON, self.clickandadd)
 
-                    self.fullscrapedropdown = wx.ComboBox(self.panel, value="Full", pos=(12,48 ),size=(87.5, 25), choices=self.scrapeoptions, style = wx.CB_DROPDOWN)
+                    self.scrape_type = wx.StaticText((self.panel), label='ScrapeType', pos=scrapper_window_config["scrape_type_label_field"][0], style=0, name='')
+                    self.fullscrapedropdown = wx.ComboBox(self.panel, value="Full", pos=scrapper_window_config["fullscrapedropdown_field"][0], size=scrapper_window_config["fullscrapedropdown_field"][1], choices=self.scrapeoptions, style=wx.CB_DROPDOWN)
                     self.fullscrapedropdown.SetEditable(False)
                     self.fullscrapedropdown.SetToolTip(wx.ToolTip("full objects will be scraped"))
                     self.fullscrapedropdown.Bind(wx.EVT_COMBOBOX,self.OnFullscrapeChoice)
 
-                    self.fullscrapebutton = wx.Button(self.panel, label="Scrape",pos=(101,48 ), size=(86, 25))
+                    self.fullscrapebutton = wx.Button(self.panel, label="Scrape", pos=scrapper_window_config["fullscrapebutton"][0], size=scrapper_window_config["fullscrapebutton"][1])
                     self.fullscrapebutton.Bind(wx.EVT_BUTTON, self.fullscrape)
 
-                    self.visibilityCheck = wx.CheckBox(self.panel, label="Visibility",pos=(12,78), size=(175, 25))
+                    self.visibilityCheck = wx.CheckBox(self.panel, label="Visibility", pos=scrapper_window_config["visibilityCheck"][0], size=scrapper_window_config["visibilityCheck"][1])
                     self.visibilityCheck.Bind(wx.EVT_CHECKBOX, self.visibility)
 
                     self.prevbutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap(os.environ["IMAGES_PATH"] +"stepBack.png", wx.BITMAP_TYPE_ANY), (35, 48), (35, 28))
@@ -84,20 +139,25 @@ class ScrapeWindow(wx.Frame):
                     self.nextbutton.SetToolTip(wx.ToolTip("Select next window/tab"))
                     self.nextbutton.Hide()
 
-                    import cropandadd
-                    global cropandaddobj
-                    cropandaddobj = cropandadd.Cropandadd()
-                    self.cropbutton = wx.ToggleButton(self.panel, label="Start IRIS",pos=(12,108 ), size=(175, 25))
-                    self.cropbutton.Bind(wx.EVT_TOGGLEBUTTON, self.cropandadd)
-                    if(self.action == 'replace'): self.cropbutton.Disable()
+                    if checkWebPackage['isWebPackage'] == "False":
+                        import cropandadd
+                        global cropandaddobj
+                        cropandaddobj = cropandadd.Cropandadd()
+                        self.cropbutton = wx.ToggleButton(self.panel, label="Start IRIS",pos=(290,160 ), size=(165, 30))
+                        self.cropbutton.Bind(wx.EVT_TOGGLEBUTTON, self.cropandadd)
+                        if(self.action == 'replace'): self.cropbutton.Disable()
 
                 elif(self.action == 'compare'):
                     try:
                         browserops.driver.get(data['scrapedurl'])
                     except:
                         log.error("scrapedurl is Empty")
-                    self.comparebutton = wx.ToggleButton(self.panel, label="Start Compare",pos=(12,38 ), size=(175, 28))
+                    self.comparebutton = wx.ToggleButton(self.panel, label="Start Compare",pos=(110,80 ), size=(260, 30))
                     self.comparebutton.Bind(wx.EVT_TOGGLEBUTTON, self.compare)
+                # Name : A sreenivasulu Date: 02/08/2022
+                # setting the URL from allowed_urls when istrail is true
+                if isTrial:
+                        self.navigateURL.SetValue(allowed_urls[0])
                 self.Centre()
                 style = self.GetWindowStyle()
                 self.SetWindowStyle( style|wx.STAY_ON_TOP )
@@ -106,40 +166,104 @@ class ScrapeWindow(wx.Frame):
             except Exception as e:
                 log.error(e)
                 self.parent.schedule.Enable()
-
+    #Name: A sreenivasulu Date:14/07/2022
+    # this function will help you navigate a url in browser by scrape window
+    def navigateurl_scrape(self,event):
+        url = self.navigateURL.GetValue()
+        try:
+            if not (url is None and url.strip() is ''):
+                if url[0:7].lower()!='http://' and url[0:8].lower()!='https://' and url[0:5].lower()!='file:':
+                    url='https://'+url
+                self.driver.get(url)
+                logger.print_on_console('Navigated to URL')
+                log.info('Navigated to URL')
+            else:
+                logger.print_on_console("INVALID_INPUT")
+                log.info("INVALID_INPUT")
+        except Exception as e:
+            log.error(e)
+  
     def OnExit(self, event):
         self.Close()
         self.driver.close()
 
     def clickandadd(self,event):
-        try:
-            if not(self.driver.current_window_handle):
-                self.driver.switch_to_window(self.driver.window_handles[-1])
-        except NoSuchWindowException as e:
-            log.debug("Window Handle not found, switching to window",self.driver.window_handles[-1])
-            self.driver.switch_to_window(self.driver.window_handles[-1])
-        if self.driver.current_url in self.invalid_urls:
-            wx.MessageBox(self.invalid_url_msg, "Avo Assure - Web Scraper", wx.OK | wx.ICON_ERROR)
-            self.startbutton.SetValue(not self.startbutton.GetValue())
-        else:
-            self.scrape_type = "clickandadd"
-            self.fullscrapebutton.Disable()
-            self.fullscrapedropdown.Disable()
-            self.visibilityCheck.Disable()
-            self.cropbutton.Disable()
-            if len(self.driver.window_handles) > 1 and not self.window_selected:
-                self.fullscrapebutton.Hide()
-                self.visibilityCheck.Hide()
-                self.startbutton.Hide()
-                self.cropbutton.Hide()
-                self.fullscrapedropdown.Hide()
-                self.nextbutton.Show()
-                self.resume_scraping_button.SetToolTip(wx.ToolTip("Resume " + self.scrape_type))
-                self.resume_scraping_button.Show()
-                self.prevbutton.Show()
-                self.vsizer.Layout()
+        global checkWebPackage
+        driver = browserops.driver
+        current_url = driver.current_url
+        # Name: SN adiga Date:02/08/2022
+        # conditional statements for check the browser current url in allowed urls list
+        if isTrial:
+            allowed = False
+            for url in allowed_urls:
+                if url in driver.current_url:
+                    allowed = True
+
+            if allowed == True:
+        # end
+                try:
+                    if not(self.driver.current_window_handle):
+                        self.driver.switch_to_window(self.driver.window_handles[-1])
+                except NoSuchWindowException as e:
+                    log.debug("Window Handle not found, switching to window",self.driver.window_handles[-1])
+                    self.driver.switch_to_window(self.driver.window_handles[-1])
+                if self.driver.current_url in self.invalid_urls:
+                    wx.MessageBox(self.invalid_url_msg, "Avo Assure - Web Scraper", wx.OK | wx.ICON_ERROR)
+                    self.startbutton.SetValue(not self.startbutton.GetValue())
+                else:
+                    self.scrape_type = "clickandadd"
+                    self.fullscrapebutton.Disable()
+                    self.fullscrapedropdown.Disable()
+                    self.visibilityCheck.Disable()
+                    if checkWebPackage['isWebPackage'] == "False":
+                        self.cropbutton.Disable()
+                    if len(self.driver.window_handles) > 1 and not self.window_selected:
+                        self.fullscrapebutton.Hide()
+                        self.visibilityCheck.Hide()
+                        self.startbutton.Hide()
+                        if checkWebPackage['isWebPackage'] == "False":
+                            self.cropbutton.Hide()
+                        self.fullscrapedropdown.Hide()
+                        self.nextbutton.Show()
+                        self.resume_scraping_button.SetToolTip(wx.ToolTip("Resume " + self.scrape_type))
+                        self.resume_scraping_button.Show()
+                        self.prevbutton.Show()
+                        self.vsizer.Layout()
+                    else:
+                        self.perform_clickandadd()
             else:
-                self.perform_clickandadd()
+                wx.MessageBox(self.allowed_url_msg, "Avo Assure - Web Scraper", wx.OK | wx.ICON_ERROR)
+        else:
+            try:
+                if not(self.driver.current_window_handle):
+                    self.driver.switch_to_window(self.driver.window_handles[-1])
+            except NoSuchWindowException as e:
+                log.debug("Window Handle not found, switching to window",self.driver.window_handles[-1])
+                self.driver.switch_to_window(self.driver.window_handles[-1])
+            if self.driver.current_url in self.invalid_urls:
+                wx.MessageBox(self.invalid_url_msg, "Avo Assure - Web Scraper", wx.OK | wx.ICON_ERROR)
+                self.startbutton.SetValue(not self.startbutton.GetValue())
+            else:
+                self.scrape_type = "clickandadd"
+                self.fullscrapebutton.Disable()
+                self.fullscrapedropdown.Disable()
+                self.visibilityCheck.Disable()
+                if checkWebPackage['isWebPackage'] == "False":
+                    self.cropbutton.Disable()
+                if len(self.driver.window_handles) > 1 and not self.window_selected:
+                    self.fullscrapebutton.Hide()
+                    self.visibilityCheck.Hide()
+                    self.startbutton.Hide()
+                    if checkWebPackage['isWebPackage'] == "False":
+                        self.cropbutton.Hide()
+                    self.fullscrapedropdown.Hide()
+                    self.nextbutton.Show()
+                    self.resume_scraping_button.SetToolTip(wx.ToolTip("Resume " + self.scrape_type))
+                    self.resume_scraping_button.Show()
+                    self.prevbutton.Show()
+                    self.vsizer.Layout()
+                else:
+                    self.perform_clickandadd()
 
     def perform_clickandadd(self):
         state = self.startbutton.GetValue()
@@ -192,38 +316,85 @@ class ScrapeWindow(wx.Frame):
             self.Close()
 
     def fullscrape(self,event):
-        try:
-            if not(self.driver.current_window_handle):
-                self.driver.switch_to_window(self.driver.window_handles[-1])
-        except NoSuchWindowException as e:
-            log.debug("Window Handle not found, switching to window",self.driver.window_handles[-1])
-            self.driver.switch_to_window(self.driver.window_handles[-1])
-        if self.driver.current_url in self.invalid_urls:
-            wx.MessageBox(self.invalid_url_msg, "Avo Assure - Web Scraper", wx.OK | wx.ICON_ERROR)
-        else:
-            self.scrape_type = "fullscrape"
-            self.startbutton.Disable()
-            self.cropbutton.Disable()
+        global checkWebPackage
+        driver = browserops.driver
+        current_url = driver.current_url
+        # Name: SN adiga Date:02/08/2022
+        # conditional statements for check the browser current url in allowed urls list
+        if isTrial:
+            allowed = False
+            for url in allowed_urls:
+                if url in driver.current_url:
+                    allowed = True
 
-            logger.print_on_console('Performing fullscrape using option: ',self.scrape_selected_option[0])
-            if not isinstance(self.driver,webdriver.Ie) and len(self.driver.window_handles) > 1 and not self.window_selected:
-                self.fullscrapebutton.Hide()
-                self.startbutton.Hide()
-                self.visibilityCheck.Hide()
-                self.cropbutton.Hide()
-                self.fullscrapedropdown.Hide()
-                self.nextbutton.Show()
-                self.resume_scraping_button.SetToolTip(wx.ToolTip("Resume " + self.scrape_type))
-                self.resume_scraping_button.Show()
-                self.prevbutton.Show()
-                self.vsizer.Layout()
+            if allowed == True:
+        # end
+                try:
+                    if not(self.driver.current_window_handle):
+                        self.driver.switch_to_window(self.driver.window_handles[-1])
+                except NoSuchWindowException as e:
+                    log.debug("Window Handle not found, switching to window",self.driver.window_handles[-1])
+                    self.driver.switch_to_window(self.driver.window_handles[-1])
+                if self.driver.current_url in self.invalid_urls:
+                    wx.MessageBox(self.invalid_url_msg, "Avo Assure - Web Scraper", wx.OK | wx.ICON_ERROR)
+                else:
+                    self.scrape_type = "fullscrape"
+                    self.startbutton.Disable()
+                    if checkWebPackage['isWebPackage'] == "False":
+                        self.cropbutton.Disable()  
+
+                    logger.print_on_console('Performing fullscrape using option: ',self.scrape_selected_option[0])
+                    if not isinstance(self.driver,webdriver.Ie) and len(self.driver.window_handles) > 1 and not self.window_selected:
+                        self.fullscrapebutton.Hide()
+                        self.startbutton.Hide()
+                        self.visibilityCheck.Hide()
+                        if checkWebPackage['isWebPackage'] == "False":
+                            self.cropbutton.Hide()
+                        self.fullscrapedropdown.Hide()
+                        self.nextbutton.Show()
+                        self.resume_scraping_button.SetToolTip(wx.ToolTip("Resume " + self.scrape_type))
+                        self.resume_scraping_button.Show()
+                        self.prevbutton.Show()
+                        self.vsizer.Layout()
+                    else:
+                        self.perform_fullscrape()
             else:
-                self.perform_fullscrape()
+                wx.MessageBox(self.allowed_url_msg, "Avo Assure - Web Scraper", wx.OK | wx.ICON_ERROR)
+        else:
+            try:
+                if not(self.driver.current_window_handle):
+                    self.driver.switch_to_window(self.driver.window_handles[-1])
+            except NoSuchWindowException as e:
+                log.debug("Window Handle not found, switching to window",self.driver.window_handles[-1])
+                self.driver.switch_to_window(self.driver.window_handles[-1])
+            if self.driver.current_url in self.invalid_urls:
+                wx.MessageBox(self.invalid_url_msg, "Avo Assure - Web Scraper", wx.OK | wx.ICON_ERROR)
+            else:
+                self.scrape_type = "fullscrape"
+                self.startbutton.Disable()
+                if checkWebPackage['isWebPackage'] == "False":
+                    self.cropbutton.Disable()
+
+                logger.print_on_console('Performing fullscrape using option: ',self.scrape_selected_option[0])
+                if not isinstance(self.driver,webdriver.Ie) and len(self.driver.window_handles) > 1 and not self.window_selected:
+                    self.fullscrapebutton.Hide()
+                    self.startbutton.Hide()
+                    self.visibilityCheck.Hide()
+                    if checkWebPackage['isWebPackage'] == "False":
+                        self.cropbutton.Hide()
+                    self.fullscrapedropdown.Hide()
+                    self.nextbutton.Show()
+                    self.resume_scraping_button.SetToolTip(wx.ToolTip("Resume " + self.scrape_type))
+                    self.resume_scraping_button.Show()
+                    self.prevbutton.Show()
+                    self.vsizer.Layout()
+                else:
+                    self.perform_fullscrape()
 
     def visibility(self,event):
         global visiblity_status
         visiblity_state = event.GetEventObject()
-        log.info(visiblity_state.GetLabel(),' is clicked',visiblity_state.GetValue())
+        log.info(visiblity_state.GetLabel(),' is clicked',str(visiblity_state.GetValue()))
         visiblity_status= visiblity_state.GetValue()
 
     def perform_fullscrape(self):
@@ -337,5 +508,17 @@ class ScrapeWindow(wx.Frame):
                     hwnd=win32gui.FindWindow(None, win_name+" - Windows Internet Explorer")
                 win32gui.SetForegroundWindow(hwnd)
             logger.print_on_console("Currently selected window/tab's URL: ", self.driver.current_url)
-
+    def get_client_manifest(self):
+        data=None
+        MANIFEST_LOC= normpath(os.environ["AVO_ASSURE_HOME"] + "/assets/about_manifest.json")
+        try:
+            with open(MANIFEST_LOC) as f:
+                data = json.load(f)
+        except Exception as e:
+            msg = 'Unable to fetch package manifest.'
+            logger.print_on_console(msg)
+            log.error(msg)
+            logger.print_on_console(e)
+            log.error(e)
+        return data
 

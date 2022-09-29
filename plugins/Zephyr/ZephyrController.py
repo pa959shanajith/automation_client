@@ -41,6 +41,7 @@ class ZephyrWindow():
         self.zephyrUserName = None
         self.zephyrPassword = None
         self.headers = None
+        self.release_id = None
 
     def login(self,filePath):
         res = "invalidcredentials"
@@ -112,6 +113,7 @@ class ZephyrWindow():
         try:
             # get all cycles, phases
             releaseid = filePath["releaseId"]
+            self.release_id = releaseid
             relative_path = "/cycle/release/"+str(releaseid)
             respon = requests.get(self.zephyrURL+relative_path, headers=self.headers,proxies=readconfig.proxies)
             if respon.status_code == 200:
@@ -138,6 +140,7 @@ class ZephyrWindow():
         try:
             # get all cycles, phases
             releaseid = filePath["releaseId"]
+            self.release_id = releaseid
             mappedPhases = filePath["mappedPhases"]
             relative_path = "/cycle/release/"+str(releaseid)
             respon = requests.get(self.zephyrURL+relative_path, headers=self.headers,proxies=readconfig.proxies)
@@ -191,16 +194,16 @@ class ZephyrWindow():
             # get all testcases
             treeid = filePath["treeId"]
             if "updateflag" in filePath: updateflag = filePath["updateflag"]
-            relative_path = "/testcasetree/"+str(treeid)
+            relative_path = "/testcasetree?type=Module&releaseid="+str(self.release_id)+"&revisionid=&parentid="+str(treeid)+"&isShared="
             respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, proxies=readconfig.proxies)
             if respon.status_code == 200:
                 JsonObject = respon.json()
-                if "categories" in JsonObject and len(JsonObject["categories"]) != 0:
-                    for modul in JsonObject["categories"]:
-                        phaseObj = {modul["id"]:modul["name"]}
+                if len(JsonObject) != 0:
+                    for i in range(len(JsonObject)):
+                        phaseObj = {JsonObject[i]["id"]:JsonObject[i]["name"]}
                         res["modules"].append(phaseObj)
                         if updateflag: 
-                            res["testcases"] = self.get_testcases_treeid(modul["id"], res["testcases"])
+                            res["testcases"] = self.get_testcases_treeid(JsonObject[i]["id"], res["testcases"])
                 if updateflag: res["parentids"] = self.get_modules(filePath["parentFetchList"],[])
             relative_path = "/testcase/planning/"+str(treeid)+"?pagesize=0&isascorder=true"
             respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, proxies=readconfig.proxies)
@@ -239,13 +242,13 @@ class ZephyrWindow():
 
     def get_testcases_treeid(self, treeid, tests):
         try:
-            relative_path = "/testcasetree/"+str(treeid)
+            relative_path = "/testcasetree?type=Module&releaseid="+str(self.release_id)+"&revisionid=&parentid="+str(treeid)+"&isShared="
             respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, proxies=readconfig.proxies)
             if respon.status_code == 200:
                 JsonObject = respon.json()
-                if "categories" in JsonObject and len(JsonObject["categories"]) != 0:
-                    for modul in JsonObject["categories"]:
-                        self.get_testcases_treeid(modul["id"], tests)
+                if len(JsonObject) != 0:
+                    for i in range(len(JsonObject)):
+                        self.get_testcases_treeid(JsonObject[i]["id"], tests)
             relative_path = "/testcase/planning/"+str(treeid)+"?pagesize=0&isascorder=true"
             respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, proxies=readconfig.proxies)
             if respon.status_code == 200:
@@ -287,13 +290,13 @@ class ZephyrWindow():
             # get all testcases
             treeid = filePath["treeId"]
             mappedTests = filePath["mappedTests"]
-            relative_path = "/testcasetree/"+str(treeid)
+            relative_path = "/testcasetree?type=Module&releaseid="+str(self.release_id)+"&revisionid=&parentid="+str(treeid)+"&isShared="
             respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, proxies=readconfig.proxies)
             if respon.status_code == 200:
                 JsonObject = respon.json()
-                if "categories" in JsonObject and len(JsonObject["categories"]) != 0:
-                    for modul in JsonObject["categories"]:
-                        phaseObj = {modul["id"]:modul["name"]}
+                if len(JsonObject) != 0:
+                    for i in range(len(JsonObject)):
+                        phaseObj = {JsonObject[i]["id"]:JsonObject[i]["name"]}
                         res["modules"].append(phaseObj)
             relative_path = "/testcase/planning/"+str(treeid)+"?pagesize=0&isascorder=true"
             respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, proxies=readconfig.proxies)

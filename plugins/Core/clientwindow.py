@@ -18,6 +18,7 @@ import io
 import handler
 import update_module
 import benchmark
+isTrial = readconfig.configvalues.get("isTrial")
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 log = logging.getLogger('clientwindow.py')
@@ -60,7 +61,7 @@ class ClientWindow(wx.Frame):
     def __init__(self):
         self.appName = root.name
         wx.Frame.__init__(self, parent=None,id=-1, title=self.appName,
-                   pos=(300, 150),  size=(800, 730),style=wx.DEFAULT_FRAME_STYLE & ~ (wx.MAXIMIZE_BOX))
+                   pos=(300, 150),  size=(800, 730),style=wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER  | wx.MAXIMIZE_BOX))
         self.SetBackgroundColour('#e6e7e8')
         ##self.ShowFullScreen(True,wx.ALL)
         ##self.SetBackgroundColour('#D0D0D0')
@@ -68,6 +69,11 @@ class ClientWindow(wx.Frame):
         self.scrapewindow = None
         self.pausewindow = None
         self.pluginPDF = None
+        self.aboutWindow = None
+        self.ProxyConfig_window = None
+        self.Config_window = None
+        self.Check_Update_window = None
+        self.rollback_window = None
         self.action=''
         self.debug_mode=False
         self.choice='Normal'
@@ -103,11 +109,15 @@ class ClientWindow(wx.Frame):
         self.menubar.Append(self.fileMenu, '&File')
 
         self.configItem = wx.MenuItem(self.editMenu, 103,text = "&Configuration",kind = wx.ITEM_NORMAL)
-        self.editMenu.Append(self.configItem)
+        # Name : A Sreenivasulu Date : 02/08/2022
+        # configuration editmenu is disabled with low TLS Security Level
+        configmenu = self.editMenu.Append(self.configItem)
+        if isTrial:
+            configmenu.Enable(False)
+        # end
         self.proxyconfigItem = wx.MenuItem(self.editMenu, 104,text = "&Proxy Configuration",kind = wx.ITEM_NORMAL)
         self.editMenu.Append(self.proxyconfigItem)
         self.menubar.Append(self.editMenu, '&Edit')
-
         self.pdfReportItem = wx.MenuItem(self.toolMenu, 151,text = "Generate PDF &Report",kind = wx.ITEM_NORMAL)
         self.toolMenu.Append(self.pdfReportItem)
         self.pdfReportBatchItem = wx.MenuItem(self.toolMenu, 152,text = "Generate PDF Report (B&atch)",kind = wx.ITEM_NORMAL)
@@ -117,12 +127,13 @@ class ClientWindow(wx.Frame):
 
         self.aboutItem = wx.MenuItem(self.helpMenu, 160, text="About", kind=wx.ITEM_NORMAL)
         self.helpMenu.Append(self.aboutItem)
-        self.updateItem = wx.MenuItem(self.helpMenu, 161, text="Check for Updates", kind=wx.ITEM_NORMAL)
-        self.helpMenu.Append(self.updateItem)
-        self.updateItem.Enable(False)
-        self.rollbackItem = wx.MenuItem(self.helpMenu, 162, text="Rollback", kind=wx.ITEM_NORMAL)
-        self.helpMenu.Append(self.rollbackItem)
-        self.rollbackItem.Enable(False)
+        if SYSTEM_OS!='Linux':
+            self.updateItem = wx.MenuItem(self.helpMenu, 161, text="Check for Updates", kind=wx.ITEM_NORMAL)
+            self.helpMenu.Append(self.updateItem)
+            self.updateItem.Enable(True)
+            self.rollbackItem = wx.MenuItem(self.helpMenu, 162, text="Rollback", kind=wx.ITEM_NORMAL)
+            self.helpMenu.Append(self.rollbackItem)
+            self.rollbackItem.Enable(True)
         self.menubar.Append(self.helpMenu, '&Help')
 
         self.Bind(wx.EVT_MENU, self.menuhandler)
@@ -137,7 +148,7 @@ class ClientWindow(wx.Frame):
         self.log.SetFont(font1)
 
         if SYSTEM_OS == 'Windows':
-            self.schedule = wx.CheckBox(self.panel, label='Do Not Disturb', pos=(120, 10), size=(100, 25))
+            self.schedule = wx.CheckBox(self.panel, label='Do Not Disturb', pos=(120, 10), size=(120, 25))
         else:
             self.schedule = wx.CheckBox(self.panel, label = 'Do Not Disturb',pos=(120, 10))
         # self.schedule = wx.CheckBox(self.panel, label = 'Do Not Disturb',pos=(120, 10), size=(100, 25))
@@ -149,29 +160,29 @@ class ClientWindow(wx.Frame):
 
         #Radio buttons
         lblList = ['Normal', 'Stepwise', 'RunfromStep']
-        self.rbox = wx.RadioBox(self.panel,label = 'Debug options', pos = (10, 548), choices = lblList ,size=(300, 100),
+        self.rbox = wx.RadioBox(self.panel,label = 'Debug options', pos = (10, 548), choices = lblList ,size=(380, 100),
         majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
 
         self.rbox.Bind(wx.EVT_RADIOBOX,self.onRadioBox)
-        self.breakpoint = wx.TextCtrl(self.panel, wx.ID_ANY, pos=(225, 595), size=(60,20), style = wx.TE_RICH)
+        self.breakpoint = wx.TextCtrl(self.panel, wx.ID_ANY, pos=(267, 605), size=(88,25), style = wx.TE_RICH)
         box.Add(self.breakpoint, 1, wx.ALL|wx.EXPAND, 5)
         self.breakpoint.Bind(wx.EVT_CHAR, self.handle_keypress)
         self.breakpoint.Disable()
 
-        self.cancelbutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap(IMAGES_PATH +"killStaleProcess.png", wx.BITMAP_TYPE_ANY), wx.Point(360, 555), wx.Size(50, 42))
+        self.cancelbutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap(IMAGES_PATH +"killStaleProcess.png", wx.BITMAP_TYPE_ANY), wx.Point(440, 555), wx.Size(50, 42))
         self.cancelbutton.Bind(wx.EVT_LEFT_DOWN, self.OnKillProcess)
         self.cancelbutton.SetToolTip(wx.ToolTip("To kill Stale process"))
-        self.cancel_label=wx.StaticText(self.panel, -1, 'Kill Stale Process', wx.Point(340, 600), wx.Size(100, 70))
+        self.cancel_label=wx.StaticText(self.panel, -1, 'Kill Stale Process', wx.Point(435, 600), wx.Size(100, 70))
 
-        self.terminatebutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap(IMAGES_PATH +"terminate.png", wx.BITMAP_TYPE_ANY), wx.Point(475, 555), wx.Size(50, 42))
+        self.terminatebutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap(IMAGES_PATH +"terminate.png", wx.BITMAP_TYPE_ANY), wx.Point(555, 555), wx.Size(50, 42))
         self.terminatebutton.Bind(wx.EVT_LEFT_DOWN, self.OnTerminate)
         self.terminatebutton.SetToolTip(wx.ToolTip("To Terminate the execution"))
-        self.terminate_label=wx.StaticText(self.panel, -1, 'Terminate', wx.Point(475, 600), wx.Size(100, 70))
+        self.terminate_label=wx.StaticText(self.panel, -1, 'Terminate', wx.Point(547, 600), wx.Size(100, 70))
 
-        self.clearbutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap(IMAGES_PATH +"clear.png", wx.BITMAP_TYPE_ANY), wx.Point(590, 555), wx.Size(50, 42))
+        self.clearbutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap(IMAGES_PATH +"clear.png", wx.BITMAP_TYPE_ANY), wx.Point(670, 555), wx.Size(50, 42))
         self.clearbutton.Bind(wx.EVT_LEFT_DOWN, self.OnClear)
         self.clearbutton.SetToolTip(wx.ToolTip("To clear the console area"))
-        self.clear_label=wx.StaticText(self.panel, -1, 'Clear', wx.Point(600, 600), wx.Size(100, 70))
+        self.clear_label=wx.StaticText(self.panel, -1, 'Clear', wx.Point(677, 600), wx.Size(100, 70))
         self.Bind(wx.EVT_CLOSE, root.close)
 
         box.AddStretchSpacer()
@@ -227,7 +238,10 @@ class ClientWindow(wx.Frame):
                 msg = '--Edit Config selected--'
                 logger.print_on_console(msg)
                 log.info(msg)
-                Config_window(parent = None,id = -1, title="Avo Assure Configuration")
+                if(self.Config_window):
+                    self.Config_window.Raise()
+                else:
+                    self.Config_window = Config_window(parent = None,id = -1, title="Avo Assure Configuration")
             except Exception as e:
                 msg = "Error while updating configuration"
                 logger.print_on_console(msg)
@@ -238,7 +252,10 @@ class ClientWindow(wx.Frame):
                 msg = '--Edit Proxy Config selected--'
                 logger.print_on_console(msg)
                 log.info(msg)
-                ProxyConfig_window(parent = None,id = -1, title="Avo Assure Proxy Configuration")
+                if (self.ProxyConfig_window):
+                    self.ProxyConfig_window.Raise()
+                else:
+                    self.ProxyConfig_window = ProxyConfig_window(parent = None,id = -1, title="Avo Assure Proxy Configuration")
             except Exception as e:
                 msg = "Error while updating proxy configuration"
                 logger.print_on_console(msg)
@@ -247,6 +264,7 @@ class ClientWindow(wx.Frame):
         elif id==151:      # When user selects Tools > Generate PDF Report
             try:
                 if (self.pluginPDF!= None) and (bool(self.pluginPDF) != False):
+                    self.pluginPDF.Raise()
                     msg = 'Report PDF generation plugin is already active'
                 else:
                     if pdfgentool is None:
@@ -266,6 +284,7 @@ class ClientWindow(wx.Frame):
             try:
                 if (self.pluginPDF!= None) and (bool(self.pluginPDF) != False):
                     msg = 'Report PDF generation plugin is already active'
+                    self.pluginPDF.Raise()
                 else:
                     if pdfgentool is None:
                         #con = controller.Controller()
@@ -284,7 +303,10 @@ class ClientWindow(wx.Frame):
         elif id == 160:      # When user selects Edit > About
             try:
                 log.info('--About selected--')
-                About_window(parent = None,id = -1, title="About")
+                if (self.aboutWindow):
+                    self.aboutWindow.Raise()
+                else:
+                    self.aboutWindow = About_window(parent = None,id = -1, title="About")
             except Exception as e:
                 msg = "Error while selecting about file"
                 logger.print_on_console(msg)
@@ -293,7 +315,10 @@ class ClientWindow(wx.Frame):
         elif id==161:      # When user selects Edit > Check for updates
             try:
                 log.info('--Check for updates selected--')
-                Check_Update_window(parent = None,id = -1, title="Check for Updates")
+                if (self.Check_Update_window):
+                    self.Check_Update_window.Raise()
+                else:
+                    self.Check_Update_window = Check_Update_window(parent = None,id = -1, title="Check for Updates")
             except Exception as e:
                 msg = "Error while updating file"
                 logger.print_on_console(msg)
@@ -303,7 +328,10 @@ class ClientWindow(wx.Frame):
         elif id==162:      # When user selects Edit > Rollback
             try:
                 log.info('--Rollback selected--')
-                rollback_window(parent = None,id = -1, title="Rollback")
+                if (self.rollback_window):
+                    self.rollback_window.Raise()
+                else:
+                    self.rollback_window = rollback_window(parent = None,id = -1, title="Rollback")
             except Exception as e:
                 msg = "Error while rolling back file"
                 logger.print_on_console(msg)
@@ -403,17 +431,18 @@ class ClientWindow(wx.Frame):
                 self.OnTerminate(event,"term_exec")
                 root.connection(name)
                 if self.connectbutton.GetName() != "register":
-                    self.enable_connect()
-                self.schedule.SetValue(False)
-                self.schedule.Disable()
-                self.rollbackItem.Enable(False)
-                self.updateItem.Enable(False)
+                    wx.CallAfter(self.enable_connect)
+                wx.CallAfter(self.schedule.SetValue,False)
+                wx.CallAfter(self.schedule.Disable)
+                if SYSTEM_OS!='Linux':
+                    wx.CallAfter(self.rollbackItem.Enable,False)
+                    wx.CallAfter(self.updateItem.Enable,False)
         except:
-            self.cancelbutton.Disable()
-            self.terminatebutton.Disable()
-            self.clearbutton.Disable()
-            self.connectbutton.Enable()
-            self.rbox.Disable()
+            wx.CallAfter(self.cancelbutton.Disable)
+            wx.CallAfter(self.terminatebutton.Disable)
+            wx.CallAfter(self.clearbutton.Disable)
+            wx.CallAfter(self.connectbutton.Enable)
+            wx.CallAfter(self.rbox.Disable)
 
     def enable_connect(self, enable_button = True, repaint_title = True):
         self.connectbutton.SetBitmapLabel(self.connect_img)
@@ -533,7 +562,7 @@ class Config_window(wx.Frame):
         #----------------------------------
 
         #------------------------------------Different co-ordinates for Windows and Mac
-        if SYSTEM_OS=='Windows' or SYSTEM_OS=='Linux':
+        if SYSTEM_OS=='Windows':
             config_fields= {
             "Frame":[(300, 150),(470,670)],
             "S_address":[(12,12),(85, 25),(110,8),(140,-1)],
@@ -558,7 +587,7 @@ class Config_window(wx.Frame):
             "Save":[(100,580), (100, 28)],
             "Close":[(250,580), (100, 28)]
             }
-        else:
+        elif SYSTEM_OS=='Darwin':
             config_fields={
             "Frame":[(300, 150),(600,670)],
             "S_address":[(12,12),(90,25),(116,8),(140,-1)],
@@ -583,6 +612,34 @@ class Config_window(wx.Frame):
             "Save":[(130,580),(100, 28)],
             "Close":[(370,580),(120, 28)]
             }
+        elif SYSTEM_OS=='Linux':
+            # position size
+            config_fields={
+            "Frame":[(300, 150),(600,670)], 
+            "S_address":[(12,12),(120,25),(150,8),(140,25)], 
+            "S_port": [(320,11),(120,25),(434,8), (140,25)], 
+            "Chrm_path":[(12,42),(120,25),(150,38),(370,25),(534,38),(40, 25)], 
+            "Chrm_profile":[(12,72),(120,25),(150,68),(370,25),(534,68),(40, 25)], 
+            "Chrm_extn_path":[(12,102),(120,25),(150,98), (370,25),(534,98),(40,25)],
+            "Ffox_path":[(12,132),(120,25),(150,128),(370,25),(534,128),(40,25)],
+            "Log_path":[(12,162),(120, 25),(150,158),(370,25),(534,158),(40,25)],
+            "S_cert":[(12,192),(130, 25),(150,188),(370,25),(534,188),(40,25)],
+            "Q_timeout":[(12,222),(115, 25),(150,218), (80,25)],
+            "Timeout":[(235,222),(80, 25),(315,218),(80,25)],
+            "Delay":[(404,222),(41, 25),(490,218), (85,25)],
+            "Step_exec":[(12,252),(150, 25),(180,248),(80,25)],
+            "Disp_var": [(273, 252), (-1, 25), (490, 248), (85, 25)],
+            "C_Timeout" :[(12,282),(-1, 25),(180,278), (80,25)],
+            "Delay_Stringinput":[(273,282),(-1, 25),(490,278), (85,25)],
+            "global_waittimeout":[(12,312),(-1, 25),(180,308),(80,25)],
+            "max_tries":[(273,312),(-1, 25),(490,308), (85,25)],
+            "panel1":[(10,345),(100,20),(565,185),(12,365)],
+            "err_text":[(85,555),(350, 25)],
+            "Save":[(130,580),(100, 28)],
+            "Close":[(370,580),(120, 28)]
+            }
+        
+
         wx.Frame.__init__(self, parent, title=title,
             pos=config_fields["Frame"][0], size=config_fields["Frame"][1],style = wx.CAPTION|wx.CLIP_CHILDREN)
 
@@ -1216,6 +1273,11 @@ class Config_window(wx.Frame):
         data['incognito_private_mode']=incognito_private_mode.strip()
         data['kill_stale']=kill_stale.strip()
         data['browser_screenshots']=browser_screenshots.strip()
+        data['file_server_ip']=readconfig.configvalues["file_server_ip"]
+        data['ice_Token']=readconfig.configvalues['ice_Token']
+        data['sample_application_urls']=readconfig.configvalues['sample_application_urls']
+        data['isTrial']=readconfig.configvalues['isTrial']
+        data['element_load_timeout']=readconfig.configvalues['element_load_timeout']
         config_data=data
         if (data['server_ip']!='' and data['server_port']!='' and data['server_cert']!='' and
             data['chrome_path']!='' and data['queryTimeOut'] not in ['','sec'] and data['logFile_Path']!='' and
@@ -1539,11 +1601,17 @@ class About_window(wx.Frame):
                 "disp_msg":[(12,18),(80, 28),(100,18), (310,-1),(415,18),(30, -1)],
                 "Close":[(280,148), (100, 28)]
             }
+            elif SYSTEM_OS=='Darwin':
+                upload_fields={
+                "Frame":[(300, 150),(400,220)],#(diff +85,+10 from windows)
+                "disp_msg":[(12,38),(80,28),(116,38),(382,-1),(504,38),(30, -1)],
+                "Close":[(285,148),(100, 28)]
+            }
             else:
                 upload_fields={
-                "Frame":[(300, 150),(550,220)],#(diff +85,+10 from windows)
+                "Frame":[(300, 150),(460,220)],
                 "disp_msg":[(12,38),(80,28),(116,38),(382,-1),(504,38),(30, -1)],
-                "Close":[(285,88),(100, 28)]
+                "Close":[(285,148),(100, 28)]
             }
             wx.Frame.__init__(self, parent, title=title,pos=upload_fields["Frame"][0], size=upload_fields["Frame"][1], style = wx.CAPTION|wx.CLIP_CHILDREN)
             self.SetBackgroundColour('#e6e7e8')
@@ -1553,8 +1621,12 @@ class About_window(wx.Frame):
             self.panel = wx.Panel(self)
             self.image = wx.StaticBitmap(self.panel, -1, wx.Bitmap(IMAGES_PATH + 'AVO_Assure.png', wx.BITMAP_TYPE_ANY), wx.Point(10, 10))
             self.msg1=wx.StaticText(self.panel, -1, str(msg1), wx.Point(170, 20), wx.Size(200, 50)).SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.BOLD))
-            self.msg2=wx.StaticText(self.panel, -1, str(msg2), wx.Point(170, 55), wx.Size(200, 50))
-            self.msg3=wx.StaticText(self.panel, -1, str(msg3), wx.Point(10, 90), wx.Size(350, 50))
+            if SYSTEM_OS=='Windows':
+                self.msg2=wx.StaticText(self.panel, -1, str(msg2), wx.Point(170, 55), wx.Size(200, 50))
+                self.msg3=wx.StaticText(self.panel, -1, str(msg3), wx.Point(10, 90), wx.Size(350, 50))
+            else:
+                self.msg2 = wx.StaticText(self.panel, -1, str(msg2), wx.Point(170, 55), wx.Size(300, 50))
+                self.msg3 = wx.StaticText(self.panel, -1, str(msg3), wx.Point(10, 90), wx.Size(400, 50))
             self.msg4=wx.StaticText(self.panel, -1, str(msg4), wx.Point(10, 120), wx.Size(200, 50))
             self.close_btn = wx.Button(self.panel, label="Close",pos=upload_fields["Close"][0], size=upload_fields["Close"][1])
             self.close_btn.Bind(wx.EVT_BUTTON, self.close)
@@ -1647,7 +1719,9 @@ class Check_Update_window(wx.Frame):
             self.close(event)
             logger.print_on_console("--Updating Files and Packages--")
             log.info("--Updating Files and Packages--")
-            update_obj.run_updater()
+            l_ver=check_update(False)
+            l_ver=l_ver[1]
+            update_obj.run_updater(l_ver)
         except Exception as e:
             log.error('Error occured in update_ice : ' + str(e))
             logger.print_on_console('Error occured in update_ice : ' + str(e))
@@ -1770,22 +1844,33 @@ class ProxyConfig_window(wx.Frame):
         try:
             data = self.readproxyconfig()
             #------------------------------------Different co-ordinates for Windows and Mac
-            if SYSTEM_OS=='Windows' or SYSTEM_OS=='Linux':
+            if SYSTEM_OS=='Windows':
                 upload_fields= {
-                "Frame":[(300, 150),(400,220)],
+                "Frame":[(300, 170),(400, 230)],
                 "disp_msg":[(12,18),(80, 28),(100,18), (310,-1),(415,18),(30, -1)],
-                "proxy_enable":[(12,10), (150, 48)],
-                "proxy_url":[(12,65),(95, 20),(110,61), (250,-1)],
-                "username":[(12,95),(95, 20),(110,91), (250,-1)],
-                "passwd":[(12,125),(95, 20),(110,121), (250,-1)],
-                "Save":[(92,148), (100, 28)],
-                "Close":[(192,148), (100, 28)]
+                "proxy_enable":[(17,7), (180,40)],
+                "proxy_url":[(17,67),(95, 50),(120,61), (245,-1)],
+                "username":[(17,97),(95, 20),(120,91), (245,-1)],
+                "passwd":[(17,128),(95, 20),(120,122), (245,-1)],
+                "Save":[(157, 153), (100, 28)],
+                "Close":[(264,153), (100, 28)]
             }
-            else:
+            elif SYSTEM_OS=='Darwin':
                 upload_fields={
                 "Frame":[(300, 150),(550,220)],#(diff +85,+10 from windows)
                 "disp_msg":[(12,38),(80,28),(116,38),(382,-1),(504,38),(30, -1)],
                 "Close":[(285,88),(100, 28)]
+            }
+            elif SYSTEM_OS=='Linux':
+                upload_fields= {
+                "Frame": [(300, 170), (420, 230)],
+                "disp_msg": [(12, 18), (80, 28), (100, 18), (310, -1), (415, 18), (30, -1)],
+                "proxy_enable": [(17, 7), (180, 40)],
+                "proxy_url": [(17, 67), (95, 50), (150, 61), (245, 25)],
+                "username": [(17, 97), (130, 40), (150, 91), (245, 25)],
+                "passwd": [(17, 128), (130, 50), (150, 122), (245, 25)],
+                "Save": [(157, 153), (100, 28)],
+                "Close": [(264, 153), (100, 28)]
             }
             lblList = ['Enabled', 'Disabled']
             wx.Frame.__init__(self, parent, title=title,pos=upload_fields["Frame"][0], size=upload_fields["Frame"][1], style = wx.CAPTION|wx.CLIP_CHILDREN)
@@ -1925,7 +2010,7 @@ def check_update(flag):
         request = None
         emsg = "Error in fetching update manifest from server"
         try:
-            request = requests.get(SERVER_LOC + "/manifest.json", **req_kw_args)
+            request = requests.get(SERVER_LOC + "/manifest.json", verify=False)
             if(request.status_code ==200):
                 data = json.loads(request.text) #will return json of the manifest
         except Exception as e:
@@ -1944,7 +2029,7 @@ def check_update(flag):
     UPDATE_MSG=update_obj.send_update_message()
     l_ver = update_obj.fetch_current_value()
     SERVER_CHECK_MSG = update_obj.server_check_message()
-    if (SERVER_CHECK_MSG): logger.print_on_console(SERVER_CHECK_MSG)
+    if (SERVER_CHECK_MSG): log.info(SERVER_CHECK_MSG)
     #check if update avaliable
     if ( UPDATE_MSG == 'Update Available!!! Click on update' and flag == True ):
         logger.print_on_console("An update is available. Click on 'Help' menu option -> 'Check for Updates' sub-menu option -> 'Update' button")
@@ -1965,3 +2050,4 @@ def check_update(flag):
             logger.print_on_console( UPDATE_MSG )
             log.info( UPDATE_MSG )
     return False,l_ver
+

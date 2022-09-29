@@ -321,6 +321,7 @@ class TextboxKeywords:
                                         logger.print_on_console(err_msg)
                                 else:
                                     browser_Keywords.local_bk.driver_obj.execute_script(SET_TEXT_SCRIPT, webelement, input)
+                                    browser_Keywords.local_bk.driver_obj.execute_script(EVENTS_JS, webelement)
                                     # Bug #19221. To check if value is set or not.
                                     value = browser_Keywords.local_bk.driver_obj.execute_script('return arguments[0].value', webelement)
                                     if value == input:
@@ -599,10 +600,16 @@ class TextboxKeywords:
                     #if failed, use the id to get the text
                     id = webelement.get_attribute('id')
                     if(id != '' and id is not None):
-                        text = browser_Keywords.local_bk.driver_obj.execute_script("return document.getElementById(arguments[0]).value",id)
-                        #finally everything failed then return the placeholder
-                        if text is None or text is '':
-                            text=webelement.get_attribute('placeholder')
+                        #getElementById will throw error if webelement is inside document fragment (salesforce)
+                        try:
+                            text = browser_Keywords.local_bk.driver_obj.execute_script("return document.getElementById(arguments[0]).value",id)
+                            #finally everything failed then return the placeholder
+                            if text is None or text is '':
+                                text=webelement.get_attribute('placeholder')
+                        except:
+                            #finally everything failed then return the placeholder
+                            if text is None or text is '':
+                                text=webelement.get_attribute('placeholder')
         local_to.log.debug('Text returning from __get_text is ')
         local_to.log.debug(text)
         return text
