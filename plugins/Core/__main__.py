@@ -20,10 +20,10 @@ try:
         ice_ver = json.load(m)["version"]
 except: pass
 
-parser = argparse.ArgumentParser(description="Avo Assure ICE Platform")
+parser = argparse.ArgumentParser(description="Avo Assure Client Platform")
 parser.add_argument('-n', '--AVO_ASSURE_HOME', required=True, type=str, help='A Required path to Avo Assure root location')
-parser.add_argument('-v', '--version', action='version', version=('Avo Assure ICE '+ice_ver), help='Show Avo Assure ICE version information')
-parser.add_argument('--register', action='store_true', help='Register Avo Assure ICE with Avo Assure Web Application.')
+parser.add_argument('-v', '--version', action='version', version=('Avo Assure Client '+ice_ver), help='Show Avo Assure Client version information')
+parser.add_argument('--register', action='store_true', help='Register Avo Assure Client with Avo Assure Web Application.')
 parser.add_argument('--execute', action='store_true', help='Execute from agent')
 reg_group = parser.add_argument_group("Arguments for register/guest-connect")
 reg_group.add_argument('--host', type=str, help='Avo Assure Web Application URL. Eg: https://example.com:8443. If no value is provided then value is read from configuration file.')
@@ -92,7 +92,7 @@ if __name__ == "__main__":
     try:
         if not args.execute:
             main()
-        appName = "Avo Assure ICE"
+        appName = "Avo Assure Client"
         path = os.environ["AVO_ASSURE_HOME"]+os.sep
         if not os.path.exists(path+"logs"): os.mkdir(path+"logs")
         if not os.path.exists(path+"output"): os.mkdir(path+"output")

@@ -56,7 +56,7 @@ class ScrapeWindow(wx.Frame):
                 "scrape_type_label_field": [(25, 83)],
                 "fullscrapedropdown_field": [(110, 80), (260, 30)],
                 "fullscrapebutton": [(380, 80), (75, 30)],
-                "visibilityCheck": [(110, 120), (80, 20)],
+                "visibilityCheck": [(110, 120), (160, 20)],
                 "cropbutton_field": [(290, 160), (165, 30)]
             }
         wx.Frame.__init__(self, parent, title=title,pos=scrapper_window_config["frame"][0],  size=scrapper_window_config["frame"][1] ,style=wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER  | wx.MAXIMIZE_BOX) )
@@ -121,7 +121,7 @@ class ScrapeWindow(wx.Frame):
                     self.fullscrapebutton = wx.Button(self.panel, label="Scrape", pos=scrapper_window_config["fullscrapebutton"][0], size=scrapper_window_config["fullscrapebutton"][1])
                     self.fullscrapebutton.Bind(wx.EVT_BUTTON, self.fullscrape)
 
-                    self.visibilityCheck = wx.CheckBox(self.panel, label="Visibility", pos=scrapper_window_config["visibilityCheck"][0], size=scrapper_window_config["visibilityCheck"][1])
+                    self.visibilityCheck = wx.CheckBox(self.panel, label="VisibleElementsOnly", pos=scrapper_window_config["visibilityCheck"][0], size=scrapper_window_config["visibilityCheck"][1])
                     self.visibilityCheck.Bind(wx.EVT_CHECKBOX, self.visibility)
 
                     self.prevbutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap(os.environ["IMAGES_PATH"] +"stepBack.png", wx.BITMAP_TYPE_ANY), (35, 48), (35, 28))

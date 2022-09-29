@@ -81,10 +81,10 @@ class CiCdCore():
         
     def fetchExecutionReq(self):
         try:
-            dataToServer = {"configkey":self.opts.configkey,"executionListId":self.opts.executionListId}
+            dataToServer = {"configkey":self.opts.configkey, "executionListId":self.opts.executionListId}
             server_url = 'https://' + self.opts.serverurl + ':' + self.opts.serverport + '/getExecScenario'
-            logger.print_on_console(" Fetching Execution Request Using configkey : "+self.opts.configkey)
-            res = requests.post(server_url,json=dataToServer, verify=False)
+            logger.print_on_console("Fetching Execution Request Using configkey : "+ self.opts.configkey)
+            res = requests.post(server_url, json=dataToServer, verify=False)
             response = res.json()
             if res.status_code == 200:
                 # import core
@@ -92,7 +92,7 @@ class CiCdCore():
                 # Change it after API integration
                 return response["status"][0]["executionRequest"]
         except Exception as ex:
-            err_msg='Error while Fetching Execution Request Using Configuration Key'
+            err_msg = 'Error while Fetching Execution Request Using Configuration Key'
             log.error(err_msg)
             logger.print_on_console(err_msg)
-            log.error(ex,exc_info=True)
+            log.error(ex, exc_info=True)

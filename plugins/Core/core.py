@@ -1539,7 +1539,7 @@ class Main():
 
     def verifyRegistration(self, verifyonly = False):
         global executionOnly
-        emsg = "Avo Assure ICE is not registered."
+        emsg = "Avo Assure Client is not registered."
         executionOnly = True
         try:
             self.token_obj = ICEToken()
@@ -2144,10 +2144,10 @@ def check_PatchUpdate():
                 logger.print_on_console("An update is available. Click on 'Help' menu option -> 'Check for Updates' sub-menu option -> 'Update' button")
                 logger.print_on_console('The latest ICE version : ',l_ver)
                 log.info(UPDATE_MSG)
-            elif ( UPDATE_MSG == 'You are running the latest version of Avo Assure ICE' and flag == True ):
+            elif ( UPDATE_MSG == 'You are running the latest version of Avo Assure Client' and flag == True ):
                 logger.print_on_console( "No updates available" )
                 log.info( "No updates available" )
-            elif ( UPDATE_MSG == 'An Error has occured while checking for new versions of Avo Assure ICE, kindly contact Support Team'):
+            elif ( UPDATE_MSG == 'An Error has occured while checking for new versions of Avo Assure Client, kindly contact Support Team'):
                 if not (os.path.exists(MANIFEST_LOC)):
                     logger.print_on_console( "Client manifest unavaliable." )
                     log.info( "Client manifest unavaliable." )
