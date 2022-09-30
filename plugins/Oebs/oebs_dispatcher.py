@@ -78,7 +78,8 @@ class OebsDispatcher:
                             'rightclick': 1,
                             'setfocus': 1,
                             'setsecuretext': 1,
-                            'cleartext': 1
+                            'cleartext': 1,
+                            'selectfromnavigator': 1
                         }
         self.keyword_dict = {
                             'findwindowandattach':self.utils_obj.find_window_and_attach,
@@ -127,6 +128,7 @@ class OebsDispatcher:
                             'selectallvalues':self.dropdownlistboxops_obj.selectallvalues,
                             'getselected':self.dropdownlistboxops_obj.getselected,
                             'getallvalues':self.dropdownlistboxops_obj.getallvalues,
+                            'selectfromnavigator':self.dropdownlistboxops_obj.select_from_navigator,
 
                         
                             'getstatus':self.radiocheckboxops_obj.getstatus,
