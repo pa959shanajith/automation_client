@@ -1752,6 +1752,7 @@ class TextboxKeywords:
                                     if user_input is not None:
                                         input_val=user_input
                                     browser_Keywords.local_bk.driver_obj.execute_script(SET_TEXT_SCRIPT,webelement,input_val)
+                                    browser_Keywords.local_bk.driver_obj.execute_script(EVENTS_JS, webelement)
                                     status=TEST_RESULT_PASS
                                     methodoutput=TEST_RESULT_TRUE
                                 else:
