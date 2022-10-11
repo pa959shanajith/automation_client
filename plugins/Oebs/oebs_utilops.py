@@ -89,9 +89,8 @@ class UtilOperations:
                 x_cor = (x1+x2)/2
                 y_cor = (y1+y2)/2
                 if curaccinfo.role == "panel":
-                    x_cor = x1
-                    y_cor = y1
-                oebs_mouseops.MouseOperation('hold',x_cor,y_cor)
+                    y_cor = y1 - 15
+                oebs_mouseops.MouseOperation('hold',int(x_cor),int(y_cor))
                 methodoutput = TEST_RESULT_TRUE
                 status = TEST_RESULT_PASS
                 log.debug('%s',status)
@@ -131,8 +130,8 @@ class UtilOperations:
                 x_cor = (x1+x2)/2
                 y_cor = (y1+y2)/2
 
-                oebs_mouseops.MouseOperation('slide',x_cor,y_cor)
-                oebs_mouseops.MouseOperation('release',x_cor,y_cor)
+                oebs_mouseops.MouseOperation('slide',int(x_cor),int(y_cor))
+                oebs_mouseops.MouseOperation('release',int(x_cor),int(y_cor))
 
                 methodoutput = TEST_RESULT_TRUE
                 status = TEST_RESULT_PASS
