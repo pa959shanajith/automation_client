@@ -545,7 +545,7 @@ class DropdownListboxOperations:
                                         if currentselection>childindex:
                                             moveloc=currentselection-childindex
                                             for index in range(int(moveloc)):
-                                                self.keyboardops_obj.keyboard_operations('keypress','A_UP')
+                                                self.keyboardops_obj.keyboard_operation('keypress','A_UP')
                                                 time.sleep(0.1)
                                             requiredcontext, visible, active_parent = self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]",oebs_key_objects.object_type)
                                             listObj = self.utilities_obj.looptolist(requiredcontext)
