@@ -81,13 +81,26 @@ class InternalFrameOperations:
             charinfo = acc.getAccessibleContextInfo()
             log.debug('Received Object Context',DEF_TOGGLEMAXIMIZE)
             objstates = charinfo.states
+            keywordop_obj=KeywordOperations()
             if 'enabled' in objstates:
+                from oebs_utilops import UtilOperations
+                obj=UtilOperations()
                 accessibleactionsinfo = acc.getAccessibleActions()
                 found = False
                 actioncount = accessibleactionsinfo.actionsCount
                 for i in range(actioncount):
                     actiontext = accessibleactionsinfo.actionInfo[i].name
-                    if(str(actiontext) == 'Toggle Maximized'):
+                    if "Navigator" in charinfo.name and str(actiontext) == 'Toggle Minimized':
+                        found = True
+                        obj.rightclick(acc)
+                        if('iconified' in objstates):
+                            keywordop_obj.keyboard_operation('keypress','R')
+                        else:
+                            keywordop_obj.keyboard_operation('keypress','A_DOWN')
+                            keywordop_obj.keyboard_operation('keypress','ENTER')
+                        methodoutput = TEST_RESULT_TRUE
+                        status=TEST_RESULT_PASS
+                    elif(str(actiontext) == 'Toggle Maximized'):
                         found = True
                         acc.doAccessibleActions(i,'Toggle Maximized')
                         methodoutput = TEST_RESULT_TRUE
@@ -118,32 +131,26 @@ class InternalFrameOperations:
         try:
             #gets the entire context information
             charinfo = acc.getAccessibleContextInfo()
-            log.debug('Received Object Context',DEF_TOGGLEMINIMIZE)
+            log.debug('Received Object Context',DEF_CLOSEFRAME)
             objstates = charinfo.states
-            keywordop_obj=KeywordOperations()
-            if 'enabled' in objstates :
-                from oebs_utilops import UtilOperations
-                obj=UtilOperations()
+            if 'enabled' in objstates:
                 accessibleactionsinfo = acc.getAccessibleActions()
                 actioncount = accessibleactionsinfo.actionsCount
                 for i in range(actioncount):
-                    found = False
                     actiontext = accessibleactionsinfo.actionInfo[i].name
-                    if(str(actiontext) == 'Toggle Minimized'):
-                        found = True
-                        obj.rightclick(acc)
-                        if('iconified' in objstates):
-                            keywordop_obj.keyboard_operation('keypress','R')
-                        else:
-                            for i in range(0,4):
-                                keywordop_obj.keyboard_operation('keypress','A_DOWN')
-                            keywordop_obj.keyboard_operation('keypress','ENTER')
-                        methodoutput = TEST_RESULT_TRUE
-                        status=TEST_RESULT_PASS
-                if not found:
-                    err_msg = ERROR_CODE_DICT['err_minimize']
-                    log.debug('Object Disabled',err_msg)
-                    logger.print_on_console(err_msg)
+                    x1 = charinfo.x
+                    x2 = charinfo.x + charinfo.width
+                    y1 = charinfo.y
+                    y2 = charinfo.y + charinfo.height
+                    if "Navigator" in charinfo.name and str(actiontext) == 'Toggle Minimized':
+                        xcor = x2 - 25
+                        ycor = y1 + 10
+                    else:
+                        xcor = x2 - 45
+                        ycor = y1 + 10
+                    oebs_mouseops.MouseOperation('click',int(xcor),int(ycor))
+                    methodoutput = TEST_RESULT_TRUE
+                    status=TEST_RESULT_PASS
             else:
                 err_msg = MSG_DISABLED_OBJECT
                 log.debug('Object Disabled',err_msg)
