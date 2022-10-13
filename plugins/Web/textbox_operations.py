@@ -1181,6 +1181,10 @@ class TextboxKeywords:
                                 webelement.clear()
                                 from selenium.webdriver.common.keys import Keys
                                 try:
+                                    #Fixes for: Clear text clears only last character
+                                    if len(webelement.get_attribute('value')) > 0:
+                                        self.__clear_text(webelement)
+                                        browser_Keywords.local_bk.driver_obj.execute_script("""arguments[0].focusout()""", webelement)
                                     webelement.send_keys(Keys.BACK_SPACE)
                                 except Exception as e:
                                     local_to.log.debug('Warning!: Could not perform backspace function due to error : '+str(e))
