@@ -519,7 +519,7 @@ class DropdownListboxOperations:
                                 err_msg = MSG_ELEMENT_NOT_VISIBLE
                                 logger.print_on_console(err_msg)
                         else:
-                            if currinfo.accessibleAction == 1:
+                            if currinfo.accessibleAction == 1 or currinfo.accessibleSelection == 1:
                                 acc.addAccessibleSelectionFromContext(int(childindex))
                                 status = TEST_RESULT_PASS
                                 methodoutput = TEST_RESULT_TRUE
@@ -881,11 +881,21 @@ class DropdownListboxOperations:
                             log.debug('MSG:%s',err_msg)
                             logger.print_on_console(err_msg)
                     else:
-                        if currinfo.accessibleAction == 1:
-                            acc.addAccessibleSelectionFromContext(int(childindex))
-                            status = TEST_RESULT_PASS
-                            methodoutput = TEST_RESULT_TRUE
-                            log.debug('Value is selected',DEF_SELECTVALUEBYTEXT)
+                        if currinfo.accessibleAction == 1 or currinfo.accessibleSelection == 1:
+                            for index in range(children):
+                                childacc = acc.getAccessibleChildFromContext(int(index))
+                                childcontext = childacc.getAccessibleContextInfo()
+                                fetchedname = childcontext.name
+                                if(childname == fetchedname):
+                                    acc.addAccessibleSelectionFromContext(index)
+                                    status = TEST_RESULT_PASS
+                                    methodoutput = TEST_RESULT_TRUE
+                                    log.debug('Value selected is %s',fetchedname)
+                                    break
+                            else:
+                                log.debug('Value Does not exist',DEF_SELECTVALUEBYTEXT)
+                                err_msg = ERROR_CODE_DICT['err_value']
+                                logger.print_on_console(err_msg)
                         else:
                             labelContext=''
                             elementPos=0
