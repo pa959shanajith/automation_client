@@ -8,10 +8,10 @@ from loadingwindow import Loading_window
 log = logging.getLogger('Avo_Assure')
 ice_ver = '3.0.0'
 
-def main():
+def loading_ui():
     global loadingobj
     app = wx.App()
-    loadingobj = Loading_window(None)
+    loadingobj = Loading_window(None,args)
 
 try:
     cfile = os.path.abspath(__file__)
@@ -33,6 +33,7 @@ reg_group.add_argument('--agentname', nargs='?', type=str, help='Agentname is ma
 reg_group.add_argument('--serverurl', nargs='?', type=str, help='serverurl is mandatory')
 reg_group.add_argument('--serverport', nargs='?', type=str, help='serverport is mandatory')
 reg_group.add_argument('--executionListId', nargs='?', type=str, help='executionListId is mandatory')
+reg_group.add_argument('--instanceid', nargs='?', type=str, help="Agent will provide auto increment instanceid")
 parser.add_argument('--connect', action='store_true', help='Establish a connection between Avo Assure Web Application and ICE.')
 args = parser.parse_args()
 if args.AVO_ASSURE_HOME and not os.path.exists(args.AVO_ASSURE_HOME+os.sep+'/plugins'):
@@ -90,12 +91,11 @@ if sys.platform == 'win32':
 
 if __name__ == "__main__":
     try:
-        if not args.execute:
-            main()
         appName = "Avo Assure Client"
         path = os.environ["AVO_ASSURE_HOME"]+os.sep
         if not os.path.exists(path+"logs"): os.mkdir(path+"logs")
         if not os.path.exists(path+"output"): os.mkdir(path+"output")
+        loading_ui()
         import core
         import cicd_core
         core.configvalues = configvalues

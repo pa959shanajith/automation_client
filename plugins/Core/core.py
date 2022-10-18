@@ -20,7 +20,6 @@ from os.path import normpath
 from constants import *
 import controller
 import readconfig
-# from __main__ import loadingobj
 import clientwindow
 import json
 import socket
@@ -1160,6 +1159,7 @@ class TestThread(threading.Thread):
                 result["agentname"] = opts.agentname
                 server_url = 'https://' + opts.serverurl + ':' + opts.serverport + '/setExecStatus'
                 res = requests.post(server_url,json=result, verify=False)
+                controller.kill_process()
             else:
                 if status==TERMINATE:
                     logger.print_on_console('---------Termination Completed-------',color="YELLOW")
@@ -1246,7 +1246,8 @@ class Main():
             self.cw = cw
         # else:
         #logger.init_colorama(autoreset=True)
-        loadingobj.Close()
+        if not self.opts.execute:
+            loadingobj.Close()
         
         """ Creating Root Logger using logger file config and setting logfile path, which is in config.json """
         try:

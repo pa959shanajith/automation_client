@@ -2,6 +2,7 @@ import logging
 import os
 import json
 from urllib import response
+import sys
 import logger
 import requests
 import core
@@ -54,12 +55,17 @@ class CiCdCore():
             logfilename_error_flag = False
 
         try:
-            logfilename = os.path.normpath(configvalues["logFile_Path"]).replace("\\","\\\\")
+            cicd_path = os.path.normpath(AVO_ASSURE_HOME + '/logs/' + 'Avoclient_' + args.instanceid  + '.log')
+            logfilename = os.path.normpath(cicd_path).replace("\\","\\\\")
             logging.config.fileConfig(LOGCONFIG_PATH,defaults={'logfilename': logfilename},disable_existing_loggers=False)
         except Exception as e:
             logfilename_error_flag = True
             log.error(e)
         exec_req = self.fetchExecutionReq()
+        md_name = exec_req['suitedetails'][0]['testsuitename']
+        log.info('%s Module Execution Started', md_name)
+        log.info('===============================================================================')
+        logger.print_on_console( md_name + '  Module Execution Started')
         if exec_req['isHeadless']:
             cicd_isheadless = 'Yes'
         aws_mode=False
@@ -86,11 +92,16 @@ class CiCdCore():
             logger.print_on_console("Fetching Execution Request Using configkey : "+ self.opts.configkey)
             res = requests.post(server_url, json=dataToServer, verify=False)
             response = res.json()
-            if res.status_code == 200:
+            if res.status_code == 200  and response["status"] != "fail":
                 # import core
                 # core.plugins_list = response["plugins"]
                 # Change it after API integration
                 return response["status"][0]["executionRequest"]
+            else:
+                info_msg = "Response status is fail and execution request is None"
+                log.info(info_msg)
+                logger.print_on_console(info_msg)
+                sys.exit("Execution response status is fail and execution request is None")
         except Exception as ex:
             err_msg = 'Error while Fetching Execution Request Using Configuration Key'
             log.error(err_msg)
