@@ -1354,9 +1354,6 @@ class Controller():
                                 status,status_percentage,accessibility_reports = con.executor(tsplist,EXECUTE,last_tc_num,1,con.conthread,execution_env,video_path,datatables=datatables,accessibility_testing = True)
                                 #end video
                                 if (record_flag=='yes') and self.execution_mode == SERIAL and json_data['apptype'] == 'Web': recorder_obj.rec_status = False
-                                if cicd_mode:
-                                    from browser_Keywords import BrowserKeywords
-                                    BrowserKeywords.closeBrowser(self)
                                 print('=======================================================================================================')
                                 logger.print_on_console( '***Scenario' ,str(sc_idx + 1) ,' execution completed***')
                                 print('=======================================================================================================')
