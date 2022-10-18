@@ -7,7 +7,6 @@ import core_utils
 import logging
 from constants import *
 import threading
-from pyrobot import Robot
 from selenium.webdriver.common.keys import Keys
 local_cbo=threading.local()
 

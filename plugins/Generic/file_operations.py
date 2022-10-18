@@ -43,8 +43,9 @@ import time
 import docx
 import urllib.request
 import pyautogui
-import win32gui
-from pywinauto.application import Application 
+if SYSTEM_OS=='Windows':
+    import win32gui
+    from pywinauto.application import Application 
 
 
 log = logging.getLogger('file_operations.py')
