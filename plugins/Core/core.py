@@ -1227,6 +1227,7 @@ class Main():
         self.icesession = None
         self.server_url = None
         self._wants_to_close = False
+        self.ice_register_token = None
         self.opts = args
         global root, cw, browsercheckFlag, updatecheckFlag
         os.environ["ice_mode"] = "gui" if self.gui else "cli"
@@ -1351,7 +1352,8 @@ class Main():
             configvalues['server_port']=url[1]
             if not hold: self.connection("register")
             # Name : sreenivasulu A
-            return True
+            if self.ice_register_token == "validICE":
+                return True
         except requests.exceptions.SSLError as e:
             err, err_msg, _ = _process_ssl_errors(str(e))
         except Exception as e:
@@ -1416,8 +1418,10 @@ class Main():
                             clientwindow.configvalues = configvalues
                             if self.gui:
                                 cw.EnableAll()
-                                cw.enable_connect()
+                                wx.CallAfter(cw.enable_connect)
+                                # cw.enable_connect()
                             msg='ICE "'+data["icename"]+'" registered successfully with Avo Assure'
+                            self.ice_register_token = response["status"]
                             logger.print_on_console(msg)
                             log.info(msg)
                 except Exception as e:
