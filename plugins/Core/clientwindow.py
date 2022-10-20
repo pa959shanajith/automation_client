@@ -1,4 +1,3 @@
-from calendar import c
 import wx
 import sys
 import os
