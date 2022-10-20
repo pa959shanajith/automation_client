@@ -96,10 +96,10 @@ class Message(wx.Frame):
         (keepGoing, skip) = self.progress.Update(taskPercent, update_msg)
 
     def ShowMessage(self,warning=None):
-        if (warning=='rollback'): dlg = wx.MessageBox("Avo Assure Client rolled back successfully. Click 'OK' start ICE.", 'Info',wx.OK | wx.ICON_INFORMATION | wx.CANCEL)
-        elif (warning and 'Error!: unable to add files to backup' in warning) : dlg = wx.MessageBox("Avo Assure Client failed to update due to files being used by another process. Click 'OK' to start ICE.", 'Error',wx.OK | wx.ICON_EXCLAMATION | wx.CANCEL)
-        elif (warning) : dlg = wx.MessageBox("Avo Assure Client updated with warnings. Click 'OK' to start ICE.", 'Info',wx.OK | wx.ICON_INFORMATION | wx.CANCEL)
-        else : dlg = wx.MessageBox("Avo Assure Client updated successfully. Click 'OK' to start ICE.", 'Info',wx.OK | wx.ICON_INFORMATION | wx.CANCEL)
+        if (warning=='rollback'): dlg = wx.MessageBox("Avo Assure Client rolled back successfully. Click 'OK' start Avo Assure Client.", 'Info',wx.OK | wx.ICON_INFORMATION | wx.CANCEL)
+        elif (warning and 'Error!: unable to add files to backup' in warning) : dlg = wx.MessageBox("Avo Assure Client failed to update due to files being used by another process. Click 'OK' to start Avo Assure Client.", 'Error',wx.OK | wx.ICON_EXCLAMATION | wx.CANCEL)
+        elif (warning) : dlg = wx.MessageBox("Avo Assure Client updated with warnings. Click 'OK' to start Avo Assure Client.", 'Info',wx.OK | wx.ICON_INFORMATION | wx.CANCEL)
+        else : dlg = wx.MessageBox("Avo Assure Client updated successfully. Click 'OK' to start Avo Assure Client.", 'Info',wx.OK | wx.ICON_INFORMATION | wx.CANCEL)
         if (dlg == 4 or dlg == 16):
             self.Close()
         return dlg
@@ -179,9 +179,9 @@ class Updater:
     def create_backup(self):
         """Purpose: To create a backup of Avo Assure Client folder and about_manifest"""
         """Input : 1.7-zip location 2.Avo Assure Client folder location and about_manifest.json location 3.Rollbackfile location"""
-        """Functionality: 1.Checks is Update folder is present in ICE directory, if present checks if AvoAssureICE_backup.7z is present
+        """Functionality: 1.Checks is Update folder is present in Avo Assure Client directory, if present checks if AvoAssureICE_backup.7z is present
                           2.If AvoAssureICE_backup.7z is present, then delete this instance to create a new once(we do this so as not to keep appending new files to the existing 7zip file)
-                          3.If Update folder is not present then creates a new folder by the same name in ICE directory
+                          3.If Update folder is not present then creates a new folder by the same name in Avo Assure Client directory
                           4.Adds Avo Assure (plugins) folder to AvoAssureICE_backup.7z
                           5.Adds about_manifest.json to AvoAssureICE_backup.7z"""
         try:
@@ -565,7 +565,7 @@ class common_functions:
         pass
 
     def close_ICE(self,PID):
-        """Killing ICE via PID"""
+        """Killing Avo Assure Client via PID"""
         try:
             log.debug( 'Inside close_ICE function')
             hwnd = win32gui.FindWindow(None, 'Avo Assure Client')
@@ -575,8 +575,8 @@ class common_functions:
             log.info('Closing Avo Assure Client with PID :' + str(PID))
             os.system('taskkill /F /PID ' + str(PID))
             #os.system('taskkill /F /FI "WINDOWTITLE eq Avo Assure Client"')
-            print ( '=>closed ICE' )
-            log.info( 'ICE was closed' )
+            print ( '=>closed Avo Assure Client' )
+            log.info( 'Avo Assure Client was closed' )
         except Exception as e:
             print ( "Error occurred in close_ICE : ", e )
             log.error( "Error occurred in close_ICE : " + str(e) )
@@ -584,7 +584,7 @@ class common_functions:
             traceback.print_exc()
 
     def restartICE(self,AVOASSUREICE_LOC):
-        """Method to restart ICE"""
+        """Method to restart Avo Assure Client"""
         try:
             log.debug( 'Inside restartICE function' )
             #---------------------------------file and folders to delete
@@ -609,7 +609,7 @@ class common_functions:
             #---------------------------------file and folders to delete
             loc = os.path.dirname(AVOASSUREICE_LOC) + os.sep +"run.bat"
             subprocess.Popen(loc,cwd=os.path.dirname(loc), creationflags=subprocess.CREATE_NEW_CONSOLE)
-            log.debug( 'Restarted ICE.' )
+            log.debug( 'Restarted Avo Assure Client.' )
         except Exception as e:
             print ( "=>Error occurred in restartICE : ", e )
             log.error( "Error occurred in restartICE : " + str(e) )

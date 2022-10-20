@@ -61,7 +61,7 @@ class Delay_keywords:
                 status=TEST_RESULT_PASS
                 methodoutput=TEST_RESULT_TRUE
             else:
-                err_msg = "Pause Keyword is not applicable when ICE is running in command line mode"
+                err_msg = "Pause Keyword is not applicable when Avo Assure Client is running in command line mode"
                 log.error(err_msg)
                 logger.print_on_console(err_msg)
         except Exception as e:

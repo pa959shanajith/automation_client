@@ -30,7 +30,7 @@ class ICEToken():
         self.enc_obj = CoreUtils()
         self.check_token()
 
-    """ Check for the ICE token. If exists, returns decrypted token """
+    """ Check for the Avo Assure Client token. If exists, returns decrypted token """
     def check_token(self):
         self.token_folder=self.get_token_folder()
         self.tokenid_file=os.environ["AVO_ASSURE_HOME"] + os.sep + "lib" + os.sep + "METADATA"
