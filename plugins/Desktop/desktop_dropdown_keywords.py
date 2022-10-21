@@ -152,7 +152,7 @@ class Dropdown_Keywords():
                                     import platform
                                     info_32 = platform.architecture()
                                     if ( info_32[0] == '32bit' ):
-                                        logger.print_on_console( 'Warning : You are using 32bit version of ICE Engine.This keyword is unstable for this version.If unsatisfactory results, use 64bit ICE Engine.')
+                                        logger.print_on_console( 'Warning : You are using 32bit version of Avo Assure Client Engine.This keyword is unstable for this version.If unsatisfactory results, use 64bit Avo Assure Client Engine.')
                                     #---------------------------------------------
 ##                                    if element.is_active() == False:
 ##                                      element.click()
@@ -940,7 +940,7 @@ class Dropdown_Keywords():
                                 import platform
                                 info_32=platform.architecture()
                                 if ( info_32[0] == '32bit' ):
-                                    logger.print_on_console( 'Warning : You are using 32bit version of ICE Engine.This keyword is unstable for this version.If unsatisfactory results, use 64bit ICE Engine.' )
+                                    logger.print_on_console( 'Warning : You are using 32bit version of Avo Assure Client Engine.This keyword is unstable for this version.If unsatisfactory results, use 64bit Avo Assure Client Engine.' )
                                 #---------------------------------------------
                                 if ( element.is_active() == False ):
                                   element.click()

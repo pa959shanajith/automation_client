@@ -80,7 +80,7 @@ class Tab_Control_Keywords():
             import platform
             info_32 = platform.architecture()
             if ( info_32[0] == '32bit' ):
-                logger.print_on_console( 'Warning:You are using 32bit version of ICE Engine.This keyword is unstable for this version.' )
+                logger.print_on_console( 'Warning:You are using 32bit version of Avo Assure Client Engine.This keyword is unstable for this version.' )
             #---------------------------------------------
             try:
                verify_obj = Text_Box()
@@ -133,7 +133,7 @@ class Tab_Control_Keywords():
                 import platform
                 info_32 = platform.architecture()
                 if ( info_32[0] == '32bit' ):
-                    logger.print_on_console( 'Warning:You are using 32bit version of ICE Engine.This keyword is unstable for this version.' )
+                    logger.print_on_console( 'Warning:You are using 32bit version of Avo Assure Client Engine.This keyword is unstable for this version.' )
                 #---------------------------------------------
                 try:
                    verify_obj = Text_Box()
@@ -187,7 +187,7 @@ class Tab_Control_Keywords():
             import platform
             info_32 = platform.architecture()
             if ( info_32[0] == '32bit' ):
-                logger.print_on_console( 'Warning:You are using 32bit version of ICE Engine.This keyword is unstable for this version.' )
+                logger.print_on_console( 'Warning:You are using 32bit version of Avo Assure Client Engine.This keyword is unstable for this version.' )
             #---------------------------------------------
             try:
                 if ( desktop_launch_keywords.window_name != None ):

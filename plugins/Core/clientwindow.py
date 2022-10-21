@@ -460,7 +460,7 @@ class ClientWindow(wx.Frame):
     def enable_register(self, enable_button = True, repaint_title = True):
         self.connectbutton.SetBitmapLabel(self.register_img)
         self.connectbutton.SetName("register")
-        self.connectbutton.SetToolTip(wx.ToolTip("Register ICE with Avo Assure Server"))
+        self.connectbutton.SetToolTip(wx.ToolTip("Register Avo Assure Client with Avo Assure Server"))
         if repaint_title: self.SetTitle(self.appName)
         if enable_button: self.connectbutton.Enable()
 
@@ -1070,18 +1070,18 @@ class Config_window(wx.Frame):
         is_admin = core_utils.check_isadmin()
         if isConfigJson!=False:
             if is_admin:
-                log.info("ICE is run as admin")
+                log.info("Avo Assure Client is run as admin")
                 dis_sys_screenoff = isConfigJson['disable_screen_timeout'].title()
                 if dis_sys_screenoff == lblList[0]:
                     self.rbox21.SetSelection(0)
                 elif dis_sys_screenoff == lblList[1]:
                     self.rbox21.SetSelection(1)
             else:
-                log.info("ICE is run as normal")
+                log.info("Avo Assure Client is run as normal")
                 self.rbox21.SetSelection(1)
         else:
             self.rbox21.SetSelection(1)           
-        self.rbox21.SetToolTip(wx.ToolTip("Enables or Disables automatic screen lock during execution when ICE is run as admin."))
+        self.rbox21.SetToolTip(wx.ToolTip("Enables or Disables automatic screen lock during execution when Avo Assure Client is run as admin."))
 
         #adding the radio button for opening browser in incognito/private mode:
         self.rbox22 = wx.RadioBox(self.panel1, label = "Incognito/Private Mode", choices = lblList,
@@ -1584,7 +1584,7 @@ class Config_window(wx.Frame):
         log.info(msg)
 
 #-------------------
-"""Displays the details of ICE, versions, etc.(can be customised/it is read only)"""
+"""Displays the details of Avo Assure Client, versions, etc.(can be customised/it is read only)"""
 class About_window(wx.Frame):
     """Initialization and defining the wx-components of the pop-up"""
     def __init__(self, parent, id, title):
@@ -1700,7 +1700,7 @@ class Check_Update_window(wx.Frame):
             UPDATE_MSG = update_obj.send_update_message()
             if ( UPDATE_MSG == 'Update Available!!! Click on update' ):
                 self.disp_msg.AppendText( "An update is available, click on 'Update' button to install the latest patch : " + str(l_ver) + "\n")
-                self.disp_msg.AppendText( "Warning! ICE will close when update starts...")
+                self.disp_msg.AppendText( "Warning! Avo Assure Client will close when update starts...")
                 self.update_btn.Enable()
             else:
                 self.disp_msg.SetValue(UPDATE_MSG)
@@ -2033,7 +2033,7 @@ def check_update(flag):
     #check if update avaliable
     if ( UPDATE_MSG == 'Update Available!!! Click on update' and flag == True ):
         logger.print_on_console("An update is available. Click on 'Help' menu option -> 'Check for Updates' sub-menu option -> 'Update' button")
-        logger.print_on_console('The latest ICE version : ',l_ver)
+        logger.print_on_console('The latest Avo Assure Client version : ',l_ver)
         log.info(UPDATE_MSG)
     elif ( UPDATE_MSG == 'You are running the latest version of Avo Assure Client' and flag == True ):
         logger.print_on_console( "No updates available" )

@@ -1,6 +1,6 @@
 #-------------------------------------------------------------------------------
 # Name:        Update_module
-# Purpose:     1.Checks if ICE requires an update, and calls required updaters if necessary
+# Purpose:     1.Checks if Avo Assure Client requires an update, and calls required updaters if necessary
 #              2.Calls Update.py/Update.exe to rollback changes
 #
 # Author:      anas.ahmed
@@ -61,7 +61,7 @@ class Update_Rollback:
         return data
 
     def check(self,client_data,data_from_server):
-        """Filters till the point where it find the current ICE version in the server manifest, omits lower versions"""
+        """Filters till the point where it find the current Avo Assure Client version in the server manifest, omits lower versions"""
         """Input 1.Client Manifest Data
                  2.Server Manifest Data"""
         """Output 1.Sets the latest data tags
@@ -173,17 +173,17 @@ class Update_Rollback:
         return update_msg
 
     def server_check_message(self):
-        """Returns a message if there in incompatibility between ICE and Server"""
+        """Returns a message if there in incompatibility between Avo Assure Client and Server"""
         update_msg = None
         if ( self.MIN_FLAG and self.MAX_FLAG ):
-                log.info( "SERVER_COMPATIBILITY_CHECK: PASS; ICE is compatible with current server version : " + str(self.server_version) + "." )
+                log.info( "SERVER_COMPATIBILITY_CHECK: PASS; Avo Assure Client is compatible with current server version : " + str(self.server_version) + "." )
                 self.server_check_flag = True
         elif( self.server_version is None ):
             log.info( 'SERVER_COMPATIBILITY_CHECK: FAIL; Unable to get severversion' )
             self.server_check_flag = False
         else:
-            log.info( 'SERVER_COMPATIBILITY_CHECK: FAIL; ICE is incompatible with current server version : ' + str(self.server_version) + '. Please update to the latest ICE' )
-            update_msg = 'Warning!: ICE is incompatible with current server version : ' + str(self.server_version) + '; Please update to the latest ICE'
+            log.info( 'SERVER_COMPATIBILITY_CHECK: FAIL; Avo Assure Client is incompatible with current server version : ' + str(self.server_version) + '. Please update to the latest Avo Assure Client' )
+            update_msg = 'Warning!: Avo Assure Client is incompatible with current server version : ' + str(self.server_version) + '; Please update to the latest Avo Assure Client'
             self.server_check_flag = False
         return update_msg
 
