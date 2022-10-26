@@ -145,14 +145,19 @@ class StringOperation:
             if not (actual_string is None or actual_string is ''):
                 if not (index is None or index is ''):
                     coreutilsobj=core_utils.CoreUtils()
-                    actual_string=coreutilsobj.get_UTF_8(actual_string)
                     index_toint = int(index)
-                    output = actual_string[:index_toint]
-                    output=coreutilsobj.get_UTF_8(output)
-                    log.info('Result : ')
-                    log.info(output)
-                    status=generic_constants.TEST_RESULT_PASS
-                    result=generic_constants.TEST_RESULT_TRUE
+                    if index_toint > 0:
+                        actual_string=coreutilsobj.get_UTF_8(actual_string)
+                        output = actual_string[:index_toint]
+                        output=coreutilsobj.get_UTF_8(output)
+                        log.info('Result : ')
+                        log.info(output)
+                        status=generic_constants.TEST_RESULT_PASS
+                        result=generic_constants.TEST_RESULT_TRUE
+                    else:
+                        #log.error(INVALID_INPUT)
+                        err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                        #logger.print_on_cons
                 else:
                     #log.error(INVALID_INPUT)
                     err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
@@ -287,7 +292,7 @@ class StringOperation:
                             position=self.find_wildcard(actual_string,to_find)
                             position=list(set(position))
                             position.sort()
-                            position=position[:1]
+                            # position=position[:1]
                             output_val = len(position)
                             if(output_val == 0):
                                 output='false'
@@ -651,14 +656,14 @@ class StringOperation:
         try:
             log.debug("inside find wildcard")
             to_find = to_find.replace('?','.')
-            to_find = to_find.replace('*','.*')
-            if to_find.count('.')>0 and to_find != '':
+            # to_find = to_find.replace('*','*')
+            # if to_find.count('.')>0 and to_find != '':
+            if to_find != '':
                 pattern = re.compile(r"{}".format(to_find))
                 match = pattern.findall(actual_string)
                 if match:
-                    for m in match:
-                        pos = [i+1 for i in range(len(actual_string)) if actual_string.startswith(m, i)]
-                        position.extend(pos)
+                    pos = [i+1 for i in range(len(actual_string)) if actual_string.startswith(match[0], i)]
+                    position.extend(pos)
         except Exception as e:
             err_msg="Error occured in find wildcard"
             log.error(err_msg)
