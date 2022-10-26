@@ -869,22 +869,14 @@ class UtilOperations:
                             if oebs_key_objects.keyword_input[counter].lower() not in str(menuchildcontext.name).lower():
                                 flag1 = False
                             elif oebs_key_objects.keyword_input[counter].lower() in str(menuchildcontext.name).lower():
-                                x_coormenu = int(menuchildcontext.x + (0.5 * menuchildcontext.width))
-                                y_coormenu = int(menuchildcontext.y + (0.5 * menuchildcontext.height))
-                                if menuchildcontext.role != 'menu item':
-                                    oebs_mouseops.MouseOperation('hold',x_coormenu,y_coormenu)
-                                else:
-                                    oebs_mouseops.MouseOperation('hold',menuchildcontext.x + 10,y_coormenu)
+                                oebs_mouseops.MouseOperation('hold', int(menuchildcontext.x) + 10, int(menuchildcontext.y + (0.5 * menuchildcontext.height)))
                                 time.sleep(2)
                                 flag1 = True
                                 counter += 1
                                 if counter < len(oebs_key_objects.keyword_input):
                                     search_in_menu(menuchildobj)
                                 else:
-                                    if menuchildcontext.role != 'menu item':
-                                        oebs_mouseops.MouseOperation('click',x_coormenu,y_coormenu)
-                                    else:
-                                        oebs_mouseops.MouseOperation('click',menuchildcontext.x + 10,y_coormenu)
+                                    oebs_mouseops.MouseOperation('click', int(menuchildcontext.x) + 10, int(menuchildcontext.y + (0.5 * menuchildcontext.height)))
                                     flag2 = True
                                     break
                             if flag2:
