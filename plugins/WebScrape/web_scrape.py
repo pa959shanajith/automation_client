@@ -147,6 +147,11 @@ class ScrapeWindow(wx.Frame):
                         self.cropbutton.Bind(wx.EVT_TOGGLEBUTTON, self.cropandadd)
                         if(self.action == 'replace'): self.cropbutton.Disable()
 
+                    # Name : A sreenivasulu Date: 02/08/2022
+                    # setting the URL from allowed_urls when istrail is true
+                    if isTrial:
+                        self.navigateURL.SetValue(allowed_urls[0])
+
                 elif(self.action == 'compare'):
                     try:
                         browserops.driver.get(data['scrapedurl'])
@@ -154,10 +159,6 @@ class ScrapeWindow(wx.Frame):
                         log.error("scrapedurl is Empty")
                     self.comparebutton = wx.ToggleButton(self.panel, label="Start Compare",pos=(110,80 ), size=(260, 30))
                     self.comparebutton.Bind(wx.EVT_TOGGLEBUTTON, self.compare)
-                # Name : A sreenivasulu Date: 02/08/2022
-                # setting the URL from allowed_urls when istrail is true
-                if isTrial:
-                        self.navigateURL.SetValue(allowed_urls[0])
                 self.Centre()
                 style = self.GetWindowStyle()
                 self.SetWindowStyle( style|wx.STAY_ON_TOP )
