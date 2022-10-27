@@ -139,8 +139,7 @@ class StepDescription:
             return "Add the numbers '"+ input+"' and save the value '"+output +"' in '"+ tsp.outputval+"'"
         def evaluate():
             return "Evaluate Mathematical expression '"+ tsp.inputval[0]+"' and save the result '"+ output +"' in '"+ tsp.outputval+"'"
-        def numberFormatter():
-            return "numberFormatter '"+ tsp.inputval[0]+"' and save the result '"+ output +"' in '"+ tsp.outputval+"'"
+        
 
         #Compare keywords
         def verifyobjects():
@@ -167,6 +166,8 @@ class StepDescription:
             return "Perform String operation MID on string '" + input+ "' and save the value '" + output + "' in '"+ tsp.outputval + "'"
         def concatenate():
             return "Concatenate string '"+ input + "' and save the value '" + output + "' in '"+ tsp.outputval + "'"
+        def numberFormatter():
+            return "Format value'"+ input + "' and save the value '" + output + "' in '"+ tsp.outputval + "'"
         def find():
             return "Verify input string '"+ input + "' contains '"+ inputval[1] + "'"
         def replace():
