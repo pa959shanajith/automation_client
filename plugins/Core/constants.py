@@ -553,3 +553,8 @@ TEMP_PATH = AVO_ASSURE_HOME + OS_SEP + "output"
 PREDICTION_IMG_DIR = "Disabled"
 
 FILEPATH_OUTPUT_FIELD_KEYWORDS=["exportData","cellByCellCompare","getXmlBlockData","selectiveXmlFileCompare","compXmlFileWithXmlBlock","compareInputs","beautify","compareFiles","comparePDFs","findImageInPDF","selectiveCellCompare"]
+
+VERIFY_KEYWORDS = ['verifybuttonname','verifylinktext','verifypopuptext','verifycellvalue','verifycelltooltip','verifyelementtext',
+'verifytooltiptext','verifytext','verifytextboxlength','verifyselectedvalues','verifyselectedvalue','verifycount','verifyallvalues',
+'verifyvaluesexists','verifyvisible','verifyexists','verifydoesnotexists','verifyenabled','verifydisabled','verifyhidden','verifyreadonly',
+'verifywebimages','verifyattribute','verifycurrenturl','verifytextexists','verifypagetitle']
