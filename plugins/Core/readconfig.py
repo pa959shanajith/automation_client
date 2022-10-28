@@ -87,6 +87,7 @@ class readConfig():
                 configvalues['sample_application_urls']=params['sample_application_urls']
                 configvalues['isTrial']=params['isTrial']
                 configvalues['element_load_timeout'] = params['element_load_timeout']
+                configvalues['verify_wait_time'] = params['verify_wait_time']
 
             except Exception as e:
                 configvalues['errorflag']=e

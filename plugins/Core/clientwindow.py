@@ -1278,6 +1278,7 @@ class Config_window(wx.Frame):
         data['sample_application_urls']=readconfig.configvalues['sample_application_urls']
         data['isTrial']=readconfig.configvalues['isTrial']
         data['element_load_timeout']=readconfig.configvalues['element_load_timeout']
+        data['verify_wait_time']=readconfig.configvalues['verify_wait_time']
         config_data=data
         if (data['server_ip']!='' and data['server_port']!='' and data['server_cert']!='' and
             data['chrome_path']!='' and data['queryTimeOut'] not in ['','sec'] and data['logFile_Path']!='' and
