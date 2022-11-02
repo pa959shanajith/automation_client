@@ -342,7 +342,7 @@ class Controller():
                 self.conthread.pause_cond.wait()
 
 
-    def methodinvocation(self,index,execution_env,datatables=[],*args):
+    def methodinvocation(self,index,execution_env,datatables=[],*args, cicd_mode):
         global pause_flag
         result=(TEST_RESULT_FAIL,TEST_RESULT_FALSE,OUTPUT_CONSTANT,None)
 		#COmapring breakpoint with the step number of tsp instead of index - (Sushma)
@@ -396,7 +396,7 @@ class Controller():
                         start_time_string=start_time.strftime(TIME_FORMAT)
                         logger.print_on_console('Step Execution start time is : '+start_time_string)
                         log.info('Step Execution start time is : '+start_time_string)
-                        index,result = self.keywordinvocation(index,inpval,self.reporting_obj,execution_env,*args)
+                        index,result = self.keywordinvocation(index,inpval,self.reporting_obj,execution_env,*args, cicd_mode = cicd_mode)
                     else:
                         keyword_flag=False
                         start_time = datetime.now()
@@ -652,7 +652,7 @@ class Controller():
         if len(output)>1:
             self.dynamic_var_handler_obj.store_dynamic_value(output[1],result[1],tsp.name)
 
-    def keywordinvocation(self,index,inpval,*args):
+    def keywordinvocation(self,index,inpval,*args, cicd_mode):
         global socket_object, iris_constant_step, status_percentage
         self.constant_var_exists=False
         configvalues = self.configvalues
@@ -815,8 +815,15 @@ class Controller():
             kwargs = {}
             if(self.keyword_status=='Pass'): kwargs["setcolor"]="GREEN"
             elif(self.keyword_status=='Fail') : kwargs["setcolor"]="RED"
-            logger.print_on_console(keyword+' executed and the status is '+self.keyword_status+'\n',**kwargs)
-            log.info(keyword+' executed and the status is '+self.keyword_status+'\n')
+            keyword = str(teststepproperty.name)
+            if cicd_mode and keyword == 'displayVariableValue':
+                logger.print_on_console(keyword +' executed and the status is pass' + '\n',**kwargs)
+                log.info(keyword +' executed and the status is pass' + '\n')
+                logger.print_on_console(keyword +':  '+ teststepproperty.additionalinfo + '\n',**kwargs)
+                log.info(keyword +':  '+ teststepproperty.additionalinfo + '\n')
+            else:
+                logger.print_on_console(keyword+' executed and the status is '+self.keyword_status+'\n',**kwargs)
+                log.info(keyword+' executed and the status is '+self.keyword_status+'\n')
             #Checking for stop keyword
             # CR #22650 stop keyword enhancement
             # 1. when input is 'testcase' stop the current testcase execution and jump to next teststep of next testcase.
@@ -851,7 +858,7 @@ class Controller():
         else:
             return index,TERMINATE
 
-    def executor(self,tsplist,action,last_tc_num,debugfrom_step,mythread,execution_env,*args,datatables=[], accessibility_testing = False):
+    def executor(self,tsplist,action,last_tc_num,debugfrom_step,mythread,execution_env,*args, cicd_mode, datatables=[], accessibility_testing = False):
         global status_percentage, screen_testcase_map
         status_percentage = {TEST_RESULT_PASS:0,TEST_RESULT_FAIL:0,TERMINATE:0,"total":0}
         i=0
@@ -888,7 +895,7 @@ class Controller():
                     index = i
                     # if(action != DEBUG):    
                     #     log.root.handlers[hn].starttsp(tsplist[index],execution_env['scenario_id'],execution_env['browser'])
-                    i = self.methodinvocation(i,execution_env,datatables)
+                    i = self.methodinvocation(i,execution_env,datatables,cicd_mode = cicd_mode)
                     # if(action != DEBUG):
                     #     log.root.handlers[hn].stoptsp(tsplist[index],execution_env['scenario_id'],execution_env['browser'])
                     #Check wether accessibility testing has to be executed
@@ -1361,7 +1368,7 @@ class Controller():
                                 record_flag = str(configvalues['screen_rec']).lower()
                                 #start screen recording
                                 if (record_flag=='yes') and self.execution_mode == SERIAL and json_data['apptype'] == 'Web': video_path = recorder_obj.record_execution(json_data['suitedetails'][0])
-                                status,status_percentage,accessibility_reports = con.executor(tsplist,EXECUTE,last_tc_num,1,con.conthread,execution_env,video_path,datatables=datatables,accessibility_testing = True)
+                                status,status_percentage,accessibility_reports = con.executor(tsplist,EXECUTE,last_tc_num,1,con.conthread,execution_env,video_path, cicd_mode = cicd_mode, datatables=datatables, accessibility_testing = True)
                                 #end video
                                 if (record_flag=='yes') and self.execution_mode == SERIAL and json_data['apptype'] == 'Web': recorder_obj.rec_status = False
                                 print('=======================================================================================================')
