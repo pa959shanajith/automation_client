@@ -15,6 +15,7 @@ root=None
 browsercheckFlag=False
 updatecheckFlag=False
 cicd_isheadless = 'No'
+iscicd = False
 
 class CiCdCore():
     def __init__(self, appName, args):
@@ -26,7 +27,7 @@ class CiCdCore():
         self.socketthread = None
         self.icesession = None
         self.server_url = None
-        global root, browsercheckFlag, updatecheckFlag, cicd_isheadless
+        global root, browsercheckFlag, updatecheckFlag, cicd_isheadless, iscicd
         root = self
         core.root = self
         updatecheckFlag = configvalues['update_check'].lower() == 'no'
@@ -62,6 +63,7 @@ class CiCdCore():
             logfilename_error_flag = True
             log.error(e)
         exec_req = self.fetchExecutionReq()
+        iscicd = True
         md_name = exec_req['suitedetails'][0]['testsuitename']
         log.info('%s Module Execution Started', md_name)
         log.info('===============================================================================')
