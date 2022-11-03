@@ -37,6 +37,7 @@ from logging.handlers import TimedRotatingFileHandler
 import shutil
 import requests
 local_cont = threading.local()
+import cicd_core
 #index for iterating the teststepproperty for executor
 ##i = 0
 terminate_flag=False
@@ -815,8 +816,16 @@ class Controller():
             kwargs = {}
             if(self.keyword_status=='Pass'): kwargs["setcolor"]="GREEN"
             elif(self.keyword_status=='Fail') : kwargs["setcolor"]="RED"
-            logger.print_on_console(keyword+' executed and the status is '+self.keyword_status+'\n',**kwargs)
-            log.info(keyword+' executed and the status is '+self.keyword_status+'\n')
+            keyword = str(teststepproperty.name)
+            cicd_mode = cicd_core.iscicd
+            if cicd_mode and keyword == 'displayVariableValue':
+                logger.print_on_console(keyword +':  '+ teststepproperty.additionalinfo, **kwargs)
+                logger.print_on_console(keyword +' executed and the status is Pass' + '\n', **kwargs)
+                log.info(keyword +':  '+ teststepproperty.additionalinfo)
+                log.info(keyword +' executed and the status is pass'+'\n')
+            else:
+                logger.print_on_console(keyword+' executed and the status is '+self.keyword_status+'\n',**kwargs)
+                log.info(keyword+' executed and the status is '+self.keyword_status+'\n')
             #Checking for stop keyword
             # CR #22650 stop keyword enhancement
             # 1. when input is 'testcase' stop the current testcase execution and jump to next teststep of next testcase.
