@@ -1159,8 +1159,10 @@ class FileOperations:
             if (not (folder_path is None or folder_path == '' or file_path is None or file_path == '') and os.path.exists(
                 folder_path)):
                 if url is not None:
-                    log.debug('saving the file')        
-                    urllib.request.urlretrieve(url, folder_path + "\\" + file_path)
+                    log.debug('saving the file')
+                    path=str(folder_path + "\\" + file_path)  
+                   
+                    urllib.request.urlretrieve(url,path)
                 else:
                     log.debug('saving the file')
                     #Wait for the Save As dialog to load. Might need to increase the wait time on slower machinesy:
@@ -1176,8 +1178,8 @@ class FileOperations:
                     #Path of the file you want to Save
                     FILE_NAME = folder_path+'\\'+ file_path
                     # Type the file path and name is Save AS dialog
-                    app.SaveAs.edit1.SetText(str(FILE_NAME))
-                    app.SaveAs.Save.Click() 
+                    app.SaveAs.edit.SetText(str(FILE_NAME))
+                    app.SaveAs.Save.click_input()  
                 status = TEST_RESULT_PASS
                 methodoutput = TEST_RESULT_TRUE
                 status_message="File has been saved"
