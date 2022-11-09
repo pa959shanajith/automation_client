@@ -299,7 +299,7 @@ class DynamicVariables:
                         continue
                     if exp[i][0]=='{' and exp[i][-1]=='}':
                         inp_err_list[i]=exp[i]=self.replace_dynamic_variable(exp[i],keyword,con_obj)
-                        if exp[i] is None:
+                        if exp[i] is None or exp[i]=='':
                             exp[i]='null'
                     if exp[i][0]=='_' and exp[i][-1]=='_':
                         inp_err_list[i]=exp[i]=self.const_var_obj.get_constant_value(exp[i])
