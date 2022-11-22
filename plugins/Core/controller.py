@@ -1178,7 +1178,7 @@ class Controller():
                 base_execute_data["event"] = "return_status_executeTestSuite"
                 base_execute_data["configkey"] = opts.configkey
                 base_execute_data["executionListId"] = opts.executionListId
-                base_execute_data["agentname"] = opts.agentname
+                base_execute_data["agentname"] = opts.agentname + "_" + opts.instanceid
                 base_execute_data['execReq'] = json_data
                 server_url = 'https://' + opts.serverurl + ':' + opts.serverport + '/setExecStatus'
                 data_dict = dict({"status" : "started",
@@ -1424,7 +1424,7 @@ class Controller():
                                 execute_result_data["event"] = "result_executeTestSuite"
                                 execute_result_data["configkey"] = opts.configkey
                                 execute_result_data["executionListId"] = opts.executionListId
-                                execute_result_data["agentname"] = opts.agentname
+                                execute_result_data["agentname"] = opts.agentname + "_" + opts.instanceid
                                 execute_result_data['execReq'] = json_data
                                 server_url = 'https://' + opts.serverurl + ':' + opts.serverport + '/setExecStatus'
                                 data_dict = dict({"exce_data" : execute_result_data})
@@ -1459,7 +1459,7 @@ class Controller():
                                 execute_result_data["event"] = "result_executeTestSuite"
                                 execute_result_data["configkey"] = opts.configkey
                                 execute_result_data["executionListId"] = opts.executionListId
-                                execute_result_data["agentname"] = opts.agentname
+                                execute_result_data["agentname"] = opts.agentname + "_" + opts.instanceid
                                 execute_result_data['execReq'] = json_data
                                 server_url = 'https://' + opts.serverurl + ':' + opts.serverport + '/setExecStatus'
                                 data_dict = dict({"exce_data" : execute_result_data})
@@ -1650,7 +1650,7 @@ class Controller():
                             execute_result_data["event"] = "result_executeTestSuite"
                             execute_result_data["configkey"] = opts.configkey
                             execute_result_data["executionListId"] = opts.executionListId
-                            execute_result_data["agentname"] = opts.agentname
+                            execute_result_data["agentname"] = opts.agentname + "_" + opts.instanceid
                             execute_result_data['execReq'] = json_data
                             server_url = 'https://' + opts.serverurl + ':' + opts.serverport + '/setExecStatus'
                             data_dict = dict({"exce_data" : execute_result_data})
@@ -1687,7 +1687,7 @@ class Controller():
                         execute_result_data["event"] = "result_executeTestSuite"
                         execute_result_data["configkey"] = opts.configkey
                         execute_result_data["executionListId"] = opts.executionListId
-                        execute_result_data["agentname"] = opts.agentname
+                        execute_result_data["agentname"] = opts.agentname + "_" + opts.instanceid
                         execute_result_data['execReq'] = json_data
                         server_url = 'https://' + opts.serverurl + ':' + opts.serverport + '/setExecStatus'
                         data_dict = dict({"exce_data" : execute_result_data})
@@ -1720,7 +1720,7 @@ class Controller():
                 base_execute_data["event"] = "return_status_executeTestSuite"
                 base_execute_data["configkey"] = opts.configkey
                 base_execute_data["executionListId"] = opts.executionListId
-                base_execute_data["agentname"] = opts.agentname
+                base_execute_data["agentname"] = opts.agentname + "_" + opts.instanceid
                 base_execute_data['execReq'] = json_data
                 server_url = 'https://' + opts.serverurl + ':' + opts.serverport + '/setExecStatus'
                 data_dict = dict({"status" : "finished", "executionStatus": exc_pass,
