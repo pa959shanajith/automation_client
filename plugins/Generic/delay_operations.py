@@ -112,7 +112,7 @@ class Delay_keywords:
                         if not isinstance(y,str):
                             if str(type(y))=="<class 'selenium.webdriver.remote.webelement.WebElement'>":
                                 y = "WebElement"
-                            y=str(y)
+                            y=str(y)  
                         display_input+=x+' = '+y+'\n'
                     if not (flag_invalid_syntax):
                         if cicd_core.iscicd:
