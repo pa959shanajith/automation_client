@@ -62,6 +62,12 @@ class CiCdCore():
         except Exception as e:
             logfilename_error_flag = True
             log.error(e)
+        if args.screenshotpath:
+            try:
+                import constants
+                constants.SCREENSHOT_PATH=args.screenshotpath+OS_SEP
+            except Exception as e:
+                log.error(e)
         exec_req = self.fetchExecutionReq()
         iscicd = True
         md_name = exec_req['suitedetails'][0]['testsuitename']
