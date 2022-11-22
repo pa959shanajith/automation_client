@@ -757,10 +757,14 @@ class WebScrape_Utils:
                         f.style.setAttribute('cssText', 'background: #fff300 !important;opacity:1!important; border: 2px solid #cc3300 !important;outline: 2px solid #fff300 !important;');
                     } else {
                         f.setAttribute('class', className + ' AvoAssure_Highlight');
-                        f.setAttribute('style', 'background: #fff300 !important;opacity:1!important; border: 2px solid #cc3300 !important;outline: 2px solid #fff300 !important;');
+                        var styleElement = 'background: #fff300 !important;opacity:1!important; border: 2px solid #cc3300 !important;outline: 2px solid #fff300 !important;'
+                        if (f.hasAttribute('style'))
+                            styleElement += f.getAttribute('style');    //Taking care of existing css on element
+                        f.setAttribute('style', styleElement);          
                     }
                     //Using CSS to make pointer events auto after highlighting.
-                    document.getElementsByTagName('html')[0].style.pointerEvents='auto';
+                    if (browser!='2')   //Excluding the changes for firefox
+                        document.getElementsByTagName('html')[0].style.pointerEvents='auto';
                 }
                 return false;
             }
@@ -773,7 +777,8 @@ class WebScrape_Utils:
                 return true;
             }
             //Using CSS to make pointer events none as event.preventDefault can't cancel sometimes.
-            document.getElementsByTagName('html')[0].style.pointerEvents='none';
+            if (browser!='2' && currentElement.tagName!='HTML')   //Excluding the changes for firefox and for scrollbar
+                document.getElementsByTagName('html')[0].style.pointerEvents='none';
             if (event.preventDefault) {
                 event.preventDefault();
                 event.stopPropagation();
