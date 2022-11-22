@@ -65,7 +65,7 @@ class CiCdCore():
         if args.screenshotpath:
             try:
                 import constants
-                constants.SCREENSHOT_PATH=args.screenshotpath+OS_SEP
+                constants.SCREENSHOT_PATH = args.screenshotpath + OS_SEP
             except Exception as e:
                 log.error(e)
         exec_req = self.fetchExecutionReq()
