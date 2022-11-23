@@ -34,6 +34,7 @@ reg_group.add_argument('--serverurl', nargs='?', type=str, help='serverurl is ma
 reg_group.add_argument('--serverport', nargs='?', type=str, help='serverport is mandatory')
 reg_group.add_argument('--executionListId', nargs='?', type=str, help='executionListId is mandatory')
 reg_group.add_argument('--instanceid', nargs='?', type=str, help="Agent will provide auto increment instanceid")
+reg_group.add_argument('--screenshotpath', nargs='?', type=str, help="Agent will provide shraed screenshotpath from webserver config file or agent configfile")
 parser.add_argument('--connect', action='store_true', help='Establish a connection between Avo Assure Web Application and Avo Assure Client.')
 args = parser.parse_args()
 if args.AVO_ASSURE_HOME and not os.path.exists(args.AVO_ASSURE_HOME+os.sep+'/plugins'):

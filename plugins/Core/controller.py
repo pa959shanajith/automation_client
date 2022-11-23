@@ -1178,12 +1178,12 @@ class Controller():
                 base_execute_data["event"] = "return_status_executeTestSuite"
                 base_execute_data["configkey"] = opts.configkey
                 base_execute_data["executionListId"] = opts.executionListId
-                base_execute_data["agentname"] = opts.agentname + "_" + opts.instanceid
                 base_execute_data['execReq'] = json_data
                 server_url = 'https://' + opts.serverurl + ':' + opts.serverport + '/setExecStatus'
                 data_dict = dict({"status" : "started",
                     'startTime': datetime.now().strftime(TIME_FORMAT),"exce_data" : base_execute_data})
-                res = requests.post(server_url,json=data_dict, verify=False)
+                #res = requests.post(server_url,json=data_dict, verify=False)
+                res = cicd_core.retry_cicd_apis(server_url, data_dict)
                 # #send response through API
             else:
                 socketIO.emit("return_status_executeTestSuite", dict({"status": "started",
@@ -1424,11 +1424,11 @@ class Controller():
                                 execute_result_data["event"] = "result_executeTestSuite"
                                 execute_result_data["configkey"] = opts.configkey
                                 execute_result_data["executionListId"] = opts.executionListId
-                                execute_result_data["agentname"] = opts.agentname + "_" + opts.instanceid
                                 execute_result_data['execReq'] = json_data
                                 server_url = 'https://' + opts.serverurl + ':' + opts.serverport + '/setExecStatus'
                                 data_dict = dict({"exce_data" : execute_result_data})
-                                res = requests.post(server_url,json=data_dict, verify=False)
+                                # res = requests.post(server_url,json=data_dict, verify=False)
+                                res = cicd_core.retry_cicd_apis(server_url, data_dict)
                             else:
                                 socketIO.emit('result_executeTestSuite', execute_result_data)
                             obj.clearList(con)
@@ -1459,11 +1459,11 @@ class Controller():
                                 execute_result_data["event"] = "result_executeTestSuite"
                                 execute_result_data["configkey"] = opts.configkey
                                 execute_result_data["executionListId"] = opts.executionListId
-                                execute_result_data["agentname"] = opts.agentname + "_" + opts.instanceid
                                 execute_result_data['execReq'] = json_data
                                 server_url = 'https://' + opts.serverurl + ':' + opts.serverport + '/setExecStatus'
                                 data_dict = dict({"exce_data" : execute_result_data})
-                                res = requests.post(server_url,json=data_dict, verify=False)                            
+                                # res = requests.post(server_url,json=data_dict, verify=False)  
+                                res = cicd_core.retry_cicd_apis(server_url, data_dict)                          
                             else:
                                 socketIO.emit('result_executeTestSuite', execute_result_data)
                             obj.clearList(con)
@@ -1650,11 +1650,11 @@ class Controller():
                             execute_result_data["event"] = "result_executeTestSuite"
                             execute_result_data["configkey"] = opts.configkey
                             execute_result_data["executionListId"] = opts.executionListId
-                            execute_result_data["agentname"] = opts.agentname + "_" + opts.instanceid
                             execute_result_data['execReq'] = json_data
                             server_url = 'https://' + opts.serverurl + ':' + opts.serverport + '/setExecStatus'
                             data_dict = dict({"exce_data" : execute_result_data})
-                            res = requests.post(server_url,json=data_dict, verify=False)
+                            # res = requests.post(server_url,json=data_dict, verify=False)
+                            res = cicd_core.retry_cicd_apis(server_url, data_dict)
                         else:
                             socketIO.emit('result_executeTestSuite', execute_result_data)
                         obj.clearList(con)
@@ -1687,11 +1687,11 @@ class Controller():
                         execute_result_data["event"] = "result_executeTestSuite"
                         execute_result_data["configkey"] = opts.configkey
                         execute_result_data["executionListId"] = opts.executionListId
-                        execute_result_data["agentname"] = opts.agentname + "_" + opts.instanceid
                         execute_result_data['execReq'] = json_data
                         server_url = 'https://' + opts.serverurl + ':' + opts.serverport + '/setExecStatus'
                         data_dict = dict({"exce_data" : execute_result_data})
-                        res = requests.post(server_url,json=data_dict, verify=False)
+                        # res = requests.post(server_url,json=data_dict, verify=False)
+                        res = cicd_core.retry_cicd_apis(server_url, data_dict)
                     else:
                         socketIO.emit('result_executeTestSuite', execute_result_data)
                     obj.clearList(con)
@@ -1720,12 +1720,12 @@ class Controller():
                 base_execute_data["event"] = "return_status_executeTestSuite"
                 base_execute_data["configkey"] = opts.configkey
                 base_execute_data["executionListId"] = opts.executionListId
-                base_execute_data["agentname"] = opts.agentname + "_" + opts.instanceid
                 base_execute_data['execReq'] = json_data
                 server_url = 'https://' + opts.serverurl + ':' + opts.serverport + '/setExecStatus'
                 data_dict = dict({"status" : "finished", "executionStatus": exc_pass,
                     'endTime': datetime.now().strftime(TIME_FORMAT),"exce_data" : base_execute_data})
-                res = requests.post(server_url,json=data_dict, verify=False)
+                # res = requests.post(server_url,json=data_dict, verify=False)
+                res = cicd_core.retry_cicd_apis(server_url, data_dict)
             else:
                 socketIO.emit("return_status_executeTestSuite", dict({"status": "finished", "executionStatus": exc_pass,
                     "endTime": datetime.now().strftime(TIME_FORMAT)}, **base_execute_data))
