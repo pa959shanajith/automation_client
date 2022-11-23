@@ -1,6 +1,7 @@
 import logging
 import os
 import json
+import time
 from urllib import response
 import sys
 import logger
@@ -95,10 +96,11 @@ class CiCdCore():
         
     def fetchExecutionReq(self):
         try:
-            dataToServer = {"configkey":self.opts.configkey, "executionListId":self.opts.executionListId}
+            data_dict = {"configkey":self.opts.configkey, "executionListId":self.opts.executionListId, "agentname":self.opts.agentname + "_" +self. opts.instanceid}
             server_url = 'https://' + self.opts.serverurl + ':' + self.opts.serverport + '/getExecScenario'
             logger.print_on_console("Fetching Execution Request Using configkey : "+ self.opts.configkey)
-            res = requests.post(server_url, json=dataToServer, verify=False)
+            # res = requests.post(server_url, json=dataToServer, verify=False)
+            res = retry_cicd_apis(server_url,data_dict)
             response = res.json()
             if res.status_code == 200  and response["status"] != "fail":
                 # import core
@@ -115,3 +117,19 @@ class CiCdCore():
             log.error(err_msg)
             logger.print_on_console(err_msg)
             log.error(ex, exc_info=True)
+
+def retry_cicd_apis(server_url,data_dict):
+    retry_flag = 1
+    while retry_flag :
+        try:
+            res = requests.post(server_url, json = data_dict, verify = False)
+            if res.status_code != 200:
+                log.error("Unable to connect to server retrying after 10 seconds, /setExecStatus.Status code is: %s",
+                        res.status_code)
+                time.sleep(10)
+            else:
+                retry_flag = 0
+        except Exception as e:
+            log.error(e)
+            time.sleep(30)
+    return res
