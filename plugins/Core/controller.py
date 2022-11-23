@@ -1721,6 +1721,7 @@ class Controller():
                 base_execute_data["configkey"] = opts.configkey
                 base_execute_data["executionListId"] = opts.executionListId
                 base_execute_data['execReq'] = json_data
+                server_url = 'https://' + opts.serverurl + ':' + opts.serverport + '/setExecStatus'
                 data_dict = dict({"status" : "finished", "executionStatus": exc_pass,
                     'endTime': datetime.now().strftime(TIME_FORMAT),"exce_data" : base_execute_data})
                 # res = requests.post(server_url,json=data_dict, verify=False)
