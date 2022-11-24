@@ -96,7 +96,8 @@ class CiCdCore():
         
     def fetchExecutionReq(self):
         try:
-            data_dict = {"configkey":self.opts.configkey, "executionListId":self.opts.executionListId, "agentname":self.opts.agentname + "_" +self. opts.instanceid}
+            data_dict = {"configkey" : self.opts.configkey, "executionListId" : self.opts.executionListId, 
+                        "agentname" : self.opts.agentname, "iceInstanceId" : self.opts.instanceid}
             server_url = 'https://' + self.opts.serverurl + ':' + self.opts.serverport + '/getExecScenario'
             logger.print_on_console("Fetching Execution Request Using configkey : "+ self.opts.configkey)
             # res = requests.post(server_url, json=dataToServer, verify=False)
