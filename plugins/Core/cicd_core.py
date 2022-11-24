@@ -96,7 +96,7 @@ class CiCdCore():
         
     def fetchExecutionReq(self):
         try:
-            data_dict = {"configkey" : self.opts.configkey, "executionListId" : self.opts.executionListId, 
+            data_dict = {"configkey" : self.opts.configkey, "executionListId" : self.opts.executionListId,
                         "agentname" : self.opts.agentname, "iceInstanceId" : self.opts.instanceid}
             server_url = 'https://' + self.opts.serverurl + ':' + self.opts.serverport + '/getExecScenario'
             logger.print_on_console("Fetching Execution Request Using configkey : "+ self.opts.configkey)
@@ -123,7 +123,7 @@ def retry_cicd_apis(server_url,data_dict):
     retry_flag = 1
     while retry_flag :
         try:
-            res = requests.post(server_url, json = data_dict, verify = False)
+            res = requests.post(server_url, json = data_dict, verify = False, timeout=120)
             if res.status_code != 200:
                 log.error("Unable to connect to server retrying after 10 seconds, /setExecStatus.Status code is: %s",
                         res.status_code)
