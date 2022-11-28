@@ -68,6 +68,11 @@ class ClientWindow(wx.Frame):
         self.scrapewindow = None
         self.pausewindow = None
         self.pluginPDF = None
+        self.aboutWindow = None
+        self.ProxyConfig_window = None
+        self.Config_window = None
+        self.Check_Update_window = None
+        self.rollback_window = None
         self.action=''
         self.debug_mode=False
         self.choice='Normal'
@@ -119,10 +124,10 @@ class ClientWindow(wx.Frame):
         self.helpMenu.Append(self.aboutItem)
         self.updateItem = wx.MenuItem(self.helpMenu, 161, text="Check for Updates", kind=wx.ITEM_NORMAL)
         self.helpMenu.Append(self.updateItem)
-        self.updateItem.Enable(False)
+        self.updateItem.Enable(True)
         self.rollbackItem = wx.MenuItem(self.helpMenu, 162, text="Rollback", kind=wx.ITEM_NORMAL)
         self.helpMenu.Append(self.rollbackItem)
-        self.rollbackItem.Enable(False)
+        self.rollbackItem.Enable(True)
         self.menubar.Append(self.helpMenu, '&Help')
 
         self.Bind(wx.EVT_MENU, self.menuhandler)
@@ -227,7 +232,10 @@ class ClientWindow(wx.Frame):
                 msg = '--Edit Config selected--'
                 logger.print_on_console(msg)
                 log.info(msg)
-                Config_window(parent = None,id = -1, title="Avo Assure Configuration")
+                if(self.Config_window):
+                    self.Config_window.Raise()
+                else:
+                    self.Config_window = Config_window(parent = None,id = -1, title="Avo Assure Configuration")
             except Exception as e:
                 msg = "Error while updating configuration"
                 logger.print_on_console(msg)
@@ -238,7 +246,10 @@ class ClientWindow(wx.Frame):
                 msg = '--Edit Proxy Config selected--'
                 logger.print_on_console(msg)
                 log.info(msg)
-                ProxyConfig_window(parent = None,id = -1, title="Avo Assure Proxy Configuration")
+                if (self.ProxyConfig_window):
+                    self.ProxyConfig_window.Raise()
+                else:
+                    self.ProxyConfig_window = ProxyConfig_window(parent = None,id = -1, title="Avo Assure Proxy Configuration")
             except Exception as e:
                 msg = "Error while updating proxy configuration"
                 logger.print_on_console(msg)
@@ -247,6 +258,7 @@ class ClientWindow(wx.Frame):
         elif id==151:      # When user selects Tools > Generate PDF Report
             try:
                 if (self.pluginPDF!= None) and (bool(self.pluginPDF) != False):
+                    self.pluginPDF.Raise()
                     msg = 'Report PDF generation plugin is already active'
                 else:
                     if pdfgentool is None:
@@ -266,6 +278,7 @@ class ClientWindow(wx.Frame):
             try:
                 if (self.pluginPDF!= None) and (bool(self.pluginPDF) != False):
                     msg = 'Report PDF generation plugin is already active'
+                    self.pluginPDF.Raise()
                 else:
                     if pdfgentool is None:
                         #con = controller.Controller()
@@ -284,7 +297,10 @@ class ClientWindow(wx.Frame):
         elif id == 160:      # When user selects Edit > About
             try:
                 log.info('--About selected--')
-                About_window(parent = None,id = -1, title="About")
+                if (self.aboutWindow):
+                    self.aboutWindow.Raise()
+                else:
+                    self.aboutWindow = About_window(parent = None,id = -1, title="About")
             except Exception as e:
                 msg = "Error while selecting about file"
                 logger.print_on_console(msg)
@@ -293,7 +309,10 @@ class ClientWindow(wx.Frame):
         elif id==161:      # When user selects Edit > Check for updates
             try:
                 log.info('--Check for updates selected--')
-                Check_Update_window(parent = None,id = -1, title="Check for Updates")
+                if (self.Check_Update_window):
+                    self.Check_Update_window.Raise()
+                else:
+                    self.Check_Update_window = Check_Update_window(parent = None,id = -1, title="Check for Updates")
             except Exception as e:
                 msg = "Error while updating file"
                 logger.print_on_console(msg)
@@ -303,7 +322,10 @@ class ClientWindow(wx.Frame):
         elif id==162:      # When user selects Edit > Rollback
             try:
                 log.info('--Rollback selected--')
-                rollback_window(parent = None,id = -1, title="Rollback")
+                if (self.rollback_window):
+                    self.rollback_window.Raise()
+                else:
+                    self.rollback_window = rollback_window(parent = None,id = -1, title="Rollback")
             except Exception as e:
                 msg = "Error while rolling back file"
                 logger.print_on_console(msg)
@@ -1216,6 +1238,7 @@ class Config_window(wx.Frame):
         data['incognito_private_mode']=incognito_private_mode.strip()
         data['kill_stale']=kill_stale.strip()
         data['browser_screenshots']=browser_screenshots.strip()
+        data['file_server_ip']=readconfig.configvalues["file_server_ip"]
         config_data=data
         if (data['server_ip']!='' and data['server_port']!='' and data['server_cert']!='' and
             data['chrome_path']!='' and data['queryTimeOut'] not in ['','sec'] and data['logFile_Path']!='' and
@@ -1541,9 +1564,9 @@ class About_window(wx.Frame):
             }
             else:
                 upload_fields={
-                "Frame":[(300, 150),(550,220)],#(diff +85,+10 from windows)
+                "Frame":[(300, 150),(400,220)],#(diff +85,+10 from windows)
                 "disp_msg":[(12,38),(80,28),(116,38),(382,-1),(504,38),(30, -1)],
-                "Close":[(285,88),(100, 28)]
+                "Close":[(285,148),(100, 28)]
             }
             wx.Frame.__init__(self, parent, title=title,pos=upload_fields["Frame"][0], size=upload_fields["Frame"][1], style = wx.CAPTION|wx.CLIP_CHILDREN)
             self.SetBackgroundColour('#e6e7e8')
@@ -1553,8 +1576,12 @@ class About_window(wx.Frame):
             self.panel = wx.Panel(self)
             self.image = wx.StaticBitmap(self.panel, -1, wx.Bitmap(IMAGES_PATH + 'AVO_Assure.png', wx.BITMAP_TYPE_ANY), wx.Point(10, 10))
             self.msg1=wx.StaticText(self.panel, -1, str(msg1), wx.Point(170, 20), wx.Size(200, 50)).SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.BOLD))
-            self.msg2=wx.StaticText(self.panel, -1, str(msg2), wx.Point(170, 55), wx.Size(200, 50))
-            self.msg3=wx.StaticText(self.panel, -1, str(msg3), wx.Point(10, 90), wx.Size(350, 50))
+            if SYSTEM_OS=='Windows':
+                self.msg2=wx.StaticText(self.panel, -1, str(msg2), wx.Point(170, 55), wx.Size(200, 50))
+                self.msg3=wx.StaticText(self.panel, -1, str(msg3), wx.Point(10, 90), wx.Size(350, 50))
+            elif SYSTEM_OS=='Darwin':
+                self.msg2 = wx.StaticText(self.panel, -1, str(msg2), wx.Point(170, 55), wx.Size(300, 50))
+                self.msg3 = wx.StaticText(self.panel, -1, str(msg3), wx.Point(10, 90), wx.Size(400, 50))
             self.msg4=wx.StaticText(self.panel, -1, str(msg4), wx.Point(10, 120), wx.Size(200, 50))
             self.close_btn = wx.Button(self.panel, label="Close",pos=upload_fields["Close"][0], size=upload_fields["Close"][1])
             self.close_btn.Bind(wx.EVT_BUTTON, self.close)
@@ -1647,7 +1674,9 @@ class Check_Update_window(wx.Frame):
             self.close(event)
             logger.print_on_console("--Updating Files and Packages--")
             log.info("--Updating Files and Packages--")
-            update_obj.run_updater()
+            l_ver=check_update(False)
+            l_ver=l_ver[1]
+            update_obj.run_updater(l_ver)
         except Exception as e:
             log.error('Error occured in update_ice : ' + str(e))
             logger.print_on_console('Error occured in update_ice : ' + str(e))
@@ -1925,7 +1954,7 @@ def check_update(flag):
         request = None
         emsg = "Error in fetching update manifest from server"
         try:
-            request = requests.get(SERVER_LOC + "/manifest.json", **req_kw_args)
+            request = requests.get(SERVER_LOC + "/manifest.json", verify=False)
             if(request.status_code ==200):
                 data = json.loads(request.text) #will return json of the manifest
         except Exception as e:

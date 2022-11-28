@@ -127,6 +127,8 @@ class Dispatcher:
             'drop':local_Wd.element_object.drop,
             'dropfile':local_Wd.element_object.drop_file,
             'getaggridtooltiptext':local_Wd.element_object.get_ag_grid_tooltip_text,
+            'getchildelements':local_Wd.element_object.get_child_elements,
+            'getchildelementcount':local_Wd.element_object.get_child_element_count,
             'settext':local_Wd.textbox_object.set_text,
             'sendvalue':local_Wd.textbox_object.send_value,
             'gettext':local_Wd.textbox_object.get_text,
@@ -411,7 +413,6 @@ class Dispatcher:
             err_msg=ERROR_CODE_DICT[err_msg]
             logger.print_on_console(err_msg)
             local_Wd.log.error(err_msg)
-
         def send_webelement_to_keyword(driver,objectname,url):
             webelement=None
             getObjectFlag=False
@@ -419,11 +420,18 @@ class Dispatcher:
                 local_Wd.log.debug('In send_webelement_to_keyword method')
                 #check if the element is in iframe or frame
                 try:
-                    if url and local_Wd.custom_object.is_int(url):
+                    if objectname!='@Custom' and (objectname.split(';')[2].find('iframe')!=-1):
+                        local_Wd.log.debug('Encountered iframe/frame url')
+                        iframe_xpath = objectname.split(';')[2].split(',')[0]
+                        local_Wd.custom_object.switch_to_iframe(iframe_xpath,driver.current_window_handle)
+                        driver = browser_Keywords.local_bk.driver_obj
+                        ele_inside_iframe_xpath = objectname.split(';')[2].split(',')[1]
+                        webelement = driver.find_element_by_xpath(ele_inside_iframe_xpath)
+                    elif url and local_Wd.custom_object.is_int(url):
                         local_Wd.log.debug('Encountered iframe/frame url')
                         local_Wd.custom_object.switch_to_iframe(url,driver.current_window_handle)
                         driver = browser_Keywords.local_bk.driver_obj
-                    if objectname==CUSTOM:
+                    elif objectname==CUSTOM:
                         local_Wd.log.info('Encountered custom object')
                         local_Wd.log.info('Custom flag is ')
                         local_Wd.log.info(teststepproperty.custom_flag)
@@ -834,7 +842,6 @@ class Dispatcher:
         return webElement
 
     def getwebelement(self,driver,objectname,stepnum,custname):
-        ##objectname = str(objectname)
         global obj_flag,simple_debug_gwto
         obj_flag=False
         webElement = None
@@ -842,6 +849,8 @@ class Dispatcher:
             identifiers = objectname.split(';')
             local_Wd.log.debug('Identifiers are ')
             local_Wd.log.debug(identifiers)
+            global finalXpath
+            finalXpath = identifiers[0]
             if len(identifiers)>=3:
                 #find by absolute xpath
                 webElement=self.element_locator(driver,'xpath',identifiers[0],'1')
