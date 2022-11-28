@@ -1158,11 +1158,11 @@ class TestThread(threading.Thread):
                 result["event"] = "result_executeTestSuite"
                 result["configkey"] = opts.configkey
                 result["executionListId"] = opts.executionListId
-                result["agentname"] = opts.agentname + "_" + opts.instanceid
+                result["agentname"] = opts.agentname
                 server_url = 'https://' + opts.serverurl + ':' + opts.serverport + '/setExecStatus'
                 # res = requests.post(server_url,json=result, verify=False)
-                import cicd_core
-                res = cicd_core.retry_cicd_apis(server_url, result)
+                from retryapis_cicd import Retryrequests
+                res = Retryrequests.retry_cicd_apis(self, server_url, result)
                 controller.kill_process()
             else:
                 if self.action==DEBUG:
