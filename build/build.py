@@ -74,7 +74,8 @@ def build_c(full_path, ffile, exe_args=False):
             file_refer.write(msg)
             return -1
         if os.path.isfile(ffile):
-           subprocess.check_call("del "+full_path, shell = True)
+            if "__main__" not in full_path:
+                subprocess.check_call("del "+full_path, shell = True)
     except subprocess.CalledProcessError as e:
         errorcount = errorcount + 1
         print(e)
@@ -88,7 +89,7 @@ def build_exe(source, target, gui=False, console=False):
         flags = "-municode"
         if gui: flags += " -mwindows"
         elif console: flags += " -mconsole"
-        gcc_process = subprocess.Popen("gcc -I"+pythondir+"include -DMS_WIN64 "+source+" ../avo_ico.res -o "+target+" "+flags+" -L"+pythondir+"libs -lpython"+pymajor+pyminor, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell = True)
+        gcc_process = subprocess.Popen("gcc -I"+pythondir+"include -DMS_WIN64 "+source+" ./build/avo_ico.res -o "+target+" "+flags+" -L"+pythondir+"libs -lpython"+pymajor+pyminor, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell = True)
         out, err = gcc_process.communicate()
         exitcode = gcc_process.returncode
         if not exitcode == 0:
@@ -209,6 +210,19 @@ try:
                 fo.write("@echo off\ncd ../..\nstart assets\ObjectPredictionMT\ObjectPredictionMT.exe\nexit")
 except Exception as e:
     print("Failed to build ObjectPredictionMT")
+    print("Error: ", e)
+try:
+    main_fileloc = os.path.abspath(cwd + "/plugins/Core/__main__")
+    if os.path.exists(main_fileloc+".py"):
+        build_c(main_fileloc+".py",main_fileloc+".c",exe_args=True)
+        build_exe(main_fileloc+".c",main_fileloc+".exe",gui=True)
+        if os.path.exists(main_fileloc+".exe"):
+            exe_fileloc = os.path.abspath(cwd + "/plugins/Core/AvoAssureICE")
+            if os.path.exists(exe_fileloc+".exe"):
+                subprocess.check_call("del "+exe_fileloc+".exe", shell = True)
+            os.rename(main_fileloc+".exe", exe_fileloc+".exe")
+except Exception as e:
+    print("Failed to build main file")
     print("Error: ", e)
 build_recursive_dir_tree(cwd + sl +"plugins" + sl)
 file_refer.close()

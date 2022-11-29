@@ -431,7 +431,7 @@ class Dispatcher:
                         local_Wd.log.debug('Encountered iframe/frame url')
                         local_Wd.custom_object.switch_to_iframe(url,driver.current_window_handle)
                         driver = browser_Keywords.local_bk.driver_obj
-                    elif objectname==CUSTOM:
+                    if objectname==CUSTOM:
                         local_Wd.log.info('Encountered custom object')
                         local_Wd.log.info('Custom flag is ')
                         local_Wd.log.info(teststepproperty.custom_flag)
@@ -850,16 +850,20 @@ class Dispatcher:
             local_Wd.log.debug('Identifiers are ')
             local_Wd.log.debug(identifiers)
             global finalXpath
-            finalXpath = identifiers[0]
+            #Absolute xpath is used to locate web element first as it doesn't change like relative xpath.
             if len(identifiers)>=3:
                 #find by absolute xpath
                 webElement=self.element_locator(driver,'xpath',identifiers[0],'1')
+                if (webElement):
+                    finalXpath = identifiers[0]
                 if not(webElement):
                     #find by id
                     webElement=self.element_locator(driver,'id',identifiers[1],'2')
                     if not(webElement):
                         #find by relative xpath
                         webElement=self.element_locator(driver,'rxpath',identifiers[2],'3')
+                        if (webElement):
+                            finalXpath = identifiers[2]
                         if not(webElement):
                             #find by name
                             webElement=self.element_locator(driver,'name',identifiers[3],'4')

@@ -20,6 +20,7 @@ from os.path import normpath
 from constants import *
 import controller
 import readconfig
+# from __main__ import loadingobj
 import clientwindow
 import json
 import socket
@@ -30,6 +31,7 @@ import update_module
 import shutil
 from icetoken import ICEToken
 import benchmark
+import stat
 if SYSTEM_OS=='Windows':
     from win32com.client import Dispatch
 from urllib import request
@@ -138,7 +140,7 @@ class MainNamespace(BaseNamespace):
                             allow_connect = True
                             plugins_list = response['plugins']
                             if root.gui:
-                                cw.enable_disconnect()
+                                wx.CallAfter(cw.enable_disconnect)
                             controller.disconnect_flag=False
                         else:
                             if 'err_msg' in response: err_res = response['err_msg']
@@ -159,13 +161,13 @@ class MainNamespace(BaseNamespace):
                     root.token_obj.delete_token()
                     if root.gui:
                         logger.print_on_console("ICE is not registered with Avo Assure. Click to Register")
-                        cw.enable_register()
+                        wx.CallAfter(cw.enable_register)
                     else:
                         logger.print_on_console("ICE is not registered with Avo Assure. Try Again")
-                if root.gui: cw.connectbutton.Enable()
+                if root.gui: wx.CallAfter(cw.connectbutton.Enable)
 
                 if allow_connect:
-                    dnd_mode = cw.schedule.GetValue() if root.gui else False
+                    dnd_mode = wx.CallAfter(cw.schedule.GetValue) if root.gui else False
                     msg = ("Do Not Disturb" if dnd_mode else "Normal") + " Mode: Connection to the Avo Assure Server established"
                     logger.print_on_console(msg)
                     log.info(msg)
@@ -173,14 +175,16 @@ class MainNamespace(BaseNamespace):
                     logger.print_on_console(msg)
                     log.info(msg)
                     if root.gui:
-                        cw.SetTitle(root.name + " (" + root.ice_token["icename"] + ")")
-                        cw.schedule.Enable()
-                        cw.cancelbutton.Enable()
-                        cw.terminatebutton.Enable()
-                        cw.clearbutton.Enable()
-                        cw.rollbackItem.Enable(True)
-                        cw.updateItem.Enable(True)
-                        cw.rbox.Enable()
+                        # cw.SetTitle(root.name + " (" + root.ice_token["icename"] + ")")
+                        wx.CallAfter(cw.SetTitle,root.name + " (" + root.ice_token["icename"] + ")")
+                        wx.CallAfter(cw.schedule.Enable)
+                        wx.CallAfter(cw.cancelbutton.Enable)
+                        wx.CallAfter(cw.terminatebutton.Enable)
+                        wx.CallAfter(cw.clearbutton.Enable)
+                        if SYSTEM_OS!='Linux':
+                            wx.CallAfter(cw.rollbackItem.Enable,True)
+                            wx.CallAfter(cw.updateItem.Enable,True)
+                        wx.CallAfter(cw.rbox.Enable)
                     if browsercheckFlag == False:
                         check_browser()
                     #if updatecheckFlag == False and root.gui:
@@ -226,7 +230,7 @@ class MainNamespace(BaseNamespace):
                 logger.print_on_console(fail_msg)
                 log.info(fail_msg)
                 kill_conn = True
-                if root.gui: cw.connectbutton.Enable()
+                if root.gui: wx.CallAfter(cw.connectbutton.Enable)
 
         except Exception as e:
             err_msg='Error while Connecting to Server'
@@ -798,6 +802,8 @@ class MainNamespace(BaseNamespace):
         import constants
         if(SYSTEM_OS=='Darwin'):
             spath=spath["mac"]
+        elif SYSTEM_OS == 'Linux':
+            spath=spath['linux']
         else:
             spath=spath["default"]
         if len(spath) != 0 and os.path.exists(spath):
@@ -930,7 +936,7 @@ class MainNamespace(BaseNamespace):
                 cw.connectbutton.Disable()
             """Enables the Register button , if disconnection happened due to Invalid Token"""
             if root.ice_token is None:
-                if root.gui: cw.enable_register()
+                if root.gui: wx.CallAfter(cw.enable_register)
                 return
             else:
                 msg = 'Connectivity issue with Avo Assure Server. Attempting to restore connectivity...'
@@ -1187,7 +1193,7 @@ class TestThread(threading.Thread):
 
 
 class Main():
-    def __init__(self, appName, args):
+    def __init__(self, appName, args, loadingobj):
         self.name = appName
         self.gui = not (args.register or args.connect)
         self.cw = None
@@ -1215,8 +1221,9 @@ class Main():
             cw = clientwindow.ClientWindow()
             self.cw = cw
         # else:
-            #     logger.init_colorama(autoreset=True)
-
+        #logger.init_colorama(autoreset=True)
+        loadingobj.Close()
+        
         """ Creating Root Logger using logger file config and setting logfile path, which is in config.json """
         try:
             logfilename = os.path.normpath(configvalues["logFile_Path"]).replace("\\","\\\\")
@@ -1297,6 +1304,7 @@ class Main():
             subprocess.Popen("TASKKILL /F /IM AvoAssureMFapi.exe", stdout=nul, stderr=nul)
         sys.exit(0)
 
+
     def register(self, token, hold = False):
         ice_das_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
             'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
@@ -1317,19 +1325,25 @@ class Main():
             if len(url) == 1: url.append("443")
             configvalues['server_port']=url[1]
             if not hold: self.connection("register")
+            # Name : sreenivasulu A
+            return True
         except requests.exceptions.SSLError as e:
             err, err_msg, _ = _process_ssl_errors(str(e))
         except Exception as e:
             err = e
             if 'certificate' in str(e):
                 err, err_msg, _ = _process_ssl_errors(e)
+                return False
             else:
                 logger.print_on_console(err_msg)
+                return False
         if err:
             log.error(err_msg)
             log.error(err)
-            if self.gui: self.cw.enable_register()
+            if self.gui: wx.CallAfter(self.cw.enable_register)
             else: self._wants_to_close = True
+            # Name : sreenivasulu A
+            return False 
 
     def connection(self, mode):
         try:
@@ -1393,10 +1407,10 @@ class Main():
                     self.token_obj.delete_token()
                     if self.gui:
                         logger.print_on_console("ICE is not registered with Avo Assure. Click to Register")
-                        cw.enable_register()
+                        wx.CallAfter(cw.enable_register)
                     else:
                         logger.print_on_console("ICE is not registered with Avo Assure. Try Again")
-                if self.gui: cw.connectbutton.Enable()
+                if self.gui: wx.CallAfter(cw.connectbutton.Enable)
                 else: self._wants_to_close = True
             elif mode == 'connect' or mode == "guestconnect":
                 if mode == "guestconnect": status = True
@@ -1411,7 +1425,7 @@ class Main():
                         msg += " Click to Register"
                         logger.print_on_console(msg)
                         log.error(msg)
-                        cw.enable_register()
+                        wx.CallAfter(cw.enable_register)
                     else:
                         logger.print_on_console(msg)
                         log.error(msg)
@@ -1446,7 +1460,7 @@ class Main():
                     connection_Timer = None
                 if not self.gui: self._wants_to_close = True
                 else:
-                    if not self.token_obj.token: cw.enable_register()
+                    if not self.token_obj.token: wx.CallAfter(cw.enable_register)
         except Exception as e:
             emsg="Forbidden request, Connection refused, please configure server ip and server port in "
             if self.gui: emsg += "Edit -> Configuration"
@@ -1457,7 +1471,7 @@ class Main():
                 emsg = "Connection refused: Invalid Server URL."
                 if self.gui:
                     emsg += " Click on Connect to retry Registration"
-                    cw.enable_register()
+                    wx.CallAfter(cw.enable_register)
             logger.print_on_console(emsg)
             log.error(emsg)
             log.error(e,exc_info=True)
@@ -1506,6 +1520,7 @@ class Main():
         try:
             self.token_obj = ICEToken()
             self.server_url = configvalues['server_ip']+':'+configvalues['server_port']
+            self.Ice_Token = configvalues['ice_Token']
             if self.token_obj.token:
                 self.ice_token = self.token_obj.token
                 emsg = None
@@ -1532,7 +1547,7 @@ class Main():
             else:
                 if self.gui:
                     if not verifyonly:
-                        cw.enable_register(enable_button=False)
+                        wx.CallAfter(cw.enable_register,enable_button=False)
                         self.token_obj.token_window(self, IMAGES_PATH)
                 else:
                     if self.opts.host is not None: self.server_url = self.opts.host
@@ -1587,7 +1602,10 @@ class Main():
                     core_utils.get_all_the_imports('WebScrape')
                     sys.coinit_flags = 2
                     import web_scrape
-                    cw.scrapewindow = web_scrape.ScrapeWindow(parent = cw,id = -1, title="Avo Assure - Web Scrapper",browser = browsername,socketIO = socketIO,action=action,data=data)
+                    # scrapewindow title is changed < Avo Assure - Web Scrapper > to < AvoAssure Object Identification >
+                    # changed  on Date:08/07/2022
+                    # Author : sreenivasulu
+                    cw.scrapewindow = web_scrape.ScrapeWindow(parent = cw,id = -1, title="AvoAssure Object Identification",browser = browsername,socketIO = socketIO,action=action,data=data)
                     browsername = ''
                 else:
                     import pause_display_operation
@@ -1609,9 +1627,9 @@ class Main():
             log.error(e,exc_info=True)
 
     def print_banner(self):
-        print('********************************************************************************************************')
-        print('============================================ '+self.name+' ============================================')
-        print('********************************************************************************************************')
+        print('********************************************************************************')
+        print('================================ '+self.name+' ================================')
+        print('********************************************************************************')
 
 def get_version_via_com(filename):
     import pythoncom
@@ -1756,7 +1774,37 @@ def check_browser():
                         FIREFOX_VERSION=FIREFOX_VERSION.split(".")[0] 
                 else:
                     FIREFOX_VERSION=-1
-
+            elif SYSTEM_OS=='Linux':
+                if os.path.exists('/usr/bin/google-chrome'):
+                    with os.popen('/usr/bin/google-chrome --version') as p:
+                        CHROME_VERSION = p.read()
+                        p.close()
+                    if 'not found' in CHROME_VERSION:
+                        CHROME_VERSION=-1
+                    else:
+                        CHROME_VERSION=CHROME_VERSION.split(".")[0].split(" ")[2]
+                else:
+                    CHROME_VERSION=-1
+                if os.path.exists('/usr/bin/microsoft-edge'):
+                    with os.popen('/usr/bin/microsoft-edge --version') as p:
+                        CHROMIUM_VERSION = p.read()
+                        p.close()
+                    if 'not found' in CHROMIUM_VERSION:
+                        CHROMIUM_VERSION=-1
+                    else:
+                        CHROMIUM_VERSION=CHROMIUM_VERSION.split(".")[0].split(" ")[2]
+                else:
+                    CHROMIUM_VERSION=-1
+                if os.path.exists('/usr/bin/firefox'):
+                    with os.popen('firefox --version') as p:
+                        FIREFOX_VERSION=p.read()
+                        p.close()
+                    if 'not found' in FIREFOX_VERSION:
+                        FIREFOX_VERSION=-1
+                    else:
+                        FIREFOX_VERSION=FIREFOX_VERSION.split(".")[0].split(" ")[2]
+                else:
+                    FIREFOX_VERSION=-1       
         except Exception as e:
             logger.print_on_console("Unable to locate ICE parameters")
             log.error(e)
@@ -1819,6 +1867,28 @@ def check_browser():
                         chromeFlag = False 
                 if chromeFlag == False:
                     logger.print_on_console('Unable to download compatible chrome driver from AvoAssure server')
+        elif SYSTEM_OS == 'Linux':
+            if CHROME_VERSION != -1:
+                chromeFlag = False
+                if os.path.exists(CHROME_DRIVER_PATH):
+                    p = os.popen('"' + CHROME_DRIVER_PATH + '" --version')
+                    a = p.read()
+                    a=a.split(' ')[1].split('.')[0]
+                    if str(a) == CHROME_VERSION:
+                        chromeFlag = True
+                if not os.path.exists(CHROME_DRIVER_PATH) or chromeFlag == False:
+                    try:
+                        URL=readconfig.configvalues["file_server_ip"]+"/"+SYSTEM_OS.lower()+"/"+platform.machine().lower()+"/chromedriver"+CHROME_VERSION
+                        request.urlretrieve(URL,CHROME_DRIVER_PATH)
+                        chromeFlag = True
+                        os.chmod(CHROME_DRIVER_PATH,stat.S_IEXEC | os.stat(CHROME_DRIVER_PATH).st_mode)
+                    except Exception as e:
+                        log.debug("Error in chrome driver download")
+                        log.error(e)
+                        chromeFlag = False 
+                if chromeFlag == False:
+                    logger.print_on_console('Unable to download compatible chrome driver from AvoAssure server')
+        
         #checking browser for firefox
         if SYSTEM_OS == 'Windows':
             try:
@@ -1845,6 +1915,25 @@ def check_browser():
                         request.urlretrieve(URL,GECKODRIVER_PATH)
                         firefoxFlag = True  
                     except:
+                        firefoxFlag = False
+
+                    if firefoxFlag == False:
+                        logger.print_on_console('Unable to download compatible firefox driver from AvoAssure server')
+            except Exception as e:
+                logger.print_on_console("Unable to download compatible firefox driver from AvoAssure server")
+                log.error("Unable to download compatible firefox driver from AvoAssure server")
+                log.error(e,exc_info=True)
+        elif SYSTEM_OS == 'Linux':
+            try:
+                if FIREFOX_VERSION != -1:
+                    try:
+                        URL=readconfig.configvalues["file_server_ip"]+"/"+SYSTEM_OS.lower()+"/"+platform.machine().lower()+"/geckodriver"
+                        request.urlretrieve(URL,GECKODRIVER_PATH)
+                        os.chmod(GECKODRIVER_PATH,stat.S_IEXEC | os.stat(GECKODRIVER_PATH).st_mode)
+                        firefoxFlag = True  
+                    except Exception as e:
+                        log.debug("Error in firefox driver check and download ")
+                        log.error(e)
                         firefoxFlag = False
 
                     if firefoxFlag == False:
@@ -1899,7 +1988,11 @@ def check_browser():
                 if os.path.exists(EDGE_CHROMIUM_DRIVER_PATH):
                     p = subprocess.Popen('"' + EDGE_CHROMIUM_DRIVER_PATH + '" --version', stdout=subprocess.PIPE, bufsize=1,cwd=DRIVERS_PATH,shell=True)
                     a = p.stdout.readline()
-                    a = a.decode('utf-8')[13:17]
+                    a = a.decode('utf-8').split(' ')
+                    if len(a) == 5:
+                        a = a[3]
+                    else:
+                        a = a[1]    
                     a=a.split('.')[0]
                     if str(a) == CHROMIUM_VERSION.split('.')[0]:
                         chromiumFlag = True
@@ -1930,6 +2023,27 @@ def check_browser():
                     except:
                         chromiumFlag = False 
 
+                if chromiumFlag == False :
+                    logger.print_on_console('Unable to download compatible Edge Chromium driver from AvoAssure server')
+        elif SYSTEM_OS == 'Linux':
+            if CHROMIUM_VERSION != -1:
+                chromiumFlag = False
+                if os.path.exists(EDGE_CHROMIUM_DRIVER_PATH):
+                    p = os.popen('"' + EDGE_CHROMIUM_DRIVER_PATH + '" --version')
+                    a = p.read()
+                    a=a.split(' ')[3].split('.')[0]
+                    if str(a) == CHROMIUM_VERSION:
+                        chromiumFlag = True
+                if not os.path.exists(EDGE_CHROMIUM_DRIVER_PATH) or chromiumFlag == False:
+                    try:
+                        URL=readconfig.configvalues["file_server_ip"]+"/"+SYSTEM_OS.lower()+"/"+platform.machine().lower()+"/msedgedriver"+CHROMIUM_VERSION
+                        request.urlretrieve(URL,EDGE_CHROMIUM_DRIVER_PATH)
+                        chromiumFlag = True
+                        os.chmod(EDGE_CHROMIUM_DRIVER_PATH,stat.S_IEXEC | os.stat(EDGE_CHROMIUM_DRIVER_PATH).st_mode)
+                    except Exception as e:
+                        log.debug("Error in edge-chromium driver download")
+                        log.error(e)
+                        chromiumFlag = False 
                 if chromiumFlag == False :
                     logger.print_on_console('Unable to download compatible Edge Chromium driver from AvoAssure server')
 
@@ -1980,7 +2094,7 @@ def check_PatchUpdate():
             UPDATE_MSG=update_obj.send_update_message()
             l_ver = update_obj.fetch_current_value()
             SERVER_CHECK_MSG = update_obj.server_check_message()
-            if (SERVER_CHECK_MSG): logger.print_on_console(SERVER_CHECK_MSG)
+            if (SERVER_CHECK_MSG):log.info(SERVER_CHECK_MSG)
             #check if update avaliable
             if ( UPDATE_MSG == 'Update Available!!! Click on update' and flag == True ):
                 logger.print_on_console("An update is available. Click on 'Help' menu option -> 'Check for Updates' sub-menu option -> 'Update' button")
@@ -2058,3 +2172,4 @@ def stop_ping_thread():
         status_ping_thread.cancel()
         time.sleep(0.5)
         status_ping_thread = None
+

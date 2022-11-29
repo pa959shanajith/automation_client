@@ -17,8 +17,11 @@ import logging
 from uuid import uuid4 as uuid
 from core_utils import CoreUtils
 import logger
-
 log = logging.getLogger('icetoken.py')
+
+import readconfig
+configvalues = readconfig.readConfig().readJson()
+ICE_Token = configvalues.get('Ice_Token')
 
 class ICEToken():
     def __init__(self):
@@ -104,30 +107,54 @@ class Token_window(wx.Frame):
     """Initialization and defining the wx-components of the pop-up"""
     def __init__(self, parent, id, title,images_path=None):
         try:
-            wx.Frame.__init__(self, parent=None, title=title, pos=(300, 150), size=(420,210), style = wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER  | wx.MAXIMIZE_BOX | wx.MINIMIZE_BOX))
-            self.SetBackgroundColour('#e6e7e8')
             self.parent=parent
+            self.ICE_Token = self.parent.Ice_Token
+
+            # SN Adiga 07-Aug-2022: Show both URL and Token during registration window display
+            # Name : A Sreenivasulu Date : 05/08/2022 ICE_token frame properties will change depend on token existens,token comes from config.json
+            #if self.ICE_Token:
+            #    wx.Frame.__init__(self, parent=None, title=title, pos=(300, 150), size=(420,170), style = wx.STAY_ON_TOP | wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER  | wx.MAXIMIZE_BOX | wx.MINIMIZE_BOX))
+            #else:
+            #    wx.Frame.__init__(self, parent=None, title=title, pos=(300, 150), size=(420,210), style = wx.STAY_ON_TOP | wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER  | wx.MAXIMIZE_BOX | wx.MINIMIZE_BOX))
+            
+            wx.Frame.__init__(self, parent=None, title=title, pos=(300, 150), size=(420,210), style = wx.STAY_ON_TOP | wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER  | wx.MAXIMIZE_BOX | wx.MINIMIZE_BOX))
+            
+            # End - SNA
+
+            self.SetBackgroundColour('#e6e7e8')
             self.iconpath = images_path +"avo.ico"
             self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
             self.SetIcon(self.wicon)
             self.panel = wx.Panel(self)
-            self.host_url_label = wx.StaticText((self.panel), label='Host URL', pos=(40,35), style=0, name='')
+            self.host_url_label = wx.StaticText((self.panel), label='Host URL', pos=(35,35), style=0, name='')
             self.url = wx.TextCtrl((self.panel), pos=(108, 30), size=(250, 28))
+            
+            # SN Adiga 07-Aug-2022: Show both URL and Token during registration window display
+            #if self.ICE_Token:
+            #    self.submit_btn=wx.Button(self.panel, label="Submit", pos=(200, 70), size=(65,26))
+            #else:
+            # End SNA
+
             self.token_label = wx.StaticText((self.panel), label='Token', pos=(40,80), style=0, name='')
             #self.tok_name=wx.StaticText(self.panel, label="Register", pos=(70,10),size=(70,20), style=0, name="")
             self.token_name = wx.TextCtrl((self.panel), pos=(108, 75), size=(250, 28))
+            self.submit_btn=wx.Button(self.panel, label="Submit", pos=(200, 115), size=(65,26))
+            
             #self.url=wx.TextCtrl(self.panel, pos=(10,35), size=((175,28)))
             #self.token_name=wx.TextCtrl(self.panel, pos=(10,70), size=((175,28)))
-            self.submit_btn=wx.Button(self.panel, label="Submit", pos=(200, 115), size=(65,26))
             self.submit_btn.Bind(wx.EVT_BUTTON, self.submit_token)
             self.url.SetValue('server-ip:port')
             if self.parent.server_url.strip() != ':':
                 self.url.SetValue(self.parent.server_url)
-            #self.token_name.SetValue('Token')
+            self.token_name.SetValue(self.ICE_Token)
             self.Centre()
             self.Bind(wx.EVT_CLOSE, self.close)
             wx.Frame(self.panel)
-            self.Show()
+            res = self.auto_registration()
+
+            # SN Adiga 07-Aug-2022: Show registration window if auto registration failure
+            if (res == False) or (res == None):
+                self.Show()
         except Exception as e:
             import traceback
             traceback.print_exc()
@@ -136,11 +163,48 @@ class Token_window(wx.Frame):
 
     def submit_token(self, event):
         url = self.url.GetValue().strip()
-        token = self.token_name.GetValue().strip()
+        # A Sreenivasulu Date:03/08/2022 this condistion is adding https protocal to URL if protocal not exit 
+        if url[0:7].lower() == 'http://':
+            url = url[7:]
+        if url[0:8].lower() == 'https://':
+            url = url[8:]
+        if self.ICE_Token:
+            token = self.ICE_Token    
+        else:
+            token = self.token_name.GetValue().strip()
         self.parent.server_url = url
         self.parent.register(token)
         self.parent.token_obj.kill_window()
 
     def close(self, event):
         self.parent.cw.connectbutton.Enable()
+        self.parent.token_obj.kill_window()    
+        
+    # Name:A sreenivasulu Date: 3/08/2022
+    # below two functions responsible for auto registration{auto_submit() and auto_registration()} 
+    def auto_submit(self,url,token):
+        if url[0:7].lower() == 'http://':
+            url = url[7:]
+        if url[0:8].lower() == 'https://':
+            url = url[8:]
+        self.parent.server_url = url
+        res = self.parent.register(token)
         self.parent.token_obj.kill_window()
+        return res
+
+    def auto_registration(self):
+        try:
+            avo_url = configvalues['server_ip']+':'+configvalues['server_port']
+            token = self.ICE_Token
+            if avo_url:
+                # calling for registration
+                res = self.auto_submit(avo_url,token)
+                return res
+            else:
+                logger.print_on_console('file not found')
+                return False
+        except Exception as ex:
+            logger.print_on_console(ex)
+            return False
+
+

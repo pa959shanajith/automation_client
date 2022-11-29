@@ -142,6 +142,7 @@ class Controller():
                     core_utils.get_all_the_imports('Mobility/MobileWeb')
                 else:
                     core_utils.get_all_the_imports('Mobility')
+                    core_utils.get_all_the_imports('Saucelabs')
                 import web_dispatcher_MW
                 self.mobile_web_dispatcher_obj = web_dispatcher_MW.Dispatcher()
                 self.mobile_web_dispatcher_obj.action=self.action
@@ -738,7 +739,7 @@ class Controller():
                     #MobileWeb apptype module call
                     if self.mobile_web_dispatcher_obj == None:
                         self.__load_mobile_web()
-                    result = self.invokemobilekeyword(teststepproperty,self.mobile_web_dispatcher_obj,inpval,args[0])
+                    result = self.invokemobilekeyword(teststepproperty,self.mobile_web_dispatcher_obj,inpval,args[0],args[1])
                 elif teststepproperty.apptype.lower() == APPTYPE_MOBILE_APP:
                     #MobileApp apptype module call
                     if self.mobile_app_dispatcher_obj==None:
@@ -969,8 +970,8 @@ class Controller():
         res = dispatcher_obj.dispatcher(teststepproperty,inputval,self.reporting_obj,self.wx_object,self.conthread,execution_env)
         return res
 
-    def invokemobilekeyword(self,teststepproperty,dispatcher_obj,inputval,reporting_obj):
-        res = dispatcher_obj.dispatcher(teststepproperty,inputval,self.reporting_obj,self.conthread)
+    def invokemobilekeyword(self,teststepproperty,dispatcher_obj,inputval,reporting_obj,execution_env):
+        res = dispatcher_obj.dispatcher(teststepproperty,inputval,self.reporting_obj,self.conthread,execution_env)
         return res
 
     def invokemobileappkeyword(self,teststepproperty,dispatcher_obj,inputval,reporting_obj):
@@ -1991,6 +1992,7 @@ def kill_process():
         log.info('Stale processes killed')
         logger.print_on_console('Stale processes killed')
     elif SYSTEM_OS == 'Linux':
+        stale_process_killed=False
         log.info("killing stale process in linux")
         try:
             import browser_Keywords
@@ -2007,11 +2009,14 @@ def kill_process():
             if hasattr(browser_Keywords.local_bk, 'pid_set'):
                 if (browser_Keywords.local_bk.pid_set):
                     del browser_Keywords.local_bk.pid_set[:]
+            stale_process_killed=True
         except Exception as e:
-            logger.print_on_console('Unable to kill stale process')
-            log.error(e)
-        log.info('Stale process Killed')
-        logger.print_on_console('Stale process killed')
+            if isinstance(e,ModuleNotFoundError):
+                logger.print_on_console('No stale process to kill')
+                log.error(e,exc_info=True)
+        if stale_process_killed:
+            log.info('Stale process Killed')
+            logger.print_on_console('Stale process killed')
 
     else:
         try:
