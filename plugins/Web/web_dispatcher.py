@@ -893,9 +893,10 @@ class Dispatcher:
                                         if not(webElement):
                                             webElement=None
                                             local_Wd.log.info("Weblement not found with Primary identifers")
-                    time.sleep(1)
                     if (webElement):
                         break
+                    else:
+                        time.sleep(1)
             #enhance object reconition changes
             if(webElement == None):
                 try:
