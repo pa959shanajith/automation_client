@@ -19,7 +19,7 @@ class Retryrequests:
         while retry_flag:
             current_time = datetime.now()
             try:
-                if current_time <= loop_timelimit:
+                if current_time >= loop_timelimit:
                     retry_flag = 0 
                     log.info("Maximum retries and Time limit exceeded")
                 res = requests.post(server_url, json = data_dict, verify = False, timeout=160)
