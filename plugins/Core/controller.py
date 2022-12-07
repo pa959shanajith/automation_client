@@ -1688,7 +1688,7 @@ class Controller():
                     log.info(info_msg)
                     con.reporting_obj.save_report_json_conditioncheck_testcase_empty(filename,info_msg,json_data,status_percentage)
                     execute_result_data["reportData"] = con.reporting_obj.report_json_condition_check_testcase_empty
-                    if cicd_mode is False:
+                    if cicd_mode :
                         execute_result_data["event"] = "result_executeTestSuite"
                         execute_result_data["configkey"] = opts.configkey
                         execute_result_data["executionListId"] = opts.executionListId
