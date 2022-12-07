@@ -23,7 +23,7 @@ class Retryrequests:
                     retry_flag = 0 
                     log.info("Maximum retries and Time limit exceeded")
                     log.info("Something went wrong. Sorry, we're unable to reach the server right now")
-                res = requests.post(server_url, json = data_dict, verify = False, timeout=10)
+                res = requests.post(server_url, json = data_dict, verify = False, timeout = 120)
                 if res.status_code != 200:
                     log.error("Unable to connect to server retrying after 10 seconds. Status code is: %s",
                         res.status_code)
