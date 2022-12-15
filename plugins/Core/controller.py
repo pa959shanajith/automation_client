@@ -979,16 +979,11 @@ class Controller():
 
     def invokewebkeyword(self,teststepproperty,dispatcher_obj,inputval,reporting_obj,execution_env):
         res = dispatcher_obj.dispatcher(teststepproperty,inputval,self.reporting_obj,self.wx_object,self.conthread,execution_env)
-        keyword = teststepproperty.name
-        configvalues = self.configvalues
-        if (keyword.lower() in VERIFY_KEYWORDS) and (res[1] == 'False' and res[3] != 'Web Element not found'):
-            verify_wait_time = int(configvalues['verify_wait_time'])
-            for i in range(verify_wait_time):
-                res = dispatcher_obj.dispatcher(teststepproperty,inputval,self.reporting_obj,self.wx_object,self.conthread,execution_env)
-                if res[1] == 'True':
-                    break
-                else:
-                    time.sleep(1)
+        # To Retry on driver exception
+        if (res[3] == ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']) and (res[1] == 'False'):
+            log.info('Retry on Driver Exception')
+            res = dispatcher_obj.dispatcher(teststepproperty,inputval,self.reporting_obj,self.wx_object,self.conthread,execution_env)
+            log.info('Retry on Driver Exception Done!')
         return res
 
     def invokemobilekeyword(self,teststepproperty,dispatcher_obj,inputval,reporting_obj,execution_env):
