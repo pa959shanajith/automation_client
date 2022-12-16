@@ -1999,7 +1999,7 @@ class Controller():
     def seperate_log(self, cur_thread, id):
         try:
             log = logging.getLogger("controller.py")
-            log_filepath = os.path.normpath(os.path.dirname(self.configvalues["logFile_Path"]) + os.sep + 'TestautoV2_Parallel_' + str(BROWSER_NAME_LOG[id]) + '.log').replace("\\","\\\\")
+            log_filepath = os.path.normpath(os.path.dirname(self.configvalues["logFile_Path"]) + os.sep + 'Avoclient_Parallel_' + str(BROWSER_NAME_LOG[id]) + '.log').replace("\\","\\\\")
             file1 = open(log_filepath, 'a+')
             file1.close()
             threadName = cur_thread.name #Get name of each thread

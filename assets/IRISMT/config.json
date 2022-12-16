@@ -6,7 +6,7 @@
     "iterations": "400",
     "lang": "eng",
     "langdata_dir": "Lib/Tesseract-OCR/langdata",
-    "logFile_Path": "logs/TestautoV2_irismt.log",
+    "logFile_Path": "logs/Avoclient_irismt.log",
     "rollback_dir": "assets/IRISMT/model_backup.7z",
     "tessdata_dir": "Lib/Tesseract-OCR/tessdata",
     "trained_result": "Lib/Tesseract-OCR/tessdata/eng.traineddata",
