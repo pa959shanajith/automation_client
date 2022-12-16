@@ -396,7 +396,6 @@ class Controller():
                         log.info( "----Keyword :"+str(tsp.name)+' execution Started----')
                         start_time = datetime.now()
                         start_time_string=start_time.strftime(TIME_FORMAT)
-                        logger.print_on_console('Step Execution start time is : '+start_time_string)
                         log.info('Step Execution start time is : '+start_time_string)
                         index,result = self.keywordinvocation(index,inpval,self.reporting_obj,execution_env,*args)
                     else:
@@ -431,9 +430,9 @@ class Controller():
         if keyword_flag:
             end_time = datetime.now()
             end_time_string=end_time.strftime(TIME_FORMAT)
-            logger.print_on_console('Step Execution end time is : '+end_time_string)
+            log.info('Step Execution end time is : '+end_time_string)
             ellapsed_time=end_time-start_time
-            logger.print_on_console('Step Elapsed time is : ',str(ellapsed_time)+'\n')
+            log.info('Step Elapsed time is : '+str(ellapsed_time)+"\n")
             #Changing the overallstatus of the scenario if it's Fail or Terminate
             if self.status == TEST_RESULT_FAIL :
                 if not statusflag:
