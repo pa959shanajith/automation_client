@@ -69,7 +69,6 @@ class CiCdCore():
                 constants.SCREENSHOT_PATH = args.screenshotpath + OS_SEP
         except Exception as e:
             log.error(e)
-        core.check_browser()
         exec_req = self.fetchExecutionReq()
         iscicd = True
         md_name = exec_req['suitedetails'][0]['testsuitename']

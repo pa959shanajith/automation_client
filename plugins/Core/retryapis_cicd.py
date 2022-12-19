@@ -3,6 +3,7 @@ import logging
 import time
 import logger
 from datetime import datetime,timedelta
+import controller
 log = logging.getLogger('retryapis_cicd.py')
 
 class Retryrequests:
@@ -19,21 +20,20 @@ class Retryrequests:
         while retry_flag:
             current_time = datetime.now()
             try:
-                if current_time >= loop_timelimit:
-                    retry_flag = 0 
+                if current_time >= loop_timelimit or controller.terminate_flag:
+                    controller.terminate_flag = True
                     log.info("Maximum retries and Time limit exceeded")
                     log.info("Something went wrong. Sorry, we're unable to reach the server right now")
+                    res = None
+                    break
                 res = requests.post(server_url, json = data_dict, verify = False, timeout = 120)
                 if res.status_code != 200:
-                    log.error("Unable to connect to server retrying after 10 seconds. Status code is: %s",
+                    log.info("Unable to connect to server retrying after 10 seconds. Status code is: %s",
                         res.status_code)
+                    logger.print_on_console("Connection error occurred with:"+ server_url)
                     time.sleep(10)
                 else:
                     retry_flag = 0
-            except requests.exceptions.ConnectionError:
-                logger.print_on_console('connection error occurred')
-                log.info("connection error occurred with:%s", server_url)
-                time.sleep(30)
             except Exception as e:
                 res = None
                 log.error(e)

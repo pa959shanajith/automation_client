@@ -1094,6 +1094,8 @@ class TestThread(threading.Thread):
     def run(self):
         """Run Worker Thread."""
         # This is the code executing in the new thread.
+        if self.cicd_mode:
+            check_browser()
         global execution_flag, closeActiveConnection, connection_Timer, termination_inprogress
         batch_id = None
         termination_inprogress = True

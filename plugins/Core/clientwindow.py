@@ -710,8 +710,8 @@ class Config_window(wx.Frame):
         self.log_file_path=wx.TextCtrl(self.panel, pos=config_fields["Log_path"][2], size=config_fields["Log_path"][3])
         self.log_file_path_btn=wx.Button(self.panel, label="...",pos=config_fields["Log_path"][4], size=config_fields["Log_path"][5])
         self.log_file_path_btn.Bind(wx.EVT_BUTTON, self.fileBrowser_logfilepath)
-        if (not isConfigJson) or (isConfigJson and isConfigJson['logFile_Path']=='./logs/TestautoV2.log'):
-            self.log_file_path.SetValue(os.path.normpath(AVO_ASSURE_HOME + '/logs/TestautoV2.log'))
+        if (not isConfigJson) or (isConfigJson and isConfigJson['logFile_Path']=='./logs/Avoclient.log'):
+            self.log_file_path.SetValue(os.path.normpath(AVO_ASSURE_HOME + '/logs/Avoclient.log'))
         else:
             self.log_file_path.SetValue(isConfigJson['logFile_Path'])
 
@@ -1547,7 +1547,7 @@ class Config_window(wx.Frame):
         dlg = wx.DirDialog(None, "Choose a folder", "", wx.DD_DEFAULT_STYLE)
         if dlg.ShowModal() == wx.ID_OK:
             log_path = dlg.GetPath()
-            log_path= os.path.normpath(log_path+"/TestautoV2.log")
+            log_path= os.path.normpath(log_path+"/Avoclient.log")
             self.log_file_path.SetValue(log_path)
         dlg.Destroy()
     """This method open a file selector dialog , from where file path can be set """
