@@ -1208,6 +1208,8 @@ class Controller():
                     #check if accessibility parameters are present if not initialize empty array
                     if "accessibilityMap" in suite and scenario_id in suite['accessibilityMap']:
                         accessibility_parameters = suite['accessibilityMap'][scenario_id]
+                        if len(accessibility_parameters) > 0 and isinstance(accessibility_parameters, list) and isinstance(accessibility_parameters[0], list):
+                            accessibility_parameters = accessibility_parameters[0]
                     else:
                         accessibility_parameters = []
                     con.reporting_obj=reporting.Reporting()
