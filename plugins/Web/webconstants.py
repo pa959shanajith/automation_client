@@ -206,12 +206,16 @@ IGNORE_FILE_EXTENSIONS = ('.pdf','.docx','.zip','.dmg')
 # check whether element is in viewport
 INVIEW = """ var rect = arguments[0].getBoundingClientRect(); var windowHeight = (window.innerHeight || document.documentElement.clientHeight); var windowWidth = (window.innerWidth || document.documentElement.clientWidth); return ((rect.left >= 0) && (rect.top >= 0) && ((rect.left + rect.width) <= windowWidth) && ((rect.top + rect.height) <= windowHeight));"""
 
-EVENTS_JS = """
-var validEventList = ["blur", "change", "focus", "click", "keydown", "keypress", "keyup", "mousedown", "mousemove", "mouseup", "input"];
-
+SET_TEXT_WITH_EVENTS_SCRIPT= """
+arguments[0].setAttribute("value", arguments[1]);
+var textbox_value = arguments[0].value;
+if (textbox_value != arguments[1]) {
+    arguments[0].value=arguments[1];
+}
+var validEventList = ["input", "blur", "change", "focus", "click", "keydown", "keypress", "keyup", "mousedown", "mousemove", "mouseup"];
 function Trigger_Post(element){
     for (var event in validEventList) {
-        element.dispatchEvent(new Event(validEventList[event]));
+        element.dispatchEvent(new Event(validEventList[event], { bubbles:true }));
     }
 }
 Trigger_Post(arguments[0]);
