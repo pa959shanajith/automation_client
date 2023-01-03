@@ -77,12 +77,16 @@ class ComboboxKeywords():
                             if (input_val < optionListSize):
                                 for i in range(0, optionListSize):
                                     if (input_val == i):
-                                        if (webelement.tag_name == 'input'):
-                                            browser_Keywords.local_bk.driver_obj.execute_script("""arguments[0].focus()""", optionList[input_val])
-                                            optionList[input_val].click()
-                                            status = TEST_RESULT_PASS
-                                            result = TEST_RESULT_TRUE
-                                            local_cbo.log.info(STATUS_METHODOUTPUT_UPDATE)
+                                        if (webelement.tag_name in ['input','li','a']):
+                                            try:
+                                                browser_Keywords.local_bk.driver_obj.execute_script("""arguments[0].focus()""", optionList[input_val])
+                                                optionList[input_val].click()
+                                                status = TEST_RESULT_PASS
+                                                result = TEST_RESULT_TRUE
+                                                local_cbo.log.info(STATUS_METHODOUTPUT_UPDATE)
+                                            except Exception as e:
+                                                local_cbo.log.error(e)
+                                                logger.print_on_console("Element is not clickable")
                                         else:
                                             value = self.getelement_text(optionList[input_val])
                                             browser_Keywords.local_bk.driver_obj.execute_script(SET_VALUE_ATTRIBUTE, webelement, value)
@@ -103,7 +107,6 @@ class ComboboxKeywords():
                             err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                 except Exception as e:
                     local_cbo.log.error(e)
-                    logger.print_on_console(e)
             elif not err_msg:
                 err_msg = 'Element is not enabled'
                 logger.print_on_console(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
@@ -143,17 +146,16 @@ class ComboboxKeywords():
                         else:
                             continue
                     local_cbo.log.info('Count of combobox')
-                    local_cbo.log.info(optionListSize)                   
-                    webelement.send_keys(Keys.ESCAPE)   #Fixes for: list should be closed once the actions are performed
+                    local_cbo.log.info(optionListSize)
                     if (optionListSize >= 0):
                         output = str(optionListSize)
                         status=TEST_RESULT_PASS
                         result=TEST_RESULT_TRUE
                         logger.print_on_console('Result obtained is: ',output)
                         local_cbo.log.info(STATUS_METHODOUTPUT_UPDATE)
+                    webelement.send_keys(Keys.ESCAPE)           #Fixes for: The item list should be closed once the actions are performed on the combo box
                 except Exception as e:
                     local_cbo.log.error(e)
-                    logger.print_on_console(e)
                 local_cbo.log.info(RETURN_RESULT)
             elif not err_msg:
                 err_msg = 'Element is not enabled'
@@ -197,16 +199,15 @@ class ComboboxKeywords():
                         temp.append(internal_val)
                     local_cbo.log.info('temp value')
                     local_cbo.log.info(temp)
-                    output=temp                    
-                    webelement.send_keys(Keys.ESCAPE)   #Fixes for: list should be closed once the actions are performed     
+                    output=temp
                     if(len(temp) != 0 ):
                         status=TEST_RESULT_PASS
                         result=TEST_RESULT_TRUE
                         logger.print_on_console(output)
                         local_cbo.log.info(STATUS_METHODOUTPUT_UPDATE)
+                    webelement.send_keys(Keys.ESCAPE)           #Fixes for: The item list should be closed once the actions are performed on the combo box 
                 except Exception as e:
                     local_cbo.log.error(e)
-                    logger.print_on_console(e)
             elif not err_msg:
                 err_msg = 'Element is not enabled'
                 logger.print_on_console(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])
@@ -267,12 +268,16 @@ class ComboboxKeywords():
                                     local_cbo.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                                     err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                                 if (flag):
-                                    if (webelement.tag_name == 'input'):                                          
-                                        browser_Keywords.local_bk.driver_obj.execute_script("""arguments[0].focus()""", optionList[i])
-                                        optionList[i].click()
-                                        status = TEST_RESULT_PASS
-                                        result = TEST_RESULT_TRUE
-                                        local_cbo.log.info(STATUS_METHODOUTPUT_UPDATE)
+                                    if (webelement.tag_name in ['input','li','a']):
+                                        try:                                          
+                                            browser_Keywords.local_bk.driver_obj.execute_script("""arguments[0].focus()""", optionList[i])
+                                            optionList[i].click()
+                                            status = TEST_RESULT_PASS
+                                            result = TEST_RESULT_TRUE
+                                            local_cbo.log.info(STATUS_METHODOUTPUT_UPDATE)
+                                        except Exception as e:
+                                                local_cbo.log.error(e)
+                                                logger.print_on_console("Element is not clickable")
                                     else:
                                         browser_Keywords.local_bk.driver_obj.execute_script(SET_VALUE_ATTRIBUTE, webelement, inp_val)
                                         status = TEST_RESULT_PASS
@@ -299,7 +304,6 @@ class ComboboxKeywords():
                     from selenium.common.exceptions import NoSuchElementException
                     if type(e) == NoSuchElementException:
                         err_msg = str(e)
-                    logger.print_on_console(e)
             elif not err_msg:
                 err_msg = 'Element is not enabled'
                 logger.print_on_console(ERROR_CODE_DICT['ERR_OBJECT_DISABLED'])

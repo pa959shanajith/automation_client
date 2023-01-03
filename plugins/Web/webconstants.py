@@ -234,6 +234,10 @@ try {
         var element = document.getElementById(ele_id);
         return element.querySelectorAll('[role="option"]');
     }
+    else if (arguments[0].tagName.toLowerCase() == 'li') {
+        element = arguments[0].parentElement;
+        return element.children;
+    }
     else {
         return arguments[0].children;
     }
