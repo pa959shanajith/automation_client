@@ -242,6 +242,16 @@ try {
         element = arguments[0].parentElement;
         return element.children;
     }
+    else if (arguments[0].tagName.toLowerCase() == 'a') {
+        if (arguments[0].parentElement.tagName.toLowerCase() == 'li') {
+            li_element = arguments[0].parentElement;
+            element = li_element.parentElement;
+        }
+        else {
+            element = arguments[0].parentElement;
+        }
+        return element.children;
+    }
     else {
         return arguments[0].children;
     }
