@@ -186,7 +186,6 @@ class JiraWindow():
         data = {}
         projects_list = []
         issue_types = []
-        priority_list = []
         data['projects'] = []
         data['issuetype'] = []
         data['priority'] = []
@@ -203,14 +202,11 @@ class JiraWindow():
                 jira = JIRA(options=jira_options,basic_auth=(jira_credentials['jira_uname'],jira_credentials['jira_pwd']))
             projects_list = jira.projects()
             issue_types = jira.issue_types()
-            priority_list = jira.priorities()
             for index,item in enumerate(projects_list):
                 data['projects'].append({'id': item.id , 'name':item.name, 'code':item.key})
             for index,item in enumerate(issue_types):
                 if item.name.lower()=='bug':
                     data['issuetype'].append({'id': item.id , 'name':item.name})
-            for index,item in enumerate(priority_list):
-                data['priority'].append({'id': item.id , 'name':item.name})
             socket.emit('auto_populate',data)
         except Exception as e:
             log.error(e)
@@ -350,24 +346,16 @@ class JiraWindow():
         res = {}
         res['projects']=[]
         try:
-            logger.print_on_console('-----------------------------Jira projects-------------------------------------')
-            url=jira_input_dict['url']+"/rest/api/3/project"
-            auth = HTTPBasicAuth(jira_input_dict['username'],jira_input_dict['password'])
+            url=jira_input_dict['jira_serverlocation']+"/rest/api/3/project"
+            auth = HTTPBasicAuth(jira_input_dict['jira_uname'],jira_input_dict['jira_pwd'])
             headers={"Accept":"application/json"}
             respon=requests.request("GET",url,headers=headers,auth=auth)
             if respon.status_code == 200:
                 JsonObject = respon.json()
                 for index,item in enumerate(JsonObject):
                     res['projects'].append({'id': item['id'] , 'name':item['name'], 'code':item['key']})
-            logger.print_on_console(res)
-            # jira_input_dict['projects']=res
-            self.get_testcases(jira_input_dict,socket)
-            # socket.emit('Jira Projects',res)
+            socket.emit('Jira_Projects',res)
         except Exception as e:
-            # err_msg='Error while getting projects from jira'
-            # log.error(err_msg)
-            # logger.print_on_console(err_msg)
-            # log.error(e, exc_info=True)
             log.error(e)
             if 'Invalid URL' in str(e):
                 socket.emit('auto_populate','Invalid Url')
@@ -385,35 +373,22 @@ class JiraWindow():
         res = {}
         res['testcases']=[]
         try:
-            # project='Avobank'
-            # key='AV'
-            # project='N68_testing'
-            # key='DUM'
-            # project='Testing'
-            # key='TES'
             project=jira_input_dict['project_selected']['project']
             key=jira_input_dict['project_selected']['key']
-            logger.print_on_console('-------------------Jira Testcases for '+project+'---------------------------------')
             url=jira_input_dict['url']+"/rest/api/2/search?jql=issueType='Test Case'&fields=id,key,project"
             auth = HTTPBasicAuth(jira_input_dict['username'],jira_input_dict['password'])
             headers={"Accept":"application/json"}
             respon=requests.request("GET",url,headers=headers,auth=auth)
             if respon.status_code == 200:
                 JsonObject = respon.json()
-                # print(JsonObject)
                 if 'issues' in JsonObject:
                     for index,item in enumerate(JsonObject['issues']):
                         if 'fields' in item:
                             if 'project' in item['fields']:
                                 if project == item['fields']['project']['name'] and key == item['fields']['project']['key']:
                                     res['testcases'].append({'id': item['id'], 'code':item['key']})
-            logger.print_on_console(res)
-            # socket.emit('Jira Projects',res)
+            socket.emit('Jira Projects',res)
         except Exception as e:
-            # err_msg='Error while getting projects from jira'
-            # log.error(err_msg)
-            # logger.print_on_console(err_msg)
-            # log.error(e, exc_info=True)
             log.error(e)
             if 'Invalid URL' in str(e):
                 socket.emit('auto_populate','Invalid Url')
