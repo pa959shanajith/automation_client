@@ -172,7 +172,6 @@ class JiraWindow():
             response=str(response)
             socket.emit('issue_id',response)
         elif(issue_id==None and check == False):
-            # log.debug("Invalid Attachment Path")
             log.error("Invalid Attachment Path")
             socket.emit('issue_id','Invalid Path')
         else:
@@ -277,9 +276,7 @@ class JiraWindow():
                                     JsonObject = respon.json()
                                     temp['value']=[]
                                     count=1
-                                    # if 'values' in JsonObject:
-                                    #     temp['value']=JsonObject['values']
-                                    for index,item in enumerate(JsonObject['values']):
+                                   for index,item in enumerate(JsonObject['values']):
                                         temp['value'].append({'key': count , 'text':item})
                                         count=count+1
                             config_data[all_fields[i]['name']]=temp
