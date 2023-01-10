@@ -784,6 +784,12 @@ class MainNamespace(BaseNamespace):
             elif args[0] == JIRA_ACTION_3:
                 data = args[1]
                 obj.getConfigureFields(data,socketIO)
+            elif args[0] == JIRA_ACTION_4:
+                data = args[1]
+                obj.get_projects(data,socketIO)
+            elif args[0] == JIRA_ACTION_5:
+                data = args[1]
+                obj.get_testcases(data,socketIO)
         except Exception as e:
             err_msg='Error in JIRA operations'
             log.error(err_msg)
