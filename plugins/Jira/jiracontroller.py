@@ -36,7 +36,7 @@ class JiraWindow():
     def createIssue(self,data,socket):
         """
             Method to create issue in JIRA
-            inputs project id , summary , issuetype , priority , description , ConfigureFields(selected)
+            inputs project id , summary , issuetype , description , ConfigureFields(selected)
             returns issue id created in JIRA
         """
         issue_id = None
@@ -63,10 +63,9 @@ class JiraWindow():
             project_id = data['project']
             summary = data['summary']
             issue_type = data['issuetype']
-            priority = data['priority']
             parentid=data['parentissue']
             flag = False
-            if all(check1 is not None for check1 in [project_id, summary, issue_type, priority]):
+            if all(check1 is not None for check1 in [project_id, summary, issue_type]):
                 log.debug('Condition passed inside if not none check')
                 temp_dict={}
                 for i in data:
@@ -179,16 +178,15 @@ class JiraWindow():
 
     def getAllAutoDetails(self,jira_credentials,socket):
         """
-            Method to login using the user provided credentials and get projects, issue type and priority lists
+            Method to login using the user provided credentials and get projects, issue type lists
             related to user credentials
-            returns list of projects, issue type and priority
+            returns list of projects, issue type
         """
         data = {}
         projects_list = []
         issue_types = []
         data['projects'] = []
         data['issuetype'] = []
-        data['priority'] = []
         jira = None
         try:
             if(';' in jira_credentials['jira_serverlocation']):
@@ -301,7 +299,6 @@ class JiraWindow():
                             config_data.pop('Epic Link')
             log.debug('Fetching of Configure fields by the given inputs is completed successfully')
             jira_input_dict['project_selected']={'project':project_name,'key':project_key}
-            self.get_projects(jira_input_dict,socket)
             socket.emit('configure_field',config_data)           
         except Exception as e:
             log.error(e)
