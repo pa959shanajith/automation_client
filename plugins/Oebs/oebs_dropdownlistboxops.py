@@ -1055,29 +1055,36 @@ class DropdownListboxOperations:
         try:
             log.debug('Received Object Context',DEF_SELECTFROMNAVIGATOR)
 
+            # minimizing all the opened navaigator child elements
+            for childindex in range(acc.getAccessibleContextInfo().childrenCount):
+                try:
+                    listchildobjcontext = acc.getAccessibleChildFromContext(childindex)
+                    listchildobj = listchildobjcontext.getAccessibleContextInfo()
+                    if "-" in str(listchildobj.name).lower():
+                        x_cord = listchildobj.x
+                        y_cord = listchildobj.y
+                        x_cord_width = x_cord + listchildobj.width
+                        y_cord_width = y_cord + listchildobj.height
+                        x_cordinate = (x_cord + x_cord_width) / 2
+                        y_cordinate = (y_cord + y_cord_width) / 2
+                        oebs_mouseops.MouseOperation('doubleClick', int(x_cordinate), int(y_cordinate))
+                except Exception as e:
+                    break
+
             if len(oebs_key_objects.keyword_input) > 0:
-                global counter,flag1,flag2
+                global counter,flag1,flag2,last_index_clicked
                 counter = 0
                 flag1 = flag2 =  False
+                last_index_clicked = -1
                 # currinfo = acc.getAccessibleContextInfo()
 
                 def search_in_navigator():
-                    global counter,flag1,flag2
+                    global counter,flag1,flag2,last_index_clicked
                     try:
                         for childindex in range(acc.getAccessibleContextInfo().childrenCount):
                             listchildobjcontext = acc.getAccessibleChildFromContext(childindex)
                             listchildobj = listchildobjcontext.getAccessibleContextInfo()
-                            if oebs_key_objects.keyword_input[counter].lower() not in str(listchildobj.name).lower():
-                                flag1 = False
-                                if "-" in str(listchildobj.name).lower() and " ".join(re.findall("[a-zA-Z]+", str(listchildobj.name).lower())) not in [element.lower() for element in oebs_key_objects.keyword_input]:
-                                    x_cord = listchildobj.x
-                                    y_cord = listchildobj.y
-                                    x_cord_width = x_cord + listchildobj.width
-                                    y_cord_width = y_cord + listchildobj.height
-                                    x_cordinate = (x_cord + x_cord_width) / 2
-                                    y_cordinate = (y_cord + y_cord_width) / 2
-                                    oebs_mouseops.MouseOperation('doubleClick', int(x_cordinate), int(y_cordinate))
-                            elif oebs_key_objects.keyword_input[counter].lower() in str(listchildobj.name).lower():
+                            if oebs_key_objects.keyword_input[counter].lower() in str(listchildobj.name).lower() and childindex > last_index_clicked:
                                 if "-" not in str(listchildobj.name).lower():
                                     x_cord = listchildobj.x
                                     y_cord = listchildobj.y
@@ -1085,6 +1092,7 @@ class DropdownListboxOperations:
                                     y_cord_width = y_cord + listchildobj.height
                                     x_cordinate = (x_cord + x_cord_width) / 2
                                     y_cordinate = (y_cord + y_cord_width) / 2
+                                    last_index_clicked = childindex
                                     oebs_mouseops.MouseOperation('doubleClick', int(x_cordinate), int(y_cordinate))
                                 time.sleep(2)
                                 flag1 = True
