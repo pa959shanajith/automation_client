@@ -169,6 +169,7 @@ class JiraWindow():
             response=[]
             response.append(issue_id)
             response.append(issue_link)
+            response=str(response)
             socket.emit('issue_id',response)
         elif(issue_id==None and check == False):
             # log.debug("Invalid Attachment Path")
