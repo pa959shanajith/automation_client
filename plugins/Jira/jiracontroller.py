@@ -276,7 +276,7 @@ class JiraWindow():
                                     JsonObject = respon.json()
                                     temp['value']=[]
                                     count=1
-                                   for index,item in enumerate(JsonObject['values']):
+                                    for index,item in enumerate(JsonObject['values']):
                                         temp['value'].append({'key': count , 'text':item})
                                         count=count+1
                             config_data[all_fields[i]['name']]=temp
