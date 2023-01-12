@@ -244,7 +244,7 @@ class JiraWindow():
                 if JsonObject['projects'][0]['name']==project_name:
                     all_fields=JsonObject['projects'][0]['issuetypes'][0]['fields']
                     for i in all_fields:
-                        if all_fields[i]['name'] not in ['Project', 'Issue Type'] or 'customfield' in all_fields[i]['key']:
+                        if all_fields[i]['name'] not in ['Project', 'Issue Type','Description'] or 'customfield' in all_fields[i]['key']:
                             temp = {}
                             temp['name']=all_fields[i]['name']
                             temp['key']=all_fields[i]['key']
@@ -370,8 +370,8 @@ class JiraWindow():
         try:
             project=jira_input_dict['project_selected']['project']
             key=jira_input_dict['project_selected']['key']
-            url=jira_input_dict['url']+"/rest/api/2/search?jql=issueType='Test Case'&fields=id,key,project"
-            auth = HTTPBasicAuth(jira_input_dict['username'],jira_input_dict['password'])
+            url=jira_input_dict['jira_serverlocation']+"/rest/api/2/search?jql=issueType='Test Case'&fields=id,key,project"
+            auth = HTTPBasicAuth(jira_input_dict['jira_uname'],jira_input_dict['jira_pwd'])
             headers={"Accept":"application/json"}
             respon=requests.request("GET",url,headers=headers,auth=auth)
             if respon.status_code == 200:
@@ -382,7 +382,7 @@ class JiraWindow():
                             if 'project' in item['fields']:
                                 if project == item['fields']['project']['name'] and key == item['fields']['project']['key']:
                                     res['testcases'].append({'id': item['id'], 'code':item['key']})
-            socket.emit('Jira Projects',res)
+            socket.emit('Jira_testcases',res)
         except Exception as e:
             log.error(e)
             if 'Invalid URL' in str(e):

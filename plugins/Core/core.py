@@ -789,6 +789,7 @@ class MainNamespace(BaseNamespace):
                 obj.get_projects(data,socketIO)
             elif args[0] == JIRA_ACTION_5:
                 data = args[1]
+                data['project_selected']=args[2]
                 obj.get_testcases(data,socketIO)
         except Exception as e:
             err_msg='Error in JIRA operations'
