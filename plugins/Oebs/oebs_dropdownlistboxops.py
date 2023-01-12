@@ -1060,7 +1060,7 @@ class DropdownListboxOperations:
                 try:
                     listchildobjcontext = acc.getAccessibleChildFromContext(childindex)
                     listchildobj = listchildobjcontext.getAccessibleContextInfo()
-                    if "-" in str(listchildobj.name).lower():
+                    if "-" in str(listchildobj.name).lower() and len(str(listchildobj.name)) > 0 and str(listchildobj.name)[0] == "-":
                         x_cord = listchildobj.x
                         y_cord = listchildobj.y
                         x_cord_width = x_cord + listchildobj.width
@@ -1085,7 +1085,7 @@ class DropdownListboxOperations:
                             listchildobjcontext = acc.getAccessibleChildFromContext(childindex)
                             listchildobj = listchildobjcontext.getAccessibleContextInfo()
                             if oebs_key_objects.keyword_input[counter].lower() in str(listchildobj.name).lower() and childindex > last_index_clicked:
-                                if "-" not in str(listchildobj.name).lower():
+                                if len(str(listchildobj.name)) > 0 and str(listchildobj.name)[0] != "-":
                                     x_cord = listchildobj.x
                                     y_cord = listchildobj.y
                                     x_cord_width = x_cord + listchildobj.width
