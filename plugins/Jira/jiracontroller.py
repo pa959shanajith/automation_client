@@ -46,7 +46,7 @@ class JiraWindow():
         linkedIssue_Type=None
         attachement_path=None
         Labels=['AvoAssure']
-        Execution='ExecutionNo:E2'
+        Execution=data['executionReportNo'].replace(" ","")
         Labels.append(Execution)
         issue_link=None
         try:
@@ -71,7 +71,7 @@ class JiraWindow():
                 for i in data:
                     custom_val_dd={'value':''}
                     custom_val_tb=None
-                    if i not in ['project','issuetype','parentissue','reportId','slno','url','username','password','executionId','priority','Attachment','Linked Issues']:
+                    if i not in ['project','issuetype','parentissue','reportId','slno','url','username','password','executionId','priority','Attachment','Linked Issues','executionReportNo']:
                         if 'userInput' in data[i]:
                             if 'key' in data[i]['userInput']:
                                 if 'customfield' in data[i]['field_name']:
@@ -338,8 +338,7 @@ class JiraWindow():
             Method to login to Jira and get the projects from jira (Jira integration screen)
             returns list of projects
         """
-        res = {}
-        res['projects']=[]
+        res = "invalidcredentials"
         try:
             url=jira_input_dict['jira_serverlocation']+"/rest/api/3/project"
             auth = HTTPBasicAuth(jira_input_dict['jira_uname'],jira_input_dict['jira_pwd'])
@@ -347,8 +346,11 @@ class JiraWindow():
             respon=requests.request("GET",url,headers=headers,auth=auth)
             if respon.status_code == 200:
                 JsonObject = respon.json()
-                for index,item in enumerate(JsonObject):
-                    res['projects'].append({'id': item['id'] , 'name':item['name'], 'code':item['key']})
+                if len(JsonObject)>0:
+                    res = {}
+                    res['projects']=[]
+                    for index,item in enumerate(JsonObject):
+                        res['projects'].append({'id': item['id'] , 'name':item['name'], 'code':item['key']})
             socket.emit('Jira_Projects',res)
         except Exception as e:
             log.error(e)
