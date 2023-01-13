@@ -751,7 +751,7 @@ class WebScrape_Utils:
                         });
                     }
                     uniqueFlag = false;
-                    if (browser == 3) {
+                    if (browser == '3') {
                         f.setAttribute('class', className + ' AvoAssure_Highlight');
                         f.setAttribute('className', className + ' AvoAssure_Highlight');
                         f.style.setAttribute('cssText', 'background: #fff300 !important;opacity:1!important; border: 2px solid #cc3300 !important;outline: 2px solid #fff300 !important;');
@@ -763,7 +763,7 @@ class WebScrape_Utils:
                         f.setAttribute('style', styleElement);          
                     }
                     //Using CSS to make pointer events auto after highlighting.
-                    if (browser!='2')   //Excluding the changes for firefox
+                    if (browser!='2' && currentElement.tagName!='HTML')   //Excluding the changes for firefox
                         document.getElementsByTagName('html')[0].style.pointerEvents='auto';
                 }
                 return false;
@@ -777,7 +777,7 @@ class WebScrape_Utils:
                 return true;
             }
             //Using CSS to make pointer events none as event.preventDefault can't cancel sometimes.
-            if (browser!='2' && currentElement.tagName!='HTML')   //Excluding the changes for firefox and for scrollbar
+            if (browser!='2' && currentElement.tagName!='HTML'  && currentElement._scopedScroll==undefined)   //Excluding the changes for firefox and for scrollbar
                 document.getElementsByTagName('html')[0].style.pointerEvents='none';
             if (event.preventDefault) {
                 event.preventDefault();
@@ -900,6 +900,8 @@ function getElementsByClassName(classname) {
     }
     return a;
 }
+if (document.getElementById('AvoAssure_Table'))
+    document.getElementById('AvoAssure_Table').remove()
 if (document.getElementById('AvoAssureCheckboxHighlight') || document.getElementById('AvoAssureBorderHighlight')) {
     styleTag = document.getElementById('AvoAssureCheckboxHighlight');
     styleTagH = document.getElementById('AvoAssureBorderHighlight');
