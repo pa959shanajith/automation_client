@@ -172,8 +172,8 @@ class JiraWindow():
                     for issue in outwardIssue:
                         res=jira.create_issue_link(type=linkedIssue_Type,inwardIssue=issue_id,outwardIssue=issue)
                         if res.reason=='Created' and res.status_code==201:
-                            logger.print_on_console('created Issue is linked to ',issue)
-            logger.print_on_console('Issue id created is ',issue_id)
+                            logger.print_on_console('Bug is linked to ',issue)
+            logger.print_on_console('Bug created is ',issue_id)
             response=[]
             response.append(issue_id)
             response.append(issue_link)
