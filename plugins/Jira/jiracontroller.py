@@ -71,7 +71,7 @@ class JiraWindow():
                 for i in data:
                     custom_val_dd={'value':''}
                     custom_val_tb=None
-                    if i not in ['project','issuetype','parentissue','reportId','slno','url','username','password','executionId','priority','Attachment','Linked Issues','executionReportNo']:
+                    if i not in ['project','issuetype','parentissue','reportId','slno','url','username','password','executionId','priority','Attachment','Linked Issues','executionReportNo','Testcase']:
                         if 'userInput' in data[i]:
                             if 'key' in data[i]['userInput']:
                                 if 'customfield' in data[i]['field_name']:
@@ -164,7 +164,16 @@ class JiraWindow():
                         res=jira.create_issue_link(type=linkedIssue_Type,inwardIssue=issue_id,outwardIssue=issue)
                         if res.reason=='Created' and res.status_code==201:
                             logger.print_on_console('created Issue is linked to ',issue)
-            logger.print_on_console('Issue id created is ',issue_id)
+            if 'Testcase' in data:
+                outwardIssue=data['Testcase']
+                outwardIssue=outwardIssue.split(',')
+                linkedIssue_Type='blocks'
+                if outwardIssue!='' and linkedIssue_Type!='':
+                    for issue in outwardIssue:
+                        res=jira.create_issue_link(type=linkedIssue_Type,inwardIssue=issue_id,outwardIssue=issue)
+                        if res.reason=='Created' and res.status_code==201:
+                            logger.print_on_console('Bug is linked to ',issue)
+            logger.print_on_console('Bug created is ',issue_id)
             response=[]
             response.append(issue_id)
             response.append(issue_link)
@@ -172,7 +181,12 @@ class JiraWindow():
             socket.emit('issue_id',response)
         elif(issue_id==None and check == False):
             log.error("Invalid Attachment Path")
-            socket.emit('issue_id','Invalid Path')
+            # socket.emit('issue_id','Invalid Path')
+            response=[]
+            response.append('Invalid Path')
+            response.append('')
+            response=str(response)
+            socket.emit('issue_id',response)
         else:
             socket.emit('issue_id','Fail')
 
