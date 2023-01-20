@@ -43,8 +43,6 @@ import time
 import docx
 import urllib.request
 import pyautogui
-
-
 if SYSTEM_OS=='Windows':
     import win32gui
     from pywinauto.application import Application 
@@ -1178,10 +1176,8 @@ class FileOperations:
                     #connect used when you are attempting to automate a running process. 
                     # You can pass in the process id, handle, title or path of the program.
                     app = Application().connect(title="Save As") 
-                    #Path of the file you want to Save
                     # Type the file path and name is Save AS dialog
                     app.SaveAs.edit.SetText(str(FILE_NAME))
-
                     app.SaveAs.Save.click_input()
                 status = TEST_RESULT_PASS
                 methodoutput = TEST_RESULT_TRUE
