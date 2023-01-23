@@ -130,9 +130,8 @@ class ZephyrWindow():
                             res[cyclename] = [phaseObj]
         except Exception as eproject:
             err_msg = 'Error while fetching cycles from Zephyr'
-            if releaseid != 'Jira_123':
-                log.error(err_msg)
-                logger.print_on_console(err_msg)
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
             log.error(eproject, exc_info=True)
         return res
 
