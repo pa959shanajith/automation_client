@@ -1867,6 +1867,7 @@ class Controller():
                     log.root.removeHandler(log.root.handlers[1])
                 shutil.rmtree(os.sep.join([os.getcwd(),'output','.logs',json_data['batchId']]), ignore_errors=True)
             elif action==DEBUG:
+                if json_data[0]['testcasename'] == AVO_GENIUS: kill_process()
                 self.debug_choice=wxObject.choice
                 self.debug_mode=debug_mode
                 self.wx_object=wxObject

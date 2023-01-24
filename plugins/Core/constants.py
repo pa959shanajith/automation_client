@@ -445,6 +445,8 @@ EXECUTE='execute'
 
 DEBUG='debug'
 
+AVO_GENIUS = 'geniusExecution'
+
 STEP_BY_SETP_DEBUG='step_debug'
 
 CORE='Core'
