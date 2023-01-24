@@ -365,7 +365,8 @@ class Dispatcher:
         url=teststepproperty.url.strip()
         keyword = teststepproperty.name
         keyword = keyword.lower()
-        if self.action == DEBUG and browser_Keywords.driver_pre != None:
+        test_script = teststepproperty.testscript_name
+        if (self.action == DEBUG and test_script != AVO_GENIUS) and browser_Keywords.driver_pre != None:
             browser_Keywords.local_bk.driver_obj = browser_Keywords.driver_pre
             driver_util = browser_Keywords.Singleton_DriverUtil()
             v = driver_util.check_if_driver_exists_in_map(teststepproperty.browser_type[0])
