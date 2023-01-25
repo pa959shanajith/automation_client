@@ -36,6 +36,7 @@ class WebScrape_Utils:
 
     """Javascript logic used in start click and add operation"""
     javascript_clicknadd = """
+        //window.location.href = 'https://google.com';
         if (!window.Element || !window.Element.prototype || !window.Element.prototype.hasAttribute) {
             (function () {
                 function hasAttribute(attrName) {
@@ -756,11 +757,14 @@ class WebScrape_Utils:
                         f.setAttribute('className', className + ' AvoAssure_Highlight');
                         f.style.setAttribute('cssText', 'background: #fff300 !important;opacity:1!important; border: 2px solid #cc3300 !important;outline: 2px solid #fff300 !important;');
                     } else {
-                        f.setAttribute('class', className + ' AvoAssure_Highlight');
                         var styleElement = 'background: #fff300 !important;opacity:1!important; border: 2px solid #cc3300 !important;outline: 2px solid #fff300 !important;'
-                        if (f.hasAttribute('style'))
-                            styleElement += f.getAttribute('style');    //Taking care of existing css on element
-                        f.setAttribute('style', styleElement);          
+                        if ((f.hasAttribute('style') && f.getAttribute('style').indexOf(styleElement)==-1)||!f.hasAttribute('style'))
+                        {
+                            f.setAttribute('class', className + ' AvoAssure_Highlight');
+                            if (f.hasAttribute('style'))
+                                styleElement += f.getAttribute('style');    //Taking care of existing css on element
+                            f.setAttribute('style', styleElement);          
+                        }
                     }
                     //Using CSS to make pointer events auto after highlighting.
                     if (browser!='2' && currentElement.tagName!='HTML')   //Excluding the changes for firefox
@@ -910,7 +914,7 @@ if (document.getElementById('AvoAssureCheckboxHighlight') || document.getElement
     head.removeChild(styleTagH);
     var a = getElementsByClassName('AvoAssure_Highlight');
     for (var i = 0; i < a.length; i++) {
-        a[i].removeAttribute('style');
+        a[i].setAttribute('style',a[i].getAttribute('style').replace('background: #fff300 !important;opacity:1!important; border: 2px solid #cc3300 !important;outline: 2px solid #fff300 !important;',''));
     }
     var elms = document.querySelectorAll("*[style]");
     Array.prototype.forEach.call(elms, function(elm) {
