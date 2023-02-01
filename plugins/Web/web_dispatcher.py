@@ -179,6 +179,7 @@ class Dispatcher:
             'getelementtagvalue': local_Wd.util_object.get_element_tag_value,
             'getattributevalue': local_Wd.util_object.get_attribute_value,
             'verifyattribute': local_Wd.util_object.verify_attribute,
+            'verifystyle': local_Wd.util_object.verify_style,
 
             'openbrowser':local_Wd.browser_object.openBrowser,
             'getbrowsertoforeground':local_Wd.browser_object.get_foreground_window,
@@ -432,9 +433,11 @@ class Dispatcher:
             if driver:
                 local_Wd.log.debug('In send_webelement_to_keyword method')
                 try:
+                    #Handling cross origin iframe
                     if objectname!='' and objectname!='@Custom' and (objectname.split(';')[2].find('iframe')!=-1):
                         local_Wd.log.debug('Encountered iframe/frame url')
                         iframe_xpath = objectname.split(';')[2].split(',')[0]
+                        #changing driver local_bk.driver_obj to point to iframe.
                         local_Wd.custom_object.switch_to_iframe(iframe_xpath,driver.current_window_handle)
                         driver = browser_Keywords.local_bk.driver_obj
                         ele_inside_iframe_xpath = objectname.split(';')[2].split(',')[1]
@@ -655,7 +658,7 @@ class Dispatcher:
                             result[3]=err_msg
                         if(err_msg): return result
                     identifiers = objectname.split(';')
-                    input=identifiers[0]
+                    input=identifiers
 
                 if result != TERMINATE:
 
@@ -684,7 +687,7 @@ class Dispatcher:
                             else : result = self.web_dict[keyword](webelement,input,output)
                     else:
                         result= self.web_dict[keyword](webelement,input)
-                    ## To terminate debug/execution if requested browser is not available in the system (Defect #846)
+                    ## To terminate debug/execution if requested browser is not available in the system (Defect #846) 
                     if(result[1] == TERMINATE):
                         result = TERMINATE
                     if keyword in window_ops_list:

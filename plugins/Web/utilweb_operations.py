@@ -1285,6 +1285,30 @@ return isVisible(s);"""
             local_uo.log.error(e)
         return status,methodoutput,output,err_msg
 
+    def verify_style(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output=OUTPUT_CONSTANT
+        try:
+            if webelement.is_enabled()==False:
+                local_uo.log.error(ERR_DISABLED_OBJECT)
+                err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
+                logger.print_on_console(ERR_DISABLED_OBJECT)  
+            else:                
+                verify_result = browser_Keywords.local_bk.driver_obj.execute_script(webconstants.VERIFY_STYLE, webelement,input[0],input[1])
+                if verify_result:
+                    logger.print_on_console("The style attribute matches.")
+                else:
+                    logger.print_on_console("The style attribute doesn't match.")
+                methodoutput = TEST_RESULT_TRUE
+                status = TEST_RESULT_PASS
+        except Exception as e:
+            err_msg = 'Error occured while fetching style value'
+            logger.print_on_console(err_msg)
+            local_uo.log.error(e)
+        return status,methodoutput,output,err_msg
+
     def verify_attribute(self,webelement,input,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE

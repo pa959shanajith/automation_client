@@ -1500,6 +1500,8 @@ class StepDescription:
             return 'Verify text ' + "'"+input +"'"+ ' is the name of the ' +"'" + tsp.custname + "'"
 
         #utilweb operations
+        def verifyStyle():
+            return 'Verify the style of '+ "'" + tsp.custname + "'" + ' with given input'
         def verifyreadonly():
             return 'Verify '+ "'" + tsp.custname + "'" + ' is read-only'
         def verifyenabled():
