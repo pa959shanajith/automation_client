@@ -25,6 +25,8 @@ import time
 from PIL import ImageGrab
 from PIL.ImageOps import flip
 import struct
+import PIL.ImageGrab
+import core_utils
 from ctypes import wintypes
 from constants import *
 win_rect = 0
@@ -439,6 +441,20 @@ class Launch_Keywords():
                             app_win32 = Application(backend = 'win32').connect(process = window_pid)
                             app_uia = Application(backend = 'uia').connect(process = window_pid)
                             app_win32.top_window().set_focus()
+                            #-----Taking screenshot at execution---------
+                            time.sleep(3)
+                            im = PIL.ImageGrab.grab()
+
+                            core_utils.get_all_the_imports('IRIS')
+
+                            import client_1
+                            message=client_1.image_save(im)
+
+                            #execution_image_path ="D:\Source_Code\AI_Output\\execution_image.png"
+                            #im.save(execution_image_path)
+                            
+
+                                #logger.print_on_console(box_dict1)
                             status = desktop_constants.TEST_RESULT_PASS
                             result = desktop_constants.TEST_RESULT_TRUE
                             break

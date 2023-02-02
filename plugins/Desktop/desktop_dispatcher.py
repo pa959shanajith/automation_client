@@ -324,6 +324,118 @@ class DesktopDispatcher:
 
         return result
 
+
+    def dispatcher_iris(self,theta,hypo_x,hypo_y,teststepproperty, input, mythread):
+        #logger.print_on_console(input)
+        objectname = teststepproperty.objectname
+        output = teststepproperty.outputval
+        objectname = objectname.strip()
+        keyword = teststepproperty.name.lower()
+        url = teststepproperty.url
+        err_msg = None
+        result = [desktop_constants.TEST_RESULT_FAIL, desktop_constants.TEST_RESULT_FALSE, constants.OUTPUT_CONSTANT, err_msg]
+
+        try:
+            if ( objectname == desktop_constants.CUSTOM and teststepproperty.custom_flag ):
+                ele_type = input[0].lower()
+                if ( ele_type in self.get_ele_type ):
+                    ele_type=self.get_ele_type[ele_type]
+                parent_xpath=teststepproperty.parent_xpath
+                if ( keyword in self.custom_dict and ele_type in self.custom_dict[keyword] ):
+                    custom_desktop_element = self.desktop_custom_object_obj.getobjectforcustom(parent_xpath, ele_type, input[2])
+                    if ( custom_desktop_element != '' or None ):
+                        objectname = custom_desktop_element
+                else:
+                    logger.print_on_console( "Unmapped or non existant custom objects" )
+                    log.error( "Unmapped or non existant custom objects" )
+        except Exception as e:
+            logger.print_on_console( "Error has occured in custom objects" )
+            log.error( "Error has occured in custom objects" )
+#-----------------------------------------------------------------for custom objects
+
+        try:
+
+            keyword = keyword.lower()
+            ele = None
+            if ( keyword in list(self.desktop_dict.keys()) ):
+                if ( keyword == 'launchapplication' or keyword == 'findwindowandattach' or keyword == 'selectmenu' or keyword in list(self.email_dict.keys()) ):
+                    result = self.desktop_dict[keyword](input,output)
+                    #logger.print_on_console(result)
+                    
+                else:
+                    self.launch_keywords_obj.verifyWindowTitle()
+                    if ( objectname != '' and teststepproperty.cord != None and teststepproperty.cord != '' ):
+                        if( desktop_launch_keywords.window_name != None ):
+                            SetForegroundWindow(find_window(title=self.launch_keywords_obj.windowname))
+                        obj_props = teststepproperty.objectname.split(';')
+                        obj_lab=teststepproperty.cord
+                        #logger.print_on_console(teststepproperty)
+                        #logger.print_on_console(obj_props)
+                        lab=obj_props[1].split("_")
+                        coord = [obj_props[2],obj_props[3],obj_props[4],obj_props[5],lab[0]]
+                        #logger.print_on_console(coord)
+                        ele = {'cord': teststepproperty.cord, 'coordinates': coord}
+                        #logger.print_on_console(ele)
+                        #logger.print_on_console(teststepproperty.custom_flag)
+                        if ( teststepproperty.custom_flag ):
+                            if (keyword.lower() == 'getstatusiris') : result = self.desktop_dict[keyword](ele, input, output, teststepproperty.parent_xpath, teststepproperty.objectname.split(';')[-2])
+                            else : result = self.desktop_dict[keyword](ele, input, output, teststepproperty.parent_xpath)
+                        elif ( teststepproperty.objectname.split(';')[-1] == 'constant' and keyword.lower() == 'verifyexistsiris' ):
+                            result = self.desktop_dict[keyword](ele, input, output, 'constant')
+                            #logger.print_on_console(result)
+                        else:
+                            if (keyword.lower() == 'getstatusiris') : result = self.desktop_dict[keyword](ele, input, output, teststepproperty.objectname.split(';')[-2])
+                            else : result = self.desktop_dict[keyword](ele,theta,hypo_x,hypo_y, input, output)
+                    else:
+                        if ( objectname != '' ):
+                            ele = self.get_desktop_element(objectname, url)
+                        result = self.desktop_dict[keyword](ele, url, input, output)
+
+                if ( not(desktop_constants.ELEMENT_FOUND) and self.exception_flag ):
+                    result = constants.TERMINATE
+            else:
+                err_msg = desktop_constants.INVALID_KEYWORD
+                result = list(result)
+                
+                result[3] = err_msg
+            configvalues = readconfig.configvalues
+            #logger.print_on_console(configvalues)            
+            screen_shot_obj = screenshot_keywords.Screenshot()
+            #logger.print_on_console(screen_shot_obj)
+            #------------------------------------------return null for get-keywords if keyword fails
+            if ( keyword in desktop_constants.GET_KEYWORDS and result[0] == desktop_constants.TEST_RESULT_FAIL and result[1] == desktop_constants.TEST_RESULT_FALSE ):
+                try:
+                    lst = list(result)
+                    lst[2] = None
+                    result = tuple(lst)
+                except:
+                    pass
+            #------------------------------------------------------------------------------------------
+            if ( self.action == constants.EXECUTE ):
+                if  ( result != constants.TERMINATE  ):
+                    result = list(result)
+                    screen_details=mythread.json_data['suitedetails'][0]
+                    if ( configvalues['screenShot_Flag'].lower() == 'fail' ):
+                        if ( result[0].lower() == 'fail' ):
+                            if ( keyword not in desktop_constants.APPLICATION_KEYWORDS ):
+                                file_path = screen_shot_obj.captureScreenshot(screen_details)
+                                result.append(file_path[2])
+                    elif configvalues['screenShot_Flag'].lower() == 'all':
+                        if  ( keyword not in desktop_constants.APPLICATION_KEYWORDS ):
+                            file_path = screen_shot_obj.captureScreenshot(screen_details)
+                            result.append(file_path[2])
+        except TypeError as e:
+            err_msg = constants.ERROR_CODE_DICT['ERR_INDEX_OUT_OF_BOUNDS_EXCEPTION']
+            result = list(result)
+            result[3] = err_msg
+        except Exception as e:
+            log.error( e )
+        if  ( err_msg != None ):
+            log.error( err_msg )
+            logger.print_on_console( err_msg )
+
+        return result
+
     def get_desktop_element(self, xPath, url):
         index = None
         ele = ''
