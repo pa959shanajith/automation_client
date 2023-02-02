@@ -74,7 +74,7 @@ class Pause(wx.Frame):
 
 class Display(wx.Frame):
     def __init__(self, parent, id,title,input):
-        wx.Frame.__init__(self, parent, title="Avo Assure ICE - DisplayValue",   size=(400, 300),style=wx.STAY_ON_TOP|wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER |wx.MAXIMIZE_BOX|wx.CLOSE_BOX))
+        wx.Frame.__init__(self, parent, title="Avo Assure Client - DisplayValue",   size=(400, 300),style=wx.STAY_ON_TOP|wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER |wx.MAXIMIZE_BOX|wx.CLOSE_BOX))
         self.SetBackgroundColour('#e6e7e8')
         self.panel = wx.Panel(self)
         self.iconpath = os.environ["IMAGES_PATH"] + "/avo.ico"

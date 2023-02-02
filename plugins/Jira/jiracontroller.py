@@ -36,23 +36,19 @@ class JiraWindow():
     def createIssue(self,data,socket):
         """
             Method to create issue in JIRA
-            inputs project id , summary , issuetype , priority , description , ConfigureFields(selected)
+            inputs project id , summary , issuetype , description , ConfigureFields(selected)
             returns issue id created in JIRA
         """
         issue_id = None
         jira = None
         create_issues = None
-        Assignee = None
-        Reporter = None
-        Cause_of_Defect=None
-        Epic_Link_Ip=None
-        Environment=None
         outwardIssue=None
         linkedIssue_Type=None
         attachement_path=None
-        Labels=None
-        Epic_Name=None
-        description=None
+        Labels=['AvoAssure']
+        Execution=data['executionReportNo'].replace(" ","")
+        Labels.append(Execution)
+        issue_link=None
         try:
             username= data['username']
             password = data['password']
@@ -67,27 +63,51 @@ class JiraWindow():
             project_id = data['project']
             summary = data['summary']
             issue_type = data['issuetype']
-            priority = data['priority']
             parentid=data['parentissue']
             flag = False
-            if all(check1 is not None for check1 in [project_id, summary, issue_type, priority]):
+            if all(check1 is not None for check1 in [project_id, summary, issue_type]):
                 log.debug('Condition passed inside if not none check')
-                description = data['description']
-                if 'Environment' in data:
-                    Environment = data['Environment']['userInput']
-                if 'Labels' in data:
-                    Labels = data['Labels']['userInput']
-                if 'Assignee' in data:
-                    Assignee = data['Assignee']['userInput']
-                if 'Reporter' in data:
-                    Reporter = data['Reporter']['userInput']
-                if 'Cause of Defect' in data:
-                    Cause_of_Defect=data['Cause of Defect']
-                if 'epicName' in data:
-                    Epic_Name = data['epicName']
-                if 'Epic Link' in data:
-                    Epic_Link_Ip = data['Epic Link']['userInput']
-                    Epic_Link = data['Epic Link']
+                temp_dict={}
+                for i in data:
+                    custom_val_dd={'value':''}
+                    custom_val_tb=None
+                    if i not in ['project','issuetype','parentissue','reportId','slno','url','username','password','executionId','priority','Attachment','Linked Issues','executionReportNo','Testcase']:
+                        if 'userInput' in data[i]:
+                            if 'key' in data[i]['userInput']:
+                                if 'customfield' in data[i]['field_name']:
+                                    custom_val_dd['value']=data[i]['userInput']['text']
+                                    temp_dict[data[i]['field_name']] = custom_val_dd
+                                else:
+                                    if data[i]['field_name'].lower()=='priority':
+                                        temp_dict[data[i]['field_name']] = {'name':data[i]['userInput']['text']}
+                                    else:
+                                        if i.lower() == 'labels':
+                                            Labels.append(data[i]['userInput']['text'])
+                                            temp_dict[data[i]['field_name']] = Labels
+                                        else:
+                                            temp_dict[data[i]['field_name']] = data[i]['userInput']['text']
+                            else:
+                                # use below logic is for label text box without suggestion
+                                # if i.lower() == 'labels':
+                                #     Labels.append(data[i]['userInput'])
+                                #     temp_dict[data[i]['field_name']] = Labels
+                                # else:
+                                if 'customfield' in data[i]['field_name']:
+                                    custom_val_tb=data[i]['userInput']
+                                    temp_dict[data[i]['field_name']] = custom_val_tb
+                                else:
+                                    temp_dict[data[i]['field_name']] = data[i]['userInput']
+                        else:
+                            temp_dict[i]=data[i]
+                    if i.lower() == 'project': 
+                        temp_dict[i]={'id': project_id}
+                    if i.lower() in ['issuetype']: 
+                        temp_dict[i]={'name': issue_type}
+                    if i.lower() in ['reporter', 'assignee']:
+                        user_id = self.getAccountID(data[i]['userInput'])
+                        temp_dict[data[i]['field_name']]={'accountId':user_id}
+                if 'labels' not in temp_dict:
+                    temp_dict['labels']=Labels
                 if 'Attachment' in data:
                     attachement_path = str(data['Attachment']['userInput'])
                 check = None
@@ -106,30 +126,13 @@ class JiraWindow():
                 else:
                     flag = True
                 if(flag):
-                    if(issue_type == 'Story' or issue_type == 'Epic'):
-                        issue_dict = {'project': {'id': project_id},'summary': summary,'issuetype': {'name': issue_type},'description': description}
-                    else:
-                        issue_dict = {'project': {'id': project_id},'summary': summary,'issuetype': {'name': issue_type},'priority':{'name' : priority},'description': description}
+                    issue_dict={}
                     if(issue_type=='Sub-task'):
                         issue_dict['parent']={'key':parentid}
-                    if Assignee is not None and Assignee!='':
-                        Assignee_id = self.getAccountID(Assignee)
-                        issue_dict['assignee']={'accountId': Assignee_id}
-                    if Reporter is not None and Reporter!='':
-                        Reporter_id = self.getAccountID(Reporter)
-                        issue_dict['reporter']={'accountId': Reporter_id}
-                    if Labels is not None and Labels!='':
-                        issue_dict['labels']=[Labels]
-                    if Environment is not None and Environment!='':
-                        issue_dict['environment']=Environment
-                    if Cause_of_Defect is not None and Cause_of_Defect!='':
-                        issue_dict[Cause_of_Defect['field_name']]={'value':Cause_of_Defect['userInput']['text']}
-                    if Epic_Link_Ip is not None and Epic_Link_Ip!='':
-                        issue_dict[Epic_Link['field_name']]=Epic_Link_Ip
-                    if Epic_Name is not None and Epic_Name!='':
-                        issue_dict[Epic_Name['field_name']]=Epic_Name['userInput']
-                    create_issues = jira.create_issue(issue_dict)
+                    create_issues = jira.create_issue(temp_dict)
                     issue_id = create_issues.key
+                    issue_link = url + "/browse/" + issue_id
+                    logger.print_on_console('Issue link is', issue_link)
                     if attachement_path != '' and  attachement_path is not None and check == True:
                         try:
                             file_obj = None
@@ -161,28 +164,43 @@ class JiraWindow():
                         res=jira.create_issue_link(type=linkedIssue_Type,inwardIssue=issue_id,outwardIssue=issue)
                         if res.reason=='Created' and res.status_code==201:
                             logger.print_on_console('created Issue is linked to ',issue)
-            logger.print_on_console('Issue id created is ',issue_id)
-            socket.emit('issue_id',issue_id)
+            if 'Testcase' in data:
+                outwardIssue=data['Testcase']
+                outwardIssue=outwardIssue.split(',')
+                linkedIssue_Type='blocks'
+                if outwardIssue!='' and linkedIssue_Type!='':
+                    for issue in outwardIssue:
+                        res=jira.create_issue_link(type=linkedIssue_Type,inwardIssue=issue_id,outwardIssue=issue)
+                        if res.reason=='Created' and res.status_code==201:
+                            logger.print_on_console('Bug is linked to ',issue)
+            logger.print_on_console('Bug created is ',issue_id)
+            response=[]
+            response.append(issue_id)
+            response.append(issue_link)
+            response=str(response)
+            socket.emit('issue_id',response)
         elif(issue_id==None and check == False):
-            # log.debug("Invalid Attachment Path")
             log.error("Invalid Attachment Path")
-            socket.emit('issue_id','Invalid Path')
+            # socket.emit('issue_id','Invalid Path')
+            response=[]
+            response.append('Invalid Path')
+            response.append('')
+            response=str(response)
+            socket.emit('issue_id',response)
         else:
             socket.emit('issue_id','Fail')
 
     def getAllAutoDetails(self,jira_credentials,socket):
         """
-            Method to login using the user provided credentials and get projects, issue type and priority lists
+            Method to login using the user provided credentials and get projects, issue type lists
             related to user credentials
-            returns list of projects, issue type and priority
+            returns list of projects, issue type
         """
         data = {}
         projects_list = []
         issue_types = []
-        priority_list = []
         data['projects'] = []
         data['issuetype'] = []
-        data['priority'] = []
         jira = None
         try:
             if(';' in jira_credentials['jira_serverlocation']):
@@ -196,13 +214,11 @@ class JiraWindow():
                 jira = JIRA(options=jira_options,basic_auth=(jira_credentials['jira_uname'],jira_credentials['jira_pwd']))
             projects_list = jira.projects()
             issue_types = jira.issue_types()
-            priority_list = jira.priorities()
             for index,item in enumerate(projects_list):
                 data['projects'].append({'id': item.id , 'name':item.name, 'code':item.key})
             for index,item in enumerate(issue_types):
-                data['issuetype'].append({'id': item.id , 'name':item.name})
-            for index,item in enumerate(priority_list):
-                data['priority'].append({'id': item.id , 'name':item.name})
+                if item.name.lower()=='bug':
+                    data['issuetype'].append({'id': item.id , 'name':item.name})
             socket.emit('auto_populate',data)
         except Exception as e:
             log.error(e)
@@ -242,19 +258,39 @@ class JiraWindow():
                 if JsonObject['projects'][0]['name']==project_name:
                     all_fields=JsonObject['projects'][0]['issuetypes'][0]['fields']
                     for i in all_fields:
-                        if all_fields[i]['name'] not in ['Project', 'Issue Type', 'Summary', 'Priority', 'Description'] or 'customfield' in all_fields[i]['key']:
+                        if all_fields[i]['name'] not in ['Project', 'Issue Type','Description'] or 'customfield' in all_fields[i]['key']:
                             temp = {}
                             temp['name']=all_fields[i]['name']
                             temp['key']=all_fields[i]['key']
                             temp['value']='Editable'
+                            temp['required']=all_fields[i]['required']
+                            temp['type']= all_fields[i]['schema']['type'] if all_fields[i]['schema'] else None
                             if 'allowedValues' in all_fields[i] and all_fields[i]['allowedValues']==[]:
                                 temp['value']='None'
-                            if 'allowedValues' in all_fields[i] and all_fields[i]['name']=='Cause of Defect':
+                            elif 'allowedValues' in all_fields[i] and all_fields[i]['allowedValues']!=[] and all_fields[i]['name'].lower()!='priority':
                                 temp['value']=[]
                                 count=1
                                 for index,item in enumerate(all_fields[i]['allowedValues']):
                                     temp['value'].append({'key': count , 'text':item['value']})
                                     count=count+1
+                            elif 'allowedValues' in all_fields[i] and all_fields[i]['allowedValues']!=[] and all_fields[i]['name'].lower()=='priority':
+                                temp['value']=[]
+                                count=1
+                                for index,item in enumerate(all_fields[i]['allowedValues']):
+                                    temp['value'].append({'key': count , 'text':item['name']})
+                                    count=count+1
+                            if all_fields[i]['name'].lower() == 'labels':
+                                url=jira_input_dict['url']+"/rest/api/3/label"
+                                auth = HTTPBasicAuth(jira_input_dict['username'],jira_input_dict['password'])
+                                headers={"Accept":"application/json"}
+                                respon=requests.request("GET",url,headers=headers,auth=auth)
+                                if respon.status_code == 200:
+                                    JsonObject = respon.json()
+                                    temp['value']=[]
+                                    count=1
+                                    for index,item in enumerate(JsonObject['values']):
+                                        temp['value'].append({'key': count , 'text':item})
+                                        count=count+1
                             config_data[all_fields[i]['name']]=temp
                     if issue_type == 'Epic' and 'Epic Link' in config_data:
                         config_data['Epic Link']['value']='An epic cannot have another epic linked to it.'
@@ -276,7 +312,8 @@ class JiraWindow():
                         if 'Epic Link' in config_data:
                             config_data.pop('Epic Link')
             log.debug('Fetching of Configure fields by the given inputs is completed successfully')
-            socket.emit('configure_field',config_data)
+            jira_input_dict['project_selected']={'project':project_name,'key':project_key}
+            socket.emit('configure_field',config_data)           
         except Exception as e:
             log.error(e)
             socket.emit('configure_field','Fail')
@@ -308,3 +345,66 @@ class JiraWindow():
             log.error(e)
             logger.print_on_console('Exception in fetching Account ID')
         return acc_id
+
+
+    def get_projects(self,jira_input_dict,socket):
+        """
+            Method to login to Jira and get the projects from jira (Jira integration screen)
+            returns list of projects
+        """
+        res = "invalidcredentials"
+        try:
+            url=jira_input_dict['jira_serverlocation']+"/rest/api/3/project"
+            auth = HTTPBasicAuth(jira_input_dict['jira_uname'],jira_input_dict['jira_pwd'])
+            headers={"Accept":"application/json"}
+            respon=requests.request("GET",url,headers=headers,auth=auth)
+            if respon.status_code == 200:
+                JsonObject = respon.json()
+                if len(JsonObject)>0:
+                    res = {}
+                    res['projects']=[]
+                    for index,item in enumerate(JsonObject):
+                        res['projects'].append({'id': item['id'] , 'name':item['name'], 'code':item['key']})
+            socket.emit('Jira_Projects',res)
+        except Exception as e:
+            log.error(e)
+            if 'Invalid URL' in str(e):
+                socket.emit('auto_populate','Invalid Url')
+            elif 'Unauthorized' in str(e):
+                socket.emit('auto_populate','Invalid Credentials')
+            else:
+                socket.emit('auto_populate','Fail')
+            logger.print_on_console('Exception in login and auto populating projects')
+
+    def get_testcases(self,jira_input_dict,socket):
+        """
+            Method to get the testcases based on project from jira
+            returns list of testcases
+        """
+        res = {}
+        res['testcases']=[]
+        try:
+            project=jira_input_dict['project_selected']['project']
+            key=jira_input_dict['project_selected']['key']
+            url=jira_input_dict['jira_serverlocation']+"/rest/api/2/search?jql=issueType='Test Case'&fields=id,key,project"
+            auth = HTTPBasicAuth(jira_input_dict['jira_uname'],jira_input_dict['jira_pwd'])
+            headers={"Accept":"application/json"}
+            respon=requests.request("GET",url,headers=headers,auth=auth)
+            if respon.status_code == 200:
+                JsonObject = respon.json()
+                if 'issues' in JsonObject:
+                    for index,item in enumerate(JsonObject['issues']):
+                        if 'fields' in item:
+                            if 'project' in item['fields']:
+                                if project == item['fields']['project']['name'] and key == item['fields']['project']['key']:
+                                    res['testcases'].append({'id': item['id'], 'code':item['key']})
+            socket.emit('Jira_testcases',res)
+        except Exception as e:
+            log.error(e)
+            if 'Invalid URL' in str(e):
+                socket.emit('auto_populate','Invalid Url')
+            elif 'Unauthorized' in str(e):
+                socket.emit('auto_populate','Invalid Credentials')
+            else:
+                socket.emit('auto_populate','Fail')
+            logger.print_on_console('Exception in login and populating testcases')

@@ -20,7 +20,6 @@ from os.path import normpath
 from constants import *
 import controller
 import readconfig
-# from __main__ import loadingobj
 import clientwindow
 import json
 import socket
@@ -96,7 +95,7 @@ def _process_ssl_errors(e):
     err = "[TLS Certificate Error] TLS certificate is invalid"
     err_msg = "Error occured while connecting to server due to TLS certificate error."
     desc_err_msg = ("Try changing Server Certificate Path to 'default'." +
-        " If that doesn't work, then try lowering TLS security Level in ICE configuration." +
+        " If that doesn't work, then try lowering TLS security Level in Avo Assure Client configuration." +
         "\nNote: Setting TLS security level to 'Low' will result in an insecure HTTPS connection\n")
     error = str(e).replace("[engine.io waiting for connection] ",'').replace("[SSL: CERTIFICATE_VERIFY_FAILED] ",'')
     if "_ssl.c" in error:
@@ -104,7 +103,7 @@ def _process_ssl_errors(e):
     elif 'SSLCertVerificationError' in error and "doesn't match" in error:
         err = "[TLS Hostname Mismatch] " + error.split('SSLCertVerificationError')[1][2:-3]
         desc_err_msg = ("Provide a valid hostname for which TLS certificate is issued for." +
-            " If that doesn't work, then try setting TLS security Level to 'Med' in ICE configuration\n")
+            " If that doesn't work, then try setting TLS security Level to 'Med' in Avo Assure Client configuration\n")
     elif 'bad handshake' in error and 'certificate verify failed' in error:
         err = "[TLS Certificate Mismatch] TLS certificate does not match with Server"
     elif 'certificate' in error and 'key values mismatch' in error:
@@ -160,10 +159,10 @@ class MainNamespace(BaseNamespace):
                     root.ice_token = None
                     root.token_obj.delete_token()
                     if root.gui:
-                        logger.print_on_console("ICE is not registered with Avo Assure. Click to Register")
+                        logger.print_on_console("Avo Assure Client is not registered with Avo Assure. Click to Register")
                         wx.CallAfter(cw.enable_register)
                     else:
-                        logger.print_on_console("ICE is not registered with Avo Assure. Try Again")
+                        logger.print_on_console("Avo Assure Client is not registered with Avo Assure. Try Again")
                 if root.gui: wx.CallAfter(cw.connectbutton.Enable)
 
                 if allow_connect:
@@ -171,7 +170,7 @@ class MainNamespace(BaseNamespace):
                     msg = ("Do Not Disturb" if dnd_mode else "Normal") + " Mode: Connection to the Avo Assure Server established"
                     logger.print_on_console(msg)
                     log.info(msg)
-                    msg = "ICE Name: " + root.ice_token["icename"]
+                    msg = "Avo Assure Client Name: " + root.ice_token["icename"]
                     logger.print_on_console(msg)
                     log.info(msg)
                     if root.gui:
@@ -785,6 +784,13 @@ class MainNamespace(BaseNamespace):
             elif args[0] == JIRA_ACTION_3:
                 data = args[1]
                 obj.getConfigureFields(data,socketIO)
+            elif args[0] == JIRA_ACTION_4:
+                data = args[1]
+                obj.get_projects(data,socketIO)
+            elif args[0] == JIRA_ACTION_5:
+                data = args[1]
+                data['project_selected']=args[2]
+                obj.get_testcases(data,socketIO)
         except Exception as e:
             err_msg='Error in JIRA operations'
             log.error(err_msg)
@@ -806,7 +812,9 @@ class MainNamespace(BaseNamespace):
             spath=spath['linux']
         else:
             spath=spath["default"]
-        if len(spath) != 0 and os.path.exists(spath):
+        if readconfig.configvalues["isTrial"] == 1 :
+            constants.SCREENSHOT_PATH = os.getcwd()+OS_SEP+'screenshots'
+        elif len(spath) != 0 and os.path.exists(spath):
             constants.SCREENSHOT_PATH=os.path.normpath(spath)+OS_SEP
         else:
             constants.SCREENSHOT_PATH="Disabled"
@@ -901,7 +909,7 @@ class MainNamespace(BaseNamespace):
             logger.print_on_console(msg)
             log.info(msg)
             if (len(args) > 1 and args[1] == "dereg"):
-                msg = 'ICE "'+root.ice_token["icename"]+'" is Deregistered.'
+                msg = 'Avo Assure Client "'+root.ice_token["icename"]+'" is Deregistered.'
                 logger.print_on_console(msg)
                 log.info(msg)
                 root.token_obj.delete_token()
@@ -1016,7 +1024,7 @@ class ConnectionThread(threading.Thread):
         if "hostname" in root.ice_token: reg_hostname=root.ice_token["hostname"]
         """Check if registered hostname in the Token matches with the current hostname"""
         if reg_hostname != hostname:
-            msg="Access denied: Hostname doesn't match. ICE is registered with a different hostname "+reg_hostname
+            msg="Access denied: Hostname doesn't match. Avo Assure Client is registered with a different hostname "+reg_hostname
             logger.print_on_console(msg)
             log.error(msg)
             root.ice_token = None
@@ -1058,7 +1066,7 @@ class TestThread(threading.Thread):
     """Test Worker Thread Class."""
 
     #----------------------------------------------------------------------
-    def __init__(self, main, action, json_data, aws_mode):
+    def __init__(self, main, action, json_data, aws_mode, cicd_mode=False):
         """Init Worker Thread Class."""
         super(TestThread, self).__init__()
         self.name = "test_thread"
@@ -1078,6 +1086,7 @@ class TestThread(threading.Thread):
         self.json_data = json_data
         self.debug_mode = False if not(self.cw) else self.cw.debug_mode
         self.aws_mode = aws_mode
+        self.cicd_mode = cicd_mode
         self.test_status = 'pass'
         self.start()    # start the thread
 
@@ -1092,6 +1101,8 @@ class TestThread(threading.Thread):
     def run(self):
         """Run Worker Thread."""
         # This is the code executing in the new thread.
+        if self.cicd_mode:
+            check_browser()
         global execution_flag, closeActiveConnection, connection_Timer, termination_inprogress
         batch_id = None
         termination_inprogress = True
@@ -1125,54 +1136,76 @@ class TestThread(threading.Thread):
                 apptype = (self.json_data)[0]['apptype']
             else:
                 execution_flag = True
-                #set ICE status as busy
+                #set Avo Assure Client status as busy
                 set_ICE_status(True)
                 if root.gui: benchmark.stop(True)
                 apptype = self.json_data['apptype']
             if apptype == "DesktopJava": apptype = "oebs"
-            if apptype.lower() not in plugins_list:
-                logger.print_on_console('This app type is not part of the license.')
-                status=TERMINATE
+            if self.cicd_mode:
+            # if apptype.lower() not in plugins_list:
+            #     logger.print_on_console('This app type is not part of the license.')
+            #     status=TERMINATE
+            # else:
+                status = self.con.invoke_controller(self.action,self,self.debug_mode,runfrom_step,self.json_data,self.main,socketIO,qcObject,qtestObject,zephyrObject,self.aws_mode,self.cicd_mode)
             else:
-                status = self.con.invoke_controller(self.action,self,self.debug_mode,runfrom_step,self.json_data,self.main,socketIO,qcObject,qtestObject,zephyrObject,self.aws_mode)
+                if apptype.lower() not in plugins_list:
+                    logger.print_on_console('This app type is not part of the license.')
+                    status=TERMINATE
+                else:
+                    status = self.con.invoke_controller(self.action,self,self.debug_mode,runfrom_step,self.json_data,self.main,socketIO,qcObject,qtestObject,zephyrObject,self.aws_mode,self.cicd_mode)
 
             logger.print_on_console('Execution status '+status)
-
             if status==TERMINATE:
                 logger.print_on_console('---------Termination Completed-------',color="YELLOW")
-            if self.action==DEBUG:
-                testcasename = handler.local_handler.testcasename
-                self.cw.killChildWindow(debug=True)
-                if (len(testcasename) > 0 or apptype.lower() not in plugins_list):
-                    if('UserObjectScrape' in sys.modules):
-                        import UserObjectScrape
-                        if(UserObjectScrape.update_data!={}):
-                            data=UserObjectScrape.update_data
-                            UserObjectScrape.update_data={}
-                            data['status']=status
-                            socketIO.emit('result_debugTestCase',data)
+            if self.cicd_mode:
+                opts = self.main.opts
+                if self.test_status == 'pass' and status != COMPLETED: self.test_status = 'fail'
+                result = {"status":status, "batchId": batch_id, "testStatus": self.test_status}
+                result['exec_req'] = {'execReq':self.json_data}
+                result["event"] = "result_executeTestSuite"
+                result["configkey"] = opts.configkey
+                result["executionListId"] = opts.executionListId
+                result["agentname"] = opts.agentname
+                server_url = 'https://' + opts.serverurl + ':' + opts.serverport + '/setExecStatus'
+                # res = requests.post(server_url,json=result, verify=False)
+                from retryapis_cicd import Retryrequests
+                res = Retryrequests.retry_cicd_apis(self, server_url, result)
+                controller.kill_process()
+            else:
+                if self.action==DEBUG:
+                    testcasename = handler.local_handler.testcasename
+                    self.cw.killChildWindow(debug=True)
+                    if (len(testcasename) > 0 or apptype.lower() not in plugins_list):
+                        if('UserObjectScrape' in sys.modules):
+                            import UserObjectScrape
+                            if(UserObjectScrape.update_data!={}):
+                                data=UserObjectScrape.update_data
+                                UserObjectScrape.update_data={}
+                                data['status']=status
+                                socketIO.emit('result_debugTestCase',data)
+                            else:
+                                socketIO.emit('result_debugTestCase',status)
                         else:
                             socketIO.emit('result_debugTestCase',status)
                     else:
-                        socketIO.emit('result_debugTestCase',status)
-                else:
-                    socketIO.emit('result_debugTestCaseWS',status)
-            elif self.action==EXECUTE:
-                if self.test_status == 'pass' and status != COMPLETED: self.test_status = 'fail'
-                result = {"status":status, "batchId": batch_id, "testStatus": self.test_status}
-                if controller.manual_terminate_flag: result["userTerminated"] = True
-                socketIO.emit('result_executeTestSuite', result)
-        except Exception as e:
-            log.error(e, exc_info=True)
-            status=TERMINATE
-            if socketIO is not None:
-                if self.action==DEBUG:
-                    self.cw.killChildWindow(debug=True)
-                    socketIO.emit('result_debugTestCase',status)
+                        socketIO.emit('result_debugTestCaseWS',status)
                 elif self.action==EXECUTE:
-                    result = {"status":status, "batchId": batch_id, "testStatus": 'fail'}
+                    if self.test_status == 'pass' and status != COMPLETED: self.test_status = 'fail'
+                    result = {"status":status, "batchId": batch_id, "testStatus": self.test_status}
                     if controller.manual_terminate_flag: result["userTerminated"] = True
                     socketIO.emit('result_executeTestSuite', result)
+        except Exception as e:
+            log.error(e, exc_info=True)
+            if self.cicd_mode is False:
+                status=TERMINATE
+                if socketIO is not None:
+                    if self.action==DEBUG:
+                        self.cw.killChildWindow(debug=True)
+                        socketIO.emit('result_debugTestCase',status)
+                    elif self.action==EXECUTE:
+                        result = {"status":status, "batchId": batch_id, "testStatus": 'fail'}
+                        if controller.manual_terminate_flag: result["userTerminated"] = True
+                        socketIO.emit('result_executeTestSuite', result)
         if closeActiveConnection:
             closeActiveConnection = False
             connection_Timer = threading.Timer(300, self.main.closeConnection)
@@ -1180,7 +1213,7 @@ class TestThread(threading.Thread):
 
         self.main.testthread = None
         execution_flag = False
-        #set ICE status as available
+        #set Avo Assure Client status as available
         termination_inprogress = False
         set_ICE_status(True)
         if self.main.gui:
@@ -1203,6 +1236,7 @@ class Main():
         self.icesession = None
         self.server_url = None
         self._wants_to_close = False
+        self.ice_register_token = None
         self.opts = args
         global root, cw, browsercheckFlag, updatecheckFlag
         os.environ["ice_mode"] = "gui" if self.gui else "cli"
@@ -1222,7 +1256,8 @@ class Main():
             self.cw = cw
         # else:
         #logger.init_colorama(autoreset=True)
-        loadingobj.Close()
+        if not self.opts.execute:
+            loadingobj.Close()
         
         """ Creating Root Logger using logger file config and setting logfile path, which is in config.json """
         try:
@@ -1271,7 +1306,7 @@ class Main():
             if self.opts.connect:
                 connectmode = "connect"
                 if self.opts.token:
-                    msg = "Connecting ICE in guest mode"
+                    msg = "Connecting Avo Assure Client in guest mode"
                     logger.print_on_console(msg)
                     log.info(msg)
                     connectmode = "guestconnect"
@@ -1314,11 +1349,11 @@ class Main():
             token_dec = core_utils_obj.unwrap(token,ice_das_key).split("@")
             token_info = {'token':token_dec[0],'icetype':token_dec[1] ,'icename':token_dec[2]}
             if self.gui and token_info["icetype"] != "normal":
-                err_msg = "Token is provisioned for CI-CD ICE. Either use a token provisioned for Normal mode or register ICE in command line mode."
-                raise ValueError("Invalid Token/ICE mode")
+                err_msg = "Token is provisioned for CI-CD Avo Assure Client. Either use a token provisioned for Normal mode or register Avo Assure Client in command line mode."
+                raise ValueError("Invalid Token/Avo Assure Client mode")
             if not self.gui and token_info["icetype"] == "normal":
-                err_msg = "Token is provisioned for Normal ICE. Either use a token provisioned for CI-CD mode or register ICE in GUI mode."
-                raise ValueError("Invalid Token/ICE mode")
+                err_msg = "Token is provisioned for Normal Avo Assure Client. Either use a token provisioned for CI-CD mode or register Avo Assure Client in GUI mode."
+                raise ValueError("Invalid Token/Avo Assure Client mode")
             self.ice_token = token_info
             url = self.server_url.split(":")
             configvalues['server_ip']=url[0]
@@ -1326,7 +1361,8 @@ class Main():
             configvalues['server_port']=url[1]
             if not hold: self.connection("register")
             # Name : sreenivasulu A
-            return True
+            if self.ice_register_token == "validICE":
+                return True
         except requests.exceptions.SSLError as e:
             err, err_msg, _ = _process_ssl_errors(str(e))
         except Exception as e:
@@ -1364,7 +1400,7 @@ class Main():
                     err_res = None
                     enable_reregister = False
                     if response == "fail":
-                        err_res = "ICE registration failed."
+                        err_res = "Avo Assure Client registration failed."
                     else:
                         ice_das_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
                             'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
@@ -1391,12 +1427,14 @@ class Main():
                             clientwindow.configvalues = configvalues
                             if self.gui:
                                 cw.EnableAll()
-                                cw.enable_connect()
-                            msg='ICE "'+data["icename"]+'" registered successfully with Avo Assure'
+                                wx.CallAfter(cw.enable_connect)
+                                # cw.enable_connect()
+                            msg='Avo Assure Client "'+data["icename"]+'" registered successfully with Avo Assure'
+                            self.ice_register_token = response["status"]
                             logger.print_on_console(msg)
                             log.info(msg)
                 except Exception as e:
-                    err_res = 'Error in ICE Registration'
+                    err_res = 'Error in Avo Assure Client Registration'
                     logger.print_on_console(err_res)
                     log.info(err_res)
                     log.error(e, exc_info=True)
@@ -1406,10 +1444,10 @@ class Main():
                     self.ice_token = None
                     self.token_obj.delete_token()
                     if self.gui:
-                        logger.print_on_console("ICE is not registered with Avo Assure. Click to Register")
+                        logger.print_on_console("Avo Assure Client is not registered with Avo Assure. Click to Register")
                         wx.CallAfter(cw.enable_register)
                     else:
-                        logger.print_on_console("ICE is not registered with Avo Assure. Try Again")
+                        logger.print_on_console("Avo Assure Client is not registered with Avo Assure. Try Again")
                 if self.gui: wx.CallAfter(cw.connectbutton.Enable)
                 else: self._wants_to_close = True
             elif mode == 'connect' or mode == "guestconnect":
@@ -1420,7 +1458,7 @@ class Main():
                 if status == False:
                     self.ice_action = "register"
                     self.ice_token = None
-                    msg = "ICE is not registered with Avo Assure."
+                    msg = "Avo Assure Client is not registered with Avo Assure."
                     if self.gui:
                         msg += " Click to Register"
                         logger.print_on_console(msg)
@@ -1431,7 +1469,7 @@ class Main():
                         log.error(msg)
                         self._wants_to_close = True
                     return None
-                # ICE is registered
+                # Avo Assure Client is registered
                 ip = configvalues['server_ip']
                 port = configvalues['server_port']
                 conn = http.client.HTTPConnection(ip,int(port))
@@ -1515,7 +1553,7 @@ class Main():
 
     def verifyRegistration(self, verifyonly = False):
         global executionOnly
-        emsg = "Avo Assure ICE is not registered."
+        emsg = "Avo Assure Client is not registered."
         executionOnly = True
         try:
             self.token_obj = ICEToken()
@@ -1528,16 +1566,16 @@ class Main():
                 name = self.ice_token["icename"]
                 if self.gui:
                     if icetype != "normal":
-                        emsg = "Access denied: "+name+" is registered for CI-CD mode. ICE has to run in command line mode"
+                        emsg = "Access denied: "+name+" is registered for CI-CD mode. Avo Assure Client has to run in command line mode"
                     else:
                         executionOnly = False
                         cw.EnableAll()
                         if verifyonly: cw.connectbutton.Disable()
                 else:
                     if icetype != "ci-cd":
-                        emsg = "Access denied: "+name+" is registered for Normal mode. ICE has to run in GUI mode"
+                        emsg = "Access denied: "+name+" is registered for Normal mode. Avo Assure Client has to run in GUI mode"
                     elif self.opts.register:
-                        emsg = "Registration denied: ICE already Registered."
+                        emsg = "Registration denied: Avo Assure Client already Registered."
                 if emsg:
                     log.error(emsg)
                     logger.print_on_console(emsg)
@@ -1671,7 +1709,7 @@ def get_Browser_Version(browser_Name):
                                
 
         elif browser_Name == 'FIREFOX':
-            path_flag=False
+            path_flag=False 
             if readconfig.configvalues['firefox_path'] == 'default':
                 paths = [os.path.expandvars(r'%ProgramFiles%\\Mozilla Firefox\\firefox.exe'),
                 os.path.expandvars(r'%ProgramFiles(x86)%\\Mozilla Firefox\\firefox.exe')]
@@ -1686,7 +1724,7 @@ def get_Browser_Version(browser_Name):
                 for p in paths:
                     if os.path.exists(p):
                         path_flag=True
-
+        
             if path_flag == True:     
                 firefox_version = list(filter(None, [get_version_via_com(p) for p in paths]))[0]
                 return firefox_version 
@@ -1806,7 +1844,7 @@ def check_browser():
                 else:
                     FIREFOX_VERSION=-1       
         except Exception as e:
-            logger.print_on_console("Unable to locate ICE parameters")
+            logger.print_on_console("Unable to locate Avo Assure Client parameters")
             log.error(e)
         #checking browser for IE
         if SYSTEM_OS == 'Windows':
@@ -1814,7 +1852,12 @@ def check_browser():
                 if IE_VERSION != -1:
                     try:
                         URL=readconfig.configvalues["file_server_ip"]+ "/IEDriverServer.exe"
-                        request.urlretrieve(URL,normpath(DRIVERS_PATH + "/IEDriverServer.exe"))
+                        if proxies:
+                            fileObj = requests.get(URL,verify=False,proxies=proxies)
+                            if(fileObj.status_code == 200):
+                                open(normpath(DRIVERS_PATH + "/IEDriverServer.exe"), 'wb').write(fileObj.content)
+                        else:
+                            request.urlretrieve(URL,normpath(DRIVERS_PATH + "/IEDriverServer.exe"))
                         ieFlag = True  
                     except:
                         ieFlag = False
@@ -1840,7 +1883,12 @@ def check_browser():
                 if not os.path.exists(CHROME_DRIVER_PATH) or chromeFlag == False:
                     try:
                         URL=readconfig.configvalues["file_server_ip"]+"/chromedriver"+CHROME_VERSION.split('.')[0]+".exe"
-                        request.urlretrieve(URL,CHROME_DRIVER_PATH)
+                        if proxies:
+                            fileObj = requests.get(URL,verify=False,proxies=proxies)
+                            if(fileObj.status_code == 200):
+                                open(CHROME_DRIVER_PATH, 'wb').write(fileObj.content)
+                        else:
+                            request.urlretrieve(URL,CHROME_DRIVER_PATH)
                         chromeFlag = True
                     except:
                         logger.print_on_console("Unable to download compatible chrome driver from AvoAssure server")
@@ -1895,7 +1943,12 @@ def check_browser():
                 if FIREFOX_VERSION != -1:
                     try:
                         URL=readconfig.configvalues["file_server_ip"]+"/geckodriver.exe"
-                        request.urlretrieve(URL,GECKODRIVER_PATH)
+                        if proxies:
+                            fileObj = requests.get(URL,verify=False,proxies=proxies)
+                            if(fileObj.status_code == 200):
+                                open(GECKODRIVER_PATH, 'wb').write(fileObj.content)
+                        else:
+                            request.urlretrieve(URL,GECKODRIVER_PATH)
                         firefoxFlag = True  
                     except:
                         logger.print_on_console("Unable to download compatible firefox driver from AvoAssure server")
@@ -1972,7 +2025,7 @@ def check_browser():
                     if edgeFlag == False:
                         logger.print_on_console('WARNING!! : MS Edge Legacy version ',str(browser_ver),' is not supported.')
                 else:
-                    logger.print_on_console("WARNING!! : To perform MS Edge Legacy check, all instances of MS Edge legacy should be closed. Close the instances and restart ICE again")
+                    logger.print_on_console("WARNING!! : To perform MS Edge Legacy check, all instances of MS Edge legacy should be closed. Close the instances and restart Avo Assure Client again")
             else:
                 logger.print_on_console("WARNING!! : MS Edge Legacy is supported only in Windows10 platform")
         except Exception as e:
@@ -1999,7 +2052,12 @@ def check_browser():
                 if not os.path.exists(EDGE_CHROMIUM_DRIVER_PATH) or chromiumFlag == False:
                     try:
                         URL=readconfig.configvalues["file_server_ip"]+"/msedgedriver"+CHROMIUM_VERSION.split('.')[0]+".exe"
-                        request.urlretrieve(URL,EDGE_CHROMIUM_DRIVER_PATH)
+                        if proxies:
+                            fileObj = requests.get(URL,verify=False,proxies=proxies)
+                            if(fileObj.status_code == 200):
+                                open(EDGE_CHROMIUM_DRIVER_PATH, 'wb').write(fileObj.content)
+                        else:
+                            request.urlretrieve(URL,EDGE_CHROMIUM_DRIVER_PATH)
                         chromiumFlag = True
                     except:
                         chromiumFlag = False 
@@ -2098,12 +2156,12 @@ def check_PatchUpdate():
             #check if update avaliable
             if ( UPDATE_MSG == 'Update Available!!! Click on update' and flag == True ):
                 logger.print_on_console("An update is available. Click on 'Help' menu option -> 'Check for Updates' sub-menu option -> 'Update' button")
-                logger.print_on_console('The latest ICE version : ',l_ver)
+                logger.print_on_console('The latest Avo Assure Client version : ',l_ver)
                 log.info(UPDATE_MSG)
-            elif ( UPDATE_MSG == 'You are running the latest version of Avo Assure ICE' and flag == True ):
+            elif ( UPDATE_MSG == 'You are running the latest version of Avo Assure Client' and flag == True ):
                 logger.print_on_console( "No updates available" )
                 log.info( "No updates available" )
-            elif ( UPDATE_MSG == 'An Error has occured while checking for new versions of Avo Assure ICE, kindly contact Support Team'):
+            elif ( UPDATE_MSG == 'An Error has occured while checking for new versions of Avo Assure Client, kindly contact Support Team'):
                 if not (os.path.exists(MANIFEST_LOC)):
                     logger.print_on_console( "Client manifest unavaliable." )
                     log.info( "Client manifest unavaliable." )
@@ -2141,7 +2199,7 @@ def check_execution_lic(event):
 def set_ICE_status(one_time_ping = False,connect=True,interval = 60000):
     """
     def : set_ICE_status
-    purpose : communicates ICE status (availble/busy)
+    purpose : communicates Avo Assure Client status (availble/busy)
     param : status (bool)
     return : Timer
 
@@ -2155,8 +2213,11 @@ def set_ICE_status(one_time_ping = False,connect=True,interval = 60000):
         status_ping_thread.setName("Status Ping")
         status_ping_thread.start()
     log.debug('Ping Server')
-    # Add ICE identification and status, which is busy by default
-    result = {"hostip":socket.gethostbyname(socket.gethostname()),"time":str(datetime.utcnow()),"connected":connect}
+    # Add Avo Assure Client identification and status, which is busy by default
+    if SYSTEM_OS=='Darwin':
+        result = {"hostip":socket.gethostname(),"time":str(datetime.utcnow()),"connected":connect}
+    else:
+        result = {"hostip":socket.gethostbyname(socket.gethostname()),"time":str(datetime.utcnow()),"connected":connect}
     result['status'] = execution_flag or termination_inprogress
     if cw is not None:
         result['mode'] = cw.schedule.GetValue()

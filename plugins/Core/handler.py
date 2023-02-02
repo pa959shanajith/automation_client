@@ -192,14 +192,17 @@ class Handler():
                 browser_type=json_data['browsertype']
             elif 'browserType' in json_data:
                 browser_type=json_data['browserType']
+            
             if 'datatables' in json_data:
-                if not len(json_data['datatables']):
-                    # when datatables values are not present
-                    datatables=json_data['datatables']
-                else:
-                    # loop through all the datatables present testcase and append to datatables
-                    for dt_index in range(len(json_data['datatables'])):
-                        datatables.append(json_data['datatables'][dt_index])
+                if len(json_data['datatables']): 
+                    if not len(datatables):
+                        # loop through all the datatables present testcase and append to datatables
+                        for dt_index in range(len(json_data['datatables'])):
+                            datatables.append(json_data['datatables'][dt_index])
+            
+        if not len(datatables):
+                datatables=[]
+
         flag=self.create_list(script,testcasename_list,extract_path,appType)
         return flag,browser_type,len(script),datatables,testcase_empty_flag,empty_testcase_names
 
@@ -536,7 +539,7 @@ class Handler():
                 #Currenlty implemented only for WEB and MobileWeb apptype
                 if(apptype.lower() == constants.APPTYPE_WEB or apptype.lower() == constants.APPTYPE_MOBILE ):
                     try:
-                        if len(url.strip())!=0:
+                        if len(url.strip())!=0 and (not ("https" in url or "http" in url)):
                             url_dec=self.utils_obj.scrape_unwrap(url)
                             if url is not None: url = url_dec
                         if(objectname.strip() != '' and not(objectname.startswith('@'))):

@@ -503,6 +503,7 @@ class TextOperations:
                         x_coor = int(curaccinfo.x + (0.5 * curaccinfo.width))
                         y_coor = int(curaccinfo.y + (0.5 * curaccinfo.height))
                         log.debug('Formula Created',DEF_CLEARTEXT)
+                        robot = Robot()
                         text=''
                         if text != None:
                             #Visibility check for scrollbar
@@ -538,9 +539,18 @@ class TextOperations:
                                             character=acc.getAccessibleTextInfo(0,1)
                                             self.keywordops_obj.keyboard_operation('keypress','HOME')
                                             #clears the text until all characters are deleted
-                                            for num in range(character.charCount):
-                                                shell.SendKeys("{DELETE}")
-                                            log.debug('MSG:%s',MSG_TEXTBOX_CLEARED)
+                                            try:
+                                                log.debug("Clearing the textbox using Shell.")
+                                                log.debug(shell)
+                                                for num in range(character.charCount):
+                                                    shell.SendKeys("{DELETE}")
+                                                log.debug("Textbox is cleared using Shell.")
+                                            except Exception as e:
+                                                log.debug("Clearing the textbox using PyRobot.")
+                                                for num in range(character.charCount):
+                                                    robot.press_and_release("delete")
+                                                log.debug("Textbox is cleared using PyRobot.")
+                                                log.debug('MSG:%s',MSG_TEXTBOX_CLEARED)
                                             #sets the result to pass
                                             status=TEST_RESULT_PASS
                                             methodoutput=TEST_RESULT_TRUE

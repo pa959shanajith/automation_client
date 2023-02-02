@@ -88,7 +88,9 @@ class UtilOperations:
                 y2 = y1 + height
                 x_cor = (x1+x2)/2
                 y_cor = (y1+y2)/2
-                oebs_mouseops.MouseOperation('hold',x_cor,y_cor)
+                if curaccinfo.role == "panel":
+                    y_cor = y1 - 15
+                oebs_mouseops.MouseOperation('hold',int(x_cor),int(y_cor))
                 methodoutput = TEST_RESULT_TRUE
                 status = TEST_RESULT_PASS
                 log.debug('%s',status)
@@ -128,8 +130,8 @@ class UtilOperations:
                 x_cor = (x1+x2)/2
                 y_cor = (y1+y2)/2
 
-                oebs_mouseops.MouseOperation('slide',x_cor,y_cor)
-                oebs_mouseops.MouseOperation('release',x_cor,y_cor)
+                oebs_mouseops.MouseOperation('slide',int(x_cor),int(y_cor))
+                oebs_mouseops.MouseOperation('release',int(x_cor),int(y_cor))
 
                 methodoutput = TEST_RESULT_TRUE
                 status = TEST_RESULT_PASS
@@ -867,22 +869,14 @@ class UtilOperations:
                             if oebs_key_objects.keyword_input[counter].lower() not in str(menuchildcontext.name).lower():
                                 flag1 = False
                             elif oebs_key_objects.keyword_input[counter].lower() in str(menuchildcontext.name).lower():
-                                x_coormenu = int(menuchildcontext.x + (0.5 * menuchildcontext.width))
-                                y_coormenu = int(menuchildcontext.y + (0.5 * menuchildcontext.height))
-                                if menuchildcontext.role != 'menu item':
-                                    oebs_mouseops.MouseOperation('hold',x_coormenu,y_coormenu)
-                                else:
-                                    oebs_mouseops.MouseOperation('hold',menuchildcontext.x + 10,y_coormenu)
+                                oebs_mouseops.MouseOperation('hold', int(menuchildcontext.x) + 10, int(menuchildcontext.y + (0.5 * menuchildcontext.height)))
                                 time.sleep(2)
                                 flag1 = True
                                 counter += 1
                                 if counter < len(oebs_key_objects.keyword_input):
                                     search_in_menu(menuchildobj)
                                 else:
-                                    if menuchildcontext.role != 'menu item':
-                                        oebs_mouseops.MouseOperation('click',x_coormenu,y_coormenu)
-                                    else:
-                                        oebs_mouseops.MouseOperation('click',menuchildcontext.x + 10,y_coormenu)
+                                    oebs_mouseops.MouseOperation('click', int(menuchildcontext.x) + 10, int(menuchildcontext.y + (0.5 * menuchildcontext.height)))
                                     flag2 = True
                                     break
                             if flag2:

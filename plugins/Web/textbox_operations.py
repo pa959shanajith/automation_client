@@ -320,7 +320,7 @@ class TextboxKeywords:
                                         local_to.log.error(err_msg)
                                         logger.print_on_console(err_msg)
                                 else:
-                                    browser_Keywords.local_bk.driver_obj.execute_script(SET_TEXT_SCRIPT, webelement, input)
+                                    browser_Keywords.local_bk.driver_obj.execute_script(SET_TEXT_WITH_EVENTS_SCRIPT, webelement, input)
                                     # Bug #19221. To check if value is set or not.
                                     value = browser_Keywords.local_bk.driver_obj.execute_script('return arguments[0].value', webelement)
                                     if value == input:
@@ -522,7 +522,7 @@ class TextboxKeywords:
                                 user_input=self.validate_input(webelement,input)
                                 if user_input is not None:
                                     input=user_input
-                                if isvisble or (not(isvisble) and self.__check_visibility_from_config()):
+                                if not(isvisble) and self.__check_visibility_from_config():
                                     try:
                                         self.clear_text(webelement)
                                     except Exception as e:
@@ -599,10 +599,16 @@ class TextboxKeywords:
                     #if failed, use the id to get the text
                     id = webelement.get_attribute('id')
                     if(id != '' and id is not None):
-                        text = browser_Keywords.local_bk.driver_obj.execute_script("return document.getElementById(arguments[0]).value",id)
-                        #finally everything failed then return the placeholder
-                        if text is None or text is '':
-                            text=webelement.get_attribute('placeholder')
+                        #getElementById will throw error if webelement is inside document fragment (salesforce)
+                        try:
+                            text = browser_Keywords.local_bk.driver_obj.execute_script("return document.getElementById(arguments[0]).value",id)
+                            #finally everything failed then return the placeholder
+                            if text is None or text is '':
+                                text=webelement.get_attribute('placeholder')
+                        except:
+                            #finally everything failed then return the placeholder
+                            if text is None or text is '':
+                                text=webelement.get_attribute('placeholder')
         local_to.log.debug('Text returning from __get_text is ')
         local_to.log.debug(text)
         return text
@@ -1174,6 +1180,10 @@ class TextboxKeywords:
                                 webelement.clear()
                                 from selenium.webdriver.common.keys import Keys
                                 try:
+                                    #Fixes for: Clear text clears only last character
+                                    if len(webelement.get_attribute('value')) > 0:
+                                        self.__clear_text(webelement)
+                                        browser_Keywords.local_bk.driver_obj.execute_script("""arguments[0].focusout()""", webelement)
                                     webelement.send_keys(Keys.BACK_SPACE)
                                 except Exception as e:
                                     local_to.log.debug('Warning!: Could not perform backspace function due to error : '+str(e))
@@ -1744,7 +1754,7 @@ class TextboxKeywords:
                                     user_input=self.validate_input(webelement,input_val)
                                     if user_input is not None:
                                         input_val=user_input
-                                    browser_Keywords.local_bk.driver_obj.execute_script(SET_TEXT_SCRIPT,webelement,input_val)
+                                    browser_Keywords.local_bk.driver_obj.execute_script(SET_TEXT_WITH_EVENTS_SCRIPT, webelement, input_val)
                                     status=TEST_RESULT_PASS
                                     methodoutput=TEST_RESULT_TRUE
                                 else:

@@ -192,8 +192,8 @@ class Reporting:
             end_time = datetime.now()
             self.ellapsed_time = str(end_time - start_time).split('.')[0].split(':')
             self.ellapsed_time="~" + ("0" + self.ellapsed_time[0])[-2:] + ":" + ("0" + self.ellapsed_time[1])[-2:] + ":" + ("0" + self.ellapsed_time[2])[-2:]
-            self.start_time=str(start_time).split('.')
-            self.end_time=str(end_time).split('.')
+            self.start_time=str(start_time).split('.')[0]
+            self.end_time=str(end_time).split('.')[0]
             getTym = self.end_time.split(".")[0]
             self.date = getTym.split(" ")[0]
             self.time = getTym.split(" ")[1]

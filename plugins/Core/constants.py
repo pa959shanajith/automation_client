@@ -445,6 +445,8 @@ EXECUTE='execute'
 
 DEBUG='debug'
 
+AVO_GENIUS = 'geniusExecution'
+
 STEP_BY_SETP_DEBUG='step_debug'
 
 CORE='Core'
@@ -486,6 +488,10 @@ JIRA_ACTION_1 = 'loginToJira'
 JIRA_ACTION_2 = 'createIssueInJira'
 
 JIRA_ACTION_3 = 'getJiraConfigureFields'
+
+JIRA_ACTION_4 = 'jiraLogin'
+
+JIRA_ACTION_5 = 'getJiraTestcases'
 
 STATIC_NONE = "{#@#n_o_n_e#@#}"
 
@@ -553,3 +559,5 @@ TEMP_PATH = AVO_ASSURE_HOME + OS_SEP + "output"
 PREDICTION_IMG_DIR = "Disabled"
 
 FILEPATH_OUTPUT_FIELD_KEYWORDS=["exportData","cellByCellCompare","getXmlBlockData","selectiveXmlFileCompare","compXmlFileWithXmlBlock","compareInputs","beautify","compareFiles","comparePDFs","findImageInPDF","selectiveCellCompare"]
+
+VERIFY_KEYWORDS = ["dummyverifykeyword"]

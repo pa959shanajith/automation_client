@@ -1,7 +1,7 @@
 #-------------------------------------------------------------------------------
 # Name:        Updater/Rollback Module
 # Purpose for update:     Does the following functions
-#                   1.Create a backup of Avo Assure ICE (plugins folder) and the about manifest
+#                   1.Create a backup of Avo Assure Client (plugins folder) and the about manifest
 #                   2.Download files from End Point URL location to temp folder.
 #                   3.Unpack the files and replace them in AvoAssure directory.
 #                   4.Once all files have been replaced, delete the file from temp directory.
@@ -11,7 +11,7 @@
 #                   8.Close Client_updater module
 # Purpose for rollback:     Does the following functions
 #               1. Close ICE
-#               2. Delete Avo Assure ICE Folder and client manifest
+#               2. Delete Avo Assure Client Folder and client manifest
 #               3. Unpack AvoAssureICE_backup.7z in ICE directory
 #               4. Delete the rollback
 #               5. Update in client manifest
@@ -96,10 +96,10 @@ class Message(wx.Frame):
         (keepGoing, skip) = self.progress.Update(taskPercent, update_msg)
 
     def ShowMessage(self,warning=None):
-        if (warning=='rollback'): dlg = wx.MessageBox("Avo Assure ICE rolled back successfully. Click 'OK' start ICE.", 'Info',wx.OK | wx.ICON_INFORMATION | wx.CANCEL)
-        elif (warning and 'Error!: unable to add files to backup' in warning) : dlg = wx.MessageBox("Avo Assure ICE failed to update due to files being used by another process. Click 'OK' to start ICE.", 'Error',wx.OK | wx.ICON_EXCLAMATION | wx.CANCEL)
-        elif (warning) : dlg = wx.MessageBox("Avo Assure ICE updated with warnings. Click 'OK' to start ICE.", 'Info',wx.OK | wx.ICON_INFORMATION | wx.CANCEL)
-        else : dlg = wx.MessageBox("Avo Assure ICE updated successfully. Click 'OK' to start ICE.", 'Info',wx.OK | wx.ICON_INFORMATION | wx.CANCEL)
+        if (warning=='rollback'): dlg = wx.MessageBox("Avo Assure Client rolled back successfully. Click 'OK' start Avo Assure Client.", 'Info',wx.OK | wx.ICON_INFORMATION | wx.CANCEL)
+        elif (warning and 'Error!: unable to add files to backup' in warning) : dlg = wx.MessageBox("Avo Assure Client failed to update due to files being used by another process. Click 'OK' to start Avo Assure Client.", 'Error',wx.OK | wx.ICON_EXCLAMATION | wx.CANCEL)
+        elif (warning) : dlg = wx.MessageBox("Avo Assure Client updated with warnings. Click 'OK' to start Avo Assure Client.", 'Info',wx.OK | wx.ICON_INFORMATION | wx.CANCEL)
+        else : dlg = wx.MessageBox("Avo Assure Client updated successfully. Click 'OK' to start Avo Assure Client.", 'Info',wx.OK | wx.ICON_INFORMATION | wx.CANCEL)
         if (dlg == 4 or dlg == 16):
             self.Close()
         return dlg
@@ -177,11 +177,11 @@ class Updater:
         log.info( 'All class variables assigned.' )
 
     def create_backup(self):
-        """Purpose: To create a backup of Avo Assure ICE folder and about_manifest"""
-        """Input : 1.7-zip location 2.Avo Assure ICE folder location and about_manifest.json location 3.Rollbackfile location"""
-        """Functionality: 1.Checks is Update folder is present in ICE directory, if present checks if AvoAssureICE_backup.7z is present
+        """Purpose: To create a backup of Avo Assure Client folder and about_manifest"""
+        """Input : 1.7-zip location 2.Avo Assure Client folder location and about_manifest.json location 3.Rollbackfile location"""
+        """Functionality: 1.Checks is Update folder is present in Avo Assure Client directory, if present checks if AvoAssureICE_backup.7z is present
                           2.If AvoAssureICE_backup.7z is present, then delete this instance to create a new once(we do this so as not to keep appending new files to the existing 7zip file)
-                          3.If Update folder is not present then creates a new folder by the same name in ICE directory
+                          3.If Update folder is not present then creates a new folder by the same name in Avo Assure Client directory
                           4.Adds Avo Assure (plugins) folder to AvoAssureICE_backup.7z
                           5.Adds about_manifest.json to AvoAssureICE_backup.7z"""
         try:
@@ -193,7 +193,7 @@ class Updater:
                 os.rename(str(self.extraction_loc + "\\assets\\AvoAssureICE_backup.7z"), str(self.extraction_loc + "\\assets\\AvoAssureICE_backup_temp.7z"))
                 log.debug( 'AvoAssureICE_backup.7z already exists, and renaming AvoAssureICE_backup.7z' )
                 time.sleep(1)
-            print ( '=>Creating new Avo Assure ICE backup instance' )
+            print ( '=>Creating new Avo Assure Client backup instance' )
             store_loc = self.extraction_loc+"\\assets\\AvoAssureICE_backup.7z"
             source_ice = self.extraction_loc +'\\plugins'
             source_client_manifest = self.extraction_loc +'\\assets\\about_manifest.json'
@@ -231,7 +231,7 @@ class Updater:
             else:
                 if ( os.path.exists(self.extraction_loc + "\\assets\\AvoAssureICE_backup_temp.7z") ):
                     os.remove(self.extraction_loc + "\\assets\\AvoAssureICE_backup_temp.7z")
-                log.debug( 'Successfully created backup of Avo Assure ICE' )
+                log.debug( 'Successfully created backup of Avo Assure Client' )
         except Exception as e:
             err_msg = "Error!: unable to add files to backup"
             print ( "Error occurred in create_backup : ", e )
@@ -483,15 +483,15 @@ class Rollback():
         self.ROLLBACK_LOC = AVOASSUREICE_LOC+"\\assets\\AvoAssureICE_backup.7z"
         log.info( '=>Rollback location : ' + str(self.ROLLBACK_LOC))
         self.AVOASSUREICE_LOC = AVOASSUREICE_LOC
-        log.info( '=>Avo Assure ICE location : ' + str(self.AVOASSUREICE_LOC))
+        log.info( '=>Avo Assure Client location : ' + str(self.AVOASSUREICE_LOC))
         self.loc_7z = loc_7z
         log.info( '=>7z location : ' + str(self.loc_7z))
 
     def delete_old_instance(self):
-        """Removing old Avo Assure ICE and client manifest"""
+        """Removing old Avo Assure Client and client manifest"""
         try:
             log.debug( 'Inside delete_old_instance function' )
-            #-----------------------------------------deleting Avo Assure ICE folder and its contents
+            #-----------------------------------------deleting Avo Assure Client folder and its contents
             print( '=>Deleting : ',self.AVOASSUREICE_LOC+"\\plugins" )
             log.info( 'Deleting : ' + str(self.AVOASSUREICE_LOC+"\\plugins") )
             shutil.rmtree(self.AVOASSUREICE_LOC+"\\plugins", ignore_errors=False, onerror=None)
@@ -525,7 +525,7 @@ class Rollback():
             traceback.print_exc()
 
     def delete_rollback(self):
-        """Removing old Avo Assure ICE and client manifest"""
+        """Removing old Avo Assure Client and client manifest"""
         try:
             log.debug( 'Inside delete_rollback function' )
             #--------------------------------------deleting AvoAssureICE_backup.7z
@@ -565,18 +565,18 @@ class common_functions:
         pass
 
     def close_ICE(self,PID):
-        """Killing ICE via PID"""
+        """Killing Avo Assure Client via PID"""
         try:
             log.debug( 'Inside close_ICE function')
-            hwnd = win32gui.FindWindow(None, 'Avo Assure ICE')
+            hwnd = win32gui.FindWindow(None, 'Avo Assure Client')
             win32gui.PostMessage(hwnd, win32con.WM_CLOSE, 0, 0)
             time.sleep(5)
-            print('=>Closing Avo Assure ICE with PID :' + str(PID))
-            log.info('Closing Avo Assure ICE with PID :' + str(PID))
+            print('=>Closing Avo Assure Client with PID :' + str(PID))
+            log.info('Closing Avo Assure Client with PID :' + str(PID))
             os.system('taskkill /F /PID ' + str(PID))
-            #os.system('taskkill /F /FI "WINDOWTITLE eq Avo Assure ICE"')
-            print ( '=>closed ICE' )
-            log.info( 'ICE was closed' )
+            #os.system('taskkill /F /FI "WINDOWTITLE eq Avo Assure Client"')
+            print ( '=>closed Avo Assure Client' )
+            log.info( 'Avo Assure Client was closed' )
         except Exception as e:
             print ( "Error occurred in close_ICE : ", e )
             log.error( "Error occurred in close_ICE : " + str(e) )
@@ -584,7 +584,7 @@ class common_functions:
             traceback.print_exc()
 
     def restartICE(self,AVOASSUREICE_LOC):
-        """Method to restart ICE"""
+        """Method to restart Avo Assure Client"""
         try:
             log.debug( 'Inside restartICE function' )
             #---------------------------------file and folders to delete
@@ -609,7 +609,7 @@ class common_functions:
             #---------------------------------file and folders to delete
             loc = os.path.dirname(AVOASSUREICE_LOC) + os.sep +"run.bat"
             subprocess.Popen(loc,cwd=os.path.dirname(loc), creationflags=subprocess.CREATE_NEW_CONSOLE)
-            log.debug( 'Restarted ICE.' )
+            log.debug( 'Restarted Avo Assure Client.' )
         except Exception as e:
             print ( "=>Error occurred in restartICE : ", e )
             log.error( "Error occurred in restartICE : " + str(e) )
@@ -666,7 +666,7 @@ def main():
                 comm_obj.percentageIncri(msg,70,"Latest files retrieved.")
                 comm_obj.percentageIncri(msg,75,"Updating...")
                 comm_obj.percentageIncri(msg,80,"Downloading and extracting files")
-                warning_msg = obj.download_files(end_point_list)#---------------------------------->6.From the endpoint url list a.download the file, b.extract file into Avo Assure ICE and c.delete the downloaded  7z file
+                warning_msg = obj.download_files(end_point_list)#---------------------------------->6.From the endpoint url list a.download the file, b.extract file into Avo Assure Client and c.delete the downloaded  7z file
                 if ( warning_msg ):
                     comm_obj.percentageIncri(msg,85,warning_msg)
                     time.sleep(2)
@@ -716,7 +716,7 @@ def main():
             dlg_selected = 0
             if ( res == True ):
                 comm_obj.percentageIncri(msg,40,"Deleting old instance...")
-                obj.delete_old_instance()#---------------------------------->2.Delete old instance of Avo Assure ICE and about_manifest.json
+                obj.delete_old_instance()#---------------------------------->2.Delete old instance of Avo Assure Client and about_manifest.json
                 comm_obj.percentageIncri(msg,45,"Old instance deleted.")
                 comm_obj.percentageIncri(msg,50,"Rolling back changes...")
                 comm_obj.percentageIncri(msg,55,"Extracting files...")

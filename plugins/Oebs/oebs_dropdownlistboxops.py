@@ -18,6 +18,7 @@ import logger
 import oebs_mouseops
 from oebs_utilops import UtilOperations
 from oebs_keyboardops import KeywordOperations
+import re
 
 log = logging.getLogger('oebs_dropdownlistboxops.py')
 
@@ -518,7 +519,7 @@ class DropdownListboxOperations:
                                 err_msg = MSG_ELEMENT_NOT_VISIBLE
                                 logger.print_on_console(err_msg)
                         else:
-                            if currinfo.accessibleAction == 1:
+                            if currinfo.accessibleAction == 1 or currinfo.accessibleSelection == 1:
                                 acc.addAccessibleSelectionFromContext(int(childindex))
                                 status = TEST_RESULT_PASS
                                 methodoutput = TEST_RESULT_TRUE
@@ -544,7 +545,7 @@ class DropdownListboxOperations:
                                         if currentselection>childindex:
                                             moveloc=currentselection-childindex
                                             for index in range(int(moveloc)):
-                                                self.keyboardops_obj.keyboard_operations('keypress','A_UP')
+                                                self.keyboardops_obj.keyboard_operation('keypress','A_UP')
                                                 time.sleep(0.1)
                                             requiredcontext, visible, active_parent = self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]",oebs_key_objects.object_type)
                                             listObj = self.utilities_obj.looptolist(requiredcontext)
@@ -880,11 +881,21 @@ class DropdownListboxOperations:
                             log.debug('MSG:%s',err_msg)
                             logger.print_on_console(err_msg)
                     else:
-                        if currinfo.accessibleAction == 1:
-                            acc.addAccessibleSelectionFromContext(int(childindex))
-                            status = TEST_RESULT_PASS
-                            methodoutput = TEST_RESULT_TRUE
-                            log.debug('Value is selected',DEF_SELECTVALUEBYTEXT)
+                        if currinfo.accessibleAction == 1 or currinfo.accessibleSelection == 1:
+                            for index in range(children):
+                                childacc = acc.getAccessibleChildFromContext(int(index))
+                                childcontext = childacc.getAccessibleContextInfo()
+                                fetchedname = childcontext.name
+                                if(childname == fetchedname):
+                                    acc.addAccessibleSelectionFromContext(index)
+                                    status = TEST_RESULT_PASS
+                                    methodoutput = TEST_RESULT_TRUE
+                                    log.debug('Value selected is %s',fetchedname)
+                                    break
+                            else:
+                                log.debug('Value Does not exist',DEF_SELECTVALUEBYTEXT)
+                                err_msg = ERROR_CODE_DICT['err_value']
+                                logger.print_on_console(err_msg)
                         else:
                             labelContext=''
                             elementPos=0
@@ -1029,4 +1040,91 @@ class DropdownListboxOperations:
             log.debug('Status %s',status)
         log.debug('Status %s',status)
         return status,methodoutput,output_res,err_msg
-        
+
+    def select_from_navigator(self, acc):
+        """
+        def : select_from_navigator
+        purpose : select from navigator is used to select the screen from navigator.
+        param  : inputs : 1. Heirarchy of the navigator items 
+        return : pass,true / fail,false
+        """
+        status = TEST_RESULT_FAIL
+        methodoutput = TEST_RESULT_FALSE
+        output_res = OUTPUT_CONSTANT
+        err_msg = None
+        try:
+            log.debug('Received Object Context',DEF_SELECTFROMNAVIGATOR)
+
+            # minimizing all the opened navaigator child elements
+            for childindex in range(acc.getAccessibleContextInfo().childrenCount):
+                try:
+                    listchildobjcontext = acc.getAccessibleChildFromContext(childindex)
+                    listchildobj = listchildobjcontext.getAccessibleContextInfo()
+                    if "-" in str(listchildobj.name).lower() and len(str(listchildobj.name)) > 0 and str(listchildobj.name)[0] == "-":
+                        x_cord = listchildobj.x
+                        y_cord = listchildobj.y
+                        x_cord_width = x_cord + listchildobj.width
+                        y_cord_width = y_cord + listchildobj.height
+                        x_cordinate = (x_cord + x_cord_width) / 2
+                        y_cordinate = (y_cord + y_cord_width) / 2
+                        oebs_mouseops.MouseOperation('doubleClick', int(x_cordinate), int(y_cordinate))
+                except Exception as e:
+                    break
+
+            if len(oebs_key_objects.keyword_input) > 0:
+                global counter,flag1,flag2,last_index_clicked
+                counter = 0
+                flag1 = flag2 =  False
+                last_index_clicked = -1
+                # currinfo = acc.getAccessibleContextInfo()
+
+                def search_in_navigator():
+                    global counter,flag1,flag2,last_index_clicked
+                    try:
+                        for childindex in range(acc.getAccessibleContextInfo().childrenCount):
+                            listchildobjcontext = acc.getAccessibleChildFromContext(childindex)
+                            listchildobj = listchildobjcontext.getAccessibleContextInfo()
+                            if oebs_key_objects.keyword_input[counter].lower() in str(listchildobj.name).lower() and childindex > last_index_clicked:
+                                if len(str(listchildobj.name)) > 0 and str(listchildobj.name)[0] != "-":
+                                    x_cord = listchildobj.x
+                                    y_cord = listchildobj.y
+                                    x_cord_width = x_cord + listchildobj.width
+                                    y_cord_width = y_cord + listchildobj.height
+                                    x_cordinate = (x_cord + x_cord_width) / 2
+                                    y_cordinate = (y_cord + y_cord_width) / 2
+                                    last_index_clicked = childindex
+                                    oebs_mouseops.MouseOperation('doubleClick', int(x_cordinate), int(y_cordinate))
+                                time.sleep(2)
+                                flag1 = True
+                                counter += 1
+                                if counter < len(oebs_key_objects.keyword_input):
+                                    search_in_navigator()
+                                else:
+                                    flag2 = True
+                                    break
+                            if flag2:
+                                    break
+                    except Exception as e:
+                        err_msg = ERROR_CODE_DICT['err_select_navigator']
+                        logger.print_on_console(err_msg)
+                        log.error(err_msg)
+                        log.debug('%s',e)
+                        
+                search_in_navigator()
+                
+                if flag1 == True and flag2 == True:
+                    status = TEST_RESULT_PASS
+                    methodoutput = TEST_RESULT_TRUE
+                elif flag1 != False or flag2 == False:
+                    err_msg = ERROR_CODE_DICT['err_select_navigator']
+
+            if err_msg:
+                log.info(err_msg)
+                logger.print_on_console (err_msg)
+        except Exception as e:
+            self.utilities_obj.cleardata()
+            err_msg = ERROR_CODE_DICT['err_select_navigator']
+            logger.print_on_console(err_msg)
+            log.error(err_msg)
+            log.debug('%s',e)
+        return status,methodoutput,output_res,err_msg

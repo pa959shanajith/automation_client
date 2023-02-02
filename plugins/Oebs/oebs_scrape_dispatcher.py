@@ -41,8 +41,8 @@ class ScrapeDispatcher(wx.Frame):
         self.utils_obj=oebs_utils.Utils()
         self.scrape_obj=oebs_fullscrape.FullScrape()
         self.core_utilsobject = core_utils.CoreUtils()
-        self.scrapeoptions = ['Full', 'Button', 'Textbox', 'Dropdown', 'Radiobutton', 'Checkbox', 'Table', 'List', 'InternalFrame', 'Frame', 'ScrollBar', 'Link', 'Other Tags']
-        self.tag_map = {'Full':'full','Button':['push button','toggle button'], 'Textbox':['edit','Edit Box','text','password text'], 'Dropdown':'combo box', 'Radiobutton':'radio button', 'Checkbox':'check box', 'Table':'table', 'List':['list item','list'],'InternalFrame':'internal frame','Frame':'frame','ScrollBar':'scroll bar', 'Link':['hyperlink','Static'] , 'Other Tags':'element'}
+        self.scrapeoptions = ['Full', 'Button', 'Textbox', 'Dropdown', 'Radiobutton', 'Checkbox', 'Table', 'List', 'InternalFrame', 'Frame', 'ScrollBar', 'Link', 'Page Tab', 'Other Tags']
+        self.tag_map = {'Full':'full','Button':['push button','toggle button'], 'Textbox':['edit','Edit Box','text','password text'], 'Dropdown':'combo box', 'Radiobutton':'radio button', 'Checkbox':'check box', 'Table':'table', 'List':['list item','list'],'InternalFrame':'internal frame','Frame':'frame','ScrollBar':'scroll bar', 'Link':['hyperlink','Static'], 'Page Tab': 'page tab', 'Other Tags':'element'}
         self.delay_time=["0s","5s","10s","15s","20s","25s"]
         self.delay_time_map={"0s":0,"5s":5,"10s":10,"15s":15,"20s":20,"25s":25}
         self.parent = parent

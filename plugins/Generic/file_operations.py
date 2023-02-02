@@ -41,6 +41,12 @@ import zipfile
 import platform
 import time
 import docx
+import urllib.request
+import pyautogui
+if SYSTEM_OS=='Windows':
+    import win32gui
+    from pywinauto.application import Application 
+
 
 log = logging.getLogger('file_operations.py')
 
@@ -1131,104 +1137,62 @@ class FileOperations:
             logger.print_on_console(err_msg)
         return status,methodoutput,linenumbers,err_msg
 
-    def save_file(self,folder_path,file_path):
+    def save_file(self, folder_path, file_path,url=None):
         """
         def : save_file
         purpose : Saving a file in windows
-        param : folder_path,file_path
+        param :folder_path,file_path,url
         return :
 
         """
         try:
-            from sendfunction_keys import SendFunctionKeys
-            obj=SendFunctionKeys()
             configvalues = readconfig.configvalues
             delay_stringinput = float(configvalues['delay_stringinput'])
-            status=TEST_RESULT_FAIL
-            methodoutput=TEST_RESULT_FALSE
-            err_msg=None
-            output_res=OUTPUT_CONSTANT
+            status = TEST_RESULT_FAIL
+            methodoutput = TEST_RESULT_FALSE
+            err_msg = None
+            output_res = OUTPUT_CONSTANT
             log.debug('reading the inputs')
-            folder_path=str(folder_path)
-            file_path=str(file_path)
-            log.debug('Folder path is '+folder_path+' and File is '+file_path)
-            if (not(folder_path is None or folder_path == '' or file_path is None or file_path == '') and os.path.exists(folder_path)):
-                log.debug('saving the file')
-                """
-                if (url_save is not None):
-                    ##print folder_path,file_path
-                    response = urllib2.urlopen(url_save)
-                    file = open(folder_path+"\\"+file_path+".pdf", 'wb')
-                    file.write(response.read())
-                    file.close()
-                    ##print("Completed")
-                    status=TEST_RESULT_PASS
-                    methodoutput=TEST_RESULT_TRUE
-                    log.info('File has been saved')
-                else:
-                """
-                full_path = os.path.join(folder_path, file_path)
-                if SYSTEM_OS=='Linux':
-                    obj.press_multiple_keys(['alt','d'],1)
-                    time.sleep(1)
-                    # create the path incluiding the file name for linux
-                    import pyautogui as pag
-                    pag.hotkey('ctrl','a')
-                    pag.hotkey('backspace')
-                    obj.type(full_path,delay_stringinput)
-                    time.sleep(1)
-                    obj.execute_key('enter',1)
-                    time.sleep(2)
-                    status=TEST_RESULT_PASS
-                    methodoutput=TEST_RESULT_TRUE
-                    log.info('File has been saved')
-                else:
-                    #Get the focus on Windows Dialog box by pressing 'alt+d'
-                    obj.press_multiple_keys(['alt','d'],1)      ##added timer after every step
-                    time.sleep(1)
-                    #Enter the folder path
-                    obj.type(folder_path,delay_stringinput)
-                    time.sleep(1)
-                    #Press 'Enter' key
-                    obj.execute_key('enter',1)
-                    time.sleep(1)
-                    #Press 'tab' key to get the focus on 'search tab'
-                    obj.execute_key('tab',1)
-                    time.sleep(1)
-                    ##Press 'tab' key again for windows 10 to focus on 'organise'
-                    if str(platform.release()) == '10':
-                        log.debug("Windows 10 machine detected, pereforming an extra 'tab'")
-                        obj.execute_key('tab',1)
-                        time.sleep(1)
-                    #Press 'alt+n' key to create a new file
-                    obj.press_multiple_keys(['alt','n'],1)
-                    time.sleep(1)
-                    #Enter the file name
-                    obj.type(file_path,delay_stringinput)
-                    time.sleep(1)
-                    #Press 'Enter' key
-                    obj.execute_key('enter',1)
-                    time.sleep(2)
-                    #Press 'alt+y' key in case if the file is already existing
-                    obj.press_multiple_keys(['alt','y'],1)   #added alt+y sendfunction key for automating overwrite process if the file is already existed.
+            folder_path = str(folder_path)
+            file_path = str(file_path)
+            log.debug('Folder path is ' + folder_path + ' and File is ' + file_path)
+            if (not (folder_path is None or folder_path == '' or file_path is None or file_path == '') and os.path.exists(
+                folder_path)):
 
-                    status=TEST_RESULT_PASS
-                    methodoutput=TEST_RESULT_TRUE
-                    log.info('File has been saved')
-            else:
-                err_msg='Invalid file path'
-                time.sleep(1)
-                obj.execute_key('esc',1)
-                time.sleep(1)
-        except (IOError,WindowsError):
-            err_msg=ERROR_CODE_DICT['ERR_FILE_NOT_ACESSIBLE']
+                if url is not None:
+                    log.debug('saving the file')
+                    path=str(folder_path + "\\" + file_path)  
+                    urllib.request.urlretrieve(url,path)
+                else:
+                    log.debug('saving the file')
+                    #Wait for the Save As dialog to load. Might need to increase the wait time on slower machinesy:
+                    waiting_time=0 
+                    while waiting_time<5:
+                        if win32gui.FindWindow(None,"Save As"):
+                            break
+                        time.sleep(1)
+                        waiting_time+=1
+                    FILE_NAME = folder_path+'\\'+ file_path
+                    #connect used when you are attempting to automate a running process. 
+                    # You can pass in the process id, handle, title or path of the program.
+                    app = Application().connect(title="Save As") 
+                    # Type the file path and name is Save AS dialog
+                    app.SaveAs.edit.SetText(str(FILE_NAME))
+                    app.SaveAs.Save.click_input()
+                status = TEST_RESULT_PASS
+                methodoutput = TEST_RESULT_TRUE
+                status_message="File has been saved"
+                log.info('File has been saved')   
+        except (IOError, WindowsError):
+            err_msg = ERROR_CODE_DICT['ERR_FILE_NOT_ACESSIBLE']
         except Exception as e:
             log.error(e)
-            err_msg=generic_constants.ERR_MSG1+'Saving'+generic_constants.ERR_MSG2
-        if err_msg!=None:
+            err_msg = generic_constants.ERR_MSG1 + 'Saving' + generic_constants.ERR_MSG2
+        if err_msg != None:
             log.error(err_msg)
             logger.print_on_console(err_msg)
-        return status,methodoutput,output_res,err_msg
+        
+        return status,status_message, methodoutput, output_res, err_msg
 
     def json_compare_content(self,input_path1,input_path2):
         """

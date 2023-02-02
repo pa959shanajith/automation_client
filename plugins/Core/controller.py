@@ -35,7 +35,10 @@ import core_utils
 import recording
 from logging.handlers import TimedRotatingFileHandler
 import shutil
+import requests
 local_cont = threading.local()
+import cicd_core
+from retryapis_cicd import Retryrequests
 #index for iterating the teststepproperty for executor
 ##i = 0
 terminate_flag=False
@@ -506,7 +509,6 @@ class Controller():
                         log.info( "----Keyword :"+str(tsp.name)+' execution Started----')
                         start_time = datetime.now()
                         start_time_string=start_time.strftime(TIME_FORMAT)
-                        logger.print_on_console('Step Execution start time is : '+start_time_string)
                         log.info('Step Execution start time is : '+start_time_string)
                         index,result = self.keywordinvocation(index,inpval,self.reporting_obj,execution_env,*args)
                     else:
@@ -541,9 +543,9 @@ class Controller():
         if keyword_flag:
             end_time = datetime.now()
             end_time_string=end_time.strftime(TIME_FORMAT)
-            logger.print_on_console('Step Execution end time is : '+end_time_string)
+            log.info('Step Execution end time is : '+end_time_string)
             ellapsed_time=end_time-start_time
-            logger.print_on_console('Step Elapsed time is : ',str(ellapsed_time)+'\n')
+            log.info('Step Elapsed time is : '+str(ellapsed_time)+"\n")
             #Changing the overallstatus of the scenario if it's Fail or Terminate
             if self.status == TEST_RESULT_FAIL :
                 if not statusflag:
@@ -1149,8 +1151,16 @@ class Controller():
             kwargs = {}
             if(self.keyword_status=='Pass'): kwargs["setcolor"]="GREEN"
             elif(self.keyword_status=='Fail') : kwargs["setcolor"]="RED"
-            logger.print_on_console(keyword+' executed and the status is '+self.keyword_status+'\n',**kwargs)
-            log.info(keyword+' executed and the status is '+self.keyword_status+'\n')
+            keyword = str(teststepproperty.name)
+            cicd_mode = cicd_core.iscicd
+            if cicd_mode and keyword == 'displayVariableValue':
+                logger.print_on_console(keyword +':  '+ teststepproperty.additionalinfo, **kwargs)
+                logger.print_on_console(keyword +' executed and the status is Pass' + '\n', **kwargs)
+                log.info(keyword +':  '+ teststepproperty.additionalinfo)
+                log.info(keyword +' executed and the status is pass'+'\n')
+            else:
+                logger.print_on_console(keyword+' executed and the status is '+self.keyword_status+'\n',**kwargs)
+                log.info(keyword+' executed and the status is '+self.keyword_status+'\n')
             #Checking for stop keyword
             # CR #22650 stop keyword enhancement
             # 1. when input is 'testcase' stop the current testcase execution and jump to next teststep of next testcase.
@@ -1443,6 +1453,11 @@ class Controller():
 
     def invokewebkeyword(self,teststepproperty,dispatcher_obj,inputval,reporting_obj,execution_env):
         res = dispatcher_obj.dispatcher(teststepproperty,inputval,self.reporting_obj,self.wx_object,self.conthread,execution_env)
+        # To Retry on driver exception
+        if (res[3] == ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']) and (res[1] == 'False'):
+            log.info('Retry on Driver Exception')
+            res = dispatcher_obj.dispatcher(teststepproperty,inputval,self.reporting_obj,self.wx_object,self.conthread,execution_env)
+            log.info('Retry on Driver Exception Done!')
         return res
 
     def invokemobilekeyword(self,teststepproperty,dispatcher_obj,inputval,reporting_obj,execution_env):
@@ -1589,7 +1604,7 @@ class Controller():
         obj.clear_const_variables()
         return status
 
-    def invoke_execution(self,mythread,json_data,socketIO,wxObject,configvalues,qcObject,qtestObject,zephyrObject,aws_mode,browserno='0',threadName=''):
+    def invoke_execution(self,mythread,json_data,socketIO,wxObject,configvalues,qcObject,qtestObject,zephyrObject,cicd_mode,aws_mode,browserno='0',threadName=''):
         global terminate_flag, status_percentage, saucelabs_count, screen_testcase_map
         qc_url=''
         qc_password=''
@@ -1611,6 +1626,7 @@ class Controller():
         testcase_empty_flag = False
         count = 0
         info_msg=''
+        opts = mythread.main.opts
         # t = test.Test()
         # suites_list,flag = t.gettsplist()
         #Getting all the details by parsing the json_data
@@ -1652,8 +1668,21 @@ class Controller():
                 'testsuiteId': suite_id,
                 'projectname' : suite['projectname']
             }
-            socketIO.emit("return_status_executeTestSuite", dict({"status": "started",
-                'startTime': datetime.now().strftime(TIME_FORMAT)}, **base_execute_data))
+            if cicd_mode:
+                base_execute_data["event"] = "return_status_executeTestSuite"
+                base_execute_data["configkey"] = opts.configkey
+                base_execute_data["executionListId"] = opts.executionListId
+                base_execute_data["agentname"] = opts.agentname
+                base_execute_data['execReq'] = json_data
+                server_url = 'https://' + opts.serverurl + ':' + opts.serverport + '/setExecStatus'
+                data_dict = dict({"status" : "started",
+                    'startTime': datetime.now().strftime(TIME_FORMAT),"exce_data" : base_execute_data})
+                #res = requests.post(server_url,json=data_dict, verify=False)
+                res = Retryrequests.retry_cicd_apis(self, server_url, data_dict)
+                # #send response through API
+            else:
+                socketIO.emit("return_status_executeTestSuite", dict({"status": "started",
+                    'startTime': datetime.now().strftime(TIME_FORMAT)}, **base_execute_data))
             execute_result_data = dict({'scenarioId': None, 'reportData': None}, **base_execute_data)
             if(self.execution_mode == PARALLEL):
                 log_handler = logger.CustomHandler(self.execution_mode,base_execute_data,browserno)
@@ -1678,6 +1707,10 @@ class Controller():
                     #check if accessibility parameters are present if not initialize empty array
                     if "accessibilityMap" in suite and scenario_id in suite['accessibilityMap']:
                         accessibility_parameters = suite['accessibilityMap'][scenario_id]
+                        if len(accessibility_parameters) > 0 and isinstance(accessibility_parameters, list) and isinstance(accessibility_parameters[0], list) and len(accessibility_parameters[0]) > 0:
+                            accessibility_parameters = accessibility_parameters[0]
+                        else:
+                            accessibility_parameters = []
                     else:
                         accessibility_parameters = []
                     con.reporting_obj=reporting.Reporting()
@@ -1881,12 +1914,23 @@ class Controller():
                                         os.makedirs(path)
                                     file_name = datetime.now().strftime("%Y%m%d%H%M%S")
                                     video_path = path+"ScreenRecording_"+file_name+".mp4"
-                                for i in range(0,len(all_jobs)):
-                                    if(all_jobs[i]['browser']==browser_num[browser]):
-                                        file_creations_status=j.get_job_asset_content(all_jobs[i]['id'],file_name,path)
-                                if len(all_jobs)!=0:
-                                    execute_result_data['reportData']['overallstatus'][0]['video']=video_path
-                            socketIO.emit('result_executeTestSuite', execute_result_data)
+                                    for i in range(0,len(all_jobs)):
+                                        if(all_jobs[i]['browser']==browser_num[browser]):
+                                            file_creations_status=j.get_job_asset_content(all_jobs[i]['id'],file_name,path)
+                                    if len(all_jobs)!=0:
+                                        execute_result_data['reportData']['overallstatus']['video']=video_path
+                            if cicd_mode:
+                                execute_result_data["event"] = "result_executeTestSuite"
+                                execute_result_data["configkey"] = opts.configkey
+                                execute_result_data["executionListId"] = opts.executionListId
+                                execute_result_data["agentname"] = opts.agentname
+                                execute_result_data['execReq'] = json_data
+                                server_url = 'https://' + opts.serverurl + ':' + opts.serverport + '/setExecStatus'
+                                data_dict = dict({"exce_data" : execute_result_data})
+                                # res = requests.post(server_url,json=data_dict, verify=False)
+                                res = Retryrequests.retry_cicd_apis(self, server_url, data_dict)
+                            else:
+                                socketIO.emit('result_executeTestSuite', execute_result_data)
                             obj.clearList(con)
                             sc_idx += 1
                             #logic for condition check
@@ -1911,7 +1955,18 @@ class Controller():
                             con.reporting_obj.user_termination=manual_terminate_flag
                             con.reporting_obj.save_report_json_conditioncheck_testcase_empty(filename,info_msg,json_data,status_percentage)
                             execute_result_data["reportData"] = con.reporting_obj.report_json_condition_check_testcase_empty
-                            socketIO.emit('result_executeTestSuite', execute_result_data)
+                            if cicd_mode:
+                                execute_result_data["event"] = "result_executeTestSuite"
+                                execute_result_data["configkey"] = opts.configkey
+                                execute_result_data["executionListId"] = opts.executionListId
+                                execute_result_data["agentname"] = opts.agentname
+                                execute_result_data['execReq'] = json_data
+                                server_url = 'https://' + opts.serverurl + ':' + opts.serverport + '/setExecStatus'
+                                data_dict = dict({"exce_data" : execute_result_data})
+                                # res = requests.post(server_url,json=data_dict, verify=False)  
+                                res = Retryrequests.retry_cicd_apis(self, server_url, data_dict)                          
+                            else:
+                                socketIO.emit('result_executeTestSuite', execute_result_data)
                             obj.clearList(con)
                             sc_idx += 1
                             exc_pass = False
@@ -2092,7 +2147,18 @@ class Controller():
                         con.reporting_obj.user_termination=manual_terminate_flag
                         con.reporting_obj.save_report_json_conditioncheck(filename,json_data,status_percentage)
                         execute_result_data["reportData"] = con.reporting_obj.report_json_condition_check
-                        socketIO.emit('result_executeTestSuite', execute_result_data)
+                        if cicd_mode:
+                            execute_result_data["event"] = "result_executeTestSuite"
+                            execute_result_data["configkey"] = opts.configkey
+                            execute_result_data["executionListId"] = opts.executionListId
+                            execute_result_data["agentname"] = opts.agentname
+                            execute_result_data['execReq'] = json_data
+                            server_url = 'https://' + opts.serverurl + ':' + opts.serverport + '/setExecStatus'
+                            data_dict = dict({"exce_data" : execute_result_data})
+                            # res = requests.post(server_url,json=data_dict, verify=False)
+                            res = Retryrequests.retry_cicd_apis(self, server_url, data_dict)
+                        else:
+                            socketIO.emit('result_executeTestSuite', execute_result_data)
                         obj.clearList(con)
                         sc_idx += 1
                         exc_pass = False
@@ -2119,7 +2185,18 @@ class Controller():
                     log.info(info_msg)
                     con.reporting_obj.save_report_json_conditioncheck_testcase_empty(filename,info_msg,json_data,status_percentage)
                     execute_result_data["reportData"] = con.reporting_obj.report_json_condition_check_testcase_empty
-                    socketIO.emit('result_executeTestSuite', execute_result_data)
+                    if cicd_mode :
+                        execute_result_data["event"] = "result_executeTestSuite"
+                        execute_result_data["configkey"] = opts.configkey
+                        execute_result_data["executionListId"] = opts.executionListId
+                        execute_result_data["agentname"] = opts.agentname
+                        execute_result_data['execReq'] = json_data
+                        server_url = 'https://' + opts.serverurl + ':' + opts.serverport + '/setExecStatus'
+                        data_dict = dict({"exce_data" : execute_result_data})
+                        # res = requests.post(server_url,json=data_dict, verify=False)
+                        res = Retryrequests.retry_cicd_apis(self, server_url, data_dict)
+                    else:
+                        socketIO.emit('result_executeTestSuite', execute_result_data)
                     obj.clearList(con)
                     sc_idx += 1
                     exc_pass = False
@@ -2142,8 +2219,20 @@ class Controller():
             print('=======================================================================================================')
             log.info('***SUITE '+ str(suite_idx) +' EXECUTION COMPLETED***')
             if status == TERMINATE: exc_pass = False
-            socketIO.emit("return_status_executeTestSuite", dict({"status": "finished", "executionStatus": exc_pass,
-                "endTime": datetime.now().strftime(TIME_FORMAT)}, **base_execute_data))
+            if cicd_mode:
+                base_execute_data["event"] = "return_status_executeTestSuite"
+                base_execute_data["configkey"] = opts.configkey
+                base_execute_data["executionListId"] = opts.executionListId
+                base_execute_data["agentname"] = opts.agentname
+                base_execute_data['execReq'] = json_data
+                server_url = 'https://' + opts.serverurl + ':' + opts.serverport + '/setExecStatus'
+                data_dict = dict({"status" : "finished", "executionStatus": exc_pass,
+                    'endTime': datetime.now().strftime(TIME_FORMAT),"exce_data" : base_execute_data})
+                # res = requests.post(server_url,json=data_dict, verify=False)
+                res = Retryrequests.retry_cicd_apis(self, server_url, data_dict)
+            else:
+                socketIO.emit("return_status_executeTestSuite", dict({"status": "finished", "executionStatus": exc_pass,
+                    "endTime": datetime.now().strftime(TIME_FORMAT)}, **base_execute_data))
             if not exc_pass:
                 if status == TERMINATE and manual_terminate_flag:
                     mythread.test_status = 'userTerminate'
@@ -2245,7 +2334,7 @@ class Controller():
             logger.print_on_console("Exception in aws_report")
             log.error("Exception in aws_report. Error: " + str(e))
 
-    def invoke_controller(self,action,mythread,debug_mode,runfrom_step,json_data,root_obj,socketIO,qc_soc,qtest_soc,zephyr_soc,*args):
+    def invoke_controller(self,action,mythread,debug_mode,runfrom_step,json_data,root_obj,socketIO,qc_soc,qtest_soc,zephyr_soc,cicd_mode,*args):
         status = COMPLETED
         global socket_object
         self.conthread=mythread
@@ -2268,15 +2357,16 @@ class Controller():
                     self.disable_screen_timeout()
                     reset_sys_screenoff = True
                 if self.execution_mode == SERIAL:
-                    status=self.invoke_execution(mythread,json_data,socketIO,wxObject,self.configvalues,qc_soc,qtest_soc,zephyr_soc,aws_mode)
+                    status=self.invoke_execution(mythread,json_data,socketIO,wxObject,self.configvalues,qc_soc,qtest_soc,zephyr_soc,aws_mode,cicd_mode)
                 elif self.execution_mode == PARALLEL:
-                    status = self.invoke_parralel_exe(mythread,json_data,socketIO,wxObject,self.configvalues,qc_soc,qtest_soc,zephyr_soc,aws_mode)
+                    status = self.invoke_parralel_exe(mythread,json_data,socketIO,wxObject,self.configvalues,qc_soc,qtest_soc,zephyr_soc,aws_mode,cicd_mode)
                 # Remove all the added custom handlers. Handler at 0 index is main one. So we start removing from 1st index.
                 for _ in range(len(log.root.handlers)-1):
                     log.root.handlers[1].writeManifest()
                     log.root.removeHandler(log.root.handlers[1])
                 shutil.rmtree(os.sep.join([os.getcwd(),'output','.logs',json_data['batchId']]), ignore_errors=True)
             elif action==DEBUG:
+                if json_data[0]['testcasename'] == AVO_GENIUS: kill_process()
                 self.debug_choice=wxObject.choice
                 self.debug_mode=debug_mode
                 self.wx_object=wxObject
@@ -2366,7 +2456,7 @@ class Controller():
             logger.print_on_console("Exception in reset screen timeout")
             log.error("Exception in reset screen timeout. Error: " + str(e))
 
-    def invoke_parralel_exe(self,mythread,json_data,socketIO,wxObject,configvalues,qc_soc,qtest_soc,zephyr_soc,aws_mode):
+    def invoke_parralel_exe(self,mythread,json_data,socketIO,wxObject,configvalues,qc_soc,qtest_soc,zephyr_soc,aws_mode,cicd_mode):
         try:
             import copy
             browsers_data = json_data['suitedetails'][0]['browserType']
@@ -2394,7 +2484,7 @@ class Controller():
                 for j in range(len(jsondata_dict[i]['suitedetails'])):
                     jsondata_dict[i]['suitedetails'][j]['browserType'] = [browsers_data[i]]
                 thread_name = "test_thread_browser" + str(browsers_data[i])
-                th[i] = threading.Thread(target = self.invoke_execution, name = thread_name, args = (mythread,jsondata_dict[i],socketIO,wxObject,configvalues,qc_soc,qtest_soc,zephyr_soc,aws_mode,browsers_data[i],thread_name))
+                th[i] = threading.Thread(target = self.invoke_execution, name = thread_name, args = (mythread,jsondata_dict[i],socketIO,wxObject,configvalues,qc_soc,qtest_soc,zephyr_soc,cicd_mode,aws_mode,browsers_data[i],thread_name))
                 self.seperate_log(th[i], browsers_data[i]) #function that creates different logs for each browser
                 if SYSTEM_OS =='Linux': time.sleep(0.5)
                 th[i].start()
@@ -2413,7 +2503,7 @@ class Controller():
     def seperate_log(self, cur_thread, id):
         try:
             log = logging.getLogger("controller.py")
-            log_filepath = os.path.normpath(os.path.dirname(self.configvalues["logFile_Path"]) + os.sep + 'TestautoV2_Parallel_' + str(BROWSER_NAME_LOG[id]) + '.log').replace("\\","\\\\")
+            log_filepath = os.path.normpath(os.path.dirname(self.configvalues["logFile_Path"]) + os.sep + 'Avoclient_Parallel_' + str(BROWSER_NAME_LOG[id]) + '.log').replace("\\","\\\\")
             file1 = open(log_filepath, 'a+')
             file1.close()
             threadName = cur_thread.name #Get name of each thread

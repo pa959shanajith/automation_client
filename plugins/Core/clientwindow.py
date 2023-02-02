@@ -460,7 +460,7 @@ class ClientWindow(wx.Frame):
     def enable_register(self, enable_button = True, repaint_title = True):
         self.connectbutton.SetBitmapLabel(self.register_img)
         self.connectbutton.SetName("register")
-        self.connectbutton.SetToolTip(wx.ToolTip("Register ICE with Avo Assure Server"))
+        self.connectbutton.SetToolTip(wx.ToolTip("Register Avo Assure Client with Avo Assure Server"))
         if repaint_title: self.SetTitle(self.appName)
         if enable_button: self.connectbutton.Enable()
 
@@ -710,8 +710,8 @@ class Config_window(wx.Frame):
         self.log_file_path=wx.TextCtrl(self.panel, pos=config_fields["Log_path"][2], size=config_fields["Log_path"][3])
         self.log_file_path_btn=wx.Button(self.panel, label="...",pos=config_fields["Log_path"][4], size=config_fields["Log_path"][5])
         self.log_file_path_btn.Bind(wx.EVT_BUTTON, self.fileBrowser_logfilepath)
-        if (not isConfigJson) or (isConfigJson and isConfigJson['logFile_Path']=='./logs/TestautoV2.log'):
-            self.log_file_path.SetValue(os.path.normpath(AVO_ASSURE_HOME + '/logs/TestautoV2.log'))
+        if (not isConfigJson) or (isConfigJson and isConfigJson['logFile_Path']=='./logs/Avoclient.log'):
+            self.log_file_path.SetValue(os.path.normpath(AVO_ASSURE_HOME + '/logs/Avoclient.log'))
         else:
             self.log_file_path.SetValue(isConfigJson['logFile_Path'])
 
@@ -1070,18 +1070,18 @@ class Config_window(wx.Frame):
         is_admin = core_utils.check_isadmin()
         if isConfigJson!=False:
             if is_admin:
-                log.info("ICE is run as admin")
+                log.info("Avo Assure Client is run as admin")
                 dis_sys_screenoff = isConfigJson['disable_screen_timeout'].title()
                 if dis_sys_screenoff == lblList[0]:
                     self.rbox21.SetSelection(0)
                 elif dis_sys_screenoff == lblList[1]:
                     self.rbox21.SetSelection(1)
             else:
-                log.info("ICE is run as normal")
+                log.info("Avo Assure Client is run as normal")
                 self.rbox21.SetSelection(1)
         else:
             self.rbox21.SetSelection(1)           
-        self.rbox21.SetToolTip(wx.ToolTip("Enables or Disables automatic screen lock during execution when ICE is run as admin."))
+        self.rbox21.SetToolTip(wx.ToolTip("Enables or Disables automatic screen lock during execution when Avo Assure Client is run as admin."))
 
         #adding the radio button for opening browser in incognito/private mode:
         self.rbox22 = wx.RadioBox(self.panel1, label = "Incognito/Private Mode", choices = lblList,
@@ -1277,6 +1277,8 @@ class Config_window(wx.Frame):
         data['ice_Token']=readconfig.configvalues['ice_Token']
         data['sample_application_urls']=readconfig.configvalues['sample_application_urls']
         data['isTrial']=readconfig.configvalues['isTrial']
+        data['element_load_timeout']=readconfig.configvalues['element_load_timeout']
+        data['verify_wait_time']=readconfig.configvalues['verify_wait_time']
         config_data=data
         if (data['server_ip']!='' and data['server_port']!='' and data['server_cert']!='' and
             data['chrome_path']!='' and data['queryTimeOut'] not in ['','sec'] and data['logFile_Path']!='' and
@@ -1545,7 +1547,7 @@ class Config_window(wx.Frame):
         dlg = wx.DirDialog(None, "Choose a folder", "", wx.DD_DEFAULT_STYLE)
         if dlg.ShowModal() == wx.ID_OK:
             log_path = dlg.GetPath()
-            log_path= os.path.normpath(log_path+"/TestautoV2.log")
+            log_path= os.path.normpath(log_path+"/Avoclient.log")
             self.log_file_path.SetValue(log_path)
         dlg.Destroy()
     """This method open a file selector dialog , from where file path can be set """
@@ -1583,13 +1585,13 @@ class Config_window(wx.Frame):
         log.info(msg)
 
 #-------------------
-"""Displays the details of ICE, versions, etc.(can be customised/it is read only)"""
+"""Displays the details of Avo Assure Client, versions, etc.(can be customised/it is read only)"""
 class About_window(wx.Frame):
     """Initialization and defining the wx-components of the pop-up"""
     def __init__(self, parent, id, title):
         try:
             data = self.get_client_manifest()
-            msg1='Avo Assure ICE '+ str(data['version']) + ' (64-bit)' +' \n'
+            msg1='Avo Assure Client '+ str(data['version']) + ' (64-bit)' +' \n'
             msg2='Updated on : '+ str(data['updated_on']) +' \n'
             msg3='For any queries write to us at support@avoautomation.com'+' \n'
             msg4='© Avo Automation\n'
@@ -1699,7 +1701,7 @@ class Check_Update_window(wx.Frame):
             UPDATE_MSG = update_obj.send_update_message()
             if ( UPDATE_MSG == 'Update Available!!! Click on update' ):
                 self.disp_msg.AppendText( "An update is available, click on 'Update' button to install the latest patch : " + str(l_ver) + "\n")
-                self.disp_msg.AppendText( "Warning! ICE will close when update starts...")
+                self.disp_msg.AppendText( "Warning! Avo Assure Client will close when update starts...")
                 self.update_btn.Enable()
             else:
                 self.disp_msg.SetValue(UPDATE_MSG)
@@ -1767,10 +1769,10 @@ class rollback_window(wx.Frame):
             res = os.path.exists(os.path.normpath(AVO_ASSURE_HOME+'/assets/AvoAssureICE_backup.7z'))
             self.rollback_obj = update_module.Update_Rollback()
             if ( res == False ):
-                self.disp_msg.AppendText( "Avo Assure ICE backup not found, cannot rollback changes.")
+                self.disp_msg.AppendText( "Avo Assure Client backup not found, cannot rollback changes.")
             else:
                 self.rollback_obj.update(None, None, None, AVO_ASSURE_HOME, LOC_7Z, UPDATER_LOC, 'ROLLBACK')
-                self.disp_msg.AppendText( "Click 'Rollback' to run previous version of Avo Assure ICE.")
+                self.disp_msg.AppendText( "Click 'Rollback' to run previous version of Avo Assure Client.")
                 self.rollback_btn.Enable()
             self.Centre()
             wx.Frame(self.panel)
@@ -1780,11 +1782,11 @@ class rollback_window(wx.Frame):
             logger.print_on_console('Error occured while trying to rollback.')
 
     def rollback(self,event):
-        """Rolls back Avo Assure ICE"""
+        """Rolls back Avo Assure Client"""
         try:
             self.close(event)
-            logger.print_on_console("--Rolling back to previous version of Avo Assure ICE--")
-            log.info("--Rolling back to previous version of Avo Assure ICE--")
+            logger.print_on_console("--Rolling back to previous version of Avo Assure Client--")
+            log.info("--Rolling back to previous version of Avo Assure Client--")
             self.rollback_obj.run_rollback()
         except Exception as e:
             log.error('Error occured in rollback : ' + str(e))
@@ -1800,7 +1802,7 @@ class rollback_window(wx.Frame):
 
 class DebugWindow(wx.Frame):
     def __init__(self, parent,id, title):
-        wx.Frame.__init__(self, parent, title=title, pos=(300, 150),  size=(200, 75),
+        wx.Frame.__init__(self, parent, title=title, pos=(300, 150),  size=(300, 100),
             style=wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER |wx.MAXIMIZE_BOX|wx.CLOSE_BOX) )
         self.SetBackgroundColour('#e6e7e8')
         ##style = wx.CAPTION|wx.CLIP_CHILDREN
@@ -1808,10 +1810,10 @@ class DebugWindow(wx.Frame):
         self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
         self.SetIcon(self.wicon)
         self.panel = wx.Panel(self)
-        self.continue_debugbutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap(IMAGES_PATH +"play.png", wx.BITMAP_TYPE_ANY), (65, 15), (35, 28))
+        self.continue_debugbutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap(IMAGES_PATH +"play.png", wx.BITMAP_TYPE_ANY), (100, 15), (50, 30))
         self.continue_debugbutton.Bind(wx.EVT_LEFT_DOWN, self.Resume)
         self.continue_debugbutton.SetToolTip(wx.ToolTip("Resume"))
-        self.continuebutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap(IMAGES_PATH +"step.png", wx.BITMAP_TYPE_ANY), (105, 15), (35, 28))
+        self.continuebutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap(IMAGES_PATH +"step.png", wx.BITMAP_TYPE_ANY), (140, 15), (50, 30))
         self.continuebutton.Bind(wx.EVT_LEFT_DOWN, self.OnContinue)
         self.continuebutton.SetToolTip(wx.ToolTip("Proceed to next step"))
         self.Centre()
@@ -1843,7 +1845,7 @@ class ProxyConfig_window(wx.Frame):
         try:
             data = self.readproxyconfig()
             #------------------------------------Different co-ordinates for Windows and Mac
-            if SYSTEM_OS=='Windows' or SYSTEM_OS=='Linux':
+            if SYSTEM_OS=='Windows':
                 upload_fields= {
                 "Frame":[(300, 170),(400, 230)],
                 "disp_msg":[(12,18),(80, 28),(100,18), (310,-1),(415,18),(30, -1)],
@@ -1854,11 +1856,22 @@ class ProxyConfig_window(wx.Frame):
                 "Save":[(157, 153), (100, 28)],
                 "Close":[(264,153), (100, 28)]
             }
-            else:
+            elif SYSTEM_OS=='Darwin':
                 upload_fields={
                 "Frame":[(300, 150),(550,220)],#(diff +85,+10 from windows)
                 "disp_msg":[(12,38),(80,28),(116,38),(382,-1),(504,38),(30, -1)],
                 "Close":[(285,88),(100, 28)]
+            }
+            elif SYSTEM_OS=='Linux':
+                upload_fields= {
+                "Frame": [(300, 170), (420, 230)],
+                "disp_msg": [(12, 18), (80, 28), (100, 18), (310, -1), (415, 18), (30, -1)],
+                "proxy_enable": [(17, 7), (180, 40)],
+                "proxy_url": [(17, 67), (95, 50), (150, 61), (245, 25)],
+                "username": [(17, 97), (130, 40), (150, 91), (245, 25)],
+                "passwd": [(17, 128), (130, 50), (150, 122), (245, 25)],
+                "Save": [(157, 153), (100, 28)],
+                "Close": [(264, 153), (100, 28)]
             }
             lblList = ['Enabled', 'Disabled']
             wx.Frame.__init__(self, parent, title=title,pos=upload_fields["Frame"][0], size=upload_fields["Frame"][1], style = wx.CAPTION|wx.CLIP_CHILDREN)
@@ -1869,7 +1882,7 @@ class ProxyConfig_window(wx.Frame):
             self.panel = wx.Panel(self)
             self.rbox1 = wx.RadioBox(self.panel, label = 'Enable Proxy', choices = lblList, majorDimension = 1,
                 style = wx.RA_SPECIFY_ROWS, pos=upload_fields["proxy_enable"][0], size=upload_fields["proxy_enable"][1])
-            self.rbox1.SetToolTip(wx.ToolTip("Enable or Disable Proxy in Avo Assure ICE"))
+            self.rbox1.SetToolTip(wx.ToolTip("Enable or Disable Proxy in Avo Assure Client"))
             self.rbox1.Bind(wx.EVT_RADIOBOX, self.radio_check)
             self.proxy_url_path=wx.StaticText(self.panel, label="Proxy URL", pos=upload_fields["proxy_url"][0],size=upload_fields["proxy_url"][1], style=0, name="")
             self.proxy_url_path.SetToolTip(wx.ToolTip("Proxy URL (must start with http:// or https://)"))
@@ -2021,12 +2034,12 @@ def check_update(flag):
     #check if update avaliable
     if ( UPDATE_MSG == 'Update Available!!! Click on update' and flag == True ):
         logger.print_on_console("An update is available. Click on 'Help' menu option -> 'Check for Updates' sub-menu option -> 'Update' button")
-        logger.print_on_console('The latest ICE version : ',l_ver)
+        logger.print_on_console('The latest Avo Assure Client version : ',l_ver)
         log.info(UPDATE_MSG)
-    elif ( UPDATE_MSG == 'You are running the latest version of Avo Assure ICE' and flag == True ):
+    elif ( UPDATE_MSG == 'You are running the latest version of Avo Assure Client' and flag == True ):
         logger.print_on_console( "No updates available" )
         log.info( "No updates available" )
-    elif ( UPDATE_MSG == 'An Error has occured while checking for new versions of Avo Assure ICE, kindly contact Support Team'):
+    elif ( UPDATE_MSG == 'An Error has occured while checking for new versions of Avo Assure Client, kindly contact Support Team'):
         if not (os.path.exists(MANIFEST_LOC)):
             logger.print_on_console( "Client manifest unavaliable." )
             log.info( "Client manifest unavaliable." )
