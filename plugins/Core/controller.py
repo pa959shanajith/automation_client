@@ -340,6 +340,119 @@ class Controller():
             while self.conthread.paused:
                 self.conthread.pause_cond.wait()
 
+    def methodinvocation_desktop(self,index,theta,hypo_x,hypo_y,execution_env,datatables=[],*args):
+            global pause_flag
+            #logger.print_on_console(theta)
+            #logger.print_on_console(hypo)
+            result=(TEST_RESULT_FAIL,TEST_RESULT_FALSE,OUTPUT_CONSTANT,None)
+            #COmapring breakpoint with the step number of tsp instead of index - (Sushma)
+            tsp = handler.local_handler.tspList[index]
+            testcase_details_orig=tsp.testcase_details
+            if local_cont.test_case_number != tsp.testcase_num and tsp.testscript_name:
+                local_cont.test_case_number = tsp.testcase_num
+                log.info('---------------------------------------------------------------------')
+                print('-------------------------------------------------------------------------------------------------------')
+                logger.print_on_console('***Test case name: '+str(tsp.testscript_name)+'***')
+                log.info('***Test case name: '+str(tsp.testscript_name)+'***')
+                print('-------------------------------------------------------------------------------------------------------')
+                log.info('---------------------------------------------------------------------')
+            #logic to handle step by step debug
+            if self.debug_mode and tsp.testcase_num==self.last_tc_num:
+                #logic to handle run from setp debug
+                if self.debug_choice=='RunfromStep' and self.debugfrom_step>0 and tsp.stepnum < self.debugfrom_step :
+                    return index +1
+                pause_flag=True
+            keyword_flag=True
+            ignore_stat=False
+            inpval=[]
+            start_time = datetime.now()
+            #Check for 'terminate_flag' before execution
+            if not(terminate_flag):
+                #Check for 'pause_flag' before executionee
+                if pause_flag:
+                    self.pause_execution()
+                if(self.check_dangling(tsp,index)):
+                    input = tsp.inputval[0]
+                    #Logic to split input and handle dynamic variables
+                    rawinput = tsp.inputval
+                    if len(args) > 0:
+                        rawinput = args[0]
+                    inpval,ignore_stat=self.split_input(rawinput,tsp.name)
+                    if tsp.name.lower() not in [FOR,ENDFOR] :
+                        #Print the details of keyword
+                        self.__print_details(tsp,input,inpval)
+                    #Calculating Start time
+                    #logger.print_on_console('Step number is : ',str(tsp.stepnum))
+                    log.info('Step number is : '+str(tsp.stepnum))
+                    if ignore_stat:
+                        teststepproperty = handler.local_handler.tspList[index]
+                        keyword=teststepproperty.name
+                        logger.print_on_console('Step Skipped : Encountered ignore step instruction for the keyword : ',keyword)
+                        index=index+1
+                    else:
+                        if tsp != None and isinstance(tsp,TestStepProperty) :
+                            log.info( "----Keyword :"+str(tsp.name)+' execution Started----')
+                            start_time = datetime.now()
+                            start_time_string=start_time.strftime(TIME_FORMAT)
+                            logger.print_on_console('Step Execution start time is : '+start_time_string)
+                            log.info('Step Execution start time is : '+start_time_string)
+                            index,result = self.keywordinvocation_desktop(index,theta,hypo_x,hypo_y,inpval,self.reporting_obj,execution_env,*args)
+                        else:
+                            keyword_flag=False
+                            start_time = datetime.now()
+                            if len(tsp.inputval[0].strip())==0 and tsp.name.lower().strip() in [IF,ELSE_IF,FOR,GETPARAM]:
+                                logger.print_on_console('Input value for '+tsp.name+' cannot be empty')
+                                index = TERMINATE
+                            else:
+                                if tsp != None and isinstance(tsp,if_step.If):
+                                    index = tsp.invoke_condtional_keyword(inpval,self.reporting_obj)
+                                elif tsp != None and isinstance(tsp,for_step.For):
+                                    index = tsp.invokeFor(inpval,self.reporting_obj)
+                                elif tsp != None and isinstance(tsp,getparam.GetParam):
+                                    index = tsp.performdataparam(inpval,self,self.reporting_obj,execution_env,datatables)
+                                elif tsp != None and isinstance(tsp,jumpBy.JumpBy):
+                                    index = tsp.invoke_jumpby(inpval,self.reporting_obj)
+                                elif tsp != None and isinstance(tsp,jumpTo.JumpTo):
+                                    self.jumpto_previousindex.append(index+1)
+                                    index,counter = tsp.invoke_jumpto(inpval,self.reporting_obj,self.counter)
+                                    self.counter.append(counter)
+                else:
+                    index= TERMINATE
+                    self.status=index
+            else:
+                index= TERMINATE
+                self.status=index
+            ellapsed_time=''
+            statusflag = self.step_execution_status(tsp)
+            if ignore_stat:
+                statusflag=True
+            if keyword_flag:
+                end_time = datetime.now()
+                end_time_string=end_time.strftime(TIME_FORMAT)
+                logger.print_on_console('Step Execution end time is : '+end_time_string)
+                ellapsed_time=end_time-start_time
+                logger.print_on_console('Step Elapsed time is : ',str(ellapsed_time)+'\n')
+                #Changing the overallstatus of the scenario if it's Fail or Terminate
+                if self.status == TEST_RESULT_FAIL :
+                    if not statusflag:
+                        self.reporting_obj.overallstatus=self.status
+                elif self.status == TERMINATE:
+                    self.reporting_obj.overallstatus=self.status
+            if self.action==EXECUTE:
+                # self.reporting_obj.generate_report_step(tsp,self.status,tsp.name+' EXECUTED and the result is  '+self.status,ellapsed_time,keyword_flag,result[3])
+                if statusflag:
+                    self.reporting_obj.generate_report_step(tsp,'',self,ellapsed_time,keyword_flag,result,ignore_stat,inpval)
+                else:
+                    self.reporting_obj.generate_report_step(tsp,self.status,self,ellapsed_time,keyword_flag,result,ignore_stat,inpval)
+                if tsp.name.lower()=='verifyvalues' or tsp.name.lower()=='verifytextiris':
+                    tsp.testcase_details=testcase_details_orig
+
+            # Issue #160
+            if index==STOP:
+                return index
+            if len(self.counter)>0 and self.counter[-1]>-1 and self.counter[-1]-index==0:
+                return JUMP_TO
+            return index
 
     def methodinvocation(self,index,execution_env,datatables=[],*args):
         global pause_flag
@@ -651,6 +764,228 @@ class Controller():
         if len(output)>1:
             self.dynamic_var_handler_obj.store_dynamic_value(output[1],result[1],tsp.name)
 
+    def keywordinvocation_desktop(self,index,theta,hypo_x,hypo_y,inpval,*args):
+            #logger.print_on_console(self)
+            #logger.print_on_console(inpval)
+            #logger.print_on_console(*args)
+            global socket_object, iris_constant_step, status_percentage
+            self.constant_var_exists=False
+            configvalues = self.configvalues
+            try:
+                time.sleep(float(configvalues['stepExecutionWait']))
+            except Exception as e:
+                log.error('stepExecutionWait should be a integer, please change it in config.json')
+                logger.print_on_console('stepExecutionWait should be a integer, please change it in config.json')
+                log.error(e)
+            result=(TEST_RESULT_FAIL,TEST_RESULT_FALSE,OUTPUT_CONSTANT,None)
+            #Check for 'terminate_flag' before execution
+            if not(terminate_flag):
+                #Check for 'pause_flag' before execution
+                if pause_flag:
+                    self.pause_execution()
+                teststepproperty = handler.local_handler.tspList[index]
+                #logger.print_on_console(teststepproperty)
+                keyword=teststepproperty.name
+                #Custom object implementation for Web
+                if teststepproperty.objectname==CUSTOM:
+                    if self.verify_exists==False:
+                        previous_step=handler.local_handler.tspList[index-1]
+                        apptype=previous_step.apptype.lower()
+                        if  apptype in self.verify_dict and previous_step.name.lower()==self.verify_dict[apptype]:
+                            self.previous_step=previous_step
+                            teststepproperty.custom_flag=True
+                            self.verify_exists=True
+                        else:
+                            apptype=teststepproperty.apptype.lower()
+                            logger.print_on_console('ERR_CUSTOM_VERIFYEXISTS: Previous step ',self.verify_dict[apptype],' is missing')
+                    if self.verify_exists==True:
+                        teststepproperty.custom_flag=True
+                        teststepproperty.parent_xpath=self.previous_step.objectname
+                        teststepproperty.url=self.previous_step.url
+                #Fixed OEBS custom reference defect #398
+                elif keyword.lower() in [VERIFY_EXISTS,VERIFY_VISIBLE] and self.verify_exists:
+                    self.verify_exists=False
+                #Checking of  Drag and Drop keyowrds Issue #115 in Git
+                if teststepproperty.name.lower()==DROP:
+                    log.debug('Drop keyword encountered')
+                    teststepproperty_prev = handler.local_handler.tspList[index-1]
+                    if teststepproperty_prev.name.lower()!=DRAG:
+                        teststepproperty.execute_flag=False
+                        result=list(result)
+                        result[3]='Drag Keyword is missing'
+                elif keyword.lower()==DRAG:
+                    log.debug('Drag keyword encountered')
+                    if(index+1)<len(handler.local_handler.tspList):
+                        teststepproperty_next = handler.local_handler.tspList[index+1]
+                        if teststepproperty_next.name.lower()!=DROP:
+                            teststepproperty.execute_flag=False
+                            result=list(result)
+                            result[3]='Drop Keyword is missing'
+                #Checking for test step with constant iris object
+                if(teststepproperty.cord != '' and teststepproperty.cord != None):
+                    if (teststepproperty.objectname.split(';')[-1] == 'constant' and keyword.lower() == 'verifyexistsiris'):
+                        iris_constant_step = index
+                    elif iris_constant_step!=-1:
+                        tsp = handler.local_handler.tspList[iris_constant_step]
+                        #logger.print_on_console(tsp)
+                        obj_props = tsp.objectname.split(';')
+                        coords = [obj_props[2],obj_props[3],obj_props[4],obj_props[5]]
+                        teststepproperty.custom_flag = True
+                        teststepproperty.parent_xpath = {'cord': tsp.cord, 'coordinates': coords}
+                #get the output varible from the teststep property
+                if teststepproperty.execute_flag:
+                    #Check the apptype and pass to perticular module
+                    if teststepproperty.apptype.lower() == APPTYPE_GENERIC:
+                        #Generic apptype module call
+
+                        if local_cont.generic_dispatcher_obj == None:
+                            self.__load_generic()
+                        result = self.invokegenerickeyword(teststepproperty,local_cont.generic_dispatcher_obj,inpval)
+
+                    elif teststepproperty.apptype.lower() == APPTYPE_SYSTEM:
+                        #System apptype module call
+                        if self.system_dispatcher_obj == None:
+                            self.__load_system()
+                        result = self.invokesystemkeyword(teststepproperty,self.system_dispatcher_obj,inpval)
+
+                    elif teststepproperty.apptype.lower() == APPTYPE_WEB:
+                        #Web apptype module call
+                        # if local_cont.web_dispatcher_obj == None:
+                        #     self.__load_web()
+                        # result = self.invokewebkeyword(teststepproperty,local_cont.web_dispatcher_obj,inpval,args[0],args[1])
+                        if self.desktop_dispatcher_obj == None:
+                            self.__load_desktop()
+                        result = self.invokeDesktopkeyword_iris(theta,hypo_x,hypo_y,teststepproperty,self.desktop_dispatcher_obj,inpval)
+                    elif teststepproperty.apptype.lower() == APPTYPE_MOBILE:
+                        #MobileWeb apptype module call
+                        # if self.mobile_web_dispatcher_obj == None:
+                        #     self.__load_mobile_web()
+                        # result = self.invokemobilekeyword(teststepproperty,self.mobile_web_dispatcher_obj,inpval,args[0])
+                        if self.desktop_dispatcher_obj == None:
+                            self.__load_desktop()
+                        result = self.invokeDesktopkeyword_iris(theta,hypo_x,hypo_y,teststepproperty,self.desktop_dispatcher_obj,inpval)
+                    elif teststepproperty.apptype.lower() == APPTYPE_MOBILE_APP:
+                        #MobileApp apptype module call
+                        # if self.mobile_app_dispatcher_obj==None:
+                        #     self.__load_mobile_app()
+                        # result = self.invokemobileappkeyword(teststepproperty,self.mobile_app_dispatcher_obj,inpval,args[0])
+                        if self.desktop_dispatcher_obj == None:
+                            self.__load_desktop()
+                        result = self.invokeDesktopkeyword_iris(theta,hypo_x,hypo_y,teststepproperty,self.desktop_dispatcher_obj,inpval)
+                    elif teststepproperty.apptype.lower() == APPTYPE_WEBSERVICE:
+                        #Webservice apptype module call
+                        # if self.webservice_dispatcher_obj == None:
+                        #     self.__load_webservice()
+                        # result = self.invokewebservicekeyword(teststepproperty,self.webservice_dispatcher_obj,inpval,socket_object)
+                        if self.desktop_dispatcher_obj == None:
+                            self.__load_desktop()
+                        result = self.invokeDesktopkeyword_iris(theta,hypo_x,hypo_y,teststepproperty,self.desktop_dispatcher_obj,inpval)
+                    elif teststepproperty.apptype.lower() == APPTYPE_DESKTOP:
+                        #Desktop apptype module call
+                        if self.desktop_dispatcher_obj == None:
+                            self.__load_desktop()
+                        result = self.invokeDesktopkeyword_iris(theta,hypo_x,hypo_y,teststepproperty,self.desktop_dispatcher_obj,inpval)
+                        #----------------------------------------------------------------------------------------------SAP change
+                    elif teststepproperty.apptype.lower() == APPTYPE_SAP:
+                        #SAP apptype module call
+                        # if self.sap_dispatcher_obj == None:
+                        #     self.__load_sap()
+                        # result = self.invokeSAPkeyword(teststepproperty,self.sap_dispatcher_obj,inpval)
+                        if self.desktop_dispatcher_obj == None:
+                            self.__load_desktop()
+                        result = self.invokeDesktopkeyword_iris(theta,hypo_x,hypo_y,teststepproperty,self.desktop_dispatcher_obj,inpval)
+                    #----------------------------------------------------------------------------------------------SAP change
+                    elif teststepproperty.apptype.lower() == APPTYPE_DESKTOP_JAVA:
+                        #OEBS apptype module call
+                        # if self.oebs_dispatcher_obj == None:
+                        #     self.__load_oebs()
+                        # result = self.invokeoebskeyword(teststepproperty,self.oebs_dispatcher_obj,inpval)
+                        if self.desktop_dispatcher_obj == None:
+                            self.__load_desktop()
+                        result = self.invokeDesktopkeyword_iris(theta,hypo_x,hypo_y,teststepproperty,self.desktop_dispatcher_obj,inpval)
+                #----------------------------------------------------------------------------------------------Mainframe change
+                    elif teststepproperty.apptype.lower() == APPTYPE_MAINFRAME:
+                        #Mainframe apptype module call
+                        if self.mainframe_dispatcher_obj == None:
+                            self.__load_mainframe()
+                        result = self.invokemainframekeyword(teststepproperty,self.mainframe_dispatcher_obj,inpval)
+                    #----------------------------------------------------------------------------------------------Mainframe change
+                    elif teststepproperty.apptype.lower() == APPTYPE_PDF:
+                        #pdf apptype module call
+                        if self.pdf_dispatcher_obj == None:
+                            self.__load_pdf()
+                        result = self.invokepdfkeyword(teststepproperty,self.pdf_dispatcher_obj,inpval)
+                #Fixed issue num #389 (Taiga)
+                temp_result=result
+                if result!=TERMINATE:
+                    temp_result=list(result)
+                    if  len(temp_result)>2 and temp_result[2]==OUTPUT_CONSTANT:
+                        temp_result[2]=None
+                    if len(temp_result)>4:
+                        temp_result=temp_result[0:-1]
+                if pause_flag:
+                    self.pause_execution()
+                # logger.print_on_console( 'Result in methodinvocation : ', teststepproperty.name,' : ',temp_result)
+                log.info('Result in methodinvocation : '+ str(teststepproperty.name)+' : ')
+                log.info(result)
+                self.keyword_status=TEST_RESULT_FAIL
+                if result!=TERMINATE:
+                    self.store_result(result,teststepproperty)
+                    if self.constant_var_exists:
+                        #if the output variable(constant variable) is assigned with a value and still constantVariable is used in output
+                        temp_re=list(result)
+                        temp_re[0]=TEST_RESULT_FAIL
+                        temp_re[1]=TEST_RESULT_FALSE
+                        result=tuple(temp_re)
+                    self.status=result[0]
+                    index+=1
+                    self.keyword_status=self.status
+                else:
+                    index=result
+                    self.status=result
+                #Fixing issue #382
+                if teststepproperty.outputval.split(";")[-1].strip() != STEPSTATUS_INREPORTS_ZERO:
+                    status_percentage[self.keyword_status]+=1
+                    status_percentage["total"]+=1
+                kwargs = {}
+                if(self.keyword_status=='Pass'): kwargs["setcolor"]="GREEN"
+                elif(self.keyword_status=='Fail') : kwargs["setcolor"]="RED"
+                logger.print_on_console(keyword+' executed and the status is '+self.keyword_status+'\n',**kwargs)
+                log.info(keyword+' executed and the status is '+self.keyword_status+'\n')
+                #Checking for stop keyword
+                # CR #22650 stop keyword enhancement
+                # 1. when input is 'testcase' stop the current testcase execution and jump to next teststep of next testcase.
+                #    1.a :  assign index to prev_index and reduce the index value as its incremented already
+                #    1.b : Find the starting index of next testcase and assign it to index by checking testcase_name
+                #    1.b : if index+1 hasnt changed implies that there are no further testcase in that scenario. so make index= STOP
+                # 2. when input is 'module' stop the current module and move to next module if its batch execution.
+                #   2.a : set module_stop=True. which asks to stop looping through the scenarios of the current module and move to next module if present
+                # 3. when input is 'scenario' assign STOP to index and stop the sceanrio execution and move to next scenario if present
+                if teststepproperty.name.lower() == STOP and self.status == 'Pass':
+                    ## Issue #160
+                    # index = STOP
+                    if self.action.lower() == 'debug':
+                        index = STOP
+                    else:
+                        if teststepproperty.inputval[0].lower() == 'testcase':
+                            prev_index = index
+                            index -= 1
+                            teststepproperty_name = teststepproperty.testscript_name
+                            for i in range(index, len(handler.local_handler.tspList)):
+                                if teststepproperty_name != handler.local_handler.tspList[i].testscript_name:
+                                    index = handler.local_handler.tspList[i].index
+                                    break
+                            if (index + 1) == prev_index:
+                                index = STOP
+                        elif teststepproperty.inputval[0].lower() == 'module':
+                            local_cont.module_stop = True
+                            index = STOP
+                        else:
+                            index = STOP
+                return index,result
+            else:
+                return index,TERMINATE
+
     def keywordinvocation(self,index,inpval,*args):
         global socket_object, iris_constant_step, status_percentage
         self.constant_var_exists=False
@@ -850,6 +1185,146 @@ class Controller():
         else:
             return index,TERMINATE
 
+    def executor_desktop(self,tsplist,action,last_tc_num,debugfrom_step,mythread,execution_env,*args,datatables=[], accessibility_testing = False):
+        global status_percentage, screen_testcase_map
+        status_percentage = {TEST_RESULT_PASS:0,TEST_RESULT_FAIL:0,TERMINATE:0,"total":0}
+        i=0
+        j=0
+        count1=0
+        coordinates_list_old=[]
+        theta=0
+        hypo_x=0
+        hypo_y=0
+        coordinate_count=0
+        status=True
+        accessibility_reports = []
+        self.scenario_start_time=datetime.now()
+        start_time_string=self.scenario_start_time.strftime(TIME_FORMAT)
+        logger.print_on_console('Scenario Execution start time is : '+start_time_string,'\n')
+        global pause_flag
+        if(action != DEBUG):
+            hn = execution_env['handlerno']
+            log.root.handlers[hn].createTspObj(execution_env['scenario_id'],execution_env['browser'])
+        if local_cont.generic_dispatcher_obj is not None and local_cont.generic_dispatcher_obj.action is None:
+            local_cont.generic_dispatcher_obj.action=action
+        #Check for 'run from step' with range as input
+        last_step_val = len(tsplist)
+        #logger.print_on_console(last_step_val)
+        #logger.print_on_console(tsplist[0])
+        if self.runfrom_step_range_input:
+            last_step_val=self.runfrom_step_range_input[-1]
+
+        
+        while(j< len(tsplist)):
+
+            #old_coordinates(j)
+            teststepproperty = handler.local_handler.tspList[j]
+            old_coordinates_prop=teststepproperty.objectname.split(";")
+            #logger.print_on_console(len(old_coordinates_prop))
+            
+            #------------------
+            if len(old_coordinates_prop)>2:
+                lab_co=old_coordinates_prop[1].split("_")
+                coordinates_list_old.append([int(old_coordinates_prop[2]),int(old_coordinates_prop[3]),int(old_coordinates_prop[4]),int(old_coordinates_prop[5]),lab_co[0]])
+                #logger.print_on_console(coordinates_list_old)
+            j=j+1
+        #logger.print_on_console(coordinates_list_old)
+
+        while (i < len(tsplist)):
+            if i==1:
+                import core_utils
+                core_utils.get_all_the_imports('IRIS')
+                #execution_image_path ="D:\Source_Code\AI_Output\\execution_image.png"
+                #import testing_AI
+                #import client
+                import client_1
+                if count1==0:
+                    box_dict1=client_1.execute_client()
+                    #box_dict1=client.client(execution_image_path)
+                    #box_dict1=testing_AI.main_fun(execution_image_path)
+                    count1=+1
+                #logger.print_on_console(box_dict1)
+                import New_Coordinates
+                theta,hypo_x,hypo_y=New_Coordinates.getting_new_coor(coordinates_list_old,box_dict1)
+            #Check for 'terminate_flag' before execution
+            if not(terminate_flag):
+                if tsplist[i].testcase_num == last_tc_num:
+                    if mythread.cw and mythread.cw.debugwindow is not None:
+                        wx.CallAfter(mythread.cw.debugwindow.Show)
+                    if self.runfrom_step_range_input:
+                        #checks if the current step num is greater than ending range of run from step, to Run till the ending range of run from step
+                        if tsplist[i].stepnum > last_step_val: break
+                #Check for 'pause_flag' before execution
+                if pause_flag:
+                    self.pause_execution()
+                self.last_tc_num=last_tc_num
+                self.debugfrom_step=debugfrom_step
+                try:
+                    index = i
+                    # if(action != DEBUG):  
+                    #     log.root.handlers[hn].starttsp(tsplist[index],execution_env['scenario_id'],execution_env['browser'])
+                    i = self.methodinvocation_desktop(i,theta,hypo_x,hypo_y,execution_env,datatables)
+                    
+                    #logger.print_on_console(i)
+                    #logger.print_on_console(execution_env)
+                    #logger.print_on_console(datatables)
+                    # if(action != DEBUG):
+                    #     log.root.handlers[hn].stoptsp(tsplist[index],execution_env['scenario_id'],execution_env['browser'])
+                    #Check wether accessibility testing has to be executed
+                    if accessibility_testing and (index + 1 >= len(tsplist) or (tsplist[index].testscript_name != tsplist[index + 1].testscript_name and screen_testcase_map[tsplist[index].testscript_name]['screenid'] != screen_testcase_map[tsplist[index + 1].testscript_name]['screenid'])):
+                        if local_cont.accessibility_testing_obj is None: self.__load_web()
+                        import browser_Keywords
+                        script_info =  screen_testcase_map[tsplist[index].testscript_name]
+                        #Check if browser is present or not
+                        if hasattr(browser_Keywords.local_bk, 'driver_obj') and browser_Keywords.local_bk.driver_obj is not None and len(script_info['accessibility_parameters']) > 0:
+                            acc_result = local_cont.accessibility_testing_obj.runCrawler(browser_Keywords.local_bk.driver_obj, script_info, screen_testcase_map["executionid"], index)
+                            #Check if accessibility Testing was successful
+                            if acc_result and acc_result["status"] != "fail":
+                                accessibility_reports.append(acc_result)
+                    if i == TERMINATE:
+                        #Changing the overallstatus of the report_obj to Terminate - (Sushma)
+                        self.reporting_obj.overallstatus=TERMINATE
+                        status_percentage[TERMINATE]+=1
+                        status_percentage["total"]+=1
+                        logger.print_on_console('Terminating the execution',color="YELLOW")
+                        status=i
+                        break
+                    ## Issue #160
+                    elif i==STOP:
+                        log.info('Encountered STOP keyword')
+                        break
+                    elif i==JUMP_TO:
+                        i=self.jumpto_previousindex[-1]
+                        if len(self.jumpto_previousindex)>0 and len(self.counter)>0:
+                            self.jumpto_previousindex.pop()
+                            self.counter.pop()
+                except Exception as e:
+                    log.error(e,exc_info=True)
+                    logger.print_on_console("Error encountered during Execution")
+                    #logger.print_on_console(e)
+                    status=False
+                    i=i+1
+            else:
+                logger.print_on_console('Terminating the execution',color="YELLOW")
+                #Changing the overallstatus of the report_obj to Terminate - (Sushma)
+                self.reporting_obj.overallstatus=TERMINATE
+                status=TERMINATE
+                break
+        self.scenario_end_time=datetime.now()
+        end_time_string=self.scenario_end_time.strftime(TIME_FORMAT)
+        logger.print_on_console('Scenario Execution end time is : '+end_time_string)
+        self.scenario_ellapsed_time=self.scenario_end_time-self.scenario_start_time
+        if terminate_flag:
+            #Indication of user_termination to report_obj to add a proper description in report - (Sushma)
+            self.reporting_obj.user_termination=True
+            status_percentage[TERMINATE]+=1
+            status_percentage["total"]+=1
+        ##send path to build overall status
+        video_path = args[0] if (args and args[0]) else ''
+        self.reporting_obj.build_overallstatus(self.scenario_start_time,self.scenario_end_time,self.scenario_ellapsed_time,video_path)
+        logger.print_on_console('Step Elapsed time is : ',str(self.scenario_ellapsed_time))
+        return status,status_percentage,accessibility_reports
+
     def executor(self,tsplist,action,last_tc_num,debugfrom_step,mythread,execution_env,*args,datatables=[], accessibility_testing = False):
         global status_percentage, screen_testcase_map
         status_percentage = {TEST_RESULT_PASS:0,TEST_RESULT_FAIL:0,TERMINATE:0,"total":0}
@@ -978,6 +1453,11 @@ class Controller():
         res = dispatcher_obj.dispatcher(teststepproperty,inputval,self.reporting_obj,self.conthread)
         return res
 
+
+    def invokeDesktopkeyword_iris(self,theta,hypo_x,hypo_y,teststepproperty,dispatcher_obj,inputval):
+            res = dispatcher_obj.dispatcher_iris(theta,hypo_x,hypo_y,teststepproperty,inputval,self.conthread)
+            return res
+
     def invokeDesktopkeyword(self,teststepproperty,dispatcher_obj,inputval):
         res = dispatcher_obj.dispatcher(teststepproperty,inputval,self.conthread)
         return res
@@ -1012,6 +1492,21 @@ class Controller():
                 break
             print('\n')
             tsplist = obj.read_step()
+            
+            if tsplist[0].apptype.lower()=='web':
+                appiris=tsplist[2].objectname
+            else:
+                appiris=tsplist[1].objectname
+
+            appirislst=appiris.split(';')
+
+            for var in appirislst:
+                if var.lower()=='iris':
+                    appiris_var=var
+                    break
+                else:
+                    appiris_var='notiris'                
+            # logger.print_on_console(appiris_var)
             for k in range(len(tsplist)):
                 if tsplist[k].apptype.lower()=='web':
                     tsplist[k].browser_type = browser_type
@@ -1064,7 +1559,11 @@ class Controller():
             if start_debug:
                 self.conthread=mythread
                 execution_env = {'env':'default'}
-                status,_,_ = self.executor(tsplist,DEBUG,last_tc_num,runfrom_step,mythread,execution_env,datatables=datatables, accessibility_testing = False)
+                #if tsplist[0].apptype.lower()=='desktop':
+                if appiris_var=='iris':  
+                    status,_,_ = self.executor_desktop(tsplist,DEBUG,last_tc_num,runfrom_step,mythread,execution_env,datatables=datatables, accessibility_testing = False)
+                else:
+                    status,_,_ = self.executor(tsplist,DEBUG,last_tc_num,runfrom_step,mythread,execution_env,datatables=datatables, accessibility_testing = False)
         else:
             logger.print_on_console('Invalid script')
         temp={}
