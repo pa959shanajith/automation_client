@@ -12,7 +12,7 @@ import time
 import controller
 import readconfig
 from constants import *
-import label_image
+#import label_image
 if SYSTEM_OS == 'Windows':
     import screeninfo
     from pywinauto.findwindows import find_window
@@ -46,12 +46,28 @@ class Cropandadd():
                 wx_window.HideWithEffect(wx.SHOW_EFFECT_ROLL_TO_BOTTOM)
             else:
                 wx_window.Hide()
-            time.sleep(1)
+            #time.sleep(1)
+            time.sleep(5)
+            #import pyautogui
             im = PIL.ImageGrab.grab()
             test_img_path = TEMP_PATH + OS_SEP + "test.png"
             crop_img_path = TEMP_PATH + OS_SEP + "cropped.png"
             im.save(test_img_path)
+            #im.save("D:\\Source_Code\\AI_Output\\test.png")
+            #img1="D:\\Source_Code\\AI_Output\\test.png"
+
+        
+
+            # import testing_AI
+            # box_dict=testing_AI.main_fun(img1)
+            # image_orig = cv2.imread(test_img_path)
+
+            # New Changes
+            import client_1
+            box_dict=client_1.client(im)
             image_orig = cv2.imread(test_img_path)
+            #logger.print_on_console(box_dict)
+
             if SYSTEM_OS == 'Windows':
                 screen = screeninfo.get_monitors()[0]
             elif SYSTEM_OS == 'Darwin':
@@ -76,6 +92,50 @@ class Cropandadd():
             self.data = {}
             self.data['view'] = []            #cords of selected parts
             self.stopflag = False
+
+            for elem in box_dict:
+
+                if(constant_image):
+                    log.debug('Inside draw : Event3 - if constant obj set custname and tag')
+                    custname=elem[0]+'_'+elem[1]
+                    #custname = 'const_img_object_'+str(ix)+'_'+str(iy)+'_'+str(x)+'_'+str(y)
+                    logger.print_on_console("#####****************"+custname)
+
+                    tag = 'constant'
+                    RGB_img_crop = image_orig[elem[3]:elem[5],elem[2]:elem[4]]
+
+                    cv2.rectangle(image_orig, (elem[2],elem[3]), (elem[4], elem[5]),color=(0, 255, 0), thickness=1)
+
+                    cv2.imwrite(crop_img_path, RGB_img_crop)
+                    with open(crop_img_path, "rb") as imageFile:
+                        RGB_img_crop_im = str(base64.b64encode(imageFile.read()))
+
+                else:
+                    log.debug('Inside draw : Event3 - if relative obj set custname and tag')
+                    custname=elem[0]+'_'+elem[1]
+                    #custname = 'img_object_'+str(ix)+'_'+str(iy)+'_'+str(x)+'_'+str(y)
+                    logger.print_on_console("------------------"+custname)
+                    tag = 'relative'
+                    RGB_img_crop = image_orig[elem[3]:elem[5],elem[2]:elem[4]]
+
+                    cv2.rectangle(image_orig, (elem[2],elem[3]), (elem[4], elem[5]),color=(0, 255, 0), thickness=1)
+
+                    cv2.imwrite(crop_img_path, RGB_img_crop)
+                    with open(crop_img_path, "rb") as imageFile:
+                        RGB_img_crop_im = str(base64.b64encode(imageFile.read()))
+
+
+                #cord_value=[12]
+
+                self.data['view'].append({'custname': custname,'cord':RGB_img_crop_im,'tag':tag,'width':abs(elem[2]-elem[4]),'height':abs(elem[3]-elem[5]),'top':elem[3],'left':elem[2],'xpath':'iris','objectType':''})
+                #logger.print_on_console(self.data)
+            
+            #img_hig="D:\\Source_Code\\AI_Output\\img_high.png"
+            img_hig= TEMP_PATH + OS_SEP + "img_high.png"
+            cv2.imwrite(img_hig,image_orig)
+            #cv2.imshow("image",image_orig)
+            #cv2.waitKey(0)
+            
             def draw_rect(event,x,y,flags,param):
                 global ix,iy,drawing1,constant_image
                 if event == cv2.EVENT_LBUTTONDOWN:
@@ -89,10 +149,13 @@ class Cropandadd():
                 elif event == cv2.EVENT_MOUSEMOVE:
                     if drawing1 == True:
                         self.RGB_img = np.copy(self.RGB_img_c)
+                        #self.image_orig = np.copy(self.RGB_img_c)
                         if(constant_image):
-                            cv2.rectangle(self.RGB_img,(ix,iy),(x,y),(0,0,255),1)
+                            cv2.rectangle(self.image_orig,(ix,iy),(x,y),(0,0,255),1)
+                            #cv2.imshow("image", image_orig)
                         else:
-                            cv2.rectangle(self.RGB_img,(ix,iy),(x,y),(0,255,0),1)
+                            cv2.rectangle(self.image_orig,(ix,iy),(x,y),(0,255,0),1)
+                            #cv2.imshow("image", image_orig)
 
                 elif event == cv2.EVENT_LBUTTONUP:
                     log.debug('Inside draw : Event3 - left button up')
@@ -117,17 +180,20 @@ class Cropandadd():
                         else : self.data['view'].append({'custname': custname,'cord':RGB_img_crop_im,'tag':tag,'width':abs(x-ix),'height':abs(y-iy),'top':iy,'left':ix,'xpath':'iris','objectType':''})
                     if(constant_image):
                         log.debug('Inside draw : Event3 - constant obj - box colour red ')
-                        cv2.rectangle(self.RGB_img,(ix,iy),(x,y),(0,0,255),1)
+                        cv2.rectangle(image_orig,(ix,iy),(x,y),(0,0,255),1)
                     else:
                         log.debug('Inside draw : Event3 - constant obj - box colour green ')
-                        cv2.rectangle(self.RGB_img,(ix,iy),(x,y),(0,255,0),1)
+                        cv2.rectangle(image_orig,(ix,iy),(x,y),(0,255,0),1)
                     self.RGB_img_c = np.copy(self.RGB_img)
                     self.RGB_img[(iy+1):(y-1),(ix+1):(x-1)]=image_orig[(iy+1):(y-1),(ix+1):(x-1)]
                     self.RGB_img_c = np.copy(self.RGB_img)
                     constant_image = False
 
             cv2.namedWindow('image',cv2.WND_PROP_FULLSCREEN)
+            #cv2.imshow("image",image_orig)
             cv2.setMouseCallback('image',draw_rect)
+            #cv2.waitKey(0)
+            
             if SYSTEM_OS == 'Windows':
                 cv2.moveWindow('image', screen.x - 1, screen.y - 1)
             else:
@@ -137,7 +203,7 @@ class Cropandadd():
             if SYSTEM_OS == 'Windows':
                 SetForegroundWindow(find_window(title='image'))
             while(1):
-                cv2.imshow('image',self.RGB_img)
+                cv2.imshow('image',image_orig)
                 """cv2.waitKey : The waitkey() is a keyword binding function and it only accepts time in milliseconds as an argument.
                    When you add any time as an argument , then it waits for the specified time and then the program continues.
                    If o is passed , it waits indefinitely until a key is pressed.
@@ -161,6 +227,7 @@ class Cropandadd():
         except Exception as e:
             log.error("Error occured in capturing iris object, ERR_MSG : " + str(e))
             logger.print_on_console("Error occured in capturing iris object")
+            logger.print_on_console(e)
 
     def stopcropandadd(self):
         try:
