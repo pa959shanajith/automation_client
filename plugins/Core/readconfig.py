@@ -88,6 +88,7 @@ class readConfig():
                 configvalues['isTrial']=params['isTrial']
                 configvalues['element_load_timeout'] = params['element_load_timeout']
                 configvalues['verify_wait_time'] = params['verify_wait_time']
+                configvalues['ai_server']=params['ai_server']
 
             except Exception as e:
                 configvalues['errorflag']=e
