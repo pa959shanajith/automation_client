@@ -501,12 +501,29 @@ class ButtonLinkKeyword():
         try:
             filepath = inputs[0]
             filename = inputs[1]
-            inputfile = os.path.join(filepath, filename)
+            file_list = filename.split(',')
+            multiplefile = False
+            # Multiple file upload
+            if len(file_list) > 1:
+                multiplefile = True
+                inputfile = ''
+                for file_index in range(len(file_list)):
+                    filename = file_list[file_index]
+                    file_exists = os.path.isfile(os.path.join(filepath, filename))
+                    if file_exists:
+                        if file_index+1 != len(file_list):
+                            inputfile = inputfile + os.path.join(filepath, filename) + '\n'
+                        else:
+                            inputfile = inputfile + os.path.join(filepath, filename)
+                    else:
+                        break
+            else:
+                inputfile = os.path.join(filepath, filename)
+                file_exists = os.path.isfile(inputfile)
             if webelement != None:
                 local_blk.log.info('Recieved web element from the web dispatcher')
                 local_blk.log.debug(webelement)
                 local_blk.log.debug('Check for the element enable')
-                file_exists = os.path.isfile(inputfile)
                 if not file_exists:
                     err_msg=ERROR_CODE_DICT['ERR_IIO_EXCEPTION']
                 elif webelement.is_enabled():
@@ -526,23 +543,28 @@ class ButtonLinkKeyword():
                             methodoutput = webconstants.TEST_RESULT_TRUE
                     else:
                         #Checking for headless mode
-                        inputElement = webelement.find_element(By.XPATH,'..').find_element(By.XPATH,"//input[@type='file']")
-                        # if (str(readconfig.configvalues['headless_mode'])=='Yes'):
-                        inputElement.send_keys(inputfile)
-                        status = webconstants.TEST_RESULT_PASS
-                        methodoutput = webconstants.TEST_RESULT_TRUE
-                        if self.__click_for_file_upload(browser_Keywords.local_bk.driver_obj,webelement):
-                            filestatus =self.__upload_operation(inputfile,inputs)
-                            local_blk.log.info(STATUS_METHODOUTPUT_UPDATE)
-                            if filestatus:
-                                status = webconstants.TEST_RESULT_PASS
-                                methodoutput = webconstants.TEST_RESULT_TRUE
+                        inputElement = webelement.find_element(By.XPATH,'..').find_element(By.XPATH,".//input[@type='file']")
+                        if inputElement:
+                            # if (str(readconfig.configvalues['headless_mode'])=='Yes'):
+                            inputElement.send_keys(inputfile)
+                            status = webconstants.TEST_RESULT_PASS
+                            methodoutput = webconstants.TEST_RESULT_TRUE
+                        elif not(multiplefile):
+                            if self.__click_for_file_upload(browser_Keywords.local_bk.driver_obj,webelement):
+                                filestatus =self.__upload_operation(inputfile,inputs)
+                                local_blk.log.info(STATUS_METHODOUTPUT_UPDATE)
+                                if filestatus:
+                                    status = webconstants.TEST_RESULT_PASS
+                                    methodoutput = webconstants.TEST_RESULT_TRUE
                     
                 else:
                     err_msg = WEB_ELEMENT_DISABLED
         except Exception as e:
             local_blk.log.error(e)
-            err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+            if type(e).__name__ == "InvalidArgumentException":
+                err_msg=ERROR_CODE_DICT['ERR_MULTIPLE_FILES']
+            else:    
+                err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         if err_msg:
             local_blk.log.error(err_msg)
             logger.print_on_console(err_msg)
