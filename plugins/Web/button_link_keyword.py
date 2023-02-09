@@ -511,12 +511,10 @@ class ButtonLinkKeyword():
                     filename = file_list[file_index]
                     file_exists = os.path.isfile(os.path.join(filepath, filename))
                     if file_exists:
-                        if file_index+1 != len(file_list):
-                            inputfile = inputfile + os.path.join(filepath, filename) + '\n'
-                        else:
-                            inputfile = inputfile + os.path.join(filepath, filename)
+                        inputfile = inputfile + os.path.join(filepath, filename) + '\n'
                     else:
                         break
+                inputfile = inputfile.strip()
             else:
                 inputfile = os.path.join(filepath, filename)
                 file_exists = os.path.isfile(inputfile)
