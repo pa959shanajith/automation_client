@@ -265,6 +265,7 @@ ERROR_CODE_DICT = {
                     'ERR_ELEMENT_IS_NOT_READONLY':'Element is not readonly.',
                     'ERR_ELEMENT_IS_READONLY':'Element is readonly.',
                     'ERR_IIO_EXCEPTION':'File not found in the specified path.',
+                    'ERR_MULTIPLE_FILES':'Invalid input: the element can not hold multiple files.',
                     'ERR_DRIVER_IS_NULL':'Driver is null. Hence cannot capture screenshot.',
                     'ERR_NO_MATCH':'The Cell value and Expected value do-not Match.',
                     'ERR_WEB_ELEMENT_IS_NULL':'The WebElement Value is null.',
