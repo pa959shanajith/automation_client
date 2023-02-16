@@ -77,6 +77,8 @@ class JiraWindow():
                                 if 'customfield' in data[i]['field_name']:
                                     custom_val_dd['value']=data[i]['userInput']['text']
                                     temp_dict[data[i]['field_name']] = custom_val_dd
+                                    if data[i]['type']=='array':
+                                        temp_dict[data[i]['field_name']]=[temp_dict[data[i]['field_name']]]
                                 else:
                                     if data[i]['field_name'].lower()=='priority':
                                         temp_dict[data[i]['field_name']] = {'name':data[i]['userInput']['text']}
@@ -95,6 +97,8 @@ class JiraWindow():
                                 if 'customfield' in data[i]['field_name']:
                                     custom_val_tb=data[i]['userInput']
                                     temp_dict[data[i]['field_name']] = custom_val_tb
+                                    if data[i]['type']=='number':
+                                        temp_dict[data[i]['field_name']]=int(temp_dict[data[i]['field_name']])
                                 else:
                                     temp_dict[data[i]['field_name']] = data[i]['userInput']
                         else:
@@ -365,7 +369,21 @@ class JiraWindow():
                     res['projects']=[]
                     for index,item in enumerate(JsonObject):
                         res['projects'].append({'id': item['id'] , 'name':item['name'], 'code':item['key']})
-            socket.emit('Jira_Projects',res)
+            if(';' in jira_input_dict['jira_serverlocation']):
+                log.debug('Connecting to JIRA through proxy')
+                jira_server = jira_input_dict['jira_serverlocation'].split(';')[0]
+                jira_proxy = jira_input_dict['jira_serverlocation'].split(';')[1]
+                jira_options = {'server':jira_server,'verify':False}
+                jira = JIRA(options=jira_options,basic_auth=(jira_input_dict['jira_uname'],jira_input_dict['jira_pwd']),proxies={'http':jira_proxy,'https':jira_proxy})
+            else:
+                jira_options = {'server': jira_input_dict['jira_serverlocation']}
+                jira = JIRA(options=jira_options,basic_auth=(jira_input_dict['jira_uname'],jira_input_dict['jira_pwd']))
+            issue_types = jira.issue_types()
+            res['issue_types']=[]
+            for index,item in enumerate(issue_types):
+                if item.name.lower() in ['story', 'test case']:
+                        res['issue_types'].append({'id': item.id , 'name':item.name})
+            socket.emit('Jira_details',res)
         except Exception as e:
             log.error(e)
             if 'Invalid URL' in str(e):
@@ -384,9 +402,10 @@ class JiraWindow():
         res = {}
         res['testcases']=[]
         try:
+            # jira_input_dict['item_type']='Story'
             project=jira_input_dict['project_selected']['project']
             key=jira_input_dict['project_selected']['key']
-            url=jira_input_dict['jira_serverlocation']+"/rest/api/2/search?jql=issueType='Test Case'&fields=id,key,project"
+            url=jira_input_dict['jira_serverlocation']+"/rest/api/2/search?jql=issueType="+jira_input_dict['item_type']+"&fields=id,key,project"
             auth = HTTPBasicAuth(jira_input_dict['jira_uname'],jira_input_dict['jira_pwd'])
             headers={"Accept":"application/json"}
             respon=requests.request("GET",url,headers=headers,auth=auth)
