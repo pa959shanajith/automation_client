@@ -1874,7 +1874,7 @@ class Controller():
                 status=self.invoke_debug(mythread,runfrom_step,json_data)
             if status != TERMINATE:
                 status=COMPLETED
-        except:
+        except Exception as e:
             logger.print_on_console("Exception in Invoke Controller")
             log.error("Exception in Invoke Controller", exc_info=True)
             status = TERMINATE

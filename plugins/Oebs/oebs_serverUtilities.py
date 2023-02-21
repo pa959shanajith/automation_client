@@ -39,7 +39,7 @@ log = logging.getLogger('oebs_serverUtilities.py')
 class Utilities:
 
     #Method to swoop till the element at the given Object location
-    def swooptoelement(self , a, objecttofind, currentxpathtemp, i, p, windowname, object_type, errors = False, allow_showing = False):
+    def swooptoelement(self , a, objecttofind, currentxpathtemp, i, p, windowname, object_type, top, left, width, height, errors = False, allow_showing = False):
         queue = []
         active_parent = False
         page_tab_list = False
@@ -98,7 +98,7 @@ class Utilities:
                             path = xpath + '/' + elementObj.role  + '[' + str(index) + ']'  + '[' + str(elementObj.description.strip()) + ']'
                         else:
                             path = xpath + '/' + elementObj.role  + '[' + str(elementObj.description.strip()) + ']'
-            if path == currentxpathtemp:
+            if path == currentxpathtemp or (str(top) == str(elementObj.y) and str(left) == str(elementObj.x) and str(width) == str(elementObj.width) and str(height) == str(elementObj.height)):
                 if currentxpathtemp.split("/").pop() == 'internal frame' and elementObj.name != identifiers[1]:
                     continue
                 if page_tab_list:
@@ -108,7 +108,7 @@ class Utilities:
             curr = currentxpathtemp.split('/')
             p = path.split('/')
             index = len(p) - 1
-            if len(curr) > index and curr[index] == p[index]:
+            if len(curr) > index and (curr[index] == p[index] or (''.join([i for i in str(curr[index]) if not i.isdigit()]).strip("[]") == ''.join([i for i in str(p[index]) if not i.isdigit()]).strip("[]"))):
                 if 'active' in elementObj.states and windowname != elementObj.name:
                     active_parent = True
                 for index in range(elementObj.childrenCount):
@@ -285,7 +285,7 @@ class Utilities:
                 return True
         return False
 
-    def object_generator(self,applicationname,locator,keyword,inputs,outputs,object_type, errors = False, allow_showing = False):
+    def object_generator(self,applicationname,locator,keyword,inputs,outputs,object_type,top,left,width,height, errors = False, allow_showing = False):
         global accessContext
         accessContext = ''
         active_parent = None
@@ -315,7 +315,7 @@ class Utilities:
             for i in range(len(newlist2)):
                 absolute_path = absolute_path.replace(newlist2[i],'frame')
 
-            active_parent, accessContextParent, visible = self.swooptoelement(oebs_api.JABContext(hwnd), oebs_key_objects.xpath, absolute_path ,0 ,'', applicationname, object_type, errors, allow_showing)
+            active_parent, accessContextParent, visible = self.swooptoelement(oebs_api.JABContext(hwnd), oebs_key_objects.xpath, absolute_path ,0 ,'', applicationname, object_type, top, left, width, height, errors, allow_showing)
             accessContextParent = accessContextParent or ''
             if active_parent is None:
                 active_parent = False
@@ -343,7 +343,7 @@ class Utilities:
                     xpathneeded=xpathneeded.replace(newlist2[i],'frame')
                 if(accessContextParent):
                     accessContextParent.releaseJavaObject()
-                active_parent, accessContextParent, visible = self.swooptoelement(oebs_api.JABContext(hwnd),oebs_key_objects.xpath,xpathneeded,0,'', applicationname, object_type)
+                active_parent, accessContextParent, visible = self.swooptoelement(oebs_api.JABContext(hwnd),oebs_key_objects.xpath,xpathneeded,0,'', applicationname, object_type, top, left, width, height)
                 flag='true'
 
         accessContext=accessContextParent
@@ -372,7 +372,7 @@ class Utilities:
 
     def getsize(self,xpath,windowname):
         #object is identified using normal object identification
-        accessContext, visible = self.object_generator(windowname,xpath,'',[],'','')
+        accessContext, visible = self.object_generator(windowname,xpath,'',[],'','','','','','')
         #context is taken from global value
         acc=accessContext
         #fetching the context

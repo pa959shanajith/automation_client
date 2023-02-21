@@ -426,7 +426,7 @@ class DropdownListboxOperations:
         log.debug('Status %s',DEF_GETMULTIPLEVALUESBYINDEXES,status)
         return status,output_list,output_res,err_msg
 
-    def selectvaluebyindex(self,acc):
+    def selectvaluebyindex(self,acc,*args):
         status = TEST_RESULT_FAIL
         methodoutput = TEST_RESULT_FALSE
         output_res = OUTPUT_CONSTANT
@@ -450,9 +450,14 @@ class DropdownListboxOperations:
                         if currinfo.role =='combo box':
                             x_coor = int(currinfo.x + (0.5 * currinfo.width))
                             y_coor = int(currinfo.y + (0.5 * currinfo.height))
+                            if x_coor == -1 or y_coor == -1 and (args[0]['top'] != '' and args[0]['left'] != '' and args[0]['width'] != '' and args[0]['height'] != '' and args[0]['top'] != -1 and args[0]['left'] != -1 and args[0]['width'] != -1 and args[0]['height'] != -1):
+                                x_coor = int(args[0]['left'] + (0.5 * args[0]['width']))
+                                y_coor = int(args[0]['top'] + (0.5 * args[0]['height']))
                             #Visibility check for scrollbar
                             if(self.utilops_obj.getObjectVisibility(acc,x_coor,y_coor)):
-                                oebs_mouseops.MouseOperation('click',x_coor,y_coor)
+                                acc.doAccessibleActions(1, 'Toggle Drop Down')
+                                for i in range(2):
+                                    oebs_mouseops.MouseOperation('click',x_coor,y_coor)
                                 acc = self.utilities_obj.looptolist(acc)
                                 currinfo=acc.getAccessibleContextInfo()
                                 if currinfo.accessibleAction == 1:
@@ -473,7 +478,7 @@ class DropdownListboxOperations:
                                             moveloc=currentselection-childindex
                                             for index in range(int(moveloc)):
                                                 self.keyboardops_obj.keyboard_operation('keypress','A_UP')
-                                            requiredcontext, visible, active_parent = self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]",oebs_key_objects.object_type)
+                                            requiredcontext, visible, active_parent = self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]",oebs_key_objects.object_type,args[0]['top'],args[0]['left'],args[0]['width'],args[0]['height'])
                                             listObj = self.utilities_obj.looptolist(requiredcontext)
                                             childobj=listObj.getAccessibleChildFromContext(int(childindex))
                                             childcontext=childobj.getAccessibleContextInfo()
@@ -486,7 +491,7 @@ class DropdownListboxOperations:
                                             for index in range(int(moveloc)):
                                                 self.keyboardops_obj.keyboard_operation('keypress','A_DOWN')
                                                 time.sleep(0.1)
-                                            requiredcontext, visible, active_parent = self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]",oebs_key_objects.object_type)
+                                            requiredcontext, visible, active_parent = self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]",oebs_key_objects.object_type,args[0]['top'],args[0]['left'],args[0]['width'],args[0]['height'])
                                             listObj = self.utilities_obj.looptolist(requiredcontext)
                                             childobj=listObj.getAccessibleChildFromContext(int(childindex))
                                             childcontext=childobj.getAccessibleContextInfo()
@@ -510,10 +515,15 @@ class DropdownListboxOperations:
                                     status = TEST_RESULT_PASS
                                     methodoutput = TEST_RESULT_TRUE
                                 else:
-                                    err_msg = MSG_OBJECT_READONLY
-                                    logger.print_on_console(err_msg)
-                                    status = TEST_RESULT_FAIL
-                                    methodoutput = TEST_RESULT_FALSE
+                                    if labelcontext1.x == -1 and labelcontext1.y == -1 and labelcontext1.width == -1 and labelcontext1.height == -1:
+                                        oebs_key_objects.custom_msg.append(MSG_OBJECT_SELECTABLE)
+                                        status = TEST_RESULT_PASS
+                                        methodoutput = TEST_RESULT_TRUE
+                                    else:
+                                        err_msg = MSG_OBJECT_READONLY
+                                        logger.print_on_console(err_msg)
+                                        status = TEST_RESULT_FAIL
+                                        methodoutput = TEST_RESULT_FALSE
                             else:
                                 log.debug('MSG:%s',MSG_ELEMENT_NOT_VISIBLE)
                                 err_msg = MSG_ELEMENT_NOT_VISIBLE
@@ -547,7 +557,7 @@ class DropdownListboxOperations:
                                             for index in range(int(moveloc)):
                                                 self.keyboardops_obj.keyboard_operation('keypress','A_UP')
                                                 time.sleep(0.1)
-                                            requiredcontext, visible, active_parent = self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]",oebs_key_objects.object_type)
+                                            requiredcontext, visible, active_parent = self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]",oebs_key_objects.object_type,args[0]['top'],args[0]['left'],args[0]['width'],args[0]['height'])
                                             listObj = self.utilities_obj.looptolist(requiredcontext)
                                             childobj=listObj.getAccessibleChildFromContext(int(childindex))
                                             childcontext=childobj.getAccessibleContextInfo()
@@ -560,7 +570,7 @@ class DropdownListboxOperations:
                                             for index in range(int(moveloc)):
                                                 self.keyboardops_obj.keyboard_operation('keypress','A_DOWN')
                                                 time.sleep(0.1)
-                                            requiredcontext, visible, active_parent = self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]",oebs_key_objects.object_type)
+                                            requiredcontext, visible, active_parent = self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]",oebs_key_objects.object_type,args[0]['top'],args[0]['left'],args[0]['width'],args[0]['height'])
                                             listObj = self.utilities_obj.looptolist(requiredcontext)
                                             childobj=listObj.getAccessibleChildFromContext(int(childindex))
                                             childcontext=childobj.getAccessibleContextInfo()
@@ -785,7 +795,7 @@ class DropdownListboxOperations:
         log.debug('Status %s',status)
         return status,methodoutput,output_res,err_msg
 
-    def selectvaluebytext(self,acc):
+    def selectvaluebytext(self,acc,*args):
         status = TEST_RESULT_FAIL
         methodoutput = TEST_RESULT_FALSE
         output_res = OUTPUT_CONSTANT
@@ -810,9 +820,14 @@ class DropdownListboxOperations:
                     if currinfo.role == 'combo box':
                         x_coor = int(currinfo.x + (0.5 * currinfo.width))
                         y_coor = int(currinfo.y + (0.5 * currinfo.height))
+                        if x_coor == -1 or y_coor == -1 and (args[0]['top'] != '' and args[0]['left'] != '' and args[0]['width'] != '' and args[0]['height'] != '' and args[0]['top'] != -1 and args[0]['left'] != -1 and args[0]['width'] != -1 and args[0]['height'] != -1):
+                            x_coor = int(args[0]['left'] + (0.5 * args[0]['width']))
+                            y_coor = int(args[0]['top'] + (0.5 * args[0]['height']))
                         #Visibility check for scrollbar
                         if(self.utilops_obj.getObjectVisibility(acc,x_coor,y_coor)):
-                            oebs_mouseops.MouseOperation('click',x_coor,y_coor)
+                            acc.doAccessibleActions(1, 'Toggle Drop Down')
+                            for i in range(2):
+                                oebs_mouseops.MouseOperation('click',x_coor,y_coor)
                             acc = self.utilities_obj.looptolist(acc)
                             currinfo=acc.getAccessibleContextInfo()
                             if currinfo.accessibleAction == 1:
@@ -850,7 +865,7 @@ class DropdownListboxOperations:
                                     for num in range(elementPos):
                                         self.keyboardops_obj.keyboard_operation('keypress','A_DOWN')
                                         time.sleep(0.1)
-                                    requiredcontext, visible, active_parent = self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]",oebs_key_objects.object_type)
+                                    requiredcontext, visible, active_parent = self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]",oebs_key_objects.object_type,'','','','')
                                     listObj = self.utilities_obj.looptolist(requiredcontext)
                                     childobj=listObj.getAccessibleChildFromContext(int(elementPos))
                                     childcontext=childobj.getAccessibleContextInfo()
@@ -872,10 +887,15 @@ class DropdownListboxOperations:
                                 status = TEST_RESULT_PASS
                                 methodoutput = TEST_RESULT_TRUE
                             else:
-                                err_msg = MSG_OBJECT_READONLY
-                                logger.print_on_console(err_msg)
-                                status = TEST_RESULT_FAIL
-                                methodoutput = TEST_RESULT_FALSE
+                                if labelcontext1.x == -1 and labelcontext1.y == -1 and labelcontext1.width == -1 and labelcontext1.height == -1:
+                                    oebs_key_objects.custom_msg.append(MSG_OBJECT_SELECTABLE)
+                                    status = TEST_RESULT_PASS
+                                    methodoutput = TEST_RESULT_TRUE
+                                else:
+                                    err_msg = MSG_OBJECT_READONLY
+                                    logger.print_on_console(err_msg)
+                                    status = TEST_RESULT_FAIL
+                                    methodoutput = TEST_RESULT_FALSE
                         else:
                             err_msg = MSG_ELEMENT_NOT_VISIBLE
                             log.debug('MSG:%s',err_msg)
@@ -935,7 +955,7 @@ class DropdownListboxOperations:
                                             for index in range(int(moveloc)):
                                                 self.keyboardops_obj.keyboard_operation('keypress','A_UP')
                                                 time.sleep(0.1)
-                                            requiredcontext, visible, active_parent = self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]",oebs_key_objects.object_type)
+                                            requiredcontext, visible, active_parent = self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]",oebs_key_objects.object_type,'','','','')
                                             listObj = self.utilities_obj.looptolist(requiredcontext)
                                             childobj=listObj.getAccessibleChildFromContext(int(elementPos))
                                             childcontext=childobj.getAccessibleContextInfo()
@@ -948,7 +968,7 @@ class DropdownListboxOperations:
                                             for index in range(int(moveloc)):
                                                 self.keyboardops_obj.keyboard_operation('keypress','A_DOWN')
                                                 time.sleep(0.1)
-                                            requiredcontext, visible, active_parent = self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]",oebs_key_objects.object_type)
+                                            requiredcontext, visible, active_parent = self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]",oebs_key_objects.object_type,'','','','')
                                             listObj = self.utilities_obj.looptolist(requiredcontext)
                                             childobj=listObj.getAccessibleChildFromContext(int(elementPos))
                                             childcontext=childobj.getAccessibleContextInfo()

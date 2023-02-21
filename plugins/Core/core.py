@@ -274,7 +274,7 @@ class MainNamespace(BaseNamespace):
                             log.error(err_msg)
                             logger.print_on_console(err_msg)
                         else:
-                            res = light.highlight(args[0],args[1])
+                            res = light.highlight(args[0],args[1],args[3],args[4],args[5],args[6])
                             logger.print_on_console('Highlight result: '+str(res))
                 elif appType==APPTYPE_DESKTOP.lower():
                     core_utils.get_all_the_imports('Desktop')
