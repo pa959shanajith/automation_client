@@ -1633,7 +1633,120 @@ class TableOperationKeywords():
         def getChildNodes(self,webElement):
             contents=None
             try:
-                js='var mytarget = arguments[0]; var mynodes = mytarget.childNodes; var result = []; if (typeof  String.prototype.trim  !== "function")  {       String.prototype.trim  =   function()  {             return  this.replace(/^\\s+|\\s+$/g,"");        } } recursfunc(mynodes); return result.toString();  function recursfunc(mynodes) {     for (var i = 0; i < mynodes.length; i++) {         if (mynodes[i].nodeName.toUpperCase() == \"#TEXT\") {             if ((mynodes[i].parentNode.nodeName.toUpperCase() != \"OPTION\") & (mynodes[i].parentNode.nodeName.toUpperCase() != \"SCRIPT\")) {                 var myvalue = mynodes[i].nodeValue;                 if (myvalue.trim().length > 0) {                     result.push(myvalue);                 }             }         } else if (mynodes[i].nodeName.toUpperCase() == \"INPUT\") {             if (mynodes[i].type.toUpperCase() == \"RADIO\") {                 if (mynodes[i].checked == true) {                     var myvalue = \"Selected\";                 } else {                     var myvalue = \"Unselected\";                 }             } else if (mynodes[i].type.toUpperCase() == \"CHECKBOX\") {                 if (mynodes[i].checked == true) {                     var myvalue = \"Checked\";                 } else {                     var myvalue = \"Unchecked\";                 }             } else if ((mynodes[i].type.toUpperCase() == \"BUTTON\") | (mynodes[i].type.toUpperCase() == \"SUBMIT\") | (mynodes[i].type.toUpperCase() == \"TEXT\")) {                 var myvalue = mynodes[i].value;             } else if (mynodes[i].type.toUpperCase() == \"IMAGE\") {                 var myvalue = mynodes[i].title;                 if (myvalue.trim().length < 1) {                     myvalue = mynodes[i].value;                     if (myvalue != undefined) {                         if (myvalue.trim().length < 1) {                             myvalue = \"Image\";                         }                     } else {                         myvalue = \"Image\";                     }                 }             }else{ var myvalue=mynodes[i].value; }             result.push(myvalue);         } else if (mynodes[i].nodeName.toUpperCase() == \"IMG\") {             var myvalue = mynodes[i].title;             if (myvalue.trim().length < 1) {                 myvalue = mynodes[i].value;                 if (myvalue != undefined) {                     if (myvalue.trim().length < 1) {                         myvalue = \"Image\";                     }                 } else {                     myvalue = \"Image\";                 }             }             result.push(myvalue);         } else if (mynodes[i].nodeName.toUpperCase() == \"TEXTAREA\") {             var myvalue = mynodes[i].value;             result.push(myvalue);         } else if (mynodes[i].nodeName.toUpperCase() == \"SELECT\") {             var myselect = mynodes[i].selectedOptions;             if (myselect != undefined | myselect != null) {                 for (var j = 0; j < myselect.length; j++) {                     var myvalue = mynodes[i].selectedOptions[j].textContent;                     result.push(myvalue);                 }             } else {                 var myvalue = dropdowncallie(mynodes[i]);                 result.push(myvalue);             }         } else if ((mynodes[i].nodeName.toUpperCase() == \"I\")) {             var myvalue = mynodes[i].textContent;             result.push(myvalue);         }         if (mynodes[i].hasChildNodes()) {             recursfunc(mynodes[i].childNodes);         }     } }  function dropdowncallie(op) {     var x = op.options[op.selectedIndex].text;     return x; };'
+                js="""var mytarget = arguments[0];
+var mynodes = mytarget.childNodes;
+var result = [];
+if (typeof String.prototype.trim !== "function") {
+    String.prototype.trim = function() {
+        return this.replace(/^\\s+|\\s+$/g, "");
+    }
+}
+recursfunc(mynodes);
+return result.toString();
+
+function recursfunc(mynodes) {
+debugger;
+    for (var i = 0; i < mynodes.length; i++) {
+        if (mynodes[i].nodeName.toUpperCase() == \"#TEXT\") {             
+            if ((mynodes[i].parentNode.nodeName.toUpperCase() != \"OPTION\") & (mynodes[i].parentNode.nodeName.toUpperCase() != \"SCRIPT\")) {
+      			var myvalue = mynodes[i].nodeValue;                 
+      			if (myvalue.trim().length > 0) {
+                  if (result[result.length-1]!=myvalue)
+                    result.push(myvalue);                 
+                }             
+    		}         
+		} 
+		else if (mynodes[i].nodeName.toUpperCase() == \"INPUT\") {
+        	if (mynodes[i].type.toUpperCase() == \"RADIO\") {  
+				if (mynodes[i].checked == true) {   
+                	var myvalue = \"Selected\";                 
+                } 
+				else {
+                	var myvalue = \"Unselected\";                 
+                }             
+			} 
+            else if (mynodes[i].type.toUpperCase() == \"CHECKBOX\") {
+            	if (mynodes[i].checked == true) {
+              		var myvalue = \"Checked\";                 
+                } 
+				else {                     
+                	var myvalue = \"Unchecked\";                 
+                }             
+			} 
+            else if ((mynodes[i].type.toUpperCase() == \"BUTTON\") | (mynodes[i].type.toUpperCase() == \"SUBMIT\") | (mynodes[i].type.toUpperCase() == \"TEXT\")) {
+            	var myvalue = mynodes[i].value;             
+			} 
+            else if (mynodes[i].type.toUpperCase() == \"IMAGE\") {
+            	var myvalue = mynodes[i].title;                 
+				if (myvalue.trim().length < 1) {
+                	myvalue = mynodes[i].value;
+                  	if (myvalue != undefined) {
+                    	if (myvalue.trim().length < 1) {
+                        	myvalue = \"Image\";                         
+                        }                     
+                    } 
+                  	else {
+                    	myvalue = \"Image\";                     
+                    }                 
+                }             
+			}
+            else { 
+            	var myvalue=mynodes[i].value; 
+            }             
+            if (result[result.length-1]!=myvalue)
+			    result.push(myvalue);         
+		} 
+        else if (mynodes[i].nodeName.toUpperCase() == \"IMG\") {
+        	var myvalue = mynodes[i].title;             
+			if (myvalue.trim().length < 1) {
+            	myvalue = mynodes[i].value;                 
+              	if (myvalue != undefined) {
+                	if (myvalue.trim().length < 1) {
+                    	myvalue = \"Image\";                     
+                    }                 
+                } 
+              	else {
+                	myvalue = \"Image\";                 
+                }             
+            }     
+            if (result[result.length-1]!=myvalue)        
+			    result.push(myvalue);         
+		} 
+        else if (mynodes[i].nodeName.toUpperCase() == \"TEXTAREA\") {
+        	var myvalue = mynodes[i].value;    
+            if (result[result.length-1]!=myvalue)         
+			    result.push(myvalue);         
+		} 
+        else if (mynodes[i].nodeName.toUpperCase() == \"SELECT\") {
+        	var myselect = mynodes[i].selectedOptions;             
+			if (myselect != undefined | myselect != null) {
+            	for (var j = 0; j < myselect.length; j++) {
+                	var myvalue = mynodes[i].selectedOptions[j].textContent;
+                    if (result[result.length-1]!=myvalue)
+                  	    result.push(myvalue);                 
+                }             
+            } 
+			else {
+            	var myvalue = dropdowncallie(mynodes[i]);
+                if (result[result.length-1]!=myvalue)
+              	    result.push(myvalue);             
+            }         
+		} 
+        else if ((mynodes[i].nodeName.toUpperCase() == \"I\")) {
+        	var myvalue = mynodes[i].textContent;    
+            if (result[result.length-1]!=myvalue)         
+			    result.push(myvalue);         
+		}         
+        if (mynodes[i].hasChildNodes()) {
+        	recursfunc(mynodes[i].childNodes);         
+        }     
+	} 
+}  
+function dropdowncallie(op) {
+	var x = op.options[op.selectedIndex].text;
+  	return x; 
+};"""
+                # js='var mytarget = arguments[0]; var mynodes = mytarget.childNodes; var result = []; if (typeof  String.prototype.trim  !== "function")  {       String.prototype.trim  =   function()  {             return  this.replace(/^\\s+|\\s+$/g,"");        } } recursfunc(mynodes); return result.toString();  function recursfunc(mynodes) {     for (var i = 0; i < mynodes.length; i++) {         if (mynodes[i].nodeName.toUpperCase() == \"#TEXT\") {             if ((mynodes[i].parentNode.nodeName.toUpperCase() != \"OPTION\") & (mynodes[i].parentNode.nodeName.toUpperCase() != \"SCRIPT\")) {                 var myvalue = mynodes[i].nodeValue;                 if (myvalue.trim().length > 0) {                     result.push(myvalue);                 }             }         } else if (mynodes[i].nodeName.toUpperCase() == \"INPUT\") {             if (mynodes[i].type.toUpperCase() == \"RADIO\") {                 if (mynodes[i].checked == true) {                     var myvalue = \"Selected\";                 } else {                     var myvalue = \"Unselected\";                 }             } else if (mynodes[i].type.toUpperCase() == \"CHECKBOX\") {                 if (mynodes[i].checked == true) {                     var myvalue = \"Checked\";                 } else {                     var myvalue = \"Unchecked\";                 }             } else if ((mynodes[i].type.toUpperCase() == \"BUTTON\") | (mynodes[i].type.toUpperCase() == \"SUBMIT\") | (mynodes[i].type.toUpperCase() == \"TEXT\")) {                 var myvalue = mynodes[i].value;             } else if (mynodes[i].type.toUpperCase() == \"IMAGE\") {                 var myvalue = mynodes[i].title;                 if (myvalue.trim().length < 1) {                     myvalue = mynodes[i].value;                     if (myvalue != undefined) {                         if (myvalue.trim().length < 1) {                             myvalue = \"Image\";                         }                     } else {                         myvalue = \"Image\";                     }                 }             }else{ var myvalue=mynodes[i].value; }             result.push(myvalue);         } else if (mynodes[i].nodeName.toUpperCase() == \"IMG\") {             var myvalue = mynodes[i].title;             if (myvalue.trim().length < 1) {                 myvalue = mynodes[i].value;                 if (myvalue != undefined) {                     if (myvalue.trim().length < 1) {                         myvalue = \"Image\";                     }                 } else {                     myvalue = \"Image\";                 }             }             result.push(myvalue);         } else if (mynodes[i].nodeName.toUpperCase() == \"TEXTAREA\") {             var myvalue = mynodes[i].value;             result.push(myvalue);         } else if (mynodes[i].nodeName.toUpperCase() == \"SELECT\") {             var myselect = mynodes[i].selectedOptions;             if (myselect != undefined | myselect != null) {                 for (var j = 0; j < myselect.length; j++) {                     var myvalue = mynodes[i].selectedOptions[j].textContent;                     result.push(myvalue);                 }             } else {                 var myvalue = dropdowncallie(mynodes[i]);                 result.push(myvalue);             }         } else if ((mynodes[i].nodeName.toUpperCase() == \"I\")) {             var myvalue = mynodes[i].textContent;             result.push(myvalue);         }         if (mynodes[i].hasChildNodes()) {             recursfunc(mynodes[i].childNodes);         }     } }  function dropdowncallie(op) {     var x = op.options[op.selectedIndex].text;     return x; };'
                 contents = browser_Keywords.local_bk.driver_obj.execute_script(js,webElement)
             except Exception as e:
                 local_tk.log.error(e)
