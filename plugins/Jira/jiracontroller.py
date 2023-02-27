@@ -404,7 +404,7 @@ class JiraWindow():
         try:
             project=jira_input_dict['project_selected']['project']
             key=jira_input_dict['project_selected']['key']
-            url=jira_input_dict['jira_serverlocation']+"/rest/api/2/search?jql=issueType="+'"'+jira_input_dict['item_type']+'"'+"&fields=id,key,project"
+            url=jira_input_dict['jira_serverlocation']+"/rest/api/2/search?jql=issueType="+'"'+jira_input_dict['item_type']+'"'+"&fields=id,key,project,summary"
             auth = HTTPBasicAuth(jira_input_dict['jira_uname'],jira_input_dict['jira_pwd'])
             headers={"Accept":"application/json"}
             respon=requests.request("GET",url,headers=headers,auth=auth)
@@ -415,7 +415,9 @@ class JiraWindow():
                         if 'fields' in item:
                             if 'project' in item['fields']:
                                 if project == item['fields']['project']['name'] and key == item['fields']['project']['key']:
-                                    res['testcases'].append({'id': item['id'], 'code':item['key']})
+                                    # res['testcases'].append({'id': item['id'], 'code':item['key']})
+                                    # res['testcases'].append({'id': item['key'], 'code':item['fields']['summary']})
+                                    res['testcases'].append({'id': item['id'], 'code':item['key'], 'summary':item['fields']['summary']})
             socket.emit('Jira_testcases',res)
         except Exception as e:
             log.error(e)
