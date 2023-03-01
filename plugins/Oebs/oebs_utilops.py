@@ -33,7 +33,7 @@ class UtilOperations:
         self.utils_obj = Utils()
 
     #Method to setfocus on the User given Object
-    def setfocus(self,acc):
+    def setfocus(self,acc,*args):
         status = TEST_RESULT_FAIL
         methodoutput = TEST_RESULT_FAIL
         output_res = OUTPUT_CONSTANT
@@ -45,9 +45,12 @@ class UtilOperations:
             x_coor = int(curaccinfo.x + (0.5 * curaccinfo.width))
             y_coor = int(curaccinfo.y + (0.5 * curaccinfo.height))
             log.debug('Formula Created',DEF_SETFOCUS)
+            if x_coor == -1 or y_coor == -1 and (args[0]['top'] != '' and args[0]['left'] != '' and args[0]['width'] != '' and args[0]['height'] != '' and args[0]['top'] != -1 and args[0]['left'] != -1 and args[0]['width'] != -1 and args[0]['height'] != -1):
+                x_coor = int(args[0]['left'] + (0.5 * args[0]['width']))
+                y_coor = int(args[0]['top'] + (0.5 * args[0]['height']))
             #Visibility check for scrollbar
             if(self.getObjectVisibility(acc,x_coor,y_coor)):
-                if ('showing' or 'focusable') in curaccinfo.states:
+                if 'showing' in curaccinfo.states or 'focusable' in curaccinfo.states:
                     oebs_mouseops.MouseOperation('move',x_coor,y_coor)
                     acc.requestFocus()
                     methodoutput = TEST_RESULT_TRUE
@@ -381,7 +384,7 @@ class UtilOperations:
                         oebs_mouseops.MouseOperation('click',x_coor,y_coor)
                         self.keyboardops.keyboard_operation('keypress','A_DOWN')
                         time.sleep(0.1)
-                        requiredcontext, visible, active_parent = self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]",oebs_key_objects.object_type)
+                        requiredcontext, visible, active_parent = self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]",oebs_key_objects.object_type,'','','','')
                         listObj = self.utilities_obj.looptolist(requiredcontext)
                         childobj=listObj.getAccessibleChildFromContext(int(childindex))
                         childcontext=childobj.getAccessibleContextInfo()
@@ -401,7 +404,7 @@ class UtilOperations:
                         else:
                             self.keyboardops.keyboard_operation('keypress','A_UP')
                             time.sleep(0.1)
-                            requiredcontext, visible, active_parent = self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]",oebs_key_objects.object_type)
+                            requiredcontext, visible, active_parent = self.utilities_obj.object_generator(oebs_key_objects.applicationname,oebs_key_objects.xpath,oebs_key_objects.keyword,"[\"\"]","[\"\"]",oebs_key_objects.object_type,'','','','')
                             listObj = self.utilities_obj.looptolist(requiredcontext)
                             childobj=listObj.getAccessibleChildFromContext(int(childindex))
                             childcontext=childobj.getAccessibleContextInfo()
@@ -600,7 +603,7 @@ class UtilOperations:
         return status,methodoutput,output_res,err_msg
 
     #definition for switching from one internal frame to another
-    def switchtoframe(self,applicationname,objectname,keyword,inputs,outputs,object_type):
+    def switchtoframe(self,applicationname,objectname,keyword,inputs,outputs,object_type,top,left,width,height):
         global activeframes
         activeframes=[]
         status = TEST_RESULT_FAIL
@@ -829,7 +832,7 @@ class UtilOperations:
         log.debug('Verify Response %s',str(methodoutput))
         return status,methodoutput,output_res,err_msg
 
-    def select_menu(self,applicationname,objectname,keyword,inputs,outputs,object_type):
+    def select_menu(self,applicationname,objectname,keyword,inputs,outputs,object_type,top,left,width,height):
         """
         def : select_menu
         purpose : select menu is used to select the menu items.
