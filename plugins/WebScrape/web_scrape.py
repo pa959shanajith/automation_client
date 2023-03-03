@@ -124,17 +124,17 @@ class ScrapeWindow(wx.Frame):
                     self.visibilityCheck = wx.CheckBox(self.panel, label="VisibleElementsOnly", pos=scrapper_window_config["visibilityCheck"][0], size=scrapper_window_config["visibilityCheck"][1])
                     self.visibilityCheck.Bind(wx.EVT_CHECKBOX, self.visibility)
 
-                    self.prevbutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap(os.environ["IMAGES_PATH"] +"stepBack.png", wx.BITMAP_TYPE_ANY), (35, 48), (35, 28))
+                    self.prevbutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap(os.environ["IMAGES_PATH"] +"stepBack.png", wx.BITMAP_TYPE_ANY), (160, 90), (35, 28))
                     self.prevbutton.Bind(wx.EVT_LEFT_DOWN, self.on_prev)
                     self.prevbutton.SetToolTip(wx.ToolTip("Select previous window/tab"))
                     self.prevbutton.Hide()
 
-                    self.resume_scraping_button = wx.StaticBitmap(self.panel, -1, wx.Bitmap(os.environ["IMAGES_PATH"] +"play.png", wx.BITMAP_TYPE_ANY), (75, 48), (35, 28))
+                    self.resume_scraping_button = wx.StaticBitmap(self.panel, -1, wx.Bitmap(os.environ["IMAGES_PATH"] +"play.png", wx.BITMAP_TYPE_ANY), (200, 90), (35, 28))
                     self.resume_scraping_button.Bind(wx.EVT_LEFT_DOWN, self.resume_scraping)
                     self.resume_scraping_button.SetToolTip(wx.ToolTip("Resume scraping"))
                     self.resume_scraping_button.Hide()
 
-                    self.nextbutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap(os.environ["IMAGES_PATH"] +"step.png", wx.BITMAP_TYPE_ANY), (115, 48), (35, 28))
+                    self.nextbutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap(os.environ["IMAGES_PATH"] +"step.png", wx.BITMAP_TYPE_ANY), (240, 90), (35, 28))
                     self.nextbutton.Bind(wx.EVT_LEFT_DOWN, self.on_next)
                     self.nextbutton.SetToolTip(wx.ToolTip("Select next window/tab"))
                     self.nextbutton.Hide()
@@ -159,10 +159,11 @@ class ScrapeWindow(wx.Frame):
                         log.error("scrapedurl is Empty")
                     self.comparebutton = wx.ToggleButton(self.panel, label="Start Compare",pos=(110,80 ), size=(260, 30))
                     self.comparebutton.Bind(wx.EVT_TOGGLEBUTTON, self.compare)
-                self.Centre()
                 style = self.GetWindowStyle()
                 self.SetWindowStyle( style|wx.STAY_ON_TOP )
                 wx.Frame(self.panel, style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER)
+                screen_width, screen_height = wx.GetDisplaySize()
+                self.SetPosition((screen_width - self.GetSize()[0], screen_height - self.GetSize()[1]))
                 self.Show()
             except Exception as e:
                 log.error(e)
