@@ -22,6 +22,7 @@ import win32api
 import win32process
 import platform
 from threading import Thread
+from pywinauto.application import Application
 ctrldownflag = False
 stopumpingmsgs = False
 obj_ref = None
@@ -123,6 +124,9 @@ class Scrape:
                 log.error( 'Error occured : ' + str(e) )
                 logger.print_on_console( 'Error occured in getWindow' )
                 return None
+        app=Application()
+        app.connect(title=window_to_scrape.__getattr__("Text"))    
+        app.window(title=window_to_scrape.__getattr__("Text")).set_focus()
         return window_to_scrape
 
     # def getBaseWindow(self, object):
