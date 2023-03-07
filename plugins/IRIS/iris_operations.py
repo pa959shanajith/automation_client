@@ -149,8 +149,8 @@ def get_ocr(image):
     """Step 6: Load the image as a PIL/Pillow image, apply OCR, and then delete the temporary file"""
     try:
 
-        import client_1
-        text=client_1.ocr_client(image)
+        import client
+        text=client.api_request().ocr_client(image)
         #text = pytesseract.image_to_string(cropped)
         #text = pytesseract.image_to_string(cropped)
     except Exception as e:
@@ -164,7 +164,7 @@ def get_ocr(image):
     #del image, rez_image, gray_img, filter_img, thresh_img, filename #deleting variables
     logger.print_on_console(text)
     #del cropped
-    return text
+    return text[5]
 
 def hough_transform_p(img, pos):
     """
@@ -624,17 +624,20 @@ class IRISKeywords():
         verifyFlag = False
         dropIrisFlag = False
 
-    def clickiris(self,element,theta,hypo_x,hypo_y,*args):
+    def clickiris(self,element,*args):
         """
         Discription: Performs a click operation on the IRIS object, if VerifyExistIRIS is provided then uses that(IRIS object) as a parent reference, then finds the element to perform action.
         Input: N/A
         OutPut: Boolean Value
         """
+        log.info('Inside clickiris and No. of arguments passed are : '+str(len(args)))
+        import coordinates_storage
+        theta,hypo_x,hypo_y=coordinates_storage.Sqliteloadtable().loadtable()
 
         hypo_x=math.ceil(hypo_x)
         hypo_y=math.ceil(hypo_y)
 
-        log.info('Inside clickiris and No. of arguments passed are : '+str(len(args)))
+        
         status = TEST_RESULT_FAIL
         result = TEST_RESULT_FALSE
         err_msg = None
@@ -704,17 +707,21 @@ class IRISKeywords():
         return status,result,value,err_msg
 
 
-    def doubleclickiris(self,element,theta,hypo_x,hypo_y,*args):
+    def doubleclickiris(self,element,*args):
         """
         Discription: Performs a double-click operation on the IRIS object, if VerifyExistIRIS is provided then uses that(IRIS object) as a parent reference, then finds the element to perform action.
         Input: N/A
         OutPut: Boolean Value
         """
 
+        log.info('Inside doubleclickiris and No. of arguments passed are : '+str(len(args)))
+        import coordinates_storage
+
+        theta,hypo_x,hypo_y=coordinates_storage.Sqliteloadtable().loadtable()
+
         hypo_x=math.ceil(hypo_x)
         hypo_y=math.ceil(hypo_y)
 
-        log.info('Inside doubleclickiris and No. of arguments passed are : '+str(len(args)))
         status = TEST_RESULT_FAIL
         result = TEST_RESULT_FALSE
         err_msg=None
@@ -779,16 +786,20 @@ class IRISKeywords():
         del element, args, img, res, elem_coordinates, const_coordintes, elements, height, width # deleting variables
         return status,result,value,err_msg
 
-    def rightclickiris(self,element,theta,hypo_x,hypo_y,*args):
+    def rightclickiris(self,element,*args):
         """
         Discription: Performs a right-click operation on the IRIS object, if VerifyExistIRIS is provided then uses that(IRIS object) as a parent reference, then finds the element to perform action.
         Input: N/A
         OutPut: Boolean Value
         """
+        log.info('Inside rightclickiris and No. of arguments passed are : '+str(len(args)))
+        import coordinates_storage
+
+        theta,hypo_x,hypo_y=coordinates_storage.Sqliteloadtable().loadtable()
+
         hypo_x=math.ceil(hypo_x)
         hypo_y=math.ceil(hypo_y)
 
-        log.info('Inside rightclickiris and No. of arguments passed are : '+str(len(args)))
         status = TEST_RESULT_FAIL
         result = TEST_RESULT_FALSE
         err_msg=None
@@ -846,7 +857,7 @@ class IRISKeywords():
         del element, args, img, res, elem_coordinates, const_coordintes, elements, height, width # deleting variables
         return status, result, value, err_msg
 
-    def settextiris(self,element,theta,hypo_x,hypo_y,*args):
+    def settextiris(self,element,*args):
         #logger.print_on_console(theta)
         
         #logger.print_on_console(hypo)
@@ -856,11 +867,13 @@ class IRISKeywords():
         Input: Input Text
         OutPut: Boolean Value
         """
+        import coordinates_storage
+
+        theta,hypo_x,hypo_y=coordinates_storage.Sqliteloadtable().loadtable()
+
         hypo_x=math.ceil(hypo_x)
         hypo_y=math.ceil(hypo_y)
 
-        #logger.print_on_console(hypo_x)
-        #logger.print_on_console(hypo_y)
 
         log.info('Inside settextiris and No. of arguments passed are : '+str(len(args)))
         status = TEST_RESULT_FAIL
@@ -940,7 +953,7 @@ class IRISKeywords():
         del args, img, res, elem_coordinates, height, width # deleting variables
         return status, result, value, err_msg
 
-    def cleartextiris(self,element,theta,hypo_x,hypo_y,*args):
+    def cleartextiris(self,element,*args):
         """
         Discription: Performs a clear text operation(keyboard-backspace) on the IRIS object, if VerifyExistIRIS is provided then uses that(IRIS object) as a parent reference, then finds the element to perform action.
         Input: Options: a. N/A or 0 - Clearing text by default method: Click element + "Ctrl+A" + Backspace
@@ -951,11 +964,16 @@ class IRISKeywords():
                              - Clearing text by method if 2nd-input is positive integer : Click element + Home + Shift + Right X 2nd-input + Backspace
         OutPut: Boolean Value
         """
+        log.info('Inside settextiris and No. of arguments passed are : '+str(len(args)))
+        import coordinates_storage
+
+        theta,hypo_x,hypo_y=coordinates_storage.Sqliteloadtable().loadtable()
+
         hypo_x=math.ceil(hypo_x)
         hypo_y=math.ceil(hypo_y)
 
-        log.info('Inside cleartextiris and No. of arguments passed are : '+str(len(args)))
-        logger.print_on_console(args[0][0])
+        #log.info('Inside cleartextiris and No. of arguments passed are : '+str(len(args)))
+        #logger.print_on_console(args[0][0])
         status = TEST_RESULT_FAIL
         result = TEST_RESULT_FALSE
         err_msg=None
@@ -1080,17 +1098,21 @@ class IRISKeywords():
         del element, args, img, res, elem_coordinates, const_coordintes, elements, height, width # deleting variables
         return status, result, value, err_msg
 
-    def setsecuretextiris(self,element,theta,hypo_x,hypo_y,*args):
+    def setsecuretextiris(self,element,*args):
         """
         Discription: Performs a set secure text operation(inputs a AES encrypted text) on the IRIS object, if VerifyExistIRIS is provided then uses that(IRIS object) as a parent reference, then finds the element to perform action.
         Input: Encrypted Input Text (AES)
         OutPut: Boolean Value
         """
+        log.info('Inside setsecuretextiris and No. of arguments passed are : '+str(len(args)))
+        import coordinates_storage
+
+        theta,hypo_x,hypo_y=coordinates_storage.Sqliteloadtable().loadtable()
 
         hypo_x=math.ceil(hypo_x)
         hypo_y=math.ceil(hypo_y)
 
-        log.info('Inside setsecuretextiris and No. of arguments passed are : '+str(len(args)))
+
         status = TEST_RESULT_FAIL
         result = TEST_RESULT_FALSE
         err_msg = None
@@ -1158,7 +1180,7 @@ class IRISKeywords():
         del element, args, img, res, elem_coordinates, const_coordintes, elements, height, width # deleting variables
         return status,result,value,err_msg
 
-    def gettextiris(self,element,theta,hypo_x,hypo_y,*args):
+    def gettextiris(self,element,*args):
         """
         Discription: Performs a get text operation(fetches text of the image) on the IRIS object, if VerifyExistIRIS is provided then uses that(IRIS object) as a parent reference, then finds the element to perform action.
         Input: N/A - no input then performs a direct image to text operation(uses Tessaract - OCR).
@@ -1166,10 +1188,15 @@ class IRISKeywords():
                'date' - giving this value will help in removing
         OutPut: Text (of IRIS object)
         """
+
+        log.info('Inside gettextiris and No. of arguments passed are : '+str(len(args)))
+        import coordinates_storage
+
+        theta,hypo_x,hypo_y=coordinates_storage.Sqliteloadtable().loadtable()
+
         hypo_x=math.ceil(hypo_x)
         hypo_y=math.ceil(hypo_y)
 
-        log.info('Inside gettextiris and No. of arguments passed are : '+str(len(args)))
         status = TEST_RESULT_FAIL
         result = TEST_RESULT_FALSE
         err_msg = None
@@ -2050,15 +2077,12 @@ class IRISKeywords():
         return status,result,value,err_msg
 #--------------------------------------------------------------------------------------------------------------------------------- iris table keywords
 
-    def verifyexistsiris(self,element,theta,hypo_x,hypo_y,*args):
+    def verifyexistsiris(self,element,*args):
         """
         Discription: Verifies if image is present on DOM. This image will be set as a parent element , if scraped image is a 'const' type
         Input: N/A
         OutPut: Boolean Value
         """
-        hypo_x=math.ceil(hypo_x)
-        hypo_y=math.ceil(hypo_y)
-
         log.info('Inside verifyexistsiris and No. of arguments passed are : '+str(len(args)))
         status = TEST_RESULT_FAIL
         result = TEST_RESULT_FALSE
@@ -2071,10 +2095,80 @@ class IRISKeywords():
         elements = []
         width = None
         height = None
+        im_b64=element['cord']
+        im_b64=eval(im_b64)
+        
         try:
+
+            import client
+            text_response=client.api_request().extracttext(im_b64)
+            elem_coordinates = element['coordinates']
+            res=[int(elem_coordinates[0]),int(elem_coordinates[1]),int(elem_coordinates[2]),int(elem_coordinates[3]),text_response[0][5]]
+            cord_old=[[int(elem_coordinates[0]),int(elem_coordinates[1]),int(elem_coordinates[2]),int(elem_coordinates[3]),text_response[0][5]]]
+            logger.print_on_console('old_cord',cord_old)
+
+            import core_utils
+            core_utils.get_all_the_imports('IRIS')
+            core_utils.get_all_the_imports('Core')
+            import New_Coordinates
+
+            # text_response=client.extracttext(im_b64)
+
+            new_text=client.api_request().newtextexecute_client()
+            logger.print_on_console(new_text)
+
+            for tex_cor in new_text:
+                if tex_cor[5].lower()==text_response[0][5].lower():
+                    logger.print_on_console(tex_cor)
+                    cord_new=[tex_cor]
+                    theta,hypo_x,hypo_y=New_Coordinates.getting_new_coor(cord_old,cord_new)
+
+                    import coordinates_storage
+
+                    coordinates_storage.Sqlitecreatetable(theta,hypo_x,hypo_y).createtable()
+
+
+                    status= TEST_RESULT_PASS
+                    result = TEST_RESULT_TRUE
+                    break
+
+                else:
+                    status= TEST_RESULT_FAIL
+                    result = TEST_RESULT_FALSE
+
+        
+        
+
+        # logger.print_on_console('theta:',theta)
+        # logger.print_on_console('hypo_x:',hypo_x)
+        # logger.print_on_console('hypo_y:',hypo_y)
+        # db_path = os.path.join(os.getenv("AVO_ASSURE_HOME"), 'assets')
+        # logger.print_on_console('db_path:',db_path)
+
+        #logger.print_on_console('hypo_y:',hypo_y)
+
             global relativeCoordinates
             global verifyFlag
-            elem_coordinates = element['coordinates']
+
+            hypo_x=math.ceil(hypo_x)
+            hypo_y=math.ceil(hypo_y)
+
+            x_new=abs(math.ceil((math.cos(theta)*hypo_x)+res[0]))
+            y_new=abs(math.ceil((math.sin(theta)*hypo_y)+res[1]))
+            x_new1=abs(math.ceil((math.cos(theta)*hypo_x)+res[2]))
+            y_new1=abs(math.ceil((math.sin(theta)*hypo_y)+res[3]))
+            width=abs(x_new-x_new1)
+            height=abs(y_new-y_new1)
+
+            logger.print_on_console(x_new)
+            logger.print_on_console(y_new)
+
+            logger.print_on_console(x_new1)
+            logger.print_on_console(y_new1)
+
+            pyautogui.moveTo(x_new+ int(width/2),y_new + int(height/2))
+
+
 
             # if( len(args) == 3 and args[2] != '' and args[2] !='constant' and verifyFlag ):
             #     log.info('IRIS element recognised as a relative element')
@@ -2092,21 +2186,9 @@ class IRISKeywords():
             # else:
             #     log.info('IRIS element recognised as a non-relative element')
             #     res, width, height = gotoobject(element)
-
-            res=[int(elem_coordinates[0]),int(elem_coordinates[1]),int(elem_coordinates[2]),int(elem_coordinates[3])]
-            #logger.print_on_console(res)
-            x_new=abs(math.ceil((math.cos(theta)*hypo_x)+res[0]))
-            y_new=abs(math.ceil((math.sin(theta)*hypo_y)+res[1]))
-            x_new1=abs(math.ceil((math.cos(theta)*hypo_x)+res[2]))
-            y_new1=abs(math.ceil((math.sin(theta)*hypo_y)+res[3]))
-            width=abs(x_new-x_new1)
-            height=abs(y_new-y_new1)
-
-            pyautogui.moveTo(x_new+ int(width/2),y_new + int(height/2))
-
             if( len(res) > 0 ):
-                status= TEST_RESULT_PASS
-                result = TEST_RESULT_TRUE
+                # status= TEST_RESULT_PASS
+                # result = TEST_RESULT_TRUE
                 if( len(args) == 3 and args[2] == 'constant' ):
                     relativeCoordinates = res
                     verifyFlag = True
@@ -2204,17 +2286,21 @@ class IRISKeywords():
         del element, args, img, res, elem_coordinates, const_coordintes, elements, text, verifytext, image, height, width # deleting variables
         return status, result, value, err_msg
 
-    def dragiris(self,element,theta,hypo_x,hypo_y,*args):
+    def dragiris(self,element,*args):
         """
         Discription: Set mouse position to the center of the scraped element and hold that element
         Input: N/A
         Output: Boolean Value
         """
-        
+
+        log.info('Inside dragIris and No. of arguments passed are : '+str(len(args)))
+        import coordinates_storage
+
+        theta,hypo_x,hypo_y=coordinates_storage.Sqliteloadtable().loadtable()
+
         hypo_x=math.ceil(hypo_x)
         hypo_y=math.ceil(hypo_y)
 
-        log.info('Inside dragIris and No. of arguments passed are : '+str(len(args)))
         status = TEST_RESULT_FAIL
         result = TEST_RESULT_FALSE
         err_msg = None
@@ -2279,16 +2365,21 @@ class IRISKeywords():
         del element, args, img, res, elem_coordinates, const_coordintes, elements, height, width # deleting variables
         return status, result, value, err_msg
 
-    def dropiris(self,element,theta,hypo_x,hypo_y,*args):
+    def dropiris(self,element,*args):
         """
         Discription: Drop the dragiris-element to the target element described in dropiris
         Input: N/A
         Output: Boolean Value
         """
+
+        log.info('Inside dropIris and No. of arguments passed are : '+str(len(args)))
+        import coordinates_storage
+
+        theta,hypo_x,hypo_y=coordinates_storage.Sqliteloadtable().loadtable()
+
         hypo_x=math.ceil(hypo_x)
         hypo_y=math.ceil(hypo_y)
 
-        log.info('Inside dropIris and No. of arguments passed are : '+str(len(args)))
         status = TEST_RESULT_FAIL
         result = TEST_RESULT_FALSE
         err_msg = None
@@ -2357,17 +2448,21 @@ class IRISKeywords():
         del element, args, img, res, elem_coordinates, const_coordintes, elements, height, width # deleting variables
         return status, result, value, err_msg
 
-    def mousehoveriris(self,element,theta,hypo_x,hypo_y,*args):
+    def mousehoveriris(self,element,*args):
         """
         Discription: Performs a mousehover operation on the element.
         Input: N/A
         OutPut: Boolean Value
         """
 
+        log.info('Inside mousehoveriris and No. of arguments passed are : '+str(len(args)))
+        import coordinates_storage
+
+        theta,hypo_x,hypo_y=coordinates_storage.Sqliteloadtable().loadtable()
+
         hypo_x=math.ceil(hypo_x)
         hypo_y=math.ceil(hypo_y)
 
-        log.info('Inside mousehoveriris and No. of arguments passed are : '+str(len(args)))
         status = TEST_RESULT_FAIL
         result = TEST_RESULT_FALSE
         err_msg = None
@@ -2425,17 +2520,21 @@ class IRISKeywords():
         del element, args, img, res, elem_coordinates, const_coordintes, elements, height, width # deleting variables
         return status, result, value, err_msg
 
-    def getstatusiris(self,element,theta,hypo_x,hypo_y,*args):
+    def getstatusiris(self,element,*args):
         """
         Discription: Performs a get status operation on the checkbox element.
         Input: N/A
         OutPut: Boolean Value
         """
+
+        log.info('Inside getstatusiris and No. of arguments passed are : '+str(len(args)))
+        import coordinates_storage
+
+        theta,hypo_x,hypo_y=coordinates_storage.Sqliteloadtable().loadtable()
+
         hypo_x=math.ceil(hypo_x)
         hypo_y=math.ceil(hypo_y)
 
-
-        log.info('Inside getstatusiris and No. of arguments passed are : '+str(len(args)))
         status = TEST_RESULT_FAIL
         result = TEST_RESULT_FALSE
         err_msg = None
@@ -2529,7 +2628,7 @@ class IRISKeywords():
         del element, args, img, res, elem_coordinates, const_coordintes, elements, height, width, originalImage, relativeImage, matchFlag, flg # deleting variables
         return status, result, value, err_msg
 
-    def scrollupiris(self,element,theta,hypo_x,hypo_y,*args):
+    def scrollupiris(self,element,*args):
         """
         Discription: Performs a scroll up operation on the scroll element.
         Input:  <count>;<type(optional)>
@@ -2537,11 +2636,14 @@ class IRISKeywords():
                 type : type of scroll function 0(default) - clicks on the scroll button of up/down/right/left. 1 - clicks in the middle of the scroll bar then uses sendkeys to traverse in direction of option
         OutPut: Boolean Value
         """
+        log.info('Inside scrollupiris and No. of arguments passed are : '+str(len(args)))
+        import coordinates_storage
+
+        theta,hypo_x,hypo_y=coordinates_storage.Sqliteloadtable().loadtable()
+
         hypo_x=math.ceil(hypo_x)
         hypo_y=math.ceil(hypo_y)
 
-
-        log.info('Inside scrollupiris and No. of arguments passed are : '+str(len(args)))
         status = TEST_RESULT_FAIL
         result = TEST_RESULT_FALSE
         err_msg = None
@@ -2625,7 +2727,7 @@ class IRISKeywords():
         del element, args, img, res, elem_coordinates, const_coordintes, elements, height, width,flg # deleting variables
         return status, result, value, err_msg
 
-    def scrolldowniris(self,element,theta,hypo_x,hypo_y,*args):
+    def scrolldowniris(self,element,*args):
         """
         Discription: Performs a scroll down operation on the scroll element.
         Input:  <count>;<type(optional)>
@@ -2633,11 +2735,14 @@ class IRISKeywords():
                 type : type of scroll function 0(default) - clicks on the scroll button of up/down/right/left. 1 - clicks in the middle of the scroll bar then uses sendkeys to traverse in direction of option
         OutPut: Boolean Value
         """
+        log.info('Inside scrolldowniris and No. of arguments passed are : '+str(len(args)))
+        import coordinates_storage
+
+        theta,hypo_x,hypo_y=coordinates_storage.Sqliteloadtable().loadtable()
 
         hypo_x=math.ceil(hypo_x)
         hypo_y=math.ceil(hypo_y)
 
-        log.info('Inside scrolldowniris and No. of arguments passed are : '+str(len(args)))
         status = TEST_RESULT_FAIL
         result = TEST_RESULT_FALSE
         err_msg = None
@@ -2723,7 +2828,7 @@ class IRISKeywords():
         del element, args, img, res, elem_coordinates, const_coordintes, elements, height, width,flg # deleting variables
         return status, result, value, err_msg
 
-    def scrollleftiris(self,element,theta,hypo_x,hypo_y,*args):
+    def scrollleftiris(self,element,theta,*args):
         """
         Discription: Performs a scroll left operation on the scroll element.
         Input:  <count>;<type(optional)>
@@ -2731,12 +2836,15 @@ class IRISKeywords():
                 type : type of scroll function 0(default) - clicks on the scroll button of up/down/right/left. 1 - clicks in the middle of the scroll bar then uses sendkeys to traverse in direction of option
         OutPut: Boolean Value
         """
+
+        log.info('Inside scrollleftiris and No. of arguments passed are : '+str(len(args)))
+        import coordinates_storage
+
+        theta,hypo_x,hypo_y=coordinates_storage.Sqliteloadtable().loadtable()
+
         hypo_x=math.ceil(hypo_x)
         hypo_y=math.ceil(hypo_y)
 
-
-
-        log.info('Inside scrollleftiris and No. of arguments passed are : '+str(len(args)))
         status = TEST_RESULT_FAIL
         result = TEST_RESULT_FALSE
         err_msg = None
@@ -2817,7 +2925,7 @@ class IRISKeywords():
         del element, args, img, res, elem_coordinates, const_coordintes, elements, height, width,flg # deleting variables
         return status, result, value, err_msg
 
-    def scrollrightiris(self,element,theta,hypo_x,hypo_y,*args):
+    def scrollrightiris(self,element,*args):
         """
         Discription: Performs a scroll right operation on the scroll element.
         Input:  <count>;<type(optional)>
@@ -2825,10 +2933,14 @@ class IRISKeywords():
                 type : type of scroll function 0(default) - clicks on the scroll button of up/down/right/left. 1 - clicks in the middle of the scroll bar then uses sendkeys to traverse in direction of option
         OutPut: Boolean Value
         """
+        log.info('Inside scrollrightiris and No. of arguments passed are : '+str(len(args)))
+        import coordinates_storage
+
+        theta,hypo_x,hypo_y=coordinates_storage.Sqliteloadtable().loadtable()
+
         hypo_x=math.ceil(hypo_x)
         hypo_y=math.ceil(hypo_y)
 
-        log.info('Inside scrollrightiris and No. of arguments passed are : '+str(len(args)))
         status = TEST_RESULT_FAIL
         result = TEST_RESULT_FALSE
         err_msg = None

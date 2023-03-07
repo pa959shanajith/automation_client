@@ -1,5 +1,5 @@
 {
-    "ai_server": "https://avoaiapitest.avoautomation.com",
+    "ai_server": "https://avoaiapi.avoautomation.com",
     "bit_64": "Yes",
     "browser_check": "Yes",
     "browser_screenshots": "Yes",
