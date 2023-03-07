@@ -1,4 +1,5 @@
 {
+    "ai_server": "https://avoaiapi.avoautomation.com",
     "bit_64": "Yes",
     "browser_check": "Yes",
     "browser_screenshots": "Yes",
@@ -12,6 +13,7 @@
     "delay_stringinput": "1",
     "disable_screen_timeout": "No",
     "displayVariableTimeOut": "1",
+    "element_load_timeout": "30",
     "enableSecurityCheck": "No",
     "exception_flag": "false",
     "extn_enabled": "No",
@@ -46,6 +48,5 @@
     "tls_security": "Low",
     "update_check": "No",
     "use_custom_debugport": "No",
-    "element_load_timeout": "30",
     "verify_wait_time": "60"
 }
