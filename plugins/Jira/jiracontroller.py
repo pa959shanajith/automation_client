@@ -71,7 +71,7 @@ class JiraWindow():
                 for i in data:
                     custom_val_dd={'value':''}
                     custom_val_tb=None
-                    if i not in ['project','issuetype','parentissue','reportId','slno','url','username','password','executionId','priority','Attachment','Linked Issues','executionReportNo','Testcase']:
+                    if i not in ['project','issuetype','parentissue','reportId','slno','url','username','password','executionId','priority','Attachment','Linked Issues','executionReportNo','mappedItem']:
                         if 'userInput' in data[i]:
                             if 'key' in data[i]['userInput']:
                                 if 'customfield' in data[i]['field_name']:
@@ -168,8 +168,8 @@ class JiraWindow():
                         res=jira.create_issue_link(type=linkedIssue_Type,inwardIssue=issue_id,outwardIssue=issue)
                         if res.reason=='Created' and res.status_code==201:
                             logger.print_on_console('created Issue is linked to ',issue)
-            if 'Testcase' in data:
-                outwardIssue=data['Testcase']
+            if 'mappedItem' in data:
+                outwardIssue=data['mappedItem']
                 outwardIssue=outwardIssue.split(',')
                 linkedIssue_Type='blocks'
                 if outwardIssue!='' and linkedIssue_Type!='':
