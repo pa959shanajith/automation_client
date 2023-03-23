@@ -4,33 +4,39 @@
 
 try
 {
- Write-Output ($avofolder)
-
-
- #Read-Host
+ Write-Output ("Updating avo config file") 
  
-    $efile = Split-Path -Path $exename -Leaf
-    
+    $efile = Split-Path -Path $exename -Leaf 
     $efile =$efile.ToLower()
 
-    if ($efile -clike 'avoassureclient*') { 
-        
-		if ($efile.Contains(" ")) {$efile = $efile.Split(" ")[0] + ".exe"; }
-		 
+    if ($efile.StartsWith('avoassureclient')) 
+    { 
+        if ($efile.Contains(" ")) {$efile = $efile.Split(" ")[0] + ".exe"; }
+        $config=Get-Content $avofolder/AvoAssure/assets/Config.json -raw | ConvertFrom-Json
+        $wurl = $efile.Replace(".exe", "");
 
-        $wurl = $efile.Replace(".exe", ".avoassure.ai");
-      # Write-Output ("1" + $wurl)
+#--for non-trial license
+        if ($efile.StartsWith('avoassureclient0')) 
+        {
+            $wurl = $wurl.Replace("avoassureclient0_","");
+            $config.isTrial=0;
 
-
-
-        $wurl = $wurl.Replace("avoassureclient_","");
-        $newsvr = '"server_ip": "'+ $wurl + '",' 
-        (Get-Content $avofolder/AvoAssure/assets/Config.json) -replace '"server_ip": "localhost",' ,$newsvr  | Out-File -FilePath $avofolder/AvoAssure/assets/Config.json -Force -encoding default
-       # Write-Output ("2" + $wurl)
+        }
+#--for trial license
+        if ($efile.StartsWith('avoassureclient1')) 
+        {
+            $config.isTrial=1;
+            $wurl = $wurl.Replace("avoassureclient1_","");
+        }
+    
+        $config.server_ip = $wurl ;
+        Copy-Item $avofolder/AvoAssure/assets/Config.json -Destination $avofolder/AvoAssure/assets/Config.bak
+        $config | ConvertTo-Json | set-content $avofolder/AvoAssure/assets/Config.json
     }
     else {
            Write-Output ("No changes made");
     }
+   Write-Output ("success") 
     
    # Read-Host
     
