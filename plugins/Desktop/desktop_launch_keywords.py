@@ -442,7 +442,8 @@ class Launch_Keywords():
                             app_uia = Application(backend = 'uia').connect(process = window_pid)
                             app_win32.top_window().set_focus()
 
-                            time.sleep(3)
+                            time.sleep(5)
+                            
                             im = PIL.ImageGrab.grab()
 
                             core_utils.get_all_the_imports('IRIS')

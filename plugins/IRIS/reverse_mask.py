@@ -18,5 +18,5 @@ def mask(image_path,coordinates):
     mask=cv2.rectangle(mask, (xmid-x_dist+3,ymid+2),(xmid+x_dist, ymid),color=(255, 255, 255), thickness=thickness)
     masked = cv2.bitwise_and(image, image, mask=mask)
     #masked = cv2.bitwise_or(image, mask)
-    cv2.imwrite(mask_img,masked)
+    #cv2.imwrite(mask_img,masked)
     return masked
