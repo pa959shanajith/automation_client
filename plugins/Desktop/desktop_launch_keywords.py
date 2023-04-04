@@ -22,7 +22,9 @@ import ctypes
 import psutil
 import re
 import time
+import core_utils
 from PIL import ImageGrab
+import PIL.ImageGrab
 from PIL.ImageOps import flip
 import struct
 from ctypes import wintypes
@@ -439,6 +441,15 @@ class Launch_Keywords():
                             app_win32 = Application(backend = 'win32').connect(process = window_pid)
                             app_uia = Application(backend = 'uia').connect(process = window_pid)
                             app_win32.top_window().set_focus()
+
+                            time.sleep(3)
+                            im = PIL.ImageGrab.grab()
+
+                            core_utils.get_all_the_imports('IRIS')
+
+                            import client
+                            message=client.api_request().image_save(im)
+
                             status = desktop_constants.TEST_RESULT_PASS
                             result = desktop_constants.TEST_RESULT_TRUE
                             break
