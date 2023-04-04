@@ -81,14 +81,14 @@ if sys.platform == 'win32':
     if 'Windows-10' in host_os or 'Windows-8.1' in host_os:
         windll.shcore.SetProcessDpiAwareness(2)
     import msvcrt
-    __builtins__open = __builtins__.open
+    __builtins__open = __builtins__['open']
     def __open_inheritance_hack(*args, **kwargs):
         result = __builtins__open(*args, **kwargs)
         handle = msvcrt.get_osfhandle(result.fileno())
         if configvalues["logFile_Path"] in args:
             windll.kernel32.SetHandleInformation(handle, 1, 0)
         return result
-    __builtins__.open = __open_inheritance_hack
+    __builtins__['open'] = __open_inheritance_hack
 
 if __name__ == "__main__":
     try:

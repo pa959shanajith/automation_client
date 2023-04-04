@@ -9,6 +9,7 @@ import cv2
 # import screeninfo
 import os
 import time
+import reverse_mask
 import controller
 import readconfig
 from constants import *
@@ -98,8 +99,14 @@ class Cropandadd():
                     log.debug('Inside draw : Event3 - left button up')
                     drawing1 = False
                     self.data['scrapetype'] = 'caa'
-                    if (iy > y and ix > x) : RGB_img_crop = image_orig[y:iy,x:ix]
-                    else : RGB_img_crop = image_orig[iy:y,ix:x]
+                    if (iy > y and ix > x) : 
+                        #RGB_img_crop = image_orig[y:iy,x:ix]
+                        mask_coordinates=[ix,iy,x,y]
+                        RGB_img_crop = reverse_mask.mask(test_img_path,mask_coordinates)
+                    else : 
+                        #RGB_img_crop = image_orig[iy:y,ix:x]
+                        mask_coordinates=[ix,iy,x,y]
+                        RGB_img_crop = reverse_mask.mask(test_img_path,mask_coordinates)
                     cv2.imwrite(crop_img_path, RGB_img_crop)
                     with open(crop_img_path, "rb") as imageFile:
                         RGB_img_crop_im = str(base64.b64encode(imageFile.read()))
