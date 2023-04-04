@@ -787,24 +787,6 @@ class IRISKeywords():
         width = None
         height = None
         try:
-<<<<<<< Updated upstream
-            if(len(args) == 3 and args[2]!='' and verifyFlag ):
-                log.info('IRIS element recognised as a relative element')
-                elem_coordinates = element['coordinates']
-                const_coordintes = args[2]['coordinates']
-                elements = [(const_coordintes[0],const_coordintes[1]),
-                        (const_coordintes[2],const_coordintes[3]),
-                        (elem_coordinates[0], elem_coordinates[1]),
-                        (elem_coordinates[2], elem_coordinates[3])]
-                img, res = find_relative_image(elements, relativeCoordinates)
-                log.info( 'Relative image co-ordinates : ' + str(res) )
-                width = res[2] - res[0]
-                height = res[3] - res[1]
-                pyautogui.moveTo(res[0]+ int(width/2),res[1] + int(height/2))
-            else:
-                log.info('IRIS element recognised as a non-relative element')
-                res, width, height = gotoobject(element)
-=======
             #if(len(args) == 3 and args[2]!='' and verifyFlag ):
             log.info('IRIS element recognised as a relative element')
             elem_coordinates = element['coordinates']
@@ -840,7 +822,6 @@ class IRISKeywords():
             # else:
             #     log.info('IRIS element recognised as a non-relative element')
             #     res, width, height = gotoobject(element)
->>>>>>> Stashed changes
             if(len(res)>0):
                 if SYSTEM_OS == 'Windows':
                     pythoncom.CoInitialize()
@@ -1922,8 +1903,6 @@ class IRISKeywords():
         width = None
         height = None
         try:
-<<<<<<< Updated upstream
-=======
 
             import client
             text_response=client.api_request().extracttext(im_b64)
@@ -1972,7 +1951,6 @@ class IRISKeywords():
 
         #logger.print_on_console('hypo_y:',hypo_y)
 
->>>>>>> Stashed changes
             global relativeCoordinates
             global verifyFlag
             if( len(args) == 3 and args[2] != '' and args[2] !='constant' and verifyFlag ):
@@ -2151,29 +2129,6 @@ class IRISKeywords():
         height = None
         img = None
         try:
-<<<<<<< Updated upstream
-            if(len(args) == 3 and args[2]!='' and verifyFlag ):
-                elem_coordinates = element['coordinates']
-                const_coordintes = args[2]['coordinates']
-                elements = [(const_coordintes[0],const_coordintes[1]),
-                        (const_coordintes[2],const_coordintes[3]),
-                        (elem_coordinates[0], elem_coordinates[1]),
-                        (elem_coordinates[2], elem_coordinates[3])]
-                img, res = find_relative_image(elements, relativeCoordinates)
-                width = res[2] - res[0]
-                height = res[3] - res[1]
-                log.info('Moving the mouse cursor to the element that needs to be dragged')
-                pyautogui.moveTo(res[0]+ int(width/2),res[1] + int(height/2))
-                self.dragIrisPos['x'] = res[0] + int(width/2)
-                self.dragIrisPos['y'] = res[1] + int(height/2)
-                log.info('Moved the mouse cursor to the element that needs to be dragged')
-                log.info( 'Relative image co-ordinates : ' + str(res) )
-            else:
-                res, width, height = gotoobject(element)
-                self.dragIrisPos['x'] = res[0] + int(width/2)
-                self.dragIrisPos['y'] = res[0] + int(height/2)
-                log.info( 'Image co-ordinates : ' + str(res) )
-=======
             elem_coordinates = element['coordinates']
 
             res=[int(elem_coordinates[0]),int(elem_coordinates[1]),int(elem_coordinates[2]),int(elem_coordinates[3])]
@@ -2210,7 +2165,6 @@ class IRISKeywords():
             #     self.dragIrisPos['x'] = res[0] + int(width/2)
             #     self.dragIrisPos['y'] = res[0] + int(height/2)
             #     log.info( 'Image co-ordinates : ' + str(res) )
->>>>>>> Stashed changes
             if( len(res) > 0 ):
                 self.dragIrisFlag = True
                 status= TEST_RESULT_PASS
@@ -2236,6 +2190,12 @@ class IRISKeywords():
         Output: Boolean Value
         """
         log.info('Inside dropIris and No. of arguments passed are : '+str(len(args)))
+        
+        import coordinates_storage
+
+        theta,hypo_x,hypo_y=coordinates_storage.Sqliteloadtable().loadtable()
+        hypo_x=math.ceil(hypo_x)
+        
         status = TEST_RESULT_FAIL
         result = TEST_RESULT_FALSE
         err_msg = None
@@ -2255,22 +2215,36 @@ class IRISKeywords():
                 x, y = pyautogui.position()
                 if( self.dragIrisPos['x'] != x and self.dragIrisPos['y'] != y ): pyautogui.moveTo(self.dragIrisPos['x'], self.dragIrisPos['y'])
 
-                if(len(args) == 3 and args[2]!='' and verifyFlag ):
-                    elem_coordinates = element['coordinates']
-                    const_coordintes = args[2]['coordinates']
-                    elements = [(const_coordintes[0],const_coordintes[1]),
-                            (const_coordintes[2],const_coordintes[3]),
-                            (elem_coordinates[0], elem_coordinates[1]),
-                            (elem_coordinates[2], elem_coordinates[3])]
-                    img, res = find_relative_image(elements, relativeCoordinates)
-                    log.info( 'Relative image co-ordinates : ' + str(res) )
-                    width = res[2] - res[0]
-                    height = res[3] - res[1]
-                else:
-                    dropIrisFlag = True
-                    res, width, height = gotoobject(element)
-                    dropIrisFlag = False
-                    log.info( 'Image co-ordinates : ' + str(res) )
+                # if(len(args) == 3 and args[2]!='' and verifyFlag ):
+                #     elem_coordinates = element['coordinates']
+                #     const_coordintes = args[2]['coordinates']
+                #     elements = [(const_coordintes[0],const_coordintes[1]),
+                #             (const_coordintes[2],const_coordintes[3]),
+                #             (elem_coordinates[0], elem_coordinates[1]),
+                #             (elem_coordinates[2], elem_coordinates[3])]
+                #     img, res = find_relative_image(elements, relativeCoordinates)
+                #     log.info( 'Relative image co-ordinates : ' + str(res) )
+                #     width = res[2] - res[0]
+                #     height = res[3] - res[1]
+                # else:
+                #     dropIrisFlag = True
+                #     res, width, height = gotoobject(element)
+                #     dropIrisFlag = False
+                #     log.info( 'Image co-ordinates : ' + str(res) )
+
+                log.info('IRIS element recognised as a relative element')
+                elem_coordinates = element['coordinates']
+
+                res=[int(elem_coordinates[0]),int(elem_coordinates[1]),int(elem_coordinates[2]),int(elem_coordinates[3])]
+
+                x_new=abs(math.ceil((math.cos(theta)*hypo_x)+res[0]))
+                y_new=abs(math.ceil((math.sin(theta)*hypo_y)+res[1]))
+                x_new1=abs(math.ceil((math.cos(theta)*hypo_x)+res[2]))
+                y_new1=abs(math.ceil((math.sin(theta)*hypo_y)+res[3]))
+                width=abs(x_new-x_new1)
+                height=abs(y_new-y_new1)
+
+
                 if( len(res) > 0 ):
                     log.info('Dragging the element to drop location')
                     pyautogui.dragTo(res[0]+ int(width/2),res[1] + int(height/2),1,button='left') #dragTo(X,Y,time in seconds to drag over,left/right click)
