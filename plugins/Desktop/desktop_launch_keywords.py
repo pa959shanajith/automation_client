@@ -442,7 +442,7 @@ class Launch_Keywords():
                             app_uia = Application(backend = 'uia').connect(process = window_pid)
                             app_win32.top_window().set_focus()
 
-                            time.sleep(5)
+                            time.sleep(4)
                             
                             im = PIL.ImageGrab.grab()
 
