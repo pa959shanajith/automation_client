@@ -476,7 +476,8 @@ class ScrapeWindow(wx.Frame):
             self.perform_clickandadd()
             list(map(lambda button: button.Hide(), selector_window_buttons))
             list(map(lambda button: button.Show(), scrape_window_basic_buttons))
-            self.cropbutton.Show()
+            if checkWebPackage['isWebPackage'] == "False":
+                self.cropbutton.Show()
             self.vsizer.Layout()
             self.window_selected = True
             self.startbutton.SetValue(True)
