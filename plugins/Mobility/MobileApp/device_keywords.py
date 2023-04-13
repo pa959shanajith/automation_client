@@ -167,7 +167,8 @@ class Device_Keywords():
         packageName = None
         maindir=os.getcwd()
         try:
-            aapt_home=os.environ['AAPT_HOME']
+            # aapt_home=os.environ['AAPT_HOME']
+            aapt_home=os.environ['ANDROID_HOME']+"\\build-tools\\33.0.1\\"
             if aapt_home != None:
                 cmd=aapt_home
                 os.chdir(cmd)
@@ -192,7 +193,8 @@ class Device_Keywords():
         activityName = None
         maindir=os.getcwd()
         try:
-            aapt_home=os.environ['AAPT_HOME']
+            # aapt_home=os.environ['AAPT_HOME']
+            aapt_home=os.environ['ANDROID_HOME']+"\\build-tools\\33.0.1\\"
             if aapt_home != None:
                 cmd=aapt_home
                 os.chdir(cmd)
