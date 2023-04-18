@@ -1772,67 +1772,67 @@ class IRISKeywords():
         width = None
         try:
             self.getrowcountiris(element)
-            if( TESSERACT_PATH_EXISTS ):
-                pytesseract.tesseract_cmd = TESSERACT_PATH + '/tesseract'
-                os.environ["TESSDATA_PREFIX"] = TESSERACT_PATH + '/tessdata'
+            # if( TESSERACT_PATH_EXISTS ):
+            #     pytesseract.tesseract_cmd = TESSERACT_PATH + '/tesseract'
+            #     os.environ["TESSDATA_PREFIX"] = TESSERACT_PATH + '/tessdata'
 
-                log.info('IRIS element recognised as a relative element')
-                elem_coordinates = element['coordinates']
+            log.info('IRIS element recognised as a relative element')
+            elem_coordinates = element['coordinates']
 
-                res=[int(elem_coordinates[0]),int(elem_coordinates[1]),int(elem_coordinates[2]),int(elem_coordinates[3])]
+            res=[int(elem_coordinates[0]),int(elem_coordinates[1]),int(elem_coordinates[2]),int(elem_coordinates[3])]
 
-                x_new=abs(math.ceil((math.cos(theta)*hypo_x)+res[0]))
-                y_new=abs(math.ceil((math.sin(theta)*hypo_y)+res[1]))
-                x_new1=abs(math.ceil((math.cos(theta)*hypo_x)+res[2]))
-                y_new1=abs(math.ceil((math.sin(theta)*hypo_y)+res[3]))
-                width=abs(x_new-x_new1)
-                height=abs(y_new-y_new1)
-                img = None
-                # if( len(args) == 3 and args[2] != '' and verifyFlag ):
-                #     log.info('IRIS element recognised as a relative element')
-                #     elem_coordinates = element['coordinates']
-                #     const_coordintes = args[2]['coordinates']
-                #     elements = [(const_coordintes[0],const_coordintes[1]),
-                #             (const_coordintes[2],const_coordintes[3]),
-                #             (elem_coordinates[0], elem_coordinates[1]),
-                #             (elem_coordinates[2], elem_coordinates[3])]
-                #     img, res = find_relative_image(elements, relativeCoordinates)
-                #     width = res[2] - res[0]
-                #     height = res[3] - res[1]
-                #     log.info( 'Relative image co-ordinates : '+str(res) )
-                # else:
-                #     log.info('IRIS element recognised as a non-relative element')
-                #     res, width, height = gotoobject(element)
-                #     if(res): img = get_byte_mirror(element['cord'])
-                img = get_byte_mirror(element['cord'])
-                logger.print_on_console(element['cord'])
+            x_new=abs(math.ceil((math.cos(theta)*hypo_x)+res[0]))
+            y_new=abs(math.ceil((math.sin(theta)*hypo_y)+res[1]))
+            x_new1=abs(math.ceil((math.cos(theta)*hypo_x)+res[2]))
+            y_new1=abs(math.ceil((math.sin(theta)*hypo_y)+res[3]))
+            width=abs(x_new-x_new1)
+            height=abs(y_new-y_new1)
+            #img = None
+            # if( len(args) == 3 and args[2] != '' and verifyFlag ):
+            #     log.info('IRIS element recognised as a relative element')
+            #     elem_coordinates = element['coordinates']
+            #     const_coordintes = args[2]['coordinates']
+            #     elements = [(const_coordintes[0],const_coordintes[1]),
+            #             (const_coordintes[2],const_coordintes[3]),
+            #             (elem_coordinates[0], elem_coordinates[1]),
+            #             (elem_coordinates[2], elem_coordinates[3])]
+            #     img, res = find_relative_image(elements, relativeCoordinates)
+            #     width = res[2] - res[0]
+            #     height = res[3] - res[1]
+            #     log.info( 'Relative image co-ordinates : '+str(res) )
+            # else:
+            #     log.info('IRIS element recognised as a non-relative element')
+            #     res, width, height = gotoobject(element)
+            #     if(res): img = get_byte_mirror(element['cord'])
+            img = get_byte_mirror(element['cord'])
+            logger.print_on_console(element['cord'])
 
-                if( res and img ):
-                    with open("cropped.png", "wb") as f:
-                        f.write(base64.b64decode(img))
-                    img = cv2.imread("cropped.png")
-                    X, Y = get_cell_position(img,row,col)
-                    #--------------------------------------------------------equal in distance
-                    try:
-                        if(args[0][2] == str(1)):
-                            rows = len(horizontal)-1
-                            height_ele = height/rows
-                            Y = (height_ele*(row-1)) + (height_ele/2)
-                    except:pass
+            if( res and img ):
+                with open("cropped.png", "wb") as f:
+                    f.write(base64.b64decode(img))
+                img = cv2.imread("cropped.png")
+                X, Y = get_cell_position(img,row,col)
+                #--------------------------------------------------------equal in distance
+                try:
+                    if(args[0][2] == str(1)):
+                        rows = len(horizontal)-1
+                        height_ele = height/rows
+                        Y = (height_ele*(row-1)) + (height_ele/2)
+                except:pass
                     #--------------------------------------------------------equal in distance
                     #pyautogui.moveTo(res[0]+ int(X), res[1]+ int(Y))
-                    pyautogui.moveTo(x_new+ int(X), y_new+ int(Y))
-                    if SYSTEM_OS == 'Windows': pythoncom.CoInitialize()
-                    log.info('Performing clickcelliris')
-                    pyautogui.click()
-                    log.info('clickcelliris performed')
-                    status  = TEST_RESULT_PASS
-                    result = TEST_RESULT_TRUE
-                    os.remove('cropped.png')
-                else:
-                    err_msg = "Element not found on screen."
+                pyautogui.moveTo(x_new+ int(X), y_new+ int(Y))
+                if SYSTEM_OS == 'Windows': pythoncom.CoInitialize()
+                log.info('Performing clickcelliris')
+                pyautogui.click()
+                log.info('clickcelliris performed')
+                status  = TEST_RESULT_PASS
+                result = TEST_RESULT_TRUE
+                os.remove('cropped.png')
             else:
-                err_msg = "Tesseract module not found"
+                err_msg = "Element not found on screen."
+            # else:
+            #     err_msg = "Tesseract module not found"
             if ( err_msg ):
                 log.info( err_msg )
                 logger.print_on_console( err_msg )
@@ -2115,7 +2115,7 @@ class IRISKeywords():
             # text_response=client.extracttext(im_b64)
 
             new_text=client.api_request().newtextexecute_client()
-            logger.print_on_console(new_text)
+            #logger.print_on_console(new_text)
 
             for tex_cor in new_text:
                 if tex_cor[5].lower()==text_response[0][5].lower():

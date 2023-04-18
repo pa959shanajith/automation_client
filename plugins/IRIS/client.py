@@ -73,11 +73,6 @@ class api_request():
 
 
         test_url = self.addr + '/text/extract'
-        im_file = BytesIO()
-        imgPath.save(im_file, format="png")
-        im_bytes = im_file.getvalue()
-        im_b64 = base64.b64encode(im_bytes)
-        response = requests.post(test_url, data=im_b64,verify = False , timeout = None)
-        text=json.loads(response.text)['reference'][0]
+        
 
         return text
