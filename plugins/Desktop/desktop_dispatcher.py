@@ -32,7 +32,7 @@ from pywinauto.application import Application
 import pywinauto
 from pywinauto.findwindows import find_window
 from pywinauto.win32functions import SetForegroundWindow
-import iris_operations
+import iris_operations_ai
 log = logging.getLogger( 'desktop_dispatcher.py' )
 
 class DesktopDispatcher:
@@ -49,7 +49,7 @@ class DesktopDispatcher:
     tree_keywords_obj = desktop_treeview_keywords.Tree_View_Keywords()
     table_keywords_obj = desktop_table_keywords.Table_Keywords()
     outook_obj = outlook.OutlookKeywords()
-    iris_object = iris_operations.IRISKeywords()
+    iris_object = iris_operations_ai.IRISKeywords()
 
     desktop_dict = { 'click': button_link_keywords_obj.click,
         'press' : button_link_keywords_obj.press,
