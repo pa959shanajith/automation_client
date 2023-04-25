@@ -60,12 +60,12 @@ class InstallAndLaunch():
         try:
             err_msg = None
             curdir = os.environ["AVO_ASSURE_HOME"]
-            path_node_modules = curdir + '/plugins/Mobility/MobileApp/node_modules'
+            path_node_modules = curdir + '/node_modules'
             if not os.path.exists(path_node_modules):
-                self.print_error('node_modules Directory not Found in /plugins/Mobility/MobileApp')
+                self.print_error('node_modules Directory not Found in Avo Assure Client')
                 return False
             if (SYSTEM_OS != 'Darwin'):
-                path = curdir + '/plugins/Mobility/MobileApp/node_modules/appium/build/lib/main.js'
+                path = curdir + '/node_modules/appium/build/lib/main.js'
                 nodePath = os.environ["AVO_ASSURE_HOME"] + "/Lib/Drivers/node.exe"
                 proc = subprocess.Popen([nodePath, path], shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)
                 start = time.time()
@@ -88,8 +88,8 @@ class InstallAndLaunch():
                     logger.print_on_console('Server started')
                     return True
             else:
-                path = curdir + '/plugins/Mobility/MobileApp/node_modules/appium/build/lib/main.js'
-                nodePath = curdir + '/plugins/Mobility/MobileApp/node_modules/node_appium'
+                path = curdir + '/node_modules/appium/build/lib/main.js'
+                nodePath = curdir + '/node_modules/node_appium'
                 proc = subprocess.Popen([nodePath, path], shell=False, stdin=None, stdout=None, stderr=None, close_fds=True)
                 time.sleep(25) # psutil.net_connections() doesn't work on Mac, insearch of alternatives
                 logger.print_on_console('Server started')
