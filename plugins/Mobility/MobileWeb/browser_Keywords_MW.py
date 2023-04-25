@@ -67,12 +67,12 @@ class BrowserKeywords():
         try:
             err_msg = None
             curdir = os.environ["AVO_ASSURE_HOME"]
-            path_node_modules = curdir + '/plugins/Mobility/MobileApp/node_modules'
+            path_node_modules = curdir + '/node_modules'
             if not os.path.exists(path_node_modules):
-                err_msg= 'node_modules Directory not Found in /plugins/Mobility/MobileApp'
+                err_msg= 'node_modules Directory not Found in Avo Assure Client'
                 return False
             if (SYSTEM_OS != 'Darwin'):
-                path = curdir + '/plugins/Mobility/MobileApp/node_modules/appium/build/lib/main.js'
+                path = curdir + '/node_modules/appium/build/lib/main.js'
                 nodePath = os.environ["AVO_ASSURE_HOME"] + "/Lib/Drivers/node.exe"
                 proc = subprocess.Popen([nodePath, path], shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)
                 controller.process_ids.append(proc.pid)
@@ -98,8 +98,8 @@ class BrowserKeywords():
                     logger.print_on_console('Browser session started')
                     return True
             else:
-                path = curdir + '/plugins/Mobility/MobileApp/node_modules/appium/build/lib/main.js'
-                nodePath = curdir + '/plugins/Mobility/MobileApp/node_modules/node_appium'
+                path = curdir + '/node_modules/appium/build/lib/main.js'
+                nodePath = curdir + '/node_modules/node_appium'
                 proc = subprocess.Popen([nodePath, path], shell=False, stdin=None, stdout=None, stderr=None, close_fds=True)
                 controller.process_ids.append(proc.pid)
                 time.sleep(25) # psutil.net_connections() doesn't work on Mac, insearch of alternatives
@@ -219,10 +219,10 @@ class BrowserKeywords():
             err_msg = 'error occured while opening browser'
             if SYSTEM_OS == 'Darwin':
                 curdir = os.environ["AVO_ASSURE_HOME"]
-                path_node_modules = curdir + '/plugins/Mobility/MobileApp/node_modules'
+                path_node_modules = curdir + '/node_modules'
                 if not os.path.exists(path_node_modules):
                     logger.print_on_console(
-                        "node_modules Directory not Found in /plugins/Mobility/MobileApp/")
+                        "node_modules Directory not Found in Client")
             log.error(e)
         if err_msg is not None:
             logger.print_on_console(err_msg)
