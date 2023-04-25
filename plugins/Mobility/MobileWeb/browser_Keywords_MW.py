@@ -222,7 +222,7 @@ class BrowserKeywords():
                 path_node_modules = curdir + '/node_modules'
                 if not os.path.exists(path_node_modules):
                     logger.print_on_console(
-                        "node_modules Directory not Found in Client")
+                        "node_modules Directory not Found in Avo Assure Client")
             log.error(e)
         if err_msg is not None:
             logger.print_on_console(err_msg)
