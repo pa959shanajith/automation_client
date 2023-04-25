@@ -798,6 +798,47 @@ class MainNamespace(BaseNamespace):
             logger.print_on_console(err_msg)
             log.error(e,exc_info=True)
 
+    def on_azurelogin(self,*args):
+        try:
+            wait_until_browsercheck()
+            core_utils.get_all_the_imports('Azure')
+            import azurecontroller
+            obj = azurecontroller.AzureWindow()
+            if args[0] == Azure_ACTION_1:
+                data = args[1]
+                obj.getAllAutoDetails(data,socketIO)
+            elif args[0] == Azure_ACTION_2:
+                data = args[1]
+                obj.createIssue(data,socketIO)
+            elif args[0] == Azure_ACTION_3:
+                data = args[1]
+                obj.getConfigureFields(data,socketIO)
+            elif args[0] == Azure_ACTION_4:
+                data = args[1]
+                obj.get_projects(data,socketIO)
+            elif args[0] == Azure_ACTION_5:
+                data = args[1]
+                data['project_selected']=args[2]
+                data['item_type']=args[3]
+                obj.get_testcases(data,socketIO)
+            elif args[0] == Azure_ACTION_6:
+                data = args[1]
+                obj.get_userstories(data,socketIO)
+            elif args[0] == Azure_ACTION_7:
+                data = args[1]
+                obj.get_testplans(data,socketIO)
+            elif args[0] == Azure_ACTION_8:
+                data = args[1]
+                obj.get_testsuites(data,socketIO)
+            elif args[0] == Azure_ACTION_9:
+                data = args[1]
+                obj.get_testcases(data,socketIO)
+        except Exception as e:
+            err_msg='Error in Azure operations'
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
+            log.error(e,exc_info=True)
+
     def on_update_screenshot_path(self,*args):
         if root.gui: benchmark.init(args[1], socketIO)
         intv = 120000
