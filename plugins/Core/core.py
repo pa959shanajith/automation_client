@@ -138,6 +138,27 @@ class MainNamespace(BaseNamespace):
                             executionOnly = root.ice_token["icetype"] != "normal"
                             allow_connect = True
                             plugins_list = response['plugins']
+                            try:
+                                isTrial_val = configvalues.get("isTrial")
+                                LicenseType = response["license_data"]["LicenseTypes"].lower()
+                                config_path = os.environ["AVO_ASSURE_HOME"]+os.sep+"assets\config.json"
+                                isTrial_update = ''
+                                if LicenseType == "trial" and isTrial_val != 1:
+                                    isTrial_update = 1
+                                if LicenseType != "trial" and isTrial_val != 0:
+                                    isTrial_update = 0
+                                if isTrial_update != '':
+                                    with open(config_path,'r+') as f:
+                                        data = json.load(f)
+                                        data['isTrial'] = int(isTrial_update)
+                                        f.seek(0)
+                                        json.dump(data, f, indent=4)
+                                        f.truncate()
+                                        logger.print_on_console("Your license is upgraded, Please restart Avo Assure client to continue.")
+                                        wx.MessageBox("Your license is upgraded, Please restart Avo Assure client to continue.")
+                            except Exception as e:
+                                log.error(e)
+                                log.info("Error occurred while changing isTrail value in config.json")
                             if root.gui:
                                 wx.CallAfter(cw.enable_disconnect)
                             controller.disconnect_flag=False
