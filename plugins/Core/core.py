@@ -447,8 +447,8 @@ class MainNamespace(BaseNamespace):
             if (type(d)==dict): action = d['action']
             else: action = None
             if action == 'update_dataset':
-                import iris_operations
-                iris_operations.update_dataset(d,socketIO)
+                import iris_operations_ai
+                iris_operations_ai.update_dataset(d,socketIO)
             else:
                 global browsername, desktopScrapeObj, desktopScrapeFlag
                 browsername = args
