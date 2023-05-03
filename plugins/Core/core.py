@@ -809,7 +809,7 @@ class MainNamespace(BaseNamespace):
                 obj.getAllAutoDetails(data,socketIO)
             elif args[0] == Azure_ACTION_2:
                 data = args[1]
-                obj.createIssue(data,socketIO)
+                obj.get_createWorkItem(data,socketIO)
             elif args[0] == Azure_ACTION_3:
                 data = args[1]
                 obj.getConfigureFields(data,socketIO)
