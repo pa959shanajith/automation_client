@@ -834,7 +834,7 @@ class MainNamespace(BaseNamespace):
             spath=spath['linux']
         else:
             spath=spath["default"]
-        if readconfig.configvalues["isTrial"] == 1 :
+        if  len(spath) == 0 :
             constants.SCREENSHOT_PATH = os.getcwd()+OS_SEP+'screenshots'
         elif len(spath) != 0 and os.path.exists(spath):
             constants.SCREENSHOT_PATH=os.path.normpath(spath)+OS_SEP
