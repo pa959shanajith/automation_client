@@ -877,8 +877,8 @@ class MainNamespace(BaseNamespace):
                             log.error( 'Unable to delete '+ s +' dir' )
             else:
                 constants.PREDICTION_IMG_DIR="Disabled"
-                logger.print_on_console("Object Prediction Manual Training disabled since user does not have sufficient privileges for object prediction dataset folder\n")
-                log.info("Object Prediction Manual Training disabled since user does not have sufficient privileges for object prediction dataset folder\n")
+                # logger.print_on_console("Object Prediction Manual Training disabled since user does not have sufficient privileges for object prediction dataset folder\n")
+                # log.info("Object Prediction Manual Training disabled since user does not have sufficient privileges for object prediction dataset folder\n")
 
     def on_generateFlowGraph(self,*args):
         try:
