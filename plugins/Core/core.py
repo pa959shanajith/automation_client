@@ -138,6 +138,27 @@ class MainNamespace(BaseNamespace):
                             executionOnly = root.ice_token["icetype"] != "normal"
                             allow_connect = True
                             plugins_list = response['plugins']
+                            try:
+                                isTrial_val = configvalues.get("isTrial")
+                                LicenseType = response["license_data"]["LicenseTypes"].lower()
+                                config_path = os.environ["AVO_ASSURE_HOME"]+os.sep+"assets\config.json"
+                                isTrial_update = ''
+                                if LicenseType == "trial" and isTrial_val != 1:
+                                    isTrial_update = 1
+                                if LicenseType != "trial" and isTrial_val != 0:
+                                    isTrial_update = 0
+                                if isTrial_update != '':
+                                    with open(config_path,'r+') as f:
+                                        data = json.load(f)
+                                        data['isTrial'] = int(isTrial_update)
+                                        f.seek(0)
+                                        json.dump(data, f, indent=4)
+                                        f.truncate()
+                                        logger.print_on_console("Your license is upgraded, Please restart Avo Assure client to continue.")
+                                        wx.MessageBox("Your license is upgraded, Please restart Avo Assure client to continue.")
+                            except Exception as e:
+                                log.error(e)
+                                log.info("Error occurred while changing isTrail value in config.json")
                             if root.gui:
                                 wx.CallAfter(cw.enable_disconnect)
                             controller.disconnect_flag=False
@@ -426,8 +447,8 @@ class MainNamespace(BaseNamespace):
             if (type(d)==dict): action = d['action']
             else: action = None
             if action == 'update_dataset':
-                import iris_operations
-                iris_operations.update_dataset(d,socketIO)
+                import iris_operations_ai
+                iris_operations_ai.update_dataset(d,socketIO)
             else:
                 global browsername, desktopScrapeObj, desktopScrapeFlag
                 browsername = args
@@ -854,7 +875,7 @@ class MainNamespace(BaseNamespace):
             spath=spath['linux']
         else:
             spath=spath["default"]
-        if readconfig.configvalues["isTrial"] == 1 :
+        if  len(spath) == 0 :
             constants.SCREENSHOT_PATH = os.getcwd()+OS_SEP+'screenshots'
         elif len(spath) != 0 and os.path.exists(spath):
             constants.SCREENSHOT_PATH=os.path.normpath(spath)+OS_SEP
@@ -897,8 +918,8 @@ class MainNamespace(BaseNamespace):
                             log.error( 'Unable to delete '+ s +' dir' )
             else:
                 constants.PREDICTION_IMG_DIR="Disabled"
-                logger.print_on_console("Object Prediction Manual Training disabled since user does not have sufficient privileges for object prediction dataset folder\n")
-                log.info("Object Prediction Manual Training disabled since user does not have sufficient privileges for object prediction dataset folder\n")
+                # logger.print_on_console("Object Prediction Manual Training disabled since user does not have sufficient privileges for object prediction dataset folder\n")
+                # log.info("Object Prediction Manual Training disabled since user does not have sufficient privileges for object prediction dataset folder\n")
 
     def on_generateFlowGraph(self,*args):
         try:
