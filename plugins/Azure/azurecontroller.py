@@ -21,10 +21,10 @@ import base64
 
 
 class AzureWindow():
-    jira = None
-    def __init__(self,x=0):
-        self.x = x
-        self.jira_details=None
+    # jira = None
+    # def __init__(self,x=0):
+    #     self.x = x
+    #     self.jira_details=None
 
     def connectJIRA(self,jira_serverlocation , jira_uname , jira_pwd ):
         try:
@@ -34,7 +34,7 @@ class AzureWindow():
         except Exception as e:
             logger.print_on_console("Failed to connect to JIRA")
 
-    def getAllAutoDetails(self,azure_input_dict,socket):
+    def get_all_auto_details(self,azure_input_dict,socket):
         """
             Method to login using the user provided credentials and get projects, issue type lists
             related to user credentials
@@ -48,7 +48,7 @@ class AzureWindow():
         azure = None
 
         try:
-           #Azure changes
+            #Azure changes
             pat = azure_input_dict['azurepat']
             authorization = str(base64.b64encode(bytes(':'+pat, 'ascii')), 'ascii')
             headers = {
@@ -90,7 +90,7 @@ class AzureWindow():
                 socket.emit('auto_populate','Fail')
             logger.print_on_console('Exception in login and auto populating data')
 
-    def getConfigureFields(self,azure_input_dict,socket):
+    def get_configure_fields(self,azure_input_dict,socket):
         """
             Method to get Configure fields using the user selected project and issue_type
             returns list of Configurable fields
@@ -101,8 +101,6 @@ class AzureWindow():
         project_key=None
         project_name=None
         try:
-
-
 
              #Azure changes
             pat = azure_input_dict['azurepat']
@@ -219,9 +217,13 @@ class AzureWindow():
                 JsonObject = respon.json()
                 if len(JsonObject)>0:
                     ids = ''
-                    for details in JsonObject['workItems'][-20:-1]:
+                    list_count = 0
+                    for details in JsonObject['workItems'][::-1]:
+                        if list_count >= 100:
+                            break
                         ids += str(details['id'])
-                        ids+=','
+                        ids += ','
+                        list_count += 1
 
                 # call api to fetch name of user stories
                 ids = ids[:-1]
@@ -450,8 +452,6 @@ class AzureWindow():
 
                 if value['name'] == 'Repro Steps':
                     data = azure_input_dict['info']['reproSteps']['value']
-                if value['name'] == 'Found In':
-                    data = 'demo'
                 patch_document.append(
                      {
                         "op": "add",
@@ -460,51 +460,8 @@ class AzureWindow():
                         "value": data
                     }
                 )
-                to_make = [
-                        {
-                            "op": "add",
-                            "path": "/fields/System.Title",
-                            "value": "Bug created using API march 29"
-                        },{
-                            "op": "add",
-                            "path": "/fields/Microsoft.VSTS.TCM.ReproSteps",
-                            "value": "Bug created using API"
-                        },{
-                            "op": "add",
-                            "path": "/fields/Microsoft.VSTS.Common.Priority",
-                            "value": "1"
-                        },{
-                            "op": "add",
-                            "path": "/fields/Microsoft.VSTS.Common.Severity",
-                            "value": "2 - High"
-                        },{
-                            "op": "add",
-                            "path": "/fields/System.IterationPath",
-                            "value": "AvoAssure"
-                        },{
-                            "op": "add",
-                            "path": "/fields/System.AreaPath",
-                            "value": "AvoAssure\Product Team"
-                        },{
-                            "op": "add",
-                            "path": "/fields/System.State",
-                            "value": "New"
-                        },{
-                            "op": "add",
-                            "path": "/fields/Microsoft.VSTS.Common.ValueArea",
-                            "value": "Business"
-                        },{
-                            "op": "add",
-                            "path": "/fields/Custom.Build#",
-                            "value": "Avo Assure v22.3.0-rc.1"
-                        },{
-                            "op": "add",
-                            "path": "/fields/Microsoft.VSTS.Build.FoundIn",
-                            "value": "demo"
-                        }]
             respon = requests.patch(endpoint_url, headers=headers, data=json.dumps(patch_document))
 
-            
             if respon.status_code == 200:
                 res = []
                 JsonObject = respon.json()

@@ -827,13 +827,13 @@ class MainNamespace(BaseNamespace):
             obj = azurecontroller.AzureWindow()
             if args[0] == Azure_ACTION_1:
                 data = args[1]
-                obj.getAllAutoDetails(data,socketIO)
+                obj.get_all_auto_details(data,socketIO)
             elif args[0] == Azure_ACTION_2:
                 data = args[1]
                 obj.get_createWorkItem(data,socketIO)
             elif args[0] == Azure_ACTION_3:
                 data = args[1]
-                obj.getConfigureFields(data,socketIO)
+                obj.get_configure_fields(data,socketIO)
             elif args[0] == Azure_ACTION_4:
                 data = args[1]
                 obj.get_projects(data,socketIO)

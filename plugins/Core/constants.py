@@ -513,11 +513,6 @@ Azure_ACTION_8 = 'azureTestSuites'
 
 Azure_ACTION_9 = 'azureTestCases'
 
-
-
-
-
-
 STATIC_NONE = "{#@#n_o_n_e#@#}"
 
 STATIC_DV_NAME = "{#@#n_u_m#@#}"
