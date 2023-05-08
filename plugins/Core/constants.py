@@ -494,6 +494,25 @@ JIRA_ACTION_4 = 'jiraLogin'
 
 JIRA_ACTION_5 = 'getJiraTestcases'
 
+# Azure variables
+Azure_ACTION_1 = 'loginToAzure'
+
+Azure_ACTION_2 = 'createIssueInAzure'
+
+Azure_ACTION_3 = 'getAzureConfigureFields'
+
+Azure_ACTION_4 = 'azureLogin'
+
+Azure_ACTION_5 = 'getAzureTestcases'
+
+Azure_ACTION_6 = 'azureUserStories'
+
+Azure_ACTION_7 = 'azureTestPlans'
+
+Azure_ACTION_8 = 'azureTestSuites'
+
+Azure_ACTION_9 = 'azureTestCases'
+
 STATIC_NONE = "{#@#n_o_n_e#@#}"
 
 STATIC_DV_NAME = "{#@#n_u_m#@#}"
