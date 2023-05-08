@@ -26,13 +26,13 @@ class AzureWindow():
     #     self.x = x
     #     self.jira_details=None
 
-    def connectJIRA(self,jira_serverlocation , jira_uname , jira_pwd ):
-        try:
-            jira_options = {'server': jira_serverlocation}
-            jira = JIRA(options=jira_options,basic_auth=(jira_uname,jira_pwd))
-            return jira
-        except Exception as e:
-            logger.print_on_console("Failed to connect to JIRA")
+    # def connectJIRA(self,jira_serverlocation , jira_uname , jira_pwd ):
+    #     try:
+    #         jira_options = {'server': jira_serverlocation}
+    #         jira = JIRA(options=jira_options,basic_auth=(jira_uname,jira_pwd))
+    #         return jira
+    #     except Exception as e:
+    #         logger.print_on_console("Failed to connect to JIRA")
 
     def get_all_auto_details(self,azure_input_dict,socket):
         """
