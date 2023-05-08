@@ -517,7 +517,7 @@ class Dispatcher:
                                     if teststepproperty.custname in v:
                                         objectname=v[teststepproperty.custname]
                                         UserObjectScrape.update_data[str(teststepproperty.stepnum)]=v
-                                webelement = self.getwebelement(driver,objectname,teststepproperty.stepnum,teststepproperty.custname)
+                                webelement = self.getwebelement(driver,objectname,teststepproperty.stepnum,teststepproperty.custname, teststepproperty.identifiers)
                                 if(obj_flag!=False):
                                     import UserObjectScrape
                                     webscrape=UserObjectScrape.UserObject()
@@ -851,14 +851,35 @@ class Dispatcher:
                 webElement=getattr(driver,self.identifier_dict[type])(identifier)
             if len(webElement) == 1:
                 webElement=webElement[0]
-                logger.print_on_console('Webelement found by OI '+id_num)
-                local_Wd.log.info('Webelement found by OI '+id_num)
+                try:
+                    identifier_fullname = {'xpath':'Absolute X-Path',
+                                            'id':'ID Attribute',
+                                            'rxpath':'Relative X-Path',
+                                            'name':'Name Attribute',
+                                            'classname':'Classname Attribute',
+                                            'css_selector':'CSS Selector'}
+                    logger.print_on_console(f'Webelement found by OI "{identifier_fullname[type]}"')
+                    local_Wd.log.info(f'Webelement found by OI "{str(type)}"')
+                except:
+                    logger.print_on_console(f'Webelement found by OI "{id_num}"')
+                    local_Wd.log.info(f'Webelement found by OI "{id_num}"')
             else: webElement = None
         except Exception as e:
             local_Wd.log.error(e,exc_info=True)
         return webElement
 
-    def getwebelement(self,driver,objectname,stepnum,custname):
+    def update_identifiers(self, modified_identifiers):
+        updated_identifiers = {}
+        for i in range(len(modified_identifiers)):
+            key = modified_identifiers[i]['identifier']
+            value = modified_identifiers[i]['id']
+            if key != 'classname':
+                updated_identifiers[key] = int(value)-1
+            else:
+                updated_identifiers[key] = int(value)
+        return updated_identifiers
+
+    def getwebelement(self,driver,objectname,stepnum,custname,modified_identifiers):
         global obj_flag,simple_debug_gwto
         obj_flag=False
         webElement = None
@@ -868,35 +889,52 @@ class Dispatcher:
             local_Wd.log.debug('Identifiers are ')
             local_Wd.log.debug(identifiers)
             global finalXpath
-            #Absolute xpath is used to locate web element first as it doesn't change like relative xpath.
+            updated_identifiers = self.update_identifiers(modified_identifiers)
             if len(identifiers)>=3:
                 delayconst = int(configvalues['element_load_timeout'])
                 for i in range(delayconst):
                 #find by absolute xpath
-                    webElement=self.element_locator(driver,'xpath',identifiers[0],'1')
-                    if (webElement):
-                        finalXpath = identifiers[0]
-                    if not(webElement):
-                        #find by id
-                        webElement=self.element_locator(driver,'id',identifiers[1],'2')
+                    # webElement=self.element_locator(driver,'xpath',identifiers[0],'1')
+                    # if (webElement):
+                    #     finalXpath = identifiers[0]
+                    # if not(webElement):
+                    #     #find by id
+                    #     webElement=self.element_locator(driver,'id',identifiers[1],'2')
+                    #     if not(webElement):
+                    #         #find by relative xpath
+                    #         webElement=self.element_locator(driver,'rxpath',identifiers[2],'3')
+                    #         if (webElement):
+                    #             finalXpath = identifiers[2]
+                    #         if not(webElement):
+                    #             #find by name
+                    #             webElement=self.element_locator(driver,'name',identifiers[3],'4')
+                    #             if not(webElement):
+                    #                 #find by classname
+                    #                 webElement=self.element_locator(driver,'classname',identifiers[5],'5')
+                    #                 if not(webElement):
+                    #                 #find by css selector
+                    #                     if len(identifiers) > 11:
+                    #                         webElement=self.element_locator(driver,'css_selector',identifiers[11],'6')
+                    #                     if not(webElement):
+                    #                         webElement=None
+                    #                         local_Wd.log.info("Weblement not found with Primary identifers")
+
+                    # This code will handle the above commented code
+                    identifiers_list = list(updated_identifiers.keys())
+                    identifiers_sequence = {'xpath':0,'id':1,'rxpath':2,'name':3,'classname':5,'css_selector':11}
+                    for i in range(len(identifiers_list)):
+                        identifiers_type = identifiers_list[i]
+                        identifiers_index = identifiers_sequence[identifiers_type]
+                        if identifiers_type != 'classname':
+                            identifiers_id = str(identifiers_index + 1)
+                        else:
+                            identifiers_id = str(identifiers_index)
+                        webElement=self.element_locator(driver,identifiers_type,identifiers[identifiers_index],identifiers_id)
                         if not(webElement):
-                            #find by relative xpath
-                            webElement=self.element_locator(driver,'rxpath',identifiers[2],'3')
-                            if (webElement):
-                                finalXpath = identifiers[2]
-                            if not(webElement):
-                                #find by name
-                                webElement=self.element_locator(driver,'name',identifiers[3],'4')
-                                if not(webElement):
-                                    #find by classname
-                                    webElement=self.element_locator(driver,'classname',identifiers[5],'5')
-                                    if not(webElement):
-                                    #find by css selector
-                                        if len(identifiers) > 11:
-                                            webElement=self.element_locator(driver,'css_selector',identifiers[11],'6')
-                                        if not(webElement):
-                                            webElement=None
-                                            local_Wd.log.info("Weblement not found with Primary identifers")
+                            webElement=None
+                            local_Wd.log.info(f'Webelement not found with Primary identifers "{identifiers_type}"')
+                        else:
+                            break
                     if (webElement):
                         break
                     else:
