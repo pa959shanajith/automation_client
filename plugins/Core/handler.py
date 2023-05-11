@@ -567,7 +567,10 @@ class Handler():
         apptype=step['appType']
         inputval=step['inputVal']
         objectname=step['objectName']
-        identifiers=step['identifier']
+        if 'identifier' in step:
+            identifiers=step['identifier']
+        else:
+            identifiers = ''
         outputval=step['outputVal'].strip()
         stepnum=step['stepNo']
         url=step['url']
