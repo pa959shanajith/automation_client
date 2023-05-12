@@ -658,7 +658,7 @@ class Dispatcher:
                             result[3]=err_msg
                         if(err_msg): return result
                     identifiers = objectname.split(';')
-                    input=identifiers
+                    input=identifiers[0]
 
                 if result != TERMINATE:
 
