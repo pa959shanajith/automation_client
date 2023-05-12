@@ -137,7 +137,9 @@ class Textbox_keywords():
                                 element.clear()
                             encryption_obj = AESCipher()
                             input_val = encryption_obj.decrypt(input)
-                            if SYSTEM_OS != 'Darwin': element.set_text(input_val)
+                            if SYSTEM_OS != 'Darwin': 
+                                element.set_text(input_val)
+                                status=TEST_RESULT_PASS
                             else: element.set_value(input_val)
                             configvalues = readconfig.configvalues
                             hide_soft_key = configvalues['hide_soft_key']
