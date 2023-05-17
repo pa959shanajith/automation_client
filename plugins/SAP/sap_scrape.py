@@ -32,7 +32,7 @@ class ScrapeWindow(wx.Frame):
         try:
             self.uk=SapUtilKeywords()
             wx.Frame.__init__(self, parent, title=title,
-                    pos = (300, 150), size = (210, 150), style=wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER | wx.MAXIMIZE_BOX | wx.CLOSE_BOX) )
+                    pos = (300, 150), size = (360, 310), style=wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER | wx.MAXIMIZE_BOX | wx.CLOSE_BOX) )
             self.SetBackgroundColour('#e6e7e8')
             self.iconpath = os.environ["IMAGES_PATH"] + "/avo.ico"
             self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
@@ -45,26 +45,41 @@ class ScrapeWindow(wx.Frame):
             windowname = filePath.split(';')[1]
             input_val.append(fileLoc)
             input_val.append(windowname)
+            self.choice='Manual'
             status = obj.launch_application(input_val)
             self.scrapeoptions = ['Full', 'Button', 'Textbox', 'Dropdown', 'Label', 'Radiobutton', 'Checkbox', 'Table', 'Scroll Bar', 'Tab', 'Shell', 'SContainer', 'Other Tags']
             self.tag_map = {'Full':'full','Button':'button', 'Textbox':'input', 'Dropdown':'select', 'Label':'label', 'Radiobutton':'radiobutton', 'Checkbox':'checkbox', 'Table':'table', 'Scroll Bar':'GuiScrollContainer', 'Tab':'GuiTab', 'Shell':'shell', 'SContainer':'scontainer', 'Other Tags':'others'}
             if ( status != TERMINATE ):
                 self.panel = wx.Panel(self)
                 self.vsizer = wx.BoxSizer(wx.VERTICAL)
-                self.startbutton = wx.ToggleButton(self.panel, label = "Start ClickAndAdd", pos=(12, 18), size=(175, 25))
+                self.startbutton = wx.ToggleButton(self.panel, label = "Start ClickAndAdd", pos=(20, 20), size=(300, 30))
                 self.startbutton.Bind(wx.EVT_TOGGLEBUTTON, self.clickandadd)
 
-                self.fullscrapedropdown = wx.ComboBox(self.panel, value = "Full", pos = (12, 48), size = (87.5, 25), choices = self.scrapeoptions, style = wx.CB_DROPDOWN)
+                self.fullscrapedropdown = wx.ComboBox(self.panel, value = "Full", pos = (20, 60), size = (145, 30), choices = self.scrapeoptions, style = wx.CB_DROPDOWN)
                 self.fullscrapedropdown.SetEditable(False)
                 self.fullscrapedropdown.SetToolTip(wx.ToolTip( "Full objects will be scraped" ))
 
-                self.fullscrapebutton = wx.Button(self.panel, label="Scrape", pos = (101, 48), size = (86, 25))
+                self.fullscrapebutton = wx.Button(self.panel, label="Scrape", pos = (175, 60), size = (145, 30))
                 self.fullscrapebutton.Bind(wx.EVT_BUTTON, self.fullscrape)
 
+                lblList = ['Manual', 'Auto']
+                self.rbox = wx.RadioBox(self.panel,label = 'Capture options',  choices = lblList , pos = (20,140), size = (300,60), style = wx.RA_SPECIFY_COLS)
+                self.rbox.Bind(wx.EVT_RADIOBOX,self.onRadioBox)
+
                 import cropandadd
-                global cropandaddobj
-                cropandaddobj = cropandadd.Cropandadd()
-                self.cropbutton = wx.ToggleButton(self.panel, label = "Start IRIS", pos = (12, 78), size = (175, 25))
+                import cropandadd_auto
+
+
+                global cropandaddobj_manual
+                global cropandaddobj_auto
+
+
+                # import cropandadd
+                # global cropandaddobj
+                # cropandaddobj = cropandadd.Cropandadd()
+                cropandaddobj_manual = cropandadd.Cropandadd()
+                cropandaddobj_auto = cropandadd_auto.Cropandadd()
+                self.cropbutton = wx.ToggleButton(self.panel, label = "Start IRIS", pos = (20, 210), size = (300, 30))
                 self.cropbutton.Bind(wx.EVT_TOGGLEBUTTON, self.cropandadd)
                 self.Centre()
                 style = self.GetWindowStyle()
@@ -168,18 +183,31 @@ class ScrapeWindow(wx.Frame):
         SapGui = self.uk.getSapObject()
         wndname = sap_scraping_obj.getWindow(SapGui)
         state = event.GetEventObject().GetValue()
-        global cropandaddobj
+        global cropandaddobj_manual
+        global cropandaddobj_auto
+        #global cropandaddobj
         if ( state == True ):
             self.fullscrapebutton.Disable()
             self.startbutton.Disable()
             event.GetEventObject().SetLabel("Stop IRIS")
-            status = cropandaddobj.startcropandadd(self)
+            if self.choice=='Auto':
+                status = cropandaddobj_auto.startcropandadd(self)
+                        #logger.print_on_console(self.choice)
+            else:
+                status = cropandaddobj_manual.startcropandadd(self)
+            #status = cropandaddobj.startcropandadd(self)
         else:
             self.Hide()
             import cv2
             cv2.destroyAllWindows()
             time.sleep(1)
-            d = cropandaddobj.stopcropandadd()
+
+            if self.choice=='Auto':
+                d = cropandaddobj_auto.stopcropandadd()
+
+            else:
+                d = cropandaddobj_manual.stopcropandadd()
+            #d = cropandaddobj.stopcropandadd()
             self.socketIO.emit('scrape',d)
             self.parent.schedule.Enable()
             self.Close()
@@ -203,3 +231,7 @@ class ScrapeWindow(wx.Frame):
         if ( len( new_data ) == 0 ):
             log.error('Unable to find object_type : ' + tag_choice + ' when scraping ')
         return new_data
+    
+    def onRadioBox(self,e):
+        self.choice=self.rbox.GetStringSelection()
+        #logger.print_on_console(self.choice)
