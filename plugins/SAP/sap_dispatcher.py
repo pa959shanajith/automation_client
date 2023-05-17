@@ -30,7 +30,7 @@ import sap_constants
 import constants
 import screenshot_keywords
 import readconfig
-import iris_operations
+import iris_operations_ai
 
 class SAPDispatcher:
 
@@ -47,7 +47,7 @@ class SAPDispatcher:
     shell_tree_keywords_obj = sap_shell_tree_keywords.Shell_Tree_Keywords()
     shell_calendar_keywords_obj = sap_shell_calendar_keywords.Shell_Calendar_Keywords()
     scontainer_keywords_obj = sap_scontainer_keywords.SContainer_Keywords()
-    iris_object = iris_operations.IRISKeywords()
+    iris_object = iris_operations_ai.IRISKeywords()
     sap_dict = {
         #------------------------------------------------------launch keywords
         'launchapplication' : launch_keywords_obj.launch_application,
