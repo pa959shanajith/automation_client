@@ -1449,76 +1449,84 @@ class TableOperationKeywords():
                         try:
                             lightning = len(webElement.find_elements_by_xpath('.//ancestor::lightning-datatable'))>0
                         except:
+
                             lightning = False
-                        if webElement.tag_name.lower() != 'table' and webElement.get_attribute('role') == 'grid':
-                            body = True
-                            right = True
-                            if len(input_val)>=3:
-                                if (input_val[1].lower() == 'body') : body = True
-                                elif (input_val[1].lower() == 'header') : body = False
-                                else: err_msg = "Invalid input"
-                                if (input_val[2].lower() == 'right') : right = True
-                                elif (input_val[2].lower() == 'left') : right = False
-                                elif not(err_msg): err_msg = "Invalid input"
-                            if not (err_msg):
-                                if body:
-                                    if right:
-                                        try:
-                                            container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-body-container')]")
-                                        except:
-                                            container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-center-cols-container')]")
-                                    else:
-                                        container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-pinned-left-cols-container')]")
-                                    rows = container.find_elements_by_xpath(".//div[@role='row']")
-                                else:
-                                    if right:
-                                        container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-header-viewport')]")
-                                    else:
-                                        container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-pinned-left-header')]")
-                                    rows = container.find_elements_by_xpath(".//div[contains(@class,'ag-header-row')]")
-                                for i in range(len(rows)):
+                        if webElement.tag_name.lower() == 'div' and webElement.get_attribute('role') == 'grid':
+                            cell = webElement.find_element_by_xpath(".//div[@role='cell']/*[text()='"+text+"']").find_element_by_xpath("..")
+                            row = cell.find_element_by_xpath("..")
+                            row_number = row.get_attribute('aria-rowindex')
+                            status=TEST_RESULT_PASS
+                            methodoutput=TEST_RESULT_TRUE
+                        else:                                                           
+                            if webElement.tag_name.lower() != 'table' and webElement.get_attribute('role') == 'grid':
+                                body = True
+                                right = True
+                                if len(input_val)>=3:
+                                    if (input_val[1].lower() == 'body') : body = True
+                                    elif (input_val[1].lower() == 'header') : body = False
+                                    else: err_msg = "Invalid input"
+                                    if (input_val[2].lower() == 'right') : right = True
+                                    elif (input_val[2].lower() == 'left') : right = False
+                                    elif not(err_msg): err_msg = "Invalid input"
+                                if not (err_msg):
                                     if body:
-                                        cells = rows[i].find_elements_by_xpath(".//div[@role='gridcell']")
+                                        if right:
+                                            try:
+                                                container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-body-container')]")
+                                            except:
+                                                container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-center-cols-container')]")
+                                        else:
+                                            container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-pinned-left-cols-container')]")
+                                        rows = container.find_elements_by_xpath(".//div[@role='row']")
                                     else:
-                                        cells = rows[i].find_elements_by_xpath(".//div[contains(@class,'ag-header-cell')]")
-                                    for j in range(len(cells)):
-                                        cellVal = self.getChildNodes(cells[j])
-                                        cellVal=cellVal.strip()
-                                        local_tk.log.debug("cellvalue:"+cellVal+" ; text:"+text+" ; attr:"+input_val[3])
-                                        if text in cellVal:
-                                            if len(input_val)==4:
-                                                row_number = rows[i].get_attribute(input_val[3])
-                                            else:
-                                                row_number = i+1
+                                        if right:
+                                            container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-header-viewport')]")
+                                        else:
+                                            container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-pinned-left-header')]")
+                                        rows = container.find_elements_by_xpath(".//div[contains(@class,'ag-header-row')]")
+                                    for i in range(len(rows)):
+                                        if body:
+                                            cells = rows[i].find_elements_by_xpath(".//div[@role='gridcell']")
+                                        else:
+                                            cells = rows[i].find_elements_by_xpath(".//div[contains(@class,'ag-header-cell')]")
+                                        for j in range(len(cells)):
+                                            cellVal = self.getChildNodes(cells[j])
+                                            cellVal=cellVal.strip()
+                                            local_tk.log.debug("cellvalue:"+cellVal+" ; text:"+text+" ; attr:"+input_val[3])
+                                            if text in cellVal:
+                                                if len(input_val)==4:
+                                                    row_number = rows[i].get_attribute(input_val[3])
+                                                else:
+                                                    row_number = i+1
+                                                break
+                                        if row_number:
                                             break
                                     if row_number:
-                                        break
+                                        status=TEST_RESULT_PASS
+                                        methodoutput=TEST_RESULT_TRUE
+                                    else:
+                                        err_msg = 'Error in fetching Row number'
+                                        local_tk.log.info('Error in fetching Row number')
+                                        logger.print_on_console('Error in fetching Row number')
+                            elif (lightning):
+                                cell=webElement.find_elements_by_xpath('//*[text()="'+text+'"]')
+                                if len(cell)!=0:
+                                    tr=cell[0].find_element_by_xpath('.//ancestor::tr')
+                                    rows=webElement.find_elements_by_xpath('.//tr')
+                                    for i in range(0,len(rows)):
+                                        if rows[i]==tr:
+                                            row_number=i+1
+                                            status=TEST_RESULT_PASS
+                                            methodoutput=TEST_RESULT_TRUE
+                                            break
+                                local_tk.log.info('Got the result : %s',str(row_number))
+                                logger.print_on_console('Got the result : ',str(row_number))
+                            else:
+                                js='var temp = fun(arguments[0], arguments[1]); return temp; function fun(table, str) {     var m = [],         row, cell, xx, tx, ty, xxx, yyy, child;     for (yyy = 0; yyy < table.rows.length; yyy++) {         row = table.rows[yyy];         for (xxx = 0; xxx < row.cells.length; xxx++) {             cell = row.cells[xxx];             xx = xxx;             for (; m[yyy] && m[yyy][xx]; ++xx) {}             for (tx = xx; tx < xx + cell.colSpan; ++tx) {                 for (ty = yyy; ty < yyy + cell.rowSpan; ++ty) {                     if (!m[ty]) m[ty] = [];                     m[ty][tx] = true;                 }             }             if (cell.innerText.indexOf(str)>= 0 && cell.innerText && cell.innerText.trim()==str) return yyy + cell.rowSpan;             if (cell.children.length > 0) {                 for (var i = 0; i < cell.children.length; i++) {                     child = cell.children[i];                     var value = child.value || child.innerText;                     if (value && value.trim() == str) return yyy + cell.rowSpan; 					else{ 					var a=value; 					if(a){ 					var b=a; 					if(b.indexOf(str)>=0 && b==str)return yyy + cell.rowSpan; 					}	 				}			 					                 }             }         }     }     return null; };'
+                                row_number=browser_Keywords.local_bk.driver_obj.execute_script(js,webElement,text)
                                 if row_number:
                                     status=TEST_RESULT_PASS
                                     methodoutput=TEST_RESULT_TRUE
-                                else:
-                                    err_msg = 'Error in fetching Row number'
-                                    local_tk.log.info('Error in fetching Row number')
-                                    logger.print_on_console('Error in fetching Row number')
-                        elif (lightning):
-                            cell=webElement.find_elements_by_xpath('//*[text()="'+text+'"]')
-                            if len(cell)!=0:
-                                tr=cell[0].find_element_by_xpath('.//ancestor::tr')
-                                rows=webElement.find_elements_by_xpath('.//tr')
-                                for i in range(0,len(rows)):
-                                    if rows[i]==tr:
-                                        row_number=i+1
-                                        status=TEST_RESULT_PASS
-                                        methodoutput=TEST_RESULT_TRUE
-                                        break
-                            local_tk.log.info('Got the result : %s',str(row_number))
-                            logger.print_on_console('Got the result : ',str(row_number))
-                        else:
-                            js='var temp = fun(arguments[0], arguments[1]); return temp; function fun(table, str) {     var m = [],         row, cell, xx, tx, ty, xxx, yyy, child;     for (yyy = 0; yyy < table.rows.length; yyy++) {         row = table.rows[yyy];         for (xxx = 0; xxx < row.cells.length; xxx++) {             cell = row.cells[xxx];             xx = xxx;             for (; m[yyy] && m[yyy][xx]; ++xx) {}             for (tx = xx; tx < xx + cell.colSpan; ++tx) {                 for (ty = yyy; ty < yyy + cell.rowSpan; ++ty) {                     if (!m[ty]) m[ty] = [];                     m[ty][tx] = true;                 }             }             if (cell.innerText.indexOf(str)>= 0 && cell.innerText && cell.innerText.trim()==str) return yyy + cell.rowSpan;             if (cell.children.length > 0) {                 for (var i = 0; i < cell.children.length; i++) {                     child = cell.children[i];                     var value = child.value || child.innerText;                     if (value && value.trim() == str) return yyy + cell.rowSpan; 					else{ 					var a=value; 					if(a){ 					var b=a; 					if(b.indexOf(str)>=0 && b==str)return yyy + cell.rowSpan; 					}	 				}			 					                 }             }         }     }     return null; };'
-                            row_number=browser_Keywords.local_bk.driver_obj.execute_script(js,webElement,text)
-                            if row_number:
-                                status=TEST_RESULT_PASS
-                                methodoutput=TEST_RESULT_TRUE
                         local_tk.log.info('Got the result : %s',str(row_number))
                         logger.print_on_console('Got the result : ',str(row_number))
                     except Exception as e:
@@ -1792,7 +1800,7 @@ function dropdowncallie(op) {
         def javascriptExecutor(self,webElement,row_num,col_num):
             remoteWebElement=None
             try:
-                js='var temp = fun(arguments[0], arguments[2], arguments[1]); return temp;  function fun(table, x, y) {     var m = [],         row, cell, xx, tx, ty, xxx, yyy;     for (yyy = 0; yyy < table.rows.length; yyy++) {         row = table.rows[yyy];         for (xxx = 0; xxx < row.cells.length; xxx++) {             cell = row.cells[xxx];             xx = xxx;             for (; m[yyy] && m[yyy][xx]; ++xx) {}             for (tx = xx; tx < xx + cell.colSpan; ++tx) {                 for (ty = yyy; ty < yyy + cell.rowSpan; ++ty) {                     if (!m[ty]) m[ty] = [];                     m[ty][tx] = true;                 }             }             if (xx <= x && x < xx + cell.colSpan && yyy <= y && y < yyy + cell.rowSpan) return cell;         }     }     return null; };'
+                js='var temp = fun(arguments[0], arguments[2], arguments[1]); return temp;  function fun(table, x, y) {     var m = [],         row, cell, xx, tx, ty, xxx, yyy;     for (yyy = 0; yyy < table.rows.length; yyy++) {         row = table.rows[yyy];    if (row.style!=undefined && row.style.display=="none")    {y++;continue;};     for (xxx = 0; xxx < row.cells.length; xxx++) {             cell = row.cells[xxx];             xx = xxx;             for (; m[yyy] && m[yyy][xx]; ++xx) {}             for (tx = xx; tx < xx + cell.colSpan; ++tx) {                 for (ty = yyy; ty < yyy + cell.rowSpan; ++ty) {                     if (!m[ty]) m[ty] = [];                     m[ty][tx] = true;                 }             }             if (xx <= x && x < xx + cell.colSpan && yyy <= y && y < yyy + cell.rowSpan) return cell;         }     }     return null; };'
                 remoteWebElement=browser_Keywords.local_bk.driver_obj.execute_script(js,webElement,row_num,col_num)
             except Exception as e:
                 local_tk.log.error(e)

@@ -180,6 +180,7 @@ class Dispatcher:
             'getattributevalue': local_Wd.util_object.get_attribute_value,
             'verifyattribute': local_Wd.util_object.verify_attribute,
             'verifystyle': local_Wd.util_object.verify_style,
+            'getelementcount': local_Wd.util_object.get_element_count,
 
             'openbrowser':local_Wd.browser_object.openBrowser,
             'getbrowsertoforeground':local_Wd.browser_object.get_foreground_window,
