@@ -26,7 +26,7 @@ if (document.createEvent && element.hasAttribute('getRootNode') && element.getRo
 }
 return (evType);"""
 
-VERIFY_STYLE = """return window.getComputedStyle(arguments[0])[arguments[1]]==arguments[2]"""
+VERIFY_STYLE = """if (arguments[0].hasAttribute(arguments[1]) && arguments[0][arguments[1]]==arguments[2]) return true; return window.getComputedStyle(arguments[0])[arguments[1]]==arguments[2]"""
 
 GET_CELL_JS="""var temp = fun(arguments[0], arguments[2], arguments[1]); return temp;  function fun(table, x, y) {     var m = [],         row, cell, xx, tx, ty, xxx, yyy;     for (yyy = 0; yyy < table.rows.length; yyy++) {         row = table.rows[yyy];         for (xxx = 0; xxx < row.cells.length; xxx++) {             cell = row.cells[xxx];             xx = xxx;             for (; m[yyy] && m[yyy][xx]; ++xx) {}             for (tx = xx; tx < xx + cell.colSpan; ++tx) {                 for (ty = yyy; ty < yyy + cell.rowSpan; ++ty) {                     if (!m[ty]) m[ty] = [];                     m[ty][tx] = true;                 }             }             if (xx <= x && x < xx + cell.colSpan && yyy <= y && y < yyy + cell.rowSpan) return cell;         }     }     return null; };"""
 
