@@ -123,7 +123,6 @@ class AzureWindow():
             if respon.status_code == 200:
                 JsonObject = respon.json()
                 for details in JsonObject['value']:
-                    # if details['alwaysRequired']:
                     required_comp[details['name']] = details
 
             socket.emit('configure_field',required_comp)
@@ -200,10 +199,11 @@ class AzureWindow():
             # Azure DevOps organization URL
             org_url = azure_input_dict['azureBaseUrl']
             project_name = azure_input_dict['projectDetails']['name']
-            endpoint_url = f'{org_url}/{project_name}/_apis/wit/wiql?api-version=7.0'
+            skip_value = azure_input_dict['skip']
+            endpoint_url = f'{org_url}/{project_name}/_apis/wit/wiql?api-version=6.1'
 
             # WIQL query to fetch all user stories
-            wiql_query = "SELECT * FROM WorkItems WHERE [System.WorkItemType] = 'User Story' ORDER BY [System.Id]"
+            wiql_query = "SELECT * FROM WorkItems WHERE [System.WorkItemType] = 'User Story' ORDER BY [System.CreatedDate] DESC"
 
             # Request body with WIQL query
             body = {
@@ -215,20 +215,24 @@ class AzureWindow():
 
             if respon.status_code == 200:
                 JsonObject = respon.json()
+                total_count = len(JsonObject['workItems'])
                 if len(JsonObject)>0:
                     ids = ''
                     list_count = 0
-                    for details in JsonObject['workItems'][::-1]:
+                    start_index = skip_value
+                    end_index = start_index + 100
+                    for details in JsonObject['workItems'][start_index:end_index]:
                         if list_count >= 100:
                             break
                         ids += str(details['id'])
                         ids += ','
                         list_count += 1
-
+                        
                 # call api to fetch name of user stories
                 ids = ids[:-1]
+                # maximum limit of API response data  200
                 endpoint_url = f'{org_url}/{project_name}/_apis/wit/workitems?ids={ids}&api-version=7.0'
-
+                
                 # Send request to API endpoint
                 respon = requests.get(endpoint_url, headers=headers)
 
@@ -237,6 +241,7 @@ class AzureWindow():
                     if len(JsonObject)>0:
                         res = {}
                         res['userStories'] = JsonObject['value']
+                        res['total_count'] = total_count
 
             # if(';' in org_url):
             #     log.debug('Connecting to JIRA through proxy')
