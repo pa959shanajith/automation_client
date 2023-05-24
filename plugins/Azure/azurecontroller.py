@@ -201,14 +201,10 @@ class AzureWindow():
             # Azure DevOps organization URL
             org_url = azure_input_dict['azureBaseUrl']
             project_name = azure_input_dict['projectDetails']['name']
-            topValue = 100
             skipValue = azure_input_dict['skip']
-            # &$skip={skipValue}
-            # &$top={topValue}
             endpoint_url = f'{org_url}/{project_name}/_apis/wit/wiql?api-version=6.1'
 
             # WIQL query to fetch all user stories
-            # wiql_query = "SELECT * FROM WorkItems WHERE [System.WorkItemType] = 'User Story' ORDER BY [System.Id]"
             wiql_query = "SELECT * FROM WorkItems WHERE [System.WorkItemType] = 'User Story' ORDER BY [System.CreatedDate] DESC"
 
             # Request body with WIQL query
@@ -227,7 +223,6 @@ class AzureWindow():
                     list_count = 0
                     start_index = skipValue
                     end_index = start_index + 100
-                    # for details in JsonObject['workItems'][::-1]:
                     for details in JsonObject['workItems'][start_index:end_index]:
                         if list_count >= 100:
                             break
@@ -237,7 +232,7 @@ class AzureWindow():
                         
                 # call api to fetch name of user stories
                 ids = ids[:-1]
-                # maximum count 200
+                # maximum limit of API response data  200
                 endpoint_url = f'{org_url}/{project_name}/_apis/wit/workitems?ids={ids}&api-version=7.0'
                 
                 # Send request to API endpoint
