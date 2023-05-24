@@ -199,7 +199,7 @@ class AzureWindow():
             # Azure DevOps organization URL
             org_url = azure_input_dict['azureBaseUrl']
             project_name = azure_input_dict['projectDetails']['name']
-            skipValue = azure_input_dict['skip']
+            skipvalue = azure_input_dict['skip']
             endpoint_url = f'{org_url}/{project_name}/_apis/wit/wiql?api-version=6.1'
 
             # WIQL query to fetch all user stories
@@ -219,7 +219,7 @@ class AzureWindow():
                 if len(JsonObject)>0:
                     ids = ''
                     list_count = 0
-                    start_index = skipValue
+                    start_index = skipvalue
                     end_index = start_index + 100
                     for details in JsonObject['workItems'][start_index:end_index]:
                         if list_count >= 100:
