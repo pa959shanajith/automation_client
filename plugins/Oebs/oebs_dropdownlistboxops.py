@@ -835,7 +835,7 @@ class DropdownListboxOperations:
                                     childacc = acc.getAccessibleChildFromContext(int(index))
                                     childcontext = childacc.getAccessibleContextInfo()
                                     fetchedname = childcontext.name
-                                    if(childname == fetchedname):
+                                    if(childname.strip() == fetchedname.strip()):
                                         acc.addAccessibleSelectionFromContext(index)
                                         status = TEST_RESULT_PASS
                                         methodoutput = TEST_RESULT_TRUE
@@ -851,7 +851,7 @@ class DropdownListboxOperations:
                                     listObj=acc.getAccessibleChildFromContext(index)
                                     labelContext=listObj.getAccessibleContextInfo()
                                     fetchedname=labelContext.name
-                                    if(childname == fetchedname):
+                                    if(childname.strip() == fetchedname.strip()):
                                         break
                                     else:
                                         if index < int(children -1):
@@ -906,7 +906,7 @@ class DropdownListboxOperations:
                                 childacc = acc.getAccessibleChildFromContext(int(index))
                                 childcontext = childacc.getAccessibleContextInfo()
                                 fetchedname = childcontext.name
-                                if(childname == fetchedname):
+                                if(childname.strip() == fetchedname.strip()):
                                     acc.addAccessibleSelectionFromContext(index)
                                     status = TEST_RESULT_PASS
                                     methodoutput = TEST_RESULT_TRUE
@@ -932,7 +932,7 @@ class DropdownListboxOperations:
                                     listContext=acc.getAccessibleChildFromContext(index)
                                     labelContext=listContext.getAccessibleContextInfo()
                                     fetchedname=labelContext.name
-                                    if(childname == fetchedname):
+                                    if(childname.strip() == fetchedname.strip()):
                                         break
                                     else:
                                         if index < int(children -1):
