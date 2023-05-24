@@ -123,8 +123,6 @@ class AzureWindow():
             if respon.status_code == 200:
                 JsonObject = respon.json()
                 for details in JsonObject['value']:
-                    # if details['name'] in ['Iteration Path', 'Area Path']:
-                    #     details['alwaysRequired'] = True
                     required_comp[details['name']] = details
 
             socket.emit('configure_field',required_comp)
