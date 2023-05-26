@@ -100,6 +100,10 @@ class AzureWindow():
         issue_type=azure_input_dict['issuetype']
         project_key=None
         project_name=None
+        data_area=[]
+        data_iteration=[]
+        area_paths=[]
+        iteration_paths=[]
         try:
 
              #Azure changes
@@ -113,6 +117,20 @@ class AzureWindow():
             org_url = azure_input_dict['azureBaseUrl']
             project_name = azure_input_dict['project']
 
+            # API endpoint URL for classification nodes
+            area_url = f'{org_url}/{project_name}/_apis/wit/classificationnodes/areas?$depth=2&api-version=6.1'
+            iteration_url = f'{org_url}/{project_name}/_apis/wit/classificationnodes/iterations?$depth=2&api-version=6.1'
+
+            response_area = requests.get(area_url, headers=headers)
+            if response_area.status_code == 200:
+                data_area = response_area.json()
+                area_paths = [{'id':node['id'],'name':node['name']} for node in data_area['children']]
+
+            response_iteration = requests.get(iteration_url, headers=headers)
+            if response_iteration.status_code == 200:
+                data_iteration = response_iteration.json()
+                iteration_paths = [{'id':node['id'],'name':node['name']} for node in data_iteration['children']]
+
             endpoint_url = f'{org_url}/{project_name}/_apis/wit/workitemtypes/{issue_type}/fields?$expand=all&api-version=7.0'
 
             
@@ -124,6 +142,8 @@ class AzureWindow():
                 JsonObject = respon.json()
                 for details in JsonObject['value']:
                     required_comp[details['name']] = details
+                required_comp['Area_Paths'] = {'name':data_area['name'] or '','child':area_paths}
+                required_comp['Iteration_Paths'] = {'name':data_iteration['name'] or '','child':iteration_paths}
 
             socket.emit('configure_field',required_comp)
         except Exception as e:
@@ -452,6 +472,8 @@ class AzureWindow():
                 data = ""
                 if isinstance(value['data'], dict):
                     data = value['data']['text']
+                elif value['name'] == 'Area Path' or value['name'] == 'Iteration Path':
+                    data = f'{project_name}\\' + value['data']
                 else:
                     data = value['data']
 
