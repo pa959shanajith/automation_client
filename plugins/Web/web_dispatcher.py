@@ -587,6 +587,7 @@ class Dispatcher:
                     if(teststepproperty.name=="openBrowser"):
                         browser=teststepproperty.inputval[0]
                         self.browsers_sl[browser]["platform"]=self.sauce_conf["platform"]
+                        self.browsers_sl[browser]["version"]=self.sauce_conf["version"]
                         if browser in ['7','8'] and self.sauce_conf["platform"]!='Windows 10':
                             logger.print_on_console('Microsoft Edge browser is supported only in Windows 10')
                             return 'Terminate'

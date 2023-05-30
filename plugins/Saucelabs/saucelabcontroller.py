@@ -1,0 +1,118 @@
+#-------------------------------------------------------------------------------
+# Name:        module1
+# Purpose:
+#
+# Author:      rakesh.v
+#
+# Created:
+# Copyright:   (c) rakesh.v
+# Licence:     <your licence>
+#-------------------------------------------------------------------------------
+
+from jira.client import JIRA
+import os
+import logger
+import logging
+import requests
+from requests.auth import HTTPBasicAuth
+import json
+log = logging.getLogger("saucelabcontroller.py")
+import base64
+
+
+class SaucelabWindow():
+    # jira = None
+    # def __init__(self,x=0):
+    #     self.x = x
+    #     self.jira_details=None
+
+    # def connectJIRA(self,jira_serverlocation , jira_uname , jira_pwd ):
+    #     try:
+    #         jira_options = {'server': jira_serverlocation}
+    #         jira = JIRA(options=jira_options,basic_auth=(jira_uname,jira_pwd))
+    #         return jira
+    #     except Exception as e:
+    #         logger.print_on_console("Failed to connect to JIRA")
+
+    def get_details(self,saucelab_input_dict,socket):
+        """
+            Method to login to Azure and get the projects from Azure (Azure integration screen)
+            returns list of projects
+        """
+        res = "invalidcredentials"
+        try:
+           response = requests.get("https://app.saucelabs.com/rest/v1/info/platforms/webdriver/")
+           data = json.loads(response.text)
+           # Create empty lists and dictionary to hold the options for each dropdown
+           os_names = []
+           browser_names = {}
+           chrome_versions = []
+           firefox_versions = []
+           edge_versions = []
+           ie_versions = []
+           # Extract the OS name, browser name, and version for each platform and add them to the corresponding list
+           for platform in data:
+                os_name = platform['os']
+                browser_name = platform['long_name']
+                browser_version = platform['short_version']
+
+                # Add OS name to the list
+                if os_name not in os_names:
+                    os_names.append(os_name)
+
+                # Add browser versions to the corresponding browser dictionary
+                if browser_name == 'Google Chrome':
+                    if browser_name not in browser_names:
+                        browser_names[browser_name] = {}
+                    if browser_version.isdigit() and int(browser_version) >= 75:
+                        if browser_version not in chrome_versions:
+                            chrome_versions.append(browser_version)
+                        if os_name.startswith('Windows'):
+                            if os_name not in browser_names[browser_name]:
+                                browser_names[browser_name][os_name] = []
+                            browser_names[browser_name][os_name].append(browser_version)
+                elif browser_name == 'Firefox':
+                    if browser_name not in browser_names:
+                        browser_names[browser_name] = {}
+                    if browser_version.isdigit() and int(browser_version) >= 75:
+                        if browser_version not in firefox_versions:
+                            firefox_versions.append(browser_version)
+                        if os_name.startswith('Windows'):
+                            if os_name not in browser_names[browser_name]:
+                                browser_names[browser_name][os_name] = []
+                            browser_names[browser_name][os_name].append(browser_version)
+                elif browser_name == 'Microsoft Edge':
+                    if browser_name not in browser_names:
+                        browser_names[browser_name] = {}
+                    if browser_version.isdigit() and int(browser_version) >= 75:
+                        if browser_version not in edge_versions:
+                            edge_versions.append(browser_version)
+                        if os_name.startswith('Windows'):
+                            if os_name not in browser_names[browser_name]:
+                                browser_names[browser_name][os_name] = []
+                            browser_names[browser_name][os_name].append(browser_version)
+                elif browser_name == 'Internet Explorer':
+                    if browser_name not in browser_names:
+                        browser_names[browser_name] = {}
+                    if browser_version.isdigit():
+                        if browser_version not in ie_versions:
+                            ie_versions.append(browser_version)
+                        if os_name.startswith('Windows'):
+                            if os_name not in browser_names[browser_name]:
+                                browser_names[browser_name][os_name] = []
+                            browser_names[browser_name][os_name].append(browser_version)
+
+            # Create the API response dictionary
+           res = {'os_names': sorted([os_name for os_name in os_names if os_name.startswith('Windows')]),
+                            'browser': browser_names}
+           socket.emit('qcresponse',res)
+
+        except Exception as e:
+            log.error(e)
+            if 'Invalid URL' in str(e):
+                socket.emit('auto_populate','Invalid Url')
+            elif 'Unauthorized' in str(e):
+                socket.emit('auto_populate','Invalid Credentials')
+            else:
+                socket.emit('auto_populate','Fail')
+            logger.print_on_console('Exception in login and auto populating projects')
