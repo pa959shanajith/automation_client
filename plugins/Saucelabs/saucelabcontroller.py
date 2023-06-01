@@ -50,6 +50,7 @@ class SaucelabWindow():
            firefox_versions = []
            edge_versions = []
            ie_versions = []
+           safari_versions = []
            # Extract the OS name, browser name, and version for each platform and add them to the corresponding list
            for platform in data:
                 os_name = platform['os']
@@ -67,52 +68,57 @@ class SaucelabWindow():
                     if browser_version.isdigit() and int(browser_version) >= 75:
                         if browser_version not in chrome_versions:
                             chrome_versions.append(browser_version)
-                        if os_name.startswith('Windows'):
-                            if os_name not in browser_names[browser_name]:
-                                browser_names[browser_name][os_name] = []
-                            browser_names[browser_name][os_name].append(browser_version)
+                        if os_name not in browser_names[browser_name]:
+                            browser_names[browser_name][os_name] = []
+                        browser_names[browser_name][os_name].append(browser_version)
                 elif browser_name == 'Firefox':
                     if browser_name not in browser_names:
                         browser_names[browser_name] = {}
                     if browser_version.isdigit() and int(browser_version) >= 75:
                         if browser_version not in firefox_versions:
                             firefox_versions.append(browser_version)
-                        if os_name.startswith('Windows'):
-                            if os_name not in browser_names[browser_name]:
-                                browser_names[browser_name][os_name] = []
-                            browser_names[browser_name][os_name].append(browser_version)
+                        if os_name not in browser_names[browser_name]:
+                            browser_names[browser_name][os_name] = []
+                        browser_names[browser_name][os_name].append(browser_version)
                 elif browser_name == 'Microsoft Edge':
                     if browser_name not in browser_names:
                         browser_names[browser_name] = {}
                     if browser_version.isdigit() and int(browser_version) >= 75:
                         if browser_version not in edge_versions:
                             edge_versions.append(browser_version)
-                        if os_name.startswith('Windows'):
-                            if os_name not in browser_names[browser_name]:
+                        if os_name not in browser_names[browser_name]:
+                            browser_names[browser_name][os_name] = []
+                        browser_names[browser_name][os_name].append(browser_version)
+                elif browser_name == 'Safari':
+                    if browser_name not in browser_names:
+                        browser_names[browser_name] = {}
+                    if browser_version.isdigit():
+                        if browser_version not in safari_versions:
+                            safari_versions.append(browser_version)
+                        if os_name not in browser_names[browser_name]:
                                 browser_names[browser_name][os_name] = []
-                            browser_names[browser_name][os_name].append(browser_version)
+                        browser_names[browser_name][os_name].append(browser_version)
                 elif browser_name == 'Internet Explorer':
                     if browser_name not in browser_names:
                         browser_names[browser_name] = {}
                     if browser_version.isdigit():
                         if browser_version not in ie_versions:
                             ie_versions.append(browser_version)
-                        if os_name.startswith('Windows'):
-                            if os_name not in browser_names[browser_name]:
-                                browser_names[browser_name][os_name] = []
-                            browser_names[browser_name][os_name].append(browser_version)
+                        if os_name not in browser_names[browser_name]:
+                            browser_names[browser_name][os_name] = []
+                        browser_names[browser_name][os_name].append(browser_version)
 
             # Create the API response dictionary
-           res = {'os_names': sorted([os_name for os_name in os_names if os_name.startswith('Windows')]),
+           res = {'os_names': sorted([os_name for os_name in os_names]),
                             'browser': browser_names}
            socket.emit('qcresponse',res)
 
         except Exception as e:
             log.error(e)
             if 'Invalid URL' in str(e):
-                socket.emit('auto_populate','Invalid Url')
+                socket.emit('fetch_sauce_details','Invalid Url')
             elif 'Unauthorized' in str(e):
-                socket.emit('auto_populate','Invalid Credentials')
+                socket.emit('fetch_sauce_details','Invalid Credentials')
             else:
-                socket.emit('auto_populate','Fail')
-            logger.print_on_console('Exception in login and auto populating projects')
+                socket.emit('fetch_sauce_details','Fail')
+            logger.print_on_console('Exception in fetching the sauce details')

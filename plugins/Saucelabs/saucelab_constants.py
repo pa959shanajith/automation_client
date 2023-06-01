@@ -2,5 +2,5 @@
 Saucelabs_Username = ""
 Saucelabs_key = ""
 SaucelabsURL = ""
-Platform:""
-Version: ''
+Platform=""
+Version= ''

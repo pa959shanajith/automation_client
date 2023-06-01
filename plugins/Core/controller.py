@@ -1345,8 +1345,8 @@ class Controller():
                                 'sauce_username': json_data['sauce_username'],
                                 'sauce_access_key': json_data['sauce_access_key'],
                                 'remote_url': json_data['remote_url'],
-                                'version': '101',
-                                'platform': 'Windows 7'
+                                'version': json_data['version'],
+                                'platform': json_data['platform']
                             }
                             s.save_sauceconf(sauce_details)
                             execution_env = {'env': 'saucelabs','browser':browser,'scenario': scenario_name,'scenario_id':scenario_id,'handlerno': handlerno}
