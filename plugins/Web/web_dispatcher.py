@@ -467,7 +467,7 @@ class Dispatcher:
                                         logger.print_on_console(err_msg)
                                         local_Wd.log.error(err_msg)
                                 else:
-                                    reference_element=self.getwebelement(driver,teststepproperty.parent_xpath,teststepproperty.stepnum,teststepproperty.custname)
+                                    reference_element=self.getwebelement(driver,teststepproperty.parent_xpath,teststepproperty.stepnum,teststepproperty.custname, teststepproperty.identifiers)
                                 local_Wd.log.debug('Reference_element ')
                                 local_Wd.log.debug(reference_element)
                                 if reference_element != None:
