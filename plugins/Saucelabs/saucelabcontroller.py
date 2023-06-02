@@ -116,9 +116,9 @@ class SaucelabWindow():
         except Exception as e:
             log.error(e)
             if 'Invalid URL' in str(e):
-                socket.emit('fetch_sauce_details','Invalid Url')
+                socket.emit('qcresponse','Invalid Url')
             elif 'Unauthorized' in str(e):
-                socket.emit('fetch_sauce_details','Invalid Credentials')
+                socket.emit('qcresponse','Invalid Credentials')
             else:
-                socket.emit('fetch_sauce_details','Fail')
+                socket.emit('qcresponse','Fail')
             logger.print_on_console('Exception in fetching the sauce details')
