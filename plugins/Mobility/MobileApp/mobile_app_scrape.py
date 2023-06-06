@@ -314,3 +314,20 @@ class ScrapeWindow(wx.Frame):
             self.onIRISstart(event)                 # perform start crop operation
         else:
             self.onIRISstop(event)                  # perform stop crop operation
+
+def run_adb_devices(socket):
+    try:
+        adb_path = os.environ["AVO_ASSURE_HOME"] + "/platform-tools/adb.exe"
+        # result = subprocess.run(['C:\\Users\\akhil.m\\Downloads\\ICE\\AvoAssure\\platform-tools\\adb.exe', 'devices'], capture_output=True, text=True)
+        result = subprocess.run([adb_path, 'devices'], capture_output=True, text=True)
+        if result.returncode == 0:
+            output = result.stdout.strip()
+            devices = output.split('\n')[1:]
+            devices = [device.split('\t')[0] for device in devices if '\t' in device]  # Remove '\tdevice' part
+            socket.emit('get_serial_number', devices)
+        else:
+            error = result.stderr.strip()
+            socket.emit('get_serial_number', 'Error occurred in run adb devices')
+    except Exception as e:
+        socket.emit('get_serial_number', 'Error occurred in run adb devices')
+        logger.print_on_console("ADB command not found. Make sure ADB is installed and added to your system's PATH.")
