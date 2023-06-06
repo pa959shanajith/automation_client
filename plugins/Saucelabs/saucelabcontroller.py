@@ -111,14 +111,14 @@ class SaucelabWindow():
             # Create the API response dictionary
            res = {'os_names': sorted([os_name for os_name in os_names]),
                             'browser': browser_names}
-           socket.emit('qcresponse',res)
+           socket.emit('sauceconfresponse',res)
 
         except Exception as e:
             log.error(e)
             if 'Invalid URL' in str(e):
-                socket.emit('qcresponse','Invalid Url')
+                socket.emit('sauceconfresponse','Invalid Url')
             elif 'Unauthorized' in str(e):
-                socket.emit('qcresponse','Invalid Credentials')
+                socket.emit('sauceconfresponse','Invalid Credentials')
             else:
-                socket.emit('qcresponse','Fail')
+                socket.emit('sauceconfresponse','Fail')
             logger.print_on_console('Exception in fetching the sauce details')
