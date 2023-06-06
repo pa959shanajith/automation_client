@@ -2451,7 +2451,8 @@ class IRISKeywords():
             import core_utils
             core_utils.get_all_the_imports('IRIS')
             core_utils.get_all_the_imports('Core')
-            import New_Coordinates
+            #import New_Coordinates
+            import new_coordinates
 
             # text_response=client.extracttext(im_b64)
 
@@ -2462,7 +2463,7 @@ class IRISKeywords():
                 if tex_cor[5].lower()==text_response[0][5].lower():
                     logger.print_on_console(tex_cor)
                     cord_new=tex_cor
-                    theta,hypo_x,hypo_y=New_Coordinates.getting_new_coor(cord_old,cord_new)
+                    theta,hypo_x,hypo_y=new_coordinates.getting_new_coor(cord_old,cord_new)
 
                     import coordinates_storage
 
