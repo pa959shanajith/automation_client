@@ -362,11 +362,20 @@ class ZephyrWindow():
                 if respon.status_code == 200:
                     JsonObject = respon.json()
                     if JsonObject["resultSize"] != 0:
+                        # default userid of Anyone
+                        testerid = -10 
+                        user_url = self.baseURL + "/flex/services/rest/v3/user"
+                        list_user = requests.get(user_url, headers=self.headers)
+                        if list_user.status_code == 200:
+                            users_json = list_user.json()
+                            for obj in users_json:
+                                if obj['fullName'] == "Avo Assure":
+                                    testerid = obj["id"]
                         results = JsonObject["results"]
                         result = [i for i in results if str(i["tcrTreeTestcase"]["testcase"]["testcaseId"])==str(testcaseid[index])]
                         scheduleid = result[0]["id"]
-                        testerid = result[0]["testerId"]
-                        relative_path_update = "/execution/bulk?scheduleids="+str(scheduleid)+"&status="+str(status_tc)+"&testerid=6"+"&tcrCatalogTreeId=&allExecutions=&includeanyoneuser="
+                        # testerid = result[0]["testerId"]
+                        relative_path_update = "/execution/bulk?scheduleids="+str(scheduleid)+"&status="+str(status_tc)+"&testerid="+str(testerid)+"&tcrCatalogTreeId=&allExecutions=&includeanyoneuser="
                         ids = []
                         ids.append(scheduleid)
                         data1 = {"ids":ids, "selectedAll":1, "serachView": "false", "teststepUpdate": "false"}
