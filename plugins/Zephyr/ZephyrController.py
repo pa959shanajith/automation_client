@@ -366,7 +366,7 @@ class ZephyrWindow():
                         result = [i for i in results if str(i["tcrTreeTestcase"]["testcase"]["testcaseId"])==str(testcaseid[index])]
                         scheduleid = result[0]["id"]
                         testerid = result[0]["testerId"]
-                        relative_path_update = "/execution/bulk?scheduleids="+str(scheduleid)+"&status="+str(status_tc)+"&testerid="+str(testerid)+"&tcrCatalogTreeId=&allExecutions=&includeanyoneuser="
+                        relative_path_update = "/execution/bulk?scheduleids="+str(scheduleid)+"&status="+str(status_tc)+"&testerid=6"+"&tcrCatalogTreeId=&allExecutions=&includeanyoneuser="
                         ids = []
                         ids.append(scheduleid)
                         data1 = {"ids":ids, "selectedAll":1, "serachView": "false", "teststepUpdate": "false"}
