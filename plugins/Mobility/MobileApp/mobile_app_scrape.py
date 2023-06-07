@@ -9,6 +9,7 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 from mobile_app_constants import *
+import subprocess
 from constants import *
 import android_scrapping
 import wx
@@ -314,3 +315,27 @@ class ScrapeWindow(wx.Frame):
             self.onIRISstart(event)                 # perform start crop operation
         else:
             self.onIRISstop(event)                  # perform stop crop operation
+
+
+class MobileWindow():
+
+    def run_adb_devices(self, socket):
+        """
+            Method to get the serail number of connected mobile device
+            related to android native scraping
+            returns the serial numbers of connected mobile device
+        """
+        try:
+            adb_path = os.environ["AVO_ASSURE_HOME"] + "/platform-tools/adb.exe"
+            result = subprocess.run([adb_path, 'devices'], capture_output=True, text=True)
+            if result.returncode == 0:
+                output = result.stdout.strip()
+                devices = output.split('\n')[1:]
+                devices = [device.split('\t')[0] for device in devices if '\t' in device]  # Remove '\tdevice' part
+                socket.emit('get_serial_number', devices)
+            else:
+                error = result.stderr.strip()
+                socket.emit('get_serial_number', 'Error occurred in getting the serial number of connected device')
+        except Exception as e:
+            socket.emit('get_serial_number', 'Error occurred in getting the serial number of connected device')
+            logger.print_on_console("ADB command not found. Make sure ADB is installed and added to your system's PATH.")
