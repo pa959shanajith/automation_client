@@ -1038,12 +1038,13 @@ class MainNamespace(BaseNamespace):
             wait_until_browsercheck()
             core_utils.get_all_the_imports('Mobility')
             import mobile_app_scrape
-            mobile_app_scrape.run_adb_devices(socketIO)
+            obj = mobile_app_scrape.MobileWindow()
+            obj.run_adb_devices(socketIO)
         except Exception as e:
             err_msg='Error occured in getting the device serial number'
             log.error(err_msg)
             logger.print_on_console(err_msg)
-            log.error(e,exc_info=True)        
+            log.error(e,exc_info=True)       
 
 
 class ConnectionThread(threading.Thread):
