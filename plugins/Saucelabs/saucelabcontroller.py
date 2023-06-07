@@ -34,10 +34,10 @@ class SaucelabWindow():
     #     except Exception as e:
     #         logger.print_on_console("Failed to connect to JIRA")
 
-    def get_details(self,saucelab_input_dict,socket):
+    def get_webconf_details(self,saucelab_input_dict,socket):
         """
-            Method to login to Azure and get the projects from Azure (Azure integration screen)
-            returns list of projects
+            Method to fetch saucelab configurations
+            returns list of os names and respective browser configurations
         """
         res = "invalidcredentials"
         try:
@@ -122,3 +122,42 @@ class SaucelabWindow():
             else:
                 socket.emit('sauceconfresponse','Fail')
             logger.print_on_console('Exception in fetching the sauce details')
+
+
+    def get_mobileconf_details(self,saucleb_input_dict,socket):
+        """
+                Method to fetch saucelab configurations
+                returns list of os names and respective browser configurations
+        """
+        res = "invalidcredentials"
+        try:
+            response = requests.get('https://app.saucelabs.com/rest/v1/info/platforms/webdriver')
+            data = json.loads(response.text)
+
+            androidVersions = {}
+            iphoneVersions = {}
+            for detail in data:
+                if detail['api_name'] == 'android':
+                    if detail['short_version'] not in androidVersions.keys():
+                        androidVersions[detail['short_version']] = []
+                    androidVersions[detail['short_version']].append(detail['long_name'])
+                if detail['api_name'] == 'iphone':
+                    if detail['short_version'] not in iphoneVersions.keys():
+                        iphoneVersions[detail['short_version']] = []
+                    iphoneVersions[detail['short_version']].append(detail['long_name'])
+
+            res =  {
+                'android' : androidVersions,
+                'iphone': iphoneVersions
+            }
+            socket.emit('sauceconfresponse',res)
+        except Exception as e:
+            log.error(e)
+            if 'Invalid URL' in str(e):
+                socket.emit('sauceconfresponse','Invalid Url')
+            elif 'Unauthorized' in str(e):
+                socket.emit('sauceconfresponse','Invalid Credentials')
+            else:
+                socket.emit('sauceconfresponse','Fail')
+            logger.print_on_console('Exception in fetching the sauce details')
+        

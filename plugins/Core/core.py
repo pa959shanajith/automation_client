@@ -866,8 +866,12 @@ class MainNamespace(BaseNamespace):
             core_utils.get_all_the_imports('Saucelabs')
             import saucelabcontroller
             obj = saucelabcontroller.SaucelabWindow()
-            data = args[0]
-            obj.get_details(data,socketIO)
+            if args[0]['action'] == Saucelab_ACTION_1:
+                data = args[0]
+                obj.get_webconf_details(data,socketIO)
+            elif args[0]['action'] == Saucelab_ACTION_2:
+                data = args[0]
+                obj.get_mobileconf_details(data,socketIO)
         except Exception as e:
             err_msg='Error in Saucelab operations'
             log.error(err_msg)
