@@ -1364,7 +1364,7 @@ class Sauce_Config():
         # self.url = args[0]["remote_url"]
         saucelab_constants.Saucelabs_Username = args[0]["sauce_username"]
         saucelab_constants.Saucelabs_key = args[0]["sauce_access_key"]
-        saucelab_constants.SaucelabsURL = args[0]["remote_url"]
+        saucelab_constants.Saucelabs_Url = args[0]["remote_url"]
         saucelab_constants.Platform = args[0]['platform']
         saucelab_constants.Version = args[0]['version']
         return
@@ -1377,7 +1377,7 @@ class Sauce_Config():
             'version': saucelab_constants.Version,
             'sauce_username': saucelab_constants.Saucelabs_Username,
             'sauce_access_key': saucelab_constants.Saucelabs_key,
-            'remote_url': saucelab_constants.SaucelabsURL
+            'remote_url': saucelab_constants.Saucelabs_Url
         }
         # conf_obj = open(Saucelabs_config_path, 'r')
         # conf_obj.close()

@@ -846,7 +846,7 @@ class Sauce_Config():
             'version': saucelab_constants.Version,
             'sauce_username': saucelab_constants.Saucelabs_Username,
             'sauce_access_key': saucelab_constants.Saucelabs_key,
-            'remote_url': saucelab_constants.SaucelabsURL
+            'remote_url': saucelab_constants.Saucelabs_Url
         }
         # conf_obj = open(Saucelabs_config_path, 'r')
         # conf_obj.close()
@@ -855,7 +855,6 @@ class Sauce_Config():
         self.access_key = conf["sauce_access_key"]
         self.platform = conf["platform"]
         self.url = conf["remote_url"]
-        return conf
         return conf
 
     def get_sauceclient(self):

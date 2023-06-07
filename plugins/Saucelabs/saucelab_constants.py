@@ -1,6 +1,6 @@
 # saving saucelab details coming from webserver
 Saucelabs_Username = ""
 Saucelabs_key = ""
-SaucelabsURL = ""
+Saucelabs_Url = ""
 Platform=""
-Version= ''
+Version= ""
