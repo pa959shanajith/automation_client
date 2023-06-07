@@ -11,6 +11,8 @@ import time
 from constants import *
 import sauceclient
 import threading
+import saucelab_constants
+
 local_wk=threading.local()
 log=logging.getLogger('web_keywords.py')
 def request_content(self, url, filename, dirpath=None, body=None, content_type=''):
@@ -1355,12 +1357,30 @@ class Util_Keywords():
 
 class Sauce_Config():
 
+    def save_sauceconf(self,*args):
+        # self.username = args[0]["sauce_username"]
+        # self.access_key = args[0]["sauce_access_key"]
+        # self.platform = args["platform"]
+        # self.url = args[0]["remote_url"]
+        saucelab_constants.Saucelabs_Username = args[0]["sauce_username"]
+        saucelab_constants.Saucelabs_key = args[0]["sauce_access_key"]
+        saucelab_constants.Saucelabs_Url = args[0]["remote_url"]
+        saucelab_constants.Platform = args[0]['platform']
+        saucelab_constants.Version = args[0]['version']
+        return
+
     def get_sauceconf(self):
         Saucelabs_config_path=os.environ['AVO_ASSURE_HOME']+os.sep+'assets'+os.sep+'sauce_config.json'
         import json
-        conf_obj = open(Saucelabs_config_path, 'r')
-        conf = json.load(conf_obj)
-        conf_obj.close()
+        conf = {
+            'platform': saucelab_constants.Platform,
+            'version': saucelab_constants.Version,
+            'sauce_username': saucelab_constants.Saucelabs_Username,
+            'sauce_access_key': saucelab_constants.Saucelabs_key,
+            'remote_url': saucelab_constants.Saucelabs_Url
+        }
+        # conf_obj = open(Saucelabs_config_path, 'r')
+        # conf_obj.close()
         # self.proxies=self.conf["proxy"]
         self.username = conf["sauce_username"]
         self.access_key = conf["sauce_access_key"]

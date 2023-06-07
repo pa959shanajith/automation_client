@@ -859,6 +859,20 @@ class MainNamespace(BaseNamespace):
             log.error(err_msg)
             logger.print_on_console(err_msg)
             log.error(e,exc_info=True)
+    
+    def on_saucelablogin(self,*args):
+        try:
+            wait_until_browsercheck()
+            core_utils.get_all_the_imports('Saucelabs')
+            import saucelabcontroller
+            obj = saucelabcontroller.SaucelabWindow()
+            data = args[0]
+            obj.get_details(data,socketIO)
+        except Exception as e:
+            err_msg='Error in Saucelab operations'
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
+            log.error(e,exc_info=True)
 
     def on_update_screenshot_path(self,*args):
         if root.gui: benchmark.init(args[1], socketIO)
