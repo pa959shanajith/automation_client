@@ -320,17 +320,28 @@ class TextboxKeywords:
                                         local_to.log.error(err_msg)
                                         logger.print_on_console(err_msg)
                                 else:
-                                    browser_Keywords.local_bk.driver_obj.execute_script(SET_TEXT_WITH_EVENTS_SCRIPT, webelement, input)
-                                    # Bug #19221. To check if value is set or not.
-                                    value = browser_Keywords.local_bk.driver_obj.execute_script('return arguments[0].value', webelement)
-                                    if value == input:
-                                        # implies that the value has been set in the textbox
-                                        status = TEST_RESULT_PASS
-                                        methodoutput = TEST_RESULT_TRUE
-                                    else:
-                                        if webelement.get_attribute('type') == 'number':
-                                            err_msg = ERROR_CODE_DICT['ERR_INPUT_TYPE_MISMATCH']
-                                            logger.print_on_console(err_msg)
+                                    try:
+                                        browser_Keywords.local_bk.driver_obj.execute_script(SET_TEXT_WITH_EVENTS_SCRIPT, webelement, input)
+                                        # Bug #19221. To check if value is set or not.
+                                        value = browser_Keywords.local_bk.driver_obj.execute_script('return arguments[0].value', webelement)
+                                        if value == input:
+                                            # implies that the value has been set in the textbox
+                                            status = TEST_RESULT_PASS
+                                            methodoutput = TEST_RESULT_TRUE
+                                        else:
+                                            if webelement.get_attribute('type') == 'number':
+                                                err_msg = ERROR_CODE_DICT['ERR_INPUT_TYPE_MISMATCH']
+                                                logger.print_on_console(err_msg)
+                                    except:
+                                        value = browser_Keywords.local_bk.driver_obj.execute_script('return arguments[0].value', webelement)
+                                        if value == input:
+                                            # implies that the value has been set in the textbox
+                                            status = TEST_RESULT_PASS
+                                            methodoutput = TEST_RESULT_TRUE
+                                        else:
+                                            if webelement.get_attribute('type') == 'number':
+                                                err_msg = ERROR_CODE_DICT['ERR_INPUT_TYPE_MISMATCH']
+                                                logger.print_on_console(err_msg)
                             else:
                                 err_msg=self.__read_only()
                 else:
