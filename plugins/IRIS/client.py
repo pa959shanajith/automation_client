@@ -38,14 +38,26 @@ class api_request():
         coordinates=json.loads(response.text)['coordinates']
         return coordinates
 
-    def extracttext(self,imgPath) :
+    def extracttext(self,imgPath,booliean) :
 
         test_url = self.addr + '/text/extract'
-
-        response = requests.post(test_url, data=imgPath,verify = False , timeout = None)
+        data={'img':imgPath,'message':booliean}
+        #response = requests.post(test_url, data=imgPath,verify = False , timeout = None)
+        response = requests.post(test_url, json=data,verify = False , timeout = None)
         text_oldrefer=json.loads(response.text)['reference']
-
+        logger.print_on_console(text_oldrefer)
         return text_oldrefer
+    
+    def tableextract(self,imgPath) :
+
+        test_url = self.addr + '/table/extract'
+        data=imgPath
+        #response = requests.post(test_url, data=imgPath,verify = False , timeout = None)
+        response = requests.post(test_url, data=data,verify = False , timeout = None)
+        #logger.print_on_console(response)
+        table_data=json.loads(response.text)['reference']
+        logger.print_on_console(table_data)
+        return table_data
 
 
     def image_save(self,imgPath) :
@@ -69,15 +81,10 @@ class api_request():
         coordinates=json.loads(response.text)['reference']
         return coordinates
 
-    def ocr_client(self,imgPath) :
+    # def ocr_client(self,imgPath) :
 
 
-        test_url = self.addr + '/text/extract'
-        im_file = BytesIO()
-        imgPath.save(im_file, format="png")
-        im_bytes = im_file.getvalue()
-        im_b64 = base64.b64encode(im_bytes)
-        response = requests.post(test_url, data=im_b64,verify = False , timeout = None)
-        text=json.loads(response.text)['reference'][0]
+    #     test_url = self.addr + '/text/extract'
+        
 
-        return text
+    #     return text

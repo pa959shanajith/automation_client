@@ -12,6 +12,7 @@ import time
 import controller
 import readconfig
 from constants import *
+import reverse_mask
 #import label_image
 if SYSTEM_OS == 'Windows':
     import screeninfo
@@ -161,8 +162,14 @@ class Cropandadd():
                     log.debug('Inside draw : Event3 - left button up')
                     drawing1 = False
                     self.data['scrapetype'] = 'caa'
-                    if (iy > y and ix > x) : RGB_img_crop = image_orig[y:iy,x:ix]
-                    else : RGB_img_crop = image_orig[iy:y,ix:x]
+                    if (iy > y and ix > x) :
+                        #RGB_img_crop = image_orig[y:iy,x:ix]
+                        mask_coordinates=[ix,iy,x,y]
+                        RGB_img_crop = reverse_mask.mask(test_img_path,mask_coordinates)
+                    else :
+                        #RGB_img_crop = image_orig[iy:y,ix:x]
+                        mask_coordinates=[ix,iy,x,y]
+                        RGB_img_crop = reverse_mask.mask(test_img_path,mask_coordinates)
                     cv2.imwrite(crop_img_path, RGB_img_crop)
                     with open(crop_img_path, "rb") as imageFile:
                         RGB_img_crop_im = str(base64.b64encode(imageFile.read()))
@@ -259,3 +266,5 @@ class Cropandadd():
         except Exception as e:
             log.error("Error occured in stop IRIS, ERR_MSG : ", str(e))
             logger.print_on_console("Error occured in stop IRIS")
+
+            

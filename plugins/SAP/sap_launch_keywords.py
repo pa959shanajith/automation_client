@@ -16,6 +16,8 @@ import os
 import sap_constants
 import time
 from PIL import ImageGrab
+import PIL.ImageGrab
+import core_utils
 from constants import *
 from saputil_operations import SapUtilKeywords
 from pywinauto.application import Application
@@ -447,6 +449,13 @@ class Launch_Keywords():
                 SetForegroundWindow(find_window(title=self.windowName))
                 logger.print_on_console( 'SAP Logon window already exists will proceed further' )
                 log.debug( 'SAP Logon window already exists' )
+                #---Added AI Enabled code-----------------
+                time.sleep(3)
+                im = PIL.ImageGrab.grab()
+                core_utils.get_all_the_imports('IRIS')
+                import client
+                message=client.api_request().image_save(im)
+
                 status = sap_constants.TEST_RESULT_PASS
                 result = sap_constants.TEST_RESULT_TRUE
                 # made changes : launch will not terminate if window already exists
