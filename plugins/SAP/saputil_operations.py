@@ -24,7 +24,28 @@ class SapUtilKeywords:
         try:
             import pythoncom
             pythoncom.CoInitialize()
-            self.SapGui = win32com.client.GetObject("SAPGUI").GetScriptingEngine
+            try:
+                """
+                    The below code will get the SAP GUI object for SAP logon,
+                    but fails in case of SAP Business client
+                """
+
+                self.SapGui = win32com.client.GetObject("SAPGUI").GetScriptingEngine
+
+                """
+                    In some case above code will run for SAP Business client but gives method instead
+                    of SAP GUI object so in that case we will run the below code to get the SAP GUI object
+                """
+
+                if 'method' in str(type(self.SapGui)):
+                    self.SapGui = win32com.client.GetObject("SAPGUISERVER").GetScriptingEngine
+            except:
+                """
+                    The below code will run for SAP Business client as the above method will fail
+                    as we need to pass "SAPGUISERVER" in case of SAP Business clinet
+                """
+
+                self.SapGui = win32com.client.GetObject("SAPGUISERVER").GetScriptingEngine
         except Exception as e:
             logger.print_on_console( 'Not able to find SAPGUI object' )
             log.error(e)
