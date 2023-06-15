@@ -1339,15 +1339,21 @@ class Controller():
                             scenario_name=json_data['suitedetails'][suite_idx-1]["scenarioNames"][sc_idx]
                             import sauceclient
                             core_utils.get_all_the_imports('Saucelabs')
-                            import web_keywords
-                            s=web_keywords.Sauce_Config()
+                            import web_keywords,web_keywords_MW
+                            s = ''
                             sauce_details = {
                                 'sauce_username': json_data['sauce_username'],
                                 'sauce_access_key': json_data['sauce_access_key'],
                                 'remote_url': json_data['remote_url'],
-                                'version': json_data['version'],
-                                'platform': json_data['platform']
                             }
+                            if(json_data['apptype'] == 'Web'):
+                                s=web_keywords.Sauce_Config()
+                                sauce_details['saucelab_os_version'] = json_data['saucelab_os_version']
+                                sauce_details['platform'] = json_data['platform']
+                            else:
+                                s=web_keywords_MW.Sauce_Config()
+                                sauce_details['mobile'] = json_data['mobile']
+
                             s.save_sauceconf(sauce_details)
                             execution_env = {'env': 'saucelabs','browser':browser,'scenario': scenario_name,'scenario_id':scenario_id,'handlerno': handlerno}
                             now=datetime.now()
