@@ -729,8 +729,52 @@ class WebScrape_Utils:
                             ssclassname.baseVal = ssclassname.baseVal.trim();
                         }
                     }
+
+                    // capture css selector of the element
+                    var cssSelector = '';
+                    function getCssSelector(ele) {
+                        let path = [];
+                        let parentEle = ele.parentNode;
+                        while (ele.nodeName.toLowerCase() != 'body') {
+                            let selector = ele.nodeName.toLowerCase();
+                            let arr = Array.from(ele.parentNode.children);
+                            let tagNameArr = [];
+                            for (i = 0; i < arr.length; i++) {
+                                let tag = arr[i].tagName.toLowerCase();
+                                tagNameArr.push(tag);
+                            }
+                            let count = tagNameArr.toString().match(new RegExp(selector, 'g')).length;
+                            if (ele.id) {
+                                selector += '#' + ele.id;
+                            }
+                            else if (count > 1) {
+                                let sib = ele.previousSibling, nth = 1;
+                                while((sib != null) && nth++) {
+                                    if ((sib.nodeName.toLowerCase() == '#text') || (sib.nodeName.toLowerCase() == '#comment')) {
+                                        nth--;
+                                    }
+                                    sib = sib.previousSibling;
+                                }
+                                selector += ":nth-child("+nth+")";
+                            }
+                            path.unshift(selector);
+                            ele = ele.parentNode;
+                        }
+                        return path.join(" > ");
+                    }
+                    cssSelector = getCssSelector(f);
+
+                    // capture href of the element
+                    var href='';
+                    if (f.hasAttribute('href')) {
+                        href = f.getAttribute('href');
+                    }
+                    else {
+                        href = null;
+                    }
+
                     //We will be using absolute xpath first as relative xpath has id that may change and incorrect element may get selected.
-                    newPath = String(path) + ';' + String(id) + ';' + String(rpath) + ';' + ssname + ';' + sstagname + ';' + ssclassname + ';' + coordinates + ';' + textvalue;
+                    newPath = String(path) + ';' + String(id) + ';' + String(rpath) + ';' + ssname + ';' + sstagname + ';' + ssclassname + ';' + coordinates + ';' + textvalue + ';' + String(href) + ';' + cssSelector;
                     for (var i = 0; i < arr.length; i++) {
                         if (arr[i].xpath == newPath) {
                             uniqueFlag = true;
