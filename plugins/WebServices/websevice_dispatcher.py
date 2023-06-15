@@ -38,6 +38,7 @@ class Dispatcher:
                   'setproxies':self.webservice.setProxies,
                   # Authentication methods
                   'setbasicauth': self.webservice.setBasicAuth,
+                  'setoauth': self.webservice.setOAuth,
                   'setparam':self.webservice.setParam,
                   'setparamvalue':self.webservice.setParamValue
                 }
