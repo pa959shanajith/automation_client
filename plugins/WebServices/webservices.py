@@ -1249,10 +1249,11 @@ class WSkeywords:
                             "scope": scope
                         }
                         response = requests.request("POST", token_url, auth=(client_id, client_secret), data=data)
-                        generated_token = json.loads(response.text)['access_token']
-                        output = generated_token
-                        status = ws_constants.TEST_RESULT_PASS
-                        methodoutput = ws_constants.TEST_RESULT_TRUE
+                        if response.status_code == 200:
+                            generated_token = json.loads(response.text)['access_token']
+                            output = generated_token
+                            status = ws_constants.TEST_RESULT_PASS
+                            methodoutput = ws_constants.TEST_RESULT_TRUE
                     else:
                         log.info('Grant type not supported')
                         logger.print_on_console('Grant type not supported')
