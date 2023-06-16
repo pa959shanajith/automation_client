@@ -1229,7 +1229,7 @@ class WSkeywords:
         return status,methodoutput,output,err_msg
     
 
-    def setOAuth(self,token_url,client_id,client_secret,scope):
+    def setOAuth2(self,token_url,client_id,client_secret,scope,grant_type):
         status = ws_constants.TEST_RESULT_FAIL
         methodoutput = ws_constants.TEST_RESULT_FALSE
         err_msg=None
@@ -1240,17 +1240,23 @@ class WSkeywords:
             if (not(client_id == '' or client_id == None) and
                 not(client_secret == '' or client_secret == None) and
                 not(scope == '' or scope == None) and
+                not(grant_type == '' or grant_type == None) and
                 not(token_url == '' or token_url == None)):
 
-                    data = {
-                        "grant_type": "client_credentials",
-                        "scope": scope
-                    }
-                    response = requests.request("POST", token_url, auth=(client_id, client_secret), data=data)
-                    generated_token = json.loads(response.text)['access_token']
-                    output = generated_token
-                    status = ws_constants.TEST_RESULT_PASS
-                    methodoutput = ws_constants.TEST_RESULT_TRUE
+                    if(grant_type == 'client_credentials'):
+                        data = {
+                            "grant_type": "client_credentials",
+                            "scope": scope
+                        }
+                        response = requests.request("POST", token_url, auth=(client_id, client_secret), data=data)
+                        generated_token = json.loads(response.text)['access_token']
+                        output = generated_token
+                        status = ws_constants.TEST_RESULT_PASS
+                        methodoutput = ws_constants.TEST_RESULT_TRUE
+                    else:
+                        log.info('Grant type not supported')
+                        logger.print_on_console('Grant type not supported')
+                        err_msg='Grant type not supported'
             else:
                 log.info(ws_constants.METHOD_INVALID_INPUT)
                 err_msg = ws_constants.METHOD_INVALID_INPUT
