@@ -26,7 +26,9 @@ import difflib
 import itertools
 import cv2
 import numpy as np
+from pdf2image import convert_from_path
 import imutils
+from PIL import Image, ImageDraw, ImageChops
 import fitz
 import re
 import copy
@@ -57,7 +59,6 @@ class FileOperationsPDF:
         purpose : verifies whether the content is given pagenumber of pdf file
         param : input_path,pagenumber,content
         return : bool
-
         """
         status=False
         err_msg=None
@@ -78,6 +79,63 @@ class FileOperationsPDF:
         if err_msg!=None:
             logger.print_on_console(err_msg)
         return status,err_msg
+    
+    #Support methods for compare_content
+    def compare_pdf_differences(self, pdf1_path, pdf2_path, output_dir):
+        logger.print_on_console('PDF compare Started...')
+
+        pdf1_doc = fitz.open(pdf1_path)
+        pdf2_doc = fitz.open(pdf2_path)
+
+        num_pages = min(len(pdf1_doc), len(pdf2_doc))
+
+        differing_pages = []
+
+        for page_num in range(num_pages):
+            pdf1_page = pdf1_doc[page_num]
+            pdf2_page = pdf2_doc[page_num]
+
+            pix1 = pdf1_page.get_pixmap()
+            img1 = Image.frombytes("RGB", [pix1.width, pix1.height], pix1.samples)
+
+            pix2 = pdf2_page.get_pixmap()
+            img2 = Image.frombytes("RGB", [pix2.width, pix2.height], pix2.samples)
+
+            # Calculate the bounding box of differences
+            gray1 = img1.convert("L")
+            gray2 = img2.convert("L")
+
+            diff = ImageChops.difference(gray1, gray2)
+            bbox = diff.getbbox()
+
+            if bbox is not None:
+                differing_pages.append(page_num)
+
+                # Draw rectangle on the image
+                draw = ImageDraw.Draw(img1)
+                draw.rectangle(bbox, outline="red", width=2)
+
+                # Save the image with the highlighted shape
+                logger.print_on_console('PDFs differ at Page ' + str(page_num + 1))
+                pdf_name = os.path.splitext(os.path.basename(pdf1_path))[0]
+                filename = f"{pdf_name}_{page_num + 1}.png"
+                image_path = os.path.join(output_dir, filename)
+                img1.save(image_path)
+                print(f"Saved {filename}")
+
+        if differing_pages:
+            differences = ", ".join(str(page_num + 1) for page_num in differing_pages)
+            logger.print_on_console('The PDFs differ at the following pages: ' + differences)
+
+            logger.print_on_console('Differing Images saved at ' + str(output_dir))
+        else:
+            logger.print_on_console('The PDFs are similar.')
+        logger.print_on_console('PDF Compare Executed.')
+
+        pdf1_doc.close()
+        pdf2_doc.close()
+
+        return differing_pages
 
     def compare_content(self,input_val,args):
         """
@@ -212,6 +270,27 @@ class FileOperationsPDF:
                         err_msg = "Invalid fourth input"
                     else:
                         err_msg = generic_constants.FILE_NOT_EXISTS
+            elif  len(input_val) == 5 and input_val[-1]== "pixel":         
+                pdf1_path = input_val[0]
+                pdf2_path = input_val[1]
+                pdf_comparision = None
+                if input_val[2] != '':
+                    output_path = input_val[2]          # User-specified output path
+                    if not os.path.exists(output_path):
+                        logger.print_on_console("Incorrect Output Path")
+                        log.info("Incorrect Output Path")
+                    else:
+                        pdf_comparision = self.compare_pdf_differences(pdf1_path, pdf2_path, output_path)
+                else:
+                    output_path = os.environ["AVO_ASSURE_HOME"] + "\\output\\pdf_difference"
+                    if not os.path.exists(output_path):
+                        os.makedirs(output_path, exist_ok=True)
+                    pdf_comparision = self.compare_pdf_differences(pdf1_path, pdf2_path, output_path)
+
+                if pdf_comparision is not None:
+                    status = constants.TEST_RESULT_PASS
+                    result = constants.TEST_RESULT_TRUE
+
             else:
                 err_msg = 'Invalid number of inputs'
             if ( err_msg != None ):
