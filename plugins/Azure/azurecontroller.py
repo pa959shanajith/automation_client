@@ -18,6 +18,7 @@ from requests.auth import HTTPBasicAuth
 import json
 log = logging.getLogger("azurecontroller.py")
 import base64
+import time
 
 
 class AzureWindow():
@@ -230,8 +231,27 @@ class AzureWindow():
                 'query': wiql_query
             }
             
-            # Send request to API endpoint
-            respon = requests.post(endpoint_url, headers=headers, json=body)
+            retry_limit = 5
+            retry_counter = 0
+            while retry_counter < retry_limit:
+                try:
+                    # Send request to API endpoint
+                    respon = requests.post(endpoint_url, headers=headers, json=body)
+                    if respon.status_code != 200:
+                        log.info("Unable to connect to server retrying Status code is: %s",
+                            respon.status_code)
+                        logger.print_on_console("Connection error occurred with:"+ endpoint_url)
+                        time.sleep(2)
+                    else:
+                        break
+                
+                except Exception as e:
+                    log.error(e)
+                    logger.print_on_console("Unable to connect to server retrying.")
+                    time.sleep(2)
+                retry_counter += 1
+            if retry_counter == retry_limit:
+                logger.print_on_console("Maximum retry limit reached. Unable to connect to the server.")
 
             if respon.status_code == 200:
                 JsonObject = respon.json()
@@ -241,27 +261,53 @@ class AzureWindow():
                     list_count = 0
                     start_index = skip_value
                     end_index = start_index + 100
+                    my_list = []
                     for details in JsonObject['workItems'][start_index:end_index]:
                         if list_count >= 100:
                             break
                         ids += str(details['id'])
+                        my_list.append(str(details['id']))
+                        
                         ids += ','
                         list_count += 1
                         
                 # call api to fetch name of user stories
                 ids = ids[:-1]
-                # maximum limit of API response data  200
-                endpoint_url = f'{org_url}/{project_name}/_apis/wit/workitems?ids={ids}&api-version=7.0'
-                
-                # Send request to API endpoint
-                respon = requests.get(endpoint_url, headers=headers)
+                # Using list comprehension and join()
+                flat_string = ','.join([str(num) for num in my_list])
 
-                if respon.status_code == 200:
-                    JsonObject = respon.json()
-                    if len(JsonObject)>0:
-                        res = {}
-                        res['userStories'] = JsonObject['value']
-                        res['total_count'] = total_count
+                # Using map() and join()
+                flat_string = ','.join(map(str, my_list))
+                # maximum limit of API response data  200
+                endpoint_url = f'{org_url}/{project_name}/_apis/wit/workitems?ids={flat_string}&api-version=7.0'
+                
+                retry_limit = 5
+                retry_counter = 0
+                while retry_counter < retry_limit:
+                    try:
+                        # Send request to API endpoint
+                        respon = requests.get(endpoint_url, headers=headers)
+                        if respon.status_code != 200:
+                            log.info("Unable to connect to server retrying. Status code is: %s",
+                                respon.status_code)
+                            logger.print_on_console("Connection error occurred with:"+ endpoint_url)
+                            time.sleep(2)
+                        else:
+                            # break
+                            if respon.status_code == 200:
+                                JsonObject = respon.json()
+                                if len(JsonObject)>0:
+                                    res = {}
+                                    res['userStories'] = JsonObject['value']
+                                    res['total_count'] = total_count
+                    
+                    except Exception as e:
+                        log.error(e)
+                        logger.print_on_console("Unable to connect to server retrying.")
+                        time.sleep(2)
+                    retry_counter += 1
+                if retry_counter == retry_limit:
+                    logger.print_on_console("Maximum retry limit reached. Unable to connect to the server.")
 
             # if(';' in org_url):
             #     log.debug('Connecting to JIRA through proxy')
@@ -281,6 +327,8 @@ class AzureWindow():
                 socket.emit('auto_populate','Invalid Url')
             elif 'Unauthorized' in str(e):
                 socket.emit('auto_populate','Invalid Credentials')
+            elif 'Max retries exceeded' in str(e):
+                socket.emit('auto_populate','Max retries exceeded')    
             else:
                 socket.emit('auto_populate','Fail')
             logger.print_on_console('Exception in login and auto populating projects')
