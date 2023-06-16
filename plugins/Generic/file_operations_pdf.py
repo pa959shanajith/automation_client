@@ -95,10 +95,10 @@ class FileOperationsPDF:
             pdf1_page = pdf1_doc[page_num]
             pdf2_page = pdf2_doc[page_num]
 
-            pix1 = pdf1_page.get_pixmap()
+            pix1 = pdf1_page.getPixmap()
             img1 = Image.frombytes("RGB", [pix1.width, pix1.height], pix1.samples)
 
-            pix2 = pdf2_page.get_pixmap()
+            pix2 = pdf2_page.getPixmap()
             img2 = Image.frombytes("RGB", [pix2.width, pix2.height], pix2.samples)
 
             # Calculate the bounding box of differences
