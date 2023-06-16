@@ -80,7 +80,9 @@ class Dispatcher:
             'xpath': 'find_elements_by_xpath',
             'name':'find_elements_by_name',
             'classname':'find_elements_by_class_name',
-            'css_selector': 'find_elements_by_css_selector'
+            'css_selector': 'find_elements_by_css_selector',
+            'href' : 'find_elements_by_css_selector',
+            'label' : 'find_elements_by_xpath'
         }
 
         self.web_dict={
@@ -849,6 +851,10 @@ class Dispatcher:
                 webElement=getattr(driver,self.identifier_dict[type])(identifier)
                 if len(webElement) > index:
                     webElement = [webElement[index]]
+            elif type == "href":
+                webElement = getattr(driver,self.identifier_dict[type])(f'[href^="{identifier}"]')
+            elif type == "label":
+                webElement = getattr(driver,self.identifier_dict[type])(f'//*[contains(text(),"{identifier}")] | //*[@value="{identifier}"] | //*[@name="{identifier}"]')
             else:
                 webElement=getattr(driver,self.identifier_dict[type])(identifier)
             if len(webElement) == 1:
@@ -859,7 +865,9 @@ class Dispatcher:
                                             'rxpath':'Relative X-Path',
                                             'name':'Name Attribute',
                                             'classname':'Classname Attribute',
-                                            'css_selector':'CSS Selector'}
+                                            'css_selector':'CSS Selector',
+                                            'href':'Hyperlink',
+                                            'label':'Label'}
                     logger.print_on_console(f'Webelement found by OI "{identifier_fullname[type]}"')
                     local_Wd.log.info(f'Webelement found by OI "{str(type)}"')
                 except:
@@ -875,10 +883,9 @@ class Dispatcher:
         for modified_identifier_value in modified_identifiers:
             key = modified_identifier_value['identifier']
             value = modified_identifier_value['id']
-            if key != 'classname':
-                updated_identifiers[key] = int(value)-1
-            else:
-                updated_identifiers[key] = int(value)
+            if key == 'cssselector':
+                key = "css_selector"
+            updated_identifiers[key] = int(value)-1
         if len(updated_identifiers) == 0:
             updated_identifiers = None    
             return updated_identifiers
@@ -901,13 +908,10 @@ class Dispatcher:
             if updated_identifiers != None:
                 for i in range(delayconst):
                     identifiers_list = list(updated_identifiers.keys())
-                    identifiers_sequence = {'xpath':0,'id':1,'rxpath':2,'name':3,'classname':5,'css_selector':11}
+                    identifiers_sequence = {'xpath':0,'id':1,'rxpath':2,'name':3,'classname':5,'label':10,'href':11,'css_selector':12}
                     for identifiers_type in identifiers_list:
                         identifiers_index = identifiers_sequence[identifiers_type]
-                        if identifiers_type != 'classname':
-                            identifiers_id = str(identifiers_index + 1)
-                        else:
-                            identifiers_id = str(identifiers_index)
+                        identifiers_id = str(identifiers_index + 1)
                         webElement=self.element_locator(driver,identifiers_type,identifiers[identifiers_index],identifiers_id)
                         if not(webElement):
                             webElement=None

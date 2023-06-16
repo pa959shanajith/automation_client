@@ -542,7 +542,7 @@ class Handler():
                         if len(url.strip())!=0 and (not ("https" in url or "http" in url)):
                             url_dec=self.utils_obj.scrape_unwrap(url)
                             if url is not None: url = url_dec
-                        if(objectname.strip() != '' and not(objectname.startswith('@'))):
+                        if(objectname.strip() != '' and not(objectname.startswith('@')) and len(objectname.split(';')) == 3):
                             xpath_string=objectname.split(';')
                             left_part=self.utils_obj.scrape_unwrap(xpath_string[0])
                             right_part=self.utils_obj.scrape_unwrap(xpath_string[2])
