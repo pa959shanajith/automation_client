@@ -1348,7 +1348,7 @@ class Controller():
                             }
                             if(json_data['apptype'] == 'Web'):
                                 s=web_keywords.Sauce_Config()
-                                sauce_details['saucelab_os_version'] = json_data['saucelab_os_version']
+                                sauce_details['version'] = json_data['browserVersion']
                                 sauce_details['platform'] = json_data['platform']
                             else:
                                 s=web_keywords_MW.Sauce_Config()
