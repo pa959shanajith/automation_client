@@ -31,8 +31,14 @@ class ElementKeywords():
         value = OUTPUT_CONSTANT
         err_msg = None
         try:
+            # get the co-ordinate or position
+            if len(args) >= 3:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 value = ses.FindById(id).text
                 status = sap_constants.TEST_RESULT_PASS
@@ -56,8 +62,14 @@ class ElementKeywords():
         value = OUTPUT_CONSTANT
         err_msg = None
         try:
+            # get the co-ordinate or position
+            if len(args) >= 2:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 if ( len(input_val) != 0 ):
                     if ( len(input_val) > 1 ):
@@ -91,8 +103,14 @@ class ElementKeywords():
         err_msg = None
         flag = False
         try:
+            # get the co-ordinate or position
+            if len(args) >= 3:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 elem = ses.FindById(id)
                 #------------------------------Condition to check if its a table element
@@ -154,8 +172,14 @@ class ElementKeywords():
         err_msg = None
         flag = False
         try:
+            # get the co-ordinate or position
+            if len(args) >= 3:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 elem = ses.FindById(id)
                 input_val = args[0][0]
@@ -218,8 +242,14 @@ class ElementKeywords():
         err_msg = None
         flag = False
         try:
+            # get the co-ordinate or position
+            if len(args) >= 3:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 elem = ses.FindById(id)
                 #------------------------------Condition to check if its a table element
@@ -266,8 +296,14 @@ class ElementKeywords():
         err_msg = None
         flag = False
         try:
+            # get the co-ordinate or position
+            if len(args) >= 3:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 elem = ses.FindById(id)
                 text = args[0][0]
@@ -323,8 +359,14 @@ class ElementKeywords():
         err_msg = None
         flag = False
         try:
+            # get the co-ordinate or position
+            if len(args) >= 3:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 elem = ses.FindById(id)
                 #------------------------------Condition to check if its a table element
@@ -370,8 +412,14 @@ class ElementKeywords():
         err_msg = None
         flag = False
         try:
+            # get the co-ordinate or position
+            if len(args) >= 3:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 elem = ses.FindById(id)
             #------------------------------Condition to check if its a table element
@@ -416,8 +464,14 @@ class ElementKeywords():
         err_msg = None
         flag = False
         try:
+            # get the co-ordinate or position
+            if len(args) >= 3:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 elem = ses.FindById(id)
             #------------------------------Condition to check if its a table element
@@ -469,8 +523,14 @@ class ElementKeywords():
         err_msg = None
         flag = False
         try:
+            # get the co-ordinate or position
+            if len(args) >= 3:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 elem = ses.FindById(id)
                 #------------------------------Condition to check if its a table element
@@ -522,8 +582,14 @@ class ElementKeywords():
         err_msg = None
         flag = False
         try:
+            # get the co-ordinate or position
+            if len(args) >= 3:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 elem = ses.FindById(id)
                 #------------------------------Condition to check if its a table element
@@ -571,8 +637,14 @@ class ElementKeywords():
         err_msg = None
         flag = False
         try:
+            # get the co-ordinate or position
+            if len(args) >= 3:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 elem = ses.FindById(id)
             #------------------------------Condition to check if its a table element
@@ -620,8 +692,14 @@ class ElementKeywords():
         value = OUTPUT_CONSTANT
         err_msg = None
         try:
+            # get the co-ordinate or position
+            if len(args) >= 2:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 element = ses.FindById(id)
                 maximum = element.VerticalScrollbar.Maximum
@@ -665,8 +743,14 @@ class ElementKeywords():
         value = OUTPUT_CONSTANT
         err_msg = None
         try:
+            # get the co-ordinate or position
+            if len(args) >= 2:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id,ses = self.uk.getSapElement(sap_id)
+            id,ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 element = ses.FindById(id)
                 maximum = element.VerticalScrollbar.Maximum
@@ -709,8 +793,14 @@ class ElementKeywords():
         value = OUTPUT_CONSTANT
         err_msg = None
         try:
+            # get the co-ordinate or position
+            if len(args) >= 2:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 element = ses.FindById(id)
                 maximum = element.HorizontalScrollbar.Maximum
@@ -754,8 +844,14 @@ class ElementKeywords():
         value = OUTPUT_CONSTANT
         err_msg = None
         try:
+            # get the co-ordinate or position
+            if len(args) >= 2:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 element = ses.FindById(id)
                 maximum = element.HorizontalScrollbar.Maximum
@@ -846,8 +942,14 @@ class ElementKeywords():
         value = OUTPUT_CONSTANT
         err_msg = None
         try:
+            # get the co-ordinate or position
+            if len(args) >= 3:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 elem = ses.FindById(id)
                 elem.ScrollToLeft()
@@ -871,8 +973,14 @@ class ElementKeywords():
         value = OUTPUT_CONSTANT
         err_msg = None
         try:
+            # get the co-ordinate or position
+            if len(args) >= 3:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 elem = ses.FindById(id)
                 if ( elem.type == 'GuiTab' ):

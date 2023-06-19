@@ -27,8 +27,14 @@ class Radio_Checkbox_keywords():
         value = OUTPUT_CONSTANT
         err_msg = None
         try:
+            # get the co-ordinate or position
+            if len(args) >= 3:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 if ( ses.FindById(id).Changeable == True ):
                     ses.FindById(id).Select()
@@ -54,8 +60,14 @@ class Radio_Checkbox_keywords():
         value = OUTPUT_CONSTANT
         err_msg = None
         try:
+            # get the co-ordinate or position
+            if len(args) >= 3:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 if ( ses.FindById(id).Changeable == True ):
                     b = ses.FindById(id)
@@ -82,8 +94,14 @@ class Radio_Checkbox_keywords():
         value = OUTPUT_CONSTANT
         err_msg = None
         try:
+            # get the co-ordinate or position
+            if len(args) >= 3:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 if ( ses.FindById(id).Changeable == True ):
                     b = ses.FindById(id)
@@ -110,8 +128,14 @@ class Radio_Checkbox_keywords():
         value = OUTPUT_CONSTANT
         err_msg = None
         try:
+            # get the co-ordinate or position
+            if len(args) >= 3:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 #----------------------------------------------------------Check for radio
                 if ( ses.FindById(id).type == "GuiRadioButton" ):

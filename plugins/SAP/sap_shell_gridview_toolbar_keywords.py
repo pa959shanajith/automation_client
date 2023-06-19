@@ -27,8 +27,14 @@ class Shell_GridView_Toolbar_Keywords():
         err_msg = None
         value = OUTPUT_CONSTANT
         try:
+            # get the co-ordinate or position
+            if len(args) >= 3:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses):
                 elem = ses.FindById(id)
                 if ( elem.type == 'GuiShell' ):
@@ -56,8 +62,14 @@ class Shell_GridView_Toolbar_Keywords():
         err_msg = None
         value = OUTPUT_CONSTANT
         try:
+            # get the co-ordinate or position
+            if len(args) >= 3:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 elem = ses.FindById(id)
                 if ( elem.type == 'GuiShell' ):
@@ -86,8 +98,14 @@ class Shell_GridView_Toolbar_Keywords():
         value = OUTPUT_CONSTANT
         colOrder = []
         try:
+            # get the co-ordinate or position
+            if len(args) >= 2:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 elem = ses.FindById(id)
                 if ( elem.type == 'GuiShell' ):
@@ -136,8 +154,14 @@ class Shell_GridView_Toolbar_Keywords():
         value = OUTPUT_CONSTANT
         row = []
         try:
+            # get the co-ordinate or position
+            if len(args) >= 2:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 elem = ses.FindById(id)
                 if ( elem.type == 'GuiShell' ):
@@ -175,8 +199,14 @@ class Shell_GridView_Toolbar_Keywords():
         err_msg = None
         value = OUTPUT_CONSTANT
         try:
+            # get the co-ordinate or position
+            if len(args) >= 2:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 elem = ses.FindById(id)
                 if ( elem.type == 'GuiShell' ):
@@ -206,8 +236,14 @@ class Shell_GridView_Toolbar_Keywords():
         value = OUTPUT_CONSTANT
         bList = []
         try:
+            # get the co-ordinate or position
+            if len(args) >= 2:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             d1,d2,imax,d3 = self.get_colCount(sap_id)
             if ( id and ses ):
                 elem = ses.FindById(id)
@@ -247,8 +283,14 @@ class Shell_GridView_Toolbar_Keywords():
         err_msg = None
         value = OUTPUT_CONSTANT
         try:
+            # get the co-ordinate or position
+            if len(args) >= 2:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 elem = ses.FindById(id)
                 if ( elem.type == 'GuiShell' and elem.SubType == 'GridView' ):# check for shell gridview
@@ -341,8 +383,14 @@ class Shell_GridView_Toolbar_Keywords():
         value = OUTPUT_CONSTANT
         bList = []
         try:
+            # get the co-ordinate or position
+            if len(args) >= 2:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 elem = ses.FindById(id)
                 d1,d2,imax,d3 = self.get_colCount(sap_id)
@@ -388,8 +436,14 @@ class Shell_GridView_Toolbar_Keywords():
         value = OUTPUT_CONSTANT
         bList = []
         try:
+            # get the co-ordinate or position
+            if len(args) >= 2:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 elem = ses.FindById(id)
                 d1, d2, imax, d3 = self.get_colCount(sap_id)
@@ -435,8 +489,14 @@ class Shell_GridView_Toolbar_Keywords():
         value = OUTPUT_CONSTANT
         err_msg = None
         try:
+            # get the co-ordinate or position
+            if len(args) >= 2:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 elem = ses.FindById(id)
                 if ( elem.type == 'GuiShell' ):
@@ -464,8 +524,14 @@ class Shell_GridView_Toolbar_Keywords():
         value = OUTPUT_CONSTANT
         bList = []
         try:
+            # get the co-ordinate or position
+            if len(args) >= 2:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 elem = ses.FindById(id)
                 d1,d2,imax,d3 = self.get_colCount(sap_id)
@@ -507,8 +573,14 @@ class Shell_GridView_Toolbar_Keywords():
         err_msg = None
         value = OUTPUT_CONSTANT
         try:
+            # get the co-ordinate or position
+            if len(args) >= 3:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 elem = ses.FindById(id)
                 if ( elem.type == 'GuiShell' and elem.SubType == 'GridView' ):
@@ -535,8 +607,14 @@ class Shell_GridView_Toolbar_Keywords():
         err_msg = None
         value = OUTPUT_CONSTANT
         try:
+            # get the co-ordinate or position
+            if len(args) >= 3:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 elem = ses.FindById(id)
                 if (elem.type == 'GuiShell' and elem.SubType == 'GridView'):
@@ -563,8 +641,14 @@ class Shell_GridView_Toolbar_Keywords():
         err_msg = None
         value = OUTPUT_CONSTANT
         try:
+            # get the co-ordinate or position
+            if len(args) >= 2:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 elem = ses.FindById(id)
                 if ( elem.type == 'GuiShell' and elem.SubType == 'GridView' ):
@@ -603,8 +687,14 @@ class Shell_GridView_Toolbar_Keywords():
         value = OUTPUT_CONSTANT
         bList = []
         try:
+            # get the co-ordinate or position
+            if len(args) >= 2:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 elem = ses.FindById(id)
                 if ( elem.type == 'GuiShell' ):
@@ -663,8 +753,14 @@ class Shell_GridView_Toolbar_Keywords():
         value = OUTPUT_CONSTANT
         bList = []
         try:
+            # get the co-ordinate or position
+            if len(args) >= 2:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 elem = ses.FindById(id)
                 d1,d2,imax,d3 = self.get_colCount(sap_id)
@@ -703,8 +799,14 @@ class Shell_GridView_Toolbar_Keywords():
         value = OUTPUT_CONSTANT
         bList = []
         try:
+            # get the co-ordinate or position
+            if len(args) >= 2:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 elem = ses.FindById(id)
                 d1,d2,imax,d3 = self.get_colCount(sap_id)
@@ -743,8 +845,14 @@ class Shell_GridView_Toolbar_Keywords():
         bList = []
         vList = []
         try:
+            # get the co-ordinate or position
+            if len(args) >= 2:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 elem = ses.FindById(id)
                 d1,d2,imax,d3 = self.get_colCount(sap_id)
@@ -783,8 +891,14 @@ class Shell_GridView_Toolbar_Keywords():
         vList_temp = []
         allTrueFlag = True
         try:
+            # get the co-ordinate or position
+            if len(args) >= 2:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 elem = ses.FindById(id)
                 d1,d2,imax,d3 = self.get_colCount(sap_id)

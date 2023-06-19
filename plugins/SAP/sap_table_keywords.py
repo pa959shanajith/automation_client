@@ -48,8 +48,14 @@ class Table_keywords():
         value = OUTPUT_CONSTANT
         err_msg = None
         try:
+            # get the co-ordinate or position
+            if len(args) >= 3:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id ):
                 elem = ses.FindById(id)
                 value = elem.RowCount
@@ -73,8 +79,14 @@ class Table_keywords():
         result = OUTPUT_CONSTANT
         err_msg = None
         try:
+            # get the co-ordinate or position
+            if len(args) >= 3:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id ):
                 elem = ses.FindById(id)
                 value = elem.Columns.Length
@@ -99,8 +111,14 @@ class Table_keywords():
         err_msg = None
         flag = False
         try:
+            # get the co-ordinate or position
+            if len(args) >= 2:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id ):
                 colText = input_val[0]
                 elem = ses.FindById(id)
@@ -145,8 +163,14 @@ class Table_keywords():
         err_msg = None
         flag = False
         try:
+            # get the co-ordinate or position
+            if len(args) >= 2:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id ):
                 elem = ses.FindById(id)
                 rowText = input_val[0]
@@ -189,8 +213,14 @@ class Table_keywords():
         value = OUTPUT_CONSTANT
         err_msg = None
         try:
+            # get the co-ordinate or position
+            if len(args) >= 2:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id ):
                 row = int(input_val[0]) - 1
                 col = int(input_val[1]) - 1
@@ -220,8 +250,14 @@ class Table_keywords():
         value = OUTPUT_CONSTANT
         err_msg = None
         try:
+            # get the co-ordinate or position
+            if len(args) >= 2:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id ):
                 elem = ses.FindById(id)
                 row = int(input_val[0]) - 1
@@ -254,8 +290,14 @@ class Table_keywords():
         value = OUTPUT_CONSTANT
         err_msg = None
         try:
+            # get the co-ordinate or position
+            if len(args) >= 2:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id ):
                 elem = ses.FindById(id)
                 text = input_val[0]
@@ -440,8 +482,14 @@ class Table_keywords():
         value = OUTPUT_CONSTANT
         err_msg = None
         try:
+            # get the co-ordinate or position
+            if len(args) >= 2:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id ):
                 row = int(input_val[0])-1
                 col = int(input_val[1])-1
@@ -474,8 +522,14 @@ class Table_keywords():
         value = OUTPUT_CONSTANT
         err_msg = None
         try:
+            # get the co-ordinate or position
+            if len(args) >= 2:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id ):
                 rowNum = int(input_val[0])-1
                 elem = ses.FindById(id)
@@ -504,8 +558,14 @@ class Table_keywords():
         value = OUTPUT_CONSTANT
         err_msg = None
         try:
+            # get the co-ordinate or position
+            if len(args) >= 2:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 colNum = int(input_val[0])-1
                 elem = ses.FindById(id)
@@ -533,8 +593,14 @@ class Table_keywords():
         value = OUTPUT_CONSTANT
         err_msg = None
         try:
+            # get the co-ordinate or position
+            if len(args) >= 2:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id ):
                 rowNum = int(input_val[0])-1
                 elem = ses.FindById(id)
@@ -563,8 +629,14 @@ class Table_keywords():
         value = OUTPUT_CONSTANT
         err_msg = None
         try:
+            # get the co-ordinate or position
+            if len(args) >= 2:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 colNum = int(input_val[0])-1
                 elem = ses.FindById(id)
@@ -592,8 +664,14 @@ class Table_keywords():
         value = OUTPUT_CONSTANT
         err_msg = None
         try:
+            # get the co-ordinate or position
+            if len(args) >= 2:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id ):
                 row = int(input_val[0]) - 1
                 col = int(input_val[1]) - 1

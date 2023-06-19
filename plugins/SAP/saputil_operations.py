@@ -15,6 +15,7 @@ from sap_scraping import Scrape
 import logger
 import logging
 import sap_highlight
+import readconfig
 log = logging.getLogger('saputil_operations.py')
 class SapUtilKeywords:
 
@@ -49,6 +50,41 @@ class SapUtilKeywords:
                 i = sap_id.index("/")
                 #-----------------------------------------------------
             id = wndId + sap_id[i:]
+            temp_id = id
+
+            configvalues = readconfig.configvalues
+            if "sap_object_indentification_order" in configvalues:
+                sap_object_indentification_order = configvalues['sap_object_indentification_order']
+            else:
+                sap_object_indentification_order = "1"
+
+            if sap_object_indentification_order == "1":
+                logger.print_on_console('Finding the SAP element by ID')
+                try:
+                    # check element exists or not using find by id
+                    ses.FindById(id)
+                except:
+                    # logic to find the id by co-ordinate or position
+                    logger.print_on_console('Finding the SAP element by ID failed so finding the element by position')
+                    if len(args) >= 1:
+                        cord_value = args[0]
+                    else:
+                        cord_value = {'top': None, 'left': None, 'width': None, 'height': None}
+                    id, ses = self.find_sap_element_by_position(cord_value)
+            else:
+                try:
+                    # logic to find the id by co-ordinate or position
+                    logger.print_on_console('Finding the SAP element by POSITION')
+                    if len(args) >= 1:
+                        cord_value = args[0]
+                    else:
+                        cord_value = {'top': None, 'left': None, 'width': None, 'height': None}
+                    id, ses = self.find_sap_element_by_position(cord_value)
+
+                    ses.FindById(id)
+                except:
+                    logger.print_on_console('Finding the SAP element by POSITION failed so finding the element by ID')
+                    id = temp_id
         except Exception as e:
             logger.print_on_console( 'No instance open error :',e)
         except AttributeError as e1:
@@ -62,7 +98,13 @@ class SapUtilKeywords:
         err_msg  = None
         value = OUTPUT_CONSTANT
         try:
-            id, ses = self.getSapElement(sap_id)
+            # get the co-ordinate or position
+            if len(args) >= 3:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
+            id, ses = self.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 if( ses.FindById(id).type == "GuiLabel" or ses.FindById(id).Changeable == True ):
                     status=sap_constants.TEST_RESULT_PASS
@@ -86,7 +128,13 @@ class SapUtilKeywords:
         err_msg = None
         value = OUTPUT_CONSTANT
         try:
-            id, ses = self.getSapElement(sap_id)
+            # get the co-ordinate or position
+            if len(args) >= 3:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
+            id, ses = self.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 if ( ses.FindById(id).Changeable == False and ses.FindById(id).type != "GuiLabel" ):
                     status = sap_constants.TEST_RESULT_PASS
@@ -110,7 +158,13 @@ class SapUtilKeywords:
         err_msg = None
         value = OUTPUT_CONSTANT
         try:
-            id, ses = self.getSapElement(sap_id)
+            # get the co-ordinate or position
+            if len(args) >= 3:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
+            id, ses = self.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 highligh_obj = sap_highlight.highLight()
                 elem = ses.FindById(id)
@@ -137,7 +191,13 @@ class SapUtilKeywords:
         err_msg = None
         value = OUTPUT_CONSTANT
         try:
-            id, ses = self.getSapElement(sap_id)
+            # get the co-ordinate or position
+            if len(args) >= 3:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
+            id, ses = self.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 try:
                     ses.FindById(id)
@@ -163,7 +223,13 @@ class SapUtilKeywords:
         err_msg = None
         value = OUTPUT_CONSTANT
         try:
-            id, ses = self.getSapElement(sap_id)
+            # get the co-ordinate or position
+            if len(args) >= 3:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
+            id, ses = self.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 try:
                     ses.FindById(id)
@@ -222,3 +288,30 @@ class SapUtilKeywords:
             log.error( err_msg )
             logger.print_on_console( "Error occured in Get Object For Custom" )
         return xpath
+    
+    def find_sap_element_by_position(self, sap_position):
+        sap_element_id = None
+        session = None
+
+        try:
+            # get the session object
+            sap_gui_object = self.getSapObject()
+            scrape_object = Scrape()
+            window_handle = scrape_object.getWindow(sap_gui_object)
+            window_id = window_handle.__getattr__('id')
+            session_index = window_id.index('ses')
+            session_id = window_id[0:session_index + 6]
+            session = sap_gui_object.FindByid(str(session_id))
+            window_title = session.ActiveWindow.Text
+
+            full_data = scrape_object.full_scrape(window_handle, window_title)
+
+            for data in full_data:
+                if data['top'] == sap_position['top'] and data['left'] == sap_position['left'] and data['width'] == sap_position['width'] and data['height'] == sap_position['height']:
+                    sap_element_id = data['id']
+                    break
+        except AttributeError as error:
+            logger.print_on_console('Attribute  error :', error)
+        except Exception as error:
+            logger.print_on_console('No instance open error :', error)
+        return sap_element_id, session

@@ -301,7 +301,7 @@ class SAPDispatcher:
                             if (keyword.lower() == 'getstatusiris') : result = self.sap_dict[keyword](objectname, input, output, teststepproperty.objectname.split(';')[-2])
                             else : result = self.sap_dict[keyword](objectname, input, output)
                     else:
-                        result = self.sap_dict[keyword](objectname, input, output)
+                        result = self.sap_dict[keyword](objectname, input, output, {'top': teststepproperty.top, 'left': teststepproperty.left, 'width': teststepproperty.width, 'height': teststepproperty.height})
                 if ( not (sap_constants.ELEMENT_FOUND) and self.exception_flag ):
                     logger.print_on_console( 'Element not found terminating' )
                     result = constants.TERMINATE

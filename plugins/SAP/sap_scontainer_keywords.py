@@ -37,8 +37,14 @@ class SContainer_Keywords():
         err_msg = None
         value = OUTPUT_CONSTANT
         try:
+            # get the co-ordinate or position
+            if len(args) >= 3:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 #elem = ses.FindById(id)
                 if ( ses.FindById(id).type == 'GuiSimpleContainer' ):
@@ -78,8 +84,14 @@ class SContainer_Keywords():
         err_msg = None
         value = OUTPUT_CONSTANT
         try:
+            # get the co-ordinate or position
+            if len(args) >= 3:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 if ( ses.FindById(id).type == 'GuiSimpleContainer' ):
                     """check if elem is steploop"""
@@ -118,8 +130,14 @@ class SContainer_Keywords():
         err_msg = None
         value = OUTPUT_CONSTANT
         try:
+            # get the co-ordinate or position
+            if len(args) >= 2:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 row = int(input_val[0])-1
                 col = int(input_val[1])-1
@@ -157,8 +175,14 @@ class SContainer_Keywords():
         err_msg = None
         value = OUTPUT_CONSTANT
         try:
+            # get the co-ordinate or position
+            if len(args) >= 2:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 row = int(input_val[0])-1
                 col = int(input_val[1])-1
@@ -198,8 +222,14 @@ class SContainer_Keywords():
         err_msg = None
         value = OUTPUT_CONSTANT
         try:
+            # get the co-ordinate or position
+            if len(args) >= 2:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 row = int(input_val[0])-1
                 col = int(input_val[1])-1
@@ -240,8 +270,14 @@ class SContainer_Keywords():
         err_msg = None
         value = OUTPUT_CONSTANT
         try:
+            # get the co-ordinate or position
+            if len(args) >= 2:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 row = int(input_val[0])-1
                 col = int(input_val[1])-1
@@ -284,8 +320,14 @@ class SContainer_Keywords():
         err_msg = None
         value = OUTPUT_CONSTANT
         try:
+            # get the co-ordinate or position
+            if len(args) >= 2:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 row = int(input_val[0])-1
                 col = int(input_val[1])-1
@@ -328,8 +370,14 @@ class SContainer_Keywords():
         err_msg = None
         value = OUTPUT_CONSTANT
         try:
+            # get the co-ordinate or position
+            if len(args) >= 2:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 row = int(input_val[0])-1
                 col = int(input_val[1])-1
@@ -371,8 +419,14 @@ class SContainer_Keywords():
         err_msg = None
         value = OUTPUT_CONSTANT
         try:
+            # get the co-ordinate or position
+            if len(args) >= 2:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 row = int(input_val[0])-1
                 col = int(input_val[1])-1
