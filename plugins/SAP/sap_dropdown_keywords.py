@@ -343,7 +343,7 @@ class Dropdown_Keywords():
         count = 0
         try:
             # get the co-ordinate or position
-            if len(args) >= 2:
+            if len(args) >= 3:
                 sap_position = args[-1]
             else:
                 sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
