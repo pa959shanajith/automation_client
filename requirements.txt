@@ -1,3 +1,2 @@
-
-cython
-pyinstaller
+pandas==1.3.5
+pdf2image==1.16.3
