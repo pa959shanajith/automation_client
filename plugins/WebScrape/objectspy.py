@@ -62,8 +62,12 @@ class Object_Mapper():
                 xpath_string = element['xpath'].split(';')
                 if not xpath_string[0]:
                     raise ValueError('xpath of the object is empty')
-                left_part = self.coreutilsobj.scrape_unwrap(xpath_string[0])
-                right_part = self.coreutilsobj.scrape_unwrap(xpath_string[2])
+                if len(xpath_string) == 3:
+                    left_part = self.coreutilsobj.scrape_unwrap(xpath_string[0])
+                    right_part = self.coreutilsobj.scrape_unwrap(xpath_string[2])
+                else:
+                    left_part = str(xpath_string[0])
+                    right_part = ';'.join(map(str,xpath_string[2:]))
                 decryptedxpath = left_part + ';' + xpath_string[1] + ';' + right_part
                 decryptedelementurl = self.coreutilsobj.scrape_unwrap(element['url'])
                 identifiers = decryptedxpath.split(';')
