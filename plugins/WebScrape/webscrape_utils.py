@@ -1006,8 +1006,380 @@ var temp = window.tasarr;
 window.tasarr = null;
 return (temp);"""
 
-    javascript_get_object_properties = """if (!window.Element || !window.Element.prototype || !window.Element.prototype.hasAttribute) {     (function () {         function hasAttribute(attrName) {             return typeof this[attrName] !== 'undefined';         }         var inputs = document.getElementsByTagName('*');         for (var i = 0; i < inputs.length; i++) {             inputs[i].hasAttribute = hasAttribute;         }     }         ()); } if (!window.Element || !window.Element.prototype || !window.Element.prototype.getAttribute) {     (function () {         function getAttribute(attrName) {             return typeof this[attrName] !== 'undefined';         }         var inputs = document.getElementsByTagName('*');         for (var i = 0; i < inputs.length; i++) {             inputs[i].getAttribute = getAttribute;         }     }         ()); } (function () {     if (!document.getElementsByClassName) {         var indexOf = [].indexOf || function (prop) {             for (var i = 0; i < this.length; i++) {                 if (this[i] === prop)                     return i;             }             return -1;         };         getElementsByClassName = function (className, context) {             var elems = document.querySelectorAll ? context.querySelectorAll("." + className) : (function () {                     var all = context.getElementsByTagName("*"),                     elements = [],                     i = 0;                     for (; i < all.length; i++) {                         if (all[i].className && (" " + all[i].className + " ").indexOf(" " + className + " ") > -1 && indexOf.call(elements, all[i]) === -1)                             elements.push(all[i]);                     }                     return elements;                 })();             return elems;         };         document.getElementsByClassName = function (className) {             return getElementsByClassName(className, document);         };         if (window.Element) {             window.Element.prototype.getElementsByClassName = function (className) {                 return getElementsByClassName(className, this);             };         }     } })(); var suseIdx = true; var suseId = true; var suseClass = true; var srelative = true; var sae = []; var sarr = []; var sele = document.getElementsByTagName('*'); var smyid = 0; var stextvalue = ''; var stagname = 0; var sishidden = 0; var scustname = ''; var smultipleFlag = false; var element = arguments[0]; console.log(element); var surl = arguments[1]; var snonamecounter = 1; var txt_area_nonamecounter = 1; var select_nonamecounter = 1; var td_nonamecounter = 1; var a_nonamecounter = 1; var table_nonamecounter = 1; var input_nonamecounter = 1; var stagtype = ''; var ssname = 'null'; var sstagname = 'null'; var ssclassname = 'null'; var sclassname = 'null'; var top = 0; var left = 0; var height = 0; var width = 0; var coordinates = ''; var sisVisible = (function () {     function inside(schild, sparent) {         while (schild) {             if (schild === sparent)                 return true;             schild = schild.parentNode;         }         return false;     };     return function (selem) {         if (document.hidden || selem.offsetWidth == 0 || selem.offsetHeight == 0 || selem.style.visibility == 'hidden' || selem.style.display == 'none' || selem.style.opacity === 0)             return false;         var srect = selem.getBoundingClientRect();         if (window.getComputedStyle || selem.currentStyle) {             var sel = selem,             scomp = null;             while (sel) {                 if (sel === document) {                     break;                 } else if (!sel.parentNode)                     return false;                 scomp = window.getComputedStyle ? window.getComputedStyle(sel, null) : sel.currentStyle;                 if (scomp && (scomp.visibility == 'hidden' || scomp.display == 'none' || (typeof scomp.opacity !== 'undefined' && !(scomp.opacity > 0))))                     return false;                 sel = sel.parentNode;             }         }         return true;     } })(); function getElementProperties(element) {     stagtype = '';     ssname = 'null';     sstagname = 'null';     sid = element.id;     sname = element.name;     salttext = element.alt;     splaceholder = element.placeholder;     sclassname = element.className;     sid = (String(sid));     sclassname = (String(sclassname));     sname = (String(sname));     splaceholder = (String(splaceholder));     stextvalue = stext_content(element);     stextvalue = (String(stextvalue));     stagname = element.tagName.toLowerCase();     ssname = 'null';     sstagname = 'null';     ssclassname = 'null';     var role = 'null';     if (element.hasAttribute('role')) {         if (element.getAttribute('role') === 'grid' && element.tagName.toLowerCase() === 'div') {             role = 'grid';         }     }     findCoordinates(element);     if (stagname.indexOf(':') != -1) {         stagname = stagname.replace(':', '');         stagname = 'custom' + stagname;     }     if (sname != '' && sname != 'undefined') {         snames = document.getElementsByName(sname);         if (snames.length > 1) {             for (var k = 0; k < snames.length; k++) {                 if (element == snames[k]) {                     ssname = sname + '[' + k + ']'                 }             }         } else {             ssname = sname;         }     }     if (stagname != '' && stagname != 'undefined') {         stagnames = document.getElementsByTagName(stagname);         if (stagnames.length > 1) {             for (var k = 0; k < stagnames.length; k++) {                 if (element == stagnames[k]) {                     sstagname = stagname + '[' + k + ']'                 }             }         } else {             sstagname = stagname;         }     }     if (sclassname != '' && sclassname != 'undefined') {         try {             sclassnames = document.getElementsByClassName(sclassname);             if (sclassnames.length > 1) {                 for (var k = 0; k < sclassnames.length; k++) {                     if (element == sclassnames[k]) {                         ssclassname = sclassname + '[' + k + ']'                     }                 }             } else {                 ssclassname = sclassname;             }         } catch (err) {             console.log(sclassname);             console.log("skipping this element: " + err);         }     }     if (stagname != 'script' && stagname != 'meta' && stagname != 'html' && stagname != 'head' && stagname != 'style' && stagname != 'body' && stagname != 'form' && stagname != 'link' && stagname != 'noscript' && stagname != 'option' && stagname != '!' && stagname != 'code' && stagname != 'pre' && stagname != 'br' && stagname != 'animatetransform' && stagname != 'noembed') {         if (stextvalue == '' || stextvalue == 'null' || stextvalue == 'undefined' || stextvalue == '0') {             if (sname != '' && sname != 'undefined') {                 snames = document.getElementsByName(sname);                 if (snames.length > 1) {                     for (var k = 0; k < snames.length; k++) {                         if (element == snames[k]) {                             stextvalue = sname + k;                         }                     }                 } else {                     stextvalue = sname;                 }             } else if (sid != '' && sid != 'undefined') {                 stextvalue = sid;             } else if (splaceholder != '' && splaceholder != 'undefined') {                 stextvalue = splaceholder;             } else {                 var seles = document.getElementsByTagName(stagname);                 for (var k = 0; k < seles.length; k++) {                     if (element == seles[k]) {                         stextvalue = stagname + '_NONAME' + (k + 1);                     }                 }             }         }         if (sid == '') {             sid = 'null';         }         smultipleFlag = element.hasAttribute('multiple');         sishidden = sisVisible(element);         if (sishidden == true || sishidden == 'True' || sishidden == 'true') {             sishidden = 'No';         } else {             sishidden = 'Yes';         }         var sfirstpass = 0;         var srpath = '';         var setype = element.getAttribute('type');         setype = (String(setype)).toLowerCase();         for (var spath = ''; element && element.nodeType == 1; element = element.parentNode) {             var spredicate = [];             var ssiblings = element.parentNode.children;             var scount = 0;             var sunique = false;             var snewPath = '';             var sidx = 0;             for (var i = 0; ssiblings && (i < ssiblings.length); i++) {                 if (ssiblings[i].tagName == element.tagName) {                     scount++;                     if (ssiblings[i] == element) {                         sidx = scount;                     }                 }             }             if (sidx == 1 && scount == 1) {                 sidx = null;             }             if (suseId && element.id) {                 spredicate[spredicate.length] = '@id=' + '"' + element.id + '"';                 sunique = true;             }             xidx = (suseIdx && sidx) ? ('[' + sidx + ']') : '';             sidx = (suseIdx && sidx && !sunique) ? ('[' + sidx + ']') : '';             spredicate = (spredicate.length > 0) ? ('[' + spredicate.join(' and ') + ']') : '';             spath = '/' + element.tagName.toLowerCase() + xidx + spath;             if (sfirstpass == 0) {                 if (sunique && srelative) {                     srpath = '//*' + sidx + spredicate + srpath;                     sfirstpass = 1;                 } else {                     srpath = '/' + element.tagName.toLowerCase() + sidx + spredicate + srpath;                 }             }         }         if (stagname == 'textarea') {             stagname = 'input';             stagtype = 'txtarea';         } else if (stagname == 'select' && smultipleFlag) {             stagname = 'list';             stagtype = 'lst';         } else if (stagname == 'select') {             stagtype = 'select';         } else if (stagname == 'td' || stagname == 'tr') {             stagname = 'tablecell';             stagtype = 'tblcell';         } else if (stagname == 'a') {             stagtype = 'lnk';         } else if (stagname == 'table') {             stagtype = 'tbl';         } else if (stagname == 'img') {             stagtype = 'img';         } else if (stagname == 'input' && setype == 'image') {             stagname = 'img';             stagtype = 'img';         }         if (stagname == 'input' && (setype == 'button' || setype == 'submit' || setype == 'reset' || setype == 'file')) {             stagname = 'button';             stagtype = 'btn';         } else if (stagname == 'input' && setype == 'radio') {             stagname = 'radiobutton';             stagtype = 'radiobtn';         } else if (stagname == 'input' && setype == 'checkbox') {             stagname = 'checkbox';             stagtype = 'chkbox';         } else if (stagname == 'input' && (setype == 'text' || setype == 'email' || setype == 'number' || setype == 'password' || setype == 'range' || setype == 'search' || setype == 'url')) {             stagname = 'input';             stagtype = 'txtbox';         } else if (stagname == 'input' && stagtype == '' && (setype == 'hidden' || setype == 'null')) {             stagname = 'div';             stagtype = 'elmnt';         } else if (stagname == 'button') {             stagname = 'button';             stagtype = 'btn';         }         if (role == 'grid') {             stagname = 'grid';             stagtype = 'grid';         }         stextvalue = stextvalue.replace(">", "");         stextvalue = stextvalue.replace("</", "");         stextvalue = stextvalue.replace("<", "");         stextvalue = stextvalue.replace("/>", "");         stextvalue = stextvalue.split("\\n").join("");         stextvalue = stextvalue.split("\\t").join("");         stextvalue = stextvalue.split("\\r").join("");         stextvalue = stextvalue.split("  ").join("");         stextvalue = stextvalue.split("\\u00a0").join("");         if (stextvalue == '' || stextvalue.length == 0 || stextvalue == '0') {             stextvalue = 'NONAME' + snonamecounter;             snonamecounter = snonamecounter + 1;             scustname = stextvalue;         } else {             scustname = stextvalue;         }         if (stagtype != '') {             scustname = scustname + '_' + stagtype;         } else {             scustname = scustname + '_elmnt';         }         coordinates = left + ';' + top + ';' + height + ';' + width;         coordinates = String(coordinates);         snewPath = String(srpath) + ';' + String(sid) + ';' + String(spath) + ';' + ssname + ';' + sstagname + ';' + ssclassname + ';' + coordinates + ';' + stextvalue + ';' + 'null' + ';' + stagname;         sarr.push({             'xpath': snewPath,             'tag': stagname,             'hiddentag': sishidden,             'url': surl,             'height': height,             'width': width,             'custname': scustname,             'top': top,             'left': left         });     }     return sarr; } function findCoordinates(element) {     height = element.offsetHeight;     width = element.offsetWidth;     top = 0;     left = 0;     do {         top += element.offsetTop || 0;         left += element.offsetLeft || 0;         element = element.offsetParent;     } while (element); } function saddNodesOuter(sarray, scollection) {     for (var i = 0; scollection && scollection.length && i < scollection.length; i++) {         sarray.push(scollection[i]);     } }; function stext_content(f) {     var sfirstText = '';     var stextdisplay = '';     for (var z = 0; z < f.childNodes.length; z++) {         var scurNode = f.childNodes[z];         swhitespace = /^\s*$/;         if (scurNode.nodeName === '#text' && !(swhitespace.test(scurNode.nodeValue))) {             sfirstText = scurNode.nodeValue;             stextdisplay = stextdisplay + sfirstText;         }     }     return (stextdisplay); }; return getElementProperties(element);"""
+    javascript_get_object_properties = """
+    if (!window.Element || !window.Element.prototype || !window.Element.prototype.hasAttribute) {
+    (function () {
+        function hasAttribute(attrName) {
+            return typeof this[attrName] !== 'undefined';
+        }
+        var inputs = document.getElementsByTagName('*');
+        for (var i = 0; i < inputs.length; i++) {
+            inputs[i].hasAttribute = hasAttribute;
+        }
+    }());
+    }
+    if (!window.Element || !window.Element.prototype || !window.Element.prototype.getAttribute) {
+        (function () {
+            function getAttribute(attrName) {
+                return typeof this[attrName] !== 'undefined';
+            }
+            var inputs = document.getElementsByTagName('*');
+            for (var i = 0; i < inputs.length; i++) {
+                inputs[i].getAttribute = getAttribute;
+            }
+        }());
+    }(function () {
+        if (!document.getElementsByClassName) {
+            var indexOf = [].indexOf || function (prop) {
+                for (var i = 0; i < this.length; i++) {
+                    if (this[i] === prop) return i;
+                }
+                return -1;
+            };
+            getElementsByClassName = function (className, context) {
+                var elems = document.querySelectorAll ? context.querySelectorAll("." + className) : (function () {
+                    var all = context.getElementsByTagName("*"),
+                        elements = [],
+                        i = 0;
+                    for (; i < all.length; i++) {
+                        if (all[i].className && (" " + all[i].className + " ").indexOf(" " + className + " ") > -1 && indexOf.call(elements, all[i]) === -1) elements.push(all[i]);
+                    }
+                    return elements;
+                })();
+                return elems;
+            };
+            document.getElementsByClassName = function (className) {
+                return getElementsByClassName(className, document);
+            };
+            if (window.Element) {
+                window.Element.prototype.getElementsByClassName = function (className) {
+                    return getElementsByClassName(className, this);
+                };
+            }
+        }
+    })();
+    var suseIdx = true;
+    var suseId = true;
+    var suseClass = true;
+    var srelative = true;
+    var sae = [];
+    var sarr = [];
+    var sele = document.getElementsByTagName('*');
+    var smyid = 0;
+    var stextvalue = '';
+    var stagname = 0;
+    var sishidden = 0;
+    var scustname = '';
+    var smultipleFlag = false;
+    var element = arguments[0];
+    console.log(element);
+    var surl = arguments[1];
+    var snonamecounter = 1;
+    var txt_area_nonamecounter = 1;
+    var select_nonamecounter = 1;
+    var td_nonamecounter = 1;
+    var a_nonamecounter = 1;
+    var table_nonamecounter = 1;
+    var input_nonamecounter = 1;
+    var stagtype = '';
+    var ssname = 'null';
+    var sstagname = 'null';
+    var ssclassname = 'null';
+    var sclassname = 'null';
+    var top = 0;
+    var left = 0;
+    var height = 0;
+    var width = 0;
+    var coordinates = '';
+    var sisVisible = (function () {
+        function inside(schild, sparent) {
+            while (schild) {
+                if (schild === sparent) return true;
+                schild = schild.parentNode;
+            }
+            return false;
+        };
+        return function (selem) {
+            if (document.hidden || selem.offsetWidth == 0 || selem.offsetHeight == 0 || selem.style.visibility == 'hidden' || selem.style.display == 'none' || selem.style.opacity === 0) return false;
+            var srect = selem.getBoundingClientRect();
+            if (window.getComputedStyle || selem.currentStyle) {
+                var sel = selem,
+                    scomp = null;
+                while (sel) {
+                    if (sel === document) {
+                        break;
+                    } else if (!sel.parentNode) return false;
+                    scomp = window.getComputedStyle ? window.getComputedStyle(sel, null) : sel.currentStyle;
+                    if (scomp && (scomp.visibility == 'hidden' || scomp.display == 'none' || (typeof scomp.opacity !== 'undefined' && !(scomp.opacity > 0)))) return false;
+                    sel = sel.parentNode;
+                }
+            }
+            return true;
+        }
+    })();
 
+    function getElementProperties(element) {
+        stagtype = '';
+        ssname = 'null';
+        sstagname = 'null';
+        sid = element.id;
+        sname = element.name;
+        salttext = element.alt;
+        splaceholder = element.placeholder;
+        sclassname = element.className;
+        sid = (String(sid));
+        sclassname = (String(sclassname));
+        sname = (String(sname));
+        splaceholder = (String(splaceholder));
+        stextvalue = stext_content(element);
+        stextvalue = (String(stextvalue));
+        stagname = element.tagName.toLowerCase();
+        ssname = 'null';
+        sstagname = 'null';
+        ssclassname = 'null';
+        var role = 'null';
+        if (element.hasAttribute('role')) {
+            if (element.getAttribute('role') === 'grid' && element.tagName.toLowerCase() === 'div') {
+                role = 'grid';
+            }
+        }
+        findCoordinates(element);
+        if (stagname.indexOf(':') != -1) {
+            stagname = stagname.replace(':', '');
+            stagname = 'custom' + stagname;
+        }
+        if (sname != '' && sname != 'undefined') {
+            snames = document.getElementsByName(sname);
+            if (snames.length > 1) {
+                for (var k = 0; k < snames.length; k++) {
+                    if (element == snames[k]) {
+                        ssname = sname + '[' + k + ']'
+                    }
+                }
+            } else {
+                ssname = sname;
+            }
+        }
+        if (stagname != '' && stagname != 'undefined') {
+            stagnames = document.getElementsByTagName(stagname);
+            if (stagnames.length > 1) {
+                for (var k = 0; k < stagnames.length; k++) {
+                    if (element == stagnames[k]) {
+                        sstagname = stagname + '[' + k + ']'
+                    }
+                }
+            } else {
+                sstagname = stagname;
+            }
+        }
+        if (sclassname != '' && sclassname != 'undefined') {
+            try {
+                sclassnames = document.getElementsByClassName(sclassname);
+                if (sclassnames.length > 1) {
+                    for (var k = 0; k < sclassnames.length; k++) {
+                        if (element == sclassnames[k]) {
+                            ssclassname = sclassname + '[' + k + ']'
+                        }
+                    }
+                } else {
+                    ssclassname = sclassname;
+                }
+            } catch (err) {
+                console.log(sclassname);
+                console.log("skipping this element: " + err);
+            }
+        }
+        if (stagname != 'script' && stagname != 'meta' && stagname != 'html' && stagname != 'head' && stagname != 'style' && stagname != 'body' && stagname != 'form' && stagname != 'link' && stagname != 'noscript' && stagname != 'option' && stagname != '!' && stagname != 'code' && stagname != 'pre' && stagname != 'br' && stagname != 'animatetransform' && stagname != 'noembed') {
+            if (stextvalue == '' || stextvalue == 'null' || stextvalue == 'undefined' || stextvalue == '0') {
+                if (sname != '' && sname != 'undefined') {
+                    snames = document.getElementsByName(sname);
+                    if (snames.length > 1) {
+                        for (var k = 0; k < snames.length; k++) {
+                            if (element == snames[k]) {
+                                stextvalue = sname + k;
+                            }
+                        }
+                    } else {
+                        stextvalue = sname;
+                    }
+                } else if (sid != '' && sid != 'undefined') {
+                    stextvalue = sid;
+                } else if (splaceholder != '' && splaceholder != 'undefined') {
+                    stextvalue = splaceholder;
+                } else {
+                    var seles = document.getElementsByTagName(stagname);
+                    for (var k = 0; k < seles.length; k++) {
+                        if (element == seles[k]) {
+                            stextvalue = stagname + '_NONAME' + (k + 1);
+                        }
+                    }
+                }
+            }
+            if (sid == '') {
+                sid = 'null';
+            }
+            smultipleFlag = element.hasAttribute('multiple');
+            sishidden = sisVisible(element);
+            if (sishidden == true || sishidden == 'True' || sishidden == 'true') {
+                sishidden = 'No';
+            } else {
+                sishidden = 'Yes';
+            }
+            var sfirstpass = 0;
+            var srpath = '';
+            var setype = element.getAttribute('type');
+            setype = (String(setype)).toLowerCase();
+            for (var spath = ''; element && element.nodeType == 1; element = element.parentNode) {
+                var spredicate = [];
+                var ssiblings = element.parentNode.children;
+                var scount = 0;
+                var sunique = false;
+                var snewPath = '';
+                var sidx = 0;
+                for (var i = 0; ssiblings && (i < ssiblings.length); i++) {
+                    if (ssiblings[i].tagName == element.tagName) {
+                        scount++;
+                        if (ssiblings[i] == element) {
+                            sidx = scount;
+                        }
+                    }
+                }
+                if (sidx == 1 && scount == 1) {
+                    sidx = null;
+                }
+                if (suseId && element.id) {
+                    spredicate[spredicate.length] = '@id=' + '"' + element.id + '"';
+                    sunique = true;
+                }
+                xidx = (suseIdx && sidx) ? ('[' + sidx + ']') : '';
+                sidx = (suseIdx && sidx && !sunique) ? ('[' + sidx + ']') : '';
+                spredicate = (spredicate.length > 0) ? ('[' + spredicate.join(' and ') + ']') : '';
+                spath = '/' + element.tagName.toLowerCase() + xidx + spath;
+                if (sfirstpass == 0) {
+                    if (sunique && srelative) {
+                        srpath = '//*' + sidx + spredicate + srpath;
+                        sfirstpass = 1;
+                    } else {
+                        srpath = '/' + element.tagName.toLowerCase() + sidx + spredicate + srpath;
+                    }
+                }
+            }
+            if (stagname == 'textarea') {
+                stagname = 'input';
+                stagtype = 'txtarea';
+            } else if (stagname == 'select' && smultipleFlag) {
+                stagname = 'list';
+                stagtype = 'lst';
+            } else if (stagname == 'select') {
+                stagtype = 'select';
+            } else if (stagname == 'td' || stagname == 'tr') {
+                stagname = 'tablecell';
+                stagtype = 'tblcell';
+            } else if (stagname == 'a') {
+                stagtype = 'lnk';
+            } else if (stagname == 'table') {
+                stagtype = 'tbl';
+            } else if (stagname == 'img') {
+                stagtype = 'img';
+            } else if (stagname == 'input' && setype == 'image') {
+                stagname = 'img';
+                stagtype = 'img';
+            }
+            if (stagname == 'input' && (setype == 'button' || setype == 'submit' || setype == 'reset' || setype == 'file')) {
+                stagname = 'button';
+                stagtype = 'btn';
+            } else if (stagname == 'input' && setype == 'radio') {
+                stagname = 'radiobutton';
+                stagtype = 'radiobtn';
+            } else if (stagname == 'input' && setype == 'checkbox') {
+                stagname = 'checkbox';
+                stagtype = 'chkbox';
+            } else if (stagname == 'input' && (setype == 'text' || setype == 'email' || setype == 'number' || setype == 'password' || setype == 'range' || setype == 'search' || setype == 'url')) {
+                stagname = 'input';
+                stagtype = 'txtbox';
+            } else if (stagname == 'input' && stagtype == '' && (setype == 'hidden' || setype == 'null')) {
+                stagname = 'div';
+                stagtype = 'elmnt';
+            } else if (stagname == 'button') {
+                stagname = 'button';
+                stagtype = 'btn';
+            }
+            if (role == 'grid') {
+                stagname = 'grid';
+                stagtype = 'grid';
+            }
+            stextvalue = stextvalue.replace(">", "");
+            stextvalue = stextvalue.replace("</", "");
+            stextvalue = stextvalue.replace("<", "");
+            stextvalue = stextvalue.replace("/>", "");
+            stextvalue = stextvalue.split("\\n").join("");
+            stextvalue = stextvalue.split("\\t").join("");
+            stextvalue = stextvalue.split("\\r").join("");
+            stextvalue = stextvalue.split("  ").join("");
+            stextvalue = stextvalue.split("\\u00a0").join("");
+            if (stextvalue == '' || stextvalue.length == 0 || stextvalue == '0') {
+                stextvalue = 'NONAME' + snonamecounter;
+                snonamecounter = snonamecounter + 1;
+                scustname = stextvalue;
+            } else {
+                scustname = stextvalue;
+            }
+            if (stagtype != '') {
+                scustname = scustname + '_' + stagtype;
+            } else {
+                scustname = scustname + '_elmnt';
+            }
+            coordinates = left + ';' + top + ';' + height + ';' + width;
+            coordinates = String(coordinates);
+            snewPath = String(srpath) + ';' + String(sid) + ';' + String(spath) + ';' + ssname + ';' + sstagname + ';' + ssclassname + ';' + coordinates + ';' + stextvalue + ';' + 'null' + ';' + stagname;
+            sarr.push({
+                'xpath': snewPath,
+                'tag': stagname,
+                'hiddentag': sishidden,
+                'url': surl,
+                'height': height,
+                'width': width,
+                'custname': scustname,
+                'top': top,
+                'left': left
+            });
+        }
+        return sarr;
+    }
+
+    function findCoordinates(element) {
+        height = element.offsetHeight;
+        width = element.offsetWidth;
+        top = 0;
+        left = 0;
+        do {
+            top += element.offsetTop || 0;
+            left += element.offsetLeft || 0;
+            element = element.offsetParent;
+        } while (element);
+    }
+
+    function saddNodesOuter(sarray, scollection) {
+        for (var i = 0; scollection && scollection.length && i < scollection.length; i++) {
+            sarray.push(scollection[i]);
+        }
+    };
+
+    function stext_content(f) {
+        var sfirstText = '';
+        var stextdisplay = '';
+        for (var z = 0; z < f.childNodes.length; z++) {
+            var scurNode = f.childNodes[z];
+            swhitespace = /^\s*$/;
+            if (scurNode.nodeName === '#text' && !(swhitespace.test(scurNode.nodeValue))) {
+                sfirstText = scurNode.nodeValue;
+                stextdisplay = stextdisplay + sfirstText;
+            }
+        }
+        return (stextdisplay);
+    };
+    return getElementProperties(element);
+    """
 
     AVO_ASSURE_WEBELEMENT_HIGHLIGHT_STYLE = "background: #fff300 !important; border: 2px solid #cc3300 !important;outline: 2px solid #fff300 !important;"
 
