@@ -38,7 +38,7 @@ WizardStyle=modern
 DisableWelcomePage=no
 DisableDirPage=no
 DisableReadyPage=yes
- SignTool=ksigning /d $qAvo Assure$q /du $qhttps://www.avoautomation.ai$q $f
+; SignTool=ksigning /d $qAvo Assure$q /du $qhttps://www.avoautomation.ai$q $f
  
 
 [Languages]
