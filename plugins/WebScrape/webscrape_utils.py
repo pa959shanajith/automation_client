@@ -579,30 +579,44 @@ class WebScrape_Utils:
                         console.log("skipping this element: " + err);
                     }
                 }
+                // capture label content of the element
+                function findLableForControl(ele) {
+                    var idVal = ele.id;
+                    labels = document.getElementsByTagName('label');
+                    for( var i = 0; i < labels.length; i++ ) {
+                        if (labels[i].htmlFor == idVal)
+                            return labels[i];
+                    }
+                }
                 if (tagname != 'script' && tagname != 'meta' && tagname != 'html' && tagname != 'head' && tagname != 'style' && tagname != 'body' && tagname != 'form' && tagname != 'link' && tagname != 'noscript' && tagname != '!' && tagname != 'pre' && tagname != 'code' && tagname != 'animatetransform' && tagname != 'noembed') {
                     if (textvalue == '' || textvalue == 'null' || textvalue == 'undefined' || textvalue == '0') {
-                        if (name != '' && name != 'undefined') {
-                            names = document.getElementsByName(name);
-                            if (names.length > 1) {
-                                for (var k = 0; k < names.length; k++) {
-                                    if (f == names[k]) {
-                                        textvalue = name + k;
-                                    }
-                                }
-                            } else {
-                                textvalue = name;
-                            }
-                        } else if (id != '' && id != 'undefined') {
-                            textvalue = id;
-                        } else if (placeholder != '' && placeholder != 'undefined') {
+                        //if (name != '' && name != 'undefined') {
+                        //    names = document.getElementsByName(name);
+                        //    if (names.length > 1) {
+                        //        for (var k = 0; k < names.length; k++) {
+                        //            if (f == names[k]) {
+                        //                textvalue = name + k;
+                        //            }
+                        //        }
+                        //    } else {
+                        //        textvalue = name;
+                        //    }
+                        //} else if (id != '' && id != 'undefined') {
+                        //    textvalue = id;
+                        //} else if (placeholder != '' && placeholder != 'undefined') {
+                        //    textvalue = placeholder;
+                        //} else {
+                        //    var eles = document.getElementsByTagName(tagname);
+                        //    for (var k = 0; k < eles.length; k++) {
+                        //        if (f == eles[k]) {
+                        //            textvalue = tagname + '_NONAME' + (k + 1);
+                        //        }
+                        //    }
+                        //}
+                        if (placeholder != '' && placeholder != 'undefined') {
                             textvalue = placeholder;
-                        } else {
-                            var eles = document.getElementsByTagName(tagname);
-                            for (var k = 0; k < eles.length; k++) {
-                                if (f == eles[k]) {
-                                    textvalue = tagname + '_NONAME' + (k + 1);
-                                }
-                            }
+                        } else if (f.nodeName.toLowerCase() == 'input' || f.nodeName.toLowerCase() == 'select' || f.nodeName.toLowerCase() == 'textarea' || f.nodeName.toLowerCase() == 'progress' || f.nodeName.toLowerCase() == 'meter') {
+	                        textvalue = findLableForControl(f).textContent;
                         }
                     }
                     if (tagname == 'select') {
