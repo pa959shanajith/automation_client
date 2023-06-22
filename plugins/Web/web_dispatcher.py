@@ -836,42 +836,42 @@ class Dispatcher:
             log.debug(msg1)
             log.error(e)
 
-    def find_element_by_label(self, driver, type, identifier):
+    def find_element_by_label(self, driver, identifiers_type, identifier):
         temp_element = None
         web_element = None
-        temp_element = getattr(driver,self.identifier_dict[type])(f'//*[text()="{identifier}"]')
+        temp_element = getattr(driver,self.identifier_dict[identifiers_type])(f'//*[text()="{identifier}"]')
         if len(temp_element) == 1:
             temp_element_tagname = driver.execute_script("""return arguments[0].tagName.toLowerCase();""", temp_element[0])
             if temp_element_tagname == 'label':
                 web_element_id = driver.execute_script("""return arguments[0].htmlFor;""", temp_element[0])
-                web_element = getattr(driver,self.identifier_dict[type])(f'//*[@id="{web_element_id}"]')
+                web_element = getattr(driver,self.identifier_dict[identifiers_type])(f'//*[@id="{web_element_id}"]')
             else:
                 web_element = temp_element
         return web_element
 
-    def element_locator(self,driver,type,identifier,id_num):
+    def element_locator(self,driver,identifiers_type,identifier,id_num):
         if identifier=='null': return None
         webElement = None
         try:
             index = 0
-            if type == "classname" :
+            if identifiers_type == "classname" :
                 if '[' and ']' in identifier:
                     index = int(identifier.split('[')[1].split(']')[0])
                     identifier = identifier.split('[')[0]
                 if ' ' in identifier.strip():
                     identifier = '.'+identifier.replace(' ','.')
-                    type = 'css_selector'
-                webElement=getattr(driver,self.identifier_dict[type])(identifier)
+                    identifiers_type = 'css_selector'
+                webElement=getattr(driver,self.identifier_dict[identifiers_type])(identifier)
                 if len(webElement) > index:
                     webElement = [webElement[index]]
-            elif type == "href":
-                webElement = getattr(driver,self.identifier_dict[type])(f'[href^="{identifier}"]')
-            elif type == "label":
-                webElement = getattr(driver,self.identifier_dict[type])(f'//*[@placeholder="{identifier}"]')
+            elif identifiers_type == "href":
+                webElement = getattr(driver,self.identifier_dict[identifiers_type])(f'[href^="{identifier}"]')
+            elif identifiers_type == "label":
+                webElement = getattr(driver,self.identifier_dict[identifiers_type])(f'//*[@placeholder="{identifier}"]')
                 if len(webElement) == 0:
-                    webElement = self.find_element_by_label(driver, type, identifier)
+                    webElement = self.find_element_by_label(driver, identifiers_type, identifier)
             else:
-                webElement=getattr(driver,self.identifier_dict[type])(identifier)
+                webElement=getattr(driver,self.identifier_dict[identifiers_type])(identifier)
             if len(webElement) == 1:
                 webElement=webElement[0]
                 try:
@@ -883,8 +883,8 @@ class Dispatcher:
                                             'css_selector':'CSS Selector',
                                             'href':'Href Attribute',
                                             'label':'Label'}
-                    logger.print_on_console(f'Webelement found by OI "{identifier_fullname[type]}"')
-                    local_Wd.log.info(f'Webelement found by OI "{str(type)}"')
+                    logger.print_on_console(f'Webelement found by OI "{identifier_fullname[identifiers_type]}"')
+                    local_Wd.log.info(f'Webelement found by OI "{str(identifiers_type)}"')
                 except:
                     logger.print_on_console(f'Webelement found by OI "{id_num}"')
                     local_Wd.log.info(f'Webelement found by OI "{id_num}"')
