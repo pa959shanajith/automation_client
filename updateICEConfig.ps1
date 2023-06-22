@@ -20,6 +20,7 @@ try
         {
             $wurl = $wurl.Replace("avoassureclient0_","");
             $config.isTrial=0;
+            $config.ice_Token="";
 
         }
 #--for trial license
