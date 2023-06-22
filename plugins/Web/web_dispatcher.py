@@ -836,6 +836,19 @@ class Dispatcher:
             log.debug(msg1)
             log.error(e)
 
+    def find_element_by_label(self, driver, type, identifier):
+        temp_element = None
+        web_element = None
+        temp_element = getattr(driver,self.identifier_dict[type])(f'//*[text()="{identifier}"]')
+        if len(temp_element) == 1:
+            temp_element_tagname = driver.execute_script("""return arguments[0].tagName.toLowerCase();""", temp_element[0])
+            if temp_element_tagname == 'label':
+                web_element_id = driver.execute_script("""return arguments[0].htmlFor;""", temp_element[0])
+                web_element = getattr(driver,self.identifier_dict[type])(f'//*[@id="{web_element_id}"]')
+            else:
+                web_element = temp_element
+        return web_element
+
     def element_locator(self,driver,type,identifier,id_num):
         if identifier=='null': return None
         webElement = None
@@ -854,7 +867,9 @@ class Dispatcher:
             elif type == "href":
                 webElement = getattr(driver,self.identifier_dict[type])(f'[href^="{identifier}"]')
             elif type == "label":
-                webElement = getattr(driver,self.identifier_dict[type])(f'//*[contains(text(),"{identifier}")] | //*[@value="{identifier}"] | //*[@name="{identifier}"]')
+                webElement = getattr(driver,self.identifier_dict[type])(f'//*[@placeholder="{identifier}"]')
+                if len(webElement) == 0:
+                    webElement = self.find_element_by_label(driver, type, identifier)
             else:
                 webElement=getattr(driver,self.identifier_dict[type])(identifier)
             if len(webElement) == 1:
@@ -866,7 +881,7 @@ class Dispatcher:
                                             'name':'Name Attribute',
                                             'classname':'Classname Attribute',
                                             'css_selector':'CSS Selector',
-                                            'href':'Hyperlink',
+                                            'href':'Href Attribute',
                                             'label':'Label'}
                     logger.print_on_console(f'Webelement found by OI "{identifier_fullname[type]}"')
                     local_Wd.log.info(f'Webelement found by OI "{str(type)}"')
