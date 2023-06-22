@@ -30,7 +30,7 @@ DisableStartupPrompt=yes
 ; Remove the following line to run in administrative install mode (install for all users.)
 PrivilegesRequired=lowest
 OutputDir=..\Binaries
-OutputBaseFilename=Avoassureclient
+OutputBaseFilename=AvoAssureClient
 SetupIconFile=C:\AVO\avo.ico
 Compression=lzma
 SolidCompression=yes
