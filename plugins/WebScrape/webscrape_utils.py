@@ -1331,7 +1331,7 @@ return (temp);"""
             }
             coordinates = left + ';' + top + ';' + height + ';' + width;
             coordinates = String(coordinates);
-            snewPath = String(srpath) + ';' + String(sid) + ';' + String(spath) + ';' + ssname + ';' + sstagname + ';' + ssclassname + ';' + coordinates + ';' + stextvalue + ';' + 'null' + ';' + stagname;
+            snewPath = String(spath) + ';' + String(sid) + ';' + String(srpath) + ';' + ssname + ';' + sstagname + ';' + ssclassname + ';' + coordinates + ';' + stextvalue + ';' + 'null' + ';' + stagname;
             sarr.push({
                 'xpath': snewPath,
                 'tag': stagname,
