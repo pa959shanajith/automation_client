@@ -39,13 +39,13 @@ class UserObject:
                 right_part = ';'.join(map(str,xpath_string[2:]))
             data['url']=obj.scrape_unwrap(d['url'])
             data['apath']=left_part.split(';')[0]
-            data['rpath']=xpath_string[1]
+            data['rpath']=right_part.split(';')[0]
             data['id']=left_part.split(';')[1]
             data['tag']=d['tag']
-            data["name"]=right_part.split(';')[0]
-            data["tagname"]=right_part.split(';')[1]
-            data["classname"]=right_part.split(';')[2]
-            data["selector"]=right_part.split(';')[8]
+            data["name"]=right_part.split(';')[1]
+            data["tagname"]=right_part.split(';')[2]
+            data["classname"]=right_part.split(';')[3]
+            data["selector"]=right_part.split(';')[9]
             log.debug('data decrypt',data)
             socketIO.emit('scrape',data)
 
