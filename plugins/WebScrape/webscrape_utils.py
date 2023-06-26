@@ -627,12 +627,9 @@ class WebScrape_Utils:
                         if (placeholder != '' && placeholder != 'undefined') {
                             label = placeholder;
                         } else if (f.nodeName.toLowerCase() == 'input' || f.nodeName.toLowerCase() == 'select' || f.nodeName.toLowerCase() == 'textarea' || f.nodeName.toLowerCase() == 'progress' || f.nodeName.toLowerCase() == 'meter') {
-	                        console.log('inside fun');
                             label = findLableForControl(f);
-                            console.log(typeof(label));
                         }
                         if (f.nodeName.toLowerCase() == 'input' && (label == null || label == '')) {
-                            console.log('inside input');
                             if (f.hasAttribute('value')) {
                                 label = f.getAttribute('value');
                             }
