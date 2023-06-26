@@ -88,6 +88,7 @@ class WebScrape_Utils:
         var ishidden = 0;
         var tagname = 0;
         var textvalue = '';
+        var label = '';
         var arr = [];
         var custname = '';
         var tagtype = '';
@@ -526,6 +527,8 @@ class WebScrape_Utils:
                 placeholder = (String(placeholder));
                 var textvalue = text_content(f);
                 textvalue = (String(textvalue));
+                var label = text_content(f);
+                label = (String(label));
                 findCoordinates(f);
                 if (name != '' && name != 'undefined') {
                     names = document.getElementsByName(name);
@@ -579,44 +582,63 @@ class WebScrape_Utils:
                         console.log("skipping this element: " + err);
                     }
                 }
-                // capture label content of the element
-                function findLableForControl(ele) {
-                    var idVal = ele.id;
-                    labels = document.getElementsByTagName('label');
-                    for( var i = 0; i < labels.length; i++ ) {
-                        if (labels[i].htmlFor == idVal)
-                            return labels[i];
-                    }
-                }
                 if (tagname != 'script' && tagname != 'meta' && tagname != 'html' && tagname != 'head' && tagname != 'style' && tagname != 'body' && tagname != 'form' && tagname != 'link' && tagname != 'noscript' && tagname != '!' && tagname != 'pre' && tagname != 'code' && tagname != 'animatetransform' && tagname != 'noembed') {
                     if (textvalue == '' || textvalue == 'null' || textvalue == 'undefined' || textvalue == '0') {
-                        //if (name != '' && name != 'undefined') {
-                        //    names = document.getElementsByName(name);
-                        //    if (names.length > 1) {
-                        //        for (var k = 0; k < names.length; k++) {
-                        //            if (f == names[k]) {
-                        //                textvalue = name + k;
-                        //            }
-                        //        }
-                        //    } else {
-                        //        textvalue = name;
-                        //    }
-                        //} else if (id != '' && id != 'undefined') {
-                        //    textvalue = id;
-                        //} else if (placeholder != '' && placeholder != 'undefined') {
-                        //    textvalue = placeholder;
-                        //} else {
-                        //    var eles = document.getElementsByTagName(tagname);
-                        //    for (var k = 0; k < eles.length; k++) {
-                        //        if (f == eles[k]) {
-                        //            textvalue = tagname + '_NONAME' + (k + 1);
-                        //        }
-                        //    }
-                        //}
-                        if (placeholder != '' && placeholder != 'undefined') {
+                        if (name != '' && name != 'undefined') {
+                            names = document.getElementsByName(name);
+                            if (names.length > 1) {
+                                for (var k = 0; k < names.length; k++) {
+                                    if (f == names[k]) {
+                                        textvalue = name + k;
+                                    }
+                                }
+                            } else {
+                                textvalue = name;
+                            }
+                        } else if (id != '' && id != 'undefined') {
+                            textvalue = id;
+                        } else if (placeholder != '' && placeholder != 'undefined') {
                             textvalue = placeholder;
+                        } else {
+                            var eles = document.getElementsByTagName(tagname);
+                            for (var k = 0; k < eles.length; k++) {
+                                if (f == eles[k]) {
+                                    textvalue = tagname + '_NONAME' + (k + 1);
+                                }
+                            }
+                        }
+                    }
+                    // capture label content of the element
+                    function findLableForControl(ele) {
+                        var idVal = ele.id;
+                        labels = document.getElementsByTagName('label');
+                        if (labels.length !== 0) {
+                            for( var i = 0; i < labels.length; i++ ) {
+                                if (labels[i].htmlFor == idVal) {
+                                    return labels[i].textContent;
+                                }
+                            }
+                        }
+                        else {
+                            return null;
+                        }
+                    }
+                    if (label == '' || label == 'null' || label == 'undefined' || label == '0') {
+                        if (placeholder != '' && placeholder != 'undefined') {
+                            label = placeholder;
                         } else if (f.nodeName.toLowerCase() == 'input' || f.nodeName.toLowerCase() == 'select' || f.nodeName.toLowerCase() == 'textarea' || f.nodeName.toLowerCase() == 'progress' || f.nodeName.toLowerCase() == 'meter') {
-	                        textvalue = findLableForControl(f).textContent;
+	                        console.log('inside fun');
+                            label = findLableForControl(f);
+                            console.log(typeof(label));
+                        }
+                        if (f.nodeName.toLowerCase() == 'input' && (label == null || label == '')) {
+                            console.log('inside input');
+                            if (f.hasAttribute('value')) {
+                                label = f.getAttribute('value');
+                            }
+                            else {
+                                label = null;
+                            }
                         }
                     }
                     if (tagname == 'select') {
@@ -788,7 +810,7 @@ class WebScrape_Utils:
                     }
 
                     //We will be using absolute xpath first as relative xpath has id that may change and incorrect element may get selected.
-                    newPath = String(path) + ';' + String(id) + ';' + String(rpath) + ';' + ssname + ';' + sstagname + ';' + ssclassname + ';' + coordinates + ';' + textvalue + ';' + String(href) + ';' + cssSelector;
+                    newPath = String(path) + ';' + String(id) + ';' + String(rpath) + ';' + ssname + ';' + sstagname + ';' + ssclassname + ';' + coordinates + ';' + label + ';' + String(href) + ';' + cssSelector;
                     for (var i = 0; i < arr.length; i++) {
                         if (arr[i].xpath == newPath) {
                             uniqueFlag = true;

@@ -867,7 +867,7 @@ class Dispatcher:
             elif identifiers_type == "href":
                 webElement = getattr(driver,self.identifier_dict[identifiers_type])(f'[href^="{identifier}"]')
             elif identifiers_type == "label":
-                webElement = getattr(driver,self.identifier_dict[identifiers_type])(f'//*[@placeholder="{identifier}"]')
+                webElement = getattr(driver,self.identifier_dict[identifiers_type])(f'//*[@placeholder="{identifier}"] | //*[@value="{identifier}"]')
                 if len(webElement) == 0:
                     webElement = self.find_element_by_label(driver, identifiers_type, identifier)
             else:
