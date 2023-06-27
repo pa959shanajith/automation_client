@@ -191,6 +191,16 @@ class ScrapeWindow(wx.Frame):
                 # 10 is the limit of MB set as per Avo Assure standards
                 if d is not None:
                     if self.core_utilsobject.getdatasize(str(d),'mb') < 10:
+                        
+                        # Separate the items starting with "NONAME" from the rest of the items
+                        noname_items = [item for item in d['view'] if item['text'].startswith('NONAME')]
+                        other_items = [item for item in d['view'] if not item['text'].startswith('NONAME')]
+
+                        # Combine the sorted items and the items starting with "NONAME"
+                        sorted_view_list = other_items + noname_items
+
+                        # Update the 'view' list in the JSON data
+                        d['view'] = sorted_view_list
                         self.socketIO.emit('scrape',d)
                     else:
                         self.print_error('Scraped data exceeds max. Limit.')
