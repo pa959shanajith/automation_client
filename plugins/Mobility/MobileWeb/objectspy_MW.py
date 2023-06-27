@@ -70,7 +70,9 @@ class Object_Mapper():
             for element in elementsdata['view']:
                 # XPath and URL decryption logic implemented
                 xpath_string = element['xpath'].split(';')
-                if not xpath_string[0]:
+                check_xpath_list = [i.strip() for i in xpath_string]
+                check_xpath_list = [i for i in check_xpath_list if i]
+                if len(check_xpath_list) == 0:
                     raise ValueError('xpath of the object is empty')
                 if len(xpath_string) == 3:
                     left_part = self.coreutilsobj.scrape_unwrap(xpath_string[0])
