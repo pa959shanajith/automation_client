@@ -851,7 +851,7 @@ class OutlookKeywords:
                     log.info(error_msg)
                     logger.print_on_console(error_msg)
             except Exception as e:
-                logger.print_on_console('Error : mail does''t have such info')
+                logger.print_on_console('Error: mail does not have such info')
                 error_msg = desktop_constants.ERROR_MSG + ' : ' + str(e)
                 log.error(error_msg)
                 logger.print_on_console(error_msg)
