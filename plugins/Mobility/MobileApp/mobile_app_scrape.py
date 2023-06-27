@@ -191,28 +191,17 @@ class ScrapeWindow(wx.Frame):
                 # 10 is the limit of MB set as per Avo Assure standards
                 if d is not None:
                     if self.core_utilsobject.getdatasize(str(d),'mb') < 10:
-                        file_path = "Mobile_ScrapeData.json"
-                        with open(file_path, "w") as file:
-                            json.dump(d, file)
-
-                        # Read the JSON data from the file
-                        with open('Mobile_ScrapeData.json', 'r') as file:
-                            fullScraped_json_data = json.load(file)
-
+                        
                         # Separate the items starting with "NONAME" from the rest of the items
-                        noname_items = [item for item in fullScraped_json_data['view'] if item['text'].startswith('NONAME')]
-                        other_items = [item for item in fullScraped_json_data['view'] if not item['text'].startswith('NONAME')]
+                        noname_items = [item for item in d['view'] if item['text'].startswith('NONAME')]
+                        other_items = [item for item in d['view'] if not item['text'].startswith('NONAME')]
 
                         # Combine the sorted items and the items starting with "NONAME"
                         sorted_view_list = other_items + noname_items
 
                         # Update the 'view' list in the JSON data
-                        fullScraped_json_data['view'] = sorted_view_list
-
-                        # Write the modified JSON data back to the file
-                        with open('output.json', 'w') as file:
-                            json.dump(fullScraped_json_data, file, indent=4)
-                            self.socketIO.emit('scrape',fullScraped_json_data)
+                        d['view'] = sorted_view_list
+                        self.socketIO.emit('scrape',d)
                     else:
                         self.print_error('Scraped data exceeds max. Limit.')
                         self.socketIO.emit('scrape','Response Body exceeds max. Limit.')
