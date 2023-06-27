@@ -610,17 +610,21 @@ class WebScrape_Utils:
                     }
                     // capture label content of the element
                     function findLableForControl(ele) {
-                        var idVal = ele.id;
-                        labels = document.getElementsByTagName('label');
-                        if (labels.length !== 0) {
-                            for( var i = 0; i < labels.length; i++ ) {
-                                if (labels[i].htmlFor == idVal) {
-                                    return labels[i].textContent;
+                        try {
+                            var idVal = ele.id;
+                            labels = document.getElementsByTagName('label');
+                            if (labels.length !== 0) {
+                                for( var i = 0; i < labels.length; i++ ) {
+                                    if (labels[i].htmlFor == idVal) {
+                                        return labels[i].textContent;
+                                    }
                                 }
                             }
-                        }
-                        else {
-                            return null;
+                            else {
+                                return null;
+                            }
+                        } catch (err) {
+                            console.log("skipping this element: " + err);
                         }
                     }
                     if (label == '' || label == 'null' || label == 'undefined' || label == '0') {
@@ -766,34 +770,39 @@ class WebScrape_Utils:
                     // capture css selector of the element
                     var cssSelector = '';
                     function getCssSelector(ele) {
-                        let path = [];
-                        let parentEle = ele.parentNode;
-                        while (ele.nodeName.toLowerCase() != 'body') {
-                            let selector = ele.nodeName.toLowerCase();
-                            let arr = Array.from(ele.parentNode.children);
-                            let tagNameArr = [];
-                            for (i = 0; i < arr.length; i++) {
-                                let tag = arr[i].tagName.toLowerCase();
-                                tagNameArr.push(tag);
-                            }
-                            let count = tagNameArr.toString().match(new RegExp(selector, 'g')).length;
-                            if (ele.id) {
-                                selector += '#' + ele.id;
-                            }
-                            else if (count > 1) {
-                                let sib = ele.previousSibling, nth = 1;
-                                while((sib != null) && nth++) {
-                                    if ((sib.nodeName.toLowerCase() == '#text') || (sib.nodeName.toLowerCase() == '#comment')) {
-                                        nth--;
-                                    }
-                                    sib = sib.previousSibling;
+                        try {
+                            let path = [];
+                            let parentEle = ele.parentNode;
+                            while (ele.nodeName.toLowerCase() != 'body') {
+                                let selector = ele.nodeName.toLowerCase();
+                                let arr = Array.from(ele.parentNode.children);
+                                let tagNameArr = [];
+                                for (i = 0; i < arr.length; i++) {
+                                    let tag = arr[i].tagName.toLowerCase();
+                                    tagNameArr.push(tag);
                                 }
-                                selector += ":nth-child("+nth+")";
+                                let count = tagNameArr.toString().match(new RegExp(selector, 'g')).length;
+                                if (ele.id) {
+                                    selector += '#' + ele.id;
+                                }
+                                else if (count > 1) {
+                                    let sib = ele.previousSibling, nth = 1;
+                                    while((sib != null) && nth++) {
+                                        if ((sib.nodeName.toLowerCase() == '#text') || (sib.nodeName.toLowerCase() == '#comment')) {
+                                            nth--;
+                                        }
+                                        sib = sib.previousSibling;
+                                    }
+                                    selector += ":nth-child("+nth+")";
+                                }
+                                path.unshift(selector);
+                                ele = ele.parentNode;
                             }
-                            path.unshift(selector);
-                            ele = ele.parentNode;
+                            return path.join(" > ");
+                        } catch (err) {
+                            console.log("skipping this element: " + err);
                         }
-                        return path.join(" > ");
+
                     }
                     cssSelector = getCssSelector(f);
 
