@@ -138,6 +138,7 @@ class DesktopDispatcher:
         'setbody' : outook_obj.send_body,
         'setattachments' : outook_obj.send_attachments,
         'sendemail' : outook_obj.send_mail,
+        'verifyattachmentcontent' : outook_obj.verify_attachment_content,
         'clickiris' : iris_object.clickiris,
         'doubleclickiris' : iris_object.doubleclickiris,
         'rightclickiris' : iris_object.rightclickiris,
@@ -181,7 +182,8 @@ class DesktopDispatcher:
           'setsubject' : 12,
           'setbody' : 13,
           'setattachments' : 14,
-          'sendemail' : 15
+          'sendemail' : 15,
+          'verifyattachmentcontent': 16
     }
 
     # For custom objects

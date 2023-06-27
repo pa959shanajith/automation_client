@@ -25,7 +25,10 @@ import core_utils
 import tempfile
 import os
 import shutil
+import fitz
 log = logging.getLogger( 'outlook.py' )
+
+AVO_ASSURE_HOME = os.environ["AVO_ASSURE_HOME"]
 
 ## This class will have the methods to automate Outlook Application
 class OutlookKeywords:
@@ -203,6 +206,7 @@ class OutlookKeywords:
                 FromMailId = ''
                 AttachmentStatus = outlook_constants.ATTACH_STATUS_NO
                 Body = ''
+                attachment_list = []
                 Flag = False
                 if ( self.outlook == None ):
                      self.outlook = self.getOutlookComObj(2)
@@ -247,6 +251,7 @@ class OutlookKeywords:
                         body_image_count=0
                         while x <= nbrOfAttachmentInMessage:
                             attachment_item = attachments_item.Item(x)
+                            attachment_list.append(attachment_item)
                             fn = attachment_item.FileName
                             log.info( fn )
                             filename = fn.split('.')
@@ -266,7 +271,7 @@ class OutlookKeywords:
                                 msg.Display()
                                 Flag = True
                                 key = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(5)) #creating a random key of length '5'
-                                self.GetEmailList.append({'Subject' : msg.Subject, 'ToMailID' : ToMailID, 'FromMailId' : FromMailId, 'AttachmentStatus' : AttachmentStatus, 'Body' : msg.Body, 'Flag' : Flag, 'Key' : key, 'Content' : msg})
+                                self.GetEmailList.append({'Subject' : msg.Subject, 'ToMailID' : ToMailID, 'FromMailId' : FromMailId, 'AttachmentStatus' : AttachmentStatus, 'Body' : msg.Body, 'Flag' : Flag, 'Key' : key, 'Content' : msg, 'AttachmentList': attachment_list})
                                 result = key
                                 status = desktop_constants.TEST_RESULT_PASS
                                 method_output = desktop_constants.TEST_RESULT_TRUE
@@ -788,4 +793,67 @@ class OutlookKeywords:
             if ( error_msg ):
                 log.info( error_msg )
                 logger.print_on_console( error_msg )
+            return status, method_output, result, error_msg
+        
+        def verify_attachment_content(self, input_value, *args):
+            """
+                def : verify_attachment_content
+                purpose : verifies whether the content is present or not in the attachment specified in the input of an Email.
+                param  : inputs : 1. list containing the output of the getEmail Keyword, attachment name and content to verify. 
+                return : pass,true / fail,false
+            """
+
+            status = desktop_constants.TEST_RESULT_FAIL
+            method_output = desktop_constants.TEST_RESULT_FALSE
+            result = OUTPUT_CONSTANT
+            error_msg = None
+            status_flag = True
+            attachment_path = None
+
+            try:
+                attachment_name = input_value[1]
+                if len(input_value) == 3 and attachment_name.split('.')[-1] == 'pdf':
+                    for data in self.GetEmailList:
+                        if input_value[0] == data['Key'] and data['Flag'] == True and data['AttachmentStatus'] == 'Yes' and len(data['AttachmentList']) > 0:
+                            for attachment in data['AttachmentList']:
+                                if attachment.FileName == attachment_name:
+                                    attachment_path = AVO_ASSURE_HOME + '\\' + attachment.FileName
+                                    attachment.SaveAsFile(attachment_path)
+                                    status_flag = False
+                                    break
+                            else:
+                                error_msg = 'Error: Attachment name ' + attachment_name + ' is not present in the mail'
+                    
+                    if attachment_path is not None:
+                        page_content = None
+                        content_to_verify = input_value[2]
+                        with fitz.open(attachment_path) as document:
+                            page_content = chr(12).join([page.getText() for page in document])
+                        if page_content is not None:
+                            if content_to_verify in page_content.replace('\n',''):
+                                logger.print_on_console(content_to_verify + " is present in the attachment " + attachment_name)
+                                status = desktop_constants.TEST_RESULT_PASS
+                                method_output = desktop_constants.TEST_RESULT_TRUE
+                                status_flag = False
+                            else:
+                                error_msg = content_to_verify + " is not present in the attachment " + attachment_name
+
+                        if os.path.isfile(attachment_path):
+                            os.remove(attachment_path)
+                        
+                else:
+                    error_msg = 'Error: Invalid Input'
+
+                if status_flag and error_msg is None:
+                    error_msg = 'Error: mail does not have such info'
+
+                if error_msg:
+                    log.info(error_msg)
+                    logger.print_on_console(error_msg)
+            except Exception as e:
+                logger.print_on_console('Error : mail does''t have such info')
+                error_msg = desktop_constants.ERROR_MSG + ' : ' + str(e)
+                log.error(error_msg)
+                logger.print_on_console(error_msg)
+
             return status, method_output, result, error_msg

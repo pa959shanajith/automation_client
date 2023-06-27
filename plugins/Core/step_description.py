@@ -966,6 +966,8 @@ class StepDescription:
             return 'Set attachment/attachments from the path '+"'"+input+"'"+' for the email and save the value in '+"'"+tsp_outputval+"'."
         def sendemail():
             return 'Send the email and save the value in '+"'"+tsp_outputval+"'."
+        def verifyattachmentcontent():
+            return 'Verify the attachment content of the file '+"'"+inputval[1]+"'"+' for the email '+"'"+inputval[0]+"'."
 
         #TextBox keywords( 5 keywords)
         def cleartext():
