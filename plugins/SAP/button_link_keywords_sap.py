@@ -55,8 +55,14 @@ class ButtonLinkKeyword():
         value = OUTPUT_CONSTANT
         err_msg = None
         try:
+            # get the co-ordinate or position
+            if len(args) >= 3:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 if ( ses.FindById(id).Text ):
                     value = ses.FindById(id).Text
@@ -82,8 +88,14 @@ class ButtonLinkKeyword():
         value = OUTPUT_CONSTANT
         err_msg = None
         try:
+            # get the co-ordinate or position
+            if len(args) >= 2:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 if ( ses.FindById(id).Text and (ses.FindById(id).Text.lstrip() == input_val[0].lstrip()) ):
                     status = sap_constants.TEST_RESULT_PASS
@@ -108,8 +120,14 @@ class ButtonLinkKeyword():
         value = OUTPUT_CONSTANT
         err_msg = None
         try:
+            # get the co-ordinate or position
+            if len(args) >= 2:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             result = None
             if ( id and ses ):
                 filepath = input_val[0]

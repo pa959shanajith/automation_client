@@ -27,8 +27,14 @@ class Dropdown_Keywords():
         err_msg = None
         value = OUTPUT_CONSTANT
         try:
+            # get the co-ordinate or position
+            if len(args) >= 3:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 if ( ses.FindById(id).Changeable == True ):
                     value = ses.FindById(id).Text.strip()
@@ -58,8 +64,14 @@ class Dropdown_Keywords():
         arr_v = []
         arr_k = []
         try:
+            # get the co-ordinate or position
+            if len(args) >= 2:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 if ( ses.FindById(id).Changeable == True ):
                     entries = ses.FindById(id).Entries
@@ -105,8 +117,14 @@ class Dropdown_Keywords():
         i = 0
         arr = []
         try:
+            # get the co-ordinate or position
+            if len(args) >= 2:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 if ( ses.FindById(id).Changeable == True ):
                     entries = ses.FindById(id).Entries
@@ -145,8 +163,14 @@ class Dropdown_Keywords():
         i = 0
         arr = []
         try:
+            # get the co-ordinate or position
+            if len(args) >= 2:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 if ( ses.FindById(id).Changeable == True ):
                     entries = ses.FindById(id).Entries
@@ -184,8 +208,14 @@ class Dropdown_Keywords():
         err_msg = None
         flag = False
         try:
+            # get the co-ordinate or position
+            if len(args) >= 2:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 if ( len(input_val) > 1 ):
                     text = input_val[3]
@@ -227,8 +257,14 @@ class Dropdown_Keywords():
         err_msg = None
         flag = False
         try:
+            # get the co-ordinate or position
+            if len(args) >= 2:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 if ( len(input_val) > 1 ):
                     text = input_val[3]
@@ -269,8 +305,14 @@ class Dropdown_Keywords():
         value = OUTPUT_CONSTANT
         err_msg = None
         try:
+            # get the co-ordinate or position
+            if len(args) >= 2:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 if ( ses.FindById(id).Changeable == True ):
                     if ( ses.FindById(id).Text.strip() == input_val[0] ):
@@ -300,8 +342,14 @@ class Dropdown_Keywords():
         err_msg = None
         count = 0
         try:
+            # get the co-ordinate or position
+            if len(args) >= 3:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 if ( ses.FindById(id).type == "GuiComboBox" ):
                     entries = ses.FindById(id).Entries
@@ -336,8 +384,14 @@ class Dropdown_Keywords():
         err_msg = None
         count = 0
         try:
+            # get the co-ordinate or position
+            if len(args) >= 2:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 value = count
                 entries = ses.FindById(id).Entries
@@ -376,8 +430,14 @@ class Dropdown_Keywords():
         i = 0
         flag = True
         try:
+            # get the co-ordinate or position
+            if len(args) >= 2:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 entries = ses.FindById(id).Entries
                 while True:
@@ -416,8 +476,14 @@ class Dropdown_Keywords():
         i = 0
         dd_entries = []
         try:
+            # get the co-ordinate or position
+            if len(args) >= 2:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id,ses = self.uk.getSapElement(sap_id)
+            id,ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 entries = ses.FindById(id).Entries
                 while True:
@@ -455,8 +521,14 @@ class Dropdown_Keywords():
         i = 0
         dd_entries = []
         try:
+            # get the co-ordinate or position
+            if len(args) >= 2:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id,ses = self.uk.getSapElement(sap_id)
+            id,ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 entries = ses.FindById(id).Entries
                 while True:

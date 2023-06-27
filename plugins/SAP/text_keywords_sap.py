@@ -29,8 +29,14 @@ class Text_Keywords():
         err_msg = None
         value = OUTPUT_CONSTANT
         try:
+            # get the co-ordinate or position
+            if len(args) >= 3:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 if ( ses.FindById(id).type == 'GuiCTextField' or 'GuiTextField' ):
                     value = ses.FindById(id).text
@@ -55,8 +61,15 @@ class Text_Keywords():
         value = OUTPUT_CONSTANT
         err_msg = None
         try:
+            # get the co-ordinate or position
+            if len(args) >= 2:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
+
             if ( id and ses ):
                 if ( ses.FindById(id).Changeable == True ):
                     if ( ses.FindById(id).type == 'GuiCTextField' or 'GuiTextField'  or 'GuiPasswordField' ):
@@ -92,8 +105,14 @@ class Text_Keywords():
         value = OUTPUT_CONSTANT
         err_msg = None
         try:
+            # get the co-ordinate or position
+            if len(args) >= 2:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 if ( ses.FindById(id).Changeable == True ):
                     if ( len(input_val) > 1 ):
@@ -124,8 +143,14 @@ class Text_Keywords():
         err_msg = None
         value = OUTPUT_CONSTANT
         try:
+            # get the co-ordinate or position
+            if len(args) >= 3:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 if ( ses.FindById(id).Changeable == True ):
                     if ( ses.FindById(id).type == 'GuiCTextField' or 'GuiTextField' or 'GuiPasswordField' ):
@@ -153,8 +178,14 @@ class Text_Keywords():
         err_msg = None
         value = OUTPUT_CONSTANT
         try:
+            # get the co-ordinate or position
+            if len(args) >= 2:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 text = input_val[0].strip()
                 if ( ses.FindById(id).text.strip() == text ):
@@ -179,8 +210,14 @@ class Text_Keywords():
         err_msg = None
         value = OUTPUT_CONSTANT
         try:
+            # get the co-ordinate or position
+            if len(args) >= 3:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 if ( ses.FindById(id).type == "GuiTextField" or "GuiCTextField" ):
                     value = ses.FindById(id).MaxLength
@@ -206,8 +243,14 @@ class Text_Keywords():
         err_msg = None
         value = OUTPUT_CONSTANT
         try:
+            # get the co-ordinate or position
+            if len(args) >= 2:
+                sap_position = args[-1]
+            else:
+                sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
             self.lk.setWindowToForeground(sap_id)
-            id, ses = self.uk.getSapElement(sap_id)
+            id, ses = self.uk.getSapElement(sap_id, sap_position)
             if ( id and ses ):
                 length = int(input_val[0])
                 if ( ses.FindById(id).MaxLength == length ):
