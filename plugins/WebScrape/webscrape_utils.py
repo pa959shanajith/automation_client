@@ -809,14 +809,14 @@ class WebScrape_Utils:
                     var href='';
                     function getHref(ele) {
                         try {
-                            var href='';
+                            var hrefValue='';
                             if (ele.hasAttribute('href')) {
-                                href = ele.getAttribute('href');
+                                hrefValue = ele.getAttribute('href');
                             }
                             else {
-                                href = null;
+                                hrefValue = null;
                             }
-                            return href
+                            return hrefValue;
                         } catch (err) {
                             console.log("skipping this element: " + err);
                         }
