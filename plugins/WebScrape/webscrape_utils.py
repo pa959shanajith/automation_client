@@ -802,18 +802,26 @@ class WebScrape_Utils:
                         } catch (err) {
                             console.log("skipping this element: " + err);
                         }
-
                     }
                     cssSelector = getCssSelector(f);
 
                     // capture href of the element
                     var href='';
-                    if (f.hasAttribute('href')) {
-                        href = f.getAttribute('href');
+                    function getHref(ele) {
+                        try {
+                            var href='';
+                            if (ele.hasAttribute('href')) {
+                                href = ele.getAttribute('href');
+                            }
+                            else {
+                                href = null;
+                            }
+                            return href
+                        } catch (err) {
+                            console.log("skipping this element: " + err);
+                        }
                     }
-                    else {
-                        href = null;
-                    }
+                    href = getHref(f);
 
                     //We will be using absolute xpath first as relative xpath has id that may change and incorrect element may get selected.
                     newPath = String(path) + ';' + String(id) + ';' + String(rpath) + ';' + ssname + ';' + sstagname + ';' + ssclassname + ';' + coordinates + ';' + label + ';' + String(href) + ';' + cssSelector;
@@ -1109,6 +1117,7 @@ return (temp);"""
     var sele = document.getElementsByTagName('*');
     var smyid = 0;
     var stextvalue = '';
+    var slabel = '';
     var stagname = 0;
     var sishidden = 0;
     var scustname = '';
@@ -1175,6 +1184,8 @@ return (temp);"""
         splaceholder = (String(splaceholder));
         stextvalue = stext_content(element);
         stextvalue = (String(stextvalue));
+        var slabel = stext_content(element);
+        slabel = (String(slabel));
         stagname = element.tagName.toLowerCase();
         ssname = 'null';
         sstagname = 'null';
@@ -1257,6 +1268,97 @@ return (temp);"""
                     }
                 }
             }
+            // capture label content of the element
+            function findLableForControl(ele) {
+                try {
+                    var idVal = ele.id;
+                    labels = document.getElementsByTagName('label');
+                    if (labels.length !== 0) {
+                        for( var i = 0; i < labels.length; i++ ) {
+                            if (labels[i].htmlFor == idVal) {
+                                return labels[i].textContent;
+                            }
+                        }
+                    }
+                    else {
+                        return null;
+                    }
+                } catch (err) {
+                    console.log("skipping this element: " + err);
+                }
+            }
+            if (slabel == '' || slabel == 'null' || slabel == 'undefined' || slabel == '0') {
+                if (splaceholder != '' && splaceholder != 'undefined') {
+                    slabel = splaceholder;
+                } else if (element.nodeName.toLowerCase() == 'input' || element.nodeName.toLowerCase() == 'select' || element.nodeName.toLowerCase() == 'textarea' || element.nodeName.toLowerCase() == 'progress' || element.nodeName.toLowerCase() == 'meter') {
+                    slabel = findLableForControl(element);
+                }
+                if (element.nodeName.toLowerCase() == 'input' && (slabel == null || slabel == '')) {
+                    if (element.hasAttribute('value')) {
+                        slabel = element.getAttribute('value');
+                    }
+                    else {
+                        slabel = null;
+                    }
+                }
+            }
+
+            // capture css selector of the element
+            var sCssSelector = '';
+            function getCssSelector(ele) {
+                try {
+                    let path = [];
+                    let parentEle = ele.parentNode;
+                    while (ele.nodeName.toLowerCase() != 'body') {
+                        let selector = ele.nodeName.toLowerCase();
+                        let arr = Array.from(ele.parentNode.children);
+                        let tagNameArr = [];
+                        for (i = 0; i < arr.length; i++) {
+                            let tag = arr[i].tagName.toLowerCase();
+                            tagNameArr.push(tag);
+                        }
+                        let count = tagNameArr.toString().match(new RegExp(selector, 'g')).length;
+                        if (ele.id) {
+                            selector += '#' + ele.id;
+                        }
+                        else if (count > 1) {
+                            let sib = ele.previousSibling, nth = 1;
+                            while((sib != null) && nth++) {
+                                if ((sib.nodeName.toLowerCase() == '#text') || (sib.nodeName.toLowerCase() == '#comment')) {
+                                    nth--;
+                                }
+                                sib = sib.previousSibling;
+                            }
+                            selector += ":nth-child("+nth+")";
+                        }
+                        path.unshift(selector);
+                        ele = ele.parentNode;
+                    }
+                    return path.join(" > ");
+                } catch (err) {
+                    console.log("skipping this element: " + err);
+                }
+            }
+            sCssSelector = getCssSelector(element);
+
+            // capture href of the element
+            var shref='';
+            function getHref(ele) {
+                try {
+                    var href='';
+                    if (ele.hasAttribute('href')) {
+                        href = ele.getAttribute('href');
+                    }
+                    else {
+                        href = null;
+                    }
+                    return href
+                } catch (err) {
+                    console.log("skipping this element: " + err);
+                }
+            }
+            shref = getHref(element);
+
             if (sid == '') {
                 sid = 'null';
             }
@@ -1373,7 +1475,7 @@ return (temp);"""
             }
             coordinates = left + ';' + top + ';' + height + ';' + width;
             coordinates = String(coordinates);
-            snewPath = String(spath) + ';' + String(sid) + ';' + String(srpath) + ';' + ssname + ';' + sstagname + ';' + ssclassname + ';' + coordinates + ';' + stextvalue + ';' + 'null' + ';' + stagname;
+            snewPath = String(spath) + ';' + String(sid) + ';' + String(srpath) + ';' + ssname + ';' + sstagname + ';' + ssclassname + ';' + coordinates + ';' + slabel + ';' + shref + ';' + sCssSelector;
             sarr.push({
                 'xpath': snewPath,
                 'tag': stagname,
