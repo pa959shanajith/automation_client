@@ -167,9 +167,9 @@ class Update_Rollback:
         if ( self.update_flag == True and self.check_flag == True ):
             update_msg = 'Update Available!!! Click on update'
         elif ( self.update_flag == False and self.check_flag == True ):
-            update_msg = 'You are running the latest version of Avo Assure ICE'
+            update_msg = 'You are running the latest version of Avo Assure Client'
         elif ( self.check_flag == False ):
-            update_msg = 'An Error has occured while checking for new versions of Avo Assure ICE, kindly contact Support Team'
+            update_msg = 'An Error has occured while checking for new versions of Avo Assure Client, kindly contact Support Team'
         return update_msg
 
     def server_check_message(self):

@@ -17,6 +17,7 @@ import table_keywords
 import element_operations
 import textbox_operations
 import dropdown_listbox
+import combobox_operations
 import utilweb_operations
 import static_text_keywords
 import logger
@@ -57,6 +58,7 @@ class Dispatcher:
         local_Wd.util_object = utilweb_operations.UtilWebKeywords()
         local_Wd.statict_text_object = static_text_keywords.StaticTextKeywords()
         local_Wd.custom_object=custom_keyword.CustomKeyword()
+        local_Wd.combobox_object=combobox_operations.ComboboxKeywords()
         # local_Wd.driver_util = browser_Keywords.Singleton_DriverUtil()
 
         local_Wd.browser_obj_sl = web_keywords.Browser_Keywords()
@@ -199,6 +201,12 @@ class Dispatcher:
             'execute_js':local_Wd.browser_object.execute_js,
             'getbrowsername': local_Wd.browser_object.getBrowserName,
             'savefile': local_Wd.browser_object.save_file,
+
+            # Combobox Keywords
+            'cmbselectvaluebyindex':local_Wd.combobox_object.cmbSelectValueByIndex,
+            'cmbgetcount':local_Wd.combobox_object.cmbGetCount,
+            'cmbgetallvalues':local_Wd.combobox_object.cmbGetAllValues,
+            'cmbselectvaluebytext':local_Wd.combobox_object.cmbSelectValueByText,
 
             'clickiris':iris_object.clickiris,
             'doubleclickiris':iris_object.doubleclickiris,
@@ -402,7 +410,11 @@ class Dispatcher:
             'getlinktext': ['a','link'],
             'verifylinktext': ['a','link'],
             'verifywebimages': ['img'],
-            'imagesimilaritypercentage': ['img']
+            'imagesimilaritypercentage': ['img'],
+            'cmbselectvaluebyindex': ['textbox','div','span'],
+            'cmbgetcount': ['textbox','div','span'],
+            'cmbgetallvalues': ['textbox','div','span'],
+            'cmbselectvaluebytext': ['textbox','div','span']
         }
         custom_dict_element={'element':['getobjectcount','getobject','clickelement','doubleclick','rightclick','getelementtext','verifyelementtext','drag', 'drop','gettooltiptext','verifytooltiptext','verifyexists', 'verifydoesnotexists','verifyvisible', 'switchtotab','switchtowindow','setfocus','sendfunctionkeys', 'sendsecurefunctionkeys',
             'tab','waitforelementvisible','mousehover','press','verifyenabled','verifydisabled','verifyreadonly','getattributevalue','verifyattribute','getrowcount','getcolumncount','getcellvalue','verifycellvalue','getcelltooltip','verifycelltooltip','cellclick','getrownumbytext','getcolnumbytext','getinnertable','selectbyabsolutevalue','horizontalscroll','verticalscroll','click','uploadfile','dropfile']}
@@ -418,61 +430,66 @@ class Dispatcher:
             getObjectFlag=False
             if driver:
                 local_Wd.log.debug('In send_webelement_to_keyword method')
-                #check if the element is in iframe or frame
                 try:
-                    if objectname!='@Custom' and (objectname.split(';')[2].find('iframe')!=-1):
+                    if objectname!='' and objectname!='@Custom' and (objectname.split(';')[2].find('iframe')!=-1):
                         local_Wd.log.debug('Encountered iframe/frame url')
                         iframe_xpath = objectname.split(';')[2].split(',')[0]
                         local_Wd.custom_object.switch_to_iframe(iframe_xpath,driver.current_window_handle)
                         driver = browser_Keywords.local_bk.driver_obj
                         ele_inside_iframe_xpath = objectname.split(';')[2].split(',')[1]
-                        webelement = driver.find_element_by_xpath(ele_inside_iframe_xpath)
-                    elif url and local_Wd.custom_object.is_int(url):
-                        local_Wd.log.debug('Encountered iframe/frame url')
-                        local_Wd.custom_object.switch_to_iframe(url,driver.current_window_handle)
-                        driver = browser_Keywords.local_bk.driver_obj
-                    if objectname==CUSTOM:
-                        local_Wd.log.info('Encountered custom object')
-                        local_Wd.log.info('Custom flag is ')
-                        local_Wd.log.info(teststepproperty.custom_flag)
-                        custom_input=teststepproperty.inputval[0].split(';')
-                        if teststepproperty.custom_flag:
-                            if len(input)>3 and custom_input[-1].startswith('{{') and custom_input[-1].endswith('}}'):
-                                if isinstance(input[-1],webdriver.remote.webelement.WebElement):
-                                    reference_element=input[-1]
-                                    getObjectFlag=True
-                                    local_Wd.log.info("getObjectFlag is True. Reference element is taken from getObject")
-                                    logger.print_on_console("getObjectFlag is True. Reference element is taken from getObject")
-                                else:
-                                    reference_element=None
-                                    err_msg=ERROR_CODE_DICT['INCORRECT_VARIABLE_FORMAT']
-                                    logger.print_on_console(err_msg)
-                                    local_Wd.log.error(err_msg)
-                            else:
-                                reference_element=self.getwebelement(driver,teststepproperty.parent_xpath,teststepproperty.stepnum,teststepproperty.custname)
-                            local_Wd.log.debug('Reference_element ')
-                            local_Wd.log.debug(reference_element)
-                            if reference_element != None:
-                                ##reference_element = reference_element[0]
-                                local_Wd.log.info('Reference_element is found')
-                                if keyword==GET_OBJECT_COUNT:
-                                    local_Wd.log.info('Keyword is ')
-                                    local_Wd.log.info(keyword)
-                                    webelement=reference_element
-                                elif len(input)>=3:
-                                    if (keyword in custom_dict and input[0].lower() in custom_dict[keyword]) or keyword in list(custom_dict_element.values())[0]:
-                                        absMatch=False
-                                        if input[-1]=='abs':
-                                            absMatch=True
-                                        webelement=local_Wd.custom_object.getCustomobject(reference_element,input[0],input[1],input[2],teststepproperty.url,absMatch)
-                                        local_Wd.log.debug(MSG_CUSTOM_FOUND)
-                                        if getObjectFlag:
-                                            input.pop()
-                                        del input[:3]
+                        webelement = driver.find_element_by_xpath(ele_inside_iframe_xpath)   
+                    else:
+                        #check if the element is in iframe or frame
+                        if url and local_Wd.custom_object.is_int(url):
+                            local_Wd.log.debug('Encountered iframe/frame url')
+                            local_Wd.custom_object.switch_to_iframe(url,driver.current_window_handle)
+                            driver = browser_Keywords.local_bk.driver_obj
+                        if objectname==CUSTOM:
+                            local_Wd.log.info('Encountered custom object')
+                            local_Wd.log.info('Custom flag is ')
+                            local_Wd.log.info(teststepproperty.custom_flag)
+                            custom_input=teststepproperty.inputval[0].split(';')
+                            if teststepproperty.custom_flag:
+                                if len(input)>3 and custom_input[-1].startswith('{{') and custom_input[-1].endswith('}}'):
+                                    if isinstance(input[-1],webdriver.remote.webelement.WebElement):
+                                        reference_element=input[-1]
+                                        getObjectFlag=True
+                                        local_Wd.log.info("getObjectFlag is True. Reference element is taken from getObject")
+                                        logger.print_on_console("getObjectFlag is True. Reference element is taken from getObject")
                                     else:
-                                        print_error('ERR_CUSTOM_MISMATCH')
+                                        reference_element=None
+                                        err_msg=ERROR_CODE_DICT['INCORRECT_VARIABLE_FORMAT']
+                                        logger.print_on_console(err_msg)
+                                        local_Wd.log.error(err_msg)
                                 else:
-                                    print_error('ERR_PRECONDITION_NOTMET')
+                                    reference_element=self.getwebelement(driver,teststepproperty.parent_xpath,teststepproperty.stepnum,teststepproperty.custname)
+                                local_Wd.log.debug('Reference_element ')
+                                local_Wd.log.debug(reference_element)
+                                if reference_element != None:
+                                    ##reference_element = reference_element[0]
+                                    local_Wd.log.info('Reference_element is found')
+                                    if keyword==GET_OBJECT_COUNT:
+                                        local_Wd.log.info('Keyword is ')
+                                        local_Wd.log.info(keyword)
+                                        webelement=reference_element
+                                    elif len(input)>=3:
+                                        if (keyword in custom_dict and input[0].lower() in custom_dict[keyword]) or keyword in list(custom_dict_element.values())[0]:
+                                            absMatch=False
+                                            if input[-1]=='abs':
+                                                absMatch=True
+                                            webelement=local_Wd.custom_object.getCustomobject(reference_element,input[0],input[1],input[2],teststepproperty.url,absMatch)
+                                            local_Wd.log.debug(MSG_CUSTOM_FOUND)
+                                            if getObjectFlag:
+                                                input.pop()
+                                            del input[:3]
+                                        else:
+                                            print_error('ERR_CUSTOM_MISMATCH')
+                                    else:
+                                        print_error('ERR_PRECONDITION_NOTMET')
+                                        print_error('ERR_CUSTOM_NOTFOUND')
+
+                                else:
+                                    print_error('ERR_REF_ELE_NULL')
                                     print_error('ERR_CUSTOM_NOTFOUND')
 
                             else:
@@ -480,37 +497,33 @@ class Dispatcher:
                                 print_error('ERR_CUSTOM_NOTFOUND')
 
                         else:
-                            print_error('ERR_REF_ELE_NULL')
-                            print_error('ERR_CUSTOM_NOTFOUND')
-
-                    else:
-                        if objectname=="@Object":
-                            webelement = input[0]
-                            local_Wd.log.info(WEB_ELEMENT_FOUND_FROM_GetInnerTable)
-                            logger.print_on_console(WEB_ELEMENT_FOUND_FROM_GetInnerTable)
-                        elif teststepproperty.cord != None and teststepproperty.cord != "":
-                            obj_props = teststepproperty.objectname.split(';')
-                            coord = [obj_props[2],obj_props[3],obj_props[4],obj_props[5]]
-                            webelement = {'cord': teststepproperty.cord, 'coordinates':coord}
-                        else:
-                            import UserObjectScrape
-                            webscrape=UserObjectScrape.UserObject()
-                            obj1=UserObjectScrape.update_data.copy()
-                            for k,v in obj1.items():
-                                if teststepproperty.custname in v:
-                                    objectname=v[teststepproperty.custname]
-                                    UserObjectScrape.update_data[str(teststepproperty.stepnum)]=v
-                            webelement = self.getwebelement(driver,objectname,teststepproperty.stepnum,teststepproperty.custname)
-                            if(obj_flag!=False):
+                            if objectname=="@Object":
+                                webelement = input[0]
+                                local_Wd.log.info(WEB_ELEMENT_FOUND_FROM_GetInnerTable)
+                                logger.print_on_console(WEB_ELEMENT_FOUND_FROM_GetInnerTable)
+                            elif teststepproperty.cord != None and teststepproperty.cord != "":
+                                obj_props = teststepproperty.objectname.split(';')
+                                coord = [obj_props[2],obj_props[3],obj_props[4],obj_props[5]]
+                                webelement = {'cord': teststepproperty.cord, 'coordinates':coord}
+                            else:
                                 import UserObjectScrape
                                 webscrape=UserObjectScrape.UserObject()
-                                # obj=core_utils.CoreUtils()
-                                webscrape.update_scrape_object(url,objectname,obj_flag,teststepproperty.stepnum,teststepproperty.custname)
-                            if webelement != None:
-                                if isinstance(webelement,list):
-                                    webelement = webelement[0]
-                                    local_Wd.log.info(WEB_ELEMENT_FOUND)
-                                    logger.print_on_console(WEB_ELEMENT_FOUND)
+                                obj1=UserObjectScrape.update_data.copy()
+                                for k,v in obj1.items():
+                                    if teststepproperty.custname in v:
+                                        objectname=v[teststepproperty.custname]
+                                        UserObjectScrape.update_data[str(teststepproperty.stepnum)]=v
+                                webelement = self.getwebelement(driver,objectname,teststepproperty.stepnum,teststepproperty.custname)
+                                if(obj_flag!=False):
+                                    import UserObjectScrape
+                                    webscrape=UserObjectScrape.UserObject()
+                                    # obj=core_utils.CoreUtils()
+                                    webscrape.update_scrape_object(url,objectname,obj_flag,teststepproperty.stepnum,teststepproperty.custname)
+                                if webelement != None:
+                                    if isinstance(webelement,list):
+                                        webelement = webelement[0]
+                                        local_Wd.log.info(WEB_ELEMENT_FOUND)
+                                        logger.print_on_console(WEB_ELEMENT_FOUND)
                 except Exception as e:
                     local_Wd.log.error(e,exc_info=True)
                     print_error('Web element not found')
@@ -845,6 +858,7 @@ class Dispatcher:
         global obj_flag,simple_debug_gwto
         obj_flag=False
         webElement = None
+        configvalues = readconfig.configvalues
         if objectname.strip() != '':
             identifiers = objectname.split(';')
             local_Wd.log.debug('Identifiers are ')
@@ -852,31 +866,36 @@ class Dispatcher:
             global finalXpath
             #Absolute xpath is used to locate web element first as it doesn't change like relative xpath.
             if len(identifiers)>=3:
+                delayconst = int(configvalues['element_load_timeout'])
+                for i in range(delayconst):
                 #find by absolute xpath
-                webElement=self.element_locator(driver,'xpath',identifiers[0],'1')
-                if (webElement):
-                    finalXpath = identifiers[0]
-                if not(webElement):
-                    #find by id
-                    webElement=self.element_locator(driver,'id',identifiers[1],'2')
+                    webElement=self.element_locator(driver,'xpath',identifiers[0],'1')
+                    if (webElement):
+                        finalXpath = identifiers[0]
                     if not(webElement):
-                        #find by relative xpath
-                        webElement=self.element_locator(driver,'rxpath',identifiers[2],'3')
-                        if (webElement):
-                            finalXpath = identifiers[2]
+                        #find by id
+                        webElement=self.element_locator(driver,'id',identifiers[1],'2')
                         if not(webElement):
-                            #find by name
-                            webElement=self.element_locator(driver,'name',identifiers[3],'4')
+                            #find by relative xpath
+                            webElement=self.element_locator(driver,'rxpath',identifiers[2],'3')
+                            if (webElement):
+                                finalXpath = identifiers[2]
                             if not(webElement):
-                                 #find by classname
-                                webElement=self.element_locator(driver,'classname',identifiers[5],'5')
+                                #find by name
+                                webElement=self.element_locator(driver,'name',identifiers[3],'4')
                                 if not(webElement):
-                                #find by css selector
-                                    if len(identifiers) > 11:
-                                        webElement=self.element_locator(driver,'css_selector',identifiers[11],'6')
+                                    #find by classname
+                                    webElement=self.element_locator(driver,'classname',identifiers[5],'5')
                                     if not(webElement):
-                                        webElement=None
-                                        local_Wd.log.info("Weblement not found with Primary identifers")
+                                    #find by css selector
+                                        if len(identifiers) > 11:
+                                            webElement=self.element_locator(driver,'css_selector',identifiers[11],'6')
+                                        if not(webElement):
+                                            webElement=None
+                                            local_Wd.log.info("Weblement not found with Primary identifers")
+                    time.sleep(1)
+                    if (webElement):
+                        break
             #enhance object reconition changes
             if(webElement == None):
                 try:

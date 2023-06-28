@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Avo Assure ICE: GUI",
+            "name": "Avo Assure Client: GUI",
             "type": "python",
             "request": "launch",
             "cwd": "${workspaceRoot}",
@@ -21,7 +21,7 @@
             "justMyCode": false
         },
         {
-            "name": "Avo Assure ICE: CLI - Register",
+            "name": "Avo Assure Client: CLI - Register",
             "type": "python",
             "request": "launch",
             "cwd": "${workspaceRoot}",
@@ -40,7 +40,7 @@
             "justMyCode": false
         },
         {
-            "name": "Avo Assure ICE: CLI - Connect",
+            "name": "Avo Assure Client: CLI - Connect",
             "type": "python",
             "request": "launch",
             "cwd": "${workspaceRoot}",
@@ -57,7 +57,7 @@
             "justMyCode": false
         },
         {
-            "name": "Avo Assure ICE: CLI - Guest Connect",
+            "name": "Avo Assure Client: CLI - Guest Connect",
             "type": "python",
             "request": "launch",
             "cwd": "${workspaceRoot}",

@@ -141,6 +141,7 @@ class UtilWebKeywords:
         flag=False
         local_uo.log.debug('Checking the visibility of element')
         try:
+            #Handled document fragments for salesforce. If document fragment is encountered, parentNode is replaced by host.
             script="""var isVisible = (function () {
     function inside(schild, sparent) {
         while (schild) {

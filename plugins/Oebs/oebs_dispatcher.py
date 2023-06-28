@@ -78,7 +78,8 @@ class OebsDispatcher:
                             'rightclick': 1,
                             'setfocus': 1,
                             'setsecuretext': 1,
-                            'cleartext': 1
+                            'cleartext': 1,
+                            'selectfromnavigator': 1
                         }
         self.keyword_dict = {
                             'findwindowandattach':self.utils_obj.find_window_and_attach,
@@ -127,6 +128,7 @@ class OebsDispatcher:
                             'selectallvalues':self.dropdownlistboxops_obj.selectallvalues,
                             'getselected':self.dropdownlistboxops_obj.getselected,
                             'getallvalues':self.dropdownlistboxops_obj.getallvalues,
+                            'selectfromnavigator':self.dropdownlistboxops_obj.select_from_navigator,
 
                         
                             'getstatus':self.radiocheckboxops_obj.getstatus,
@@ -201,8 +203,21 @@ class OebsDispatcher:
                     'selectvaluebytext': ['combo box','list'],
 
                     'settext': ['text'],
-                    'gettext': ['text']
+                    'gettext': ['text'],
+                    'cleartext': ['text'],
+                    'setsecuretext': ['text'],
 
+                    'getbuttonname': ['push button'],
+                    'mousehover': ['push button','combo box'],
+                    'verifybuttonname': ['push button'],
+
+                    'getallvalues': ['combo box',  'list'],
+                    'getcount': ['combo box', 'list'],
+                    'getselected': ['combo box', 'list'],
+                    'getvaluebyindex': ['combo box', 'list'],
+                    'verifyallvalues': ['combo box', 'list'],
+                    'verifycount': ['combo box', 'list'],
+                    'verifyvaluesexists' : ['combo box', 'list']
                     }
 
     get_ele_type={
@@ -213,7 +228,7 @@ class OebsDispatcher:
                     'textbox':'text',
                     'button':'push button'
                     }
-    custom_dict_element={'element':['clickelement','setfocus','doubleclick','rightclick','getelementtext','verifyelementtext','verifyexists', 'verifydoesnotexists', 'verifyreadonly','verifyhidden','verifyvisible','sendfunctionkeys','waitforelementvisible']}
+    custom_dict_element={'element':['clickelement','setfocus','doubleclick','rightclick','getelementtext','verifyelementtext','verifyexists', 'verifydoesnotexists', 'verifyreadonly','verifyhidden','verifyvisible','sendfunctionkeys','waitforelementvisible', 'verifydisabled', 'verifyenabled']}
 
     def clear_oebs_window_name(self):
         log.info('Clearing the window name')

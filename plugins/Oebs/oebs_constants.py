@@ -132,7 +132,8 @@ ERROR_CODE_DICT = {
     'err_object_background': 'Window containing object is not on top, can not perform operation',
     'err_value': 'Value does not exist',
     'err_operation_detect': 'Element clicked but operation not detected, Please use alternative keyword double click',
-    'err_shell': 'Unable to use shell to bring window on top'
+    'err_shell': 'Unable to use shell to bring window on top',
+    'err_select_navigator': 'Error occurred in select from navigator'
 }
 
 
@@ -150,7 +151,7 @@ MSG_KEYWORD_NA = "Keyword Not Available"
 MSG_TEXTBOX_CLEARED = "The Text in the TextBox is Cleared."
 
 MSG_STATUS = "Executed and the status is:"
-MSG_INVALID_INPUT = "Input cannot be empty/null."
+MSG_INVALID_INPUT = "Input cannot be empty/null/invalid."
 MSG_RESULT = "Executed and the result is:"
 MSG_INVALID_OBJECT = "This Element is not Accessible."
 MSG_HIDDEN_OBJECT = "The Element is Hidden."
@@ -266,6 +267,7 @@ DEF_GETCOUNT = "getcount"
 DEF_VERIFYCOUNT = "verifycount"
 DEF_VERIFYALLVALUES = "verifyallvalues"
 DEF_VERIFYVALUESEXISTS = "verifyvaluesexists"
+DEF_SELECTFROMNAVIGATOR = "selectfromnavigator"
 
 
 # DEFINITIONS RELATED TO ELEMENTS
