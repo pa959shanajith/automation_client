@@ -831,9 +831,25 @@ start = timer()
 class Sauce_Config():
 
     def get_sauceconf(self):
-        conf_obj = open(Saucelabs_config_path, 'r')
-        conf = json.load(conf_obj)
-        conf_obj.close()
+        # conf_obj = open(Saucelabs_config_path, 'r')
+        # conf = json.load(conf_obj)
+        # conf_obj.close()
+        # # self.proxies=self.conf["proxy"]
+        # self.username = conf["sauce_username"]
+        # self.access_key = conf["sauce_access_key"]
+        # self.platform = conf["platform"]
+        # self.url = conf["remote_url"]
+        # Saucelabs_config_path=os.environ['AVO_ASSURE_HOME']+os.sep+'assets'+os.sep+'sauce_config.json'
+        import saucelab_constants
+        conf = {
+            'platform': saucelab_constants.Platform,
+            'version': saucelab_constants.Version,
+            'sauce_username': saucelab_constants.Saucelabs_Username,
+            'sauce_access_key': saucelab_constants.Saucelabs_key,
+            'remote_url': saucelab_constants.Saucelabs_Url
+        }
+        # conf_obj = open(Saucelabs_config_path, 'r')
+        # conf_obj.close()
         # self.proxies=self.conf["proxy"]
         self.username = conf["sauce_username"]
         self.access_key = conf["sauce_access_key"]

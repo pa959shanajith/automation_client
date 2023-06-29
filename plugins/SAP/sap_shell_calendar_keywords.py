@@ -206,8 +206,14 @@ class Shell_Calendar_Keywords():
             except : er.append(flag_message[i])
         try:
             if ( flag[0] == True and flag[1] == True ):
+                # get the co-ordinate or position
+                if len(args) >= 2:
+                    sap_position = args[-1]
+                else:
+                    sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
                 self.lk.setWindowToForeground(sap_id)
-                id, ses = self.uk.getSapElement(sap_id)
+                id, ses = self.uk.getSapElement(sap_id, sap_position)
                 if ( id and ses ):
                     elem = ses.FindById(id)
                     if ( elem.type == 'GuiShell' and elem.SubType == 'Calendar' ): #identify if its a shell and calender
@@ -258,7 +264,13 @@ class Shell_Calendar_Keywords():
             if ( flag[0] == True and flag[1] == True ):
                 s,r,v,e = self.create_date(sap_id,['01',input_val[0],input_val[1]]) #get 1st of month/year
                 self.lk.setWindowToForeground(sap_id)# to navigate to the start date
-                id, ses = self.uk.getSapElement(sap_id)
+                # get the co-ordinate or position
+                if len(args) >= 2:
+                    sap_position = args[-1]
+                else:
+                    sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
+                id, ses = self.uk.getSapElement(sap_id, sap_position)
                 if ( id and ses):
                     elem = ses.FindById(id)
                     #self.navigate_to(elem, v)
@@ -301,8 +313,14 @@ class Shell_Calendar_Keywords():
         try:
             if ( flag[0] == True and flag[1] == True ):
                 self.select_date(sap_id,input_val)#to navigate to start date
+                # get the co-ordinate or position
+                if len(args) >= 2:
+                    sap_position = args[-1]
+                else:
+                    sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
                 self.lk.setWindowToForeground(sap_id)
-                id, ses = self.uk.getSapElement(sap_id)
+                id, ses = self.uk.getSapElement(sap_id, sap_position)
                 if ( id and ses):
                     elem = ses.FindById(id)
                     #self.navigate_to(elem, input_val[0])
@@ -388,8 +406,14 @@ class Shell_Calendar_Keywords():
             er, flag = self.date_validator(input_val[0])
             try:
                 if ( flag == True and len(er) == 0 ):
+                    # get the co-ordinate or position
+                    if len(args) >= 2:
+                        sap_position = args[-1]
+                    else:
+                        sap_position = {'top': None, 'left': None, 'width': None, 'height': None}
+
                     self.lk.setWindowToForeground(sap_id)
-                    id, ses = self.uk.getSapElement(sap_id)
+                    id, ses = self.uk.getSapElement(sap_id, sap_position)
                     if ( id and ses):
                         elem = ses.FindById(id)
                         if ( elem.type == 'GuiShell' and elem.SubType == 'Calendar'): #identify if its a shell and calender

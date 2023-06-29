@@ -12,7 +12,7 @@ import time
 import controller
 import readconfig
 from constants import *
-import label_image
+#import label_image
 if SYSTEM_OS == 'Windows':
     import screeninfo
     from pywinauto.findwindows import find_window
@@ -90,9 +90,9 @@ class Cropandadd():
                     if drawing1 == True:
                         self.RGB_img = np.copy(self.RGB_img_c)
                         if(constant_image):
-                            cv2.rectangle(self.RGB_img,(ix,iy),(x,y),(0,0,255),1)
+                            cv2.rectangle(self.RGB_img,(ix,iy),(x,y),(0,0,255),2)
                         else:
-                            cv2.rectangle(self.RGB_img,(ix,iy),(x,y),(0,255,0),1)
+                            cv2.rectangle(self.RGB_img,(ix,iy),(x,y),(0,255,0),2)
 
                 elif event == cv2.EVENT_LBUTTONUP:
                     log.debug('Inside draw : Event3 - left button up')
@@ -117,10 +117,10 @@ class Cropandadd():
                         else : self.data['view'].append({'custname': custname,'cord':RGB_img_crop_im,'tag':tag,'width':abs(x-ix),'height':abs(y-iy),'top':iy,'left':ix,'xpath':'iris','objectType':''})
                     if(constant_image):
                         log.debug('Inside draw : Event3 - constant obj - box colour red ')
-                        cv2.rectangle(self.RGB_img,(ix,iy),(x,y),(0,0,255),1)
+                        cv2.rectangle(self.RGB_img,(ix,iy),(x,y),(0,0,255),2)
                     else:
                         log.debug('Inside draw : Event3 - constant obj - box colour green ')
-                        cv2.rectangle(self.RGB_img,(ix,iy),(x,y),(0,255,0),1)
+                        cv2.rectangle(self.RGB_img,(ix,iy),(x,y),(0,255,0),2)
                     self.RGB_img_c = np.copy(self.RGB_img)
                     self.RGB_img[(iy+1):(y-1),(ix+1):(x-1)]=image_orig[(iy+1):(y-1),(ix+1):(x-1)]
                     self.RGB_img_c = np.copy(self.RGB_img)

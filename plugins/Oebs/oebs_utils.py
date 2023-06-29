@@ -91,11 +91,11 @@ class Utils:
             log.debug(e)
             logger.print_on_console(err_msg)
 
-    def highlight(self,objectname,windowname):
+    def highlight(self,objectname,windowname,top,left,width,height):
         status=True
         try:
             self.set_to_foreground(windowname)
-            acc, visible, active_parent = self.utils_obj.object_generator(windowname, objectname, 'highlight', [], '', objectname, errors = True)
+            acc, visible, active_parent = self.utils_obj.object_generator(windowname, objectname, 'highlight', [], '', objectname, top, left, width, height, errors = True)
             if not acc or (acc and str(acc) == 'fail'):
                 logger.print_on_console(ERROR_CODE_DICT['err_object_highlight'])
                 status = False
@@ -107,6 +107,9 @@ class Utils:
                 logger.print_on_console('Highlighting in progress')
                 curaccinfo = acc.getAccessibleContextInfo()
                 size = [curaccinfo.x, curaccinfo.y, curaccinfo.width, curaccinfo.height]
+                if -1 in size:
+                    size = [left, top, width, height]
+                    
                 if -1 in size or 'showing' not in curaccinfo.states:
                     logger.print_on_console(ERROR_CODE_DICT['err_visible'])
                     status = False

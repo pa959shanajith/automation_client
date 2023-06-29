@@ -36,7 +36,7 @@ class Textbox_keywords():
         err_msg=None
         text=input_val[0]
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
-        try:
+        try:            
             if element is not None:
                 if element.is_displayed():
                     log.debug(ELEMENT_VISIBLE)
@@ -46,8 +46,14 @@ class Textbox_keywords():
                         if len(element.text)>0:
                             log.debug('clearing  the existing text')
                             element.clear()
-                        if SYSTEM_OS != 'Darwin': element.set_text(text)
-                        else: element.set_value(text)
+                        if SYSTEM_OS == 'Darwin': element.set_value(text)
+                        else:
+                            action = TouchAction(android_scrapping.driver)
+                            action.tap(element).perform()
+                            text1 = []
+                            text1.append(text)
+                            obj = action_keywords_app.Action_Key_App()
+                            status,methodoutput,output,err_msg = obj.action_key(element,text1)
                         configvalues = readconfig.configvalues
                         hide_soft_key = configvalues['hide_soft_key']
                         if android_scrapping.driver.is_keyboard_shown() and (hide_soft_key == "Yes"):
@@ -131,7 +137,9 @@ class Textbox_keywords():
                                 element.clear()
                             encryption_obj = AESCipher()
                             input_val = encryption_obj.decrypt(input)
-                            if SYSTEM_OS != 'Darwin': element.set_text(input_val)
+                            if SYSTEM_OS != 'Darwin': 
+                                element.set_text(input_val)
+                                status=TEST_RESULT_PASS
                             else: element.set_value(input_val)
                             configvalues = readconfig.configvalues
                             hide_soft_key = configvalues['hide_soft_key']

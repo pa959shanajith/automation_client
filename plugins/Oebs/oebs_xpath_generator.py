@@ -44,6 +44,8 @@ class PathGenerator():
             custname = custname + "_scroll"
         elif(role in ['hyperlink','Static']):
             custname = custname + "_link"
+        elif(role == "page tab"):
+            custname = custname + "_pagetab"
         else:
             custname = custname + "_elmnt"
         return custname
@@ -189,6 +191,21 @@ class PathGenerator():
             text = name.strip().replace('<','').replace('>','')
         custname = self.postfixCustname(str(current_acc_info.role),text.strip())
         #custname
+
+        # Highlight the element while scraping
+        size = [current_acc_info.x, current_acc_info.y, current_acc_info.width, current_acc_info.height]
+        rgn1=win32gui.CreateRectRgnIndirect((size[0] - 3, size[1] - 3,
+                                        size[0] + size[2] + 3, size[1] + size[3] + 3))
+        rgn2=win32gui.CreateRectRgnIndirect((size[0], size[1], size[0] + size[2], size[1] + size[3]))
+
+        hdc=win32gui.CreateDC("DISPLAY", None, None)
+        brush=win32gui.GetSysColorBrush(13)
+        win32gui.CombineRgn(rgn1,rgn1,rgn2,3)
+        win32gui.FillRgn(hdc,rgn1,brush)
+        win32gui.DeleteObject(brush)
+        win32gui.DeleteObject(rgn1)
+        win32gui.DeleteObject(rgn2)
+        win32gui.DeleteDC(hdc)
 
 
         self.store_object.append({

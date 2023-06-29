@@ -479,8 +479,12 @@ return isVisible(s);"""
             elif(webelement is not None and len(args[0]) == 2):
                 row = int(args[0][0])-1
                 col = int(args[0][1])-1
-                tableops = TableOperationKeywords()
-                cell=tableops.javascriptExecutor(webelement,row,col)
+                if webelement.tag_name == 'div' and webelement.get_attribute('role') == 'grid':
+                    row = webelement.find_elements_by_xpath(".//div[@role='row']")[row]
+                    cell = row.find_elements_by_xpath(".//*")[col]
+                else:
+                    tableops = TableOperationKeywords()
+                    cell=tableops.javascriptExecutor(webelement,row,col)
                 element_list=cell.find_elements_by_xpath('.//*')
                 if len(list(element_list))>0:
                     xpath=tableops.getElemntXpath(element_list[0])
@@ -1285,6 +1289,51 @@ return isVisible(s);"""
             local_uo.log.error(e)
         return status,methodoutput,output,err_msg
 
+    def verify_style(self,webelement,input,*args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output=OUTPUT_CONSTANT
+        try:
+            if webelement.is_enabled()==False:
+                local_uo.log.error(ERR_DISABLED_OBJECT)
+                err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
+                logger.print_on_console(ERR_DISABLED_OBJECT)  
+            else:                
+                verify_result = browser_Keywords.local_bk.driver_obj.execute_script(webconstants.VERIFY_STYLE, webelement,input[0],input[1])
+                if verify_result:
+                    logger.print_on_console("The style attribute matches.")
+                else:
+                    logger.print_on_console("The style attribute doesn't match.")
+                methodoutput = TEST_RESULT_TRUE
+                status = TEST_RESULT_PASS
+        except Exception as e:
+            err_msg = 'Error occured while fetching style value'
+            logger.print_on_console(err_msg)
+            local_uo.log.error(e)
+        return status,methodoutput,output,err_msg
+    
+    def get_element_count(self, webelement, input, *args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output=OUTPUT_CONSTANT
+        try:
+            if webelement.is_enabled()==False:
+                local_uo.log.error(ERR_DISABLED_OBJECT)
+                err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
+                logger.print_on_console(ERR_DISABLED_OBJECT)  
+            else:     
+                output = len(webelement.find_elements_by_xpath('.//*[contains(@value,"'+input[0]+'")]'))|len(webelement.find_elements_by_xpath('.//*[contains(@text,"'+input[0]+'")]'))
+                logger.print_on_console("Count of elements with "+input[0]+" is "+str(output)+".")
+                methodoutput = TEST_RESULT_TRUE
+                status = TEST_RESULT_PASS
+        except Exception as e:
+            err_msg = 'Error occured while fetching element'
+            logger.print_on_console(err_msg)
+            local_uo.log.error(e)
+        return status,methodoutput,output,err_msg
+    
     def verify_attribute(self,webelement,input,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE

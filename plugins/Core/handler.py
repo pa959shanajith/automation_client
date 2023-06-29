@@ -192,14 +192,17 @@ class Handler():
                 browser_type=json_data['browsertype']
             elif 'browserType' in json_data:
                 browser_type=json_data['browserType']
+            
             if 'datatables' in json_data:
-                if not len(json_data['datatables']):
-                    # when datatables values are not present
-                    datatables=json_data['datatables']
-                else:
-                    # loop through all the datatables present testcase and append to datatables
-                    for dt_index in range(len(json_data['datatables'])):
-                        datatables.append(json_data['datatables'][dt_index])
+                if len(json_data['datatables']): 
+                    if not len(datatables):
+                        # loop through all the datatables present testcase and append to datatables
+                        for dt_index in range(len(json_data['datatables'])):
+                            datatables.append(json_data['datatables'][dt_index])
+            
+        if not len(datatables):
+                datatables=[]
+
         flag=self.create_list(script,testcasename_list,extract_path,appType)
         return flag,browser_type,len(script),datatables,testcase_empty_flag,empty_testcase_names
 
@@ -482,7 +485,7 @@ class Handler():
                 logger.print_on_console('Commented step '+str(step['stepNo']))
         return flag
 
-    def create_step(self,index,keyword,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo,i,remark,testcase_details,cord,original_device_height,original_device_width,extract_path=None):
+    def create_step(self,index,keyword,apptype,inputval,objectname,identifiers,outputval,stepnum,url,custname,testscript_name,additionalinfo,i,remark,testcase_details,cord,original_device_height,original_device_width,top,left,width,height,extract_path=None):
         """
         def : create_step
         purpose : creates an object of each step
@@ -536,10 +539,10 @@ class Handler():
                 #Currenlty implemented only for WEB and MobileWeb apptype
                 if(apptype.lower() == constants.APPTYPE_WEB or apptype.lower() == constants.APPTYPE_MOBILE ):
                     try:
-                        if len(url.strip())!=0:
+                        if len(url.strip())!=0 and (not ("https" in url or "http" in url)):
                             url_dec=self.utils_obj.scrape_unwrap(url)
                             if url is not None: url = url_dec
-                        if(objectname.strip() != '' and not(objectname.startswith('@'))):
+                        if(objectname.strip() != '' and not(objectname.startswith('@')) and len(objectname.split(';')) == 3):
                             xpath_string=objectname.split(';')
                             left_part=self.utils_obj.scrape_unwrap(xpath_string[0])
                             right_part=self.utils_obj.scrape_unwrap(xpath_string[2])
@@ -547,7 +550,7 @@ class Handler():
                                 objectname = left_part+';'+xpath_string[1]+';'+right_part
                     except Exception as e:
                         local_handler.log.error(e)
-                tsp_step=TestStepProperty(keyword,index,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo,i,remark,testcase_details,cord,original_device_height,original_device_width)
+                tsp_step=TestStepProperty(keyword,index,apptype,inputval,objectname,identifiers,outputval,stepnum,url,custname,testscript_name,additionalinfo,i,remark,testcase_details,cord,original_device_height,original_device_width,top,left,width,height)
         except Exception as e:
             logger.print_on_console(e)
             local_handler.log.error(e)
@@ -564,6 +567,10 @@ class Handler():
         apptype=step['appType']
         inputval=step['inputVal']
         objectname=step['objectName']
+        if 'identifier' in step:
+            identifiers=step['identifier']
+        else:
+            identifiers = ''
         outputval=step['outputVal'].strip()
         stepnum=step['stepNo']
         url=step['url']
@@ -585,13 +592,33 @@ class Handler():
             remark=step['remarks']
         if 'addTestCaseDetailsInfo' in step:
             testcase_details=step['addTestCaseDetailsInfo']
+        
+        if 'top' in step:
+            top = step['top']
+        else:
+            top = None
+
+        if 'left' in step:
+            left = step['left']
+        else:
+            left = None
+
+        if 'width' in step:
+            width = step['width']
+        else:
+            width = None
+
+        if 'height' in step:
+            height = step['height']
+        else:
+            height = None
 
         additionalinfo = ''
         outputArray=outputval.split(';')
         #check if the step is commented before adding to the tsplist
         if not (len(outputArray)>=1 and  '##' == outputArray[-1] ):
             local_handler.tspIndex2+=1
-            return self.create_step(local_handler.tspIndex2,keyword,apptype,inputval,objectname,outputval,stepnum,url,custname,testscript_name,additionalinfo,i,remark,testcase_details,cord, original_device_height, original_device_width,extract_path)
+            return self.create_step(local_handler.tspIndex2,keyword,apptype,inputval,objectname,identifiers,outputval,stepnum,url,custname,testscript_name,additionalinfo,i,remark,testcase_details,cord, original_device_height, original_device_width,top,left,width,height,extract_path)
         return None
 
 

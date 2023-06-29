@@ -206,6 +206,7 @@ class OebsDispatcher:
                     'gettext': ['text'],
                     'cleartext': ['text'],
                     'setsecuretext': ['text'],
+                    'verifytext': ['text'],
 
                     'getbuttonname': ['push button'],
                     'mousehover': ['push button','combo box'],
@@ -268,7 +269,7 @@ class OebsDispatcher:
                     self.print_error('ERR_CUSTOM_MISMATCH')
             else:
                 self.print_error('ERR_PRECONDITION_NOTMET')
-        message=[self.windowname,objectname,tsp.name,input,tsp.outputval,tsp.objectname]
+        message=[self.windowname,objectname,tsp.name,input,tsp.outputval,tsp.objectname,tsp.top,tsp.left,tsp.width,tsp.height]
         return message
 
     def dispatcher(self,tsp,input,mythread,*message):
@@ -305,7 +306,10 @@ class OebsDispatcher:
                     accessContext , visible, active_parent =  self.utilities_obj.object_generator(*message)
                     if accessContext and str(accessContext) != 'fail':
                         if (keyword in self.required_on_top and active_parent) or (keyword not in self.required_on_top):
-                            result = self.keyword_dict[keyword](accessContext)
+                            if keyword in ['selectvaluebytext', 'selectvaluebyindex', 'setfocus']:
+                                result = self.keyword_dict[keyword](accessContext, {'top': message[6], 'left': message[7], 'width': message[8], 'height': message[9]})
+                            else:
+                                result = self.keyword_dict[keyword](accessContext)
                         else:
                             err_msg = oebs_constants.ERROR_CODE_DICT['err_object_background']
 

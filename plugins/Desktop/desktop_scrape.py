@@ -34,10 +34,11 @@ class ScrapeWindow(wx.Frame):
     def __init__(self, parent,id, title, filePath, socketIO):
         try:
             wx.Frame.__init__(self, parent, title = title,
-                       pos = (300, 150), size = (210, 180), style = wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER | wx.MAXIMIZE_BOX | wx.CLOSE_BOX) )
+                       pos = (300, 150), size = (360, 310), style = wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER | wx.MAXIMIZE_BOX | wx.CLOSE_BOX) )
             self.SetBackgroundColour('#e6e7e8')
             self.iconpath = os.environ["IMAGES_PATH"] + "/avo.ico"
             self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
+            self.SetIcon(self.wicon)
             global obj
             obj = desktop_launch_keywords.Launch_Keywords()
             self.socketIO = socketIO
@@ -49,6 +50,7 @@ class ScrapeWindow(wx.Frame):
             global backend_process
             backend_process = self.backend_process
             input_val = []
+            self.choice='Manual'
             verify_pname = None
             if ( windowname != None or windowname.strip() != '' ) and ( pid == None or pid == '' ):
                 input_val.append(windowname)
@@ -76,29 +78,40 @@ class ScrapeWindow(wx.Frame):
                 if ( status != TERMINATE ):
                     self.panel = wx.Panel(self)
                     self.vsizer = wx.BoxSizer(wx.VERTICAL)
-                    self.startbutton = wx.ToggleButton(self.panel, label = "Start ClickAndAdd", pos = (12, 18), size = (175, 25))
+                    self.startbutton = wx.ToggleButton(self.panel, label = "Start ClickAndAdd", pos = (20, 20), size = (300, 30))
                     self.startbutton.Bind(wx.EVT_TOGGLEBUTTON, self.clickandadd)
                     self.startbutton.SetToolTip(wx.ToolTip( "Elements will be scraped via Click and Add method." ))
 
-                    self.fullscrapedropdown = wx.ComboBox(self.panel, value = "Full", pos = (12, 48), size = (87.5, 25), choices = self.scrapeoptions, style = wx.CB_DROPDOWN)
+                    self.fullscrapedropdown = wx.ComboBox(self.panel, value = "Full", pos = (20, 60), size = (145, 30), choices = self.scrapeoptions, style = wx.CB_DROPDOWN)
                     self.fullscrapedropdown.SetEditable(False)
                     self.fullscrapedropdown.SetToolTip(wx.ToolTip( "Full objects will be scraped" ))
 
-                    self.fullscrapebutton = wx.Button(self.panel, label = "Scrape", pos = (101, 48), size = (86, 25))
+                    self.fullscrapebutton = wx.Button(self.panel, label = "Scrape", pos = (175, 60), size = (145, 30))
                     self.fullscrapebutton.Bind(wx.EVT_BUTTON, self.fullscrape)
 
-                    self.visibilityCheck = wx.CheckBox(self.panel, label = "Visibility", pos = (12,78), size = (60, 25))
+                    self.visibilityCheck = wx.CheckBox(self.panel, label = "Visibility", pos = (20,100), size = (80, 30))
                     self.visibilityCheck.Bind(wx.EVT_CHECKBOX, self.visibility)
 
-                    self.delaytext=wx.StaticText(self.panel, label="Delay", pos=(104,83), size=(30,25), style=0, name="")
-                    self.scrapeDelaydropdown = wx.ComboBox(self.panel, value = "0s", pos = (140,80), size = (47, 25), choices = self.delay_time, style = wx.CB_DROPDOWN)
+                    self.delaytext=wx.StaticText(self.panel, label="Delay", pos=(175,100), size=(40,30), style=0, name="")
+                    self.scrapeDelaydropdown = wx.ComboBox(self.panel, value = "0s", pos = (225,100), size = (55, 25), choices = self.delay_time, style = wx.CB_DROPDOWN)
                     self.scrapeDelaydropdown.SetEditable(False)
                     self.scrapeDelaydropdown.SetToolTip(wx.ToolTip( "Set delay time before start of scraping." ))
+                    #radio buttons
+                    
+                    lblList = ['Manual', 'Auto']
+                    self.rbox = wx.RadioBox(self.panel,label = 'Capture options',  choices = lblList , pos = (20, 140), size = (300,60), style = wx.RA_SPECIFY_COLS)
+                    self.rbox.Bind(wx.EVT_RADIOBOX,self.onRadioBox)
 
                     import cropandadd
-                    global cropandaddobj
-                    cropandaddobj = cropandadd.Cropandadd()
-                    self.cropbutton = wx.ToggleButton(self.panel, label = "Start IRIS", pos=(12, 108), size = (175, 25))
+                    import cropandadd_auto
+
+
+                    global cropandaddobj_manual
+                    global cropandaddobj_auto
+
+                    cropandaddobj_manual = cropandadd.Cropandadd()
+                    cropandaddobj_auto = cropandadd_auto.Cropandadd()
+                    self.cropbutton = wx.ToggleButton(self.panel, label = "Start IRIS", pos=(20, 210), size = (300, 30))
                     self.cropbutton.Bind(wx.EVT_TOGGLEBUTTON, self.cropandadd)
                     self.Centre()
                     style = self.GetWindowStyle()
@@ -238,7 +251,8 @@ class ScrapeWindow(wx.Frame):
     def cropandadd(self, event):
         try:
             state = event.GetEventObject().GetValue()
-            global cropandaddobj
+            global cropandaddobj_manual
+            global cropandaddobj_auto
             obj = desktop_launch_keywords.Launch_Keywords()
             if ( state == True ):
                 event.GetEventObject().SetLabel("Stop IRIS")
@@ -252,13 +266,24 @@ class ScrapeWindow(wx.Frame):
                 else:
                     obj.set_to_foreground()
                     time.sleep(1)
-                status = cropandaddobj.startcropandadd(self)
+                    if self.choice=='Auto':
+                        status = cropandaddobj_auto.startcropandadd(self)
+                        #logger.print_on_console(self.choice)
+                    else:
+                        status = cropandaddobj_manual.startcropandadd(self)
+                        #logger.print_on_console(self.choice)
             else:
                 self.Hide()
                 import cv2
                 cv2.destroyAllWindows()
                 time.sleep(1)
-                d = cropandaddobj.stopcropandadd()
+                
+                if self.choice=='Auto':
+                    d = cropandaddobj_auto.stopcropandadd()
+
+                else:
+                    d = cropandaddobj_manual.stopcropandadd()
+
                 logger.print_on_console( 'Scraped data saved successfully in domelements.json file' )
                 self.socketIO.emit('scrape', d)
                 self.parent.schedule.Enable()
@@ -309,3 +334,8 @@ class ScrapeWindow(wx.Frame):
         visiblity_state = event.GetEventObject()
         log.info( str(visiblity_state.GetLabel()) + ' is clicked and value obtained is : ' + str(visiblity_state.GetValue()) )
         visiblity_status = visiblity_state.GetValue()
+
+
+    def onRadioBox(self,e):
+        self.choice=self.rbox.GetStringSelection()
+        #logger.print_on_console(self.choice)

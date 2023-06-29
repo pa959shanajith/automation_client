@@ -36,836 +36,938 @@ class WebScrape_Utils:
 
     """Javascript logic used in start click and add operation"""
     javascript_clicknadd = """
-if (!window.Element || !window.Element.prototype || !window.Element.prototype.hasAttribute) {
-    (function () {
-        function hasAttribute(attrName) {
-            return typeof this[attrName] !== 'undefined';
-        }
-        var inputs = document.getElementsByTagName('select');
-        for (var i = 0; i < inputs.length; i++) {
-            inputs[i].hasAttribute = hasAttribute;
-        }
-    }());
-} (function () {
-    if (!document.getElementsByClassName) {
-        var indexOf = [].indexOf || function (prop) {
-            for (var i = 0; i < this.length; i++) {
-                if (this[i] === prop) return i;
-            }
-            return -1;
-        };
-        getElementsByClassName = function (className, context) {
-            var elems = document.querySelectorAll ? context.querySelectorAll("." + className) : (function () {
-                var all = context.getElementsByTagName("*"),
-                    elements = [],
-                    i = 0;
-                for (; i < all.length; i++) {
-                    if (all[i].className && (" " + all[i].className + " ").indexOf(" " + className + " ") > -1 && indexOf.call(elements, all[i]) === -1) elements.push(all[i]);
+        //window.location.href = 'https://google.com';
+        if (!window.Element || !window.Element.prototype || !window.Element.prototype.hasAttribute) {
+            (function () {
+                function hasAttribute(attrName) {
+                    return typeof this[attrName] !== 'undefined';
                 }
-                return elements;
-            })();
-            return elems;
-        };
-        document.getElementsByClassName = function (className) {
-            return getElementsByClassName(className, document);
-        };
-        if (window.Element) {
-            window.Element.prototype.getElementsByClassName = function (className) {
-                return getElementsByClassName(className, this);
+                var inputs = document.getElementsByTagName('select');
+                for (var i = 0; i < inputs.length; i++) {
+                    inputs[i].hasAttribute = hasAttribute;
+                }
+            }());
+        } (function () {
+            if (!document.getElementsByClassName) {
+                var indexOf = [].indexOf || function (prop) {
+                    for (var i = 0; i < this.length; i++) {
+                        if (this[i] === prop) return i;
+                    }
+                    return -1;
+                };
+                getElementsByClassName = function (className, context) {
+                    var elems = document.querySelectorAll ? context.querySelectorAll("." + className) : (function () {
+                        var all = context.getElementsByTagName("*"),
+                            elements = [],
+                            i = 0;
+                        for (; i < all.length; i++) {
+                            if (all[i].className && (" " + all[i].className + " ").indexOf(" " + className + " ") > -1 && indexOf.call(elements, all[i]) === -1) elements.push(all[i]);
+                        }
+                        return elements;
+                    })();
+                    return elems;
+                };
+                document.getElementsByClassName = function (className) {
+                    return getElementsByClassName(className, document);
+                };
+                if (window.Element) {
+                    window.Element.prototype.getElementsByClassName = function (className) {
+                        return getElementsByClassName(className, this);
+                    };
+                }
+            }
+        })();
+        var useIdx = true;
+        var useId = true;
+        var useClass = true;
+        var relative = true;
+        var ae = [];
+        var be = [];
+        var url = arguments[0];
+        var browser = arguments[1];
+        var ishidden = 0;
+        var tagname = 0;
+        var textvalue = '';
+        var label = '';
+        var arr = [];
+        var custname = '';
+        var tagtype = '';
+        var multipleFlag = false;
+        var uniqueFlag = false;
+        var nonamecounter = 1;
+        var txt_area_nonamecounter = 1;
+        var select_nonamecounter = 1;
+        var td_nonamecounter = 1;
+        var a_nonamecounter = 1;
+        var table_nonamecounter = 1;
+        var input_nonamecounter = 1;
+        var salesforcecounter = 1;
+        var ssname = 'null';
+        var sstagname = 'null';
+        var ssclassname = 'null';
+        var top = 0;
+        var left = 0;
+        var height = 0;
+        var width = 0;
+        var co = 0;
+        var coordinates = '';
+        var viewTop = 0;
+        var isIE = false || !!document.documentMode;
+        var salesF = false;
+        var isVisible = (function () {
+            function inside(child, parent) {
+                while (child) {
+                    if (child === parent) return true;
+                    child = child.parentNode;
+                }
+                return false;
             };
-        }
-    }
-})();
-var useIdx = true;
-var useId = true;
-var useClass = true;
-var relative = true;
-var ae = [];
-var be = [];
-var url = arguments[0];
-var browser = arguments[1];
-var ishidden = 0;
-var tagname = 0;
-var textvalue = '';
-var arr = [];
-var custname = '';
-var tagtype = '';
-var multipleFlag = false;
-var uniqueFlag = false;
-var nonamecounter = 1;
-var txt_area_nonamecounter = 1;
-var select_nonamecounter = 1;
-var td_nonamecounter = 1;
-var a_nonamecounter = 1;
-var table_nonamecounter = 1;
-var input_nonamecounter = 1;
-var salesforcecounter = 1;
-var ssname = 'null';
-var sstagname = 'null';
-var ssclassname = 'null';
-var top = 0;
-var left = 0;
-var height = 0;
-var width = 0;
-var co = 0;
-var coordinates = '';
-var viewTop = 0;
-var isIE = false || !!document.documentMode;
-var salesF = false;
-var isVisible = (function () {
-    function inside(child, parent) {
-        while (child) {
-            if (child === parent) return true;
-            child = child.parentNode;
-        }
-        return false;
-    };
-    return function (elem) {
-        if (document.hidden || elem.offsetWidth == 0 || elem.offsetHeight == 0 || elem.style.visibility == 'hidden' || elem.style.display == 'none' || elem.style.opacity === 0) return false;
-        var rect = elem.getBoundingClientRect();
-        if (window.getComputedStyle || elem.currentStyle) {
-            var el = elem,
-                comp = null;
-            while (el) {
-                if (el === document) {
-                    break;
-                } else if (el.nodeName == '#document-fragment') {
-                    el = el.host;
-                } else if (!el.parentNode) return false;
-                if (el instanceof (HTMLElement)) comp = window.getComputedStyle ? window.getComputedStyle(el, null) : el.currentStyle;
-                if (comp && (comp.visibility == 'hidden' || comp.display == 'none' || (typeof comp.opacity !== 'undefined' && !(comp.opacity > 0)))) return false;
-                el = el.parentNode;
-            }
-        }
-        return true;
-    }
-})();
-window.tastopflag = false;
-ele = document.getElementsByTagName('*');
-for (var i=0;i<ele.length;i++)
-{
-    ae.push(ele[i]);
-    if (ele[i].shadowRoot)
-        addNodesOuter(ae, ele[i].getElementsByTagName('*'));
-}
-// addNodesOuter(ae, document.getElementsByTagName('*'));
-// salele = document.getElementsByTagName('one-record-home-flexipage2');
-// if (salele.length > 0) addNodesOuter(ae, salele[0].getElementsByTagName('*'));
-// salele = document.getElementsByTagName('records-lwc-detail-panel');
-// if (salele.length > 0) addNodesOuter(ae, salele[0].getElementsByTagName('*'));
-var css = '.AvoAssureCheckboxHighlight {outline:2px solid black!important;opacity:1!important; box-shadow: 0px 0px 0px 4px yellow !important;}',
-    head = document.head || document.getElementsByTagName('head')[0],
-    style = document.createElement('style');
-style.type = 'text/css';
-style.id = 'AvoAssureCheckboxHighlight';
-if (style.styleSheet) {
-    style.styleSheet.cssText = css;
-} else {
-    style.appendChild(document.createTextNode(css));
-}
-var css0 = 'table:hover{border:6px solid !important}'; 
-head = document.head || document.getElementsByTagName('head')[0], style0 = document.createElement('style'); 
-style0.type = 'text/css'; style0.id = 'AvoAssure_Table';
- if (style0.styleSheet) 
- { 
-     style0.styleSheet.cssText = css0; } 
- else { 
-     style0.appendChild(document.createTextNode(css0)); 
-    }
-
-style_new = document.createElement('style');
-style_new.type = 'text/css';
-style_new.id = 'AvoAssureBorderHighlight';
-var css2 = '.AvoAssureBorderHighlight { border: 2px black solid !important; outline: 2px yellow solid !important; }';
-if (style_new.styleSheet) {
-    style_new.styleSheet.cssText = css2;
-} else {
-    style_new.appendChild(document.createTextNode(css2));
-}
-if (head == undefined) {
-    Avo_head = document.createElement('head');
-    Avo_head.id = 'AvoAssure_head';
-    var html = document.children[0];
-    Avo_head.appendChild(style);
-    Avo_head.appendChild(style_new);
-    Avo_head.appendChild(style0);
-    html.appendChild(Avo_head);
-} else {
-    head.appendChild(style);
-    head.appendChild(style_new);
-    head.appendChild(style0);
-}
-
-function getElementsByClassName(classname) {
-    var a = [];
-    var re = new RegExp('(^| )' + classname + '( |$)');
-    var els = document.getElementsByTagName("*");
-    var elesal = document.getElementsByTagName("one-record-home-flexipage2");
-    var elesal1 = document.getElementsByTagName("records-lwc-detail-panel");
-    for (var i = 0, j = els.length; i < j; i++)
-        if (re.test(els[i].className)) a.push(els[i]);
-    if (elesal.length > 0) {
-        els1 = elesal[0].getElementsByTagName("*");
-        for (var i = 0, j = els1.length; i < j; i++) {
-            if (re.test(els1[i].className)) {
-                a.push(els1[i]);
-            }
-        }
-    }
-    if (elesal1.length > 0) {
-        els2 = elesal1[0].getElementsByTagName("*");
-        for (var i = 0, j = els2.length; i < j; i++) {
-            if (re.test(els2[i].className)) {
-                a.push(els2[i]);
-            }
-        }
-    }
-    return a;
-}
-
-function leave_handler(event) {
-    var event = event || window.event;
-    if (event.ctrlKey) {
-        return true;
-    }
-    if (event.preventDefault) {
-        event.preventDefault();
-        event.stopPropagation();
-    }
-    var f = event.fromElement || event.target || event.srcElement;
-    var classNameT = 'AvoAssureBorderHighlight';
-    var classNameTT = 'AvoAssureCheckboxHighlight';
-    if (f.classList) {
-        f.classList.remove(classNameT);
-        f.classList.remove(classNameTT);
-    } else if (hasClass(f, classNameT)) {
-        var reg = new RegExp('(\\s|^)' + classNameT + '(\\s|$)');
-        f.className = f.className.replace(reg, ' ');
-    } else if (hasClass(f, classNameTT)) {
-        var reg = new RegExp('(\\s|^)' + classNameTT + '(\\s|$)');
-        f.className = f.className.replace(reg, ' ');
-    }
-}
-
-function hov_handler(event) {
-    var event = event || window.event;
-    if (event.ctrlKey) {
-        return true;
-    }
-    if (event.preventDefault) {
-        event.preventDefault();
-        event.stopPropagation();
-    }
-    var f = event.toElement || event.target || event.srcElement;
-    var tagname = f.tagName.toLowerCase();
-    var classNameT = 'AvoAssureBorderHighlight';
-    var classNameTT = 'AvoAssureCheckboxHighlight';
-    var a = getElementsByClassName(classNameT);
-    var b = getElementsByClassName(classNameTT);
-    i = 0;
-    if (a.length > 0) {
-        if (a[i].classList) {
-            a[i].classList.remove(classNameT);
-        } else if (hasClass(a[i], classNameT)) {
-            var reg = new RegExp('(\\s|^)' + classNameT + '(\\s|$)');
-            a[i].className = a[i].className.replace(reg, ' ');
-        }
-    }
-    if (b.length > 0) {
-        if (b[i].classList) {
-            b[i].classList.remove(classNameTT);
-        } else if (hasClass(b[i], classNameTT)) {
-            var reg = new RegExp('(\\s|^)' + classNameTT + '(\\s|$)');
-            b[i].className = b[i].className.replace(reg, ' ');
-        }
-    }
-    if (tagname != 'script' && tagname != 'meta' && tagname != 'html' && tagname != 'head' && tagname != 'style' && tagname != 'body' && tagname != 'form' && tagname != 'link' && tagname != 'noscript' && tagname != '!' && tagname != 'pre' && tagname != 'code' && tagname != 'animatetransform' && tagname != 'noembed' && tagname != 'iframe' && tagname != 'frame') {
-        if (browser == 3) {
-            if (f.type == 'checkbox' || f.type == 'radio' || tagname == 'td' || tagname == 'th') {
-                f.className += ' ' + classNameTT;
-            } else {
-                f.className += ' ' + classNameT;
-            }
-        } else {
-            if (f.type == 'checkbox' || f.type == 'radio' || tagname == 'td' || tagname == 'th') {
-                console.log('hover highlight radio/checkbox');
-                f.classList.add(classNameTT);
-            } else {
-                console.log('hover highlight');
-                f.classList.add(classNameT);
-            }
-        }
-    }
-}
-var currentElement;
-function handler(event) {
-
-    
-    tagtype = '';
-    if (window.tastopflag == 'true') {
-        if (window.Prototype) {
-            var _arr_tojson = Array.prototype.toJSON;
-            delete Array.prototype.toJSON;
-            window.tasarr = arr;
-            Array.prototype.toJSON = _arr_tojson;
-        } else {
-            window.tasarr = arr;
-        }
-        clickStop(ae, isIE, be);
-
-        function clickStop(ae, isIE, be) {
-            if (isIE) {
-                for (var i = 0; i < ae.length; i++) {
-                    if (ae[i].removeEventListener) {
-                        ae[i].removeEventListener('click', handler, true);
-                        ae[i].removeEventListener('mouseover', hov_handler, true);
-                        ae[i].removeEventListener('mouseleave', leave_handler, true);
-                        ae[i].removeEventListener('mousedown', block_handler, true);
-                        ae[i].removeEventListener('mouseup', block_handler, true);
-                    } else if (ae[i].detachEvent) {
-                        ae[i].detachEvent('onclick', handler);
-                        ae[i].detachEvent('onmouseover', hov_handler);
-                        ae[i].detachEvent('onmouseleave', leave_handler);
-                        ae[i].detachEvent('onmousedown', block_handler);
-                        ae[i].detachEvent('onmouseup', block_handler);
-                    }
-                    if ((ae[i].getAttribute("_onclick")) != null) {
-                        ae[i].parentNode.replaceChild(be[i], ae[i]);
+            return function (elem) {
+                if (document.hidden || elem.offsetWidth == 0 || elem.offsetHeight == 0 || elem.style.visibility == 'hidden' || elem.style.display == 'none' || elem.style.opacity === 0) return false;
+                var rect = elem.getBoundingClientRect();
+                if (window.getComputedStyle || elem.currentStyle) {
+                    var el = elem,
+                        comp = null;
+                    while (el) {
+                        if (el === document) {
+                            break;
+                        } else if (el.nodeName == '#document-fragment') {
+                            el = el.host;
+                        } else if (!el.parentNode) return false;
+                        if (el instanceof (HTMLElement)) comp = window.getComputedStyle ? window.getComputedStyle(el, null) : el.currentStyle;
+                        if (comp && (comp.visibility == 'hidden' || comp.display == 'none' || (typeof comp.opacity !== 'undefined' && !(comp.opacity > 0)))) return false;
+                        el = el.parentNode;
                     }
                 }
-            } else {
-                for (var i = 0; i < ae.length; i++) {
-                    if (ae[i].removeEventListener) {
-                        ae[i].removeEventListener('click', handler, true);
-                        ae[i].removeEventListener('mouseover', hov_handler, true);
-                        ae[i].removeEventListener('mouseleave', leave_handler, true);
-                        ae[i].removeEventListener('mousedown', block_handler, true);
-                        ae[i].removeEventListener('mouseup', block_handler, true);
-                    } else if (ae[i].detachEvent) {
-                        ae[i].detachEvent('onclick', handler);
-                        ae[i].detachEvent('onmouseover', hov_handler);
-                        ae[i].detachEvent('onmouseleave', leave_handler);
-                        ae[i].detachEvent('onmousedown', block_handler);
-                        ae[i].detachEvent('onmouseup', block_handler);
-                    }
-                    if ((ae[i].getAttribute("_onclick")) != null) {
-                        var _onclickval = ae[i].getAttribute("_onclick");
-                        ae[i].removeAttribute("_onclick");
-                        ae[i].setAttribute("onclick", _onclickval);
-                    }
-                }
+                return true;
             }
-        }
+        })();
         window.tastopflag = false;
-        arr = [];
-        return true;
-    } else {
-        ssclassname = 'null';
-        ssname = 'null';
-        sstagname = 'null';
-        if (event.ctrlKey) {
-            return true;
+        ele = document.getElementsByTagName('*');
+        for (var i=0;i<ele.length;i++)
+        {
+            ae.push(ele[i]);
+            if (ele[i].shadowRoot)
+                addNodesOuter(ae, ele[i].getElementsByTagName('*'));
         }
-        if (event.preventDefault) {
-            event.preventDefault();
-            event.stopPropagation();
-            event.cancelBubble = true;
-            event.returnValue = false;
+        // addNodesOuter(ae, document.getElementsByTagName('*'));
+        // salele = document.getElementsByTagName('one-record-home-flexipage2');
+        // if (salele.length > 0) addNodesOuter(ae, salele[0].getElementsByTagName('*'));
+        // salele = document.getElementsByTagName('records-lwc-detail-panel');
+        // if (salele.length > 0) addNodesOuter(ae, salele[0].getElementsByTagName('*'));
+        var css = '.AvoAssureCheckboxHighlight {outline:2px solid black!important;opacity:1!important; box-shadow: 0px 0px 0px 4px yellow !important;}',
+            head = document.head || document.getElementsByTagName('head')[0],
+            style = document.createElement('style');
+        style.type = 'text/css';
+        style.id = 'AvoAssureCheckboxHighlight';
+        if (style.styleSheet) {
+            style.styleSheet.cssText = css;
         } else {
-            window.event.cancelBubble = true;
-            window.event.returnValue = false;
+            style.appendChild(document.createTextNode(css));
         }
-        var e = currentElement || event.target || event.srcElement;
-        var f = currentElement || event.target || event.srcElement;
-        if (event.srcElement.nodeName.toLowerCase() == 'one-record-home-flexipage2' || event.srcElement.nodeName.toLowerCase() == 'records-lwc-detail-panel') {
-            // e = event.toElement;
-            // f = event.toElement;
-            // if ((event.toElement.closest('lightning-combobox') || event.toElement.closest('lightning-grouped-combobox')) && event.toElement.nodeName.toLowerCase() == 'input') {
-            //     e = event.toElement.closest('lightning-combobox') || event.toElement.closest('lightning-grouped-combobox');
-            //     f = event.toElement.closest('lightning-combobox') || event.toElement.closest('lightning-grouped-combobox');
-            // }
-            salesF = true
-        }
-        var parentele = 'null';
-        // if (f != null && f.tagName.toLowerCase() == 'lightning-datatable') {
-        //     temp2 = f.getElementsByTagName('table')[0];
-        //     parentele = f;
-        //     f = temp2;
-        //     e = temp2;
-        // }
-        var className = e.className;
-        var rpath = '';
-        var firstpass = 0;
-        var role = 'null';
-        var svgTags = ['svg', 'circle', 'rect', 'ellipse', 'line', 'polygon', 'polyline', 'path', 'g', 'text', 'image', 'use'];
-        if (e.hasAttribute('role')) {
-            if (e.getAttribute('role') === 'grid' && e.tagName.toLowerCase() === 'div') {
-                role = 'grid';
+        var css0 = 'table:hover{border:6px solid !important}'; 
+        head = document.head || document.getElementsByTagName('head')[0], style0 = document.createElement('style'); 
+        style0.type = 'text/css'; style0.id = 'AvoAssure_Table';
+        if (style0.styleSheet) 
+        { 
+            style0.styleSheet.cssText = css0; } 
+        else { 
+            style0.appendChild(document.createTextNode(css0)); 
             }
+
+        style_new = document.createElement('style');
+        style_new.type = 'text/css';
+        style_new.id = 'AvoAssureBorderHighlight';
+        var css2 = '.AvoAssureBorderHighlight { border: 2px black solid !important; outline: 2px yellow solid !important; }';
+        if (style_new.styleSheet) {
+            style_new.styleSheet.cssText = css2;
+        } else {
+            style_new.appendChild(document.createTextNode(css2));
         }
-        for (var path = ''; e &&(e.nodeName=='#document-fragment'|| e.nodeType == 1); e = e.assignedSlot||e.parentNode) {
-            if (e.nodeName=='#document-fragment')
-                e=e.host;
-            var predicate = [];
-            var parentNode;
-            parentNode = e.parentNode;
-            if (parentNode.shadowRoot&&parentNode.shadowRoot.toString()=='[object ShadowRoot]'&&e.assignedSlot)
-                var siblings = e.assignedSlot.assignedNodes();
-            else
-                var siblings = parentNode.children;
-            var count = 0;
-            var unique = false;
-            for (var i = 0; siblings && (i < siblings.length); i++) {
-                if (siblings[i].tagName == e.tagName) {
-                    count++;
-                    if (siblings[i] == e) {
-                        idx = count;
+        if (head == undefined) {
+            Avo_head = document.createElement('head');
+            Avo_head.id = 'AvoAssure_head';
+            var html = document.children[0];
+            Avo_head.appendChild(style);
+            Avo_head.appendChild(style_new);
+            Avo_head.appendChild(style0);
+            html.appendChild(Avo_head);
+        } else {
+            head.appendChild(style);
+            head.appendChild(style_new);
+            head.appendChild(style0);
+        }
+
+        function getElementsByClassName(classname) {
+            var a = [];
+            var re = new RegExp('(^| )' + classname + '( |$)');
+            var els = document.getElementsByTagName("*");
+            var elesal = document.getElementsByTagName("one-record-home-flexipage2");
+            var elesal1 = document.getElementsByTagName("records-lwc-detail-panel");
+            for (var i = 0, j = els.length; i < j; i++)
+                if (re.test(els[i].className)) a.push(els[i]);
+            if (elesal.length > 0) {
+                els1 = elesal[0].getElementsByTagName("*");
+                for (var i = 0, j = els1.length; i < j; i++) {
+                    if (re.test(els1[i].className)) {
+                        a.push(els1[i]);
                     }
                 }
             }
-            if (idx == 1 && count == 1) {
-                idx = null;
+            if (elesal1.length > 0) {
+                els2 = elesal1[0].getElementsByTagName("*");
+                for (var i = 0, j = els2.length; i < j; i++) {
+                    if (re.test(els2[i].className)) {
+                        a.push(els2[i]);
+                    }
+                }
             }
-            if (useId && e.id) {        
-                predicate[predicate.length] = '@id=' + '"' + e.id + '"';
-                unique = true;
+            return a;
+        }
+
+        function leave_handler(event) {
+            var event = event || window.event;
+            if (event.ctrlKey) {
+                return true;
             }
-            xidx = (useIdx && idx) ? ('[' + idx + ']') : '';
-            idx = (useIdx && idx && !unique) ? ('[' + idx + ']') : '';
-            predicate = (predicate.length > 0) ? ('[' + predicate.join(' and ') + ']') : '';
-            if (svgTags.indexOf(e.tagName.toLowerCase()) !== -1) {
-                path = '/*[local-name()="' + e.tagName.toLowerCase() + '"]' + xidx + path;
-            } else if (e.tagName.toLowerCase() === 'foreignobject') {
-                path = '/*[local-name()="foreignObject"]' + xidx + path;
-            } else {
-                path = '/' + e.tagName.toLowerCase() + xidx + path;
+            if (event.preventDefault) {
+                event.preventDefault();
+                event.stopPropagation();
             }
-            if (firstpass == 0) {
-                if (unique && relative) {
-                    rpath = '//*' + idx + predicate + rpath;
-                    firstpass = 1;
-                } else if (salesF) {
-                    rpath = '//' + e.tagName.toLowerCase() + idx + predicate + rpath;
+            var f = event.fromElement || event.target || event.srcElement;
+            var classNameT = 'AvoAssureBorderHighlight';
+            var classNameTT = 'AvoAssureCheckboxHighlight';
+            if (f.classList) {
+                f.classList.remove(classNameT);
+                f.classList.remove(classNameTT);
+            } else if (hasClass(f, classNameT)) {
+                var reg = new RegExp('(\\s|^)' + classNameT + '(\\s|$)');
+                f.className = f.className.replace(reg, ' ');
+            } else if (hasClass(f, classNameTT)) {
+                var reg = new RegExp('(\\s|^)' + classNameTT + '(\\s|$)');
+                f.className = f.className.replace(reg, ' ');
+            }
+        }
+
+        function hov_handler(event) {
+            var event = event || window.event;
+            if (event.ctrlKey) {
+                return true;
+            }
+            if (event.preventDefault) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            var f = event.toElement || event.target || event.srcElement;
+            var tagname = f.tagName.toLowerCase();
+            var classNameT = 'AvoAssureBorderHighlight';
+            var classNameTT = 'AvoAssureCheckboxHighlight';
+            var a = getElementsByClassName(classNameT);
+            var b = getElementsByClassName(classNameTT);
+            i = 0;
+            if (a.length > 0) {
+                if (a[i].classList) {
+                    a[i].classList.remove(classNameT);
+                } else if (hasClass(a[i], classNameT)) {
+                    var reg = new RegExp('(\\s|^)' + classNameT + '(\\s|$)');
+                    a[i].className = a[i].className.replace(reg, ' ');
+                }
+            }
+            if (b.length > 0) {
+                if (b[i].classList) {
+                    b[i].classList.remove(classNameTT);
+                } else if (hasClass(b[i], classNameTT)) {
+                    var reg = new RegExp('(\\s|^)' + classNameTT + '(\\s|$)');
+                    b[i].className = b[i].className.replace(reg, ' ');
+                }
+            }
+            if (tagname != 'script' && tagname != 'meta' && tagname != 'html' && tagname != 'head' && tagname != 'style' && tagname != 'body' && tagname != 'form' && tagname != 'link' && tagname != 'noscript' && tagname != '!' && tagname != 'pre' && tagname != 'code' && tagname != 'animatetransform' && tagname != 'noembed' && tagname != 'iframe' && tagname != 'frame') {
+                if (browser == 3) {
+                    if (f.type == 'checkbox' || f.type == 'radio' || tagname == 'td' || tagname == 'th') {
+                        f.className += ' ' + classNameTT;
+                    } else {
+                        f.className += ' ' + classNameT;
+                    }
                 } else {
+                    if (f.type == 'checkbox' || f.type == 'radio' || tagname == 'td' || tagname == 'th') {
+                        console.log('hover highlight radio/checkbox');
+                        f.classList.add(classNameTT);
+                    } else {
+                        console.log('hover highlight');
+                        f.classList.add(classNameT);
+                    }
+                }
+            }
+        }
+        var currentElement;
+        function handler(event) {
+            tagtype = '';
+            if (window.tastopflag == 'true') {
+                if (window.Prototype) {
+                    var _arr_tojson = Array.prototype.toJSON;
+                    delete Array.prototype.toJSON;
+                    window.tasarr = arr;
+                    Array.prototype.toJSON = _arr_tojson;
+                } else {
+                    window.tasarr = arr;
+                }
+                clickStop(ae, isIE, be);
+                function clickStop(ae, isIE, be) {
+                    if (isIE) {
+                        for (var i = 0; i < ae.length; i++) {
+                            if (ae[i].removeEventListener) {
+                                ae[i].removeEventListener('click', handler, true);
+                                ae[i].removeEventListener('mouseover', hov_handler, true);
+                                ae[i].removeEventListener('mouseleave', leave_handler, true);
+                                ae[i].removeEventListener('mousedown', block_handler, true);
+                                ae[i].removeEventListener('mouseup', block_handler, true);
+                            } else if (ae[i].detachEvent) {
+                                ae[i].detachEvent('onclick', handler);
+                                ae[i].detachEvent('onmouseover', hov_handler);
+                                ae[i].detachEvent('onmouseleave', leave_handler);
+                                ae[i].detachEvent('onmousedown', block_handler);
+                                ae[i].detachEvent('onmouseup', block_handler);
+                            }
+                            if ((ae[i].getAttribute("_onclick")) != null) {
+                                ae[i].parentNode.replaceChild(be[i], ae[i]);
+                            }
+                        }
+                    } else {
+                        for (var i = 0; i < ae.length; i++) {
+                            if (ae[i].removeEventListener) {
+                                ae[i].removeEventListener('click', handler, true);
+                                ae[i].removeEventListener('mouseover', hov_handler, true);
+                                ae[i].removeEventListener('mouseleave', leave_handler, true);
+                                ae[i].removeEventListener('mousedown', block_handler, true);
+                                ae[i].removeEventListener('mouseup', block_handler, true);
+                            } else if (ae[i].detachEvent) {
+                                ae[i].detachEvent('onclick', handler);
+                                ae[i].detachEvent('onmouseover', hov_handler);
+                                ae[i].detachEvent('onmouseleave', leave_handler);
+                                ae[i].detachEvent('onmousedown', block_handler);
+                                ae[i].detachEvent('onmouseup', block_handler);
+                            }
+                            if ((ae[i].getAttribute("_onclick")) != null) {
+                                var _onclickval = ae[i].getAttribute("_onclick");
+                                ae[i].removeAttribute("_onclick");
+                                ae[i].setAttribute("onclick", _onclickval);
+                            }
+                        }
+                    }
+                }
+                window.tastopflag = false;
+                arr = [];
+                return true;
+            } else {
+                ssclassname = 'null';
+                ssname = 'null';
+                sstagname = 'null';
+                if (event.ctrlKey) {
+                    return true;
+                }
+                if (event.preventDefault) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    event.cancelBubble = true;
+                    event.returnValue = false;
+                } else {
+                    window.event.cancelBubble = true;
+                    window.event.returnValue = false;
+                }
+                var e = currentElement || event.target || event.srcElement;
+                var f = currentElement || event.target || event.srcElement;
+                if (event.srcElement.nodeName.toLowerCase() == 'one-record-home-flexipage2' || event.srcElement.nodeName.toLowerCase() == 'records-lwc-detail-panel') {
+                    // e = event.toElement;
+                    // f = event.toElement;
+                    // if ((event.toElement.closest('lightning-combobox') || event.toElement.closest('lightning-grouped-combobox')) && event.toElement.nodeName.toLowerCase() == 'input') {
+                    //     e = event.toElement.closest('lightning-combobox') || event.toElement.closest('lightning-grouped-combobox');
+                    //     f = event.toElement.closest('lightning-combobox') || event.toElement.closest('lightning-grouped-combobox');
+                    // }
+                    salesF = true
+                }
+                var parentele = 'null';
+                // if (f != null && f.tagName.toLowerCase() == 'lightning-datatable') {
+                //     temp2 = f.getElementsByTagName('table')[0];
+                //     parentele = f;
+                //     f = temp2;
+                //     e = temp2;
+                // }
+                var className = e.className;
+                var rpath = '';
+                var firstpass = 0;
+                var role = 'null';
+                var svgTags = ['svg', 'circle', 'rect', 'ellipse', 'line', 'polygon', 'polyline', 'path', 'g', 'text', 'image', 'use'];
+                if (e.hasAttribute('role')) {
+                    if (e.getAttribute('role') === 'grid' && e.tagName.toLowerCase() === 'div') {
+                        role = 'grid';
+                    }
+                }
+                for (var path = ''; e &&(e.nodeName=='#document-fragment'|| e.nodeType == 1); e = e.assignedSlot||e.parentNode) {
+                    if (e.nodeName=='#document-fragment')
+                        e=e.host;
+                    var predicate = [];
+                    var parentNode;
+                    parentNode = e.parentNode;
+                    if (parentNode.shadowRoot&&parentNode.shadowRoot.toString()=='[object ShadowRoot]'&&e.assignedSlot)
+                        var siblings = e.assignedSlot.assignedNodes();
+                    else
+                        var siblings = parentNode.children;
+                    var count = 0;
+                    var unique = false;
+                    for (var i = 0; siblings && (i < siblings.length); i++) {
+                        if (siblings[i].tagName == e.tagName) {
+                            count++;
+                            if (siblings[i] == e) {
+                                idx = count;
+                            }
+                        }
+                    }
+                    if (idx == 1 && count == 1) {
+                        idx = null;
+                    }
+                    if (useId && e.id) {        
+                        predicate[predicate.length] = '@id=' + '"' + e.id + '"';
+                        unique = true;
+                    }
+                    xidx = (useIdx && idx) ? ('[' + idx + ']') : '';
+                    idx = (useIdx && idx && !unique) ? ('[' + idx + ']') : '';
+                    predicate = (predicate.length > 0) ? ('[' + predicate.join(' and ') + ']') : '';
                     if (svgTags.indexOf(e.tagName.toLowerCase()) !== -1) {
-                        rpath = '/*[local-name()="' + e.tagName.toLowerCase() + '"]' + idx + predicate + rpath;
+                        path = '/*[local-name()="' + e.tagName.toLowerCase() + '"]' + xidx + path;
                     } else if (e.tagName.toLowerCase() === 'foreignobject') {
-                        rpath = '/*[local-name()="foreignObject"]' + idx + predicate + rpath;
+                        path = '/*[local-name()="foreignObject"]' + xidx + path;
                     } else {
-                        rpath = '/' + e.tagName.toLowerCase() + idx + predicate + rpath;
+                        path = '/' + e.tagName.toLowerCase() + xidx + path;
                     }
-                }
-            }
-        }
-        var firstpass1 = 0;
-        var rpath1 = '';
-        if (parentele != 'null') {
-            g = parentele;
-            for (var path1 = ''; g && g.nodeType == 1; g = g.parentNode.host || g.parentNode) {
-                var predicate1 = [];
-                var siblings1 = g.parentNode.children;
-                var count1 = 0;
-                var unique1 = false;
-                for (var i = 0; siblings1 && (i < siblings1.length); i++) {
-                    if (siblings1[i].tagName == g.tagName) {
-                        count1++;
-                        if (siblings1[i] == g) {
-                            idx1 = count1;
+                    if (firstpass == 0) {
+                        if (unique && relative) {
+                            rpath = '//*' + idx + predicate + rpath;
+                            firstpass = 1;
+                        } else if (salesF) {
+                            rpath = '//' + e.tagName.toLowerCase() + idx + predicate + rpath;
+                        } else {
+                            if (svgTags.indexOf(e.tagName.toLowerCase()) !== -1) {
+                                rpath = '/*[local-name()="' + e.tagName.toLowerCase() + '"]' + idx + predicate + rpath;
+                            } else if (e.tagName.toLowerCase() === 'foreignobject') {
+                                rpath = '/*[local-name()="foreignObject"]' + idx + predicate + rpath;
+                            } else {
+                                rpath = '/' + e.tagName.toLowerCase() + idx + predicate + rpath;
+                            }
                         }
                     }
                 }
-                if (idx1 == 1 && count1 == 1) {
-                    idx1 = null;
-                }
-                if (useId && g.id) {
-                    predicate1[predicate1.length] = '@id=' + '"' + g.id + '"';
-                    unique1 = true;
-                }
-                xidx1 = (useIdx && idx1) ? ('[' + idx1 + ']') : '';
-                idx1 = (useIdx && idx1 && !unique1) ? ('[' + idx1 + ']') : '';
-                predicate1 = (predicate1.length > 0) ? ('[' + predicate1.join(' and ') + ']') : '';
-                if (svgTags.indexOf(g.tagName.toLowerCase()) !== -1) {
-                    path1 = '/*[local-name()="' + g.tagName.toLowerCase() + '"]' + xidx1 + path1;
-                } else if (g.tagName.toLowerCase() == 'foreignobject') {
-                    path1 = '/*[local-name()="foreignObject"]' + xidx1 + path1;
-                } else {
-                    path1 = '/' + g.tagName.toLowerCase() + xidx1 + path1;
-                }
-                if (firstpass1 == 0) {
-                    if (unique1 && relative) {
-                        rpath1 = '//*' + idx1 + predicate1 + rpath1;
-                        firstpass1 = 1;
-                    } else {
+                var firstpass1 = 0;
+                var rpath1 = '';
+                if (parentele != 'null') {
+                    g = parentele;
+                    for (var path1 = ''; g && g.nodeType == 1; g = g.parentNode.host || g.parentNode) {
+                        var predicate1 = [];
+                        var siblings1 = g.parentNode.children;
+                        var count1 = 0;
+                        var unique1 = false;
+                        for (var i = 0; siblings1 && (i < siblings1.length); i++) {
+                            if (siblings1[i].tagName == g.tagName) {
+                                count1++;
+                                if (siblings1[i] == g) {
+                                    idx1 = count1;
+                                }
+                            }
+                        }
+                        if (idx1 == 1 && count1 == 1) {
+                            idx1 = null;
+                        }
+                        if (useId && g.id) {
+                            predicate1[predicate1.length] = '@id=' + '"' + g.id + '"';
+                            unique1 = true;
+                        }
+                        xidx1 = (useIdx && idx1) ? ('[' + idx1 + ']') : '';
+                        idx1 = (useIdx && idx1 && !unique1) ? ('[' + idx1 + ']') : '';
+                        predicate1 = (predicate1.length > 0) ? ('[' + predicate1.join(' and ') + ']') : '';
                         if (svgTags.indexOf(g.tagName.toLowerCase()) !== -1) {
-                            rpath1 = '/*[local-name()="' + g.tagName.toLowerCase() + '"]' + idx1 + predicate1 + rpath1;
+                            path1 = '/*[local-name()="' + g.tagName.toLowerCase() + '"]' + xidx1 + path1;
                         } else if (g.tagName.toLowerCase() == 'foreignobject') {
-                            rpath1 = '/*[local-name()="foreignObject"]' + idx1 + predicate1 + rpath1;
+                            path1 = '/*[local-name()="foreignObject"]' + xidx1 + path1;
                         } else {
-                            rpath1 = '/' + g.tagName.toLowerCase() + idx1 + predicate1 + rpath1;
+                            path1 = '/' + g.tagName.toLowerCase() + xidx1 + path1;
+                        }
+                        if (firstpass1 == 0) {
+                            if (unique1 && relative) {
+                                rpath1 = '//*' + idx1 + predicate1 + rpath1;
+                                firstpass1 = 1;
+                            } else {
+                                if (svgTags.indexOf(g.tagName.toLowerCase()) !== -1) {
+                                    rpath1 = '/*[local-name()="' + g.tagName.toLowerCase() + '"]' + idx1 + predicate1 + rpath1;
+                                } else if (g.tagName.toLowerCase() == 'foreignobject') {
+                                    rpath1 = '/*[local-name()="foreignObject"]' + idx1 + predicate1 + rpath1;
+                                } else {
+                                    rpath1 = '/' + g.tagName.toLowerCase() + idx1 + predicate1 + rpath1;
+                                }
+                            }
                         }
                     }
+                    path = path1 + path;
+                    rpath = rpath1 + rpath;
                 }
-            }
-            path = path1 + path;
-            rpath = rpath1 + rpath;
-        }
-        ishidden = isVisible(f);
-        if (ishidden == true || ishidden == 'True' || ishidden == 'true') {
-            ishidden = 'No';
-        } else {
-            ishidden = 'Yes';
-        }
-        var tagname = f.tagName.toLowerCase();
-        if (tagname.indexOf(':') != -1) {
-            tagname = tagname.replace(':', '');
-            tagname = 'custom' + tagname;
-        }
-        id = f.id;
-        name = f.name;
-        placeholder = f.placeholder;
-        id = (String(id));
-        name = (String(name));
-        placeholder = (String(placeholder));
-        var textvalue = text_content(f);
-        textvalue = (String(textvalue));
-        findCoordinates(f);
-        if (name != '' && name != 'undefined') {
-            names = document.getElementsByName(name);
-            if (names.length > 1) {
-                for (var k = 0; k < names.length; k++) {
-                    if (f == names[k]) {
-                        ssname = name + '[' + k + ']'
-                    }
-                }
-            } else {
-                ssname = name;
-            }
-        }
-        if (tagname != '' && tagname != 'undefined') {
-            tagnames = document.getElementsByTagName(tagname);
-            if (tagnames.length > 1) {
-                for (var k = 0; k < tagnames.length; k++) {
-                    if (f == tagnames[k]) {
-                        if (svgTags.indexOf(tagname) !== -1) {
-                            sstagname = '/*[local-name()="' + tagname + '"]' + '[' + k + ']';
-                        } else if (tagname == 'foreignobject') {
-                            sstagname = '/*[local-name()="foreignObject"]' + '[' + k + ']';
-                        } else {
-                            sstagname = tagname + '[' + k + ']';
-                        }
-                    }
-                }
-            } else {
-                if (svgTags.indexOf(tagname) !== -1) {
-                    sstagname = '/*[local-name()="' + tagname + '"]';
-                } else if (tagname == 'foreignobject') {
-                    sstagname = '/*[local-name()="foreignObject"]';
+                ishidden = isVisible(f);
+                if (ishidden == true || ishidden == 'True' || ishidden == 'true') {
+                    ishidden = 'No';
                 } else {
-                    sstagname = tagname;
+                    ishidden = 'Yes';
                 }
-            }
-        }
-        if (className != '' && className != 'undefined' && className != 'AvoAssure_Highlight') {
-            try {
-                classnames = document.getElementsByClassName(className);
-                if (classnames.length > 1) {
-                    for (var k = 0; k < classnames.length; k++) {
-                        if (f == classnames[k]) {
-                            ssclassname = className + '[' + k + ']'
-                        }
-                    }
-                } else {
-                    ssclassname = className;
+                var tagname = f.tagName.toLowerCase();
+                if (tagname.indexOf(':') != -1) {
+                    tagname = tagname.replace(':', '');
+                    tagname = 'custom' + tagname;
                 }
-            } catch (err) {
-                console.log("skipping this element: " + err);
-            }
-        }
-        if (tagname != 'script' && tagname != 'meta' && tagname != 'html' && tagname != 'head' && tagname != 'style' && tagname != 'body' && tagname != 'form' && tagname != 'link' && tagname != 'noscript' && tagname != '!' && tagname != 'pre' && tagname != 'code' && tagname != 'animatetransform' && tagname != 'noembed') {
-            if (textvalue == '' || textvalue == 'null' || textvalue == 'undefined' || textvalue == '0') {
+                id = f.id;
+                name = f.name;
+                placeholder = f.placeholder;
+                id = (String(id));
+                name = (String(name));
+                placeholder = (String(placeholder));
+                var textvalue = text_content(f);
+                textvalue = (String(textvalue));
+                var label = text_content(f);
+                label = (String(label));
+                findCoordinates(f);
                 if (name != '' && name != 'undefined') {
                     names = document.getElementsByName(name);
                     if (names.length > 1) {
                         for (var k = 0; k < names.length; k++) {
                             if (f == names[k]) {
-                                textvalue = name + k;
+                                ssname = name + '[' + k + ']'
                             }
                         }
                     } else {
-                        textvalue = name;
+                        ssname = name;
                     }
-                } else if (id != '' && id != 'undefined') {
-                    textvalue = id;
-                } else if (placeholder != '' && placeholder != 'undefined') {
-                    textvalue = placeholder;
-                } else {
-                    var eles = document.getElementsByTagName(tagname);
-                    for (var k = 0; k < eles.length; k++) {
-                        if (f == eles[k]) {
-                            textvalue = tagname + '_NONAME' + (k + 1);
+                }
+                if (tagname != '' && tagname != 'undefined') {
+                    tagnames = document.getElementsByTagName(tagname);
+                    if (tagnames.length > 1) {
+                        for (var k = 0; k < tagnames.length; k++) {
+                            if (f == tagnames[k]) {
+                                if (svgTags.indexOf(tagname) !== -1) {
+                                    sstagname = '/*[local-name()="' + tagname + '"]' + '[' + k + ']';
+                                } else if (tagname == 'foreignobject') {
+                                    sstagname = '/*[local-name()="foreignObject"]' + '[' + k + ']';
+                                } else {
+                                    sstagname = tagname + '[' + k + ']';
+                                }
+                            }
+                        }
+                    } else {
+                        if (svgTags.indexOf(tagname) !== -1) {
+                            sstagname = '/*[local-name()="' + tagname + '"]';
+                        } else if (tagname == 'foreignobject') {
+                            sstagname = '/*[local-name()="foreignObject"]';
+                        } else {
+                            sstagname = tagname;
                         }
                     }
                 }
+                if (className != '' && className != 'undefined' && className != 'AvoAssure_Highlight') {
+                    try {
+                        classnames = document.getElementsByClassName(className);
+                        if (classnames.length > 1) {
+                            for (var k = 0; k < classnames.length; k++) {
+                                if (f == classnames[k]) {
+                                    ssclassname = className + '[' + k + ']'
+                                }
+                            }
+                        } else {
+                            ssclassname = className;
+                        }
+                    } catch (err) {
+                        console.log("skipping this element: " + err);
+                    }
+                }
+                if (tagname != 'script' && tagname != 'meta' && tagname != 'html' && tagname != 'head' && tagname != 'style' && tagname != 'body' && tagname != 'form' && tagname != 'link' && tagname != 'noscript' && tagname != '!' && tagname != 'pre' && tagname != 'code' && tagname != 'animatetransform' && tagname != 'noembed') {
+                    if (textvalue == '' || textvalue == 'null' || textvalue == 'undefined' || textvalue == '0') {
+                        if (name != '' && name != 'undefined') {
+                            names = document.getElementsByName(name);
+                            if (names.length > 1) {
+                                for (var k = 0; k < names.length; k++) {
+                                    if (f == names[k]) {
+                                        textvalue = name + k;
+                                    }
+                                }
+                            } else {
+                                textvalue = name;
+                            }
+                        } else if (id != '' && id != 'undefined') {
+                            textvalue = id;
+                        } else if (placeholder != '' && placeholder != 'undefined') {
+                            textvalue = placeholder;
+                        } else {
+                            var eles = document.getElementsByTagName(tagname);
+                            for (var k = 0; k < eles.length; k++) {
+                                if (f == eles[k]) {
+                                    textvalue = tagname + '_NONAME' + (k + 1);
+                                }
+                            }
+                        }
+                    }
+                    // capture label content of the element
+                    function findLableForControl(ele) {
+                        try {
+                            var idVal = ele.id;
+                            labels = document.getElementsByTagName('label');
+                            if (labels.length !== 0) {
+                                for( var i = 0; i < labels.length; i++ ) {
+                                    if (labels[i].htmlFor == idVal) {
+                                        return labels[i].textContent;
+                                    }
+                                }
+                            }
+                            else {
+                                return null;
+                            }
+                        } catch (err) {
+                            console.log("skipping this element: " + err);
+                        }
+                    }
+                    if (label == '' || label == 'null' || label == 'undefined' || label == '0') {
+                        if (placeholder != '' && placeholder != 'undefined') {
+                            label = placeholder;
+                        } else if (f.nodeName.toLowerCase() == 'input' || f.nodeName.toLowerCase() == 'select' || f.nodeName.toLowerCase() == 'textarea' || f.nodeName.toLowerCase() == 'progress' || f.nodeName.toLowerCase() == 'meter') {
+                            label = findLableForControl(f);
+                        }
+                        if (f.nodeName.toLowerCase() == 'input' && (label == null || label == '')) {
+                            if (f.hasAttribute('value')) {
+                                label = f.getAttribute('value');
+                            }
+                            else {
+                                label = null;
+                            }
+                        }
+                    }
+                    if (tagname == 'select') {
+                        f.setAttribute('disabled', 'disabled');
+                        multipleFlag = f.hasAttribute('multiple');
+                    }
+                    var etype = f.getAttribute('type');
+                    etype = (String(etype)).toLowerCase();
+                    var newPath = path;
+                    if (tagname == 'textarea') {
+                        tagname = 'input';
+                        tagtype = 'txtarea';
+                    } else if (tagname == 'select' && multipleFlag) {
+                        tagname = 'list';
+                        tagtype = 'lst';
+                    } else if (tagname == 'select') {
+                        tagtype = 'select';
+                    } else if (tagname == 'lightning-combobox' || tagname == 'lightning-grouped-combobox') {
+                        tagtype = tagname;
+                        tagname = 'select';
+                    } else if (tagname == 'td') {
+                        tagname = 'tablecell';
+                        tagtype = 'tblcell';
+                    } else if (tagname == 'a') {
+                        tagtype = 'lnk';
+                    } else if (tagname == 'table') {
+                        tagtype = 'tbl';
+                    } else if (tagname == 'img') {
+                        tagtype = 'img';
+                    } else if (tagname == 'input' && etype == 'image') {
+                        tagname = 'img';
+                        tagtype = 'img';
+                    }
+                    if (tagname == 'input' && (etype == 'button' || etype == 'submit' || etype == 'reset' || etype == 'file')) {
+                        tagname = 'button';
+                        tagtype = 'btn';
+                    } else if (tagname == 'input' && etype == 'radio') {
+                        tagname = 'radiobutton';
+                        tagtype = 'radiobtn';
+                    } else if (tagname == 'input' && etype == 'checkbox') {
+                        tagname = 'checkbox';
+                        tagtype = 'chkbox';
+                    } else if (tagname == 'input' && (etype == 'text' || etype == 'email' || etype == 'number' || etype == 'password' || etype == 'range' || etype == 'search' || etype == 'url')) {
+                        tagname = 'input';
+                        tagtype = 'txtbox';
+                    } else if (tagname == 'input' && tagtype == '' && (etype == 'hidden' || etype == 'null')) {
+                        tagname = 'div';
+                        tagtype = 'elmnt';
+                    } else if (tagname == 'option' && f.parentNode.hasAttribute('multiple')) {
+                        tagname = 'list';
+                        var selectIndex1 = rpath.indexOf('select');
+                        var selectIndex2 = path.indexOf('select');
+                        rpath = rpath.substring(0, selectIndex1 + 6);
+                        path = path.substring(0, selectIndex2 + 6);
+                    } else if (tagname == 'button') {
+                        tagname = 'button';
+                        tagtype = 'btn';
+                    }
+                    if (role == 'grid') {
+                        tagname = 'grid';
+                        tagtype = 'grid';
+                    }
+                    if (id == '') {
+                        id = 'null';
+                    }
+                    if (salesF) {
+                        textvalue = tagname + '_Salesforce' + salesforcecounter + '_sfc';
+                        salesforcecounter = salesforcecounter + 1;
+                    }
+                    textvalue = textvalue.replace(">", "");
+                    textvalue = textvalue.replace("</", "");
+                    textvalue = textvalue.replace("<", "");
+                    textvalue = textvalue.replace("/>", "");
+                    textvalue = textvalue.split("\\n").join("");
+                    textvalue = textvalue.split("\\t").join("");
+                    textvalue = textvalue.split("\\r").join("");
+                    textvalue = textvalue.split("  ").join("");
+                    textvalue = textvalue.split("\\u00a0").join("");
+                    if (textvalue == '' || textvalue.length == 0 || textvalue == '0') {
+                        textvalue = 'NONAME' + nonamecounter;
+                        nonamecounter = nonamecounter + 1;
+                        custname = textvalue;
+                    } else {
+                        custname = textvalue;
+                    }
+                    if (tagtype != '') {
+                        custname = custname + '_' + tagtype;
+                    } else {
+                        custname = custname + '_elmnt';
+                    }
+                    if (tagname == 'select') {
+                        f.removeAttribute('disabled');
+                        f.setAttribute('enabled', 'enabled');
+                    } else if (tagname == "list") {
+                        f.removeAttribute('disabled');
+                        f.setAttribute('enabled', 'enabled');
+                    }
+                    coordinates = left + ';' + top + ';' + height + ';' + width;
+                    coordinates = String(coordinates);
+                    if (browser == 3) {
+                        if (svgTags.indexOf(tagname) === -1) {
+                            ssclassname = ssclassname.replace(/AvoAssure_Highlight/g, '');
+                            ssclassname = ssclassname.replace(/AvoAssureBorderHighlight/g, '');
+                            ssclassname = ssclassname.trim();
+                        } else {
+                            ssclassname.animVal = ssclassname.animVal.replace(/AvoAssure_Highlight/g, '');
+                            ssclassname.baseVal = ssclassname.baseVal.replace(/AvoAssure_Highlight/g, '');
+                            ssclassname.animVal = ssclassname.animVal.replace(/AvoAssureBorderHighlight/g, '');
+                            ssclassname.baseVal = ssclassname.baseVal.replace(/AvoAssureBorderHighlight/g, '');
+                            ssclassname.animVal = ssclassname.animVal.trim();
+                            ssclassname.baseVal = ssclassname.baseVal.trim();
+                        }
+                    } else {
+                        if (svgTags.indexOf(tagname) === -1) {
+                            ssclassname = ssclassname.replaceAll('AvoAssure_Highlight', '');
+                            ssclassname = ssclassname.replaceAll('AvoAssureBorderHighlight', '');
+                            ssclassname = ssclassname.trim();
+                        } else {
+                            ssclassname.animVal = ssclassname.animVal.replaceAll('AvoAssure_Highlight', '');
+                            ssclassname.baseVal = ssclassname.baseVal.replaceAll('AvoAssure_Highlight', '');
+                            ssclassname.animVal = ssclassname.animVal.replaceAll('AvoAssureBorderHighlight', '');
+                            ssclassname.baseVal = ssclassname.baseVal.replaceAll('AvoAssureBorderHighlight', '');
+                            ssclassname.animVal = ssclassname.animVal.trim();
+                            ssclassname.baseVal = ssclassname.baseVal.trim();
+                        }
+                    }
+
+                    // capture css selector of the element
+                    var cssSelector = '';
+                    function getCssSelector(ele) {
+                        try {
+                            let path = [];
+                            let parentEle = ele.parentNode;
+                            while (ele.nodeName.toLowerCase() != 'body') {
+                                let selector = ele.nodeName.toLowerCase();
+                                let arr = Array.from(ele.parentNode.children);
+                                let tagNameArr = [];
+                                for (i = 0; i < arr.length; i++) {
+                                    let tag = arr[i].tagName.toLowerCase();
+                                    tagNameArr.push(tag);
+                                }
+                                let count = tagNameArr.toString().match(new RegExp(selector, 'g')).length;
+                                if (ele.id) {
+                                    selector += '#' + ele.id;
+                                }
+                                else if (count > 1) {
+                                    let sib = ele.previousSibling, nth = 1;
+                                    while((sib != null) && nth++) {
+                                        if ((sib.nodeName.toLowerCase() == '#text') || (sib.nodeName.toLowerCase() == '#comment')) {
+                                            nth--;
+                                        }
+                                        sib = sib.previousSibling;
+                                    }
+                                    selector += ":nth-child("+nth+")";
+                                }
+                                path.unshift(selector);
+                                ele = ele.parentNode;
+                            }
+                            return path.join(" > ");
+                        } catch (err) {
+                            console.log("skipping this element: " + err);
+                        }
+                    }
+                    cssSelector = getCssSelector(f);
+
+                    // capture href of the element
+                    var href='';
+                    function getHref(ele) {
+                        try {
+                            var hrefValue='';
+                            if (ele.hasAttribute('href')) {
+                                hrefValue = ele.getAttribute('href');
+                            }
+                            else {
+                                hrefValue = null;
+                            }
+                            return hrefValue;
+                        } catch (err) {
+                            console.log("skipping this element: " + err);
+                        }
+                    }
+                    href = getHref(f);
+
+                    //We will be using absolute xpath first as relative xpath has id that may change and incorrect element may get selected.
+                    newPath = String(path) + ';' + String(id) + ';' + String(rpath) + ';' + ssname + ';' + sstagname + ';' + ssclassname + ';' + coordinates + ';' + label + ';' + String(href) + ';' + cssSelector;
+                    for (var i = 0; i < arr.length; i++) {
+                        if (arr[i].xpath == newPath) {
+                            uniqueFlag = true;
+                            break;
+                        }
+                    };
+                    if (uniqueFlag == false) {
+                        arr.push({
+                            'xpath': newPath,
+                            'url': url,
+                            'hiddentag': ishidden,
+                            'custname': custname,
+                            'tag': tagname,
+                            'top': top,
+                            'left': left,
+                            'height': height,
+                            'width': width,
+                            'viewTop': viewTop,
+                        });
+                    }
+                    uniqueFlag = false;
+                    if (browser == '3') {
+                        f.setAttribute('class', className + ' AvoAssure_Highlight');
+                        f.setAttribute('className', className + ' AvoAssure_Highlight');
+                        f.style.setAttribute('cssText', 'background: #fff300 !important;opacity:1!important; border: 2px solid #cc3300 !important;outline: 2px solid #fff300 !important;');
+                    } else {
+                        var styleElement = 'background: #fff300 !important;opacity:1!important; border: 2px solid #cc3300 !important;outline: 2px solid #fff300 !important;'
+                        if ((f.hasAttribute('style') && f.getAttribute('style').indexOf(styleElement)==-1)||!f.hasAttribute('style'))
+                        {
+                            f.setAttribute('class', className + ' AvoAssure_Highlight');
+                            if (f.hasAttribute('style'))
+                                styleElement += f.getAttribute('style');    //Taking care of existing css on element
+                            f.setAttribute('style', styleElement);          
+                        }
+                    }
+                    //Using CSS to make pointer events auto after highlighting.
+                    if (browser!='2' && currentElement.tagName!='HTML')   //Excluding the changes for firefox
+                        document.getElementsByTagName('html')[0].style.pointerEvents='auto';
+                }
+                return false;
             }
-            if (tagname == 'select') {
-                f.setAttribute('disabled', 'disabled');
-                multipleFlag = f.hasAttribute('multiple');
+        }
+        function block_handler(event) {
+            event = event || window.event;
+            if (event.type=="mousedown")
+                currentElement = event.toElement;
+            if (event.ctrlKey) {
+                return true;
             }
-            var etype = f.getAttribute('type');
-            etype = (String(etype)).toLowerCase();
-            var newPath = path;
-            if (tagname == 'textarea') {
-                tagname = 'input';
-                tagtype = 'txtarea';
-            } else if (tagname == 'select' && multipleFlag) {
-                tagname = 'list';
-                tagtype = 'lst';
-            } else if (tagname == 'select') {
-                tagtype = 'select';
-            } else if (tagname == 'lightning-combobox' || tagname == 'lightning-grouped-combobox') {
-                tagtype = tagname;
-                tagname = 'select';
-            } else if (tagname == 'td') {
-                tagname = 'tablecell';
-                tagtype = 'tblcell';
-            } else if (tagname == 'a') {
-                tagtype = 'lnk';
-            } else if (tagname == 'table') {
-                tagtype = 'tbl';
-            } else if (tagname == 'img') {
-                tagtype = 'img';
-            } else if (tagname == 'input' && etype == 'image') {
-                tagname = 'img';
-                tagtype = 'img';
-            }
-            if (tagname == 'input' && (etype == 'button' || etype == 'submit' || etype == 'reset' || etype == 'file')) {
-                tagname = 'button';
-                tagtype = 'btn';
-            } else if (tagname == 'input' && etype == 'radio') {
-                tagname = 'radiobutton';
-                tagtype = 'radiobtn';
-            } else if (tagname == 'input' && etype == 'checkbox') {
-                tagname = 'checkbox';
-                tagtype = 'chkbox';
-            } else if (tagname == 'input' && (etype == 'text' || etype == 'email' || etype == 'number' || etype == 'password' || etype == 'range' || etype == 'search' || etype == 'url')) {
-                tagname = 'input';
-                tagtype = 'txtbox';
-            } else if (tagname == 'input' && tagtype == '' && (etype == 'hidden' || etype == 'null')) {
-                tagname = 'div';
-                tagtype = 'elmnt';
-            } else if (tagname == 'option' && f.parentNode.hasAttribute('multiple')) {
-                tagname = 'list';
-                var selectIndex1 = rpath.indexOf('select');
-                var selectIndex2 = path.indexOf('select');
-                rpath = rpath.substring(0, selectIndex1 + 6);
-                path = path.substring(0, selectIndex2 + 6);
-            } else if (tagname == 'button') {
-                tagname = 'button';
-                tagtype = 'btn';
-            }
-            if (role == 'grid') {
-                tagname = 'grid';
-                tagtype = 'grid';
-            }
-            if (id == '') {
-                id = 'null';
-            }
-            if (salesF) {
-                textvalue = tagname + '_Salesforce' + salesforcecounter + '_sfc';
-                salesforcecounter = salesforcecounter + 1;
-            }
-            textvalue = textvalue.replace(">", "");
-            textvalue = textvalue.replace("</", "");
-            textvalue = textvalue.replace("<", "");
-            textvalue = textvalue.replace("/>", "");
-            textvalue = textvalue.split("\\n").join("");
-            textvalue = textvalue.split("\\t").join("");
-            textvalue = textvalue.split("\\r").join("");
-            textvalue = textvalue.split("  ").join("");
-            textvalue = textvalue.split("\\u00a0").join("");
-            if (textvalue == '' || textvalue.length == 0 || textvalue == '0') {
-                textvalue = 'NONAME' + nonamecounter;
-                nonamecounter = nonamecounter + 1;
-                custname = textvalue;
+            //Using CSS to make pointer events none as event.preventDefault can't cancel sometimes.
+            if (browser!='2' && currentElement.tagName!='HTML'  && currentElement._scopedScroll==undefined)   //Excluding the changes for firefox and for scrollbar
+                document.getElementsByTagName('html')[0].style.pointerEvents='none';
+            if (event.preventDefault) {
+                event.preventDefault();
+                event.stopPropagation();
+                event.cancelBubble = true;
+                event.returnValue = false;
             } else {
-                custname = textvalue;
+                window.event.cancelBubble = true;
+                window.event.returnValue = false;
             }
-            if (tagtype != '') {
-                custname = custname + '_' + tagtype;
-            } else {
-                custname = custname + '_elmnt';
-            }
-            if (tagname == 'select') {
-                f.removeAttribute('disabled');
-                f.setAttribute('enabled', 'enabled');
-            } else if (tagname == "list") {
-                f.removeAttribute('disabled');
-                f.setAttribute('enabled', 'enabled');
-            }
-            coordinates = left + ';' + top + ';' + height + ';' + width;
-            coordinates = String(coordinates);
-            if (browser == 3) {
-                if (svgTags.indexOf(tagname) === -1) {
-                    ssclassname = ssclassname.replace(/AvoAssure_Highlight/g, '');
-                    ssclassname = ssclassname.replace(/AvoAssureBorderHighlight/g, '');
-                    ssclassname = ssclassname.trim();
-                } else {
-                    ssclassname.animVal = ssclassname.animVal.replace(/AvoAssure_Highlight/g, '');
-                    ssclassname.baseVal = ssclassname.baseVal.replace(/AvoAssure_Highlight/g, '');
-                    ssclassname.animVal = ssclassname.animVal.replace(/AvoAssureBorderHighlight/g, '');
-                    ssclassname.baseVal = ssclassname.baseVal.replace(/AvoAssureBorderHighlight/g, '');
-                    ssclassname.animVal = ssclassname.animVal.trim();
-                    ssclassname.baseVal = ssclassname.baseVal.trim();
+            return false;
+        }
+        click(ae, isIE, be);
+        function click(ae, isIE, be) {
+            if (isIE) {
+                for (var i = 0; i < ae.length; i++) {
+                    if ((ae[i].getAttribute("onclick")) != null) {
+                        var onclickval = ae[i].attributes["onclick"].value;
+                        be[i] = ae[i].cloneNode(true);
+                        ae[i].onclick = null;
+                        ae[i].setAttribute('_onclick', onclickval);
+                    }
+                    if (ae[i].addEventListener) {
+                        ae[i].addEventListener('click', handler, true);
+                        ae[i].addEventListener('mouseover', hov_handler, true);
+                        ae[i].addEventListener('mouseleave', leave_handler, true);
+                        ae[i].addEventListener('mousedown', block_handler, true);
+                        ae[i].addEventListener('mouseup', block_handler, true);
+                    } else if (ae[i].attachEvent) {
+                        ae[i].attachEvent('onclick', handler);
+                        ae[i].attachEvent('onmouseover', hov_handler);
+                        ae[i].attachEvent('onmouseleave', leave_handler);
+                        ae[i].attachEvent('onmousedown', block_handler);
+                        ae[i].attachEvent('onmouseup', block_handler);
+                    }
                 }
             } else {
-                if (svgTags.indexOf(tagname) === -1) {
-                    ssclassname = ssclassname.replaceAll('AvoAssure_Highlight', '');
-                    ssclassname = ssclassname.replaceAll('AvoAssureBorderHighlight', '');
-                    ssclassname = ssclassname.trim();
-                } else {
-                    ssclassname.animVal = ssclassname.animVal.replaceAll('AvoAssure_Highlight', '');
-                    ssclassname.baseVal = ssclassname.baseVal.replaceAll('AvoAssure_Highlight', '');
-                    ssclassname.animVal = ssclassname.animVal.replaceAll('AvoAssureBorderHighlight', '');
-                    ssclassname.baseVal = ssclassname.baseVal.replaceAll('AvoAssureBorderHighlight', '');
-                    ssclassname.animVal = ssclassname.animVal.trim();
-                    ssclassname.baseVal = ssclassname.baseVal.trim();
+                for (var i = 0; i < ae.length; i++) {
+                    if ((ae[i].getAttribute("onclick")) != null) {
+                        var onclickval = ae[i].getAttribute("onclick");
+                        ae[i].removeAttribute("onclick");
+                        ae[i].setAttribute("_onclick", onclickval);
+                    }
+                    if (ae[i].addEventListener) {
+                        ae[i].addEventListener('click', handler, true);
+                        ae[i].addEventListener('mouseover', hov_handler, true);
+                        ae[i].addEventListener('mouseleave', leave_handler, true);
+                        ae[i].addEventListener('mousedown', block_handler, true);
+                        ae[i].addEventListener('mouseup', block_handler, true);
+                    } else if (ae[i].attachEvent) {
+                        ae[i].attachEvent('onclick', handler);
+                        ae[i].attachEvent('onmouseover', hov_handler);
+                        ae[i].attachEvent('onmouseleave', leave_handler);
+                        ae[i].attachEvent('onmousedown', block_handler);
+                        ae[i].attachEvent('onmouseup', block_handler);
+                    }
                 }
             }
-            
-            newPath = String(path) + ';' + String(id) + ';' + String(rpath) + ';' + ssname + ';' + sstagname + ';' + ssclassname + ';' + coordinates + ';' + textvalue;
+        }
 
-            for (var i = 0; i < arr.length; i++) {
-                if (arr[i].xpath == newPath) {
-                    uniqueFlag = true;
-                    break;
+        function findCoordinates(element) {
+            height = element.offsetHeight;
+            width = element.offsetWidth;
+            viewTop = element.getBoundingClientRect()['top'];
+            top = 0;
+            left = 0;
+            do {
+                top += element.offsetTop || 0;
+                left += element.offsetLeft || 0;
+                element = element.offsetParent;
+            } while (element);
+        };
+
+        function text_content(f) {
+            var firstText = '';
+            var textdisplay = '';
+            for (var z = 0; z < f.childNodes.length; z++) {
+                var curNode = f.childNodes[z];
+                whitespace = /^\s*$/;
+                if (curNode.nodeName === '#text' && !(whitespace.test(curNode.nodeValue))) {
+                    firstText = curNode.nodeValue;
+                    textdisplay = textdisplay + firstText;
                 }
-            };
-            if (uniqueFlag == false) {
-                arr.push({
-                    'xpath': newPath,
-                    'url': url,
-                    'hiddentag': ishidden,
-                    'custname': custname,
-                    'tag': tagname,
-                    'top': top,
-                    'left': left,
-                    'height': height,
-                    'width': width,
-                    'viewTop': viewTop,
-                });
             }
-            uniqueFlag = false;
-            if (browser == 3) {
-                f.setAttribute('class', className + ' AvoAssure_Highlight');
-                f.setAttribute('className', className + ' AvoAssure_Highlight');
-                f.style.setAttribute('cssText', 'background: #fff300 !important;opacity:1!important; border: 2px solid #cc3300 !important;outline: 2px solid #fff300 !important;');
-            } else {
-                f.setAttribute('class', className + ' AvoAssure_Highlight');
-                f.setAttribute('style', 'background: #fff300 !important;opacity:1!important; border: 2px solid #cc3300 !important;outline: 2px solid #fff300 !important;');
-            }
-        }
-        return false;
-    }
-}
+            return (textdisplay);
+        };
 
-function block_handler(event) {
-    event = event || window.event;
-    currentElement = event.toElement;
-    if (event.ctrlKey) {
-        return true;
-    }
-    if (event.preventDefault) {
-        event.preventDefault();
-        event.stopPropagation();
-        event.cancelBubble = true;
-        event.returnValue = false;
-    } else {
-        window.event.cancelBubble = true;
-        window.event.returnValue = false;
-    }
-    return false;
-}
-click(ae, isIE, be);
-
-function click(ae, isIE, be) {
-    if (isIE) {
-        for (var i = 0; i < ae.length; i++) {
-            if ((ae[i].getAttribute("onclick")) != null) {
-                var onclickval = ae[i].attributes["onclick"].value;
-                be[i] = ae[i].cloneNode(true);
-                ae[i].onclick = null;
-                ae[i].setAttribute('_onclick', onclickval);
+        function addNodesOuter(array, collection) {
+            for (var i = 0; collection && collection.length && i < collection.length; i++) {
+                    array.push(collection[i]);
             }
-            if (ae[i].addEventListener) {
-                ae[i].addEventListener('click', handler, true);
-                ae[i].addEventListener('mouseover', hov_handler, true);
-                ae[i].addEventListener('mouseleave', leave_handler, true);
-                ae[i].addEventListener('mousedown', block_handler, true);
-                ae[i].addEventListener('mouseup', block_handler, true);
-            } else if (ae[i].attachEvent) {
-                ae[i].attachEvent('onclick', handler);
-                ae[i].attachEvent('onmouseover', hov_handler);
-                ae[i].attachEvent('onmouseleave', leave_handler);
-                ae[i].attachEvent('onmousedown', block_handler);
-                ae[i].attachEvent('onmouseup', block_handler);
-            }
-        }
-    } else {
-        for (var i = 0; i < ae.length; i++) {
-            if ((ae[i].getAttribute("onclick")) != null) {
-                var onclickval = ae[i].getAttribute("onclick");
-                ae[i].removeAttribute("onclick");
-                ae[i].setAttribute("_onclick", onclickval);
-            }
-            if (ae[i].addEventListener) {
-                ae[i].addEventListener('click', handler, true);
-                ae[i].addEventListener('mouseover', hov_handler, true);
-                ae[i].addEventListener('mouseleave', leave_handler, true);
-                ae[i].addEventListener('mousedown', block_handler, true);
-                ae[i].addEventListener('mouseup', block_handler, true);
-            } else if (ae[i].attachEvent) {
-                ae[i].attachEvent('onclick', handler);
-                ae[i].attachEvent('onmouseover', hov_handler);
-                ae[i].attachEvent('onmouseleave', leave_handler);
-                ae[i].attachEvent('onmousedown', block_handler);
-                ae[i].attachEvent('onmouseup', block_handler);
-            }
-        }
-    }
-}
-
-function findCoordinates(element) {
-    height = element.offsetHeight;
-    width = element.offsetWidth;
-    viewTop = element.getBoundingClientRect()['top'];
-    top = 0;
-    left = 0;
-    do {
-        top += element.offsetTop || 0;
-        left += element.offsetLeft || 0;
-        element = element.offsetParent;
-    } while (element);
-};
-
-function text_content(f) {
-    var firstText = '';
-    var textdisplay = '';
-    for (var z = 0; z < f.childNodes.length; z++) {
-        var curNode = f.childNodes[z];
-        whitespace = /^\s*$/;
-        if (curNode.nodeName === '#text' && !(whitespace.test(curNode.nodeValue))) {
-            firstText = curNode.nodeValue;
-            textdisplay = textdisplay + firstText;
-        }
-    }
-    return (textdisplay);
-};
-
-function addNodesOuter(array, collection) {
-    for (var i = 0; collection && collection.length && i < collection.length; i++) {
-            array.push(collection[i]);
-    }
-};"""
+        };"""
     """Javascript logic used in stop click and add operation in IE"""
     javascript_stopclicknadd_IE = """window.tastopflag = "true";document.getElementsByTagName('HTML')[0].click();function getElementsByClassName(classname) {    var a = [];    var re = new RegExp('(^| )' + classname + '( |$)');    var els = document.getElementsByTagName("*");    var elesal = document.getElementsByTagName("one-record-home-flexipage2");    var elesal1 = document.getElementsByTagName("records-lwc-detail-panel");    for (var i = 0, j = els.length; i < j; i++)        if (re.test(els[i].className)) a.push(els[i]);    if (elesal.length > 0) {        els1 = elesal[0].getElementsByTagName("*");        for (var i = 0, j = els1.length; i < j; i++) {            if (re.test(els1[i].className)) {                a.push(els1[i]);            }        }    }    if (elesal1.length > 0) {        els2 = elesal1[0].getElementsByTagName("*");        for (var i = 0, j = els2.length; i < j; i++) {            if (re.test(els2[i].className)) {                a.push(els2[i]);            }        }    }    return a;}if (document.getElementById('AvoAssureCheckboxHighlight') || document.getElementById('AvoAssureBorderHighlight')) {    styleTag = document.getElementById('AvoAssureCheckboxHighlight');    styleTagH = document.getElementById('AvoAssureBorderHighlight');    head = document.head || document.getElementsByTagName('head')[0] || document.getElementById('AvoAssure_head');    head.removeChild(styleTag);    head.removeChild(styleTagH);    var a = getElementsByClassName('AvoAssure_Highlight');    for (var i = 0; i < a.length; i++) {        a[i].removeAttribute('style');    }    var elms = document.querySelectorAll("*[style]");    Array.prototype.forEach.call(elms, function(elm) {        var clr = elm.style.background || "";        clr = clr.replace(/\s/g, "").toLowerCase();        if (clr === '#fff300' || clr === 'rgb(255,243,0)' || clr === 'rgb(255,243,0)nonerepeatscroll0%0%') {            elm.removeAttribute('style');        }    });    if (document.getElementById('AvoAssure_head') != undefined) {        var html = document.children[0];        if (html.childElementCount > 1) html.removeChild(html.children[1]);    }    var b = getElementsByClassName('AvoAssureBorderHighlight');    var c = getElementsByClassName('AvoAssureCheckboxHighlight');    var className = "AvoAssure_Highlight";    var classNameB = "AvoAssureBorderHighlight";    var classNameC = "AvoAssureCheckboxHighlight";    for (var i = 0; i < a.length; i++) {        if (a[i].classList) {            a[i].classList.remove(className);        } else if (hasClass(a[i], className)) {            var reg = new RegExp('(\\s|^)' + className + '(\\s|$)');            a[i].className = a[i].className.replace(reg, ' ');        }    }    for (var i = 0; i < b.length; i++) {        if (b[i].classList) {            b[i].classList.remove(classNameB);        } else if (hasClass(b[i], classNameB)) {            var reg = new RegExp('(\\s|^)' + classNameB + '(\\s|$)');            b[i].className = b[i].className.replace(reg, ' ');        }    }    for (var i = 0; i < c.length; i++) {        if (c[i].classList) {            c[i].classList.remove(classNameC);        } else if (hasClass(c[i], classNameC)) {            var reg = new RegExp('(\\s|^)' + classNameC + '(\\s|$)');            c[i].className = c[i].className.replace(reg, ' ');        }    }}var temp = window.tasarr;window.tasarr = null;return (temp);"""
 
@@ -896,6 +998,8 @@ function getElementsByClassName(classname) {
     }
     return a;
 }
+if (document.getElementById('AvoAssure_Table'))
+    document.getElementById('AvoAssure_Table').remove()
 if (document.getElementById('AvoAssureCheckboxHighlight') || document.getElementById('AvoAssureBorderHighlight')) {
     styleTag = document.getElementById('AvoAssureCheckboxHighlight');
     styleTagH = document.getElementById('AvoAssureBorderHighlight');
@@ -904,7 +1008,7 @@ if (document.getElementById('AvoAssureCheckboxHighlight') || document.getElement
     head.removeChild(styleTagH);
     var a = getElementsByClassName('AvoAssure_Highlight');
     for (var i = 0; i < a.length; i++) {
-        a[i].removeAttribute('style');
+        a[i].setAttribute('style',a[i].getAttribute('style').replace('background: #fff300 !important;opacity:1!important; border: 2px solid #cc3300 !important;outline: 2px solid #fff300 !important;',''));
     }
     var elms = document.querySelectorAll("*[style]");
     Array.prototype.forEach.call(elms, function(elm) {
@@ -952,8 +1056,474 @@ var temp = window.tasarr;
 window.tasarr = null;
 return (temp);"""
 
-    javascript_get_object_properties = """if (!window.Element || !window.Element.prototype || !window.Element.prototype.hasAttribute) {     (function () {         function hasAttribute(attrName) {             return typeof this[attrName] !== 'undefined';         }         var inputs = document.getElementsByTagName('*');         for (var i = 0; i < inputs.length; i++) {             inputs[i].hasAttribute = hasAttribute;         }     }         ()); } if (!window.Element || !window.Element.prototype || !window.Element.prototype.getAttribute) {     (function () {         function getAttribute(attrName) {             return typeof this[attrName] !== 'undefined';         }         var inputs = document.getElementsByTagName('*');         for (var i = 0; i < inputs.length; i++) {             inputs[i].getAttribute = getAttribute;         }     }         ()); } (function () {     if (!document.getElementsByClassName) {         var indexOf = [].indexOf || function (prop) {             for (var i = 0; i < this.length; i++) {                 if (this[i] === prop)                     return i;             }             return -1;         };         getElementsByClassName = function (className, context) {             var elems = document.querySelectorAll ? context.querySelectorAll("." + className) : (function () {                     var all = context.getElementsByTagName("*"),                     elements = [],                     i = 0;                     for (; i < all.length; i++) {                         if (all[i].className && (" " + all[i].className + " ").indexOf(" " + className + " ") > -1 && indexOf.call(elements, all[i]) === -1)                             elements.push(all[i]);                     }                     return elements;                 })();             return elems;         };         document.getElementsByClassName = function (className) {             return getElementsByClassName(className, document);         };         if (window.Element) {             window.Element.prototype.getElementsByClassName = function (className) {                 return getElementsByClassName(className, this);             };         }     } })(); var suseIdx = true; var suseId = true; var suseClass = true; var srelative = true; var sae = []; var sarr = []; var sele = document.getElementsByTagName('*'); var smyid = 0; var stextvalue = ''; var stagname = 0; var sishidden = 0; var scustname = ''; var smultipleFlag = false; var element = arguments[0]; console.log(element); var surl = arguments[1]; var snonamecounter = 1; var txt_area_nonamecounter = 1; var select_nonamecounter = 1; var td_nonamecounter = 1; var a_nonamecounter = 1; var table_nonamecounter = 1; var input_nonamecounter = 1; var stagtype = ''; var ssname = 'null'; var sstagname = 'null'; var ssclassname = 'null'; var sclassname = 'null'; var top = 0; var left = 0; var height = 0; var width = 0; var coordinates = ''; var sisVisible = (function () {     function inside(schild, sparent) {         while (schild) {             if (schild === sparent)                 return true;             schild = schild.parentNode;         }         return false;     };     return function (selem) {         if (document.hidden || selem.offsetWidth == 0 || selem.offsetHeight == 0 || selem.style.visibility == 'hidden' || selem.style.display == 'none' || selem.style.opacity === 0)             return false;         var srect = selem.getBoundingClientRect();         if (window.getComputedStyle || selem.currentStyle) {             var sel = selem,             scomp = null;             while (sel) {                 if (sel === document) {                     break;                 } else if (!sel.parentNode)                     return false;                 scomp = window.getComputedStyle ? window.getComputedStyle(sel, null) : sel.currentStyle;                 if (scomp && (scomp.visibility == 'hidden' || scomp.display == 'none' || (typeof scomp.opacity !== 'undefined' && !(scomp.opacity > 0))))                     return false;                 sel = sel.parentNode;             }         }         return true;     } })(); function getElementProperties(element) {     stagtype = '';     ssname = 'null';     sstagname = 'null';     sid = element.id;     sname = element.name;     salttext = element.alt;     splaceholder = element.placeholder;     sclassname = element.className;     sid = (String(sid));     sclassname = (String(sclassname));     sname = (String(sname));     splaceholder = (String(splaceholder));     stextvalue = stext_content(element);     stextvalue = (String(stextvalue));     stagname = element.tagName.toLowerCase();     ssname = 'null';     sstagname = 'null';     ssclassname = 'null';     var role = 'null';     if (element.hasAttribute('role')) {         if (element.getAttribute('role') === 'grid' && element.tagName.toLowerCase() === 'div') {             role = 'grid';         }     }     findCoordinates(element);     if (stagname.indexOf(':') != -1) {         stagname = stagname.replace(':', '');         stagname = 'custom' + stagname;     }     if (sname != '' && sname != 'undefined') {         snames = document.getElementsByName(sname);         if (snames.length > 1) {             for (var k = 0; k < snames.length; k++) {                 if (element == snames[k]) {                     ssname = sname + '[' + k + ']'                 }             }         } else {             ssname = sname;         }     }     if (stagname != '' && stagname != 'undefined') {         stagnames = document.getElementsByTagName(stagname);         if (stagnames.length > 1) {             for (var k = 0; k < stagnames.length; k++) {                 if (element == stagnames[k]) {                     sstagname = stagname + '[' + k + ']'                 }             }         } else {             sstagname = stagname;         }     }     if (sclassname != '' && sclassname != 'undefined') {         try {             sclassnames = document.getElementsByClassName(sclassname);             if (sclassnames.length > 1) {                 for (var k = 0; k < sclassnames.length; k++) {                     if (element == sclassnames[k]) {                         ssclassname = sclassname + '[' + k + ']'                     }                 }             } else {                 ssclassname = sclassname;             }         } catch (err) {             console.log(sclassname);             console.log("skipping this element: " + err);         }     }     if (stagname != 'script' && stagname != 'meta' && stagname != 'html' && stagname != 'head' && stagname != 'style' && stagname != 'body' && stagname != 'form' && stagname != 'link' && stagname != 'noscript' && stagname != 'option' && stagname != '!' && stagname != 'code' && stagname != 'pre' && stagname != 'br' && stagname != 'animatetransform' && stagname != 'noembed') {         if (stextvalue == '' || stextvalue == 'null' || stextvalue == 'undefined' || stextvalue == '0') {             if (sname != '' && sname != 'undefined') {                 snames = document.getElementsByName(sname);                 if (snames.length > 1) {                     for (var k = 0; k < snames.length; k++) {                         if (element == snames[k]) {                             stextvalue = sname + k;                         }                     }                 } else {                     stextvalue = sname;                 }             } else if (sid != '' && sid != 'undefined') {                 stextvalue = sid;             } else if (splaceholder != '' && splaceholder != 'undefined') {                 stextvalue = splaceholder;             } else {                 var seles = document.getElementsByTagName(stagname);                 for (var k = 0; k < seles.length; k++) {                     if (element == seles[k]) {                         stextvalue = stagname + '_NONAME' + (k + 1);                     }                 }             }         }         if (sid == '') {             sid = 'null';         }         smultipleFlag = element.hasAttribute('multiple');         sishidden = sisVisible(element);         if (sishidden == true || sishidden == 'True' || sishidden == 'true') {             sishidden = 'No';         } else {             sishidden = 'Yes';         }         var sfirstpass = 0;         var srpath = '';         var setype = element.getAttribute('type');         setype = (String(setype)).toLowerCase();         for (var spath = ''; element && element.nodeType == 1; element = element.parentNode) {             var spredicate = [];             var ssiblings = element.parentNode.children;             var scount = 0;             var sunique = false;             var snewPath = '';             var sidx = 0;             for (var i = 0; ssiblings && (i < ssiblings.length); i++) {                 if (ssiblings[i].tagName == element.tagName) {                     scount++;                     if (ssiblings[i] == element) {                         sidx = scount;                     }                 }             }             if (sidx == 1 && scount == 1) {                 sidx = null;             }             if (suseId && element.id) {                 spredicate[spredicate.length] = '@id=' + '"' + element.id + '"';                 sunique = true;             }             xidx = (suseIdx && sidx) ? ('[' + sidx + ']') : '';             sidx = (suseIdx && sidx && !sunique) ? ('[' + sidx + ']') : '';             spredicate = (spredicate.length > 0) ? ('[' + spredicate.join(' and ') + ']') : '';             spath = '/' + element.tagName.toLowerCase() + xidx + spath;             if (sfirstpass == 0) {                 if (sunique && srelative) {                     srpath = '//*' + sidx + spredicate + srpath;                     sfirstpass = 1;                 } else {                     srpath = '/' + element.tagName.toLowerCase() + sidx + spredicate + srpath;                 }             }         }         if (stagname == 'textarea') {             stagname = 'input';             stagtype = 'txtarea';         } else if (stagname == 'select' && smultipleFlag) {             stagname = 'list';             stagtype = 'lst';         } else if (stagname == 'select') {             stagtype = 'select';         } else if (stagname == 'td' || stagname == 'tr') {             stagname = 'tablecell';             stagtype = 'tblcell';         } else if (stagname == 'a') {             stagtype = 'lnk';         } else if (stagname == 'table') {             stagtype = 'tbl';         } else if (stagname == 'img') {             stagtype = 'img';         } else if (stagname == 'input' && setype == 'image') {             stagname = 'img';             stagtype = 'img';         }         if (stagname == 'input' && (setype == 'button' || setype == 'submit' || setype == 'reset' || setype == 'file')) {             stagname = 'button';             stagtype = 'btn';         } else if (stagname == 'input' && setype == 'radio') {             stagname = 'radiobutton';             stagtype = 'radiobtn';         } else if (stagname == 'input' && setype == 'checkbox') {             stagname = 'checkbox';             stagtype = 'chkbox';         } else if (stagname == 'input' && (setype == 'text' || setype == 'email' || setype == 'number' || setype == 'password' || setype == 'range' || setype == 'search' || setype == 'url')) {             stagname = 'input';             stagtype = 'txtbox';         } else if (stagname == 'input' && stagtype == '' && (setype == 'hidden' || setype == 'null')) {             stagname = 'div';             stagtype = 'elmnt';         } else if (stagname == 'button') {             stagname = 'button';             stagtype = 'btn';         }         if (role == 'grid') {             stagname = 'grid';             stagtype = 'grid';         }         stextvalue = stextvalue.replace(">", "");         stextvalue = stextvalue.replace("</", "");         stextvalue = stextvalue.replace("<", "");         stextvalue = stextvalue.replace("/>", "");         stextvalue = stextvalue.split("\\n").join("");         stextvalue = stextvalue.split("\\t").join("");         stextvalue = stextvalue.split("\\r").join("");         stextvalue = stextvalue.split("  ").join("");         stextvalue = stextvalue.split("\\u00a0").join("");         if (stextvalue == '' || stextvalue.length == 0 || stextvalue == '0') {             stextvalue = 'NONAME' + snonamecounter;             snonamecounter = snonamecounter + 1;             scustname = stextvalue;         } else {             scustname = stextvalue;         }         if (stagtype != '') {             scustname = scustname + '_' + stagtype;         } else {             scustname = scustname + '_elmnt';         }         coordinates = left + ';' + top + ';' + height + ';' + width;         coordinates = String(coordinates);         snewPath = String(srpath) + ';' + String(sid) + ';' + String(spath) + ';' + ssname + ';' + sstagname + ';' + ssclassname + ';' + coordinates + ';' + stextvalue + ';' + 'null' + ';' + stagname;         sarr.push({             'xpath': snewPath,             'tag': stagname,             'hiddentag': sishidden,             'url': surl,             'height': height,             'width': width,             'custname': scustname,             'top': top,             'left': left         });     }     return sarr; } function findCoordinates(element) {     height = element.offsetHeight;     width = element.offsetWidth;     top = 0;     left = 0;     do {         top += element.offsetTop || 0;         left += element.offsetLeft || 0;         element = element.offsetParent;     } while (element); } function saddNodesOuter(sarray, scollection) {     for (var i = 0; scollection && scollection.length && i < scollection.length; i++) {         sarray.push(scollection[i]);     } }; function stext_content(f) {     var sfirstText = '';     var stextdisplay = '';     for (var z = 0; z < f.childNodes.length; z++) {         var scurNode = f.childNodes[z];         swhitespace = /^\s*$/;         if (scurNode.nodeName === '#text' && !(swhitespace.test(scurNode.nodeValue))) {             sfirstText = scurNode.nodeValue;             stextdisplay = stextdisplay + sfirstText;         }     }     return (stextdisplay); }; return getElementProperties(element);"""
+    javascript_get_object_properties = """
+    if (!window.Element || !window.Element.prototype || !window.Element.prototype.hasAttribute) {
+    (function () {
+        function hasAttribute(attrName) {
+            return typeof this[attrName] !== 'undefined';
+        }
+        var inputs = document.getElementsByTagName('*');
+        for (var i = 0; i < inputs.length; i++) {
+            inputs[i].hasAttribute = hasAttribute;
+        }
+    }());
+    }
+    if (!window.Element || !window.Element.prototype || !window.Element.prototype.getAttribute) {
+        (function () {
+            function getAttribute(attrName) {
+                return typeof this[attrName] !== 'undefined';
+            }
+            var inputs = document.getElementsByTagName('*');
+            for (var i = 0; i < inputs.length; i++) {
+                inputs[i].getAttribute = getAttribute;
+            }
+        }());
+    }(function () {
+        if (!document.getElementsByClassName) {
+            var indexOf = [].indexOf || function (prop) {
+                for (var i = 0; i < this.length; i++) {
+                    if (this[i] === prop) return i;
+                }
+                return -1;
+            };
+            getElementsByClassName = function (className, context) {
+                var elems = document.querySelectorAll ? context.querySelectorAll("." + className) : (function () {
+                    var all = context.getElementsByTagName("*"),
+                        elements = [],
+                        i = 0;
+                    for (; i < all.length; i++) {
+                        if (all[i].className && (" " + all[i].className + " ").indexOf(" " + className + " ") > -1 && indexOf.call(elements, all[i]) === -1) elements.push(all[i]);
+                    }
+                    return elements;
+                })();
+                return elems;
+            };
+            document.getElementsByClassName = function (className) {
+                return getElementsByClassName(className, document);
+            };
+            if (window.Element) {
+                window.Element.prototype.getElementsByClassName = function (className) {
+                    return getElementsByClassName(className, this);
+                };
+            }
+        }
+    })();
+    var suseIdx = true;
+    var suseId = true;
+    var suseClass = true;
+    var srelative = true;
+    var sae = [];
+    var sarr = [];
+    var sele = document.getElementsByTagName('*');
+    var smyid = 0;
+    var stextvalue = '';
+    var slabel = '';
+    var stagname = 0;
+    var sishidden = 0;
+    var scustname = '';
+    var smultipleFlag = false;
+    var element = arguments[0];
+    console.log(element);
+    var surl = arguments[1];
+    var snonamecounter = 1;
+    var txt_area_nonamecounter = 1;
+    var select_nonamecounter = 1;
+    var td_nonamecounter = 1;
+    var a_nonamecounter = 1;
+    var table_nonamecounter = 1;
+    var input_nonamecounter = 1;
+    var stagtype = '';
+    var ssname = 'null';
+    var sstagname = 'null';
+    var ssclassname = 'null';
+    var sclassname = 'null';
+    var top = 0;
+    var left = 0;
+    var height = 0;
+    var width = 0;
+    var coordinates = '';
+    var sisVisible = (function () {
+        function inside(schild, sparent) {
+            while (schild) {
+                if (schild === sparent) return true;
+                schild = schild.parentNode;
+            }
+            return false;
+        };
+        return function (selem) {
+            if (document.hidden || selem.offsetWidth == 0 || selem.offsetHeight == 0 || selem.style.visibility == 'hidden' || selem.style.display == 'none' || selem.style.opacity === 0) return false;
+            var srect = selem.getBoundingClientRect();
+            if (window.getComputedStyle || selem.currentStyle) {
+                var sel = selem,
+                    scomp = null;
+                while (sel) {
+                    if (sel === document) {
+                        break;
+                    } else if (!sel.parentNode) return false;
+                    scomp = window.getComputedStyle ? window.getComputedStyle(sel, null) : sel.currentStyle;
+                    if (scomp && (scomp.visibility == 'hidden' || scomp.display == 'none' || (typeof scomp.opacity !== 'undefined' && !(scomp.opacity > 0)))) return false;
+                    sel = sel.parentNode;
+                }
+            }
+            return true;
+        }
+    })();
 
+    function getElementProperties(element) {
+        stagtype = '';
+        ssname = 'null';
+        sstagname = 'null';
+        sid = element.id;
+        sname = element.name;
+        salttext = element.alt;
+        splaceholder = element.placeholder;
+        sclassname = element.className;
+        sid = (String(sid));
+        sclassname = (String(sclassname));
+        sname = (String(sname));
+        splaceholder = (String(splaceholder));
+        stextvalue = stext_content(element);
+        stextvalue = (String(stextvalue));
+        var slabel = stext_content(element);
+        slabel = (String(slabel));
+        stagname = element.tagName.toLowerCase();
+        ssname = 'null';
+        sstagname = 'null';
+        ssclassname = 'null';
+        var role = 'null';
+        if (element.hasAttribute('role')) {
+            if (element.getAttribute('role') === 'grid' && element.tagName.toLowerCase() === 'div') {
+                role = 'grid';
+            }
+        }
+        findCoordinates(element);
+        if (stagname.indexOf(':') != -1) {
+            stagname = stagname.replace(':', '');
+            stagname = 'custom' + stagname;
+        }
+        if (sname != '' && sname != 'undefined') {
+            snames = document.getElementsByName(sname);
+            if (snames.length > 1) {
+                for (var k = 0; k < snames.length; k++) {
+                    if (element == snames[k]) {
+                        ssname = sname + '[' + k + ']'
+                    }
+                }
+            } else {
+                ssname = sname;
+            }
+        }
+        if (stagname != '' && stagname != 'undefined') {
+            stagnames = document.getElementsByTagName(stagname);
+            if (stagnames.length > 1) {
+                for (var k = 0; k < stagnames.length; k++) {
+                    if (element == stagnames[k]) {
+                        sstagname = stagname + '[' + k + ']'
+                    }
+                }
+            } else {
+                sstagname = stagname;
+            }
+        }
+        if (sclassname != '' && sclassname != 'undefined') {
+            try {
+                sclassnames = document.getElementsByClassName(sclassname);
+                if (sclassnames.length > 1) {
+                    for (var k = 0; k < sclassnames.length; k++) {
+                        if (element == sclassnames[k]) {
+                            ssclassname = sclassname + '[' + k + ']'
+                        }
+                    }
+                } else {
+                    ssclassname = sclassname;
+                }
+            } catch (err) {
+                console.log(sclassname);
+                console.log("skipping this element: " + err);
+            }
+        }
+        if (stagname != 'script' && stagname != 'meta' && stagname != 'html' && stagname != 'head' && stagname != 'style' && stagname != 'body' && stagname != 'form' && stagname != 'link' && stagname != 'noscript' && stagname != 'option' && stagname != '!' && stagname != 'code' && stagname != 'pre' && stagname != 'br' && stagname != 'animatetransform' && stagname != 'noembed') {
+            if (stextvalue == '' || stextvalue == 'null' || stextvalue == 'undefined' || stextvalue == '0') {
+                if (sname != '' && sname != 'undefined') {
+                    snames = document.getElementsByName(sname);
+                    if (snames.length > 1) {
+                        for (var k = 0; k < snames.length; k++) {
+                            if (element == snames[k]) {
+                                stextvalue = sname + k;
+                            }
+                        }
+                    } else {
+                        stextvalue = sname;
+                    }
+                } else if (sid != '' && sid != 'undefined') {
+                    stextvalue = sid;
+                } else if (splaceholder != '' && splaceholder != 'undefined') {
+                    stextvalue = splaceholder;
+                } else {
+                    var seles = document.getElementsByTagName(stagname);
+                    for (var k = 0; k < seles.length; k++) {
+                        if (element == seles[k]) {
+                            stextvalue = stagname + '_NONAME' + (k + 1);
+                        }
+                    }
+                }
+            }
+            // capture label content of the element
+            function findLableForControl(ele) {
+                try {
+                    var idVal = ele.id;
+                    labels = document.getElementsByTagName('label');
+                    if (labels.length !== 0) {
+                        for( var i = 0; i < labels.length; i++ ) {
+                            if (labels[i].htmlFor == idVal) {
+                                return labels[i].textContent;
+                            }
+                        }
+                    }
+                    else {
+                        return null;
+                    }
+                } catch (err) {
+                    console.log("skipping this element: " + err);
+                }
+            }
+            if (slabel == '' || slabel == 'null' || slabel == 'undefined' || slabel == '0') {
+                if (splaceholder != '' && splaceholder != 'undefined') {
+                    slabel = splaceholder;
+                } else if (element.nodeName.toLowerCase() == 'input' || element.nodeName.toLowerCase() == 'select' || element.nodeName.toLowerCase() == 'textarea' || element.nodeName.toLowerCase() == 'progress' || element.nodeName.toLowerCase() == 'meter') {
+                    slabel = findLableForControl(element);
+                }
+                if (element.nodeName.toLowerCase() == 'input' && (slabel == null || slabel == '')) {
+                    if (element.hasAttribute('value')) {
+                        slabel = element.getAttribute('value');
+                    }
+                    else {
+                        slabel = null;
+                    }
+                }
+            }
+
+            // capture css selector of the element
+            var sCssSelector = '';
+            function getCssSelector(ele) {
+                try {
+                    let path = [];
+                    let parentEle = ele.parentNode;
+                    while (ele.nodeName.toLowerCase() != 'body') {
+                        let selector = ele.nodeName.toLowerCase();
+                        let arr = Array.from(ele.parentNode.children);
+                        let tagNameArr = [];
+                        for (i = 0; i < arr.length; i++) {
+                            let tag = arr[i].tagName.toLowerCase();
+                            tagNameArr.push(tag);
+                        }
+                        let count = tagNameArr.toString().match(new RegExp(selector, 'g')).length;
+                        if (ele.id) {
+                            selector += '#' + ele.id;
+                        }
+                        else if (count > 1) {
+                            let sib = ele.previousSibling, nth = 1;
+                            while((sib != null) && nth++) {
+                                if ((sib.nodeName.toLowerCase() == '#text') || (sib.nodeName.toLowerCase() == '#comment')) {
+                                    nth--;
+                                }
+                                sib = sib.previousSibling;
+                            }
+                            selector += ":nth-child("+nth+")";
+                        }
+                        path.unshift(selector);
+                        ele = ele.parentNode;
+                    }
+                    return path.join(" > ");
+                } catch (err) {
+                    console.log("skipping this element: " + err);
+                }
+            }
+            sCssSelector = getCssSelector(element);
+
+            // capture href of the element
+            var shref='';
+            function getHref(ele) {
+                try {
+                    var href='';
+                    if (ele.hasAttribute('href')) {
+                        href = ele.getAttribute('href');
+                    }
+                    else {
+                        href = null;
+                    }
+                    return href
+                } catch (err) {
+                    console.log("skipping this element: " + err);
+                }
+            }
+            shref = getHref(element);
+
+            if (sid == '') {
+                sid = 'null';
+            }
+            smultipleFlag = element.hasAttribute('multiple');
+            sishidden = sisVisible(element);
+            if (sishidden == true || sishidden == 'True' || sishidden == 'true') {
+                sishidden = 'No';
+            } else {
+                sishidden = 'Yes';
+            }
+            var sfirstpass = 0;
+            var srpath = '';
+            var setype = element.getAttribute('type');
+            setype = (String(setype)).toLowerCase();
+            for (var spath = ''; element && element.nodeType == 1; element = element.parentNode) {
+                var spredicate = [];
+                var ssiblings = element.parentNode.children;
+                var scount = 0;
+                var sunique = false;
+                var snewPath = '';
+                var sidx = 0;
+                for (var i = 0; ssiblings && (i < ssiblings.length); i++) {
+                    if (ssiblings[i].tagName == element.tagName) {
+                        scount++;
+                        if (ssiblings[i] == element) {
+                            sidx = scount;
+                        }
+                    }
+                }
+                if (sidx == 1 && scount == 1) {
+                    sidx = null;
+                }
+                if (suseId && element.id) {
+                    spredicate[spredicate.length] = '@id=' + '"' + element.id + '"';
+                    sunique = true;
+                }
+                xidx = (suseIdx && sidx) ? ('[' + sidx + ']') : '';
+                sidx = (suseIdx && sidx && !sunique) ? ('[' + sidx + ']') : '';
+                spredicate = (spredicate.length > 0) ? ('[' + spredicate.join(' and ') + ']') : '';
+                spath = '/' + element.tagName.toLowerCase() + xidx + spath;
+                if (sfirstpass == 0) {
+                    if (sunique && srelative) {
+                        srpath = '//*' + sidx + spredicate + srpath;
+                        sfirstpass = 1;
+                    } else {
+                        srpath = '/' + element.tagName.toLowerCase() + sidx + spredicate + srpath;
+                    }
+                }
+            }
+            if (stagname == 'textarea') {
+                stagname = 'input';
+                stagtype = 'txtarea';
+            } else if (stagname == 'select' && smultipleFlag) {
+                stagname = 'list';
+                stagtype = 'lst';
+            } else if (stagname == 'select') {
+                stagtype = 'select';
+            } else if (stagname == 'td' || stagname == 'tr') {
+                stagname = 'tablecell';
+                stagtype = 'tblcell';
+            } else if (stagname == 'a') {
+                stagtype = 'lnk';
+            } else if (stagname == 'table') {
+                stagtype = 'tbl';
+            } else if (stagname == 'img') {
+                stagtype = 'img';
+            } else if (stagname == 'input' && setype == 'image') {
+                stagname = 'img';
+                stagtype = 'img';
+            }
+            if (stagname == 'input' && (setype == 'button' || setype == 'submit' || setype == 'reset' || setype == 'file')) {
+                stagname = 'button';
+                stagtype = 'btn';
+            } else if (stagname == 'input' && setype == 'radio') {
+                stagname = 'radiobutton';
+                stagtype = 'radiobtn';
+            } else if (stagname == 'input' && setype == 'checkbox') {
+                stagname = 'checkbox';
+                stagtype = 'chkbox';
+            } else if (stagname == 'input' && (setype == 'text' || setype == 'email' || setype == 'number' || setype == 'password' || setype == 'range' || setype == 'search' || setype == 'url')) {
+                stagname = 'input';
+                stagtype = 'txtbox';
+            } else if (stagname == 'input' && stagtype == '' && (setype == 'hidden' || setype == 'null')) {
+                stagname = 'div';
+                stagtype = 'elmnt';
+            } else if (stagname == 'button') {
+                stagname = 'button';
+                stagtype = 'btn';
+            }
+            if (role == 'grid') {
+                stagname = 'grid';
+                stagtype = 'grid';
+            }
+            stextvalue = stextvalue.replace(">", "");
+            stextvalue = stextvalue.replace("</", "");
+            stextvalue = stextvalue.replace("<", "");
+            stextvalue = stextvalue.replace("/>", "");
+            stextvalue = stextvalue.split("\\n").join("");
+            stextvalue = stextvalue.split("\\t").join("");
+            stextvalue = stextvalue.split("\\r").join("");
+            stextvalue = stextvalue.split("  ").join("");
+            stextvalue = stextvalue.split("\\u00a0").join("");
+            if (stextvalue == '' || stextvalue.length == 0 || stextvalue == '0') {
+                stextvalue = 'NONAME' + snonamecounter;
+                snonamecounter = snonamecounter + 1;
+                scustname = stextvalue;
+            } else {
+                scustname = stextvalue;
+            }
+            if (stagtype != '') {
+                scustname = scustname + '_' + stagtype;
+            } else {
+                scustname = scustname + '_elmnt';
+            }
+            coordinates = left + ';' + top + ';' + height + ';' + width;
+            coordinates = String(coordinates);
+            snewPath = String(spath) + ';' + String(sid) + ';' + String(srpath) + ';' + ssname + ';' + sstagname + ';' + ssclassname + ';' + coordinates + ';' + slabel + ';' + shref + ';' + sCssSelector;
+            sarr.push({
+                'xpath': snewPath,
+                'tag': stagname,
+                'hiddentag': sishidden,
+                'url': surl,
+                'height': height,
+                'width': width,
+                'custname': scustname,
+                'top': top,
+                'left': left
+            });
+        }
+        return sarr;
+    }
+
+    function findCoordinates(element) {
+        height = element.offsetHeight;
+        width = element.offsetWidth;
+        top = 0;
+        left = 0;
+        do {
+            top += element.offsetTop || 0;
+            left += element.offsetLeft || 0;
+            element = element.offsetParent;
+        } while (element);
+    }
+
+    function saddNodesOuter(sarray, scollection) {
+        for (var i = 0; scollection && scollection.length && i < scollection.length; i++) {
+            sarray.push(scollection[i]);
+        }
+    };
+
+    function stext_content(f) {
+        var sfirstText = '';
+        var stextdisplay = '';
+        for (var z = 0; z < f.childNodes.length; z++) {
+            var scurNode = f.childNodes[z];
+            swhitespace = /^\s*$/;
+            if (scurNode.nodeName === '#text' && !(swhitespace.test(scurNode.nodeValue))) {
+                sfirstText = scurNode.nodeValue;
+                stextdisplay = stextdisplay + sfirstText;
+            }
+        }
+        return (stextdisplay);
+    };
+    return getElementProperties(element);
+    """
 
     AVO_ASSURE_WEBELEMENT_HIGHLIGHT_STYLE = "background: #fff300 !important; border: 2px solid #cc3300 !important;outline: 2px solid #fff300 !important;"
 

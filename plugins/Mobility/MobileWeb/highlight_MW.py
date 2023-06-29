@@ -59,8 +59,12 @@ class Highlight():
 
             # XPath and URL decryption logic implemented
             xpath_string = elementxpath.split(';')
-            left_part = self.coreutilsobj.scrape_unwrap(xpath_string[0])
-            right_part = self.coreutilsobj.scrape_unwrap(xpath_string[2])
+            if len(xpath_string) == 3:
+                left_part = self.coreutilsobj.scrape_unwrap(xpath_string[0])
+                right_part = self.coreutilsobj.scrape_unwrap(xpath_string[2])
+            else:
+                left_part = str(xpath_string[0])
+                right_part = ';'.join(map(str,xpath_string[2:]))
             decryptedxpath = left_part + ';' + xpath_string[1] + ';' + right_part
             decryptedelementurl = self.coreutilsobj.scrape_unwrap(elementurl)
             identifiers = decryptedxpath.split(';')

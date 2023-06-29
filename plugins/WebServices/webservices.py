@@ -1227,6 +1227,47 @@ class WSkeywords:
             logger.print_on_console(e)
         log.info(RETURN_RESULT)
         return status,methodoutput,output,err_msg
+    
+
+    def setOAuth2(self,token_url,client_id,client_secret,scope,grant_type):
+        status = ws_constants.TEST_RESULT_FAIL
+        methodoutput = ws_constants.TEST_RESULT_FALSE
+        err_msg=None
+        output=OUTPUT_CONSTANT
+        log.debug(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        generated_token = ''
+        try:
+            if (not(client_id == '' or client_id == None) and
+                not(client_secret == '' or client_secret == None) and
+                not(scope == '' or scope == None) and
+                not(grant_type == '' or grant_type == None) and
+                not(token_url == '' or token_url == None)):
+
+                    if(grant_type == 'client_credentials'):
+                        data = {
+                            "grant_type": "client_credentials",
+                            "scope": scope
+                        }
+                        response = requests.request("POST", token_url, auth=(client_id, client_secret), data=data)
+                        if response.status_code == 200:
+                            generated_token = json.loads(response.text)['access_token']
+                            output = generated_token
+                            status = ws_constants.TEST_RESULT_PASS
+                            methodoutput = ws_constants.TEST_RESULT_TRUE
+                    else:
+                        log.info('Grant type not supported')
+                        logger.print_on_console('Grant type not supported')
+                        err_msg='Grant type not supported'
+            else:
+                log.info(ws_constants.METHOD_INVALID_INPUT)
+                err_msg = ws_constants.METHOD_INVALID_INPUT
+                logger.print_on_console(ws_constants.METHOD_INVALID_INPUT)
+        except Exception as e:
+            log.error(e)
+            err_msg = e
+            logger.print_on_console(e)
+        log.info(RETURN_RESULT)
+        return status,methodoutput,output,err_msg
 
     def aes_decript(self,encrypted_data):
         decrypted_data = ''

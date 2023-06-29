@@ -211,6 +211,8 @@ class FullScrape:
             custname = custname + "_scroll"
         elif(role in ['hyperlink','Static']):
             custname = custname + "_link"
+        elif(role == "page tab"):
+            custname = custname + "_pagetab"
         else:
             custname = custname + "_elmnt"
         return custname

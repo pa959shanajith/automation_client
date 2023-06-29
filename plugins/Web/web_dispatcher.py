@@ -80,7 +80,9 @@ class Dispatcher:
             'xpath': 'find_elements_by_xpath',
             'name':'find_elements_by_name',
             'classname':'find_elements_by_class_name',
-            'css_selector': 'find_elements_by_css_selector'
+            'css_selector': 'find_elements_by_css_selector',
+            'href' : 'find_elements_by_css_selector',
+            'label' : 'find_elements_by_xpath'
         }
 
         self.web_dict={
@@ -179,6 +181,8 @@ class Dispatcher:
             'getelementtagvalue': local_Wd.util_object.get_element_tag_value,
             'getattributevalue': local_Wd.util_object.get_attribute_value,
             'verifyattribute': local_Wd.util_object.verify_attribute,
+            'verifystyle': local_Wd.util_object.verify_style,
+            'getelementcount': local_Wd.util_object.get_element_count,
 
             'openbrowser':local_Wd.browser_object.openBrowser,
             'getbrowsertoforeground':local_Wd.browser_object.get_foreground_window,
@@ -239,113 +243,113 @@ class Dispatcher:
         self.sauce_web_dict = {
             # 'getobjectcount':local_Wd.custom_object.get_object_count,
             # 'getobject':local_Wd.custom_object.get_object,
-            'click': local_Wd.element_obj_sl.click,
-            'press'  : local_Wd.element_obj_sl.press,
-            'doubleClick' : local_Wd.element_obj_sl.doubleClick,
-            'rightClick' : local_Wd.element_obj_sl.rightClick,
+            'click': local_Wd.button_link_object.click,
+            'press'  : local_Wd.button_link_object.press,
+            'doubleClick' : local_Wd.button_link_object.double_click,
+            'rightClick' : local_Wd.button_link_object.right_click,
             # 'uploadFile'  : local_Wd.element_obj_sl.uploadFile,
 
-            'verifyButtonName' : local_Wd.button_link_obj_sl.verifyButtonName,
-            'getButtonName': local_Wd.button_link_obj_sl.getButtonName,
-            'getLinkText'    : local_Wd.button_link_obj_sl.getLinkText,
-            'verifyLinkText' : local_Wd.button_link_obj_sl.verifyLinkText,
+            'verifyButtonName' : local_Wd.button_link_object.verify_button_name,
+            'getButtonName': local_Wd.button_link_object.get_button_name,
+            'getLinkText'    : local_Wd.button_link_object.get_link_text,
+            'verifyLinkText' : local_Wd.button_link_object.verify_link_text,
 
-            'acceptPopUp' : local_Wd.browser_popup_obj_sl.acceptPopUp,
-            'dismissPopUp': local_Wd.browser_popup_obj_sl.dismissPopUp,
-            'getPopUpText': local_Wd.browser_popup_obj_sl.getPopUpText,
-            'verifyPopUpText': local_Wd.browser_popup_obj_sl.verifyPopUpText,
+            'acceptPopUp' : local_Wd.popup_object.accept_popup,
+            'dismissPopUp': local_Wd.popup_object.dismiss_popup,
+            'getPopUpText': local_Wd.popup_object.get_popup_text,
+            'verifyPopUpText': local_Wd.popup_object.verify_popup_text,
 
-            'getStatus': local_Wd.radio_check_obj_sl.getStatus,
-            'selectRadioButton': local_Wd.radio_check_obj_sl.selectRadioButton,
-            'selectCheckbox': local_Wd.radio_check_obj_sl.selectCheckbox,
-            'unselectCheckbox': local_Wd.radio_check_obj_sl.unselectCheckbox,
+            'getStatus': local_Wd.radio_checkbox_object.get_status,
+            'selectRadioButton': local_Wd.radio_checkbox_object.select_radiobutton,
+            'selectCheckbox': local_Wd.radio_checkbox_object.select_checkbox,
+            'unselectCheckbox': local_Wd.radio_checkbox_object.unselect_checkbox,
 
-            'getRowCount' : local_Wd.table_obj_sl.getRowCount,
-            'getColumnCount' : local_Wd.table_obj_sl.getColumnCount,
-            'getCellValue' : local_Wd.table_obj_sl.getCellValue,
-            'verifyCellValue' : local_Wd.table_obj_sl.verifyCellValue,
-            'cellClick' : local_Wd.table_obj_sl.cellClick,
-            'getRowNumByText' : local_Wd.table_obj_sl.getRowNumByText,
-            'getColNumByText' : local_Wd.table_obj_sl.getColNumByText,
-            'getInnerTable' : local_Wd.table_obj_sl.getInnerTable,
-            'getCellToolTip' : local_Wd.table_obj_sl.getCellToolTip,
-            'verifyCellToolTip' : local_Wd.table_obj_sl.verifyCellToolTip,
+            'getRowCount' : local_Wd.table_object.getRowCount,
+            'getColumnCount' : local_Wd.table_object.getColoumnCount,
+            'getCellValue' : local_Wd.table_object.getCellValue,
+            'verifyCellValue' : local_Wd.table_object.verifyCellValue,
+            'cellClick' : local_Wd.table_object.cellClick,
+            'getRowNumByText' : local_Wd.table_object.getRowNumByText,
+            'getColNumByText' : local_Wd.table_object.getColNumByText,
+            'getInnerTable' : local_Wd.table_object.getInnerTable,
+            'getCellToolTip' : local_Wd.table_object.getCellToolTip,
+            'verifyCellToolTip' : local_Wd.table_object.verifyCellToolTip,
 
-            'getElementText' : local_Wd.element_obj_sl.getElementText,
-            'verifyElementText' : local_Wd.element_obj_sl.verifyElementText,
-            'clickElement' : local_Wd.element_obj_sl.click,
-            'getToolTipText' : local_Wd.element_obj_sl.getToolTipText,
-            'verifyToolTipText' : local_Wd.element_obj_sl.verifyToolTipText,
-            'drag': local_Wd.util_obj_sl.drag,
-            'drop': local_Wd.util_obj_sl.drop,
+            'getElementText' : local_Wd.element_object.get_element_text,
+            'verifyElementText' : local_Wd.element_object.verify_element_text,
+            'clickElement' : local_Wd.element_object.click_element,
+            'getToolTipText' : local_Wd.element_object.get_tooltip_text,
+            'verifyToolTipText' : local_Wd.element_object.verify_tooltip_text,
+            'drag': local_Wd.element_object.drag,
+            'drop': local_Wd.element_object.drop,
             # 'dropFile': local_Wd.element_obj_sl.dropFile,
 
-            'setText': local_Wd.textbox_obj_sl.setText,
-            'sendValue': local_Wd.textbox_obj_sl.sendValue,
-            'getText': local_Wd.textbox_obj_sl.getText,
-            'verifyText': local_Wd.textbox_obj_sl.verifyText,
-            'clearText': local_Wd.textbox_obj_sl.clearText,
-            'getTextboxLength': local_Wd.textbox_obj_sl.getTextboxLength,
-            'verifyTextboxLength': local_Wd.textbox_obj_sl.verifyTextboxLength,
-            'setSecureText': local_Wd.textbox_obj_sl.setSecureText,
-            'sendSecureValue': local_Wd.textbox_obj_sl.sendSecureValue,
+            'setText': local_Wd.textbox_object.set_text,
+            'sendValue': local_Wd.textbox_object.send_value,
+            'getText': local_Wd.textbox_object.get_text,
+            'verifyText': local_Wd.textbox_object.verify_text,
+            'clearText': local_Wd.textbox_object.clear_text,
+            'getTextboxLength': local_Wd.textbox_object.gettextbox_length,
+            'verifyTextboxLength': local_Wd.textbox_object.verifytextbox_length,
+            'setSecureText': local_Wd.textbox_object.setsecuretext,
+            'sendSecureValue': local_Wd.textbox_object.sendSecureValue,
 
-            'selectValueByIndex': local_Wd.dropdown_obj_sl.selectValueByIndex,
-            'getCount': local_Wd.dropdown_obj_sl.getCount,
-            'selectValueByText': local_Wd.dropdown_obj_sl.selectValueByText,
-            'verifySelectedValues': local_Wd.dropdown_obj_sl.verifySelectedValues,
-            'verifySelectedValue': local_Wd.dropdown_obj_sl.verifySelectedValue,
-            'verifyCount': local_Wd.dropdown_obj_sl.verifyCount,
-            'selectAllValues': local_Wd.dropdown_obj_sl.selectAllValues,
-            'selectMultipleValuesByIndexes': local_Wd.dropdown_obj_sl.selectMultipleValuesByIndexes,
-            'getSelected': local_Wd.dropdown_obj_sl.getSelected,
-            'selectMultipleValuesByText': local_Wd.dropdown_obj_sl.selectMultipleValuesByText,
-            'getMultipleValuesByIndexes': local_Wd.dropdown_obj_sl.getMultipleValuesByIndexes,
-            'verifyAllValues': local_Wd.dropdown_obj_sl.verifyAllValues,
-            'selectByAbsoluteValue': local_Wd.dropdown_obj_sl.selectByAbsoluteValue,
-            'getAllValues': local_Wd.dropdown_obj_sl.getAllValues,
-            'getValueByIndex': local_Wd.dropdown_obj_sl.getValueByIndex,
-            'verifyValuesExists': local_Wd.dropdown_obj_sl.verifyValuesExists,
-            'deselectAll': local_Wd.dropdown_obj_sl.deselectAll,
+            'selectValueByIndex': local_Wd.dropdown_list_object.selectValueByIndex,
+            'getCount': local_Wd.dropdown_list_object.getCount,
+            'selectValueByText': local_Wd.dropdown_list_object.selectValueByText,
+            'verifySelectedValues': local_Wd.dropdown_list_object.verifySelectedValues,
+            'verifySelectedValue': local_Wd.dropdown_list_object.verifySelectedValue,
+            'verifyCount': local_Wd.dropdown_list_object.verifyCount,
+            'selectAllValues': local_Wd.dropdown_list_object.selectAllValues,
+            'selectMultipleValuesByIndexes': local_Wd.dropdown_list_object.selectMultipleValuesByIndexes,
+            'getSelected': local_Wd.dropdown_list_object.getSelected,
+            'selectMultipleValuesByText': local_Wd.dropdown_list_object.selectMultipleValuesByText,
+            'getMultipleValuesByIndexes': local_Wd.dropdown_list_object.getMultipleValuesByIndexes,
+            'verifyAllValues': local_Wd.dropdown_list_object.verifyAllValues,
+            'selectByAbsoluteValue': local_Wd.dropdown_list_object.selectByAbsoluteValue,
+            'getAllValues': local_Wd.dropdown_list_object.getAllValues,
+            'getValueByIndex': local_Wd.dropdown_list_object.getValueByIndex,
+            'verifyValuesExists': local_Wd.dropdown_list_object.verifyValuesExists,
+            'deselectAll': local_Wd.dropdown_list_object.deselectAll,
 
-            'verifyVisible': local_Wd.util_obj_sl.verifyVisible,
-            'verifyExists': local_Wd.util_obj_sl.verifyExists,
-            'verifyDoesNotExists': local_Wd.util_obj_sl.verifyDoesNotExists,
-            'verifyEnabled': local_Wd.util_obj_sl.verifyEnabled,
-            'verifyDisabled': local_Wd.util_obj_sl.verifyDisabled,
-            'verifyHidden': local_Wd.util_obj_sl.verifyHidden,
-            'verifyReadOnly': local_Wd.util_obj_sl.verifyReadOnly,
-            'tab': local_Wd.util_obj_sl.tab,
-            'sendFunctionKeys': local_Wd.util_obj_sl.sendFunctionKeys,
-            'setFocus': local_Wd.element_obj_sl.setFocus,
-            'mouseHover': local_Wd.element_obj_sl.mouseHover,
+            'verifyVisible': local_Wd.util_object.verify_visible,
+            'verifyExists': local_Wd.util_object.verify_exists,
+            'verifyDoesNotExists': local_Wd.util_object.verify_doesnot_exists,
+            'verifyEnabled': local_Wd.util_object.verify_enabled,
+            'verifyDisabled': local_Wd.util_object.verify_disabled,
+            'verifyHidden': local_Wd.util_object.verify_hidden,
+            'verifyReadOnly': local_Wd.util_object.verify_readonly,
+            'tab': local_Wd.util_object.tab,
+            'sendFunctionKeys': local_Wd.util_object.sendfunction_keys,
+            'setFocus': local_Wd.util_object.setfocus,
+            'mouseHover': local_Wd.util_object.mouse_hover,
             # 'rightclick':obj.rightclick,
             # 'mouseclick': local_Wd.util_obj_sl.mouseClick,
             # 'verifywebimages': local_Wd.util_obj_sl.verify_web_images,
             # 'imagesimilaritypercentage': local_Wd.util_obj_sl.image_similarity_percentage,
-            'waitForElementVisible': local_Wd.util_obj_sl.waitForElementVisible,
-            'getElementTagValue': local_Wd.element_obj_sl.getElementTagValue,
-            'getAttributeValue': local_Wd.element_obj_sl.getAttributeValue,
-            'verifyAttribute': local_Wd.element_obj_sl.verifyAttribute,
+            'waitForElementVisible': local_Wd.element_object.waitforelement_visible,
+            'getElementTagValue': local_Wd.util_object.get_element_tag_value,
+            'getAttributeValue': local_Wd.util_object.get_attribute_value,
+            'verifyAttribute': local_Wd.util_object.verify_attribute,
 
             'openBrowser': local_Wd.browser_obj_sl.openBrowser,
-            'navigateToURL': local_Wd.browser_obj_sl.navigateToURL,
-            'getPageTitle': local_Wd.browser_obj_sl.getPageTitle,
-            'getCurrentURL': local_Wd.browser_obj_sl.getCurrentURL,
-            'maximizeBrowser': local_Wd.browser_obj_sl.maximizeBrowser,
-            'refresh': local_Wd.browser_obj_sl.refresh,
-            'verifyCurrentURL': local_Wd.browser_obj_sl.verifyCurrentURL,
+            'navigateToURL': local_Wd.browser_object.navigateToURL,
+            'getPageTitle': local_Wd.browser_object.getPageTitle,
+            'getCurrentURL': local_Wd.browser_object.getCurrentURL,
+            'maximizeBrowser': local_Wd.browser_object.maximizeBrowser,
+            'refresh': local_Wd.browser_object.refresh,
+            'verifyCurrentURL': local_Wd.browser_object.verifyCurrentURL,
             'closeBrowser': local_Wd.browser_obj_sl.closeBrowser,
-            'closeSubWindows': local_Wd.browser_obj_sl.closeSubWindows,
-            'switchToWindow': local_Wd.browser_obj_sl.switchToWindow,
-            'verifyTextExists': local_Wd.browser_obj_sl.verifyTextExists,
-            'verifyPageTitle': local_Wd.browser_obj_sl.verifyPageTitle,
-            'clearCache': local_Wd.browser_obj_sl.clearCache,
-            'navigateWithAuthenticate': local_Wd.browser_obj_sl.navigateWithAuthenticate,
-            'navigateBack': local_Wd.browser_obj_sl.navigateBack,
-            'openNewTab': local_Wd.browser_obj_sl.openNewTab,
-            'execute_js': local_Wd.browser_obj_sl.execute_js,
-            'getBrowserName': local_Wd.browser_obj_sl.getBrowserName
+            'closeSubWindows': local_Wd.browser_object.closeSubWindows,
+            'switchToWindow': local_Wd.browser_object.switch_to_window,
+            'verifyTextExists': local_Wd.statict_text_object.verify_text_exists,
+            'verifyPageTitle': local_Wd.browser_object.verify_page_title,
+            'clearCache': local_Wd.browser_object.clear_cache,
+            'navigateWithAuthenticate': local_Wd.browser_object.navigate_with_authenticate,
+            'navigateBack': local_Wd.browser_object.navigate_back,
+            'openNewTab': local_Wd.browser_object.openNewTab,
+            'execute_js': local_Wd.browser_object.execute_js,
+            'getBrowserName': local_Wd.browser_object.getBrowserName
         }
 
         self.browsers_sl={'1':{'browserName': "chrome", 'sauce:options':{}},'2':{'browserName': "firefox", 'sauce:options':{}},'3':{'browserName': "internet explorer", 'sauce:options':{}},'7':{'browserName': "MicrosoftEdge", 'sauce:options':{}},'8':{'browserName': "MicrosoftEdge", 'sauce:options':{}}}
@@ -365,7 +369,8 @@ class Dispatcher:
         url=teststepproperty.url.strip()
         keyword = teststepproperty.name
         keyword = keyword.lower()
-        if self.action == DEBUG and browser_Keywords.driver_pre != None:
+        test_script = teststepproperty.testscript_name
+        if (self.action == DEBUG and test_script != AVO_GENIUS) and browser_Keywords.driver_pre != None:
             browser_Keywords.local_bk.driver_obj = browser_Keywords.driver_pre
             driver_util = browser_Keywords.Singleton_DriverUtil()
             v = driver_util.check_if_driver_exists_in_map(teststepproperty.browser_type[0])
@@ -431,9 +436,11 @@ class Dispatcher:
             if driver:
                 local_Wd.log.debug('In send_webelement_to_keyword method')
                 try:
+                    #Handling cross origin iframe
                     if objectname!='' and objectname!='@Custom' and (objectname.split(';')[2].find('iframe')!=-1):
                         local_Wd.log.debug('Encountered iframe/frame url')
                         iframe_xpath = objectname.split(';')[2].split(',')[0]
+                        #changing driver local_bk.driver_obj to point to iframe.
                         local_Wd.custom_object.switch_to_iframe(iframe_xpath,driver.current_window_handle)
                         driver = browser_Keywords.local_bk.driver_obj
                         ele_inside_iframe_xpath = objectname.split(';')[2].split(',')[1]
@@ -462,7 +469,7 @@ class Dispatcher:
                                         logger.print_on_console(err_msg)
                                         local_Wd.log.error(err_msg)
                                 else:
-                                    reference_element=self.getwebelement(driver,teststepproperty.parent_xpath,teststepproperty.stepnum,teststepproperty.custname)
+                                    reference_element=self.getwebelement(driver,teststepproperty.parent_xpath,teststepproperty.stepnum,teststepproperty.custname, teststepproperty.identifiers)
                                 local_Wd.log.debug('Reference_element ')
                                 local_Wd.log.debug(reference_element)
                                 if reference_element != None:
@@ -513,7 +520,7 @@ class Dispatcher:
                                     if teststepproperty.custname in v:
                                         objectname=v[teststepproperty.custname]
                                         UserObjectScrape.update_data[str(teststepproperty.stepnum)]=v
-                                webelement = self.getwebelement(driver,objectname,teststepproperty.stepnum,teststepproperty.custname)
+                                webelement = self.getwebelement(driver,objectname,teststepproperty.stepnum,teststepproperty.custname, teststepproperty.identifiers)
                                 if(obj_flag!=False):
                                     import UserObjectScrape
                                     webscrape=UserObjectScrape.UserObject()
@@ -582,6 +589,7 @@ class Dispatcher:
                     if(teststepproperty.name=="openBrowser"):
                         browser=teststepproperty.inputval[0]
                         self.browsers_sl[browser]["platform"]=self.sauce_conf["platform"]
+                        self.browsers_sl[browser]["version"]=self.sauce_conf["version"]
                         if browser in ['7','8'] and self.sauce_conf["platform"]!='Windows 10':
                             logger.print_on_console('Microsoft Edge browser is supported only in Windows 10')
                             return 'Terminate'
@@ -592,7 +600,7 @@ class Dispatcher:
                         browser_Keywords.local_bk.driver_obj = web_keywords.local_wk.driver
                         find_browser_info(reporting_obj,mythread)
                     else:
-                        result = self.sauce_web_dict[teststepproperty.name](input)
+                        result = self.sauce_web_dict[teststepproperty.name](webelement,input)
                 elif teststepproperty.name in self.sauce_web_dict:
                     xpath=teststepproperty.objectname.split(';')[0]
                     if(teststepproperty.name=="waitForElementVisible"):
@@ -683,7 +691,7 @@ class Dispatcher:
                             else : result = self.web_dict[keyword](webelement,input,output)
                     else:
                         result= self.web_dict[keyword](webelement,input)
-                    ## To terminate debug/execution if requested browser is not available in the system (Defect #846)
+                    ## To terminate debug/execution if requested browser is not available in the system (Defect #846) 
                     if(result[1] == TERMINATE):
                         result = TERMINATE
                     if keyword in window_ops_list:
@@ -828,44 +836,109 @@ class Dispatcher:
             log.debug(msg1)
             log.error(e)
 
-    def element_locator(self,driver,type,identifier,id_num):
+    def find_element_by_label(self, driver, identifiers_type, identifier):
+        temp_element = None
+        web_element = None
+        temp_element = getattr(driver,self.identifier_dict[identifiers_type])(f'//*[text()="{identifier}"]')
+        if len(temp_element) == 1:
+            temp_element_tagname = driver.execute_script("""return arguments[0].tagName.toLowerCase();""", temp_element[0])
+            if temp_element_tagname == 'label':
+                web_element_id = driver.execute_script("""return arguments[0].htmlFor;""", temp_element[0])
+                web_element = getattr(driver,self.identifier_dict[identifiers_type])(f'//*[@id="{web_element_id}"]')
+            else:
+                web_element = temp_element
+        return web_element
+
+    def element_locator(self,driver,identifiers_type,identifier,id_num):
         if identifier=='null': return None
         webElement = None
         try:
             index = 0
-            if type == "classname" :
+            if identifiers_type == "classname" :
                 if '[' and ']' in identifier:
                     index = int(identifier.split('[')[1].split(']')[0])
                     identifier = identifier.split('[')[0]
                 if ' ' in identifier.strip():
                     identifier = '.'+identifier.replace(' ','.')
-                    type = 'css_selector'
-                webElement=getattr(driver,self.identifier_dict[type])(identifier)
+                    identifiers_type = 'css_selector'
+                webElement=getattr(driver,self.identifier_dict[identifiers_type])(identifier)
                 if len(webElement) > index:
                     webElement = [webElement[index]]
+            elif identifiers_type == "href":
+                webElement = getattr(driver,self.identifier_dict[identifiers_type])(f'[href^="{identifier}"]')
+            elif identifiers_type == "label":
+                webElement = getattr(driver,self.identifier_dict[identifiers_type])(f'//*[@placeholder="{identifier}"] | //*[@value="{identifier}"]')
+                if len(webElement) == 0:
+                    webElement = self.find_element_by_label(driver, identifiers_type, identifier)
             else:
-                webElement=getattr(driver,self.identifier_dict[type])(identifier)
+                webElement=getattr(driver,self.identifier_dict[identifiers_type])(identifier)
             if len(webElement) == 1:
                 webElement=webElement[0]
-                logger.print_on_console('Webelement found by OI '+id_num)
-                local_Wd.log.info('Webelement found by OI '+id_num)
+                try:
+                    identifier_fullname = {'xpath':'Absolute X-Path',
+                                            'id':'ID Attribute',
+                                            'rxpath':'Relative X-Path',
+                                            'name':'Name Attribute',
+                                            'classname':'Classname Attribute',
+                                            'css_selector':'CSS Selector',
+                                            'href':'Href Attribute',
+                                            'label':'Label'}
+                    logger.print_on_console(f'Webelement found by OI "{identifier_fullname[identifiers_type]}"')
+                    local_Wd.log.info(f'Webelement found by OI "{str(identifiers_type)}"')
+                except:
+                    logger.print_on_console(f'Webelement found by OI "{id_num}"')
+                    local_Wd.log.info(f'Webelement found by OI "{id_num}"')
             else: webElement = None
         except Exception as e:
             local_Wd.log.error(e,exc_info=True)
         return webElement
 
-    def getwebelement(self,driver,objectname,stepnum,custname):
+    def update_identifiers(self, modified_identifiers):
+        updated_identifiers = {}
+        for modified_identifier_value in modified_identifiers:
+            key = modified_identifier_value['identifier']
+            value = modified_identifier_value['id']
+            if key == 'cssselector':
+                key = "css_selector"
+            updated_identifiers[key] = int(value)-1
+        if len(updated_identifiers) == 0:
+            updated_identifiers = None    
+            return updated_identifiers
+        else:
+            return updated_identifiers
+
+    def getwebelement(self,driver,objectname,stepnum,custname,modified_identifiers):
         global obj_flag,simple_debug_gwto
         obj_flag=False
         webElement = None
         configvalues = readconfig.configvalues
+        delayconst = int(configvalues['element_load_timeout'])
         if objectname.strip() != '':
             identifiers = objectname.split(';')
             local_Wd.log.debug('Identifiers are ')
             local_Wd.log.debug(identifiers)
             global finalXpath
-            #Absolute xpath is used to locate web element first as it doesn't change like relative xpath.
-            if len(identifiers)>=3:
+            updated_identifiers = self.update_identifiers(modified_identifiers)
+            # finding web element based on Prioritize Object
+            if updated_identifiers != None:
+                for i in range(delayconst):
+                    identifiers_list = list(updated_identifiers.keys())
+                    identifiers_sequence = {'xpath':0,'id':1,'rxpath':2,'name':3,'classname':5,'label':10,'href':11,'css_selector':12}
+                    for identifiers_type in identifiers_list:
+                        identifiers_index = identifiers_sequence[identifiers_type]
+                        identifiers_id = str(identifiers_index + 1)
+                        webElement=self.element_locator(driver,identifiers_type,identifiers[identifiers_index],identifiers_id)
+                        if not(webElement):
+                            webElement=None
+                            local_Wd.log.info(f'Webelement not found with Primary identifers "{identifiers_type}"')
+                        else:
+                            break
+                    if (webElement):
+                        break
+                    else:
+                        time.sleep(1)
+                    
+            elif len(identifiers)>=3:
                 delayconst = int(configvalues['element_load_timeout'])
                 for i in range(delayconst):
                 #find by absolute xpath
@@ -893,9 +966,10 @@ class Dispatcher:
                                         if not(webElement):
                                             webElement=None
                                             local_Wd.log.info("Weblement not found with Primary identifers")
-                    time.sleep(1)
                     if (webElement):
                         break
+                    else:
+                        time.sleep(1)
             #enhance object reconition changes
             if(webElement == None):
                 try:

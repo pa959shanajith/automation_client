@@ -30,7 +30,7 @@ class ICEToken():
         self.enc_obj = CoreUtils()
         self.check_token()
 
-    """ Check for the ICE token. If exists, returns decrypted token """
+    """ Check for the Avo Assure Client token. If exists, returns decrypted token """
     def check_token(self):
         self.token_folder=self.get_token_folder()
         self.tokenid_file=os.environ["AVO_ASSURE_HOME"] + os.sep + "lib" + os.sep + "METADATA"
@@ -150,11 +150,14 @@ class Token_window(wx.Frame):
             self.Centre()
             self.Bind(wx.EVT_CLOSE, self.close)
             wx.Frame(self.panel)
-            res = self.auto_registration()
-
             # SN Adiga 07-Aug-2022: Show registration window if auto registration failure
-            if (res == False) or (res == None):
+            if configvalues.get('isTrial'):
+                res = self.auto_registration()
+                if (res == False) or (res == None):
+                    self.Show()
+            else:
                 self.Show()
+
         except Exception as e:
             import traceback
             traceback.print_exc()
@@ -168,10 +171,7 @@ class Token_window(wx.Frame):
             url = url[7:]
         if url[0:8].lower() == 'https://':
             url = url[8:]
-        if self.ICE_Token:
-            token = self.ICE_Token    
-        else:
-            token = self.token_name.GetValue().strip()
+        token = self.token_name.GetValue().strip()
         self.parent.server_url = url
         self.parent.register(token)
         self.parent.token_obj.kill_window()

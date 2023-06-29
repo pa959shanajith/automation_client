@@ -22,6 +22,7 @@ import win32api
 import win32process
 import platform
 from threading import Thread
+from pywinauto.application import Application
 ctrldownflag = False
 stopumpingmsgs = False
 obj_ref = None
@@ -123,6 +124,24 @@ class Scrape:
                 log.error( 'Error occured : ' + str(e) )
                 logger.print_on_console( 'Error occured in getWindow' )
                 return None
+        app=Application()
+        try:
+            """ The below code will try to connect to window based on window name
+            which works fine in case of SAP logon but in case of SAP Business client it might fail to connect 
+            as getattr method gives window name as "SAP" but works fine for subsequent screens """
+
+            app.connect(title=window_to_scrape.__getattr__("Text"))    
+            app.window(title=window_to_scrape.__getattr__("Text")).set_focus()
+        except:
+            """
+                The below code will run in case of SAP Business client as for the SAP Business client
+                the name of the first screen is "SAP GUI" but getattr method returns "SAP", to handle this issue
+                we are passing the window name as hardcoded value.
+            """
+
+            window_name = "SAP GUI"
+            app.connect(title=window_name)    
+            app.window(title=window_name).set_focus()
         return window_to_scrape
 
     # def getBaseWindow(self, object):
@@ -380,7 +399,20 @@ class Scrape:
                         wnd = scrape.getWindow(SapGui)
                         wndId = wnd.Id
                         wndName = wnd.Text
-                        handle = win32gui.FindWindow(None, wndName)
+                        try:
+                            handle = win32gui.FindWindow(None, wndName)
+
+                            """
+                                The below condition will run in case of SAP Business client as for the SAP Business client
+                                the name of the first screen is "SAP GUI" but getattr method returns "SAP", and the value
+                                of the handle will be 0 so we are passing the window name as hardcode in order to get the handle.
+                            """
+
+                            if handle == 0 and wndName == "SAP":
+                                wndName = "SAP GUI"
+                                handle = win32gui.FindWindow(None, wndName)
+                        except:
+                            pass
                         foreThread = win32process.GetWindowThreadProcessId(win32gui.GetForegroundWindow())
                         appThread = win32api.GetCurrentThreadId()
                         if ( foreThread != appThread ):

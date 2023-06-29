@@ -8,10 +8,10 @@ from loadingwindow import Loading_window
 log = logging.getLogger('Avo_Assure')
 ice_ver = '3.0.0'
 
-def main():
+def loading_ui():
     global loadingobj
     app = wx.App()
-    loadingobj = Loading_window(None)
+    loadingobj = Loading_window(None,args)
 
 try:
     cfile = os.path.abspath(__file__)
@@ -27,13 +27,15 @@ parser.add_argument('--register', action='store_true', help='Register Avo Assure
 parser.add_argument('--execute', action='store_true', help='Execute from agent')
 reg_group = parser.add_argument_group("Arguments for register/guest-connect")
 reg_group.add_argument('--host', type=str, help='Avo Assure Web Application URL. Eg: https://example.com:8443. If no value is provided then value is read from configuration file.')
-reg_group.add_argument('--token', type=str, help='Registration token obtained during ICE Provisioning. Input can be filepath or text.')
+reg_group.add_argument('--token', type=str, help='Registration token obtained during Avo Assure Client Provisioning. Input can be filepath or text.')
 reg_group.add_argument('--configkey', type=str, help='Configuration Key holding configuration information')
 reg_group.add_argument('--agentname', nargs='?', type=str, help='Agentname is mandatory')
 reg_group.add_argument('--serverurl', nargs='?', type=str, help='serverurl is mandatory')
 reg_group.add_argument('--serverport', nargs='?', type=str, help='serverport is mandatory')
 reg_group.add_argument('--executionListId', nargs='?', type=str, help='executionListId is mandatory')
-parser.add_argument('--connect', action='store_true', help='Establish a connection between Avo Assure Web Application and ICE.')
+reg_group.add_argument('--instanceid', nargs='?', type=str, help="Agent will provide auto increment instanceid")
+reg_group.add_argument('--screenshotpath', nargs='?', type=str, help="Agent will provide shraed screenshotpath from webserver config file or agent configfile")
+parser.add_argument('--connect', action='store_true', help='Establish a connection between Avo Assure Web Application and Avo Assure Client.')
 args = parser.parse_args()
 if args.AVO_ASSURE_HOME and not os.path.exists(args.AVO_ASSURE_HOME+os.sep+'/plugins'):
     parser.error("Invalid path provided for AVO_ASSURE_HOME")
@@ -90,12 +92,11 @@ if sys.platform == 'win32':
 
 if __name__ == "__main__":
     try:
-        if not args.execute:
-            main()
         appName = "Avo Assure Client"
         path = os.environ["AVO_ASSURE_HOME"]+os.sep
         if not os.path.exists(path+"logs"): os.mkdir(path+"logs")
         if not os.path.exists(path+"output"): os.mkdir(path+"output")
+        loading_ui()
         import core
         import cicd_core
         core.configvalues = configvalues

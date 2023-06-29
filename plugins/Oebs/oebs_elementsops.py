@@ -198,7 +198,7 @@ class ElementOperations:
         return status,methodoutput,output_res,err_msg
 
     #Method to waitforelementvisible
-    def waitforelementvisible(self,applicationname,objectname,keyword,inputs,outputs,object_type):
+    def waitforelementvisible(self,applicationname,objectname,keyword,inputs,outputs,object_type,top,left,width,height):
         acc = ''
         status = TEST_RESULT_FAIL
         methodoutput = TEST_RESULT_FALSE
@@ -216,7 +216,7 @@ class ElementOperations:
             start_time = time.time()
             logger.print_on_console("Waiting for element to be visible")
             while True:
-                acc, visible, active_parent =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs,object_type, errors = False)
+                acc, visible, active_parent =  self.utilities_obj.object_generator(applicationname,objectname,keyword,inputs,outputs,object_type,top,left,width,height,errors = False)
                 if acc and str(acc) != "fail":
                     break
                 if time.time() - start_time >= delay:

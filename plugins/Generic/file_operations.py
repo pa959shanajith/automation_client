@@ -43,8 +43,9 @@ import time
 import docx
 import urllib.request
 import pyautogui
-import win32gui
-from pywinauto.application import Application 
+if SYSTEM_OS=='Windows':
+    import win32gui
+    from pywinauto.application import Application 
 
 
 log = logging.getLogger('file_operations.py')
@@ -1157,9 +1158,11 @@ class FileOperations:
             log.debug('Folder path is ' + folder_path + ' and File is ' + file_path)
             if (not (folder_path is None or folder_path == '' or file_path is None or file_path == '') and os.path.exists(
                 folder_path)):
+
                 if url is not None:
-                    log.debug('saving the file')        
-                    urllib.request.urlretrieve(url, folder_path + "\\" + file_path)
+                    log.debug('saving the file')
+                    path=str(folder_path + "\\" + file_path)  
+                    urllib.request.urlretrieve(url,path)
                 else:
                     log.debug('saving the file')
                     #Wait for the Save As dialog to load. Might need to increase the wait time on slower machinesy:
@@ -1169,14 +1172,13 @@ class FileOperations:
                             break
                         time.sleep(1)
                         waiting_time+=1
+                    FILE_NAME = folder_path+'\\'+ file_path
                     #connect used when you are attempting to automate a running process. 
                     # You can pass in the process id, handle, title or path of the program.
                     app = Application().connect(title="Save As") 
-                    #Path of the file you want to Save
-                    FILE_NAME = folder_path+'\\'+ file_path
                     # Type the file path and name is Save AS dialog
-                    app.SaveAs.edit1.SetText(str(FILE_NAME))
-                    app.SaveAs.Save.Click() 
+                    app.SaveAs.edit.SetText(str(FILE_NAME))
+                    app.SaveAs.Save.click_input()
                 status = TEST_RESULT_PASS
                 methodoutput = TEST_RESULT_TRUE
                 status_message="File has been saved"

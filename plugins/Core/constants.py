@@ -265,6 +265,7 @@ ERROR_CODE_DICT = {
                     'ERR_ELEMENT_IS_NOT_READONLY':'Element is not readonly.',
                     'ERR_ELEMENT_IS_READONLY':'Element is readonly.',
                     'ERR_IIO_EXCEPTION':'File not found in the specified path.',
+                    'ERR_MULTIPLE_FILES':'Invalid input: the element can not hold multiple files.',
                     'ERR_DRIVER_IS_NULL':'Driver is null. Hence cannot capture screenshot.',
                     'ERR_NO_MATCH':'The Cell value and Expected value do-not Match.',
                     'ERR_WEB_ELEMENT_IS_NULL':'The WebElement Value is null.',
@@ -445,6 +446,8 @@ EXECUTE='execute'
 
 DEBUG='debug'
 
+AVO_GENIUS = 'geniusExecution'
+
 STEP_BY_SETP_DEBUG='step_debug'
 
 CORE='Core'
@@ -486,6 +489,35 @@ JIRA_ACTION_1 = 'loginToJira'
 JIRA_ACTION_2 = 'createIssueInJira'
 
 JIRA_ACTION_3 = 'getJiraConfigureFields'
+
+JIRA_ACTION_4 = 'jiraLogin'
+
+JIRA_ACTION_5 = 'getJiraTestcases'
+
+# Azure variables
+Azure_ACTION_1 = 'loginToAzure'
+
+Azure_ACTION_2 = 'createIssueInAzure'
+
+Azure_ACTION_3 = 'getAzureConfigureFields'
+
+Azure_ACTION_4 = 'azureLogin'
+
+Azure_ACTION_5 = 'getAzureTestcases'
+
+Azure_ACTION_6 = 'azureUserStories'
+
+Azure_ACTION_7 = 'azureTestPlans'
+
+Azure_ACTION_8 = 'azureTestSuites'
+
+Azure_ACTION_9 = 'azureTestCases'
+
+#SaucelabActions
+
+Saucelab_ACTION_1 = 'sauceWebDetails'
+
+Saucelab_ACTION_2 = 'sauceMobileWebDetails'
 
 STATIC_NONE = "{#@#n_o_n_e#@#}"
 
@@ -553,3 +585,5 @@ TEMP_PATH = AVO_ASSURE_HOME + OS_SEP + "output"
 PREDICTION_IMG_DIR = "Disabled"
 
 FILEPATH_OUTPUT_FIELD_KEYWORDS=["exportData","cellByCellCompare","getXmlBlockData","selectiveXmlFileCompare","compXmlFileWithXmlBlock","compareInputs","beautify","compareFiles","comparePDFs","findImageInPDF","selectiveCellCompare"]
+
+VERIFY_KEYWORDS = ["dummyverifykeyword"]

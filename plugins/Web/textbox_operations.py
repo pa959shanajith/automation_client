@@ -320,18 +320,28 @@ class TextboxKeywords:
                                         local_to.log.error(err_msg)
                                         logger.print_on_console(err_msg)
                                 else:
-                                    browser_Keywords.local_bk.driver_obj.execute_script(SET_TEXT_SCRIPT, webelement, input)
-                                    browser_Keywords.local_bk.driver_obj.execute_script(EVENTS_JS, webelement)
-                                    # Bug #19221. To check if value is set or not.
-                                    value = browser_Keywords.local_bk.driver_obj.execute_script('return arguments[0].value', webelement)
-                                    if value == input:
-                                        # implies that the value has been set in the textbox
-                                        status = TEST_RESULT_PASS
-                                        methodoutput = TEST_RESULT_TRUE
-                                    else:
-                                        if webelement.get_attribute('type') == 'number':
-                                            err_msg = ERROR_CODE_DICT['ERR_INPUT_TYPE_MISMATCH']
-                                            logger.print_on_console(err_msg)
+                                    try:
+                                        browser_Keywords.local_bk.driver_obj.execute_script(SET_TEXT_WITH_EVENTS_SCRIPT, webelement, input)
+                                        # Bug #19221. To check if value is set or not.
+                                        value = browser_Keywords.local_bk.driver_obj.execute_script('return arguments[0].value', webelement)
+                                        if value == input:
+                                            # implies that the value has been set in the textbox
+                                            status = TEST_RESULT_PASS
+                                            methodoutput = TEST_RESULT_TRUE
+                                        else:
+                                            if webelement.get_attribute('type') == 'number':
+                                                err_msg = ERROR_CODE_DICT['ERR_INPUT_TYPE_MISMATCH']
+                                                logger.print_on_console(err_msg)
+                                    except:
+                                        value = browser_Keywords.local_bk.driver_obj.execute_script('return arguments[0].value', webelement)
+                                        if value == input:
+                                            # implies that the value has been set in the textbox
+                                            status = TEST_RESULT_PASS
+                                            methodoutput = TEST_RESULT_TRUE
+                                        else:
+                                            if webelement.get_attribute('type') == 'number':
+                                                err_msg = ERROR_CODE_DICT['ERR_INPUT_TYPE_MISMATCH']
+                                                logger.print_on_console(err_msg)
                             else:
                                 err_msg=self.__read_only()
                 else:
@@ -1181,6 +1191,10 @@ class TextboxKeywords:
                                 webelement.clear()
                                 from selenium.webdriver.common.keys import Keys
                                 try:
+                                    #Fixes for: Clear text clears only last character
+                                    if len(webelement.get_attribute('value')) > 0:
+                                        self.__clear_text(webelement)
+                                        browser_Keywords.local_bk.driver_obj.execute_script("""arguments[0].focusout()""", webelement)
                                     webelement.send_keys(Keys.BACK_SPACE)
                                 except Exception as e:
                                     local_to.log.debug('Warning!: Could not perform backspace function due to error : '+str(e))
@@ -1751,8 +1765,7 @@ class TextboxKeywords:
                                     user_input=self.validate_input(webelement,input_val)
                                     if user_input is not None:
                                         input_val=user_input
-                                    browser_Keywords.local_bk.driver_obj.execute_script(SET_TEXT_SCRIPT,webelement,input_val)
-                                    browser_Keywords.local_bk.driver_obj.execute_script(EVENTS_JS, webelement)
+                                    browser_Keywords.local_bk.driver_obj.execute_script(SET_TEXT_WITH_EVENTS_SCRIPT, webelement, input_val)
                                     status=TEST_RESULT_PASS
                                     methodoutput=TEST_RESULT_TRUE
                                 else:

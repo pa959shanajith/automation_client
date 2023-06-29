@@ -37,6 +37,8 @@ from logging.handlers import TimedRotatingFileHandler
 import shutil
 import requests
 local_cont = threading.local()
+import cicd_core
+from retryapis_cicd import Retryrequests
 #index for iterating the teststepproperty for executor
 ##i = 0
 terminate_flag=False
@@ -394,7 +396,6 @@ class Controller():
                         log.info( "----Keyword :"+str(tsp.name)+' execution Started----')
                         start_time = datetime.now()
                         start_time_string=start_time.strftime(TIME_FORMAT)
-                        logger.print_on_console('Step Execution start time is : '+start_time_string)
                         log.info('Step Execution start time is : '+start_time_string)
                         index,result = self.keywordinvocation(index,inpval,self.reporting_obj,execution_env,*args)
                     else:
@@ -429,9 +430,9 @@ class Controller():
         if keyword_flag:
             end_time = datetime.now()
             end_time_string=end_time.strftime(TIME_FORMAT)
-            logger.print_on_console('Step Execution end time is : '+end_time_string)
+            log.info('Step Execution end time is : '+end_time_string)
             ellapsed_time=end_time-start_time
-            logger.print_on_console('Step Elapsed time is : ',str(ellapsed_time)+'\n')
+            log.info('Step Elapsed time is : '+str(ellapsed_time)+"\n")
             #Changing the overallstatus of the scenario if it's Fail or Terminate
             if self.status == TEST_RESULT_FAIL :
                 if not statusflag:
@@ -815,8 +816,16 @@ class Controller():
             kwargs = {}
             if(self.keyword_status=='Pass'): kwargs["setcolor"]="GREEN"
             elif(self.keyword_status=='Fail') : kwargs["setcolor"]="RED"
-            logger.print_on_console(keyword+' executed and the status is '+self.keyword_status+'\n',**kwargs)
-            log.info(keyword+' executed and the status is '+self.keyword_status+'\n')
+            keyword = str(teststepproperty.name)
+            cicd_mode = cicd_core.iscicd
+            if cicd_mode and keyword == 'displayVariableValue':
+                logger.print_on_console(keyword +':  '+ teststepproperty.additionalinfo, **kwargs)
+                logger.print_on_console(keyword +' executed and the status is Pass' + '\n', **kwargs)
+                log.info(keyword +':  '+ teststepproperty.additionalinfo)
+                log.info(keyword +' executed and the status is pass'+'\n')
+            else:
+                logger.print_on_console(keyword+' executed and the status is '+self.keyword_status+'\n',**kwargs)
+                log.info(keyword+' executed and the status is '+self.keyword_status+'\n')
             #Checking for stop keyword
             # CR #22650 stop keyword enhancement
             # 1. when input is 'testcase' stop the current testcase execution and jump to next teststep of next testcase.
@@ -969,6 +978,11 @@ class Controller():
 
     def invokewebkeyword(self,teststepproperty,dispatcher_obj,inputval,reporting_obj,execution_env):
         res = dispatcher_obj.dispatcher(teststepproperty,inputval,self.reporting_obj,self.wx_object,self.conthread,execution_env)
+        # To Retry on driver exception
+        if (res[3] == ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']) and (res[1] == 'False'):
+            log.info('Retry on Driver Exception')
+            res = dispatcher_obj.dispatcher(teststepproperty,inputval,self.reporting_obj,self.wx_object,self.conthread,execution_env)
+            log.info('Retry on Driver Exception Done!')
         return res
 
     def invokemobilekeyword(self,teststepproperty,dispatcher_obj,inputval,reporting_obj,execution_env):
@@ -1164,7 +1178,8 @@ class Controller():
                 server_url = 'https://' + opts.serverurl + ':' + opts.serverport + '/setExecStatus'
                 data_dict = dict({"status" : "started",
                     'startTime': datetime.now().strftime(TIME_FORMAT),"exce_data" : base_execute_data})
-                res = requests.post(server_url,json=data_dict, verify=False)
+                #res = requests.post(server_url,json=data_dict, verify=False)
+                res = Retryrequests.retry_cicd_apis(self, server_url, data_dict)
                 # #send response through API
             else:
                 socketIO.emit("return_status_executeTestSuite", dict({"status": "started",
@@ -1193,6 +1208,10 @@ class Controller():
                     #check if accessibility parameters are present if not initialize empty array
                     if "accessibilityMap" in suite and scenario_id in suite['accessibilityMap']:
                         accessibility_parameters = suite['accessibilityMap'][scenario_id]
+                        if len(accessibility_parameters) > 0 and isinstance(accessibility_parameters, list) and isinstance(accessibility_parameters[0], list) and len(accessibility_parameters[0]) > 0:
+                            accessibility_parameters = accessibility_parameters[0]
+                        else:
+                            accessibility_parameters = []
                     else:
                         accessibility_parameters = []
                     con.reporting_obj=reporting.Reporting()
@@ -1318,6 +1337,24 @@ class Controller():
                             # self.__load_web()
                             # import script_generator
                             scenario_name=json_data['suitedetails'][suite_idx-1]["scenarioNames"][sc_idx]
+                            import sauceclient
+                            core_utils.get_all_the_imports('Saucelabs')
+                            import web_keywords,web_keywords_MW
+                            s = ''
+                            sauce_details = {
+                                'sauce_username': json_data['sauce_username'],
+                                'sauce_access_key': json_data['sauce_access_key'],
+                                'remote_url': json_data['remote_url'],
+                            }
+                            if(json_data['apptype'] == 'Web'):
+                                s=web_keywords.Sauce_Config()
+                                sauce_details['version'] = json_data['browserVersion']
+                                sauce_details['platform'] = json_data['platform']
+                            else:
+                                s=web_keywords_MW.Sauce_Config()
+                                sauce_details['mobile'] = json_data['mobile']
+
+                            s.save_sauceconf(sauce_details)
                             execution_env = {'env': 'saucelabs','browser':browser,'scenario': scenario_name,'scenario_id':scenario_id,'handlerno': handlerno}
                             now=datetime.now()
                             # if not terminate_flag:
@@ -1354,9 +1391,6 @@ class Controller():
                                 status,status_percentage,accessibility_reports = con.executor(tsplist,EXECUTE,last_tc_num,1,con.conthread,execution_env,video_path,datatables=datatables,accessibility_testing = True)
                                 #end video
                                 if (record_flag=='yes') and self.execution_mode == SERIAL and json_data['apptype'] == 'Web': recorder_obj.rec_status = False
-                                if cicd_mode:
-                                    from browser_Keywords import BrowserKeywords
-                                    BrowserKeywords.closeBrowser(self)
                                 print('=======================================================================================================')
                                 logger.print_on_console( '***Scenario' ,str(sc_idx + 1) ,' execution completed***')
                                 print('=======================================================================================================')
@@ -1412,7 +1446,8 @@ class Controller():
                                 execute_result_data['execReq'] = json_data
                                 server_url = 'https://' + opts.serverurl + ':' + opts.serverport + '/setExecStatus'
                                 data_dict = dict({"exce_data" : execute_result_data})
-                                res = requests.post(server_url,json=data_dict, verify=False)
+                                # res = requests.post(server_url,json=data_dict, verify=False)
+                                res = Retryrequests.retry_cicd_apis(self, server_url, data_dict)
                             else:
                                 socketIO.emit('result_executeTestSuite', execute_result_data)
                             obj.clearList(con)
@@ -1447,7 +1482,8 @@ class Controller():
                                 execute_result_data['execReq'] = json_data
                                 server_url = 'https://' + opts.serverurl + ':' + opts.serverport + '/setExecStatus'
                                 data_dict = dict({"exce_data" : execute_result_data})
-                                res = requests.post(server_url,json=data_dict, verify=False)                            
+                                # res = requests.post(server_url,json=data_dict, verify=False)  
+                                res = Retryrequests.retry_cicd_apis(self, server_url, data_dict)                          
                             else:
                                 socketIO.emit('result_executeTestSuite', execute_result_data)
                             obj.clearList(con)
@@ -1638,7 +1674,8 @@ class Controller():
                             execute_result_data['execReq'] = json_data
                             server_url = 'https://' + opts.serverurl + ':' + opts.serverport + '/setExecStatus'
                             data_dict = dict({"exce_data" : execute_result_data})
-                            res = requests.post(server_url,json=data_dict, verify=False)
+                            # res = requests.post(server_url,json=data_dict, verify=False)
+                            res = Retryrequests.retry_cicd_apis(self, server_url, data_dict)
                         else:
                             socketIO.emit('result_executeTestSuite', execute_result_data)
                         obj.clearList(con)
@@ -1667,7 +1704,7 @@ class Controller():
                     log.info(info_msg)
                     con.reporting_obj.save_report_json_conditioncheck_testcase_empty(filename,info_msg,json_data,status_percentage)
                     execute_result_data["reportData"] = con.reporting_obj.report_json_condition_check_testcase_empty
-                    if cicd_mode is False:
+                    if cicd_mode :
                         execute_result_data["event"] = "result_executeTestSuite"
                         execute_result_data["configkey"] = opts.configkey
                         execute_result_data["executionListId"] = opts.executionListId
@@ -1675,7 +1712,8 @@ class Controller():
                         execute_result_data['execReq'] = json_data
                         server_url = 'https://' + opts.serverurl + ':' + opts.serverport + '/setExecStatus'
                         data_dict = dict({"exce_data" : execute_result_data})
-                        res = requests.post(server_url,json=data_dict, verify=False)
+                        # res = requests.post(server_url,json=data_dict, verify=False)
+                        res = Retryrequests.retry_cicd_apis(self, server_url, data_dict)
                     else:
                         socketIO.emit('result_executeTestSuite', execute_result_data)
                     obj.clearList(con)
@@ -1709,7 +1747,8 @@ class Controller():
                 server_url = 'https://' + opts.serverurl + ':' + opts.serverport + '/setExecStatus'
                 data_dict = dict({"status" : "finished", "executionStatus": exc_pass,
                     'endTime': datetime.now().strftime(TIME_FORMAT),"exce_data" : base_execute_data})
-                res = requests.post(server_url,json=data_dict, verify=False)
+                # res = requests.post(server_url,json=data_dict, verify=False)
+                res = Retryrequests.retry_cicd_apis(self, server_url, data_dict)
             else:
                 socketIO.emit("return_status_executeTestSuite", dict({"status": "finished", "executionStatus": exc_pass,
                     "endTime": datetime.now().strftime(TIME_FORMAT)}, **base_execute_data))
@@ -1846,13 +1885,14 @@ class Controller():
                     log.root.removeHandler(log.root.handlers[1])
                 shutil.rmtree(os.sep.join([os.getcwd(),'output','.logs',json_data['batchId']]), ignore_errors=True)
             elif action==DEBUG:
+                if json_data[0]['testcasename'] == AVO_GENIUS: kill_process()
                 self.debug_choice=wxObject.choice
                 self.debug_mode=debug_mode
                 self.wx_object=wxObject
                 status=self.invoke_debug(mythread,runfrom_step,json_data)
             if status != TERMINATE:
                 status=COMPLETED
-        except:
+        except Exception as e:
             logger.print_on_console("Exception in Invoke Controller")
             log.error("Exception in Invoke Controller", exc_info=True)
             status = TERMINATE
@@ -1982,7 +2022,7 @@ class Controller():
     def seperate_log(self, cur_thread, id):
         try:
             log = logging.getLogger("controller.py")
-            log_filepath = os.path.normpath(os.path.dirname(self.configvalues["logFile_Path"]) + os.sep + 'TestautoV2_Parallel_' + str(BROWSER_NAME_LOG[id]) + '.log').replace("\\","\\\\")
+            log_filepath = os.path.normpath(os.path.dirname(self.configvalues["logFile_Path"]) + os.sep + 'Avoclient_Parallel_' + str(BROWSER_NAME_LOG[id]) + '.log').replace("\\","\\\\")
             file1 = open(log_filepath, 'a+')
             file1.close()
             threadName = cur_thread.name #Get name of each thread

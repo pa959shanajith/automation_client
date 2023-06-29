@@ -17,6 +17,7 @@ import dynamic_variable_handler
 import time
 import os
 import readconfig
+import cicd_core
 log = logging.getLogger('delay_operations.py')
 
 class Delay_keywords:
@@ -61,7 +62,7 @@ class Delay_keywords:
                 status=TEST_RESULT_PASS
                 methodoutput=TEST_RESULT_TRUE
             else:
-                err_msg = "Pause Keyword is not applicable when ICE is running in command line mode"
+                err_msg = "Pause Keyword is not applicable when Avo Assure Client is running in command line mode"
                 log.error(err_msg)
                 logger.print_on_console(err_msg)
         except Exception as e:
@@ -111,15 +112,19 @@ class Delay_keywords:
                         if not isinstance(y,str):
                             if str(type(y))=="<class 'selenium.webdriver.remote.webelement.WebElement'>":
                                 y = "WebElement"
-                            y=str(y)
+                            y=str(y)  
                         display_input+=x+' = '+y+'\n'
                     if not (flag_invalid_syntax):
-                        if os.environ["ice_mode"] == "gui":
-                            o = pause_display_operation.PauseAndDisplay()
-                            o.display_value(display_input,args[-2],args[-1])
-                        logger.print_on_console('Result is ',display_input)
-                        status=TEST_RESULT_PASS
-                        methodoutput=TEST_RESULT_TRUE
+                        if cicd_core.iscicd:
+                            status = TEST_RESULT_PASS
+                            methodoutput=TEST_RESULT_TRUE
+                        else:
+                            if os.environ["ice_mode"] == "gui":
+                                o = pause_display_operation.PauseAndDisplay()
+                                o.display_value(display_input,args[-2],args[-1])
+                            logger.print_on_console('Result is ',display_input)
+                            status=TEST_RESULT_PASS
+                            methodoutput=TEST_RESULT_TRUE
                     else:
                         err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                 else:

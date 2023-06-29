@@ -16,6 +16,8 @@ import os
 import sap_constants
 import time
 from PIL import ImageGrab
+import PIL.ImageGrab
+import core_utils
 from constants import *
 from saputil_operations import SapUtilKeywords
 from pywinauto.application import Application
@@ -447,6 +449,13 @@ class Launch_Keywords():
                 SetForegroundWindow(find_window(title=self.windowName))
                 logger.print_on_console( 'SAP Logon window already exists will proceed further' )
                 log.debug( 'SAP Logon window already exists' )
+                #---Added AI Enabled code-----------------
+                time.sleep(3)
+                im = PIL.ImageGrab.grab()
+                core_utils.get_all_the_imports('IRIS')
+                import client
+                message=client.api_request().image_save(im)
+
                 status = sap_constants.TEST_RESULT_PASS
                 result = sap_constants.TEST_RESULT_TRUE
                 # made changes : launch will not terminate if window already exists
@@ -487,6 +496,7 @@ class Launch_Keywords():
                     app = Application(backend = "win32").connect(path = self.filePath).window(title = self.windowName)
                     SetForegroundWindow(find_window(title = self.windowName))
                     try:
+                        ele = None
                         editEle = app.Edit
                         edit2Ele = app.Edit2
                         editExists = editEle.exists()
@@ -497,6 +507,19 @@ class Launch_Keywords():
                             ele = editEle
                         elif ( edit2Exists ):
                             ele = edit2Ele
+
+                        """
+                            The below code will be run for SAP Business Client as win32 will not give all the control indentifiers on the screen, so we are using backend
+                            as uia for SAP Business client which is a modern application compared to SAP Logon 760
+                        """
+                        
+                        if ele is None and len(app.criteria) > 0 and app.criteria[0]['title'] == 'System Selection':
+                            app = Application(backend = "uia").connect(path = self.filePath).window(title = self.windowName)
+                            if app['System Selection'].exists():
+                                filter_textbox_exists = app.Edit3.exists()
+                                if filter_textbox_exists:
+                                    ele = app.Edit3
+
                         ele.set_edit_text('')
                         ele.type_keys(server, with_spaces = True)
                         time.sleep(0.4)#this delay is introduced as ServerConnect in SAP 7.70 upwards is very fast(would always select the first server connection)
@@ -504,6 +527,8 @@ class Launch_Keywords():
                             app['Log &OnButton'].click()
                         elif ( app['Log &On'].exists() and app['Log &On'].is_enabled() ):
                             app['Log &OnButton'].click()
+                        elif app['Log OnButton'].exists() and app['Log OnButton'].is_enabled():
+                            app['Log OnButton'].click()
                         elif ( app.Button.exists() and app.Button.is_enabled() ):
                             app.Button.click()
                     except Exception as e:
@@ -715,19 +740,24 @@ class Launch_Keywords():
         try:
             i = sap_id.index("/")
             wndNAME = sap_id[:i]
-            handle = win32gui.FindWindow(None, wndNAME)
-            foreground_handle = win32gui.GetForegroundWindow()
-            if ( handle != foreground_handle ):
-                foreThread = win32process.GetWindowThreadProcessId(win32gui.GetForegroundWindow())
-                appThread = win32api.GetCurrentThreadId()
-                if ( foreThread != appThread ):
-                    win32process.AttachThreadInput(foreThread[0], appThread, True)
-                    win32gui.BringWindowToTop(handle)
-                    win32gui.ShowWindow(handle,5)
-                    win32process.AttachThreadInput(foreThread[0], appThread, False)
-                else:
-                    win32gui.BringWindowToTop(handle)
-                    win32gui.ShowWindow(handle,5)
+            app = Application()
+            app.connect(title_re=wndNAME+"*")
+            app.window(title_re=wndNAME+"*").set_focus()
+            # handle = win32gui.FindWindow(None, wndNAME)
+            # print(handle)
+            # foreground_handle = win32gui.GetForegroundWindow()
+            # print(foreground_handle)
+            # if ( handle != foreground_handle ):
+            #     foreThread = win32process.GetWindowThreadProcessId(win32gui.GetForegroundWindow())
+            #     appThread = win32api.GetCurrentThreadId()
+            #     if ( foreThread != appThread ):
+            #         win32process.AttachThreadInput(foreThread[0], appThread, True)
+            #         win32gui.BringWindowToTop(handle)
+            #         win32gui.ShowWindow(handle,5)
+            #         win32process.AttachThreadInput(foreThread[0], appThread, False)
+            #     else:
+            #         win32gui.BringWindowToTop(handle)
+            #         win32gui.ShowWindow(handle,5)
         except Exception as e:
             error = sap_constants.ERROR_MSG + ' : ' + str(e)
             log.error(error)
