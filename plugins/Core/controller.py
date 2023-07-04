@@ -1428,7 +1428,8 @@ class Controller():
                                 time.sleep(5)
                                 import constants
                                 if constants.SCREENSHOT_PATH  not in ['screenshot_path', 'Disabled']:
-                                    path = constants.SCREENSHOT_PATH+json_data['suitedetails'][0]['projectname']+os.sep+json_data['suitedetails'][0]['releaseid']+os.sep+json_data['suitedetails'][0]['cyclename']+os.sep+datetime.now().strftime("%Y-%m-%d")+os.sep
+                                    path = os.path.join(constants.SCREENSHOT_PATH,json_data['suitedetails'][0]['projectname'],json_data['suitedetails'][0]['releaseid'],json_data['suitedetails'][0]['cyclename'],datetime.now().strftime("%Y-%m-%d"))
+                                    
                                     if not os.path.exists(path):
                                         os.makedirs(path)
                                     file_name = datetime.now().strftime("%Y%m%d%H%M%S")
