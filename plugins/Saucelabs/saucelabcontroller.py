@@ -131,25 +131,52 @@ class SaucelabWindow():
         """
         res = "invalidcredentials"
         try:
-            response = requests.get('https://app.saucelabs.com/rest/v1/info/platforms/webdriver')
-            data = json.loads(response.text)
-
-            androidVersions = {}
-            iphoneVersions = {}
-            for detail in data:
-                if detail['api_name'] == 'android':
-                    if detail['short_version'] not in androidVersions.keys():
-                        androidVersions[detail['short_version']] = []
-                    androidVersions[detail['short_version']].append(detail['long_name'])
-                if detail['api_name'] == 'iphone':
-                    if detail['short_version'] not in iphoneVersions.keys():
-                        iphoneVersions[detail['short_version']] = []
-                    iphoneVersions[detail['short_version']].append(detail['long_name'])
-
-            res =  {
-                'android' : androidVersions,
-                'iphone': iphoneVersions
+            authorization = str(base64.b64encode(bytes(saucleb_input_dict['SauceLabusername']+':'+saucleb_input_dict['SauceLabAccessKey'], 'ascii')), 'ascii')
+            headers = {
+                'Authorization': 'Basic '+authorization
             }
+            response = requests.get('https://app.saucelabs.com/rest/v1/info/platforms/webdriver',headers=headers)
+            
+            if response.status_code == 200:
+                data = json.loads(response.text)
+                androidVersions = {}
+                iphoneVersions = {}
+                for detail in data:
+                    if detail['api_name'] == 'android':
+                        if detail['short_version'] not in androidVersions.keys():
+                            androidVersions[detail['short_version']] = []
+                        androidVersions[detail['short_version']].append(detail['long_name'])
+                    if detail['api_name'] == 'iphone':
+                        if detail['short_version'] not in iphoneVersions.keys():
+                            iphoneVersions[detail['short_version']] = []
+                        iphoneVersions[detail['short_version']].append(detail['long_name'])
+
+                res = {}
+                res['emulator'] = {
+                        'android' : androidVersions,
+                        'iphone': iphoneVersions
+                    }
+
+            response_real_devices = requests.get('https://api.us-west-1.saucelabs.com/v1/rdc/devices',headers=headers)
+            if response_real_devices.status_code == 200:
+                data = json.loads(response_real_devices.text)
+                androidVersions = {}
+                iphoneVersions = {}
+                for detail in data:
+                    if detail['os'] == 'ANDROID':
+                        if detail['osVersion'] not in androidVersions.keys():
+                            androidVersions[detail['osVersion']] = []
+                        androidVersions[detail['osVersion']].append(detail['name'])
+                    if detail['os'] == 'IOS':
+                        if detail['osVersion'] not in iphoneVersions.keys():
+                            iphoneVersions[detail['osVersion']] = []
+                        iphoneVersions[detail['osVersion']].append(detail['name'])
+
+                res['real devices'] = {
+                        'android' : androidVersions,
+                        'iphone': iphoneVersions
+                    }
+                
             socket.emit('sauceconfresponse',res)
         except Exception as e:
             log.error(e)
