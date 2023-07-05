@@ -851,6 +851,7 @@ class Dispatcher:
 
     def element_locator(self,driver,identifiers_type,identifier,id_num):
         if identifier=='null': return None
+        display_identifier_type = identifiers_type
         webElement = None
         try:
             index = 0
@@ -883,8 +884,8 @@ class Dispatcher:
                                             'css_selector':'CSS Selector',
                                             'href':'Href Attribute',
                                             'label':'Label'}
-                    logger.print_on_console(f'Webelement found by OI "{identifier_fullname[identifiers_type]}"')
-                    local_Wd.log.info(f'Webelement found by OI "{str(identifiers_type)}"')
+                    logger.print_on_console(f'Webelement found by OI "{identifier_fullname[display_identifier_type]}"')
+                    local_Wd.log.info(f'Webelement found by OI "{str(display_identifier_type)}"')
                 except:
                     logger.print_on_console(f'Webelement found by OI "{id_num}"')
                     local_Wd.log.info(f'Webelement found by OI "{id_num}"')
@@ -934,6 +935,7 @@ class Dispatcher:
                         else:
                             break
                     if (webElement):
+                        finalXpath = identifiers[0]     #finalXpath used in getCustomobject 
                         break
                     else:
                         time.sleep(1)
