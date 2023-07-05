@@ -817,7 +817,7 @@ class OutlookKeywords:
                         if input_value[0] == data['Key'] and data['Flag'] == True and data['AttachmentStatus'] == 'Yes' and len(data['AttachmentList']) > 0:
                             for attachment in data['AttachmentList']:
                                 if attachment.FileName == attachment_name:
-                                    attachment_path = AVO_ASSURE_HOME + '\\' + attachment.FileName
+                                    attachment_path = AVO_ASSURE_HOME + os.sep + attachment.FileName
                                     attachment.SaveAsFile(attachment_path)
                                     status_flag = False
                                     break
