@@ -172,7 +172,7 @@ class SaucelabWindow():
                             iphoneVersions[detail['osVersion']] = []
                         iphoneVersions[detail['osVersion']].append(detail['name'])
 
-                res['real devices'] = {
+                res['real_devices'] = {
                         'android' : androidVersions,
                         'iphone': iphoneVersions
                     }
