@@ -141,7 +141,7 @@ class MainNamespace(BaseNamespace):
                             try:
                                 isTrial_val = configvalues.get("isTrial")
                                 LicenseType = response["license_data"]["LicenseTypes"].lower()
-                                config_path = os.environ["AVO_ASSURE_HOME"]+os.sep+"assets\config.json"
+                                config_path = os.environ["AVO_ASSURE_HOME"]+os.sep+"assets"+os.sep+"config.json"
                                 isTrial_update = ''
                                 if LicenseType == "trial" and isTrial_val != 1:
                                     isTrial_update = 1
@@ -2001,7 +2001,7 @@ def check_browser():
                         chromeFlag = True
                 if not os.path.exists(CHROME_DRIVER_PATH) or chromeFlag == False:
                     try:
-                        URL=readconfig.configvalues["file_server_ip"]+"/chromedriver"+CHROME_VERSION
+                        URL=readconfig.configvalues["file_server_ip"]+"/Mac"+"/chromedriver"+CHROME_VERSION
                         request.urlretrieve(URL,CHROME_DRIVER_PATH)
                         chromeFlag = True
                     except:
@@ -2058,7 +2058,7 @@ def check_browser():
             try:
                 if FIREFOX_VERSION != -1:
                     try:
-                        URL=readconfig.configvalues["file_server_ip"]+"/geckodriver"
+                        URL=readconfig.configvalues["file_server_ip"]+"/Mac"+"/geckodriver"
                         request.urlretrieve(URL,GECKODRIVER_PATH)
                         firefoxFlag = True  
                     except:
@@ -2169,7 +2169,7 @@ def check_browser():
                 #         chromiumFlag = True
                 if not os.path.exists(EDGE_CHROMIUM_DRIVER_PATH) or chromiumFlag == False:
                     try:
-                        URL=readconfig.configvalues["file_server_ip"]+"/msedgedriver"+CHROMIUM_VERSION
+                        URL=readconfig.configvalues["file_server_ip"]+"/Mac"+"/msedgedriver"+CHROMIUM_VERSION
                         request.urlretrieve(URL,EDGE_CHROMIUM_DRIVER_PATH)
                         chromiumFlag = True
                     except:
