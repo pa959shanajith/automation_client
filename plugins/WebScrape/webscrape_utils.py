@@ -769,38 +769,107 @@ class WebScrape_Utils:
 
                     // capture css selector of the element
                     var cssSelector = '';
+                    function getElementCount(ele, tag) {
+                        try {
+                            let tagIndex = '';
+                            let arr = Array.from(ele.parentNode.children);
+                            let tagNameArr = [];
+                            for (i = 0; i < arr.length; i++) {
+                                let tag = arr[i].tagName.toLowerCase();
+                                tagNameArr.push(tag);
+                            }
+                            let count = tagNameArr.toString().match(new RegExp(tag, 'g')).length;
+                            if (count > 1) {
+                                let sib = ele.previousSibling, nth = 1;
+                                while((sib != null) && nth++) {
+                                    if ((sib.nodeName.toLowerCase() == '#text') || (sib.nodeName.toLowerCase() == '#comment')) {
+                                        nth--;
+                                    }
+                                    sib = sib.previousSibling;
+                                }
+                                tagIndex = ":nth-child("+nth+")";
+                            }
+                            return tagIndex;
+                        } catch (err) {
+                            console.log(err);
+                        }
+                    }
+                    function getAttr(ele) {
+                        try {
+                            let arr = ['id','class','name','value','placeholder','title', 'href'];
+                            let nodes=[], values=[];
+                            for (var att, i = 0, atts = ele.attributes, n = atts.length; i < n; i++){
+                                att = atts[i];
+                                if (arr.includes(att.nodeName)) {
+                                    nodes.push(att.nodeName);
+                                    values.push(att.nodeValue);
+                                }
+                            }
+                            return [nodes, values];
+                        } catch (err) {
+                            console.log(err);
+                        }
+                    }
                     function getCssSelector(ele) {
                         try {
-                            let path = [];
-                            let parentEle = ele.parentNode;
-                            while (ele.nodeName.toLowerCase() != 'body') {
-                                let selector = ele.nodeName.toLowerCase();
-                                let arr = Array.from(ele.parentNode.children);
-                                let tagNameArr = [];
-                                for (i = 0; i < arr.length; i++) {
-                                    let tag = arr[i].tagName.toLowerCase();
-                                    tagNameArr.push(tag);
-                                }
-                                let count = tagNameArr.toString().match(new RegExp(selector, 'g')).length;
-                                if (ele.id) {
-                                    selector += '#' + ele.id;
-                                }
-                                else if (count > 1) {
-                                    let sib = ele.previousSibling, nth = 1;
-                                    while((sib != null) && nth++) {
-                                        if ((sib.nodeName.toLowerCase() == '#text') || (sib.nodeName.toLowerCase() == '#comment')) {
-                                            nth--;
-                                        }
-                                        sib = sib.previousSibling;
+                            let selector = parentSelector = childSelector = '';
+                            let parentFlag = false;
+                            if (ele != null && ele.attributes) {
+                                let tag = ele.nodeName.toLowerCase();
+                                let [nodes, values] = getAttr(ele);
+                                for (let index=0; index < nodes.length; index++) {
+                                    if (document.querySelectorAll(`${tag}[${nodes[index]}="${values[index]}"]`).length == 1) {
+                                        selector = `${tag}[${nodes[index]}="${values[index]}"]`;
+                                        break;
                                     }
-                                    selector += ":nth-child("+nth+")";
                                 }
-                                path.unshift(selector);
-                                ele = ele.parentNode;
+                                if (selector == '' && !parentFlag && nodes.length != 0) {
+                                    childSelector = `${tag}[${nodes.slice(-1)}="${values.slice(-1)}"]`;
+                                    parentFlag = true;
+                                }
+                                else if (nodes.length == 0) {
+                                    childSelector = tag;
+                                    parentFlag = true;
+                                }
                             }
-                            return path.join(" > ");
+                            if (parentFlag) {
+                                let parentEle = ele.parentNode;
+                                while (parentFlag && parentEle.nodeName.toLowerCase() != 'body') {
+                                    if (parentEle != null && parentEle.attributes) {
+                                        let parentTag = parentEle.nodeName.toLowerCase();
+                                        let [parentNodes, parentValues] = getAttr(parentEle);
+                                        for (let index=0; index < parentNodes.length; index++) {
+                                            if (document.querySelectorAll(`${parentTag}[${parentNodes[index]}="${parentValues[index]}"] ${childSelector}`).length == 1) {
+                                                parentSelector = `${parentTag}[${parentNodes[index]}="${parentValues[index]}"]`;
+                                                selector = `${parentSelector} ${childSelector}`;
+                                                parentFlag = false;
+                                                break;
+                                            }
+                                        }
+                                        if (selector == '') {
+                                            if (document.querySelectorAll(`${parentTag} ${childSelector}`).length > 1) {
+                                                let tagIndex = getElementCount(parentEle, parentTag);
+                                                if (tagIndex && document.querySelectorAll(`${parentTag}${tagIndex} ${childSelector}`).length == 1) {
+                                                    selector = `${parentTag}${tagIndex} ${childSelector}`;
+                                                }
+                                                else {
+                                                    childSelector = `${parentTag} ${childSelector}`;
+                                                    parentEle = parentEle.parentNode;
+                                                }
+                                            }
+                                            else {
+                                                parentEle = parentEle.parentNode;
+                                            }
+                                        }
+                                        else {
+                                            parentFlag = false;
+                                        }
+                                    }
+                                }
+                            }
+                            return selector;
                         } catch (err) {
-                            console.log("skipping this element: " + err);
+                            console.log("ERROR in get getCssSelector(): " + err);
                         }
                     }
                     cssSelector = getCssSelector(f);
@@ -1305,38 +1374,107 @@ return (temp);"""
 
             // capture css selector of the element
             var sCssSelector = '';
+            function getElementCount(ele, tag) {
+                try {
+                    let tagIndex = '';
+                    let arr = Array.from(ele.parentNode.children);
+                    let tagNameArr = [];
+                    for (i = 0; i < arr.length; i++) {
+                        let tag = arr[i].tagName.toLowerCase();
+                        tagNameArr.push(tag);
+                    }
+                    let count = tagNameArr.toString().match(new RegExp(tag, 'g')).length;
+                    if (count > 1) {
+                        let sib = ele.previousSibling, nth = 1;
+                        while((sib != null) && nth++) {
+                            if ((sib.nodeName.toLowerCase() == '#text') || (sib.nodeName.toLowerCase() == '#comment')) {
+                                nth--;
+                            }
+                            sib = sib.previousSibling;
+                        }
+                        tagIndex = ":nth-child("+nth+")";
+                    }
+                    return tagIndex;
+                } catch (err) {
+                    console.log(err);
+                }
+            }
+            function getAttr(ele) {
+                try {
+                    let arr = ['id','class','name','value','placeholder','title', 'href'];
+                    let nodes=[], values=[];
+                    for (var att, i = 0, atts = ele.attributes, n = atts.length; i < n; i++){
+                        att = atts[i];
+                        if (arr.includes(att.nodeName)) {
+                            nodes.push(att.nodeName);
+                            values.push(att.nodeValue);
+                        }
+                    }
+                    return [nodes, values];
+                } catch (err) {
+                    console.log(err);
+                }
+            }
             function getCssSelector(ele) {
                 try {
-                    let path = [];
-                    let parentEle = ele.parentNode;
-                    while (ele.nodeName.toLowerCase() != 'body') {
-                        let selector = ele.nodeName.toLowerCase();
-                        let arr = Array.from(ele.parentNode.children);
-                        let tagNameArr = [];
-                        for (i = 0; i < arr.length; i++) {
-                            let tag = arr[i].tagName.toLowerCase();
-                            tagNameArr.push(tag);
-                        }
-                        let count = tagNameArr.toString().match(new RegExp(selector, 'g')).length;
-                        if (ele.id) {
-                            selector += '#' + ele.id;
-                        }
-                        else if (count > 1) {
-                            let sib = ele.previousSibling, nth = 1;
-                            while((sib != null) && nth++) {
-                                if ((sib.nodeName.toLowerCase() == '#text') || (sib.nodeName.toLowerCase() == '#comment')) {
-                                    nth--;
-                                }
-                                sib = sib.previousSibling;
+                    let selector = parentSelector = childSelector = '';
+                    let parentFlag = false;
+                    if (ele != null && ele.attributes) {
+                        let tag = ele.nodeName.toLowerCase();
+                        let [nodes, values] = getAttr(ele);
+                        for (let index=0; index < nodes.length; index++) {
+                            if (document.querySelectorAll(`${tag}[${nodes[index]}="${values[index]}"]`).length == 1) {
+                                selector = `${tag}[${nodes[index]}="${values[index]}"]`;
+                                break;
                             }
-                            selector += ":nth-child("+nth+")";
                         }
-                        path.unshift(selector);
-                        ele = ele.parentNode;
+                        if (selector == '' && !parentFlag && nodes.length != 0) {
+                            childSelector = `${tag}[${nodes.slice(-1)}="${values.slice(-1)}"]`;
+                            parentFlag = true;
+                        }
+                        else if (nodes.length == 0) {
+                            childSelector = tag;
+                            parentFlag = true;
+                        }
                     }
-                    return path.join(" > ");
+                    if (parentFlag) {
+                        let parentEle = ele.parentNode;
+                        while (parentFlag && parentEle.nodeName.toLowerCase() != 'body') {
+                            if (parentEle != null && parentEle.attributes) {
+                                let parentTag = parentEle.nodeName.toLowerCase();
+                                let [parentNodes, parentValues] = getAttr(parentEle);
+                                for (let index=0; index < parentNodes.length; index++) {
+                                    if (document.querySelectorAll(`${parentTag}[${parentNodes[index]}="${parentValues[index]}"] ${childSelector}`).length == 1) {
+                                        parentSelector = `${parentTag}[${parentNodes[index]}="${parentValues[index]}"]`;
+                                        selector = `${parentSelector} ${childSelector}`;
+                                        parentFlag = false;
+                                        break;
+                                    }
+                                }
+                                if (selector == '') {
+                                    if (document.querySelectorAll(`${parentTag} ${childSelector}`).length > 1) {
+                                        let tagIndex = getElementCount(parentEle, parentTag);
+                                        if (tagIndex && document.querySelectorAll(`${parentTag}${tagIndex} ${childSelector}`).length == 1) {
+                                            selector = `${parentTag}${tagIndex} ${childSelector}`;
+                                        }
+                                        else {
+                                            childSelector = `${parentTag} ${childSelector}`;
+                                            parentEle = parentEle.parentNode;
+                                        }
+                                    }
+                                    else {
+                                        parentEle = parentEle.parentNode;
+                                    }
+                                }
+                                else {
+                                    parentFlag = false;
+                                }
+                            }
+                        }
+                    }
+                    return selector;
                 } catch (err) {
-                    console.log("skipping this element: " + err);
+                    console.log("ERROR in get getCssSelector(): " + err);
                 }
             }
             sCssSelector = getCssSelector(element);
