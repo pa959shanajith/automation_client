@@ -511,18 +511,33 @@ class Launch_Keywords():
                         """
                             The below code will be run for SAP Business Client as win32 will not give all the control indentifiers on the screen, so we are using backend
                             as uia for SAP Business client which is a modern application compared to SAP Logon 760
+
+                            We are handling the filter textbox according to different SAP themes below.
                         """
                         
                         if ele is None and len(app.criteria) > 0 and app.criteria[0]['title'] == 'System Selection':
                             app = Application(backend = "uia").connect(path = self.filePath).window(title = self.windowName)
-                            if app['System Selection'].exists():
-                                filter_textbox_exists = app.Edit3.exists()
-                                if filter_textbox_exists:
+                            if app['System Selection'].exists(): 
+                                if app.Edit2.exists() and 'filter' in app.Edit2.element_info.name.lower() and 'textbox' in app.Edit2.element_info.class_name.lower() and 'edit' in app.Edit2.element_info.control_type.lower():
+                                    ele = app.Edit2
+                                elif app.Edit3.exists() and 'filter' in app.Edit3.element_info.name.lower() and 'textbox' in app.Edit3.element_info.class_name.lower() and 'edit' in app.Edit3.element_info.control_type.lower():
                                     ele = app.Edit3
 
                         ele.set_edit_text('')
                         ele.type_keys(server, with_spaces = True)
                         time.sleep(0.4)#this delay is introduced as ServerConnect in SAP 7.70 upwards is very fast(would always select the first server connection)
+
+                        """
+                            In case of SAP Business client, We need to highlight the filtered connection so that logon button will be enabled.
+                            the below code will take care of that.
+                            but in case of SAP Logon its handled by the application it self.
+                        """
+                        if len(app.criteria) > 0 and app.criteria[0]['title'] == 'System Selection':
+                            if app['System Selection'].exists():
+                                if app.ListBox.exists() and len(app.Listbox.texts()) > 0 and server in app.ListBox.texts()[0]:
+                                    app.child_window(title=server, control_type="Text").click_input()
+                                    time.sleep(0.5)
+
                         if ( app['Log &OnButton'].exists() and app['Log &OnButton'].is_enabled() ):
                             app['Log &OnButton'].click()
                         elif ( app['Log &On'].exists() and app['Log &On'].is_enabled() ):
