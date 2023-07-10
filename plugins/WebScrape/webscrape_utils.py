@@ -1613,7 +1613,7 @@ return (temp);"""
             }
             coordinates = left + ';' + top + ';' + height + ';' + width;
             coordinates = String(coordinates);
-            snewPath = String(spath) + ';' + String(sid) + ';' + String(srpath) + ';' + ssname + ';' + sstagname + ';' + ssclassname + ';' + coordinates + ';' + slabel + ';' + shref + ';' + sCssSelector;
+            snewPath = String(spath) + ';' + String(sid) + ';' + String(srpath) + ';' + ssname + ';' + sstagname + ';' + ssclassname + ';' + coordinates + ';' + slabel + ';' + shref + ';' + sCssSelector + ';' + 'null' + ';' + stagname;
             sarr.push({
                 'xpath': snewPath,
                 'tag': stagname,
