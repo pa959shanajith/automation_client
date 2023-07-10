@@ -814,36 +814,57 @@ class WebScrape_Utils:
                         try {
                             let selector = parentSelector = childSelector = '';
                             let parentFlag = false;
-                            if (ele != null && ele.attributes) {
-                                let tag = ele.nodeName.toLowerCase();
+                            let tag = ele.nodeName.toLowerCase();
+                            if (ele != null && ele.attributes.length) {
                                 let [nodes, values] = getAttr(ele);
                                 for (let index=0; index < nodes.length; index++) {
-                                    if (document.querySelectorAll(`${tag}[${nodes[index]}="${values[index]}"]`).length == 1) {
-                                        selector = `${tag}[${nodes[index]}="${values[index]}"]`;
-                                        break;
+                                    if (values[index] != '') {
+                                        let elementCount = '';
+                                        if (nodes[index] == 'class') {
+                                            elementCount = document.querySelectorAll(`${tag}[${nodes[index]}="${values[index]}"]`).length + document.querySelectorAll(`${tag}[${nodes[index]}="${values[index]} AvoAssure_Highlight"]`).length;
+                                        }
+                                        else {
+                                            elementCount = document.querySelectorAll(`${tag}[${nodes[index]}="${values[index]}"]`).length;
+                                        }
+                                        if (elementCount == 1) {
+                                            selector = `${tag}[${nodes[index]}="${values[index]}"]`;
+                                            break;
+                                        }
                                     }
                                 }
-                                if (selector == '' && !parentFlag && nodes.length != 0) {
+                                if (selector == '' && !parentFlag && nodes.length != 0 && values.slice(-1) != '') {
                                     childSelector = `${tag}[${nodes.slice(-1)}="${values.slice(-1)}"]`;
                                     parentFlag = true;
                                 }
-                                else if (nodes.length == 0) {
+                                else if (selector == '' && nodes.length != 0 && values.slice(-1) == '') {
                                     childSelector = tag;
+                                    parentFlag = true;
+                                }
+                            }
+                            else {
+                                let tagIndex = getElementCount(ele, tag);
+                                if (tagIndex && document.querySelectorAll(`${tag}${tagIndex}`).length == 1) {
+                                    selector = `${tag}${tagIndex}`;
+                                }
+                                else {
+                                    childSelector = `${tag}${tagIndex}`;
                                     parentFlag = true;
                                 }
                             }
                             if (parentFlag) {
                                 let parentEle = ele.parentNode;
                                 while (parentFlag && parentEle.nodeName.toLowerCase() != 'body') {
-                                    if (parentEle != null && parentEle.attributes) {
-                                        let parentTag = parentEle.nodeName.toLowerCase();
+                                    let parentTag = parentEle.nodeName.toLowerCase();
+                                    if (parentEle != null && parentEle.attributes.length) {
                                         let [parentNodes, parentValues] = getAttr(parentEle);
                                         for (let index=0; index < parentNodes.length; index++) {
-                                            if (document.querySelectorAll(`${parentTag}[${parentNodes[index]}="${parentValues[index]}"] ${childSelector}`).length == 1) {
-                                                parentSelector = `${parentTag}[${parentNodes[index]}="${parentValues[index]}"]`;
-                                                selector = `${parentSelector} ${childSelector}`;
-                                                parentFlag = false;
-                                                break;
+                                            if (parentValues[index] != '') {
+                                                if (document.querySelectorAll(`${parentTag}[${parentNodes[index]}="${parentValues[index]}"] ${childSelector}`).length == 1) {
+                                                    parentSelector = `${parentTag}[${parentNodes[index]}="${parentValues[index]}"]`;
+                                                    selector = `${parentSelector} ${childSelector}`;
+                                                    parentFlag = false;
+                                                    break;
+                                                }
                                             }
                                         }
                                         if (selector == '') {
@@ -851,9 +872,9 @@ class WebScrape_Utils:
                                                 let tagIndex = getElementCount(parentEle, parentTag);
                                                 if (tagIndex && document.querySelectorAll(`${parentTag}${tagIndex} ${childSelector}`).length == 1) {
                                                     selector = `${parentTag}${tagIndex} ${childSelector}`;
+                                                    parentFlag = false;
                                                 }
                                                 else {
-                                                    childSelector = `${parentTag} ${childSelector}`;
                                                     parentEle = parentEle.parentNode;
                                                 }
                                             }
@@ -863,6 +884,16 @@ class WebScrape_Utils:
                                         }
                                         else {
                                             parentFlag = false;
+                                        }
+                                    }
+                                    else {
+                                        let tagIndex = getElementCount(parentEle, parentTag);
+                                        if (tagIndex && document.querySelectorAll(`${parentTag}${tagIndex} ${childSelector}`).length == 1) {
+                                            selector = `${parentTag}${tagIndex} ${childSelector}`;
+                                            parentFlag = false;
+                                        }
+                                        else {
+                                            parentEle = parentEle.parentNode;
                                         }
                                     }
                                 }
@@ -1419,36 +1450,50 @@ return (temp);"""
                 try {
                     let selector = parentSelector = childSelector = '';
                     let parentFlag = false;
-                    if (ele != null && ele.attributes) {
-                        let tag = ele.nodeName.toLowerCase();
+                    let tag = ele.nodeName.toLowerCase();
+                    if (ele != null && ele.attributes.length) {
                         let [nodes, values] = getAttr(ele);
                         for (let index=0; index < nodes.length; index++) {
-                            if (document.querySelectorAll(`${tag}[${nodes[index]}="${values[index]}"]`).length == 1) {
-                                selector = `${tag}[${nodes[index]}="${values[index]}"]`;
-                                break;
+                            if (values[index] != '') {
+                                if (document.querySelectorAll(`${tag}[${nodes[index]}="${values[index]}"]`).length == 1) {
+                                    selector = `${tag}[${nodes[index]}="${values[index]}"]`;
+                                    break;
+                                }
                             }
                         }
-                        if (selector == '' && !parentFlag && nodes.length != 0) {
+                        if (selector == '' && !parentFlag && nodes.length != 0 && values.slice(-1) != '') {
                             childSelector = `${tag}[${nodes.slice(-1)}="${values.slice(-1)}"]`;
                             parentFlag = true;
                         }
-                        else if (nodes.length == 0) {
+                        else if (selector == '' && nodes.length != 0 && values.slice(-1) == '') {
                             childSelector = tag;
+                            parentFlag = true;
+                        }
+                    }
+                    else {
+                        let tagIndex = getElementCount(ele, tag);
+                        if (tagIndex && document.querySelectorAll(`${tag}${tagIndex}`).length == 1) {
+                            selector = `${tag}${tagIndex}`;
+                        }
+                        else {
+                            childSelector = `${tag}${tagIndex}`;
                             parentFlag = true;
                         }
                     }
                     if (parentFlag) {
                         let parentEle = ele.parentNode;
                         while (parentFlag && parentEle.nodeName.toLowerCase() != 'body') {
-                            if (parentEle != null && parentEle.attributes) {
-                                let parentTag = parentEle.nodeName.toLowerCase();
+                            let parentTag = parentEle.nodeName.toLowerCase();
+                            if (parentEle != null && parentEle.attributes.length) {
                                 let [parentNodes, parentValues] = getAttr(parentEle);
                                 for (let index=0; index < parentNodes.length; index++) {
-                                    if (document.querySelectorAll(`${parentTag}[${parentNodes[index]}="${parentValues[index]}"] ${childSelector}`).length == 1) {
-                                        parentSelector = `${parentTag}[${parentNodes[index]}="${parentValues[index]}"]`;
-                                        selector = `${parentSelector} ${childSelector}`;
-                                        parentFlag = false;
-                                        break;
+                                    if (parentValues[index] != '') {
+                                        if (document.querySelectorAll(`${parentTag}[${parentNodes[index]}="${parentValues[index]}"] ${childSelector}`).length == 1) {
+                                            parentSelector = `${parentTag}[${parentNodes[index]}="${parentValues[index]}"]`;
+                                            selector = `${parentSelector} ${childSelector}`;
+                                            parentFlag = false;
+                                            break;
+                                        }
                                     }
                                 }
                                 if (selector == '') {
@@ -1456,9 +1501,9 @@ return (temp);"""
                                         let tagIndex = getElementCount(parentEle, parentTag);
                                         if (tagIndex && document.querySelectorAll(`${parentTag}${tagIndex} ${childSelector}`).length == 1) {
                                             selector = `${parentTag}${tagIndex} ${childSelector}`;
+                                            parentFlag = false;
                                         }
                                         else {
-                                            childSelector = `${parentTag} ${childSelector}`;
                                             parentEle = parentEle.parentNode;
                                         }
                                     }
@@ -1468,6 +1513,16 @@ return (temp);"""
                                 }
                                 else {
                                     parentFlag = false;
+                                }
+                            }
+                            else {
+                                let tagIndex = getElementCount(parentEle, parentTag);
+                                if (tagIndex && document.querySelectorAll(`${parentTag}${tagIndex} ${childSelector}`).length == 1) {
+                                    selector = `${parentTag}${tagIndex} ${childSelector}`;
+                                    parentFlag = false;
+                                }
+                                else {
+                                    parentEle = parentEle.parentNode;
                                 }
                             }
                         }
