@@ -79,6 +79,7 @@ class Object_Mapper():
                 webElement = self.webscrapeutilsobj.locate_webelement(self.driver, identifiers)
                 if webElement is not None:
                     new_properties = self.driver.execute_script(self.webscrapeutilsobj.javascript_get_object_properties,webElement[0],decryptedelementurl)[0]
+                    # removing coordinates from xpath for Anayze screen condition check
                     new_properties_list = new_properties['xpath'].split(';')
                     new_properties_list = new_properties_list[:6] + new_properties_list[10:]
                     decryptedxpath_list = decryptedxpath.split(';')
