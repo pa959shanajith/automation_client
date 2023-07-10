@@ -145,7 +145,8 @@ class AzureWindow():
                     required_comp[details['name']] = details
                 required_comp['Area_Paths'] = {'name':data_area['name'] or '','child':area_paths}
                 required_comp['Iteration_Paths'] = {'name':data_iteration['name'] or '','child':iteration_paths}
-
+            if respon.status_code == 404:
+                required_comp['Error']={'status':404,'msg':'project not found'}
             socket.emit('configure_field',required_comp)
         except Exception as e:
             log.error(e)
