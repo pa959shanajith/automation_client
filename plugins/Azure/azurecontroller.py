@@ -512,6 +512,7 @@ class AzureWindow():
             # Azure DevOps organization URL
             org_url = azure_input_dict['url']
             project_name = azure_input_dict['info']['project']['text']
+            userstory_id = azure_input_dict['mappedId']
             type='Bug'
             endpoint_url = f'{org_url}/{project_name}/_apis/wit/workitems/${type}?api-version=6.0'
 
@@ -536,6 +537,19 @@ class AzureWindow():
                         "value": data
                     }
                 )
+            patch_document.append(
+                     {
+                        'op': 'add',
+                        'path': '/relations/-',
+                        'value': {
+                            'rel': 'System.LinkTypes.Hierarchy-Reverse',
+                            'url': f'{org_url}/{project_name}/_apis/wit/workitems/{userstory_id}',
+                            'attributes': {
+                                'comment': 'Relates to'
+                            }
+                        }
+                    }
+                )    
             respon = requests.patch(endpoint_url, headers=headers, data=json.dumps(patch_document))
 
             if respon.status_code == 200:
