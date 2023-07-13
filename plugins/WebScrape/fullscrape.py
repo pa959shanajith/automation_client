@@ -31,7 +31,7 @@ import logger
 from webscrape_utils import WebScrape_Utils
 
 class Fullscrape():
-    def fullscrape(self,scrape_option,window_handle_number,visiblity_status):
+    def fullscrape(self,scrape_option,window_handle_number,visiblity_status,tagfilter,xpathfilter):
         global currenthandle
         start_time = time.clock()
         data = {}
@@ -119,7 +119,7 @@ class Fullscrape():
                             tempne.extend(temp)
                         callback_fullscrape_frames(path, tempne)
                         callback_fullscrape_iframes(path, tempne)
-                    else:
+                    else:   
                         log.info('could not switch to iframe/frame %s', path)
 
             # scrape through iframes/frames iff OS is windows and scrape_option is not the xpath one
@@ -140,8 +140,9 @@ class Fullscrape():
                 xpath_string=a['xpath'].split(';') + ["null",a['tag']]
                 left_part=obj.scrape_wrap(';'.join(xpath_string[:2]))
                 right_part=obj.scrape_wrap(';'.join(xpath_string[3:]))
-                a['xpath'] = left_part+';'+xpath_string[2]+';'+right_part
-                new_obj.append(a)
+                a['xpath'] = left_part+';'+xpath_string[0]+';'+right_part
+                if (tagfilter=={} and xpathfilter=={}) or tagfilter.get(a['tag']) and xpathfilter.get(xpath_string[0])==None:
+                    new_obj.append(a)
             tempne=new_obj
             log.info('json operations dumps and loads are performed on the return data')
             scrape_time = time.clock() - start_time

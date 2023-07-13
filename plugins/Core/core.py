@@ -375,7 +375,7 @@ class MainNamespace(BaseNamespace):
             logger.print_on_console(err_msg)
             log.error(e,exc_info=True)
 
-    def on_webscrape(self,*args):
+    def on_webscrape(self,*args):#initScraping_ICE socket connection
         try:
             global action,cw,browsername,desktopScrapeFlag,data
             if check_execution_lic("scrape"): return None
@@ -417,8 +417,13 @@ class MainNamespace(BaseNamespace):
                         browsername = '8'
                 elif action == 'compare':
                     task = d['task']
-                    data['view'] = d['viewString']
-                    data['scrapedurl'] = d['scrapedurl']
+                    if (d.get('scenarioLevel')==True):
+                        data['view'] = d['view']
+                        data['scenarioLevel'] = True
+                    else:
+                        data['view'] = d['viewString']          #view and scraped url extracted here
+                        data['scrapedurl'] = d['scrapedurl']
+                        data['scenarioLevel'] = False
                     if str(task) == 'OPEN BROWSER CH':
                         browsername = '1'
                     elif str(task) == 'OPEN BROWSER IE':
