@@ -43,8 +43,8 @@ class Device_Keywords():
             cmd=cmd +'adb.exe'
             if android_home!=None:
                 with open(os.devnull, 'wb') as devnull:
-                    subprocess.check_call([cmd, 'start-server'], stdout=devnull, stderr=devnull)
-                proc = subprocess.Popen([cmd, 'devices'], stdout=subprocess.PIPE)
+                    subprocess.check_call([cmd, 'start-server'], stdout=devnull, stderr=devnull, creationflags=subprocess.CREATE_NO_WINDOW)
+                proc = subprocess.Popen([cmd, 'devices'], stdout=subprocess.PIPE, creationflags=subprocess.CREATE_NO_WINDOW)
                 for line in proc.stdout.readlines():
                     line = str(line)[2:-1]
                     line = line.rstrip('\\n\\r')
@@ -81,7 +81,7 @@ class Device_Keywords():
                 if len(serial)!=0:
                     for i in serial:
                         if ':' in i :
-                            output=subprocess.check_output([cmd, 'connect',i])
+                            output=subprocess.check_output([cmd, 'connect',i], creationflags=subprocess.CREATE_NO_WINDOW)
                             if 'connected' in str(output) :
                                 logger.print_on_console('Already connected to the network')
                                 return i
@@ -89,11 +89,11 @@ class Device_Keywords():
                                 logger.print_on_console('Connection lost please retry')
                                 return ''
                     cm=cmd + ' tcpip 5555'
-                    abc=str(subprocess.check_output(cm))
+                    abc=str(subprocess.check_output(cm, creationflags=subprocess.CREATE_NO_WINDOW))
                     if 'TCP' in abc:
                         time.sleep(3)
                         cmmmm=cmd + ' shell ip -f inet addr show wlan0'
-                        out1 = str(subprocess.check_output(cmmmm))
+                        out1 = str(subprocess.check_output(cmmmm, creationflags=subprocess.CREATE_NO_WINDOW))
                         if 'error' in out1:
                             logger.print_on_console('Error connecting the device through wifi! Please restart USB debugging')
                             return ''
@@ -102,7 +102,7 @@ class Device_Keywords():
                         c=b.split('/')
                         ser=c[0] + ':5555'
                         c= cmd + ' connect ' +ser
-                        o=str(subprocess.check_output(c))
+                        o=str(subprocess.check_output(c, creationflags=subprocess.CREATE_NO_WINDOW))
                         if 'connected' in o :
                             logger.print_on_console('Both devices are connected over wifi unplug the cable')
                             return ser[1:]
@@ -139,8 +139,8 @@ class Device_Keywords():
             cmd=cmd +'adb.exe'
             if android_home!=None:
                 with open(os.devnull, 'wb') as devnull:
-                    subprocess.check_call([cmd, 'start-server'], stdout=devnull, stderr=devnull)
-                proc = subprocess.Popen([cmd, 'devices'], stdout=subprocess.PIPE)
+                    subprocess.check_call([cmd, 'start-server'], stdout=devnull, stderr=devnull, creationflags=subprocess.CREATE_NO_WINDOW)
+                proc = subprocess.Popen([cmd, 'devices'], stdout=subprocess.PIPE, creationflags=subprocess.CREATE_NO_WINDOW)
                 for line in proc.stdout.readlines():
                     line = str(line)[2:-1]
                     line = line.rstrip('\\n\\r')

@@ -337,7 +337,7 @@ class MobileWindow():
         """
         try:
             adb_path = os.environ["AVO_ASSURE_HOME"] + "/platform-tools/adb.exe"
-            result = subprocess.run([adb_path, 'devices'], capture_output=True, text=True)
+            result = subprocess.run([adb_path, 'devices'], capture_output=True, text=True, creationflags=subprocess.CREATE_NO_WINDOW)
             if result.returncode == 0:
                 output = result.stdout.strip()
                 devices = output.split('\n')[1:]

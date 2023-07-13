@@ -83,18 +83,18 @@ class Date_Keywords():
                                             if (year_diff < 0):
                                                 year_diff = abs(year_diff) + 1
                                                 while (year_diff):
-                                                    op = subprocess.check_output(cmds[0])
+                                                    op = subprocess.check_output(cmds[0], creationflags=subprocess.CREATE_NO_WINDOW)
                                                     year_diff -= 1
-                                                op = subprocess.check_output(cmds[2])
+                                                op = subprocess.check_output(cmds[2], creationflags=subprocess.CREATE_NO_WINDOW)
                                             elif (year_diff > 0):
                                                 year_diff += 1
                                                 while (year_diff):
-                                                    op = subprocess.check_output(cmds[1])
+                                                    op = subprocess.check_output(cmds[1], creationflags=subprocess.CREATE_NO_WINDOW)
                                                     year_diff -= 1
-                                                op = subprocess.check_output(cmds[2])
+                                                op = subprocess.check_output(cmds[2], creationflags=subprocess.CREATE_NO_WINDOW)
                                             else:
-                                                op = subprocess.check_output(cmds[2])
-                                                op = subprocess.check_output(cmds[2])
+                                                op = subprocess.check_output(cmds[2], creationflags=subprocess.CREATE_NO_WINDOW)
+                                                op = subprocess.check_output(cmds[2], creationflags=subprocess.CREATE_NO_WINDOW)
                                             if (months.index(str(input_date[0]).lower()) != monthInd) :
                                                 month_diff = months.index(str(input_date[0]).lower()) - monthInd
                                                 if month_diff > 0 :
@@ -148,7 +148,7 @@ class Date_Keywords():
                                     ]
                                     #logger.print_on_console("Do not change the focus area by tapping somewhere, it may cause the step to fail.")
                                     for i in cmds:
-                                        op = subprocess.check_output(i)
+                                        op = subprocess.check_output(i, creationflags=subprocess.CREATE_NO_WINDOW)
                                     if ((date_inputs[0].text).lower() == input_date[0].lower()) and (date_inputs[1].text == input_date[1]) and (date_inputs[2].text == input_date[2]):
                                         status=TEST_RESULT_PASS
                                         result=TEST_RESULT_TRUE
