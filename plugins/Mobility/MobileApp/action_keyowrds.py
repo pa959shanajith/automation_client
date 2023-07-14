@@ -45,7 +45,7 @@ class Action_Key():
                 if input > 0 :
                     while True:
                         cmd = adb +' shell input keyevent 66'
-                        s = subprocess.check_output(cmd.split())
+                        s = subprocess.check_output(cmd.split(), creationflags=subprocess.CREATE_NO_WINDOW)
                         time.sleep(1)
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
@@ -59,7 +59,7 @@ class Action_Key():
                 if input > 0 :
                     while True:
                         cmd = adb +' shell input keyevent 20'
-                        s = subprocess.check_output(cmd.split())
+                        s = subprocess.check_output(cmd.split(), creationflags=subprocess.CREATE_NO_WINDOW)
                         time.sleep(1)
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
@@ -73,7 +73,7 @@ class Action_Key():
                 if input > 0 :
                     while True:
                         cmd = adb +' shell input keyevent 19'
-                        s = subprocess.check_output(cmd.split())
+                        s = subprocess.check_output(cmd.split(), creationflags=subprocess.CREATE_NO_WINDOW)
                         time.sleep(1)
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
@@ -88,7 +88,7 @@ class Action_Key():
                     while True:
 ##                        actions = ActionChains(android_scrapping.driver)
                         cmd = adb +' shell input keyevent 61'
-                        s = subprocess.check_output(cmd.split())
+                        s = subprocess.check_output(cmd.split(), creationflags=subprocess.CREATE_NO_WINDOW)
                         time.sleep(1)
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE

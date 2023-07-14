@@ -67,7 +67,7 @@ class InstallAndLaunch():
             if (SYSTEM_OS != 'Darwin'):
                 path = curdir + '/node_modules/appium/build/lib/main.js'
                 nodePath = os.environ["AVO_ASSURE_HOME"] + "/Lib/Drivers/node.exe"
-                proc = subprocess.Popen([nodePath, path], shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)
+                proc = subprocess.Popen([nodePath, path], shell=True, stdin=None, stdout=None, stderr=None, close_fds=True, creationflags=subprocess.CREATE_NO_WINDOW)
                 start = time.time()
                 timeout = 120 #tentative; as it depends on the system performance.
                 server_flag = False
@@ -90,7 +90,7 @@ class InstallAndLaunch():
             else:
                 path = curdir + '/node_modules/appium/build/lib/main.js'
                 nodePath = curdir + '/node_modules/node_appium'
-                proc = subprocess.Popen([nodePath, path], shell=False, stdin=None, stdout=None, stderr=None, close_fds=True)
+                proc = subprocess.Popen([nodePath, path], shell=False, stdin=None, stdout=None, stderr=None, close_fds=True, creationflags=subprocess.CREATE_NO_WINDOW)
                 time.sleep(25) # psutil.net_connections() doesn't work on Mac, insearch of alternatives
                 logger.print_on_console('Server started')
                 return True
@@ -197,7 +197,7 @@ class InstallAndLaunch():
                 adb=os.environ['ANDROID_HOME']+"\\platform-tools\\adb.exe"
                 if dv_name is not None:
                     cmd = adb + ' -s '+ dv_name+' shell getprop ro.build.version.release '
-                s = subprocess.check_output(cmd.split(),universal_newlines=True).strip()
+                s = subprocess.check_output(cmd.split(),universal_newlines=True, creationflags=subprocess.CREATE_NO_WINDOW).strip()
                 if s==platform_ver:
                     res_2=TEST_RESULT_TRUE
                 else:
@@ -258,7 +258,7 @@ class InstallAndLaunch():
                 screenshot_img = Image.open("test_screenshot.png")
                 # original_width = driver.get_window_size()['width']
                 # original_height = driver.get_window_size()['height']
-                result = subprocess.run("adb shell wm size", stdout=subprocess.PIPE)   # device dimensions are retrieved through adb command because driver.get_window_size is giving wrong dimensions for some device ex. HTC
+                result = subprocess.run("adb shell wm size", stdout=subprocess.PIPE, creationflags=subprocess.CREATE_NO_WINDOW)   # device dimensions are retrieved through adb command because driver.get_window_size is giving wrong dimensions for some device ex. HTC
                 device_dimensions = result.stdout.decode("utf-8").split(" ")[-1].split("x")
                 original_width = int(device_dimensions[0])
                 original_height = int(device_dimensions[1])

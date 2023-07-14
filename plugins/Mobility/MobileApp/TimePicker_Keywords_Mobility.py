@@ -68,20 +68,20 @@ class Time_Keywords():
                                             cmd+' shell input keyevent 66'
                                         ]
                                         #logger.print_on_console("Do not change the focus area by tapping somewhere, it may cause the step to fail.")
-                                        subprocess.check_output(cmds[2])
-                                        subprocess.check_output(cmds[0])
+                                        subprocess.check_output(cmds[2], creationflags=subprocess.CREATE_NO_WINDOW)
+                                        subprocess.check_output(cmds[0], creationflags=subprocess.CREATE_NO_WINDOW)
                                         if (str(hr) == '1'):
-                                            subprocess.check_output(cmds[2])
-                                        subprocess.check_output(cmds[1])
-                                        subprocess.check_output(cmds[2])
+                                            subprocess.check_output(cmds[2], creationflags=subprocess.CREATE_NO_WINDOW)
+                                        subprocess.check_output(cmds[1], creationflags=subprocess.CREATE_NO_WINDOW)
+                                        subprocess.check_output(cmds[2], creationflags=subprocess.CREATE_NO_WINDOW)
                                         if (ampm == 'pm'):
-                                            subprocess.check_output(cmds[2])
-                                        subprocess.check_output(cmds[3])
-                                        subprocess.check_output(cmds[2])
-                                        subprocess.check_output(cmds[2])
-                                        subprocess.check_output(cmds[2])
+                                            subprocess.check_output(cmds[2], creationflags=subprocess.CREATE_NO_WINDOW)
+                                        subprocess.check_output(cmds[3], creationflags=subprocess.CREATE_NO_WINDOW)
+                                        subprocess.check_output(cmds[2], creationflags=subprocess.CREATE_NO_WINDOW)
+                                        subprocess.check_output(cmds[2], creationflags=subprocess.CREATE_NO_WINDOW)
+                                        subprocess.check_output(cmds[2], creationflags=subprocess.CREATE_NO_WINDOW)
                                         if (ampm == 'am'):
-                                            subprocess.check_output(cmds[2])
+                                            subprocess.check_output(cmds[2], creationflags=subprocess.CREATE_NO_WINDOW)
                                         element1=driver.find_elements_by_class_name('android.widget.TextView')
                                         AmorPm=driver.find_elements_by_class_name('android.widget.RadioButton')
                                         Hour=element1[0].text
@@ -117,7 +117,7 @@ class Time_Keywords():
                                     ]
                                     #logger.print_on_console("Do not change the focus area by tapping somewhere, it may cause the step to fail.")
                                     for i in cmds:
-                                        op = subprocess.check_output(i)
+                                        op = subprocess.check_output(i, creationflags=subprocess.CREATE_NO_WINDOW)
                                     if ((time_inputs[0].text == input_time[0]) and (time_inputs[1].text == input_time[1]) and (time_inputs[2].text == input_time[2])):
                                         status=TEST_RESULT_PASS
                                         result=TEST_RESULT_TRUE

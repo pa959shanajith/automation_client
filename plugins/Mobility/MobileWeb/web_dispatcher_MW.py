@@ -449,7 +449,7 @@ class Dispatcher:
                 if execution_env['env'] == 'default':
                     adb=os.environ['ANDROID_HOME']+"\\platform-tools\\adb.exe"
                     cmd = adb + ' -s '+ browser_info['deviceName']+ ' shell dumpsys package com.android.chrome | grep "versionName"'
-                    s = subprocess.check_output(cmd.split(),universal_newlines=True).strip()
+                    s = subprocess.check_output(cmd.split(),universal_newlines=True, creationflags=subprocess.CREATE_NO_WINDOW).strip()
                     reporting_obj.browser_version=s.split("=")[1]
                 reporting_obj.browser_type=browser_info.get('browserName')
                 log.info(reporting_obj.browser_version)
@@ -468,7 +468,7 @@ class Dispatcher:
                 if execution_env['env'] == 'default':
                     adb=os.environ['ANDROID_HOME']+"\\platform-tools\\adb.exe"
                     cmd = adb + ' -s '+ browser_info['deviceName']+ ' shell dumpsys package com.android.chrome | grep "versionName"'
-                    s = subprocess.check_output(cmd.split(),universal_newlines=True).strip()
+                    s = subprocess.check_output(cmd.split(),universal_newlines=True, creationflags=subprocess.CREATE_NO_WINDOW).strip()
                     reporting_obj.browser_version=s.split("=")[1]
                 reporting_obj.browser_type=browser_info.get('browserName')
                 log.info(reporting_obj.browser_version)

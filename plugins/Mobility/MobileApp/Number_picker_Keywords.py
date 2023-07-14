@@ -48,7 +48,7 @@ class Number_Picker():
                             cmd = android_home + '\\platform-tools\\'
                             os.chdir(cmd)
                             cmd = cmd + 'adb.exe shell input keyevent 61'
-                            op = subprocess.check_output(cmd)
+                            op = subprocess.check_output(cmd, creationflags=subprocess.CREATE_NO_WINDOW)
                             configvalues = readconfig.configvalues
                             hide_soft_key = configvalues['hide_soft_key']
                             if android_scrapping.driver.is_keyboard_shown() and hide_soft_key == "Yes":
