@@ -257,7 +257,7 @@ class ScrapeWindow(wx.Frame):
             self.startbutton.SetLabel("Stop Capture")        
             try:
                 if(self.selected_choice.lower()=="full"):
-                    folder_path = os.environ["AVO_ASSURE_HOME"] + '/avoAssureClient_Mobile'
+                    folder_path = os.environ["AVO_ASSURE_HOME"] + os.sep +'avoAssureClient_Mobile'
                     command = "npm start"
                     self.process = subprocess.Popen(command, shell=True, cwd=folder_path)
                 else:
@@ -272,9 +272,9 @@ class ScrapeWindow(wx.Frame):
                 if(self.selected_choice.lower()=="full"):
                     if self.process.poll() is None:
                             subprocess.call(["taskkill", "/F", "/T", "/PID", str(self.process.pid)])
-                    folder_path = os.environ["AVO_ASSURE_HOME"] + '/avoAssureClient_Mobile'
+                    folder_path = os.environ["AVO_ASSURE_HOME"] + os.sep +'avoAssureClient_Mobile'
                     file_name = 'scraped_data.json'
-                    file_path = folder_path + '/' + file_name
+                    file_path = folder_path + os.sep + file_name
 
                     with open(file_path) as file:
                         # Step 2: Parse the JSON data
