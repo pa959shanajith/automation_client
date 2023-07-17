@@ -154,8 +154,11 @@ class MainNamespace(BaseNamespace):
                                         f.seek(0)
                                         json.dump(data, f, indent=4)
                                         f.truncate()
-                                        logger.print_on_console("Your license is upgraded, Please restart Avo Assure client to continue.")
-                                        wx.MessageBox("Your license is upgraded, Please restart Avo Assure client to continue.")
+                                        # By default configItem is disabled for trial users.
+                                        # Here we enabling(LicenseType != "trial") or disabling(LicenseType == "trial") it by user license without restarting the application ice
+                                        wx.CallAfter(cw.Enable_configItem)
+                                        log.info("The licence you have has changed.")
+                                        logger.print_on_console("Your license is modified")
                             except Exception as e:
                                 log.error(e)
                                 log.info("Error occurred while changing isTrail value in config.json")
