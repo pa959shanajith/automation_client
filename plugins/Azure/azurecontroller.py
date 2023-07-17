@@ -125,12 +125,14 @@ class AzureWindow():
             response_area = requests.get(area_url, headers=headers)
             if response_area.status_code == 200:
                 data_area = response_area.json()
-                area_paths = [{'id':node['id'],'name':node['name']} for node in data_area['children']]
+                if 'children' in data_area:
+                    area_paths = [{'id':node['id'],'name':node['name']} for node in data_area['children']]
 
             response_iteration = requests.get(iteration_url, headers=headers)
             if response_iteration.status_code == 200:
                 data_iteration = response_iteration.json()
-                iteration_paths = [{'id':node['id'],'name':node['name']} for node in data_iteration['children']]
+                if 'children' in data_iteration:
+                    iteration_paths = [{'id':node['id'],'name':node['name']} for node in data_iteration['children']]
 
             endpoint_url = f'{org_url}/{project_name}/_apis/wit/workitemtypes/{issue_type}/fields?$expand=all&api-version=7.0'
 
