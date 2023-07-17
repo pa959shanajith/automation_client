@@ -139,7 +139,7 @@ class MainNamespace(BaseNamespace):
                             allow_connect = True
                             plugins_list = response['plugins']
                             try:
-                                isTrial_val = configvalues.get("isTrial")
+                                isTrial_val = readconfig.readConfig().readJson().get('isTrial')
                                 LicenseType = response["license_data"]["LicenseTypes"].lower()
                                 config_path = os.environ["AVO_ASSURE_HOME"]+os.sep+"assets"+os.sep+"config.json"
                                 isTrial_update = ''
@@ -156,7 +156,7 @@ class MainNamespace(BaseNamespace):
                                         f.truncate()
                                         # By default configItem is disabled for trial users.
                                         # Here we enabling(LicenseType != "trial") or disabling(LicenseType == "trial") it by user license without restarting the application ice
-                                        wx.CallAfter(cw.Enable_configItem)
+                                        wx.CallAfter(cw.Enable_configItem, isEnable = isTrial_update)
                                         log.info("The licence you have has changed.")
                                         logger.print_on_console("Your license is modified")
                             except Exception as e:
