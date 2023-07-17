@@ -227,7 +227,7 @@ class AzureWindow():
             endpoint_url = f'{org_url}/{project_name}/_apis/wit/wiql?api-version=6.1'
 
             # WIQL query to fetch all user stories
-            wiql_query = "SELECT * FROM WorkItems WHERE [System.WorkItemType] = 'User Story' ORDER BY [System.CreatedDate] DESC"
+            wiql_query = f"SELECT * FROM WorkItems WHERE [System.WorkItemType] = 'User Story' AND [System.TeamProject] = '{project_name}' ORDER BY [System.CreatedDate] DESC"
 
             # Request body with WIQL query
             body = {
