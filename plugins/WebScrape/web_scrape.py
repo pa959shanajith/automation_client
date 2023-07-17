@@ -28,17 +28,10 @@ checkWebPackage = None
 # Name: A sreenivaulu Date:02/08/2022
 # scraping is allowed for list of allowed_urls only if istrail=1  
 allowed_urls = readconfig.configvalues["sample_application_urls"]
-try:
-    isTrial = readconfig.configvalues["isTrial"]
-    # If a user's license is adjusted after reading isTrail from the readconfig file,
-    # the code below will update the isTrial value 
-    with open(CONFIG_PATH,'r') as conf_file:
-        data = json.load(conf_file)
-        isTrial = data['isTrial']
-except FileNotFoundError:
-    log.error(f"Config.json file not found at {CONFIG_PATH}")
-except Exception as e:
-    log.error(e)
+# If a user's license is adjusted after reading isTrail from the readconfig file,
+# the code below will update the isTrial value 
+isTrial = readconfig.readConfig().readJson().get('isTrial')
+
 
 class ScrapeWindow(wx.Frame):
 
