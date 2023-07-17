@@ -330,10 +330,6 @@ class ScrapeWindow(wx.Frame):
             tagfilter = {}
             for elem in d['view'][2]['notfoundobject']:
                 tagfilter[elem['tag']]=True
-            
-            if tagfilter =={}:
-                for elem in d['view'][1]['notchangedobject'] or d['view'][0]['changedobject']:
-                    tagfilter[elem['tag']]=True
                 
             xpathfilter = {}
             if self.data['scenarioLevel']==False:
