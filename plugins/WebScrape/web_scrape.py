@@ -320,7 +320,7 @@ class ScrapeWindow(wx.Frame):
                 event.GetEventObject().SetLabel("Comparing...")
             if event!=None:
                 self.comparebutton.Disable()
-            if (self.data['scenarioLevel']):
+            if ('scenarioLevel' in self.data):
                 currentScrapedData = self.data['view']
 
             else:
@@ -328,19 +328,15 @@ class ScrapeWindow(wx.Frame):
             
             d = obj.perform_compare(currentScrapedData)  #self.data is the current scraped objects
 
-            if (self.data['scenarioLevel']):
+            if ('scenarioLevel' in self.data):
                 d['orderlist']=currentScrapedData['orderlist']
                 
             tagfilter = {}
             for elem in d['view'][2]['notfoundobject']:
                 tagfilter[elem['tag']]=True
-            
-            if tagfilter =={}:
-                for elem in d['view'][1]['notchangedobject'] or d['view'][0]['changedobject']:
-                    tagfilter[elem['tag']]=True
                 
             xpathfilter = {}
-            if self.data['scenarioLevel']==False:
+            if not 'scenarioLevel' in self.data:
                 for elem in currentScrapedData['view']:
                     xpathfilter[elem['xpath'].split(';')[0]] = True
                 

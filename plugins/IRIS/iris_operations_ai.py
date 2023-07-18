@@ -150,7 +150,7 @@ def get_ocr(image):
 
     """Step 6: Load the image as a PIL/Pillow image, apply OCR, and then delete the temporary file"""
     try:
-        texxt_sentence='True'
+        texxt_sentence='False'
         import client
         text=client.api_request().extracttext(image,texxt_sentence)
         #text = pytesseract.image_to_string(cropped)
@@ -166,7 +166,7 @@ def get_ocr(image):
     #del image, rez_image, gray_img, filter_img, thresh_img, filename #deleting variables
     logger.print_on_console(text)
     #del cropped
-    return text[5]
+    return text[0][5]
 
 def hough_transform_p(img, pos):
     """
@@ -2625,7 +2625,7 @@ class IRISKeywords():
             # pyautogui.moveTo(x_new+ int(width/2),y_new + int(height/2))
 
             #text = get_ocr(img_crop)
-            text_sentence='True'
+            text_sentence='False'
 
             import client
             text =client.api_request().extracttext(im_b64,text_sentence)
