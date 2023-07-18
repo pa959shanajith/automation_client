@@ -142,8 +142,8 @@ class StepDescription:
             return "Perform String operation MID on string '" + input+ "' and save the value '" + output + "' in '"+ tsp.outputval + "'"
         def concatenate():
             return "Concatenate string '"+ input + "' and save the value '" + output + "' in '"+ tsp.outputval + "'"
-        def numberFormatter():
-            return "Format value'"+ input + "' and save the value '" + output + "' in '"+ tsp.outputval + "'"
+        def numberformatter():
+            return "Format value '"+ input + "' and save the value '" + output + "' in '"+ tsp.outputval + "'"
         def find():
             return "Verify input string '"+ input + "' contains '"+ inputval[1] + "'"
         def replace():
