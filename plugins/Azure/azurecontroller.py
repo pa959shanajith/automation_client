@@ -296,13 +296,13 @@ class AzureWindow():
                             logger.print_on_console("Connection error occurred with:"+ endpoint_url)
                             time.sleep(2)
                         else:
-                            # break
                             if respon.status_code == 200:
                                 JsonObject = respon.json()
                                 if len(JsonObject)>0:
                                     res = {}
                                     res['userStories'] = JsonObject['value']
                                     res['total_count'] = total_count
+                            break
                     
                     except Exception as e:
                         log.error(e)
