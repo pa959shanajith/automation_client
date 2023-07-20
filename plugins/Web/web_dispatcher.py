@@ -851,6 +851,8 @@ class Dispatcher:
                 web_element = getattr(driver,self.identifier_dict[identifiers_type])(f'//*[@id="{web_element_id}"]')
             else:
                 web_element = temp_element
+        elif len(temp_element) > 1:
+            local_Wd.log.info(f'More than one element found by Lable: {identifier}')
         return web_element
 
     def element_locator(self,driver,identifiers_type,identifier,id_num):
