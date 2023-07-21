@@ -141,24 +141,20 @@ class MainNamespace(BaseNamespace):
                             try:
                                 isTrial_val = readconfig.readConfig().readJson().get('isTrial')
                                 LicenseType = response["license_data"]["LicenseTypes"].lower()
-                                config_path = os.environ["AVO_ASSURE_HOME"]+os.sep+"assets"+os.sep+"config.json"
                                 isTrial_update = ''
                                 if LicenseType == "trial" and isTrial_val != 1:
                                     isTrial_update = 1
                                 if LicenseType != "trial" and isTrial_val != 0:
                                     isTrial_update = 0
+                                    wx.CallAfter(cw.configItem.Enable)
                                 if isTrial_update != '':
-                                    with open(config_path,'r+') as f:
-                                        data = json.load(f)
-                                        data['isTrial'] = int(isTrial_update)
-                                        f.seek(0)
-                                        json.dump(data, f, indent=4)
-                                        f.truncate()
-                                        # By default configItem is disabled for trial users.
-                                        # Here we enabling(LicenseType != "trial") or disabling(LicenseType == "trial") it by user license without restarting the application ice
-                                        wx.CallAfter(cw.Enable_configItem, isEnable = isTrial_update)
-                                        log.info("The licence you have has changed.")
-                                        logger.print_on_console("Your license is modified")
+                                    configvalues["isTrial"] = isTrial_update
+                                    obj_readConfig_class = readconfig.readConfig()
+                                    obj_readConfig_class.updateconfig(configvalues)
+                                    # By default configItem is disabled for trial users.
+                                    # while connect, Here we enabling(LicenseType != "trial") or disabling(LicenseType == "trial") it by user license without restarting the application ice
+                                    log.info("The licence you have has changed.")
+                                    logger.print_on_console("Your license is modified")
                             except Exception as e:
                                 log.error(e)
                                 log.info("Error occurred while changing isTrail value in config.json")
