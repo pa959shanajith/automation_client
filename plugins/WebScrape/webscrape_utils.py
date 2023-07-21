@@ -385,8 +385,14 @@ class WebScrape_Utils:
                                 }
                             }
                             else if (selector == '' && childSelector == '') {
-                                childSelector = tag;
-                                parentFlag = true;
+                                let tagIndex = getElementCount(ele, tag);
+                                if (document.querySelectorAll(`${tag}${tagIndex}`).length == 1) {
+                                    selector = `${tag}${tagIndex}`;
+                                }
+                                else {
+                                    childSelector = tag;
+                                    parentFlag = true;
+                                }
                             }
                         }
                         else {
@@ -1579,7 +1585,7 @@ class WebScrape_Utils:
                             if (ele != null && ele.attributes.length) {
                                 let [nodes, values] = getAttr(ele);
                                 for (let index=0; index < nodes.length; index++) {
-                                    if (values[index] != '' && values[index] != 'AvoAssureBorderHighlight' && values[index] != 'AvoAssure_Highlight') {
+                                    if (values[index] != '' && !(values[index].includes('AvoAssure'))) {
                                         let elementCount = '';
                                         if (nodes[index] == 'class') {
                                             elementCount = document.querySelectorAll(`${tag}[${nodes[index]}="${values[index]}"]`).length + document.querySelectorAll(`${tag}[${nodes[index]}="${values[index]} AvoAssure_Highlight"]`).length;
@@ -1593,11 +1599,11 @@ class WebScrape_Utils:
                                         }
                                     }
                                 }
-                                if (selector == '' && !parentFlag && nodes.length != 0 && values.slice(-1) != '' && values.slice(-1) != 'AvoAssureBorderHighlight' && values.slice(-1) != 'AvoAssure_Highlight') {
+                                if (selector == '' && !parentFlag && nodes.length != 0 && values.slice(-1) != '' && !(values.slice(-1).includes('AvoAssure'))) {
                                     childSelector = `${tag}[${nodes.slice(-1)}="${values.slice(-1)}"]`;
                                     parentFlag = true;
                                 }
-                                else if (selector == '' && nodes.length != 0 && (values.slice(-1) == '' || values.slice(-1) != 'AvoAssureBorderHighlight' || values.slice(-1) != 'AvoAssure_Highlight')) {
+                                else if (selector == '' && nodes.length != 0 && (values.slice(-1) == '' || !(values.slice(-1).includes('AvoAssure')))) {
                                     if (childSelector == '' && nodes.length > 1 && nodes.slice(-1) == 'class') {
                                         childSelector = `${tag}[${nodes[nodes.length-2]}="${values[values.length-2]}"]`;
                                         parentFlag = true;
@@ -1614,8 +1620,14 @@ class WebScrape_Utils:
                                     }
                                 }
                                 else if (selector == '' && childSelector == '') {
-                                    childSelector = tag;
-                                    parentFlag = true;
+                                    let tagIndex = getElementCount(ele, tag);
+                                    if (document.querySelectorAll(`${tag}${tagIndex}`).length == 1) {
+                                        selector = `${tag}${tagIndex}`;
+                                    }
+                                    else {
+                                        childSelector = tag;
+                                        parentFlag = true;
+                                    }
                                 }
                             }
                             else {
@@ -2263,8 +2275,14 @@ return (temp);"""
                             }
                         }
                         else if (selector == '' && childSelector == '') {
-                            childSelector = tag;
-                            parentFlag = true;
+                            let tagIndex = getElementCount(ele, tag);
+                            if (document.querySelectorAll(`${tag}${tagIndex}`).length == 1) {
+                                selector = `${tag}${tagIndex}`;
+                            }
+                            else {
+                                childSelector = tag;
+                                parentFlag = true;
+                            }
                         }
                     }
                     else {
