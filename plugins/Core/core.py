@@ -139,7 +139,7 @@ class MainNamespace(BaseNamespace):
                             allow_connect = True
                             plugins_list = response['plugins']
                             try:
-                                isTrial_val = readconfig.readConfig().readJson().get('isTrial')
+                                isTrial_val = configvalues["isTrial"]
                                 LicenseType = response["license_data"]["LicenseTypes"].lower()
                                 isTrial_update = ''
                                 if LicenseType == "trial" and isTrial_val != 1:
